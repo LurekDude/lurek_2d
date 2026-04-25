@@ -2,101 +2,187 @@
 
 **Generated**: 2026-04-25
 **Mode**: hybrid
-**Total API functions**: 4067
+**Total API functions**: 4379
 
 ## Summary
 
 | Metric | Value |
 |--------|-------|
-| Marker-covered | 477 |
-| Heuristic-covered | 3534 |
-| Total covered | 4011 |
-| Coverage | 98.6% |
+| Marker-covered | 229 |
+| Heuristic-covered | 4002 |
+| Total covered | 4255 |
+| Coverage | 97.2% |
 
 ## Per-Module Coverage
 
 | Module | Total | Marker | Heuristic | Covered | Coverage |
 |--------|-------|--------|-----------|---------|----------|
-| raycaster | 59 | 13 | 42 | 55 | 93.2% |
-| patterns | 170 | 22 | 140 | 162 | 95.3% |
+| compute | 77 | 5 | 59 | 64 | 83.1% |
+| patterns | 170 | 1 | 141 | 142 | 83.5% |
+| raycaster | 61 | 3 | 50 | 53 | 86.9% |
+| html | 59 | 1 | 51 | 52 | 88.1% |
+| math | 246 | 36 | 195 | 231 | 93.9% |
+| globe | 57 | 2 | 52 | 54 | 94.7% |
+| ecs | 63 | 1 | 59 | 60 | 95.2% |
+| data | 68 | 7 | 58 | 65 | 95.6% |
+| dataframe | 118 | 1 | 112 | 113 | 95.8% |
 | system | 26 | 5 | 20 | 25 | 96.2% |
-| dataframe | 116 | 7 | 105 | 112 | 96.6% |
+| animation | 63 | 1 | 60 | 61 | 96.8% |
 | i18n | 31 | 0 | 30 | 30 | 96.8% |
 | pipeline | 62 | 0 | 60 | 60 | 96.8% |
-| thread | 37 | 2 | 34 | 36 | 97.3% |
-| ai | 292 | 6 | 279 | 285 | 97.6% |
-| terminal | 83 | 0 | 81 | 81 | 97.6% |
-| render | 175 | 13 | 158 | 171 | 97.7% |
-| mods | 47 | 0 | 46 | 46 | 97.9% |
-| physics | 193 | 29 | 160 | 189 | 97.9% |
-| particle | 98 | 14 | 82 | 96 | 98.0% |
-| devtools | 54 | 34 | 19 | 53 | 98.1% |
-| effect | 158 | 7 | 148 | 155 | 98.1% |
-| ecs | 61 | 7 | 53 | 60 | 98.4% |
-| graph | 126 | 8 | 116 | 124 | 98.4% |
-| math | 220 | 64 | 153 | 217 | 98.6% |
-| compute | 77 | 17 | 59 | 76 | 98.7% |
-| tilemap | 168 | 12 | 154 | 166 | 98.8% |
-| pathfind | 90 | 8 | 81 | 89 | 98.9% |
-| audio | 215 | 23 | 191 | 214 | 99.5% |
-| animation | 53 | 10 | 43 | 53 | 100.0% |
+| thread | 37 | 1 | 35 | 36 | 97.3% |
+| terminal | 87 | 0 | 85 | 85 | 97.7% |
+| ai | 322 | 3 | 312 | 315 | 97.8% |
+| particle | 100 | 1 | 97 | 98 | 98.0% |
+| physics | 205 | 12 | 189 | 201 | 98.0% |
+| render | 197 | 7 | 186 | 193 | 98.0% |
+| effect | 158 | 0 | 155 | 155 | 98.1% |
+| mods | 53 | 0 | 52 | 52 | 98.1% |
+| scene | 55 | 4 | 50 | 54 | 98.2% |
+| devtools | 58 | 33 | 24 | 57 | 98.3% |
+| tween | 58 | 7 | 50 | 57 | 98.3% |
+| graph | 126 | 1 | 123 | 124 | 98.4% |
+| pathfind | 94 | 3 | 90 | 93 | 98.9% |
+| tilemap | 188 | 3 | 183 | 186 | 98.9% |
+| audio | 219 | 19 | 199 | 218 | 99.5% |
 | automation | 28 | 0 | 28 | 28 | 100.0% |
-| camera | 47 | 4 | 43 | 47 | 100.0% |
-| data | 62 | 10 | 52 | 62 | 100.0% |
+| camera | 49 | 2 | 47 | 49 | 100.0% |
 | debugbridge | 14 | 14 | 0 | 14 | 100.0% |
-| docs | 75 | 12 | 63 | 75 | 100.0% |
+| docs | 85 | 12 | 73 | 85 | 100.0% |
 | engine | 10 | 1 | 9 | 10 | 100.0% |
-| event | 26 | 4 | 22 | 26 | 100.0% |
-| filesystem | 54 | 5 | 49 | 54 | 100.0% |
-| globe | 53 | 5 | 48 | 53 | 100.0% |
-| image | 80 | 39 | 41 | 80 | 100.0% |
-| input | 81 | 0 | 81 | 81 | 100.0% |
-| light | 86 | 1 | 85 | 86 | 100.0% |
+| event | 26 | 2 | 24 | 26 | 100.0% |
+| filesystem | 60 | 5 | 55 | 60 | 100.0% |
+| image | 90 | 3 | 87 | 90 | 100.0% |
+| input | 87 | 0 | 87 | 87 | 100.0% |
+| light | 90 | 1 | 89 | 90 | 100.0% |
 | log | 18 | 0 | 18 | 18 | 100.0% |
-| minimap | 76 | 7 | 69 | 76 | 100.0% |
-| network | 47 | 2 | 45 | 47 | 100.0% |
+| minimap | 76 | 1 | 75 | 76 | 100.0% |
+| network | 51 | 0 | 51 | 51 | 100.0% |
 | parallax | 44 | 2 | 42 | 44 | 100.0% |
 | procgen | 18 | 2 | 16 | 18 | 100.0% |
-| save | 26 | 5 | 21 | 26 | 100.0% |
-| scene | 53 | 5 | 48 | 53 | 100.0% |
+| save | 28 | 1 | 27 | 28 | 100.0% |
 | serial | 10 | 2 | 8 | 10 | 100.0% |
-| spine | 30 | 10 | 20 | 30 | 100.0% |
-| sprite | 20 | 0 | 20 | 20 | 100.0% |
-| timer | 47 | 4 | 43 | 47 | 100.0% |
-| tween | 35 | 7 | 28 | 35 | 100.0% |
-| ui | 366 | 30 | 336 | 366 | 100.0% |
+| spine | 34 | 1 | 33 | 34 | 100.0% |
+| sprite | 24 | 0 | 24 | 24 | 100.0% |
+| timer | 49 | 4 | 45 | 49 | 100.0% |
+| ui | 380 | 14 | 366 | 380 | 100.0% |
 | window | 50 | 5 | 45 | 50 | 100.0% |
 
 ## Uncovered Functions (lowest coverage first)
 
-### raycaster (93.2%)
+### compute (83.1%)
 
-- `Raycaster:drawView` (method)
-- `Raycaster:drawDepthMap` (method)
-- `Raycaster:drawLineOfSight` (method)
-- `Raycaster:drawCameraSweep` (method)
+- `LArray:get` (method)
+- `LArray:set` (method)
+- `LArray:pow` (method)
+- `LArray:abs` (method)
+- `LArray:neg` (method)
+- `LArray:any` (method)
+- `LArray:all` (method)
+- `LArray:sum` (method)
+- `LArray:min` (method)
+- `LArray:max` (method)
+- `LArray:dot` (method)
+- `LArray:eigenPower` (method)
+- `LArray:map` (method)
 
-### patterns (95.3%)
+### patterns (83.5%)
 
-- `Queue:len` (method)
-- `List:add` (method)
-- `List:get` (method)
-- `List:set` (method)
-- `List:len` (method)
-- `Set:add` (method)
-- `Set:has` (method)
-- `Set:len` (method)
+- `LEventBus:on` (method)
+- `LEventBus:off` (method)
+- `LObjectPool:add` (method)
+- `LServiceLocator:has` (method)
+- `LFactory:has` (method)
+- `LBlackboard:set` (method)
+- `LBlackboard:get` (method)
+- `LBlackboard:has` (method)
+- `LObserver:set` (method)
+- `LObserver:get` (method)
+- `LPriorityQueue:pop` (method)
+- `LPriorityQueue:len` (method)
+- `LRing:sum` (method)
+- `LRing:len` (method)
+- `LMediator:on` (method)
+- `LMediator:off` (method)
+- `LStrategy:set` (method)
+- `LStrategy:has` (method)
+- `LStack:pop` (method)
+- `LStack:len` (method)
+- ... and 8 more
+
+### raycaster (86.9%)
+
+- `LPointLight:x` (method)
+- `LPointLight:y` (method)
+- `LPointLight:set` (method)
+- `LRaycaster:drawView` (method)
+- `LRaycaster:drawDepthMap` (method)
+- `LRaycaster:drawLineOfSight` (method)
+- `LRaycaster:drawCameraSweep` (method)
+- `LSpriteManager:add` (method)
+
+### html (88.1%)
+
+- `lurek.html.preventDefault` (function)
+- `lurek.html.stopPropagation` (function)
+- `lurek.html.isDefaultPrevented` (function)
+- `LHtmlDocument:on` (method)
+- `LHtmlDocument:off` (method)
+- `LHtmlElement:on` (method)
+- `LHtmlElement:off` (method)
+
+### math (93.9%)
+
+- `LVec2:dot` (method)
+- `LVec2:x` (method)
+- `LVec2:y` (method)
+- `LVec3:dot` (method)
+- `LVec3:add` (method)
+- `LVec3:sub` (method)
+- `LCatmullRom:len` (method)
+- `LTween:set` (method)
+- `LNoiseGenerator:worley3d` (method)
+- `LNoiseGenerator:fbm` (method)
+- `LNoiseGenerator:warpDomain` (method)
+- `LNoiseGenerator:generateMap` (method)
+- `LCircle:x` (method)
+- `LCircle:y` (method)
+- `LAabbTree:len` (method)
+
+### globe (94.7%)
+
+- `LGlobe:pan` (method)
+- `LGlobeRegistry:new` (method)
+- `LGlobeRegistry:get` (method)
+
+### ecs (95.2%)
+
+- `LUniverse:set` (method)
+- `LUniverse:get` (method)
+- `LUniverse:has` (method)
+
+### data (95.6%)
+
+- `LRingBuffer:pop` (method)
+- `LRingBuffer:len` (method)
+- `LDataWriter:len` (method)
+
+### dataframe (95.8%)
+
+- `LDataFrame:sum` (method)
+- `LDataFrame:min` (method)
+- `LDataFrame:max` (method)
+- `LDataFrame:withRollingMin` (method)
+- `LDataFrame:withRollingMax` (method)
 
 ### system (96.2%)
 
 - `lurek.runtime.log` (function)
 
-### dataframe (96.6%)
+### animation (96.8%)
 
-- `DataFrame:min` (method)
-- `DataFrame:max` (method)
-- `DataFrame:withRollingMin` (method)
-- `DataFrame:withRollingMax` (method)
+- `LBlendLayerSet:len` (method)
+- `LAnimSyncGroup:add` (method)
 
 ### i18n (96.8%)
 
@@ -104,73 +190,72 @@
 
 ### pipeline (96.8%)
 
-- `Pipeline:run` (method)
-- `Pipeline:addSubPipeline` (method)
+- `LPipeline:run` (method)
+- `LPipeline:addSubPipeline` (method)
 
 ### thread (97.3%)
 
-- `Channel:pop` (method)
+- `LChannel:pop` (method)
 
-### ai (97.6%)
+### terminal (97.7%)
 
-- `AIBlackboard:has` (method)
-- `InfluenceMap:stampInfluence` (method)
-- `TraitProfile:set` (method)
-- `TraitProfile:get` (method)
-- `TraitProfile:has` (method)
-- `EmotionModel:add` (method)
-- `EmotionModel:get` (method)
-
-### terminal (97.6%)
-
-- `Terminal:set` (method)
-- `Terminal:get` (method)
-
-### render (97.7%)
-
-- `lurek.render.arc` (function)
-- `lurek.render.pop` (function)
-- `SpriteBatch:add` (method)
-- `Shape:arc` (method)
-
-### mods (97.9%)
-
-- `ContentRegistry:get` (method)
-
-### physics (97.9%)
-
-- `World:setJointMotorSpeed` (method)
-- `World:setJointLimitsEnabled` (method)
-- `World:setJointLimits` (method)
-- `World:setMouseJointTarget` (method)
-
-### particle (98.0%)
-
-- `Trail:setHeadColor` (method)
-- `Trail:setTailColor` (method)
-
-### devtools (98.1%)
-
-- `lurek.devtools.fatal` (function)
-
-### effect (98.1%)
-
-- `PostFxStack:add` (method)
-- `PostFxStack:len` (method)
-- `Overlay:triggerShake` (method)
+- `LTerminal:set` (method)
+- `LTerminal:get` (method)
 
 ## Orphaned Markers (typos or removed APIs)
 
+- `Animation:addClipFromGrid` in `tests/lua/evidence/test_animation_evidence.lua:54`
+- `Animation:play` in `tests/lua/evidence/test_animation_evidence.lua:55`
+- `Animation:update` in `tests/lua/evidence/test_animation_evidence.lua:56`
+- `Animation:getQuad` in `tests/lua/evidence/test_animation_evidence.lua:57`
+- `Animation:pollEvents` in `tests/lua/evidence/test_animation_evidence.lua:59`
+- `Animation:addClip` in `tests/lua/evidence/test_animation_evidence.lua:123`
+- `Animation:setSpeed` in `tests/lua/evidence/test_animation_evidence.lua:124`
+- `Animation:update` in `tests/lua/evidence/test_animation_evidence.lua:125`
+- `Animation:getQuad` in `tests/lua/evidence/test_animation_evidence.lua:126`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:10`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:11`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:12`
+- `SoundData:getDuration` in `tests/lua/evidence/test_audio_evidence.lua:15`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:48`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:49`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:80`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:81`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:108`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:109`
 - `AudioBus:setVolume` in `tests/lua/evidence/test_audio_evidence.lua:172`
 - `AudioBus:getVolume` in `tests/lua/evidence/test_audio_evidence.lua:173`
 - `AudioBus:setPitch` in `tests/lua/evidence/test_audio_evidence.lua:205`
 - `AudioBus:getPitch` in `tests/lua/evidence/test_audio_evidence.lua:206`
 - `AudioBus:setVolume` in `tests/lua/evidence/test_audio_evidence.lua:235`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:237`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:505`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:566`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:586`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:587`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:624`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:645`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:646`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:684`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:685`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:686`
+- `SoundData:getDuration` in `tests/lua/evidence/test_audio_evidence.lua:689`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:722`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:723`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:754`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:755`
+- `SoundData:setSample` in `tests/lua/evidence/test_audio_evidence.lua:782`
+- `SoundData:drawWaveform` in `tests/lua/evidence/test_audio_evidence.lua:783`
 - `AudioBus:setVolume` in `tests/lua/evidence/test_audio_evidence.lua:846`
 - `AudioBus:getVolume` in `tests/lua/evidence/test_audio_evidence.lua:847`
 - `AudioBus:setPitch` in `tests/lua/evidence/test_audio_evidence.lua:879`
 - `AudioBus:getPitch` in `tests/lua/evidence/test_audio_evidence.lua:880`
 - `AudioBus:setVolume` in `tests/lua/evidence/test_audio_evidence.lua:909`
+- `SoundData:getSample` in `tests/lua/evidence/test_audio_evidence.lua:911`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_bezier_evidence.lua:12`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_bezier_evidence.lua:13`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_bezier_evidence.lua:53`
+- `BezierCurve:getDerivative` in `tests/lua/evidence/test_bezier_evidence.lua:54`
 - `Camera:setViewport` in `tests/lua/evidence/test_camera_evidence.lua:60`
 - `Camera:setPosition` in `tests/lua/evidence/test_camera_evidence.lua:61`
 - `Camera:setZoom` in `tests/lua/evidence/test_camera_evidence.lua:62`
@@ -191,6 +276,237 @@
 - `Camera:shake` in `tests/lua/evidence/test_camera_evidence.lua:178`
 - `Camera:update` in `tests/lua/evidence/test_camera_evidence.lua:179`
 - `Camera:getPosition` in `tests/lua/evidence/test_camera_evidence.lua:180`
+- `LineChart:addSeries` in `tests/lua/evidence/test_charts_evidence.lua:12`
+- `LineChart:setYMax` in `tests/lua/evidence/test_charts_evidence.lua:13`
+- `LineChart:drawToImage` in `tests/lua/evidence/test_charts_evidence.lua:14`
+- `BarChart:addSeries` in `tests/lua/evidence/test_charts_evidence.lua:36`
+- `BarChart:addCategory` in `tests/lua/evidence/test_charts_evidence.lua:37`
+- `BarChart:drawToImage` in `tests/lua/evidence/test_charts_evidence.lua:38`
+- `ScatterPlot:addSeries` in `tests/lua/evidence/test_charts_evidence.lua:59`
+- `ScatterPlot:setXRange` in `tests/lua/evidence/test_charts_evidence.lua:60`
+- `ScatterPlot:setYRange` in `tests/lua/evidence/test_charts_evidence.lua:61`
+- `ScatterPlot:drawToImage` in `tests/lua/evidence/test_charts_evidence.lua:62`
+- `PieChart:addSegment` in `tests/lua/evidence/test_charts_evidence.lua:86`
+- `PieChart:drawToImage` in `tests/lua/evidence/test_charts_evidence.lua:87`
+- `AreaChart:addLayer` in `tests/lua/evidence/test_charts_evidence.lua:106`
+- `AreaChart:setYMax` in `tests/lua/evidence/test_charts_evidence.lua:107`
+- `AreaChart:drawToImage` in `tests/lua/evidence/test_charts_evidence.lua:108`
+- `Overlay:triggerFlash` in `tests/lua/evidence/test_effect_evidence.lua:31`
+- `Overlay:getFlashAlpha` in `tests/lua/evidence/test_effect_evidence.lua:32`
+- `Overlay:update` in `tests/lua/evidence/test_effect_evidence.lua:33`
+- `Overlay:triggerFade` in `tests/lua/evidence/test_effect_evidence.lua:62`
+- `Overlay:update` in `tests/lua/evidence/test_effect_evidence.lua:63`
+- `Overlay:triggerFlash` in `tests/lua/evidence/test_effect_evidence.lua:92`
+- `Overlay:clear` in `tests/lua/evidence/test_effect_evidence.lua:93`
+- `Overlay:triggerLightning` in `tests/lua/evidence/test_effect_evidence.lua:94`
+- `Overlay:getFlashAlpha` in `tests/lua/evidence/test_effect_evidence.lua:95`
+- `Overlay:getLightningAlpha` in `tests/lua/evidence/test_effect_evidence.lua:96`
+- `ImageData:grayscale` in `tests/lua/evidence/test_effect_evidence.lua:171`
+- `ImageData:getPixel` in `tests/lua/evidence/test_effect_evidence.lua:172`
+- `ImageData:invert` in `tests/lua/evidence/test_effect_evidence.lua:184`
+- `ImageData:getPixel` in `tests/lua/evidence/test_effect_evidence.lua:185`
+- `ImageData:blur` in `tests/lua/evidence/test_effect_evidence.lua:199`
+- `ImageData:sepia` in `tests/lua/evidence/test_effect_evidence.lua:209`
+- `ImageData:grayscale` in `tests/lua/evidence/test_effect_evidence.lua:219`
+- `ImageData:sepia` in `tests/lua/evidence/test_effect_evidence.lua:220`
+- `ImageData:invert` in `tests/lua/evidence/test_effect_evidence.lua:221`
+- `ImageData:blur` in `tests/lua/evidence/test_effect_evidence.lua:222`
+- `ImageData:sharpen` in `tests/lua/evidence/test_effect_evidence.lua:223`
+- `ImageData:brightness` in `tests/lua/evidence/test_effect_evidence.lua:224`
+- `ImageData:contrast` in `tests/lua/evidence/test_effect_evidence.lua:225`
+- `ImageData:threshold` in `tests/lua/evidence/test_effect_evidence.lua:226`
+- `ImageData:posterize` in `tests/lua/evidence/test_effect_evidence.lua:263`
+- `ImageData:gamma` in `tests/lua/evidence/test_effect_evidence.lua:264`
+- `ImageData:tint` in `tests/lua/evidence/test_effect_evidence.lua:265`
+- `ImageData:saturation` in `tests/lua/evidence/test_effect_evidence.lua:277`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_effect_evidence.lua:278`
+- `Overlay:triggerFlash` in `tests/lua/evidence/test_effect_evidence.lua:386`
+- `Overlay:getFlashAlpha` in `tests/lua/evidence/test_effect_evidence.lua:387`
+- `Overlay:update` in `tests/lua/evidence/test_effect_evidence.lua:388`
+- `Overlay:triggerFade` in `tests/lua/evidence/test_effect_evidence.lua:417`
+- `Overlay:update` in `tests/lua/evidence/test_effect_evidence.lua:418`
+- `Overlay:triggerFlash` in `tests/lua/evidence/test_effect_evidence.lua:447`
+- `Overlay:clear` in `tests/lua/evidence/test_effect_evidence.lua:448`
+- `Overlay:triggerLightning` in `tests/lua/evidence/test_effect_evidence.lua:449`
+- `Overlay:getFlashAlpha` in `tests/lua/evidence/test_effect_evidence.lua:450`
+- `Overlay:getLightningAlpha` in `tests/lua/evidence/test_effect_evidence.lua:451`
+- `ImageData:grayscale` in `tests/lua/evidence/test_effect_evidence.lua:526`
+- `ImageData:getPixel` in `tests/lua/evidence/test_effect_evidence.lua:527`
+- `ImageData:invert` in `tests/lua/evidence/test_effect_evidence.lua:539`
+- `ImageData:getPixel` in `tests/lua/evidence/test_effect_evidence.lua:540`
+- `ImageData:blur` in `tests/lua/evidence/test_effect_evidence.lua:554`
+- `ImageData:sepia` in `tests/lua/evidence/test_effect_evidence.lua:564`
+- `ImageData:grayscale` in `tests/lua/evidence/test_effect_evidence.lua:574`
+- `ImageData:sepia` in `tests/lua/evidence/test_effect_evidence.lua:575`
+- `ImageData:invert` in `tests/lua/evidence/test_effect_evidence.lua:576`
+- `ImageData:blur` in `tests/lua/evidence/test_effect_evidence.lua:577`
+- `ImageData:sharpen` in `tests/lua/evidence/test_effect_evidence.lua:578`
+- `ImageData:brightness` in `tests/lua/evidence/test_effect_evidence.lua:579`
+- `ImageData:contrast` in `tests/lua/evidence/test_effect_evidence.lua:580`
+- `ImageData:threshold` in `tests/lua/evidence/test_effect_evidence.lua:581`
+- `ImageData:posterize` in `tests/lua/evidence/test_effect_evidence.lua:618`
+- `ImageData:gamma` in `tests/lua/evidence/test_effect_evidence.lua:619`
+- `ImageData:tint` in `tests/lua/evidence/test_effect_evidence.lua:620`
+- `ImageData:saturation` in `tests/lua/evidence/test_effect_evidence.lua:632`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_effect_evidence.lua:633`
+- `Graph:findPath` in `tests/lua/evidence/test_graph_evidence.lua:77`
+- `Graph:addNode` in `tests/lua/evidence/test_graph_evidence.lua:80`
+- `Graph:addEdge` in `tests/lua/evidence/test_graph_evidence.lua:81`
+- `Graph:findPath` in `tests/lua/evidence/test_graph_evidence.lua:110`
+- `HtmlDocument:getHtml` in `tests/lua/evidence/test_html_evidence.lua:13`
+- `HtmlDocument:setCss` in `tests/lua/evidence/test_html_evidence.lua:31`
+- `HtmlDocument:relayout` in `tests/lua/evidence/test_html_evidence.lua:32`
+- `HtmlElement:getRect` in `tests/lua/evidence/test_html_evidence.lua:33`
+- `HtmlDocument:queryAll` in `tests/lua/evidence/test_html_evidence.lua:57`
+- `HtmlElement:getText` in `tests/lua/evidence/test_html_evidence.lua:58`
+- `HtmlElement:addClass` in `tests/lua/evidence/test_html_evidence.lua:84`
+- `HtmlElement:hasClass` in `tests/lua/evidence/test_html_evidence.lua:85`
+- `HtmlElement:toggleClass` in `tests/lua/evidence/test_html_evidence.lua:86`
+- `HtmlDocument:on` in `tests/lua/evidence/test_html_evidence.lua:108`
+- `HtmlDocument:mousepressed` in `tests/lua/evidence/test_html_evidence.lua:109`
+- `HtmlDocument:setViewport` in `tests/lua/evidence/test_html_evidence.lua:130`
+- `HtmlDocument:getViewport` in `tests/lua/evidence/test_html_evidence.lua:131`
+- `ImageData:drawRect` in `tests/lua/evidence/test_image_evidence.lua:23`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:24`
+- `ImageData:drawLine` in `tests/lua/evidence/test_image_evidence.lua:57`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:58`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_image_evidence.lua:83`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:84`
+- `ImageData:drawRect` in `tests/lua/evidence/test_image_evidence.lua:110`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_image_evidence.lua:111`
+- `ImageData:drawLine` in `tests/lua/evidence/test_image_evidence.lua:112`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:113`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:219`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:220`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:233`
+- `ImageData:contrast` in `tests/lua/evidence/test_image_evidence.lua:243`
+- `ImageData:contrast` in `tests/lua/evidence/test_image_evidence.lua:253`
+- `ImageData:saturation` in `tests/lua/evidence/test_image_evidence.lua:263`
+- `ImageData:saturation` in `tests/lua/evidence/test_image_evidence.lua:273`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:283`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:284`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:295`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:305`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:315`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:325`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:335`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:345`
+- `ImageData:gamma` in `tests/lua/evidence/test_image_evidence.lua:355`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:369`
+- `ImageData:drawRect` in `tests/lua/evidence/test_image_evidence.lua:409`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:410`
+- `ImageData:drawLine` in `tests/lua/evidence/test_image_evidence.lua:443`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:444`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_image_evidence.lua:469`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:470`
+- `ImageData:drawRect` in `tests/lua/evidence/test_image_evidence.lua:496`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_image_evidence.lua:497`
+- `ImageData:drawLine` in `tests/lua/evidence/test_image_evidence.lua:498`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:499`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:605`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:606`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:619`
+- `ImageData:contrast` in `tests/lua/evidence/test_image_evidence.lua:629`
+- `ImageData:contrast` in `tests/lua/evidence/test_image_evidence.lua:639`
+- `ImageData:saturation` in `tests/lua/evidence/test_image_evidence.lua:649`
+- `ImageData:saturation` in `tests/lua/evidence/test_image_evidence.lua:659`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:669`
+- `ImageData:getPixel` in `tests/lua/evidence/test_image_evidence.lua:670`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:681`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:691`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:701`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:711`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:721`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:731`
+- `ImageData:gamma` in `tests/lua/evidence/test_image_evidence.lua:741`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:755`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:786`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:802`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:815`
+- `ImageData:mapPixel` in `tests/lua/evidence/test_image_evidence.lua:816`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:832`
+- `ImageData:crop` in `tests/lua/evidence/test_image_evidence.lua:833`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:847`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_image_evidence.lua:848`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:862`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_image_evidence.lua:863`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:882`
+- `ImageData:rotate90cw` in `tests/lua/evidence/test_image_evidence.lua:883`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:908`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:909`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:910`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:911`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:912`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:913`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:914`
+- `ImageData:noise` in `tests/lua/evidence/test_image_evidence.lua:915`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:916`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:917`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:934`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:946`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:958`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:970`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:982`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:994`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:1006`
+- `ImageData:noise` in `tests/lua/evidence/test_image_evidence.lua:1018`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:1030`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:1042`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:1076`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:1092`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:1105`
+- `ImageData:mapPixel` in `tests/lua/evidence/test_image_evidence.lua:1106`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:1122`
+- `ImageData:crop` in `tests/lua/evidence/test_image_evidence.lua:1123`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:1137`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_image_evidence.lua:1138`
+- `ImageData:setPixel` in `tests/lua/evidence/test_image_evidence.lua:1152`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_image_evidence.lua:1153`
+- `ImageData:fill` in `tests/lua/evidence/test_image_evidence.lua:1172`
+- `ImageData:rotate90cw` in `tests/lua/evidence/test_image_evidence.lua:1173`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:1198`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:1199`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:1200`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:1201`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:1202`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:1203`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:1204`
+- `ImageData:noise` in `tests/lua/evidence/test_image_evidence.lua:1205`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:1206`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:1207`
+- `ImageData:grayscale` in `tests/lua/evidence/test_image_evidence.lua:1224`
+- `ImageData:invert` in `tests/lua/evidence/test_image_evidence.lua:1236`
+- `ImageData:sepia` in `tests/lua/evidence/test_image_evidence.lua:1248`
+- `ImageData:brightness` in `tests/lua/evidence/test_image_evidence.lua:1260`
+- `ImageData:threshold` in `tests/lua/evidence/test_image_evidence.lua:1272`
+- `ImageData:posterize` in `tests/lua/evidence/test_image_evidence.lua:1284`
+- `ImageData:tint` in `tests/lua/evidence/test_image_evidence.lua:1296`
+- `ImageData:noise` in `tests/lua/evidence/test_image_evidence.lua:1308`
+- `ImageData:blur` in `tests/lua/evidence/test_image_evidence.lua:1320`
+- `ImageData:sharpen` in `tests/lua/evidence/test_image_evidence.lua:1332`
+- `ImageData:fill` in `tests/lua/evidence/test_imagedata_evidence.lua:12`
+- `ImageData:setPixel` in `tests/lua/evidence/test_imagedata_evidence.lua:13`
+- `ImageData:getPixel` in `tests/lua/evidence/test_imagedata_evidence.lua:14`
+- `ImageData:drawRect` in `tests/lua/evidence/test_imagedata_evidence.lua:42`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_imagedata_evidence.lua:43`
+- `ImageData:drawLine` in `tests/lua/evidence/test_imagedata_evidence.lua:44`
+- `ImageData:blur` in `tests/lua/evidence/test_imagedata_evidence.lua:61`
+- `ImageData:brightness` in `tests/lua/evidence/test_imagedata_evidence.lua:62`
+- `ImageData:contrast` in `tests/lua/evidence/test_imagedata_evidence.lua:63`
+- `ImageData:grayscale` in `tests/lua/evidence/test_imagedata_evidence.lua:64`
+- `ImageData:getDimensions` in `tests/lua/evidence/test_imagedata_evidence.lua:97`
+- `ImageData:crop` in `tests/lua/evidence/test_imagedata_evidence.lua:98`
+- `LayeredImage:addLayer` in `tests/lua/evidence/test_layers_evidence.lua:12`
+- `LayeredImage:getLayer` in `tests/lua/evidence/test_layers_evidence.lua:13`
+- `LayeredImage:merge` in `tests/lua/evidence/test_layers_evidence.lua:14`
+- `LayeredImage:addLayer` in `tests/lua/evidence/test_layers_evidence.lua:45`
+- `LayeredImage:setOpacity` in `tests/lua/evidence/test_layers_evidence.lua:46`
+- `LayeredImage:getOpacity` in `tests/lua/evidence/test_layers_evidence.lua:47`
+- `LayeredImage:setVisible` in `tests/lua/evidence/test_layers_evidence.lua:48`
+- `LayeredImage:isVisible` in `tests/lua/evidence/test_layers_evidence.lua:49`
+- `LayeredImage:merge` in `tests/lua/evidence/test_layers_evidence.lua:50`
+- `LayeredImage:save` in `tests/lua/evidence/test_layers_evidence.lua:80`
+- `LayeredImage:swapLayers` in `tests/lua/evidence/test_layers_evidence.lua:81`
 - `LightSource:setColor` in `tests/lua/evidence/test_light_evidence.lua:10`
 - `LightSource:getPosition` in `tests/lua/evidence/test_light_evidence.lua:11`
 - `LightSource:getRadius` in `tests/lua/evidence/test_light_evidence.lua:12`
@@ -208,50 +524,424 @@
 - `LightSource:getRadius` in `tests/lua/evidence/test_light_evidence.lua:145`
 - `LightSource:getColor` in `tests/lua/evidence/test_light_evidence.lua:146`
 - `lurek.math.newVec2` in `tests/lua/evidence/test_math_evidence.lua:5`
+- `Vec2:length` in `tests/lua/evidence/test_math_evidence.lua:6`
+- `Vec2:normalize` in `tests/lua/evidence/test_math_evidence.lua:7`
+- `Vec2:dot` in `tests/lua/evidence/test_math_evidence.lua:8`
+- `Vec2:distance` in `tests/lua/evidence/test_math_evidence.lua:9`
 - `lurek.math.newVec2` in `tests/lua/evidence/test_math_evidence.lua:39`
+- `Vec2:normalize` in `tests/lua/evidence/test_math_evidence.lua:40`
 - `lurek.math.randomSeed` in `tests/lua/evidence/test_math_evidence.lua:63`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:111`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:124`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:125`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:144`
+- `ImageData:drawLine` in `tests/lua/evidence/test_math_evidence.lua:145`
+- `ImageData:drawRect` in `tests/lua/evidence/test_math_evidence.lua:146`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:147`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:179`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:180`
+- `ImageData:paste` in `tests/lua/evidence/test_math_evidence.lua:181`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:199`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:200`
+- `ImageData:noise` in `tests/lua/evidence/test_math_evidence.lua:201`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:216`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:217`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_math_evidence.lua:218`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:236`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:237`
+- `ImageData:flipVertical` in `tests/lua/evidence/test_math_evidence.lua:238`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:258`
+- `ImageData:rotate90cw` in `tests/lua/evidence/test_math_evidence.lua:259`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:273`
+- `ImageData:drawRect` in `tests/lua/evidence/test_math_evidence.lua:274`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:275`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:290`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:291`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_math_evidence.lua:292`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:307`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:308`
+- `ImageData:mapPixel` in `tests/lua/evidence/test_math_evidence.lua:309`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:330`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:331`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:332`
+- `ImageData:blur` in `tests/lua/evidence/test_math_evidence.lua:333`
 - `lurek.math.perlinFast` in `tests/lua/evidence/test_math_evidence.lua:348`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:350`
 - `lurek.math.simplex` in `tests/lua/evidence/test_math_evidence.lua:371`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:373`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:419`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:432`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:433`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:452`
+- `ImageData:drawLine` in `tests/lua/evidence/test_math_evidence.lua:453`
+- `ImageData:drawRect` in `tests/lua/evidence/test_math_evidence.lua:454`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:455`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:487`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:488`
+- `ImageData:paste` in `tests/lua/evidence/test_math_evidence.lua:489`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:507`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:508`
+- `ImageData:noise` in `tests/lua/evidence/test_math_evidence.lua:509`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:524`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:525`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_math_evidence.lua:526`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:544`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:545`
+- `ImageData:flipVertical` in `tests/lua/evidence/test_math_evidence.lua:546`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:566`
+- `ImageData:rotate90cw` in `tests/lua/evidence/test_math_evidence.lua:567`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:581`
+- `ImageData:drawRect` in `tests/lua/evidence/test_math_evidence.lua:582`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:583`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:598`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:599`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_math_evidence.lua:600`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:615`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:616`
+- `ImageData:mapPixel` in `tests/lua/evidence/test_math_evidence.lua:617`
+- `ImageData:fill` in `tests/lua/evidence/test_math_evidence.lua:638`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_math_evidence.lua:639`
+- `ImageData:crop` in `tests/lua/evidence/test_math_evidence.lua:640`
+- `ImageData:blur` in `tests/lua/evidence/test_math_evidence.lua:641`
 - `lurek.math.perlinFast` in `tests/lua/evidence/test_math_evidence.lua:656`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:658`
 - `lurek.math.simplex` in `tests/lua/evidence/test_math_evidence.lua:679`
+- `ImageData:setPixel` in `tests/lua/evidence/test_math_evidence.lua:681`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:756`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:757`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:758`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:787`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:788`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:789`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:817`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:818`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:819`
+- `BezierCurve:getDerivative` in `tests/lua/evidence/test_math_evidence.lua:864`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:865`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:945`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:946`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:947`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:976`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:977`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:978`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:1006`
+- `BezierCurve:getControlPointCount` in `tests/lua/evidence/test_math_evidence.lua:1007`
+- `BezierCurve:getControlPoint` in `tests/lua/evidence/test_math_evidence.lua:1008`
+- `BezierCurve:getDerivative` in `tests/lua/evidence/test_math_evidence.lua:1053`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_math_evidence.lua:1054`
+- `NoiseGenerator:perlin2d` in `tests/lua/evidence/test_math_evidence.lua:1334`
+- `NoiseGenerator:simplex2d` in `tests/lua/evidence/test_math_evidence.lua:1354`
+- `NoiseGenerator:fbm` in `tests/lua/evidence/test_math_evidence.lua:1374`
+- `NoiseGenerator:worley2d` in `tests/lua/evidence/test_math_evidence.lua:1394`
+- `NoiseGenerator:ridged` in `tests/lua/evidence/test_math_evidence.lua:1414`
+- `NoiseGenerator:turbulence` in `tests/lua/evidence/test_math_evidence.lua:1434`
+- `NoiseGenerator:perlin2d` in `tests/lua/evidence/test_math_evidence.lua:1476`
+- `NoiseGenerator:simplex2d` in `tests/lua/evidence/test_math_evidence.lua:1496`
+- `NoiseGenerator:fbm` in `tests/lua/evidence/test_math_evidence.lua:1516`
+- `NoiseGenerator:worley2d` in `tests/lua/evidence/test_math_evidence.lua:1536`
+- `NoiseGenerator:ridged` in `tests/lua/evidence/test_math_evidence.lua:1556`
+- `NoiseGenerator:turbulence` in `tests/lua/evidence/test_math_evidence.lua:1576`
+- `Minimap:setTerrainColor` in `tests/lua/evidence/test_minimap_evidence.lua:20`
+- `Minimap:setTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:21`
+- `Minimap:getTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:22`
+- `Minimap:setFogEnabled` in `tests/lua/evidence/test_minimap_evidence.lua:76`
+- `Minimap:setTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:77`
+- `Minimap:setFogLevel` in `tests/lua/evidence/test_minimap_evidence.lua:78`
+- `Minimap:getFogLevel` in `tests/lua/evidence/test_minimap_evidence.lua:79`
+- `Minimap:setTerrainColor` in `tests/lua/evidence/test_minimap_evidence.lua:147`
+- `Minimap:setTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:148`
+- `Minimap:getTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:149`
+- `Minimap:setFogEnabled` in `tests/lua/evidence/test_minimap_evidence.lua:203`
+- `Minimap:setTerrain` in `tests/lua/evidence/test_minimap_evidence.lua:204`
+- `Minimap:setFogLevel` in `tests/lua/evidence/test_minimap_evidence.lua:205`
+- `Minimap:getFogLevel` in `tests/lua/evidence/test_minimap_evidence.lua:206`
+- `NoiseGenerator:perlin2d` in `tests/lua/evidence/test_noise_evidence.lua:52`
+- `ParticleSystem:setPosition` in `tests/lua/evidence/test_particle_evidence.lua:22`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:23`
+- `ParticleSystem:emit` in `tests/lua/evidence/test_particle_evidence.lua:24`
+- `ParticleSystem:getPosition` in `tests/lua/evidence/test_particle_evidence.lua:25`
+- `ParticleSystem:setPosition` in `tests/lua/evidence/test_particle_evidence.lua:81`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:82`
+- `ParticleSystem:emit` in `tests/lua/evidence/test_particle_evidence.lua:83`
+- `ParticleSystem:count` in `tests/lua/evidence/test_particle_evidence.lua:84`
+- `ParticleSystem:setShape` in `tests/lua/evidence/test_particle_evidence.lua:121`
+- `ParticleSystem:warmUp` in `tests/lua/evidence/test_particle_evidence.lua:122`
+- `ParticleSystem:toImage` in `tests/lua/evidence/test_particle_evidence.lua:123`
+- `ParticleSystem:addAttractor` in `tests/lua/evidence/test_particle_evidence.lua:170`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:171`
+- `ParticleSystem:update` in `tests/lua/evidence/test_particle_evidence.lua:172`
+- `ParticleSystem:toImage` in `tests/lua/evidence/test_particle_evidence.lua:173`
+- `ParticleSystem:setPosition` in `tests/lua/evidence/test_particle_evidence.lua:234`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:235`
+- `ParticleSystem:emit` in `tests/lua/evidence/test_particle_evidence.lua:236`
+- `ParticleSystem:getPosition` in `tests/lua/evidence/test_particle_evidence.lua:237`
+- `ParticleSystem:setPosition` in `tests/lua/evidence/test_particle_evidence.lua:293`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:294`
+- `ParticleSystem:emit` in `tests/lua/evidence/test_particle_evidence.lua:295`
+- `ParticleSystem:count` in `tests/lua/evidence/test_particle_evidence.lua:296`
+- `ParticleSystem:setShape` in `tests/lua/evidence/test_particle_evidence.lua:333`
+- `ParticleSystem:warmUp` in `tests/lua/evidence/test_particle_evidence.lua:334`
+- `ParticleSystem:toImage` in `tests/lua/evidence/test_particle_evidence.lua:335`
+- `ParticleSystem:addAttractor` in `tests/lua/evidence/test_particle_evidence.lua:382`
+- `ParticleSystem:start` in `tests/lua/evidence/test_particle_evidence.lua:383`
+- `ParticleSystem:update` in `tests/lua/evidence/test_particle_evidence.lua:384`
+- `ParticleSystem:toImage` in `tests/lua/evidence/test_particle_evidence.lua:385`
 - `lurek.pathfind.newUnitPathfinder` in `tests/lua/evidence/test_pathfind_evidence.lua:90`
 - `lurek.pathfind.newUnitPathfinder` in `tests/lua/evidence/test_pathfind_evidence.lua:115`
+- `UnitPathfinder:findPath` in `tests/lua/evidence/test_pathfind_evidence.lua:116`
+- `FlowField:calculate` in `tests/lua/evidence/test_pathfind_evidence.lua:139`
+- `FlowField:getDirection` in `tests/lua/evidence/test_pathfind_evidence.lua:140`
+- `World:newBody` in `tests/lua/evidence/test_physics_evidence.lua:7`
+- `World:step` in `tests/lua/evidence/test_physics_evidence.lua:11`
+- `Body:getPosition` in `tests/lua/evidence/test_physics_evidence.lua:12`
+- `World:addZone` in `tests/lua/evidence/test_physics_evidence.lua:220`
 - `LuaZone:setGravityZero` in `tests/lua/evidence/test_physics_evidence.lua:221`
+- `World:step` in `tests/lua/evidence/test_physics_evidence.lua:222`
+- `World:getZoneEvents` in `tests/lua/evidence/test_physics_evidence.lua:223`
+- `World:newBody` in `tests/lua/evidence/test_physics_evidence.lua:285`
+- `World:step` in `tests/lua/evidence/test_physics_evidence.lua:289`
+- `Body:getPosition` in `tests/lua/evidence/test_physics_evidence.lua:290`
+- `World:addZone` in `tests/lua/evidence/test_physics_evidence.lua:498`
 - `LuaZone:setGravityZero` in `tests/lua/evidence/test_physics_evidence.lua:499`
+- `World:step` in `tests/lua/evidence/test_physics_evidence.lua:500`
+- `World:getZoneEvents` in `tests/lua/evidence/test_physics_evidence.lua:501`
 - `LuaCellular:fillRect` in `tests/lua/evidence/test_physics_evidence.lua:562`
 - `LuaCellular:stepN` in `tests/lua/evidence/test_physics_evidence.lua:563`
 - `LuaCellular:toImageData` in `tests/lua/evidence/test_physics_evidence.lua:564`
 - `LuaCellular:fillRect` in `tests/lua/evidence/test_physics_evidence.lua:617`
 - `LuaCellular:stepN` in `tests/lua/evidence/test_physics_evidence.lua:618`
 - `LuaCellular:toImageData` in `tests/lua/evidence/test_physics_evidence.lua:619`
+- `Raycaster:setCell` in `tests/lua/evidence/test_raycaster_evidence.lua:12`
+- `Raycaster:castRaysFlat` in `tests/lua/evidence/test_raycaster_evidence.lua:13`
 - `LuaTerrain:fillAll` in `tests/lua/evidence/test_render_evidence.lua:187`
 - `LuaTerrain:fillCircle` in `tests/lua/evidence/test_render_evidence.lua:188`
 - `LuaTerrain:toImageData` in `tests/lua/evidence/test_render_evidence.lua:189`
 - `LuaTerrain:fillAll` in `tests/lua/evidence/test_render_evidence.lua:408`
 - `LuaTerrain:fillCircle` in `tests/lua/evidence/test_render_evidence.lua:409`
 - `LuaTerrain:toImageData` in `tests/lua/evidence/test_render_evidence.lua:410`
+- `ImageData:fill` in `tests/lua/evidence/test_render_evidence.lua:466`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:467`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:484`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:500`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:519`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:539`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:561`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:576`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_render_evidence.lua:622`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_render_evidence.lua:638`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:658`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:681`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:702`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:726`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:744`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:763`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:782`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:798`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:818`
+- `ImageData:brightness` in `tests/lua/evidence/test_render_evidence.lua:860`
+- `ImageData:contrast` in `tests/lua/evidence/test_render_evidence.lua:861`
+- `ImageData:grayscale` in `tests/lua/evidence/test_render_evidence.lua:862`
+- `ImageData:sepia` in `tests/lua/evidence/test_render_evidence.lua:863`
+- `ImageData:invert` in `tests/lua/evidence/test_render_evidence.lua:864`
+- `ImageData:threshold` in `tests/lua/evidence/test_render_evidence.lua:865`
+- `ImageData:posterize` in `tests/lua/evidence/test_render_evidence.lua:866`
+- `ImageData:tint` in `tests/lua/evidence/test_render_evidence.lua:867`
+- `ImageData:saturation` in `tests/lua/evidence/test_render_evidence.lua:868`
+- `ImageData:gamma` in `tests/lua/evidence/test_render_evidence.lua:869`
+- `ImageData:noise` in `tests/lua/evidence/test_render_evidence.lua:870`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_render_evidence.lua:871`
+- `ImageData:flipVertical` in `tests/lua/evidence/test_render_evidence.lua:872`
 - `ImageData:rotate90Cw` in `tests/lua/evidence/test_render_evidence.lua:873`
+- `ImageData:blur` in `tests/lua/evidence/test_render_evidence.lua:874`
+- `ImageData:sharpen` in `tests/lua/evidence/test_render_evidence.lua:875`
+- `ImageData:crop` in `tests/lua/evidence/test_render_evidence.lua:876`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_render_evidence.lua:877`
+- `TileMap:addLayer` in `tests/lua/evidence/test_render_evidence.lua:936`
+- `TileMap:fill` in `tests/lua/evidence/test_render_evidence.lua:937`
+- `TileMap:setTile` in `tests/lua/evidence/test_render_evidence.lua:938`
+- `TileMap:drawToImage` in `tests/lua/evidence/test_render_evidence.lua:939`
+- `ImageData:fill` in `tests/lua/evidence/test_render_evidence.lua:982`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:983`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1000`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1016`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1035`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1055`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1077`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1092`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_render_evidence.lua:1138`
+- `BezierCurve:evaluate` in `tests/lua/evidence/test_render_evidence.lua:1154`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1174`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1197`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1218`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1242`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1260`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1279`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1298`
+- `SoundData:setSample` in `tests/lua/evidence/test_render_evidence.lua:1314`
+- `ImageData:setPixel` in `tests/lua/evidence/test_render_evidence.lua:1334`
+- `ImageData:brightness` in `tests/lua/evidence/test_render_evidence.lua:1376`
+- `ImageData:contrast` in `tests/lua/evidence/test_render_evidence.lua:1377`
+- `ImageData:grayscale` in `tests/lua/evidence/test_render_evidence.lua:1378`
+- `ImageData:sepia` in `tests/lua/evidence/test_render_evidence.lua:1379`
+- `ImageData:invert` in `tests/lua/evidence/test_render_evidence.lua:1380`
+- `ImageData:threshold` in `tests/lua/evidence/test_render_evidence.lua:1381`
+- `ImageData:posterize` in `tests/lua/evidence/test_render_evidence.lua:1382`
+- `ImageData:tint` in `tests/lua/evidence/test_render_evidence.lua:1383`
+- `ImageData:saturation` in `tests/lua/evidence/test_render_evidence.lua:1384`
+- `ImageData:gamma` in `tests/lua/evidence/test_render_evidence.lua:1385`
+- `ImageData:noise` in `tests/lua/evidence/test_render_evidence.lua:1386`
+- `ImageData:flipHorizontal` in `tests/lua/evidence/test_render_evidence.lua:1387`
+- `ImageData:flipVertical` in `tests/lua/evidence/test_render_evidence.lua:1388`
 - `ImageData:rotate90Cw` in `tests/lua/evidence/test_render_evidence.lua:1389`
+- `ImageData:blur` in `tests/lua/evidence/test_render_evidence.lua:1390`
+- `ImageData:sharpen` in `tests/lua/evidence/test_render_evidence.lua:1391`
+- `ImageData:crop` in `tests/lua/evidence/test_render_evidence.lua:1392`
+- `ImageData:resizeNearest` in `tests/lua/evidence/test_render_evidence.lua:1393`
+- `TileMap:addLayer` in `tests/lua/evidence/test_render_evidence.lua:1452`
+- `TileMap:fill` in `tests/lua/evidence/test_render_evidence.lua:1453`
+- `TileMap:setTile` in `tests/lua/evidence/test_render_evidence.lua:1454`
+- `TileMap:drawToImage` in `tests/lua/evidence/test_render_evidence.lua:1455`
+- `NavGrid:setBlocked` in `tests/lua/evidence/test_render_evidence.lua:1494`
 - `Pathfinder:findPath` in `tests/lua/evidence/test_render_evidence.lua:1496`
+- `NoiseGenerator:fbm` in `tests/lua/evidence/test_render_evidence.lua:1555`
+- `Minimap:setTerrain` in `tests/lua/evidence/test_render_evidence.lua:1557`
+- `NoiseGenerator:fbm` in `tests/lua/evidence/test_render_evidence.lua:1605`
+- `Raycaster:setCell` in `tests/lua/evidence/test_render_evidence.lua:1607`
+- `Raycaster:castRays` in `tests/lua/evidence/test_render_evidence.lua:1608`
+- `TileMap:addLayer` in `tests/lua/evidence/test_render_evidence.lua:1660`
+- `ParticleSystem:setPosition` in `tests/lua/evidence/test_render_evidence.lua:1662`
+- `ParticleSystem:start` in `tests/lua/evidence/test_render_evidence.lua:1663`
+- `ParticleSystem:emit` in `tests/lua/evidence/test_render_evidence.lua:1664`
+- `ParticleSystem:update` in `tests/lua/evidence/test_render_evidence.lua:1665`
+- `StateMachine:addState` in `tests/lua/evidence/test_render_evidence.lua:1761`
+- `StateMachine:setInitialState` in `tests/lua/evidence/test_render_evidence.lua:1762`
+- `StateMachine:forceState` in `tests/lua/evidence/test_render_evidence.lua:1763`
+- `StateMachine:getCurrentState` in `tests/lua/evidence/test_render_evidence.lua:1764`
 - `NdArray:fill` in `tests/lua/evidence/test_render_evidence.lua:1780`
 - `NdArray:sum` in `tests/lua/evidence/test_render_evidence.lua:1781`
+- `DataFrame:addColumn` in `tests/lua/evidence/test_render_evidence.lua:1796`
+- `DataFrame:sum` in `tests/lua/evidence/test_render_evidence.lua:1797`
+- `DataFrame:mean` in `tests/lua/evidence/test_render_evidence.lua:1798`
 - `World:spawn` in `tests/lua/evidence/test_render_evidence.lua:1812`
 - `World:isAlive` in `tests/lua/evidence/test_render_evidence.lua:1813`
 - `World:getEntityCount` in `tests/lua/evidence/test_render_evidence.lua:1814`
+- `StateMachine:addState` in `tests/lua/evidence/test_render_evidence.lua:1913`
+- `StateMachine:setInitialState` in `tests/lua/evidence/test_render_evidence.lua:1914`
+- `StateMachine:forceState` in `tests/lua/evidence/test_render_evidence.lua:1915`
+- `StateMachine:getCurrentState` in `tests/lua/evidence/test_render_evidence.lua:1916`
 - `NdArray:fill` in `tests/lua/evidence/test_render_evidence.lua:1932`
 - `NdArray:sum` in `tests/lua/evidence/test_render_evidence.lua:1933`
+- `DataFrame:addColumn` in `tests/lua/evidence/test_render_evidence.lua:1948`
+- `DataFrame:sum` in `tests/lua/evidence/test_render_evidence.lua:1949`
+- `DataFrame:mean` in `tests/lua/evidence/test_render_evidence.lua:1950`
 - `World:spawn` in `tests/lua/evidence/test_render_evidence.lua:1964`
 - `World:isAlive` in `tests/lua/evidence/test_render_evidence.lua:1965`
 - `World:getEntityCount` in `tests/lua/evidence/test_render_evidence.lua:1966`
+- `Canvas:getDimensions` in `tests/lua/evidence/test_render_evidence.lua:2063`
+- `Canvas:release` in `tests/lua/evidence/test_render_evidence.lua:2064`
+- `Canvas:getWidth` in `tests/lua/evidence/test_render_evidence.lua:2098`
+- `Canvas:release` in `tests/lua/evidence/test_render_evidence.lua:2099`
+- `Canvas:getDimensions` in `tests/lua/evidence/test_render_evidence.lua:2161`
+- `Canvas:release` in `tests/lua/evidence/test_render_evidence.lua:2162`
+- `Canvas:getWidth` in `tests/lua/evidence/test_render_evidence.lua:2196`
+- `Canvas:release` in `tests/lua/evidence/test_render_evidence.lua:2197`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2237`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2238`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2265`
+- `DrawLayer:queue` in `tests/lua/evidence/test_render_evidence.lua:2286`
+- `DrawLayer:flush` in `tests/lua/evidence/test_render_evidence.lua:2287`
+- `DrawLayer:clear` in `tests/lua/evidence/test_render_evidence.lua:2288`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2347`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2348`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2375`
+- `DrawLayer:queue` in `tests/lua/evidence/test_render_evidence.lua:2396`
+- `DrawLayer:flush` in `tests/lua/evidence/test_render_evidence.lua:2397`
+- `DrawLayer:clear` in `tests/lua/evidence/test_render_evidence.lua:2398`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2482`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2483`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2484`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2517`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2518`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2519`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2548`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2565`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2566`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2639`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2640`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2641`
+- `ImageData:drawRect` in `tests/lua/evidence/test_render_evidence.lua:2674`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2675`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2676`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2705`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_render_evidence.lua:2722`
+- `ImageData:drawLine` in `tests/lua/evidence/test_render_evidence.lua:2723`
+- `ImageData:drawRect` in `tests/lua/evidence/test_shapes_evidence.lua:11`
+- `ImageData:drawCircle` in `tests/lua/evidence/test_shapes_evidence.lua:51`
+- `ImageData:drawLine` in `tests/lua/evidence/test_shapes_evidence.lua:76`
+- `ImageData:paste` in `tests/lua/evidence/test_shapes_evidence.lua:100`
+- `Skeleton:addBone` in `tests/lua/evidence/test_spine_evidence.lua:10`
+- `Skeleton:addChildBone` in `tests/lua/evidence/test_spine_evidence.lua:11`
+- `Skeleton:addSlot` in `tests/lua/evidence/test_spine_evidence.lua:12`
+- `Skeleton:setPosition` in `tests/lua/evidence/test_spine_evidence.lua:13`
+- `Skeleton:updateWorldTransforms` in `tests/lua/evidence/test_spine_evidence.lua:14`
+- `Skeleton:drawToImage` in `tests/lua/evidence/test_spine_evidence.lua:15`
+- `Skeleton:addBone` in `tests/lua/evidence/test_spine_evidence.lua:45`
+- `Skeleton:addChildBone` in `tests/lua/evidence/test_spine_evidence.lua:46`
+- `Skeleton:setPosition` in `tests/lua/evidence/test_spine_evidence.lua:47`
+- `Skeleton:updateWorldTransforms` in `tests/lua/evidence/test_spine_evidence.lua:48`
+- `Skeleton:getBoneWorld` in `tests/lua/evidence/test_spine_evidence.lua:49`
+- `Skeleton:drawToImage` in `tests/lua/evidence/test_spine_evidence.lua:50`
+- `Skeleton:addBone` in `tests/lua/evidence/test_spine_evidence.lua:87`
+- `Skeleton:addChildBone` in `tests/lua/evidence/test_spine_evidence.lua:88`
+- `Skeleton:addSlot` in `tests/lua/evidence/test_spine_evidence.lua:89`
+- `Skeleton:setPosition` in `tests/lua/evidence/test_spine_evidence.lua:90`
+- `Skeleton:updateWorldTransforms` in `tests/lua/evidence/test_spine_evidence.lua:91`
+- `Skeleton:drawToImage` in `tests/lua/evidence/test_spine_evidence.lua:92`
+- `Skeleton:addBone` in `tests/lua/evidence/test_spine_evidence.lua:122`
+- `Skeleton:addChildBone` in `tests/lua/evidence/test_spine_evidence.lua:123`
+- `Skeleton:setPosition` in `tests/lua/evidence/test_spine_evidence.lua:124`
+- `Skeleton:updateWorldTransforms` in `tests/lua/evidence/test_spine_evidence.lua:125`
+- `Skeleton:getBoneWorld` in `tests/lua/evidence/test_spine_evidence.lua:126`
+- `Skeleton:drawToImage` in `tests/lua/evidence/test_spine_evidence.lua:127`
+- `TileMap:addLayer` in `tests/lua/evidence/test_tilemap_evidence.lua:37`
+- `TileMap:fill` in `tests/lua/evidence/test_tilemap_evidence.lua:38`
+- `TileMap:addLayer` in `tests/lua/evidence/test_tilemap_evidence.lua:90`
+- `TileMap:getLayerName` in `tests/lua/evidence/test_tilemap_evidence.lua:91`
+- `TileMap:addLayer` in `tests/lua/evidence/test_tilemap_evidence.lua:162`
+- `TileMap:fill` in `tests/lua/evidence/test_tilemap_evidence.lua:163`
+- `TileMap:addLayer` in `tests/lua/evidence/test_tilemap_evidence.lua:215`
+- `TileMap:getLayerName` in `tests/lua/evidence/test_tilemap_evidence.lua:216`
+- `LineChart:setYMax` in `tests/lua/evidence/test_ui_evidence.lua:174`
+- `LineChart:setXMax` in `tests/lua/evidence/test_ui_evidence.lua:175`
+- `LineChart:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:176`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:177`
+- `BarChart:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:197`
+- `BarChart:addCategory` in `tests/lua/evidence/test_ui_evidence.lua:198`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:199`
+- `ScatterPlot:setXRange` in `tests/lua/evidence/test_ui_evidence.lua:217`
+- `ScatterPlot:setYRange` in `tests/lua/evidence/test_ui_evidence.lua:218`
+- `ScatterPlot:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:219`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:220`
+- `PieChart:addSegment` in `tests/lua/evidence/test_ui_evidence.lua:242`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:243`
+- `AreaChart:setYMax` in `tests/lua/evidence/test_ui_evidence.lua:259`
+- `AreaChart:addLayer` in `tests/lua/evidence/test_ui_evidence.lua:260`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:261`
+- `LineChart:setYMax` in `tests/lua/evidence/test_ui_evidence.lua:293`
+- `LineChart:setXMax` in `tests/lua/evidence/test_ui_evidence.lua:294`
+- `LineChart:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:295`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:296`
+- `BarChart:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:316`
+- `BarChart:addCategory` in `tests/lua/evidence/test_ui_evidence.lua:317`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:318`
+- `ScatterPlot:setXRange` in `tests/lua/evidence/test_ui_evidence.lua:336`
+- `ScatterPlot:setYRange` in `tests/lua/evidence/test_ui_evidence.lua:337`
+- `ScatterPlot:addSeries` in `tests/lua/evidence/test_ui_evidence.lua:338`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:339`
+- `PieChart:addSegment` in `tests/lua/evidence/test_ui_evidence.lua:361`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:362`
+- `AreaChart:setYMax` in `tests/lua/evidence/test_ui_evidence.lua:378`
+- `AreaChart:addLayer` in `tests/lua/evidence/test_ui_evidence.lua:379`
 - `Chart:drawToImage` in `tests/lua/evidence/test_ui_evidence.lua:380`
 - `lurek.ecs.Universe` in `tests/lua/integration/test_ai_ecs_scene.lua:7`
 - `lurek.ecs.Universe` in `tests/lua/integration/test_ai_ecs_scene.lua:58`
@@ -292,8 +982,14 @@
 - `lurek.math.pi` in `tests/lua/integration/test_math_physics.lua:11`
 - `lurek.particle.newEmitter` in `tests/lua/integration/test_particle_timer.lua:6`
 - `lurek.pathfind.newGrid` in `tests/lua/integration/test_pathfind_ecs.lua:8`
+- `World:addZone` in `tests/lua/integration/test_physics_space.lua:7`
 - `LuaZone:setGravityPoint` in `tests/lua/integration/test_physics_space.lua:8`
+- `World:step` in `tests/lua/integration/test_physics_space.lua:9`
+- `World:getZoneEvents` in `tests/lua/integration/test_physics_space.lua:10`
+- `World:addZone` in `tests/lua/integration/test_physics_space.lua:29`
 - `LuaZone:setGravityZero` in `tests/lua/integration/test_physics_space.lua:30`
+- `World:step` in `tests/lua/integration/test_physics_space.lua:31`
+- `World:addZone` in `tests/lua/integration/test_physics_space.lua:52`
 - `LuaZone:setPriority` in `tests/lua/integration/test_physics_space.lua:53`
 - `LuaZone:setGravityDirectional` in `tests/lua/integration/test_physics_space.lua:54`
 - `LuaTerrain:fillAll` in `tests/lua/integration/test_physics_tanks.lua:7`
@@ -302,6 +998,7 @@
 - `LuaTerrain:spawnDebris` in `tests/lua/integration/test_physics_tanks.lua:10`
 - `LuaTerrain:collapseColumns` in `tests/lua/integration/test_physics_tanks.lua:11`
 - `LuaTerrain:flush` in `tests/lua/integration/test_physics_tanks.lua:12`
+- `World:step` in `tests/lua/integration/test_physics_tanks.lua:13`
 - `LuaTerrain:toImageData` in `tests/lua/integration/test_physics_tanks.lua:48`
 - `LuaCellular:fillRect` in `tests/lua/integration/test_physics_world_sim.lua:8`
 - `LuaCellular:stepN` in `tests/lua/integration/test_physics_world_sim.lua:9`
@@ -315,6 +1012,8 @@
 - `LuaTerrain:fillAll` in `tests/lua/integration/test_physics_worms.lua:10`
 - `LuaTerrain:fillCircle` in `tests/lua/integration/test_physics_worms.lua:11`
 - `LuaTerrain:flush` in `tests/lua/integration/test_physics_worms.lua:12`
+- `World:newBody` in `tests/lua/integration/test_physics_worms.lua:13`
+- `World:step` in `tests/lua/integration/test_physics_worms.lua:14`
 - `LuaTerrain:fillCircle` in `tests/lua/integration/test_physics_worms.lua:38`
 - `LuaTerrain:flush` in `tests/lua/integration/test_physics_worms.lua:39`
 - `lurek.procgen.noise2d` in `tests/lua/integration/test_procgen_tilemap.lua:6`
@@ -364,15 +1063,47 @@
 - `NdArray:min` in `tests/lua/stress/test_compute_stress.lua:100`
 - `NdArray:max` in `tests/lua/stress/test_compute_stress.lua:101`
 - `NdArray:mean` in `tests/lua/stress/test_compute_stress.lua:111`
+- `DataFrame:addColumn` in `tests/lua/stress/test_dataframe_stress.lua:7`
+- `DataFrame:addRow` in `tests/lua/stress/test_dataframe_stress.lua:8`
+- `DataFrame:addRow` in `tests/lua/stress/test_dataframe_stress.lua:26`
+- `DataFrame:getValue` in `tests/lua/stress/test_dataframe_stress.lua:27`
+- `DataFrame:addColumn` in `tests/lua/stress/test_dataframe_stress.lua:52`
+- `DataFrame:addRow` in `tests/lua/stress/test_dataframe_stress.lua:53`
+- `DataFrame:getValue` in `tests/lua/stress/test_dataframe_stress.lua:54`
+- `DataFrame:addColumn` in `tests/lua/stress/test_dataframe_stress.lua:85`
+- `DataFrame:removeColumn` in `tests/lua/stress/test_dataframe_stress.lua:86`
+- `Universe:spawn` in `tests/lua/stress/test_ecs_stress.lua:7`
+- `Universe:getEntityCount` in `tests/lua/stress/test_ecs_stress.lua:8`
+- `Universe:spawn` in `tests/lua/stress/test_ecs_stress.lua:22`
+- `Universe:kill` in `tests/lua/stress/test_ecs_stress.lua:23`
+- `Universe:spawn` in `tests/lua/stress/test_ecs_stress.lua:44`
+- `Universe:set` in `tests/lua/stress/test_ecs_stress.lua:45`
+- `Universe:spawn` in `tests/lua/stress/test_ecs_stress.lua:62`
+- `Universe:kill` in `tests/lua/stress/test_ecs_stress.lua:63`
+- `Universe:addTag` in `tests/lua/stress/test_ecs_stress.lua:87`
 - `lurek.ecs.defineBlueprint` in `tests/lua/stress/test_ecs_stress.lua:122`
 - `lurek.ecs.spawnBulk` in `tests/lua/stress/test_ecs_stress.lua:123`
 - `lurek.ecs.spawnBulk` in `tests/lua/stress/test_ecs_stress.lua:133`
 - `lurek.ecs.spawnBulk` in `tests/lua/stress/test_ecs_stress.lua:144`
 - `lurek.ecs.spawnBulk` in `tests/lua/stress/test_ecs_stress.lua:153`
 - `lurek.event.new` in `tests/lua/stress/test_event_stress.lua:6`
+- `Signal:connect` in `tests/lua/stress/test_event_stress.lua:7`
+- `Signal:emit` in `tests/lua/stress/test_event_stress.lua:8`
 - `lurek.event.new` in `tests/lua/stress/test_event_stress.lua:36`
+- `Signal:connect` in `tests/lua/stress/test_event_stress.lua:37`
 - `Connection:disconnect` in `tests/lua/stress/test_event_stress.lua:38`
 - `lurek.event.new` in `tests/lua/stress/test_event_stress.lua:53`
+- `Signal:connect` in `tests/lua/stress/test_event_stress.lua:54`
+- `Signal:emit` in `tests/lua/stress/test_event_stress.lua:55`
+- `Graph:addNode` in `tests/lua/stress/test_graph_stress.lua:7`
+- `Graph:addEdge` in `tests/lua/stress/test_graph_stress.lua:8`
+- `Graph:getStats` in `tests/lua/stress/test_graph_stress.lua:9`
+- `Graph:addNode` in `tests/lua/stress/test_graph_stress.lua:31`
+- `Graph:addEdge` in `tests/lua/stress/test_graph_stress.lua:32`
+- `Graph:getStats` in `tests/lua/stress/test_graph_stress.lua:33`
+- `Graph:createItem` in `tests/lua/stress/test_graph_stress.lua:71`
+- `Graph:addItem` in `tests/lua/stress/test_graph_stress.lua:72`
+- `Graph:update` in `tests/lua/stress/test_graph_stress.lua:73`
 - `lurek.image.newImage` in `tests/lua/stress/test_image_stress.lua:6`
 - `lurek.image.newImage` in `tests/lua/stress/test_image_stress.lua:22`
 - `Image:getPixel` in `tests/lua/stress/test_image_stress.lua:23`
@@ -384,14 +1115,34 @@
 - `lurek.light.setRadius` in `tests/lua/stress/test_light_stress.lua:62`
 - `lurek.light.setColor` in `tests/lua/stress/test_light_stress.lua:63`
 - `lurek.light.setIntensity` in `tests/lua/stress/test_light_stress.lua:64`
+- `ParticleSystem:emit` in `tests/lua/stress/test_particle_stress.lua:7`
+- `ParticleSystem:getCount` in `tests/lua/stress/test_particle_stress.lua:8`
+- `ParticleSystem:start` in `tests/lua/stress/test_particle_stress.lua:28`
+- `ParticleSystem:update` in `tests/lua/stress/test_particle_stress.lua:29`
 - `lurek.particle.isActive` in `tests/lua/stress/test_particle_stress.lua:30`
-- `Observer:notify` in `tests/lua/stress/test_patterns_stress.lua:8`
-- `lurek.patterns.newCommandQueue` in `tests/lua/stress/test_patterns_stress.lua:37`
-- `CommandQueue:push` in `tests/lua/stress/test_patterns_stress.lua:38`
-- `CommandQueue:executeAll` in `tests/lua/stress/test_patterns_stress.lua:39`
-- `lurek.patterns.newStateMachine` in `tests/lua/stress/test_patterns_stress.lua:64`
-- `StateMachine:getState` in `tests/lua/stress/test_patterns_stress.lua:65`
-- `StateMachine:setState` in `tests/lua/stress/test_patterns_stress.lua:66`
+- `ParticleSystem:start` in `tests/lua/stress/test_particle_stress.lua:55`
+- `ParticleSystem:update` in `tests/lua/stress/test_particle_stress.lua:56`
+- `ParticleSystem:stop` in `tests/lua/stress/test_particle_stress.lua:57`
+- `ParticleSystem:reset` in `tests/lua/stress/test_particle_stress.lua:58`
+- `ParticleSystem:getCount` in `tests/lua/stress/test_particle_stress.lua:59`
+- `UnitPathfinder:findPath` in `tests/lua/stress/test_pathfind_stress.lua:8`
+- `NavGrid:setBlocked` in `tests/lua/stress/test_pathfind_stress.lua:21`
+- `UnitPathfinder:findPath` in `tests/lua/stress/test_pathfind_stress.lua:22`
+- `NavGrid:setBlocked` in `tests/lua/stress/test_pathfind_stress.lua:40`
+- `UnitPathfinder:findPath` in `tests/lua/stress/test_pathfind_stress.lua:41`
+- `NavGrid:setCost` in `tests/lua/stress/test_pathfind_stress.lua:64`
+- `UnitPathfinder:findPath` in `tests/lua/stress/test_pathfind_stress.lua:65`
+- `NavGrid:setBlocked` in `tests/lua/stress/test_pathfind_stress.lua:87`
+- `UnitPathfinder:findPath` in `tests/lua/stress/test_pathfind_stress.lua:88`
+- `FlowField:calculate` in `tests/lua/stress/test_pathfind_stress.lua:122`
+- `FlowField:getDirection` in `tests/lua/stress/test_pathfind_stress.lua:123`
+- `Observer:subscribe` in `tests/lua/stress/test_patterns_stress.lua:7`
+- `Observer:set` in `tests/lua/stress/test_patterns_stress.lua:8`
+- `CommandQueue:enqueue` in `tests/lua/stress/test_patterns_stress.lua:38`
+- `CommandQueue:getCount` in `tests/lua/stress/test_patterns_stress.lua:39`
+- `StateMachine:getCurrentState` in `tests/lua/stress/test_patterns_stress.lua:62`
+- `StateMachine:forceState` in `tests/lua/stress/test_patterns_stress.lua:63`
+- `Body:getPosition` in `tests/lua/stress/test_physics_stress.lua:8`
 - `LuaCellular:fillRect` in `tests/lua/stress/test_physics_stress.lua:70`
 - `LuaCellular:stepN` in `tests/lua/stress/test_physics_stress.lua:71`
 - `LuaCellular:countCells` in `tests/lua/stress/test_physics_stress.lua:72`
@@ -403,7 +1154,11 @@
 - `LuaTerrain:isDirty` in `tests/lua/stress/test_physics_stress.lua:258`
 - `LuaTerrain:collapseColumns` in `tests/lua/stress/test_physics_stress.lua:278`
 - `LuaTerrain:solidPositions` in `tests/lua/stress/test_physics_stress.lua:279`
+- `World:addZone` in `tests/lua/stress/test_physics_stress.lua:308`
 - `LuaZone:setGravityZero` in `tests/lua/stress/test_physics_stress.lua:309`
+- `World:newBody` in `tests/lua/stress/test_physics_stress.lua:310`
+- `World:step` in `tests/lua/stress/test_physics_stress.lua:311`
+- `World:getZoneEvents` in `tests/lua/stress/test_physics_stress.lua:312`
 - `LuaCellular:fillRect` in `tests/lua/stress/test_physics_stress.lua:358`
 - `LuaCellular:stepN` in `tests/lua/stress/test_physics_stress.lua:359`
 - `LuaCellular:countCells` in `tests/lua/stress/test_physics_stress.lua:360`
@@ -414,20 +1169,139 @@
 - `LuaTerrain:isDirty` in `tests/lua/stress/test_physics_stress.lua:417`
 - `LuaTerrain:collapseColumns` in `tests/lua/stress/test_physics_stress.lua:437`
 - `LuaTerrain:solidPositions` in `tests/lua/stress/test_physics_stress.lua:438`
+- `World:addZone` in `tests/lua/stress/test_physics_stress.lua:467`
 - `LuaZone:setGravityZero` in `tests/lua/stress/test_physics_stress.lua:468`
-- `lurek.serial.base64Encode` in `tests/lua/stress/test_serial_stress.lua:6`
-- `lurek.serial.base64Decode` in `tests/lua/stress/test_serial_stress.lua:7`
-- `lurek.serial.base64Encode` in `tests/lua/stress/test_serial_stress.lua:20`
-- `lurek.serial.base64Decode` in `tests/lua/stress/test_serial_stress.lua:21`
+- `World:newBody` in `tests/lua/stress/test_physics_stress.lua:469`
+- `World:step` in `tests/lua/stress/test_physics_stress.lua:470`
+- `World:getZoneEvents` in `tests/lua/stress/test_physics_stress.lua:471`
+- `SaveManager:register` in `tests/lua/stress/test_save_stress.lua:7`
+- `SaveManager:collect` in `tests/lua/stress/test_save_stress.lua:8`
+- `SaveManager:setSummary` in `tests/lua/stress/test_save_stress.lua:43`
+- `SaveManager:getSummary` in `tests/lua/stress/test_save_stress.lua:44`
+- `Universe:spawn` in `tests/lua/stress/test_scene_stress.lua:7`
+- `Universe:kill` in `tests/lua/stress/test_scene_stress.lua:8`
+- `Universe:spawn` in `tests/lua/stress/test_scene_stress.lua:24`
+- `Universe:set` in `tests/lua/stress/test_scene_stress.lua:25`
+- `Universe:get` in `tests/lua/stress/test_scene_stress.lua:26`
+- `Channel:push` in `tests/lua/stress/test_thread_stress.lua:18`
 - `Channel:tryPop` in `tests/lua/stress/test_thread_stress.lua:19`
+- `Channel:push` in `tests/lua/stress/test_thread_stress.lua:45`
 - `Channel:tryPop` in `tests/lua/stress/test_thread_stress.lua:46`
+- `Channel:push` in `tests/lua/stress/test_thread_stress.lua:79`
 - `Channel:tryPop` in `tests/lua/stress/test_thread_stress.lua:80`
+- `TileMap:addTileSet` in `tests/lua/stress/test_tilemap_stress.lua:8`
+- `TileMap:addLayer` in `tests/lua/stress/test_tilemap_stress.lua:9`
+- `TileMap:setTile` in `tests/lua/stress/test_tilemap_stress.lua:10`
+- `TileMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:11`
+- `TileMap:setTile` in `tests/lua/stress/test_tilemap_stress.lua:35`
+- `TileMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:36`
+- `TileMap:addLayer` in `tests/lua/stress/test_tilemap_stress.lua:67`
+- `TileMap:setTile` in `tests/lua/stress/test_tilemap_stress.lua:68`
+- `TileMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:69`
+- `TileMap:fill` in `tests/lua/stress/test_tilemap_stress.lua:101`
+- `TileMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:102`
+- `TileMap:fill` in `tests/lua/stress/test_tilemap_stress.lua:119`
+- `TileMap:setTile` in `tests/lua/stress/test_tilemap_stress.lua:120`
+- `TileMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:121`
+- `ChunkMap:setTile` in `tests/lua/stress/test_tilemap_stress.lua:137`
+- `ChunkMap:getTile` in `tests/lua/stress/test_tilemap_stress.lua:138`
 - `lurek.tween.newTween` in `tests/lua/stress/test_tween_stress.lua:6`
 - `Tween:setDuration` in `tests/lua/stress/test_tween_stress.lua:7`
 - `Tween:setEasing` in `tests/lua/stress/test_tween_stress.lua:8`
 - `Tween:setFrom` in `tests/lua/stress/test_tween_stress.lua:9`
 - `Tween:setTo` in `tests/lua/stress/test_tween_stress.lua:10`
+- `Tween:update` in `tests/lua/stress/test_tween_stress.lua:11`
 - `lurek.tween.newTween` in `tests/lua/stress/test_tween_stress.lua:42`
 - `Tween:seek` in `tests/lua/stress/test_tween_stress.lua:43`
 - `lurek.tween.newTween` in `tests/lua/stress/test_tween_stress.lua:62`
 - `Tween:onComplete` in `tests/lua/stress/test_tween_stress.lua:63`
+- `Tween:update` in `tests/lua/stress/test_tween_stress.lua:64`
+- `BlendLayerSet:len` in `tests/lua/unit/test_animation_unit.lua:1244`
+- `BlendLayerSet:len` in `tests/lua/unit/test_animation_unit.lua:1250`
+- `AnimSyncGroup:add` in `tests/lua/unit/test_animation_unit.lua:1259`
+- `Camera2D:followPath` in `tests/lua/unit/test_camera_unit.lua:776`
+- `Camera2D:setParallaxFactor` in `tests/lua/unit/test_camera_unit.lua:788`
+- `Array:get` in `tests/lua/unit/test_compute_unit.lua:1755`
+- `Array:set` in `tests/lua/unit/test_compute_unit.lua:1762`
+- `Array:pow` in `tests/lua/unit/test_compute_unit.lua:1770`
+- `Array:abs` in `tests/lua/unit/test_compute_unit.lua:1778`
+- `Array:neg` in `tests/lua/unit/test_compute_unit.lua:1786`
+- `Array:any` in `tests/lua/unit/test_compute_unit.lua:1794`
+- `Array:all` in `tests/lua/unit/test_compute_unit.lua:1802`
+- `Array:sum` in `tests/lua/unit/test_compute_unit.lua:1810`
+- `Array:min` in `tests/lua/unit/test_compute_unit.lua:1817`
+- `Array:max` in `tests/lua/unit/test_compute_unit.lua:1824`
+- `Array:dot` in `tests/lua/unit/test_compute_unit.lua:1831`
+- `Array:map` in `tests/lua/unit/test_compute_unit.lua:1839`
+- `RingBuffer:pop` in `tests/lua/unit/test_data_unit.lua:1335`
+- `RingBuffer:len` in `tests/lua/unit/test_data_unit.lua:1345`
+- `DataWriter:len` in `tests/lua/unit/test_data_unit.lua:1356`
+- `ReplConsole:len` in `tests/lua/unit/test_devtools_unit.lua:681`
+- `Globe:pan` in `tests/lua/unit/test_globe_unit.lua:1057`
+- `GlobeRegistry:new` in `tests/lua/unit/test_globe_unit.lua:1066`
+- `GlobeRegistry:get` in `tests/lua/unit/test_globe_unit.lua:1079`
+- `Vec2:x` in `tests/lua/unit/test_math_unit.lua:3164`
+- `Vec2:y` in `tests/lua/unit/test_math_unit.lua:3177`
+- `Vec3:dot` in `tests/lua/unit/test_math_unit.lua:3191`
+- `Vec3:add` in `tests/lua/unit/test_math_unit.lua:3200`
+- `Vec3:sub` in `tests/lua/unit/test_math_unit.lua:3210`
+- `CatmullRom:len` in `tests/lua/unit/test_math_unit.lua:3222`
+- `Transform:setTransformation` in `tests/lua/unit/test_math_unit.lua:3249`
+- `BezierCurve:setControlPoint` in `tests/lua/unit/test_math_unit.lua:3260`
+- `BezierCurve:insertControlPoint` in `tests/lua/unit/test_math_unit.lua:3267`
+- `Tween:set` in `tests/lua/unit/test_math_unit.lua:3281`
+- `Circle:x` in `tests/lua/unit/test_math_unit.lua:3296`
+- `Circle:y` in `tests/lua/unit/test_math_unit.lua:3302`
+- `AabbTree:len` in `tests/lua/unit/test_math_unit.lua:3310`
+- `AabbTree:len` in `tests/lua/unit/test_math_unit.lua:3316`
+- `NetworkHost:disconnectNow` in `tests/lua/unit/test_network_unit.lua:1003`
+- `NetworkHost:disconnectLater` in `tests/lua/unit/test_network_unit.lua:1012`
+- `EventBus:on` in `tests/lua/unit/test_patterns_unit.lua:2114`
+- `EventBus:off` in `tests/lua/unit/test_patterns_unit.lua:2123`
+- `ObjectPool:add` in `tests/lua/unit/test_patterns_unit.lua:2137`
+- `ServiceLocator:has` in `tests/lua/unit/test_patterns_unit.lua:2147`
+- `ServiceLocator:has` in `tests/lua/unit/test_patterns_unit.lua:2153`
+- `Factory:has` in `tests/lua/unit/test_patterns_unit.lua:2162`
+- `Factory:has` in `tests/lua/unit/test_patterns_unit.lua:2168`
+- `Blackboard:set` in `tests/lua/unit/test_patterns_unit.lua:2177`
+- `Blackboard:get` in `tests/lua/unit/test_patterns_unit.lua:2178`
+- `Blackboard:has` in `tests/lua/unit/test_patterns_unit.lua:2185`
+- `Blackboard:has` in `tests/lua/unit/test_patterns_unit.lua:2192`
+- `Observer:set` in `tests/lua/unit/test_patterns_unit.lua:2200`
+- `Observer:get` in `tests/lua/unit/test_patterns_unit.lua:2201`
+- `PriorityQueue:pop` in `tests/lua/unit/test_patterns_unit.lua:2217`
+- `PriorityQueue:len` in `tests/lua/unit/test_patterns_unit.lua:2227`
+- `Ring:len` in `tests/lua/unit/test_patterns_unit.lua:2237`
+- `Ring:sum` in `tests/lua/unit/test_patterns_unit.lua:2245`
+- `Mediator:on` in `tests/lua/unit/test_patterns_unit.lua:2255`
+- `Mediator:off` in `tests/lua/unit/test_patterns_unit.lua:2269`
+- `Strategy:set` in `tests/lua/unit/test_patterns_unit.lua:2285`
+- `Strategy:has` in `tests/lua/unit/test_patterns_unit.lua:2286`
+- `Stack:pop` in `tests/lua/unit/test_patterns_unit.lua:2300`
+- `Stack:len` in `tests/lua/unit/test_patterns_unit.lua:2308`
+- `World:newChainBody` in `tests/lua/unit/test_physics_unit.lua:3114`
+- `World:addPrismaticJoint` in `tests/lua/unit/test_physics_unit.lua:3137`
+- `World:addRopeJoint` in `tests/lua/unit/test_physics_unit.lua:3147`
+- `World:addWheelJoint` in `tests/lua/unit/test_physics_unit.lua:3157`
+- `World:addFrictionJoint` in `tests/lua/unit/test_physics_unit.lua:3167`
+- `World:addMotorJoint` in `tests/lua/unit/test_physics_unit.lua:3177`
+- `World:addMouseJoint` in `tests/lua/unit/test_physics_unit.lua:3187`
+- `World:addPulleyJoint` in `tests/lua/unit/test_physics_unit.lua:3197`
+- `World:addGearJoint` in `tests/lua/unit/test_physics_unit.lua:3207`
+- `World:raycastClosest` in `tests/lua/unit/test_physics_unit.lua:3218`
+- `World:queryAABB` in `tests/lua/unit/test_physics_unit.lua:3230`
+- `Body:applyForceAtPoint` in `tests/lua/unit/test_physics_unit.lua:3240`
+- `DoorManager:addDoor` in `tests/lua/unit/test_raycaster_unit.lua:838`
+- `DoorManager:addDoor` in `tests/lua/unit/test_raycaster_unit.lua:841`
+- `PointLight:x` in `tests/lua/unit/test_raycaster_unit.lua:851`
+- `PointLight:y` in `tests/lua/unit/test_raycaster_unit.lua:857`
+- `PointLight:set` in `tests/lua/unit/test_raycaster_unit.lua:863`
+- `Raycaster:buildScene` in `tests/lua/unit/test_raycaster_unit.lua:871`
+- `Raycaster:buildScene` in `tests/lua/unit/test_raycaster_unit.lua:874`
+- `Raycaster:drawTopDown` in `tests/lua/unit/test_raycaster_unit.lua:882`
+- `Raycaster:drawTopDown` in `tests/lua/unit/test_raycaster_unit.lua:885`
+- `SpriteManager:add` in `tests/lua/unit/test_raycaster_unit.lua:892`
+- `SpriteManager:add` in `tests/lua/unit/test_raycaster_unit.lua:895`
+- `DepthSorter:add` in `tests/lua/unit/test_scene_unit.lua:1563`
+- `Skeleton:blendAnimation` in `tests/lua/unit/test_spine_unit.lua:551`
+- `SkeletonAnimation:addEventKey` in `tests/lua/unit/test_spine_unit.lua:562`

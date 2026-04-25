@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-DEFAULT_INPUT = WORKSPACE_ROOT / "logs" / "test_coverage.json"
+DEFAULT_INPUT = WORKSPACE_ROOT / "logs" / "data" / "test_coverage.json"
 DEFAULT_OUTPUT = WORKSPACE_ROOT / "logs" / "reports" / "test_docs.md"
 DEFAULT_OUTPUT_RUST = WORKSPACE_ROOT / "logs" / "reports" / "test_docs_rust.md"
 DEFAULT_OUTPUT_LUA = WORKSPACE_ROOT / "logs" / "reports" / "test_docs_lua.md"

@@ -278,7 +278,7 @@ impl LuaUserData for LuaParticleSystem {
         // -- type --
         /// Returns the type name "ParticleSystem".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ParticleSystem"));
+        methods.add_method("type", |_, _, ()| Ok("LParticleSystem"));
 
         // -- typeOf --
         /// Returns true if this matches the given type name.
@@ -1292,9 +1292,10 @@ impl LuaUserData for LuaParticleSystem {
         methods.add_method_mut("addSubSystem", |_, this, config_tbl: LuaTable| {
             let config = ParticleConfig::from_lua_opts(&config_tbl)?;
             let mut st = this.state.borrow_mut();
-            let ps = st.particle_systems.get_mut(this.key).ok_or_else(|| {
-                LuaError::runtime("ParticleSystem handle is invalid (released)")
-            })?;
+            let ps = st
+                .particle_systems
+                .get_mut(this.key)
+                .ok_or_else(|| LuaError::runtime("ParticleSystem handle is invalid (released)"))?;
             let idx = ps.add_sub_system(config);
             Ok((idx + 1) as i64)
         });
@@ -1466,6 +1467,19 @@ impl LuaUserData for LuaTrail {
             let img = this.inner.draw_to_image(w, h);
             Ok(img)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTrail"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTrail" || name == "Object")
+        });
     }
 }
 
@@ -1534,8 +1548,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, path: String| {
             let toml_str = std::fs::read_to_string(&path)
                 .map_err(|e| LuaError::runtime(format!("fromTOML: cannot read '{path}': {e}")))?;
-            let cfg = ParticleConfig::from_toml_str(&toml_str)
-                .map_err(|e| LuaError::runtime(format!("fromTOML: parse error in '{path}': {e}")))?;
+            let cfg = ParticleConfig::from_toml_str(&toml_str).map_err(|e| {
+                LuaError::runtime(format!("fromTOML: parse error in '{path}': {e}"))
+            })?;
             let ps = ParticleSystem::new(cfg);
             let key = s_toml.borrow_mut().particle_systems.insert(ps);
             lua.create_userdata(LuaParticleSystem {

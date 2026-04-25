@@ -80,7 +80,7 @@ end
 function M.newScheduler(opts)
     opts = opts or {}
 
-    ---@class Scheduler
+    ---@class LScheduler
     local sched = {
         _tasks          = {},
         _next_id        = 1,

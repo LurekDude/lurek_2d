@@ -1222,6 +1222,19 @@ impl LuaUserData for LuaWorld {
             }
             Ok(tbl)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LWorld"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LWorld" || name == "Object")
+        });
     }
 }
 
@@ -1399,6 +1412,19 @@ impl LuaUserData for LuaZone {
         methods.add_method("destroy", |_, this, ()| {
             this.world.borrow_mut().remove_zone(this.zone_id);
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LZone"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LZone" || name == "Object")
         });
     }
 }
@@ -1604,6 +1630,19 @@ impl LuaUserData for LuaTerrain {
         methods.add_method_mut("loadFromBytes", |_, this, data: LuaString| {
             Ok(this.terrain.borrow_mut().load_from_bytes(data.as_bytes()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTerrain"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTerrain" || name == "Object")
+        });
     }
 }
 
@@ -1780,6 +1819,19 @@ impl LuaUserData for LuaCellular {
                 }
                 None => Ok(false),
             }
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCellular"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCellular" || name == "Object")
         });
     }
 }
@@ -2208,6 +2260,19 @@ impl LuaUserData for LuaBody {
             this.world.borrow_mut().sleep_body(this.id);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LBody"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LBody" || name == "Object")
+        });
     }
 }
 
@@ -2346,6 +2411,19 @@ impl LuaUserData for LuaPhysicsShape {
         /// Releases this shape handle (GC handles cleanup).
         /// @return nil
         methods.add_method("destroy", |_, _this, ()| Ok(()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LPhysicsShape"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LPhysicsShape" || name == "Object")
+        });
     }
 }
 

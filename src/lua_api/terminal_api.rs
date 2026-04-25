@@ -697,6 +697,19 @@ impl LuaUserData for LuaTerminal {
                 .pending_size = Some((new_w, new_h));
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTerminal"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTerminal" || name == "Object")
+        });
     }
 }
 
@@ -1255,6 +1268,19 @@ impl LuaUserData for LuaWidget {
                     None => Ok(LuaValue::Nil),
                 }
             }
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LWidget"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LWidget" || name == "Object")
         });
     }
 }

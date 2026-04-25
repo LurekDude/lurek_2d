@@ -126,6 +126,19 @@ impl LuaUserData for LuaSpriteSheet {
             let img = this.inner.draw_to_image(w, h);
             lua.create_userdata(img)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSpriteSheet"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSpriteSheet" || name == "Object")
+        });
     }
 }
 
@@ -226,6 +239,19 @@ impl LuaUserData for LuaSpriteAtlas {
                 None => Ok(LuaValue::Nil),
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSpriteAtlas"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSpriteAtlas" || name == "Object")
+        });
     }
 }
 

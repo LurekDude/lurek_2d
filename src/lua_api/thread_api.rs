@@ -29,7 +29,7 @@ impl LuaUserData for LuaThreadHandle {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Thread".to_string()));
+        methods.add_method("type", |_, _, ()| Ok("LThread".to_string()));
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
@@ -95,7 +95,7 @@ impl LuaUserData for LuaThreadPool {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ThreadPool".to_string()));
+        methods.add_method("type", |_, _, ()| Ok("LThreadPool".to_string()));
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
@@ -177,7 +177,7 @@ impl LuaUserData for LuaPromise {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Promise".to_string()));
+        methods.add_method("type", |_, _, ()| Ok("LPromise".to_string()));
 
         // -- typeOf --
         /// Returns whether this object is of the given type.
@@ -319,7 +319,7 @@ impl LuaUserData for LuaChannel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         /// Returns the type of the object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Channel".to_string()));
+        methods.add_method("type", |_, _, ()| Ok("LChannel".to_string()));
         /// Checks if the object is of the specified type.
         /// @param name string
         /// @return boolean

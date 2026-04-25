@@ -123,6 +123,19 @@ impl LuaUserData for LuaSchema {
             }
             Ok(tbl)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSchema"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSchema" || name == "Object")
+        });
     }
 }
 
@@ -229,6 +242,19 @@ impl LuaUserData for DocEntry {
         /// Returns true when the entry has an example snippet.
         /// @return boolean
         methods.add_method("hasExample", |_, this, ()| Ok(this.0.example.is_some()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LDocEntry"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LDocEntry" || name == "Object")
+        });
     }
 }
 
@@ -451,6 +477,19 @@ impl LuaUserData for ApiCatalog {
             }
             Ok(serde_json::to_string_pretty(&entries).unwrap_or_default())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LApiCatalog"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LApiCatalog" || name == "Object")
+        });
     }
 }
 
@@ -555,6 +594,19 @@ impl LuaUserData for ValidationReport {
                 "isValid": this.0.missing.is_empty()
             });
             Ok(serde_json::to_string_pretty(&val).unwrap_or_default())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LValidationReport"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LValidationReport" || name == "Object")
         });
     }
 }
@@ -682,6 +734,19 @@ impl LuaUserData for QualityReport {
                 "moduleScores": this.0.module_scores
             });
             Ok(serde_json::to_string_pretty(&val).unwrap_or_default())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LQualityReport"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LQualityReport" || name == "Object")
         });
     }
 }

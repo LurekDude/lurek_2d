@@ -36,7 +36,7 @@ from datetime import datetime, timezone
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = WORKSPACE_ROOT / "src"
-DEFAULT_OUTPUT = WORKSPACE_ROOT / "logs" / "doc_coverage.json"
+DEFAULT_OUTPUT = WORKSPACE_ROOT / "logs" / "data" / "doc_coverage.json"
 
 # Matches pub item declarations in Rust source
 _PUB_ITEM_RE = re.compile(

@@ -79,7 +79,7 @@ export interface TypeInfo {
 /** Known factory functions → return type mappings. */
 export const FACTORY_TYPES: Record<string, TypeInfo> = {
   "lurek.graphics.newImage": {
-    typeName: "Image",
+    typeName: "LImage",
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -89,11 +89,11 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "setWrap", sig: ":setWrap(horiz, vert)", desc: "Set texture wrap mode" },
       { name: "getWrap", sig: ":getWrap()", desc: "Returns horizontal, vertical wrap" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Image'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LImage'" },
     ],
   },
   "lurek.graphics.newCanvas": {
-    typeName: "Canvas",
+    typeName: "LCanvas",
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -102,11 +102,11 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "setFilter", sig: ":setFilter(min, mag)", desc: "Set texture filter" },
       { name: "renderTo", sig: ":renderTo(fn)", desc: "Render to this canvas" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Canvas'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LCanvas'" },
     ],
   },
   "lurek.graphics.newFont": {
-    typeName: "Font",
+    typeName: "LFont",
     methods: [
       { name: "getWidth", sig: ":getWidth(text)", desc: "Width of text in pixels" },
       { name: "getHeight", sig: ":getHeight()", desc: "Font height in pixels" },
@@ -116,30 +116,30 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "getDescent", sig: ":getDescent()", desc: "Returns font descent" },
       { name: "hasGlyphs", sig: ":hasGlyphs(text)", desc: "Check if font has glyphs" },
       { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Font'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LFont'" },
     ],
   },
   "lurek.graphics.newShader": {
-    typeName: "Shader",
+    typeName: "LShader",
     methods: [
       { name: "send", sig: ":send(name, value)", desc: "Set uniform value" },
       { name: "hasUniform", sig: ":hasUniform(name)", desc: "Check if uniform exists" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Shader'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LShader'" },
     ],
   },
   "lurek.graphics.newMesh": {
-    typeName: "Mesh",
+    typeName: "LMesh",
     methods: [
       { name: "setVertices", sig: ":setVertices(verts)", desc: "Set vertex data" },
       { name: "setTexture", sig: ":setTexture(tex)", desc: "Set texture for mesh" },
       { name: "getVertexCount", sig: ":getVertexCount()", desc: "Returns vertex count" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Mesh'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LMesh'" },
     ],
   },
   "lurek.graphics.newSpriteBatch": {
-    typeName: "SpriteBatch",
+    typeName: "LSpriteBatch",
     methods: [
       { name: "add", sig: ":add(quad, x, y, r, sx, sy)", desc: "Add sprite to batch" },
       { name: "clear", sig: ":clear()", desc: "Remove all sprites" },
@@ -147,20 +147,20 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "set", sig: ":set(id, quad, x, y, r, sx, sy)", desc: "Update sprite at index" },
       { name: "flush", sig: ":flush()", desc: "Upload data to GPU" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'SpriteBatch'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LSpriteBatch'" },
     ],
   },
   "lurek.graphics.newQuad": {
-    typeName: "Quad",
+    typeName: "LQuad",
     methods: [
       { name: "getViewport", sig: ":getViewport()", desc: "Returns x, y, w, h" },
       { name: "setViewport", sig: ":setViewport(x, y, w, h)", desc: "Set viewport rect" },
       { name: "getTextureDimensions", sig: ":getTextureDimensions()", desc: "Returns ref width, height" },
-      { name: "type", sig: ":type()", desc: "Returns 'Quad'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LQuad'" },
     ],
   },
   "lurek.audio.newSource": {
-    typeName: "Source",
+    typeName: "LSource",
     methods: [
       { name: "play", sig: ":play()", desc: "Start or resume playback" },
       { name: "pause", sig: ":pause()", desc: "Pause playback" },
@@ -176,11 +176,11 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "tell", sig: ":tell()", desc: "Returns current position" },
       { name: "getDuration", sig: ":getDuration()", desc: "Returns duration in seconds" },
       { name: "release", sig: ":release()", desc: "Free audio resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Source'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LSource'" },
     ],
   },
   "lurek.physics.newWorld": {
-    typeName: "World",
+    typeName: "LWorld",
     methods: [
       { name: "update", sig: ":update(dt)", desc: "Step the simulation" },
       { name: "setGravity", sig: ":setGravity(gx, gy)", desc: "Set gravity vector" },
@@ -190,11 +190,11 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "rayCast", sig: ":rayCast(x1, y1, x2, y2, fn)", desc: "Cast a ray" },
       { name: "setCallbacks", sig: ":setCallbacks(begin, end, pre, post)", desc: "Set collision callbacks" },
       { name: "destroy", sig: ":destroy()", desc: "Destroy physics world" },
-      { name: "type", sig: ":type()", desc: "Returns 'World'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LWorld'" },
     ],
   },
   "lurek.physics.newBody": {
-    typeName: "Body",
+    typeName: "LBody",
     methods: [
       { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
       { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set position" },
@@ -210,11 +210,11 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "getType", sig: ":getType()", desc: "Returns body type string" },
       { name: "isAwake", sig: ":isAwake()", desc: "Returns true if body is awake" },
       { name: "destroy", sig: ":destroy()", desc: "Remove body from world" },
-      { name: "type", sig: ":type()", desc: "Returns 'Body'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LBody'" },
     ],
   },
   "lurek.graphics.newParticleSystem": {
-    typeName: "ParticleSystem",
+    typeName: "LParticleSystem",
     methods: [
       { name: "emit", sig: ":emit(count)", desc: "Emit particles" },
       { name: "update", sig: ":update(dt)", desc: "Update particle system" },
@@ -230,13 +230,13 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "setDirection", sig: ":setDirection(angle)", desc: "Set emission direction" },
       { name: "setSpread", sig: ":setSpread(spread)", desc: "Set emission cone angle" },
       { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'ParticleSystem'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LParticleSystem'" },
     ],
   },
   // ── cardgame types ────────────────────────────────────────
   // lurek.cardgame.clone is an alias — it clones a Card from another (advanced use)
   "lurek.cardgame.clone": {
-    typeName: "Card",
+    typeName: "LCard",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
       { name: "name", type: "string", desc: "Card display name" },
@@ -262,7 +262,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newCard": {
-    typeName: "Card",
+    typeName: "LCard",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
       { name: "name", type: "string", desc: "Card display name" },
@@ -290,7 +290,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newDeck": {
-    typeName: "Deck",
+    typeName: "LDeck",
     fields: [
       { name: "name", type: "string", desc: "Deck display name" },
     ],
@@ -314,7 +314,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newDeckBuilder": {
-    typeName: "DeckBuilder",
+    typeName: "LDeckBuilder",
     fields: [
       { name: "min_cards", type: "integer", desc: "Minimum total cards required" },
       { name: "max_cards", type: "integer", desc: "Maximum total cards allowed (0 = no limit)" },
@@ -325,7 +325,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newStackManager": {
-    typeName: "StackManager",
+    typeName: "LStackManager",
     methods: [
       { name: "push", sig: ":push(entry)", desc: "Push an entry onto the stack" },
       { name: "resolve", sig: ":resolve()", desc: "Pop and return the top entry" },
@@ -337,7 +337,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newZone": {
-    typeName: "Zone",
+    typeName: "LZone",
     fields: [
       { name: "name", type: "string", desc: "Zone name" },
       { name: "capacity", type: "integer", desc: "Max capacity (0 = unlimited)" },
@@ -354,7 +354,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
     ],
   },
   "lurek.cardgame.newCardPool": {
-    typeName: "CardPool",
+    typeName: "LCardPool",
     fields: [
       { name: "name", type: "string", desc: "Pool name" },
     ],
@@ -369,7 +369,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
   },
   // ── entity types ──────────────────────────────────────────
   "lurek.ecs.new": {
-    typeName: "Entity",
+    typeName: "LEntity",
     methods: [
       { name: "getId", sig: ":getId()", desc: "Returns entity ID" },
       { name: "getTag", sig: ":getTag()", desc: "Returns entity tag" },
@@ -382,44 +382,44 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "hasComponent", sig: ":hasComponent(name)", desc: "Returns true if entity has component" },
       { name: "destroy", sig: ":destroy()", desc: "Destroy entity" },
       { name: "isAlive", sig: ":isAlive()", desc: "Returns true if entity is alive" },
-      { name: "type", sig: ":type()", desc: "Returns 'Entity'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LEntity'" },
     ],
   },
   // ── timer types ───────────────────────────────────────────
   "lurek.timer.after": {
-    typeName: "Timer",
+    typeName: "LTimer",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
       { name: "pause", sig: ":pause()", desc: "Pause the timer" },
       { name: "resume", sig: ":resume()", desc: "Resume the timer" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'Timer'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" },
     ],
   },
   "lurek.timer.every": {
-    typeName: "Timer",
+    typeName: "LTimer",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
       { name: "pause", sig: ":pause()", desc: "Pause the timer" },
       { name: "resume", sig: ":resume()", desc: "Resume the timer" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'Timer'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" },
     ],
   },
   "lurek.timer.tween": {
-    typeName: "Tween",
+    typeName: "LTween",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the tween" },
       { name: "pause", sig: ":pause()", desc: "Pause the tween" },
       { name: "resume", sig: ":resume()", desc: "Resume the tween" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
       { name: "getProgress", sig: ":getProgress()", desc: "Returns progress 0-1" },
-      { name: "type", sig: ":type()", desc: "Returns 'Tween'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LTween'" },
     ],
   },
   // ── tilemap types ─────────────────────────────────────────
   "lurek.tilemap.load": {
-    typeName: "Tilemap",
+    typeName: "LTilemap",
     methods: [
       { name: "draw", sig: ":draw()", desc: "Draw the tilemap" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns width in tiles" },
@@ -429,24 +429,24 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "getLayer", sig: ":getLayer(name)", desc: "Get layer by name" },
       { name: "getLayerCount", sig: ":getLayerCount()", desc: "Returns number of layers" },
       { name: "getProperty", sig: ":getProperty(name)", desc: "Get map property" },
-      { name: "type", sig: ":type()", desc: "Returns 'Tilemap'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LTilemap'" },
     ],
   },
   // ── scene types ───────────────────────────────────────────
   "lurek.scene.new": {
-    typeName: "Scene",
+    typeName: "LScene",
     methods: [
       { name: "enter", sig: ":enter()", desc: "Called when scene becomes active" },
       { name: "exit", sig: ":exit()", desc: "Called when scene is deactivated" },
       { name: "update", sig: ":update(dt)", desc: "Update scene" },
       { name: "draw", sig: ":draw()", desc: "Draw scene" },
       { name: "getName", sig: ":getName()", desc: "Returns scene name" },
-      { name: "type", sig: ":type()", desc: "Returns 'Scene'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LScene'" },
     ],
   },
   // ── data types ────────────────────────────────────────────
   "lurek.data.newStore": {
-    typeName: "DataStore",
+    typeName: "LDataStore",
     methods: [
       { name: "get", sig: ":get(key)", desc: "Get value by key" },
       { name: "set", sig: ":set(key, value)", desc: "Set a key-value pair" },
@@ -456,20 +456,20 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "values", sig: ":values()", desc: "Returns all values" },
       { name: "clear", sig: ":clear()", desc: "Remove all entries" },
       { name: "size", sig: ":size()", desc: "Returns number of entries" },
-      { name: "type", sig: ":type()", desc: "Returns 'DataStore'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LDataStore'" },
     ],
   },
   // ── event types ───────────────────────────────────────────
   "lurek.event.on": {
-    typeName: "EventHandle",
+    typeName: "LEventHandle",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Unsubscribe from event" },
-      { name: "type", sig: ":type()", desc: "Returns 'EventHandle'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LEventHandle'" },
     ],
   },
   // ── camera types ──────────────────────────────────────────
   "lurek.camera.new": {
-    typeName: "Camera",
+    typeName: "LCamera",
     methods: [
       { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
       { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set camera position" },
@@ -483,7 +483,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
       { name: "detach", sig: ":detach()", desc: "Reset camera transform" },
       { name: "worldToScreen", sig: ":worldToScreen(wx, wy)", desc: "Convert world to screen coords" },
       { name: "screenToWorld", sig: ":screenToWorld(sx, sy)", desc: "Convert screen to world coords" },
-      { name: "type", sig: ":type()", desc: "Returns 'Camera'" },
+      { name: "type", sig: ":type()", desc: "Returns 'LCamera'" },
     ],
   },
 };

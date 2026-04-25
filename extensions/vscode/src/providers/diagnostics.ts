@@ -17,11 +17,20 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
     context.subscriptions.push(collection);
 
     const debounceTimers = new Map<string, ReturnType<typeof setTimeout>>();
+    const docVersions = new Map<string, number>();
 
     const diagnose = (document: vscode.TextDocument): void => {
         if (document.languageId !== 'lua') return;
 
+        // Track document version to avoid stale diagnostics
+        const key = document.uri.toString();
+        const currentVersion = document.version;
+        docVersions.set(key, currentVersion);
+
         try {
+            // Re-check version after async gap — skip if document changed again
+            if (docVersions.get(key) !== currentVersion) return;
+
             const text = document.getText();
             const info = analyzer.analyze(text);
             const diagnostics: vscode.Diagnostic[] = [];
@@ -48,12 +57,17 @@ export function register(context: vscode.ExtensionContext, apiData: ApiDataServi
 
     const debouncedDiagnose = (document: vscode.TextDocument): void => {
         const key = document.uri.toString();
+        const version = document.version;
+        docVersions.set(key, version);
         const existing = debounceTimers.get(key);
         if (existing) clearTimeout(existing);
         debounceTimers.set(key, setTimeout(() => {
             debounceTimers.delete(key);
-            diagnose(document);
-        }, 300));
+            // Only diagnose if version hasn't changed during debounce wait
+            if (docVersions.get(key) === version) {
+                diagnose(document);
+            }
+        }, 800));
     };
 
     context.subscriptions.push(

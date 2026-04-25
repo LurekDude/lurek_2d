@@ -197,6 +197,19 @@ impl LuaUserData for LuaRingBuffer {
             }
             Ok(t)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LRingBuffer"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LRingBuffer" || name == "Object")
+        });
     }
 }
 
@@ -421,6 +434,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     /// Instantiates a raw byte data container object.
+    /// @param value integer | number | string  Size in bytes (allocates zeroed buffer) or a string to copy.
+    /// @return ByteData
     tbl.set(
         "newByteData",
         lua.create_function(|lua, value: LuaValue| {
@@ -744,6 +759,19 @@ impl LuaUserData for LuaDataView {
         /// Returns the size of this view in bytes.
         /// @return integer
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.get_size() as i64));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LDataView"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LDataView" || name == "Object")
+        });
     }
 }
 
@@ -856,13 +884,27 @@ impl LuaUserData for LuaDataWriter {
         methods.add_method("toBytes", |lua, this, ()| {
             lua.create_string(this.inner.as_bytes())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LDataWriter"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LDataWriter" || name == "Object")
+        });
     }
 }
 
+/// Raw byte buffer for binary I/O; addressable by byte or bit offset.
 impl mlua::UserData for ByteData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // ── getSize ──────────────────────────────────────────────
-        /// Get the size.
+        /// Returns the total byte length of this buffer.
         /// @return integer
         methods.add_method("getSize", |_, this, ()| Ok(this.len()));
         // ── getString ──────────────────────────────────────────────
@@ -899,7 +941,7 @@ impl mlua::UserData for ByteData {
             }
         });
         // ── clone ──────────────────────────────────────────────
-        /// Clone the ByteData.
+        /// Creates an independent copy of this byte buffer with identical contents.
         /// @return ByteData
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(this.clone_data())

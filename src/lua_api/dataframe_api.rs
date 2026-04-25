@@ -119,6 +119,19 @@ impl LuaUserData for LuaGroupedFrame {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("GroupedFrame({} groups)", this.groups.len()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LGroupedFrame"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LGroupedFrame" || name == "Object")
+        });
     }
 }
 
@@ -1005,7 +1018,7 @@ impl LuaUserData for LuaDataFrame {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("DataFrame"));
+        methods.add_method("type", |_, _, ()| Ok("LDataFrame"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1281,7 +1294,7 @@ impl LuaUserData for LuaDatabase {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Database"));
+        methods.add_method("type", |_, _, ()| Ok("LDatabase"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1598,7 +1611,7 @@ impl LuaUserData for LuaVecFrame {
 
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("VecFrame"));
+        methods.add_method("type", |_, _, ()| Ok("LVecFrame"));
 
         /// Returns true if this object is of the given type.
         /// @param name : string

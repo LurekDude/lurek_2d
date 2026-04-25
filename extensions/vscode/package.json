@@ -1,8 +1,8 @@
 {
   "name": "lurek2d-toolkit",
   "displayName": "Lurek2D Toolkit",
-  "description": "Official VS Code extension for Lurek2D game engine. 778+ lurek.* API completions, hover docs, signature help, diagnostics, semantic highlighting, debug adapter (DAP), build/run/package tools, 29 visual editors, and MCP server for AI agents.",
-  "version": "0.9.0",
+  "description": "Official VS Code extension for the Lurek2D game engine v1.0. 4000+ lurek.* API items (1200+ module functions + 2900+ class methods across 50 modules and 223 types), 13 Lurek-specific diagnostic rules, semantic highlighting, callback/test/library/demo CodeLens markers, type inference for lurek factory objects, 85 commands, debug adapter (DAP), build/run/package tools, visual editors, and MCP server for AI agents. Designed to complement sumneko.lua — focuses only on Lurek-unique features.",
+  "version": "1.0.0",
   "publisher": "lurek2d",
   "icon": "media/lurek-logo.png",
   "license": "MIT",

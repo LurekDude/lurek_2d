@@ -18,15 +18,6 @@ class LuaCodeLensProvider implements vscode.CodeLensProvider {
     // Collect all function definitions
     const funcDef = /^(?:local\s+function\s+(\w+)|function\s+([\w.:]+))/;
 
-    // Count how many times each identifier appears in the whole document
-    function countRefs(name: string): number {
-      // Simple word-boundary count, skip the definition itself
-      const plain = name.replace(/[.]/g, "\\.");
-      const re = new RegExp(`\\b${plain}\\b`, "g");
-      const all = text.match(re) ?? [];
-      return Math.max(0, all.length - 1); // subtract 1 for the definition
-    }
-
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const m = funcDef.exec(line.trimStart());
@@ -48,19 +39,17 @@ class LuaCodeLensProvider implements vscode.CodeLensProvider {
           arguments: [`lurek.${cbName}`],
           tooltip: `Open API documentation for lurek.${cbName}`,
         }));
-      } else {
-        // Regular function: show reference count
-        const refCount = countRefs(funcName.split(".").pop() ?? funcName);
-        const refLabel = refCount === 1 ? "1 reference" : `${refCount} references`;
+      } else if (funcName.startsWith("lurek.")) {
+        // lurek.* function that isn't a callback: show module badge
         lenses.push(new vscode.CodeLens(range, {
-          title: refCount === 0 ? "⚠ unused" : refLabel,
-          command: "lurek.codelens.findRefs",
-          arguments: [document.uri, new vscode.Position(i, line.indexOf(funcName)), funcName],
-          tooltip: refCount === 0
-            ? `"${funcName}" is never called`
-            : `Find all references to "${funcName}"`,
+          title: `🔧 lurek API override`,
+          command: "lurek.browseApi",
+          arguments: [funcName],
+          tooltip: `This overrides a lurek API function: ${funcName}`,
         }));
       }
+      // NOTE: Reference counting removed — sumneko.lua already provides
+      // reference CodeLens for all Lua functions (avoids duplicate counts).
 
       // Add "Run test" lens for test-style functions (test_ prefix or _test suffix)
       if (/^test_|_test\b/.test(funcName)) {
@@ -69,6 +58,61 @@ class LuaCodeLensProvider implements vscode.CodeLensProvider {
           command: "lurek.test.runSingleLua",
           arguments: [document.uri, funcName],
           tooltip: `Run Lua test "${funcName}"`,
+        }));
+      }
+    }
+
+    // ── File-level markers (require, demo, library, module) ──
+    const filePath = document.uri.fsPath.replace(/\\/g, "/");
+    const firstLine = document.lineAt(0).text;
+    const lineCount = document.lineCount;
+
+    // Library init.lua marker
+    if (filePath.includes("/library/") && filePath.endsWith("/init.lua")) {
+      const libName = filePath.match(/\/library\/([^/]+)\//)?.[1];
+      if (libName) {
+        lenses.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          title: `📦 Lunasome library: ${libName}`,
+          command: "",
+          tooltip: `This is the entry point for the "${libName}" Lunasome library`,
+        }));
+      }
+    }
+
+    // Demo/game main.lua marker
+    if (filePath.includes("/content/games/") && filePath.endsWith("/main.lua")) {
+      const demoName = filePath.match(/\/content\/games\/([^/]+)\//)?.[1];
+      if (demoName) {
+        lenses.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          title: `🎮 Demo: ${demoName}`,
+          command: "lurek.runDemo",
+          arguments: [demoName],
+          tooltip: `Run the "${demoName}" demo`,
+        }));
+      }
+    }
+
+    // Example file marker
+    if (filePath.includes("/content/examples/") && filePath.endsWith(".lua")) {
+      const exName = filePath.match(/\/content\/examples\/([^/]+)\.lua$/)?.[1];
+      if (exName) {
+        lenses.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          title: `📖 Example: ${exName}`,
+          command: "",
+          tooltip: `API example script demonstrating ${exName}`,
+        }));
+      }
+    }
+
+    // Lua test file marker
+    if (filePath.includes("/tests/lua/") && filePath.endsWith(".lua")) {
+      const testName = filePath.match(/\/tests\/lua\/.*?\/([^/]+)\.lua$/)?.[1];
+      if (testName) {
+        lenses.push(new vscode.CodeLens(new vscode.Range(0, 0, 0, 0), {
+          title: `🧪 Lua test: ${testName}`,
+          command: "lurek.test.runSingleLua",
+          arguments: [document.uri, testName],
+          tooltip: `Test file: ${testName}`,
         }));
       }
     }

@@ -553,6 +553,19 @@ impl LuaUserData for LuaSaveManager {
                 None => Ok(LuaValue::Nil),
             }
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSaveManager"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSaveManager" || name == "Object")
+        });
     }
 }
 

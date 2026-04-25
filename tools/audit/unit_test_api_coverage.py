@@ -55,9 +55,9 @@ from typing import Dict, List, NamedTuple, Optional, Set, Tuple
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 ROOT = Path(__file__).resolve().parents[2]
-API_JSON = ROOT / "logs" / "lua_api_data.json"
+API_JSON = ROOT / "logs" / "data" / "lua_api_data.json"
 LUA_UNIT_TESTS = ROOT / "tests" / "lua" / "unit"
-OUTPUT_JSON = ROOT / "logs" / "unit_test_coverage.json"
+OUTPUT_JSON = ROOT / "logs" / "data" / "unit_test_coverage.json"
 OUTPUT_MD = ROOT / "logs" / "reports" / "unit_test_coverage.md"
 
 # ── Data types ─────────────────────────────────────────────────────────────────

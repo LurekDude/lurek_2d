@@ -485,6 +485,19 @@ impl LuaUserData for LuaNetworkHost {
                 this.inner.borrow().local_address()
             ))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNetworkHost"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNetworkHost" || name == "Object")
+        });
     }
 }
 
@@ -741,6 +754,19 @@ impl LuaUserData for LuaNetworkRuntime {
         /// @return string
         methods.add_meta_method(LuaMetaMethod::ToString, |_, _this, ()| {
             Ok("NetworkRuntime".to_string())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNetworkRuntime"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNetworkRuntime" || name == "Object")
         });
     }
 }

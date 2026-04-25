@@ -404,7 +404,7 @@ impl LuaUserData for LuaStep {
         /// Type.
         ///
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("PipelineStep"));
+        methods.add_method("type", |_, _, ()| Ok("LPipelineStep"));
         // -- typeOf --
         /// Returns true when the given name matches "PipelineStep" or a parent type
         /// Type of.
@@ -1130,7 +1130,7 @@ impl LuaUserData for LuaPipeline {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Pipeline"));
+        methods.add_method("type", |_, _, ()| Ok("LPipeline"));
 
         // -- addConditional --
         /// Adds a step with a runtime condition guard: the step is skipped when `when_fn()` returns false.

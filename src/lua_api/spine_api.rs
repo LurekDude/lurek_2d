@@ -312,6 +312,19 @@ impl LuaUserData for LuaSkeleton {
                 Ok(())
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSkeleton"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSkeleton" || name == "Object")
+        });
     }
 }
 
@@ -444,6 +457,19 @@ impl LuaUserData for LuaSkeletonAnimation {
         /// @return integer
         methods.add_method("getTimelineCount", |_, this, ()| {
             Ok(this.inner.timelines.len())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSkeletonAnimation"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSkeletonAnimation" || name == "Object")
         });
     }
 }

@@ -14,7 +14,7 @@ import argparse, json, re, sys
 from pathlib import Path
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-INPUT_FILE  = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
+INPUT_FILE  = WORKSPACE_ROOT / "logs" / "data" / "lua_api_data.json"
 OUTPUT_FILE = WORKSPACE_ROOT / "docs" / "api" / "lurek.md"
 
 _MODULE_ORDER = [

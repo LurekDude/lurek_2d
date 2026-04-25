@@ -1,20 +1,20 @@
 {
   "meta": {
-    "generated": "2026-04-23T22:15:48.426764+00:00",
+    "generated": "2026-04-25T22:43:08.622940+00:00",
     "generator": "tools/gen_rust_api_data.py",
-    "version": "0.20.0",
+    "version": "1.0.0",
     "stats": {
-      "rust_items": 1882,
-      "rust_modules": 452,
-      "rust_tests": 1,
-      "lua_tests": 256
+      "rust_items": 1903,
+      "rust_modules": 458,
+      "rust_tests": 2,
+      "lua_tests": 263
     }
   },
   "rust_api": {
     "summary": {
-      "total_items": 1882,
-      "documented": 1871,
-      "modules": 452
+      "total_items": 1903,
+      "documented": 1878,
+      "modules": 458
     },
     "modules": {
       "ai::agent": {
@@ -1239,7 +1239,7 @@
             "kind": "struct",
             "description": "Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` â€” `Config`. - `conf_error` â€” `Option<String>`.",
             "file": "src/app/app.rs",
-            "line": 2592
+            "line": 2595
           }
         ]
       },
@@ -2966,7 +2966,7 @@
             "kind": "enum",
             "description": "Aggregation function variants for group-by and pivot operations.  # Variants - `Mean`  — Arithmetic mean of numeric values. - `Sum`   — Sum of numeric values. - `Min`   — Minimum numeric value. - `Max`   — Maximum numeric value. - `Count` — Count of non-nil values. - `First` — First encountered value. - `Last`  — Last encountered value.",
             "file": "src/dataframe/frame.rs",
-            "line": 1179
+            "line": 1236
           }
         ]
       },
@@ -4868,6 +4868,189 @@
             "description": "Result of a successful pathfinding query.  # Fields - `nodes` — `Vec<u64>`. - `edges` — `Vec<u64>`. - `cost` — `f64`.",
             "file": "src/graph/traversal.rs",
             "line": 23
+          }
+        ]
+      },
+      "html::document": {
+        "module_doc": "HTML document — core DOM, layout engine, draw-command emitter, and input router.  [`HtmlDocument`] is the top-level entry point for the pure-Rust HTML/CSS subsystem. Create one with [`HtmlDocument::new`], mutate it through its public methods, then call [`HtmlDocument::draw`] each frame to receive a list of [`HtmlDrawCommand`]s that the wgpu renderer can consume.",
+        "source_file": "src/html/document.rs",
+        "items": [
+          {
+            "name": "HtmlDocumentOptions",
+            "kind": "struct",
+            "description": "Configuration options for [`HtmlDocument::new`].",
+            "file": "src/html/document.rs",
+            "line": 17
+          },
+          {
+            "name": "HtmlDrawCommand",
+            "kind": "struct",
+            "description": "A single renderer-agnostic draw instruction produced by [`HtmlDocument::draw`].  The wgpu render layer (or any other backend) iterates this list and emits the corresponding GPU draw calls.",
+            "file": "src/html/document.rs",
+            "line": 41
+          },
+          {
+            "name": "HtmlDocument",
+            "kind": "struct",
+            "description": "An HTML/CSS document with an integrated layout engine and draw-command emitter.  # Lifecycle  1. Create with [`HtmlDocument::new`] (or via the `lurek.html.newDocument` Lua binding). 2. Call [`HtmlDocument::update`] every frame to advance CSS animations. 3. Call [`HtmlDocument::draw`] every frame to obtain [`HtmlDrawCommand`]s for rendering. 4. After any bulk DOM mutation, call [`HtmlDocument::relayout`] before the next draw.",
+            "file": "src/html/document.rs",
+            "line": 65
+          }
+        ]
+      },
+      "html::element": {
+        "module_doc": "DOM element — individual HTML node with tag, attributes, classes, inline style, text content, child links, and a computed bounding rectangle.  All mutable element operations go through [`HtmlElement`] methods. The element's identity within a document is its [`HtmlElementId`] (a `usize` index).",
+        "source_file": "src/html/element.rs",
+        "items": [
+          {
+            "name": "HtmlElementId",
+            "kind": "type",
+            "description": "Opaque index into the element arena inside [`super::document::HtmlDocument`].",
+            "file": "src/html/element.rs",
+            "line": 12
+          },
+          {
+            "name": "HtmlRect",
+            "kind": "struct",
+            "description": "Axis-aligned bounding rectangle in screen pixels, set during the layout pass.",
+            "file": "src/html/element.rs",
+            "line": 16
+          },
+          {
+            "name": "HtmlElement",
+            "kind": "struct",
+            "description": "A single DOM element node within an [`super::document::HtmlDocument`] arena.  Elements are addressed by their [`HtmlElementId`]; direct struct access is `pub(crate)` — all mutations go through document-level methods to ensure consistent dirty-flag tracking.",
+            "file": "src/html/element.rs",
+            "line": 40
+          },
+          {
+            "name": "normalise_name",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/element.rs",
+            "line": 219
+          }
+        ]
+      },
+      "html": {
+        "module_doc": "Lightweight pure-Rust HTML/CSS layout engine for `lurek.html`.",
+        "source_file": "src/html/mod.rs",
+        "items": [
+          {
+            "name": "document",
+            "kind": "mod",
+            "description": "",
+            "file": "src/html/mod.rs",
+            "line": 3
+          },
+          {
+            "name": "element",
+            "kind": "mod",
+            "description": "",
+            "file": "src/html/mod.rs",
+            "line": 4
+          },
+          {
+            "name": "parser",
+            "kind": "mod",
+            "description": "",
+            "file": "src/html/mod.rs",
+            "line": 5
+          },
+          {
+            "name": "selector",
+            "kind": "mod",
+            "description": "",
+            "file": "src/html/mod.rs",
+            "line": 6
+          },
+          {
+            "name": "style",
+            "kind": "mod",
+            "description": "",
+            "file": "src/html/mod.rs",
+            "line": 7
+          }
+        ]
+      },
+      "html::parser": {
+        "module_doc": "Minimal HTML parser — converts a UTF-8 HTML string into the element arena used by [`super::document::HtmlDocument`].  The parser is intentionally lenient: unrecognised attributes are stored verbatim, unclosed tags are implicitly closed, and unknown entities are passed through as-is. This matches browser-grade fault tolerance for game UI markup.",
+        "source_file": "src/html/parser.rs",
+        "items": [
+          {
+            "name": "parse_into",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/parser.rs",
+            "line": 12
+          },
+          {
+            "name": "escape_text",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/parser.rs",
+            "line": 160
+          },
+          {
+            "name": "escape_attribute",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/parser.rs",
+            "line": 166
+          }
+        ]
+      },
+      "html::selector": {
+        "module_doc": "CSS selector matcher — evaluates compiled selectors against a live element arena.  Supports type, class (`.foo`), id (`#id`), attribute (`[attr]`, `[attr=\"val\"]`), descendant (` `), and child (`>`) combinators.  Pseudo-classes are not yet implemented; they are silently ignored during matching.",
+        "source_file": "src/html/selector.rs",
+        "items": [
+          {
+            "name": "matches_selector",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/selector.rs",
+            "line": 28
+          }
+        ]
+      },
+      "html::style": {
+        "module_doc": "CSS parser and cascade engine — parses stylesheet text into [`CssRule`]s and resolves the computed style for each DOM element in specificity + source order.  Only a subset of CSS 2.1 property names are handled by the layout engine; unknown properties are stored but silently ignored during layout computation.",
+        "source_file": "src/html/style.rs",
+        "items": [
+          {
+            "name": "CssRule",
+            "kind": "struct",
+            "description": "A parsed CSS rule with a selector string and a property → value map.",
+            "file": "src/html/style.rs",
+            "line": 13
+          },
+          {
+            "name": "CssParseResult",
+            "kind": "struct",
+            "description": "",
+            "file": "src/html/style.rs",
+            "line": 23
+          },
+          {
+            "name": "parse_stylesheets",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/style.rs",
+            "line": 28
+          },
+          {
+            "name": "parse_declarations",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/style.rs",
+            "line": 54
+          },
+          {
+            "name": "parse_length",
+            "kind": "fn",
+            "description": "",
+            "file": "src/html/style.rs",
+            "line": 76
           }
         ]
       },
@@ -7968,7 +8151,7 @@
             "kind": "struct",
             "description": "Configuration for a particle emitter. Controls emission rate, lifetime, physics, rendering, and the full set of per-particle randomisation ranges.  All range fields (e.g. `speed_min` / `speed_max`) are sampled uniformly per particle at spawn.  # Fields - `max_particles` â€” `u32`. Pool size cap. - `emission_rate` â€” `f32`. Particles per second. - `lifetime_min` / `lifetime_max` â€” `f32`. Particle lifetime range in seconds. - `speed_min` / `speed_max` â€” `f32`. Initial speed range. - `direction` â€” `f32`. Base emission angle in radians. - `spread` â€” `f32`. Angular spread around `direction`. - `sizes` â€” `Vec<f32>`. Keyframe sizes over particle lifetime. - `colors` â€” `Vec<[f32; 4]>`. RGBA colour gradient keyframes. - `emission_shape` â€” `EmissionShape`. Spawn-point distribution shape. - `relative_mode` â€” `RelativeMode`. Whether particles follow the emitter. - `shape` â€” `ParticleShape`. Rendered primitive type (point, rect, sprite). - (additional fields: gravity, accel, damping, turbulence, drag, orbit, animation, etc.)",
             "file": "src/particle/config.rs",
-            "line": 221
+            "line": 222
           }
         ]
       },
@@ -10838,98 +11021,98 @@
             "kind": "struct",
             "description": "A single deferred draw operation queued during `lurek.draw()` and executed by `GpuRenderer`.  # Variants - `SetColor(r, g, b, a)` — Sets the active draw color; affects all subsequent draw calls. - `Rectangle` — Draws an axis-aligned rectangle. - `RoundedRectangle` — Draws a rectangle with rounded corners. - `Circle` — Draws a circle at center `(x, y)` with radius `r`. - `Ellipse` — Draws an ellipse with semi-axes `rx`, `ry`. - `Triangle` — Draws a triangle with three explicit vertices. - `Polygon` — Draws an arbitrary polygon from a flat `[x0, y0, x1, y1, ...]` vertex list. - `Line` — Draws a line segment from `(x1, y1)` to `(x2, y2)`. - `Polyline` — Draws a connected sequence of line segments through a flat `[x0,y0,x1,y1,…]` list. - `DrawImage` — Blits a texture (by index) at position `(x, y)`. - `DrawImageEx` — Draws a texture with full transform (rotation, scale, origin offset). - `DrawQuad` — Draws a sub-region (quad) of a texture with full transform. - `Print` — Renders text using a loaded bitmap font. - `SetLineWidth` — Sets the stroke width for subsequent outline draws. - `PushTransform` — Saves the current transform onto the stack. - `PopTransform` — Restores the previous transform from the stack. - `Translate` — Applies a translation to the current transform. - `Rotate` — Applies a rotation (in radians) to the current transform. - `Scale` — Applies a scale to the current transform. - `Arc` — Draws an arc (sector or outline) of a circle. - `DrawShape` — Draw all primitives in a compound shape with a unified affine transform. - `DrawParticleSystem` — Renders all particles in a single batched command, dispatching per-shape geometry helpers internally. - `BeginPostFx` — Start capturing the framebuffer for post-processing; subsequent draw calls render into the capture target. - `EndPostFx` — Stop capturing; resume rendering to the previous target. - `ApplyPostFx` — Apply the registered post-processing effects from the named stack and composite the result onto the current target. - `DrawTexturedQuad` — Draws an arbitrary textured quad specified by four explicit screen-space corners and four UV coordinates. A single shader pass in a post-FX pipeline.  Produced by the Lua PostFx stack at `apply()` time and stored inside [`RenderCommand::ApplyPostFx`]. The GPU renderer iterates the list and dispatches the appropriate WGSL shader for each pass in order.  # Fields - `effect_name` — Name that maps to a WGSL shader file (e.g. `\"bloom\"`, `\"vignette\"`). - `params` — Shader uniform values keyed by name. - `shader_id` — For `Custom` passes only; index into the GPU shader registry. - `auto_uniforms` — When `true`, the engine injects time/frame/resolution into `p[3]`.",
             "file": "src/render/renderer.rs",
-            "line": 238
+            "line": 237
           },
           {
             "name": "TextSpan",
             "kind": "struct",
             "description": "RenderCommand.  # Variants - `SetColor` — SetColor variant. - `Rectangle` — Rectangle variant. - `RoundedRectangle` — RoundedRectangle variant. - `Circle` — Circle variant. - `Ellipse` — Ellipse variant. - `Triangle` — Triangle variant. - `Polygon` — Polygon variant. - `Line` — Line variant. - `Polyline` — Polyline variant. - `DrawImage` — DrawImage variant. - `DrawImageEx` — DrawImageEx variant. - `DrawQuad` — DrawQuad variant. - `Print` — Print variant. - `SetLineWidth` — SetLineWidth variant. - `PushTransform` — PushTransform variant. - `PopTransform` — PopTransform variant. - `Translate` — Translate variant. - `Rotate` — Rotate variant. - `Scale` — Scale variant. - `Shear` — Shear variant. - `Origin` — Origin variant. - `ApplyTransform` — ApplyTransform variant. - `Arc` — Arc variant. - `DrawBatch` — DrawBatch variant. - `SetBlendMode` — SetBlendMode variant. - `SetCanvas` — SetCanvas variant. - `DrawCanvas` — DrawCanvas variant. - `RegisterCanvas` — RegisterCanvas variant. - `Points` — Points variant. - `SetPointSize` — SetPointSize variant. - `SetScissor` — SetScissor variant. - `SetColorMask` — SetColorMask variant. - `SetWireframe` — SetWireframe variant. - `PrintFormatted` — PrintFormatted variant. - `StencilBegin` — StencilBegin variant. - `StencilEnd` — StencilEnd variant. - `SetStencilTest` — SetStencilTest variant. - `SetShader` — SetShader variant. - `DrawMesh` — DrawMesh variant. - `SyncMesh` — SyncMesh variant. - `DrawNineSlice` — DrawNineSlice variant. - `DrawShape` — DrawShape variant. - `DrawParticleSystem` — DrawParticleSystem variant. - `BeginPostFx` — BeginPostFx variant. - `EndPostFx` — EndPostFx variant. - `ApplyPostFx` — ApplyPostFx variant. - `DrawTexturedQuad` — DrawTexturedQuad variant. - `DrawQuadBezier` — DrawQuadBezier variant. - `DrawCubicBezier` — DrawCubicBezier variant. - `DrawPath` — DrawPath variant. - `DrawGradientRect` — DrawGradientRect variant. - `DrawColoredPolygon` — DrawColoredPolygon variant. - `DrawIsoCubeTile` — DrawIsoCubeTile variant. - `DrawHexTile` — DrawHexTile variant. - `BeginSortGroup` — BeginSortGroup variant. - `PushSortKey` — PushSortKey variant. - `FlushSortGroup` — FlushSortGroup variant. - `DrawPhysicsDebug` — DrawPhysicsDebug variant. - `DrawSpineSkeleton` — DrawSpineSkeleton variant. - `DrawBevelRect` — DrawBevelRect variant. - `PushLayer` — PushLayer variant. - `PopLayer` — PopLayer variant. - `DrawRichText` — DrawRichText variant. One styled segment inside a [`RenderCommand::DrawRichText`] command.  Each span can carry its own colour and scale, while the command as a whole provides the default font and the baseline origin.  # Fields - `text` — `String`. UTF-8 text content of this span. - `r`, `g`, `b`, `a` — `u8`. RGBA colour override (0–255). - `scale` — `f32`. Font scale multiplier (1.0 = default size).",
             "file": "src/render/renderer.rs",
-            "line": 326
+            "line": 324
           },
           {
             "name": "RenderCommand",
             "kind": "enum",
             "description": "Enqueues a typed draw or state command into the per-frame GPU render queue.",
             "file": "src/render/renderer.rs",
-            "line": 358
+            "line": 356
           },
           {
             "name": "TextureData",
             "kind": "struct",
             "description": "Raw RGBA pixel data for a loaded texture, stored in the renderer's texture atlas.  # Fields - `pixels` — Raw RGBA byte data in RGBA format. - `width` — Texture width in pixels. - `height` — Texture height in pixels.",
             "file": "src/render/renderer.rs",
-            "line": 1040
+            "line": 1038
           },
           {
             "name": "ParticleRenderShape",
             "kind": "enum",
             "description": "Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.  This mirrors `particle::ParticleShape` one-for-one. The particle module converts `ParticleShape` -> `ParticleRenderShape` when building the `DrawParticleSystem` command, keeping the Tier-1 `graphics` module free of an upward Tier-2 import.  # Variants - `Square` — Axis-aligned filled square. - `Circle` — Filled circle. - `Triangle` — Filled equilateral triangle. - `Spark` — Thin line segment along velocity. - `Diamond` — Filled diamond (square rotated 45°). - `Shrapnel` — Random jagged polygon (deterministic per particle). `edges` = vertex count; `seed` = per-particle RNG seed. - `Ray` — Elongated filled rectangle. `aspect` = length-to-width ratio. - `Puff` — Soft filled circle (more tessellation segments than `Circle`). - `Ring` — Hollow ring (annulus). `thickness` = band width as fraction of size. - `Capsule` — Filled capsule (rectangle + hemispherical caps).",
             "file": "src/render/renderer.rs",
-            "line": 1064
+            "line": 1062
           },
           {
             "name": "ParticleInstance",
             "kind": "struct",
             "description": "Per-particle render data for a single frame.  Produced by `ParticleSystem::build_render_commands()` and consumed by the GPU renderer's `DrawParticleSystem` arm. All positions are in world space.  # Fields - `x` — `f32`. - `y` — `f32`. - `r` — `f32`. - `g` — `f32`. - `b` — `f32`. - `a` — `f32`. - `rotation` — `f32`. - `size` — `f32`. - `shape` — `ParticleRenderShape`. - `texture_key` — `Option<TextureKey>`. - `quad` — `Option<[f32; 4]>`. - `quad_tex_dims` — `Option<(f32, f32)>`.",
             "file": "src/render/renderer.rs",
-            "line": 1119
+            "line": 1117
           },
           {
             "name": "DrawableKind",
             "kind": "enum",
             "description": "Type discriminator for resources that can be passed to lurek.graphic.draw.  Used to dispatch the polymorphic draw(drawable, ...) Lua API to the correct RenderCommand variant based on resource type.  # Variants - Image(TextureKey) — A loaded texture (Image). - Canvas(CanvasKey) — An off-screen render target. - SpriteBatch(SpriteBatchKey) — A batched sprite collection. - Mesh(MeshKey) — A custom geometry mesh.",
             "file": "src/render/renderer.rs",
-            "line": 1159
+            "line": 1157
           },
           {
             "name": "PathSegment",
             "kind": "enum",
             "description": "A single segment of a vector path, used with `RenderCommand::DrawPath`.  # Variants - `MoveTo` — Move the pen to an absolute position without drawing. - `LineTo` — Draw a straight line to the given position. - `QuadTo` — Draw a quadratic Bézier curve: one control point, one end point. - `CubicTo` — Draw a cubic Bézier curve: two control points, one end point.",
             "file": "src/render/renderer.rs",
-            "line": 1178
+            "line": 1176
           },
           {
             "name": "GradientDirection",
             "kind": "enum",
             "description": "Direction for a two-stop linear or radial gradient.  # Variants - `Horizontal` — Gradient flows left → right. - `Vertical` — Gradient flows top → bottom. - `DiagDown` — Gradient flows top-left → bottom-right. - `DiagUp` — Gradient flows bottom-left → top-right. - `Radial` — Radial gradient expanding from the rectangle centre outward.",
             "file": "src/render/renderer.rs",
-            "line": 1198
+            "line": 1196
           },
           {
             "name": "HexOrientation",
             "kind": "enum",
             "description": "Orientation for a hexagonal tile cell.  # Variants - `PointyTop` — Pointy-top hexagon (flat sides left/right). - `FlatTop` — Flat-top hexagon (flat sides top/bottom).",
             "file": "src/render/renderer.rs",
-            "line": 1217
+            "line": 1215
           },
           {
             "name": "BevelStyle",
             "kind": "enum",
             "description": "Visual style for a bevelled rectangle.  # Variants - `Raised` — Raised 3-D appearance (highlight top-left, shadow bottom-right). - `Sunken` — Sunken 3-D appearance (shadow top-left, highlight bottom-right). - `Ridge` — Double ridge border on all sides. - `Groove` — Double groove border on all sides. - `Flat` — Flat border (same colour all sides).",
             "file": "src/render/renderer.rs",
-            "line": 1233
+            "line": 1231
           },
           {
             "name": "PhysicsDebugShape",
             "kind": "struct",
             "description": "Per-collider geometry snapshot extracted from the physics world for GPU debug rendering.  Produced by `physics::World::extract_debug_shapes()` and consumed by `RenderCommand::DrawPhysicsDebug`. Keeping geometry data in this struct prevents the renderer from importing the physics crate.  # Fields - `x` — `f32`. AABB centre or circle/capsule origin in world space (X axis). - `y` — `f32`. AABB centre or circle/capsule origin in world space (Y axis). - `half_w` — `f32`. Half-width (box) or radius (circle) in world units. - `half_h` — `f32`. Half-height (box) in world units; equal to `half_w` for circles. - `angle` — `f32`. Body rotation in radians. - `is_static` — `bool`. True when the collider belongs to a static body. - `is_sleeping` — `bool`. True when the body is sleeping. - `is_sensor` — `bool`. True when the collider is a sensor (trigger volume). - `hull_verts` — `Vec<[f32; 2]>`. Convex hull vertices in body-local space (empty for box/circle). - `is_circle` — `bool`. True when the shape is a circle (use `half_w` as radius).",
             "file": "src/render/renderer.rs",
-            "line": 1264
+            "line": 1262
           },
           {
             "name": "PhysicsDebugConfig",
             "kind": "struct",
             "description": "Appearance parameters for `RenderCommand::DrawPhysicsDebug`.  # Fields - `body_color` — `[f32; 4]`. Colour for dynamic bodies. - `static_color` — `[f32; 4]`. Colour for static bodies. - `sleep_color` — `[f32; 4]`. Colour for sleeping bodies. - `sensor_color` — `[f32; 4]`. Colour for sensor colliders. - `line_width` — `f32`. Stroke width in screen pixels.",
             "file": "src/render/renderer.rs",
-            "line": 1298
+            "line": 1296
           },
           {
             "name": "SpineSlotDraw",
             "kind": "struct",
             "description": "One textured slot from a Spine skeleton for GPU rendering.  Produced by the spine CPU module and consumed by `RenderCommand::DrawSpineSkeleton`. Keeps the renderer free of a spine-crate import.  # Fields - `texture_key` — `TextureKey`. Texture atlas key for this slot's attachment. - `corners` — `[Vec2; 4]`. Four screen-space corner positions: top-left, top-right, bottom-right, bottom-left. - `uvs` — `[Vec2; 4]`. Normalised UV coordinates in the same winding order as `corners`. - `color` — `[f32; 4]`. RGBA tint for this slot. - `blend_mode` — `BlendMode`. Blend mode for this slot.",
             "file": "src/render/renderer.rs",
-            "line": 1335
+            "line": 1333
           }
         ]
       },
@@ -15885,6 +16068,13 @@
         "name": "examples_load_all",
         "description": "",
         "line": 37
+      },
+      {
+        "file": "tests/games_load_test.rs",
+        "module": "games_load",
+        "name": "games_load_all",
+        "description": "",
+        "line": 60
       }
     ],
     "lua": [
@@ -15935,6 +16125,41 @@
         "module": "test_hello_world",
         "name": "test_hello_world",
         "description": "tests/lua/content/demos/test_hello_world.lua",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/demos/test_html_dialog.lua",
+        "module": "test_html_dialog",
+        "name": "test_html_dialog",
+        "description": "Static-analysis checks for the html-dialog showcase demo.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/demos/test_html_hud.lua",
+        "module": "test_html_hud",
+        "name": "test_html_hud",
+        "description": "Static-analysis checks for the html-hud showcase demo.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/demos/test_html_inventory.lua",
+        "module": "test_html_inventory",
+        "name": "test_html_inventory",
+        "description": "Static-analysis checks for the html-inventory showcase demo.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/demos/test_html_scoreboard.lua",
+        "module": "test_html_scoreboard",
+        "name": "test_html_scoreboard",
+        "description": "Static-analysis checks for the html-scoreboard showcase demo.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/demos/test_html_settings.lua",
+        "module": "test_html_settings",
+        "name": "test_html_settings",
+        "description": "Static-analysis checks for the html-settings showcase demo.",
         "kind": "lua"
       },
       {
@@ -16124,6 +16349,13 @@
         "module": "test_gui_evidence",
         "name": "test_gui_evidence",
         "description": "Produces PNG artifacts from lurek.ui layout rendering.",
+        "kind": "lua"
+      },
+      {
+        "file": "tests/lua/evidence/test_html_evidence.lua",
+        "module": "test_html_evidence",
+        "name": "test_html_evidence",
+        "description": "Evidence tests: html module",
         "kind": "lua"
       },
       {
@@ -17450,6 +17682,13 @@
         "kind": "lua"
       },
       {
+        "file": "tests/lua/unit/test_html_unit.lua",
+        "module": "test_html_unit",
+        "name": "test_html_unit",
+        "description": "Unit tests for lurek.html (standalone HTML/CSS layout engine).",
+        "kind": "lua"
+      },
+      {
         "file": "tests/lua/unit/test_i18n_unit.lua",
         "module": "test_i18n_unit",
         "name": "test_i18n_unit",
@@ -17670,7 +17909,7 @@
         "file": "tests/lua/unit/test_ui_unit.lua",
         "module": "test_ui_unit",
         "name": "test_ui_unit",
-        "description": "test_ui_layout.lua",
+        "description": "Unit tests for lurek.ui.loadLayout and lurek.ui.loadLayoutFile.",
         "kind": "lua"
       },
       {

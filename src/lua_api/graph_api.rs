@@ -293,7 +293,7 @@ impl LuaUserData for LuaGraphItem {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("GraphItem"));
+        methods.add_method("type", |_, _, ()| Ok("LGraphItem"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -577,7 +577,7 @@ impl LuaUserData for LuaEdge {
         // -- type --
         /// Returns the type name "GraphEdge".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("GraphEdge"));
+        methods.add_method("type", |_, _, ()| Ok("LGraphEdge"));
         // -- typeOf --
         /// Returns true when the given name matches "GraphEdge" or a parent type.
         /// @param name string
@@ -1105,7 +1105,7 @@ impl LuaUserData for LuaNode {
         // -- type --
         /// Returns the type name "GraphNode".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("GraphNode"));
+        methods.add_method("type", |_, _, ()| Ok("LGraphNode"));
         // -- typeOf --
         /// Returns true when the given name matches "GraphNode" or a parent type.
         /// @param name string
@@ -1704,7 +1704,7 @@ impl LuaUserData for LuaGraph {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Graph"));
+        methods.add_method("type", |_, _, ()| Ok("LGraph"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.

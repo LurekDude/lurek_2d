@@ -910,7 +910,7 @@ impl LuaUserData for LuaMinimap {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Minimap"));
+        methods.add_method("type", |_, _, ()| Ok("LMinimap"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.

@@ -459,7 +459,10 @@ test_summary()
 describe("Missing API Coverage", function()
     -- @tests Channel:pop
     it("covers Channel:pop", function()
-        -- TODO: Implement test for Channel:pop
+        local ch = lurek.thread.newChannel()
+        ch:push("queued_value")
+        expect_equal("queued_value", ch:pop())
+        expect_equal(nil, ch:pop())  -- empty channel returns nil
     end)
 
 end)

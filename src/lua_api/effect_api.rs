@@ -130,7 +130,7 @@ impl LuaUserData for LuaPostFxEffect {
         // -- type -- (Lurek2D typeOf protocol)
         /// Returns the type name "PostFxEffect".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("PostFxEffect"));
+        methods.add_method("type", |_, _, ()| Ok("LPostFxEffect"));
         /// Returns true when the given name matches "PostFxEffect" or a parent type.
         /// @param name string
         /// @return boolean
@@ -525,7 +525,7 @@ impl LuaUserData for LuaPostFxStack {
         // -- type --
         /// Returns the type name "PostFxStack".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("PostFxStack"));
+        methods.add_method("type", |_, _, ()| Ok("LPostFxStack"));
         // -- typeOf --
         /// Returns true when the given name matches "PostFxStack" or a parent type.
         /// @param name string
@@ -669,7 +669,7 @@ impl LuaUserData for LuaImageEffect {
         // -- type --
         /// Returns the type name "ImageEffect".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ImageEffect"));
+        methods.add_method("type", |_, _, ()| Ok("LImageEffect"));
         // -- typeOf --
         /// Returns true when the given name matches "ImageEffect" or a parent type.
         /// @param name string
@@ -1392,7 +1392,7 @@ impl LuaUserData for LuaOverlay {
         // -- type --
         /// Returns the type name of this object ("Overlay").
         /// @return string
-        methods.add_method("type", |_, _this, ()| Ok("Overlay"));
+        methods.add_method("type", |_, _this, ()| Ok("LOverlay"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type ("Object" or "Overlay").
@@ -1492,14 +1492,14 @@ impl mlua::UserData for LuaScreenTransition {
             Ok(())
         });
 
-        /// Type.
+        /// Returns the type name of this object ("ScreenTransition").
         ///
-        /// @return table|nil
-        methods.add_method("type", |_, _, ()| Ok("ScreenTransition"));
-        /// Type of.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LScreenTransition"));
+        /// Returns true if this object is of the given type name or a parent type.
         ///
         /// @param name string
-        /// @return table|nil
+        /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "ScreenTransition" || name == "Object")
         });

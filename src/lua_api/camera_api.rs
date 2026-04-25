@@ -501,6 +501,19 @@ impl LuaUserData for LuaCamera2D {
         methods.add_method("getEffectOffset", |_, this, ()| {
             Ok(this.inner.borrow().effect_offset())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCamera"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCamera" || name == "Object")
+        });
     }
 }
 

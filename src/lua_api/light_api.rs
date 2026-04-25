@@ -959,6 +959,19 @@ impl LuaUserData for LuaLight {
             this.cookie_path.borrow_mut().take();
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LLight"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LLight" || name == "Object")
+        });
     }
 }
 
@@ -1146,6 +1159,19 @@ impl LuaUserData for LuaOccluder {
                 Some(o) => Ok(format!("Occluder({} verts)", o.get_vertices().len())),
                 None => Ok("Occluder(invalid)".to_string()),
             }
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LOccluder"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LOccluder" || name == "Object")
         });
     }
 }

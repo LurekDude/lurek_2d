@@ -158,7 +158,7 @@ def guess_type(text, is_return=False):
         elif "width, height, channels" in t:
             return "number, number, number"
         if "quad, x, y" in t:
-            return "Quad, number, number"
+            return "LQuad, number, number"
 
     if "string" in t or "path" in t or "filename" in t or "mode" in t:
         return "string"
@@ -171,27 +171,27 @@ def guess_type(text, is_return=False):
     elif "function" in t or "callback" in t:
         return "function"
     elif "image" in t:
-        return "Image"
+        return "LImage"
     elif "font" in t:
-        return "Font"
+        return "LFont"
     elif "canvas" in t:
-        return "Canvas"
+        return "LCanvas"
     elif "spritebatch" in t:
-        return "SpriteBatch"
+        return "LSpriteBatch"
     elif "mesh" in t:
-        return "Mesh"
+        return "LMesh"
     elif "shader" in t:
-        return "Shader"
+        return "LShader"
     elif "sounddata" in t:
-        return "SoundData"
+        return "LSoundData"
     elif "imagedata" in t:
-        return "ImageData"
+        return "LImageData"
     elif "quad" in t:
-        return "Quad"
+        return "LQuad"
     elif "filehandle" in t:
-        return "FileHandle"
+        return "LFileHandle"
     elif "audio source" in t or "audiosource" in t or "source" in t:
-        return "Source"
+        return "LSource"
     return "any"
 
 def parse_params(fn):
@@ -375,7 +375,42 @@ def main():
     )
 
     # LuaValue is mlua's dynamic value type — alias to `any` so LuaLS treats it correctly.
-    _OPAQUE_ALIASES = {"LuaValue": "any"}
+    # Old-name → L-prefix aliases: if a referenced type "Foo" has a declared counterpart "LFoo",
+    # emit an alias instead of a duplicate stub class.  This happens when docstring @return tags
+    # still use the pre-L-prefix name.
+    #
+    # Manual overrides for types whose canonical L-prefix name cannot be derived automatically
+    # (casing mismatches, suffix changes, or genuinely internal/non-userdata types).
+    _OPAQUE_ALIASES: dict[str, str] = {
+        "LuaValue":     "any",   # mlua's dynamic value — not a Lurek userdata type
+        "MultiValue":   "any",   # mlua multi-return — not a Lurek userdata type
+        "Environment":  "any",   # OS/Lua environment table — not a Lurek userdata type
+        "GID":          "integer",  # tilemap global tile ID — integer alias
+        "ID":           "integer",  # generic ID — integer alias
+        "Radius":       "number",   # plain numeric radius — not a userdata type
+        "TextureKey":   "any",   # internal render key — not exposed as userdata
+        "Tint":         "any",   # plain color tint — not a userdata type
+        # Struct-name → L-prefix where casing or suffix differs
+        "AiFlowField":  "LAIFlowField",  # LuaAiFlowField struct but type() returns LAIFlowField
+        "Camera2D":     "LCamera",       # LuaCamera2D struct but type() returns LCamera
+        "Edge":         "LGraphEdge",    # LuaEdge shorthand → full graph type
+        "Node":         "LGraphNode",    # LuaNode shorthand → full graph type
+        "Step":         "LPipelineStep", # LuaStep shorthand → full pipeline type
+        "ThreadHandle": "LThread",       # LuaThreadHandle → LThread
+    }
+    # Auto-derive: if a referenced type "Foo" has a declared counterpart "LFoo" (exact match),
+    # alias it.  Case-insensitive fallback for minor capitalisation differences.
+    _l_declared_lower = {("l" + n[1:]).lower(): n for n in declared_types if n.startswith("L")}
+    for type_name in opaque_types:
+        if type_name in _OPAQUE_ALIASES:
+            continue
+        lname = "L" + type_name
+        if lname in declared_types:
+            _OPAQUE_ALIASES[type_name] = lname
+        else:
+            candidate = ("l" + type_name).lower()
+            if candidate in _l_declared_lower:
+                _OPAQUE_ALIASES[type_name] = _l_declared_lower[candidate]
 
     for type_name in opaque_types:
         if type_name in _OPAQUE_ALIASES:

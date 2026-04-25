@@ -2,76 +2,69 @@
 
 All notable changes to Lurek2D are recorded here.
 
-## [0.20.42] - 2026-04-25
+## [1.0.4] - 2026-04-26
 
-### refactor(html): extract lurek.html as standalone top-level module
+### feat(library,docs): L-prefix library class annotations; fix gen_luadoc opaque alias generation
 
-- **`src/html/`**: Moved from `src/ui/html/` to a standalone top-level module. Six files: `mod.rs`, `document.rs`, `element.rs`, `parser.rs`, `selector.rs`, `style.rs`. All `crate::ui::html::` paths updated to `crate::html::`.
-- **`src/lua_api/html_api.rs`**: New thin Lua wrapper registering `lurek.html` as a top-level namespace (was `lurek.ui.html`). Full `LuaHtmlDocument` and `LuaHtmlElement` userdata with 100% docstring coverage.
-- **`src/lua_api/register.rs`**: `html_api::register` wired unconditionally (no modules guard — lightweight, no GPU).
-- **`src/lua_api/ui_api.rs`**: Removed ~900 lines of HTML code (now in `html_api.rs`). Removed `register_html_api` call and `use crate::ui::html::` import.
-- **`src/ui/mod.rs`**: Removed `pub mod html;` and `pub use html::{...}` re-exports.
-- **`src/ui/html/`**: Deleted (replaced by `src/html/`).
-- **`docs/specs/html.md`**: New module spec for the standalone HTML module.
-- **`content/examples/html.lua`**: New example file covering full `lurek.html` API surface.
-- **`tests/lua/unit/test_html_unit.lua`**: New Lua unit tests for `lurek.html`.
-- **`.github/skills/html-css/`**: Updated all references from `lurek.ui.html` to `lurek.html`.
+- **`library/cardgame/init.lua`**: renamed `---@class Card` → `---@class LCard` and `---@class Stack` → `---@class LCardStack`; updated all `---@field`, `--- @param`, and `--- @treturn` type references accordingly.
+- **`library/scheduler/init.lua`**: renamed `---@class Scheduler` → `---@class LScheduler`.
+- **`tools/docs/gen_luadoc.py`**: fixed opaque-stub section to emit `---@alias OldName LNewName` entries (backward-compatible aliases) instead of duplicate `---@class OldName` stubs. Added auto-lookup from opaque type names to declared L-prefixed classes (case-insensitive fallback) plus manual overrides for non-auto-derivable mappings (`Camera2D→LCamera`, `AiFlowField→LAIFlowField`, `Edge→LGraphEdge`, `Node→LGraphNode`, `Step→LPipelineStep`, `ThreadHandle→LThread`).
+- **`docs/api/lurek.lua`** regenerated: 0 non-L-prefix opaque class stubs; old names available as `---@alias` entries for backward compatibility.
+- **Extension rebuilt** (`lurek2d-toolkit-1.0.0.vsix`) and reinstalled after full `gen_all_docs.py` run.
 
-## [0.20.41] - 2026-04-25
+## [1.0.3] - 2026-04-26
 
-### feat(ui): complete lurek.ui.html module — tests, examples, skill, demo registration
+### fix(tools,examples,docs): consolidate JSON paths; fill 179 example stubs; fix tween doc annotations
 
-- **`tests/lua/unit/test_ui_unit.lua`**: Appended 10 `describe` blocks (~58 tests) covering the full
-  `lurek.ui.html` API surface: module availability, `newDocument`/`loadDocument`/`supports`, document
-  HTML/CSS/viewport API, element access (`getRoot`, `getElementById`, `query`, `queryAll`), event and
-  input API (`on`/`off`, all six input-forwarding methods), `HtmlElement` DOM manipulation (28 methods),
-  and `supports()` feature flags.
-- **`tests/lua/demos/test_html_{hud,inventory,dialog,settings,scoreboard}.lua`**: Five static-analysis
-  demo tests, each verifying file existence, key API call sites, and presence of all three `lurek.*`
-  callbacks.
-- **`tests/lua/harness.rs`**: Registered `lua_demo_html_{hud,inventory,dialog,settings,scoreboard}`
-  test functions.
-- **`tests/demo_smoke_tests.rs`**: Registered `demo_smoke_html_{hud,inventory,dialog,settings,scoreboard}`
-  smoke tests under `// ─── showcase: HTML UI demos ───`.
-- **`content/examples/ui.lua`**: Appended `--@api-stub:` blocks for all 37 `lurek.ui.html.*` functions
-  and methods (`newDocument`, `loadDocument`, `supports`, plus full `HtmlDocument` and `HtmlElement`
-  method sets).
-- **`content/games/README.md`**: Added "Showcase — HTML UI Demos" table registering all five demos.
-- **`.github/skills/html-css/SKILL.md`**: New CAG skill for building HTML/CSS UI in Lurek2D games.
-  Covers document lifecycle, input forwarding, CSS class state machine, radio-group pattern, viewport
-  sync, and performance guidelines.  No fenced code blocks — code lives in companion files.
-- **`.github/skills/html-css/examples/quickstart.lua`**: Minimal HUD skeleton companion.
-- **`.github/skills/html-css/snippets/common-patterns.lua`**: 8 copy-paste patterns companion.
-- **`src/ui/html/{document,element,parser,selector,style}.rs`**: Added `//!` module-level docs and
-  `///` item docstrings to all five HTML domain files (`HtmlDocumentOptions`, `HtmlDrawCommand`,
-  `HtmlDocument`, `HtmlRect`, `HtmlElement`, `CssRule`).
+- **JSON data path consolidation**: fixed 17 Python tool scripts under `tools/audit/`, `tools/docs/`, and `tools/fix/` that wrote or read JSON data files from the wrong location. All data intermediates now consistently use `logs/data/` (`lua_api_data.json`, `rust_api_data.json`, `doc_coverage.json`, `test_coverage.json`, `docstring_audit.json`, `lua_api_test_coverage.json`). Deleted 6 stale root-level `logs/*.json` files.
+- **`content/examples/tween.lua`**: filled 15 bare `@api-stub` blocks — `Spring:type/typeOf`, `Tween:onComplete/onUpdate/onCancel/type/typeOf`, `TweenParallel:add/onComplete/type/typeOf`, `TweenSequence:callback/onComplete/type/typeOf` — all now have real `do..end` code blocks.
+- **`content/examples/image.lua`**: filled 5 bare stubs — `lurek.image.newCompressedData`, `lurek.image.isCompressed`, `lurek.image.newProvinceGrid`, `ImageData:type`, `ImageData:typeOf`.
+- **`content/examples/devtools.lua`** and **`content/examples/html.lua`**: filled remaining bare stubs (9 total); all stubs now have real `do..end` blocks with verifiable assertions.
+- **`src/lua_api/tween_api.rs`**: fixed `///` `@param` doc annotations on `onComplete`, `onUpdate`, and `onCancel` methods — was `@param fn function` (missing `self`), now correctly `@param self Tween` + `@param f function` so generated LuaCATS stubs have correct signatures.
+- **`python tools/gen_all_docs.py`** re-run after all path fixes; `docs/api/lurek.lua` regenerated from source.
+- Example coverage tool: `Stub=0` across all 51 modules.
+- Lua API test coverage: 97.2% (exits 0).
 
-## [0.20.40] - 2026-04-25
+## [1.0.2] - 2026-04-26
 
-### fix(lua_api, stubs): fix LuaLS diagnostics in tween, audio, render Shape methods
+### feat(lua_api): rename all Lurek userdata types to L-prefix for uniqueness
 
-- **`src/lua_api/tween_api.rs`**: Added `@param self TweenSequence/TweenParallel` to all `add_function` method docstrings so LuaCATS stubs include the implicit self parameter (`tween`, `delay`, `callback`, `start`, `onComplete` on both types).
-- **`src/lua_api/audio_api.rs`**: Made `buffer_count` optional (`@param buffer_count? integer`) in `newQueueableSource`, fixing "requires 4 args, receiving 3" errors in tests.
-- **`src/lua_api/render_api.rs`**: Fixed `Shape:polygon` docstring `@param coords number` → `@param ... number` so variadic coordinate pairs generate a correct LuaCATS `...` stub.
-- **`extensions/vscode/src/providers/diagnostics.ts`**: Excluded `content/examples/` files from `checkPerFrameAllocation` to suppress false `lurek.perFrameAlloc` warnings in example scripts.
-- **`docs/api/lurek.lua`**: Regenerated — `Shape:polygon(mode, ...)`, `TweenSequence:tween(self, ...)`, `newQueueableSource(path, type, buffer_count?)` now correct.
+- **All `src/lua_api/*.rs` files**: renamed every `type()` return string and `typeOf()` comparison string to use an `L`-prefix (e.g. `Image` → `LImage`, `World` → `LWorld`, `Queue` → `LQueue`). This eliminates name clashes with Lua keywords and common library names and makes every Lurek type uniquely identifiable.
+- **`src/lua_api/patterns_api.rs`**: updated 20 `TYPE_NAME` constants and 20 `TYPE_HIERARCHY` first elements to `L`-prefixed strings (`LEventBus`, `LObjectPool`, `LCommandStack`, … `LSet`).
+- **New `type()`/`typeOf()` methods added** to all userdata types that previously lacked them (physics, camera, tilemap, timer, tween, sprite, ui, ecs, save, scene, animation, data, devtools, filesystem, globe, html, input, light, math, mods, serial, spine, terminal, network, and more — 106 new methods in total).
+- **`src/lua_api/ui_api.rs`**: `create_widget_table` now accepts a `type_name: &'static str` parameter; `type()` and `typeOf()` methods added to all 35 widget table call sites (`LButton`, `LLabel`, `LTextInput`, `LCheckbox`, `LSlider`, `LProgressBar`, `LComboBox`, `LListBox`, `LPanel`, `LLayout`, `LScrollPanel`, `LNinePatch`, `LTabBar`, `LSeparator`, `LSpacer`, `LToast`, `LTreeView`, `LRadioButton`, `LScrollBar`, `LGuiWindow`, `LSplitPanel`, `LDockPanel`, `LToolbar`, `LMenuBar`, `LMenuItem`, `LDialog`, `LStatusBar`, `LAccordion`, `LTooltipPanel`, `LColorPicker`, `LGuiTable`, `LImageWidget`, `LSpinBox`, `LSwitch`, `LBadge`).
+- **`tools/docs/gen_lua_api.py`**: added Pass 0 that reads `add_method("type", …)` return values as authoritative Lua class names; added `_canonical_name()` and `_display_name()` helpers; fixed Pass 3 widget function name derivation to `L` + camelCase; updated all `display_owner` computations to use `_display_name()`.
+- **`extensions/vscode/src/providers/typeInference.ts`**: updated all `typeName` values in `FACTORY_TYPES` to L-prefix names so IDE type inference returns the correct L-prefixed class for factory function calls (e.g. `lurek.graphics.newImage()` → `LImage` completions).
+- **API docs regenerated** via `python tools/gen_all_docs.py`; all 223 Lua class names now carry L-prefix.
+- **Extension rebuilt** to `lurek2d-toolkit-1.0.0.vsix` and reinstalled.
 
-## [0.20.39] - 2026-04-25
+## [1.0.1] - 2026-04-25
 
-### fix(lua_api, stubs): fix LuaLS diagnostics in physics.lua and restore LuaImageData
+### docs(lua_api): expand 37 stub docstrings; fill 35 TODO test stubs
 
-- **`src/lua_api/physics_api.rs`**: Fixed docstrings for `newPolygonShape`/`newChainShape` (variadic params), `drawDebug` (optional r/g/b/a), return types (`LuaTerrain`→`Terrain`, `LuaCellular`→`Cellular`, `LuaZone`→`Zone`), `spawnDebris` (`@return table`), `Terrain:toImageData` (`@return string`, 6 u8 params), `Cellular:toImageDataRegion` (`@return string`), `getZoneEvents` (`@return table`), all 5 shape constructors (`@return PhysicsShape`), `newTerrain` world param (`World` not `LuaWorld`), `addFixture` variadic (`any`).
-- **`content/examples/physics.lua`**: Fixed `fillAll`/`fillCircle`/`fillRect`/`setCell` to use booleans; `toImageData` called with 6 u8 color params; `toImageDataRegion` result used as string; `spawnDebris` signature corrected; `lurek.input.isDown` → `lurek.input.keyboard.isDown`.
-- **`src/lua_api/render_api.rs`**: Restored accidentally-deleted `LuaImageData` struct and `LuaUserData` impl with corrected single-blank doc comment (was double-blank `///`). Fixed `empty_line_after_doc_comments` clippy lint that caused compile failure.
-- **`src/render/renderer.rs`**, **`src/render/gpu_renderer.rs`**, **`src/lua_api/animation_api.rs`**, **`src/lua_api/effect_api.rs`**, **`src/lua_api/devtools_api.rs`**: Fixed `empty_line_after_doc_comments` clippy lint in each file.
-- **`tools/docs/gen_luadoc.py`**: Fixed `INPUT_FILE` path to read from `logs/data/lua_api_data.json` (was incorrectly `logs/lua_api_data.json`). Added `CELL_AIR/CELL_SAND/CELL_WATER/CELL_ROCK/CELL_FIRE/CELL_GAS` constants as `@field` on `lurek.physics`.
+- **`src/lua_api/audio_api.rs`**: Added `SoundData` class-level description; expanded `getBitDepth` and `getSampleRate` from one-word stubs to full sentences with correct return type annotations.
+- **`src/lua_api/data_api.rs`**: Added `ByteData` class-level description; expanded `getSize` and `clone` docstrings.
+- **`src/lua_api/effect_api.rs`**: Fixed `ScreenTransition:type` and `ScreenTransition:typeOf` — corrected return types from `table|nil` to `string` and `boolean` respectively; reworded both descriptions.
+- **`src/lua_api/image_api.rs`**: Added `ImageData` class-level description; filled in missing docstrings for `setPixel` and `tint`; expanded 28 additional stub descriptions including `getDimensions`, `getPixel`, `mapPixel`, `encode`, and all image-processing methods (brightness, contrast, saturation, gamma, tint, grayscale, sepia, invert, threshold, posterize, fill, noise, alphaMask, flipHorizontal, flipVertical, rotate90cw, crop, resizeNearest, blur, sharpen); corrected `@return nil` on `encode` to `@return string`; corrected `@param` types from `u8` to `integer` on threshold/posterize/fill/noise.
+- **`tests/lua/unit/test_dataframe_unit.lua`**: Filled in `DataFrame:min` and `DataFrame:max` stubs with `fromCSV` data and `expect_equal` assertions.
+- **`tests/lua/unit/test_devtools_unit.lua`**: Filled 14 TODO stubs (`lurek.devtools.log`, `exposeWatch`, `removeWatch`, `getWatches`, `ReplConsole:len`, `scan`, `snapshot`, `FileWatcher:onChanged/check/getPath/cancel`, `ReplConsole:eval/history/clear`) and added new `lurek.devtools.fatal` test.
+- **`tests/lua/unit/test_patterns_unit.lua`**: Filled `Queue:len`, `List:add/get/set/len`, `Set:add/has/len` stubs.
+- **`tests/lua/unit/test_raycaster_unit.lua`**: Filled 16 stubs: `PointLight:type/typeOf`, `Raycaster:setCell/getCell/setCells/isBlocked/width/height/setWallAlpha/getWallAlpha`, `SpriteManager:remove/setPosition/setVisible/clear/type/typeOf`.
+- **`tests/lua/unit/test_thread_unit.lua`**: Filled `Channel:pop` stub with push-then-pop assertion.
+- **API docs regenerated** via `python tools/gen_all_docs.py`.
+
+## [1.0.0] - 2026-04-25
+
+### feat(extension): VS Code extension v1.0.0 — full Lua API IntelliSense overhaul
+
+- **Extension version**: bumped to 1.0.0 with updated description (1200+ API completions, 13 diagnostic rules, callback/test/library/demo CodeLens markers, zero sumneko.lua overlap).
+- **API data regenerated**: 50 modules, 223 classes, 1201 functions, 2960 methods, 31 callbacks via `gen_extension_api.py` → `lurek-api.json` → `lurekApiData.ts`.
+- **Callbacks**: added 13 missing callbacks (`init`, `ready`, `process`, `process_late`, `process_physics`, `fixedUpdate`, `draw_ui`, `exit`, `touchpressed`, `touchmoved`, `touchreleased`, `textedited`) — now 31 total in `LUREK_CALLBACK_NAMES`.
+- **CodeLens fixes**: removed duplicate reference counting (sumneko.lua already provides this); added file-level markers for library (📦), demo (🎮), example (📖), and test (🧪) files; kept callback (⚡) and test-run (▶) markers.
+- **Diagnostics stability**: increased debounce from 300ms to 800ms; added document-version tracking to prevent stale diagnostics from firing after rapid edits.
+- **Engine version**: bumped `Cargo.toml` to 1.0.0.
 
 ## [0.20.38] - 2026-04-25
-
-### docs(ui): propose `lurek.ui.html` API surface
-
-- **`docs/specs/ui.md`**: Added a focused design proposal for the planned `lurek.ui.html` HTML/CSS UI facade, including backend-neutral `HtmlDocument`/`HtmlElement` signatures, event callback shape, lifecycle calls, RML-compatible subset wording, and testing placement notes.
-- **`work/rmlui-integration-20260425/`**: Added Lua-Designer proposal artifacts and draft example/test coverage for Developer handoff; no Rust implementation was added.
 
 ### fix(tests, stubs): fix LuaLS diagnostics in 7 test files and regenerate type stubs
 

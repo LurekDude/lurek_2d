@@ -284,6 +284,19 @@ impl LuaUserData for LuaAnimation {
             let img = this.inner.draw_to_image(w, h);
             lua.create_userdata(img)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAnimation"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAnimation" || name == "Object")
+        });
     }
 }
 
@@ -391,6 +404,19 @@ impl LuaUserData for LuaAnimStateMachine {
             } else {
                 Ok(LuaValue::Nil)
             }
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAnimStateMachine"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAnimStateMachine" || name == "Object")
         });
     }
 }
@@ -521,6 +547,19 @@ impl LuaUserData for LuaBlendLayerSet {
         /// Returns the number of blend layers.
         /// @return integer
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LBlendLayerSet"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LBlendLayerSet" || name == "Object")
+        });
     }
 }
 
@@ -756,6 +795,19 @@ impl LuaUserData for LuaAnimCurve {
             this.inner.clear();
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAnimCurve"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAnimCurve" || name == "Object")
+        });
     }
 }
 
@@ -813,5 +865,18 @@ impl LuaUserData for LuaAnimSyncGroup {
         ///
         /// @return integer
         methods.add_method("memberCount", |_, this, ()| Ok(this.inner.member_count()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAnimSyncGroup"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAnimSyncGroup" || name == "Object")
+        });
     }
 }

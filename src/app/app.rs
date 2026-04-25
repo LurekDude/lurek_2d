@@ -638,12 +638,11 @@ impl LurekApp {
                     )));
                 }
             }
-        } else if self.explicit_game_dir {
-            // Explicitly passed a directory but it has no main.lua
-            let msg = format!("No game found\nNo main.lua at: {}", self.game_dir.display());
-            log_msg!(warn, L007_NO_MAIN_LUA, "{}", self.game_dir.display());
-            self.run_state = RunState::Error(ErrorScreen::from_error(&msg));
         } else {
+            if self.explicit_game_dir {
+                // Explicitly passed a directory but it has no main.lua
+                log_msg!(warn, L007_NO_MAIN_LUA, "{}", self.game_dir.display());
+            }
             log_msg!(info, L006_SPLASH_SCREEN);
         }
 
@@ -1947,6 +1946,7 @@ impl ApplicationHandler for LurekApp {
 
         let initial_title = self.current_window_title();
         let mut window_attrs = Window::default_attributes()
+            .with_visible(false)
             .with_title(&initial_title)
             .with_inner_size(winit::dpi::PhysicalSize::new(
                 self.config.window.width,
@@ -2337,6 +2337,9 @@ impl ApplicationHandler for LurekApp {
                 // init_lua blocks, so the user sees it during loading.
                 if !self.lua_initialized {
                     self.render_splash();
+                    if let Some(win) = &self.window {
+                        win.set_visible(true);
+                    }
                     self.init_lua();
                     self.lua_initialized = true;
                     // Start the screenshot safety timer now that the game is loaded.

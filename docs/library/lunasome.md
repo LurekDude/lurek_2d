@@ -902,7 +902,7 @@ Return the current value of the internal ID counter (next ID to assign). Lua dou
 
 #### `resetIdCounter()`
 
-Reset the ID counter to 1.  Call between game sessions to reclaim the integer range.  Does NOT invalidate already-created cards — callers must ensure no stale references remain.
+Reset the ID counter to 1.  Call between game sessions to reclaim the integer range.  Does NOT invalidate already-created cards � callers must ensure no stale references remain.
 
 #### `defineCardType(name, def)`
 
@@ -959,7 +959,7 @@ Create a new card instance.  Seeds fields from the registry if the type is defin
 
 **Returns**
 
-- *Card*
+- *LCard*
 
 #### `getStat(key)`
 
@@ -1169,11 +1169,11 @@ Create a new unbounded Stack. Stack fields:
 
 **Parameters**
 
-- `name` *string* — Stack name.
+- `name` *string* — LCardStack name.
 
 **Returns**
 
-- *Stack*
+- *LCardStack*
 
 #### `newStackWithCapacity(name, cap)`
 
@@ -1181,12 +1181,12 @@ Create a new Stack with a fixed capacity limit.
 
 **Parameters**
 
-- `name` *string* — Stack name.
-- `cap` *number* — Maximum card count (must be >= 1).
+- `name` *string* — LCardStack name.
+- `cap` *number* — Maximum LCard count (must be >= 1).
 
 **Returns**
 
-- *Stack*
+- *LCardStack*
 
 #### `size()`
 
@@ -1234,7 +1234,7 @@ Push a card onto the top of the stack; returns false when full.
 
 **Parameters**
 
-- `card` *Card*
+- `card` *LCard*
 
 **Returns**
 
@@ -1246,7 +1246,7 @@ Push a card onto the bottom of the stack; returns false when full.
 
 **Parameters**
 
-- `card` *Card*
+- `card` *LCard*
 
 **Returns**
 
@@ -1258,7 +1258,7 @@ Remove and return the top card, or nil if empty.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `popBottom()`
 
@@ -1266,7 +1266,7 @@ Remove and return the bottom card, or nil if empty.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `popMany(n)`
 
@@ -1278,7 +1278,7 @@ Pop up to n cards from the top and return them.
 
 **Returns**
 
-- *table* — Array of Card (may be shorter than n if stack empties).
+- *table* — Array of LCard (may be shorter than n if LCardStack empties).
 
 #### `peekTop()`
 
@@ -1286,7 +1286,7 @@ Return the top card without removing it.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `peekBottom()`
 
@@ -1294,7 +1294,7 @@ Return the bottom card without removing it.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `peekAt(idx)`
 
@@ -1306,7 +1306,7 @@ Return the card at the given 1-based index without removing it.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `insertAt(idx, card)`
 
@@ -1315,7 +1315,7 @@ Insert card at position idx (1-based, clamped); returns false when full.
 **Parameters**
 
 - `idx` *number*
-- `card` *Card*
+- `card` *LCard*
 
 **Returns**
 
@@ -1331,7 +1331,7 @@ Remove and return the card at 1-based position idx, or nil if out of range.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `moveWithin(from, to)`
 
@@ -1424,7 +1424,7 @@ Return all Card objects with the given category.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `findByTypeAll(type_name)`
 
@@ -1436,7 +1436,7 @@ Return all Card objects with the given type name.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `findByTagAll(tag)`
 
@@ -1448,7 +1448,7 @@ Return all Card objects that have the given tag.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `removeById(id)`
 
@@ -1460,7 +1460,7 @@ Remove and return the Card with the given id, or nil if not found.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `containsId(id)`
 
@@ -1687,7 +1687,7 @@ Push a card into the slot; returns true on success, false+error when full.
 
 **Parameters**
 
-- `card` *Card*
+- `card` *LCard*
 
 **Returns**
 
@@ -1699,7 +1699,7 @@ Remove and return the last pushed card, or nil if empty.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `removeAt(idx)`
 
@@ -1711,7 +1711,7 @@ Remove and return the item at 1-based index, or nil if out of range.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `peek()`
 
@@ -1719,7 +1719,7 @@ Return the last pushed item without removing it.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `peekAt(idx)`
 
@@ -1731,7 +1731,7 @@ Return the item at 1-based index without removing it.
 
 **Returns**
 
-- *Card|nil*
+- *LCard|nil*
 
 #### `clear()`
 
@@ -1791,7 +1791,7 @@ Add a type with a draw weight (minimum 1).
 
 **Parameters**
 
-- `type_name` *string* — Card type name (must be non-empty).
+- `type_name` *string* — LCard type name (must be non-empty).
 - `weight` *number* — Draw weight (clamped to minimum 1).
 
 #### `remove(type_name)`
@@ -1894,7 +1894,7 @@ Draw n Card instances by weighted random selection (with replacement).
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `drawUniqueTypes(n)`
 
@@ -1918,7 +1918,7 @@ Draw up to n unique Card instances by weighted selection without replacement.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `drawItemsSeeded(n, seed)`
 
@@ -1931,7 +1931,7 @@ Draw n Card instances using a fixed random seed for reproducibility. Saves and r
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 See: [`lurek.math`](../api/lurek.md#lurekmath)
 
@@ -1945,7 +1945,7 @@ Draw cards matching a rarity distribution table {rarity=count,...}.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `newStackManager()`
 
@@ -1962,7 +1962,7 @@ Register an existing stack under a name.
 **Parameters**
 
 - `name` *string*
-- `stack` *Stack*
+- `stack` *LCardStack*
 
 #### `createStack(name)`
 
@@ -1991,7 +1991,7 @@ Deregister and return a stack, or nil if not found.
 
 **Returns**
 
-- *Stack|nil*
+- *LCardStack|nil*
 
 #### `hasStack(name)`
 
@@ -2015,7 +2015,7 @@ Return the registered Stack, or nil if not found.
 
 **Returns**
 
-- *Stack|nil*
+- *LCardStack|nil*
 
 #### `stackNames()`
 
@@ -2045,7 +2045,7 @@ Move the card at idx in from_name to the top of to_name.
 
 **Returns**
 
-- *Card|nil,* — string|nil  Moved card or nil+error.
+- *LCard|nil,* — string|nil  Moved LCard or nil+error.
 
 #### `moveItemByType(from_name, card_type, to_name)`
 
@@ -2059,7 +2059,7 @@ Move the first card of a given type from one stack to another.
 
 **Returns**
 
-- *Card|nil,* — string|nil
+- *LCard|nil,* — string|nil
 
 #### `moveTop(from_name, to_name)`
 
@@ -2072,7 +2072,7 @@ Move the top card from one stack to another.
 
 **Returns**
 
-- *Card|nil,* — string|nil
+- *LCard|nil,* — string|nil
 
 #### `newBuildEntry(type_name, count)`
 
@@ -2080,7 +2080,7 @@ Create a new build entry for use with DeckBuilder.
 
 **Parameters**
 
-- `type_name` *string* — Card type to include.
+- `type_name` *string* — LCard type to include.
 - `count` *number* — Number of copies.
 
 **Returns**
@@ -2105,7 +2105,7 @@ Add count copies of type_name to the build list.
 
 **Parameters**
 
-- `type_name` *string* — Card type name (must be non-empty).
+- `type_name` *string* — LCard type name (must be non-empty).
 - `count` *number* — Number of copies (must be >= 1).
 
 #### `addWith(type_name, count, stat_overrides, extra_tags)`
@@ -2116,7 +2116,7 @@ Add count copies with per-card stat overrides and extra tags.
 
 - `type_name` *string*
 - `count` *number*
-- `stat_overrides` *table* — Map of stat_name Ôćĺ value.
+- `stat_overrides` *table* — Map of stat_name ��� value.
 - `extra_tags` *table* — Array of tag strings.
 
 #### `requireType(t)`
@@ -2189,7 +2189,7 @@ Validate an already-built Stack against size constraints.
 
 **Parameters**
 
-- `stack` *Stack*
+- `stack` *LCardStack*
 
 **Returns**
 
@@ -2201,7 +2201,7 @@ Build and return a Stack using the builder's own name.
 
 **Returns**
 
-- *Stack*
+- *LCardStack*
 
 #### `buildNamed(stack_name)`
 
@@ -2213,7 +2213,7 @@ Build and return a Stack with a custom name.
 
 **Returns**
 
-- *Stack*
+- *LCardStack*
 
 #### `HistoryAction.pushed(card_type, item_name)`
 
@@ -2336,7 +2336,7 @@ Append an action entry to the log.
 
 - `stack_name` *string*
 - `action` *table* — A HistoryAction table.
-- `size_after` *number* — Stack size after the action.
+- `size_after` *number* — LCardStack size after the action.
 
 #### `recordCustom(stack_name, label, size_after)`
 
@@ -2403,7 +2403,7 @@ Create a new CardGroup with a label, index list, and optional score.
 **Parameters**
 
 - `label` *string* — Human-readable group label.
-- `indices` *table* — Array of 1-based indices into a card list.
+- `indices` *table* — Array of 1-based indices into a LCard list.
 - `score` *number|nil* — Optional numeric score (default 0).
 
 **Returns**
@@ -2416,11 +2416,11 @@ Collect the actual card objects referenced by this group's indices.
 
 **Parameters**
 
-- `cards` *table* — Flat array of Card objects.
+- `cards` *table* — Flat array of LCard objects.
 
 **Returns**
 
-- *table* — Array of Card objects.
+- *table* — Array of LCard objects.
 
 #### `size()`
 
@@ -2444,7 +2444,7 @@ Return the highest value of a stat across grouped cards.
 
 **Parameters**
 
-- `cards` *table* — flat card list
+- `cards` *table* — flat LCard list
 - `stat` *string*
 
 **Returns**
@@ -2483,7 +2483,7 @@ Validate that a card list does not exceed per-type max_per_deck limits. Returns 
 
 **Parameters**
 
-- `cards` *table* — list of Card objects
+- `cards` *table* — list of LCard objects
 
 **Returns**
 
@@ -2554,11 +2554,11 @@ Return 1-based indices sorted by category (alphabetical).
 
 #### `groupByStat(items, stat)`
 
-Group 1-based indices of items by the integer value of a named stat. Returns a map of stat_value (floored to integer) Ôćĺ array of 1-based indices.
+Group 1-based indices of items by the integer value of a named stat. Returns a map of stat_value (floored to integer) ��� array of 1-based indices.
 
 **Parameters**
 
-- `items` *table* — List of Card objects.
+- `items` *table* — List of LCard objects.
 - `stat` *string* — Stat name to group by.
 
 **Returns**
@@ -2571,7 +2571,7 @@ Group 1-based indices by the value portion of a prefixed tag. Tags of the form "
 
 **Parameters**
 
-- `items` *table* — List of Card objects.
+- `items` *table* — List of LCard objects.
 - `prefix` *string* — Tag prefix to match (e.g. "suit" matches "suit:hearts").
 
 **Returns**
@@ -2584,7 +2584,7 @@ Find all groups where exactly n items share the same integer stat value. Analogo
 
 **Parameters**
 
-- `items` *table* — List of Card objects.
+- `items` *table* — List of LCard objects.
 - `stat` *string* — Stat name to compare.
 - `n` *number* — Exact group size required.
 
@@ -2598,7 +2598,7 @@ Find all runs of consecutive integer stat values with length >= min_run. Useful 
 
 **Parameters**
 
-- `items` *table* — List of Card objects.
+- `items` *table* — List of LCard objects.
 - `stat` *string* — Stat name to use for sequencing.
 - `min_run` *number* — Minimum run length to include.
 

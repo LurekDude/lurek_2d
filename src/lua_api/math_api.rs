@@ -210,6 +210,19 @@ impl LuaUserData for LuaVec2 {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("Vec2({}, {})", this.inner.x, this.inner.y))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LVec2"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LVec2" || name == "Object")
+        });
     }
 }
 
@@ -354,6 +367,19 @@ impl LuaUserData for LuaVec3 {
                 inner: Vec3::splat(v),
             })
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LVec3"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LVec3" || name == "Object")
+        });
     }
 }
 
@@ -411,6 +437,19 @@ impl LuaUserData for LuaCatmullRom {
                 .map(|(x, y)| (x, y))
                 .ok_or_else(|| LuaError::RuntimeError("index out of bounds".into()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCatmullRom"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCatmullRom" || name == "Object")
+        });
     }
 }
 
@@ -432,6 +471,19 @@ impl LuaUserData for LuaHermite {
         methods.add_method("sample", |_, this, t: f32| {
             let (x, y) = this.inner.sample(t);
             Ok((x, y))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LHermite"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LHermite" || name == "Object")
         });
     }
 }
@@ -510,6 +562,19 @@ impl LuaUserData for LuaRandomGenerator {
         methods.add_method_mut("setState", |_, this, state: String| {
             this.inner.set_state(&state).map_err(LuaError::external)?;
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LRandomGenerator"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LRandomGenerator" || name == "Object")
         });
     }
 }
@@ -668,6 +733,19 @@ impl LuaUserData for LuaTransform {
         /// Decomposes this transform into translation, rotation, and scale.
         /// @return number, number, number, number, number — x, y, angle, scaleX, scaleY
         methods.add_method("decompose", |_, this, ()| Ok(this.inner.decompose()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTransform"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTransform" || name == "Object")
+        });
     }
 }
 
@@ -813,6 +891,19 @@ impl LuaUserData for LuaBezierCurve {
             this.inner.scale(s, ox, oy);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LBezierCurve"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LBezierCurve" || name == "Object")
+        });
     }
 }
 
@@ -933,6 +1024,19 @@ impl LuaUserData for LuaTween {
         /// @return integer
         methods.add_method_mut("addValue", |_, this, (start, target): (f64, f64)| {
             Ok(this.inner.add_value(start, target) + 1)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTween"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTween" || name == "Object")
         });
     }
 }
@@ -1062,6 +1166,19 @@ impl LuaUserData for LuaSpatialHash {
         /// Returns the number of items in the hash.
         /// @return integer
         methods.add_method("getItemCount", |_, this, ()| Ok(this.inner.item_count()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSpatialHash"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSpatialHash" || name == "Object")
+        });
     }
 }
 
@@ -1373,6 +1490,19 @@ impl LuaUserData for LuaNoiseGenerator {
             this.inner.set_seed(seed);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNoiseGenerator"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNoiseGenerator" || name == "Object")
+        });
     }
 }
 
@@ -1441,6 +1571,19 @@ impl LuaUserData for LuaCircle {
         /// Returns the circle radius.
         /// @return number
         methods.add_method("radius", |_, this, ()| Ok(this.inner.radius));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCircle"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCircle" || name == "Object")
+        });
     }
 }
 
@@ -1553,6 +1696,19 @@ impl LuaUserData for LuaAabbTree {
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAabbTree"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAabbTree" || name == "Object")
         });
     }
 }

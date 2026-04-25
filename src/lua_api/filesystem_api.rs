@@ -40,6 +40,19 @@ impl LuaUserData for LuaFileData {
         /// Returns the virtual path this data was loaded from.
         /// @return string
         methods.add_method("getFilename", |_, this, ()| Ok(this.inner.path.clone()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LFileData"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LFileData" || name == "Object")
+        });
     }
 }
 
@@ -138,6 +151,19 @@ impl LuaUserData for LuaFileHandle {
         methods.add_method("isEOF", |_, this, ()| {
             this.inner.borrow_mut().is_eof().map_err(LuaError::external)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LFileHandle"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LFileHandle" || name == "Object")
+        });
     }
 }
 
@@ -190,6 +216,19 @@ impl LuaUserData for LuaZipMount {
         /// Returns the virtual path prefix this archive was mounted under.
         /// @return string
         methods.add_method("prefix", |_, this, ()| Ok(this.inner.prefix.clone()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LZipMount"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LZipMount" || name == "Object")
+        });
     }
 }
 

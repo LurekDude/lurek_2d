@@ -28,8 +28,8 @@ struct LuaEventBus {
 }
 
 impl LurekType for LuaEventBus {
-    const TYPE_NAME: &'static str = "EventBus";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["EventBus", "Object"];
+    const TYPE_NAME: &'static str = "LEventBus";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LEventBus", "Object"];
 }
 
 impl LuaUserData for LuaEventBus {
@@ -161,8 +161,8 @@ struct LuaObjectPool {
 }
 
 impl LurekType for LuaObjectPool {
-    const TYPE_NAME: &'static str = "ObjectPool";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["ObjectPool", "Object"];
+    const TYPE_NAME: &'static str = "LObjectPool";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LObjectPool", "Object"];
 }
 
 impl LuaUserData for LuaObjectPool {
@@ -264,8 +264,8 @@ struct LuaCommandStack {
 }
 
 impl LurekType for LuaCommandStack {
-    const TYPE_NAME: &'static str = "CommandStack";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["CommandStack", "Object"];
+    const TYPE_NAME: &'static str = "LCommandStack";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LCommandStack", "Object"];
 }
 
 impl LuaUserData for LuaCommandStack {
@@ -451,8 +451,8 @@ struct LuaServiceLocator {
 }
 
 impl LurekType for LuaServiceLocator {
-    const TYPE_NAME: &'static str = "ServiceLocator";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["ServiceLocator", "Object"];
+    const TYPE_NAME: &'static str = "LServiceLocator";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LServiceLocator", "Object"];
 }
 
 impl LuaUserData for LuaServiceLocator {
@@ -550,8 +550,8 @@ struct LuaFactory {
 }
 
 impl LurekType for LuaFactory {
-    const TYPE_NAME: &'static str = "Factory";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Factory", "Object"];
+    const TYPE_NAME: &'static str = "LFactory";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LFactory", "Object"];
 }
 
 impl LuaUserData for LuaFactory {
@@ -678,8 +678,8 @@ struct LuaSimpleState {
 }
 
 impl LurekType for LuaSimpleState {
-    const TYPE_NAME: &'static str = "SimpleState";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["SimpleState", "Object"];
+    const TYPE_NAME: &'static str = "LSimpleState";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LSimpleState", "Object"];
 }
 
 impl LuaUserData for LuaSimpleState {
@@ -859,8 +859,8 @@ struct LuaBlackboard {
 }
 
 impl LurekType for LuaBlackboard {
-    const TYPE_NAME: &'static str = "Blackboard";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Blackboard", "Object"];
+    const TYPE_NAME: &'static str = "LBlackboard";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LBlackboard", "Object"];
 }
 
 impl LuaUserData for LuaBlackboard {
@@ -1041,8 +1041,8 @@ struct LuaObserver {
 }
 
 impl LurekType for LuaObserver {
-    const TYPE_NAME: &'static str = "Observer";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Observer", "Object"];
+    const TYPE_NAME: &'static str = "LObserver";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LObserver", "Object"];
 }
 
 impl LuaUserData for LuaObserver {
@@ -1134,8 +1134,8 @@ struct LuaThrottle {
 }
 
 impl LurekType for LuaThrottle {
-    const TYPE_NAME: &'static str = "Throttle";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Throttle", "Object"];
+    const TYPE_NAME: &'static str = "LThrottle";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LThrottle", "Object"];
 }
 
 impl LuaUserData for LuaThrottle {
@@ -1210,8 +1210,8 @@ struct LuaDebounce {
 }
 
 impl LurekType for LuaDebounce {
-    const TYPE_NAME: &'static str = "Debounce";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Debounce", "Object"];
+    const TYPE_NAME: &'static str = "LDebounce";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LDebounce", "Object"];
 }
 
 impl LuaUserData for LuaDebounce {
@@ -1289,8 +1289,8 @@ struct LuaPriorityQueue {
 }
 
 impl LurekType for LuaPriorityQueue {
-    const TYPE_NAME: &'static str = "PriorityQueue";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["PriorityQueue", "Object"];
+    const TYPE_NAME: &'static str = "LPriorityQueue";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LPriorityQueue", "Object"];
 }
 
 impl LuaUserData for LuaPriorityQueue {
@@ -1383,8 +1383,8 @@ struct LuaRing {
 }
 
 impl LurekType for LuaRing {
-    const TYPE_NAME: &'static str = "Ring";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Ring", "Object"];
+    const TYPE_NAME: &'static str = "LRing";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LRing", "Object"];
 }
 
 impl LuaUserData for LuaRing {
@@ -1500,8 +1500,8 @@ struct LuaFunnel {
 }
 
 impl LurekType for LuaFunnel {
-    const TYPE_NAME: &'static str = "Funnel";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Funnel", "Object"];
+    const TYPE_NAME: &'static str = "LFunnel";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LFunnel", "Object"];
 }
 
 impl LuaUserData for LuaFunnel {
@@ -1607,8 +1607,8 @@ struct LuaRelationshipManager {
 }
 
 impl LurekType for LuaRelationshipManager {
-    const TYPE_NAME: &'static str = "RelationshipManager";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["RelationshipManager", "Object"];
+    const TYPE_NAME: &'static str = "LRelationshipManager";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LRelationshipManager", "Object"];
 }
 
 impl LuaUserData for LuaRelationshipManager {
@@ -1739,8 +1739,8 @@ struct LuaMediator {
 }
 
 impl LurekType for LuaMediator {
-    const TYPE_NAME: &'static str = "Mediator";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Mediator", "Object"];
+    const TYPE_NAME: &'static str = "LMediator";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LMediator", "Object"];
 }
 
 impl LuaUserData for LuaMediator {
@@ -1877,8 +1877,8 @@ struct LuaStrategy {
 }
 
 impl LurekType for LuaStrategy {
-    const TYPE_NAME: &'static str = "Strategy";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Strategy", "Object"];
+    const TYPE_NAME: &'static str = "LStrategy";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LStrategy", "Object"];
 }
 
 impl LuaUserData for LuaStrategy {
@@ -1996,8 +1996,8 @@ struct LuaStack {
 }
 
 impl LurekType for LuaStack {
-    const TYPE_NAME: &'static str = "Stack";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Stack", "Object"];
+    const TYPE_NAME: &'static str = "LStack";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LStack", "Object"];
 }
 
 impl LuaUserData for LuaStack {
@@ -2097,8 +2097,8 @@ struct LuaQueue {
 }
 
 impl LurekType for LuaQueue {
-    const TYPE_NAME: &'static str = "Queue";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Queue", "Object"];
+    const TYPE_NAME: &'static str = "LQueue";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LQueue", "Object"];
 }
 
 impl LuaUserData for LuaQueue {
@@ -2197,8 +2197,8 @@ struct LuaList {
 }
 
 impl LurekType for LuaList {
-    const TYPE_NAME: &'static str = "List";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["List", "Object"];
+    const TYPE_NAME: &'static str = "LList";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LList", "Object"];
 }
 
 impl LuaUserData for LuaList {
@@ -2329,8 +2329,8 @@ struct LuaSet {
 }
 
 impl LurekType for LuaSet {
-    const TYPE_NAME: &'static str = "Set";
-    const TYPE_HIERARCHY: &'static [&'static str] = &["Set", "Object"];
+    const TYPE_NAME: &'static str = "LSet";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LSet", "Object"];
 }
 
 impl LuaUserData for LuaSet {

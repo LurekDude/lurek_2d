@@ -409,6 +409,19 @@ impl LuaUserData for LuaMod {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("Mod({})", this.inner.id))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMod"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMod" || name == "Object")
+        });
     }
 }
 
@@ -593,6 +606,19 @@ impl LuaUserData for LuaModManager {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("ModManager({} mods)", this.inner.mod_count()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LModManager"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LModManager" || name == "Object")
+        });
     }
 }
 
@@ -691,6 +717,19 @@ impl LuaUserData for LuaContentRegistry {
         /// @return string
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("ContentRegistry({} types)", this.types.len()))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LContentRegistry"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LContentRegistry" || name == "Object")
         });
     }
 }

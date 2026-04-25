@@ -44,10 +44,27 @@ fn create_widget_table<'a>(
     ctx: &Rc<RefCell<GuiContext>>,
     idx: usize,
     cbs: &Rc<RefCell<GuiCallbacks>>,
+    type_name: &'static str,
 ) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
     /// @return nil
     t.set("_idx", idx)?;
+
+    // -- type --
+    /// Returns the Lua type name of this widget (e.g. "LButton").
+    /// @return string
+    t.set("type", lua.create_function(move |_, ()| Ok(type_name))?)?;
+
+    // -- typeOf --
+    /// Returns true if this widget is of the given type, "LWidget", or "Object".
+    /// @param name string
+    /// @return boolean
+    t.set(
+        "typeOf",
+        lua.create_function(move |_, name: String| {
+            Ok(name == type_name || name == "LWidget" || name == "Object")
+        })?,
+    )?;
 
     // -- setPosition --
     /// Sets the widget position.
@@ -4616,6 +4633,19 @@ impl LuaUserData for LuaTheme {
                 Ok(())
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTheme"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTheme" || name == "Object")
+        });
     }
 }
 
@@ -4727,7 +4757,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_button(text.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LButton")?;
             add_button_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4746,7 +4776,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_label(text.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LLabel")?;
             add_label_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4764,7 +4794,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_text_input();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LTextInput")?;
             add_text_input_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4783,7 +4813,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_checkbox(text.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LCheckbox")?;
             add_checkbox_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4803,7 +4833,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_slider(min.unwrap_or(0.0), max.unwrap_or(100.0));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSlider")?;
             add_slider_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4823,7 +4853,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_progress_bar(min.unwrap_or(0.0), max.unwrap_or(100.0));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LProgressBar")?;
             add_progress_bar_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4841,7 +4871,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_combo_box();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LComboBox")?;
             add_combo_box_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4859,7 +4889,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_list_box();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LListBox")?;
             add_list_box_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4877,7 +4907,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_panel();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LPanel")?;
             add_panel_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4900,7 +4930,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_layout(dir);
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LLayout")?;
             add_layout_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4918,7 +4948,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_scroll_panel();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LScrollPanel")?;
             add_scroll_panel_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4936,7 +4966,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_nine_patch();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LNinePatch")?;
             add_nine_patch_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4954,7 +4984,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_tab_bar();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LTabBar")?;
             add_tab_bar_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4973,7 +5003,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_separator(vertical.unwrap_or(false));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSeparator")?;
             add_separator_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -4993,7 +5023,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_spacer(w.unwrap_or(0.0), h.unwrap_or(0.0));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSpacer")?;
             Ok(t)
         })?,
     )?;
@@ -5015,7 +5045,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let idx = g.widgets.len();
                 g.widgets.push(WidgetKind::Toast(toast));
                 drop(g);
-                let t = create_widget_table(lua, &c, idx, &cbs)?;
+                let t = create_widget_table(lua, &c, idx, &cbs, "LToast")?;
                 add_toast_methods(lua, &t, &c, idx)?;
                 Ok(t)
             },
@@ -5034,7 +5064,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_tree_view();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LTreeView")?;
             add_tree_view_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5055,7 +5085,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 let mut g = c.borrow_mut();
                 let idx = g.add_radio_button(text.unwrap_or_default(), group.unwrap_or_default());
                 drop(g);
-                let t = create_widget_table(lua, &c, idx, &cbs)?;
+                let t = create_widget_table(lua, &c, idx, &cbs, "LRadioButton")?;
                 add_radio_button_methods(lua, &t, &c, idx, &cbs)?;
                 Ok(t)
             },
@@ -5075,7 +5105,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_scroll_bar(vertical.unwrap_or(true));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LScrollBar")?;
             add_scroll_bar_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5094,7 +5124,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_gui_window(title.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LGuiWindow")?;
             add_gui_window_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5113,7 +5143,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_split_panel(orientation.unwrap_or_else(|| "horizontal".to_string()));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSplitPanel")?;
             add_split_panel_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5131,7 +5161,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_dock_panel();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LDockPanel")?;
             add_dock_panel_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5150,7 +5180,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_toolbar(orientation.unwrap_or_else(|| "horizontal".to_string()));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LToolbar")?;
             add_toolbar_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5168,7 +5198,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_menu_bar();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LMenuBar")?;
             add_menu_bar_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5187,7 +5217,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_menu_item(text.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LMenuItem")?;
             add_menu_item_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5206,7 +5236,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_dialog(title.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LDialog")?;
             add_dialog_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5224,7 +5254,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_status_bar();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LStatusBar")?;
             add_status_bar_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5242,7 +5272,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_accordion();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LAccordion")?;
             add_accordion_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5261,7 +5291,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_tooltip_panel(text.unwrap_or_default());
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LTooltipPanel")?;
             add_tooltip_panel_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5279,7 +5309,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_color_picker();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LColorPicker")?;
             add_color_picker_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5297,7 +5327,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_gui_table();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LGuiTable")?;
             add_gui_table_methods(lua, &t, &c, idx, &cbs)?;
             Ok(t)
         })?,
@@ -5315,7 +5345,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_image_widget();
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LImageWidget")?;
             add_image_widget_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5369,7 +5399,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "getRoot",
         lua.create_function(move |lua, ()| {
-            let t = create_widget_table(lua, &c, 0, &cbs)?;
+            let t = create_widget_table(lua, &c, 0, &cbs, "LPanel")?;
             add_panel_methods(lua, &t, &c, 0)?;
             Ok(t)
         })?,
@@ -5679,7 +5709,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 }
                 idx
             };
-            create_widget_table(lua, &c, idx, &cbs)
+            create_widget_table(lua, &c, idx, &cbs, "LWidget")
         })?,
     )?;
 
@@ -5843,7 +5873,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_spin_box(min.unwrap_or(0.0), max.unwrap_or(100.0));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSpinBox")?;
             add_spin_box_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5861,7 +5891,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_switch(on.unwrap_or(false));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LSwitch")?;
             add_switch_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -5879,7 +5909,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
             let mut g = c.borrow_mut();
             let idx = g.add_badge(count.unwrap_or(0));
             drop(g);
-            let t = create_widget_table(lua, &c, idx, &cbs)?;
+            let t = create_widget_table(lua, &c, idx, &cbs, "LBadge")?;
             add_badge_methods(lua, &t, &c, idx)?;
             Ok(t)
         })?,
@@ -6202,6 +6232,19 @@ impl LuaUserData for LuaLineChart {
             this.inner.draw_to_image(&mut img);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LLineChart"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LLineChart" || name == "Object")
+        });
     }
 }
 
@@ -6257,6 +6300,19 @@ impl LuaUserData for LuaBarChart {
             let mut img = target.borrow_mut::<crate::image::ImageData>()?;
             this.inner.draw_to_image(&mut img);
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LBarChart"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LBarChart" || name == "Object")
         });
     }
 }
@@ -6324,6 +6380,19 @@ impl LuaUserData for LuaScatterPlot {
             this.inner.draw_to_image(&mut img);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LScatterPlot"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LScatterPlot" || name == "Object")
+        });
     }
 }
 
@@ -6364,6 +6433,19 @@ impl LuaUserData for LuaPieChart {
             let mut img = target.borrow_mut::<crate::image::ImageData>()?;
             this.inner.draw_to_image(&mut img);
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LPieChart"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LPieChart" || name == "Object")
         });
     }
 }
@@ -6417,6 +6499,19 @@ impl LuaUserData for LuaAreaChart {
             let mut img = target.borrow_mut::<crate::image::ImageData>()?;
             this.inner.draw_to_image(&mut img);
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAreaChart"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAreaChart" || name == "Object")
         });
     }
 }

@@ -1055,9 +1055,23 @@ end)
 
 describe("TweenState:t (@covers)", function()
     it("t returns the current normalised time", function()
-        -- @covers TweenState:t
+        -- @covers LTweenState:t
         local ts = lurek.tween.newState(1.0)
         local v = ts:t()
         expect_type("number", v)
+    end)
+end)
+
+describe("LTweenParallel.add (@covers)", function()
+    it("add appends a tween to the parallel group", function()
+        -- @covers LTweenParallel.add
+        local target1 = { x = 0 }
+        local target2 = { y = 0 }
+        local t1 = lurek.tween.to(target1, { x = 1 }, 0.1)
+        local t2 = lurek.tween.to(target2, { y = 1 }, 0.1)
+        local par = lurek.tween.parallel()
+        par:add(t1)
+        par:add(t2)
+        expect_not_nil(par)
     end)
 end)

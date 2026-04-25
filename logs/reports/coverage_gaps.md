@@ -10,77 +10,82 @@ This report identifies three categories of coverage issues:
 
 ---
 
-## 1. Rust→Lua Gaps (0 items)
+## 1. Rust→Lua Gaps (8 items)
 
 These public Rust functions are **not exposed** to the `lurek.*` Lua API.
 This may be intentional (engine internals) or an oversight.
 
-*All public Rust functions appear to be exposed to Lua.*
+### `html::element`
+
+- `normalise_name` `src/html/element.rs:219`
+
+### `html::parser`
+
+- `escape_attribute` `src/html/parser.rs:166`
+- `escape_text` `src/html/parser.rs:160`
+- `parse_into` `src/html/parser.rs:12`
+
+### `html::selector`
+
+- `matches_selector` `src/html/selector.rs:28`
+
+### `html::style`
+
+- `parse_declarations` `src/html/style.rs:54`
+- `parse_length` `src/html/style.rs:76`
+- `parse_stylesheets` `src/html/style.rs:28`
 
 ---
 
-## 2. Rust Docstring Issues (0 items)
+## 2. Rust Docstring Issues (14 items)
 
 Public Rust items with missing or very short descriptions (< 25 chars).
 These appear as `// (undocumented)` in `docs/api/rust.md`.
 
-*All public Rust items have adequate docstrings.*
+### `html`
+
+- `mod` **document** `src/html/mod.rs:3`
+- `mod` **element** `src/html/mod.rs:4`
+- `mod` **parser** `src/html/mod.rs:5`
+- `mod` **selector** `src/html/mod.rs:6`
+- `mod` **style** `src/html/mod.rs:7`
+
+### `html::element`
+
+- `fn` **normalise_name** `src/html/element.rs:219`
+
+### `html::parser`
+
+- `fn` **escape_attribute** `src/html/parser.rs:166`
+- `fn` **escape_text** `src/html/parser.rs:160`
+- `fn` **parse_into** `src/html/parser.rs:12`
+
+### `html::selector`
+
+- `fn` **matches_selector** `src/html/selector.rs:28`
+
+### `html::style`
+
+- `fn` **parse_declarations** `src/html/style.rs:54`
+- `fn` **parse_length** `src/html/style.rs:76`
+- `fn` **parse_stylesheets** `src/html/style.rs:28`
+- `struct` **CssParseResult** `src/html/style.rs:23`
 
 ---
 
-## 3. Lua Docstring Issues (37 items)
+## 3. Lua Docstring Issues (3 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/api/lurek.md` and IntelliSense.
 
-### `audio`
+### `html`
 
-- `class` **`lurek.audio.SoundData`** — *(no description)*
-- `method` **`SoundData:getBitDepth`** — *"Get the bit depth."* (too short)
-- `method` **`SoundData:getSampleRate`** — *"Get the sample rate."* (too short)
+- `method` **`LHtmlDocument:getElementById`** — *"Finds one element by id."* (too short)
+- `method` **`LHtmlElement:removeAttribute`** — *"Removes an attribute."* (too short)
 
-### `data`
+### `ui`
 
-- `class` **`lurek.data.ByteData`** — *(no description)*
-- `method` **`ByteData:clone`** — *"Clone the ByteData."* (too short)
-- `method` **`ByteData:getSize`** — *"Get the size."* (too short)
-
-### `effect`
-
-- `method` **`ScreenTransition:type`** — *"Type."* (too short)
-- `method` **`ScreenTransition:typeOf`** — *"Type of."* (too short)
-
-### `image`
-
-- `class` **`lurek.image.ImageData`** — *(no description)*
-- `method` **`ImageData:alphaMask`** — *"Alpha mask."* (too short)
-- `method` **`ImageData:blur`** — *"Blur."* (too short)
-- `method` **`ImageData:brightness`** — *"Brightness."* (too short)
-- `method` **`ImageData:contrast`** — *"Contrast."* (too short)
-- `method` **`ImageData:crop`** — *"Crop."* (too short)
-- `method` **`ImageData:encode`** — *"Encode."* (too short)
-- `method` **`ImageData:fill`** — *"Fill."* (too short)
-- `method` **`ImageData:flipHorizontal`** — *"Flip horizontal."* (too short)
-- `method` **`ImageData:flipVertical`** — *"Flip vertical."* (too short)
-- `method` **`ImageData:gamma`** — *"Gamma."* (too short)
-- `method` **`ImageData:getDimensions`** — *"Returns the dimensions."* (too short)
-- `method` **`ImageData:getHeight`** — *"Returns the height."* (too short)
-- `method` **`ImageData:getPixel`** — *"Returns the pixel."* (too short)
-- `method` **`ImageData:getString`** — *"Returns the string."* (too short)
-- `method` **`ImageData:getWidth`** — *"Returns the width."* (too short)
-- `method` **`ImageData:grayscale`** — *"Grayscale."* (too short)
-- `method` **`ImageData:invert`** — *"Invert."* (too short)
-- `method` **`ImageData:mapPixel`** — *"Map pixel."* (too short)
-- `method` **`ImageData:noise`** — *"Noise."* (too short)
-- `method` **`ImageData:posterize`** — *"Posterize."* (too short)
-- `method` **`ImageData:resizeNearest`** — *"Resize nearest."* (too short)
-- `method` **`ImageData:rotate90cw`** — *"Rotate90cw."* (too short)
-- `method` **`ImageData:saturation`** — *"Saturation."* (too short)
-- `method` **`ImageData:sepia`** — *"Sepia."* (too short)
-- `method` **`ImageData:setPixel`** — *(no description)*
-- `method` **`ImageData:sharpen`** — *"Sharpen."* (too short)
-- `method` **`ImageData:threshold`** — *"Threshold."* (too short)
-- `method` **`ImageData:tint`** — *(no description)*
+- `module` **`lurek.ui`** — *(no description)*
 
 ---
 

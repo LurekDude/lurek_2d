@@ -3,17 +3,176 @@
 
 lurek = {}
 
----@class Environment
-Environment = {}
+---@alias AIBlackboard LAIBlackboard
 
----@class GID
-GID = {}
+---@alias AIDirector LAIDirector
 
----@class ID
-ID = {}
+---@alias AILod LAILod
+
+---@alias AIWorld LAIWorld
+
+---@alias AabbTree LAabbTree
+
+---@alias Agent LAgent
+
+---@alias AiFlowField LAIFlowField
+
+---@alias AnimCurve LAnimCurve
+
+---@alias AnimStateMachine LAnimStateMachine
+
+---@alias AnimSyncGroup LAnimSyncGroup
+
+---@alias Animation LAnimation
+
+---@alias ApiCatalog LApiCatalog
+
+---@alias AreaChart LAreaChart
+
+---@alias Array LArray
+
+---@alias AutoTileSheet LAutoTileSheet
+
+---@alias BTNode LBTNode
+
+---@alias Bandit LBandit
+
+---@alias BarChart LBarChart
+
+---@alias BehaviorTree LBehaviorTree
+
+---@alias BezierCurve LBezierCurve
+
+---@alias Blackboard LBlackboard
+
+---@alias BlendLayerSet LBlendLayerSet
+
+---@alias Body LBody
+
+---@alias Bus LBus
+
+---@alias ByteData LByteData
+
+---@alias Camera2D LCamera
+
+---@alias Canvas LCanvas
+
+---@alias CatmullRom LCatmullRom
+
+---@alias Cellular LCellular
+
+---@alias Channel LChannel
+
+---@alias ChunkMap LChunkMap
+
+---@alias Circle LCircle
+
+---@alias Combo LCombo
+
+---@alias CommandQueue LCommandQueue
+
+---@alias CommandStack LCommandStack
+
+---@alias CompressedImageData LCompressedImageData
+
+---@alias ContentRegistry LContentRegistry
+
+---@alias ContextSteering LContextSteering
+
+---@alias Cursor LCursor
+
+---@alias DataFrame LDataFrame
+
+---@alias DataView LDataView
+
+---@alias DataWriter LDataWriter
+
+---@alias Database LDatabase
+
+---@alias Debounce LDebounce
+
+---@alias Decoder LDecoder
+
+---@alias DepthSorter LDepthSorter
+
+---@alias DoorManager LDoorManager
+
+---@alias DrawLayer LDrawLayer
+
+---@alias Edge LGraphEdge
+
+---@alias EmotionModel LEmotionModel
+
+---@alias Environment any
+
+---@alias EventBus LEventBus
+
+---@alias Factory LFactory
+
+---@alias FileData LFileData
+
+---@alias FileHandle LFileHandle
+
+---@alias FileWatcher LFileWatcher
+
+---@alias FlowField LFlowField
+
+---@alias Font LFont
+
+---@alias Funnel LFunnel
+
+---@alias GID integer
+
+---@alias GOAPPlanner LGOAPPlanner
+
+---@alias GeneticAlgorithm LGeneticAlgorithm
+
+---@alias Globe LGlobe
+
+---@alias Graph LGraph
+
+---@alias GraphItem LGraphItem
+
+---@alias GroupedFrame LGroupedFrame
+
+---@alias HTNDomain LHTNDomain
+
+---@alias HeightMap LHeightMap
+
+---@alias Hermite LHermite
+
+---@alias HexGrid LHexGrid
+
+---@alias HtmlDocument LHtmlDocument
+
+---@alias HtmlElement LHtmlElement
+
+---@alias ID integer
+
+---@alias Image LImage
+
+---@alias ImageData LImageData
+
+---@alias ImageEffect LImageEffect
+
+---@alias InfluenceMap LInfluenceMap
+
+---@alias IsoMap LIsoMap
+
+---@alias JpsGrid LJpsGrid
+
+---@alias LargeMapRenderer LLargeMapRenderer
+
+---@alias LayeredImage LLayeredImage
+
+---@alias Light LLight
+
+---@alias LineChart LLineChart
 
 ---@class Linux
 Linux = {}
+
+---@alias List LList
 
 ---@class Lua
 Lua = {}
@@ -26,148 +185,355 @@ LuaParallaxSet = {}
 
 ---@alias LuaValue any
 
----@class MultiValue
-MultiValue = {}
+---@alias MCTSEngine LMCTSEngine
 
----@class Radius
-Radius = {}
+---@alias MapBlock LMapBlock
 
----@class TextureKey
-TextureKey = {}
+---@alias MapGen LMapGen
 
----@class Tint
-Tint = {}
+---@alias MapGroup LMapGroup
+
+---@alias MapScript LMapScript
+
+---@alias Mediator LMediator
+
+---@alias Mesh LMesh
+
+---@alias MidiPlayer LMidiPlayer
+
+---@alias Minimap LMinimap
+
+---@alias Mod LMod
+
+---@alias ModManager LModManager
+
+---@alias MultiValue any
+
+---@alias NavGrid LNavGrid
+
+---@alias NeedSystem LNeedSystem
+
+---@alias NetworkHost LNetworkHost
+
+---@alias NetworkRuntime LNetworkRuntime
+
+---@alias NeuralNet LNeuralNet
+
+---@alias Neuroevolution LNeuroevolution
+
+---@alias NineSlice LNineSlice
+
+---@alias Node LGraphNode
+
+---@alias NoiseGenerator LNoiseGenerator
+
+---@alias ORCASolver LORCASolver
+
+---@alias ObjectPool LObjectPool
+
+---@alias Observer LObserver
+
+---@alias Occluder LOccluder
+
+---@alias Overlay LOverlay
+
+---@alias PaletteLUT LPaletteLUT
+
+---@alias ParticleSystem LParticleSystem
+
+---@alias PathGrid LPathGrid
+
+---@alias PhysicsShape LPhysicsShape
+
+---@alias PieChart LPieChart
+
+---@alias Pipeline LPipeline
+
+---@alias PointLight LPointLight
+
+---@alias PostFxEffect LPostFxEffect
+
+---@alias PostFxStack LPostFxStack
+
+---@alias PriorityQueue LPriorityQueue
+
+---@alias Promise LPromise
+
+---@alias ProvinceGrid LProvinceGrid
+
+---@alias QLearner LQLearner
+
+---@alias Quad LQuad
+
+---@alias Queue LQueue
+
+---@alias Radius number
+
+---@alias RandomGenerator LRandomGenerator
+
+---@alias Raycaster LRaycaster
+
+---@alias RelationshipManager LRelationshipManager
+
+---@alias ReplConsole LReplConsole
+
+---@alias Ring LRing
+
+---@alias RingBuffer LRingBuffer
+
+---@alias SaveManager LSaveManager
+
+---@alias ScatterPlot LScatterPlot
+
+---@alias Scheduler LScheduler
+
+---@alias ScreenTransition LScreenTransition
+
+---@alias ServiceLocator LServiceLocator
+
+---@alias Set LSet
+
+---@alias Shader LShader
+
+---@alias Shape LShape
+
+---@alias Signal LSignal
+
+---@alias SimpleState LSimpleState
+
+---@alias Skeleton LSkeleton
+
+---@alias SkeletonAnimation LSkeletonAnimation
+
+---@alias SoundData LSoundData
+
+---@alias SoundPool LSoundPool
+
+---@alias Source LSource
+
+---@alias SpatialHash LSpatialHash
+
+---@alias Spring LSpring
+
+---@alias SpriteAtlas LSpriteAtlas
+
+---@alias SpriteBatch LSpriteBatch
+
+---@alias SpriteManager LSpriteManager
+
+---@alias SpriteSheet LSpriteSheet
+
+---@alias Squad LSquad
+
+---@alias Stack LStack
+
+---@alias StateMachine LStateMachine
+
+---@alias SteeringManager LSteeringManager
+
+---@alias Step LPipelineStep
+
+---@alias StimulusWorld LStimulusWorld
+
+---@alias Strategy LStrategy
+
+---@alias StrategyAI LStrategyAI
+
+---@alias Terminal LTerminal
+
+---@alias Terrain LTerrain
+
+---@alias TextureKey any
+
+---@alias Theme LTheme
+
+---@alias ThreadHandle LThread
+
+---@alias ThreadPool LThreadPool
+
+---@alias Throttle LThrottle
+
+---@alias TileMap LTileMap
+
+---@alias TileSet LTileSet
+
+---@alias Tint any
+
+---@alias Trail LTrail
+
+---@alias TraitProfile LTraitProfile
+
+---@alias Transform LTransform
+
+---@alias Tween LTween
+
+---@alias TweenParallel LTweenParallel
+
+---@alias TweenSequence LTweenSequence
+
+---@alias TweenState LTweenState
+
+---@alias UnitPathfinder LUnitPathfinder
+
+---@alias Universe LUniverse
+
+---@alias UtilityAI LUtilityAI
+
+---@alias ValidationReport LValidationReport
+
+---@alias Vec2 LVec2
+
+---@alias Vec3 LVec3
+
+---@alias VecFrame LVecFrame
+
+---@alias Widget LWidget
+
+---@alias World LWorld
+
+---@alias ZipMount LZipMount
+
+---@alias Zone LZone
 
 ---@class lurek.ai
 lurek.ai = {}
 
 --- Lua-side wrapper around a [`Blackboard`].
----@class AIBlackboard
-AIBlackboard = {}
+---@class LAIBlackboard
+LAIBlackboard = {}
 
 --- Removes all local entries.
 ---@return nil
-function AIBlackboard:clear() end
+function LAIBlackboard:clear() end
 
 --- Returns the boolean for the given key, or default.
 ---@param key string
 ---@param default? boolean
 ---@return boolean
-function AIBlackboard:getBool(key, default) end
+function LAIBlackboard:getBool(key, default) end
 
 --- Returns all local keys as a table.
 ---@return table
-function AIBlackboard:getKeys() end
+function LAIBlackboard:getKeys() end
 
 --- Returns the number for the given key, or default.
 ---@param key string
 ---@param default? number
 ---@return number
-function AIBlackboard:getNumber(key, default) end
+function LAIBlackboard:getNumber(key, default) end
 
 --- Returns the number of local entries.
 ---@return number
-function AIBlackboard:getSize() end
+function LAIBlackboard:getSize() end
 
 --- Returns the string for the given key, or default.
 ---@param key string
 ---@param default? string
 ---@return string
-function AIBlackboard:getString(key, default) end
+function LAIBlackboard:getString(key, default) end
 
 --- Returns true if a value exists under the key.
 ---@param key string
 ---@return boolean
-function AIBlackboard:has(key) end
+function LAIBlackboard:has(key) end
 
 --- Removes the entry at key.
 ---@param key string
 ---@return nil
-function AIBlackboard:remove(key) end
+function LAIBlackboard:remove(key) end
 
 --- Stores a boolean under the given key.
 ---@param key string
 ---@param value boolean
 ---@return nil
-function AIBlackboard:setBool(key, value) end
+function LAIBlackboard:setBool(key, value) end
 
 --- Stores a number under the given key.
 ---@param key string
 ---@param value number
 ---@return nil
-function AIBlackboard:setNumber(key, value) end
+function LAIBlackboard:setNumber(key, value) end
 
 --- Stores a string under the given key.
 ---@param key string
 ---@param value string
 ---@return nil
-function AIBlackboard:setString(key, value) end
+function LAIBlackboard:setString(key, value) end
 
 --- Returns the type name of this object.
 ---@return string
-function AIBlackboard:type() end
+function LAIBlackboard:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function AIBlackboard:typeOf(name) end
+function LAIBlackboard:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::director::AIDirector`].
----@class AIDirector
-AIDirector = {}
+---@class LAIDirector
+LAIDirector = {}
 
 --- Returns or performs ambient intensity.
 ---@return number
-function AIDirector:ambientIntensity() end
+function LAIDirector:ambientIntensity() end
 
 --- Returns or performs loot factor.
 ---@return number
-function AIDirector:lootFactor() end
+function LAIDirector:lootFactor() end
 
 --- Returns or performs phase.
 ---@return string
-function AIDirector:phase() end
+function LAIDirector:phase() end
 
 --- Pushes a gameplay event with the given intensity to the director for awareness analysis.
 ---@param intensity number
 ---@return nil
-function AIDirector:pushEvent(intensity) end
+function LAIDirector:pushEvent(intensity) end
 
 --- Resets or clears the state.
 ---@return nil
-function AIDirector:reset() end
+function LAIDirector:reset() end
 
 --- Sets the global narrative tension level (0â€“1 scale).
 ---@param value number
 ---@return nil
-function AIDirector:setTension(value) end
+function LAIDirector:setTension(value) end
 
 --- Returns or performs spawn rate factor.
 ---@return number
-function AIDirector:spawnRateFactor() end
+function LAIDirector:spawnRateFactor() end
 
 --- Returns or performs tension.
 ---@return number
-function AIDirector:tension() end
+function LAIDirector:tension() end
+
+--- Returns the type name of this object.
+---@return string
+function LAIDirector:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAIDirector:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@return nil
-function AIDirector:update(dt) end
+function LAIDirector:update(dt) end
 
 --- Lua wrapper for [`crate::ai::lod::AILod`].
----@class AILod
-AILod = {}
+---@class LAILod
+LAILod = {}
 
 --- Returns or performs should update.
 ---@param tier integer
 ---@param frame_number integer
 ---@return boolean
-function AILod:shouldUpdate(tier, frame_number) end
+function LAILod:shouldUpdate(tier, frame_number) end
 
 --- Returns or performs tier count.
 ---@return number
-function AILod:tierCount() end
+function LAILod:tierCount() end
 
 --- Returns or performs tier for.
 ---@param agent_x number
@@ -175,322 +541,340 @@ function AILod:tierCount() end
 ---@param ref_x number
 ---@param ref_y number
 ---@return number
-function AILod:tierFor(agent_x, agent_y, ref_x, ref_y) end
+function LAILod:tierFor(agent_x, agent_y, ref_x, ref_y) end
 
 --- Returns or performs tier name.
 ---@param tier integer
 ---@return string
-function AILod:tierName(tier) end
-
---- Lua-side wrapper around an [`AIWorld`].
----@class AIWorld
-AIWorld = {}
-
---- Registers a new named agent and returns its handle.
----@param name string
----@return Agent
-function AIWorld:addAgent(name) end
-
---- Returns the agent handle for the given name, or nil.
----@param name string
----@return nil
-function AIWorld:getAgent(name) end
-
---- Returns the number of registered agents.
----@return number
-function AIWorld:getAgentCount() end
-
---- Returns a snapshot of the world-level blackboard.
----@return AIBlackboard
-function AIWorld:getGlobalBlackboard() end
-
---- Removes an agent by its userdata handle.
----@param agent Agent
----@return nil
-function AIWorld:removeAgent(agent) end
+function LAILod:tierName(tier) end
 
 --- Returns the type name of this object.
 ---@return string
-function AIWorld:type() end
+function LAILod:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function AIWorld:typeOf(name) end
+function LAILod:typeOf(name) end
+
+--- Lua-side wrapper around an [`AIWorld`].
+---@class LAIWorld
+LAIWorld = {}
+
+--- Registers a new named agent and returns its handle.
+---@param name string
+---@return Agent
+function LAIWorld:addAgent(name) end
+
+--- Returns the agent handle for the given name, or nil.
+---@param name string
+---@return nil
+function LAIWorld:getAgent(name) end
+
+--- Returns the number of registered agents.
+---@return number
+function LAIWorld:getAgentCount() end
+
+--- Returns a snapshot of the world-level blackboard.
+---@return AIBlackboard
+function LAIWorld:getGlobalBlackboard() end
+
+--- Removes an agent by its userdata handle.
+---@param agent Agent
+---@return nil
+function LAIWorld:removeAgent(agent) end
+
+--- Returns the type name of this object.
+---@return string
+function LAIWorld:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAIWorld:typeOf(name) end
 
 --- Advances all agents by dt seconds, then invokes any custom-model callbacks.
 ---@param dt number
 ---@return nil
-function AIWorld:update(dt) end
+function LAIWorld:update(dt) end
 
 --- Lua-side wrapper for an agent accessed by name through the owning world.
----@class Agent
-Agent = {}
+---@class LAgent
+LAgent = {}
 
 --- Adds a tag to this agent.
 ---@param tag string
 ---@return nil
-function Agent:addTag(tag) end
+function LAgent:addTag(tag) end
 
 --- Returns the agent's local blackboard.
 ---@return AIBlackboard
-function Agent:getBlackboard() end
+function LAgent:getBlackboard() end
 
 --- Returns the name of the current decision model.
 ---@return string
-function Agent:getDecisionModel() end
+function LAgent:getDecisionModel() end
 
 --- Returns the maximum steering force cap.
 ---@return number
-function Agent:getMaxForce() end
+function LAgent:getMaxForce() end
 
 --- Returns the maximum speed cap.
 ---@return number
-function Agent:getMaxSpeed() end
+function LAgent:getMaxSpeed() end
 
 --- Returns the agent's registered name.
 ---@return string
-function Agent:getName() end
+function LAgent:getName() end
 
 --- Returns the agent's current position.
 ---@return number
-function Agent:getPosition() end
+function LAgent:getPosition() end
 
 --- Returns the agent's scheduling priority.
 ---@return number
-function Agent:getPriority() end
+function LAgent:getPriority() end
 
 --- Returns the agent's current velocity.
 ---@return number
-function Agent:getVelocity() end
+function LAgent:getVelocity() end
 
 --- Returns true if the agent has the given tag.
 ---@param tag string
 ---@return boolean
-function Agent:hasTag(tag) end
+function LAgent:hasTag(tag) end
 
 --- Removes a tag from this agent.
 ---@param tag string
 ---@return nil
-function Agent:removeTag(tag) end
+function LAgent:removeTag(tag) end
 
 --- Installs a Lua-driven decision model on this agent.
 ---@param callback function(agent,blackboard,dt)
 ---@return nil
-function Agent:setCustomModel(callback) end
+function LAgent:setCustomModel(callback) end
 
 --- Sets the active decision model.
 ---@param model string
 ---@return nil
-function Agent:setDecisionModel(model) end
+function LAgent:setDecisionModel(model) end
 
 --- Sets the maximum steering force cap.
 ---@param v number
 ---@return nil
-function Agent:setMaxForce(v) end
+function LAgent:setMaxForce(v) end
 
 --- Sets the maximum speed cap.
 ---@param v number
 ---@return nil
-function Agent:setMaxSpeed(v) end
+function LAgent:setMaxSpeed(v) end
 
 --- Sets the agent's world-space position.
 ---@param x number
 ---@param y number
 ---@return nil
-function Agent:setPosition(x, y) end
+function LAgent:setPosition(x, y) end
 
 --- Sets the scheduling priority (higher = earlier).
 ---@param p integer
 ---@return nil
-function Agent:setPriority(p) end
+function LAgent:setPriority(p) end
 
 --- Sets the agent's velocity vector.
 ---@param x number
 ---@param y number
 ---@return nil
-function Agent:setVelocity(x, y) end
+function LAgent:setVelocity(x, y) end
 
 --- Returns the type name of this object.
 ---@return string
-function Agent:type() end
+function LAgent:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Agent:typeOf(name) end
+function LAgent:typeOf(name) end
 
 --- Lua-side wrapper around a [`BTNode`].
----@class BTNode
-BTNode = {}
+---@class LBTNode
+LBTNode = {}
 
 --- Adds a child node (Selector, Sequence, or Parallel only).
 ---@param child BTNode
 ---@return nil
-function BTNode:addChild(child) end
+function LBTNode:addChild(child) end
 
 --- Returns the number of direct children.
 ---@return number
-function BTNode:getChildCount() end
+function LBTNode:getChildCount() end
 
 --- Returns the repeat count, or 0 if not a Repeater.
 ---@return number
-function BTNode:getCount() end
+function LBTNode:getCount() end
 
 --- Returns the node type as a string.
 ---@return string
-function BTNode:getNodeType() end
+function LBTNode:getNodeType() end
 
 --- Resets all running-child memos and repeater counters.
 ---@return nil
-function BTNode:reset() end
+function LBTNode:reset() end
 
 --- Sets the single child of a decorator node.
 ---@param child BTNode
 ---@return nil
-function BTNode:setChild(child) end
+function LBTNode:setChild(child) end
 
 --- Sets the repeat count for a Repeater node.
 ---@param n integer
 ---@return nil
-function BTNode:setCount(n) end
+function LBTNode:setCount(n) end
 
 --- Sets the failure policy for a Parallel node.
 ---@param policy string
 ---@return nil
-function BTNode:setFailurePolicy(policy) end
+function LBTNode:setFailurePolicy(policy) end
 
 --- Sets the success policy for a Parallel node.
 ---@param policy string
 ---@return nil
-function BTNode:setSuccessPolicy(policy) end
+function LBTNode:setSuccessPolicy(policy) end
 
 --- Returns the type name of this object.
 ---@return string
-function BTNode:type() end
+function LBTNode:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function BTNode:typeOf(name) end
+function LBTNode:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::bandit::Bandit`].
----@class Bandit
-Bandit = {}
+---@class LBandit
+LBandit = {}
 
 --- Returns or performs arm count.
 ---@return number
-function Bandit:armCount() end
+function LBandit:armCount() end
 
 --- Returns or performs best arm.
 ---@return number
-function Bandit:bestArm() end
+function LBandit:bestArm() end
 
 --- Resets or clears the state.
 ---@return nil
-function Bandit:reset() end
+function LBandit:reset() end
 
 --- Returns or performs select.
 ---@return number
-function Bandit:select() end
+function LBandit:select() end
 
 --- Returns or performs total pulls.
 ---@return number
-function Bandit:totalPulls() end
+function LBandit:totalPulls() end
+
+--- Returns the type name of this object.
+---@return string
+function LBandit:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LBandit:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param index integer
 ---@param reward number
 ---@return nil
-function Bandit:update(index, reward) end
+function LBandit:update(index, reward) end
 
 --- Lua-side wrapper around a [`BehaviorTree`].
----@class BehaviorTree
-BehaviorTree = {}
+---@class LBehaviorTree
+LBehaviorTree = {}
 
 --- Returns a diagnostic snapshot of this behavior tree.
 ---@return table
-function BehaviorTree:getDebugState() end
+function LBehaviorTree:getDebugState() end
 
 --- Returns the status from the last tick.
 ---@return string
-function BehaviorTree:getLastStatus() end
+function LBehaviorTree:getLastStatus() end
 
 --- Sets the root node of this behavior tree.
 ---@param node BTNode
 ---@return nil
-function BehaviorTree:setRoot(node) end
+function LBehaviorTree:setRoot(node) end
 
 --- Returns the type name of this object.
 ---@return string
-function BehaviorTree:type() end
+function LBehaviorTree:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function BehaviorTree:typeOf(name) end
+function LBehaviorTree:typeOf(name) end
 
 --- Lua-side wrapper around a [`CommandQueue`].
----@class CommandQueue
-CommandQueue = {}
+---@class LCommandQueue
+LCommandQueue = {}
 
 --- Cancels the front command if it is interruptible.
 ---@return boolean
-function CommandQueue:cancelCurrent() end
+function LCommandQueue:cancelCurrent() end
 
 --- Discards all queued commands.
 ---@return nil
-function CommandQueue:clear() end
+function LCommandQueue:clear() end
 
 --- Appends a command to the back of the queue.
 ---@param kind string
 ---@param callback function
 ---@param opts? table
 ---@return nil
-function CommandQueue:enqueue(kind, callback, opts) end
+function LCommandQueue:enqueue(kind, callback, opts) end
 
 --- Returns the number of queued commands.
 ---@return number
-function CommandQueue:getCount() end
+function LCommandQueue:getCount() end
 
 --- Returns the target coordinates of the front command.
 ---@return number
-function CommandQueue:getCurrentTarget() end
+function LCommandQueue:getCurrentTarget() end
 
 --- Returns the kind of the front command, or nil.
 ---@return string
-function CommandQueue:getCurrentType() end
+function LCommandQueue:getCurrentType() end
 
 --- Returns true if there are no queued commands.
 ---@return boolean
-function CommandQueue:isEmpty() end
+function LCommandQueue:isEmpty() end
 
 --- Inserts a command at the front, interrupting the current one.
 ---@param kind string
 ---@param callback function
 ---@param opts? table
 ---@return nil
-function CommandQueue:pushFront(kind, callback, opts) end
+function LCommandQueue:pushFront(kind, callback, opts) end
 
 --- Clears the queue and enqueues one new command.
 ---@param kind string
 ---@param callback function
 ---@param opts? table
 ---@return nil
-function CommandQueue:replace(kind, callback, opts) end
+function LCommandQueue:replace(kind, callback, opts) end
 
 --- Returns the type name of this object.
 ---@return string
-function CommandQueue:type() end
+function LCommandQueue:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function CommandQueue:typeOf(name) end
+function LCommandQueue:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::context_steering::ContextSteering`].
----@class ContextSteering
-ContextSteering = {}
+---@class LContextSteering
+LContextSteering = {}
 
 --- Registers a rectangular region this agent must avoid.
 ---@param min_x number
@@ -500,7 +884,7 @@ ContextSteering = {}
 ---@param margin number
 ---@param weight number
 ---@return nil
-function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
+function LContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weight) end
 
 --- Adds a world-space point that this agent steers away from.
 ---@param x number
@@ -508,28 +892,28 @@ function ContextSteering:addAvoidBounds(min_x, min_y, max_x, max_y, margin, weig
 ---@param radius number
 ---@param weight number
 ---@return nil
-function ContextSteering:addAvoidPoint(x, y, radius, weight) end
+function LContextSteering:addAvoidPoint(x, y, radius, weight) end
 
 --- Adds a world-space target that this agent steers towards.
 ---@param tx number
 ---@param ty number
 ---@param weight number
 ---@return nil
-function ContextSteering:addSeekTarget(tx, ty, weight) end
+function LContextSteering:addSeekTarget(tx, ty, weight) end
 
 --- Adds a wander behavior with jitter and weight to the context steering evaluator.
 ---@param jitter number
 ---@param weight number
 ---@return nil
-function ContextSteering:addWander(jitter, weight) end
+function LContextSteering:addWander(jitter, weight) end
 
 --- Returns or performs chosen magnitude.
 ---@return number
-function ContextSteering:chosenMagnitude() end
+function LContextSteering:chosenMagnitude() end
 
 --- Resets or clears the behaviors.
 ---@return nil
-function ContextSteering:clearBehaviors() end
+function LContextSteering:clearBehaviors() end
 
 --- Evaluates and returns the computed result.
 ---@param ax number
@@ -537,15 +921,24 @@ function ContextSteering:clearBehaviors() end
 ---@param vx number
 ---@param vy number
 ---@return number
-function ContextSteering:evaluate(ax, ay, vx, vy) end
+function LContextSteering:evaluate(ax, ay, vx, vy) end
 
 --- Returns or performs slot count.
 ---@return number
-function ContextSteering:slotCount() end
+function LContextSteering:slotCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LContextSteering:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LContextSteering:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::emotion::EmotionModel`].
----@class EmotionModel
-EmotionModel = {}
+---@class LEmotionModel
+LEmotionModel = {}
 
 --- Adds an emotion category with the given name and initial intensity to the model.
 ---@param name string
@@ -553,147 +946,165 @@ EmotionModel = {}
 ---@param decay_rate number
 ---@param min_visible number
 ---@return nil
-function EmotionModel:add(name, resting_level, decay_rate, min_visible) end
+function LEmotionModel:add(name, resting_level, decay_rate, min_visible) end
 
 --- Returns or performs dominant.
 ---@return string
-function EmotionModel:dominant() end
+function LEmotionModel:dominant() end
 
 --- Returns the current float value of this emotion dimension.
 ---@param name string
 ---@return number
-function EmotionModel:get(name) end
+function LEmotionModel:get(name) end
 
 --- Returns `true` if the emotion dimension is currently active and above threshold.
 ---@param name string
 ---@return boolean
-function EmotionModel:isActive(name) end
+function LEmotionModel:isActive(name) end
 
 --- Resets or clears the state.
 ---@return nil
-function EmotionModel:reset() end
+function LEmotionModel:reset() end
 
 --- Returns or performs trigger.
 ---@param name string
 ---@param amount number
 ---@return nil
-function EmotionModel:trigger(name, amount) end
+function LEmotionModel:trigger(name, amount) end
+
+--- Returns the type name of this object.
+---@return string
+function LEmotionModel:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LEmotionModel:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@return nil
-function EmotionModel:update(dt) end
+function LEmotionModel:update(dt) end
 
 --- Lua-side wrapper around a [`GOAPPlanner`].
----@class GOAPPlanner
-GOAPPlanner = {}
+---@class LGOAPPlanner
+LGOAPPlanner = {}
 
 --- Adds a GOAP action with optional cost and callback.
 ---@param name string
 ---@param cost? number
 ---@param callback? function
 ---@return nil
-function GOAPPlanner:addAction(name, cost, callback) end
+function LGOAPPlanner:addAction(name, cost, callback) end
 
 --- Adds a planning goal with optional priority.
 ---@param name string
 ---@param priority? number
 ---@return nil
-function GOAPPlanner:addGoal(name, priority) end
+function LGOAPPlanner:addGoal(name, priority) end
 
 --- Returns the number of registered actions.
 ---@return number
-function GOAPPlanner:getActionCount() end
+function LGOAPPlanner:getActionCount() end
 
 --- Returns the number of registered goals.
 ---@return number
-function GOAPPlanner:getGoalCount() end
+function LGOAPPlanner:getGoalCount() end
 
 --- Returns the maximum A* planning iterations.
 ---@return number
-function GOAPPlanner:getMaxIterations() end
+function LGOAPPlanner:getMaxIterations() end
 
 --- Runs A* planning and returns an action sequence table.
 ---@param worldState table
 ---@param maxDepth? integer
 ---@return table
-function GOAPPlanner:plan(worldState, maxDepth) end
+function LGOAPPlanner:plan(worldState, maxDepth) end
 
 --- Sets a boolean effect on an action.
 ---@param actionName string
 ---@param key string
 ---@param value boolean
 ---@return nil
-function GOAPPlanner:setEffect(actionName, key, value) end
+function LGOAPPlanner:setEffect(actionName, key, value) end
 
 --- Sets a boolean condition on a goal.
 ---@param goalName string
 ---@param key string
 ---@param value boolean
 ---@return nil
-function GOAPPlanner:setGoalState(goalName, key, value) end
+function LGOAPPlanner:setGoalState(goalName, key, value) end
 
 --- Sets the maximum A* planning iterations (0 = unlimited).
 ---@param n integer
 ---@return nil
-function GOAPPlanner:setMaxIterations(n) end
+function LGOAPPlanner:setMaxIterations(n) end
 
 --- Sets a boolean precondition on an action.
 ---@param actionName string
 ---@param key string
 ---@param value boolean
 ---@return nil
-function GOAPPlanner:setPrecondition(actionName, key, value) end
+function LGOAPPlanner:setPrecondition(actionName, key, value) end
 
 --- Returns the type name of this object.
 ---@return string
-function GOAPPlanner:type() end
+function LGOAPPlanner:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function GOAPPlanner:typeOf(name) end
+function LGOAPPlanner:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::genetic::GeneticAlgorithm`].
----@class GeneticAlgorithm
-GeneticAlgorithm = {}
+---@class LGeneticAlgorithm
+LGeneticAlgorithm = {}
 
 --- Returns or performs best genes.
 ---@return table
-function GeneticAlgorithm:bestGenes() end
+function LGeneticAlgorithm:bestGenes() end
 
 --- Runs one generation of the evolutionary algorithm.
 ---@return nil
-function GeneticAlgorithm:evolve() end
+function LGeneticAlgorithm:evolve() end
 
 --- Returns or performs generation.
 ---@return number
-function GeneticAlgorithm:generation() end
+function LGeneticAlgorithm:generation() end
 
 --- Returns the chromosome as an ordered table of gene values.
 ---@param index integer
 ---@return table
-function GeneticAlgorithm:getGenes(index) end
+function LGeneticAlgorithm:getGenes(index) end
 
 --- Returns or performs pop size.
 ---@return number
-function GeneticAlgorithm:popSize() end
+function LGeneticAlgorithm:popSize() end
 
 --- Sets the fitness score used by the genetic algorithm selection step.
 ---@param index integer
 ---@param fitness number
 ---@return nil
-function GeneticAlgorithm:setFitness(index, fitness) end
+function LGeneticAlgorithm:setFitness(index, fitness) end
+
+--- Returns the type name of this object.
+---@return string
+function LGeneticAlgorithm:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LGeneticAlgorithm:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::htn::HTNDomain`].
----@class HTNDomain
-HTNDomain = {}
+---@class LHTNDomain
+LHTNDomain = {}
 
 --- Registers a compound HTN task that decomposes into sub-tasks.
 ---@param compound_name string
 ---@param methods table
 ---@return nil
-function HTNDomain:addCompound(compound_name, methods) end
+function LHTNDomain:addCompound(compound_name, methods) end
 
 --- Registers a primitive HTN task with a direct operator function.
 ---@param name string
@@ -701,26 +1112,35 @@ function HTNDomain:addCompound(compound_name, methods) end
 ---@param effects table
 ---@param effects_clear table
 ---@return nil
-function HTNDomain:addPrimitive(name, preconditions, effects, effects_clear) end
+function LHTNDomain:addPrimitive(name, preconditions, effects, effects_clear) end
 
 --- Runs planning and returns the resulting action sequence.
 ---@param root_task string
 ---@param state table
 ---@return table
-function HTNDomain:plan(root_task, state) end
+function LHTNDomain:plan(root_task, state) end
 
 --- Returns or performs task count.
 ---@return number
-function HTNDomain:taskCount() end
+function LHTNDomain:taskCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LHTNDomain:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LHTNDomain:typeOf(name) end
 
 --- Lua-side wrapper around an [`InfluenceMap`].
----@class InfluenceMap
-InfluenceMap = {}
+---@class LInfluenceMap
+LInfluenceMap = {}
 
 --- Adds a named influence layer.
 ---@param name string
 ---@return nil
-function InfluenceMap:addLayer(name) end
+function LInfluenceMap:addLayer(name) end
 
 --- Blends two layers into a destination layer.
 ---@param layerA string
@@ -729,62 +1149,62 @@ function InfluenceMap:addLayer(name) end
 ---@param weightB number
 ---@param dest string
 ---@return nil
-function InfluenceMap:blend(layerA, weightA, layerB, weightB, dest) end
+function LInfluenceMap:blend(layerA, weightA, layerB, weightB, dest) end
 
 --- Removes all influence values from every layer in the map.
 ---@return nil
-function InfluenceMap:clearAll() end
+function LInfluenceMap:clearAll() end
 
 --- Clears all influence in a layer.
 ---@param layer string
 ---@return nil
-function InfluenceMap:clearLayer(layer) end
+function LInfluenceMap:clearLayer(layer) end
 
 --- Multiplies all influences by a decay factor.
 ---@param layer string
 ---@param factor number
 ---@return nil
-function InfluenceMap:decay(layer, factor) end
+function LInfluenceMap:decay(layer, factor) end
 
 --- Returns the cell size in world units.
 ---@return number
-function InfluenceMap:getCellSize() end
+function LInfluenceMap:getCellSize() end
 
 --- Returns the influence map height in grid cells.
 ---@return number
-function InfluenceMap:getHeight() end
+function LInfluenceMap:getHeight() end
 
 --- Returns the influence value at a cell (1-based).
 ---@param layer string
 ---@param x integer
 ---@param y integer
 ---@return number
-function InfluenceMap:getInfluence(layer, x, y) end
+function LInfluenceMap:getInfluence(layer, x, y) end
 
 --- Returns the world-space position of the maximum value.
 ---@param layer string
 ---@return number
-function InfluenceMap:getMaxPosition(layer) end
+function LInfluenceMap:getMaxPosition(layer) end
 
 --- Returns the world-space position of the minimum value.
 ---@param layer string
 ---@return number
-function InfluenceMap:getMinPosition(layer) end
+function LInfluenceMap:getMinPosition(layer) end
 
 --- Returns the influence map width in grid cells.
 ---@return number
-function InfluenceMap:getWidth() end
+function LInfluenceMap:getWidth() end
 
 --- Returns true if the named layer exists.
 ---@param name string
 ---@return boolean
-function InfluenceMap:hasLayer(name) end
+function LInfluenceMap:hasLayer(name) end
 
 --- Propagates influence values with momentum.
 ---@param layer string
 ---@param momentum? number
 ---@return nil
-function InfluenceMap:propagate(layer, momentum) end
+function LInfluenceMap:propagate(layer, momentum) end
 
 --- Returns the summed influence in a world-space rectangle.
 ---@param layer string
@@ -793,7 +1213,7 @@ function InfluenceMap:propagate(layer, momentum) end
 ---@param ww number
 ---@param wh number
 ---@return number
-function InfluenceMap:queryRect(layer, wx, wy, ww, wh) end
+function LInfluenceMap:queryRect(layer, wx, wy, ww, wh) end
 
 --- Sets the influence value at a cell (1-based).
 ---@param layer string
@@ -801,7 +1221,7 @@ function InfluenceMap:queryRect(layer, wx, wy, ww, wh) end
 ---@param y integer
 ---@param value number
 ---@return nil
-function InfluenceMap:setInfluence(layer, x, y, value) end
+function LInfluenceMap:setInfluence(layer, x, y, value) end
 
 --- Stamps influence in a radial area.
 ---@param layer string
@@ -811,20 +1231,20 @@ function InfluenceMap:setInfluence(layer, x, y, value) end
 ---@param value number
 ---@param falloff? number
 ---@return nil
-function InfluenceMap:stampInfluence(layer, wx, wy, radius, value, falloff) end
+function LInfluenceMap:stampInfluence(layer, wx, wy, radius, value, falloff) end
 
 --- Returns the type name of this object.
 ---@return string
-function InfluenceMap:type() end
+function LInfluenceMap:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function InfluenceMap:typeOf(name) end
+function LInfluenceMap:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::mcts::MCTSEngine`].
----@class MCTSEngine
-MCTSEngine = {}
+---@class LMCTSEngine
+LMCTSEngine = {}
 
 --- Uses Lua closures for game logic. All closures receive/return integer states.
 ---@param root_state integer
@@ -832,11 +1252,20 @@ MCTSEngine = {}
 ---@param apply_action function(state,action)->integer
 ---@param evaluate function(state)->number
 ---@return number
-function MCTSEngine:search(root_state, get_actions, apply_action, evaluate) end
+function LMCTSEngine:search(root_state, get_actions, apply_action, evaluate) end
+
+--- Returns the type name of this object.
+---@return string
+function LMCTSEngine:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMCTSEngine:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::needs::NeedSystem`].
----@class NeedSystem
-NeedSystem = {}
+---@class LNeedSystem
+LNeedSystem = {}
 
 --- Registers a new need with the specified name, urgency, and decay rate in the system.
 ---@param name string
@@ -844,99 +1273,126 @@ NeedSystem = {}
 ---@param urgency_threshold number
 ---@param urgency_factor number
 ---@return nil
-function NeedSystem:addNeed(name, decay_rate, urgency_threshold, urgency_factor) end
+function LNeedSystem:addNeed(name, decay_rate, urgency_threshold, urgency_factor) end
 
 --- Returns or performs most urgent.
 ---@return string
-function NeedSystem:mostUrgent() end
+function LNeedSystem:mostUrgent() end
 
 --- Returns or performs satisfy.
 ---@param name string
 ---@param amount number
 ---@return nil
-function NeedSystem:satisfy(name, amount) end
+function LNeedSystem:satisfy(name, amount) end
+
+--- Returns the type name of this object.
+---@return string
+function LNeedSystem:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNeedSystem:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@return nil
-function NeedSystem:update(dt) end
+function LNeedSystem:update(dt) end
 
 --- Returns or performs value of.
 ---@param name string
 ---@return number
-function NeedSystem:valueOf(name) end
+function LNeedSystem:valueOf(name) end
 
 --- Lua wrapper for [`crate::ai::neural_net::NeuralNet`].
----@class NeuralNet
-NeuralNet = {}
+---@class LNeuralNet
+LNeuralNet = {}
 
 --- Adds a neural network layer with inputs, outputs, and an activation function.
 ---@param inputs integer
 ---@param outputs integer
 ---@param activation string
 ---@return nil
-function NeuralNet:addLayer(inputs, outputs, activation) end
+function LNeuralNet:addLayer(inputs, outputs, activation) end
 
 --- Returns or performs forward.
 ---@param input table
 ---@return table
-function NeuralNet:forward(input) end
+function LNeuralNet:forward(input) end
 
 --- Returns a flat table of all connection weight values in the network.
 ---@return table
-function NeuralNet:getWeights() end
+function LNeuralNet:getWeights() end
 
 --- Returns or performs layer count.
 ---@return number
-function NeuralNet:layerCount() end
+function LNeuralNet:layerCount() end
 
 --- Returns or performs param count.
 ---@return number
-function NeuralNet:paramCount() end
+function LNeuralNet:paramCount() end
 
 --- Overwrites all connection weights with values from a flat table.
 ---@param weights table
 ---@return boolean
-function NeuralNet:setWeights(weights) end
+function LNeuralNet:setWeights(weights) end
+
+--- Returns the type name of this object.
+---@return string
+function LNeuralNet:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNeuralNet:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::neuroevolution::Neuroevolution`].
----@class Neuroevolution
-Neuroevolution = {}
+---@class LNeuroevolution
+LNeuroevolution = {}
 
 --- Returns or performs best fitness.
 ---@return number
-function Neuroevolution:bestFitness() end
+function LNeuroevolution:bestFitness() end
 
 --- Returns or performs best network.
 ---@return nil
-function Neuroevolution:bestNetwork() end
+function LNeuroevolution:bestNetwork() end
 
 --- Returns or performs chromosome to net.
 ---@param index integer
 ---@return nil
-function Neuroevolution:chromosomeToNet(index) end
+function LNeuroevolution:chromosomeToNet(index) end
 
 --- Runs one generation of the evolutionary algorithm.
 ---@return nil
-function Neuroevolution:evolve() end
+function LNeuroevolution:evolve() end
 
 --- Returns or performs generation.
 ---@return number
-function Neuroevolution:generation() end
+function LNeuroevolution:generation() end
 
 --- Returns or performs pop size.
 ---@return number
-function Neuroevolution:popSize() end
+function LNeuroevolution:popSize() end
 
 --- Sets the fitness score used by the genetic algorithm selection step.
 ---@param index integer
 ---@param fitness number
 ---@return nil
-function Neuroevolution:setFitness(index, fitness) end
+function LNeuroevolution:setFitness(index, fitness) end
+
+--- Returns the type name of this object.
+---@return string
+function LNeuroevolution:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNeuroevolution:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::orca::ORCASolver`].
----@class ORCASolver
-ORCASolver = {}
+---@class LORCASolver
+LORCASolver = {}
 
 --- Adds an ORCA agent at the given position with radius and max speed to the solver.
 ---@param x number
@@ -944,92 +1400,101 @@ ORCASolver = {}
 ---@param radius number
 ---@param max_speed number
 ---@return number
-function ORCASolver:addAgent(x, y, radius, max_speed) end
+function LORCASolver:addAgent(x, y, radius, max_speed) end
 
 --- Returns or performs agent count.
 ---@return number
-function ORCASolver:agentCount() end
+function LORCASolver:agentCount() end
 
 --- Computes and returns the result.
 ---@param dt number
 ---@return nil
-function ORCASolver:compute(dt) end
+function LORCASolver:compute(dt) end
 
 --- Returns the safe velocity.
 ---@param index integer
 ---@return number
-function ORCASolver:getSafeVelocity(index) end
+function LORCASolver:getSafeVelocity(index) end
 
 --- Sets the agent's current world-space position for ORCA velocity computation.
 ---@param index integer
 ---@param x number
 ---@param y number
 ---@return nil
-function ORCASolver:setPosition(index, x, y) end
+function LORCASolver:setPosition(index, x, y) end
 
 --- Sets the preferred velocity.
 ---@param index integer
 ---@param pvx number
 ---@param pvy number
 ---@return nil
-function ORCASolver:setPreferredVelocity(index, pvx, pvy) end
+function LORCASolver:setPreferredVelocity(index, pvx, pvy) end
+
+--- Returns the type name of this object.
+---@return string
+function LORCASolver:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LORCASolver:typeOf(name) end
 
 --- Lua-side wrapper around a [`QLearner`].
----@class QLearner
-QLearner = {}
+---@class LQLearner
+LQLearner = {}
 
 --- Returns the greedy-best action for the state (1-based).
 ---@param state integer
 ---@return number
-function QLearner:bestAction(state) end
+function LQLearner:bestAction(state) end
 
 --- Selects an action using epsilon-greedy policy (1-based).
 ---@param state integer
 ---@return number
-function QLearner:chooseAction(state) end
+function LQLearner:chooseAction(state) end
 
 --- Restores the Q-table from a JSON string.
 ---@param json string
 ---@return nil
-function QLearner:deserialize(json) end
+function LQLearner:deserialize(json) end
 
 --- Ends the current episode, applying epsilon decay.
 ---@return nil
-function QLearner:endEpisode() end
+function LQLearner:endEpisode() end
 
 --- Returns the number of discrete actions.
 ---@return number
-function QLearner:getActionCount() end
+function LQLearner:getActionCount() end
 
 --- Returns the current discount factor.
 ---@return number
-function QLearner:getDiscountFactor() end
+function LQLearner:getDiscountFactor() end
 
 --- Returns the number of completed episodes.
 ---@return number
-function QLearner:getEpisodeCount() end
+function LQLearner:getEpisodeCount() end
 
 --- Returns the epsilon decay multiplier.
 ---@return number
-function QLearner:getExplorationDecay() end
+function LQLearner:getExplorationDecay() end
 
 --- Returns the current exploration rate.
 ---@return number
-function QLearner:getExplorationRate() end
+function LQLearner:getExplorationRate() end
 
 --- Returns the current learning rate.
 ---@return number
-function QLearner:getLearningRate() end
+function LQLearner:getLearningRate() end
 
 --- Returns the Q-value for a state-action pair (1-based).
 ---@param state integer
 ---@param action integer
 ---@return number
-function QLearner:getQValue(state, action) end
+function LQLearner:getQValue(state, action) end
 
 --- Returns the number of discrete states.
 ---@return number
-function QLearner:getStateCount() end
+function LQLearner:getStateCount() end
 
 --- Performs one Bellman Q-learning update (1-based indices).
 ---@param state integer
@@ -1037,126 +1502,126 @@ function QLearner:getStateCount() end
 ---@param reward number
 ---@param nextState integer
 ---@return nil
-function QLearner:learn(state, action, reward, nextState) end
+function LQLearner:learn(state, action, reward, nextState) end
 
 --- Serializes the Q-table to a JSON string.
 ---@return string
-function QLearner:serialize() end
+function LQLearner:serialize() end
 
 --- Sets the discount factor gamma.
 ---@param v number
 ---@return nil
-function QLearner:setDiscountFactor(v) end
+function LQLearner:setDiscountFactor(v) end
 
 --- Sets the epsilon decay multiplier.
 ---@param v number
 ---@return nil
-function QLearner:setExplorationDecay(v) end
+function LQLearner:setExplorationDecay(v) end
 
 --- Sets the exploration rate epsilon.
 ---@param v number
 ---@return nil
-function QLearner:setExplorationRate(v) end
+function LQLearner:setExplorationRate(v) end
 
 --- Sets the learning rate alpha.
 ---@param v number
 ---@return nil
-function QLearner:setLearningRate(v) end
+function LQLearner:setLearningRate(v) end
 
 --- Overwrites the Q-value for a state-action pair (1-based).
 ---@param state integer
 ---@param action integer
 ---@param value number
 ---@return nil
-function QLearner:setQValue(state, action, value) end
+function LQLearner:setQValue(state, action, value) end
 
 --- Returns the type name of this object.
 ---@return string
-function QLearner:type() end
+function LQLearner:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function QLearner:typeOf(name) end
+function LQLearner:typeOf(name) end
 
 --- Lua-side wrapper around a [`Squad`].
----@class Squad
-Squad = {}
+---@class LSquad
+LSquad = {}
 
 --- Adds an agent by name to this squad.
 ---@param name string
 ---@return nil
-function Squad:addMember(name) end
+function LSquad:addMember(name) end
 
 --- Returns the squad's shared blackboard.
 ---@return AIBlackboard
-function Squad:getBlackboard() end
+function LSquad:getBlackboard() end
 
 --- Returns the current formation type name.
 ---@return string
-function Squad:getFormation() end
+function LSquad:getFormation() end
 
 --- Computes the world-space position for a member index (1-based).
 ---@param memberIdx integer
 ---@param leaderX number
 ---@param leaderY number
 ---@return number
-function Squad:getFormationPosition(memberIdx, leaderX, leaderY) end
+function LSquad:getFormationPosition(memberIdx, leaderX, leaderY) end
 
 --- Returns the formation spacing in world units.
 ---@return number
-function Squad:getFormationSpacing() end
+function LSquad:getFormationSpacing() end
 
 --- Returns the leader name, or nil.
 ---@return string
-function Squad:getLeader() end
+function LSquad:getLeader() end
 
 --- Returns the number of squad members.
 ---@return number
-function Squad:getMemberCount() end
+function LSquad:getMemberCount() end
 
 --- Returns the member names as a table.
 ---@return table
-function Squad:getMembers() end
+function LSquad:getMembers() end
 
 --- Returns the unique name string assigned to this squad.
 ---@return string
-function Squad:getName() end
+function LSquad:getName() end
 
 --- Removes an agent by name from this squad.
 ---@param name string
 ---@return nil
-function Squad:removeMember(name) end
+function LSquad:removeMember(name) end
 
 --- Sets the formation type and optional spacing.
 ---@param ftype string
 ---@param spacing? number
 ---@return nil
-function Squad:setFormation(ftype, spacing) end
+function LSquad:setFormation(ftype, spacing) end
 
 --- Sets the squad leader by name.
 ---@param name string
 ---@return nil
-function Squad:setLeader(name) end
+function LSquad:setLeader(name) end
 
 --- Returns the type name of this object.
 ---@return string
-function Squad:type() end
+function LSquad:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Squad:typeOf(name) end
+function LSquad:typeOf(name) end
 
 --- Lua-side wrapper around a [`StateMachine`].
----@class StateMachine
-StateMachine = {}
+---@class LStateMachine
+LStateMachine = {}
 
 --- Registers a named state with optional lifecycle callbacks.
 ---@param name string
 ---@param opts table
 ---@return nil
-function StateMachine:addState(name, opts) end
+function LStateMachine:addState(name, opts) end
 
 --- Adds a guarded transition between states.
 ---@param from string
@@ -1164,38 +1629,38 @@ function StateMachine:addState(name, opts) end
 ---@param guard? function
 ---@param priority? integer
 ---@return nil
-function StateMachine:addTransition(from, to, guard, priority) end
+function LStateMachine:addTransition(from, to, guard, priority) end
 
 --- Forces a transition to the named state.
 ---@param name string
 ---@return nil
-function StateMachine:forceState(name) end
+function LStateMachine:forceState(name) end
 
 --- Returns the current state name, or nil.
 ---@return string
-function StateMachine:getCurrentState() end
+function LStateMachine:getCurrentState() end
 
 --- Returns seconds spent in the current state.
 ---@return number
-function StateMachine:getTimeInState() end
+function LStateMachine:getTimeInState() end
 
 --- Sets the FSM's initial state; must be called before the first update.
 ---@param name string
 ---@return nil
-function StateMachine:setInitialState(name) end
+function LStateMachine:setInitialState(name) end
 
 --- Returns the type name of this object.
 ---@return string
-function StateMachine:type() end
+function LStateMachine:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function StateMachine:typeOf(name) end
+function LStateMachine:typeOf(name) end
 
 --- Lua-side wrapper around a [`SteeringManager`].
----@class SteeringManager
-SteeringManager = {}
+---@class LSteeringManager
+LSteeringManager = {}
 
 --- Adds an Arrive behavior with deceleration.
 ---@param tx number
@@ -1203,19 +1668,19 @@ SteeringManager = {}
 ---@param slowingRadius? number
 ---@param weight? number
 ---@return nil
-function SteeringManager:addArrive(tx, ty, slowingRadius, weight) end
+function LSteeringManager:addArrive(tx, ty, slowingRadius, weight) end
 
 --- Registers a Lua callback as a custom steering behavior.
 ---@param callback function(agent,dt)->dx,dy
 ---@param weight? number
 ---@return nil
-function SteeringManager:addCustomBehavior(callback, weight) end
+function LSteeringManager:addCustomBehavior(callback, weight) end
 
 --- Adds an Evade behavior fleeing from a named agent.
 ---@param threatName? string
 ---@param weight? number
 ---@return nil
-function SteeringManager:addEvade(threatName, weight) end
+function LSteeringManager:addEvade(threatName, weight) end
 
 --- Adds a Flee behavior away from the target.
 ---@param tx number
@@ -1223,7 +1688,7 @@ function SteeringManager:addEvade(threatName, weight) end
 ---@param panicDist? number
 ---@param weight? number
 ---@return nil
-function SteeringManager:addFlee(tx, ty, panicDist, weight) end
+function LSteeringManager:addFlee(tx, ty, panicDist, weight) end
 
 --- Adds a Flock behavior for group movement.
 ---@param neighborRadius? number
@@ -1232,20 +1697,20 @@ function SteeringManager:addFlee(tx, ty, panicDist, weight) end
 ---@param cohWeight? number
 ---@param weight? number
 ---@return nil
-function SteeringManager:addFlock(neighborRadius, sepWeight, alignWeight, cohWeight, weight) end
+function LSteeringManager:addFlock(neighborRadius, sepWeight, alignWeight, cohWeight, weight) end
 
 --- Adds a Pursue behavior targeting a named agent.
 ---@param targetName? string
 ---@param weight? number
 ---@return nil
-function SteeringManager:addPursue(targetName, weight) end
+function LSteeringManager:addPursue(targetName, weight) end
 
 --- Adds a Seek behavior toward the target.
 ---@param tx number
 ---@param ty number
 ---@param weight? number
 ---@return nil
-function SteeringManager:addSeek(tx, ty, weight) end
+function LSteeringManager:addSeek(tx, ty, weight) end
 
 --- Adds a Wander behavior for random meandering.
 ---@param radius? number
@@ -1253,13 +1718,13 @@ function SteeringManager:addSeek(tx, ty, weight) end
 ---@param jitter? number
 ---@param weight? number
 ---@return nil
-function SteeringManager:addWander(radius, dist, jitter, weight) end
+function LSteeringManager:addWander(radius, dist, jitter, weight) end
 
 --- Invokes all registered custom steering callbacks and returns the combined force.
 ---@param agent Agent
 ---@param dt number
 ---@return number
-function SteeringManager:applyCustomSteering(agent, dt) end
+function LSteeringManager:applyCustomSteering(agent, dt) end
 
 --- Computes the combined steering force for the given agent state.
 ---@param px number
@@ -1270,47 +1735,47 @@ function SteeringManager:applyCustomSteering(agent, dt) end
 ---@param maxForce number
 ---@param dt number
 ---@return number
-function SteeringManager:calculate(px, py, vx, vy, maxSpeed, maxForce, dt) end
+function LSteeringManager:calculate(px, py, vx, vy, maxSpeed, maxForce, dt) end
 
 --- Enables or disables spatial-hash bucketing for neighbourhood queries.
 ---@param enabled boolean
 ---@return nil
-function SteeringManager:enableSpatialHash(enabled) end
+function LSteeringManager:enableSpatialHash(enabled) end
 
 --- Returns the number of active behaviors.
 ---@return number
-function SteeringManager:getBehaviorCount() end
+function LSteeringManager:getBehaviorCount() end
 
 --- Returns the current combination mode.
 ---@return string
-function SteeringManager:getCombineMode() end
+function LSteeringManager:getCombineMode() end
 
 --- Returns the last computed steering force.
 ---@return number
-function SteeringManager:getLastSteering() end
+function LSteeringManager:getLastSteering() end
 
 --- Sets the force combination mode.
 ---@param mode string
 ---@return nil
-function SteeringManager:setCombineMode(mode) end
+function LSteeringManager:setCombineMode(mode) end
 
 --- Sets the cell size used by the spatial-hash neighbourhood search.
 ---@param size number
 ---@return nil
-function SteeringManager:setSpatialHashCellSize(size) end
+function LSteeringManager:setSpatialHashCellSize(size) end
 
 --- Returns the type name of this object.
 ---@return string
-function SteeringManager:type() end
+function LSteeringManager:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function SteeringManager:typeOf(name) end
+function LSteeringManager:typeOf(name) end
 
 --- Lua wrapper for [`crate::ai::perception::StimulusWorld`].
----@class StimulusWorld
-StimulusWorld = {}
+---@class LStimulusWorld
+LStimulusWorld = {}
 
 --- Registers an auditory stimulus at a world-space position.
 ---@param x number
@@ -1320,7 +1785,7 @@ StimulusWorld = {}
 ---@param decay_rate number
 ---@param tag string|nil
 ---@return number
-function StimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
+function LStimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
 
 --- Adds a visual stimulus at the specified world position with radius and intensity.
 ---@param x number
@@ -1329,67 +1794,85 @@ function StimulusWorld:addAuditory(x, y, intensity, radius, decay_rate, tag) end
 ---@param radius number
 ---@param tag? string
 ---@return number
-function StimulusWorld:addVisual(x, y, intensity, radius, tag) end
+function LStimulusWorld:addVisual(x, y, intensity, radius, tag) end
 
 --- Resets or clears the state.
 ---@return nil
-function StimulusWorld:clear() end
+function LStimulusWorld:clear() end
 
 --- Returns or performs count.
 ---@return number
-function StimulusWorld:count() end
+function LStimulusWorld:count() end
 
 --- Removes the specified item.
 ---@param id integer
 ---@return boolean
-function StimulusWorld:remove(id) end
+function LStimulusWorld:remove(id) end
+
+--- Returns the type name of this object.
+---@return string
+function LStimulusWorld:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LStimulusWorld:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@return nil
-function StimulusWorld:update(dt) end
+function LStimulusWorld:update(dt) end
 
 --- Lua wrapper for [`crate::ai::strategy::StrategyAI`].
----@class StrategyAI
-StrategyAI = {}
+---@class LStrategyAI
+LStrategyAI = {}
 
 --- Returns or performs active goal.
 ---@return string
-function StrategyAI:activeGoal() end
+function LStrategyAI:activeGoal() end
 
 --- Adds a strategic goal with priority score to the planner for future evaluation.
 ---@param name string
 ---@return nil
-function StrategyAI:addGoal(name) end
+function LStrategyAI:addGoal(name) end
 
 --- Adds a string tag to the strategy AI instance for goal filtering and categorization.
 ---@param tag string
 ---@return nil
-function StrategyAI:addTag(tag) end
+function LStrategyAI:addTag(tag) end
 
 --- Returns or performs force evaluate.
 ---@param scorer function(goal_name)->number
 ---@return nil
-function StrategyAI:forceEvaluate(scorer) end
+function LStrategyAI:forceEvaluate(scorer) end
 
 --- Removes the specified tag.
 ---@param tag string
 ---@return nil
-function StrategyAI:removeTag(tag) end
+function LStrategyAI:removeTag(tag) end
 
 --- Returns or performs time until next.
 ---@return number
-function StrategyAI:timeUntilNext() end
+function LStrategyAI:timeUntilNext() end
+
+--- Returns the type name of this object.
+---@return string
+function LStrategyAI:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LStrategyAI:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@param scorer function(goal_name)->number
 ---@return nil
-function StrategyAI:update(dt, scorer) end
+function LStrategyAI:update(dt, scorer) end
 
 --- Lua wrapper for [`crate::ai::traits::TraitProfile`].
----@class TraitProfile
-TraitProfile = {}
+---@class LTraitProfile
+LTraitProfile = {}
 
 --- Adds a named modifier that adjusts the trait value by a delta.
 ---@param trait_name string
@@ -1397,57 +1880,66 @@ TraitProfile = {}
 ---@param duration? number
 ---@param source string
 ---@return nil
-function TraitProfile:addModifier(trait_name, delta, duration, source) end
+function LTraitProfile:addModifier(trait_name, delta, duration, source) end
 
 --- Returns or performs archetype.
 ---@return string
-function TraitProfile:archetype() end
+function LTraitProfile:archetype() end
 
 --- Returns the current float value of this emotion dimension.
 ---@param name string
 ---@return number
-function TraitProfile:get(name) end
+function LTraitProfile:get(name) end
 
 --- Returns the unmodified base value of this trait before modifiers.
 ---@param name string
 ---@return number
-function TraitProfile:getBase(name) end
+function LTraitProfile:getBase(name) end
 
 --- Returns true if a item is present.
 ---@param name string
 ---@return boolean
-function TraitProfile:has(name) end
+function LTraitProfile:has(name) end
 
 --- Removes the specified modifiers.
 ---@param source string
 ---@return nil
-function TraitProfile:removeModifiers(source) end
+function LTraitProfile:removeModifiers(source) end
 
 --- Sets the base value of this trait, replacing any previous base.
 ---@param name string
 ---@param value number
 ---@return nil
-function TraitProfile:set(name, value) end
+function LTraitProfile:set(name, value) end
 
 --- Returns or performs trait count.
 ---@return number
-function TraitProfile:traitCount() end
+function LTraitProfile:traitCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LTraitProfile:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTraitProfile:typeOf(name) end
 
 --- Advances the simulation by one time step.
 ---@param dt number
 ---@return nil
-function TraitProfile:update(dt) end
+function LTraitProfile:update(dt) end
 
 --- Lua-side wrapper around a [`UtilityAI`].
----@class UtilityAI
-UtilityAI = {}
+---@class LUtilityAI
+LUtilityAI = {}
 
 --- Adds a scored action with optional momentum weight.
 ---@param name string
 ---@param scorer function
 ---@param weight? number
 ---@return nil
-function UtilityAI:addAction(name, scorer, weight) end
+function LUtilityAI:addAction(name, scorer, weight) end
 
 --- Adds a multi-axis consideration to a named action.
 ---@param actionName string
@@ -1459,28 +1951,28 @@ function UtilityAI:addAction(name, scorer, weight) end
 ---@param p3? number
 ---@param weight? number
 ---@return nil
-function UtilityAI:addConsideration(actionName, name, scorerFn, curve, p1, p2, p3, weight) end
+function LUtilityAI:addConsideration(actionName, name, scorerFn, curve, p1, p2, p3, weight) end
 
 --- Evaluates all actions and returns the best action name, or nil.
 ---@return string
-function UtilityAI:evaluate() end
+function LUtilityAI:evaluate() end
 
 --- Returns the number of registered actions.
 ---@return number
-function UtilityAI:getActionCount() end
+function LUtilityAI:getActionCount() end
 
 --- Returns the name of the last chosen action, or nil.
 ---@return string
-function UtilityAI:getLastAction() end
+function LUtilityAI:getLastAction() end
 
 --- Returns the type name of this object.
 ---@return string
-function UtilityAI:type() end
+function LUtilityAI:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function UtilityAI:typeOf(name) end
+function LUtilityAI:typeOf(name) end
 
 --- Creates a new AI pacing director with default config.
 ---@return AIDirector
@@ -1656,105 +2148,132 @@ lurek.ai.newWorld = function() end
 lurek.animation = {}
 
 --- Lua-side wrapper around an [`AnimCurve`].
----@class AnimCurve
-AnimCurve = {}
+---@class LAnimCurve
+LAnimCurve = {}
 
 --- Inserts a keyframe at the given time. If a keyframe at the same time already
 ---@param time number
 ---@param value number
 ---@return nil
-function AnimCurve:addKeyframe(time, value) end
+function LAnimCurve:addKeyframe(time, value) end
 
 --- Removes all keyframes from this animation curve, resetting it to empty.
 ---@return nil
-function AnimCurve:clear() end
+function LAnimCurve:clear() end
 
 --- Returns the interpolated value at the given time using the curve's easing.
 ---@param t number
 ---@return number
-function AnimCurve:eval(t) end
+function LAnimCurve:eval(t) end
 
 --- Returns the number of keyframes currently stored.
 ---@return number
-function AnimCurve:keyframeCount() end
+function LAnimCurve:keyframeCount() end
 
 --- Set a custom Lua easing function for this curve.
 ---@param fn function(t: number)→ number — receives time t,returns output value
 ---@return nil
-function AnimCurve:setCustomEasing(fn) end
+function LAnimCurve:setCustomEasing(fn) end
 
 --- Sets the easing kind applied between all keyframe segments.
 ---@param mode string
 ---@return nil
-function AnimCurve:setEasing(mode) end
+function LAnimCurve:setEasing(mode) end
+
+--- Returns the type name of this object.
+---@return string
+function LAnimCurve:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAnimCurve:typeOf(name) end
 
 --- Lua-side wrapper around an [`AnimStateMachine`] FSM controller.
----@class AnimStateMachine
-AnimStateMachine = {}
+---@class LAnimStateMachine
+LAnimStateMachine = {}
 
 --- Registers a new named state that plays a clip from the embedded animation.
 ---@param name string
 ---@param clip string
 ---@param looping boolean
 ---@return nil
-function AnimStateMachine:addState(name, clip, looping) end
+function LAnimStateMachine:addState(name, clip, looping) end
 
 --- Adds a conditional transition between two states.
 ---@param from_state string
 ---@param to_state string
 ---@param condition string
 ---@return nil
-function AnimStateMachine:addTransition(from_state, to_state, condition) end
+function LAnimStateMachine:addTransition(from_state, to_state, condition) end
 
 --- Immediately jumps to the named state, bypassing transition conditions.
 ---@param name string
 ---@return boolean
-function AnimStateMachine:forceState(name) end
+function LAnimStateMachine:forceState(name) end
 
 --- Returns the source quad for the current animation frame, or nil.
 ---@return table
-function AnimStateMachine:getQuad() end
+function LAnimStateMachine:getQuad() end
 
 --- Returns the name of the currently active state.
 ---@return string
-function AnimStateMachine:getState() end
+function LAnimStateMachine:getState() end
 
 --- Sets an FSM parameter value (number, boolean, or integer supported).
 ---@param name string
 ---@param value number|boolean
 ---@return nil
-function AnimStateMachine:setParam(name, value) end
+function LAnimStateMachine:setParam(name, value) end
+
+--- Returns the type name of this object.
+---@return string
+function LAnimStateMachine:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAnimStateMachine:typeOf(name) end
 
 --- Advances the FSM by `dt` seconds, evaluating transitions.
 ---@param dt number
 ---@return nil
-function AnimStateMachine:update(dt) end
+function LAnimStateMachine:update(dt) end
 
 --- Lua-side wrapper around an [`AnimSyncGroup`].
----@class AnimSyncGroup
-AnimSyncGroup = {}
+---@class LAnimSyncGroup
+LAnimSyncGroup = {}
 
 --- Adds an animation handle to the group.
 ---@param handle integer
 ---@return nil
-function AnimSyncGroup:add(handle) end
+function LAnimSyncGroup:add(handle) end
 
 --- Removes all animation handles from the group.
 ---@return nil
-function AnimSyncGroup:clear() end
+function LAnimSyncGroup:clear() end
 
 --- Returns the number of animations currently in the group.
 ---@return number
-function AnimSyncGroup:memberCount() end
+function LAnimSyncGroup:memberCount() end
 
 --- Removes an animation handle from the group.
 ---@param handle integer
 ---@return nil
-function AnimSyncGroup:remove(handle) end
+function LAnimSyncGroup:remove(handle) end
+
+--- Returns the type name of this object.
+---@return string
+function LAnimSyncGroup:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAnimSyncGroup:typeOf(name) end
 
 --- Lua-side wrapper around an [`Animation`] controller.
----@class Animation
-Animation = {}
+---@class LAnimation
+LAnimation = {}
 
 --- Adds a named clip from explicit frame indices.
 ---@param name string
@@ -1762,7 +2281,7 @@ Animation = {}
 ---@param fps number
 ---@param looping boolean
 ---@return nil
-function Animation:addClip(name, indices, fps, looping) end
+function LAnimation:addClip(name, indices, fps, looping) end
 
 --- Adds a named clip sliced from a sprite-sheet grid.
 ---@param name string
@@ -1775,7 +2294,7 @@ function Animation:addClip(name, indices, fps, looping) end
 ---@param fps number
 ---@param looping boolean
 ---@return nil
-function Animation:addClipFromGrid(name, tex_w, tex_h, frame_w, frame_h, start, count, fps, looping) end
+function LAnimation:addClipFromGrid(name, tex_w, tex_h, frame_w, frame_h, start, count, fps, looping) end
 
 --- Adds a single frame to the frame pool by source rectangle.
 ---@param x number
@@ -1783,7 +2302,7 @@ function Animation:addClipFromGrid(name, tex_w, tex_h, frame_w, frame_h, start, 
 ---@param w number
 ---@param h number
 ---@return number
-function Animation:addFrame(x, y, w, h) end
+function LAnimation:addFrame(x, y, w, h) end
 
 --- Slices a sprite-sheet grid into frames and appends them.
 ---@param tex_w integer
@@ -1793,95 +2312,104 @@ function Animation:addFrame(x, y, w, h) end
 ---@param start integer
 ---@param count integer
 ---@return number
-function Animation:addFramesFromGrid(tex_w, tex_h, frame_w, frame_h, start, count) end
+function LAnimation:addFramesFromGrid(tex_w, tex_h, frame_w, frame_h, start, count) end
 
 --- Begins a smooth crossfade from the current clip to a new named clip.
 ---@param clip_name string
 ---@param duration number
 ---@return boolean
-function Animation:crossfade(clip_name, duration) end
+function LAnimation:crossfade(clip_name, duration) end
 
 --- Renders the current animation frame into a new ImageData (white bg, blue frame rect).
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function Animation:drawToImage(width, height) end
+function LAnimation:drawToImage(width, height) end
 
 --- Returns the two quads and blend factor during a crossfade, or nil when not blending.
 ---@return table
-function Animation:getBlendState() end
+function LAnimation:getBlendState() end
 
 --- Returns the name of the currently playing clip, or nil.
 ---@return string
-function Animation:getClip() end
+function LAnimation:getClip() end
 
 --- Returns the number of registered clips.
 ---@return number
-function Animation:getClipCount() end
+function LAnimation:getClipCount() end
 
 --- Returns the current position within the active clip (0-based).
 ---@return number
-function Animation:getCurrentFrame() end
+function LAnimation:getCurrentFrame() end
 
 --- Returns the total number of frames in the frame pool.
 ---@return number
-function Animation:getFrameCount() end
+function LAnimation:getFrameCount() end
 
 --- Returns the source quad (x, y, w, h) for the current frame, or nil.
 ---@return table
-function Animation:getQuad() end
+function LAnimation:getQuad() end
 
 --- Returns the playback speed multiplier.
 ---@return number
-function Animation:getSpeed() end
+function LAnimation:getSpeed() end
 
 --- Returns true if the current clip is set to loop.
 ---@return boolean
-function Animation:isLooping() end
+function LAnimation:isLooping() end
 
 --- Returns true if a clip is currently playing.
 ---@return boolean
-function Animation:isPlaying() end
+function LAnimation:isPlaying() end
 
 --- Pauses playback at the current frame.
 ---@return nil
-function Animation:pause() end
+function LAnimation:pause() end
 
 --- Starts playback of the named clip.
 ---@param name string
 ---@return boolean
-function Animation:play(name) end
+function LAnimation:play(name) end
 
 --- Drains and returns all pending animation events as a table.
 ---@return table
-function Animation:pollEvents() end
+function LAnimation:pollEvents() end
 
 --- Resumes playback from the current frame.
 ---@return nil
-function Animation:resume() end
+function LAnimation:resume() end
 
 --- Sets the playback position within the current clip.
 ---@param index integer
 ---@return nil
-function Animation:setFrame(index) end
+function LAnimation:setFrame(index) end
 
 --- Sets the playback speed multiplier.
 ---@param speed number
 ---@return nil
-function Animation:setSpeed(speed) end
+function LAnimation:setSpeed(speed) end
 
 --- Stops playback and resets to frame 0.
 ---@return nil
-function Animation:stop() end
+function LAnimation:stop() end
+
+--- Returns the type name of this object.
+---@return string
+function LAnimation:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAnimation:typeOf(name) end
 
 --- Advances the animation by dt seconds.
 ---@param dt number
 ---@return nil
-function Animation:update(dt) end
+function LAnimation:update(dt) end
 
 --- Lua-side wrapper around a [`BlendLayerSet`] blend layer compositor.
----@class BlendLayerSet
-BlendLayerSet = {}
+---@class LBlendLayerSet
+LBlendLayerSet = {}
 
 --- Appends a new blend layer.
 ---@param name string
@@ -1889,37 +2417,46 @@ BlendLayerSet = {}
 ---@param weight number
 ---@param bones? table
 ---@return boolean
-function BlendLayerSet:addLayer(name, clip_name, weight, bones) end
+function LBlendLayerSet:addLayer(name, clip_name, weight, bones) end
 
 --- Returns the blend weight of a named layer, or nil if not found.
 ---@param name string
 ---@return number
-function BlendLayerSet:getWeight(name) end
+function LBlendLayerSet:getWeight(name) end
 
 --- Returns the number of blend layers.
 ---@return number
-function BlendLayerSet:len() end
+function LBlendLayerSet:len() end
 
 --- Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
 ---@return table
-function BlendLayerSet:listLayers() end
+function LBlendLayerSet:listLayers() end
 
 --- Removes a blend layer by name.
 ---@param name string
 ---@return boolean
-function BlendLayerSet:removeLayer(name) end
+function LBlendLayerSet:removeLayer(name) end
 
 --- Replaces the bone mask of a layer.
 ---@param name string
 ---@param bones table
 ---@return boolean
-function BlendLayerSet:setMask(name, bones) end
+function LBlendLayerSet:setMask(name, bones) end
 
 --- Sets the blend weight of a named layer (clamped to [0, 1]).
 ---@param name string
 ---@param weight number
 ---@return boolean
-function BlendLayerSet:setWeight(name, weight) end
+function LBlendLayerSet:setWeight(name, weight) end
+
+--- Returns the type name of this object.
+---@return string
+function LBlendLayerSet:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LBlendLayerSet:typeOf(name) end
 
 --- Parses an Aseprite JSON export string and builds an Animation with clips and frames.
 ---@param json_str string
@@ -1952,346 +2489,356 @@ lurek.animation.newSyncGroup = function() end
 lurek.audio = {}
 
 --- Lua-side wrapper for an audio bus resource.
----@class Bus
-Bus = {}
+---@class LBus
+LBus = {}
 
 --- Removes the ducking target from this bus, restoring the target bus
 ---@return nil
-function Bus:clearDuck() end
+function LBus:clearDuck() end
 
 --- Returns the unique name string assigned to this audio bus.
 ---@return string
-function Bus:getName() end
+function LBus:getName() end
 
 --- Returns the average peak amplitude of all sources currently on this bus.
 ---@return nil
-function Bus:getPeak() end
+function LBus:getPeak() end
 
 --- Returns the bus pitch multiplier.
 ---@return number
-function Bus:getPitch() end
+function LBus:getPitch() end
 
 --- Returns the current volume multiplier applied to all sources on this bus.
 ---@return number
-function Bus:getVolume() end
+function LBus:getVolume() end
 
 --- Returns true if this bus is paused.
 ---@return boolean
-function Bus:isPaused() end
+function LBus:isPaused() end
 
 --- Pauses all sources on this bus.
 ---@return nil
-function Bus:pause() end
+function LBus:pause() end
 
 --- Resumes all sources on this bus.
 ---@return nil
-function Bus:resume() end
+function LBus:resume() end
 
 --- Configures this bus to duck (lower the volume of) another bus when
 ---@param targetBusName string
 ---@param duckVolume number
 ---@return nil
-function Bus:setDuckTarget(targetBusName, duckVolume) end
+function LBus:setDuckTarget(targetBusName, duckVolume) end
 
 --- Sets the pitch multiplier for all sources on this bus.
 ---@param pitch number
 ---@return nil
-function Bus:setPitch(pitch) end
+function LBus:setPitch(pitch) end
 
 --- Sets the volume for all sources on this bus.
 ---@param vol number
 ---@return nil
-function Bus:setVolume(vol) end
+function LBus:setVolume(vol) end
 
 --- Returns the type name of this object.
 ---@return string
-function Bus:type() end
+function LBus:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Bus:typeOf(name) end
+function LBus:typeOf(name) end
 
 --- Lua-side wrapper for a streaming audio decoder.
----@class Decoder
-Decoder = {}
+---@class LDecoder
+LDecoder = {}
 
 --- Decodes the next chunk of samples, or nil at EOF.
 ---@return SoundData
-function Decoder:decode() end
+function LDecoder:decode() end
 
 --- Returns the per-sample bit depth of this decoded audio stream.
 ---@return number
-function Decoder:getBitDepth() end
+function LDecoder:getBitDepth() end
 
 --- Returns the number of audio channels.
 ---@return number
-function Decoder:getChannelCount() end
+function LDecoder:getChannelCount() end
 
 --- Returns the total duration in seconds.
 ---@return number
-function Decoder:getDuration() end
+function LDecoder:getDuration() end
 
 --- Returns the sample rate in Hz.
 ---@return number
-function Decoder:getSampleRate() end
+function LDecoder:getSampleRate() end
 
 --- Returns true if seeking is supported.
 ---@return boolean
-function Decoder:isSeekable() end
+function LDecoder:isSeekable() end
 
 --- Releases the decoder (no-op).
 ---@return nil
-function Decoder:release() end
+function LDecoder:release() end
 
 --- Rewinds to the beginning.
 ---@return nil
-function Decoder:rewind() end
+function LDecoder:rewind() end
 
 --- Seeks to a time offset in seconds.
 ---@param offset number
 ---@return nil
-function Decoder:seek(offset) end
+function LDecoder:seek(offset) end
 
 --- Returns the current position in seconds.
 ---@return number
-function Decoder:tell() end
+function LDecoder:tell() end
+
+--- Returns the type name of this object.
+---@return string
+function LDecoder:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LDecoder:typeOf(name) end
 
 --- Lua-side wrapper for the MIDI player.
----@class MidiPlayer
-MidiPlayer = {}
+---@class LMidiPlayer
+LMidiPlayer = {}
 
 --- Returns the assigned bus, or nil.
 ---@return Bus
-function MidiPlayer:getBus() end
+function LMidiPlayer:getBus() end
 
 --- Returns the number of MIDI channels.
 ---@return number
-function MidiPlayer:getChannelCount() end
+function LMidiPlayer:getChannelCount() end
 
 --- Returns the GM instrument for a MIDI channel (1-indexed).
 ---@param ch integer
 ---@return number
-function MidiPlayer:getChannelInstrument(ch) end
+function LMidiPlayer:getChannelInstrument(ch) end
 
 --- Returns the volume for a MIDI channel (1-indexed).
 ---@param ch integer
 ---@return number
-function MidiPlayer:getChannelVolume(ch) end
+function LMidiPlayer:getChannelVolume(ch) end
 
 --- Returns the PCM output channel count (1 = mono, 2 = stereo).
 ---@return number
-function MidiPlayer:getChannels() end
+function LMidiPlayer:getChannels() end
 
 --- Returns the total MIDI duration in seconds.
 ---@return number
-function MidiPlayer:getDuration() end
+function LMidiPlayer:getDuration() end
 
 --- Returns the file path of the loaded MIDI, or nil.
 ---@return string
-function MidiPlayer:getFilePath() end
+function LMidiPlayer:getFilePath() end
 
 --- Returns the total note count in the MIDI sequence.
 ---@return number
-function MidiPlayer:getNoteCount() end
+function LMidiPlayer:getNoteCount() end
 
 --- Returns the original MIDI file tempo in BPM.
 ---@return number
-function MidiPlayer:getOriginalTempo() end
+function LMidiPlayer:getOriginalTempo() end
 
 --- Returns the PCM output sample rate in Hz.
 ---@return number
-function MidiPlayer:getSampleRate() end
+function LMidiPlayer:getSampleRate() end
 
 --- Returns the SoundFont file path, or nil (stub).
 ---@return string
-function MidiPlayer:getSoundFontPath() end
+function LMidiPlayer:getSoundFontPath() end
 
 --- Returns the current tempo in BPM.
 ---@return number
-function MidiPlayer:getTempo() end
+function LMidiPlayer:getTempo() end
 
 --- Returns the current tempo scale factor.
 ---@return number
-function MidiPlayer:getTempoScale() end
+function LMidiPlayer:getTempoScale() end
 
 --- Returns the PPQ resolution from the MIDI header.
 ---@return number
-function MidiPlayer:getTicksPerBeat() end
+function LMidiPlayer:getTicksPerBeat() end
 
 --- Returns the number of tracks in the MIDI sequence.
 ---@return number
-function MidiPlayer:getTrackCount() end
+function LMidiPlayer:getTrackCount() end
 
 --- Returns the name of a MIDI track (1-indexed), or nil.
 ---@param idx integer
 ---@return string
-function MidiPlayer:getTrackName(idx) end
+function LMidiPlayer:getTrackName(idx) end
 
 --- Returns the current MIDI volume.
 ---@return number
-function MidiPlayer:getVolume() end
+function LMidiPlayer:getVolume() end
 
 --- Returns true if a MIDI channel is muted (1-indexed).
 ---@param ch integer
 ---@return boolean
-function MidiPlayer:isChannelMuted(ch) end
+function LMidiPlayer:isChannelMuted(ch) end
 
 --- Returns true if a MIDI sequence is loaded.
 ---@return boolean
-function MidiPlayer:isLoaded() end
+function LMidiPlayer:isLoaded() end
 
 --- Returns true if looping is enabled.
 ---@return boolean
-function MidiPlayer:isLooping() end
+function LMidiPlayer:isLooping() end
 
 --- Returns true if MIDI playback is paused.
 ---@return boolean
-function MidiPlayer:isPaused() end
+function LMidiPlayer:isPaused() end
 
 --- Returns true if MIDI is currently playing.
 ---@return boolean
-function MidiPlayer:isPlaying() end
+function LMidiPlayer:isPlaying() end
 
 --- Returns true if a track is muted (1-indexed).
 ---@param idx integer
 ---@return boolean
-function MidiPlayer:isTrackMuted(idx) end
+function LMidiPlayer:isTrackMuted(idx) end
 
 --- Loads a MIDI file from the given path.
 ---@param path string
 ---@return boolean
-function MidiPlayer:load(path) end
+function LMidiPlayer:load(path) end
 
 --- Loads MIDI data from a Lua string.
 ---@param data string
 ---@return boolean
-function MidiPlayer:loadData(data) end
+function LMidiPlayer:loadData(data) end
 
 --- Pauses the MIDI sequence at the current position; resume with `play()`.
 ---@return nil
-function MidiPlayer:pause() end
+function LMidiPlayer:pause() end
 
 --- Starts or resumes MIDI sequence playback from the current position.
 ---@return nil
-function MidiPlayer:play() end
+function LMidiPlayer:play() end
 
 --- Seeks to a time position in seconds.
 ---@param secs number
 ---@return nil
-function MidiPlayer:seek(secs) end
+function LMidiPlayer:seek(secs) end
 
 --- Routes MIDI output through a bus (or nil to clear).
 ---@param bus_val Bus
 ---@return nil
-function MidiPlayer:setBus(bus_val) end
+function LMidiPlayer:setBus(bus_val) end
 
 --- Sets the GM instrument for a MIDI channel (1-indexed).
 ---@param ch integer
 ---@param inst integer
 ---@return nil
-function MidiPlayer:setChannelInstrument(ch, inst) end
+function LMidiPlayer:setChannelInstrument(ch, inst) end
 
 --- Mutes or unmutes a MIDI channel (1-indexed).
 ---@param ch integer
 ---@param muted boolean
 ---@return nil
-function MidiPlayer:setChannelMuted(ch, muted) end
+function LMidiPlayer:setChannelMuted(ch, muted) end
 
 --- Sets volume for a MIDI channel (1-indexed).
 ---@param ch integer
 ---@param vol number
 ---@return nil
-function MidiPlayer:setChannelVolume(ch, vol) end
+function LMidiPlayer:setChannelVolume(ch, vol) end
 
 --- Sets the PCM output channel count (clamped 1â€“2).
 ---@param channels integer
 ---@return nil
-function MidiPlayer:setChannels(channels) end
+function LMidiPlayer:setChannels(channels) end
 
 --- Enables or disables looping.
 ---@param looping boolean
 ---@return nil
-function MidiPlayer:setLooping(looping) end
+function LMidiPlayer:setLooping(looping) end
 
 --- Registers a playback-end callback (stub).
 ---@param cb function
 ---@return nil
-function MidiPlayer:setOnEnd(cb) end
+function LMidiPlayer:setOnEnd(cb) end
 
 --- Registers a note-off callback (stub).
 ---@param cb function
 ---@return nil
-function MidiPlayer:setOnNoteOff(cb) end
+function LMidiPlayer:setOnNoteOff(cb) end
 
 --- Registers a note-on callback (stub).
 ---@param cb function
 ---@return nil
-function MidiPlayer:setOnNoteOn(cb) end
+function LMidiPlayer:setOnNoteOn(cb) end
 
 --- Sets the PCM output sample rate in Hz (clamped 8000â€“192000).
 ---@param rate integer
 ---@return nil
-function MidiPlayer:setSampleRate(rate) end
+function LMidiPlayer:setSampleRate(rate) end
 
 --- Loads a SoundFont file into this player (stub).
 ---@param path string
 ---@return nil
-function MidiPlayer:setSoundFont(path) end
+function LMidiPlayer:setSoundFont(path) end
 
 --- Sets playback tempo in BPM.
 ---@param bpm number
 ---@return nil
-function MidiPlayer:setTempo(bpm) end
+function LMidiPlayer:setTempo(bpm) end
 
 --- Sets the tempo scale factor (1.0 = original speed).
 ---@param scale number
 ---@return nil
-function MidiPlayer:setTempoScale(scale) end
+function LMidiPlayer:setTempoScale(scale) end
 
 --- Mutes or unmutes a track (1-indexed).
 ---@param idx integer
 ---@param muted boolean
 ---@return nil
-function MidiPlayer:setTrackMuted(idx, muted) end
+function LMidiPlayer:setTrackMuted(idx, muted) end
 
 --- Sets MIDI playback volume.
 ---@param vol number
 ---@return nil
-function MidiPlayer:setVolume(vol) end
+function LMidiPlayer:setVolume(vol) end
 
 --- Solos a MIDI channel (1-indexed).
 ---@param ch integer
 ---@return nil
-function MidiPlayer:soloChannel(ch) end
+function LMidiPlayer:soloChannel(ch) end
 
 --- Stops MIDI playback and resets the playhead to the beginning.
 ---@return nil
-function MidiPlayer:stop() end
+function LMidiPlayer:stop() end
 
 --- Returns the current playback position in seconds.
 ---@return number
-function MidiPlayer:tell() end
+function LMidiPlayer:tell() end
 
 --- Returns the type name of this object.
 ---@return string
-function MidiPlayer:type() end
+function LMidiPlayer:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function MidiPlayer:typeOf(name) end
+function LMidiPlayer:typeOf(name) end
 
 --- Clears solo on all channels.
 ---@return nil
-function MidiPlayer:unsoloAll() end
+function LMidiPlayer:unsoloAll() end
 
 --- Reverts to the built-in default SoundFont (stub).
 ---@return nil
-function MidiPlayer:useDefaultSoundFont() end
+function LMidiPlayer:useDefaultSoundFont() end
 
----@class SoundData
-SoundData = {}
+--- Decoded PCM audio buffer that can be created from a file or synthesised sample-by-sample.
+---@class LSoundData
+LSoundData = {}
 
 --- Draws the waveform onto an ImageData buffer.
 ---@param target ImageData
@@ -2304,197 +2851,206 @@ SoundData = {}
 ---@param b integer
 ---@param a integer
 ---@return nil
-function SoundData:drawWaveform(target, x, y, w, h, r, g, b, a) end
+function LSoundData:drawWaveform(target, x, y, w, h, r, g, b, a) end
 
---- Get the bit depth.
+--- Returns the bit depth of this audio buffer (typically 16 or 32 bits per sample).
 ---@return number
-function SoundData:getBitDepth() end
+function LSoundData:getBitDepth() end
 
 --- Get the number of channels.
 ---@return number
-function SoundData:getChannelCount() end
+function LSoundData:getChannelCount() end
 
 --- Get the audio duration in seconds.
 ---@return number
-function SoundData:getDuration() end
+function LSoundData:getDuration() end
 
 --- Get a specific sample by index.
 ---@param index integer
 ---@return number
-function SoundData:getSample(index) end
+function LSoundData:getSample(index) end
 
 --- Get the total number of samples.
 ---@return number
-function SoundData:getSampleCount() end
+function LSoundData:getSampleCount() end
 
---- Get the sample rate.
+--- Returns the sample rate of this audio buffer in Hz (e.g. 44100 or 48000).
 ---@return number
-function SoundData:getSampleRate() end
+function LSoundData:getSampleRate() end
 
 --- Set a specific sample by index.
 ---@param index integer
 ---@param value number
 ---@return nil
-function SoundData:setSample(index, value) end
+function LSoundData:setSample(index, value) end
 
 --- Lua-side wrapper for a polyphonic [`crate::audio::SoundPool`].
----@class SoundPool
-SoundPool = {}
+---@class LSoundPool
+LSoundPool = {}
 
 --- Returns the total number of voices in this pool.
 ---@return number
-function SoundPool:getVoiceCount() end
+function LSoundPool:getVoiceCount() end
 
 --- Plays the next available voice and returns its SoundKey as an integer.
 ---@return number
-function SoundPool:play() end
+function LSoundPool:play() end
 
 --- Releases all voices from the mixer and invalidates this pool.
 ---@return nil
-function SoundPool:release() end
+function LSoundPool:release() end
 
 --- Routes all voices through the named bus.
 ---@param name string
 ---@return nil
-function SoundPool:setBus(name) end
+function LSoundPool:setBus(name) end
 
 --- Sets the volume for all voices in this pool.
 ---@param vol number
 ---@return nil
-function SoundPool:setVolume(vol) end
+function LSoundPool:setVolume(vol) end
 
 --- Stops all voices in this pool.
 ---@return nil
-function SoundPool:stopAll() end
+function LSoundPool:stopAll() end
 
 --- Returns the type name of this object.
 ---@return string
-function SoundPool:type() end
+function LSoundPool:type() end
 
 --- Returns true if the type name matches.
 ---@param name string
 ---@return boolean
-function SoundPool:typeOf(name) end
+function LSoundPool:typeOf(name) end
 
 --- Lua-side wrapper for an audio source resource.
----@class Source
-Source = {}
+---@class LSource
+LSource = {}
 
 --- Removes any active filter from this source.
 ---@return nil
-function Source:clearFilter() end
+function LSource:clearFilter() end
 
 --- Creates an independent copy of this source.
 ---@return Source
-function Source:clone() end
+function LSource:clone() end
 
 --- Fades in from silence over the given duration in seconds.
 ---@param dur number
 ---@return nil
-function Source:fadeIn(dur) end
+function LSource:fadeIn(dur) end
 
 --- Returns the total duration in seconds.
 ---@return number
-function Source:getDuration() end
+function LSource:getDuration() end
 
 --- Returns the current fade-in duration in seconds.
 ---@return number
-function Source:getFadeIn() end
+function LSource:getFadeIn() end
 
 --- Returns the high-pass filter cutoff frequency.
 ---@return number
-function Source:getHighpass() end
+function LSource:getHighpass() end
 
 --- Returns the low-pass filter cutoff frequency.
 ---@return number
-function Source:getLowpass() end
+function LSource:getLowpass() end
 
 --- Returns the current stereo panning value.
 ---@return number
-function Source:getPan() end
+function LSource:getPan() end
 
 --- Returns the current pitch multiplier.
 ---@return number
-function Source:getPitch() end
+function LSource:getPitch() end
 
 --- Returns the source type ("static" or "stream").
 ---@return string
-function Source:getType() end
+function LSource:getType() end
 
 --- Returns the current volume multiplier.
 ---@return number
-function Source:getVolume() end
+function LSource:getVolume() end
 
 --- Returns true if looping is enabled.
 ---@return boolean
-function Source:isLooping() end
+function LSource:isLooping() end
 
 --- Returns true if playback is paused.
 ---@return boolean
-function Source:isPaused() end
+function LSource:isPaused() end
 
 --- Returns true if currently playing.
 ---@return boolean
-function Source:isPlaying() end
+function LSource:isPlaying() end
 
 --- Returns true if playback has stopped.
 ---@return boolean
-function Source:isStopped() end
+function LSource:isStopped() end
 
 --- Pauses playback at the current position.
 ---@return nil
-function Source:pause() end
+function LSource:pause() end
 
 --- Starts or resumes playback.
 ---@return nil
-function Source:play() end
+function LSource:play() end
 
 --- Resumes playback from the paused position.
 ---@return nil
-function Source:resume() end
+function LSource:resume() end
 
 --- Seeks to a time position in seconds.
 ---@param pos number
 ---@return nil
-function Source:seek(pos) end
+function LSource:seek(pos) end
 
 --- Applies a high-pass filter at the given cutoff frequency.
 ---@param cutoff_hz integer
 ---@return nil
-function Source:setHighpass(cutoff_hz) end
+function LSource:setHighpass(cutoff_hz) end
 
 --- Enables or disables looping playback.
 ---@param looping boolean
 ---@return nil
-function Source:setLooping(looping) end
+function LSource:setLooping(looping) end
 
 --- Applies a low-pass filter at the given cutoff frequency.
 ---@param cutoff_hz integer
 ---@return nil
-function Source:setLowpass(cutoff_hz) end
+function LSource:setLowpass(cutoff_hz) end
 
 --- Sets stereo panning (-1.0 left to 1.0 right).
 ---@param pan number
 ---@return nil
-function Source:setPan(pan) end
+function LSource:setPan(pan) end
 
 --- Sets the pitch multiplier (1.0 = normal).
 ---@param pitch number
 ---@return nil
-function Source:setPitch(pitch) end
+function LSource:setPitch(pitch) end
 
 --- Sets playback volume (0.0 = silent, 1.0 = full).
 ---@param vol number
 ---@return nil
-function Source:setVolume(vol) end
+function LSource:setVolume(vol) end
 
 --- Stops playback and resets seek position.
 ---@return nil
-function Source:stop() end
+function LSource:stop() end
 
 --- Returns the current playback position in seconds.
 ---@return number
-function Source:tell() end
+function LSource:tell() end
+
+--- Returns the type name of this object.
+---@return string
+function LSource:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSource:typeOf(name) end
 
 --- Adds a DSP effect to a bus.
 ---@param bus_name string
@@ -3189,99 +3745,99 @@ lurek.simulator.waitUntil = function(predicate, timeout) end
 lurek.camera = {}
 
 --- Lua-side wrapper around a [`Camera2D`] instance.
----@class Camera2D
-Camera2D = {}
+---@class LCamera
+LCamera = {}
 
 --- Applies this camera's transform to the render stack.
 ---@return nil
-function Camera2D:apply() end
+function LCamera:apply() end
 
 --- Alias for `apply()`. Applies this camera's transform to the render stack.
 ---@return nil
-function Camera2D:attach() end
+function LCamera:attach() end
 
 --- Removes all parallax factor overrides.
 ---@return nil
-function Camera2D:clearParallaxFactors() end
+function LCamera:clearParallaxFactors() end
 
 --- Clears the follow target so the camera stops tracking.
 ---@return nil
-function Camera2D:clearTarget() end
+function LCamera:clearTarget() end
 
 --- Alias for `reset()`. Pops the camera transform from the render stack.
 ---@return nil
-function Camera2D:detach() end
+function LCamera:detach() end
 
 --- Animates the camera along a sequence of world-space waypoints over
 ---@param points table
 ---@param duration number
 ---@return nil
-function Camera2D:followPath(points, duration) end
+function LCamera:followPath(points, duration) end
 
 --- Returns the current sway x, y world-space offset.
 ---@return number
-function Camera2D:getEffectOffset() end
+function LCamera:getEffectOffset() end
 
 --- Returns the current zoom level including zoom pulse and breathing deltas.
 ---@return number
-function Camera2D:getEffectiveZoom() end
+function LCamera:getEffectiveZoom() end
 
 --- Returns the parallax factor for the named layer, or `1.0` if unset.
 ---@param layer string
 ---@return number
-function Camera2D:getParallaxFactor(layer) end
+function LCamera:getParallaxFactor(layer) end
 
 --- Returns the camera's world-space position as x, y.
 ---@return number
-function Camera2D:getPosition() end
+function LCamera:getPosition() end
 
 --- Returns the rotation in radians.
 ---@return number
-function Camera2D:getRotation() end
+function LCamera:getRotation() end
 
 --- Returns the current viewport as x, y, w, h.
 ---@return number
-function Camera2D:getViewport() end
+function LCamera:getViewport() end
 
 --- Returns the visible world area as x, y, w, h.
 ---@return number
-function Camera2D:getVisibleArea() end
+function LCamera:getVisibleArea() end
 
 --- Returns the current zoom factor.
 ---@return number
-function Camera2D:getZoom() end
+function LCamera:getZoom() end
 
 --- Returns true if the breathing effect is currently active.
 ---@return boolean
-function Camera2D:isBreathing() end
+function LCamera:isBreathing() end
 
 --- Returns true if the sway effect is currently active.
 ---@return boolean
-function Camera2D:isSway() end
+function LCamera:isSway() end
 
 --- Instantly moves the camera to look at the given position.
 ---@param x number
 ---@param y number
 ---@return nil
-function Camera2D:lookAt(x, y) end
+function LCamera:lookAt(x, y) end
 
 --- Translates the camera by dx, dy in world space.
 ---@param dx number
 ---@param dy number
 ---@return nil
-function Camera2D:move(dx, dy) end
+function LCamera:move(dx, dy) end
 
 --- Returns the fractional progress `[0, 1]` of the active path, or
 ---@return number
-function Camera2D:pathProgress() end
+function LCamera:pathProgress() end
 
 --- Removes previously set world-space bounds.
 ---@return nil
-function Camera2D:removeBounds() end
+function LCamera:removeBounds() end
 
 --- Pops the camera transform from the render stack.
 ---@return nil
-function Camera2D:reset() end
+function LCamera:reset() end
 
 --- Sets world-space bounds for camera clamping.
 ---@param x number
@@ -3289,46 +3845,46 @@ function Camera2D:reset() end
 ---@param w number
 ---@param h number
 ---@return nil
-function Camera2D:setBounds(x, y, w, h) end
+function LCamera:setBounds(x, y, w, h) end
 
 --- Sets the dead zone half-extents for camera follow.
 ---@param w number
 ---@param h number
 ---@return nil
-function Camera2D:setDeadZone(w, h) end
+function LCamera:setDeadZone(w, h) end
 
 --- Sets the follow smooth interpolation speed (0.0 = instant snap).
 ---@param speed number
 ---@return nil
-function Camera2D:setFollowSmooth(speed) end
+function LCamera:setFollowSmooth(speed) end
 
 --- Sets the look-ahead multiplier for follow prediction.
 ---@param mul number
 ---@return nil
-function Camera2D:setLookAhead(mul) end
+function LCamera:setLookAhead(mul) end
 
 --- Sets the parallax scroll factor for the named render layer.
 ---@param layer string
 ---@param factor number
 ---@return nil
-function Camera2D:setParallaxFactor(layer, factor) end
+function LCamera:setParallaxFactor(layer, factor) end
 
 --- Sets the camera's world-space position.
 ---@param x number
 ---@param y number
 ---@return nil
-function Camera2D:setPosition(x, y) end
+function LCamera:setPosition(x, y) end
 
 --- Sets the rotation in radians.
 ---@param r number
 ---@return nil
-function Camera2D:setRotation(r) end
+function LCamera:setRotation(r) end
 
 --- Sets the follow target position.
 ---@param x number
 ---@param y number
 ---@return nil
-function Camera2D:setTarget(x, y) end
+function LCamera:setTarget(x, y) end
 
 --- Sets the viewport rectangle in screen pixels.
 ---@param x number
@@ -3336,24 +3892,24 @@ function Camera2D:setTarget(x, y) end
 ---@param w number
 ---@param h number
 ---@return nil
-function Camera2D:setViewport(x, y, w, h) end
+function LCamera:setViewport(x, y, w, h) end
 
 --- Sets the uniform zoom factor (1.0 = natural size).
 ---@param zoom number
 ---@return nil
-function Camera2D:setZoom(zoom) end
+function LCamera:setZoom(zoom) end
 
 --- Starts a screen-shake effect.
 ---@param intensity number
 ---@param duration number
 ---@return nil
-function Camera2D:shake(intensity, duration) end
+function LCamera:shake(intensity, duration) end
 
 --- Starts a subtle periodic zoom oscillation for a "living camera" feel.
 ---@param amplitude? number
 ---@param rate? number
 ---@return nil
-function Camera2D:startBreathing(amplitude, rate) end
+function LCamera:startBreathing(amplitude, rate) end
 
 --- Starts a sinusoidal x/y offset oscillation (e.g., boat rocking).
 ---@param amplitude_x number
@@ -3361,62 +3917,71 @@ function Camera2D:startBreathing(amplitude, rate) end
 ---@param frequency number
 ---@param decay? number
 ---@return nil
-function Camera2D:startSway(amplitude_x, amplitude_y, frequency, decay) end
+function LCamera:startSway(amplitude_x, amplitude_y, frequency, decay) end
 
 --- Stops the active breathing effect.
 ---@return nil
-function Camera2D:stopBreathing() end
+function LCamera:stopBreathing() end
 
 --- Cancels the active camera path animation.
 ---@return nil
-function Camera2D:stopPath() end
+function LCamera:stopPath() end
 
 --- Stops the active sway effect immediately.
 ---@return nil
-function Camera2D:stopSway() end
+function LCamera:stopSway() end
 
 --- Cancels the active zoom tween.
 ---@return nil
-function Camera2D:stopZoom() end
+function LCamera:stopZoom() end
 
 --- Converts world coordinates to screen coordinates.
 ---@param wx number
 ---@param wy number
 ---@return number
-function Camera2D:toScreen(wx, wy) end
+function LCamera:toScreen(wx, wy) end
 
 --- Converts screen coordinates to world coordinates.
 ---@param sx number
 ---@param sy number
 ---@return number
-function Camera2D:toWorld(sx, sy) end
+function LCamera:toWorld(sx, sy) end
+
+--- Returns the type name of this object.
+---@return string
+function LCamera:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCamera:typeOf(name) end
 
 --- Advances the camera simulation by dt seconds.
 ---@param dt number
 ---@return nil
-function Camera2D:update(dt) end
+function LCamera:update(dt) end
 
 --- Advances the path animation by `dt` seconds and applies the
 ---@param dt number
 ---@return boolean
-function Camera2D:updatePath(dt) end
+function LCamera:updatePath(dt) end
 
 --- Advances the zoom tween by `dt` seconds and applies the resulting
 ---@param dt number
 ---@return boolean
-function Camera2D:updateZoom(dt) end
+function LCamera:updateZoom(dt) end
 
 --- Triggers a momentary zoom-in that decays back via a sine envelope.
 ---@param amplitude number
 ---@param duration number
 ---@return nil
-function Camera2D:zoomPulse(amplitude, duration) end
+function LCamera:zoomPulse(amplitude, duration) end
 
 --- Smoothly tweens the camera zoom from its current level to
 ---@param target_zoom number
 ---@param duration number
 ---@return nil
-function Camera2D:zoomTo(target_zoom, duration) end
+function LCamera:zoomTo(target_zoom, duration) end
 
 --- Creates a new Camera2D with the given viewport dimensions.
 ---@param viewport_w? number
@@ -3434,156 +3999,156 @@ lurek.camera.newCamera = function(viewport_w, viewport_h) end
 lurek.compute = {}
 
 --- Lua-side wrapper around [`NdArray`].
----@class Array
-Array = {}
+---@class LArray
+LArray = {}
 
 --- Element-wise absolute value.
 ---@return Array
-function Array:abs() end
+function LArray:abs() end
 
 --- Returns true if all elements are nonzero.
 ---@return boolean
-function Array:all() end
+function LArray:all() end
 
 --- Returns true if any element is nonzero.
 ---@return boolean
-function Array:any() end
+function LArray:any() end
 
 --- Returns the 1-based flat index of the maximum element.
 ---@return number
-function Array:argmax() end
+function LArray:argmax() end
 
 --- Returns the 1-based flat index of the minimum element.
 ---@return number
-function Array:argmin() end
+function LArray:argmin() end
 
 --- Bitwise AND of two Int32 arrays.
 ---@param other Array
 ---@return Array
-function Array:bitwiseAnd(other) end
+function LArray:bitwiseAnd(other) end
 
 --- Bitwise left shift of an Int32 array.
 ---@param amount integer
 ---@return Array
-function Array:bitwiseLShift(amount) end
+function LArray:bitwiseLShift(amount) end
 
 --- Bitwise NOT of an Int32 array.
 ---@return Array
-function Array:bitwiseNot() end
+function LArray:bitwiseNot() end
 
 --- Bitwise OR of two Int32 arrays.
 ---@param other Array
 ---@return Array
-function Array:bitwiseOr(other) end
+function LArray:bitwiseOr(other) end
 
 --- Bitwise right shift of an Int32 array.
 ---@param amount integer
 ---@return Array
-function Array:bitwiseRShift(amount) end
+function LArray:bitwiseRShift(amount) end
 
 --- Bitwise XOR of two Int32 arrays.
 ---@param other Array
 ---@return Array
-function Array:bitwiseXor(other) end
+function LArray:bitwiseXor(other) end
 
 --- Clamps each element to the given range.
 ---@param min number
 ---@param max number
 ---@return Array
-function Array:clamp(min, max) end
+function LArray:clamp(min, max) end
 
 --- Returns a deep copy of this array.
 ---@return Array
-function Array:clone() end
+function LArray:clone() end
 
 --- 1D convolution with a kernel array (full output).
 ---@param kernel Array
 ---@return Array
-function Array:convolve1d(kernel) end
+function LArray:convolve1d(kernel) end
 
 --- 2D convolution with zero-padding.
 ---@param kernel Array
 ---@return Array
-function Array:convolve2D(kernel) end
+function LArray:convolve2D(kernel) end
 
 --- 1D cross-correlation with a template array (valid output).
 ---@param template Array
 ---@return Array
-function Array:correlate1d(template) end
+function LArray:correlate1d(template) end
 
 --- Returns the count of nonzero elements.
 ---@return number
-function Array:countNonZero() end
+function LArray:countNonZero() end
 
 --- Population covariance with another 1D array.
 ---@param other Array
 ---@return number
-function Array:covariance(other) end
+function LArray:covariance(other) end
 
 --- Signed 2D cross product with another length-2 array.
 ---@param other Array
 ---@return number
-function Array:cross2d(other) end
+function LArray:cross2d(other) end
 
 --- Cumulative sum of all elements (flattened).
 ---@return Array
-function Array:cumsum() end
+function LArray:cumsum() end
 
 --- Discrete difference applied `order` times.
 ---@param order? integer
 ---@return Array
-function Array:diff(order) end
+function LArray:diff(order) end
 
 --- Morphological dilation with a diamond structuring element.
 ---@param radius integer
 ---@return Array
-function Array:dilate(radius) end
+function LArray:dilate(radius) end
 
 --- Dot product of two 1D arrays.
 ---@param other Array
 ---@return number
-function Array:dot(other) end
+function LArray:dot(other) end
 
 --- Computes the dominant eigenvalue and its eigenvector using power iteration.
 ---@param max_iter? integer
 ---@param tol? number?(default 1e-10)
 ---@return table
-function Array:eigenPower(max_iter, tol) end
+function LArray:eigenPower(max_iter, tol) end
 
 --- Morphological erosion with a diamond structuring element.
 ---@param radius integer
 ---@return Array
-function Array:erode(radius) end
+function LArray:erode(radius) end
 
 --- Evaluate a Lua expression string element-wise, returning a new Array.
 ---@param expr string — Lua expression using `x` as the input variable
 ---@return Array — new array with transformed values
-function Array:eval(expr) end
+function LArray:eval(expr) end
 
 --- Fills all elements with the given value in-place.
 ---@param val number
 ---@return nil
-function Array:fill(val) end
+function LArray:fill(val) end
 
 --- Flood fill from a 1-based (row, col) with a new value.
 ---@param row integer
 ---@param col integer
 ---@param val number
 ---@return Array
-function Array:floodFill(row, col, val) end
+function LArray:floodFill(row, col, val) end
 
 --- Returns the element at the given 1-based indices.
 ---@param ... integer
 ---@return number
-function Array:get(...) end
+function LArray:get(...) end
 
 --- Returns the element data type name.
 ---@return string
-function Array:getDataType() end
+function LArray:getDataType() end
 
 --- Returns the number of dimensions.
 ---@return number
-function Array:getDimensions() end
+function LArray:getDimensions() end
 
 --- Extracts a rectangular sub-region (1-based row, col).
 ---@param row integer
@@ -3591,173 +4156,173 @@ function Array:getDimensions() end
 ---@param rows integer
 ---@param cols integer
 ---@return Array
-function Array:getRegion(row, col, rows, cols) end
+function LArray:getRegion(row, col, rows, cols) end
 
 --- Returns the shape as a table of dimension sizes.
 ---@return table
-function Array:getShape() end
+function LArray:getShape() end
 
 --- Returns the total number of elements.
 ---@return number
-function Array:getSize() end
+function LArray:getSize() end
 
 --- Compute a histogram. Returns a table of {lo, hi, count} tables.
 ---@param bins integer
 ---@param lo? number
 ---@param hi? number
 ---@return table
-function Array:histogram(bins, lo, hi) end
+function LArray:histogram(bins, lo, hi) end
 
 --- Returns false (CPU arrays only).
 ---@return boolean
-function Array:isOnGPU() end
+function LArray:isOnGPU() end
 
 --- Solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector.
 ---@param b Array
 ---@return Array
-function Array:linsolve(b) end
+function LArray:linsolve(b) end
 
 --- Decomposes this square matrix into L and U factors with partial pivoting.
 ---@return table
-function Array:luDecompose() end
+function LArray:luDecompose() end
 
 --- Apply a Lua callback element-wise, returning a new Array of the same shape.
 ---@param fn function(value: number)→ number — called for each element
 ---@return Array — new array with transformed values
-function Array:map(fn) end
+function LArray:map(fn) end
 
 --- Matrix multiplication of two 2D arrays.
 ---@param other Array
 ---@return Array
-function Array:matmul(other) end
+function LArray:matmul(other) end
 
 --- Maximum of all elements, or along an axis (1-based).
 ---@param axis? integer
 ---@return nil
-function Array:max(axis) end
+function LArray:max(axis) end
 
 --- Mean of all elements, or along an axis (1-based).
 ---@param axis? integer
 ---@return nil
-function Array:mean(axis) end
+function LArray:mean(axis) end
 
 --- Minimum of all elements, or along an axis (1-based).
 ---@param axis? integer
 ---@return nil
-function Array:min(axis) end
+function LArray:min(axis) end
 
 --- Returns a new Array with every element negated (multiplied by â’1).
 ---@return Array
-function Array:neg() end
+function LArray:neg() end
 
 --- Linearly rescale values to [out_min, out_max].
 ---@param out_min number
 ---@param out_max number
 ---@return Array
-function Array:normalizeRange(out_min, out_max) end
+function LArray:normalizeRange(out_min, out_max) end
 
 --- L2-normalise a 1D vector.
 ---@return Array
-function Array:normalizeVec() end
+function LArray:normalizeVec() end
 
 --- Outer product of two 1D vectors â†’ 2D array [m, n].
 ---@param other Array
 ---@return Array
-function Array:outer(other) end
+function LArray:outer(other) end
 
 --- Pearson correlation coefficient with another 1D array.
 ---@param other Array
 ---@return number
-function Array:pearsonCorr(other) end
+function LArray:pearsonCorr(other) end
 
 --- Compute the p-th percentile (0â€“100).
 ---@param p number
 ---@return number
-function Array:percentile(p) end
+function LArray:percentile(p) end
 
 --- Raises each element to a scalar exponent.
 ---@param exp number
 ---@return Array
-function Array:pow(exp) end
+function LArray:pow(exp) end
 
 --- Fold the array left-to-right with an accumulator.
 ---@param fn function(acc: number,value: number)→ number — accumulator function
 ---@param init number — initial accumulator value
 ---@return number
-function Array:reduce(fn, init) end
+function LArray:reduce(fn, init) end
 
 --- Returns a new array with the given shape and the same data.
 ---@param shape table
 ---@return Array
-function Array:reshape(shape) end
+function LArray:reshape(shape) end
 
 --- Running accumulation — like reduce but returns every intermediate result.
 ---@param fn function(acc: number,value: number)→ number — accumulator function
 ---@param init number — initial accumulator value
 ---@return Array — array of cumulative values(same length as input)
-function Array:scan(fn, init) end
+function LArray:scan(fn, init) end
 
 --- Sets the element at the given 1-based indices to a value.
 ---@param ... number
 ---@return nil
-function Array:set(...) end
+function LArray:set(...) end
 
 --- Copies a source array into this array at the given 1-based position.
 ---@param row integer
 ---@param col integer
 ---@param source Array
 ---@return nil
-function Array:setRegion(row, col, source) end
+function LArray:setRegion(row, col, source) end
 
 --- Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
 ---@return table
-function Array:sobel() end
+function LArray:sobel() end
 
 --- Element-wise square root.
 ---@return Array
-function Array:sqrt() end
+function LArray:sqrt() end
 
 --- Sum of all elements, or along an axis (1-based).
 ---@param axis? integer
 ---@return nil
-function Array:sum(axis) end
+function LArray:sum(axis) end
 
 --- Returns a mask array with 1.0 where elements >= val, else 0.0.
 ---@param val number
 ---@return Array
-function Array:threshold(val) end
+function LArray:threshold(val) end
 
 --- Returns all elements as a flat table of numbers.
 ---@return table
-function Array:toTable() end
+function LArray:toTable() end
 
 --- Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
 ---@param points Array
 ---@return Array
-function Array:transformPoints(points) end
+function LArray:transformPoints(points) end
 
 --- Returns the transposed 2D array.
 ---@return Array
-function Array:transpose() end
+function LArray:transpose() end
 
 --- Returns the type name "Array".
 ---@return string
-function Array:type() end
+function LArray:type() end
 
 --- Returns true when the given name matches "Array" or a parent type.
 ---@param name string
 ---@return boolean
-function Array:typeOf(name) end
+function LArray:typeOf(name) end
 
 --- Selects elements from this where mask is nonzero, else from other.
 ---@param mask Array
 ---@param other Array
 ---@return Array
-function Array:where(mask, other) end
+function LArray:where(mask, other) end
 
 --- Standardise values to zero mean and unit variance.
 ---@return Array
-function Array:zscore() end
+function LArray:zscore() end
 
 --- Creates a 3Ă—3 homogeneous affine matrix.
 ---@param tx number
@@ -3830,208 +4395,236 @@ lurek.compute.zeros = function(shape, dtype) end
 ---@class lurek.data
 lurek.data = {}
 
----@class ByteData
-ByteData = {}
+--- Raw byte buffer for binary I/O; addressable by byte or bit offset.
+---@class LByteData
+LByteData = {}
 
---- Clone the ByteData.
+--- Creates an independent copy of this byte buffer with identical contents.
 ---@return ByteData
-function ByteData:clone() end
+function LByteData:clone() end
 
 --- Returns the value of a single bit within the buffer.
 ---@param byte_offset integer
 ---@param bit_offset integer
 ---@return boolean
-function ByteData:getBit(byte_offset, bit_offset) end
+function LByteData:getBit(byte_offset, bit_offset) end
 
 --- Get a byte at the specified offset.
 ---@param offset integer
 ---@return number
-function ByteData:getByte(offset) end
+function LByteData:getByte(offset) end
 
---- Get the size.
+--- Returns the total byte length of this buffer.
 ---@return number
-function ByteData:getSize() end
+function LByteData:getSize() end
 
 --- Get the string representation.
 ---@return string
-function ByteData:getString() end
+function LByteData:getString() end
 
 --- Reads `count` consecutive bits starting at `byte_offset`/`bit_offset`
 ---@param byte_offset integer
 ---@param bit_offset integer
 ---@param count integer
 ---@return nil
-function ByteData:readBits(byte_offset, bit_offset, count) end
+function LByteData:readBits(byte_offset, bit_offset, count) end
 
 --- Sets or clears a single bit within the buffer.
 ---@param byte_offset integer
 ---@param bit_offset integer
 ---@param value boolean
 ---@return nil
-function ByteData:setBit(byte_offset, bit_offset, value) end
+function LByteData:setBit(byte_offset, bit_offset, value) end
 
 --- Set a byte at the specified offset.
 ---@param offset integer
 ---@param value integer
 ---@return nil
-function ByteData:setByte(offset, value) end
+function LByteData:setByte(offset, value) end
 
 --- Access structured binary data efficiently without copying.
----@class DataView
-DataView = {}
+---@class LDataView
+LDataView = {}
 
 --- Reads a 64-bit float at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getDouble(offset) end
+function LDataView:getDouble(offset) end
 
 --- Reads a 32-bit float at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getFloat(offset) end
+function LDataView:getFloat(offset) end
 
 --- Reads a signed 16-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getInt16(offset) end
+function LDataView:getInt16(offset) end
 
 --- Reads a signed 32-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getInt32(offset) end
+function LDataView:getInt32(offset) end
 
 --- Reads a signed 8-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getInt8(offset) end
+function LDataView:getInt8(offset) end
 
 --- Returns the size of this view in bytes.
 ---@return number
-function DataView:getSize() end
+function LDataView:getSize() end
 
 --- Reads an unsigned 16-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getUInt16(offset) end
+function LDataView:getUInt16(offset) end
 
 --- Reads an unsigned 32-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getUInt32(offset) end
+function LDataView:getUInt32(offset) end
 
 --- Reads an unsigned 8-bit integer at the given offset.
 ---@param offset integer
 ---@return number
-function DataView:getUInt8(offset) end
+function LDataView:getUInt8(offset) end
+
+--- Returns the type name of this object.
+---@return string
+function LDataView:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LDataView:typeOf(name) end
 
 --- Write-cursor wrapper for the `lurek.data` module.
----@class DataWriter
-DataWriter = {}
+---@class LDataWriter
+LDataWriter = {}
 
 --- Returns the total buffer length.
 ---@return number
-function DataWriter:len() end
+function LDataWriter:len() end
 
 --- Moves the write cursor to the given position.
 ---@param pos integer
-function DataWriter:seek(pos) end
+function LDataWriter:seek(pos) end
 
 --- Returns the current write cursor position.
 ---@return number
-function DataWriter:tell() end
+function LDataWriter:tell() end
 
 --- Returns the buffer contents as a Lua string.
 ---@return string
-function DataWriter:toBytes() end
+function LDataWriter:toBytes() end
+
+--- Returns the type name of this object.
+---@return string
+function LDataWriter:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LDataWriter:typeOf(name) end
 
 --- Writes raw bytes from a Lua string.
 ---@param value string
-function DataWriter:writeBytes(value) end
+function LDataWriter:writeBytes(value) end
 
 --- Writes a 32-bit LE float.
 ---@param value number
-function DataWriter:writeF32LE(value) end
+function LDataWriter:writeF32LE(value) end
 
 --- Writes a 64-bit LE float.
 ---@param value number
-function DataWriter:writeF64LE(value) end
+function LDataWriter:writeF64LE(value) end
 
 --- Writes a signed 16-bit LE integer.
 ---@param value integer
-function DataWriter:writeI16LE(value) end
+function LDataWriter:writeI16LE(value) end
 
 --- Writes a signed 32-bit LE integer.
 ---@param value integer
-function DataWriter:writeI32LE(value) end
+function LDataWriter:writeI32LE(value) end
 
 --- Writes a signed 8-bit integer.
 ---@param value integer
-function DataWriter:writeI8(value) end
+function LDataWriter:writeI8(value) end
 
 --- Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
 ---@param value string
-function DataWriter:writeString(value) end
+function LDataWriter:writeString(value) end
 
 --- Writes an unsigned 16-bit BE integer.
 ---@param value integer
-function DataWriter:writeU16BE(value) end
+function LDataWriter:writeU16BE(value) end
 
 --- Writes an unsigned 16-bit LE integer.
 ---@param value integer
-function DataWriter:writeU16LE(value) end
+function LDataWriter:writeU16LE(value) end
 
 --- Writes an unsigned 32-bit LE integer.
 ---@param value integer
-function DataWriter:writeU32LE(value) end
+function LDataWriter:writeU32LE(value) end
 
 --- Writes an unsigned 8-bit integer.
 ---@param value integer
-function DataWriter:writeU8(value) end
+function LDataWriter:writeU8(value) end
 
 --- Lua-side fixed-capacity ring buffer that holds any Lua value.
----@class RingBuffer
-RingBuffer = {}
+---@class LRingBuffer
+LRingBuffer = {}
 
 --- Returns the maximum number of elements the buffer can hold.
 ---@return number
-function RingBuffer:capacity() end
+function LRingBuffer:capacity() end
 
 --- Removes all elements from the buffer, releasing their registry entries.
 ---@return nil
-function RingBuffer:clear() end
+function LRingBuffer:clear() end
 
 --- Returns true if the buffer contains no elements.
 ---@return boolean
-function RingBuffer:isEmpty() end
+function LRingBuffer:isEmpty() end
 
 --- Returns true if the buffer has reached its capacity.
 ---@return boolean
-function RingBuffer:isFull() end
+function LRingBuffer:isFull() end
 
 --- Returns the number of elements currently in the buffer.
 ---@return number
-function RingBuffer:len() end
+function LRingBuffer:len() end
 
 --- Returns the oldest element without removing it, or nil if empty.
 ---@return table
-function RingBuffer:peek() end
+function LRingBuffer:peek() end
 
 --- Returns the newest element without removing it, or nil if empty.
 ---@return table
-function RingBuffer:peekNewest() end
+function LRingBuffer:peekNewest() end
 
 --- Removes and returns the oldest element, or nil if the buffer is empty.
 ---@return table
-function RingBuffer:pop() end
+function LRingBuffer:pop() end
 
 --- Pushes a value onto the ring buffer.
 ---@param value any
 ---@return boolean
-function RingBuffer:push(value) end
+function LRingBuffer:push(value) end
 
 --- Returns all elements as an array table ordered oldest-first.
 ---@return table
-function RingBuffer:toTable() end
+function LRingBuffer:toTable() end
+
+--- Returns the type name of this object.
+---@return string
+function LRingBuffer:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LRingBuffer:typeOf(name) end
 
 --- Compresses data using the given algorithm (deflate, gzip, lz4).
 ---@param format string
@@ -4086,7 +4679,8 @@ lurek.data.getPackedSize = function(format, ...) end
 lurek.data.hash = function(algorithm, data) end
 
 --- Instantiates a raw byte data container object.
----@param value any
+---@param value integer|number|string
+---@return ByteData
 lurek.data.newByteData = function(value) end
 
 --- Creates a read-only windowed view into a byte string.
@@ -4150,127 +4744,127 @@ lurek.data.write = function(format, ...) end
 lurek.dataframe = {}
 
 --- Lua-side wrapper around a shared [`DataFrame`].
----@class DataFrame
-DataFrame = {}
+---@class LDataFrame
+LDataFrame = {}
 
 --- Adds a new column with an optional default value.
 ---@param name string
 ---@param default? LuaValue
 ---@return nil
-function DataFrame:addColumn(name, default) end
+function LDataFrame:addColumn(name, default) end
 
 --- Adds a row from an optional table of name-value pairs, returns 1-based index.
 ---@param row_tbl? table
 ---@return number
-function DataFrame:addRow(row_tbl) end
+function LDataFrame:addRow(row_tbl) end
 
 --- Add multiple rows at once from a table of row tables.
 ---@param rows table
 ---@return nil
-function DataFrame:addRowBatch(rows) end
+function LDataFrame:addRowBatch(rows) end
 
 --- Applies a function to each value in a column, replacing cells with results.
 ---@param col string|integer
 ---@param func function
 ---@return nil
-function DataFrame:apply(col, func) end
+function LDataFrame:apply(col, func) end
 
 --- Returns a deep copy of this DataFrame.
 ---@return DataFrame
-function DataFrame:clone() end
+function LDataFrame:clone() end
 
 --- Returns a table of column names.
 ---@return table
-function DataFrame:columns() end
+function LDataFrame:columns() end
 
 --- Pearson correlation coefficient between two numeric columns.
 ---@param col_a string|integer
 ---@param col_b string|integer
 ---@return number
-function DataFrame:corr(col_a, col_b) end
+function LDataFrame:corr(col_a, col_b) end
 
 --- Compute a correlation matrix for all numeric columns.
 ---@return DataFrame
-function DataFrame:correlationMatrix() end
+function LDataFrame:correlationMatrix() end
 
 --- Returns the row count (alias for nrows).
 ---@return number
-function DataFrame:count() end
+function LDataFrame:count() end
 
 --- Counts distinct values in a column, returns a DataFrame with value and count columns.
 ---@param col string|integer
 ---@return DataFrame
-function DataFrame:countBy(col) end
+function LDataFrame:countBy(col) end
 
 --- Returns descriptive statistics for all numeric columns.
 ---@return DataFrame
-function DataFrame:describe() end
+function LDataFrame:describe() end
 
 --- Removes rows where the given column is nil, returns a new DataFrame.
 ---@param col string|integer
 ---@return DataFrame
-function DataFrame:dropNil(col) end
+function LDataFrame:dropNil(col) end
 
 --- Shannon entropy (bits) of the value distribution in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:entropy(col) end
+function LDataFrame:entropy(col) end
 
 --- Replaces nil values in a column with the given value.
 ---@param col string|integer
 ---@param val LuaValue
 ---@return nil
-function DataFrame:fillNil(col, val) end
+function LDataFrame:fillNil(col, val) end
 
 --- Filters rows where column matches a condition, returns a new DataFrame.
 ---@param col string|integer
 ---@param op string
 ---@param val LuaValue
 ---@return DataFrame
-function DataFrame:filter(col, op, val) end
+function LDataFrame:filter(col, op, val) end
 
 --- Returns all values in a column as a table.
 ---@param col string|integer
 ---@return table
-function DataFrame:getColumn(col) end
+function LDataFrame:getColumn(col) end
 
 --- Return a numeric column as a Lua array of numbers (nils → 0/nan).
 ---@param col string|integer
 ---@return table
-function DataFrame:getColumnAsF64(col) end
+function LDataFrame:getColumnAsF64(col) end
 
 --- Returns a row as a table of name-value pairs.
 ---@param row integer
 ---@return table
-function DataFrame:getRow(row) end
+function LDataFrame:getRow(row) end
 
 --- Returns a single cell value.
 ---@param row integer
 ---@param col string|integer
 ---@return LuaValue
-function DataFrame:getValue(row, col) end
+function LDataFrame:getValue(row, col) end
 
 --- Aggregate agg_col grouped by group_col using the named function.
 ---@param group_col string|integer
 ---@param agg_col string|integer
 ---@param fn_name string
 ---@return DataFrame
-function DataFrame:groupAgg(group_col, agg_col, fn_name) end
+function LDataFrame:groupAgg(group_col, agg_col, fn_name) end
 
 --- Groups rows by column value, returns a table of DataFrames keyed by value.
 ---@param col string|integer
 ---@return table
-function DataFrame:groupBy(col) end
+function LDataFrame:groupBy(col) end
 
 --- Groups rows by column value, returns a GroupedFrame object supporting aggregate().
 ---@param col string|integer
 ---@return GroupedFrame
-function DataFrame:groupByObj(col) end
+function LDataFrame:groupByObj(col) end
 
 --- Returns the first n rows (default 5).
 ---@param n? integer
 ---@return DataFrame
-function DataFrame:head(n) end
+function LDataFrame:head(n) end
 
 --- Joins with another DataFrame on matching columns.
 ---@param other DataFrame
@@ -4278,41 +4872,41 @@ function DataFrame:head(n) end
 ---@param other_col string|integer
 ---@param join_type? string
 ---@return DataFrame
-function DataFrame:join(other, this_col, other_col, join_type) end
+function LDataFrame:join(other, this_col, other_col, join_type) end
 
 --- Returns the maximum numeric value in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:max(col) end
+function LDataFrame:max(col) end
 
 --- Returns the mean of numeric values in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:mean(col) end
+function LDataFrame:mean(col) end
 
 --- Returns the median of numeric values in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:median(col) end
+function LDataFrame:median(col) end
 
 --- Appends rows from another DataFrame in-place.
 ---@param other DataFrame
 ---@return nil
-function DataFrame:merge(other) end
+function LDataFrame:merge(other) end
 
 --- Returns the minimum numeric value in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:min(col) end
+function LDataFrame:min(col) end
 
 --- Return the most frequent value in a column (nil if empty).
 ---@param col string|integer
 ---@return table
-function DataFrame:modeVal(col) end
+function LDataFrame:modeVal(col) end
 
 --- Returns the number of columns.
 ---@return number
-function DataFrame:ncols() end
+function LDataFrame:ncols() end
 
 --- Add a min-max normalized column scaled to [out_min, out_max].
 ---@param col string|integer
@@ -4320,24 +4914,24 @@ function DataFrame:ncols() end
 ---@param out_max number
 ---@param name string
 ---@return nil
-function DataFrame:normalizeCol(col, out_min, out_max, name) end
+function LDataFrame:normalizeCol(col, out_min, out_max, name) end
 
 --- Returns the number of rows.
 ---@return number
-function DataFrame:nrows() end
+function LDataFrame:nrows() end
 
 --- Return a new DataFrame with only outlier rows (|z-score| > threshold).
 ---@param col string|integer
 ---@param threshold? number
 ---@return DataFrame
-function DataFrame:outliers(col, threshold) end
+function LDataFrame:outliers(col, threshold) end
 
 --- Creates a wide pivot table by reshaping rows into columns.
 ---@param row_col string|integer
 ---@param col_col string|integer
 ---@param val_col string|integer
 ---@return DataFrame
-function DataFrame:pivot(row_col, col_col, val_col) end
+function LDataFrame:pivot(row_col, col_col, val_col) end
 
 --- Reshapes a long-format DataFrame into wide format.
 ---@param row_key string|integer
@@ -4345,390 +4939,399 @@ function DataFrame:pivot(row_col, col_col, val_col) end
 ---@param value_key string|integer
 ---@param agg? string
 ---@return DataFrame
-function DataFrame:pivotTable(row_key, col_key, value_key, agg) end
+function LDataFrame:pivotTable(row_key, col_key, value_key, agg) end
 
 --- Executes a SQL query against this DataFrame.
 ---@param sql_str string
 ---@return DataFrame
-function DataFrame:query(sql_str) end
+function LDataFrame:query(sql_str) end
 
 --- Returns a new DataFrame with a dense-rank column appended.
 ---@param col string|integer
 ---@param order? string
 ---@param result_col? string
 ---@return DataFrame
-function DataFrame:rank(col, order, result_col) end
+function LDataFrame:rank(col, order, result_col) end
 
 --- Removes a column by name or index.
 ---@param col string|integer
 ---@return nil
-function DataFrame:removeColumn(col) end
+function LDataFrame:removeColumn(col) end
 
 --- Removes a row by 1-based index.
 ---@param row integer
 ---@return nil
-function DataFrame:removeRow(row) end
+function LDataFrame:removeRow(row) end
 
 --- Renames the column `old_name` to `new_name` in this DataFrame.
 ---@param col string|integer
 ---@param new_name string
 ---@return nil
-function DataFrame:rename(col, new_name) end
+function LDataFrame:rename(col, new_name) end
 
 --- Returns a new DataFrame with a rolling mean column appended.
 ---@param col string|integer
 ---@param window integer
 ---@param result_col? string
 ---@return DataFrame
-function DataFrame:rollingMean(col, window, result_col) end
+function LDataFrame:rollingMean(col, window, result_col) end
 
 --- Returns a new DataFrame with a rolling sum column appended.
 ---@param col string|integer
 ---@param window integer
 ---@param result_col? string
 ---@return DataFrame
-function DataFrame:rollingSum(col, window, result_col) end
+function LDataFrame:rollingSum(col, window, result_col) end
 
 --- Returns a random sample of n rows.
 ---@param n integer
 ---@param seed? integer
 ---@return DataFrame
-function DataFrame:sample(n, seed) end
+function LDataFrame:sample(n, seed) end
 
 --- Selects a subset of columns, returns a new DataFrame.
 ---@param ... string|integer
 ---@return DataFrame
-function DataFrame:select(...) end
+function LDataFrame:select(...) end
 
 --- Set a numeric column from a Lua array of numbers.
 ---@param col string|integer
 ---@param values table
 ---@return nil
-function DataFrame:setColumnFromF64(col, values) end
+function LDataFrame:setColumnFromF64(col, values) end
 
 --- Sets a single cell value.
 ---@param row integer
 ---@param col string|integer
 ---@param val LuaValue
 ---@return nil
-function DataFrame:setValue(row, col, val) end
+function LDataFrame:setValue(row, col, val) end
 
 --- Returns rows from start to end (1-based, inclusive).
 ---@param start integer
 ---@param end_idx integer
 ---@return DataFrame
-function DataFrame:slice(start, end_idx) end
+function LDataFrame:slice(start, end_idx) end
 
 --- Sorts by column, returns a new DataFrame.
 ---@param col string|integer
 ---@param ascending? boolean
 ---@return DataFrame
-function DataFrame:sort(col, ascending) end
+function LDataFrame:sort(col, ascending) end
 
 --- Returns the population standard deviation of numeric values in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:stddev(col) end
+function LDataFrame:stddev(col) end
 
 --- Returns the sum of numeric values in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:sum(col) end
+function LDataFrame:sum(col) end
 
 --- Returns the last n rows (default 5).
 ---@param n? integer
 ---@return DataFrame
-function DataFrame:tail(n) end
+function LDataFrame:tail(n) end
 
 --- Serializes this DataFrame to a binary LVDF string.
 ---@return string
-function DataFrame:toBinary() end
+function LDataFrame:toBinary() end
 
 --- Serializes this DataFrame to a CSV string.
 ---@return string
-function DataFrame:toCSV() end
+function LDataFrame:toCSV() end
 
 --- Serializes this DataFrame to a JSON string.
 ---@return string
-function DataFrame:toJSON() end
+function LDataFrame:toJSON() end
 
 --- Returns a formatted string table representation.
 ---@return string
-function DataFrame:toString() end
+function LDataFrame:toString() end
 
 --- Converts this DataFrame to a Lua table of row tables.
 ---@return table
-function DataFrame:toTable() end
+function LDataFrame:toTable() end
 
 --- Returns the type name of this object.
 ---@return string
-function DataFrame:type() end
+function LDataFrame:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function DataFrame:typeOf(name) end
+function LDataFrame:typeOf(name) end
 
 --- Returns unique values in a column as a table.
 ---@param col string|integer
 ---@return table
-function DataFrame:unique(col) end
+function LDataFrame:unique(col) end
 
 --- Returns the population variance of numeric values in a column.
 ---@param col string|integer
 ---@return number
-function DataFrame:variance(col) end
+function LDataFrame:variance(col) end
 
 --- Add a cumulative-sum column.
 ---@param col string|integer
 ---@param name string
 ---@return nil
-function DataFrame:withCumsum(col, name) end
+function LDataFrame:withCumsum(col, name) end
 
 --- Returns a new DataFrame with an additional computed column named `col_name`.
 ---@param col_name string
 ---@param expr string
 ---@return DataFrame
-function DataFrame:withEval(col_name, expr) end
+function LDataFrame:withEval(col_name, expr) end
 
 --- Add a percent-change-from-previous-row column.
 ---@param col string|integer
 ---@param name string
 ---@return nil
-function DataFrame:withPctChange(col, name) end
+function LDataFrame:withPctChange(col, name) end
 
 --- Add a rank column (1-based, ties averaged).
 ---@param col string|integer
 ---@param ascending? boolean
 ---@param name string
 ---@return nil
-function DataFrame:withRank(col, ascending, name) end
+function LDataFrame:withRank(col, ascending, name) end
 
 --- Add a rolling maximum column.
 ---@param col string|integer
 ---@param window integer
 ---@param name string
 ---@return nil
-function DataFrame:withRollingMax(col, window, name) end
+function LDataFrame:withRollingMax(col, window, name) end
 
 --- Add a rolling mean column. Rows with insufficient history get nil.
 ---@param col string|integer
 ---@param window integer
 ---@param name string
 ---@return nil
-function DataFrame:withRollingMean(col, window, name) end
+function LDataFrame:withRollingMean(col, window, name) end
 
 --- Add a rolling minimum column.
 ---@param col string|integer
 ---@param window integer
 ---@param name string
 ---@return nil
-function DataFrame:withRollingMin(col, window, name) end
+function LDataFrame:withRollingMin(col, window, name) end
 
 --- Add a rolling sum column.
 ---@param col string|integer
 ---@param window integer
 ---@param name string
 ---@return nil
-function DataFrame:withRollingSum(col, window, name) end
+function LDataFrame:withRollingSum(col, window, name) end
 
 --- Add a z-score column for the given numeric column.
 ---@param col string|integer
 ---@param name string
 ---@return nil
-function DataFrame:zscoreCol(col, name) end
+function LDataFrame:zscoreCol(col, name) end
 
 --- Lua-side wrapper around a shared [`Database`].
----@class Database
-Database = {}
+---@class LDatabase
+LDatabase = {}
 
 --- Adds or replaces a table by cloning the given DataFrame.
 ---@param name string
 ---@param df DataFrame
 ---@return nil
-function Database:addTable(name, df) end
+function LDatabase:addTable(name, df) end
 
 --- Drops every table from this in-memory database, leaving it empty.
 ---@return nil
-function Database:clear() end
+function LDatabase:clear() end
 
 --- Returns a copy of a table by name, or nil if not found.
 ---@param name string
 ---@return DataFrame?
-function Database:getTable(name) end
+function LDatabase:getTable(name) end
 
 --- Returns true if a table with the given name exists.
 ---@param name string
 ---@return boolean
-function Database:hasTable(name) end
+function LDatabase:hasTable(name) end
 
 --- Returns a table of all table names.
 ---@return table
-function Database:listTables() end
+function LDatabase:listTables() end
 
 --- Merges all tables from another Database into this one.
 ---@param other Database
 ---@return nil
-function Database:merge(other) end
+function LDatabase:merge(other) end
 
 --- Executes a SQL query against the database tables.
 ---@param sql_str string
 ---@return DataFrame
-function Database:query(sql_str) end
+function LDatabase:query(sql_str) end
 
 --- Drops the named table from this in-memory database if it exists.
 ---@param name string
 ---@return nil
-function Database:removeTable(name) end
+function LDatabase:removeTable(name) end
 
 --- Returns the number of tables.
 ---@return number
-function Database:tableCount() end
+function LDatabase:tableCount() end
 
 --- Serializes all tables to a JSON object string.
 ---@return string
-function Database:toJSON() end
+function LDatabase:toJSON() end
 
 --- Returns the type name of this object.
 ---@return string
-function Database:type() end
+function LDatabase:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Database:typeOf(name) end
+function LDatabase:typeOf(name) end
 
 --- Lua-side wrapper around a grouped result from [`DataFrame::group_by`].
----@class GroupedFrame
-GroupedFrame = {}
+---@class LGroupedFrame
+LGroupedFrame = {}
 
 --- Apply a Lua function to aggregate a column's values per group.
 ---@param col_name string — column to aggregate
 ---@param fn function(values: table)→ number — receives array of column values,returns aggregate
 ---@return DataFrame — new dataframe with group keys and aggregated values
-function GroupedFrame:aggregate(col_name, fn) end
+function LGroupedFrame:aggregate(col_name, fn) end
+
+--- Returns the type name of this object.
+---@return string
+function LGroupedFrame:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LGroupedFrame:typeOf(name) end
 
 --- Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
----@class VecFrame
-VecFrame = {}
+---@class LVecFrame
+LVecFrame = {}
 
 --- Return a new VecFrame containing only the rows where mask[i] is true.
 ---@param mask table
 ---@return VecFrame
-function VecFrame:applyMask(mask) end
+function LVecFrame:applyMask(mask) end
 
 --- Apply absolute value to every element of a Float64 column.
 ---@param col string
-function VecFrame:colAbs(col) end
+function LVecFrame:colAbs(col) end
 
 --- Add a scalar to every element of a Float64 column.
 ---@param col string
 ---@param val number
-function VecFrame:colAdd(col, val) end
+function LVecFrame:colAdd(col, val) end
 
 --- Cast a column to a new dtype: "float64", "int64", or "text".
 ---@param col string
 ---@param dtype string
-function VecFrame:colCast(col, dtype) end
+function LVecFrame:colCast(col, dtype) end
 
 --- Apply ceiling to every element of a Float64 column.
 ---@param col string
-function VecFrame:colCeil(col) end
+function LVecFrame:colCeil(col) end
 
 --- Clamp every element of a Float64 column to [min, max].
 ---@param col string
 ---@param min_val number
 ---@param max_val number
-function VecFrame:colClamp(col, min_val, max_val) end
+function LVecFrame:colClamp(col, min_val, max_val) end
 
 --- Divide every element of a Float64 column by a scalar.
 ---@param col string
 ---@param val number
-function VecFrame:colDiv(col, val) end
+function LVecFrame:colDiv(col, val) end
 
 --- Apply floor to every element of a Float64 column.
 ---@param col string
-function VecFrame:colFloor(col) end
+function LVecFrame:colFloor(col) end
 
 --- Multiply every element of a Float64 column by a scalar.
 ---@param col string
 ---@param val number
-function VecFrame:colMul(col, val) end
+function LVecFrame:colMul(col, val) end
 
 --- Negate every element of a Float64 column.
 ---@param col string
-function VecFrame:colNeg(col) end
+function LVecFrame:colNeg(col) end
 
 --- Compute out[i] = left[i] op right[i] for every row.
 ---@param out_col string
 ---@param left_col string
 ---@param op string
 ---@param right_col string
-function VecFrame:colOp(out_col, left_col, op, right_col) end
+function LVecFrame:colOp(out_col, left_col, op, right_col) end
 
 --- Apply square root to every element of a Float64 column.
 ---@param col string
-function VecFrame:colSqrt(col) end
+function LVecFrame:colSqrt(col) end
 
 --- Subtract a scalar from every element of a Float64 column.
 ---@param col string
 ---@param val number
-function VecFrame:colSub(col, val) end
+function LVecFrame:colSub(col, val) end
 
 --- Return the dtype name of a column: "float64", "int64", "bool", or "text".
 ---@param col string
 ---@return string
-function VecFrame:colType(col) end
+function LVecFrame:colType(col) end
 
 --- Return a table of column names.
 ---@return table
-function VecFrame:columns() end
+function LVecFrame:columns() end
 
 --- Build a boolean row mask: mask[i] = col[i] cmp_op val.
 ---@param col string
 ---@param cmp_op string
 ---@param val number
 ---@return table
-function VecFrame:filterMask(col, cmp_op, val) end
+function LVecFrame:filterMask(col, cmp_op, val) end
 
 --- Return the number of columns.
 ---@return number
-function VecFrame:ncols() end
+function LVecFrame:ncols() end
 
 --- Return the number of rows.
 ---@return number
-function VecFrame:nrows() end
+function LVecFrame:nrows() end
 
 --- Reduce multiple columns in parallel, returning {col → value} table.
 ---@param cols table
 ---@param op string
 ---@return table
-function VecFrame:parReduce(cols, op) end
+function LVecFrame:parReduce(cols, op) end
 
 --- Apply a scalar op in parallel to multiple Float64 columns.
 ---@param cols table
 ---@param op string
 ---@param val number
-function VecFrame:parScalarOp(cols, op, val) end
+function LVecFrame:parScalarOp(cols, op, val) end
 
 --- Reduce an entire numeric column to a single value.
 ---@param col string
 ---@param op string
 ---@return number
-function VecFrame:reduce(col, op) end
+function LVecFrame:reduce(col, op) end
 
 --- Convert this VecFrame back to a DataFrame.
 ---@return DataFrame
-function VecFrame:toDataFrame() end
+function LVecFrame:toDataFrame() end
 
 --- Returns the type name of this object.
 ---@return string
-function VecFrame:type() end
+function LVecFrame:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function VecFrame:typeOf(name) end
+function LVecFrame:typeOf(name) end
 
 --- Deserializes a binary LVDF string into a DataFrame.
 ---@param s string
@@ -4841,46 +5444,64 @@ lurek.debugbridge.stop = function() end
 lurek.devtools = {}
 
 --- Lua-side handle for a per-path file watcher.
----@class FileWatcher
-FileWatcher = {}
+---@class LFileWatcher
+LFileWatcher = {}
 
 --- Removes the stored `onChanged` callback and stops future notifications.
 ---@return nil
-function FileWatcher:cancel() end
+function LFileWatcher:cancel() end
 
 --- Polls the watcher. If the file has changed since the last call, fires the
 ---@return boolean
-function FileWatcher:check() end
+function LFileWatcher:check() end
 
 --- Returns the watched path string.
 ---@return string
-function FileWatcher:getPath() end
+function LFileWatcher:getPath() end
 
 --- Registers a callback invoked (with no arguments) when the watched path changes.
 ---@param fn function
 ---@return nil
-function FileWatcher:onChanged(fn) end
+function LFileWatcher:onChanged(fn) end
+
+--- Returns the type name of this object.
+---@return string
+function LFileWatcher:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LFileWatcher:typeOf(name) end
 
 --- Lua-side wrapper around a [`ReplConsole`] interactive evaluator.
----@class ReplConsole
-ReplConsole = {}
+---@class LReplConsole
+LReplConsole = {}
 
 --- Clears the REPL history buffer.
 ---@return nil
-function ReplConsole:clear() end
+function LReplConsole:clear() end
 
 --- Evaluates a Lua snippet and records the input in history.
 ---@param code string
 ---@return string
-function ReplConsole:eval(code) end
+function LReplConsole:eval(code) end
 
 --- Returns an ordered array of past inputs (oldest first).
 ---@return table
-function ReplConsole:history() end
+function LReplConsole:history() end
 
 --- Returns the number of history entries.
 ---@return number
-function ReplConsole:len() end
+function LReplConsole:len() end
+
+--- Returns the type name of this object.
+---@return string
+function LReplConsole:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LReplConsole:typeOf(name) end
 
 --- Discards all accumulated log entries from the in-memory devtools log buffer.
 ---@return nil
@@ -5098,238 +5719,283 @@ lurek.devtools.watch = function(path) end
 lurek.docs = {}
 
 --- Wraps a catalog snapshot of API entries for Lua access.
----@class ApiCatalog
-ApiCatalog = {}
+---@class LApiCatalog
+LApiCatalog = {}
 
 --- Returns the number of entries, optionally scoped to a module.
 ---@param module? string
 ---@return number
-function ApiCatalog:entryCount(module) end
+function LApiCatalog:entryCount(module) end
 
 --- Returns a new catalog containing only entries for which predicate returns true.
 ---@param predicate function
 ---@return ApiCatalog
-function ApiCatalog:filter(predicate) end
+function LApiCatalog:filter(predicate) end
 
 --- Returns all entries, optionally filtered to a single module.
 ---@param module? string
 ---@return table
-function ApiCatalog:getEntries(module) end
+function LApiCatalog:getEntries(module) end
 
 --- Returns a single entry by qualified name, or nil.
 ---@param qualified_name string
 ---@return nil
-function ApiCatalog:getEntry(qualified_name) end
+function LApiCatalog:getEntry(qualified_name) end
 
 --- Returns a sorted list of module names present in the catalog.
 ---@return table
-function ApiCatalog:getModules() end
+function LApiCatalog:getModules() end
 
 --- Returns entries that are methods of the given type qualified name.
 ---@param qualified_name string
 ---@return table
-function ApiCatalog:getTypeMethods(qualified_name) end
+function LApiCatalog:getTypeMethods(qualified_name) end
 
 --- Returns the names of all entries with kind "type" in the given module.
 ---@param module_name string
 ---@return table
-function ApiCatalog:getTypes(module_name) end
+function LApiCatalog:getTypes(module_name) end
 
 --- Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
 ---@param other userdata
 ---@return ApiCatalog
-function ApiCatalog:merge(other) end
+function LApiCatalog:merge(other) end
 
 --- Returns a table of entries whose name, qualified name, or description contains query.
 ---@param query string
 ---@return table
-function ApiCatalog:search(query) end
+function LApiCatalog:search(query) end
 
 --- Serialises the catalog to a pretty-printed JSON string.
 ---@return string
-function ApiCatalog:toJSON() end
+function LApiCatalog:toJSON() end
 
 --- Converts the catalog to a plain Lua table array.
 ---@return table
-function ApiCatalog:toTable() end
+function LApiCatalog:toTable() end
+
+--- Returns the type name of this object.
+---@return string
+function LApiCatalog:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LApiCatalog:typeOf(name) end
 
 --- Wraps a single doc entry for Lua access.
----@class DocEntry
-DocEntry = {}
+---@class LDocEntry
+LDocEntry = {}
 
 --- Returns the deprecation message, or nil.
 ---@return string
-function DocEntry:getDeprecated() end
+function LDocEntry:getDeprecated() end
 
 --- Returns the human-readable description text for this documentation entry.
 ---@return string
-function DocEntry:getDescription() end
+function LDocEntry:getDescription() end
 
 --- Returns the example snippet, or nil.
 ---@return string
-function DocEntry:getExample() end
+function LDocEntry:getExample() end
 
 --- Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
 ---@return string
-function DocEntry:getKind() end
+function LDocEntry:getKind() end
 
 --- Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
 ---@return string
-function DocEntry:getModule() end
+function LDocEntry:getModule() end
 
 --- Returns the symbol name for this documentation entry.
 ---@return string
-function DocEntry:getName() end
+function LDocEntry:getName() end
 
 --- Returns the parameters as a table of `{name, type, description, optional, default?}` records.
 ---@return table
-function DocEntry:getParameters() end
+function LDocEntry:getParameters() end
 
 --- Returns the qualified name.
 ---@return string
-function DocEntry:getQualifiedName() end
+function LDocEntry:getQualifiedName() end
 
 --- Returns the return values as a table of `{type, description}` records.
 ---@return table
-function DocEntry:getReturns() end
+function LDocEntry:getReturns() end
 
 --- Returns the quality score in [0,1].
 ---@return number
-function DocEntry:getScore() end
+function LDocEntry:getScore() end
 
 --- Returns the since version string, or nil.
 ---@return string
-function DocEntry:getSince() end
+function LDocEntry:getSince() end
 
 --- Returns true when the entry has a non-empty description.
 ---@return boolean
-function DocEntry:hasDescription() end
+function LDocEntry:hasDescription() end
 
 --- Returns true when the entry has an example snippet.
 ---@return boolean
-function DocEntry:hasExample() end
+function LDocEntry:hasExample() end
 
 --- Returns true when the entry has at least one parameter.
 ---@return boolean
-function DocEntry:hasParameters() end
+function LDocEntry:hasParameters() end
 
 --- Returns true when the entry declares at least one return type.
 ---@return boolean
-function DocEntry:hasReturnType() end
+function LDocEntry:hasReturnType() end
+
+--- Returns the type name of this object.
+---@return string
+function LDocEntry:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LDocEntry:typeOf(name) end
 
 --- Wraps documentation quality metrics for Lua access.
----@class QualityReport
-QualityReport = {}
+---@class LQualityReport
+LQualityReport = {}
 
 --- Returns up to count entries with the highest quality scores.
 ---@param count? integer
 ---@return table
-function QualityReport:getBest(count) end
+function LQualityReport:getBest(count) end
 
 --- Returns entries whose grade exactly matches the given letter grade.
 ---@param grade string
 ---@return table
-function QualityReport:getByGrade(grade) end
+function LQualityReport:getByGrade(grade) end
 
 --- Returns the letter grade for the overall score.
 ---@return string
-function QualityReport:getGrade() end
+function LQualityReport:getGrade() end
 
 --- Returns a table mapping module name to its average quality score.
 ---@return table
-function QualityReport:getModuleScores() end
+function LQualityReport:getModuleScores() end
 
 --- Returns the overall quality score in [0,1].
 ---@return number
-function QualityReport:getOverallScore() end
+function LQualityReport:getOverallScore() end
 
 --- Returns a multi-line human-readable summary of quality by module.
 ---@return string
-function QualityReport:getSummary() end
+function LQualityReport:getSummary() end
 
 --- Returns up to count entries with the lowest quality scores.
 ---@param count? integer
 ---@return table
-function QualityReport:getWorst(count) end
+function LQualityReport:getWorst(count) end
 
 --- Serialises the quality report to a pretty-printed JSON string.
 ---@return string
-function QualityReport:toJSON() end
+function LQualityReport:toJSON() end
 
 --- Converts the quality report to a plain Lua table.
 ---@return table
-function QualityReport:toTable() end
+function LQualityReport:toTable() end
+
+--- Returns the type name of this object.
+---@return string
+function LQualityReport:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LQualityReport:typeOf(name) end
 
 --- Lua wrapper for a runtime data-validation schema.
----@class Schema
-Schema = {}
+---@class LSchema
+LSchema = {}
 
 --- Validates data and throws a Lua error on failure with all error messages joined.
 ---@param data table
 ---@return nil
-function Schema:assert(data) end
+function LSchema:assert(data) end
 
 --- Returns true when the data passes all schema rules.
 ---@param data table
 ---@return boolean
-function Schema:check(data) end
+function LSchema:check(data) end
 
 --- Returns a table of declared field names.
 ---@return table
-function Schema:getFields() end
+function LSchema:getFields() end
 
 --- Returns the name identifier of this API schema group.
 ---@return string
-function Schema:getName() end
+function LSchema:getName() end
+
+--- Returns the type name of this object.
+---@return string
+function LSchema:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSchema:typeOf(name) end
 
 --- Validates a Lua table against the schema.
 ---@param data table
 ---@return nil
-function Schema:validate(data) end
+function LSchema:validate(data) end
 
 --- Wraps a validation report for Lua access.
----@class ValidationReport
-ValidationReport = {}
+---@class LValidationReport
+LValidationReport = {}
 
 --- Returns the list of qualified names whose catalog entry is incomplete.
 ---@return table
-function ValidationReport:getIncomplete() end
+function LValidationReport:getIncomplete() end
 
 --- Returns the list of qualified names present in the live API but missing from the catalog.
 ---@return table
-function ValidationReport:getMissing() end
+function LValidationReport:getMissing() end
 
 --- Returns the list of qualified names in the catalog that are not present in the live API.
 ---@return table
-function ValidationReport:getPhantom() end
+function LValidationReport:getPhantom() end
 
 --- Returns a single-line summary of the validation results.
 ---@return string
-function ValidationReport:getSummary() end
+function LValidationReport:getSummary() end
 
 --- Returns the count of incomplete entries.
 ---@return number
-function ValidationReport:incompleteCount() end
+function LValidationReport:incompleteCount() end
 
 --- Returns true when the report has no missing entries.
 ---@return boolean
-function ValidationReport:isValid() end
+function LValidationReport:isValid() end
 
 --- Returns the count of missing entries.
 ---@return number
-function ValidationReport:missingCount() end
+function LValidationReport:missingCount() end
 
 --- Returns the count of phantom entries.
 ---@return number
-function ValidationReport:phantomCount() end
+function LValidationReport:phantomCount() end
 
 --- Serialises the report to a pretty-printed JSON string.
 ---@return string
-function ValidationReport:toJSON() end
+function LValidationReport:toJSON() end
 
 --- Converts the report to a plain Lua table.
 ---@return table
-function ValidationReport:toTable() end
+function LValidationReport:toTable() end
+
+--- Returns the type name of this object.
+---@return string
+function LValidationReport:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LValidationReport:typeOf(name) end
 
 --- Compare catalog entries against source files in a directory for staleness.
 ---@param catalog_ud userdata
@@ -5462,329 +6128,338 @@ lurek.docs.validateModule = function(module_name, catalog_ud) end
 lurek.ecs = {}
 
 --- Lua-side wrapper around a [`Universe`] ECS world.
----@class Universe
-Universe = {}
+---@class LUniverse
+LUniverse = {}
 
 --- Adds a directed named relationship from entity `from` to entity `to`.
 ---@param from integer
 ---@param name string
 ---@param to integer
 ---@return nil
-function Universe:addRelation(from, name, to) end
+function LUniverse:addRelation(from, name, to) end
 
 --- Adds a system table to the universe with an optional priority (lower = earlier).
 ---@param system table
 ---@param opts? table? â€”{priority: integer}
 ---@return nil
-function Universe:addSystem(system, opts) end
+function LUniverse:addSystem(system, opts) end
 
 --- Attaches a string tag to an entity.
 ---@param id integer
 ---@param tag string
 ---@return nil
-function Universe:addTag(id, tag) end
+function LUniverse:addTag(id, tag) end
 
 --- Adds a bitmap tag to an entity.
 ---@param id integer
 ---@param name string
 ---@return nil
-function Universe:bitmapTag(id, name) end
+function LUniverse:bitmapTag(id, name) end
 
 --- Removes a bitmap tag from an entity.
 ---@param id integer
 ---@param name string
 ---@return nil
-function Universe:bitmapUntag(id, name) end
+function LUniverse:bitmapUntag(id, name) end
 
 --- Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
 ---@return nil
-function Universe:clear() end
+function LUniverse:clear() end
 
 --- Removes all directed named relationships of type `name` from entity `from`.
 ---@param from integer
 ---@param name string
 ---@return nil
-function Universe:clearRelations(from, name) end
+function LUniverse:clearRelations(from, name) end
 
 --- Defines a blueprint from a component table.
 ---@param name string
 ---@param components table
 ---@return nil
-function Universe:defineBlueprint(name, components) end
+function LUniverse:defineBlueprint(name, components) end
 
 --- Defines a bitmap tag name, returning its bit index.
 ---@param name string
 ---@return number
-function Universe:defineTag(name) end
+function LUniverse:defineTag(name) end
 
 --- Restores entity state from a snapshot produced by serialize().
 ---@param snapshot table
 ---@return nil
-function Universe:deserialize(snapshot) end
+function LUniverse:deserialize(snapshot) end
 
 --- Calls callback(id, value) for every entity with the named component.
 ---@param name string
 ---@param callback function
 ---@return nil
-function Universe:each(name, callback) end
+function LUniverse:each(name, callback) end
 
 --- Emits a named event to all systems that implement the handler, in priority order.
 ---@param ... string
 ---@return nil
-function Universe:emit(...) end
+function LUniverse:emit(...) end
 
 --- Defines a blueprint by extending a parent with overrides.
 ---@param name string
 ---@param parent string
 ---@param overrides table
 ---@return nil
-function Universe:extendBlueprint(name, parent, overrides) end
+function LUniverse:extendBlueprint(name, parent, overrides) end
 
 --- Dispatches all pending component-add and component-remove events to registered callbacks.
 ---@return nil
-function Universe:flushObservers() end
+function LUniverse:flushObservers() end
 
 --- Returns the component value for an entity, or nil if missing.
 ---@param id integer
 ---@param name string
 ---@return table
-function Universe:get(id, name) end
+function LUniverse:get(id, name) end
 
 --- Returns the bit index for a bitmap tag name, or nil if undefined.
 ---@param name string
 ---@return number
-function Universe:getBitmapTagBit(name) end
+function LUniverse:getBitmapTagBit(name) end
 
 --- Returns a deep copy of a blueprint's component table, or nil.
 ---@param name string
 ---@return table
-function Universe:getBlueprintComponents(name) end
+function LUniverse:getBlueprintComponents(name) end
 
 --- Returns all direct child entity IDs.
 ---@param parent_id integer
 ---@return table
-function Universe:getChildren(parent_id) end
+function LUniverse:getChildren(parent_id) end
 
 --- Returns all component names for an entity.
 ---@param id integer
 ---@return table
-function Universe:getComponents(id) end
+function LUniverse:getComponents(id) end
 
 --- Returns all alive entity IDs.
 ---@return table
-function Universe:getEntities() end
+function LUniverse:getEntities() end
 
 --- Returns all alive entities on a specific layer.
 ---@param layer integer
 ---@return table
-function Universe:getEntitiesByLayer(layer) end
+function LUniverse:getEntitiesByLayer(layer) end
 
 --- Returns all alive entities with the given string tag.
 ---@param tag string
 ---@return table
-function Universe:getEntitiesByTag(tag) end
+function LUniverse:getEntitiesByTag(tag) end
 
 --- Returns all alive entities sorted by layer then ID.
 ---@return table
-function Universe:getEntitiesSorted() end
+function LUniverse:getEntitiesSorted() end
 
 --- Returns the number of alive entities.
 ---@return number
-function Universe:getEntityCount() end
+function LUniverse:getEntityCount() end
 
 --- Returns the layer for an entity, defaulting to zero.
 ---@param id integer
 ---@return number
-function Universe:getLayer(id) end
+function LUniverse:getLayer(id) end
 
 --- Returns the parent entity ID, or nil if unparented.
 ---@param child_id integer
 ---@return number
-function Universe:getParent(child_id) end
+function LUniverse:getParent(child_id) end
 
 --- Returns all entity IDs reachable from `from` via the named relationship.
 ---@param from integer
 ---@param name string
 ---@return table
-function Universe:getRelated(from, name) end
+function LUniverse:getRelated(from, name) end
 
 --- Returns the number of registered systems.
 ---@return number
-function Universe:getSystemCount() end
+function LUniverse:getSystemCount() end
 
 --- Returns all string tags for an entity.
 ---@param id integer
 ---@return table
-function Universe:getTags(id) end
+function LUniverse:getTags(id) end
 
 --- Returns true if the entity has the named component.
 ---@param id integer
 ---@param name string
 ---@return boolean
-function Universe:has(id, name) end
+function LUniverse:has(id, name) end
 
 --- Returns true if the entity has the given bitmap tag.
 ---@param id integer
 ---@param name string
 ---@return boolean
-function Universe:hasBitmapTag(id, name) end
+function LUniverse:hasBitmapTag(id, name) end
 
 --- Returns true if a blueprint with the given name exists.
 ---@param name string
 ---@return boolean
-function Universe:hasBlueprint(name) end
+function LUniverse:hasBlueprint(name) end
 
 --- Returns true if a directed named relationship from `from` to `to` exists.
 ---@param from integer
 ---@param name string
 ---@param to integer
 ---@return boolean
-function Universe:hasRelation(from, name, to) end
+function LUniverse:hasRelation(from, name, to) end
 
 --- Returns true if the entity carries the given tag.
 ---@param id integer
 ---@param tag string
 ---@return boolean
-function Universe:hasTag(id, tag) end
+function LUniverse:hasTag(id, tag) end
 
 --- Returns true if the entity ID is currently alive.
 ---@param id integer
 ---@return boolean
-function Universe:isAlive(id) end
+function LUniverse:isAlive(id) end
 
 --- Destroys the entity with the given ID, freeing its slot for reuse.
 ---@param id integer
 ---@return nil
-function Universe:kill(id) end
+function LUniverse:kill(id) end
 
 --- Kills an entity and all its descendants recursively.
 ---@param id integer
 ---@return nil
-function Universe:killRecursive(id) end
+function LUniverse:killRecursive(id) end
 
 --- Returns all defined blueprint names.
 ---@return table
-function Universe:listBlueprints() end
+function LUniverse:listBlueprints() end
 
 --- Registers a callback to fire when a component is added to any entity.
 ---@param name string
 ---@param callback function
 ---@return nil
-function Universe:onComponentAdded(name, callback) end
+function LUniverse:onComponentAdded(name, callback) end
 
 --- Registers a callback to fire when a component is removed from any entity.
 ---@param name string
 ---@param callback function
 ---@return nil
-function Universe:onComponentRemoved(name, callback) end
+function LUniverse:onComponentRemoved(name, callback) end
 
 --- Returns entity IDs that have all listed component names.
 ---@param ... string
 ---@return table
-function Universe:query(...) end
+function LUniverse:query(...) end
 
 --- Returns all alive entities with all of the listed bitmap tags.
 ---@param names table
 ---@return table
-function Universe:queryBitmapAll(names) end
+function LUniverse:queryBitmapAll(names) end
 
 --- Returns all alive entities with any of the listed bitmap tags.
 ---@param names table
 ---@return table
-function Universe:queryBitmapAny(names) end
+function LUniverse:queryBitmapAny(names) end
 
 --- Returns all alive entities with the given bitmap tag.
 ---@param name string
 ---@return table
-function Universe:queryBitmapTag(name) end
+function LUniverse:queryBitmapTag(name) end
 
 --- Returns entity IDs that have all `with` components and none of the `without` components.
 ---@param with_table table
 ---@param without_table table
 ---@return table
-function Universe:queryNot(with_table, without_table) end
+function LUniverse:queryNot(with_table, without_table) end
 
 --- Releases all universe state, equivalent to clear.
 ---@return nil
-function Universe:release() end
+function LUniverse:release() end
 
 --- Removes a component from an entity.
 ---@param id integer
 ---@param name string
 ---@return nil
-function Universe:remove(id, name) end
+function LUniverse:remove(id, name) end
 
 --- Removes a blueprint definition.
 ---@param name string
 ---@return nil
-function Universe:removeBlueprint(name) end
+function LUniverse:removeBlueprint(name) end
 
 --- Removes the directed named relationship from entity `from` to entity `to`.
 ---@param from integer
 ---@param name string
 ---@param to integer
 ---@return nil
-function Universe:removeRelation(from, name, to) end
+function LUniverse:removeRelation(from, name, to) end
 
 --- Removes a system table from the universe.
 ---@param system table
 ---@return nil
-function Universe:removeSystem(system) end
+function LUniverse:removeSystem(system) end
 
 --- Removes a string tag from an entity.
 ---@param id integer
 ---@param tag string
 ---@return nil
-function Universe:removeTag(id, tag) end
+function LUniverse:removeTag(id, tag) end
 
 --- Calls render(system, world) on each registered system in priority order.
 ---@return nil
-function Universe:render() end
+function LUniverse:render() end
 
 --- Serializes all alive entities to a Lua table snapshot.
 ---@return table
-function Universe:serialize() end
+function LUniverse:serialize() end
 
 --- Sets a component value on an entity.
 ---@param id integer
 ---@param name string
 ---@param value any
 ---@return nil
-function Universe:set(id, name, value) end
+function LUniverse:set(id, name, value) end
 
 --- Sets the layer for an entity.
 ---@param id integer
 ---@param layer integer
 ---@return nil
-function Universe:setLayer(id, layer) end
+function LUniverse:setLayer(id, layer) end
 
 --- Sets or clears the parent of an entity.
 ---@param child_id integer
 ---@param parent_id? integer
 ---@return nil
-function Universe:setParent(child_id, parent_id) end
+function LUniverse:setParent(child_id, parent_id) end
 
 --- Creates a new entity and returns its packed ID.
 ---@return number
-function Universe:spawn() end
+function LUniverse:spawn() end
 
 --- Spawns an entity from a blueprint with optional overrides.
 ---@param name string
 ---@param overrides? table
 ---@return number
-function Universe:spawnBlueprint(name, overrides) end
+function LUniverse:spawnBlueprint(name, overrides) end
 
 --- Spawns `count` entities from a blueprint, returns an array of entity IDs.
 ---@param name string
 ---@param count integer
 ---@param overrides? table
 ---@return table
-function Universe:spawnBulk(name, count, overrides) end
+function LUniverse:spawnBulk(name, count, overrides) end
+
+--- Returns the type name of this object.
+---@return string
+function LUniverse:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LUniverse:typeOf(name) end
 
 --- Calls update(system, world, dt) on each registered system in priority order.
 ---@param dt number
 ---@return nil
-function Universe:update(dt) end
+function LUniverse:update(dt) end
 
 --- Creates a new empty ECS universe.
 ---@return Universe
@@ -5794,80 +6469,80 @@ lurek.ecs.newUniverse = function() end
 lurek.effect = {}
 
 --- Lua-side wrapper around [`ImageEffect`].
----@class ImageEffect
-ImageEffect = {}
+---@class LImageEffect
+LImageEffect = {}
 
 --- Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
 ---@param name string
 ---@return PostFxEffect
-function ImageEffect:addEffect(name) end
+function LImageEffect:addEffect(name) end
 
 --- Removes all effects from the chain (alias for clearEffects).
 ---@return nil
-function ImageEffect:clear() end
+function LImageEffect:clear() end
 
 --- Removes all effects from the chain.
 ---@return nil
-function ImageEffect:clearEffects() end
+function LImageEffect:clearEffects() end
 
 --- Returns a deep copy of this ImageEffect chain.
 ---@return ImageEffect
-function ImageEffect:clone() end
+function LImageEffect:clone() end
 
 --- Returns the number of effects in the chain.
 ---@return number
-function ImageEffect:effectCount() end
+function LImageEffect:effectCount() end
 
 --- Returns the effect at the given 1-based index or with the given type name.
 ---@param key integer|string
 ---@return nil
-function ImageEffect:getEffect(key) end
+function LImageEffect:getEffect(key) end
 
 --- Returns the number of effects in the chain (alias for effectCount).
 ---@return number
-function ImageEffect:getEffectCount() end
+function LImageEffect:getEffectCount() end
 
 --- Removes the effect at the given 0-based index from the chain.
 ---@param idx integer
 ---@return boolean
-function ImageEffect:removeByIndex(idx) end
+function LImageEffect:removeByIndex(idx) end
 
 --- Removes the first effect matching the given type name.
 ---@param name string
 ---@return boolean
-function ImageEffect:removeByName(name) end
+function LImageEffect:removeByName(name) end
 
 --- Removes the effect at the given 1-based index or with the given type name.
 ---@param key integer|string
 ---@return boolean
-function ImageEffect:removeEffect(key) end
+function LImageEffect:removeEffect(key) end
 
 --- Stub: no-op serialisation placeholder.
 ---@return boolean
-function ImageEffect:save() end
+function LImageEffect:save() end
 
 --- Returns the type name "ImageEffect".
 ---@return string
-function ImageEffect:type() end
+function LImageEffect:type() end
 
 --- Returns true when the given name matches "ImageEffect" or a parent type.
 ---@param name string
 ---@return boolean
-function ImageEffect:typeOf(name) end
+function LImageEffect:typeOf(name) end
 
 --- Lua-side wrapper around [`Overlay`].
----@class Overlay
-Overlay = {}
+---@class LOverlay
+LOverlay = {}
 
 --- Resets all effect subsystems to their default inactive state.
 ---@return nil
-function Overlay:clear() end
+function LOverlay:clear() end
 
 --- Renders the effect state (flash, fade, effects) to a CPU ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function Overlay:drawToImage(width, height) end
+function LOverlay:drawToImage(width, height) end
 
 --- Animates a full-screen colour fade; alpha defaults to 1.0, duration to 1.0 s.
 ---@param r number
@@ -5876,7 +6551,7 @@ function Overlay:drawToImage(width, height) end
 ---@param alpha? number
 ---@param duration? number
 ---@return nil
-function Overlay:fade(r, g, b, alpha, duration) end
+function LOverlay:fade(r, g, b, alpha, duration) end
 
 --- Triggers a full-screen colour flash; alpha defaults to 1.0, duration to 0.2 s.
 ---@param r number
@@ -5885,153 +6560,153 @@ function Overlay:fade(r, g, b, alpha, duration) end
 ---@param a? number
 ---@param duration? number
 ---@return nil
-function Overlay:flash(r, g, b, a, duration) end
+function LOverlay:flash(r, g, b, a, duration) end
 
 --- Returns the current ambient tint as r, g, b, a components.
 ---@return number
-function Overlay:getAmbientColor() end
+function LOverlay:getAmbientColor() end
 
 --- Returns the current cloud shadow instance count.
 ---@return number
-function Overlay:getCloudCount() end
+function LOverlay:getCloudCount() end
 
 --- Returns the current cloud shadow opacity.
 ---@return number
-function Overlay:getCloudOpacity() end
+function LOverlay:getCloudOpacity() end
 
 --- Returns the current cloud shadow scale.
 ---@return number
-function Overlay:getCloudScale() end
+function LOverlay:getCloudScale() end
 
 --- Returns the current cloud shadow scroll speed.
 ---@return number
-function Overlay:getCloudSpeed() end
+function LOverlay:getCloudSpeed() end
 
 --- Returns the effect width and height.
 ---@return number
-function Overlay:getDimensions() end
+function LOverlay:getDimensions() end
 
 --- Returns the current film-grain intensity.
 ---@return number
-function Overlay:getFilmGrainIntensity() end
+function LOverlay:getFilmGrainIntensity() end
 
 --- Returns the current flash overlay alpha value.
 ---@return number
-function Overlay:getFlashAlpha() end
+function LOverlay:getFlashAlpha() end
 
 --- Returns the current fog tint as r, g, b, a components.
 ---@return number
-function Overlay:getFogColor() end
+function LOverlay:getFogColor() end
 
 --- Returns the current fog density.
 ---@return number
-function Overlay:getFogDensity() end
+function LOverlay:getFogDensity() end
 
 --- Returns the current heat-haze distortion intensity.
 ---@return number
-function Overlay:getHeatHazeIntensity() end
+function LOverlay:getHeatHazeIntensity() end
 
 --- Returns the effect height.
 ---@return number
-function Overlay:getHeight() end
+function LOverlay:getHeight() end
 
 --- Returns the current lightning overlay alpha value.
 ---@return number
-function Overlay:getLightningAlpha() end
+function LOverlay:getLightningAlpha() end
 
 --- Returns the lightning flash tint as r, g, b, a components.
 ---@return number
-function Overlay:getLightningColor() end
+function LOverlay:getLightningColor() end
 
 --- Returns the current shake displacement as x, y.
 ---@return number
-function Overlay:getShakeOffset() end
+function LOverlay:getShakeOffset() end
 
 --- Returns the current simulated time-of-day (0â€“24).
 ---@return number
-function Overlay:getTimeOfDay() end
+function LOverlay:getTimeOfDay() end
 
 --- Returns the current vignette strength.
 ---@return number
-function Overlay:getVignetteStrength() end
+function LOverlay:getVignetteStrength() end
 
 --- Returns a table describing the current water overlay state.
 ---@return table
-function Overlay:getWater() end
+function LOverlay:getWater() end
 
 --- Returns the name of the current weather type.
 ---@return string
-function Overlay:getWeather() end
+function LOverlay:getWeather() end
 
 --- Returns the current weather intensity.
 ---@return number
-function Overlay:getWeatherIntensity() end
+function LOverlay:getWeatherIntensity() end
 
 --- Returns the effect width.
 ---@return number
-function Overlay:getWidth() end
+function LOverlay:getWidth() end
 
 --- Returns the current wind direction in radians.
 ---@return number
-function Overlay:getWindDirection() end
+function LOverlay:getWindDirection() end
 
 --- Returns the current wind speed.
 ---@return number
-function Overlay:getWindSpeed() end
+function LOverlay:getWindSpeed() end
 
 --- Returns true if any effect subsystem is currently active.
 ---@return boolean
-function Overlay:isActive() end
+function LOverlay:isActive() end
 
 --- Returns whether the ambient light layer is active.
 ---@return boolean
-function Overlay:isAmbientEnabled() end
+function LOverlay:isAmbientEnabled() end
 
 --- Returns whether cloud shadows are active.
 ---@return boolean
-function Overlay:isCloudShadowsEnabled() end
+function LOverlay:isCloudShadowsEnabled() end
 
 --- Returns true while a fade effect is in progress.
 ---@return boolean
-function Overlay:isFading() end
+function LOverlay:isFading() end
 
 --- Returns whether the film-grain layer is active.
 ---@return boolean
-function Overlay:isFilmGrainEnabled() end
+function LOverlay:isFilmGrainEnabled() end
 
 --- Returns true while a flash effect is in progress.
 ---@return boolean
-function Overlay:isFlashing() end
+function LOverlay:isFlashing() end
 
 --- Returns whether the fog layer is active.
 ---@return boolean
-function Overlay:isFogEnabled() end
+function LOverlay:isFogEnabled() end
 
 --- Returns whether the heat-haze layer is active.
 ---@return boolean
-function Overlay:isHeatHazeEnabled() end
+function LOverlay:isHeatHazeEnabled() end
 
 --- Returns true while a shake effect is in progress.
 ---@return boolean
-function Overlay:isShaking() end
+function LOverlay:isShaking() end
 
 --- Returns whether the vignette layer is active.
 ---@return boolean
-function Overlay:isVignetteEnabled() end
+function LOverlay:isVignetteEnabled() end
 
 --- Returns whether the weather particle system is active.
 ---@return boolean
-function Overlay:isWeatherEnabled() end
+function LOverlay:isWeatherEnabled() end
 
 --- Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
 ---@return nil
-function Overlay:render() end
+function LOverlay:render() end
 
 --- Resizes the effect to match new window dimensions.
 ---@param width integer
 ---@param height integer
 ---@return nil
-function Overlay:resize(width, height) end
+function LOverlay:resize(width, height) end
 
 --- Sets the ambient light tint colour; alpha defaults to 1.0.
 ---@param r number
@@ -6039,52 +6714,52 @@ function Overlay:resize(width, height) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Overlay:setAmbientColor(r, g, b, a) end
+function LOverlay:setAmbientColor(r, g, b, a) end
 
 --- Enables or disables the ambient light layer.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setAmbientEnabled(enabled) end
+function LOverlay:setAmbientEnabled(enabled) end
 
 --- Sets the number of cloud shadow instances to render.
 ---@param count integer
 ---@return nil
-function Overlay:setCloudCount(count) end
+function LOverlay:setCloudCount(count) end
 
 --- Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
 ---@param opacity number
 ---@return nil
-function Overlay:setCloudOpacity(opacity) end
+function LOverlay:setCloudOpacity(opacity) end
 
 --- Sets the scale multiplier applied to each cloud shadow.
 ---@param scale number
 ---@return nil
-function Overlay:setCloudScale(scale) end
+function LOverlay:setCloudScale(scale) end
 
 --- Enables or disables scrolling cloud-shadow projection.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setCloudShadows(enabled) end
+function LOverlay:setCloudShadows(enabled) end
 
 --- Sets the horizontal scroll speed of cloud shadows in pixels per second.
 ---@param speed number
 ---@return nil
-function Overlay:setCloudSpeed(speed) end
+function LOverlay:setCloudSpeed(speed) end
 
 --- Assigns a custom shader name to the effect, or clears it when `nil` is passed.
 ---@param name? string
 ---@return nil
-function Overlay:setCustomShader(name) end
+function LOverlay:setCustomShader(name) end
 
 --- Enables or disables the film-grain noise layer.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setFilmGrainEnabled(enabled) end
+function LOverlay:setFilmGrainEnabled(enabled) end
 
 --- Sets the film-grain noise intensity (0.0â€“1.0).
 ---@param intensity number
 ---@return nil
-function Overlay:setFilmGrainIntensity(intensity) end
+function LOverlay:setFilmGrainIntensity(intensity) end
 
 --- Sets the fog tint colour; alpha defaults to 1.0.
 ---@param r number
@@ -6092,27 +6767,27 @@ function Overlay:setFilmGrainIntensity(intensity) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Overlay:setFogColor(r, g, b, a) end
+function LOverlay:setFogColor(r, g, b, a) end
 
 --- Sets the fog density (0.0 = clear, 1.0 = fully opaque).
 ---@param density number
 ---@return nil
-function Overlay:setFogDensity(density) end
+function LOverlay:setFogDensity(density) end
 
 --- Enables or disables the fog layer.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setFogEnabled(enabled) end
+function LOverlay:setFogEnabled(enabled) end
 
 --- Enables or disables the heat-haze distortion layer.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setHeatHazeEnabled(enabled) end
+function LOverlay:setHeatHazeEnabled(enabled) end
 
 --- Sets the heat-haze distortion intensity (0.0â€“1.0).
 ---@param intensity number
 ---@return nil
-function Overlay:setHeatHazeIntensity(intensity) end
+function LOverlay:setHeatHazeIntensity(intensity) end
 
 --- Sets the lightning flash tint colour; alpha defaults to 1.0.
 ---@param r number
@@ -6120,29 +6795,29 @@ function Overlay:setHeatHazeIntensity(intensity) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Overlay:setLightningColor(r, g, b, a) end
+function LOverlay:setLightningColor(r, g, b, a) end
 
 --- Sets the simulated time-of-day (0â€“24) which drives ambient colour.
 ---@param hour number
 ---@return nil
-function Overlay:setTimeOfDay(hour) end
+function LOverlay:setTimeOfDay(hour) end
 
 --- Enables or disables the screen-edge vignette layer.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setVignetteEnabled(enabled) end
+function LOverlay:setVignetteEnabled(enabled) end
 
 --- Sets the vignette darkening strength (0.0â€“1.0).
 ---@param strength number
 ---@return nil
-function Overlay:setVignetteStrength(strength) end
+function LOverlay:setVignetteStrength(strength) end
 
 --- Enables the water UV-distortion overlay and sets its wave parameters.
 ---@param amplitude number
 ---@param frequency number
 ---@param speed number
 ---@return nil
-function Overlay:setWater(amplitude, frequency, speed) end
+function LOverlay:setWater(amplitude, frequency, speed) end
 
 --- Sets the water tint colour and blend strength.
 ---@param r number
@@ -6150,38 +6825,38 @@ function Overlay:setWater(amplitude, frequency, speed) end
 ---@param b number
 ---@param strength number â€” Tint blend factor[0.0,1.0]
 ---@return nil
-function Overlay:setWaterTint(r, g, b, strength) end
+function LOverlay:setWaterTint(r, g, b, strength) end
 
 --- Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
 ---@param name string
 ---@return nil
-function Overlay:setWeather(name) end
+function LOverlay:setWeather(name) end
 
 --- Enables or disables the weather particle system.
 ---@param enabled boolean
 ---@return nil
-function Overlay:setWeatherEnabled(enabled) end
+function LOverlay:setWeatherEnabled(enabled) end
 
 --- Sets the particle spawn rate multiplier (0.0â€“1.0).
 ---@param intensity number
 ---@return nil
-function Overlay:setWeatherIntensity(intensity) end
+function LOverlay:setWeatherIntensity(intensity) end
 
 --- Sets the wind direction in radians (0 = right, Ď€/2 = down).
 ---@param radians number
 ---@return nil
-function Overlay:setWindDirection(radians) end
+function LOverlay:setWindDirection(radians) end
 
 --- Sets the wind speed applied to weather particles in units per second.
 ---@param speed number
 ---@return nil
-function Overlay:setWindSpeed(speed) end
+function LOverlay:setWindSpeed(speed) end
 
 --- Triggers a camera shake; duration defaults to 0.5 s.
 ---@param intensity number
 ---@param duration? number
 ---@return nil
-function Overlay:shake(intensity, duration) end
+function LOverlay:shake(intensity, duration) end
 
 --- Triggers a screen fade effect to the given colour and alpha.
 ---@param r number
@@ -6190,7 +6865,7 @@ function Overlay:shake(intensity, duration) end
 ---@param target_alpha number
 ---@param duration number
 ---@return nil
-function Overlay:triggerFade(r, g, b, target_alpha, duration) end
+function LOverlay:triggerFade(r, g, b, target_alpha, duration) end
 
 --- Triggers a screen-wide colour flash effect.
 ---@param r number
@@ -6199,314 +6874,314 @@ function Overlay:triggerFade(r, g, b, target_alpha, duration) end
 ---@param a number
 ---@param duration number
 ---@return nil
-function Overlay:triggerFlash(r, g, b, a, duration) end
+function LOverlay:triggerFlash(r, g, b, a, duration) end
 
 --- Triggers a lightning flash effect.
 ---@return nil
-function Overlay:triggerLightning() end
+function LOverlay:triggerLightning() end
 
 --- Triggers a screen shake effect with the given intensity and duration.
 ---@param intensity number
 ---@param duration number
 ---@return nil
-function Overlay:triggerShake(intensity, duration) end
+function LOverlay:triggerShake(intensity, duration) end
 
 --- Returns the type name of this object ("Overlay").
 ---@return string
-function Overlay:type() end
+function LOverlay:type() end
 
 --- Returns true if this object is of the given type ("Object" or "Overlay").
 ---@param name string
 ---@return boolean
-function Overlay:typeOf(name) end
+function LOverlay:typeOf(name) end
 
 --- Advances all effect subsystems by the given delta time.
 ---@param dt number
 ---@return nil
-function Overlay:update(dt) end
+function LOverlay:update(dt) end
 
 --- Lua-side wrapper around [`PostFxEffect`].
----@class PostFxEffect
-PostFxEffect = {}
+---@class LPostFxEffect
+LPostFxEffect = {}
 
 --- Disables auto-injection of common uniforms into shader slot p[3].
 ---@return nil
-function PostFxEffect:disableAutoUniforms() end
+function LPostFxEffect:disableAutoUniforms() end
 
 --- Enables auto-injection of common uniforms into shader slot p[3] each frame.
 ---@return nil
-function PostFxEffect:enableAutoUniforms() end
+function LPostFxEffect:enableAutoUniforms() end
 
 --- Returns the type name of this effect (alias for getTypeName).
 ---@return string
-function PostFxEffect:getEffectType() end
+function LPostFxEffect:getEffectType() end
 
 --- Returns a named parameter value, or the default if not set.
 ---@param name string
 ---@param default? number
 ---@return number
-function PostFxEffect:getParameter(name, default) end
+function LPostFxEffect:getParameter(name, default) end
 
 --- Returns a list of all parameter names on this effect.
 ---@return table
-function PostFxEffect:getParameterNames() end
+function LPostFxEffect:getParameterNames() end
 
 --- Returns the type name of this effect (alias for getTypeName).
 ---@return string
-function PostFxEffect:getType() end
+function LPostFxEffect:getType() end
 
 --- Returns the display name of this effect type.
 ---@return string
-function PostFxEffect:getTypeName() end
+function LPostFxEffect:getTypeName() end
 
 --- Returns true if the named parameter exists on this effect.
 ---@param name string
 ---@return boolean
-function PostFxEffect:hasParameter(name) end
+function LPostFxEffect:hasParameter(name) end
 
 --- Returns whether auto-uniform injection is enabled for this effect.
 ---@return boolean
-function PostFxEffect:isAutoUniforms() end
+function LPostFxEffect:isAutoUniforms() end
 
 --- Returns true if this is a built-in effect, false if custom.
 ---@return boolean
-function PostFxEffect:isBuiltIn() end
+function LPostFxEffect:isBuiltIn() end
 
 --- Returns whether this effect is currently active.
 ---@return boolean
-function PostFxEffect:isEnabled() end
+function LPostFxEffect:isEnabled() end
 
 --- Sets the brightness parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setBrightness(value) end
+function LPostFxEffect:setBrightness(value) end
 
 --- Sets the contrast parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setContrast(value) end
+function LPostFxEffect:setContrast(value) end
 
 --- Enables or disables this effect.
 ---@param enabled boolean
 ---@return nil
-function PostFxEffect:setEnabled(enabled) end
+function LPostFxEffect:setEnabled(enabled) end
 
 --- Sets the intensity parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setIntensity(value) end
+function LPostFxEffect:setIntensity(value) end
 
 --- Sets the offset parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setOffset(value) end
+function LPostFxEffect:setOffset(value) end
 
 --- Sets a named float parameter on this effect.
 ---@param name string
 ---@param value number
 ---@return nil
-function PostFxEffect:setParameter(name, value) end
+function LPostFxEffect:setParameter(name, value) end
 
 --- Sets the radius parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setRadius(value) end
+function LPostFxEffect:setRadius(value) end
 
 --- Sets the saturation parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setSaturation(value) end
+function LPostFxEffect:setSaturation(value) end
 
 --- Sets the scanline strength parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setScanlineStrength(value) end
+function LPostFxEffect:setScanlineStrength(value) end
 
 --- Sets the strength parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setStrength(value) end
+function LPostFxEffect:setStrength(value) end
 
 --- Sets the threshold parameter of this effect.
 ---@param value number
 ---@return nil
-function PostFxEffect:setThreshold(value) end
+function LPostFxEffect:setThreshold(value) end
 
 --- Returns the type name "PostFxEffect".
 ---@return string
-function PostFxEffect:type() end
+function LPostFxEffect:type() end
 
 --- Returns true when the given name matches "PostFxEffect" or a parent type.
 ---@param name string
 ---@return boolean
-function PostFxEffect:typeOf(name) end
+function LPostFxEffect:typeOf(name) end
 
 --- Lua-side wrapper around [`PostFxStack`].
----@class PostFxStack
-PostFxStack = {}
+---@class LPostFxStack
+LPostFxStack = {}
 
 --- Appends a PostFxEffect to the end of the pipeline.
 ---@param effect PostFxEffect
 ---@return nil
-function PostFxStack:add(effect) end
+function LPostFxStack:add(effect) end
 
 --- Applies all enabled effects in the stack and composites the result to screen.
 ---@return nil
-function PostFxStack:apply() end
+function LPostFxStack:apply() end
 
 --- Begins capturing the scene for post-processing.
 ---@return nil
-function PostFxStack:beginCapture() end
+function LPostFxStack:beginCapture() end
 
 --- Removes all effects from the pipeline.
 ---@return nil
-function PostFxStack:clear() end
+function LPostFxStack:clear() end
 
 --- Resets the feedback intensity to `0.0` (disables feedback).
 ---@return nil
-function PostFxStack:clearFeedback() end
+function LPostFxStack:clearFeedback() end
 
 --- Removes duplicate effects from the pipeline, keeping the first occurrence
 ---@return nil
-function PostFxStack:dedup() end
+function LPostFxStack:dedup() end
 
 --- Ends scene capture for post-processing.
 ---@return nil
-function PostFxStack:endCapture() end
+function LPostFxStack:endCapture() end
 
 --- Returns width and height of the render target.
 ---@return number
-function PostFxStack:getDimensions() end
+function LPostFxStack:getDimensions() end
 
 --- Returns the effect at the given 1-based position, or nil.
 ---@param index integer
 ---@return nil
-function PostFxStack:getEffect(index) end
+function LPostFxStack:getEffect(index) end
 
 --- Returns the number of effects in the pipeline.
 ---@return number
-function PostFxStack:getEffectCount() end
+function LPostFxStack:getEffectCount() end
 
 --- Returns a list of currently enabled effect objects.
 ---@return table
-function PostFxStack:getEnabledEffects() end
+function LPostFxStack:getEnabledEffects() end
 
 --- Returns the current feedback loop intensity `[0.0, 1.0]`.
 ---@return number
-function PostFxStack:getFeedback() end
+function LPostFxStack:getFeedback() end
 
 --- Returns the height of the render target.
 ---@return number
-function PostFxStack:getHeight() end
+function LPostFxStack:getHeight() end
 
 --- Returns the width of the render target.
 ---@return number
-function PostFxStack:getWidth() end
+function LPostFxStack:getWidth() end
 
 --- Inserts a PostFxEffect at a specific 1-based position in the pipeline.
 ---@param position integer
 ---@param effect PostFxEffect
 ---@return nil
-function PostFxStack:insert(position, effect) end
+function LPostFxStack:insert(position, effect) end
 
 --- Returns whether the stack is currently capturing the scene.
 ---@return boolean
-function PostFxStack:isCapturing() end
+function LPostFxStack:isCapturing() end
 
 --- Returns true if the pipeline has no effect slots.
 ---@return boolean
-function PostFxStack:isEmpty() end
+function LPostFxStack:isEmpty() end
 
 --- Returns whether the effect at the given 1-based position is enabled.
 ---@param position integer
 ---@return boolean
-function PostFxStack:isEnabled(position) end
+function LPostFxStack:isEnabled(position) end
 
 --- Returns the total number of effect slots in the pipeline.
 ---@return number
-function PostFxStack:len() end
+function LPostFxStack:len() end
 
 --- Removes the given PostFxEffect from the pipeline.
 ---@param effect PostFxEffect
 ---@return boolean
-function PostFxStack:remove(effect) end
+function LPostFxStack:remove(effect) end
 
 --- Resizes the render target to the given dimensions.
 ---@param width integer
 ---@param height integer
 ---@return nil
-function PostFxStack:resize(width, height) end
+function LPostFxStack:resize(width, height) end
 
 --- Enables or disables the effect at the given 1-based position.
 ---@param position integer
 ---@param enabled boolean
 ---@return nil
-function PostFxStack:setEnabled(position, enabled) end
+function LPostFxStack:setEnabled(position, enabled) end
 
 --- Sets the feedback loop intensity. At `0.0` (default) there is no
 ---@param factor number
 ---@return nil
-function PostFxStack:setFeedback(factor) end
+function LPostFxStack:setFeedback(factor) end
 
 --- Returns the type name "PostFxStack".
 ---@return string
-function PostFxStack:type() end
+function LPostFxStack:type() end
 
 --- Returns true when the given name matches "PostFxStack" or a parent type.
 ---@param name string
 ---@return boolean
-function PostFxStack:typeOf(name) end
+function LPostFxStack:typeOf(name) end
 
 --- Lua-side wrapper around a [`crate::effect::ScreenTransition`].
----@class ScreenTransition
-ScreenTransition = {}
+---@class LScreenTransition
+LScreenTransition = {}
 
 --- Returns the fill color as four numbers: `r, g, b, a`.
 ---@return number
-function ScreenTransition:color() end
+function LScreenTransition:color() end
 
 --- Returns `true` while the transition is running.
 ---@return boolean
-function ScreenTransition:isActive() end
+function LScreenTransition:isActive() end
 
 --- Returns `true` after the transition has completed.
 ---@return boolean
-function ScreenTransition:isDone() end
+function LScreenTransition:isDone() end
 
 --- Returns the transition kind name (`"fade"`, `"wipe"`, `"iris_wipe"`,
 ---@return string
-function ScreenTransition:kind() end
+function LScreenTransition:kind() end
 
 --- Starts the transition playing forward (scene fades/wipes out).
 ---@return nil
-function ScreenTransition:play() end
+function LScreenTransition:play() end
 
 --- Returns the fractional progress `[0, 1]` of the transition, taking
 ---@return number
-function ScreenTransition:progress() end
+function LScreenTransition:progress() end
 
 --- Starts the transition in reverse (scene fades/wipes in).
 ---@return nil
-function ScreenTransition:reverse() end
+function LScreenTransition:reverse() end
 
 --- Updates the fill color from `{r, g, b, a?}`.
 ---@param color table
 ---@return nil
-function ScreenTransition:setColor(color) end
+function LScreenTransition:setColor(color) end
 
---- Type.
----@return table
-function ScreenTransition:type() end
+--- Returns the type name of this object ("ScreenTransition").
+---@return string
+function LScreenTransition:type() end
 
---- Type of.
+--- Returns true if this object is of the given type name or a parent type.
 ---@param name string
----@return table
-function ScreenTransition:typeOf(name) end
+---@return boolean
+function LScreenTransition:typeOf(name) end
 
 --- Advances the transition by `dt` seconds. Returns `true` while
 ---@param dt number
 ---@return boolean
-function ScreenTransition:update(dt) end
+function LScreenTransition:update(dt) end
 
 --- Returns the list of all built-in effect type names.
 ---@return table
@@ -6614,70 +7289,70 @@ lurek.engine.uptime = function() end
 lurek.signal = {}
 
 --- Lua-side wrapper around a [`Signal`] with registry-stored callbacks.
----@class Signal
-Signal = {}
+---@class LSignal
+LSignal = {}
 
 --- Removes all callbacks for the named event.
 ---@param name string
 ---@return number
-function Signal:clear(name) end
+function LSignal:clear(name) end
 
 --- Removes all callbacks across all events.
 ---@return number
-function Signal:clearAll() end
+function LSignal:clearAll() end
 
 --- Subscribes to an event name or wildcard pattern. When the pattern contains
 ---@param name string
 ---@param func function callback invoked with(...)args from emit
 ---@return nil
-function Signal:connect(name, func) end
+function LSignal:connect(name, func) end
 
 --- Emits the named event, calling all registered callbacks with extra arguments.
 ---@param ... string
 ---@return nil
-function Signal:emit(...) end
+function LSignal:emit(...) end
 
 --- Returns the callback count for the named event.
 ---@param name string
 ---@return number
-function Signal:getCount(name) end
+function LSignal:getCount(name) end
 
 --- Returns the total callback count across all events.
 ---@return number
-function Signal:getTotalCount() end
+function LSignal:getTotalCount() end
 
 --- Registers a one-shot callback that fires at most once then auto-removes itself.
 ---@param name string
 ---@param callback function
 ---@return number
-function Signal:once(name, callback) end
+function LSignal:once(name, callback) end
 
 --- Registers a callback for the named event and returns its handle ID.
 ---@param name string
 ---@param callback function
 ---@return number
-function Signal:register(name, callback) end
+function LSignal:register(name, callback) end
 
 --- Registers a callback with a filter predicate. The callback only fires if the
 ---@param name string
 ---@param callback function
 ---@param filter function
 ---@return number
-function Signal:registerWithFilter(name, callback, filter) end
+function LSignal:registerWithFilter(name, callback, filter) end
 
 --- Removes a subscription by handle ID.
 ---@param handle integer
 ---@return boolean
-function Signal:remove(handle) end
+function LSignal:remove(handle) end
 
 --- Returns the type name of this object.
 ---@return string
-function Signal:type() end
+function LSignal:type() end
 
 --- Returns true if the given type name matches this object's type or any parent type.
 ---@param name string
 ---@return boolean
-function Signal:typeOf(name) end
+function LSignal:typeOf(name) end
 
 --- Discards all pending events in the queue.
 ---@return nil
@@ -6743,89 +7418,116 @@ lurek.signal.wait = function(timeout) end
 lurek.filesystem = {}
 
 --- Lua-side wrapper around a [`FileData`] buffer.
----@class FileData
-FileData = {}
+---@class LFileData
+LFileData = {}
 
 --- Returns the virtual path this data was loaded from.
 ---@return string
-function FileData:getFilename() end
+function LFileData:getFilename() end
 
 --- Returns the file size in bytes.
 ---@return number
-function FileData:getSize() end
+function LFileData:getSize() end
 
 --- Returns the file content as a Lua string.
 ---@return string
-function FileData:getString() end
+function LFileData:getString() end
+
+--- Returns the type name of this object.
+---@return string
+function LFileData:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LFileData:typeOf(name) end
 
 --- Lua-side wrapper around a [`FileHandle`] with interior mutability.
----@class FileHandle
-FileHandle = {}
+---@class LFileHandle
+LFileHandle = {}
 
 --- Flushes any pending writes and closes the file handle.
 ---@return nil
-function FileHandle:close() end
+function LFileHandle:close() end
 
 --- Flushes all buffered writes to disk without closing the handle.
 ---@return nil
-function FileHandle:flush() end
+function LFileHandle:flush() end
 
 --- Returns the access mode the file was opened with.
 ---@return string
-function FileHandle:getMode() end
+function LFileHandle:getMode() end
 
 --- Returns the size of the open file in bytes.
 ---@return number
-function FileHandle:getSize() end
+function LFileHandle:getSize() end
 
 --- Returns whether the read cursor has reached the end of the file.
 ---@return boolean
-function FileHandle:isEOF() end
+function LFileHandle:isEOF() end
 
 --- Reads bytes from the file, returning them as a string.
 ---@param count? integer
 ---@return string
-function FileHandle:read(count) end
+function LFileHandle:read(count) end
 
 --- Reads the next line from the file without the trailing newline.
 ---@return string
-function FileHandle:readLine() end
+function LFileHandle:readLine() end
 
 --- Seeks the file position to the given byte offset from the start.
 ---@param pos integer
 ---@return number
-function FileHandle:seek(pos) end
+function LFileHandle:seek(pos) end
 
 --- Returns the current read/write byte offset from the start of the file.
 ---@return number
-function FileHandle:tell() end
+function LFileHandle:tell() end
+
+--- Returns the type name of this object.
+---@return string
+function LFileHandle:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LFileHandle:typeOf(name) end
 
 --- Writes a string to the file and returns the number of bytes written.
 ---@param data string
 ---@return number
-function FileHandle:write(data) end
+function LFileHandle:write(data) end
 
 --- Lua userdata wrapper around a [`ZipMount`].
----@class ZipMount
-ZipMount = {}
+---@class LZipMount
+LZipMount = {}
 
 --- Returns true if `virtual_path` exists inside this ZIP mount.
 ---@param virtual_path string
 ---@return boolean
-function ZipMount:contains(virtual_path) end
+function LZipMount:contains(virtual_path) end
 
 --- Returns a sorted array of all virtual paths exposed by this ZIP mount.
 ---@return table
-function ZipMount:listFiles() end
+function LZipMount:listFiles() end
 
 --- Returns the virtual path prefix this archive was mounted under.
 ---@return string
-function ZipMount:prefix() end
+function LZipMount:prefix() end
 
 --- Reads a file from the ZIP and returns it as a string of bytes.
 ---@param virtual_path string
 ---@return string
-function ZipMount:readFile(virtual_path) end
+function LZipMount:readFile(virtual_path) end
+
+--- Returns the type name of this object.
+---@return string
+function LZipMount:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LZipMount:typeOf(name) end
 
 --- Opens the file in append mode and writes the given string at the end.
 ---@param path string
@@ -7017,8 +7719,8 @@ lurek.filesystem.write = function(path, data) end
 lurek.globe = {}
 
 --- Lua-accessible handle to a `Globe` inside a `GlobeRegistry`.
----@class Globe
-Globe = {}
+---@class LGlobe
+LGlobe = {}
 
 --- Add an arc (great-circle path between two lat/lon points).
 ---@param lat1 number
@@ -7027,7 +7729,7 @@ Globe = {}
 ---@param lon2 number
 ---@param steps? integer
 ---@return number
-function Globe:addArc(lat1, lon1, lat2, lon2, steps) end
+function LGlobe:addArc(lat1, lon1, lat2, lon2, steps) end
 
 --- Add a text label. Returns label ID.
 ---@param ltype string
@@ -7035,12 +7737,12 @@ function Globe:addArc(lat1, lon1, lat2, lon2, steps) end
 ---@param lon number
 ---@param text string
 ---@return number
-function Globe:addLabel(ltype, lat, lon, text) end
+function LGlobe:addLabel(ltype, lat, lon, text) end
 
 --- Add or replace a named thematic layer.
 ---@param name string
 ---@param z_order? integer
-function Globe:addLayer(name, z_order) end
+function LGlobe:addLayer(name, z_order) end
 
 --- Add a marker. Returns marker ID.
 ---@param mtype string
@@ -7048,155 +7750,155 @@ function Globe:addLayer(name, z_order) end
 ---@param lon number
 ---@param label? string
 ---@return number
-function Globe:addMarker(mtype, lat, lon, label) end
+function LGlobe:addMarker(mtype, lat, lon, label) end
 
 --- Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},
 ---@param p table
 ---@return boolean
-function Globe:addProvince(p) end
+function LGlobe:addProvince(p) end
 
 --- Find the shortest province path from `from_id` to `to_id`.
 ---@param from_id integer
 ---@param to_id integer
 ---@return number
-function Globe:findPath(from_id, to_id) end
+function LGlobe:findPath(from_id, to_id) end
 
 --- Get the current camera (lat, lon, zoom).
 ---@return number
-function Globe:getCamera() end
+function LGlobe:getCamera() end
 
 --- Returns the current LOD tier as a string: "far", "mid", or "near".
 ---@return string
-function Globe:getLod() end
+function LGlobe:getLod() end
 
 --- Get a string attribute from a marker.
 ---@param id integer
 ---@param key string
 ---@return string
-function Globe:getMarkerAttr(id, key) end
+function LGlobe:getMarkerAttr(id, key) end
 
 --- Returns the string identifier name assigned to this globe instance.
 ---@return string
-function Globe:getName() end
+function LGlobe:getName() end
 
 --- Returns the neighbor IDs of a province.
 ---@param id integer
 ---@return number
-function Globe:getNeighbors(id) end
+function LGlobe:getNeighbors(id) end
 
 --- Gets a string attribute from a province.
 ---@param id integer
 ---@param key string
 ---@return string
-function Globe:getProvinceAttr(id, key) end
+function LGlobe:getProvinceAttr(id, key) end
 
 --- Gets the current simulated time of day for daylight computation.
 ---@return number
-function Globe:getTimeOfDay() end
+function LGlobe:getTimeOfDay() end
 
 --- Hide a province for a viewer.
 ---@param viewer string
 ---@param id integer
-function Globe:hideProvince(viewer, id) end
+function LGlobe:hideProvince(viewer, id) end
 
 --- Returns true if the province is visible to the viewer.
 ---@param viewer string
 ---@param id integer
 ---@return boolean
-function Globe:isVisible(viewer, id) end
+function LGlobe:isVisible(viewer, id) end
 
 --- Move a marker to a new lat/lon.
 ---@param id integer
 ---@param lat number
 ---@param lon number
-function Globe:moveMarker(id, lat, lon) end
+function LGlobe:moveMarker(id, lat, lon) end
 
 --- Pan the orbit camera by delta-latitude and delta-longitude (degrees).
 ---@param dlat number
 ---@param dlon number
-function Globe:pan(dlat, dlon) end
+function LGlobe:pan(dlat, dlon) end
 
 --- Returns the province ID under screen coordinates, or nil.
 ---@param sx number
 ---@param sy number
 ---@return number
-function Globe:pick(sx, sy) end
+function LGlobe:pick(sx, sy) end
 
 --- Returns (lat, lon) of the screen point on the globe surface, or nil.
 ---@param sx number
 ---@param sy number
 ---@return number
-function Globe:pickLatLon(sx, sy) end
+function LGlobe:pickLatLon(sx, sy) end
 
 --- Returns the number of provinces.
 ---@return number
-function Globe:provinceCount() end
+function LGlobe:provinceCount() end
 
 --- Return all provinces reachable within `max_cost` steps from `start_id`.
 ---@param start_id integer
 ---@param max_cost number
 ---@return number
-function Globe:reachable(start_id, max_cost) end
+function LGlobe:reachable(start_id, max_cost) end
 
 --- Removes an arc from the globe map by its unique string identifier.
 ---@param id integer
-function Globe:removeArc(id) end
+function LGlobe:removeArc(id) end
 
 --- Removes a text label from the globe map by its unique string identifier.
 ---@param id integer
-function Globe:removeLabel(id) end
+function LGlobe:removeLabel(id) end
 
 --- Removes a texture layer from the globe map by its unique string identifier.
 ---@param name string
-function Globe:removeLayer(name) end
+function LGlobe:removeLayer(name) end
 
 --- Removes a marker from the globe map by its unique string identifier.
 ---@param id integer
 ---@return boolean
-function Globe:removeMarker(id) end
+function LGlobe:removeMarker(id) end
 
 --- Removes a province by ID. Returns true if it existed.
 ---@param id integer
 ---@return boolean
-function Globe:removeProvince(id) end
+function LGlobe:removeProvince(id) end
 
 --- Reveal all provinces for a viewer.
 ---@param viewer string
-function Globe:revealAll(viewer) end
+function LGlobe:revealAll(viewer) end
 
 --- Reveal a province for a viewer.
 ---@param viewer string
 ---@param id integer
-function Globe:revealProvince(viewer, id) end
+function LGlobe:revealProvince(viewer, id) end
 
 --- Set the faction/viewer whose fog mask filters rendering.
 ---@param viewer? string
-function Globe:setActiveViewer(viewer) end
+function LGlobe:setActiveViewer(viewer) end
 
 --- Enable or disable province border rendering.
 ---@param show boolean
-function Globe:setBorders(show) end
+function LGlobe:setBorders(show) end
 
 --- Set the camera position directly.
 ---@param lat number
 ---@param lon number
 ---@param zoom number
-function Globe:setCamera(lat, lon, zoom) end
+function LGlobe:setCamera(lat, lon, zoom) end
 
 --- Updates the visible text content of an existing globe label.
 ---@param id integer
 ---@param text string
-function Globe:setLabelText(id, text) end
+function LGlobe:setLabelText(id, text) end
 
 --- Sets whether this specific label is visible on the globe.
 ---@param id integer
 ---@param visible boolean
-function Globe:setLabelVisible(id, visible) end
+function LGlobe:setLabelVisible(id, visible) end
 
 --- Set layer opacity (0.0–1.0).
 ---@param name string
 ---@param alpha number
-function Globe:setLayerAlpha(name, alpha) end
+function LGlobe:setLayerAlpha(name, alpha) end
 
 --- Set a per-province color override on a layer.
 ---@param layer string
@@ -7205,69 +7907,87 @@ function Globe:setLayerAlpha(name, alpha) end
 ---@param g number
 ---@param b number
 ---@param a number
-function Globe:setLayerColor(layer, province_id, r, g, b, a) end
+function LGlobe:setLayerColor(layer, province_id, r, g, b, a) end
 
 --- Sets whether this specific texture layer is visible on the globe.
 ---@param name string
 ---@param visible boolean
-function Globe:setLayerVisible(name, visible) end
+function LGlobe:setLayerVisible(name, visible) end
 
 --- Set a string attribute on a marker.
 ---@param id integer
 ---@param key string
 ---@param value string
-function Globe:setMarkerAttr(id, key, value) end
+function LGlobe:setMarkerAttr(id, key, value) end
 
 --- Sets whether this specific marker is visible on the globe.
 ---@param id integer
 ---@param visible boolean
-function Globe:setMarkerVisible(id, visible) end
+function LGlobe:setMarkerVisible(id, visible) end
 
 --- Sets a string attribute on a province.
 ---@param id integer
 ---@param key string
 ---@param value string
-function Globe:setProvinceAttr(id, key, value) end
+function LGlobe:setProvinceAttr(id, key, value) end
 
 --- Set planet rotation (degrees).
 ---@param deg number
-function Globe:setRotation(deg) end
+function LGlobe:setRotation(deg) end
 
 --- Set time of day (0.0–24.0 hours).
 ---@param t number
-function Globe:setTimeOfDay(t) end
+function LGlobe:setTimeOfDay(t) end
+
+--- Returns the type name of this object.
+---@return string
+function LGlobe:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LGlobe:typeOf(name) end
 
 --- Advance globe simulation by dt seconds.
 ---@param dt number
-function Globe:update(dt) end
+function LGlobe:update(dt) end
 
 --- Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
 ---@param factor number
-function Globe:zoom(factor) end
+function LGlobe:zoom(factor) end
 
 --- Lua-accessible handle to the shared `GlobeRegistry`.
----@class GlobeRegistry
-GlobeRegistry = {}
+---@class LGlobeRegistry
+LGlobeRegistry = {}
 
 --- Get an existing globe by name, or nil.
 ---@param name string
 ---@return Globe?
-function GlobeRegistry:get(name) end
+function LGlobeRegistry:get(name) end
 
 --- Returns a table of all globe names.
 ---@return string
-function GlobeRegistry:names() end
+function LGlobeRegistry:names() end
 
 --- Create a globe with the given name and optional spec table.
 ---@param name string
 ---@param spec? table
 ---@return Globe
-function GlobeRegistry:new(name, spec) end
+function LGlobeRegistry:new(name, spec) end
 
 --- Removes a globe from the central registry by its string name.
 ---@param name string
 ---@return boolean
-function GlobeRegistry:remove(name) end
+function LGlobeRegistry:remove(name) end
+
+--- Returns the type name of this object.
+---@return string
+function LGlobeRegistry:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LGlobeRegistry:typeOf(name) end
 
 --- Get an existing globe by name, or nil.
 ---@param name string
@@ -7313,537 +8033,537 @@ lurek.globe.new = function(name, spec) end
 ---@class lurek.graph
 lurek.graph = {}
 
---- Lua handle for an edge inside a `Graph`.
----@class Edge
-Edge = {}
-
---- Adds an item type to the edge allow-list.
----@param t string
----@return nil
-function Edge:addAllowedType(t) end
-
---- Clears the edge allow-list so all item types are permitted.
----@return nil
-function Edge:clearAllowedTypes() end
-
---- Returns the edge capacity (-1 = unlimited).
----@return number
-function Edge:getCapacity() end
-
---- Returns the cooldown duration in seconds.
----@return number
-function Edge:getCooldown() end
-
---- Returns the source node handle.
----@return Node
-function Edge:getFrom() end
-
---- Returns a table of GraphItem handles currently in transit on this edge.
----@return table
-function Edge:getItemsInTransit() end
-
---- Returns the speed modifier applied to items in transit.
----@return number
-function Edge:getSpeedModifier() end
-
---- Returns items per second this edge can transfer.
----@return number
-function Edge:getThroughput() end
-
---- Returns the destination node handle.
----@return Node
-function Edge:getTo() end
-
---- Returns the travel time in seconds for items on this edge.
----@return number
-function Edge:getTravelTime() end
-
---- Returns the edge type string.
----@return string
-function Edge:getType() end
-
---- Returns the pathfinding weight of this edge.
----@return number
-function Edge:getWeight() end
-
---- Returns true if the edge is active.
----@return boolean
-function Edge:isActive() end
-
---- Returns true if items can travel the edge in either direction.
----@return boolean
-function Edge:isBidirectional() end
-
---- Returns true if the given item type is allowed on this edge.
----@param t string
----@return boolean
-function Edge:isItemTypeAllowed(t) end
-
---- Returns true if the edge is currently on cooldown.
----@return boolean
-function Edge:isOnCooldown() end
-
---- Removes an item type from the edge allow-list.
----@param t string
----@return boolean
-function Edge:removeAllowedType(t) end
-
---- Sets the active state of this edge.
----@param a boolean
----@return nil
-function Edge:setActive(a) end
-
---- Sets whether items can travel the edge in either direction.
----@param b boolean
----@return nil
-function Edge:setBidirectional(b) end
-
---- Sets the edge capacity (-1 = unlimited).
----@param c integer
----@return nil
-function Edge:setCapacity(c) end
-
---- Sets the cooldown duration in seconds.
----@param c number
----@return nil
-function Edge:setCooldown(c) end
-
---- Sets the speed modifier applied to items in transit.
----@param m number
----@return nil
-function Edge:setSpeedModifier(m) end
-
---- Sets items per second this edge can transfer.
----@param t number
----@return nil
-function Edge:setThroughput(t) end
-
---- Sets the travel time in seconds for items on this edge.
----@param t number
----@return nil
-function Edge:setTravelTime(t) end
-
---- Sets the edge type string.
----@param t string
----@return nil
-function Edge:setType(t) end
-
---- Sets the pathfinding weight of this edge.
----@param w number
----@return nil
-function Edge:setWeight(w) end
-
---- Returns the type name "GraphEdge".
----@return string
-function Edge:type() end
-
---- Returns true when the given name matches "GraphEdge" or a parent type.
----@param name string
----@return boolean
-function Edge:typeOf(name) end
-
 --- Lua wrapper around a directed `Graph` with event callback registry.
----@class Graph
-Graph = {}
+---@class LGraph
+LGraph = {}
 
 --- Adds a directed edge between two nodes and returns its handle.
 ---@param from_ud Node
 ---@param to_ud Node
 ---@param edge_type? string
 ---@return Edge
-function Graph:addEdge(from_ud, to_ud, edge_type) end
+function LGraph:addEdge(from_ud, to_ud, edge_type) end
 
 --- Places an item at a node.
 ---@param item_ud GraphItem
 ---@param node_ud Node
 ---@return boolean
-function Graph:addItem(item_ud, node_ud) end
+function LGraph:addItem(item_ud, node_ud) end
 
 --- Adds a node and returns its handle.
 ---@param node_type? string
 ---@param capacity? integer
 ---@return Node
-function Graph:addNode(node_type, capacity) end
+function LGraph:addNode(node_type, capacity) end
 
 --- Finds the shortest path between two nodes using A*.
 ---@param from_node Node
 ---@param to_node Node
 ---@return table
-function Graph:astar(from_node, to_node) end
+function LGraph:astar(from_node, to_node) end
 
 --- Assigns each node the smallest non-negative integer colour not shared with any
 ---@return table
-function Graph:colorGraph() end
+function LGraph:colorGraph() end
 
 --- Creates a new unplaced item and returns its handle.
 ---@param item_type? string
 ---@param decay_time? number
 ---@return GraphItem
-function Graph:createItem(item_type, decay_time) end
+function LGraph:createItem(item_type, decay_time) end
 
 --- Finds the shortest path between two nodes using Dijkstra.
 ---@param from_ud Node
 ---@param to_ud Node
 ---@return table
-function Graph:findPath(from_ud, to_ud) end
+function LGraph:findPath(from_ud, to_ud) end
 
 --- Finds the shortest path for a specific item, filtering by item type.
 ---@param item_ud GraphItem
 ---@param from_ud Node
 ---@param to_ud Node
 ---@return table
-function Graph:findPathForItem(item_ud, from_ud, to_ud) end
+function LGraph:findPathForItem(item_ud, from_ud, to_ud) end
 
 --- Returns weakly connected components as a table of tables of Node handles.
 ---@return table
-function Graph:getComponents() end
+function LGraph:getComponents() end
 
 --- Returns the shortest path distance, or nil if unreachable.
 ---@param from_ud Node
 ---@param to_ud Node
 ---@return number
-function Graph:getDistance(from_ud, to_ud) end
+function LGraph:getDistance(from_ud, to_ud) end
 
 --- Returns the edge between two nodes, or nil if none exists.
 ---@param from_ud Node
 ---@param to_ud Node
 ---@return nil
-function Graph:getEdgeBetween(from_ud, to_ud) end
+function LGraph:getEdgeBetween(from_ud, to_ud) end
 
 --- Returns the number of edges in the graph.
 ---@return number
-function Graph:getEdgeCount() end
+function LGraph:getEdgeCount() end
 
 --- Returns a table of all Edge handles.
 ---@return table
-function Graph:getEdges() end
+function LGraph:getEdges() end
 
 --- Returns the number of items in the graph.
 ---@return number
-function Graph:getItemCount() end
+function LGraph:getItemCount() end
 
 --- Returns a table of all GraphItem handles.
 ---@return table
-function Graph:getItems() end
+function LGraph:getItems() end
 
 --- Returns a table of direct neighbor Node handles.
 ---@param node_ud Node
 ---@return table
-function Graph:getNeighbors(node_ud) end
+function LGraph:getNeighbors(node_ud) end
 
 --- Returns the number of nodes in the graph.
 ---@return number
-function Graph:getNodeCount() end
+function LGraph:getNodeCount() end
 
 --- Returns a table of all Node handles.
 ---@return table
-function Graph:getNodes() end
+function LGraph:getNodes() end
 
 --- Returns a table of Node handles reachable from the given node.
 ---@param from_ud Node
 ---@param max_dist? number
 ---@return table
-function Graph:getReachable(from_ud, max_dist) end
+function LGraph:getReachable(from_ud, max_dist) end
 
 --- Returns a statistics snapshot table.
 ---@return table
-function Graph:getStats() end
+function LGraph:getStats() end
 
 --- Returns true if the graph contains a directed cycle.
 ---@return boolean
-function Graph:hasCycle() end
+function LGraph:hasCycle() end
 
 --- Returns true if the edge exists in the graph.
 ---@param edge_ud Edge
 ---@return boolean
-function Graph:hasEdge(edge_ud) end
+function LGraph:hasEdge(edge_ud) end
 
 --- Returns true if the item exists in the graph.
 ---@param item_ud GraphItem
 ---@return boolean
-function Graph:hasItem(item_ud) end
+function LGraph:hasItem(item_ud) end
 
 --- Returns true if the node exists in the graph.
 ---@param node_ud Node
 ---@return boolean
-function Graph:hasNode(node_ud) end
+function LGraph:hasNode(node_ud) end
 
 --- Returns `true` when the graph can be 2-coloured (bipartite check via BFS).
 ---@return boolean
-function Graph:isBipartite() end
+function LGraph:isBipartite() end
 
 --- Returns edge IDs forming a minimum spanning tree (Kruskal, undirected view).
 ---@return table
-function Graph:mst() end
+function LGraph:mst() end
 
 --- Registers a callback for a graph simulation event.
 ---@param event_name string
 ---@param func function
 ---@return nil
-function Graph:on(event_name, func) end
+function LGraph:on(event_name, func) end
 
 --- Processes all supply/demand declarations and fires event callbacks.
 ---@return nil
-function Graph:processDemand() end
+function LGraph:processDemand() end
 
 --- Removes an edge from the graph.
 ---@param edge_ud Edge
 ---@return boolean
-function Graph:removeEdge(edge_ud) end
+function LGraph:removeEdge(edge_ud) end
 
 --- Removes an item from the graph entirely.
 ---@param item_ud GraphItem
 ---@return boolean
-function Graph:removeItem(item_ud) end
+function LGraph:removeItem(item_ud) end
 
 --- Removes a node from the graph.
 ---@param node_ud Node
 ---@return boolean
-function Graph:removeNode(node_ud) end
+function LGraph:removeNode(node_ud) end
 
 --- Sends an item onto an edge to begin transit.
 ---@param item_ud GraphItem
 ---@param edge_ud Edge
 ---@return boolean
-function Graph:sendItem(item_ud, edge_ud) end
+function LGraph:sendItem(item_ud, edge_ud) end
 
 --- Runs one discrete simulation step and fires event callbacks.
 ---@return nil
-function Graph:step() end
+function LGraph:step() end
 
 --- Advances simulation by dt seconds using a parallelised decay phase.
 ---@param dt number
 ---@return nil
-function Graph:tickParallel(dt) end
+function LGraph:tickParallel(dt) end
 
 --- Returns a topologically sorted table of Node handles, or nil if a cycle exists.
 ---@return table
-function Graph:topologicalSort() end
+function LGraph:topologicalSort() end
 
 --- Returns the type name of this object.
 ---@return string
-function Graph:type() end
+function LGraph:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Graph:typeOf(name) end
+function LGraph:typeOf(name) end
 
 --- Advances simulation by dt seconds and fires event callbacks.
 ---@param dt number
 ---@return nil
-function Graph:update(dt) end
+function LGraph:update(dt) end
+
+--- Lua handle for an edge inside a `Graph`.
+---@class LGraphEdge
+LGraphEdge = {}
+
+--- Adds an item type to the edge allow-list.
+---@param t string
+---@return nil
+function LGraphEdge:addAllowedType(t) end
+
+--- Clears the edge allow-list so all item types are permitted.
+---@return nil
+function LGraphEdge:clearAllowedTypes() end
+
+--- Returns the edge capacity (-1 = unlimited).
+---@return number
+function LGraphEdge:getCapacity() end
+
+--- Returns the cooldown duration in seconds.
+---@return number
+function LGraphEdge:getCooldown() end
+
+--- Returns the source node handle.
+---@return Node
+function LGraphEdge:getFrom() end
+
+--- Returns a table of GraphItem handles currently in transit on this edge.
+---@return table
+function LGraphEdge:getItemsInTransit() end
+
+--- Returns the speed modifier applied to items in transit.
+---@return number
+function LGraphEdge:getSpeedModifier() end
+
+--- Returns items per second this edge can transfer.
+---@return number
+function LGraphEdge:getThroughput() end
+
+--- Returns the destination node handle.
+---@return Node
+function LGraphEdge:getTo() end
+
+--- Returns the travel time in seconds for items on this edge.
+---@return number
+function LGraphEdge:getTravelTime() end
+
+--- Returns the edge type string.
+---@return string
+function LGraphEdge:getType() end
+
+--- Returns the pathfinding weight of this edge.
+---@return number
+function LGraphEdge:getWeight() end
+
+--- Returns true if the edge is active.
+---@return boolean
+function LGraphEdge:isActive() end
+
+--- Returns true if items can travel the edge in either direction.
+---@return boolean
+function LGraphEdge:isBidirectional() end
+
+--- Returns true if the given item type is allowed on this edge.
+---@param t string
+---@return boolean
+function LGraphEdge:isItemTypeAllowed(t) end
+
+--- Returns true if the edge is currently on cooldown.
+---@return boolean
+function LGraphEdge:isOnCooldown() end
+
+--- Removes an item type from the edge allow-list.
+---@param t string
+---@return boolean
+function LGraphEdge:removeAllowedType(t) end
+
+--- Sets the active state of this edge.
+---@param a boolean
+---@return nil
+function LGraphEdge:setActive(a) end
+
+--- Sets whether items can travel the edge in either direction.
+---@param b boolean
+---@return nil
+function LGraphEdge:setBidirectional(b) end
+
+--- Sets the edge capacity (-1 = unlimited).
+---@param c integer
+---@return nil
+function LGraphEdge:setCapacity(c) end
+
+--- Sets the cooldown duration in seconds.
+---@param c number
+---@return nil
+function LGraphEdge:setCooldown(c) end
+
+--- Sets the speed modifier applied to items in transit.
+---@param m number
+---@return nil
+function LGraphEdge:setSpeedModifier(m) end
+
+--- Sets items per second this edge can transfer.
+---@param t number
+---@return nil
+function LGraphEdge:setThroughput(t) end
+
+--- Sets the travel time in seconds for items on this edge.
+---@param t number
+---@return nil
+function LGraphEdge:setTravelTime(t) end
+
+--- Sets the edge type string.
+---@param t string
+---@return nil
+function LGraphEdge:setType(t) end
+
+--- Sets the pathfinding weight of this edge.
+---@param w number
+---@return nil
+function LGraphEdge:setWeight(w) end
+
+--- Returns the type name "GraphEdge".
+---@return string
+function LGraphEdge:type() end
+
+--- Returns true when the given name matches "GraphEdge" or a parent type.
+---@param name string
+---@return boolean
+function LGraphEdge:typeOf(name) end
 
 --- Lua handle for an item inside a `Graph`.
----@class GraphItem
-GraphItem = {}
+---@class LGraphItem
+LGraphItem = {}
 
 --- Returns the decay time in seconds (-1 = immortal).
 ---@return number
-function GraphItem:getDecayTime() end
+function LGraphItem:getDecayTime() end
 
 --- Returns the item position: node userdata if at a node, (edge, progress)
 ---@return nil
-function GraphItem:getPosition() end
+function LGraphItem:getPosition() end
 
 --- Returns the item priority.
 ---@return number
-function GraphItem:getPriority() end
+function LGraphItem:getPriority() end
 
 --- Returns the remaining life in seconds.
 ---@return number
-function GraphItem:getRemainingLife() end
+function LGraphItem:getRemainingLife() end
 
 --- Returns the item type string.
 ---@return string
-function GraphItem:getType() end
+function LGraphItem:getType() end
 
 --- Returns true if the item is alive.
 ---@return boolean
-function GraphItem:isAlive() end
+function LGraphItem:isAlive() end
 
 --- Marks this graph item as dead so it is removed on the next cleanup pass.
 ---@return nil
-function GraphItem:kill() end
+function LGraphItem:kill() end
 
 --- Sets the decay time in seconds (-1 = immortal).
 ---@param t number
 ---@return nil
-function GraphItem:setDecayTime(t) end
+function LGraphItem:setDecayTime(t) end
 
 --- Sets the scheduling priority; higher values are processed before lower ones.
 ---@param p integer
 ---@return nil
-function GraphItem:setPriority(p) end
+function LGraphItem:setPriority(p) end
 
 --- Sets the item type string.
 ---@param t string
 ---@return nil
-function GraphItem:setType(t) end
+function LGraphItem:setType(t) end
 
 --- Returns the type name of this object.
 ---@return string
-function GraphItem:type() end
+function LGraphItem:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function GraphItem:typeOf(name) end
+function LGraphItem:typeOf(name) end
 
 --- Lua handle for a node inside a `Graph`.
----@class Node
-Node = {}
+---@class LGraphNode
+LGraphNode = {}
 
 --- Declares a demand for the given item type, quantity, and priority.
 ---@param item_type string
 ---@param quantity integer
 ---@param priority? integer
 ---@return nil
-function Node:addDemand(item_type, quantity, priority) end
+function LGraphNode:addDemand(item_type, quantity, priority) end
 
 --- Declares a supply of the given item type and quantity at this node.
 ---@param item_type string
 ---@param quantity integer
 ---@return nil
-function Node:addSupply(item_type, quantity) end
+function LGraphNode:addSupply(item_type, quantity) end
 
 --- Attaches a string tag to this node for fast group queries.
 ---@param tag string
 ---@return nil
-function Node:addTag(tag) end
+function LGraphNode:addTag(tag) end
 
 --- Removes all conversion rules from this node.
 ---@return nil
-function Node:clearAllConversions() end
+function LGraphNode:clearAllConversions() end
 
 --- Removes the conversion rule for the given input type.
 ---@param in_type string
 ---@return nil
-function Node:clearConversion(in_type) end
+function LGraphNode:clearConversion(in_type) end
 
 --- Removes all demand declarations from this node.
 ---@return nil
-function Node:clearDemands() end
+function LGraphNode:clearDemands() end
 
 --- Removes all supply declarations from this node.
 ---@return nil
-function Node:clearSupplies() end
+function LGraphNode:clearSupplies() end
 
 --- Removes all tags from this node.
 ---@return nil
-function Node:clearTags() end
+function LGraphNode:clearTags() end
 
 --- Pops the next item from the node queue, or nil if empty.
 ---@return nil
-function Node:dequeue() end
+function LGraphNode:dequeue() end
 
 --- Pushes an item into the node queue.
 ---@param item_ud GraphItem
 ---@return boolean
-function Node:enqueue(item_ud) end
+function LGraphNode:enqueue(item_ud) end
 
 --- Returns the node capacity (-1 = unlimited).
 ---@return number
-function Node:getCapacity() end
+function LGraphNode:getCapacity() end
 
 --- Returns a table of Edge handles connected to this node.
 ---@param dir? string
 ---@return table
-function Node:getEdges(dir) end
+function LGraphNode:getEdges(dir) end
 
 --- Returns the flow mode as a string.
 ---@return string
-function Node:getFlowMode() end
+function LGraphNode:getFlowMode() end
 
 --- Returns the number of items currently at this node.
 ---@return number
-function Node:getItemCount() end
+function LGraphNode:getItemCount() end
 
 --- Returns a table of GraphItem handles at this node.
 ---@return table
-function Node:getItems() end
+function LGraphNode:getItems() end
 
 --- Returns the overflow policy as a string.
 ---@return string
-function Node:getOverflowPolicy() end
+function LGraphNode:getOverflowPolicy() end
 
 --- Returns the processing time in seconds.
 ---@return number
-function Node:getProcessTime() end
+function LGraphNode:getProcessTime() end
 
 --- Returns the pull filter string, or nil if unset.
 ---@return string
-function Node:getPullFilter() end
+function LGraphNode:getPullFilter() end
 
 --- Returns items per second this node pulls.
 ---@return number
-function Node:getPullRate() end
+function LGraphNode:getPullRate() end
 
 --- Returns the push filter string, or nil if unset.
 ---@return string
-function Node:getPushFilter() end
+function LGraphNode:getPushFilter() end
 
 --- Returns items per second this node pushes.
 ---@return number
-function Node:getPushRate() end
+function LGraphNode:getPushRate() end
 
 --- Returns the queue capacity (-1 = unlimited).
 ---@return number
-function Node:getQueueCapacity() end
+function LGraphNode:getQueueCapacity() end
 
 --- Returns the number of items currently in the queue.
 ---@return number
-function Node:getQueueSize() end
+function LGraphNode:getQueueSize() end
 
 --- Returns a table of tag strings on this node.
 ---@return table
-function Node:getTags() end
+function LGraphNode:getTags() end
 
 --- Returns the node type string.
 ---@return string
-function Node:getType() end
+function LGraphNode:getType() end
 
 --- Returns true if this node has the given tag.
 ---@param tag string
 ---@return boolean
-function Node:hasTag(tag) end
+function LGraphNode:hasTag(tag) end
 
 --- Returns true if the node is active.
 ---@return boolean
-function Node:isActive() end
+function LGraphNode:isActive() end
 
 --- Returns true if the node has reached its capacity.
 ---@return boolean
-function Node:isFull() end
+function LGraphNode:isFull() end
 
 --- Returns true if the node queue is enabled.
 ---@return boolean
-function Node:isQueueEnabled() end
+function LGraphNode:isQueueEnabled() end
 
 --- Removes the demand declaration for the given item type.
 ---@param item_type string
 ---@return boolean
-function Node:removeDemand(item_type) end
+function LGraphNode:removeDemand(item_type) end
 
 --- Removes the supply declaration for the given item type.
 ---@param item_type string
 ---@return boolean
-function Node:removeSupply(item_type) end
+function LGraphNode:removeSupply(item_type) end
 
 --- Removes a tag from this node.
 ---@param tag string
 ---@return boolean
-function Node:removeTag(tag) end
+function LGraphNode:removeTag(tag) end
 
 --- Sets the active state of this node.
 ---@param a boolean
 ---@return nil
-function Node:setActive(a) end
+function LGraphNode:setActive(a) end
 
 --- Sets the node capacity (-1 = unlimited).
 ---@param c integer
 ---@return nil
-function Node:setCapacity(c) end
+function LGraphNode:setCapacity(c) end
 
 --- Adds or replaces a conversion rule on this node.
 ---@param in_type string
@@ -7851,71 +8571,370 @@ function Node:setCapacity(c) end
 ---@param in_count? integer
 ---@param out_count? integer
 ---@return nil
-function Node:setConversion(in_type, out_type, in_count, out_count) end
+function LGraphNode:setConversion(in_type, out_type, in_count, out_count) end
 
 --- Sets the flow mode from a string.
 ---@param m string
 ---@return nil
-function Node:setFlowMode(m) end
+function LGraphNode:setFlowMode(m) end
 
 --- Sets the overflow policy from a string.
 ---@param p string
 ---@return nil
-function Node:setOverflowPolicy(p) end
+function LGraphNode:setOverflowPolicy(p) end
 
 --- Sets the processing time in seconds.
 ---@param t number
 ---@return nil
-function Node:setProcessTime(t) end
+function LGraphNode:setProcessTime(t) end
 
 --- Sets the pull filter string, or nil to clear.
 ---@param f? string
 ---@return nil
-function Node:setPullFilter(f) end
+function LGraphNode:setPullFilter(f) end
 
 --- Sets items per second this node pulls.
 ---@param r number
 ---@return nil
-function Node:setPullRate(r) end
+function LGraphNode:setPullRate(r) end
 
 --- Sets the push filter string, or nil to clear.
 ---@param f? string
 ---@return nil
-function Node:setPushFilter(f) end
+function LGraphNode:setPushFilter(f) end
 
 --- Sets items per second this node pushes.
 ---@param r number
 ---@return nil
-function Node:setPushRate(r) end
+function LGraphNode:setPushRate(r) end
 
 --- Sets the queue capacity (-1 = unlimited).
 ---@param c integer
 ---@return nil
-function Node:setQueueCapacity(c) end
+function LGraphNode:setQueueCapacity(c) end
 
 --- Enables or disables the node queue.
 ---@param e boolean
 ---@return nil
-function Node:setQueueEnabled(e) end
+function LGraphNode:setQueueEnabled(e) end
 
 --- Sets the node type string.
 ---@param t string
 ---@return nil
-function Node:setType(t) end
+function LGraphNode:setType(t) end
 
 --- Returns the type name "GraphNode".
 ---@return string
-function Node:type() end
+function LGraphNode:type() end
 
 --- Returns true when the given name matches "GraphNode" or a parent type.
 ---@param name string
 ---@return boolean
-function Node:typeOf(name) end
+function LGraphNode:typeOf(name) end
 
 --- Creates a new empty directed graph for item flow simulation.
 ---@param opts? table
 ---@return Graph
 lurek.graph.newGraph = function(opts) end
+
+---@class lurek.html
+lurek.html = {}
+
+--- Lua wrapper around a shared `HtmlDocument` and its callback registry.
+---@class LHtmlDocument
+LHtmlDocument = {}
+
+--- Appends stylesheet text after existing CSS rules.
+---@param css string
+---@return nil
+function LHtmlDocument:addCss(css) end
+
+--- Removes all stylesheet rules from this document.
+---@return nil
+function LHtmlDocument:clearCss() end
+
+--- Builds the current draw command list and discards it for now.
+---@param x? number
+---@param y? number
+---@return nil
+function LHtmlDocument:draw(x, y) end
+
+--- Finds one element by id.
+---@param id string
+---@return HtmlElement?
+function LHtmlDocument:getElementById(id) end
+
+--- Returns the source markup used by this document.
+---@return string
+function LHtmlDocument:getHtml() end
+
+--- Returns the root element for this document.
+---@return HtmlElement
+function LHtmlDocument:getRoot() end
+
+--- Returns the document layout viewport in UI pixels.
+---@return number
+function LHtmlDocument:getViewport() end
+
+--- Returns whether DOM, CSS, viewport, or layout state changed.
+---@return boolean
+function LHtmlDocument:isDirty() end
+
+--- Forwards a key press and emits a keydown event.
+---@param key string
+---@return boolean
+function LHtmlDocument:keypressed(key) end
+
+--- Forwards a mouse move event.
+---@param x number
+---@param y number
+---@return boolean
+function LHtmlDocument:mousemoved(x, y) end
+
+--- Forwards a mouse press and emits a minimal click event.
+---@param x number
+---@param y number
+---@param button? integer
+---@return boolean
+function LHtmlDocument:mousepressed(x, y, button) end
+
+--- Forwards a mouse release event.
+---@param x number
+---@param y number
+---@param button? integer
+---@return boolean
+function LHtmlDocument:mousereleased(x, y, button) end
+
+--- Removes a document-level event listener.
+---@param handle integer
+---@return nil
+function LHtmlDocument:off(handle) end
+
+--- Registers a document-level event listener.
+---@param event string
+---@param fn function
+---@return number
+function LHtmlDocument:on(event, fn) end
+
+--- Finds the first element matching a supported selector.
+---@param selector string
+---@return HtmlElement?
+function LHtmlDocument:query(selector) end
+
+--- Returns all elements matching a supported selector in document order.
+---@param selector string
+---@return table
+function LHtmlDocument:queryAll(selector) end
+
+--- Forces a layout pass immediately.
+---@return nil
+function LHtmlDocument:relayout() end
+
+--- Replaces this document's stylesheet text.
+---@param css string
+---@return nil
+function LHtmlDocument:setCss(css) end
+
+--- Replaces this document's markup and invalidates existing element handles.
+---@param html string
+---@return nil
+function LHtmlDocument:setHtml(html) end
+
+--- Sets the document layout viewport in UI pixels.
+---@param w number
+---@param h number
+---@return nil
+function LHtmlDocument:setViewport(w, h) end
+
+--- Forwards text input and emits an input event for focused input elements.
+---@param text string
+---@return boolean
+function LHtmlDocument:textinput(text) end
+
+--- Returns the type name of this object.
+---@return string
+function LHtmlDocument:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LHtmlDocument:typeOf(name) end
+
+--- Advances document state and runs layout if needed.
+---@param dt number
+---@return nil
+function LHtmlDocument:update(dt) end
+
+--- Forwards a mouse wheel event.
+---@param dx number
+---@param dy number
+---@return boolean
+function LHtmlDocument:wheelmoved(dx, dy) end
+
+--- Lua wrapper that references a single element inside a shared `HtmlDocument`.
+---@class LHtmlElement
+LHtmlElement = {}
+
+--- Adds a CSS class to this element.
+---@param name string
+---@return nil
+function LHtmlElement:addClass(name) end
+
+--- Appends HTML inside this element.
+---@param html string
+---@return nil
+function LHtmlElement:appendHtml(html) end
+
+--- Clears focus from this element if it currently has focus.
+---@return nil
+function LHtmlElement:blur() end
+
+--- Gives focus to this element.
+---@return nil
+function LHtmlElement:focus() end
+
+--- Returns an attribute value or nil.
+---@param name string
+---@return string
+function LHtmlElement:getAttribute(name) end
+
+--- Returns the owning HtmlDocument.
+---@return HtmlDocument
+function LHtmlElement:getDocument() end
+
+--- Returns this element's inner HTML.
+---@return string
+function LHtmlElement:getHtml() end
+
+--- Returns this element's id or nil.
+---@return string
+function LHtmlElement:getId() end
+
+--- Returns this element's last computed layout rectangle.
+---@return number
+function LHtmlElement:getRect() end
+
+--- Returns an inline or stylesheet value for a property.
+---@param name string
+---@return string
+function LHtmlElement:getStyle(name) end
+
+--- Returns this element's tag name.
+---@return string
+function LHtmlElement:getTagName() end
+
+--- Returns this element's text content.
+---@return string
+function LHtmlElement:getText() end
+
+--- Returns whether this element has a CSS class.
+---@param name string
+---@return boolean
+function LHtmlElement:hasClass(name) end
+
+--- Removes an element event listener.
+---@param handle integer
+---@return nil
+function LHtmlElement:off(handle) end
+
+--- Registers an element event listener.
+---@param event string
+---@param fn function
+---@return number
+function LHtmlElement:on(event, fn) end
+
+--- Finds the first descendant matching a selector.
+---@param selector string
+---@return HtmlElement?
+function LHtmlElement:query(selector) end
+
+--- Returns all descendants matching a selector.
+---@param selector string
+---@return table
+function LHtmlElement:queryAll(selector) end
+
+--- Removes this element from the document tree.
+---@return nil
+function LHtmlElement:remove() end
+
+--- Removes an attribute.
+---@param name string
+---@return nil
+function LHtmlElement:removeAttribute(name) end
+
+--- Removes a CSS class from this element.
+---@param name string
+---@return nil
+function LHtmlElement:removeClass(name) end
+
+--- Sets or removes an attribute value.
+---@param name string
+---@param value? string
+---@return nil
+function LHtmlElement:setAttribute(name, value) end
+
+--- Replaces this element's inner HTML.
+---@param html string
+---@return nil
+function LHtmlElement:setHtml(html) end
+
+--- Sets or removes this element's id.
+---@param id? string
+---@return nil
+function LHtmlElement:setId(id) end
+
+--- Sets or removes an inline style value.
+---@param name string
+---@param value? string
+---@return nil
+function LHtmlElement:setStyle(name, value) end
+
+--- Replaces this element's text content.
+---@param text string
+---@return nil
+function LHtmlElement:setText(text) end
+
+--- Toggles a CSS class and returns the final state.
+---@param name string
+---@param force? boolean
+---@return boolean
+function LHtmlElement:toggleClass(name, force) end
+
+--- Returns the type name of this object.
+---@return string
+function LHtmlElement:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LHtmlElement:typeOf(name) end
+
+--- Returns true if `preventDefault` has been called on this event.
+---@return boolean
+lurek.html.isDefaultPrevented = function() end
+
+--- Placeholder for future sandboxed document loading.
+---@param path string
+---@param opts? table
+---@return HtmlDocument
+lurek.html.loadDocument = function(path, opts) end
+
+--- Creates a detached HTML document from markup and optional CSS/viewport options.
+---@param html? string
+---@param opts? table
+---@return HtmlDocument
+lurek.html.newDocument = function(html, opts) end
+
+--- Prevents the default browser action associated with this event.
+lurek.html.preventDefault = function() end
+
+--- Stops the event from bubbling up to parent elements.
+lurek.html.stopPropagation = function() end
+
+--- Returns whether the active HTML facade supports a named feature.
+---@param feature string
+---@return boolean
+lurek.html.supports = function(feature) end
 
 ---@class lurek.i18n
 lurek.i18n = {}
@@ -8083,82 +9102,92 @@ lurek.i18n.unloadTable = function(locale) end
 lurek.image = {}
 
 --- Lua-side wrapper around [`CompressedImageData`].
----@class CompressedImageData
-CompressedImageData = {}
+---@class LCompressedImageData
+LCompressedImageData = {}
 
 --- Returns the width and height of the base mip level.
 ---@return number
-function CompressedImageData:getDimensions() end
+function LCompressedImageData:getDimensions() end
 
 --- Returns the compressed format name string.
 ---@return string
-function CompressedImageData:getFormat() end
+function LCompressedImageData:getFormat() end
 
 --- Returns the height of the base mip level in pixels.
 ---@return number
-function CompressedImageData:getHeight() end
+function LCompressedImageData:getHeight() end
 
 --- Returns the number of mipmap levels stored.
 ---@return number
-function CompressedImageData:getMipmapCount() end
+function LCompressedImageData:getMipmapCount() end
 
 --- Returns the width of the base mip level in pixels.
 ---@return number
-function CompressedImageData:getWidth() end
+function LCompressedImageData:getWidth() end
 
----@class ImageData
-ImageData = {}
+--- Returns the type name of this object.
+---@return string
+function LCompressedImageData:type() end
 
---- Alpha mask.
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCompressedImageData:typeOf(name) end
+
+--- RGBA pixel buffer for software image manipulation, pixel access, and encoding.
+---@class LImageData
+LImageData = {}
+
+--- Scales every pixel's alpha channel by factor; use to fade an image in or out uniformly.
 ---@param factor number
 ---@return nil
-function ImageData:alphaMask(factor) end
+function LImageData:alphaMask(factor) end
 
 --- Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
 ---@param lut PaletteLUT
 ---@return nil
-function ImageData:applyPaletteLut(lut) end
+function LImageData:applyPaletteLut(lut) end
 
 --- Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff over.
 ---@param src ImageData
 ---@param dst_x integer
 ---@param dst_y integer
 ---@return nil
-function ImageData:blit(src, dst_x, dst_y) end
+function LImageData:blit(src, dst_x, dst_y) end
 
---- Blur.
+--- Returns a new ImageData with a box blur applied using the given pixel radius.
 ---@param radius integer
 ---@return ImageData
-function ImageData:blur(radius) end
+function LImageData:blur(radius) end
 
---- Brightness.
+--- Adjusts the brightness of every pixel by the given factor (< 1.0 darkens, > 1.0 brightens).
 ---@param factor number
 ---@return nil
-function ImageData:brightness(factor) end
+function LImageData:brightness(factor) end
 
---- Contrast.
+--- Adjusts the contrast of every pixel by the given factor (< 1.0 reduces, > 1.0 increases).
 ---@param factor number
 ---@return nil
-function ImageData:contrast(factor) end
+function LImageData:contrast(factor) end
 
 --- Applies a custom NxN convolution kernel to the image and returns a new ImageData.
 ---@param kernel table
 ---@param ksize integer
 ---@return ImageData
-function ImageData:convolve(kernel, ksize) end
+function LImageData:convolve(kernel, ksize) end
 
---- Crop.
+--- Returns a new ImageData containing the rectangular sub-region at (x, y) of the given width and height.
 ---@param x integer
 ---@param y integer
 ---@param w integer
 ---@param h integer
 ---@return ImageData
-function ImageData:crop(x, y, w, h) end
+function LImageData:crop(x, y, w, h) end
 
 --- Returns the sum of absolute per-channel pixel differences with another ImageData.
 ---@param other ImageData
 ---@return number
-function ImageData:diff(other) end
+function LImageData:diff(other) end
 
 --- Draws a filled circle onto the image.
 ---@param cx integer
@@ -8169,7 +9198,7 @@ function ImageData:diff(other) end
 ---@param b integer
 ---@param a integer
 ---@return nil
-function ImageData:drawCircle(cx, cy, radius, r, g, b, a) end
+function LImageData:drawCircle(cx, cy, radius, r, g, b, a) end
 
 --- Draws a line using Bresenham's algorithm.
 ---@param x0 integer
@@ -8181,7 +9210,7 @@ function ImageData:drawCircle(cx, cy, radius, r, g, b, a) end
 ---@param b integer
 ---@param a integer
 ---@return nil
-function ImageData:drawLine(x0, y0, x1, y1, r, g, b, a) end
+function LImageData:drawLine(x0, y0, x1, y1, r, g, b, a) end
 
 --- Draws a filled rectangle onto the image.
 ---@param x integer
@@ -8193,47 +9222,47 @@ function ImageData:drawLine(x0, y0, x1, y1, r, g, b, a) end
 ---@param b integer
 ---@param a integer
 ---@return nil
-function ImageData:drawRect(x, y, w, h, r, g, b, a) end
+function LImageData:drawRect(x, y, w, h, r, g, b, a) end
 
---- Encode.
+--- Encodes the image into a byte string in the specified format (currently "png").
 ---@param format string
----@return nil
-function ImageData:encode(format) end
+---@return string
+function LImageData:encode(format) end
 
---- Fill.
+--- Fills every pixel with the given solid RGBA colour, overwriting all existing content.
 ---@param r integer
 ---@param g integer
 ---@param b integer
 ---@param a integer
 ---@return nil
-function ImageData:fill(r, g, b, a) end
+function LImageData:fill(r, g, b, a) end
 
---- Flip horizontal.
+--- Flips the image left-to-right (mirror across vertical axis), modifying in place.
 ---@return nil
-function ImageData:flipHorizontal() end
+function LImageData:flipHorizontal() end
 
---- Flip vertical.
+--- Flips the image top-to-bottom (mirror across horizontal axis), modifying in place.
 ---@return nil
-function ImageData:flipVertical() end
+function LImageData:flipVertical() end
 
---- Gamma.
+--- Applies gamma correction; values < 1.0 brighten shadows, > 1.0 darken them.
 ---@param gamma number
 ---@return nil
-function ImageData:gamma(gamma) end
+function LImageData:gamma(gamma) end
 
---- Returns the dimensions.
----@return table
-function ImageData:getDimensions() end
+--- Returns the width and height of the image as two integers.
+---@return number
+function LImageData:getDimensions() end
 
---- Returns the height.
----@return table
-function ImageData:getHeight() end
+--- Returns the height of the image in pixels.
+---@return number
+function LImageData:getHeight() end
 
---- Returns the pixel.
+--- Returns the RGBA colour components of the pixel at (x, y) as four integers (0-255).
 ---@param x integer
 ---@param y integer
----@return nil
-function ImageData:getPixel(x, y) end
+---@return number
+function LImageData:getPixel(x, y) end
 
 --- Returns a copy of the rectangular sub-region as a new ImageData.
 ---@param x integer
@@ -8241,215 +9270,228 @@ function ImageData:getPixel(x, y) end
 ---@param width integer
 ---@param height integer
 ---@return ImageData?
-function ImageData:getRegion(x, y, width, height) end
+function LImageData:getRegion(x, y, width, height) end
 
---- Returns the string.
----@return table
-function ImageData:getString() end
+--- Returns the raw pixel bytes of the image as a Lua string.
+---@return string
+function LImageData:getString() end
 
---- Returns the width.
----@return table
-function ImageData:getWidth() end
+--- Returns the width of the image in pixels.
+---@return number
+function LImageData:getWidth() end
 
---- Grayscale.
+--- Converts the image to grayscale using luminance weights (BT.601).
 ---@return nil
-function ImageData:grayscale() end
+function LImageData:grayscale() end
 
---- Invert.
+--- Inverts every colour channel (subtracts each R/G/B value from 255); alpha is preserved.
 ---@return nil
-function ImageData:invert() end
+function LImageData:invert() end
 
---- Map pixel.
+--- Calls func(x, y, r, g, b, a) for each pixel and writes the returned RGBA back.
 ---@param func function
 ---@return nil
-function ImageData:mapPixel(func) end
+function LImageData:mapPixel(func) end
 
 --- Applies a function to every pixel in-place.
 ---@param fn function
 ---@return nil
-function ImageData:mapPixels(fn) end
+function LImageData:mapPixels(fn) end
 
---- Noise.
+--- Adds random noise to every pixel channel; amount controls the maximum per-channel perturbation.
 ---@param amount integer
 ---@return nil
-function ImageData:noise(amount) end
+function LImageData:noise(amount) end
 
 --- Copies pixels from `source` onto this image starting at (dx, dy).
 ---@param source ImageData
 ---@param dx integer
 ---@param dy integer
 ---@return nil
-function ImageData:paste(source, dx, dy) end
+function LImageData:paste(source, dx, dy) end
 
---- Posterize.
+--- Reduces each channel to `levels` discrete steps, creating a flat poster-paint look.
 ---@param levels integer
 ---@return nil
-function ImageData:posterize(levels) end
+function LImageData:posterize(levels) end
 
 --- Returns a bilinear-interpolated copy of the image at the given dimensions.
 ---@param width integer
 ---@param height integer
 ---@return ImageData?
-function ImageData:resize(width, height) end
+function LImageData:resize(width, height) end
 
---- Resize nearest.
+--- Returns a new ImageData scaled to (new_w, new_h) using nearest-neighbour interpolation.
 ---@param new_w integer
 ---@param new_h integer
 ---@return ImageData
-function ImageData:resizeNearest(new_w, new_h) end
+function LImageData:resizeNearest(new_w, new_h) end
 
---- Rotate90cw.
+--- Returns a new ImageData rotated 90 degrees clockwise; the original is not modified.
 ---@return ImageData
-function ImageData:rotate90cw() end
+function LImageData:rotate90cw() end
 
---- Saturation.
+--- Adjusts colour saturation; 0.0 produces grayscale, 1.0 is unchanged, > 1.0 boosts saturation.
 ---@param factor number
 ---@return nil
-function ImageData:saturation(factor) end
+function LImageData:saturation(factor) end
 
---- Sepia.
+--- Applies a warm sepia tone to the image using standard sepia matrix weights.
 ---@return nil
-function ImageData:sepia() end
+function LImageData:sepia() end
 
----@param x any
----@param y any
----@param r any
----@param g any
----@param b any
----@param a any
-function ImageData:setPixel(x, y, r, g, b, a) end
+--- Sets the RGBA colour of the pixel at (x, y); returns an error if coordinates are out of bounds.
+---@param x integer
+---@param y integer
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+---@return nil
+function LImageData:setPixel(x, y, r, g, b, a) end
 
 --- Replaces all pixel data from a raw RGBA byte string.
 ---@param bytes string
 ---@return nil
-function ImageData:setRawData(bytes) end
+function LImageData:setRawData(bytes) end
 
---- Sharpen.
+--- Returns a new ImageData with a sharpening convolution kernel applied.
 ---@return ImageData
-function ImageData:sharpen() end
+function LImageData:sharpen() end
 
---- Threshold.
+--- Converts the image to black-and-white: pixels above value become white, at or below become black.
 ---@param value integer
 ---@return nil
-function ImageData:threshold(value) end
+function LImageData:threshold(value) end
 
----@param tr any
----@param tg any
----@param tb any
----@param factor any
-function ImageData:tint(tr, tg, tb, factor) end
+--- Blends an RGB tint colour into every pixel, controlled by factor (0.0 = no change, 1.0 = full tint).
+---@param tr integer
+---@param tg integer
+---@param tb integer
+---@param factor number
+---@return nil
+function LImageData:tint(tr, tg, tb, factor) end
 
 --- Returns the type name of this object.
 ---@return string
-function ImageData:type() end
+function LImageData:type() end
 
 --- Returns true if this object is of the given type name.
 ---@param name string
 ---@return boolean
-function ImageData:typeOf(name) end
+function LImageData:typeOf(name) end
 
 --- Lua-side wrapper around [`LayeredImage`].
----@class LayeredImage
-LayeredImage = {}
+---@class LLayeredImage
+LLayeredImage = {}
 
 --- Appends a new blank transparent layer on top and returns its 1-based index.
 ---@param name? string
 ---@return number
-function LayeredImage:addLayer(name) end
+function LLayeredImage:addLayer(name) end
 
 --- Returns the canvas height shared by all layers.
 ---@return number
-function LayeredImage:getHeight() end
+function LLayeredImage:getHeight() end
 
 --- Returns a copy of the layer's pixel buffer as an ImageData.
 ---@param index integer
 ---@return ImageData
-function LayeredImage:getLayer(index) end
+function LLayeredImage:getLayer(index) end
 
 --- Returns the name of a layer.
 ---@param index integer
 ---@return string
-function LayeredImage:getName(index) end
+function LLayeredImage:getName(index) end
 
 --- Returns the opacity of a layer in [0.0, 1.0].
 ---@param index integer
 ---@return number
-function LayeredImage:getOpacity(index) end
+function LLayeredImage:getOpacity(index) end
 
 --- Returns the canvas width shared by all layers.
 ---@return number
-function LayeredImage:getWidth() end
+function LLayeredImage:getWidth() end
 
 --- Returns whether a layer is visible.
 ---@param index integer
 ---@return boolean
-function LayeredImage:isVisible(index) end
+function LLayeredImage:isVisible(index) end
 
 --- Returns the number of layers in the stack.
 ---@return number
-function LayeredImage:layerCount() end
+function LLayeredImage:layerCount() end
 
 --- Flattens all visible layers into a single ImageData using Porter-Duff "over" compositing.
 ---@return ImageData
-function LayeredImage:merge() end
+function LLayeredImage:merge() end
 
 --- Moves a layer from one position to another, shifting layers in between.
 ---@param from_index integer
 ---@param to_index integer
 ---@return boolean
-function LayeredImage:moveLayer(from_index, to_index) end
+function LLayeredImage:moveLayer(from_index, to_index) end
 
 --- Removes the layer at the given 1-based index. Returns true on success.
 ---@param index integer
 ---@return boolean
-function LayeredImage:removeLayer(index) end
+function LLayeredImage:removeLayer(index) end
 
 --- Saves the layered image to a LIMG binary file at the given path.
 ---@param path string
 ---@return nil
-function LayeredImage:save(path) end
+function LLayeredImage:save(path) end
 
 --- Replaces a layer's pixel buffer with a copy of the given ImageData.
 ---@param index integer
 ---@param imagedata ImageData
 ---@return boolean
-function LayeredImage:setLayer(index, imagedata) end
+function LLayeredImage:setLayer(index, imagedata) end
 
 --- Renames the layer at the given index to the new name string.
 ---@param index integer
 ---@param name string
 ---@return boolean
-function LayeredImage:setName(index, name) end
+function LLayeredImage:setName(index, name) end
 
 --- Sets the opacity of a layer. Value is clamped to [0.0, 1.0].
 ---@param index integer
 ---@param opacity number
 ---@return boolean
-function LayeredImage:setOpacity(index, opacity) end
+function LLayeredImage:setOpacity(index, opacity) end
 
 --- Shows or hides a layer during compositing.
 ---@param index integer
 ---@param visible boolean
 ---@return boolean
-function LayeredImage:setVisible(index, visible) end
+function LLayeredImage:setVisible(index, visible) end
 
 --- Swaps two layers by their 1-based indices, changing their compositing order.
 ---@param a integer
 ---@param b integer
 ---@return boolean
-function LayeredImage:swapLayers(a, b) end
+function LLayeredImage:swapLayers(a, b) end
+
+--- Returns the type name of this object.
+---@return string
+function LLayeredImage:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LLayeredImage:typeOf(name) end
 
 --- Lua-side wrapper around [`PaletteLUT`].
----@class PaletteLUT
-PaletteLUT = {}
+---@class LPaletteLUT
+LPaletteLUT = {}
 
 --- Removes all colour mapping entries.
 ---@return nil
-function PaletteLUT:clear() end
+function LPaletteLUT:clear() end
 
 --- Returns the number of colour mapping entries.
 ---@return number
-function PaletteLUT:getColorCount() end
+function LPaletteLUT:getColorCount() end
 
 --- Appends a colour mapping entry to the palette: when a pixel exactly matching
 ---@param from_r integer
@@ -8461,33 +9503,51 @@ function PaletteLUT:getColorCount() end
 ---@param to_b integer
 ---@param to_a integer
 ---@return nil
-function PaletteLUT:setColor(from_r, from_g, from_b, from_a, to_r, to_g, to_b, to_a) end
+function LPaletteLUT:setColor(from_r, from_g, from_b, from_a, to_r, to_g, to_b, to_a) end
+
+--- Returns the type name of this object.
+---@return string
+function LPaletteLUT:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LPaletteLUT:typeOf(name) end
 
 --- Lua-side wrapper around [`ProvinceGrid`].
----@class ProvinceGrid
-ProvinceGrid = {}
+---@class LProvinceGrid
+LProvinceGrid = {}
 
 --- Returns an array of adjacency records. Each record is {province_a, province_b, border_pixels}.
 ---@return table
-function ProvinceGrid:adjacencies() end
+function LProvinceGrid:adjacencies() end
 
 --- Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
 ---@param x integer
 ---@param y integer
 ---@return number
-function ProvinceGrid:getAt(x, y) end
+function LProvinceGrid:getAt(x, y) end
 
 --- Returns the grid height in pixels.
 ---@return number
-function ProvinceGrid:getHeight() end
+function LProvinceGrid:getHeight() end
 
 --- Returns the grid width in pixels.
 ---@return number
-function ProvinceGrid:getWidth() end
+function LProvinceGrid:getWidth() end
 
 --- Returns the number of unique non-zero province IDs detected in the map.
 ---@return number
-function ProvinceGrid:provinceCount() end
+function LProvinceGrid:provinceCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LProvinceGrid:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LProvinceGrid:typeOf(name) end
 
 --- Returns true if the file at the given path is a DDS file.
 ---@param filename string
@@ -8545,67 +9605,94 @@ lurek.image.savePNG = function(imagedata, path) end
 lurek.input = {}
 
 --- Lua-side wrapper for a [`ComboDetector`] with an integrated millisecond clock.
----@class Combo
-Combo = {}
+---@class LCombo
+LCombo = {}
 
 --- Feed a key-press event into the combo detector.
 ---@param key string
 ---@return nil
-function Combo:feed(key) end
+function LCombo:feed(key) end
 
 --- Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
 ---@param index integer
 ---@return nil
-function Combo:getStep(index) end
+function LCombo:getStep(index) end
 
 --- Returns true if the detector is currently mid-sequence.
 ---@return boolean
-function Combo:isInProgress() end
+function LCombo:isInProgress() end
 
 --- Returns the number of steps matched so far (0 when idle).
 ---@return number
-function Combo:progress() end
+function LCombo:progress() end
 
 --- Reset the detector to its initial idle state, cancelling any in-progress sequence.
 ---@return nil
-function Combo:reset() end
+function LCombo:reset() end
 
 --- Advance the internal clock by `dt` seconds and check for timeouts.
 ---@param dt number
 ---@return nil
-function Combo:tick(dt) end
+function LCombo:tick(dt) end
 
 --- Returns the total number of steps in the combo sequence.
 ---@return number
-function Combo:totalSteps() end
+function LCombo:totalSteps() end
+
+--- Returns the type name of this object.
+---@return string
+function LCombo:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCombo:typeOf(name) end
 
 --- Lua-side wrapper around a mouse cursor handle.
----@class Cursor
-Cursor = {}
+---@class LCursor
+LCursor = {}
 
 --- Returns the cursor type as "system" or "custom".
 ---@return string
-function Cursor:getType() end
+function LCursor:getType() end
 
 --- Releases the cursor resource (no-op on desktop).
 ---@return nil
-function Cursor:release() end
+function LCursor:release() end
+
+--- Returns the type name of this object.
+---@return string
+function LCursor:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCursor:typeOf(name) end
 
 --- Lua userdata wrapper for a completed [`crate::input::recorder::InputRecording`].
----@class InputRecording
-InputRecording = {}
+---@class LInputRecording
+LInputRecording = {}
 
 --- Returns the number of sparse event frames stored in this recording.
 ---@return number
-function InputRecording:frameCount() end
+function LInputRecording:frameCount() end
 
 --- Serializes this recording to a JSON string for saving to disk.
 ---@return string
-function InputRecording:toJson() end
+function LInputRecording:toJson() end
 
 --- Returns the total frame count when recording was stopped.
 ---@return number
-function InputRecording:totalFrames() end
+function LInputRecording:totalFrames() end
+
+--- Returns the type name of this object.
+---@return string
+function LInputRecording:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LInputRecording:typeOf(name) end
 
 --- Advances playback by one frame and returns an array of key/button events for that
 ---@return table
@@ -8944,135 +10031,135 @@ lurek.input.wasActionReleased = function(action) end
 lurek.light = {}
 
 --- Lua-side handle to a light resource stored in [`LightWorld`].
----@class Light
-Light = {}
+---@class LLight
+LLight = {}
 
 --- Convenience method to set a flicker effect using amplitude range and
 ---@param min number
 ---@param max number
 ---@param hz number
 ---@return nil
-function Light:addFlicker(min, max, hz) end
+function LLight:addFlicker(min, max, hz) end
 
 --- Removes the cookie texture assignment.
 ---@return nil
-function Light:clearCookie() end
+function LLight:clearCookie() end
 
 --- Returns the custom attenuation coefficients as (constant, linear, quadratic).
 ---@return number
-function Light:getAttenuation() end
+function LLight:getAttenuation() end
 
 --- Returns the blend mode as a string.
 ---@return string
-function Light:getBlendMode() end
+function LLight:getBlendMode() end
 
 --- Returns the light's tint color as (r, g, b, a).
 ---@return number
-function Light:getColor() end
+function LLight:getColor() end
 
 --- Returns the current cookie texture path, or `nil` if unset.
 ---@return string
-function Light:getCookie() end
+function LLight:getCookie() end
 
 --- Returns the direction angle in radians.
 ---@return number
-function Light:getDirection() end
+function LLight:getDirection() end
 
 --- Returns the energy scaling factor.
 ---@return number
-function Light:getEnergy() end
+function LLight:getEnergy() end
 
 --- Returns the falloff mode as a string.
 ---@return string
-function Light:getFalloff() end
+function LLight:getFalloff() end
 
 --- Returns the flicker effect speed and strength.
 ---@return number
-function Light:getFlicker() end
+function LLight:getFlicker() end
 
 --- Returns the group identifier.
 ---@return number
-function Light:getGroupId() end
+function LLight:getGroupId() end
 
 --- Returns the inner cone angle in radians.
 ---@return number
-function Light:getInnerAngle() end
+function LLight:getInnerAngle() end
 
 --- Returns the brightness multiplier.
 ---@return number
-function Light:getIntensity() end
+function LLight:getIntensity() end
 
 --- Returns the light interaction bitmask.
 ---@return number
-function Light:getLightMask() end
+function LLight:getLightMask() end
 
 --- Returns the geometric light type as a string.
 ---@return string
-function Light:getLightType() end
+function LLight:getLightType() end
 
 --- Returns the outer cone angle in radians.
 ---@return number
-function Light:getOuterAngle() end
+function LLight:getOuterAngle() end
 
 --- Returns the light's world-space position.
 ---@return number
-function Light:getPosition() end
+function LLight:getPosition() end
 
 --- Returns the light's influence radius.
 ---@return number
-function Light:getRadius() end
+function LLight:getRadius() end
 
 --- Returns the shadow region color as (r, g, b, a).
 ---@return number
-function Light:getShadowColor() end
+function LLight:getShadowColor() end
 
 --- Returns the shadow edge filter as a string.
 ---@return string
-function Light:getShadowFilter() end
+function LLight:getShadowFilter() end
 
 --- Returns the shadow casting bitmask.
 ---@return number
-function Light:getShadowMask() end
+function LLight:getShadowMask() end
 
 --- Returns the shadow edge smoothing factor.
 ---@return number
-function Light:getShadowSmooth() end
+function LLight:getShadowSmooth() end
 
 --- Returns whether this light is active.
 ---@return boolean
-function Light:isEnabled() end
+function LLight:isEnabled() end
 
 --- Returns whether the flicker effect is active.
 ---@return boolean
-function Light:isFlickerEnabled() end
+function LLight:isFlickerEnabled() end
 
 --- Returns whether this light casts shadows.
 ---@return boolean
-function Light:isShadowEnabled() end
+function LLight:isShadowEnabled() end
 
 --- Returns whether this light handle is still valid.
 ---@return boolean
-function Light:isValid() end
+function LLight:isValid() end
 
 --- Returns whether this light hints at volumetric scattering.
 ---@return boolean
-function Light:isVolumetric() end
+function LLight:isVolumetric() end
 
 --- Removes this light from the world.
 ---@return nil
-function Light:remove() end
+function LLight:remove() end
 
 --- Sets the custom attenuation coefficients (constant, linear, quadratic).
 ---@param c number
 ---@param l number
 ---@param q number
 ---@return nil
-function Light:setAttenuation(c, l, q) end
+function LLight:setAttenuation(c, l, q) end
 
 --- Sets the blend mode ('add', 'sub', or 'mix').
 ---@param mode string
 ---@return nil
-function Light:setBlendMode(mode) end
+function LLight:setBlendMode(mode) end
 
 --- Sets the light's tint color.
 ---@param r number
@@ -9080,84 +10167,84 @@ function Light:setBlendMode(mode) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Light:setColor(r, g, b, a) end
+function LLight:setColor(r, g, b, a) end
 
 --- Sets the texture path used as a light cookie (mask) for projection.
 ---@param path string
 ---@return nil
-function Light:setCookie(path) end
+function LLight:setCookie(path) end
 
 --- Sets the direction angle in radians.
 ---@param dir number
 ---@return nil
-function Light:setDirection(dir) end
+function LLight:setDirection(dir) end
 
 --- Sets whether this light is active.
 ---@param enabled boolean
 ---@return nil
-function Light:setEnabled(enabled) end
+function LLight:setEnabled(enabled) end
 
 --- Sets the energy scaling factor.
 ---@param e number
 ---@return nil
-function Light:setEnergy(e) end
+function LLight:setEnergy(e) end
 
 --- Sets the falloff mode ('linear', 'smooth', or 'constant').
 ---@param mode string
 ---@return nil
-function Light:setFalloff(mode) end
+function LLight:setFalloff(mode) end
 
 --- Sets the flicker effect speed and strength (enables flicker).
 ---@param speed number
 ---@param strength number
 ---@return nil
-function Light:setFlicker(speed, strength) end
+function LLight:setFlicker(speed, strength) end
 
 --- Sets whether the flicker effect is active.
 ---@param enabled boolean
 ---@return nil
-function Light:setFlickerEnabled(enabled) end
+function LLight:setFlickerEnabled(enabled) end
 
 --- Sets the group identifier for batch operations.
 ---@param id integer
 ---@return nil
-function Light:setGroupId(id) end
+function LLight:setGroupId(id) end
 
 --- Sets the inner cone angle in radians for spot lights.
 ---@param angle number
 ---@return nil
-function Light:setInnerAngle(angle) end
+function LLight:setInnerAngle(angle) end
 
 --- Sets the brightness multiplier.
 ---@param i number
 ---@return nil
-function Light:setIntensity(i) end
+function LLight:setIntensity(i) end
 
 --- Sets the light interaction bitmask.
 ---@param mask integer
 ---@return nil
-function Light:setLightMask(mask) end
+function LLight:setLightMask(mask) end
 
 --- Sets the geometric light type ('point', 'directional', or 'spot').
 ---@param t string
 ---@return nil
-function Light:setLightType(t) end
+function LLight:setLightType(t) end
 
 --- Sets the outer cone angle in radians for spot lights.
 ---@param angle number
 ---@return nil
-function Light:setOuterAngle(angle) end
+function LLight:setOuterAngle(angle) end
 
 --- Sets the light's world-space position.
 ---@param x number
 ---@param y number
 ---@return nil
-function Light:setPosition(x, y) end
+function LLight:setPosition(x, y) end
 
 --- Sets the light's influence radius.
 ---@param r number
 ---@return nil
-function Light:setRadius(r) end
+function LLight:setRadius(r) end
 
 --- Sets the shadow region color.
 ---@param r number
@@ -9165,109 +10252,127 @@ function Light:setRadius(r) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Light:setShadowColor(r, g, b, a) end
+function LLight:setShadowColor(r, g, b, a) end
 
 --- Sets whether this light casts shadows.
 ---@param enabled boolean
 ---@return nil
-function Light:setShadowEnabled(enabled) end
+function LLight:setShadowEnabled(enabled) end
 
 --- Sets the shadow edge filter ('none', 'pcf5', or 'pcf13').
 ---@param filter string
 ---@return nil
-function Light:setShadowFilter(filter) end
+function LLight:setShadowFilter(filter) end
 
 --- Sets the shadow casting bitmask.
 ---@param mask integer
 ---@return nil
-function Light:setShadowMask(mask) end
+function LLight:setShadowMask(mask) end
 
 --- Sets the shadow edge smoothing factor.
 ---@param smooth number
 ---@return nil
-function Light:setShadowSmooth(smooth) end
+function LLight:setShadowSmooth(smooth) end
 
 --- Sets whether this light hints at volumetric scattering.
 ---@param enabled boolean
 ---@return nil
-function Light:setVolumetric(enabled) end
+function LLight:setVolumetric(enabled) end
 
 --- Cancels the active light transition.
 ---@return nil
-function Light:stopTransition() end
+function LLight:stopTransition() end
 
 --- Returns the fractional progress `[0, 1]` of the active transition,
 ---@return number
-function Light:transitionProgress() end
+function LLight:transitionProgress() end
 
 --- Begins a smooth linear transition of the light's color, intensity,
 ---@param target table
 ---@param duration number
 ---@return nil
-function Light:transitionTo(target, duration) end
+function LLight:transitionTo(target, duration) end
+
+--- Returns the type name of this object.
+---@return string
+function LLight:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LLight:typeOf(name) end
 
 --- Advances the active transition by `dt` seconds and applies the
 ---@param dt number
 ---@return boolean
-function Light:updateTransition(dt) end
+function LLight:updateTransition(dt) end
 
 --- Lua-side handle to an occluder resource stored in [`LightWorld`].
----@class Occluder
-Occluder = {}
+---@class LOccluder
+LOccluder = {}
 
 --- Returns the light interaction bitmask.
 ---@return number
-function Occluder:getLightMask() end
+function LOccluder:getLightMask() end
 
 --- Returns the shadow opacity.
 ---@return number
-function Occluder:getOpacity() end
+function LOccluder:getOpacity() end
 
 --- Returns the translation offset as (x, y).
 ---@return number
-function Occluder:getPosition() end
+function LOccluder:getPosition() end
 
 --- Returns the polygon vertices as a flat table {x1,y1,x2,y2,...}.
 ---@return table
-function Occluder:getVertices() end
+function LOccluder:getVertices() end
 
 --- Returns whether this occluder is active.
 ---@return boolean
-function Occluder:isEnabled() end
+function LOccluder:isEnabled() end
 
 --- Returns whether this occluder handle is still valid.
 ---@return boolean
-function Occluder:isValid() end
+function LOccluder:isValid() end
 
 --- Removes this occluder from the world.
 ---@return nil
-function Occluder:remove() end
+function LOccluder:remove() end
 
 --- Sets whether this occluder is active.
 ---@param enabled boolean
 ---@return nil
-function Occluder:setEnabled(enabled) end
+function LOccluder:setEnabled(enabled) end
 
 --- Sets the light interaction bitmask.
 ---@param mask integer
 ---@return nil
-function Occluder:setLightMask(mask) end
+function LOccluder:setLightMask(mask) end
 
 --- Sets the shadow opacity (0.0â€“1.0).
 ---@param opacity number
 ---@return nil
-function Occluder:setOpacity(opacity) end
+function LOccluder:setOpacity(opacity) end
 
 --- Sets the translation offset applied to all vertices.
 ---@param x number
 ---@param y number
 ---@return nil
-function Occluder:setPosition(x, y) end
+function LOccluder:setPosition(x, y) end
 
 --- Replaces the polygon vertices from a flat table {x1,y1,x2,y2,...}.
 ---@param vertices table
 ---@return nil
-function Occluder:setVertices(vertices) end
+function LOccluder:setVertices(vertices) end
+
+--- Returns the type name of this object.
+---@return string
+function LOccluder:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LOccluder:typeOf(name) end
 
 --- Advances flicker phase for all lights with flicker enabled.
 ---@param dt number
@@ -9471,17 +10576,17 @@ lurek.log.warn_fields = function(message, fields_table) end
 lurek.math = {}
 
 --- Lua-side wrapper around an [`AabbTree`].
----@class AabbTree
-AabbTree = {}
+---@class LAabbTree
+LAabbTree = {}
 
 --- Removes all entries from the tree.
 ---@return nil
-function AabbTree:clear() end
+function LAabbTree:clear() end
 
 --- Returns true if an entry with the given id exists in the tree.
 ---@param id integer
 ---@return boolean
-function AabbTree:contains(id) end
+function LAabbTree:contains(id) end
 
 --- Inserts an entry with the given AABB into the tree.
 ---@param id integer
@@ -9490,15 +10595,15 @@ function AabbTree:contains(id) end
 ---@param max_x number
 ---@param max_y number
 ---@return nil
-function AabbTree:insert(id, min_x, min_y, max_x, max_y) end
+function LAabbTree:insert(id, min_x, min_y, max_x, max_y) end
 
 --- Returns true if the tree contains no entries.
 ---@return boolean
-function AabbTree:isEmpty() end
+function LAabbTree:isEmpty() end
 
 --- Returns the number of entries in the tree.
 ---@return number
-function AabbTree:len() end
+function LAabbTree:len() end
 
 --- Returns the ids of all entries whose AABBs overlap the query rectangle.
 ---@param min_x number
@@ -9506,18 +10611,27 @@ function AabbTree:len() end
 ---@param max_x number
 ---@param max_y number
 ---@return table
-function AabbTree:query(min_x, min_y, max_x, max_y) end
+function LAabbTree:query(min_x, min_y, max_x, max_y) end
 
 --- Returns the ids of all entries whose AABBs contain the given point.
 ---@param x number
 ---@param y number
 ---@return table
-function AabbTree:queryPoint(x, y) end
+function LAabbTree:queryPoint(x, y) end
 
 --- Removes the entry with the given id.
 ---@param id integer
 ---@return boolean
-function AabbTree:remove(id) end
+function LAabbTree:remove(id) end
+
+--- Returns the type name of this object.
+---@return string
+function LAabbTree:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAabbTree:typeOf(name) end
 
 --- Updates the AABB for an existing entry.
 ---@param id integer
@@ -9526,158 +10640,194 @@ function AabbTree:remove(id) end
 ---@param max_x number
 ---@param max_y number
 ---@return boolean
-function AabbTree:update(id, min_x, min_y, max_x, max_y) end
+function LAabbTree:update(id, min_x, min_y, max_x, max_y) end
 
 --- Lua-side wrapper around a [`BezierCurve`].
----@class BezierCurve
-BezierCurve = {}
+---@class LBezierCurve
+LBezierCurve = {}
 
 --- Evaluates the curve at parameter t, returning (x, y).
 ---@param t number
 ---@return number
-function BezierCurve:evaluate(t) end
+function LBezierCurve:evaluate(t) end
 
 --- Returns the control point at 1-based index as (x, y), or nil.
 ---@param index integer
 ---@return nil
-function BezierCurve:getControlPoint(index) end
+function LBezierCurve:getControlPoint(index) end
 
 --- Returns the number of control points.
 ---@return number
-function BezierCurve:getControlPointCount() end
+function LBezierCurve:getControlPointCount() end
 
 --- Returns a new BezierCurve representing the first derivative.
 ---@return BezierCurve
-function BezierCurve:getDerivative() end
+function LBezierCurve:getDerivative() end
 
 --- Inserts a control point. If index is given (1-based), inserts at that position.
 ---@param x number
 ---@param y number
 ---@param index? integer
 ---@return nil
-function BezierCurve:insertControlPoint(x, y, index) end
+function LBezierCurve:insertControlPoint(x, y, index) end
 
 --- Returns the approximate arc length of the curve.
 ---@return number
-function BezierCurve:length() end
+function LBezierCurve:length() end
 
 --- Removes a control point at 1-based index.
 ---@param index integer
 ---@return boolean
-function BezierCurve:removeControlPoint(index) end
+function LBezierCurve:removeControlPoint(index) end
 
 --- Renders the curve as a polyline with the given number of segments.
 ---@param segments integer
 ---@return table
-function BezierCurve:render(segments) end
+function LBezierCurve:render(segments) end
 
 --- Rotates all control points around a pivot by angle radians.
 ---@param angle number
 ---@param ox number
 ---@param oy number
 ---@return nil
-function BezierCurve:rotate(angle, ox, oy) end
+function LBezierCurve:rotate(angle, ox, oy) end
 
 --- Scales all control points around a pivot by factor s.
 ---@param s number
 ---@param ox number
 ---@param oy number
 ---@return nil
-function BezierCurve:scale(s, ox, oy) end
+function LBezierCurve:scale(s, ox, oy) end
 
 --- Sets the control point at 1-based index.
 ---@param index integer
 ---@param x number
 ---@param y number
 ---@return boolean
-function BezierCurve:setControlPoint(index, x, y) end
+function LBezierCurve:setControlPoint(index, x, y) end
 
 --- Translates all control points by (dx, dy).
 ---@param dx number
 ---@param dy number
 ---@return nil
-function BezierCurve:translate(dx, dy) end
+function LBezierCurve:translate(dx, dy) end
+
+--- Returns the type name of this object.
+---@return string
+function LBezierCurve:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LBezierCurve:typeOf(name) end
 
 --- Lua-side wrapper around a [`CatmullRomSpline`].
----@class CatmullRom
-CatmullRom = {}
+---@class LCatmullRom
+LCatmullRom = {}
 
 --- Appends a control point to the spline.
 ---@param x number
 ---@param y number
-function CatmullRom:addPoint(x, y) end
+function LCatmullRom:addPoint(x, y) end
 
 --- Number of control points.
 ---@return number
-function CatmullRom:len() end
+function LCatmullRom:len() end
 
 --- Removes the control point at `index` (0-based) and returns it.
 ---@param index integer
 ---@return number
-function CatmullRom:removePoint(index) end
+function LCatmullRom:removePoint(index) end
 
 --- Sample the spline at global t in [0, 1].
 ---@param t number
 ---@return number
-function CatmullRom:sample(t) end
+function LCatmullRom:sample(t) end
 
 --- Sample a specific segment at local t in [0, 1].
 ---@param seg integer
 ---@param t number
 ---@return number
-function CatmullRom:sampleSegment(seg, t) end
+function LCatmullRom:sampleSegment(seg, t) end
+
+--- Returns the type name of this object.
+---@return string
+function LCatmullRom:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCatmullRom:typeOf(name) end
 
 --- Lua-side wrapper around a [`Circle`].
----@class Circle
-Circle = {}
+---@class LCircle
+LCircle = {}
 
 --- Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
 ---@return number
-function Circle:aabb() end
+function LCircle:aabb() end
 
 --- Returns the area of the circle (π r²).
 ---@return number
-function Circle:area() end
+function LCircle:area() end
 
 --- Returns true if the point (px, py) lies inside or on the boundary.
 ---@param px number
 ---@param py number
 ---@return boolean
-function Circle:contains(px, py) end
+function LCircle:contains(px, py) end
 
 --- Returns true if this circle overlaps another circle.
 ---@param other Circle
 ---@return boolean
-function Circle:intersects(other) end
+function LCircle:intersects(other) end
 
 --- Returns the circumference of the circle (2 π r).
 ---@return number
-function Circle:perimeter() end
+function LCircle:perimeter() end
 
 --- Returns the circle radius.
 ---@return number
-function Circle:radius() end
+function LCircle:radius() end
+
+--- Returns the type name of this object.
+---@return string
+function LCircle:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCircle:typeOf(name) end
 
 --- Returns the circle centre X.
 ---@return number
-function Circle:x() end
+function LCircle:x() end
 
 --- Returns the circle centre Y.
 ---@return number
-function Circle:y() end
+function LCircle:y() end
 
 --- Lua-side wrapper around a [`HermiteSpline`].
----@class Hermite
-Hermite = {}
+---@class LHermite
+LHermite = {}
 
 --- Evaluate the spline at parameter t in [0, 1].
 ---@param t number
 ---@return number
-function Hermite:sample(t) end
+function LHermite:sample(t) end
+
+--- Returns the type name of this object.
+---@return string
+function LHermite:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LHermite:typeOf(name) end
 
 --- Lua-side wrapper around a [`NoiseGenerator`].
----@class NoiseGenerator
-NoiseGenerator = {}
+---@class LNoiseGenerator
+LNoiseGenerator = {}
 
 --- Returns fractal Brownian motion noise at (x, y).
 ---@param x number
@@ -9687,36 +10837,36 @@ NoiseGenerator = {}
 ---@param persistence? number
 ---@param kind? string
 ---@return number
-function NoiseGenerator:fbm(x, y, octaves, lacunarity, persistence, kind) end
+function LNoiseGenerator:fbm(x, y, octaves, lacunarity, persistence, kind) end
 
 --- Generates a 2D noise map as a flat table (row-major).
 ---@param width integer
 ---@param height integer
 ---@param opts? table
 ---@return table
-function NoiseGenerator:generateMap(width, height, opts) end
+function LNoiseGenerator:generateMap(width, height, opts) end
 
 --- Returns the current seed.
 ---@return number
-function NoiseGenerator:getSeed() end
+function LNoiseGenerator:getSeed() end
 
 --- Returns 1D Perlin noise at x.
 ---@param x number
 ---@return number
-function NoiseGenerator:perlin1d(x) end
+function LNoiseGenerator:perlin1d(x) end
 
 --- Returns 2D Perlin noise at (x, y).
 ---@param x number
 ---@param y number
 ---@return number
-function NoiseGenerator:perlin2d(x, y) end
+function LNoiseGenerator:perlin2d(x, y) end
 
 --- Returns 3D Perlin noise at (x, y, z).
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return number
-function NoiseGenerator:perlin3d(x, y, z) end
+function LNoiseGenerator:perlin3d(x, y, z) end
 
 --- Returns 4D Perlin noise at (x, y, z, w).
 ---@param x number
@@ -9724,7 +10874,7 @@ function NoiseGenerator:perlin3d(x, y, z) end
 ---@param z number
 ---@param w number
 ---@return number
-function NoiseGenerator:perlin4d(x, y, z, w) end
+function LNoiseGenerator:perlin4d(x, y, z, w) end
 
 --- Returns ridged multi-fractal noise at (x, y).
 ---@param x number
@@ -9734,30 +10884,30 @@ function NoiseGenerator:perlin4d(x, y, z, w) end
 ---@param persistence? number
 ---@param kind? string
 ---@return number
-function NoiseGenerator:ridged(x, y, octaves, lacunarity, persistence, kind) end
+function LNoiseGenerator:ridged(x, y, octaves, lacunarity, persistence, kind) end
 
 --- Sets the seed and rebuilds the permutation table.
 ---@param seed integer
 ---@return nil
-function NoiseGenerator:setSeed(seed) end
+function LNoiseGenerator:setSeed(seed) end
 
 --- Returns 1D Simplex noise at x.
 ---@param x number
 ---@return number
-function NoiseGenerator:simplex1d(x) end
+function LNoiseGenerator:simplex1d(x) end
 
 --- Returns 2D Simplex noise at (x, y).
 ---@param x number
 ---@param y number
 ---@return number
-function NoiseGenerator:simplex2d(x, y) end
+function LNoiseGenerator:simplex2d(x, y) end
 
 --- Returns 3D Simplex noise at (x, y, z).
 ---@param x number
 ---@param y number
 ---@param z number
 ---@return number
-function NoiseGenerator:simplex3d(x, y, z) end
+function LNoiseGenerator:simplex3d(x, y, z) end
 
 --- Returns turbulence noise at (x, y).
 ---@param x number
@@ -9767,14 +10917,23 @@ function NoiseGenerator:simplex3d(x, y, z) end
 ---@param persistence? number
 ---@param kind? string
 ---@return number
-function NoiseGenerator:turbulence(x, y, octaves, lacunarity, persistence, kind) end
+function LNoiseGenerator:turbulence(x, y, octaves, lacunarity, persistence, kind) end
+
+--- Returns the type name of this object.
+---@return string
+function LNoiseGenerator:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNoiseGenerator:typeOf(name) end
 
 --- Applies domain warping, returning offset (x, y).
 ---@param x number
 ---@param y number
 ---@param strength number
 ---@return number
-function NoiseGenerator:warpDomain(x, y, strength) end
+function LNoiseGenerator:warpDomain(x, y, strength) end
 
 --- Returns 2D Worley (cellular) noise at (x, y).
 ---@param x number
@@ -9782,7 +10941,7 @@ function NoiseGenerator:warpDomain(x, y, strength) end
 ---@param distType? string
 ---@param f2? boolean
 ---@return number
-function NoiseGenerator:worley2d(x, y, distType, f2) end
+function LNoiseGenerator:worley2d(x, y, distType, f2) end
 
 --- Returns 3D Worley (cellular) noise at (x, y, z).
 ---@param x number
@@ -9791,67 +10950,76 @@ function NoiseGenerator:worley2d(x, y, distType, f2) end
 ---@param distType? string
 ---@param f2? boolean
 ---@return number
-function NoiseGenerator:worley3d(x, y, z, distType, f2) end
+function LNoiseGenerator:worley3d(x, y, z, distType, f2) end
 
 --- Lua-side wrapper around a [`RandomGenerator`].
----@class RandomGenerator
-RandomGenerator = {}
+---@class LRandomGenerator
+LRandomGenerator = {}
 
 --- Returns the seed used to initialise this generator.
 ---@return number
-function RandomGenerator:getSeed() end
+function LRandomGenerator:getSeed() end
 
 --- Serialises the generator state as a string for later restoration.
 ---@return string
-function RandomGenerator:getState() end
+function LRandomGenerator:getState() end
 
 --- Returns a uniform random number in [0, 1).
 ---@return number
-function RandomGenerator:random() end
+function LRandomGenerator:random() end
 
 --- Returns a uniform random float in [min, max).
 ---@param min number
 ---@param max number
 ---@return number
-function RandomGenerator:randomFloat(min, max) end
+function LRandomGenerator:randomFloat(min, max) end
 
 --- Returns a uniform random integer in [min, max].
 ---@param min integer
 ---@param max integer
 ---@return number
-function RandomGenerator:randomInt(min, max) end
+function LRandomGenerator:randomInt(min, max) end
 
 --- Returns a random number from a normal (Gaussian) distribution.
 ---@param stddev? number
 ---@param mean? number
 ---@return number
-function RandomGenerator:randomNormal(stddev, mean) end
+function LRandomGenerator:randomNormal(stddev, mean) end
 
 --- Sets the seed, fully resetting the generator state.
 ---@param seed integer
 ---@return nil
-function RandomGenerator:setSeed(seed) end
+function LRandomGenerator:setSeed(seed) end
 
 --- Restores the generator state from a previously serialised string.
 ---@param state string
 ---@return nil
-function RandomGenerator:setState(state) end
+function LRandomGenerator:setState(state) end
+
+--- Returns the type name of this object.
+---@return string
+function LRandomGenerator:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LRandomGenerator:typeOf(name) end
 
 --- Lua-side wrapper around a [`SpatialHash`].
----@class SpatialHash
-SpatialHash = {}
+---@class LSpatialHash
+LSpatialHash = {}
 
 --- Removes all registered items from this spatial hash, leaving it empty.
 ---@return nil
-function SpatialHash:clear() end
+function LSpatialHash:clear() end
 
 --- Returns the cell size used to partition the spatial hash grid.
 ---@return number
-function SpatialHash:getCellSize() end
+function LSpatialHash:getCellSize() end
 
 --- Returns the number of items in the hash.
 ---@return number
-function SpatialHash:getItemCount() end
+function LSpatialHash:getItemCount() end
 
 --- Inserts an item with the given AABB.
 ---@param id string
@@ -9860,14 +11028,14 @@ function SpatialHash:getItemCount() end
 ---@param w number
 ---@param h number
 ---@return nil
-function SpatialHash:insert(id, x, y, w, h) end
+function LSpatialHash:insert(id, x, y, w, h) end
 
 --- Returns IDs of items overlapping the query circle.
 ---@param cx number
 ---@param cy number
 ---@param radius number
 ---@return table
-function SpatialHash:queryCircle(cx, cy, radius) end
+function LSpatialHash:queryCircle(cx, cy, radius) end
 
 --- Returns IDs of items overlapping the query rectangle.
 ---@param x number
@@ -9875,7 +11043,7 @@ function SpatialHash:queryCircle(cx, cy, radius) end
 ---@param w number
 ---@param h number
 ---@return table
-function SpatialHash:queryRect(x, y, w, h) end
+function LSpatialHash:queryRect(x, y, w, h) end
 
 --- Returns IDs of items whose AABBs are intersected by the line segment.
 ---@param x1 number
@@ -9883,12 +11051,21 @@ function SpatialHash:queryRect(x, y, w, h) end
 ---@param x2 number
 ---@param y2 number
 ---@return table
-function SpatialHash:querySegment(x1, y1, x2, y2) end
+function LSpatialHash:querySegment(x1, y1, x2, y2) end
 
 --- Removes an item by its ID.
 ---@param id string
 ---@return nil
-function SpatialHash:remove(id) end
+function LSpatialHash:remove(id) end
+
+--- Returns the type name of this object.
+---@return string
+function LSpatialHash:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSpatialHash:typeOf(name) end
 
 --- Updates an existing item's AABB.
 ---@param id string
@@ -9897,49 +11074,49 @@ function SpatialHash:remove(id) end
 ---@param w number
 ---@param h number
 ---@return nil
-function SpatialHash:update(id, x, y, w, h) end
+function LSpatialHash:update(id, x, y, w, h) end
 
 --- Lua-side wrapper around a [`Transform`].
----@class Transform
-Transform = {}
+---@class LTransform
+LTransform = {}
 
 --- Returns a copy of this transform.
 ---@return Transform
-function Transform:clone() end
+function LTransform:clone() end
 
 --- Decomposes this transform into translation, rotation, and scale.
 ---@return number
 ---@return number
-function Transform:decompose() end
+function LTransform:decompose() end
 
 --- Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
 ---@return table
-function Transform:getMatrix() end
+function LTransform:getMatrix() end
 
 --- Returns a new Transform that undoes this transform.
 ---@return Transform
-function Transform:inverse() end
+function LTransform:inverse() end
 
 --- Transforms a point from world space back to local space.
 ---@param x number
 ---@param y number
 ---@return number
-function Transform:inverseTransformPoint(x, y) end
+function LTransform:inverseTransformPoint(x, y) end
 
 --- Resets the transform to identity.
 ---@return nil
-function Transform:reset() end
+function LTransform:reset() end
 
 --- Applies a rotation in radians.
 ---@param angle number
 ---@return nil
-function Transform:rotate(angle) end
+function LTransform:rotate(angle) end
 
 --- Applies non-uniform scaling.
 ---@param sx number
 ---@param sy? number
 ---@return nil
-function Transform:scale(sx, sy) end
+function LTransform:scale(sx, sy) end
 
 --- Replaces the transform with full transformation parameters.
 ---@param x number
@@ -9951,216 +11128,252 @@ function Transform:scale(sx, sy) end
 ---@param oy? number
 ---@param kx? number
 ---@param ky? number
-function Transform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
+function LTransform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 --- Applies horizontal and vertical shear factors to this transform matrix.
 ---@param kx number
 ---@param ky number
 ---@return nil
-function Transform:shear(kx, ky) end
+function LTransform:shear(kx, ky) end
 
 --- Transforms a point from local space to world space.
 ---@param x number
 ---@param y number
 ---@return number
-function Transform:transformPoint(x, y) end
+function LTransform:transformPoint(x, y) end
 
 --- Applies translation to the transform.
 ---@param dx number
 ---@param dy number
 ---@return nil
-function Transform:translate(dx, dy) end
+function LTransform:translate(dx, dy) end
+
+--- Returns the type name of this object.
+---@return string
+function LTransform:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTransform:typeOf(name) end
 
 --- Lua-side wrapper around a [`Tween`].
----@class Tween
-Tween = {}
+---@class LTween
+LTween = {}
 
 --- Adds a start/target value pair. Returns the 1-based index.
 ---@param start number
 ---@param target number
 ---@return number
-function Tween:addValue(start, target) end
+function LTween:addValue(start, target) end
 
 --- Returns all interpolated values as a table.
 ---@return table
-function Tween:getAllValues() end
+function LTween:getAllValues() end
 
 --- Alias for getTime(). Returns the current clock time.
 ---@return number
-function Tween:getClock() end
+function LTween:getClock() end
 
 --- Returns the tween duration in seconds.
 ---@return number
-function Tween:getDuration() end
+function LTween:getDuration() end
 
 --- Returns the easing function name.
 ---@return string
-function Tween:getEasingName() end
+function LTween:getEasingName() end
 
 --- Returns the current clock time.
 ---@return number
-function Tween:getTime() end
+function LTween:getTime() end
 
 --- Returns the interpolated value at 1-based index, or all values as a
 ---@param index? integer
 ---@return nil
-function Tween:getValue(index) end
+function LTween:getValue(index) end
 
 --- Returns the number of values in this tween.
 ---@return number
-function Tween:getValueCount() end
+function LTween:getValueCount() end
 
 --- Returns true if the tween has finished.
 ---@return boolean
-function Tween:isComplete() end
+function LTween:isComplete() end
 
 --- Resets the tween elapsed time to zero, restarting the animation.
 ---@return nil
-function Tween:reset() end
+function LTween:reset() end
 
 --- Alias for setTime(). Sets the clock to t, clamped to [0, duration].
 ---@param t number
 ---@return nil
-function Tween:set(t) end
+function LTween:set(t) end
 
 --- Sets the clock to a specific time, clamped to [0, duration].
 ---@param t number
 ---@return nil
-function Tween:setTime(t) end
+function LTween:setTime(t) end
+
+--- Returns the type name of this object.
+---@return string
+function LTween:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTween:typeOf(name) end
 
 --- Advances the clock by dt seconds. Returns true when complete.
 ---@param dt number
 ---@return boolean
-function Tween:update(dt) end
+function LTween:update(dt) end
 
 --- Lua-side wrapper around a [`Vec2`] value type.
----@class Vec2
-Vec2 = {}
+---@class LVec2
+LVec2 = {}
 
 --- Returns the angle of this vector in radians (atan2(y, x)).
 ---@return number
-function Vec2:angle() end
+function LVec2:angle() end
 
 --- Returns the 2D cross product (scalar) with another vector.
 ---@param other Vec2
 ---@return number
-function Vec2:cross(other) end
+function LVec2:cross(other) end
 
 --- Returns the Euclidean distance from this vector to another.
 ---@param other Vec2
 ---@return number
-function Vec2:distance(other) end
+function LVec2:distance(other) end
 
 --- Returns the dot product with another vector.
 ---@param other Vec2
 ---@return number
-function Vec2:dot(other) end
+function LVec2:dot(other) end
 
 --- Creates a unit vector from an angle in radians.
 ---@param radians number
 ---@return Vec2
-Vec2.fromAngle = function(radians) end
+LVec2.fromAngle = function(radians) end
 
 --- Returns the Euclidean length of the vector.
 ---@return number
-function Vec2:length() end
+function LVec2:length() end
 
 --- Returns the squared length of the vector (faster than length).
 ---@return number
-function Vec2:lengthSquared() end
+function LVec2:lengthSquared() end
 
 --- Returns a linearly interpolated vector between this and other at parameter t.
 ---@param other Vec2
 ---@param t number
 ---@return Vec2
-function Vec2:lerp(other, t) end
+function LVec2:lerp(other, t) end
 
 --- Returns a unit-length copy of this vector. Returns zero if length is zero.
 ---@return Vec2
-function Vec2:normalize() end
+function LVec2:normalize() end
 
 --- Compatibility alias for `normalize`.
 ---@return Vec2
-function Vec2:normalized() end
+function LVec2:normalized() end
 
 --- Returns the perpendicular vector (-y, x).
 ---@return Vec2
-function Vec2:perpendicular() end
+function LVec2:perpendicular() end
 
 --- Reflects this vector off a surface with the given normal.
 ---@param normal Vec2
 ---@return Vec2
-function Vec2:reflect(normal) end
+function LVec2:reflect(normal) end
 
 --- Returns a new vector rotated by the given angle in radians.
 ---@param angle number
 ---@return Vec2
-function Vec2:rotate(angle) end
+function LVec2:rotate(angle) end
+
+--- Returns the type name of this object.
+---@return string
+function LVec2:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LVec2:typeOf(name) end
 
 --- Returns the horizontal component of the vector.
 ---@return number
-function Vec2:x() end
+function LVec2:x() end
 
 --- Returns the vertical component of the vector.
 ---@return number
-function Vec2:y() end
+function LVec2:y() end
 
 --- Lua-side wrapper around a [`Vec3`] value type.
----@class Vec3
-Vec3 = {}
+---@class LVec3
+LVec3 = {}
 
 --- Add another Vec3 and return the result.
 ---@param other Vec3
 ---@return Vec3
-function Vec3:add(other) end
+function LVec3:add(other) end
 
 --- Cross product with another Vec3.
 ---@param other Vec3
 ---@return Vec3
-function Vec3:cross(other) end
+function LVec3:cross(other) end
 
 --- Euclidean distance to another Vec3.
 ---@param other Vec3
 ---@return number
-function Vec3:distance(other) end
+function LVec3:distance(other) end
 
 --- Dot product with another Vec3.
 ---@param other Vec3
 ---@return number
-function Vec3:dot(other) end
+function LVec3:dot(other) end
 
 --- Returns the Euclidean length of the vector.
 ---@return number
-function Vec3:length() end
+function LVec3:length() end
 
 --- Returns the squared Euclidean length (avoids sqrt).
 ---@return number
-function Vec3:lengthSquared() end
+function LVec3:lengthSquared() end
 
 --- Linear interpolation towards another Vec3.
 ---@param other Vec3
 ---@param t number
 ---@return Vec3
-function Vec3:lerp(other, t) end
+function LVec3:lerp(other, t) end
 
 --- Returns a unit-length version of this vector.
 ---@return Vec3
-function Vec3:normalize() end
+function LVec3:normalize() end
 
 --- Scale this vector by a scalar and return the result.
 ---@param s number
 ---@return Vec3
-function Vec3:scale(s) end
+function LVec3:scale(s) end
 
 --- Creates a Vec3 with all components set to `v`.
 ---@param v number
 ---@return Vec3
-Vec3.splat = function(v) end
+LVec3.splat = function(v) end
 
 --- Subtract another Vec3 and return the result.
 ---@param other Vec3
 ---@return Vec3
-function Vec3:sub(other) end
+function LVec3:sub(other) end
+
+--- Returns the type name of this object.
+---@return string
+function LVec3:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LVec3:typeOf(name) end
 
 --- Compatibility alias for `vec2`.
 ---@param x number
@@ -10812,8 +12025,8 @@ lurek.math.voronoi = function(points) end
 lurek.minimap = {}
 
 --- Lua-side wrapper around a [`Minimap`].
----@class Minimap
-Minimap = {}
+---@class LMinimap
+LMinimap = {}
 
 --- Adds a persistent marker and returns its auto-assigned ID.
 ---@param x number
@@ -10824,7 +12037,7 @@ Minimap = {}
 ---@param b? number
 ---@param a? number
 ---@return number
-function Minimap:addMarker(x, y, desc, r, g, b, a) end
+function LMinimap:addMarker(x, y, desc, r, g, b, a) end
 
 --- Registers a new object type and returns its 1-based index.
 ---@param name string
@@ -10833,7 +12046,7 @@ function Minimap:addMarker(x, y, desc, r, g, b, a) end
 ---@param b number
 ---@param a? number
 ---@return number
-function Minimap:addObjectType(name, r, g, b, a) end
+function LMinimap:addObjectType(name, r, g, b, a) end
 
 --- Adds an animated ping at grid coordinates with a duration and optional color.
 ---@param x number
@@ -10844,29 +12057,29 @@ function Minimap:addObjectType(name, r, g, b, a) end
 ---@param b? number
 ---@param a? number
 ---@return nil
-function Minimap:addPing(x, y, duration, r, g, b, a) end
+function LMinimap:addPing(x, y, duration, r, g, b, a) end
 
 --- Removes the animation from a marker, reverting it to static.
 ---@param id integer
 ---@return nil
-function Minimap:clearMarkerAnimation(id) end
+function LMinimap:clearMarkerAnimation(id) end
 
 --- Removes all tracked objects.
 ---@return nil
-function Minimap:clearObjects() end
+function LMinimap:clearObjects() end
 
 --- Removes all custom geometry from the minimap overlay.
 ---@return nil
-function Minimap:clearOverlay() end
+function LMinimap:clearOverlay() end
 
 --- Removes a displayed path. If id is nil, all paths are removed.
 ---@param id? integer
 ---@return nil
-function Minimap:clearPath(id) end
+function LMinimap:clearPath(id) end
 
 --- Clears the viewport rectangle overlay.
 ---@return nil
-function Minimap:clearViewportRect() end
+function LMinimap:clearViewportRect() end
 
 --- Draws a custom line segment on the minimap overlay.
 ---@param x1 number
@@ -10875,7 +12088,7 @@ function Minimap:clearViewportRect() end
 ---@param y2 number
 ---@param color table
 ---@return nil
-function Minimap:drawLine(x1, y1, x2, y2, color) end
+function LMinimap:drawLine(x1, y1, x2, y2, color) end
 
 --- Draws a custom rectangle on the minimap overlay.
 ---@param x number
@@ -10884,62 +12097,62 @@ function Minimap:drawLine(x1, y1, x2, y2, color) end
 ---@param h number
 ---@param color table
 ---@return nil
-function Minimap:drawRect(x, y, w, h, color) end
+function LMinimap:drawRect(x, y, w, h, color) end
 
 --- Renders the minimap grid to a CPU ImageData.
 ---@param pixel_size integer
 ---@return ImageData
-function Minimap:drawToImage(pixel_size) end
+function LMinimap:drawToImage(pixel_size) end
 
 --- Returns the center coordinates as x, y.
 ---@return number
-function Minimap:getCenter() end
+function LMinimap:getCenter() end
 
 --- Returns the center X coordinate.
 ---@return number
-function Minimap:getCenterX() end
+function LMinimap:getCenterX() end
 
 --- Returns the center Y coordinate.
 ---@return number
-function Minimap:getCenterY() end
+function LMinimap:getCenterY() end
 
 --- Returns the current color mode as a string.
 ---@return string
-function Minimap:getColorMode() end
+function LMinimap:getColorMode() end
 
 --- Returns the display height in pixels.
 ---@return number
-function Minimap:getDisplayHeight() end
+function LMinimap:getDisplayHeight() end
 
 --- Returns the display width and height as two values.
 ---@return number
-function Minimap:getDisplaySize() end
+function LMinimap:getDisplaySize() end
 
 --- Returns the display width in pixels.
 ---@return number
-function Minimap:getDisplayWidth() end
+function LMinimap:getDisplayWidth() end
 
 --- Returns the fog overlay color as r, g, b, a.
 ---@return number
-function Minimap:getFogColor() end
+function LMinimap:getFogColor() end
 
 --- Returns the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
 ---@param x integer
 ---@param y integer
 ---@return number
-function Minimap:getFogLevel(x, y) end
+function LMinimap:getFogLevel(x, y) end
 
 --- Returns the grid height in cells.
 ---@return number
-function Minimap:getGridHeight() end
+function LMinimap:getGridHeight() end
 
 --- Returns the grid width and height as two values.
 ---@return number
-function Minimap:getGridSize() end
+function LMinimap:getGridSize() end
 
 --- Returns the grid width in cells.
 ---@return number
-function Minimap:getGridWidth() end
+function LMinimap:getGridWidth() end
 
 --- Returns hover tooltip text for the element under screen coordinates, or nil.
 ---@param sx number
@@ -10947,65 +12160,65 @@ function Minimap:getGridWidth() end
 ---@param minimap_x number
 ---@param minimap_y number
 ---@return string
-function Minimap:getHoverInfo(sx, sy, minimap_x, minimap_y) end
+function LMinimap:getHoverInfo(sx, sy, minimap_x, minimap_y) end
 
 --- Returns the index of the currently active render layer.
 ---@return number
-function Minimap:getLayer() end
+function LMinimap:getLayer() end
 
 --- Returns the number of markers.
 ---@return number
-function Minimap:getMarkerCount() end
+function LMinimap:getMarkerCount() end
 
 --- Returns the description of a marker, or nil.
 ---@param id integer
 ---@return string
-function Minimap:getMarkerDescription(id) end
+function LMinimap:getMarkerDescription(id) end
 
 --- Returns the number of tracked objects.
 ---@return number
-function Minimap:getObjectCount() end
+function LMinimap:getObjectCount() end
 
 --- Returns the number of registered object types.
 ---@return number
-function Minimap:getObjectTypeCount() end
+function LMinimap:getObjectTypeCount() end
 
 --- Returns the display color for an owner/faction as r, g, b, a.
 ---@param owner integer
 ---@return number
-function Minimap:getOwnerColor(owner) end
+function LMinimap:getOwnerColor(owner) end
 
 --- Returns the number of active pings.
 ---@return number
-function Minimap:getPingCount() end
+function LMinimap:getPingCount() end
 
 --- Returns the terrain type at a 1-based grid position.
 ---@param x integer
 ---@param y integer
 ---@return number
-function Minimap:getTerrain(x, y) end
+function LMinimap:getTerrain(x, y) end
 
 --- Returns the display color for a terrain type as r, g, b, a.
 ---@param terrain_type integer
 ---@return number
-function Minimap:getTerrainColor(terrain_type) end
+function LMinimap:getTerrainColor(terrain_type) end
 
 --- Returns the hover tooltip string for a terrain type ID, or nil.
 ---@param type_id integer
 ---@return string
-function Minimap:getTileDescription(type_id) end
+function LMinimap:getTileDescription(type_id) end
 
 --- Returns the viewport rectangle color as r, g, b, a.
 ---@return number
-function Minimap:getViewportColor() end
+function LMinimap:getViewportColor() end
 
 --- Returns the viewport rectangle as x, y, w, h or nil if not set.
 ---@return nil
-function Minimap:getViewportRect() end
+function LMinimap:getViewportRect() end
 
 --- Returns the current zoom level.
 ---@return number
-function Minimap:getZoom() end
+function LMinimap:getZoom() end
 
 --- Converts grid coordinates to screen coordinates.
 ---@param gx number
@@ -11013,49 +12226,49 @@ function Minimap:getZoom() end
 ---@param minimap_x number
 ---@param minimap_y number
 ---@return number
-function Minimap:gridToScreen(gx, gy, minimap_x, minimap_y) end
+function LMinimap:gridToScreen(gx, gy, minimap_x, minimap_y) end
 
 --- Returns whether a marker with the given ID exists.
 ---@param id integer
 ---@return boolean
-function Minimap:hasMarker(id) end
+function LMinimap:hasMarker(id) end
 
 --- Returns whether anti-aliasing is enabled.
 ---@return boolean
-function Minimap:isAntiAlias() end
+function LMinimap:isAntiAlias() end
 
 --- Returns whether this minimap responds to click hit-testing.
 ---@return boolean
-function Minimap:isClickable() end
+function LMinimap:isClickable() end
 
 --- Returns whether fog of war is enabled.
 ---@return boolean
-function Minimap:isFogEnabled() end
+function LMinimap:isFogEnabled() end
 
 --- Returns whether an object type (1-based index) is visible.
 ---@param type_idx integer
 ---@return boolean
-function Minimap:isObjectTypeVisible(type_idx) end
+function LMinimap:isObjectTypeVisible(type_idx) end
 
 --- Returns whether the viewport rectangle is visible.
 ---@return boolean
-function Minimap:isViewportVisible() end
+function LMinimap:isViewportVisible() end
 
 --- Removes the minimap marker with the given integer ID, if present.
 ---@param id integer
 ---@return boolean
-function Minimap:removeMarker(id) end
+function LMinimap:removeMarker(id) end
 
 --- Removes a tracked object by ID.
 ---@param id integer
 ---@return boolean
-function Minimap:removeObject(id) end
+function LMinimap:removeObject(id) end
 
 --- Renders the minimap to the screen at the given position.
 ---@param x? number
 ---@param y? number
 ---@return nil
-function Minimap:render(x, y) end
+function LMinimap:render(x, y) end
 
 --- Converts screen coordinates to grid coordinates.
 ---@param sx number
@@ -11063,34 +12276,34 @@ function Minimap:render(x, y) end
 ---@param minimap_x number
 ---@param minimap_y number
 ---@return number
-function Minimap:screenToGrid(sx, sy, minimap_x, minimap_y) end
+function LMinimap:screenToGrid(sx, sy, minimap_x, minimap_y) end
 
 --- Sets whether anti-aliasing is enabled.
 ---@param enabled boolean
 ---@return nil
-function Minimap:setAntiAlias(enabled) end
+function LMinimap:setAntiAlias(enabled) end
 
 --- Sets the center of the minimap view in grid coordinates.
 ---@param x number
 ---@param y number
 ---@return nil
-function Minimap:setCenter(x, y) end
+function LMinimap:setCenter(x, y) end
 
 --- Sets whether this minimap responds to click hit-testing.
 ---@param enabled boolean
 ---@return nil
-function Minimap:setClickable(enabled) end
+function LMinimap:setClickable(enabled) end
 
 --- Sets the color mode ("terrain" or "political").
 ---@param mode string
 ---@return nil
-function Minimap:setColorMode(mode) end
+function LMinimap:setColorMode(mode) end
 
 --- Sets the display size in pixels.
 ---@param w integer
 ---@param h integer
 ---@return nil
-function Minimap:setDisplaySize(w, h) end
+function LMinimap:setDisplaySize(w, h) end
 
 --- Sets the fog overlay color.
 ---@param r number
@@ -11098,42 +12311,42 @@ function Minimap:setDisplaySize(w, h) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Minimap:setFogColor(r, g, b, a) end
+function LMinimap:setFogColor(r, g, b, a) end
 
 --- Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
 ---@param data table
 ---@return nil
-function Minimap:setFogData(data) end
+function LMinimap:setFogData(data) end
 
 --- Enables or disables fog of war.
 ---@param enabled boolean
 ---@return nil
-function Minimap:setFogEnabled(enabled) end
+function LMinimap:setFogEnabled(enabled) end
 
 --- Sets the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
 ---@param x integer
 ---@param y integer
 ---@param level integer
 ---@return nil
-function Minimap:setFogLevel(x, y, level) end
+function LMinimap:setFogLevel(x, y, level) end
 
 --- Switches the minimap's active render layer (0-based index).
 ---@param layer integer
 ---@return nil
-function Minimap:setLayer(layer) end
+function LMinimap:setLayer(layer) end
 
 --- Stores tile data for a specific layer index.
 ---@param layer integer
 ---@param data table
 ---@return nil
-function Minimap:setLayerData(layer, data) end
+function LMinimap:setLayerData(layer, data) end
 
 --- Attaches an animation to a marker. Does nothing if the ID does not exist.
 ---@param id integer
 ---@param anim_type string
 ---@param speed number
 ---@return nil
-function Minimap:setMarkerAnimation(id, anim_type, speed) end
+function LMinimap:setMarkerAnimation(id, anim_type, speed) end
 
 --- Sets or updates a tracked object on the minimap.
 ---@param id integer
@@ -11142,13 +12355,13 @@ function Minimap:setMarkerAnimation(id, anim_type, speed) end
 ---@param type_idx integer
 ---@param owner? integer
 ---@return nil
-function Minimap:setObject(id, x, y, type_idx, owner) end
+function LMinimap:setObject(id, x, y, type_idx, owner) end
 
 --- Sets whether an object type (1-based index) is visible.
 ---@param type_idx integer
 ---@param visible boolean
 ---@return nil
-function Minimap:setObjectTypeVisible(type_idx, visible) end
+function LMinimap:setObjectTypeVisible(type_idx, visible) end
 
 --- Sets the display color for an owner/faction.
 ---@param owner integer
@@ -11157,14 +12370,14 @@ function Minimap:setObjectTypeVisible(type_idx, visible) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Minimap:setOwnerColor(owner, r, g, b, a) end
+function LMinimap:setOwnerColor(owner, r, g, b, a) end
 
 --- Sets the terrain type at a 1-based grid position.
 ---@param x integer
 ---@param y integer
 ---@param terrain_type integer
 ---@return nil
-function Minimap:setTerrain(x, y, terrain_type) end
+function LMinimap:setTerrain(x, y, terrain_type) end
 
 --- Sets the display color for a terrain type.
 ---@param terrain_type integer
@@ -11173,18 +12386,18 @@ function Minimap:setTerrain(x, y, terrain_type) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Minimap:setTerrainColor(terrain_type, r, g, b, a) end
+function LMinimap:setTerrainColor(terrain_type, r, g, b, a) end
 
 --- Sets terrain types from a flat 1-based Lua table of integers (row-major).
 ---@param data table
 ---@return nil
-function Minimap:setTerrainData(data) end
+function LMinimap:setTerrainData(data) end
 
 --- Sets a hover tooltip string for a terrain type ID.
 ---@param type_id integer
 ---@param desc string
 ---@return nil
-function Minimap:setTileDescription(type_id, desc) end
+function LMinimap:setTileDescription(type_id, desc) end
 
 --- Sets the viewport rectangle color.
 ---@param r number
@@ -11192,7 +12405,7 @@ function Minimap:setTileDescription(type_id, desc) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Minimap:setViewportColor(r, g, b, a) end
+function LMinimap:setViewportColor(r, g, b, a) end
 
 --- Sets the viewport rectangle overlay in grid coordinates.
 ---@param x number
@@ -11200,37 +12413,37 @@ function Minimap:setViewportColor(r, g, b, a) end
 ---@param w number
 ---@param h number
 ---@return nil
-function Minimap:setViewportRect(x, y, w, h) end
+function LMinimap:setViewportRect(x, y, w, h) end
 
 --- Sets whether the viewport rectangle is visible.
 ---@param visible boolean
 ---@return nil
-function Minimap:setViewportVisible(visible) end
+function LMinimap:setViewportVisible(visible) end
 
 --- Sets the zoom level (minimum 0.1).
 ---@param zoom number
 ---@return nil
-function Minimap:setZoom(zoom) end
+function LMinimap:setZoom(zoom) end
 
 --- Displays a pathfinding route on the minimap and returns its path ID.
 ---@param points table
 ---@param color table
 ---@return nil
-function Minimap:showPath(points, color) end
+function LMinimap:showPath(points, color) end
 
 --- Returns the type name of this object.
 ---@return string
-function Minimap:type() end
+function LMinimap:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function Minimap:typeOf(name) end
+function LMinimap:typeOf(name) end
 
 --- Advances time-based effects by dt seconds (expires pings).
 ---@param dt number
 ---@return nil
-function Minimap:update(dt) end
+function LMinimap:update(dt) end
 
 --- Creates a new grid-based minimap.
 ---@param grid_w integer
@@ -11244,211 +12457,238 @@ lurek.minimap.newMinimap = function(grid_w, grid_h, display_w, display_h) end
 lurek.mods = {}
 
 --- A typed content registry for mod-contributed assets and objects.
----@class ContentRegistry
-ContentRegistry = {}
+---@class LContentRegistry
+LContentRegistry = {}
 
 --- Retrieve a content entry.
 ---@param type_name string — registered type name
 ---@param id string — content identifier
 ---@return number
-function ContentRegistry:get(type_name, id) end
+function LContentRegistry:get(type_name, id) end
 
 --- Get all entries for a type.
 ---@param type_name string — registered type name
 ---@return number
-function ContentRegistry:getAll(type_name) end
+function LContentRegistry:getAll(type_name) end
 
 --- Get all registered type names.
 ---@return string
-function ContentRegistry:getTypes() end
+function LContentRegistry:getTypes() end
 
 --- Register a content entry.
 ---@param type_name string — registered type name
 ---@param id string — unique identifier for this entry
 ---@param obj any — the content object to store
 ---@return nil
-function ContentRegistry:register(type_name, id, obj) end
+function LContentRegistry:register(type_name, id, obj) end
 
 --- Register a new content type.
 ---@param type_name string — type identifier(e.g. "weapon","spell")
 ---@return nil
-function ContentRegistry:registerType(type_name) end
+function LContentRegistry:registerType(type_name) end
+
+--- Returns the type name of this object.
+---@return string
+function LContentRegistry:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LContentRegistry:typeOf(name) end
 
 --- Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
----@class Mod
-Mod = {}
+---@class LMod
+LMod = {}
 
 --- Returns the required engine API version string, or nil if not set
 ---@return string
-function Mod:getApiVersion() end
+function LMod:getApiVersion() end
 
 --- Returns the author name string from this mod's metadata manifest
 ---@return string
-function Mod:getAuthor() end
+function LMod:getAuthor() end
 
 --- Returns an array of declared capability flags
 ---@return table
-function Mod:getCapabilities() end
+function LMod:getCapabilities() end
 
 --- Returns the stored config value, or nil
 ---@return table
-function Mod:getConfig() end
+function LMod:getConfig() end
 
 --- Returns the config schema as an array of `{key, type, default}` tables.
 ---@return table
-function Mod:getConfigSchema() end
+function LMod:getConfigSchema() end
 
 --- Returns the list of required mod IDs
 ---@return table
-function Mod:getDependencies() end
+function LMod:getDependencies() end
 
 --- Returns the mod description
 ---@return string
-function Mod:getDescription() end
+function LMod:getDescription() end
 
 --- Returns the hook function for the given name, or nil
 ---@param name string
 ---@return function
-function Mod:getHook(name) end
+function LMod:getHook(name) end
 
 --- Returns an array of registered hook names
 ---@return table
-function Mod:getHookNames() end
+function LMod:getHookNames() end
 
 --- Returns the unique mod identifier
 ---@return string
-function Mod:getId() end
+function LMod:getId() end
 
 --- Returns the localized or human-readable display name of the mod.
 ---@return string
-function Mod:getName() end
+function LMod:getName() end
 
 --- Returns the load-order priority
 ---@return number
-function Mod:getPriority() end
+function LMod:getPriority() end
 
 --- Returns the version string
 ---@return string
-function Mod:getVersion() end
+function LMod:getVersion() end
 
 --- Returns whether a hook with the given name exists
 ---@param name string
 ---@return boolean
-function Mod:hasHook(name) end
+function LMod:hasHook(name) end
 
 --- Returns whether the mod is enabled
 ---@return boolean
-function Mod:isEnabled() end
+function LMod:isEnabled() end
 
 --- Returns whether the mod has been loaded
 ---@return boolean
-function Mod:isLoaded() end
+function LMod:isLoaded() end
 
 --- Releases all hook and config registry references
 ---@return nil
-function Mod:releaseRefs() end
+function LMod:releaseRefs() end
 
 --- Sets the required engine API version string
 ---@param api_version string
 ---@return nil
-function Mod:setApiVersion(api_version) end
+function LMod:setApiVersion(api_version) end
 
 --- Replaces the capability list with the given array of strings
 ---@param caps table
 ---@return nil
-function Mod:setCapabilities(caps) end
+function LMod:setCapabilities(caps) end
 
 --- Stores an arbitrary config value for this mod
 ---@param value table
 ---@return nil
-function Mod:setConfig(value) end
+function LMod:setConfig(value) end
 
 --- Replaces the config schema with the given array of `{key, type, default}` tables.
 ---@param schema table
 ---@return nil
-function Mod:setConfigSchema(schema) end
+function LMod:setConfigSchema(schema) end
 
 --- Enables or disables this mod; disabled mods are skipped during loading
 ---@param enabled boolean
 ---@return nil
-function Mod:setEnabled(enabled) end
+function LMod:setEnabled(enabled) end
 
 --- Registers a named hook callback, replacing any existing one
 ---@param name string
 ---@param func function
 ---@return nil
-function Mod:setHook(name, func) end
+function LMod:setHook(name, func) end
+
+--- Returns the type name of this object.
+---@return string
+function LMod:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMod:typeOf(name) end
 
 --- Lua-side wrapper around [`ModManager`].
----@class ModManager
-ModManager = {}
+---@class LModManager
+LModManager = {}
 
 --- Clears the custom load order, reverting to priority-based sorting
 ---@return nil
-function ModManager:clearLoadOrder() end
+function LModManager:clearLoadOrder() end
 
 --- Clears the reload queue without reloading
 ---@return nil
-function ModManager:clearReloadQueue() end
+function LModManager:clearReloadQueue() end
 
 --- Returns an array of info tables for all registered mods
 ---@return table
-function ModManager:getAllMods() end
+function LModManager:getAllMods() end
 
 --- Returns an array of info tables in effective load order
 ---@return table
-function ModManager:getLoadOrder() end
+function LModManager:getLoadOrder() end
 
 --- Returns the number of registered mods
 ---@return number
-function ModManager:getModCount() end
+function LModManager:getModCount() end
 
 --- Returns the filesystem path of a registered mod, or nil
 ---@param mod_id string
 ---@return string
-function ModManager:getModPath(mod_id) end
+function LModManager:getModPath(mod_id) end
 
 --- Returns the array of mod IDs pending hot-reload
 ---@return table
-function ModManager:getReloadQueue() end
+function LModManager:getReloadQueue() end
 
 --- Returns whether any circular dependency cycles exist
 ---@return boolean
-function ModManager:hasCircularDependencies() end
+function LModManager:hasCircularDependencies() end
 
 --- Returns whether a mod with the given ID is registered
 ---@param mod_id string
 ---@return boolean
-function ModManager:hasMod(mod_id) end
+function LModManager:hasMod(mod_id) end
 
 --- Marks a registered mod for hot-reload
 ---@param mod_id string
 ---@return boolean
-function ModManager:markForReload(mod_id) end
+function LModManager:markForReload(mod_id) end
 
 --- Registers a mod from its Mod userdata
 ---@param mod_ud Mod
 ---@return nil
-function ModManager:registerMod(mod_ud) end
+function LModManager:registerMod(mod_ud) end
 
 --- Scans a directory for mods with mod.toml and registers them
 ---@param path string
 ---@return table
-function ModManager:scanFolder(path) end
+function LModManager:scanFolder(path) end
 
 --- Sets an explicit load order from an array of mod ID strings
 ---@param order table
 ---@return nil
-function ModManager:setLoadOrder(order) end
+function LModManager:setLoadOrder(order) end
+
+--- Returns the type name of this object.
+---@return string
+function LModManager:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LModManager:typeOf(name) end
 
 --- Removes a mod by ID and returns whether it was found
 ---@param mod_id string
 ---@return boolean
-function ModManager:unregisterMod(mod_id) end
+function LModManager:unregisterMod(mod_id) end
 
 --- Returns an array of mod IDs with missing dependencies
 ---@return table
-function ModManager:validateDependencies() end
+function LModManager:validateDependencies() end
 
 --- Checks whether a mod's required `api_version` is compatible with the given `host_version`.
 ---@param mod_ud Mod
@@ -11473,118 +12713,118 @@ lurek.mods.newRegistry = function() end
 lurek.network = {}
 
 --- Lua-side wrapper around [`NetworkHost`].
----@class NetworkHost
-NetworkHost = {}
+---@class LNetworkHost
+LNetworkHost = {}
 
 --- Broadcasts data to all connected peers on a channel.
 ---@param channel_id integer
 ---@param data string
 ---@param reliable? boolean
 ---@return nil
-function NetworkHost:broadcast(channel_id, data, reliable) end
+function LNetworkHost:broadcast(channel_id, data, reliable) end
 
 --- Initiates a connection to a remote host, returning the peer ID.
 ---@param addr string
 ---@param channels? integer
 ---@param data? integer
 ---@return number
-function NetworkHost:connect(addr, channels, data) end
+function LNetworkHost:connect(addr, channels, data) end
 
 --- Destroys the host, closing the underlying socket.
 ---@return nil
-function NetworkHost:destroy() end
+function LNetworkHost:destroy() end
 
 --- Gracefully disconnects a peer.
 ---@param peer_id integer
 ---@param data? integer
 ---@return nil
-function NetworkHost:disconnect(peer_id, data) end
+function LNetworkHost:disconnect(peer_id, data) end
 
 --- Disconnects a peer after all queued packets have been sent.
 ---@param peer_id integer
 ---@param data? integer
 ---@return nil
-function NetworkHost:disconnectLater(peer_id, data) end
+function LNetworkHost:disconnectLater(peer_id, data) end
 
 --- Immediately disconnects a peer without handshake.
 ---@param peer_id integer
 ---@param data? integer
 ---@return nil
-function NetworkHost:disconnectNow(peer_id, data) end
+function LNetworkHost:disconnectNow(peer_id, data) end
 
 --- Flushes all pending sends immediately.
 ---@return nil
-function NetworkHost:flush() end
+function LNetworkHost:flush() end
 
 --- Returns the local bind address as a string.
 ---@return string
-function NetworkHost:getAddress() end
+function LNetworkHost:getAddress() end
 
 --- Returns the bandwidth limits as a table with incoming and outgoing fields.
 ---@return table
-function NetworkHost:getBandwidthLimit() end
+function LNetworkHost:getBandwidthLimit() end
 
 --- Returns the maximum number of channels per connection.
 ---@return number
-function NetworkHost:getChannelLimit() end
+function LNetworkHost:getChannelLimit() end
 
 --- Returns the number of currently connected peers.
 ---@return number
-function NetworkHost:getConnectedPeerCount() end
+function LNetworkHost:getConnectedPeerCount() end
 
 --- Returns a table of connected peer IDs.
 ---@return table
-function NetworkHost:getConnectedPeerIds() end
+function LNetworkHost:getConnectedPeerIds() end
 
 --- Returns the remote address of a peer, or nil if unavailable.
 ---@param peer_id integer
 ---@return string
-function NetworkHost:getPeerAddress(peer_id) end
+function LNetworkHost:getPeerAddress(peer_id) end
 
 --- Returns the maximum number of peer slots.
 ---@return number
-function NetworkHost:getPeerLimit() end
+function LNetworkHost:getPeerLimit() end
 
 --- Returns the connection state of a peer as a string.
 ---@param peer_id integer
 ---@return string
-function NetworkHost:getPeerState(peer_id) end
+function LNetworkHost:getPeerState(peer_id) end
 
 --- Returns a statistics table for a peer.
 ---@param peer_id integer
 ---@return table
-function NetworkHost:getPeerStats(peer_id) end
+function LNetworkHost:getPeerStats(peer_id) end
 
 --- Returns the multiplayer role of this host ("server", "client", or "host").
 ---@return string
-function NetworkHost:getRole() end
+function LNetworkHost:getRole() end
 
 --- Returns the round-trip time estimate for a peer in milliseconds.
 ---@param peer_id integer
 ---@return number
-function NetworkHost:getRoundTripTime(peer_id) end
+function LNetworkHost:getRoundTripTime(peer_id) end
 
 --- Returns true if this host was created as a client.
 ---@return boolean
-function NetworkHost:isClient() end
+function LNetworkHost:isClient() end
 
 --- Returns true if the host has been destroyed.
 ---@return boolean
-function NetworkHost:isDestroyed() end
+function LNetworkHost:isDestroyed() end
 
 --- Returns true if this host was created as a server.
 ---@return boolean
-function NetworkHost:isServer() end
+function LNetworkHost:isServer() end
 
 --- Sends a ping to a peer to measure round-trip time.
 ---@param peer_id integer
 ---@return nil
-function NetworkHost:ping(peer_id) end
+function LNetworkHost:ping(peer_id) end
 
 --- Resets a peer connection immediately without notifying the remote side.
 ---@param peer_id integer
 ---@return nil
-function NetworkHost:resetPeer(peer_id) end
+function LNetworkHost:resetPeer(peer_id) end
 
 --- Sends data to a specific peer on a channel.
 ---@param peer_id integer
@@ -11592,85 +12832,103 @@ function NetworkHost:resetPeer(peer_id) end
 ---@param data string
 ---@param reliable? boolean
 ---@return nil
-function NetworkHost:send(peer_id, channel_id, data, reliable) end
+function LNetworkHost:send(peer_id, channel_id, data, reliable) end
 
 --- Polls the network for one event, returning an event table or nil.
 ---@param timeout_ms? integer
 ---@return table
-function NetworkHost:service(timeout_ms) end
+function LNetworkHost:service(timeout_ms) end
 
 --- Sets the bandwidth limits in bytes per second.
 ---@param incoming? integer
 ---@param outgoing? integer
 ---@return nil
-function NetworkHost:setBandwidthLimit(incoming, outgoing) end
+function LNetworkHost:setBandwidthLimit(incoming, outgoing) end
 
 --- Sets the channel limit for future connections.
 ---@param limit integer
 ---@return nil
-function NetworkHost:setChannelLimit(limit) end
+function LNetworkHost:setChannelLimit(limit) end
+
+--- Returns the type name of this object.
+---@return string
+function LNetworkHost:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNetworkHost:typeOf(name) end
 
 --- Lua-side wrapper around [`NetworkRuntime`] for async HTTP/TCP/WebSocket.
----@class NetworkRuntime
-NetworkRuntime = {}
+---@class LNetworkRuntime
+LNetworkRuntime = {}
 
 --- Convenience: sends an HTTP GET request.
 ---@param url string
 ---@param headers? table
 ---@return number
-function NetworkRuntime:httpGet(url, headers) end
+function LNetworkRuntime:httpGet(url, headers) end
 
 --- Convenience: sends an HTTP POST request.
 ---@param url string
 ---@param body string
 ---@param headers? table
 ---@return number
-function NetworkRuntime:httpPost(url, body, headers) end
+function LNetworkRuntime:httpPost(url, body, headers) end
 
 --- Sends an HTTP request asynchronously. Poll with `poll()` for the response.
 ---@param opts table —{method,url,headers?,body?,timeout?}
 ---@return nil
-function NetworkRuntime:httpRequest(opts) end
+function LNetworkRuntime:httpRequest(opts) end
 
 --- Polls for completed async responses (HTTP, TCP events, WebSocket events).
 ---@return table
-function NetworkRuntime:poll() end
+function LNetworkRuntime:poll() end
 
 --- Shuts down the background network thread.
 ---@return nil
-function NetworkRuntime:shutdown() end
+function LNetworkRuntime:shutdown() end
 
 --- Closes the TCP connection identified by the given connection handle.
 ---@param id integer — connection ID
 ---@return nil
-function NetworkRuntime:tcpClose(id) end
+function LNetworkRuntime:tcpClose(id) end
 
 --- Opens a TCP connection to a remote address.
 ---@param addr string
 ---@return number
-function NetworkRuntime:tcpConnect(addr) end
+function LNetworkRuntime:tcpConnect(addr) end
 
 --- Sends data over a TCP connection.
 ---@param id integer — connection ID
 ---@param data string
 ---@return nil
-function NetworkRuntime:tcpSend(id, data) end
+function LNetworkRuntime:tcpSend(id, data) end
+
+--- Returns the type name of this object.
+---@return string
+function LNetworkRuntime:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LNetworkRuntime:typeOf(name) end
 
 --- Closes a WebSocket connection.
 ---@param id integer — connection ID
 ---@return nil
-function NetworkRuntime:wsClose(id) end
+function LNetworkRuntime:wsClose(id) end
 
 --- Opens a WebSocket connection.
 ---@param url string
 ---@return number
-function NetworkRuntime:wsConnect(url) end
+function LNetworkRuntime:wsConnect(url) end
 
 --- Sends a text message over a WebSocket connection.
 ---@param id integer — connection ID
 ---@param data string
 ---@return nil
-function NetworkRuntime:wsSend(id, data) end
+function LNetworkRuntime:wsSend(id, data) end
 
 --- Creates a LobbyInfo record and broadcasts it once on the local network.
 ---@param name string
@@ -11727,77 +12985,77 @@ lurek.network.unpack = function(data) end
 lurek.parallax = {}
 
 --- Lua-side handle to a single parallax background layer.
----@class ParallaxLayer
-ParallaxLayer = {}
+---@class LParallaxLayer
+LParallaxLayer = {}
 
 --- Removes scroll clamping so the layer scrolls freely.
 ---@return nil
-function ParallaxLayer:clearClamp() end
+function LParallaxLayer:clearClamp() end
 
 --- Returns the autoscroll velocity as `(vx, vy)`.
 ---@return number
-function ParallaxLayer:getAutoscroll() end
+function LParallaxLayer:getAutoscroll() end
 
 --- Returns the current blend mode as a string.
 ---@return string
-function ParallaxLayer:getBlendMode() end
+function LParallaxLayer:getBlendMode() end
 
 --- Returns the current floating-point depth.
 ---@return number
-function ParallaxLayer:getDepth() end
+function LParallaxLayer:getDepth() end
 
 --- Returns the static offset as `(x, y)`.
 ---@return number
-function ParallaxLayer:getOffset() end
+function LParallaxLayer:getOffset() end
 
 --- Returns the current opacity.
 ---@return number
-function ParallaxLayer:getOpacity() end
+function LParallaxLayer:getOpacity() end
 
 --- Returns the scroll factor as `(x, y)`.
 ---@return number
-function ParallaxLayer:getScrollFactor() end
+function LParallaxLayer:getScrollFactor() end
 
 --- Returns `true` if seamless infinite tiling is enabled.
 ---@return boolean
-function ParallaxLayer:getTiling() end
+function LParallaxLayer:getTiling() end
 
 --- Returns the current tint as `(r, g, b, a)`.
 ---@return number
-function ParallaxLayer:getTint() end
+function LParallaxLayer:getTint() end
 
 --- Returns the draw-order depth.
 ---@return number
-function ParallaxLayer:getZ() end
+function LParallaxLayer:getZ() end
 
 --- Returns `true` if the layer is currently visible.
 ---@return boolean
-function ParallaxLayer:isVisible() end
+function LParallaxLayer:isVisible() end
 
 --- Draws the layer using an explicit camera world position.
 ---@param cam_x number
 ---@param cam_y number
 ---@return nil
-function ParallaxLayer:render(cam_x, cam_y) end
+function LParallaxLayer:render(cam_x, cam_y) end
 
 --- Draws the layer using the engine active camera position automatically.
 ---@return nil
-function ParallaxLayer:renderAuto() end
+function LParallaxLayer:renderAuto() end
 
 --- Resets the autonomous scroll accumulator to zero.
 ---@return nil
-function ParallaxLayer:resetAutoscroll() end
+function LParallaxLayer:resetAutoscroll() end
 
 --- Sets the autonomous scroll velocity in world-pixels per second.
 ---@param vx number
 ---@param vy number
 ---@return nil
-function ParallaxLayer:setAutoscroll(vx, vy) end
+function LParallaxLayer:setAutoscroll(vx, vy) end
 
 --- Sets the GPU blend mode for this layer.
 ---@param mode string
 ---@return nil
-function ParallaxLayer:setBlendMode(mode) end
+function LParallaxLayer:setBlendMode(mode) end
 
 --- Clamps the scroll offset to a world-pixel range on each axis.
 ---@param min_x number
@@ -11805,52 +13063,52 @@ function ParallaxLayer:setBlendMode(mode) end
 ---@param max_x number
 ---@param max_y number
 ---@return nil
-function ParallaxLayer:setClamp(min_x, min_y, max_x, max_y) end
+function LParallaxLayer:setClamp(min_x, min_y, max_x, max_y) end
 
 --- Sets the floating-point draw depth for fine-grained layer ordering.
 ---@param z number
 ---@return nil
-function ParallaxLayer:setDepth(z) end
+function LParallaxLayer:setDepth(z) end
 
 --- Sets the static world-pixel position bias added on top of camera scroll.
 ---@param x number
 ---@param y number
 ---@return nil
-function ParallaxLayer:setOffset(x, y) end
+function LParallaxLayer:setOffset(x, y) end
 
 --- Sets the layer-wide opacity override in `[0.0, 1.0]`.
 ---@param a number
 ---@return nil
-function ParallaxLayer:setOpacity(a) end
+function LParallaxLayer:setOpacity(a) end
 
 --- Sets whether the layer tiles on the X and Y axes.
 ---@param repeat_x boolean
 ---@param repeat_y boolean
 ---@return nil
-function ParallaxLayer:setRepeat(repeat_x, repeat_y) end
+function LParallaxLayer:setRepeat(repeat_x, repeat_y) end
 
 --- Sets the texture display scale factor on each axis.
 ---@param sx number
 ---@param sy number
 ---@return nil
-function ParallaxLayer:setScale(sx, sy) end
+function LParallaxLayer:setScale(sx, sy) end
 
 --- Sets the scroll factor relative to camera movement on each axis.
 ---@param x number
 ---@param y number
 ---@return nil
-function ParallaxLayer:setScrollFactor(x, y) end
+function LParallaxLayer:setScrollFactor(x, y) end
 
 --- Sets explicit tile dimensions in logical pixels, overriding the default
 ---@param w number
 ---@param h number
 ---@return nil
-function ParallaxLayer:setTileSize(w, h) end
+function LParallaxLayer:setTileSize(w, h) end
 
 --- Enables or disables seamless infinite tiling on both axes simultaneously.
 ---@param enabled boolean
 ---@return nil
-function ParallaxLayer:setTiling(enabled) end
+function LParallaxLayer:setTiling(enabled) end
 
 --- Sets the multiplicative RGBA tint applied to all pixels of this layer.
 ---@param r number
@@ -11858,85 +13116,85 @@ function ParallaxLayer:setTiling(enabled) end
 ---@param b number
 ---@param a number
 ---@return nil
-function ParallaxLayer:setTint(r, g, b, a) end
+function LParallaxLayer:setTint(r, g, b, a) end
 
 --- Shows or hides this layer.
 ---@param visible boolean
 ---@return nil
-function ParallaxLayer:setVisible(visible) end
+function LParallaxLayer:setVisible(visible) end
 
 --- Sets the draw-order depth. Lower values render first (further back).
 ---@param z integer
 ---@return nil
-function ParallaxLayer:setZ(z) end
+function LParallaxLayer:setZ(z) end
 
 --- Returns the type name of this object.
 ---@return string
-function ParallaxLayer:type() end
+function LParallaxLayer:type() end
 
 --- Advances the autonomous scroll accumulator by `dt` seconds.
 ---@param dt number
 ---@return nil
-function ParallaxLayer:update(dt) end
+function LParallaxLayer:update(dt) end
 
 --- Lua-side container that groups `LuaParallaxLayer` objects for scene-level management.
----@class ParallaxSet
-ParallaxSet = {}
+---@class LParallaxSet
+LParallaxSet = {}
 
 --- Adds a layer to this set.
 ---@param layer LuaParallaxLayer
 ---@return nil
-function ParallaxSet:addLayer(layer) end
+function LParallaxSet:addLayer(layer) end
 
 --- Returns the name of this set.
 ---@return string
-function ParallaxSet:getName() end
+function LParallaxSet:getName() end
 
 --- Returns `true` if the set is currently visible.
 ---@return boolean
-function ParallaxSet:isVisible() end
+function LParallaxSet:isVisible() end
 
 --- Returns the number of layers in this set.
 ---@return number
-function ParallaxSet:layerCount() end
+function LParallaxSet:layerCount() end
 
 --- Removes the layer at the given 1-based index.
 ---@param index integer
 ---@return boolean
-function ParallaxSet:removeLayerAt(index) end
+function LParallaxSet:removeLayerAt(index) end
 
 --- Draws all visible layers in ascending `z` order using an explicit camera position.
 ---@param cam_x number
 ---@param cam_y number
 ---@return nil
-function ParallaxSet:render(cam_x, cam_y) end
+function LParallaxSet:render(cam_x, cam_y) end
 
 --- Draws all visible layers using the engine active camera position.
 ---@return nil
-function ParallaxSet:renderAuto() end
+function LParallaxSet:renderAuto() end
 
 --- Sets the name of this set.
 ---@param name string
 ---@return nil
-function ParallaxSet:setName(name) end
+function LParallaxSet:setName(name) end
 
 --- Shows or hides all layers in this set.
 ---@param visible boolean
 ---@return nil
-function ParallaxSet:setVisible(visible) end
+function LParallaxSet:setVisible(visible) end
 
 --- Re-sorts all layers by ascending `z` value.
 ---@return nil
-function ParallaxSet:sortByZ() end
+function LParallaxSet:sortByZ() end
 
 --- Returns the type name of this object.
 ---@return string
-function ParallaxSet:type() end
+function LParallaxSet:type() end
 
 --- Advances the autoscroll accumulator of every layer by `dt` seconds.
 ---@param dt number
 ---@return nil
-function ParallaxSet:update(dt) end
+function LParallaxSet:update(dt) end
 
 --- Creates a new parallax background layer from an options table.
 ---@param opts table
@@ -11952,8 +13210,8 @@ lurek.parallax.newSet = function(name) end
 lurek.particle = {}
 
 --- Lua-side handle to a particle system stored in SharedState.
----@class ParticleSystem
-ParticleSystem = {}
+---@class LParticleSystem
+LParticleSystem = {}
 
 --- Adds a gravity well that pulls (positive strength) or repels
 ---@param x number
@@ -11961,201 +13219,201 @@ ParticleSystem = {}
 ---@param strength number
 ---@param radius number
 ---@return nil
-function ParticleSystem:addAttractor(x, y, strength, radius) end
+function LParticleSystem:addAttractor(x, y, strength, radius) end
 
 --- Attaches a sub-emitter that bursts when a particle dies.
 ---@param config_tbl table
 ---@param burst_count? number
 ---@return nil
-function ParticleSystem:addSubEmitter(config_tbl, burst_count) end
+function LParticleSystem:addSubEmitter(config_tbl, burst_count) end
 
 --- Adds a child emitter that updates and renders with this system.
 ---@param config table
 ---@return number
-function ParticleSystem:addSubSystem(config) end
+function LParticleSystem:addSubSystem(config) end
 
 --- Removes all attractors from this particle system.
 ---@return nil
-function ParticleSystem:clearAttractors() end
+function LParticleSystem:clearAttractors() end
 
 --- Removes the bounding rectangle so particles can move freely.
 ---@return nil
-function ParticleSystem:clearBounds() end
+function LParticleSystem:clearBounds() end
 
 --- Creates a copy of this particle system (config only, no live particles).
 ---@return ParticleSystem
-function ParticleSystem:clone() end
+function LParticleSystem:clone() end
 
 --- Returns the number of living particles.
 ---@return number
-function ParticleSystem:count() end
+function LParticleSystem:count() end
 
 --- Renders all live particles to a CPU ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function ParticleSystem:drawToImage(width, height) end
+function LParticleSystem:drawToImage(width, height) end
 
 --- Emits a burst of the given number of particles.
 ---@param count integer
 ---@return nil
-function ParticleSystem:emit(count) end
+function LParticleSystem:emit(count) end
 
 --- Returns the number of attractors currently registered on this system.
 ---@return number
-function ParticleSystem:getAttractorCount() end
+function LParticleSystem:getAttractorCount() end
 
 --- Returns the maximum particle count.
 ---@return number
-function ParticleSystem:getBufferSize() end
+function LParticleSystem:getBufferSize() end
 
 --- Returns color keyframes as a table of {r,g,b,a} tables.
 ---@return table
-function ParticleSystem:getColors() end
+function LParticleSystem:getColors() end
 
 --- Returns the number of living particles (alias for count).
 ---@return number
-function ParticleSystem:getCount() end
+function LParticleSystem:getCount() end
 
 --- Returns emission direction in radians.
 ---@return number
-function ParticleSystem:getDirection() end
+function LParticleSystem:getDirection() end
 
 --- Returns emission area: dist-string, w, h.
 ---@return nil
-function ParticleSystem:getEmissionArea() end
+function LParticleSystem:getEmissionArea() end
 
 --- Returns particles emitted per second.
 ---@return number
-function ParticleSystem:getEmissionRate() end
+function LParticleSystem:getEmissionRate() end
 
 --- Returns the emitter lifetime.
 ---@return number
-function ParticleSystem:getEmitterLifetime() end
+function LParticleSystem:getEmitterLifetime() end
 
 --- Returns the current flipbook configuration as `(cols, rows, fps)`, or `nil` if not set.
 ---@return nil
-function ParticleSystem:getFlipbook() end
+function LParticleSystem:getFlipbook() end
 
 --- Returns the gravity acceleration applied to particles as two numbers `gx, gy`.
 ---@return number
-function ParticleSystem:getGravity() end
+function LParticleSystem:getGravity() end
 
 --- Returns the insert mode as a string.
 ---@return string
-function ParticleSystem:getInsertMode() end
+function LParticleSystem:getInsertMode() end
 
 --- Returns linear acceleration range.
 ---@return number
-function ParticleSystem:getLinearAcceleration() end
+function LParticleSystem:getLinearAcceleration() end
 
 --- Returns linear damping range.
 ---@return number
-function ParticleSystem:getLinearDamping() end
+function LParticleSystem:getLinearDamping() end
 
 --- Returns the render origin offset.
 ---@return number
-function ParticleSystem:getOffset() end
+function LParticleSystem:getOffset() end
 
 --- Returns min and max particle lifetime.
 ---@return number
-function ParticleSystem:getParticleLifetime() end
+function LParticleSystem:getParticleLifetime() end
 
 --- Returns the emitter world position.
 ---@return number
-function ParticleSystem:getPosition() end
+function LParticleSystem:getPosition() end
 
 --- Returns radial acceleration range.
 ---@return number
-function ParticleSystem:getRadialAcceleration() end
+function LParticleSystem:getRadialAcceleration() end
 
 --- Returns initial rotation range.
 ---@return number
-function ParticleSystem:getRotation() end
+function LParticleSystem:getRotation() end
 
 --- Returns the particle draw shape as a string.
 ---@return string
-function ParticleSystem:getShape() end
+function LParticleSystem:getShape() end
 
 --- Returns the maximum random size variation applied to newly emitted particles.
 ---@return number
-function ParticleSystem:getSizeVariation() end
+function LParticleSystem:getSizeVariation() end
 
 --- Returns size keyframes as a Lua table.
 ---@return table
-function ParticleSystem:getSizes() end
+function LParticleSystem:getSizes() end
 
 --- Returns min/max initial speed.
 ---@return number
-function ParticleSystem:getSpeed() end
+function LParticleSystem:getSpeed() end
 
 --- Returns angular velocity range.
 ---@return number
-function ParticleSystem:getSpin() end
+function LParticleSystem:getSpin() end
 
 --- Returns the maximum random angular velocity variation for new particles.
 ---@return number
-function ParticleSystem:getSpinVariation() end
+function LParticleSystem:getSpinVariation() end
 
 --- Returns the half-angle spread in radians for the emission cone.
 ---@return number
-function ParticleSystem:getSpread() end
+function LParticleSystem:getSpread() end
 
 --- Returns tangential acceleration range.
 ---@return number
-function ParticleSystem:getTangentialAcceleration() end
+function LParticleSystem:getTangentialAcceleration() end
 
 --- Returns whether relative rotation is enabled.
 ---@return boolean
-function ParticleSystem:hasRelativeRotation() end
+function LParticleSystem:hasRelativeRotation() end
 
 --- Returns true if the emitter is currently emitting or has live particles.
 ---@return boolean
-function ParticleSystem:isActive() end
+function LParticleSystem:isActive() end
 
 --- Returns true if there are no live particles.
 ---@return boolean
-function ParticleSystem:isEmpty() end
+function LParticleSystem:isEmpty() end
 
 --- Returns true if the system has reached max_particles.
 ---@return boolean
-function ParticleSystem:isFull() end
+function LParticleSystem:isFull() end
 
 --- Returns true if the emitter is paused.
 ---@return boolean
-function ParticleSystem:isPaused() end
+function LParticleSystem:isPaused() end
 
 --- Returns true if the emitter is stopped.
 ---@return boolean
-function ParticleSystem:isStopped() end
+function LParticleSystem:isStopped() end
 
 --- Moves the emitter to the given world position.
 ---@param x number
 ---@param y number
 ---@return nil
-function ParticleSystem:moveTo(x, y) end
+function LParticleSystem:moveTo(x, y) end
 
 --- Pauses particle emission; existing particles continue to simulate.
 ---@return nil
-function ParticleSystem:pause() end
+function LParticleSystem:pause() end
 
 --- Removes the particle system from the engine, freeing its slot.
 ---@return nil
-function ParticleSystem:release() end
+function LParticleSystem:release() end
 
 --- Renders all live particles to the GPU command queue.
 ---@param ox? number
 ---@param oy? number
 ---@return nil
-function ParticleSystem:render(ox, oy) end
+function LParticleSystem:render(ox, oy) end
 
 --- Removes all particles and resets the emitter.
 ---@return nil
-function ParticleSystem:reset() end
+function LParticleSystem:reset() end
 
 --- Resumes a paused emitter.
 ---@return nil
-function ParticleSystem:resume() end
+function LParticleSystem:resume() end
 
 --- Constrains all particles to an axis-aligned bounding rectangle.
 ---@param xmin number
@@ -12164,27 +13422,27 @@ function ParticleSystem:resume() end
 ---@param ymax number
 ---@param restitution number
 ---@return nil
-function ParticleSystem:setBounds(xmin, xmax, ymin, ymax, restitution) end
+function LParticleSystem:setBounds(xmin, xmax, ymin, ymax, restitution) end
 
 --- Sets the maximum number of particles (resizes the pool).
 ---@param n integer
 ---@return nil
-function ParticleSystem:setBufferSize(n) end
+function LParticleSystem:setBufferSize(n) end
 
 --- Sets color keyframes. Each arg is a table {r, g, b, a}.
 ---@param ... table
 ---@return nil
-function ParticleSystem:setColors(...) end
+function LParticleSystem:setColors(...) end
 
 --- Sets a Lua function that returns (offset_x, offset_y) for each newly spawned
 ---@param fn function
 ---@return nil
-function ParticleSystem:setCustomEmissionShape(fn) end
+function LParticleSystem:setCustomEmissionShape(fn) end
 
 --- Sets emission direction in radians.
 ---@param dir number
 ---@return nil
-function ParticleSystem:setDirection(dir) end
+function LParticleSystem:setDirection(dir) end
 
 --- Sets emission area distribution and size.
 ---@param dist string
@@ -12193,35 +13451,35 @@ function ParticleSystem:setDirection(dir) end
 ---@param angle? number
 ---@param dir_relative? boolean
 ---@return nil
-function ParticleSystem:setEmissionArea(dist, w, h, angle, dir_relative) end
+function LParticleSystem:setEmissionArea(dist, w, h, angle, dir_relative) end
 
 --- Sets particles emitted per second.
 ---@param rate number
 ---@return nil
-function ParticleSystem:setEmissionRate(rate) end
+function LParticleSystem:setEmissionRate(rate) end
 
 --- Sets how long the emitter runs before auto-stopping. Negative = infinite.
 ---@param t number
 ---@return nil
-function ParticleSystem:setEmitterLifetime(t) end
+function LParticleSystem:setEmitterLifetime(t) end
 
 --- Configures sprite-sheet flipbook animation by dividing the texture into a grid.
 ---@param cols number -- columns in the sprite sheet
 ---@param rows number -- rows in the sprite sheet
 ---@param fps number -- animation speed in frames per second
 ---@return nil
-function ParticleSystem:setFlipbook(cols, rows, fps) end
+function LParticleSystem:setFlipbook(cols, rows, fps) end
 
 --- Sets the gravity acceleration applied to all active particles each frame.
 ---@param gx number
 ---@param gy number
 ---@return nil
-function ParticleSystem:setGravity(gx, gy) end
+function LParticleSystem:setGravity(gx, gy) end
 
 --- Sets the insert mode: "top", "bottom", or "random".
 ---@param mode string
 ---@return nil
-function ParticleSystem:setInsertMode(mode) end
+function LParticleSystem:setInsertMode(mode) end
 
 --- Sets linear acceleration range.
 ---@param xmin number
@@ -12229,165 +13487,165 @@ function ParticleSystem:setInsertMode(mode) end
 ---@param xmax number
 ---@param ymax number
 ---@return nil
-function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
+function LParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
 
 --- Sets linear damping range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setLinearDamping(min, max) end
+function LParticleSystem:setLinearDamping(min, max) end
 
 --- Sets the render origin offset.
 ---@param ox number
 ---@param oy number
 ---@return nil
-function ParticleSystem:setOffset(ox, oy) end
+function LParticleSystem:setOffset(ox, oy) end
 
 --- Sets a Lua function called after each update() with all particles that died
 ---@param fn function
 ---@return nil
-function ParticleSystem:setOnDeathBatch(fn) end
+function LParticleSystem:setOnDeathBatch(fn) end
 
 --- Sets min and max particle lifetime in seconds.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setParticleLifetime(min, max) end
+function LParticleSystem:setParticleLifetime(min, max) end
 
 --- Sets the emitter world position.
 ---@param x number
 ---@param y number
 ---@return nil
-function ParticleSystem:setPosition(x, y) end
+function LParticleSystem:setPosition(x, y) end
 
 --- Sets radial acceleration range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setRadialAcceleration(min, max) end
+function LParticleSystem:setRadialAcceleration(min, max) end
 
 --- Sets whether particle rotation follows velocity direction.
 ---@param v boolean
 ---@return nil
-function ParticleSystem:setRelativeRotation(v) end
+function LParticleSystem:setRelativeRotation(v) end
 
 --- Sets initial rotation range in radians.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setRotation(min, max) end
+function LParticleSystem:setRotation(min, max) end
 
 --- Sets the particle draw shape.
 ---@param shape string
 ---@return nil
-function ParticleSystem:setShape(shape) end
+function LParticleSystem:setShape(shape) end
 
 --- Sets size variation (0â€“1).
 ---@param v number
 ---@return nil
-function ParticleSystem:setSizeVariation(v) end
+function LParticleSystem:setSizeVariation(v) end
 
 --- Sets size keyframes (varargs: each number is one keyframe).
 ---@param ... number
 ---@return nil
-function ParticleSystem:setSizes(...) end
+function LParticleSystem:setSizes(...) end
 
 --- Sets min/max initial speed.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setSpeed(min, max) end
+function LParticleSystem:setSpeed(min, max) end
 
 --- Sets angular velocity range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setSpin(min, max) end
+function LParticleSystem:setSpin(min, max) end
 
 --- Sets spin variation (0â€“1).
 ---@param v number
 ---@return nil
-function ParticleSystem:setSpinVariation(v) end
+function LParticleSystem:setSpinVariation(v) end
 
 --- Sets emission spread (half-angle cone) in radians.
 ---@param spread number
 ---@return nil
-function ParticleSystem:setSpread(spread) end
+function LParticleSystem:setSpread(spread) end
 
 --- Sets tangential acceleration range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ParticleSystem:setTangentialAcceleration(min, max) end
+function LParticleSystem:setTangentialAcceleration(min, max) end
 
 --- Starts or restarts particle emission.
 ---@return nil
-function ParticleSystem:start() end
+function LParticleSystem:start() end
 
 --- Stops particle emission immediately.
 ---@return nil
-function ParticleSystem:stop() end
+function LParticleSystem:stop() end
 
 --- Returns the number of direct child sub-systems attached to this emitter.
 ---@return number
-function ParticleSystem:subSystemCount() end
+function LParticleSystem:subSystemCount() end
 
 --- Alias for `drawToImage`. Renders all live particles to a CPU ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function ParticleSystem:toImage(width, height) end
+function LParticleSystem:toImage(width, height) end
 
 --- Returns the type name "ParticleSystem".
 ---@return string
-function ParticleSystem:type() end
+function LParticleSystem:type() end
 
 --- Returns true if this matches the given type name.
 ---@param name string
 ---@return boolean
-function ParticleSystem:typeOf(name) end
+function LParticleSystem:typeOf(name) end
 
 --- Advances the particle simulation by dt seconds.
 ---@param dt number
 ---@return nil
-function ParticleSystem:update(dt) end
+function LParticleSystem:update(dt) end
 
 --- Pre-simulates the particle system for `seconds` so it appears fully
 ---@param seconds number
 ---@return nil
-function ParticleSystem:warmUp(seconds) end
+function LParticleSystem:warmUp(seconds) end
 
 --- Lua-side wrapper around a [`Trail`] ribbon effect.
----@class Trail
-Trail = {}
+---@class LTrail
+LTrail = {}
 
 --- Removes all trail points.
 ---@return nil
-function Trail:clear() end
+function LTrail:clear() end
 
 --- Renders the trail ribbon to a CPU ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function Trail:drawToImage(width, height) end
+function LTrail:drawToImage(width, height) end
 
 --- Returns the trail point lifetime in seconds.
 ---@return number
-function Trail:getLifetime() end
+function LTrail:getLifetime() end
 
 --- Returns the number of active trail points.
 ---@return number
-function Trail:getPointCount() end
+function LTrail:getPointCount() end
 
 --- Returns the start and end width.
 ---@return number
-function Trail:getWidth() end
+function LTrail:getWidth() end
 
 --- Appends a new point to the trail head.
 ---@param x number
 ---@param y number
 ---@return nil
-function Trail:pushPoint(x, y) end
+function LTrail:pushPoint(x, y) end
 
 --- Sets the colour at the newest end of the trail.
 ---@param r number
@@ -12395,17 +13653,17 @@ function Trail:pushPoint(x, y) end
 ---@param b number
 ---@param a number
 ---@return nil
-function Trail:setHeadColor(r, g, b, a) end
+function LTrail:setHeadColor(r, g, b, a) end
 
 --- Sets how long each trail point persists in seconds.
 ---@param lifetime number
 ---@return nil
-function Trail:setLifetime(lifetime) end
+function LTrail:setLifetime(lifetime) end
 
 --- Sets the minimum distance between trail points.
 ---@param distance number
 ---@return nil
-function Trail:setMinDistance(distance) end
+function LTrail:setMinDistance(distance) end
 
 --- Sets the colour at the oldest end of the trail.
 ---@param r number
@@ -12413,18 +13671,27 @@ function Trail:setMinDistance(distance) end
 ---@param b number
 ---@param a number
 ---@return nil
-function Trail:setTailColor(r, g, b, a) end
+function LTrail:setTailColor(r, g, b, a) end
 
 --- Sets the start and end width of the trail ribbon.
 ---@param start_width number
 ---@param end_width? number
 ---@return nil
-function Trail:setWidth(start_width, end_width) end
+function LTrail:setWidth(start_width, end_width) end
+
+--- Returns the type name of this object.
+---@return string
+function LTrail:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTrail:typeOf(name) end
 
 --- Ages trail points and removes expired ones.
 ---@param dt number
 ---@return nil
-function Trail:update(dt) end
+function LTrail:update(dt) end
 
 --- Creates a new particle system from a TOML config file.
 ---@param path string
@@ -12446,94 +13713,94 @@ lurek.particle.newTrail = function(lifetime, start_width) end
 lurek.pathfind = {}
 
 --- Lua-side wrapper around a PathGrid-based [`AiFlowField`].
----@class AiFlowField
-AiFlowField = {}
+---@class LAIFlowField
+LAIFlowField = {}
 
 --- Returns the normalised direction toward the goal (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function AiFlowField:getDirection(x, y) end
+function LAIFlowField:getDirection(x, y) end
 
 --- Returns the BFS distance to the goal (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function AiFlowField:getDistance(x, y) end
+function LAIFlowField:getDistance(x, y) end
 
 --- Returns the goal cell (1-based coordinates) or nil if unset.
 ---@return nil
-function AiFlowField:getGoal() end
+function LAIFlowField:getGoal() end
 
 --- Returns the flow field grid height in cells.
 ---@return number
-function AiFlowField:getHeight() end
+function LAIFlowField:getHeight() end
 
 --- Returns the flow field grid width in cells.
 ---@return number
-function AiFlowField:getWidth() end
+function LAIFlowField:getWidth() end
 
 --- Returns true if a goal has been set.
 ---@return boolean
-function AiFlowField:hasGoal() end
+function LAIFlowField:hasGoal() end
 
 --- Sets the goal cell and triggers BFS recomputation (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return nil
-function AiFlowField:setGoal(x, y) end
+function LAIFlowField:setGoal(x, y) end
 
 --- Returns the type name of this object.
 ---@return string
-function AiFlowField:type() end
+function LAIFlowField:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function AiFlowField:typeOf(name) end
+function LAIFlowField:typeOf(name) end
 
 --- Lua-side wrapper around a [`FlowField`].
----@class FlowField
-FlowField = {}
+---@class LFlowField
+LFlowField = {}
 
 --- Computes the flow field toward a single target (1-based coordinates).
 ---@param tx integer
 ---@param ty integer
 ---@param unitSize? integer
 ---@return nil
-function FlowField:calculate(tx, ty, unitSize) end
+function LFlowField:calculate(tx, ty, unitSize) end
 
 --- Computes the flow field toward multiple targets (1-based coordinates).
 ---@param targets table
 ---@param unitSize? integer
 ---@return nil
-function FlowField:calculateMulti(targets, unitSize) end
+function LFlowField:calculateMulti(targets, unitSize) end
 
 --- Returns the integrated cost to the nearest target (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function FlowField:getCostToTarget(x, y) end
+function LFlowField:getCostToTarget(x, y) end
 
 --- Returns the normalised direction vector at a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function FlowField:getDirection(x, y) end
+function LFlowField:getDirection(x, y) end
 
 --- Returns the flow direction as an angle in radians (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function FlowField:getDirectionAngle(x, y) end
+function LFlowField:getDirectionAngle(x, y) end
 
 --- Returns the target cells from the most recent computation (1-based coordinates).
 ---@return table
-function FlowField:getTargets() end
+function LFlowField:getTargets() end
 
 --- Returns true if the flow field has been computed at least once.
 ---@return boolean
-function FlowField:isCalculated() end
+function LFlowField:isCalculated() end
 
 --- Converts a world-space position into a velocity vector via the flow field.
 ---@param wx number
@@ -12542,20 +13809,20 @@ function FlowField:isCalculated() end
 ---@param tw number
 ---@param th number
 ---@return number
-function FlowField:steer(wx, wy, speed, tw, th) end
+function LFlowField:steer(wx, wy, speed, tw, th) end
 
 --- Returns the type name of this object.
 ---@return string
-function FlowField:type() end
+function LFlowField:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function FlowField:typeOf(name) end
+function LFlowField:typeOf(name) end
 
 --- Lua-side wrapper around a [`HexGrid`].
----@class HexGrid
-HexGrid = {}
+---@class LHexGrid
+LHexGrid = {}
 
 --- Hex-distance between two cells.
 ---@param col1 integer
@@ -12563,14 +13830,14 @@ HexGrid = {}
 ---@param col2 integer
 ---@param row2 integer
 ---@return number
-function HexGrid:distance(col1, row1, col2, row2) end
+function LHexGrid:distance(col1, row1, col2, row2) end
 
 --- Returns all cells visible from origin within max_range (1-based coordinates).
 ---@param col integer
 ---@param row integer
 ---@param max_range integer
 ---@return table
-function HexGrid:fieldOfView(col, row, max_range) end
+function LHexGrid:fieldOfView(col, row, max_range) end
 
 --- Find A* path between two cells (1-based coordinates).
 ---@param from_col integer
@@ -12578,13 +13845,13 @@ function HexGrid:fieldOfView(col, row, max_range) end
 ---@param to_col integer
 ---@param to_row integer
 ---@return table
-function HexGrid:findPath(from_col, from_row, to_col, to_row) end
+function LHexGrid:findPath(from_col, from_row, to_col, to_row) end
 
 --- Returns true if a cell is blocked (1-based coordinates).
 ---@param col integer
 ---@param row integer
 ---@return boolean
-function HexGrid:isBlocked(col, row) end
+function LHexGrid:isBlocked(col, row) end
 
 --- Returns true if there is an unobstructed line between two cells (1-based).
 ---@param from_col integer
@@ -12592,32 +13859,41 @@ function HexGrid:isBlocked(col, row) end
 ---@param to_col integer
 ---@param to_row integer
 ---@return boolean
-function HexGrid:lineOfSight(from_col, from_row, to_col, to_row) end
+function LHexGrid:lineOfSight(from_col, from_row, to_col, to_row) end
 
 --- Returns all cells reachable from origin within movement budget (1-based).
 ---@param col integer
 ---@param row integer
 ---@param budget number
 ---@return table
-function HexGrid:rangeOfMovement(col, row, budget) end
+function LHexGrid:rangeOfMovement(col, row, budget) end
 
 --- Mark/unmark a cell as blocked (1-based coordinates).
 ---@param col integer
 ---@param row integer
 ---@param blocked boolean
 ---@return nil
-function HexGrid:setBlocked(col, row, blocked) end
+function LHexGrid:setBlocked(col, row, blocked) end
 
 --- Set movement cost for a cell (1-based coordinates).
 ---@param col integer
 ---@param row integer
 ---@param cost number
 ---@return nil
-function HexGrid:setCost(col, row, cost) end
+function LHexGrid:setCost(col, row, cost) end
+
+--- Returns the type name of this object.
+---@return string
+function LHexGrid:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LHexGrid:typeOf(name) end
 
 --- Lua-side wrapper around a [`JpsGrid`].
----@class JpsGrid
-JpsGrid = {}
+---@class LJpsGrid
+LJpsGrid = {}
 
 --- Find a JPS path between two cells (1-based coordinates).
 ---@param from_x integer
@@ -12625,33 +13901,42 @@ JpsGrid = {}
 ---@param to_x integer
 ---@param to_y integer
 ---@return table
-function JpsGrid:findPath(from_x, from_y, to_x, to_y) end
+function LJpsGrid:findPath(from_x, from_y, to_x, to_y) end
 
 --- Returns true if the cell is blocked (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return boolean
-function JpsGrid:isBlocked(x, y) end
+function LJpsGrid:isBlocked(x, y) end
 
 --- Mark/unmark a cell as blocked (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param blocked boolean
 ---@return nil
-function JpsGrid:setBlocked(x, y, blocked) end
+function LJpsGrid:setBlocked(x, y, blocked) end
+
+--- Returns the type name of this object.
+---@return string
+function LJpsGrid:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LJpsGrid:typeOf(name) end
 
 --- Lua-side wrapper around a [`NavGrid`] with optional HPA★ abstract graph.
----@class NavGrid
-NavGrid = {}
+---@class LNavGrid
+LNavGrid = {}
 
 --- Clears all pending dirty rectangles.
 ---@return nil
-function NavGrid:clearDirty() end
+function LNavGrid:clearDirty() end
 
 --- Sets every cell to the given cost.
 ---@param cost integer
 ---@return nil
-function NavGrid:fill(cost) end
+function LNavGrid:fill(cost) end
 
 --- Sets all cells in a rectangle to the given cost (1-based coordinates).
 ---@param x integer
@@ -12660,83 +13945,83 @@ function NavGrid:fill(cost) end
 ---@param h integer
 ---@param cost integer
 ---@return nil
-function NavGrid:fillRect(x, y, w, h, cost) end
+function LNavGrid:fillRect(x, y, w, h, cost) end
 
 --- Returns the current HPA★ chunk size.
 ---@return number
-function NavGrid:getChunkSize() end
+function LNavGrid:getChunkSize() end
 
 --- Returns the traversal cost of a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function NavGrid:getCost(x, y) end
+function LNavGrid:getCost(x, y) end
 
 --- Returns the current diagonal movement mode as a string.
 ---@return string
-function NavGrid:getDiagonalMode() end
+function LNavGrid:getDiagonalMode() end
 
 --- Returns the grid dimensions as width, height.
 ---@return number
-function NavGrid:getDimensions() end
+function LNavGrid:getDimensions() end
 
 --- Returns the grid height in cells.
 ---@return number
-function NavGrid:getHeight() end
+function LNavGrid:getHeight() end
 
 --- Returns the grid width in cells.
 ---@return number
-function NavGrid:getWidth() end
+function LNavGrid:getWidth() end
 
 --- Returns true if the cell is blocked (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return boolean
-function NavGrid:isBlocked(x, y) end
+function LNavGrid:isBlocked(x, y) end
 
 --- Returns true if a unit footprint is fully walkable (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param unitSize? integer
 ---@return boolean
-function NavGrid:isWalkable(x, y, unitSize) end
+function LNavGrid:isWalkable(x, y, unitSize) end
 
 --- Overwrites the grid from a raw byte string (row-major, one byte per cell).
 ---@param data string
 ---@return nil
-function NavGrid:loadFromString(data) end
+function LNavGrid:loadFromString(data) end
 
 --- Rebuilds the HPA★ abstract graph from the current grid state.
 ---@return nil
-function NavGrid:rebuildAbstract() end
+function LNavGrid:rebuildAbstract() end
 
 --- Exports the cost grid as a byte string (row-major, one byte per cell).
 ---@return string
-function NavGrid:saveToString() end
+function LNavGrid:saveToString() end
 
 --- Marks a cell as blocked or unblocked (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param blocked boolean
 ---@return nil
-function NavGrid:setBlocked(x, y, blocked) end
+function LNavGrid:setBlocked(x, y, blocked) end
 
 --- Sets the HPA★ chunk size.
 ---@param size integer
 ---@return nil
-function NavGrid:setChunkSize(size) end
+function LNavGrid:setChunkSize(size) end
 
 --- Sets the traversal cost of a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param cost integer
 ---@return nil
-function NavGrid:setCost(x, y, cost) end
+function LNavGrid:setCost(x, y, cost) end
 
 --- Sets the diagonal movement mode.
 ---@param mode string
 ---@return nil
-function NavGrid:setDiagonalMode(mode) end
+function LNavGrid:setDiagonalMode(mode) end
 
 --- Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
 ---@param x integer
@@ -12744,20 +14029,20 @@ function NavGrid:setDiagonalMode(mode) end
 ---@param w integer
 ---@param h integer
 ---@return nil
-function NavGrid:setDirty(x, y, w, h) end
+function LNavGrid:setDirty(x, y, w, h) end
 
 --- Returns the type name of this object.
 ---@return string
-function NavGrid:type() end
+function LNavGrid:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function NavGrid:typeOf(name) end
+function LNavGrid:typeOf(name) end
 
 --- Lua-side wrapper around a [`PathGrid`] (A★ weighted grid with per-cell cost).
----@class PathGrid
-PathGrid = {}
+---@class LPathGrid
+LPathGrid = {}
 
 --- Finds an A★ path returning world-space waypoints (1-based coordinates).
 ---@param sx integer
@@ -12765,7 +14050,7 @@ PathGrid = {}
 ---@param gx integer
 ---@param gy integer
 ---@return table
-function PathGrid:findPath(sx, sy, gx, gy) end
+function LPathGrid:findPath(sx, sy, gx, gy) end
 
 --- Finds a smoothed A★ path with string-pulling (1-based coordinates).
 ---@param sx integer
@@ -12773,62 +14058,62 @@ function PathGrid:findPath(sx, sy, gx, gy) end
 ---@param gx integer
 ---@param gy integer
 ---@return table
-function PathGrid:findPathSmoothed(sx, sy, gx, gy) end
+function LPathGrid:findPathSmoothed(sx, sy, gx, gy) end
 
 --- Returns the world-space size of each cell.
 ---@return number
-function PathGrid:getCellSize() end
+function LPathGrid:getCellSize() end
 
 --- Returns the cost multiplier for a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return number
-function PathGrid:getCost(x, y) end
+function LPathGrid:getCost(x, y) end
 
 --- Returns the grid height in cells.
 ---@return number
-function PathGrid:getHeight() end
+function LPathGrid:getHeight() end
 
 --- Returns the grid width in cells.
 ---@return number
-function PathGrid:getWidth() end
+function LPathGrid:getWidth() end
 
 --- Returns true if a cell is walkable (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@return boolean
-function PathGrid:isWalkable(x, y) end
+function LPathGrid:isWalkable(x, y) end
 
 --- Sets the cost multiplier for a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param cost number
 ---@return nil
-function PathGrid:setCost(x, y, cost) end
+function LPathGrid:setCost(x, y, cost) end
 
 --- Sets the walkability of a cell (1-based coordinates).
 ---@param x integer
 ---@param y integer
 ---@param walkable boolean
 ---@return nil
-function PathGrid:setWalkable(x, y, walkable) end
+function LPathGrid:setWalkable(x, y, walkable) end
 
 --- Returns the type name of this object.
 ---@return string
-function PathGrid:type() end
+function LPathGrid:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function PathGrid:typeOf(name) end
+function LPathGrid:typeOf(name) end
 
 --- Lua-side wrapper around a [`UnitPathfinder`].
----@class UnitPathfinder
-UnitPathfinder = {}
+---@class LUnitPathfinder
+LUnitPathfinder = {}
 
 --- Removes all cached path results.
 ---@return nil
-function UnitPathfinder:clearCache() end
+function LUnitPathfinder:clearCache() end
 
 --- Finds the nearest walkable cell within a radius (1-based coordinates).
 ---@param x integer
@@ -12836,7 +14121,7 @@ function UnitPathfinder:clearCache() end
 ---@param maxRadius integer
 ---@param unitSize? integer
 ---@return nil
-function UnitPathfinder:findNearestWalkable(x, y, maxRadius, unitSize) end
+function LUnitPathfinder:findNearestWalkable(x, y, maxRadius, unitSize) end
 
 --- Finds a partial path with a node expansion limit (1-based coordinates).
 ---@param x1 integer
@@ -12846,7 +14131,7 @@ function UnitPathfinder:findNearestWalkable(x, y, maxRadius, unitSize) end
 ---@param maxNodes integer
 ---@param unitSize? integer
 ---@return boolean
-function UnitPathfinder:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize) end
+function LUnitPathfinder:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize) end
 
 --- Finds an A★ path between two cells (1-based coordinates).
 ---@param x1 integer
@@ -12855,7 +14140,7 @@ function UnitPathfinder:findPartialPath(x1, y1, x2, y2, maxNodes, unitSize) end
 ---@param y2 integer
 ---@param unitSize? integer
 ---@return table
-function UnitPathfinder:findPath(x1, y1, x2, y2, unitSize) end
+function LUnitPathfinder:findPath(x1, y1, x2, y2, unitSize) end
 
 --- Finds a path using bidirectional A★, expanding from start and goal simultaneously
 ---@param x1 integer
@@ -12865,7 +14150,7 @@ function UnitPathfinder:findPath(x1, y1, x2, y2, unitSize) end
 ---@param unitSize? integer
 ---@param maxNodes? integer
 ---@return nil
-function UnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unitSize, maxNodes) end
+function LUnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unitSize, maxNodes) end
 
 --- Finds a Theta★ smoothed path between two cells (1-based coordinates).
 ---@param x1 integer
@@ -12874,21 +14159,21 @@ function UnitPathfinder:findPathBidirectional(x1, y1, x2, y2, unitSize, maxNodes
 ---@param y2 integer
 ---@param unitSize? integer
 ---@return table
-function UnitPathfinder:findPathSmooth(x1, y1, x2, y2, unitSize) end
+function LUnitPathfinder:findPathSmooth(x1, y1, x2, y2, unitSize) end
 
 --- Returns the number of entries in the path cache.
 ---@return number
-function UnitPathfinder:getCacheSize() end
+function LUnitPathfinder:getCacheSize() end
 
 --- Returns the sum of grid traversal costs along a path.
 ---@param path table
 ---@return number
-function UnitPathfinder:getPathCost(path) end
+function LUnitPathfinder:getPathCost(path) end
 
 --- Returns the euclidean length of a path table.
 ---@param path table
 ---@return number
-function UnitPathfinder:getPathLength(path) end
+function LUnitPathfinder:getPathLength(path) end
 
 --- Returns the octile heuristic distance between two cells (1-based coordinates).
 ---@param x1 integer
@@ -12896,11 +14181,11 @@ function UnitPathfinder:getPathLength(path) end
 ---@param x2 integer
 ---@param y2 integer
 ---@return number
-function UnitPathfinder:heuristicDistance(x1, y1, x2, y2) end
+function LUnitPathfinder:heuristicDistance(x1, y1, x2, y2) end
 
 --- Returns true if path result caching is enabled.
 ---@return boolean
-function UnitPathfinder:isCacheEnabled() end
+function LUnitPathfinder:isCacheEnabled() end
 
 --- Returns true if a path exists between two cells (1-based coordinates).
 ---@param x1 integer
@@ -12909,7 +14194,7 @@ function UnitPathfinder:isCacheEnabled() end
 ---@param y2 integer
 ---@param unitSize? integer
 ---@return boolean
-function UnitPathfinder:isReachable(x1, y1, x2, y2, unitSize) end
+function LUnitPathfinder:isReachable(x1, y1, x2, y2, unitSize) end
 
 --- Returns true if there is a clear line of sight between two cells (1-based coordinates).
 ---@param x1 integer
@@ -12918,26 +14203,26 @@ function UnitPathfinder:isReachable(x1, y1, x2, y2, unitSize) end
 ---@param y2 integer
 ---@param unitSize? integer
 ---@return boolean
-function UnitPathfinder:lineOfSight(x1, y1, x2, y2, unitSize) end
+function LUnitPathfinder:lineOfSight(x1, y1, x2, y2, unitSize) end
 
 --- Enables or disables path result caching.
 ---@param enabled boolean
 ---@return nil
-function UnitPathfinder:setCacheEnabled(enabled) end
+function LUnitPathfinder:setCacheEnabled(enabled) end
 
 --- Sets the maximum number of cached path entries.
 ---@param n integer
 ---@return nil
-function UnitPathfinder:setCacheMaxSize(n) end
+function LUnitPathfinder:setCacheMaxSize(n) end
 
 --- Returns the type name of this object.
 ---@return string
-function UnitPathfinder:type() end
+function LUnitPathfinder:type() end
 
 --- Returns true if this object is of the given type.
 ---@param name string
 ---@return boolean
-function UnitPathfinder:typeOf(name) end
+function LUnitPathfinder:typeOf(name) end
 
 --- Returns the background pathfinding thread count (currently always 0).
 ---@return number
@@ -13005,511 +14290,511 @@ lurek.pathfind.setThreadCount = function(count) end
 lurek.patterns = {}
 
 --- Lua wrapper for the Blackboard pattern.
----@class Blackboard
-Blackboard = {}
+---@class LBlackboard
+LBlackboard = {}
 
 --- Removes a fact from the blackboard.
 ---@param key string
 ---@return nil
-function Blackboard:clear(key) end
+function LBlackboard:clear(key) end
 
 --- Clears all facts from the blackboard.
 ---@return nil
-function Blackboard:clearAll() end
+function LBlackboard:clearAll() end
 
 --- Gets a fact from the blackboard. Returns nil if not set.
 ---@param key string
 ---@return string
-function Blackboard:get(key) end
+function LBlackboard:get(key) end
 
 --- Returns the monotonic revision counter (incremented on every write).
 ---@return number
-function Blackboard:getRevision() end
+function LBlackboard:getRevision() end
 
 --- Returns true when the key has a non-nil value.
 ---@param key string
 ---@return boolean
-function Blackboard:has(key) end
+function LBlackboard:has(key) end
 
 --- Returns all set fact keys as a table.
 ---@return table
-function Blackboard:keys() end
+function LBlackboard:keys() end
 
 --- Sets a fact on the blackboard. Accepts boolean, number, or string values.
 ---@param key string
 ---@param value any
 ---@return nil
-function Blackboard:set(key, value) end
+function LBlackboard:set(key, value) end
 
 --- Returns all facts as a flat keyâ†’value table.
 ---@return table
-function Blackboard:snapshot() end
+function LBlackboard:snapshot() end
 
 --- Removes a watcher subscription by id.
 ---@param id integer
 ---@return nil
-function Blackboard:unwatch(id) end
+function LBlackboard:unwatch(id) end
 
 --- Subscribes to changes on a specific key (or "*" for all changes).
 ---@param key string
 ---@param callback function
 ---@return number
-function Blackboard:watch(key, callback) end
+function LBlackboard:watch(key, callback) end
 
 --- Lua wrapper for the CommandStack pattern.
----@class CommandStack
-CommandStack = {}
+---@class LCommandStack
+LCommandStack = {}
 
 --- Returns true if there is a command available to redo.
 ---@return boolean
-function CommandStack:canRedo() end
+function LCommandStack:canRedo() end
 
 --- Returns true if the most recent command can be undone.
 ---@return boolean
-function CommandStack:canUndo() end
+function LCommandStack:canUndo() end
 
 --- Clears all command history, releasing Lua registry values.
 ---@return nil
-function CommandStack:clearAll() end
+function LCommandStack:clearAll() end
 
 --- Executes a named command and records it in undo/redo history.
 ---@param name string
 ---@param exec_fn function
 ---@param undo_fn? function
 ---@return nil
-function CommandStack:execute(name, exec_fn, undo_fn) end
+function LCommandStack:execute(name, exec_fn, undo_fn) end
 
 --- Returns the name of the most recently executed command, or nil.
 ---@return string
-function CommandStack:getCurrentName() end
+function LCommandStack:getCurrentName() end
 
 --- Returns the total number of recorded commands (undo + redo).
 ---@return number
-function CommandStack:getHistorySize() end
+function LCommandStack:getHistorySize() end
 
 --- Re-executes the next undone command. Returns true if successful.
 ---@return boolean
-function CommandStack:redo() end
+function LCommandStack:redo() end
 
 --- Undoes the most recent command. Returns true if successful.
 ---@return boolean
-function CommandStack:undo() end
+function LCommandStack:undo() end
 
 --- Lua wrapper for the Debounce pattern.
----@class Debounce
-Debounce = {}
+---@class LDebounce
+LDebounce = {}
 
 --- Cancels the pending trigger without firing.
 ---@return nil
-function Debounce:cancel() end
+function LDebounce:cancel() end
 
 --- Returns the total number of times this debounce has fired.
 ---@return number
-function Debounce:getFireCount() end
+function LDebounce:getFireCount() end
 
 --- Returns true when a trigger is pending.
 ---@return boolean
-function Debounce:isPending() end
+function LDebounce:isPending() end
 
 --- Sets the callback invoked when the debounce fires.
 ---@param fn function
 ---@return nil
-function Debounce:onFire(fn) end
+function LDebounce:onFire(fn) end
 
 --- Records an input event, resetting the idle timer.
 ---@return nil
-function Debounce:trigger() end
+function LDebounce:trigger() end
 
 --- Advances the idle timer by dt seconds; fires the callback if idle wait expired.
 ---@param dt number
 ---@return boolean
-function Debounce:update(dt) end
+function LDebounce:update(dt) end
 
 --- Lua wrapper for the EventBus pattern.
----@class EventBus
-EventBus = {}
+---@class LEventBus
+LEventBus = {}
 
 --- Removes all listeners for a specific event.
 ---@param event string
 ---@return nil
-function EventBus:clear(event) end
+function LEventBus:clear(event) end
 
 --- Removes all listeners on this EventBus.
 ---@return nil
-function EventBus:clearAll() end
+function LEventBus:clearAll() end
 
 --- Dispatches an event, calling all registered listeners in priority order.
 ---@param event string
 ---@param ... any
 ---@return nil
-function EventBus:emit(event, ...) end
+function LEventBus:emit(event, ...) end
 
 --- Returns all event names that have at least one listener.
 ---@return table
-function EventBus:getEvents() end
+function LEventBus:getEvents() end
 
 --- Returns the number of listeners registered for an event.
 ---@param event string
 ---@return number
-function EventBus:getListenerCount(event) end
+function LEventBus:getListenerCount(event) end
 
 --- Removes a previously registered event listener by subscription ID.
 ---@param id integer
 ---@return nil
-function EventBus:off(id) end
+function LEventBus:off(id) end
 
 --- Registers a listener callback for an event.
 ---@param event string
 ---@param callback function
 ---@param priority? integer
 ---@return number
-function EventBus:on(event, callback, priority) end
+function LEventBus:on(event, callback, priority) end
 
 --- Lua wrapper for the Factory pattern.
----@class Factory
-Factory = {}
+---@class LFactory
+LFactory = {}
 
 --- Registers an alias pointing to an existing canonical type name.
 ---@param alias string
 ---@param canonical string
 ---@return nil
-function Factory:alias(alias, canonical) end
+function LFactory:alias(alias, canonical) end
 
 --- Removes all registered type constructors and aliases.
 ---@return nil
-function Factory:clearAll() end
+function LFactory:clearAll() end
 
 --- Creates an instance of the named type by invoking its constructor.
 ---@param type_name string
 ---@param ... any
 ---@return table
-function Factory:create(type_name, ...) end
+function LFactory:create(type_name, ...) end
 
 --- Returns a table of all registered type names.
 ---@return table
-function Factory:getTypes() end
+function LFactory:getTypes() end
 
 --- Returns true if the named type (or alias) is registered.
 ---@param type_name string
 ---@return boolean
-function Factory:has(type_name) end
+function LFactory:has(type_name) end
 
 --- Registers a named type constructor function.
 ---@param type_name string
 ---@param ctor function
 ---@return nil
-function Factory:register(type_name, ctor) end
+function LFactory:register(type_name, ctor) end
 
 --- Unregisters a type constructor (and any aliases pointing to it).
 ---@param type_name string
 ---@return nil
-function Factory:remove(type_name) end
+function LFactory:remove(type_name) end
 
 --- Lua wrapper for the Funnel (event aggregator) pattern.
----@class Funnel
-Funnel = {}
+---@class LFunnel
+LFunnel = {}
 
 --- Discards all buffered entries without flushing.
 ---@return nil
-function Funnel:discard() end
+function LFunnel:discard() end
 
 --- Manually flushes all pending entries, invoking the onFlush callback.
 ---@return nil
-function Funnel:flush() end
+function LFunnel:flush() end
 
 --- Returns the total number of flushes performed.
 ---@return number
-function Funnel:getFlushCount() end
+function LFunnel:getFlushCount() end
 
 --- Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries.
 ---@param fn function
 ---@return nil
-function Funnel:onFlush(fn) end
+function LFunnel:onFlush(fn) end
 
 --- Returns the number of buffered entries not yet flushed.
 ---@return number
-function Funnel:pendingCount() end
+function LFunnel:pendingCount() end
 
 --- Adds an event to the funnel. Immediately flushes if max_entries reached or window is 0.
 ---@param tag string
 ---@param value? number
 ---@return nil
-function Funnel:push(tag, value) end
+function LFunnel:push(tag, value) end
 
 --- Advances the window timer by dt seconds; flushes when window expires.
 ---@param dt number
 ---@return boolean
-function Funnel:update(dt) end
+function LFunnel:update(dt) end
 
 --- Lua wrapper for an ordered, resizable list.
----@class List
-List = {}
+---@class LList
+LList = {}
 
 --- Appends a value to the end of the list.
 ---@param value any
 ---@return nil
-function List:add(value) end
+function LList:add(value) end
 
 --- Removes all values from the list.
 ---@return nil
-function List:clear() end
+function LList:clear() end
 
 --- Returns true if the list contains a value equal to the given Lua value (string/number/boolean).
 ---@param value any
 ---@return boolean
-function List:contains(value) end
+function LList:contains(value) end
 
 --- Returns the value at a 1-based index, or nil.
 ---@param index integer
 ---@return table
-function List:get(index) end
+function LList:get(index) end
 
 --- Returns true if the list is empty.
 ---@return boolean
-function List:isEmpty() end
+function LList:isEmpty() end
 
 --- Returns the number of items in the list.
 ---@return number
-function List:len() end
+function LList:len() end
 
 --- Removes and returns the value at a 1-based index.
 ---@param index integer
 ---@return table
-function List:remove(index) end
+function LList:remove(index) end
 
 --- Replaces the value at a 1-based index.
 ---@param index integer
 ---@param value any
 ---@return nil
-function List:set(index, value) end
+function LList:set(index, value) end
 
 --- Returns all items as a Lua table.
 ---@return table
-function List:toArray() end
+function LList:toArray() end
 
 --- Lua wrapper for the Mediator pattern.
----@class Mediator
-Mediator = {}
+---@class LMediator
+LMediator = {}
 
 --- Dispatches a message to all handlers across all channels.
 ---@param ... any
 ---@return nil
-function Mediator:broadcast(...) end
+function LMediator:broadcast(...) end
 
 --- Returns all registered channel names.
 ---@return table
-function Mediator:channels() end
+function LMediator:channels() end
 
 --- Removes all channels and handlers.
 ---@return nil
-function Mediator:clear() end
+function LMediator:clear() end
 
 --- Returns the number of handlers on a channel.
 ---@param channel string
 ---@return number
-function Mediator:handlerCount(channel) end
+function LMediator:handlerCount(channel) end
 
 --- Unregisters a handler by ID.
 ---@param channel string
 ---@param id integer
 ---@return nil
-function Mediator:off(channel, id) end
+function LMediator:off(channel, id) end
 
 --- Registers a handler callback on a channel; returns handler ID.
 ---@param channel string
 ---@param callback function
 ---@return number
-function Mediator:on(channel, callback) end
+function LMediator:on(channel, callback) end
 
 --- Removes a channel and all its handlers.
 ---@param channel string
 ---@return nil
-function Mediator:removeChannel(channel) end
+function LMediator:removeChannel(channel) end
 
 --- Dispatches a message to all handlers on a channel.
 ---@param channel string
 ---@param ... any
 ---@return nil
-function Mediator:send(channel, ...) end
+function LMediator:send(channel, ...) end
 
 --- Lua wrapper for the ObjectPool pattern.
----@class ObjectPool
-ObjectPool = {}
+---@class LObjectPool
+LObjectPool = {}
 
 --- Acquires an available object from the pool; returns nil if empty.
 ---@return string
-function ObjectPool:acquire() end
+function LObjectPool:acquire() end
 
 --- Inserts a pre-built object into the available pool.
 ---@param value any
 ---@return nil
-function ObjectPool:add(value) end
+function LObjectPool:add(value) end
 
 --- Clears all objects from the pool, releasing Lua registry values.
 ---@return nil
-function ObjectPool:clearAll() end
+function LObjectPool:clearAll() end
 
 --- Returns the number of currently active (acquired) objects.
 ---@return number
-function ObjectPool:getActiveCount() end
+function LObjectPool:getActiveCount() end
 
 --- Returns the number of available (idle) objects in the pool.
 ---@return number
-function ObjectPool:getAvailableCount() end
+function LObjectPool:getAvailableCount() end
 
 --- Returns the total number of tracked objects (active + available).
 ---@return number
-function ObjectPool:getTotalCount() end
+function LObjectPool:getTotalCount() end
 
 --- Returns an object to the available pool.
 ---@param value any
 ---@return nil
-function ObjectPool:release(value) end
+function LObjectPool:release(value) end
 
 --- Lua wrapper for the Observer pattern.
----@class Observer
-Observer = {}
+---@class LObserver
+LObserver = {}
 
 --- Gets a property value, or nil if not set.
 ---@param key string
 ---@return string
-function Observer:get(key) end
+function LObserver:get(key) end
 
 --- Returns the total number of active subscriptions.
 ---@return number
-function Observer:getCount() end
+function LObserver:getCount() end
 
 --- Sets a property value and fires subscribed watchers.
 ---@param key string
 ---@param value any
 ---@return nil
-function Observer:set(key, value) end
+function LObserver:set(key, value) end
 
 --- Subscribes to changes on a property key (or "*" for all).
 ---@param key string
 ---@param callback function
 ---@param once? boolean
 ---@return number
-function Observer:subscribe(key, callback, once) end
+function LObserver:subscribe(key, callback, once) end
 
 --- Removes a subscription by id.
 ---@param id integer
 ---@return nil
-function Observer:unsubscribe(id) end
+function LObserver:unsubscribe(id) end
 
 --- Lua wrapper for the PriorityQueue pattern.
----@class PriorityQueue
-PriorityQueue = {}
+---@class LPriorityQueue
+LPriorityQueue = {}
 
 --- Removes all items from the queue.
 ---@return nil
-function PriorityQueue:clearAll() end
+function LPriorityQueue:clearAll() end
 
 --- Returns true when the queue has no items.
 ---@return boolean
-function PriorityQueue:isEmpty() end
+function LPriorityQueue:isEmpty() end
 
 --- Returns the number of items in the queue.
 ---@return number
-function PriorityQueue:len() end
+function LPriorityQueue:len() end
 
 --- Returns the highest-priority item without removing it, or nil if empty.
 ---@return string
-function PriorityQueue:peek() end
+function LPriorityQueue:peek() end
 
 --- Removes and returns the highest-priority item, or nil if empty.
 ---@return string
-function PriorityQueue:pop() end
+function LPriorityQueue:pop() end
 
 --- Inserts an item with a priority. Higher priorities are dequeued first.
 ---@param priority integer
 ---@param value any
 ---@param label? string
 ---@return number
-function PriorityQueue:push(priority, value, label) end
+function LPriorityQueue:push(priority, value, label) end
 
 --- Lua wrapper for a FIFO queue.
----@class Queue
-Queue = {}
+---@class LQueue
+LQueue = {}
 
 --- Removes all values from the queue.
 ---@return nil
-function Queue:clear() end
+function LQueue:clear() end
 
 --- Removes and returns the front value, or nil if empty.
 ---@return table
-function Queue:dequeue() end
+function LQueue:dequeue() end
 
 --- Adds a value to the back of the queue. Returns false if capacity is full.
 ---@param value any
 ---@return boolean
-function Queue:enqueue(value) end
+function LQueue:enqueue(value) end
 
 --- Returns the front value without removing it, or nil if empty.
 ---@return table
-function Queue:front() end
+function LQueue:front() end
 
 --- Returns true if the queue is empty.
 ---@return boolean
-function Queue:isEmpty() end
+function LQueue:isEmpty() end
 
 --- Returns true if the queue is at its capacity limit.
 ---@return boolean
-function Queue:isFull() end
+function LQueue:isFull() end
 
 --- Returns the number of items in the queue.
 ---@return number
-function Queue:len() end
+function LQueue:len() end
 
 --- Returns all items as a Lua table (front to back).
 ---@return table
-function Queue:toArray() end
+function LQueue:toArray() end
 
 --- Lua wrapper for the RelationshipManager pattern.
----@class RelationshipManager
-RelationshipManager = {}
+---@class LRelationshipManager
+LRelationshipManager = {}
 
 --- Adjusts the numeric relationship value by a delta.
 ---@param a integer
 ---@param b integer
 ---@param delta number
 ---@return nil
-function RelationshipManager:adjustValue(a, b, delta) end
+function LRelationshipManager:adjustValue(a, b, delta) end
 
 --- Defines a relationship type with ordered levels.
 ---@param name string
 ---@param levels table
 ---@param default_level? string
 ---@return nil
-function RelationshipManager:defineType(name, levels, default_level) end
+function LRelationshipManager:defineType(name, levels, default_level) end
 
 --- Returns the named level for a typed relationship, or nil.
 ---@param a integer
 ---@param b integer
 ---@param type_name string
 ---@return string
-function RelationshipManager:getLevel(a, b, type_name) end
+function LRelationshipManager:getLevel(a, b, type_name) end
 
 --- Returns the numeric relationship value between two entities (default 0.0).
 ---@param a integer
 ---@param b integer
 ---@return number
-function RelationshipManager:getValue(a, b) end
+function LRelationshipManager:getValue(a, b) end
 
 --- Returns the total number of stored relationship pairs.
 ---@return number
-function RelationshipManager:pairCount() end
+function LRelationshipManager:pairCount() end
 
 --- Removes all relationship data between two entities.
 ---@param a integer
 ---@param b integer
 ---@return nil
-function RelationshipManager:removePair(a, b) end
+function LRelationshipManager:removePair(a, b) end
 
 --- Removes a relationship type definition.
 ---@param name string
 ---@return nil
-function RelationshipManager:removeType(name) end
+function LRelationshipManager:removeType(name) end
 
 --- Sets a named level for a typed relationship between two entities.
 ---@param a integer
@@ -13517,281 +14802,281 @@ function RelationshipManager:removeType(name) end
 ---@param type_name string
 ---@param level string
 ---@return boolean
-function RelationshipManager:setLevel(a, b, type_name, level) end
+function LRelationshipManager:setLevel(a, b, type_name, level) end
 
 --- Sets the numeric relationship value between two entities.
 ---@param a integer
 ---@param b integer
 ---@param value number
 ---@return nil
-function RelationshipManager:setValue(a, b, value) end
+function LRelationshipManager:setValue(a, b, value) end
 
 --- Returns all defined relationship type names.
 ---@return table
-function RelationshipManager:typeNames() end
+function LRelationshipManager:typeNames() end
 
 --- Lua wrapper for the Ring (circular buffer) pattern.
----@class Ring
-Ring = {}
+---@class LRing
+LRing = {}
 
 --- Returns the average of all numeric values, or 0 if empty.
 ---@return number
-function Ring:average() end
+function LRing:average() end
 
 --- Removes all entries from the ring.
 ---@return nil
-function Ring:clear() end
+function LRing:clear() end
 
 --- Returns true when the ring is at capacity.
 ---@return boolean
-function Ring:isFull() end
+function LRing:isFull() end
 
 --- Returns the most recently pushed entry, or nil.
 ---@return table
-function Ring:latest() end
+function LRing:latest() end
 
 --- Returns the number of entries currently in the ring.
 ---@return number
-function Ring:len() end
+function LRing:len() end
 
 --- Pushes a value (number or string) with an optional tag. Overwrites oldest on overflow.
 ---@param value any
 ---@param tag? string
 ---@return number
-function Ring:push(value, tag) end
+function LRing:push(value, tag) end
 
 --- Returns the sum of all numeric values in the ring.
 ---@return number
-function Ring:sum() end
+function LRing:sum() end
 
 --- Returns all entries (oldest first) as an array of {id, tag, value?, text?} tables.
 ---@return table
-function Ring:toArray() end
+function LRing:toArray() end
 
 --- Lua wrapper for the ServiceLocator pattern.
----@class ServiceLocator
-ServiceLocator = {}
+---@class LServiceLocator
+LServiceLocator = {}
 
 --- Removes all registered services.
 ---@return nil
-function ServiceLocator:clearAll() end
+function LServiceLocator:clearAll() end
 
 --- Returns a table of all registered service names.
 ---@return table
-function ServiceLocator:getServices() end
+function LServiceLocator:getServices() end
 
 --- Returns true if a service with the given name is registered.
 ---@param name string
 ---@return boolean
-function ServiceLocator:has(name) end
+function LServiceLocator:has(name) end
 
 --- Retrieves a registered service by name; returns nil if not found.
 ---@param name string
 ---@return string
-function ServiceLocator:locate(name) end
+function LServiceLocator:locate(name) end
 
 --- Registers a named service with an associated Lua value.
 ---@param name string
 ---@param value any
 ---@return nil
-function ServiceLocator:provide(name, value) end
+function LServiceLocator:provide(name, value) end
 
 --- Unregisters and removes a named service.
 ---@param name string
 ---@return nil
-function ServiceLocator:remove(name) end
+function LServiceLocator:remove(name) end
 
 --- Lua wrapper for an unordered set. Values are keyed by their string representation.
----@class Set
-Set = {}
+---@class LSet
+LSet = {}
 
 --- Adds a string key to the set. Returns true if it was not already present.
 ---@param key string
 ---@return boolean
-function Set:add(key) end
+function LSet:add(key) end
 
 --- Removes all keys from the set.
 ---@return nil
-function Set:clear() end
+function LSet:clear() end
 
 --- Returns true if the key is in the set.
 ---@param key string
 ---@return boolean
-function Set:has(key) end
+function LSet:has(key) end
 
 --- Returns the intersection of this set and another as a new Set.
 ---@param other Set
 ---@return Set
-function Set:intersection(other) end
+function LSet:intersection(other) end
 
 --- Returns true if the set is empty.
 ---@return boolean
-function Set:isEmpty() end
+function LSet:isEmpty() end
 
 --- Returns the number of distinct keys in the set.
 ---@return number
-function Set:len() end
+function LSet:len() end
 
 --- Removes a key from the set. Returns true if it was present.
 ---@param key string
 ---@return boolean
-function Set:remove(key) end
+function LSet:remove(key) end
 
 --- Returns all keys as a Lua table (unordered).
 ---@return table
-function Set:toArray() end
+function LSet:toArray() end
 
 --- Returns the union of this set and another as a new Set.
 ---@param other Set
 ---@return Set
-function Set:union(other) end
+function LSet:union(other) end
 
 --- Lua wrapper for the SimpleState finite state machine pattern.
----@class SimpleState
-SimpleState = {}
+---@class LSimpleState
+LSimpleState = {}
 
 --- Registers a named state with optional enter, exit, and update callbacks.
 ---@param name string
 ---@param callbacks? table
 ---@return nil
-function SimpleState:addState(name, callbacks) end
+function LSimpleState:addState(name, callbacks) end
 
 --- Removes all states and callbacks from this state machine.
 ---@return nil
-function SimpleState:clearAll() end
+function LSimpleState:clearAll() end
 
 --- Returns the name of the current state, or nil if none is active.
 ---@return string
-function SimpleState:getCurrent() end
+function LSimpleState:getCurrent() end
 
 --- Returns a table of all registered state names.
 ---@return table
-function SimpleState:getStates() end
+function LSimpleState:getStates() end
 
 --- Returns true if a state with the given name is registered.
 ---@param name string
 ---@return boolean
-function SimpleState:hasState(name) end
+function LSimpleState:hasState(name) end
 
 --- Transitions to a named state, calling exit/enter callbacks as needed.
 ---@param name string
 ---@return boolean
-function SimpleState:transitionTo(name) end
+function LSimpleState:transitionTo(name) end
 
 --- Calls the update callback of the current state with the given delta time.
 ---@param dt number
 ---@return nil
-function SimpleState:update(dt) end
+function LSimpleState:update(dt) end
 
 --- Lua wrapper for a LIFO stack.
----@class Stack
-Stack = {}
+---@class LStack
+LStack = {}
 
 --- Removes all values from the stack.
 ---@return nil
-function Stack:clear() end
+function LStack:clear() end
 
 --- Returns true if the stack is empty.
 ---@return boolean
-function Stack:isEmpty() end
+function LStack:isEmpty() end
 
 --- Returns true if the stack is at its capacity limit.
 ---@return boolean
-function Stack:isFull() end
+function LStack:isFull() end
 
 --- Returns the number of items on the stack.
 ---@return number
-function Stack:len() end
+function LStack:len() end
 
 --- Returns the top value without removing it, or nil if empty.
 ---@return table
-function Stack:peek() end
+function LStack:peek() end
 
 --- Removes and returns the top value, or nil if empty.
 ---@return table
-function Stack:pop() end
+function LStack:pop() end
 
 --- Pushes a value onto the stack. Returns false if capacity is full.
 ---@param value any
 ---@return boolean
-function Stack:push(value) end
+function LStack:push(value) end
 
 --- Returns all items as a Lua table (bottom to top).
 ---@return table
-function Stack:toArray() end
+function LStack:toArray() end
 
 --- Lua wrapper for the Strategy pattern.
----@class Strategy
-Strategy = {}
+---@class LStrategy
+LStrategy = {}
 
 --- Removes all strategies and clears the active selection.
 ---@return nil
-function Strategy:clear() end
+function LStrategy:clear() end
 
 --- Calls the currently active strategy function with the given arguments.
 ---@param ... any
 ---@return table
-function Strategy:execute(...) end
+function LStrategy:execute(...) end
 
 --- Returns the name of the active strategy, or nil.
 ---@return string
-function Strategy:getCurrent() end
+function LStrategy:getCurrent() end
 
 --- Returns true if a strategy with this name is registered.
 ---@param name string
 ---@return boolean
-function Strategy:has(name) end
+function LStrategy:has(name) end
 
 --- Returns all registered strategy names.
 ---@return table
-function Strategy:names() end
+function LStrategy:names() end
 
 --- Registers a named strategy function.
 ---@param name string
 ---@param callback function
 ---@return nil
-function Strategy:register(name, callback) end
+function LStrategy:register(name, callback) end
 
 --- Removes a strategy by name.
 ---@param name string
 ---@return boolean
-function Strategy:remove(name) end
+function LStrategy:remove(name) end
 
 --- Sets the active strategy by name. Returns false if not registered.
 ---@param name string
 ---@return boolean
-function Strategy:set(name) end
+function LStrategy:set(name) end
 
 --- Lua wrapper for the Throttle pattern.
----@class Throttle
-Throttle = {}
+---@class LThrottle
+LThrottle = {}
 
 --- Returns the total number of times this throttle has fired.
 ---@return number
-function Throttle:getFireCount() end
+function LThrottle:getFireCount() end
 
 --- Returns the normalised progress through the current interval [0, 1].
 ---@return number
-function Throttle:getProgress() end
+function LThrottle:getProgress() end
 
 --- Sets the callback invoked when the throttle fires.
 ---@param fn function
 ---@return nil
-function Throttle:onFire(fn) end
+function LThrottle:onFire(fn) end
 
 --- Resets the elapsed counter without firing.
 ---@return nil
-function Throttle:reset() end
+function LThrottle:reset() end
 
 --- Enables or disables the throttle.
 ---@param enabled boolean
 ---@return nil
-function Throttle:setEnabled(enabled) end
+function LThrottle:setEnabled(enabled) end
 
 --- Advances the timer by dt seconds; fires the callback if the interval elapsed.
 ---@param dt number
 ---@return boolean
-function Throttle:update(dt) end
+function LThrottle:update(dt) end
 
 --- Creates a new Blackboard shared key-value store.
 ---@param name? string
@@ -13897,19 +15182,19 @@ lurek.patterns.newThrottle = function(interval) end
 lurek.physics = {}
 
 --- Lua-side handle to a physics body accessed through its world.
----@class Body
-Body = {}
+---@class LBody
+LBody = {}
 
 --- Applies an angular impulse.
 ---@param impulse number
 ---@return nil
-function Body:applyAngularImpulse(impulse) end
+function LBody:applyAngularImpulse(impulse) end
 
 --- Applies a continuous force to the body.
 ---@param fx number
 ---@param fy number
 ---@return nil
-function Body:applyForce(fx, fy) end
+function LBody:applyForce(fx, fy) end
 
 --- Applies a force at a specific world-space point.
 ---@param fx number
@@ -13917,209 +15202,218 @@ function Body:applyForce(fx, fy) end
 ---@param px number
 ---@param py number
 ---@return nil
-function Body:applyForceAtPoint(fx, fy, px, py) end
+function LBody:applyForceAtPoint(fx, fy, px, py) end
 
 --- Applies a linear impulse to the body.
 ---@param ix number
 ---@param iy number
 ---@return nil
-function Body:applyImpulse(ix, iy) end
+function LBody:applyImpulse(ix, iy) end
 
 --- Applies a torque (rotational force).
 ---@param torque number
 ---@return nil
-function Body:applyTorque(torque) end
+function LBody:applyTorque(torque) end
 
 --- Removes this body from the world.
 ---@return nil
-function Body:destroy() end
+function LBody:destroy() end
 
 --- Returns the body angle in radians.
 ---@return number
-function Body:getAngle() end
+function LBody:getAngle() end
 
 --- Returns the angular damping coefficient.
 ---@return number
-function Body:getAngularDamping() end
+function LBody:getAngularDamping() end
 
 --- Returns the angular velocity in radians/s.
 ---@return number
-function Body:getAngularVelocity() end
+function LBody:getAngularVelocity() end
 
 --- Returns the body friction coefficient.
 ---@return number
-function Body:getFriction() end
+function LBody:getFriction() end
 
 --- Returns the per-body gravity multiplier.
 ---@return number
-function Body:getGravityScale() end
+function LBody:getGravityScale() end
 
 --- Returns the height of this body's primary collider shape in world units.
 ---@return number
-function Body:getHeight() end
+function LBody:getHeight() end
 
 --- Returns the body's integer ID.
 ---@return number
-function Body:getId() end
+function LBody:getId() end
 
 --- Returns the collision layer bitmask.
 ---@return number
-function Body:getLayer() end
+function LBody:getLayer() end
 
 --- Returns the linear damping coefficient.
 ---@return number
-function Body:getLinearDamping() end
+function LBody:getLinearDamping() end
 
 --- Returns the collision mask bitmask.
 ---@return number
-function Body:getMask() end
+function LBody:getMask() end
 
 --- Returns the body mass in kilograms used for force and impulse calculations.
 ---@return number
-function Body:getMass() end
+function LBody:getMass() end
 
 --- Returns the body position (x, y).
 ---@return number
-function Body:getPosition() end
+function LBody:getPosition() end
 
 --- Returns the body restitution (bounciness).
 ---@return number
-function Body:getRestitution() end
+function LBody:getRestitution() end
 
 --- Returns the body type as a string.
 ---@return string
-function Body:getType() end
+function LBody:getType() end
 
 --- Returns the body velocity (vx, vy).
 ---@return number
-function Body:getVelocity() end
+function LBody:getVelocity() end
 
 --- Returns the width of this body's primary collider shape in world units.
 ---@return number
-function Body:getWidth() end
+function LBody:getWidth() end
 
 --- Returns the body X position.
 ---@return number
-function Body:getX() end
+function LBody:getX() end
 
 --- Returns the body Y position.
 ---@return number
-function Body:getY() end
+function LBody:getY() end
 
 --- Returns whether CCD is enabled.
 ---@return boolean
-function Body:isBullet() end
+function LBody:isBullet() end
 
 --- Returns whether rotation is locked.
 ---@return boolean
-function Body:isFixedRotation() end
+function LBody:isFixedRotation() end
 
 --- Returns true if this body is currently sleeping (inactive).
 ---@return boolean
-function Body:isSleeping() end
+function LBody:isSleeping() end
 
 --- Returns whether the body can sleep.
 ---@return boolean
-function Body:isSleepingAllowed() end
+function LBody:isSleepingAllowed() end
 
 --- Sets the body angle in radians.
 ---@param angle number
 ---@return nil
-function Body:setAngle(angle) end
+function LBody:setAngle(angle) end
 
 --- Sets the angular damping coefficient.
 ---@param damping number
 ---@return nil
-function Body:setAngularDamping(damping) end
+function LBody:setAngularDamping(damping) end
 
 --- Sets the angular velocity.
 ---@param omega number
 ---@return nil
-function Body:setAngularVelocity(omega) end
+function LBody:setAngularVelocity(omega) end
 
 --- Enables or disables continuous collision detection (CCD) for fast-moving bodies.
 ---@param bullet boolean
 ---@return nil
-function Body:setBullet(bullet) end
+function LBody:setBullet(bullet) end
 
 --- Locks or unlocks rotation.
 ---@param fixed boolean
 ---@return nil
-function Body:setFixedRotation(fixed) end
+function LBody:setFixedRotation(fixed) end
 
 --- Sets the body friction coefficient.
 ---@param friction number
 ---@return nil
-function Body:setFriction(friction) end
+function LBody:setFriction(friction) end
 
 --- Sets the per-body gravity multiplier.
 ---@param scale number
 ---@return nil
-function Body:setGravityScale(scale) end
+function LBody:setGravityScale(scale) end
 
 --- Sets the collision layer bitmask.
 ---@param layer integer
 ---@return nil
-function Body:setLayer(layer) end
+function LBody:setLayer(layer) end
 
 --- Sets the linear damping coefficient.
 ---@param damping number
 ---@return nil
-function Body:setLinearDamping(damping) end
+function LBody:setLinearDamping(damping) end
 
 --- Sets the collision mask bitmask.
 ---@param mask integer
 ---@return nil
-function Body:setMask(mask) end
+function LBody:setMask(mask) end
 
 --- Sets the body mass; affects how forces and impulses change velocity.
 ---@param mass number
 ---@return nil
-function Body:setMass(mass) end
+function LBody:setMass(mass) end
 
 --- Teleports the body to the given world-space position, bypassing collision.
 ---@param x number
 ---@param y number
 ---@return nil
-function Body:setPosition(x, y) end
+function LBody:setPosition(x, y) end
 
 --- Sets the body restitution (bounciness).
 ---@param restitution number
 ---@return nil
-function Body:setRestitution(restitution) end
+function LBody:setRestitution(restitution) end
 
 --- Sets whether the body can sleep.
 ---@param allowed boolean
 ---@return nil
-function Body:setSleepingAllowed(allowed) end
+function LBody:setSleepingAllowed(allowed) end
 
 --- Changes the body type: `"dynamic"`, `"static"`, or `"kinematic"`.
 ---@param bodyType string
 ---@return nil
-function Body:setType(bodyType) end
+function LBody:setType(bodyType) end
 
 --- Sets the body's linear velocity in world units per second.
 ---@param vx number
 ---@param vy number
 ---@return nil
-function Body:setVelocity(vx, vy) end
+function LBody:setVelocity(vx, vy) end
 
 --- Puts this body to sleep immediately.
 ---@return nil
-function Body:sleep() end
+function LBody:sleep() end
+
+--- Returns the type name of this object.
+---@return string
+function LBody:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LBody:typeOf(name) end
 
 --- Forcibly wakes up this body.
 ---@return nil
-function Body:wakeUp() end
+function LBody:wakeUp() end
 
 --- Lua-side handle to a falling-sand [`CellularWorld`].
----@class Cellular
-Cellular = {}
+---@class LCellular
+LCellular = {}
 
 --- Counts cells of the given material type.
 ---@param cell_type integer
 ---@return number
-function Cellular:countCells(cell_type) end
+function LCellular:countCells(cell_type) end
 
 --- Fills a circle of cells with the given material.
 ---@param cx_c integer
@@ -14127,7 +15421,7 @@ function Cellular:countCells(cell_type) end
 ---@param r_cells integer
 ---@param cell_type integer
 ---@return nil
-function Cellular:fillCircle(cx_c, cy_c, r_cells, cell_type) end
+function LCellular:fillCircle(cx_c, cy_c, r_cells, cell_type) end
 
 --- Fills a rectangular region of cells with the given material.
 ---@param cx0 integer
@@ -14136,47 +15430,47 @@ function Cellular:fillCircle(cx_c, cy_c, r_cells, cell_type) end
 ---@param ch integer
 ---@param cell_type integer
 ---@return nil
-function Cellular:fillRect(cx0, cy0, cw, ch, cell_type) end
+function LCellular:fillRect(cx0, cy0, cw, ch, cell_type) end
 
 --- Returns positions of all cells of the given material as an array of `{x, y}` tables.
 ---@param cell_type integer
 ---@return table
-function Cellular:findCells(cell_type) end
+function LCellular:findCells(cell_type) end
 
 --- Returns the material at `(cx, cy)` as an integer constant.
 ---@param cx integer
 ---@param cy integer
 ---@return number
-function Cellular:getCell(cx, cy) end
+function LCellular:getCell(cx, cy) end
 
 --- Loads grid data from bytes produced by `toBytes`.
 ---@param data string
 ---@return nil
-function Cellular:loadFromBytes(data) end
+function LCellular:loadFromBytes(data) end
 
 --- Sets the material of a cell.
 ---@param cx integer
 ---@param cy integer
 ---@param cell_type integer
 ---@return nil
-function Cellular:setCell(cx, cy, cell_type) end
+function LCellular:setCell(cx, cy, cell_type) end
 
 --- Advances the simulation by one tick.
 ---@return nil
-function Cellular:step() end
+function LCellular:step() end
 
 --- Advances the simulation by `n` ticks.
 ---@param n integer
 ---@return nil
-function Cellular:stepN(n) end
+function LCellular:stepN(n) end
 
 --- Serialises the grid to a byte string.
 ---@return string
-function Cellular:toBytes() end
+function LCellular:toBytes() end
 
 --- Returns the full grid as an RGBA byte string using the default colour palette.
 ---@return nil
-function Cellular:toImageData() end
+function LCellular:toImageData() end
 
 --- Returns a sub-region as an RGBA byte string.
 ---@param cx0 integer
@@ -14184,60 +15478,78 @@ function Cellular:toImageData() end
 ---@param cw integer
 ---@param ch integer
 ---@return string
-function Cellular:toImageDataRegion(cx0, cy0, cw, ch) end
+function LCellular:toImageDataRegion(cx0, cy0, cw, ch) end
+
+--- Returns the type name of this object.
+---@return string
+function LCellular:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LCellular:typeOf(name) end
 
 --- Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
----@class PhysicsShape
-PhysicsShape = {}
+---@class LPhysicsShape
+LPhysicsShape = {}
 
 --- Releases this shape handle (GC handles cleanup).
 ---@return nil
-function PhysicsShape:destroy() end
+function LPhysicsShape:destroy() end
 
 --- Returns the axis-aligned bounding box (x1, y1, x2, y2).
 ---@return number
-function PhysicsShape:getBoundingBox() end
+function LPhysicsShape:getBoundingBox() end
 
 --- Returns the radius. Only valid for circle shapes.
 ---@return number
-function PhysicsShape:getRadius() end
+function LPhysicsShape:getRadius() end
 
 --- Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain".
 ---@return string
-function PhysicsShape:getType() end
+function LPhysicsShape:getType() end
 
 --- Sets the density for this shape (used when attaching to a body).
 ---@param density number
 ---@return nil
-function PhysicsShape:setDensity(density) end
+function LPhysicsShape:setDensity(density) end
 
 --- Sets the friction coefficient.
 ---@param friction number
 ---@return nil
-function PhysicsShape:setFriction(friction) end
+function LPhysicsShape:setFriction(friction) end
 
 --- Sets the restitution (bounciness) coefficient.
 ---@param restitution number
 ---@return nil
-function PhysicsShape:setRestitution(restitution) end
+function LPhysicsShape:setRestitution(restitution) end
 
 --- Sets whether this shape is a sensor (non-colliding trigger).
 ---@param sensor boolean
 ---@return nil
-function PhysicsShape:setSensor(sensor) end
+function LPhysicsShape:setSensor(sensor) end
+
+--- Returns the type name of this object.
+---@return string
+function LPhysicsShape:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LPhysicsShape:typeOf(name) end
 
 --- Lua-side handle to a destructible [`TerrainMap`].
----@class Terrain
-Terrain = {}
+---@class LTerrain
+LTerrain = {}
 
 --- Removes unsupported cells, returning the number of cells that fell.
 ---@return nil
-function Terrain:collapseColumns() end
+function LTerrain:collapseColumns() end
 
 --- Sets every cell in the grid to `solid`.
 ---@param solid boolean
 ---@return nil
-function Terrain:fillAll(solid) end
+function LTerrain:fillAll(solid) end
 
 --- Fills a circle of cells centred at world position `(wx, wy)`.
 ---@param wx number
@@ -14245,7 +15557,7 @@ function Terrain:fillAll(solid) end
 ---@param radius number
 ---@param solid boolean
 ---@return nil
-function Terrain:fillCircle(wx, wy, radius, solid) end
+function LTerrain:fillCircle(wx, wy, radius, solid) end
 
 --- Fills a rectangular region of cells.
 ---@param wx number
@@ -14254,48 +15566,48 @@ function Terrain:fillCircle(wx, wy, radius, solid) end
 ---@param h number
 ---@param solid boolean
 ---@return nil
-function Terrain:fillRect(wx, wy, w, h, solid) end
+function LTerrain:fillRect(wx, wy, w, h, solid) end
 
 --- Rebuilds physics bodies for all dirty chunks.
 ---@return nil
-function Terrain:flush() end
+function LTerrain:flush() end
 
 --- Returns whether a cell is solid.
 ---@param cx integer
 ---@param cy integer
 ---@return boolean
-function Terrain:getCell(cx, cy) end
+function LTerrain:getCell(cx, cy) end
 
 --- Returns `true` when at least one chunk needs flushing.
 ---@return boolean
-function Terrain:isDirty() end
+function LTerrain:isDirty() end
 
 --- Loads terrain cell data from bytes produced by `toBytes`.
 ---@param data string
 ---@return nil
-function Terrain:loadFromBytes(data) end
+function LTerrain:loadFromBytes(data) end
 
 --- Sets a single terrain cell to solid or empty.
 ---@param cx integer
 ---@param cy integer
 ---@param solid boolean
 ---@return nil
-function Terrain:setCell(cx, cy, solid) end
+function LTerrain:setCell(cx, cy, solid) end
 
 --- Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
 ---@return table
-function Terrain:solidPositions() end
+function LTerrain:solidPositions() end
 
 --- Spawns dynamic debris bodies at the given positions.
 ---@param positions table
 ---@param mass number
 ---@param restitution number
 ---@return table
-function Terrain:spawnDebris(positions, mass, restitution) end
+function LTerrain:spawnDebris(positions, mass, restitution) end
 
 --- Serialises the terrain grid to a byte string for save/load.
 ---@return string
-function Terrain:toBytes() end
+function LTerrain:toBytes() end
 
 --- Returns the terrain as an RGBA byte string.
 ---@param sr integer
@@ -14305,11 +15617,20 @@ function Terrain:toBytes() end
 ---@param eg integer
 ---@param eb integer
 ---@return string
-function Terrain:toImageData(sr, sg, sb, er, eg, eb) end
+function LTerrain:toImageData(sr, sg, sb, er, eg, eb) end
+
+--- Returns the type name of this object.
+---@return string
+function LTerrain:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTerrain:typeOf(name) end
 
 --- Lua-side handle wrapping a physics World.
----@class World
-World = {}
+---@class LWorld
+LWorld = {}
 
 --- Creates a distance joint between two bodies.
 ---@param bodyA integer
@@ -14320,14 +15641,14 @@ World = {}
 ---@param ay2 number
 ---@param length number
 ---@return number
-function World:addDistanceJoint(bodyA, bodyB, ax1, ay1, ax2, ay2, length) end
+function LWorld:addDistanceJoint(bodyA, bodyB, ax1, ay1, ax2, ay2, length) end
 
 --- Adds an extra fixture (collider) to a body.
 ---@param bodyId integer
 ---@param shapeType string
 ---@param ... any
 ---@return number
-function World:addFixture(bodyId, shapeType, ...) end
+function LWorld:addFixture(bodyId, shapeType, ...) end
 
 --- Creates a friction joint that resists relative motion.
 ---@param bodyA integer
@@ -14337,7 +15658,7 @@ function World:addFixture(bodyId, shapeType, ...) end
 ---@param maxForce number
 ---@param maxTorque number
 ---@return number
-function World:addFrictionJoint(bodyA, bodyB, anchorX, anchorY, maxForce, maxTorque) end
+function LWorld:addFrictionJoint(bodyA, bodyB, anchorX, anchorY, maxForce, maxTorque) end
 
 --- Creates a gear joint (stub — falls back to weld joint).
 ---@param bodyA integer
@@ -14345,14 +15666,14 @@ function World:addFrictionJoint(bodyA, bodyB, anchorX, anchorY, maxForce, maxTor
 ---@param anchorX number
 ---@param anchorY number
 ---@return number
-function World:addGearJoint(bodyA, bodyB, anchorX, anchorY) end
+function LWorld:addGearJoint(bodyA, bodyB, anchorX, anchorY) end
 
 --- Creates a motor joint that drives body_b toward body_a.
 ---@param bodyA integer
 ---@param bodyB integer
 ---@param correctionFactor number
 ---@return number
-function World:addMotorJoint(bodyA, bodyB, correctionFactor) end
+function LWorld:addMotorJoint(bodyA, bodyB, correctionFactor) end
 
 --- Creates a mouse joint connecting a body to a target point.
 ---@param bodyId integer
@@ -14360,7 +15681,7 @@ function World:addMotorJoint(bodyA, bodyB, correctionFactor) end
 ---@param targetY number
 ---@param maxForce number
 ---@return number
-function World:addMouseJoint(bodyId, targetX, targetY, maxForce) end
+function LWorld:addMouseJoint(bodyId, targetX, targetY, maxForce) end
 
 --- Creates a prismatic (slider) joint between two bodies.
 ---@param bodyA integer
@@ -14370,7 +15691,7 @@ function World:addMouseJoint(bodyId, targetX, targetY, maxForce) end
 ---@param axisX number
 ---@param axisY number
 ---@return number
-function World:addPrismaticJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
+function LWorld:addPrismaticJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
 
 --- Creates a pulley joint (stub — falls back to weld joint).
 ---@param bodyA integer
@@ -14378,7 +15699,7 @@ function World:addPrismaticJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) e
 ---@param anchorX number
 ---@param anchorY number
 ---@return number
-function World:addPulleyJoint(bodyA, bodyB, anchorX, anchorY) end
+function LWorld:addPulleyJoint(bodyA, bodyB, anchorX, anchorY) end
 
 --- Creates a revolute (pin) joint between two bodies.
 ---@param bodyA integer
@@ -14386,7 +15707,7 @@ function World:addPulleyJoint(bodyA, bodyB, anchorX, anchorY) end
 ---@param anchorX number
 ---@param anchorY number
 ---@return number
-function World:addRevoluteJoint(bodyA, bodyB, anchorX, anchorY) end
+function LWorld:addRevoluteJoint(bodyA, bodyB, anchorX, anchorY) end
 
 --- Creates a rope joint with a maximum distance.
 ---@param bodyA integer
@@ -14397,7 +15718,7 @@ function World:addRevoluteJoint(bodyA, bodyB, anchorX, anchorY) end
 ---@param ay2 number
 ---@param maxLength number
 ---@return number
-function World:addRopeJoint(bodyA, bodyB, ax1, ay1, ax2, ay2, maxLength) end
+function LWorld:addRopeJoint(bodyA, bodyB, ax1, ay1, ax2, ay2, maxLength) end
 
 --- Creates a weld (rigid) joint between two bodies.
 ---@param bodyA integer
@@ -14405,7 +15726,7 @@ function World:addRopeJoint(bodyA, bodyB, ax1, ay1, ax2, ay2, maxLength) end
 ---@param anchorX number
 ---@param anchorY number
 ---@return number
-function World:addWeldJoint(bodyA, bodyB, anchorX, anchorY) end
+function LWorld:addWeldJoint(bodyA, bodyB, anchorX, anchorY) end
 
 --- Creates a wheel joint (prismatic + rotation).
 ---@param bodyA integer
@@ -14415,7 +15736,7 @@ function World:addWeldJoint(bodyA, bodyB, anchorX, anchorY) end
 ---@param axisX number
 ---@param axisY number
 ---@return number
-function World:addWheelJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
+function LWorld:addWheelJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
 
 --- Creates a rectangular gravity/damping zone and returns a LuaZone handle.
 ---@param x number
@@ -14423,39 +15744,39 @@ function World:addWheelJoint(bodyA, bodyB, anchorX, anchorY, axisX, axisY) end
 ---@param width number
 ---@param height number
 ---@return Zone
-function World:addZone(x, y, width, height) end
+function LWorld:addZone(x, y, width, height) end
 
 --- Resets the world, removing all bodies and joints.
 ---@return nil
-function World:clear() end
+function LWorld:clear() end
 
 --- Removes the begin-contact callback.
 ---@return nil
-function World:clearBeginContact() end
+function LWorld:clearBeginContact() end
 
 --- Removes the Lua data attached to a body.
 ---@param bodyId integer
 ---@return nil
-function World:clearBodyData(bodyId) end
+function LWorld:clearBodyData(bodyId) end
 
 --- Removes the one-way platform flag from a body.
 ---@param bodyId integer
 ---@return nil
-function World:clearBodyOneWay(bodyId) end
+function LWorld:clearBodyOneWay(bodyId) end
 
 --- Removes the end-contact callback.
 ---@return nil
-function World:clearEndContact() end
+function LWorld:clearEndContact() end
 
 --- Removes a body from the world.
 ---@param id integer
 ---@return nil
-function World:destroyBody(id) end
+function LWorld:destroyBody(id) end
 
 --- Removes a joint from the world.
 ---@param jointId integer
 ---@return nil
-function World:destroyJoint(jointId) end
+function LWorld:destroyJoint(jointId) end
 
 --- Draws physics objects for debugging
 ---@param target ImageData
@@ -14464,133 +15785,133 @@ function World:destroyJoint(jointId) end
 ---@param b number?[default=0]
 ---@param a number?[default=255]
 ---@return nil
-function World:drawDebug(target, r, g, b, a) end
+function LWorld:drawDebug(target, r, g, b, a) end
 
 --- Returns the number of fixtures on a body.
 ---@param bodyId integer
 ---@return number
-function World:fixtureCount(bodyId) end
+function LWorld:fixtureCount(bodyId) end
 
 --- Returns begin-contact events from the last step.
 ---@return table
-function World:getBeginContactEvents() end
+function LWorld:getBeginContactEvents() end
 
 --- Returns the body ID at a world-space point, or nil.
 ---@param x number
 ---@param y number
 ---@return number
-function World:getBodyAtPoint(x, y) end
+function LWorld:getBodyAtPoint(x, y) end
 
 --- Returns whether CCD is enabled for a body.
 ---@param bodyId integer
 ---@return boolean
-function World:getBodyCCD(bodyId) end
+function LWorld:getBodyCCD(bodyId) end
 
 --- Returns contacts involving a specific body.
 ---@param bodyId integer
 ---@return table
-function World:getBodyContacts(bodyId) end
+function LWorld:getBodyContacts(bodyId) end
 
 --- Returns the total number of bodies in the world.
 ---@return number
-function World:getBodyCount() end
+function LWorld:getBodyCount() end
 
 --- Returns the Lua data previously attached to a body, or nil if none is set.
 ---@param bodyId integer
 ---@return nil
-function World:getBodyData(bodyId) end
+function LWorld:getBodyData(bodyId) end
 
 --- Returns all body IDs in the world.
 ---@return table
-function World:getBodyIds() end
+function LWorld:getBodyIds() end
 
 --- Returns the one-way normal for a body, or nil if not configured.
 ---@param bodyId integer
 ---@return nil
-function World:getBodyOneWay(bodyId) end
+function LWorld:getBodyOneWay(bodyId) end
 
 --- Returns the body type as a string.
 ---@param bodyId integer
 ---@return string
-function World:getBodyType(bodyId) end
+function LWorld:getBodyType(bodyId) end
 
 --- Returns collision events from the last step.
 ---@return table
-function World:getCollisionEvents() end
+function LWorld:getCollisionEvents() end
 
 --- Returns all contact pairs from the narrow phase.
 ---@return table
-function World:getContacts() end
+function LWorld:getContacts() end
 
 --- Returns end-contact events from the last step.
 ---@return table
-function World:getEndContactEvents() end
+function LWorld:getEndContactEvents() end
 
 --- Returns the gravity vector (gx, gy).
 ---@return number
-function World:getGravity() end
+function LWorld:getGravity() end
 
 --- Returns the two body IDs connected by a joint.
 ---@param jointId integer
 ---@return number
-function World:getJointBodies(jointId) end
+function LWorld:getJointBodies(jointId) end
 
 --- Returns the break threshold for a joint, or nil if not set.
 ---@param jointId integer
 ---@return nil
-function World:getJointBreakForce(jointId) end
+function LWorld:getJointBreakForce(jointId) end
 
 --- Returns a table of integer IDs for every joint attached to this world.
 ---@return table
-function World:getJointIds() end
+function LWorld:getJointIds() end
 
 --- Returns the angular limits on a joint.
 ---@param jointId integer
 ---@return number
-function World:getJointLimits(jointId) end
+function LWorld:getJointLimits(jointId) end
 
 --- Returns the motor speed on a joint's angular axis.
 ---@param jointId integer
 ---@return number
-function World:getJointMotorSpeed(jointId) end
+function LWorld:getJointMotorSpeed(jointId) end
 
 --- Returns the type name of a joint.
 ---@param jointId integer
 ---@return string
-function World:getJointType(jointId) end
+function LWorld:getJointType(jointId) end
 
 --- Returns the pixels-per-meter scaling factor.
 ---@return number
-function World:getMeter() end
+function LWorld:getMeter() end
 
 --- Returns the current number of solver iterations per step.
 ---@return number
-function World:getSolverIterations() end
+function LWorld:getSolverIterations() end
 
 --- Returns zone enter/leave events produced by the most recent step.
 ---@return table
-function World:getZoneEvents() end
+function LWorld:getZoneEvents() end
 
 --- Returns true if a body is currently sleeping (inactive).
 ---@param bodyId integer
 ---@return boolean
-function World:isBodySleeping(bodyId) end
+function LWorld:isBodySleeping(bodyId) end
 
 --- Returns the total number of joints.
 ---@return number
-function World:jointCount() end
+function LWorld:jointCount() end
 
 --- Creates multiple bodies in one call.
 ---@param specs table
 ---@return nil
-function World:newBodies(specs) end
+function LWorld:newBodies(specs) end
 
 --- Creates a new rectangular body and adds it to the world.
 ---@param x number
 ---@param y number
 ---@param bodyType string
 ---@return Body
-function World:newBody(x, y, bodyType) end
+function LWorld:newBody(x, y, bodyType) end
 
 --- Creates a new chain body from a flat vertex table and adds it to the world.
 ---@param x number
@@ -14599,7 +15920,7 @@ function World:newBody(x, y, bodyType) end
 ---@param closed boolean
 ---@param bodyType string
 ---@return Body
-function World:newChainBody(x, y, vertices, closed, bodyType) end
+function LWorld:newChainBody(x, y, vertices, closed, bodyType) end
 
 --- Creates a new circular body and adds it to the world.
 ---@param x number
@@ -14607,7 +15928,7 @@ function World:newChainBody(x, y, vertices, closed, bodyType) end
 ---@param radius number
 ---@param bodyType string
 ---@return Body
-function World:newCircleBody(x, y, radius, bodyType) end
+function LWorld:newCircleBody(x, y, radius, bodyType) end
 
 --- Creates a new edge (line segment) body and adds it to the world.
 ---@param x number
@@ -14618,7 +15939,7 @@ function World:newCircleBody(x, y, radius, bodyType) end
 ---@param y2 number
 ---@param bodyType string
 ---@return Body
-function World:newEdgeBody(x, y, x1, y1, x2, y2, bodyType) end
+function LWorld:newEdgeBody(x, y, x1, y1, x2, y2, bodyType) end
 
 --- Creates a new polygon body from a flat vertex table and adds it to the world.
 ---@param x number
@@ -14626,7 +15947,7 @@ function World:newEdgeBody(x, y, x1, y1, x2, y2, bodyType) end
 ---@param vertices table
 ---@param bodyType string
 ---@return Body
-function World:newPolygonBody(x, y, vertices, bodyType) end
+function LWorld:newPolygonBody(x, y, vertices, bodyType) end
 
 --- Returns body IDs within an axis-aligned bounding box.
 ---@param x number
@@ -14634,7 +15955,7 @@ function World:newPolygonBody(x, y, vertices, bodyType) end
 ---@param w number
 ---@param h number
 ---@return table
-function World:queryAABB(x, y, w, h) end
+function LWorld:queryAABB(x, y, w, h) end
 
 --- Casts a ray and returns the nearest hit, or nil.
 ---@param x1 number
@@ -14642,7 +15963,7 @@ function World:queryAABB(x, y, w, h) end
 ---@param x2 number
 ---@param y2 number
 ---@return table
-function World:raycast(x1, y1, x2, y2) end
+function LWorld:raycast(x1, y1, x2, y2) end
 
 --- Casts a ray and returns all hits.
 ---@param x1 number
@@ -14651,7 +15972,7 @@ function World:raycast(x1, y1, x2, y2) end
 ---@param dy number
 ---@param maxDist number
 ---@return table
-function World:raycastAll(x1, y1, dx, dy, maxDist) end
+function LWorld:raycastAll(x1, y1, dx, dy, maxDist) end
 
 --- Casts a ray and returns the closest hit using the query pipeline.
 ---@param x1 number
@@ -14660,211 +15981,229 @@ function World:raycastAll(x1, y1, dx, dy, maxDist) end
 ---@param dy number
 ---@param maxDist number
 ---@return table
-function World:raycastClosest(x1, y1, dx, dy, maxDist) end
+function LWorld:raycastClosest(x1, y1, dx, dy, maxDist) end
 
 --- Registers a Lua function called with (bodyIdA, bodyIdB) when two
 ---@param fn function
 ---@return nil
-function World:setBeginContact(fn) end
+function LWorld:setBeginContact(fn) end
 
 --- Enables or disables Continuous Collision Detection for a body.
 ---@param bodyId integer
 ---@param enabled boolean
 ---@return nil
-function World:setBodyCCD(bodyId, enabled) end
+function LWorld:setBodyCCD(bodyId, enabled) end
 
 --- Attaches arbitrary Lua data to a body for retrieval in collision callbacks.
 ---@param bodyId integer
 ---@param data any
 ---@return nil
-function World:setBodyData(bodyId, data) end
+function LWorld:setBodyData(bodyId, data) end
 
 --- Marks a body as a one-way platform.  Bodies approaching from the
 ---@param bodyId integer
 ---@param nx number
 ---@param ny number
 ---@return nil
-function World:setBodyOneWay(bodyId, nx, ny) end
+function LWorld:setBodyOneWay(bodyId, nx, ny) end
 
 --- Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
 ---@param bodyId integer
 ---@param bodyType string
 ---@return nil
-function World:setBodyType(bodyId, bodyType) end
+function LWorld:setBodyType(bodyId, bodyType) end
 
 --- Registers a Lua function called with (bodyIdA, bodyIdB) when two
 ---@param fn function
 ---@return nil
-function World:setEndContact(fn) end
+function LWorld:setEndContact(fn) end
 
 --- Sets friction on a fixture by index.
 ---@param bodyId integer
 ---@param fixtureIdx integer
 ---@param friction number
 ---@return nil
-function World:setFixtureFriction(bodyId, fixtureIdx, friction) end
+function LWorld:setFixtureFriction(bodyId, fixtureIdx, friction) end
 
 --- Sets restitution on a fixture by index.
 ---@param bodyId integer
 ---@param fixtureIdx integer
 ---@param restitution number
 ---@return nil
-function World:setFixtureRestitution(bodyId, fixtureIdx, restitution) end
+function LWorld:setFixtureRestitution(bodyId, fixtureIdx, restitution) end
 
 --- Sets whether a fixture is a sensor.
 ---@param bodyId integer
 ---@param fixtureIdx integer
 ---@param sensor boolean
 ---@return nil
-function World:setFixtureSensor(bodyId, fixtureIdx, sensor) end
+function LWorld:setFixtureSensor(bodyId, fixtureIdx, sensor) end
 
 --- Sets the world gravity vector; default is `(0, 9.81)` (downward).
 ---@param gx number
 ---@param gy number
 ---@return nil
-function World:setGravity(gx, gy) end
+function LWorld:setGravity(gx, gy) end
 
 --- Sets the relative-velocity threshold above which a joint breaks.
 ---@param jointId integer
 ---@param maxForce number
 ---@return nil
-function World:setJointBreakForce(jointId, maxForce) end
+function LWorld:setJointBreakForce(jointId, maxForce) end
 
 --- Sets the angular limits on a joint.
 ---@param jointId integer
 ---@param lower number
 ---@param upper number
 ---@return nil
-function World:setJointLimits(jointId, lower, upper) end
+function LWorld:setJointLimits(jointId, lower, upper) end
 
 --- Enables or disables angular limits on a joint.
 ---@param jointId integer
 ---@param enabled boolean
 ---@return nil
-function World:setJointLimitsEnabled(jointId, enabled) end
+function LWorld:setJointLimitsEnabled(jointId, enabled) end
 
 --- Sets the motor speed on a joint's angular axis.
 ---@param jointId integer
 ---@param speed number
 ---@return nil
-function World:setJointMotorSpeed(jointId, speed) end
+function LWorld:setJointMotorSpeed(jointId, speed) end
 
 --- Sets the pixels-per-meter scaling factor.
 ---@param ppm number
 ---@return nil
-function World:setMeter(ppm) end
+function LWorld:setMeter(ppm) end
 
 --- Updates the target position of a mouse joint.
 ---@param jointId integer
 ---@param x number
 ---@param y number
 ---@return nil
-function World:setMouseJointTarget(jointId, x, y) end
+function LWorld:setMouseJointTarget(jointId, x, y) end
 
 --- Sets the number of constraint solver iterations per step.
 ---@param n integer
 ---@return nil
-function World:setSolverIterations(n) end
+function LWorld:setSolverIterations(n) end
 
 --- Puts a body to sleep immediately.
 ---@param bodyId integer
 ---@return nil
-function World:sleepBody(bodyId) end
+function LWorld:sleepBody(bodyId) end
 
 --- Advances the physics simulation by dt seconds, firing onBeginContact /
 ---@param dt number
 ---@return nil
-function World:step(dt) end
+function LWorld:step(dt) end
 
 --- Steps the world using a fixed sub-step size to consume accumulated time.
 ---@param accum number
 ---@param step_dt number
 ---@param max_steps integer
 ---@return nil
-function World:stepFixed(accum, step_dt, max_steps) end
+function LWorld:stepFixed(accum, step_dt, max_steps) end
 
 --- Converts a pixel value to physics units.
 ---@param px number
 ---@return number
-function World:toPhysics(px) end
+function LWorld:toPhysics(px) end
 
 --- Converts a physics-unit value to pixels.
 ---@param m number
 ---@return number
-function World:toPixels(m) end
+function LWorld:toPixels(m) end
+
+--- Returns the type name of this object.
+---@return string
+function LWorld:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LWorld:typeOf(name) end
 
 --- Forcibly wakes up a sleeping body.
 ---@param bodyId integer
 ---@return nil
-function World:wakeUpBody(bodyId) end
+function LWorld:wakeUpBody(bodyId) end
 
 --- Lua-side handle to a [`PhysicsZone`] living inside a [`World`].
----@class Zone
-Zone = {}
+---@class LZone
+LZone = {}
 
 --- Removes the zone from the world.
 ---@return nil
-function Zone:destroy() end
+function LZone:destroy() end
 
 --- Returns the zone's integer ID.
 ---@return number
-function Zone:getId() end
+function LZone:getId() end
 
 --- Sets an optional angular damping override for bodies inside the zone.
 ---@param value? number
 ---@return nil
-function Zone:setAngularDampingOverride(value) end
+function LZone:setAngularDampingOverride(value) end
 
 --- Replaces the zone boundary with a circle.
 ---@param cx number
 ---@param cy number
 ---@param radius number
 ---@return nil
-function Zone:setCircle(cx, cy, radius) end
+function LZone:setCircle(cx, cy, radius) end
 
 --- Enables or disables the zone.
 ---@param enabled boolean
 ---@return nil
-function Zone:setEnabled(enabled) end
+function LZone:setEnabled(enabled) end
 
 --- Sets directional gravity inside the zone.
 ---@param gx number
 ---@param gy number
 ---@return nil
-function Zone:setGravityDirectional(gx, gy) end
+function LZone:setGravityDirectional(gx, gy) end
 
 --- Sets point-attractor gravity inside the zone.
 ---@param cx number
 ---@param cy number
 ---@param strength number
 ---@return nil
-function Zone:setGravityPoint(cx, cy, strength) end
+function LZone:setGravityPoint(cx, cy, strength) end
 
 --- Sets point-repulsor gravity inside the zone.
 ---@param cx number
 ---@param cy number
 ---@param strength number
 ---@return nil
-function Zone:setGravityRepulsor(cx, cy, strength) end
+function LZone:setGravityRepulsor(cx, cy, strength) end
 
 --- Suppresses gravity inside the zone (zero-g pocket).
 ---@return nil
-function Zone:setGravityZero() end
+function LZone:setGravityZero() end
 
 --- Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
 ---@param mask integer
 ---@return nil
-function Zone:setLayerMask(mask) end
+function LZone:setLayerMask(mask) end
 
 --- Sets an optional linear damping override for bodies inside the zone.
 ---@param value? number
 ---@return nil
-function Zone:setLinearDampingOverride(value) end
+function LZone:setLinearDampingOverride(value) end
 
 --- Sets the zone priority; higher values win over lower when zones overlap.
 ---@param priority integer
 ---@return nil
-function Zone:setPriority(priority) end
+function LZone:setPriority(priority) end
+
+--- Returns the type name of this object.
+---@return string
+function LZone:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LZone:typeOf(name) end
 
 --- Attaches a standalone shape to a body as an additional fixture.
 ---@param body Body
@@ -15031,8 +16370,8 @@ lurek.physics.testPoint = function(px, py, ax, ay, aw, ah) end
 lurek.pipeline = {}
 
 --- Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
----@class Pipeline
-Pipeline = {}
+---@class LPipeline
+LPipeline = {}
 
 --- Adds a step with a runtime condition guard: the step is skipped when `when_fn()` returns false.
 ---@param name string
@@ -15040,274 +16379,274 @@ Pipeline = {}
 ---@param fn function -- step body
 ---@param when_fn function -- returns boolean; false skips the step
 ---@return Pipeline
-function Pipeline:addConditional(name, deps, fn, when_fn) end
+function LPipeline:addConditional(name, deps, fn, when_fn) end
 
 --- Adds a step to the pipeline. Returns self for chaining.
 ---@param step Step
 ---@return Pipeline
-function Pipeline:addStep(step) end
+function LPipeline:addStep(step) end
 
 --- Inlines all steps from `sub_pipeline` into this pipeline, prefixing
 ---@param sub_pipeline Pipeline
 ---@param alias string
 ---@param outer_deps? table
 ---@return nil
-function Pipeline:addSubPipeline(sub_pipeline, alias, outer_deps) end
+function LPipeline:addSubPipeline(sub_pipeline, alias, outer_deps) end
 
 --- Cancels all pending and waiting steps.
 ---@return nil
-function Pipeline:cancel() end
+function LPipeline:cancel() end
 
 --- Clears all steps from the pipeline.
 ---@return nil
-function Pipeline:clear() end
+function LPipeline:clear() end
 
 --- Returns the stored async context table, or nil.
 ---@return table
-function Pipeline:getContext() end
+function LPipeline:getContext() end
 
 --- Returns the current error mode as a string.
 ---@return string
-function Pipeline:getErrorMode() end
+function LPipeline:getErrorMode() end
 
 --- Returns the topological execution order as an array of step names.
 ---@return nil
-function Pipeline:getExecutionOrder() end
+function LPipeline:getExecutionOrder() end
 
 --- Returns the pipeline's name.
 ---@return string
-function Pipeline:getName() end
+function LPipeline:getName() end
 
 --- Returns parallel execution groups as a nested array of step name arrays.
 ---@return nil
-function Pipeline:getParallelGroups() end
+function LPipeline:getParallelGroups() end
 
 --- Returns the current result table built from step states, or nil.
 ---@return table
-function Pipeline:getResult() end
+function LPipeline:getResult() end
 
 --- Returns the LuaStep wrapper for the named step, or nil.
 ---@param name string
 ---@return Step?
-function Pipeline:getStep(name) end
+function LPipeline:getStep(name) end
 
 --- Returns the total number of steps.
 ---@return number
-function Pipeline:getStepCount() end
+function LPipeline:getStepCount() end
 
 --- Returns a Lua array of all step wrappers in the pipeline.
 ---@return table
-function Pipeline:getSteps() end
+function LPipeline:getSteps() end
 
 --- Returns a Lua array of all steps whose tag matches the given string.
 ---@param tag string
 ---@return table
-function Pipeline:getStepsByTag(tag) end
+function LPipeline:getStepsByTag(tag) end
 
 --- Returns true if all steps have reached a terminal state.
 ---@return boolean
-function Pipeline:isComplete() end
+function LPipeline:isComplete() end
 
 --- Returns true if the pipeline is currently running asynchronously.
 ---@return boolean
-function Pipeline:isRunning() end
+function LPipeline:isRunning() end
 
 --- Registers a callback invoked after every step with `(step_name, status)`.
 ---@param fn function
 ---@return nil
-function Pipeline:onProgress(fn) end
+function LPipeline:onProgress(fn) end
 
 --- Removes a step from the pipeline by name.
 ---@param name string
 ---@return nil
-function Pipeline:removeStep(name) end
+function LPipeline:removeStep(name) end
 
 --- Resets all step states and clears the async context.
 ---@return nil
-function Pipeline:reset() end
+function LPipeline:reset() end
 
 --- Executes the pipeline synchronously in topological order.
 ---@param context? table
 ---@return table
-function Pipeline:run(context) end
+function LPipeline:run(context) end
 
 --- Starts an async pipeline run. Steps are executed one-per-frame via update(dt).
 ---@param context? table
 ---@return nil
-function Pipeline:runAsync(context) end
+function LPipeline:runAsync(context) end
 
 --- Sets the pipeline error mode: "abort" or "continue".
 ---@param mode string
 ---@return nil
-function Pipeline:setErrorMode(mode) end
+function LPipeline:setErrorMode(mode) end
 
 --- Sets the pipeline's name.
 ---@param name string
 ---@return nil
-function Pipeline:setName(name) end
+function LPipeline:setName(name) end
 
 --- Sets the callback to invoke when the pipeline completes.
 ---@param fn? function
 ---@return nil
-function Pipeline:setOnComplete(fn) end
+function LPipeline:setOnComplete(fn) end
 
 --- Sets the callback to invoke each time a step completes successfully.
 ---@param fn? function
 ---@return nil
-function Pipeline:setOnStepComplete(fn) end
+function LPipeline:setOnStepComplete(fn) end
 
 --- Sets the callback to invoke each time a step fails.
 ---@param fn? function
 ---@return nil
-function Pipeline:setOnStepError(fn) end
+function LPipeline:setOnStepError(fn) end
 
 --- Returns a multi-line ASCII string visualising the pipeline DAG.
 ---@return string
-function Pipeline:toAscii() end
+function LPipeline:toAscii() end
 
 --- Serialises the pipeline definition to a Lua table (no callbacks).
 ---@return table
-function Pipeline:toTable() end
+function LPipeline:toTable() end
 
 --- Returns the type name of this object.
 ---@return string
-function Pipeline:type() end
+function LPipeline:type() end
 
 --- Returns the type identifier string of this pipeline stage object.
 ---@param name string
 ---@return boolean
-function Pipeline:typeOf(name) end
+function LPipeline:typeOf(name) end
 
 --- Advances the async pipeline by one tick. Returns true when all steps are done.
 ---@param dt number
 ---@return boolean
-function Pipeline:update(dt) end
+function LPipeline:update(dt) end
 
 --- Validates the pipeline DAG. Returns (ok, error_array).
 ---@return nil
-function Pipeline:validate() end
+function LPipeline:validate() end
 
 --- Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
----@class Step
-Step = {}
+---@class LPipelineStep
+LPipelineStep = {}
 
 --- Adds a dependency on another step by name or PipelineStep. Returns self for chaining
 ---@param dep string|Step
 ---@return Step
-function Step:dependsOn(dep) end
+function LPipelineStep:dependsOn(dep) end
 
 --- Returns the number of execution attempts so far
 ---@return number
-function Step:getAttempt() end
+function LPipelineStep:getAttempt() end
 
 --- Retrieves a metadata value by key, returning nil if not found
 ---@param key string
 ---@return string
-function Step:getData(key) end
+function LPipelineStep:getData(key) end
 
 --- Returns the configured delay in seconds
 ---@return number
-function Step:getDelay() end
+function LPipelineStep:getDelay() end
 
 --- Returns the list of dependency step names
 ---@return table
-function Step:getDependencies() end
+function LPipelineStep:getDependencies() end
 
 --- Returns the number of declared dependencies
 ---@return number
-function Step:getDependencyCount() end
+function LPipelineStep:getDependencyCount() end
 
 --- Returns total seconds spent executing this step
 ---@return number
-function Step:getDuration() end
+function LPipelineStep:getDuration() end
 
 --- Returns the error message from the last failed attempt, or nil
 ---@return string
-function Step:getError() end
+function LPipelineStep:getError() end
 
 --- Returns the unique name of this step
 ---@return string
-function Step:getName() end
+function LPipelineStep:getName() end
 
 --- Returns the configured retry count
 ---@return number
-function Step:getRetryCount() end
+function LPipelineStep:getRetryCount() end
 
 --- Returns the current execution status as a string
 ---@return string
-function Step:getStatus() end
+function LPipelineStep:getStatus() end
 
 --- Returns the tag on this step, or nil if unset
 ---@return string
-function Step:getTag() end
+function LPipelineStep:getTag() end
 
 --- Returns the timeout stored in metadata, or 0.0 if unset
 ---@return number
-function Step:getTimeout() end
+function LPipelineStep:getTimeout() end
 
 --- Returns whether this step is marked as optional
 ---@return boolean
-function Step:isOptional() end
+function LPipelineStep:isOptional() end
 
 --- Stores a Lua function as the execute callback for this step
 ---@param fn function
 ---@return nil
-function Step:setCallback(fn) end
+function LPipelineStep:setCallback(fn) end
 
 --- Stores a Lua function (or nil) as the run-condition for this step
 ---@param fn? function
 ---@return nil
-function Step:setCondition(fn) end
+function LPipelineStep:setCondition(fn) end
 
 --- Stores an arbitrary string value under the given key in step metadata
 ---@param key string
 ---@param value string
 ---@return nil
-function Step:setData(key, value) end
+function LPipelineStep:setData(key, value) end
 
 --- Sets the delay in seconds to wait after dependencies finish
 ---@param seconds number
 ---@return nil
-function Step:setDelay(seconds) end
+function LPipelineStep:setDelay(seconds) end
 
 --- Stores a Lua function (or nil) to call if this step fails
 ---@param fn? function
 ---@return nil
-function Step:setOnError(fn) end
+function LPipelineStep:setOnError(fn) end
 
 --- Marks whether this step is optional (downstream steps continue on failure)
 ---@param optional boolean
 ---@return nil
-function Step:setOptional(optional) end
+function LPipelineStep:setOptional(optional) end
 
 --- Sets the maximum number of retry attempts on failure
 ---@param count integer
 ---@return nil
-function Step:setRetryCount(count) end
+function LPipelineStep:setRetryCount(count) end
 
 --- Sets the delay in seconds between retry attempts
 ---@param seconds number
 ---@return nil
-function Step:setRetryDelay(seconds) end
+function LPipelineStep:setRetryDelay(seconds) end
 
 --- Sets the tag on this step for grouping and filtering
 ---@param tag string
 ---@return nil
-function Step:setTag(tag) end
+function LPipelineStep:setTag(tag) end
 
 --- Stores a timeout in seconds in the step's metadata
 ---@param seconds number
 ---@return nil
-function Step:setTimeout(seconds) end
+function LPipelineStep:setTimeout(seconds) end
 
 --- Returns the type name "PipelineStep"
 ---@return string
-function Step:type() end
+function LPipelineStep:type() end
 
 --- Returns true when the given name matches "PipelineStep" or a parent type
 ---@param name string
 ---@return boolean
-function Step:typeOf(name) end
+function LPipelineStep:typeOf(name) end
 
 --- Deserialises a pipeline from a definition table.
 ---@param def table
@@ -15460,8 +16799,8 @@ lurek.procgen.worldGraph = function(width, height, region_count, seed) end
 lurek.raycaster = {}
 
 --- Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
----@class DoorManager
-DoorManager = {}
+---@class LDoorManager
+LDoorManager = {}
 
 --- Registers a door at grid position (x, y).
 ---@param x integer
@@ -15469,93 +16808,93 @@ DoorManager = {}
 ---@param direction string
 ---@param speed number
 ---@return number
-function DoorManager:addDoor(x, y, direction, speed) end
+function LDoorManager:addDoor(x, y, direction, speed) end
 
 --- Begins closing the door at the given index.
 ---@param index integer
 ---@return nil
-function DoorManager:closeDoor(index) end
+function LDoorManager:closeDoor(index) end
 
 --- Returns the number of registered doors.
 ---@return number
-function DoorManager:count() end
+function LDoorManager:count() end
 
 --- Returns the state table for door at index, or nil if out of range.
 ---@param index integer
 ---@return nil
-function DoorManager:getDoor(index) end
+function LDoorManager:getDoor(index) end
 
 --- Begins opening the door at the given index.
 ---@param index integer
 ---@return nil
-function DoorManager:openDoor(index) end
+function LDoorManager:openDoor(index) end
 
 --- Returns the type string "DoorManager".
 ---@return string
-function DoorManager:type() end
+function LDoorManager:type() end
 
 --- Returns the type string "DoorManager".
 ---@return string
-function DoorManager:typeOf() end
+function LDoorManager:typeOf() end
 
 --- Advances all door animations by dt seconds.
 ---@param dt number
 ---@return nil
-function DoorManager:update(dt) end
+function LDoorManager:update(dt) end
 
 --- Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
----@class HeightMap
-HeightMap = {}
+---@class LHeightMap
+LHeightMap = {}
 
 --- Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
 ---@param x integer
 ---@param y integer
 ---@return number
-function HeightMap:ceilingAt(x, y) end
+function LHeightMap:ceilingAt(x, y) end
 
 --- Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
 ---@param x integer
 ---@param y integer
 ---@return number
-function HeightMap:floorAt(x, y) end
+function LHeightMap:floorAt(x, y) end
 
 --- Sets the ceiling height at (x, y).
 ---@param x integer
 ---@param y integer
 ---@param h number
 ---@return nil
-function HeightMap:setCeiling(x, y, h) end
+function LHeightMap:setCeiling(x, y, h) end
 
 --- Sets the floor height at (x, y).
 ---@param x integer
 ---@param y integer
 ---@param h number
 ---@return nil
-function HeightMap:setFloor(x, y, h) end
+function LHeightMap:setFloor(x, y, h) end
 
 --- Returns the type string "HeightMap".
 ---@return string
-function HeightMap:type() end
+function LHeightMap:type() end
 
 --- Returns the type string "HeightMap".
 ---@return string
-function HeightMap:typeOf() end
+function LHeightMap:typeOf() end
 
 --- Lua-side value wrapper around a raycaster [`PointLight`].
----@class PointLight
-PointLight = {}
+---@class LPointLight
+LPointLight = {}
 
 --- Returns the RGB color as three separate values.
 ---@return number
-function PointLight:color() end
+function LPointLight:color() end
 
 --- Returns the intensity multiplier.
 ---@return number
-function PointLight:intensity() end
+function LPointLight:intensity() end
 
 --- Returns the illumination radius.
 ---@return number
-function PointLight:radius() end
+function LPointLight:radius() end
 
 --- Updates all light properties at once.
 ---@param x number
@@ -15566,27 +16905,27 @@ function PointLight:radius() end
 ---@param radius number
 ---@param intensity number
 ---@return nil
-function PointLight:set(x, y, r, g, b, radius, intensity) end
+function LPointLight:set(x, y, r, g, b, radius, intensity) end
 
 --- Returns the type string "PointLight".
 ---@return string
-function PointLight:type() end
+function LPointLight:type() end
 
 --- Returns the type string "PointLight".
 ---@return string
-function PointLight:typeOf() end
+function LPointLight:typeOf() end
 
 --- Returns the world-space X position.
 ---@return number
-function PointLight:x() end
+function LPointLight:x() end
 
 --- Returns the world-space Y position.
 ---@return number
-function PointLight:y() end
+function LPointLight:y() end
 
 --- Lua-side wrapper around a [`Raycaster2D`] grid.
----@class Raycaster
-Raycaster = {}
+---@class LRaycaster
+LRaycaster = {}
 
 --- Builds a raycaster scene and stores it in SharedState for GPU rendering.
 ---@param params table â€”{px,py,angle,fov,rays,max_dist,screen_w,screen_h,ambient?,shade_dist?,floor_color?,ceiling_color?}
@@ -15594,7 +16933,7 @@ Raycaster = {}
 ---@param sprites table|nil â€” array of{x,y,texture,size}
 ---@param wall_textures table|nil â€”{[cell_value]= TextureKey}
 ---@return nil
-function Raycaster:buildScene(params, lights, sprites, wall_textures) end
+function LRaycaster:buildScene(params, lights, sprites, wall_textures) end
 
 --- Computes floor (or ceiling) texture UV coordinates for one horizontal screen row.
 ---@param cam_x number
@@ -15605,7 +16944,7 @@ function Raycaster:buildScene(params, lights, sprites, wall_textures) end
 ---@param plane_y number
 ---@param row integer
 ---@return table
-function Raycaster:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, row) end
+function LRaycaster:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, row) end
 
 --- Casts a single ray and returns a hit table, or nil if nothing was hit.
 ---@param ox number
@@ -15613,7 +16952,7 @@ function Raycaster:castFloorRow(cam_x, cam_y, dir_x, dir_y, plane_x, plane_y, ro
 ---@param angle number
 ---@param max_dist number
 ---@return table
-function Raycaster:castRay(ox, oy, angle, max_dist) end
+function LRaycaster:castRay(ox, oy, angle, max_dist) end
 
 --- Casts a ray collecting up to max_hits wall layers, continuing through
 ---@param ox number
@@ -15622,7 +16961,7 @@ function Raycaster:castRay(ox, oy, angle, max_dist) end
 ---@param max_dist number
 ---@param max_hits? integer
 ---@return table
-function Raycaster:castRayMulti(ox, oy, angle, max_dist, max_hits) end
+function LRaycaster:castRayMulti(ox, oy, angle, max_dist, max_hits) end
 
 --- Casts multiple rays across a field of view, returns an array of hit tables.
 ---@param ox number
@@ -15632,7 +16971,7 @@ function Raycaster:castRayMulti(ox, oy, angle, max_dist, max_hits) end
 ---@param count integer
 ---@param max_dist number
 ---@return table
-function Raycaster:castRays(ox, oy, angle, fov, count, max_dist) end
+function LRaycaster:castRays(ox, oy, angle, fov, count, max_dist) end
 
 --- Casts multiple rays and returns a flat array of 5 floats per ray.
 ---@param ox number
@@ -15642,7 +16981,7 @@ function Raycaster:castRays(ox, oy, angle, fov, count, max_dist) end
 ---@param count integer
 ---@param max_dist number
 ---@return table
-function Raycaster:castRaysFlat(ox, oy, angle, fov, count, max_dist) end
+function LRaycaster:castRaysFlat(ox, oy, angle, fov, count, max_dist) end
 
 --- Renders a mosaic of first-person views from evenly spaced angles to an ImageData.
 ---@param x number
@@ -15653,7 +16992,7 @@ function Raycaster:castRaysFlat(ox, oy, angle, fov, count, max_dist) end
 ---@param frame_w integer
 ---@param frame_h integer
 ---@return ImageData
-function Raycaster:drawCameraSweep(x, y, fov, max_dist, num_frames, frame_w, frame_h) end
+function LRaycaster:drawCameraSweep(x, y, fov, max_dist, num_frames, frame_w, frame_h) end
 
 --- Renders a depth-map column view to an ImageData.
 ---@param px number
@@ -15665,7 +17004,7 @@ function Raycaster:drawCameraSweep(x, y, fov, max_dist, num_frames, frame_w, fra
 ---@param height integer
 ---@param max_dist number
 ---@return ImageData
-function Raycaster:drawDepthMap(px, py, angle, fov, num_rays, width, height, max_dist) end
+function LRaycaster:drawDepthMap(px, py, angle, fov, num_rays, width, height, max_dist) end
 
 --- Renders a line-of-sight test between two points to an ImageData.
 ---@param ax number
@@ -15674,7 +17013,7 @@ function Raycaster:drawDepthMap(px, py, angle, fov, num_rays, width, height, max
 ---@param by number
 ---@param scale integer
 ---@return ImageData
-function Raycaster:drawLineOfSight(ax, ay, bx, by, scale) end
+function LRaycaster:drawLineOfSight(ax, ay, bx, by, scale) end
 
 --- Renders a top-down grid view with player marker to an ImageData.
 ---@param px number
@@ -15682,7 +17021,7 @@ function Raycaster:drawLineOfSight(ax, ay, bx, by, scale) end
 ---@param angle number
 ---@param scale integer
 ---@return ImageData
-function Raycaster:drawTopDown(px, py, angle, scale) end
+function LRaycaster:drawTopDown(px, py, angle, scale) end
 
 --- Renders a first-person column view to an ImageData.
 ---@param px number
@@ -15693,28 +17032,28 @@ function Raycaster:drawTopDown(px, py, angle, scale) end
 ---@param height integer
 ---@param max_dist number
 ---@return ImageData
-function Raycaster:drawView(px, py, angle, fov, width, height, max_dist) end
+function LRaycaster:drawView(px, py, angle, fov, width, height, max_dist) end
 
 --- Returns the cell value at (x, y).
 ---@param x integer
 ---@param y integer
 ---@return number
-function Raycaster:getCell(x, y) end
+function LRaycaster:getCell(x, y) end
 
 --- Returns the opacity for a wall tile type. Returns 1.0 if not set.
 ---@param tile_type integer
 ---@return number
-function Raycaster:getWallAlpha(tile_type) end
+function LRaycaster:getWallAlpha(tile_type) end
 
 --- Returns the grid height in cells.
 ---@return number
-function Raycaster:height() end
+function LRaycaster:height() end
 
 --- Returns true when the cell at (x, y) is a wall (value > 0).
 ---@param x integer
 ---@param y integer
 ---@return boolean
-function Raycaster:isBlocked(x, y) end
+function LRaycaster:isBlocked(x, y) end
 
 --- Checks line of sight between two points using DDA traversal.
 ---@param x1 number
@@ -15722,7 +17061,7 @@ function Raycaster:isBlocked(x, y) end
 ---@param x2 number
 ---@param y2 number
 ---@return boolean
-function Raycaster:lineOfSight(x1, y1, x2, y2) end
+function LRaycaster:lineOfSight(x1, y1, x2, y2) end
 
 --- Projects a world-space sprite onto screen space.
 ---@param sx number
@@ -15733,33 +17072,42 @@ function Raycaster:lineOfSight(x1, y1, x2, y2) end
 ---@param fov number
 ---@param screen_w number
 ---@return table
-function Raycaster:projectSprite(sx, sy, px, py, pa, fov, screen_w) end
+function LRaycaster:projectSprite(sx, sy, px, py, pa, fov, screen_w) end
 
 --- Sets the cell value at grid position (x, y).
 ---@param x integer
 ---@param y integer
 ---@param val integer
 ---@return nil
-function Raycaster:setCell(x, y, val) end
+function LRaycaster:setCell(x, y, val) end
 
 --- Replaces all grid cells from a flat array of values in row-major order.
 ---@param cells table
 ---@return nil
-function Raycaster:setCells(cells) end
+function LRaycaster:setCells(cells) end
 
 --- Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
 ---@param tile_type integer
 ---@param alpha number
 ---@return nil
-function Raycaster:setWallAlpha(tile_type, alpha) end
+function LRaycaster:setWallAlpha(tile_type, alpha) end
+
+--- Returns the type name of this object.
+---@return string
+function LRaycaster:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LRaycaster:typeOf(name) end
 
 --- Returns the grid width in cells.
 ---@return number
-function Raycaster:width() end
+function LRaycaster:width() end
 
 --- Lua-side wrapper around a [`SpriteManager`] for batch depth-sorted sprite projection.
----@class SpriteManager
-SpriteManager = {}
+---@class LSpriteManager
+LSpriteManager = {}
 
 --- Adds a sprite at world position (x, y) and returns its unique id.
 ---@param x number
@@ -15767,44 +17115,44 @@ SpriteManager = {}
 ---@param texture string
 ---@param scale? number
 ---@return number
-function SpriteManager:add(x, y, texture, scale) end
+function LSpriteManager:add(x, y, texture, scale) end
 
 --- Removes all sprites from the manager.
 ---@return nil
-function SpriteManager:clear() end
+function LSpriteManager:clear() end
 
 --- Removes the sprite with the given id. No-op if not found.
 ---@param id integer
 ---@return nil
-function SpriteManager:remove(id) end
+function LSpriteManager:remove(id) end
 
 --- Moves the sprite with the given id to world (x, y).
 ---@param id integer
 ---@param x number
 ---@param y number
 ---@return nil
-function SpriteManager:setPosition(id, x, y) end
+function LSpriteManager:setPosition(id, x, y) end
 
 --- Shows or hides the sprite with the given id.
 ---@param id integer
 ---@param visible boolean
 ---@return nil
-function SpriteManager:setVisible(id, visible) end
+function LSpriteManager:setVisible(id, visible) end
 
 --- Returns an array of visible sprites sorted back-to-front from camera position.
 ---@param cam_x number
 ---@param cam_y number
 ---@param cam_angle number
 ---@return table
-function SpriteManager:sortAndProject(cam_x, cam_y, cam_angle) end
+function LSpriteManager:sortAndProject(cam_x, cam_y, cam_angle) end
 
 --- Returns the type string "SpriteManager".
 ---@return string
-function SpriteManager:type() end
+function LSpriteManager:type() end
 
 --- Returns the type string "SpriteManager".
 ---@return string
-function SpriteManager:typeOf() end
+function LSpriteManager:typeOf() end
 
 --- Returns distance-based brightness in [0, 1].
 ---@param distance number
@@ -15860,162 +17208,162 @@ lurek.raycaster.projectColumn = function(distance, fov, screen_height) end
 lurek.render = {}
 
 --- Lua-side handle to an off-screen render target stored in SharedState.
----@class Canvas
-Canvas = {}
+---@class LCanvas
+LCanvas = {}
 
 --- Returns width and height of this canvas.
 ---@return number
-function Canvas:getDimensions() end
+function LCanvas:getDimensions() end
 
 --- Returns the height of this canvas in pixels.
 ---@return number
-function Canvas:getHeight() end
+function LCanvas:getHeight() end
 
 --- Returns the width of this canvas in pixels.
 ---@return number
-function Canvas:getWidth() end
+function LCanvas:getWidth() end
 
 --- Releases GPU framebuffer memory for this canvas.
 ---@return boolean
-function Canvas:release() end
+function LCanvas:release() end
 
 --- Returns the type name of this object.
 ---@return string
-function Canvas:type() end
+function LCanvas:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Canvas:typeOf(name) end
+function LCanvas:typeOf(name) end
 
 --- Lua-side z-ordered draw queue. Callbacks are sorted by z and called on `flush()`.
----@class DrawLayer
-DrawLayer = {}
+---@class LDrawLayer
+LDrawLayer = {}
 
 --- Removes all queued callbacks without calling them.
 ---@return number
-function DrawLayer:clear() end
+function LDrawLayer:clear() end
 
 --- Sorts and calls all queued callbacks, then empties the queue.
 ---@return nil
-function DrawLayer:flush() end
+function LDrawLayer:flush() end
 
 --- Returns the number of queued callbacks.
 ---@return number
-function DrawLayer:getCount() end
+function LDrawLayer:getCount() end
 
 --- Queues a draw callback at the given z-order.
 ---@param z number
 ---@param fn function
 ---@return nil
-function DrawLayer:queue(z, fn) end
+function LDrawLayer:queue(z, fn) end
 
 --- Returns the string type identifier of this draw layer (e.g. `'sprite'`).
 ---@return string
-function DrawLayer:type() end
+function LDrawLayer:type() end
 
 --- Returns true if this object is an instance of the given type name.
 ---@param name string
 ---@return boolean
-function DrawLayer:typeOf(name) end
+function LDrawLayer:typeOf(name) end
 
 --- Lua-side handle to a loaded font stored in SharedState.
----@class Font
-Font = {}
+---@class LFont
+LFont = {}
 
 --- Returns the ascent of this font in pixels.
 ---@return number
-function Font:getAscent() end
+function LFont:getAscent() end
 
 --- Returns the descent of this font in pixels.
 ---@return number
-function Font:getDescent() end
+function LFont:getDescent() end
 
 --- Returns the line height of this font.
 ---@return number
-function Font:getHeight() end
+function LFont:getHeight() end
 
 --- Returns the line height multiplier of this font.
 ---@return number
-function Font:getLineHeight() end
+function LFont:getLineHeight() end
 
 --- Returns the rendered width of the given text string.
 ---@param text string
 ---@return number
-function Font:getWidth(text) end
+function LFont:getWidth(text) end
 
 --- Wraps text to the given width and returns the lines.
 ---@param text string
 ---@param limit number
 ---@return nil
-function Font:getWrap(text, limit) end
+function LFont:getWrap(text, limit) end
 
 --- Releases this font and frees its atlas memory.
 ---@return boolean
-function Font:release() end
+function LFont:release() end
 
 --- Sets the line height multiplier for this font.
 ---@param height number
 ---@return nil
-function Font:setLineHeight(height) end
+function LFont:setLineHeight(height) end
 
 --- Returns the type name of this object.
 ---@return string
-function Font:type() end
+function LFont:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Font:typeOf(name) end
+function LFont:typeOf(name) end
 
 --- Lua-side handle to a loaded GPU texture stored in the engine's texture pool.
----@class Image
-Image = {}
+---@class LImage
+LImage = {}
 
 --- Returns width and height of this image.
 ---@return number
-function Image:getDimensions() end
+function LImage:getDimensions() end
 
 --- Returns the height of this image in pixels.
 ---@return number
-function Image:getHeight() end
+function LImage:getHeight() end
 
 --- Returns the width of this image in pixels.
 ---@return number
-function Image:getWidth() end
+function LImage:getWidth() end
 
 --- Releases the GPU texture memory for this image.
 ---@return boolean
-function Image:release() end
+function LImage:release() end
 
 --- Returns the type name of this object.
 ---@return string
-function Image:type() end
+function LImage:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Image:typeOf(name) end
+function LImage:typeOf(name) end
 
 --- Lua-side handle to a loaded texture stored in SharedState.
----@class ImageData
-ImageData = {}
+---@class LImageData
+LImageData = {}
 
 --- Blits the source ImageData onto this image at (dst_x, dst_y) using Porter-Duff `over`.
 ---@param src ImageData
 ---@param dst_x integer
 ---@param dst_y integer
 ---@return nil
-function ImageData:blit(src, dst_x, dst_y) end
+function LImageData:blit(src, dst_x, dst_y) end
 
 --- Returns the sum of absolute per-channel differences between this image and `other`.
 ---@param other ImageData
 ---@return number
-function ImageData:diff(other) end
+function LImageData:diff(other) end
 
 --- Returns the pixel height of this image buffer.
 ---@return number
-function ImageData:getHeight() end
+function LImageData:getHeight() end
 
 --- Returns a copy of the rectangular sub-region as a new ImageData.
 ---@param x integer
@@ -16023,72 +17371,72 @@ function ImageData:getHeight() end
 ---@param width integer
 ---@param height integer
 ---@return nil
-function ImageData:getRegion(x, y, width, height) end
+function LImageData:getRegion(x, y, width, height) end
 
 --- Returns the pixel width of this image buffer.
 ---@return number
-function ImageData:getWidth() end
+function LImageData:getWidth() end
 
 --- Applies a Lua function to every pixel in-place.
 ---@param fn function
 ---@return nil
-function ImageData:mapPixels(fn) end
+function LImageData:mapPixels(fn) end
 
 --- Returns a new ImageData scaled to the given dimensions using bilinear interpolation.
 ---@param width integer
 ---@param height integer
 ---@return nil
-function ImageData:resize(width, height) end
+function LImageData:resize(width, height) end
 
 --- Returns the type name "ImageData".
 ---@return string
-function ImageData:type() end
+function LImageData:type() end
 
 --- Returns true when the given name matches "ImageData" or a parent type.
 ---@param name string
 ---@return boolean
-function ImageData:typeOf(name) end
+function LImageData:typeOf(name) end
 
 --- Lua-side handle to a mesh stored in SharedState.
----@class Mesh
-Mesh = {}
+---@class LMesh
+LMesh = {}
 
 --- Returns vertex data at the given 1-based index.
 ---@param index integer
 ---@return nil
-function Mesh:getVertex(index) end
+function LMesh:getVertex(index) end
 
 --- Returns the number of vertices in this mesh.
 ---@return number
-function Mesh:getVertexCount() end
+function LMesh:getVertexCount() end
 
 --- Releases the GPU mesh resource, freeing VRAM immediately.
 ---@return boolean
-function Mesh:release() end
+function LMesh:release() end
 
 --- Assigns a texture to this mesh.
 ---@param image? Image
 ---@return nil
-function Mesh:setTexture(image) end
+function LMesh:setTexture(image) end
 
 --- Sets vertex data at the given 1-based index.
 ---@param index integer
 ---@param data table
 ---@return nil
-function Mesh:setVertex(index, data) end
+function LMesh:setVertex(index, data) end
 
 --- Returns the type name of this object.
 ---@return string
-function Mesh:type() end
+function LMesh:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Mesh:typeOf(name) end
+function LMesh:typeOf(name) end
 
 --- Lua-side 9-slice descriptor.
----@class NineSlice
-NineSlice = {}
+---@class LNineSlice
+LNineSlice = {}
 
 --- Compatibility stub: queuing handled by lurek.graphic.drawNineSlice.
 ---@param x any
@@ -16096,36 +17444,36 @@ NineSlice = {}
 ---@param w any
 ---@param h any
 ---@return nil
-function NineSlice:draw(x, y, w, h) end
+function LNineSlice:draw(x, y, w, h) end
 
 --- Returns the four inset values as (top, right, bottom, left).
 ---@return number
-function NineSlice:getInsets() end
+function LNineSlice:getInsets() end
 
 --- Returns the width and height of the source texture.
 ---@return number
-function NineSlice:getTextureSize() end
+function LNineSlice:getTextureSize() end
 
 --- Returns the type name "NineSlice".
 ---@return string
-function NineSlice:type() end
+function LNineSlice:type() end
 
 --- Returns true when the given name matches "NineSlice" or a parent type.
 ---@param name string
 ---@return boolean
-function NineSlice:typeOf(name) end
+function LNineSlice:typeOf(name) end
 
 --- Lua-side quad viewport into a texture.
----@class Quad
-Quad = {}
+---@class LQuad
+LQuad = {}
 
 --- Returns the reference texture dimensions.
 ---@return number
-function Quad:getTextureDimensions() end
+function LQuad:getTextureDimensions() end
 
 --- Returns the quad viewport rectangle.
 ---@return number
-function Quad:getViewport() end
+function LQuad:getViewport() end
 
 --- Sets the quad viewport rectangle.
 ---@param x number
@@ -16133,48 +17481,48 @@ function Quad:getViewport() end
 ---@param w number
 ---@param h number
 ---@return nil
-function Quad:setViewport(x, y, w, h) end
+function LQuad:setViewport(x, y, w, h) end
 
 --- Returns the type name of this object.
 ---@return string
-function Quad:type() end
+function LQuad:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Quad:typeOf(name) end
+function LQuad:typeOf(name) end
 
 --- Lua-side handle to a compiled shader stored in SharedState.
----@class Shader
-Shader = {}
+---@class LShader
+LShader = {}
 
 --- Returns whether this shader has a uniform with the given name.
 ---@param name string
 ---@return boolean
-function Shader:hasUniform(name) end
+function LShader:hasUniform(name) end
 
 --- Releases the compiled GPU shader, freeing VRAM and shader slots.
 ---@return boolean
-function Shader:release() end
+function LShader:release() end
 
 --- Sends a uniform value to this shader.
 ---@param name string
 ---@param value number|table
 ---@return nil
-function Shader:send(name, value) end
+function LShader:send(name, value) end
 
 --- Returns the type name of this object.
 ---@return string
-function Shader:type() end
+function LShader:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function Shader:typeOf(name) end
+function LShader:typeOf(name) end
 
 --- Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
----@class Shape
-Shape = {}
+---@class LShape
+LShape = {}
 
 --- Queues a filled or outlined arc draw command onto this shape.
 ---@param mode string
@@ -16185,7 +17533,7 @@ Shape = {}
 ---@param aend number
 ---@param segments? integer
 ---@return nil
-function Shape:arc(mode, x, y, r, astart, aend, segments) end
+function LShape:arc(mode, x, y, r, astart, aend, segments) end
 
 --- Queues a filled or outlined circle draw command onto this shape.
 ---@param mode string
@@ -16193,11 +17541,11 @@ function Shape:arc(mode, x, y, r, astart, aend, segments) end
 ---@param y number
 ---@param r number
 ---@return nil
-function Shape:circle(mode, x, y, r) end
+function LShape:circle(mode, x, y, r) end
 
 --- Removes all commands and resets the shape to empty.
 ---@return nil
-function Shape:clear() end
+function LShape:clear() end
 
 --- Queues a draw command for this shape at the given position.
 ---@param x number
@@ -16208,7 +17556,7 @@ function Shape:clear() end
 ---@param ox? number
 ---@param oy? number
 ---@return nil
-function Shape:draw(x, y, rotation, sx, sy, ox, oy) end
+function LShape:draw(x, y, rotation, sx, sy, ox, oy) end
 
 --- Queues an ellipse command.
 ---@param mode string
@@ -16217,11 +17565,11 @@ function Shape:draw(x, y, rotation, sx, sy, ox, oy) end
 ---@param rx number
 ---@param ry number
 ---@return nil
-function Shape:ellipse(mode, x, y, rx, ry) end
+function LShape:ellipse(mode, x, y, rx, ry) end
 
 --- Returns the number of drawing commands currently stored.
 ---@return number
-function Shape:getCommandCount() end
+function LShape:getCommandCount() end
 
 --- Queues a line segment command.
 ---@param x1 number
@@ -16229,18 +17577,18 @@ function Shape:getCommandCount() end
 ---@param x2 number
 ---@param y2 number
 ---@return nil
-function Shape:line(x1, y1, x2, y2) end
+function LShape:line(x1, y1, x2, y2) end
 
 --- Queues a polygon command from variadic (x, y) coordinate pairs.
 ---@param mode string
 ---@param ... number
 ---@return nil
-function Shape:polygon(mode, ...) end
+function LShape:polygon(mode, ...) end
 
 --- Queues a polyline command from variadic (x, y) coordinate pairs.
 ---@param ... number
 ---@return nil
-function Shape:polyline(...) end
+function LShape:polyline(...) end
 
 --- Queues a rectangle command.
 ---@param mode string
@@ -16249,7 +17597,7 @@ function Shape:polyline(...) end
 ---@param w number
 ---@param h number
 ---@return nil
-function Shape:rectangle(mode, x, y, w, h) end
+function LShape:rectangle(mode, x, y, w, h) end
 
 --- Queues a rounded rectangle command.
 ---@param mode string
@@ -16260,7 +17608,7 @@ function Shape:rectangle(mode, x, y, w, h) end
 ---@param rx number
 ---@param ry? number
 ---@return nil
-function Shape:roundedRectangle(mode, x, y, w, h, rx, ry) end
+function LShape:roundedRectangle(mode, x, y, w, h, rx, ry) end
 
 --- Sets the drawing color for subsequent primitives.
 ---@param r number
@@ -16268,12 +17616,12 @@ function Shape:roundedRectangle(mode, x, y, w, h, rx, ry) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Shape:setColor(r, g, b, a) end
+function LShape:setColor(r, g, b, a) end
 
 --- Sets the stroke width for subsequent outlined primitives.
 ---@param w number
 ---@return nil
-function Shape:setLineWidth(w) end
+function LShape:setLineWidth(w) end
 
 --- Queues a triangle command.
 ---@param mode string
@@ -16284,20 +17632,20 @@ function Shape:setLineWidth(w) end
 ---@param x3 number
 ---@param y3 number
 ---@return nil
-function Shape:triangle(mode, x1, y1, x2, y2, x3, y3) end
+function LShape:triangle(mode, x1, y1, x2, y2, x3, y3) end
 
 --- Returns the type name of this object.
 ---@return string
-function Shape:type() end
+function LShape:type() end
 
 --- Returns true if the given type name matches this object's type or any parent type.
 ---@param name string
 ---@return boolean
-function Shape:typeOf(name) end
+function LShape:typeOf(name) end
 
 --- Lua-side handle to a sprite batch stored in SharedState.
----@class SpriteBatch
-SpriteBatch = {}
+---@class LSpriteBatch
+LSpriteBatch = {}
 
 --- Adds a sprite entry to this batch.
 ---@param x number
@@ -16308,32 +17656,32 @@ SpriteBatch = {}
 ---@param ox? number
 ---@param oy? number
 ---@return number
-function SpriteBatch:add(x, y, r, sx, sy, ox, oy) end
+function LSpriteBatch:add(x, y, r, sx, sy, ox, oy) end
 
 --- Removes all sprites from this batch.
 ---@return nil
-function SpriteBatch:clear() end
+function LSpriteBatch:clear() end
 
 --- Returns the maximum capacity of this batch.
 ---@return number
-function SpriteBatch:getBufferSize() end
+function LSpriteBatch:getBufferSize() end
 
 --- Returns the number of sprites in this batch.
 ---@return number
-function SpriteBatch:getCount() end
+function LSpriteBatch:getCount() end
 
 --- Releases this sprite batch.
 ---@return boolean
-function SpriteBatch:release() end
+function LSpriteBatch:release() end
 
 --- Returns the type name of this object.
 ---@return string
-function SpriteBatch:type() end
+function LSpriteBatch:type() end
 
 --- Returns the type name of this object.
 ---@param name? string
 ---@return string
-function SpriteBatch:typeOf(name) end
+function LSpriteBatch:typeOf(name) end
 
 --- Applies an affine transform matrix.
 ---@param matrix table
@@ -16350,6 +17698,10 @@ lurek.render.applyTransform = function(matrix) end
 lurek.render.arc = function(mode, x, y, radius, angle1, angle2, segments) end
 
 --- Begins a Y/Z depth sort group. Draw commands until flushSortGroup are depth-sortable.
+---@param id integer
+lurek.render.beginSortGroup = function(id) end
+
+--- Begins a Y/Z depth sort group identified by id.
 ---@param id integer
 lurek.render.beginSortGroup = function(id) end
 
@@ -16394,11 +17746,39 @@ lurek.render.draw = function(...) end
 ---@param opts? table
 lurek.render.drawBevelRect = function(x, y, w, h, bevelW, style, opts) end
 
+--- Queues a beveled border rectangle.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param bevelW? number
+---@param style? string
+---@param opts? table
+lurek.render.drawBevelRect = function(x, y, w, h, bevelW, style, opts) end
+
 --- Queues a convex polygon with per-vertex colours.
 ---@param vertices table
 ---@param colors table
 ---@param mode? string
 lurek.render.drawColoredPolygon = function(vertices, colors, mode) end
+
+--- Queues a convex polygon with per-vertex colours.
+---@param vertices table
+---@param colors table
+---@param mode? string
+lurek.render.drawColoredPolygon = function(vertices, colors, mode) end
+
+--- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
+---@param x1 number
+---@param y1 number
+---@param cx1 number
+---@param cy1 number
+---@param cx2 number
+---@param cy2 number
+---@param x2 number
+---@param y2 number
+---@param segments? integer
+lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segments) end
 
 --- Queues a cubic BĂ©zier curve from (x1,y1) to (x2,y2) with two control points.
 ---@param x1 number
@@ -16422,6 +17802,16 @@ lurek.render.drawCubicBezier = function(x1, y1, cx1, cy1, cx2, cy2, x2, y2, segm
 ---@param direction? string
 lurek.render.drawGradientRect = function(x, y, w, h, color1, color2, direction) end
 
+--- Queues a gradient-filled rectangle. Both colors are RGBA tables {r,g,b,a} or positional {[1]=r,[2]=g,[3]=b,[4]=a}.
+---@param x number
+---@param y number
+---@param w number
+---@param h number
+---@param color1 table
+---@param color2 table
+---@param direction? string
+lurek.render.drawGradientRect = function(x, y, w, h, color1, color2, direction) end
+
 --- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
 ---@param cx number
 ---@param cy number
@@ -16429,6 +17819,22 @@ lurek.render.drawGradientRect = function(x, y, w, h, color1, color2, direction) 
 ---@param orientation? string
 ---@param mode? string
 lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
+
+--- Queues a hexagonal tile at centre (cx, cy) with given circumradius.
+---@param cx number
+---@param cy number
+---@param size number
+---@param orientation? string
+---@param mode? string
+lurek.render.drawHexTile = function(cx, cy, size, orientation, mode) end
+
+--- Queues a three-face isometric cube tile at screen position (sx, sy).
+---@param sx number
+---@param sy number
+---@param halfW number
+---@param halfH number
+---@param opts? table
+lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 
 --- Queues a three-face isometric cube tile at screen position (sx, sy).
 ---@param sx number
@@ -16453,7 +17859,23 @@ lurek.render.drawNineSlice = function(slice, x, y, width, height) end
 ---@param close? boolean
 lurek.render.drawPath = function(path, mode, close) end
 
+--- Queues a multi-segment vector path.
+---@param path table
+---@param mode? string
+---@param close? boolean
+lurek.render.drawPath = function(path, mode, close) end
+
 --- Queues a quadratic BĂ©zier curve from (x1,y1) to (x2,y2) with one control point.
+---@param x1 number
+---@param y1 number
+---@param cx number
+---@param cy number
+---@param x2 number
+---@param y2 number
+---@param segments? integer
+lurek.render.drawQuadBezier = function(x1, y1, cx, cy, x2, y2, segments) end
+
+--- Must be called inside lurek.draw or lurek.draw_ui.
 ---@param x1 number
 ---@param y1 number
 ---@param cx number
@@ -16482,6 +17904,10 @@ lurek.render.drawq = function(image, quad, x, y, r, sx, sy, ox, oy) end
 ---@param rx number
 ---@param ry number
 lurek.render.ellipse = function(mode, x, y, rx, ry) end
+
+--- Sorts and flushes all draw commands in the sort group.
+---@param id integer
+lurek.render.flushSortGroup = function(id) end
 
 --- Sorts and flushes all draw commands in the sort group.
 ---@param id integer
@@ -16715,6 +18141,10 @@ lurek.render.pop = function() end
 ---@param id integer
 lurek.render.popLayer = function(id) end
 
+--- Ends and composites the named layer.
+---@param id integer
+lurek.render.popLayer = function(id) end
+
 --- Draws text at the given position.
 ---@param text string
 ---@param x? number
@@ -16744,6 +18174,16 @@ lurek.render.push = function() end
 ---@param alpha? number
 ---@param blendMode? string
 lurek.render.pushLayer = function(id, alpha, blendMode) end
+
+--- Begins a named compositing layer. Provides alpha and blend mode for composite.
+---@param id integer
+---@param alpha? number
+---@param blendMode? string
+lurek.render.pushLayer = function(id, alpha, blendMode) end
+
+--- Associates the previous draw command with a depth value within the active sort group.
+---@param depth number
+lurek.render.pushSortKey = function(depth) end
 
 --- Associates the previous draw command with a depth value within the active sort group.
 ---@param depth number
@@ -16895,128 +18335,137 @@ lurek.render.triangle = function(mode, x1, y1, x2, y2, x3, y3) end
 lurek.save = {}
 
 --- Lua-side wrapper around [`SaveManager`] with per-module callback storage.
----@class SaveManager
-SaveManager = {}
+---@class LSaveManager
+LSaveManager = {}
 
 --- Registers a migration function for upgrading from a schema version
 ---@param from_version integer
 ---@param func function
 ---@return nil
-function SaveManager:addMigration(from_version, func) end
+function LSaveManager:addMigration(from_version, func) end
 
 --- Collects data from all registered collectors into a table with metadata
 ---@return table
-function SaveManager:collect() end
+function LSaveManager:collect() end
 
 --- Deletes a save file for the given slot.
 ---@param slot string
 ---@return nil
-function SaveManager:delete(slot) end
+function LSaveManager:delete(slot) end
 
 --- Disables automatic periodic saving; manual `write()` calls still work.
 ---@return nil
-function SaveManager:disableAutoSave() end
+function LSaveManager:disableAutoSave() end
 
 --- Enables auto-save with a given interval and target slot
 ---@param interval number
 ---@param slot string
 ---@return nil
-function SaveManager:enableAutoSave(interval, slot) end
+function LSaveManager:enableAutoSave(interval, slot) end
 
 --- Returns whether a save file exists for the given slot.
 ---@param slot string
 ---@return boolean
-function SaveManager:exists(slot) end
+function LSaveManager:exists(slot) end
 
 --- Returns the current schema version
 ---@return number
-function SaveManager:getSchemaVersion() end
+function LSaveManager:getSchemaVersion() end
 
 --- Returns metadata for a single slot, or nil if not found.
 ---@param slot string
 ---@return table
-function SaveManager:getSlotInfo(slot) end
+function LSaveManager:getSlotInfo(slot) end
 
 --- Returns a list of all save slots with metadata.
 ---@return table
-function SaveManager:getSlots() end
+function LSaveManager:getSlots() end
 
 --- Returns the current summary string
 ---@return string
-function SaveManager:getSummary() end
+function LSaveManager:getSummary() end
 
 --- Returns whether compression is currently enabled.
 ---@return boolean
-function SaveManager:isCompressed() end
+function LSaveManager:isCompressed() end
 
 --- Returns whether data has been modified since the last save or load
 ---@return boolean
-function SaveManager:isDirty() end
+function LSaveManager:isDirty() end
 
 --- Loads data from a slot file, applies migrations, and restores.
 ---@param slot string
 ---@return nil
-function SaveManager:load(slot) end
+function LSaveManager:load(slot) end
 
 --- Marks data as modified since the last save or load
 ---@return nil
-function SaveManager:markDirty() end
+function LSaveManager:markDirty() end
 
 --- Registers a callback that fires after every successful load operation.
 ---@param func? function
 ---@return nil
-function SaveManager:onAfterLoad(func) end
+function LSaveManager:onAfterLoad(func) end
 
 --- Registers a callback that fires before every save operation.
 ---@param func? function
 ---@return nil
-function SaveManager:onBeforeSave(func) end
+function LSaveManager:onBeforeSave(func) end
 
 --- Registers a named module with collector and restorer callbacks
 ---@param name string
 ---@param collector function
 ---@param restorer function
 ---@return nil
-function SaveManager:register(name, collector, restorer) end
+function LSaveManager:register(name, collector, restorer) end
 
 --- Resets all state, removing callbacks and clearing the manager
 ---@return nil
-function SaveManager:reset() end
+function LSaveManager:reset() end
 
 --- Restores data from a table, applying migrations and calling restorers
 ---@param data table
 ---@return nil
-function SaveManager:restore(data) end
+function LSaveManager:restore(data) end
 
 --- Collects data and writes it to a slot file.
 ---@param slot string
 ---@return nil
-function SaveManager:save(slot) end
+function LSaveManager:save(slot) end
 
 --- Enables or disables LZ4 compression for saved data
 ---@param enabled boolean
 ---@return nil
-function SaveManager:setCompress(enabled) end
+function LSaveManager:setCompress(enabled) end
 
 --- Sets the current schema version for new saves
 ---@param version integer
 ---@return nil
-function SaveManager:setSchemaVersion(version) end
+function LSaveManager:setSchemaVersion(version) end
 
 --- Sets the summary string included in save metadata
 ---@param summary string
 ---@return nil
-function SaveManager:setSummary(summary) end
+function LSaveManager:setSummary(summary) end
+
+--- Returns the type name of this object.
+---@return string
+function LSaveManager:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSaveManager:typeOf(name) end
 
 --- Removes a named module and its callbacks
 ---@param name string
 ---@return nil
-function SaveManager:unregister(name) end
+function LSaveManager:unregister(name) end
 
 --- Advances the auto-save timer, returning the slot name if a save should trigger
 ---@param dt number
 ---@return string
-function SaveManager:update(dt) end
+function LSaveManager:update(dt) end
 
 --- Creates a new SaveManager for slot-based save/load operations.
 ---@return SaveManager
@@ -17026,44 +18475,53 @@ lurek.save.newSaveManager = function() end
 lurek.scene = {}
 
 --- Lua-side wrapper around a [`DepthSorter`] with registry-stored callbacks.
----@class DepthSorter
-DepthSorter = {}
+---@class LDepthSorter
+LDepthSorter = {}
 
 --- Registers a draw callback at the given depth layer.
 ---@param callback function
 ---@param depth number
 ---@return nil
-function DepthSorter:add(callback, depth) end
+function LDepthSorter:add(callback, depth) end
 
 --- Registers a table object with a draw method at the given depth.
 ---@param obj table
 ---@return nil
-function DepthSorter:addObject(obj) end
+function LDepthSorter:addObject(obj) end
 
 --- Removes all registered callbacks without calling them.
 ---@return nil
-function DepthSorter:clear() end
+function LDepthSorter:clear() end
 
 --- Calls all draw callbacks in sorted depth order, then clears.
 ---@return nil
-function DepthSorter:flush() end
+function LDepthSorter:flush() end
 
 --- Returns the number of registered draw entries.
 ---@return number
-function DepthSorter:getCount() end
+function LDepthSorter:getCount() end
 
 --- Returns true if stable sort mode is enabled.
 ---@return boolean
-function DepthSorter:isStable() end
+function LDepthSorter:isStable() end
 
 --- Sets whether equal-depth entries preserve insertion order.
 ---@param stable boolean
 ---@return nil
-function DepthSorter:setStable(stable) end
+function LDepthSorter:setStable(stable) end
 
 --- Sorts all registered callbacks by depth ascending.
 ---@return nil
-function DepthSorter:sort() end
+function LDepthSorter:sort() end
+
+--- Returns the type name of this object.
+---@return string
+function LDepthSorter:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LDepthSorter:typeOf(name) end
 
 --- Clears all scenes from the stack, calling leave on each.
 ---@return nil
@@ -17357,144 +18815,153 @@ lurek.serial.validate = function(value, schema) end
 lurek.spine = {}
 
 --- Lua-side wrapper around a [`Skeleton`].
----@class Skeleton
-Skeleton = {}
+---@class LSkeleton
+LSkeleton = {}
 
 --- Adds a SkeletonAnimation to this skeleton's library.
 ---@param anim SkeletonAnimation
 ---@return nil
-function Skeleton:addAnimation(anim) end
+function LSkeleton:addAnimation(anim) end
 
 --- Adds a root bone with optional local transform and returns its index.
 ---@param name string
 ---@param opts? table
 ---@return number
-function Skeleton:addBone(name, opts) end
+function LSkeleton:addBone(name, opts) end
 
 --- Adds a child bone attached to a parent and returns its index.
 ---@param name string
 ---@param parent_idx integer
 ---@param opts? table
 ---@return number
-function Skeleton:addChildBone(name, parent_idx, opts) end
+function LSkeleton:addChildBone(name, parent_idx, opts) end
 
 --- Adds a two-bone IK constraint and returns its index.
 ---@param name string
 ---@param bone_chain table
 ---@param bend_positive? boolean
 ---@return number
-function Skeleton:addIKConstraint(name, bone_chain, bend_positive) end
+function LSkeleton:addIKConstraint(name, bone_chain, bend_positive) end
 
 --- Registers a new empty skin by name.
 ---@param name string
 ---@return nil
-function Skeleton:addSkin(name) end
+function LSkeleton:addSkin(name) end
 
 --- Adds a slot bound to a bone and returns its index.
 ---@param name string
 ---@param bone_idx integer
 ---@param attachment? string
 ---@return number
-function Skeleton:addSlot(name, bone_idx, attachment) end
+function LSkeleton:addSlot(name, bone_idx, attachment) end
 
 --- Evaluates `anim` at `time` and blends the result into this skeleton
 ---@param anim SkeletonAnimation
 ---@param time number
 ---@param blend_weight? number
 ---@return nil
-function Skeleton:blendAnimation(anim, time, blend_weight) end
+function LSkeleton:blendAnimation(anim, time, blend_weight) end
 
 --- Returns the total number of bones.
 ---@return number
-function Skeleton:boneCount() end
+function LSkeleton:boneCount() end
 
 --- Renders the skeleton as a stick-figure debug view into a new ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function Skeleton:drawToImage(width, height) end
+function LSkeleton:drawToImage(width, height) end
 
 --- Returns the index of the named bone, or nil if not found.
 ---@param name string
 ---@return number
-function Skeleton:findBone(name) end
+function LSkeleton:findBone(name) end
 
 --- Returns the index of the named slot, or nil if not found.
 ---@param name string
 ---@return number
-function Skeleton:findSlot(name) end
+function LSkeleton:findSlot(name) end
 
 --- Returns the current playback time in seconds of the active animation.
 ---@return number
-function Skeleton:getAnimationTime() end
+function LSkeleton:getAnimationTime() end
 
 --- Returns the world-space transform of a bone as a table, or nil if out of range.
 ---@param idx integer
 ---@return table
-function Skeleton:getBoneWorld(idx) end
+function LSkeleton:getBoneWorld(idx) end
 
 --- Returns the name of the currently active skin, or nil.
 ---@return string
-function Skeleton:getSkin() end
+function LSkeleton:getSkin() end
 
 --- Starts playback of the named skeletal animation clip.
 ---@param name string
 ---@param looping? boolean
 ---@return boolean
-function Skeleton:playAnimation(name, looping) end
+function LSkeleton:playAnimation(name, looping) end
 
 --- Sets the world-space target position for the named IK constraint.
 ---@param name string
 ---@param x number
 ---@param y number
 ---@return boolean
-function Skeleton:setIKTarget(name, x, y) end
+function LSkeleton:setIKTarget(name, x, y) end
 
 --- Sets the root bone position and propagates world transforms.
 ---@param x number
 ---@param y number
 ---@return nil
-function Skeleton:setPosition(x, y) end
+function LSkeleton:setPosition(x, y) end
 
 --- Activates the named skin for attachment lookups.
 ---@param name string
 ---@return boolean
-function Skeleton:setSkin(name) end
+function LSkeleton:setSkin(name) end
 
 --- Registers a slot-to-attachment mapping in the named skin.
 ---@param skin string
 ---@param slot string
 ---@param attachment string
 ---@return nil
-function Skeleton:setSkinMapping(skin, slot, attachment) end
+function LSkeleton:setSkinMapping(skin, slot, attachment) end
 
 --- Returns the total number of slots.
 ---@return number
-function Skeleton:slotCount() end
+function LSkeleton:slotCount() end
 
 --- Stops the current skeletal animation.
 ---@return nil
-function Skeleton:stopAnimation() end
+function LSkeleton:stopAnimation() end
+
+--- Returns the type name of this object.
+---@return string
+function LSkeleton:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSkeleton:typeOf(name) end
 
 --- Advances the playing animation by `dt` seconds and applies keyframes.
 ---@param dt number
 ---@return nil
-function Skeleton:updateAnimation(dt) end
+function LSkeleton:updateAnimation(dt) end
 
 --- Propagates local transforms down the bone hierarchy to compute world positions.
 ---@return nil
-function Skeleton:updateWorldTransforms() end
+function LSkeleton:updateWorldTransforms() end
 
 --- Lua-side wrapper around a [`SkeletonAnimation`] keyframe clip.
----@class SkeletonAnimation
-SkeletonAnimation = {}
+---@class LSkeletonAnimation
+LSkeletonAnimation = {}
 
 --- Adds a named event marker at `time` seconds in the animation.
 ---@param time number
 ---@param name string
 ---@param value? number
 ---@return nil
-function SkeletonAnimation:addEventKey(time, name, value) end
+function LSkeletonAnimation:addEventKey(time, name, value) end
 
 --- Adds a keyframe to the bone timeline for the given property and bone index.
 ---@param bone_idx integer
@@ -17503,21 +18970,30 @@ function SkeletonAnimation:addEventKey(time, name, value) end
 ---@param value number
 ---@param easing? string
 ---@return nil
-function SkeletonAnimation:addKeyframe(bone_idx, property, time, value, easing) end
+function LSkeletonAnimation:addKeyframe(bone_idx, property, time, value, easing) end
 
 --- Returns the total duration of the animation in seconds.
 ---@return number
-function SkeletonAnimation:getDuration() end
+function LSkeletonAnimation:getDuration() end
 
 --- Returns a list of event names that fall in the half-open interval `(from, to]`.
 ---@param from number
 ---@param to number
 ---@return nil
-function SkeletonAnimation:getEvents(from, to) end
+function LSkeletonAnimation:getEvents(from, to) end
 
 --- Returns the number of bone timelines in this animation.
 ---@return number
-function SkeletonAnimation:getTimelineCount() end
+function LSkeletonAnimation:getTimelineCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LSkeletonAnimation:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSkeletonAnimation:typeOf(name) end
 
 --- Creates a new empty skeleton with the given name.
 ---@param name string
@@ -17534,86 +19010,104 @@ lurek.spine.newSkeletonAnimation = function(name, duration) end
 lurek.sprite = {}
 
 --- Lua-side wrapper around a [`SpriteAtlas`] named-region store.
----@class SpriteAtlas
-SpriteAtlas = {}
+---@class LSpriteAtlas
+LSpriteAtlas = {}
 
 --- Returns the total number of named regions in the atlas.
 ---@return number
-function SpriteAtlas:entryCount() end
+function LSpriteAtlas:entryCount() end
 
 --- Returns a sequential table of all region names.
 ---@return table
-function SpriteAtlas:entryNames() end
+function LSpriteAtlas:entryNames() end
 
 --- Returns the region at the given 1-based insertion index, or nil.
 ---@param index integer
 ---@return table
-function SpriteAtlas:getByIndex(index) end
+function LSpriteAtlas:getByIndex(index) end
 
 --- Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
 ---@param name string
 ---@return table
-function SpriteAtlas:getEntry(name) end
+function LSpriteAtlas:getEntry(name) end
 
 --- Returns a copy of the named region with `flip_x` and `flip_y` flags set.
 ---@param name string
 ---@param flip_x boolean
 ---@param flip_y boolean
 ---@return table
-function SpriteAtlas:getFlipped(name, flip_x, flip_y) end
+function LSpriteAtlas:getFlipped(name, flip_x, flip_y) end
+
+--- Returns the type name of this object.
+---@return string
+function LSpriteAtlas:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSpriteAtlas:typeOf(name) end
 
 --- Lua-side wrapper around a [`SpriteSheet`] frame-grid calculator.
----@class SpriteSheet
-SpriteSheet = {}
+---@class LSpriteSheet
+LSpriteSheet = {}
 
 --- Renders the sheet grid as a debug view into a new ImageData.
 ---@param width integer
 ---@param height integer
 ---@return ImageData
-function SpriteSheet:drawToImage(width, height) end
+function LSpriteSheet:drawToImage(width, height) end
 
 --- Returns a sequential table of quad tables for every frame in the given column.
 ---@param col integer
 ---@return table
-function SpriteSheet:getColumn(col) end
+function LSpriteSheet:getColumn(col) end
 
 --- Returns the quad for the 0-based frame index, or nil if out of range.
 ---@param index integer
 ---@return table
-function SpriteSheet:getFrame(index) end
+function LSpriteSheet:getFrame(index) end
 
 --- Returns the total number of frames in the sheet.
 ---@return number
-function SpriteSheet:getFrameCount() end
+function LSpriteSheet:getFrameCount() end
 
 --- Returns the width and height of a single frame cell in pixels.
 ---@return number
-function SpriteSheet:getFrameSize() end
+function LSpriteSheet:getFrameSize() end
 
 --- Returns the number of columns and rows in the grid.
 ---@return number
-function SpriteSheet:getGridSize() end
+function LSpriteSheet:getGridSize() end
 
 --- Returns a sequential table of quad tables for the named frame group, or nil.
 ---@param name string
 ---@return table
-function SpriteSheet:getGroupFrames(name) end
+function LSpriteSheet:getGroupFrames(name) end
 
 --- Returns a sequential table of all defined group names.
 ---@return table
-function SpriteSheet:getGroupNames() end
+function LSpriteSheet:getGroupNames() end
 
 --- Returns a sequential table of quad tables for every frame in the given row.
 ---@param row integer
 ---@return table
-function SpriteSheet:getRow(row) end
+function LSpriteSheet:getRow(row) end
 
 --- Registers a named frame group starting at `start_frame` with `count` frames.
 ---@param name string
 ---@param start_frame integer
 ---@param count integer
 ---@return nil
-function SpriteSheet:nameGroup(name, start_frame, count) end
+function LSpriteSheet:nameGroup(name, start_frame, count) end
+
+--- Returns the type name of this object.
+---@return string
+function LSpriteSheet:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSpriteSheet:typeOf(name) end
 
 --- Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
 ---@param atlas SpriteAtlas
@@ -17765,194 +19259,203 @@ lurek.runtime.setLogLevel = function(level) end
 lurek.terminal = {}
 
 --- Lua-side wrapper around a [`Terminal`] with widget binding management.
----@class Terminal
-Terminal = {}
+---@class LTerminal
+LTerminal = {}
 
 --- Attaches a widget to this terminal.
 ---@param widget Widget
 ---@return nil
-function Terminal:addWidget(widget) end
+function LTerminal:addWidget(widget) end
 
 --- Resizes the window to exactly fit the terminal grid at the current font size.
 ---@return nil
-function Terminal:autoResize() end
+function LTerminal:autoResize() end
 
 --- Clears all cells to defaults.
 ---@return nil
-function Terminal:clear() end
+function LTerminal:clear() end
 
 --- Detaches all widgets from this terminal.
 ---@return nil
-function Terminal:clearWidgets() end
+function LTerminal:clearWidgets() end
 
 --- Returns the cell data at 1-based coordinates.
 ---@param col integer
 ---@param row integer
 ---@return nil
-function Terminal:get(col, row) end
+function LTerminal:get(col, row) end
 
 --- Returns the active cell size override as `{w, h}`, or `nil` if none is set.
 ---@return table
-function Terminal:getCellSize() end
+function LTerminal:getCellSize() end
 
 --- Returns the terminal grid dimensions.
 ---@return number
-function Terminal:getDimensions() end
+function LTerminal:getDimensions() end
 
 --- Returns the currently focused widget, or nil.
 ---@return nil
-function Terminal:getFocused() end
+function LTerminal:getFocused() end
 
 --- Returns the number of attached widgets.
 ---@return number
-function Terminal:getWidgetCount() end
+function LTerminal:getWidgetCount() end
 
 --- Routes a key press to the focused widget and fires callbacks.
 ---@param key string
 ---@return boolean
-function Terminal:keypressed(key) end
+function LTerminal:keypressed(key) end
 
 --- Routes a mouse press to widgets using pixel coordinates.
 ---@param px number
 ---@param py number
 ---@param button? integer
 ---@return nil
-function Terminal:mousepressed(px, py, button) end
+function LTerminal:mousepressed(px, py, button) end
 
 --- Detaches a widget from this terminal.
 ---@param widget Widget
 ---@return nil
-function Terminal:removeWidget(widget) end
+function LTerminal:removeWidget(widget) end
 
 --- Renders the terminal grid and widgets as render commands.
 ---@param x? number
 ---@param y? number
 ---@return nil
-function Terminal:render(x, y) end
+function LTerminal:render(x, y) end
 
 --- Removes the cell size override, restoring font-derived cell dimensions.
 ---@return nil
-function Terminal:resetCellSize() end
+function LTerminal:resetCellSize() end
 
 --- Sets a cell at 1-based coordinates with character FG and BG colours.
 ---@param ... integer|string
 ---@return nil
-function Terminal:set(...) end
+function LTerminal:set(...) end
 
 --- Sets a per-terminal cell pixel size override, bypassing the font-derived size.
 ---@param w number
 ---@param h number
 ---@return nil
-function Terminal:setCellSize(w, h) end
+function LTerminal:setCellSize(w, h) end
 
 --- Sets the focused widget, or clears focus if nil is passed.
 ---@param widget? Widget
 ---@return nil
-function Terminal:setFocus(widget) end
+function LTerminal:setFocus(widget) end
 
 --- Sets the terminal font by pixel height, snapping to the nearest built-in size.
 ---@param height integer
 ---@return nil
-function Terminal:setFont(height) end
+function LTerminal:setFont(height) end
 
 --- Routes text input to the focused widget and fires callbacks.
 ---@param text string
 ---@return boolean
-function Terminal:textinput(text) end
+function LTerminal:textinput(text) end
+
+--- Returns the type name of this object.
+---@return string
+function LTerminal:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTerminal:typeOf(name) end
 
 --- Lua-side wrapper around a [`Widget`] with attachment and callback state.
----@class Widget
-Widget = {}
+---@class LWidget
+LWidget = {}
 
 --- Adds a child widget to a panel widget.
 ---@param child Widget
 ---@return nil
-function Widget:addChild(child) end
+function LWidget:addChild(child) end
 
 --- Adds an item to a list widget.
 ---@param item string
 ---@return nil
-function Widget:addItem(item) end
+function LWidget:addItem(item) end
 
 --- Removes all children from a panel widget.
 ---@return nil
-function Widget:clearChildren() end
+function LWidget:clearChildren() end
 
 --- Removes all items from a list widget.
 ---@return nil
-function Widget:clearItems() end
+function LWidget:clearItems() end
 
 --- Returns a child widget from a panel by 1-based index, or nil.
 ---@param index integer
 ---@return nil
-function Widget:getChild(index) end
+function LWidget:getChild(index) end
 
 --- Returns the number of children in a panel widget.
 ---@return number
-function Widget:getChildCount() end
+function LWidget:getChildCount() end
 
 --- Returns the colour of a label or border widget.
 ---@return number
-function Widget:getColor() end
+function LWidget:getColor() end
 
 --- Returns a list item by 1-based index.
 ---@param index integer
 ---@return string
-function Widget:getItem(index) end
+function LWidget:getItem(index) end
 
 --- Returns the number of items in a list widget.
 ---@return number
-function Widget:getItemCount() end
+function LWidget:getItemCount() end
 
 --- Returns the maximum character length of a text box widget.
 ---@return number
-function Widget:getMaxLength() end
+function LWidget:getMaxLength() end
 
 --- Returns the widget position as 1-based coordinates.
 ---@return number
-function Widget:getPosition() end
+function LWidget:getPosition() end
 
 --- Returns the selected item index (1-based) in a list widget, or nil.
 ---@return number
-function Widget:getSelected() end
+function LWidget:getSelected() end
 
 --- Returns the widget size in cells.
 ---@return number
-function Widget:getSize() end
+function LWidget:getSize() end
 
 --- Returns the border style name of a border widget.
 ---@return string
-function Widget:getStyle() end
+function LWidget:getStyle() end
 
 --- Returns the free-form identification tag.
 ---@return string
-function Widget:getTag() end
+function LWidget:getTag() end
 
 --- Returns the text content of a label, button, or text box widget.
 ---@return string
-function Widget:getText() end
+function LWidget:getText() end
 
 --- Returns the title of a border widget.
 ---@return string
-function Widget:getTitle() end
+function LWidget:getTitle() end
 
 --- Returns whether the widget accepts input.
 ---@return boolean
-function Widget:isEnabled() end
+function LWidget:isEnabled() end
 
 --- Returns whether the widget is visible.
 ---@return boolean
-function Widget:isVisible() end
+function LWidget:isVisible() end
 
 --- Removes a child widget from a panel widget.
 ---@param child Widget
 ---@return nil
-function Widget:removeChild(child) end
+function LWidget:removeChild(child) end
 
 --- Removes an item from a list widget by 1-based index.
 ---@param index integer
 ---@return nil
-function Widget:removeItem(index) end
+function LWidget:removeItem(index) end
 
 --- Sets the colour of a label or border widget.
 ---@param r number
@@ -17960,74 +19463,83 @@ function Widget:removeItem(index) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Widget:setColor(r, g, b, a) end
+function LWidget:setColor(r, g, b, a) end
 
 --- Sets whether the widget accepts input.
 ---@param enabled boolean
 ---@return nil
-function Widget:setEnabled(enabled) end
+function LWidget:setEnabled(enabled) end
 
 --- Sets the maximum character length of a text box widget.
 ---@param max_length integer
 ---@return nil
-function Widget:setMaxLength(max_length) end
+function LWidget:setMaxLength(max_length) end
 
 --- Registers a text change callback for a text box widget.
 ---@param callback? function
 ---@return nil
-function Widget:setOnChange(callback) end
+function LWidget:setOnChange(callback) end
 
 --- Registers a click callback for a button widget.
 ---@param callback? function
 ---@return nil
-function Widget:setOnClick(callback) end
+function LWidget:setOnClick(callback) end
 
 --- Registers a selection change callback for a list widget.
 ---@param callback? function
 ---@return nil
-function Widget:setOnSelect(callback) end
+function LWidget:setOnSelect(callback) end
 
 --- Sets the widget position from 1-based coordinates.
 ---@param col integer
 ---@param row integer
 ---@return nil
-function Widget:setPosition(col, row) end
+function LWidget:setPosition(col, row) end
 
 --- Sets the selected item in a list widget by 1-based index.
 ---@param index? integer
 ---@return nil
-function Widget:setSelected(index) end
+function LWidget:setSelected(index) end
 
 --- Sets the widget size in cells.
 ---@param width integer
 ---@param height integer
 ---@return nil
-function Widget:setSize(width, height) end
+function LWidget:setSize(width, height) end
 
 --- Sets the border style of a border widget.
 ---@param style string
 ---@return nil
-function Widget:setStyle(style) end
+function LWidget:setStyle(style) end
 
 --- Sets the free-form identification tag.
 ---@param tag string
 ---@return nil
-function Widget:setTag(tag) end
+function LWidget:setTag(tag) end
 
 --- Sets the text content of a label, button, or text box widget.
 ---@param text string
 ---@return nil
-function Widget:setText(text) end
+function LWidget:setText(text) end
 
 --- Sets the title of a border widget.
 ---@param title string
 ---@return nil
-function Widget:setTitle(title) end
+function LWidget:setTitle(title) end
 
 --- Sets the widget visibility.
 ---@param visible boolean
 ---@return nil
-function Widget:setVisible(visible) end
+function LWidget:setVisible(visible) end
+
+--- Returns the type name of this object.
+---@return string
+function LWidget:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LWidget:typeOf(name) end
 
 --- Adds a candidate string to the tab-completion engine.
 ---@param candidate string
@@ -18205,159 +19717,159 @@ lurek.terminal.stripAnsi = function(text) end
 lurek.thread = {}
 
 --- A synchronized message queue for cross-VM communication.
----@class Channel
-Channel = {}
+---@class LChannel
+LChannel = {}
 
 --- Clears all items from the channel.
 ---@return nil
-function Channel:clear() end
+function LChannel:clear() end
 
 --- Blocks until a value is available or the timeout expires, then removes and returns it.
 ---@param timeout? number
 ---@return string
-function Channel:demand(timeout) end
+function LChannel:demand(timeout) end
 
 --- Returns the number of items in the channel.
 ---@return number
-function Channel:getCount() end
+function LChannel:getCount() end
 
 --- Retrieves the value from the channel without removing it.
 ---@return string
-function Channel:peek() end
+function LChannel:peek() end
 
 --- Retrieves and removes a value from the channel.
 ---@return string
-function Channel:pop() end
+function LChannel:pop() end
 
 --- Pops a bytes value from the channel and returns it as a Lua string.
 ---@return string
-function Channel:popBytes() end
+function LChannel:popBytes() end
 
 --- Pops a value from the channel expecting a table.
 ---@return table
-function Channel:popTable() end
+function LChannel:popTable() end
 
 --- Pushes a value to the channel.
 ---@param value any
 ---@return number
-function Channel:push(value) end
+function LChannel:push(value) end
 
 --- Pushes raw binary data (a Lua string treated as a byte array) to the channel.
 ---@param data string
 ---@return number
-function Channel:pushBytes(data) end
+function LChannel:pushBytes(data) end
 
 --- Serializes a Lua table and pushes it to the channel.
 ---@param value table
 ---@return number
-function Channel:pushTable(value) end
+function LChannel:pushTable(value) end
 
 --- Blocks until the channel has space, then adds the value.
 ---@param value any
 ---@return nil
-function Channel:supply(value) end
+function LChannel:supply(value) end
 
 --- Returns the type of the object.
 ---@return string
-function Channel:type() end
+function LChannel:type() end
 
 --- Checks if the object is of the specified type.
 ---@param name string
 ---@return boolean
-function Channel:typeOf(name) end
+function LChannel:typeOf(name) end
 
 --- Lua-side wrapper around a one-shot [`Promise`].
----@class Promise
-Promise = {}
+---@class LPromise
+LPromise = {}
 
 --- Returns the worker error string if the promise failed, otherwise nil.
 ---@return string
-function Promise:getError() end
+function LPromise:getError() end
 
 --- Returns true if the promise has a result or has errored (non-blocking).
 ---@return boolean
-function Promise:isDone() end
+function LPromise:isDone() end
 
 --- Pops and returns the promise result, or nil if not yet ready.
 ---@return table
-function Promise:result() end
+function LPromise:result() end
 
 --- Returns the type name of this object.
 ---@return string
-function Promise:type() end
+function LPromise:type() end
 
 --- Returns whether this object is of the given type.
 ---@param name string
 ---@return boolean
-function Promise:typeOf(name) end
+function LPromise:typeOf(name) end
 
 --- Lua-side wrapper around a background [`LuaThread`].
----@class ThreadHandle
-ThreadHandle = {}
+---@class LThread
+LThread = {}
 
 --- Returns the error message if the thread failed, or nil.
 ---@return string
-function ThreadHandle:getError() end
+function LThread:getError() end
 
 --- Returns whether the thread is currently executing.
 ---@return boolean
-function ThreadHandle:isRunning() end
+function LThread:isRunning() end
 
 --- Launches the background thread, passing optional arguments via varargs.
 ---@param ... any
 ---@return nil
-function ThreadHandle:start(...) end
+function LThread:start(...) end
 
 --- Returns the type name of this object.
 ---@return string
-function ThreadHandle:type() end
+function LThread:type() end
 
 --- Returns whether this object is of the given type.
 ---@param name string
 ---@return boolean
-function ThreadHandle:typeOf(name) end
+function LThread:typeOf(name) end
 
 --- Blocks the calling thread until the background thread finishes.
 ---@return nil
-function ThreadHandle:wait() end
+function LThread:wait() end
 
 --- Lua-side wrapper around a [`ThreadPool`].
----@class ThreadPool
-ThreadPool = {}
+---@class LThreadPool
+LThreadPool = {}
 
 --- Retrieves the next result from the pool's output channel (non-blocking).
 ---@return table
-function ThreadPool:collect() end
+function LThreadPool:collect() end
 
 --- Returns the shared input Channel (main â†’ workers).
 ---@return Channel
-function ThreadPool:getInputChannel() end
+function LThreadPool:getInputChannel() end
 
 --- Returns the shared output Channel (workers â†’ main).
 ---@return Channel
-function ThreadPool:getOutputChannel() end
+function LThreadPool:getOutputChannel() end
 
 --- Blocks until all workers in the pool have finished execution.
 ---@return nil
-function ThreadPool:join() end
+function LThreadPool:join() end
 
 --- Returns the number of workers in this pool.
 ---@return number
-function ThreadPool:size() end
+function LThreadPool:size() end
 
 --- Submits a value to the pool's input channel for processing by a worker.
 ---@param value any
 ---@return nil
-function ThreadPool:submit(value) end
+function LThreadPool:submit(value) end
 
 --- Returns the type name of this object.
 ---@return string
-function ThreadPool:type() end
+function LThreadPool:type() end
 
 --- Returns whether this object is of the given type.
 ---@param name string
 ---@return boolean
-function ThreadPool:typeOf(name) end
+function LThreadPool:typeOf(name) end
 
 --- Starts a one-shot background computation and returns a Promise.
 ---@param code string
@@ -18390,62 +19902,71 @@ lurek.thread.newThread = function(code) end
 lurek.tilemap = {}
 
 --- Lua-side wrapper around an [`AutoTileSheet`].
----@class AutoTileSheet
-AutoTileSheet = {}
+---@class LAutoTileSheet
+LAutoTileSheet = {}
 
 --- Applies autotile rules from this sheet to a TileSet.
 ---@param tileset TileSet
 ---@param typeName string
 ---@param startGid? integer
 ---@return nil
-function AutoTileSheet:applyToTileSet(tileset, typeName, startGid) end
+function LAutoTileSheet:applyToTileSet(tileset, typeName, startGid) end
 
 --- Returns the bitmask value associated with a 1-based local tile ID.
 ---@param tileId integer
 ---@return number
-function AutoTileSheet:getBitmaskForTile(tileId) end
+function LAutoTileSheet:getBitmaskForTile(tileId) end
 
 --- Returns the layout variant as a string.
 ---@return string
-function AutoTileSheet:getLayout() end
+function LAutoTileSheet:getLayout() end
 
 --- Returns the atlas region rectangle for the 1-based tile ID.
 ---@param tileId integer
 ---@return number
-function AutoTileSheet:getQuad(tileId) end
+function LAutoTileSheet:getQuad(tileId) end
 
 --- Returns the number of tiles in this sheet.
 ---@return number
-function AutoTileSheet:getTileCount() end
+function LAutoTileSheet:getTileCount() end
 
 --- Returns the 1-based tile ID for a given bitmask, or nil.
 ---@param bitmask integer
 ---@return number
-function AutoTileSheet:getTileForBitmask(bitmask) end
+function LAutoTileSheet:getTileForBitmask(bitmask) end
 
 --- Returns the tile height in pixels.
 ---@return number
-function AutoTileSheet:getTileHeight() end
+function LAutoTileSheet:getTileHeight() end
 
 --- Returns the tile width in pixels.
 ---@return number
-function AutoTileSheet:getTileWidth() end
+function LAutoTileSheet:getTileWidth() end
+
+--- Returns the type name of this object.
+---@return string
+function LAutoTileSheet:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAutoTileSheet:typeOf(name) end
 
 --- Lua-side wrapper around a [`ChunkMap`].
----@class ChunkMap
-ChunkMap = {}
+---@class LChunkMap
+LChunkMap = {}
 
 --- Returns the tile coordinate range for chunk (cx, cy) as (x0, y0, x1, y1).
 ---@param cx integer
 ---@param cy integer
 ---@return number
-function ChunkMap:chunkTileRange(cx, cy) end
+function LChunkMap:chunkTileRange(cx, cy) end
 
 --- Clears the tile at (x, y) by setting its GID to 0.
 ---@param x integer
 ---@param y integer
 ---@return nil
-function ChunkMap:clearTile(x, y) end
+function LChunkMap:clearTile(x, y) end
 
 --- Fills the rectangular tile region with a GID.
 ---@param x0 integer
@@ -18454,11 +19975,11 @@ function ChunkMap:clearTile(x, y) end
 ---@param y1 integer
 ---@param gid integer
 ---@return nil
-function ChunkMap:fillRect(x0, y0, x1, y1, gid) end
+function LChunkMap:fillRect(x0, y0, x1, y1, gid) end
 
 --- Returns the chunk size (tiles per side).
 ---@return number
-function ChunkMap:getChunkSize() end
+function LChunkMap:getChunkSize() end
 
 --- Returns chunk coordinates whose world-pixel footprint overlaps the given viewport.
 ---@param vx number
@@ -18468,75 +19989,84 @@ function ChunkMap:getChunkSize() end
 ---@param tw number
 ---@param th number
 ---@return table
-function ChunkMap:getChunksInView(vx, vy, vw, vh, tw, th) end
+function LChunkMap:getChunksInView(vx, vy, vw, vh, tw, th) end
 
 --- Returns a table of all currently loaded chunk coordinates as {{cx, cy}, ...}.
 ---@return table
-function ChunkMap:getLoadedChunks() end
+function LChunkMap:getLoadedChunks() end
 
 --- Returns the GID at tile coordinate (x, y).
 ---@param x integer
 ---@param y integer
 ---@return number
-function ChunkMap:getTile(x, y) end
+function LChunkMap:getTile(x, y) end
 
 --- Pre-allocates the chunk at chunk coordinates (cx, cy).
 ---@param cx integer
 ---@param cy integer
 ---@return nil
-function ChunkMap:loadChunk(cx, cy) end
+function LChunkMap:loadChunk(cx, cy) end
 
 --- Sets the GID at tile coordinate (x, y).
 ---@param x integer
 ---@param y integer
 ---@param gid integer
 ---@return nil
-function ChunkMap:setTile(x, y, gid) end
+function LChunkMap:setTile(x, y, gid) end
+
+--- Returns the type name of this object.
+---@return string
+function LChunkMap:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LChunkMap:typeOf(name) end
 
 --- Removes the chunk at chunk coordinates (cx, cy) from memory.
 ---@param cx integer
 ---@param cy integer
 ---@return nil
-function ChunkMap:unloadChunk(cx, cy) end
+function LChunkMap:unloadChunk(cx, cy) end
 
 --- Lua-side wrapper around an [`IsoMap`].
----@class IsoMap
-IsoMap = {}
+---@class LIsoMap
+LIsoMap = {}
 
 --- Appends a new empty Z-level and returns its 1-based index.
 ---@return number
-function IsoMap:addLevel() end
+function LIsoMap:addLevel() end
 
 --- Fills every cell in level z with gid for the given part (1-based z; 0-based part).
 ---@param z integer
 ---@param part integer
 ---@param gid integer
 ---@return nil
-function IsoMap:fillLevel(z, part, gid) end
+function LIsoMap:fillLevel(z, part, gid) end
 
 --- Returns the map height in tiles.
 ---@return number
-function IsoMap:getHeight() end
+function LIsoMap:getHeight() end
 
 --- Returns the number of Z-levels currently in the map.
 ---@return number
-function IsoMap:getLevelCount() end
+function LIsoMap:getLevelCount() end
 
 --- Returns the vertical pixel offset between consecutive Z-levels.
 ---@return number
-function IsoMap:getLevelHeight() end
+function LIsoMap:getLevelHeight() end
 
 --- Returns the number of GID slots per tile.
 ---@return number
-function IsoMap:getPartCount() end
+function LIsoMap:getPartCount() end
 
 --- Returns the current draw-order array (0-based part slot indices).
 ---@return table
-function IsoMap:getPartOrder() end
+function LIsoMap:getPartOrder() end
 
 --- Returns the tile footprint height in pixels.
 ---@return number
-function IsoMap:getTileHeight() end
+function LIsoMap:getTileHeight() end
 
 --- Reads the GID in the part slot of tile (x, y) on level z (1-based z, x, y; 0-based part).
 ---@param z integer
@@ -18544,43 +20074,43 @@ function IsoMap:getTileHeight() end
 ---@param y integer
 ---@param part integer
 ---@return number
-function IsoMap:getTilePart(z, x, y, part) end
+function LIsoMap:getTilePart(z, x, y, part) end
 
 --- Returns the tile footprint width in pixels.
 ---@return number
-function IsoMap:getTileWidth() end
+function LIsoMap:getTileWidth() end
 
 --- Returns the map width in tiles.
 ---@return number
-function IsoMap:getWidth() end
+function LIsoMap:getWidth() end
 
 --- Returns the visibility of a level (1-based z).
 ---@param z integer
 ---@return boolean
-function IsoMap:isLevelVisible(z) end
+function LIsoMap:isLevelVisible(z) end
 
 --- Converts screen pixel coordinates to isometric tile coordinates at Z-level 0.
 ---@param sx number
 ---@param sy number
 ---@return number
-function IsoMap:screenToTile(sx, sy) end
+function LIsoMap:screenToTile(sx, sy) end
 
 --- Sets the visibility of a level (1-based z).
 ---@param z integer
 ---@param visible boolean
 ---@return nil
-function IsoMap:setLevelVisible(z, visible) end
+function LIsoMap:setLevelVisible(z, visible) end
 
 --- Sets the screen pixel origin.
 ---@param x number
 ---@param y number
 ---@return nil
-function IsoMap:setOrigin(x, y) end
+function LIsoMap:setOrigin(x, y) end
 
 --- Overrides the draw order for this IsoMap. Length must equal partCount.
 ---@param order table
 ---@return nil
-function IsoMap:setPartOrder(order) end
+function LIsoMap:setPartOrder(order) end
 
 --- Writes a GID into the part slot of tile (x, y) on level z (1-based z, x, y; 0-based part).
 ---@param z integer
@@ -18589,170 +20119,188 @@ function IsoMap:setPartOrder(order) end
 ---@param part integer
 ---@param gid integer
 ---@return nil
-function IsoMap:setTilePart(z, x, y, part, gid) end
+function LIsoMap:setTilePart(z, x, y, part, gid) end
 
 --- Projects isometric tile coordinates (tx, ty, tz) to screen pixels.
 ---@param tx number
 ---@param ty number
 ---@param tz number
 ---@return number
-function IsoMap:tileToScreen(tx, ty, tz) end
+function LIsoMap:tileToScreen(tx, ty, tz) end
+
+--- Returns the type name of this object.
+---@return string
+function LIsoMap:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LIsoMap:typeOf(name) end
 
 --- Lua-side wrapper around a [`LargeMapRenderer`] for chunk-level occlusion culling on large worlds.
----@class LargeMapRenderer
-LargeMapRenderer = {}
+---@class LLargeMapRenderer
+LLargeMapRenderer = {}
 
 --- Returns the current chunk size.
 ---@return number
-function LargeMapRenderer:getChunkSize() end
+function LLargeMapRenderer:getChunkSize() end
 
 --- Returns the map dimensions as (width, height) in tiles.
 ---@return number
-function LargeMapRenderer:getMapSize() end
+function LLargeMapRenderer:getMapSize() end
 
 --- Returns the tile ID at (x, y), or nil if out of bounds.
 ---@param x integer
 ---@param y integer
 ---@return number
-function LargeMapRenderer:getTile(x, y) end
+function LLargeMapRenderer:getTile(x, y) end
 
 --- Returns the number of tileset atlas columns.
 ---@return number
-function LargeMapRenderer:getTilesetColumns() end
+function LLargeMapRenderer:getTilesetColumns() end
 
 --- Returns the total number of chunks that cover the loaded map.
 ---@return number
-function LargeMapRenderer:getTotalChunks() end
+function LLargeMapRenderer:getTotalChunks() end
 
 --- Returns the number of chunks currently within the camera viewport.
 ---@return number
-function LargeMapRenderer:getVisibleChunks() end
+function LLargeMapRenderer:getVisibleChunks() end
 
 --- Marks every chunk as dirty.
 ---@return nil
-function LargeMapRenderer:invalidateAll() end
+function LLargeMapRenderer:invalidateAll() end
 
 --- Marks a chunk at chunk-grid coordinates (cx, cy) as dirty,
 ---@param cx integer
 ---@param cy integer
 ---@return nil
-function LargeMapRenderer:invalidateChunk(cx, cy) end
+function LLargeMapRenderer:invalidateChunk(cx, cy) end
 
 --- Returns whether LOD rendering is currently enabled.
 ---@return boolean
-function LargeMapRenderer:isLodEnabled() end
+function LLargeMapRenderer:isLodEnabled() end
 
 --- Updates the camera position and zoom used for visibility culling.
 ---@param x number
 ---@param y number
 ---@param zoom number
 ---@return nil
-function LargeMapRenderer:setCamera(x, y, zoom) end
+function LLargeMapRenderer:setCamera(x, y, zoom) end
 
 --- Sets the chunk size used for culling (default 16).
 ---@param size integer
 ---@return nil
-function LargeMapRenderer:setChunkSize(size) end
+function LLargeMapRenderer:setChunkSize(size) end
 
 --- Enables or disables level-of-detail rendering for distant chunks.
 ---@param enabled boolean
 ---@return nil
-function LargeMapRenderer:setLodEnabled(enabled) end
+function LLargeMapRenderer:setLodEnabled(enabled) end
 
 --- Sets the distance thresholds (in tile units) at which each LOD level activates.
 ---@param levels table
 ---@return nil
-function LargeMapRenderer:setLodThresholds(levels) end
+function LLargeMapRenderer:setLodThresholds(levels) end
 
 --- Loads a flat array of tile IDs (row-major) covering width Ă— height tiles.
 ---@param data table
 ---@param width integer
 ---@param height integer
 ---@return nil
-function LargeMapRenderer:setMapData(data, width, height) end
+function LLargeMapRenderer:setMapData(data, width, height) end
 
 --- Sets a single tile ID at (x, y).  Coordinates are 0-based.
 ---@param x integer
 ---@param y integer
 ---@param tileId integer
 ---@return nil
-function LargeMapRenderer:setTile(x, y, tileId) end
+function LLargeMapRenderer:setTile(x, y, tileId) end
 
 --- Sets the number of tile columns in the atlas texture used for UV calculation.
 ---@param cols integer
 ---@return nil
-function LargeMapRenderer:setTilesetColumns(cols) end
+function LLargeMapRenderer:setTilesetColumns(cols) end
 
 --- Sets the viewport dimensions in pixels used for visibility culling.
 ---@param width number
 ---@param height number
 ---@return nil
-function LargeMapRenderer:setViewport(width, height) end
+function LLargeMapRenderer:setViewport(width, height) end
+
+--- Returns the type name of this object.
+---@return string
+function LLargeMapRenderer:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LLargeMapRenderer:typeOf(name) end
 
 --- Lua-side wrapper around a [`MapBlock`].
----@class MapBlock
-MapBlock = {}
+---@class LMapBlock
+LMapBlock = {}
 
 --- Returns the block dimensions as (width, height) in tiles.
 ---@return number
-function MapBlock:getDimensions() end
+function LMapBlock:getDimensions() end
 
 --- Returns the block height in tiles.
 ---@return number
-function MapBlock:getHeight() end
+function LMapBlock:getHeight() end
 
 --- Returns the number of segments along the height.
 ---@return number
-function MapBlock:getHeightInSegments() end
+function LMapBlock:getHeightInSegments() end
 
 --- Returns the number of layers in this block.
 ---@return number
-function MapBlock:getLayerCount() end
+function LMapBlock:getLayerCount() end
 
 --- Returns the name of this block.
 ---@return string
-function MapBlock:getName() end
+function LMapBlock:getName() end
 
 --- Returns the segment size in tiles.
 ---@return number
-function MapBlock:getSegmentSize() end
+function LMapBlock:getSegmentSize() end
 
 --- Returns the side connection ID for a segment on a given edge.
 ---@param edge string
 ---@param segment integer
 ---@return number
-function MapBlock:getSide(edge, segment) end
+function LMapBlock:getSide(edge, segment) end
 
 --- Returns the GID of the tile at (x, y) on the given layer (1-based).
 ---@param layer integer
 ---@param x integer
 ---@param y integer
 ---@return number
-function MapBlock:getTile(layer, x, y) end
+function LMapBlock:getTile(layer, x, y) end
 
 --- Returns the placement weight.
 ---@return number
-function MapBlock:getWeight() end
+function LMapBlock:getWeight() end
 
 --- Returns the block width in tiles.
 ---@return number
-function MapBlock:getWidth() end
+function LMapBlock:getWidth() end
 
 --- Returns the number of segments along the width.
 ---@return number
-function MapBlock:getWidthInSegments() end
+function LMapBlock:getWidthInSegments() end
 
 --- Sets the human-readable name of this block.
 ---@param name string
 ---@return nil
-function MapBlock:setName(name) end
+function LMapBlock:setName(name) end
 
 --- Sets the side connection ID for a segment on a given edge.
 ---@param edge string
 ---@param segment integer
 ---@param sideId integer
 ---@return nil
-function MapBlock:setSide(edge, segment, sideId) end
+function LMapBlock:setSide(edge, segment, sideId) end
 
 --- Sets the GID of a tile at (x, y) on the given layer (1-based).
 ---@param layer integer
@@ -18760,95 +20308,131 @@ function MapBlock:setSide(edge, segment, sideId) end
 ---@param y integer
 ---@param gid integer
 ---@return nil
-function MapBlock:setTile(layer, x, y, gid) end
+function LMapBlock:setTile(layer, x, y, gid) end
 
 --- Sets the placement weight.
 ---@param weight number
 ---@return nil
-function MapBlock:setWeight(weight) end
+function LMapBlock:setWeight(weight) end
+
+--- Returns the type name of this object.
+---@return string
+function LMapBlock:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMapBlock:typeOf(name) end
 
 --- Lua-side wrapper for a map generator (size preset or explicit dimensions).
----@class MapGen
-MapGen = {}
+---@class LMapGen
+LMapGen = {}
 
 --- Generates a TileMap using the group's blocks and an optional script index, seed, and layer name.
 ---@param scriptIndex? integer
 ---@param seed? integer
 ---@param layerName? string
 ---@return TileMap
-function MapGen:generate(scriptIndex, seed, layerName) end
+function LMapGen:generate(scriptIndex, seed, layerName) end
+
+--- Returns the type name of this object.
+---@return string
+function LMapGen:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMapGen:typeOf(name) end
 
 --- Lua-side wrapper around a [`MapGroup`].
----@class MapGroup
-MapGroup = {}
+---@class LMapGroup
+LMapGroup = {}
 
 --- Adds a block to this group.
 ---@param block MapBlock
 ---@return nil
-function MapGroup:addBlock(block) end
+function LMapGroup:addBlock(block) end
 
 --- Adds a MapScript to this group.
 ---@param script MapScript
 ---@return nil
-function MapGroup:addScript(script) end
+function LMapGroup:addScript(script) end
 
 --- Returns the number of blocks in this group.
 ---@return number
-function MapGroup:getBlockCount() end
+function LMapGroup:getBlockCount() end
 
 --- Returns the name of this group.
 ---@return string
-function MapGroup:getName() end
+function LMapGroup:getName() end
 
 --- Returns the number of scripts in this group.
 ---@return number
-function MapGroup:getScriptCount() end
+function LMapGroup:getScriptCount() end
 
 --- Removes a block by 1-based index.
 ---@param idx integer
 ---@return nil
-function MapGroup:removeBlock(idx) end
+function LMapGroup:removeBlock(idx) end
+
+--- Returns the type name of this object.
+---@return string
+function LMapGroup:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMapGroup:typeOf(name) end
 
 --- Lua-side wrapper around a [`MapScript`] procedural generation script.
----@class MapScript
-MapScript = {}
+---@class LMapScript
+LMapScript = {}
 
 --- Appends a generation step from a step-definition table.
 ---@param stepDef table
 ---@return nil
-function MapScript:addStep(stepDef) end
+function LMapScript:addStep(stepDef) end
 
 --- Returns the number of steps in this script.
 ---@return number
-function MapScript:getStepCount() end
+function LMapScript:getStepCount() end
+
+--- Returns the type name of this object.
+---@return string
+function LMapScript:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LMapScript:typeOf(name) end
 
 --- Lua-side wrapper around a [`TileMap`].
----@class TileMap
-TileMap = {}
+---@class LTileMap
+LTileMap = {}
 
 --- Adds a new empty layer and returns its 1-based index.
 ---@param name string
 ---@param w integer
 ---@param h integer
 ---@return number
-function TileMap:addLayer(name, w, h) end
+function LTileMap:addLayer(name, w, h) end
 
 --- Adds a tileset to this map.
 ---@param tileset TileSet
 ---@return nil
-function TileMap:addTileSet(tileset) end
+function LTileMap:addTileSet(tileset) end
 
 --- Applies 4-bit cardinal autotile rules to every tile on layer (1-based).
 ---@param layer integer
 ---@param typeName string
 ---@return nil
-function TileMap:applyAutoTile(layer, typeName) end
+function LTileMap:applyAutoTile(layer, typeName) end
 
 --- Applies 8-bit directional autotile rules to every tile on layer (1-based).
 ---@param layer integer
 ---@param typeName string
 ---@return nil
-function TileMap:applyAutoTile8(layer, typeName) end
+function LTileMap:applyAutoTile8(layer, typeName) end
 
 --- Applies 8-bit directional autotile at a single cell and its 3x3 neighborhood (1-based).
 ---@param layer integer
@@ -18856,7 +20440,7 @@ function TileMap:applyAutoTile8(layer, typeName) end
 ---@param y integer
 ---@param typeName string
 ---@return nil
-function TileMap:applyAutoTile8At(layer, x, y, typeName) end
+function LTileMap:applyAutoTile8At(layer, x, y, typeName) end
 
 --- Applies 4-bit cardinal autotile at a single cell and its 3x3 neighborhood (1-based).
 ---@param layer integer
@@ -18864,31 +20448,31 @@ function TileMap:applyAutoTile8At(layer, x, y, typeName) end
 ---@param y integer
 ---@param typeName string
 ---@return nil
-function TileMap:applyAutoTileAt(layer, x, y, typeName) end
+function LTileMap:applyAutoTileAt(layer, x, y, typeName) end
 
 --- Checks a list of entity positions against registered tile callbacks and fires matches.
 ---@param layer integer
 ---@param entities table
 ---@return nil
-function TileMap:checkEntities(layer, entities) end
+function LTileMap:checkEntities(layer, entities) end
 
 --- Clears a tile (sets GID to 0) at (x, y) on the given layer (1-based).
 ---@param layer integer
 ---@param x integer
 ---@param y integer
 ---@return nil
-function TileMap:clearTile(layer, x, y) end
+function LTileMap:clearTile(layer, x, y) end
 
 --- Renders the tile map to a CPU ImageData using the given tile pixel size.
 ---@param tile_size integer
 ---@return ImageData
-function TileMap:drawToImage(tile_size) end
+function LTileMap:drawToImage(tile_size) end
 
 --- Fills an entire layer with the given GID (1-based layer).
 ---@param layer integer
 ---@param gid integer
 ---@return nil
-function TileMap:fill(layer, gid) end
+function LTileMap:fill(layer, gid) end
 
 --- Fire the tile exit callback for the given GID (call when entity leaves tile).
 ---@param gid integer — tile GID
@@ -18896,7 +20480,7 @@ function TileMap:fill(layer, gid) end
 ---@param tile_x integer — tile column
 ---@param tile_y integer — tile row
 ---@return nil
-function TileMap:fireTileExit(gid, entity, tile_x, tile_y) end
+function LTileMap:fireTileExit(gid, entity, tile_x, tile_y) end
 
 --- Fire the tile step callback for the given GID (call each frame while entity is on tile).
 ---@param gid integer — tile GID
@@ -18904,101 +20488,101 @@ function TileMap:fireTileExit(gid, entity, tile_x, tile_y) end
 ---@param tile_x integer — tile column
 ---@param tile_y integer — tile row
 ---@return nil
-function TileMap:fireTileStep(gid, entity, tile_x, tile_y) end
+function LTileMap:fireTileStep(gid, entity, tile_x, tile_y) end
 
 --- Returns the chunk size used for spatial partitioning.
 ---@return number
-function TileMap:getChunkSize() end
+function LTileMap:getChunkSize() end
 
 --- Returns the RGBA tint color of a layer.
 ---@param idx integer
 ---@return number
-function TileMap:getLayerColor(idx) end
+function LTileMap:getLayerColor(idx) end
 
 --- Returns the number of layers.
 ---@return number
-function TileMap:getLayerCount() end
+function LTileMap:getLayerCount() end
 
 --- Returns the name of a layer by 1-based index.
 ---@param idx integer
 ---@return string
-function TileMap:getLayerName(idx) end
+function LTileMap:getLayerName(idx) end
 
 --- Returns the pixel offset of a layer.
 ---@param idx integer
 ---@return number
-function TileMap:getLayerOffset(idx) end
+function LTileMap:getLayerOffset(idx) end
 
 --- Returns the parallax factor of a layer.
 ---@param idx integer
 ---@return number
-function TileMap:getLayerParallax(idx) end
+function LTileMap:getLayerParallax(idx) end
 
 --- Returns layer visibility.
 ---@param idx integer
 ---@return boolean
-function TileMap:getLayerVisible(idx) end
+function LTileMap:getLayerVisible(idx) end
 
 --- Returns the map orientation as a string ("topdown", "sideview", "isometric", or "hexagonal").
 ---@return string
-function TileMap:getOrientation() end
+function LTileMap:getOrientation() end
 
 --- Returns the GID at (x, y) on the given layer (1-based).
 ---@param layer integer
 ---@param x integer
 ---@param y integer
 ---@return number
-function TileMap:getTile(layer, x, y) end
+function LTileMap:getTile(layer, x, y) end
 
 --- Returns tile dimensions as (width, height).
 ---@return number
-function TileMap:getTileDimensions() end
+function LTileMap:getTileDimensions() end
 
 --- Returns the tile height in pixels.
 ---@return number
-function TileMap:getTileHeight() end
+function LTileMap:getTileHeight() end
 
 --- Returns a tileset by 1-based index, or nil if out of range.
 ---@param idx integer
 ---@return nil
-function TileMap:getTileSet(idx) end
+function LTileMap:getTileSet(idx) end
 
 --- Returns the number of tilesets attached to this map.
 ---@return number
-function TileMap:getTileSetCount() end
+function LTileMap:getTileSetCount() end
 
 --- Returns the tile width in pixels.
 ---@return number
-function TileMap:getTileWidth() end
+function LTileMap:getTileWidth() end
 
 --- Returns the viewport as (x, y, w, h) or nil if not set.
 ---@return number
-function TileMap:getViewport() end
+function LTileMap:getViewport() end
 
 --- Returns true if the tile at (x, y) on layer is solid (1-based).
 ---@param layer integer
 ---@param x integer
 ---@param y integer
 ---@return boolean
-function TileMap:isSolid(layer, x, y) end
+function LTileMap:isSolid(layer, x, y) end
 
 --- Registers a callback fired when any entity's tile GID matches `gid`.
 ---@param gid integer
 ---@param func function
 ---@return nil
-function TileMap:onTileEnter(gid, func) end
+function LTileMap:onTileEnter(gid, func) end
 
 --- Register a callback for when an entity exits a tile with the given GID.
 ---@param gid integer — tile global ID
 ---@param fn function(entity: table,tile_x: integer,tile_y: integer)
 ---@return nil
-function TileMap:onTileExit(gid, fn) end
+function LTileMap:onTileExit(gid, fn) end
 
 --- Register a callback for when an entity steps on a tile with the given GID.
 ---@param gid integer — tile global ID
 ---@param fn function(entity: table,tile_x: integer,tile_y: integer)
 ---@return nil
-function TileMap:onTileStep(gid, fn) end
+function LTileMap:onTileStep(gid, fn) end
 
 --- Returns true if any solid tile overlaps the given world-space rectangle on layer (1-based).
 ---@param layer integer
@@ -19007,13 +20591,13 @@ function TileMap:onTileStep(gid, fn) end
 ---@param w number
 ---@param h number
 ---@return boolean
-function TileMap:rectOverlapsSolid(layer, x, y, w, h) end
+function LTileMap:rectOverlapsSolid(layer, x, y, w, h) end
 
 --- Renders the tile map to the screen at the given offset.
 ---@param ox? number
 ---@param oy? number
 ---@return nil
-function TileMap:render(ox, oy) end
+function LTileMap:render(ox, oy) end
 
 --- Sets the RGBA tint color for a layer.
 ---@param idx integer
@@ -19022,32 +20606,32 @@ function TileMap:render(ox, oy) end
 ---@param b number
 ---@param a number
 ---@return nil
-function TileMap:setLayerColor(idx, r, g, b, a) end
+function LTileMap:setLayerColor(idx, r, g, b, a) end
 
 --- Sets the pixel offset for a layer.
 ---@param idx integer
 ---@param ox number
 ---@param oy number
 ---@return nil
-function TileMap:setLayerOffset(idx, ox, oy) end
+function LTileMap:setLayerOffset(idx, ox, oy) end
 
 --- Sets the parallax scrolling factor for a layer.
 ---@param idx integer
 ---@param px number
 ---@param py number
 ---@return nil
-function TileMap:setLayerParallax(idx, px, py) end
+function LTileMap:setLayerParallax(idx, px, py) end
 
 --- Shows or hides a tile layer by its 1-based index.
 ---@param idx integer
 ---@param visible boolean
 ---@return nil
-function TileMap:setLayerVisible(idx, visible) end
+function LTileMap:setLayerVisible(idx, visible) end
 
 --- Sets the map orientation from a string ("topdown", "sideview", "isometric", or "hexagonal").
 ---@param orientation string
 ---@return nil
-function TileMap:setOrientation(orientation) end
+function LTileMap:setOrientation(orientation) end
 
 --- Sets the GID of a tile at (x, y) on the given layer (1-based).
 ---@param layer integer
@@ -19055,7 +20639,7 @@ function TileMap:setOrientation(orientation) end
 ---@param y integer
 ---@param gid integer
 ---@return nil
-function TileMap:setTile(layer, x, y, gid) end
+function LTileMap:setTile(layer, x, y, gid) end
 
 --- Sets a per-tile RGBA tint override (1-based layer, x, y).
 ---@param layer integer
@@ -19066,7 +20650,7 @@ function TileMap:setTile(layer, x, y, gid) end
 ---@param b number
 ---@param a number
 ---@return nil
-function TileMap:setTileTint(layer, x, y, r, g, b, a) end
+function LTileMap:setTileTint(layer, x, y, r, g, b, a) end
 
 --- Sets the viewport rectangle for rendering culling.
 ---@param x number
@@ -19074,7 +20658,7 @@ function TileMap:setTileTint(layer, x, y, r, g, b, a) end
 ---@param w number
 ---@param h number
 ---@return nil
-function TileMap:setViewport(x, y, w, h) end
+function LTileMap:setViewport(x, y, w, h) end
 
 --- Performs a swept AABB collision test against solid tiles on layer (1-based).
 ---@param layer integer
@@ -19085,119 +20669,137 @@ function TileMap:setViewport(x, y, w, h) end
 ---@param dx number
 ---@param dy number
 ---@return nil
-function TileMap:sweepRect(layer, x, y, w, h, dx, dy) end
+function LTileMap:sweepRect(layer, x, y, w, h, dx, dy) end
 
 --- Converts tile coordinates to world pixel coordinates (1-based input).
 ---@param tx integer
 ---@param ty integer
 ---@return number
-function TileMap:tileToWorld(tx, ty) end
+function LTileMap:tileToWorld(tx, ty) end
 
 --- Converts the given layer into a 2D navigation grid.
 ---@param layer integer
 ---@param walkable_gids table
 ---@return table
-function TileMap:toNavGrid(layer, walkable_gids) end
+function LTileMap:toNavGrid(layer, walkable_gids) end
+
+--- Returns the type name of this object.
+---@return string
+function LTileMap:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTileMap:typeOf(name) end
 
 --- Advances tile animation timers by dt seconds.
 ---@param dt number
 ---@return nil
-function TileMap:update(dt) end
+function LTileMap:update(dt) end
 
 --- Converts world pixel coordinates to tile coordinates.
 ---@param wx number
 ---@param wy number
 ---@return number
-function TileMap:worldToTile(wx, wy) end
+function LTileMap:worldToTile(wx, wy) end
 
 --- Lua-side wrapper around a [`TileSet`].
----@class TileSet
-TileSet = {}
+---@class LTileSet
+LTileSet = {}
 
 --- Returns the animation frames for a 1-based local tile ID as a table of {tileid, duration}, or nil.
 ---@param tileId integer
 ---@return table
-function TileSet:getAnimation(tileId) end
+function LTileSet:getAnimation(tileId) end
 
 --- Looks up the 1-based local tile ID for a 4-bit cardinal autotile bitmask, or nil.
 ---@param typeName string
 ---@param bitmask integer
 ---@return number
-function TileSet:getAutoTileId(typeName, bitmask) end
+function LTileSet:getAutoTileId(typeName, bitmask) end
 
 --- Looks up the 1-based local tile ID for an 8-bit directional autotile bitmask, or nil.
 ---@param typeName string
 ---@param bitmask integer
 ---@return number
-function TileSet:getAutoTileId8(typeName, bitmask) end
+function LTileSet:getAutoTileId8(typeName, bitmask) end
 
 --- Returns the number of tile columns in the atlas texture.
 ---@return number
-function TileSet:getColumns() end
+function LTileSet:getColumns() end
 
 --- Returns the first global ID assigned to this tileset.
 ---@return number
-function TileSet:getFirstGid() end
+function LTileSet:getFirstGid() end
 
 --- Returns the margin in pixels around the edges of the atlas.
 ---@return number
-function TileSet:getMargin() end
+function LTileSet:getMargin() end
 
 --- Computes the atlas source rectangle for a 1-based local tile ID.
 ---@param tileId integer
 ---@return table
-function TileSet:getQuad(tileId) end
+function LTileSet:getQuad(tileId) end
 
 --- Returns the spacing in pixels between tiles in the atlas.
 ---@return number
-function TileSet:getSpacing() end
+function LTileSet:getSpacing() end
 
 --- Returns the total number of tiles in this tileset.
 ---@return number
-function TileSet:getTileCount() end
+function LTileSet:getTileCount() end
 
 --- Returns the tile dimensions as (width, height).
 ---@return number
-function TileSet:getTileDimensions() end
+function LTileSet:getTileDimensions() end
 
 --- Returns the height of a single tile in pixels.
 ---@return number
-function TileSet:getTileHeight() end
+function LTileSet:getTileHeight() end
 
 --- Returns the width of a single tile in pixels.
 ---@return number
-function TileSet:getTileWidth() end
+function LTileSet:getTileWidth() end
 
 --- Returns whether a 1-based local tile ID is solid.
 ---@param tileId integer
 ---@return boolean
-function TileSet:isSolid(tileId) end
+function LTileSet:isSolid(tileId) end
 
 --- Sets the animation frames for a 1-based local tile ID from a table of {tileid, duration}.
 ---@param tileId integer
 ---@param frames table
 ---@return nil
-function TileSet:setAnimation(tileId, frames) end
+function LTileSet:setAnimation(tileId, frames) end
 
 --- Registers a 4-bit cardinal autotile rule. tileId is 1-based.
 ---@param typeName string
 ---@param bitmask integer
 ---@param tileId integer
 ---@return nil
-function TileSet:setAutoTileRule(typeName, bitmask, tileId) end
+function LTileSet:setAutoTileRule(typeName, bitmask, tileId) end
 
 --- Registers an 8-bit directional autotile rule. tileId is 1-based.
 ---@param typeName string
 ---@param bitmask integer
 ---@param tileId integer
 ---@return nil
-function TileSet:setAutoTileRule8(typeName, bitmask, tileId) end
+function LTileSet:setAutoTileRule8(typeName, bitmask, tileId) end
 
 --- Sets whether a 1-based local tile ID is solid for collision purposes.
 ---@param tileId integer
 ---@param solid boolean
 ---@return nil
-function TileSet:setSolid(tileId, solid) end
+function LTileSet:setSolid(tileId, solid) end
+
+--- Returns the type name of this object.
+---@return string
+function LTileSet:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTileSet:typeOf(name) end
 
 --- Parses an LDtk JSON export string and returns a TileMap.
 ---@param json_str string
@@ -19397,55 +20999,55 @@ lurek.tilemap.toScreenIso = function(tx, ty, tileW, tileH) end
 lurek.time = {}
 
 --- Lua-side wrapper around a [`Scheduler`] with per-event callback storage.
----@class Scheduler
-Scheduler = {}
+---@class LScheduler
+LScheduler = {}
 
 --- Schedules a callback to fire once after a delay.
 ---@param delay number
 ---@param func function
 ---@return number
-function Scheduler:after(delay, func) end
+function LScheduler:after(delay, func) end
 
 --- Schedules a callback to fire once after `n` frames.
 ---@param n integer
 ---@param func function
 ---@return number
-function Scheduler:afterFrames(n, func) end
+function LScheduler:afterFrames(n, func) end
 
 --- Schedules a named one-shot callback, replacing any existing event with the same name.
 ---@param name string
 ---@param delay number
 ---@param func function
 ---@return number
-function Scheduler:afterNamed(name, delay, func) end
+function LScheduler:afterNamed(name, delay, func) end
 
 --- Cancels a scheduled event by its numeric ID.
 ---@param id integer
 ---@return boolean
-function Scheduler:cancel(id) end
+function LScheduler:cancel(id) end
 
 --- Cancels all scheduled events and returns the count removed.
 ---@return number
-function Scheduler:cancelAll() end
+function LScheduler:cancelAll() end
 
 --- Cancels a scheduled event by its string name.
 ---@param name string
 ---@return boolean
-function Scheduler:cancelNamed(name) end
+function LScheduler:cancelNamed(name) end
 
 --- Schedules a callback to fire repeatedly at the given interval.
 ---@param interval number
 ---@param func function
 ---@param count? integer
 ---@return number
-function Scheduler:every(interval, func, count) end
+function LScheduler:every(interval, func, count) end
 
 --- Schedules a callback to fire every `n` frames.
 ---@param n integer â€” frame interval
 ---@param func function â€” callback
 ---@param count? integer? â€” repetitions(-1 = infinite,default)
 ---@return number
-function Scheduler:everyFrames(n, func, count) end
+function LScheduler:everyFrames(n, func, count) end
 
 --- Schedules a named repeating callback, replacing any existing event with the same name.
 ---@param name string
@@ -19453,89 +21055,98 @@ function Scheduler:everyFrames(n, func, count) end
 ---@param func function
 ---@param count? integer
 ---@return number
-function Scheduler:everyNamed(name, interval, func, count) end
+function LScheduler:everyNamed(name, interval, func, count) end
 
 --- Returns the number of active scheduled events.
 ---@return number
-function Scheduler:getCount() end
+function LScheduler:getCount() end
 
 --- Returns the base interval in seconds for an event, or nil.
 ---@param id integer
 ---@return number
-function Scheduler:getInterval(id) end
+function LScheduler:getInterval(id) end
 
 --- Returns the seconds remaining until the next fire for an event, or nil.
 ---@param id integer
 ---@return number
-function Scheduler:getRemaining(id) end
+function LScheduler:getRemaining(id) end
 
 --- Returns the repeat count remaining for an event, or nil.
 ---@param id integer
 ---@return number
-function Scheduler:getRepeatCount(id) end
+function LScheduler:getRepeatCount(id) end
 
 --- Returns the current time-scale multiplier.
 ---@return number
-function Scheduler:getTimeScale() end
+function LScheduler:getTimeScale() end
 
 --- Returns whether the scheduler has no active events.
 ---@return boolean
-function Scheduler:isEmpty() end
+function LScheduler:isEmpty() end
 
 --- Returns whether the given event is currently paused.
 ---@param id integer
 ---@return boolean
-function Scheduler:isPaused(id) end
+function LScheduler:isPaused(id) end
 
 --- Returns whether the named event is currently paused.
 ---@param name string
 ---@return boolean
-function Scheduler:isPausedNamed(name) end
+function LScheduler:isPausedNamed(name) end
 
 --- Pauses a scheduled event by its ID.
 ---@param id integer
 ---@return boolean
-function Scheduler:pause(id) end
+function LScheduler:pause(id) end
 
 --- Pauses a scheduled event by its string name.
 ---@param name string
 ---@return boolean
-function Scheduler:pauseNamed(name) end
+function LScheduler:pauseNamed(name) end
 
 --- Resets an event's remaining time back to its original interval.
 ---@param id integer
 ---@return boolean
-function Scheduler:resetEvent(id) end
+function LScheduler:resetEvent(id) end
 
 --- Resumes a paused event by its ID.
 ---@param id integer
 ---@return boolean
-function Scheduler:resume(id) end
+function LScheduler:resume(id) end
 
 --- Resumes a paused event by its string name.
 ---@param name string
 ---@return boolean
-function Scheduler:resumeNamed(name) end
+function LScheduler:resumeNamed(name) end
 
 --- Changes the repeat interval of an existing event.
 ---@param id integer
 ---@param interval number
 ---@return boolean
-function Scheduler:setInterval(id, interval) end
+function LScheduler:setInterval(id, interval) end
 
 --- Sets a global time-scale multiplier for this scheduler.
 ---@param scale number
 ---@return nil
-function Scheduler:setTimeScale(scale) end
+function LScheduler:setTimeScale(scale) end
+
+--- Returns the type name of this object.
+---@return string
+function LScheduler:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LScheduler:typeOf(name) end
 
 --- Advances all timers by dt seconds, firing due callbacks.
 ---@param dt number
 ---@return number
-function Scheduler:update(dt) end
+function LScheduler:update(dt) end
 
 --- Advances frame-based events by one frame, firing due callbacks.
 ---@return number
-function Scheduler:updateFrames() end
+function LScheduler:updateFrames() end
 
 --- Schedules a one-shot callback that fires after `delay` wall-clock seconds,
 ---@param delay number
@@ -19633,127 +21244,145 @@ lurek.time.waitSeconds = function(seconds) end
 lurek.tween = {}
 
 --- Lua-side spring handle: wraps [`SpringSystem`] and a registry reference to the target table.
----@class Spring
-Spring = {}
+---@class LSpring
+LSpring = {}
 
 --- Stops the spring. The engine will drop it on the next `update(dt)` call.
 ---@return nil
-function Spring:cancel() end
+function LSpring:cancel() end
 
 --- Returns the current interpolated position for the named field, or `nil`.
 ---@param field string
 ---@return number
-function Spring:getPosition(field) end
+function LSpring:getPosition(field) end
 
 --- Returns `true` if the spring has not been cancelled or settled.
 ---@return boolean
-function Spring:isActive() end
+function LSpring:isActive() end
 
 --- Returns `true` when all spring axes have converged within `precision`.
 ---@return boolean
-function Spring:isSettled() end
+function LSpring:isSettled() end
 
 --- Updates the damping coefficient on all axes.
 ---@param value number
 ---@return nil
-function Spring:setDamping(value) end
+function LSpring:setDamping(value) end
 
 --- Updates the stiffness constant on all axes.
 ---@param value number
 ---@return nil
-function Spring:setStiffness(value) end
+function LSpring:setStiffness(value) end
 
 --- Updates target values for all fields present in `fields_table`.
 ---@param fields_table table
 ---@return nil
-function Spring:setTarget(fields_table) end
+function LSpring:setTarget(fields_table) end
+
+--- Returns the type name of this object.
+---@return string
+function LSpring:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LSpring:typeOf(name) end
 
 --- Advances the spring by `dt` seconds and writes positions to the target table.
 ---@param dt number
 ---@return boolean
-function Spring:update(dt) end
+function LSpring:update(dt) end
 
 --- A managed interpolation from start to end values over time.
----@class Tween
-Tween = {}
+---@class LTween
+LTween = {}
 
 --- Cancels this tween immediately; fires the `onCancel` callback if set.
 ---@param ud any
 ---@return nil
-Tween.cancel = function(ud) end
+LTween.cancel = function(ud) end
 
 --- Returns raw 0..1 playback progress (not eased, not accounting for yoyo).
 ---@return number
-function Tween:getProgress() end
+function LTween:getProgress() end
 
 --- Returns true if the tween is still running (not completed or cancelled).
 ---@return boolean
-function Tween:isActive() end
+function LTween:isActive() end
 
 --- Sets a callback called when the tween is cancelled. Returns self.
----@param fn function
----@param f any
+---@param self Tween
+---@param f function
 ---@return Tween
-Tween.onCancel = function(fn, f) end
+LTween.onCancel = function(self, f) end
 
 --- Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
----@param fn function
----@param f any
+---@param self Tween
+---@param f function
 ---@return Tween
-Tween.onComplete = function(fn, f) end
+LTween.onComplete = function(self, f) end
 
 --- Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
----@param fn function
----@param f any
+---@param self Tween
+---@param f function
 ---@return Tween
-Tween.onUpdate = function(fn, f) end
+LTween.onUpdate = function(self, f) end
 
 --- Pauses this tween; time stops advancing but the tween is not cancelled.
 ---@return nil
-function Tween:pause() end
+function LTween:pause() end
 
 --- Resumes a paused tween, continuing from the position where it was paused.
 ---@return nil
-function Tween:resume() end
+function LTween:resume() end
 
 --- Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
 ---@param n integer
 ---@return nil
-function Tween:setRepeat(n) end
+function LTween:setRepeat(n) end
 
 --- Enables or disables yoyo (ping-pong) on each repeat cycle.
 ---@param enabled boolean
 ---@return nil
-function Tween:setYoyo(enabled) end
+function LTween:setYoyo(enabled) end
+
+--- Returns the type name of this object.
+---@return string
+function LTween:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTween:typeOf(name) end
 
 --- A group of animations that run simultaneously over the same duration.
----@class TweenParallel
-TweenParallel = {}
+---@class LTweenParallel
+LTweenParallel = {}
 
 --- Adds an existing LuaTween to the parallel group; marks the tween as owned.
 ---@param self TweenParallel
 ---@param tween Tween
 ---@return nil
-TweenParallel.add = function(self, tween) end
+LTweenParallel.add = function(self, tween) end
 
 --- Cancels the parallel group immediately.
 ---@return nil
-function TweenParallel:cancel() end
+function LTweenParallel:cancel() end
 
 --- Returns true if the parallel is running and not yet complete.
 ---@return boolean
-function TweenParallel:isActive() end
+function LTweenParallel:isActive() end
 
 --- Sets a callback fired when all child tweens finish. Returns self.
 ---@param self TweenParallel
 ---@param fn function
 ---@return TweenParallel
-TweenParallel.onComplete = function(self, fn) end
+LTweenParallel.onComplete = function(self, fn) end
 
 --- Marks the parallel as active. Returns self.
 ---@param self TweenParallel
 ---@return TweenParallel
-TweenParallel.start = function(self) end
+LTweenParallel.start = function(self) end
 
 --- Creates and adds an inline tween entry to the parallel group. Returns self.
 ---@param self TweenParallel
@@ -19762,43 +21391,52 @@ TweenParallel.start = function(self) end
 ---@param fields table
 ---@param easing? string
 ---@return TweenParallel
-TweenParallel.tween = function(self, duration, target, fields, easing) end
+LTweenParallel.tween = function(self, duration, target, fields, easing) end
+
+--- Returns the type name of this object.
+---@return string
+function LTweenParallel:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTweenParallel:typeOf(name) end
 
 --- A chained sequence of animations that run one after another.
----@class TweenSequence
-TweenSequence = {}
+---@class LTweenSequence
+LTweenSequence = {}
 
 --- Appends an immediate callback step. Returns self.
 ---@param self TweenSequence
 ---@param fn function
 ---@return TweenSequence
-TweenSequence.callback = function(self, fn) end
+LTweenSequence.callback = function(self, fn) end
 
 --- Cancels the sequence and stops all pending steps.
 ---@return nil
-function TweenSequence:cancel() end
+function LTweenSequence:cancel() end
 
 --- Appends a delay step that waits `seconds` before proceeding. Returns self.
 ---@param self TweenSequence
 ---@param seconds number
 ---@param fn? function
 ---@return TweenSequence
-TweenSequence.delay = function(self, seconds, fn) end
+LTweenSequence.delay = function(self, seconds, fn) end
 
 --- Returns true if the sequence has been started and has not yet completed.
 ---@return boolean
-function TweenSequence:isActive() end
+function LTweenSequence:isActive() end
 
 --- Sets a callback fired when all steps complete. Returns self.
 ---@param self TweenSequence
 ---@param fn function
 ---@return TweenSequence
-TweenSequence.onComplete = function(self, fn) end
+LTweenSequence.onComplete = function(self, fn) end
 
 --- Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
 ---@param self TweenSequence
 ---@return TweenSequence
-TweenSequence.start = function(self) end
+LTweenSequence.start = function(self) end
 
 --- Appends a tween step: animates `fields` on `target` over `duration`. Returns self.
 ---@param self TweenSequence
@@ -19807,34 +21445,52 @@ TweenSequence.start = function(self) end
 ---@param fields table
 ---@param easing? string
 ---@return TweenSequence
-TweenSequence.tween = function(self, duration, target, fields, easing) end
+LTweenSequence.tween = function(self, duration, target, fields, easing) end
+
+--- Returns the type name of this object.
+---@return string
+function LTweenSequence:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTweenSequence:typeOf(name) end
 
 --- Lua-side wrapper around the pure-Rust [`TweenState`] timing core.
----@class TweenState
-TweenState = {}
+---@class LTweenState
+LTweenState = {}
 
 --- Returns whether the tween state has completed.
 ---@return boolean
-function TweenState:isComplete() end
+function LTweenState:isComplete() end
 
 --- Interpolates from `start` to `finish` using the eased tween progress.
 ---@param start number
 ---@param finish number
 ---@return number
-function TweenState:lerp(start, finish) end
+function LTweenState:lerp(start, finish) end
 
 --- Resets the tween state to elapsed time zero.
 ---@return nil
-function TweenState:reset() end
+function LTweenState:reset() end
 
 --- Returns the raw 0..1 playback progress.
 ---@return number
-function TweenState:t() end
+function LTweenState:t() end
 
 --- Advances the tween state by `dt` seconds.
 ---@param dt number
 ---@return boolean
-function TweenState:tick(dt) end
+function LTweenState:tick(dt) end
+
+--- Returns the type name of this object.
+---@return string
+function LTweenState:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTweenState:typeOf(name) end
 
 --- Cancels all active tweens, sequences, parallels, and springs immediately.
 ---@return nil
@@ -19906,46 +21562,46 @@ lurek.tween.update = function(dt) end
 lurek.ui = {}
 
 --- Adds Accordion-specific methods (1-based sections in Lua).
----@class Accordion
-Accordion = {}
+---@class LAccordion
+LAccordion = {}
 
 --- Adds a section entry to this Accordion widget.
 ---@param title string
 ---@param content_idx? integer
 ---@return nil
-function Accordion:addSection(title, content_idx) end
+function LAccordion:addSection(title, content_idx) end
 
 --- Returns the section count of this Accordion widget.
 ---@return number
-function Accordion:getSectionCount() end
+function LAccordion:getSectionCount() end
 
 --- Returns the section title of this Accordion widget.
 ---@param section_idx integer
 ---@return nil
-function Accordion:getSectionTitle(section_idx) end
+function LAccordion:getSectionTitle(section_idx) end
 
 --- Returns true if exclusive is enabled for this Accordion widget.
 ---@return boolean
-function Accordion:isExclusive() end
+function LAccordion:isExclusive() end
 
 --- Returns true if section expanded is enabled for this Accordion widget.
 ---@param section_idx integer
 ---@return boolean
-function Accordion:isSectionExpanded(section_idx) end
+function LAccordion:isSectionExpanded(section_idx) end
 
 --- Sets the exclusive for this Accordion widget.
 ---@param v boolean
 ---@return nil
-function Accordion:setExclusive(v) end
+function LAccordion:setExclusive(v) end
 
 --- Toggles the expanded/collapsed status of an Accordion section.
 ---@param section_idx integer
 ---@return nil
-function Accordion:toggleSection(section_idx) end
+function LAccordion:toggleSection(section_idx) end
 
 --- Lua wrapper for a stacked area chart renderer.
----@class AreaChart
-AreaChart = {}
+---@class LAreaChart
+LAreaChart = {}
 
 --- Adds a stacked layer with values and colour.
 ---@param name string
@@ -19954,44 +21610,53 @@ AreaChart = {}
 ---@param g number
 ---@param b number
 ---@return nil
-function AreaChart:addLayer(name, values, r, g, b) end
+function LAreaChart:addLayer(name, values, r, g, b) end
 
 --- Renders the area chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
-function AreaChart:drawToImage(target) end
+function LAreaChart:drawToImage(target) end
 
 --- Sets the maximum Y value for axis scaling.
 ---@param v number
 ---@return nil
-function AreaChart:setYMax(v) end
+function LAreaChart:setYMax(v) end
+
+--- Returns the type name of this object.
+---@return string
+function LAreaChart:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LAreaChart:typeOf(name) end
 
 --- Adds Badge-specific methods to a widget table.
----@class Badge
-Badge = {}
+---@class LBadge
+LBadge = {}
 
 --- Returns the raw count of this Badge widget.
 ---@return number
-function Badge:getCount() end
+function LBadge:getCount() end
 
 --- Returns the display text of this Badge widget, e.g. "99+" when over the max.
 ---@return string
-function Badge:getDisplayText() end
+function LBadge:getDisplayText() end
 
 --- Sets the count displayed on this Badge widget.
 ---@param count integer
 ---@return nil
-function Badge:setCount(count) end
+function LBadge:setCount(count) end
 
 --- Lua wrapper for a grouped bar chart renderer.
----@class BarChart
-BarChart = {}
+---@class LBarChart
+LBarChart = {}
 
 --- Adds a category group with per-series values.
 ---@param label string
 ---@param values table
 ---@return nil
-function BarChart:addCategory(label, values) end
+function LBarChart:addCategory(label, values) end
 
 --- Adds a bar series with a name and colour.
 ---@param name string
@@ -19999,63 +21664,72 @@ function BarChart:addCategory(label, values) end
 ---@param g number
 ---@param b number
 ---@return nil
-function BarChart:addSeries(name, r, g, b) end
+function LBarChart:addSeries(name, r, g, b) end
 
 --- Renders the bar chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
-function BarChart:drawToImage(target) end
+function LBarChart:drawToImage(target) end
+
+--- Returns the type name of this object.
+---@return string
+function LBarChart:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LBarChart:typeOf(name) end
 
 --- Adds Button-specific methods to a widget table.
----@class Button
-Button = {}
+---@class LButton
+LButton = {}
 
 --- Returns the text of this Button widget.
 ---@return string
-function Button:getText() end
+function LButton:getText() end
 
 --- Sets the text for this Button widget.
 ---@param text string
 ---@return nil
-function Button:setText(text) end
+function LButton:setText(text) end
 
 --- Adds CheckBox-specific methods to a widget table.
----@class Checkbox
-Checkbox = {}
+---@class LCheckbox
+LCheckbox = {}
 
 --- Returns the text of this Checkbox widget.
 ---@return string
-function Checkbox:getText() end
+function LCheckbox:getText() end
 
 --- Returns true if checked is enabled for this Checkbox widget.
 ---@return boolean
-function Checkbox:isChecked() end
+function LCheckbox:isChecked() end
 
 --- Sets the checked for this Checkbox widget.
 ---@param checked boolean
 ---@return nil
-function Checkbox:setChecked(checked) end
+function LCheckbox:setChecked(checked) end
 
 --- Sets the text for this Checkbox widget.
 ---@param text string
 ---@return nil
-function Checkbox:setText(text) end
+function LCheckbox:setText(text) end
 
 --- Adds ColorPicker-specific methods.
----@class Color_Picker
-Color_Picker = {}
+---@class LColorPicker
+LColorPicker = {}
 
 --- Returns the color of this Color_Picker widget.
 ---@return number
-function Color_Picker:getColor() end
+function LColorPicker:getColor() end
 
 --- Returns the color mode of this Color_Picker widget.
 ---@return string
-function Color_Picker:getColorMode() end
+function LColorPicker:getColorMode() end
 
 --- Returns the show alpha of this Color_Picker widget.
 ---@return boolean
-function Color_Picker:getShowAlpha() end
+function LColorPicker:getShowAlpha() end
 
 --- Sets the color for this Color_Picker widget.
 ---@param r number
@@ -20063,516 +21737,267 @@ function Color_Picker:getShowAlpha() end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Color_Picker:setColor(r, green, b, a) end
+function LColorPicker:setColor(r, green, b, a) end
 
 --- Sets the color mode for this Color_Picker widget.
 ---@param mode string
 ---@return nil
-function Color_Picker:setColorMode(mode) end
+function LColorPicker:setColorMode(mode) end
 
 --- Registers a callback invoked when this widget's value changes.
 ---@param fn function
 ---@return nil
-function Color_Picker:setOnChange(fn) end
+function LColorPicker:setOnChange(fn) end
 
 --- Sets the show alpha for this Color_Picker widget.
 ---@param v boolean
 ---@return nil
-function Color_Picker:setShowAlpha(v) end
+function LColorPicker:setShowAlpha(v) end
 
 --- Adds ComboBox-specific methods (1-based indices in Lua).
----@class Combo_Box
-Combo_Box = {}
+---@class LComboBox
+LComboBox = {}
 
 --- Adds a item entry to this Combo_Box widget.
 ---@param text string
 ---@return nil
-function Combo_Box:addItem(text) end
+function LComboBox:addItem(text) end
 
 --- Clears all items entries from this Combo_Box widget.
 ---@return nil
-function Combo_Box:clearItems() end
+function LComboBox:clearItems() end
 
 --- Returns the item of this Combo_Box widget.
 ---@param index integer
 ---@return string
-function Combo_Box:getItem(index) end
+function LComboBox:getItem(index) end
 
 --- Returns the item count of this Combo_Box widget.
 ---@return number
-function Combo_Box:getItemCount() end
+function LComboBox:getItemCount() end
 
 --- Returns the selected index of this Combo_Box widget.
 ---@return number
-function Combo_Box:getSelectedIndex() end
+function LComboBox:getSelectedIndex() end
 
 --- Returns the selected item of this Combo_Box widget.
 ---@return string
-function Combo_Box:getSelectedItem() end
+function LComboBox:getSelectedItem() end
 
 --- Removes the item from this Combo_Box widget.
 ---@param index integer
 ---@return nil
-function Combo_Box:removeItem(index) end
+function LComboBox:removeItem(index) end
 
 --- Sets the selected index for this Combo_Box widget.
 ---@param index integer
 ---@return nil
-function Combo_Box:setSelectedIndex(index) end
+function LComboBox:setSelectedIndex(index) end
 
 --- Adds Dialog-specific methods.
----@class Dialog
-Dialog = {}
+---@class LDialog
+LDialog = {}
 
 --- Adds a button entry to this Dialog widget.
 ---@param text string
 ---@param cb? function
 ---@return nil
-function Dialog:addButton(text, cb) end
+function LDialog:addButton(text, cb) end
 
 --- Closes and removes this dialog from the screen.
 ---@return nil
-function Dialog:close() end
+function LDialog:close() end
 
 --- Returns the content of this Dialog widget.
 ---@return number
-function Dialog:getContent() end
+function LDialog:getContent() end
 
 --- Returns the title of this Dialog widget.
 ---@return string
-function Dialog:getTitle() end
+function LDialog:getTitle() end
 
 --- Returns true if modal is enabled for this Dialog widget.
 ---@return boolean
-function Dialog:isModal() end
+function LDialog:isModal() end
 
 --- Returns true if open is enabled for this Dialog widget.
 ---@return boolean
-function Dialog:isOpen() end
+function LDialog:isOpen() end
 
 --- Performs the open operation on this Dialog widget.
 ---@return nil
-function Dialog:open() end
+function LDialog:open() end
 
 --- Sets the content for this Dialog widget.
 ---@param content_idx? integer
 ---@return nil
-function Dialog:setContent(content_idx) end
+function LDialog:setContent(content_idx) end
 
 --- Sets the modal for this Dialog widget.
 ---@param v boolean
 ---@return nil
-function Dialog:setModal(v) end
+function LDialog:setModal(v) end
 
 --- Registers a callback invoked when this dialog is closed.
 ---@param fn function
 ---@return nil
-function Dialog:setOnClose(fn) end
+function LDialog:setOnClose(fn) end
 
 --- Sets the title for this Dialog widget.
 ---@param title string
 ---@return nil
-function Dialog:setTitle(title) end
+function LDialog:setTitle(title) end
 
 --- Adds DockPanel-specific methods.
----@class Dock_Panel
-Dock_Panel = {}
+---@class LDockPanel
+LDockPanel = {}
 
 --- Performs the dock operation on this Dock_Panel widget.
 ---@param child_idx integer
 ---@param side string
 ---@return nil
-function Dock_Panel:dock(child_idx, side) end
+function LDockPanel:dock(child_idx, side) end
 
 --- Returns the docked count of this Dock_Panel widget.
 ---@return number
-function Dock_Panel:getDockedCount() end
+function LDockPanel:getDockedCount() end
 
 --- Returns the split size of this Dock_Panel widget.
 ---@param side string
 ---@return nil
-function Dock_Panel:getSplitSize(side) end
+function LDockPanel:getSplitSize(side) end
 
 --- Sets the split size for this Dock_Panel widget.
 ---@param side string
 ---@param size number
 ---@return nil
-function Dock_Panel:setSplitSize(side, size) end
+function LDockPanel:setSplitSize(side, size) end
 
 --- Performs the undock operation on this Dock_Panel widget.
 ---@param child_idx integer
 ---@return nil
-function Dock_Panel:undock(child_idx) end
+function LDockPanel:undock(child_idx) end
 
 --- Adds GUITable-specific methods (1-based rows/cols in Lua).
----@class Gui_Table
-Gui_Table = {}
+---@class LGuiTable
+LGuiTable = {}
 
 --- Adds a column entry to this Gui_Table widget.
 ---@param header string
 ---@param width? number
 ---@return nil
-function Gui_Table:addColumn(header, width) end
+function LGuiTable:addColumn(header, width) end
 
 --- Adds a row entry to this Gui_Table widget.
 ---@param cells table
 ---@return nil
-function Gui_Table:addRow(cells) end
+function LGuiTable:addRow(cells) end
 
 --- Returns the cell of this Gui_Table widget.
 ---@param row integer
 ---@param col integer
 ---@return nil
-function Gui_Table:getCell(row, col) end
+function LGuiTable:getCell(row, col) end
 
 --- Returns the column count of this Gui_Table widget.
 ---@return number
-function Gui_Table:getColumnCount() end
+function LGuiTable:getColumnCount() end
 
 --- Returns the row count of this Gui_Table widget.
 ---@return number
-function Gui_Table:getRowCount() end
+function LGuiTable:getRowCount() end
 
 --- Returns the selected row of this Gui_Table widget.
 ---@return nil
-function Gui_Table:getSelectedRow() end
+function LGuiTable:getSelectedRow() end
 
 --- Returns true if sortable is enabled for this Gui_Table widget.
 ---@return boolean
-function Gui_Table:isSortable() end
+function LGuiTable:isSortable() end
 
 --- Sets the cell for this Gui_Table widget.
 ---@param row integer
 ---@param col integer
 ---@param text string
 ---@return nil
-function Gui_Table:setCell(row, col, text) end
+function LGuiTable:setCell(row, col, text) end
 
 --- Registers a callback invoked when a table row is selected.
 ---@param fn function
 ---@return nil
-function Gui_Table:setOnSelect(fn) end
+function LGuiTable:setOnSelect(fn) end
 
 --- Sets the selected row for this Gui_Table widget.
 ---@param row? integer
 ---@return nil
-function Gui_Table:setSelectedRow(row) end
+function LGuiTable:setSelectedRow(row) end
 
 --- Sets the sortable for this Gui_Table widget.
 ---@param v boolean
 ---@return nil
-function Gui_Table:setSortable(v) end
+function LGuiTable:setSortable(v) end
 
 --- Adds GUIWindow-specific methods.
----@class Gui_Window
-Gui_Window = {}
+---@class LGuiWindow
+LGuiWindow = {}
 
 --- Returns the title of this Gui_Window widget.
 ---@return string
-function Gui_Window:getTitle() end
+function LGuiWindow:getTitle() end
 
 --- Returns true if closeable is enabled for this Gui_Window widget.
 ---@return boolean
-function Gui_Window:isCloseable() end
+function LGuiWindow:isCloseable() end
 
 --- Returns true if draggable is enabled for this Gui_Window widget.
 ---@return boolean
-function Gui_Window:isDraggable() end
+function LGuiWindow:isDraggable() end
 
 --- Returns true if resizable is enabled for this Gui_Window widget.
 ---@return boolean
-function Gui_Window:isResizable() end
+function LGuiWindow:isResizable() end
 
 --- Sets the closeable for this Gui_Window widget.
 ---@param v boolean
 ---@return nil
-function Gui_Window:setCloseable(v) end
+function LGuiWindow:setCloseable(v) end
 
 --- Sets the draggable for this Gui_Window widget.
 ---@param v boolean
 ---@return nil
-function Gui_Window:setDraggable(v) end
+function LGuiWindow:setDraggable(v) end
 
 --- Registers a callback invoked when this window is closed.
 ---@param fn function
 ---@return nil
-function Gui_Window:setOnClose(fn) end
+function LGuiWindow:setOnClose(fn) end
 
 --- Sets the resizable for this Gui_Window widget.
 ---@param v boolean
 ---@return nil
-function Gui_Window:setResizable(v) end
+function LGuiWindow:setResizable(v) end
 
 --- Sets the title for this Gui_Window widget.
 ---@param title string
 ---@return nil
-function Gui_Window:setTitle(title) end
-
----@class HtmlDocument
-HtmlDocument = {}
-
---- Appends stylesheet text after existing CSS rules.
----@param css string
----@return nil
-function HtmlDocument:addCss(css) end
-
---- Removes all stylesheet rules from this document.
----@return nil
-function HtmlDocument:clearCss() end
-
---- Builds the current draw command list and discards it for now.
----@param x? number
----@param y? number
----@return nil
-function HtmlDocument:draw(x, y) end
-
---- Finds one element by id.
----@param id string
----@return HtmlElement?
-function HtmlDocument:getElementById(id) end
-
---- Returns the source markup used by this document.
----@return string
-function HtmlDocument:getHtml() end
-
---- Returns the root element for this document.
----@return HtmlElement
-function HtmlDocument:getRoot() end
-
---- Returns the document layout viewport in UI pixels.
----@return number
-function HtmlDocument:getViewport() end
-
---- Returns whether DOM, CSS, viewport, or layout state changed.
----@return boolean
-function HtmlDocument:isDirty() end
-
---- Forwards a key press and emits a keydown event.
----@param key string
----@return boolean
-function HtmlDocument:keypressed(key) end
-
---- Forwards a mouse move event.
----@param x number
----@param y number
----@return boolean
-function HtmlDocument:mousemoved(x, y) end
-
---- Forwards a mouse press and emits a minimal click event.
----@param x number
----@param y number
----@param button? integer
----@return boolean
-function HtmlDocument:mousepressed(x, y, button) end
-
---- Forwards a mouse release event.
----@param x number
----@param y number
----@param button? integer
----@return boolean
-function HtmlDocument:mousereleased(x, y, button) end
-
---- Removes a document-level event listener.
----@param handle integer
----@return nil
-function HtmlDocument:off(handle) end
-
---- Registers a document-level event listener.
----@param event string
----@param fn function
----@return number
-function HtmlDocument:on(event, fn) end
-
---- Finds the first element matching a supported selector.
----@param selector string
----@return HtmlElement?
-function HtmlDocument:query(selector) end
-
---- Returns all elements matching a supported selector in document order.
----@param selector string
----@return table
-function HtmlDocument:queryAll(selector) end
-
---- Forces a layout pass immediately.
----@return nil
-function HtmlDocument:relayout() end
-
---- Replaces this document's stylesheet text.
----@param css string
----@return nil
-function HtmlDocument:setCss(css) end
-
---- Replaces this document's markup and invalidates existing element handles.
----@param html string
----@return nil
-function HtmlDocument:setHtml(html) end
-
---- Sets the document layout viewport in UI pixels.
----@param w number
----@param h number
----@return nil
-function HtmlDocument:setViewport(w, h) end
-
---- Forwards text input and emits an input event for focused input elements.
----@param text string
----@return boolean
-function HtmlDocument:textinput(text) end
-
---- Advances document state and runs layout if needed.
----@param dt number
----@return nil
-function HtmlDocument:update(dt) end
-
---- Forwards a mouse wheel event.
----@param dx number
----@param dy number
----@return boolean
-function HtmlDocument:wheelmoved(dx, dy) end
-
----@class HtmlElement
-HtmlElement = {}
-
---- Adds a CSS class to this element.
----@param name string
----@return nil
-function HtmlElement:addClass(name) end
-
---- Appends HTML inside this element.
----@param html string
----@return nil
-function HtmlElement:appendHtml(html) end
-
---- Clears focus from this element if it currently has focus.
----@return nil
-function HtmlElement:blur() end
-
---- Gives focus to this element.
----@return nil
-function HtmlElement:focus() end
-
---- Returns an attribute value or nil.
----@param name string
----@return string
-function HtmlElement:getAttribute(name) end
-
---- Returns the owning HtmlDocument.
----@return HtmlDocument
-function HtmlElement:getDocument() end
-
---- Returns this element's inner HTML.
----@return string
-function HtmlElement:getHtml() end
-
---- Returns this element's id or nil.
----@return string
-function HtmlElement:getId() end
-
---- Returns this element's last computed layout rectangle.
----@return number
-function HtmlElement:getRect() end
-
---- Returns an inline or stylesheet value for a property.
----@param name string
----@return string
-function HtmlElement:getStyle(name) end
-
---- Returns this element's tag name.
----@return string
-function HtmlElement:getTagName() end
-
---- Returns this element's text content.
----@return string
-function HtmlElement:getText() end
-
---- Returns whether this element has a CSS class.
----@param name string
----@return boolean
-function HtmlElement:hasClass(name) end
-
---- Removes an element event listener.
----@param handle integer
----@return nil
-function HtmlElement:off(handle) end
-
---- Registers an element event listener.
----@param event string
----@param fn function
----@return number
-function HtmlElement:on(event, fn) end
-
---- Finds the first descendant matching a selector.
----@param selector string
----@return HtmlElement?
-function HtmlElement:query(selector) end
-
---- Returns all descendants matching a selector.
----@param selector string
----@return table
-function HtmlElement:queryAll(selector) end
-
---- Removes this element from the document tree.
----@return nil
-function HtmlElement:remove() end
-
---- Removes an attribute.
----@param name string
----@return nil
-function HtmlElement:removeAttribute(name) end
-
---- Removes a CSS class from this element.
----@param name string
----@return nil
-function HtmlElement:removeClass(name) end
-
---- Sets or removes an attribute value.
----@param name string
----@param value? string
----@return nil
-function HtmlElement:setAttribute(name, value) end
-
---- Replaces this element's inner HTML.
----@param html string
----@return nil
-function HtmlElement:setHtml(html) end
-
---- Sets or removes this element's id.
----@param id? string
----@return nil
-function HtmlElement:setId(id) end
-
---- Sets or removes an inline style value.
----@param name string
----@param value? string
----@return nil
-function HtmlElement:setStyle(name, value) end
-
---- Replaces this element's text content.
----@param text string
----@return nil
-function HtmlElement:setText(text) end
-
---- Toggles a CSS class and returns the final state.
----@param name string
----@param force? boolean
----@return boolean
-function HtmlElement:toggleClass(name, force) end
+function LGuiWindow:setTitle(title) end
 
 --- Adds ImageWidget-specific methods.
----@class Image_Widget
-Image_Widget = {}
+---@class LImageWidget
+LImageWidget = {}
 
 --- Returns the scale mode of this Image_Widget widget.
 ---@return string
-function Image_Widget:getScaleMode() end
+function LImageWidget:getScaleMode() end
 
 --- Returns the tint of this Image_Widget widget.
 ---@return number
-function Image_Widget:getTint() end
+function LImageWidget:getTint() end
 
 --- Sets the scale mode for this Image_Widget widget.
 ---@param mode string
 ---@return nil
-function Image_Widget:setScaleMode(mode) end
+function LImageWidget:setScaleMode(mode) end
 
 --- Sets the tint for this Image_Widget widget.
 ---@param r number
@@ -20580,78 +22005,78 @@ function Image_Widget:setScaleMode(mode) end
 ---@param b number
 ---@param a? number
 ---@return nil
-function Image_Widget:setTint(r, green, b, a) end
+function LImageWidget:setTint(r, green, b, a) end
 
 --- Adds Label-specific methods to a widget table.
----@class Label
-Label = {}
+---@class LLabel
+LLabel = {}
 
 --- Returns the text of this Label widget.
 ---@return string
-function Label:getText() end
+function LLabel:getText() end
 
 --- Sets the text for this Label widget.
 ---@param text string
 ---@return nil
-function Label:setText(text) end
+function LLabel:setText(text) end
 
 --- Adds Layout-specific methods.
----@class Layout
-Layout = {}
+---@class LLayout
+LLayout = {}
 
 --- Returns the align of this Layout widget.
 ---@return string
-function Layout:getAlign() end
+function LLayout:getAlign() end
 
 --- Returns the direction of this Layout widget.
 ---@return string
-function Layout:getDirection() end
+function LLayout:getDirection() end
 
 --- Returns the justify of this Layout widget.
 ---@return string
-function Layout:getJustify() end
+function LLayout:getJustify() end
 
 --- Returns the spacing of this Layout widget.
 ---@return number
-function Layout:getSpacing() end
+function LLayout:getSpacing() end
 
 --- Returns the wrap of this Layout widget.
 ---@return boolean
-function Layout:getWrap() end
+function LLayout:getWrap() end
 
 --- Sets the align for this Layout widget.
 ---@param align string
 ---@return nil
-function Layout:setAlign(align) end
+function LLayout:setAlign(align) end
 
 --- Sets the columns for this Layout widget.
 ---@param n integer
 ---@return nil
-function Layout:setColumns(n) end
+function LLayout:setColumns(n) end
 
 --- Sets the direction for this Layout widget.
 ---@param dir string
 ---@return nil
-function Layout:setDirection(dir) end
+function LLayout:setDirection(dir) end
 
 --- Sets the justify for this Layout widget.
 ---@param justify string
 ---@return nil
-function Layout:setJustify(justify) end
+function LLayout:setJustify(justify) end
 
 --- Sets the spacing for this Layout widget.
 ---@param spacing number
 ---@return nil
-function Layout:setSpacing(spacing) end
+function LLayout:setSpacing(spacing) end
 
 --- Sets the wrap for this Layout widget.
 ---@param wrap boolean
 ---@return nil
-function Layout:setWrap(wrap) end
+function LLayout:setWrap(wrap) end
 
 --- Lua wrapper for a line chart renderer.
----@class LineChart
-LineChart = {}
+---@class LLineChart
+LLineChart = {}
 
 --- Adds a named data series to the chart.
 ---@param name string
@@ -20660,152 +22085,161 @@ LineChart = {}
 ---@param g number
 ---@param b number
 ---@return nil
-function LineChart:addSeries(name, points, r, g, b) end
+function LLineChart:addSeries(name, points, r, g, b) end
 
 --- Renders the line chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
-function LineChart:drawToImage(target) end
+function LLineChart:drawToImage(target) end
 
 --- Sets the maximum X value for axis scaling.
 ---@param v number
 ---@return nil
-function LineChart:setXMax(v) end
+function LLineChart:setXMax(v) end
 
 --- Sets the maximum Y value for axis scaling.
 ---@param v number
 ---@return nil
-function LineChart:setYMax(v) end
+function LLineChart:setYMax(v) end
+
+--- Returns the type name of this object.
+---@return string
+function LLineChart:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LLineChart:typeOf(name) end
 
 --- Adds ListBox-specific methods (1-based indices in Lua).
----@class List_Box
-List_Box = {}
+---@class LListBox
+LListBox = {}
 
 --- Adds a item entry to this List_Box widget.
 ---@param text string
 ---@return nil
-function List_Box:addItem(text) end
+function LListBox:addItem(text) end
 
 --- Clears all items entries from this List_Box widget.
 ---@return nil
-function List_Box:clearItems() end
+function LListBox:clearItems() end
 
 --- Returns the item of this List_Box widget.
 ---@param index integer
 ---@return string
-function List_Box:getItem(index) end
+function LListBox:getItem(index) end
 
 --- Returns the item count of this List_Box widget.
 ---@return number
-function List_Box:getItemCount() end
+function LListBox:getItemCount() end
 
 --- Returns the selected index of this List_Box widget.
 ---@return number
-function List_Box:getSelectedIndex() end
+function LListBox:getSelectedIndex() end
 
 --- Removes the item from this List_Box widget.
 ---@param index integer
 ---@return nil
-function List_Box:removeItem(index) end
+function LListBox:removeItem(index) end
 
 --- Sets the item height for this List_Box widget.
 ---@param h number
 ---@return nil
-function List_Box:setItemHeight(h) end
+function LListBox:setItemHeight(h) end
 
 --- Sets the selected index for this List_Box widget.
 ---@param index integer
 ---@return nil
-function List_Box:setSelectedIndex(index) end
+function LListBox:setSelectedIndex(index) end
 
 --- Adds MenuBar-specific methods.
----@class Menu_Bar
-Menu_Bar = {}
+---@class LMenuBar
+LMenuBar = {}
 
 --- Adds a menu entry to this Menu_Bar widget.
 ---@param menu_idx integer
 ---@return nil
-function Menu_Bar:addMenu(menu_idx) end
+function LMenuBar:addMenu(menu_idx) end
 
 --- Returns the menu count of this Menu_Bar widget.
 ---@return number
-function Menu_Bar:getMenuCount() end
+function LMenuBar:getMenuCount() end
 
 --- Returns the menus of this Menu_Bar widget.
 ---@return nil
-function Menu_Bar:getMenus() end
+function LMenuBar:getMenus() end
 
 --- Removes the menu from this Menu_Bar widget.
 ---@param menu_idx integer
 ---@return nil
-function Menu_Bar:removeMenu(menu_idx) end
+function LMenuBar:removeMenu(menu_idx) end
 
 --- Adds MenuItem-specific methods.
----@class Menu_Item
-Menu_Item = {}
+---@class LMenuItem
+LMenuItem = {}
 
 --- Adds a sub item entry to this Menu_Item widget.
 ---@param child_idx integer
 ---@return nil
-function Menu_Item:addSubItem(child_idx) end
+function LMenuItem:addSubItem(child_idx) end
 
 --- Returns the shortcut of this Menu_Item widget.
 ---@return string
-function Menu_Item:getShortcut() end
+function LMenuItem:getShortcut() end
 
 --- Returns the sub items of this Menu_Item widget.
 ---@return nil
-function Menu_Item:getSubItems() end
+function LMenuItem:getSubItems() end
 
 --- Returns the text of this Menu_Item widget.
 ---@return string
-function Menu_Item:getText() end
+function LMenuItem:getText() end
 
 --- Returns true if checked is enabled for this Menu_Item widget.
 ---@return boolean
-function Menu_Item:isChecked() end
+function LMenuItem:isChecked() end
 
 --- Sets the checked for this Menu_Item widget.
 ---@param v boolean
 ---@return nil
-function Menu_Item:setChecked(v) end
+function LMenuItem:setChecked(v) end
 
 --- Registers a callback invoked when this menu item is clicked.
 ---@param fn function
 ---@return nil
-function Menu_Item:setOnClick(fn) end
+function LMenuItem:setOnClick(fn) end
 
 --- Sets the shortcut for this Menu_Item widget.
 ---@param shortcut string
 ---@return nil
-function Menu_Item:setShortcut(shortcut) end
+function LMenuItem:setShortcut(shortcut) end
 
 --- Sets the text for this Menu_Item widget.
 ---@param text string
 ---@return nil
-function Menu_Item:setText(text) end
+function LMenuItem:setText(text) end
 
 --- Adds NinePatch-specific methods.
----@class Nine_Patch
-Nine_Patch = {}
+---@class LNinePatch
+LNinePatch = {}
 
 --- Returns the image dimensions of this Nine_Patch widget.
 ---@return number
-function Nine_Patch:getImageDimensions() end
+function LNinePatch:getImageDimensions() end
 
 --- Returns the insets of this Nine_Patch widget.
 ---@return number
-function Nine_Patch:getInsets() end
+function LNinePatch:getInsets() end
 
 --- Returns the slices of this Nine_Patch widget.
 ---@return table
-function Nine_Patch:getSlices() end
+function LNinePatch:getSlices() end
 
 --- Sets the image dimensions for this Nine_Patch widget.
 ---@param w integer
 ---@param h integer
 ---@return nil
-function Nine_Patch:setImageDimensions(w, h) end
+function LNinePatch:setImageDimensions(w, h) end
 
 --- Sets the insets for this Nine_Patch widget.
 ---@param left integer
@@ -20813,29 +22247,29 @@ function Nine_Patch:setImageDimensions(w, h) end
 ---@param right integer
 ---@param bottom integer
 ---@return nil
-function Nine_Patch:setInsets(left, top, right, bottom) end
+function LNinePatch:setInsets(left, top, right, bottom) end
 
 --- Adds Panel-specific methods.
----@class Panel
-Panel = {}
+---@class LPanel
+LPanel = {}
 
 --- Returns the title of this Panel widget.
 ---@return string
-function Panel:getTitle() end
+function LPanel:getTitle() end
 
 --- Sets the scrollable for this Panel widget.
 ---@param scrollable boolean
 ---@return nil
-function Panel:setScrollable(scrollable) end
+function LPanel:setScrollable(scrollable) end
 
 --- Sets the title for this Panel widget.
 ---@param title string
 ---@return nil
-function Panel:setTitle(title) end
+function LPanel:setTitle(title) end
 
 --- Lua wrapper for a pie chart renderer.
----@class PieChart
-PieChart = {}
+---@class LPieChart
+LPieChart = {}
 
 --- Adds a labelled pie segment.
 ---@param label string
@@ -20844,83 +22278,92 @@ PieChart = {}
 ---@param g number
 ---@param b number
 ---@return nil
-function PieChart:addSegment(label, value, r, g, b) end
+function LPieChart:addSegment(label, value, r, g, b) end
 
 --- Renders the pie chart into an existing ImageData.
 ---@param target ImageData
 ---@return nil
-function PieChart:drawToImage(target) end
+function LPieChart:drawToImage(target) end
+
+--- Returns the type name of this object.
+---@return string
+function LPieChart:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LPieChart:typeOf(name) end
 
 --- Adds ProgressBar-specific methods to a widget table.
----@class Progress_Bar
-Progress_Bar = {}
+---@class LProgressBar
+LProgressBar = {}
 
 --- Returns the max of this Progress_Bar widget.
 ---@return number
-function Progress_Bar:getMax() end
+function LProgressBar:getMax() end
 
 --- Returns the min of this Progress_Bar widget.
 ---@return number
-function Progress_Bar:getMin() end
+function LProgressBar:getMin() end
 
 --- Returns the progress of this Progress_Bar widget.
 ---@return number
-function Progress_Bar:getProgress() end
+function LProgressBar:getProgress() end
 
 --- Returns the value of this Progress_Bar widget.
 ---@return number
-function Progress_Bar:getValue() end
+function LProgressBar:getValue() end
 
 --- Sets the range for this Progress_Bar widget.
 ---@param min number
 ---@param max number
 ---@return nil
-function Progress_Bar:setRange(min, max) end
+function LProgressBar:setRange(min, max) end
 
 --- Sets the value for this Progress_Bar widget.
 ---@param v number
 ---@return nil
-function Progress_Bar:setValue(v) end
+function LProgressBar:setValue(v) end
 
 --- Adds RadioButton-specific methods.
----@class Radio_Button
-Radio_Button = {}
+---@class LRadioButton
+LRadioButton = {}
 
 --- Returns the group of this Radio_Button widget.
 ---@return string
-function Radio_Button:getGroup() end
+function LRadioButton:getGroup() end
 
 --- Returns the text of this Radio_Button widget.
 ---@return string
-function Radio_Button:getText() end
+function LRadioButton:getText() end
 
 --- Returns true if selected is enabled for this Radio_Button widget.
 ---@return boolean
-function Radio_Button:isSelected() end
+function LRadioButton:isSelected() end
 
 --- Sets the group for this Radio_Button widget.
 ---@param group string
 ---@return nil
-function Radio_Button:setGroup(group) end
+function LRadioButton:setGroup(group) end
 
 --- Registers a callback invoked when this widget's value changes.
 ---@param fn function
 ---@return nil
-function Radio_Button:setOnChange(fn) end
+function LRadioButton:setOnChange(fn) end
 
 --- Sets the selected for this Radio_Button widget.
 ---@param v boolean
 ---@return nil
-function Radio_Button:setSelected(v) end
+function LRadioButton:setSelected(v) end
 
 --- Sets the text for this Radio_Button widget.
 ---@param text string
 ---@return nil
-function Radio_Button:setText(text) end
+function LRadioButton:setText(text) end
 
 --- Lua wrapper for a scatter plot renderer.
----@class ScatterPlot
-ScatterPlot = {}
+---@class LScatterPlot
+LScatterPlot = {}
 
 --- Adds a named data series.
 ---@param name string
@@ -20929,575 +22372,593 @@ ScatterPlot = {}
 ---@param g number
 ---@param b number
 ---@return nil
-function ScatterPlot:addSeries(name, points, r, g, b) end
+function LScatterPlot:addSeries(name, points, r, g, b) end
 
 --- Renders the scatter plot into an existing ImageData.
 ---@param target ImageData
 ---@return nil
-function ScatterPlot:drawToImage(target) end
+function LScatterPlot:drawToImage(target) end
 
 --- Sets the X-axis data range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ScatterPlot:setXRange(min, max) end
+function LScatterPlot:setXRange(min, max) end
 
 --- Sets the Y-axis data range.
 ---@param min number
 ---@param max number
 ---@return nil
-function ScatterPlot:setYRange(min, max) end
+function LScatterPlot:setYRange(min, max) end
+
+--- Returns the type name of this object.
+---@return string
+function LScatterPlot:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LScatterPlot:typeOf(name) end
 
 --- Adds ScrollBar-specific methods.
----@class Scroll_Bar
-Scroll_Bar = {}
+---@class LScrollBar
+LScrollBar = {}
 
 --- Returns the content size of this Scroll_Bar widget.
 ---@return number
-function Scroll_Bar:getContentSize() end
+function LScrollBar:getContentSize() end
 
 --- Returns the scroll position of this Scroll_Bar widget.
 ---@return number
-function Scroll_Bar:getScrollPosition() end
+function LScrollBar:getScrollPosition() end
 
 --- Returns the view size of this Scroll_Bar widget.
 ---@return number
-function Scroll_Bar:getViewSize() end
+function LScrollBar:getViewSize() end
 
 --- Returns true if vertical is enabled for this Scroll_Bar widget.
 ---@return boolean
-function Scroll_Bar:isVertical() end
+function LScrollBar:isVertical() end
 
 --- Sets the content size for this Scroll_Bar widget.
 ---@param v number
 ---@return nil
-function Scroll_Bar:setContentSize(v) end
+function LScrollBar:setContentSize(v) end
 
 --- Registers a callback invoked when this widget's value changes.
 ---@param fn function
 ---@return nil
-function Scroll_Bar:setOnChange(fn) end
+function LScrollBar:setOnChange(fn) end
 
 --- Sets the scroll position for this Scroll_Bar widget.
 ---@param v number
 ---@return nil
-function Scroll_Bar:setScrollPosition(v) end
+function LScrollBar:setScrollPosition(v) end
 
 --- Sets the view size for this Scroll_Bar widget.
 ---@param v number
 ---@return nil
-function Scroll_Bar:setViewSize(v) end
+function LScrollBar:setViewSize(v) end
 
 --- Adds ScrollPanel-specific methods.
----@class Scroll_Panel
-Scroll_Panel = {}
+---@class LScrollPanel
+LScrollPanel = {}
 
 --- Returns the content size of this Scroll_Panel widget.
 ---@return number
-function Scroll_Panel:getContentSize() end
+function LScrollPanel:getContentSize() end
 
 --- Returns the max scroll of this Scroll_Panel widget.
 ---@return number
-function Scroll_Panel:getMaxScroll() end
+function LScrollPanel:getMaxScroll() end
 
 --- Returns the scroll position of this Scroll_Panel widget.
 ---@return number
-function Scroll_Panel:getScrollPosition() end
+function LScrollPanel:getScrollPosition() end
 
 --- Returns the scroll speed of this Scroll_Panel widget.
 ---@return number
-function Scroll_Panel:getScrollSpeed() end
+function LScrollPanel:getScrollSpeed() end
 
 --- Sets the content size for this Scroll_Panel widget.
 ---@param w number
 ---@param h number
 ---@return nil
-function Scroll_Panel:setContentSize(w, h) end
+function LScrollPanel:setContentSize(w, h) end
 
 --- Sets the scroll position for this Scroll_Panel widget.
 ---@param x number
 ---@param y number
 ---@return nil
-function Scroll_Panel:setScrollPosition(x, y) end
+function LScrollPanel:setScrollPosition(x, y) end
 
 --- Sets the scroll speed for this Scroll_Panel widget.
 ---@param speed number
 ---@return nil
-function Scroll_Panel:setScrollSpeed(speed) end
+function LScrollPanel:setScrollSpeed(speed) end
 
 --- Adds Separator-specific methods.
----@class Separator
-Separator = {}
+---@class LSeparator
+LSeparator = {}
 
 --- Returns the thickness of this Separator widget.
 ---@return number
-function Separator:getThickness() end
+function LSeparator:getThickness() end
 
 --- Returns true if vertical is enabled for this Separator widget.
 ---@return boolean
-function Separator:isVertical() end
+function LSeparator:isVertical() end
 
 --- Sets the thickness for this Separator widget.
 ---@param thickness number
 ---@return nil
-function Separator:setThickness(thickness) end
+function LSeparator:setThickness(thickness) end
 
 --- Sets the vertical for this Separator widget.
 ---@param v boolean
 ---@return nil
-function Separator:setVertical(v) end
+function LSeparator:setVertical(v) end
 
 --- Adds Slider-specific methods to a widget table.
----@class Slider
-Slider = {}
+---@class LSlider
+LSlider = {}
 
 --- Returns the max of this Slider widget.
 ---@return number
-function Slider:getMax() end
+function LSlider:getMax() end
 
 --- Returns the min of this Slider widget.
 ---@return number
-function Slider:getMin() end
+function LSlider:getMin() end
 
 --- Returns the value of this Slider widget.
 ---@return number
-function Slider:getValue() end
+function LSlider:getValue() end
 
 --- Sets the range for this Slider widget.
 ---@param min number
 ---@param max number
 ---@return nil
-function Slider:setRange(min, max) end
+function LSlider:setRange(min, max) end
 
 --- Sets the step for this Slider widget.
 ---@param step number
 ---@return nil
-function Slider:setStep(step) end
+function LSlider:setStep(step) end
 
 --- Sets the value for this Slider widget.
 ---@param v number
 ---@return nil
-function Slider:setValue(v) end
+function LSlider:setValue(v) end
 
 --- Adds SpinBox-specific methods to a widget table.
----@class Spin_Box
-Spin_Box = {}
+---@class LSpinBox
+LSpinBox = {}
 
 --- Decrements the value by one step.
 ---@return nil
-function Spin_Box:decrement() end
+function LSpinBox:decrement() end
 
 --- Returns the current value of this SpinBox widget.
 ---@return number
-function Spin_Box:getValue() end
+function LSpinBox:getValue() end
 
 --- Increments the value by one step.
 ---@return nil
-function Spin_Box:increment() end
+function LSpinBox:increment() end
 
 --- Sets the valid range for this SpinBox widget.
 ---@param min number
 ---@param max number
 ---@return nil
-function Spin_Box:setRange(min, max) end
+function LSpinBox:setRange(min, max) end
 
 --- Sets the increment step for this SpinBox widget.
 ---@param step number
 ---@return nil
-function Spin_Box:setStep(step) end
+function LSpinBox:setStep(step) end
 
 --- Sets the value for this SpinBox widget.
 ---@param v number
 ---@return nil
-function Spin_Box:setValue(v) end
+function LSpinBox:setValue(v) end
 
 --- Adds SplitPanel-specific methods.
----@class Split_Panel
-Split_Panel = {}
+---@class LSplitPanel
+LSplitPanel = {}
 
 --- Returns the first child of this Split_Panel widget.
 ---@return nil
-function Split_Panel:getFirstChild() end
+function LSplitPanel:getFirstChild() end
 
 --- Returns the min panel size of this Split_Panel widget.
 ---@return number
-function Split_Panel:getMinPanelSize() end
+function LSplitPanel:getMinPanelSize() end
 
 --- Returns the orientation of this Split_Panel widget.
 ---@return string
-function Split_Panel:getOrientation() end
+function LSplitPanel:getOrientation() end
 
 --- Returns the second child of this Split_Panel widget.
 ---@return nil
-function Split_Panel:getSecondChild() end
+function LSplitPanel:getSecondChild() end
 
 --- Returns the split position of this Split_Panel widget.
 ---@return number
-function Split_Panel:getSplitPosition() end
+function LSplitPanel:getSplitPosition() end
 
 --- Sets the first child for this Split_Panel widget.
 ---@param child_idx integer
 ---@return nil
-function Split_Panel:setFirstChild(child_idx) end
+function LSplitPanel:setFirstChild(child_idx) end
 
 --- Sets the min panel size for this Split_Panel widget.
 ---@param v number
 ---@return nil
-function Split_Panel:setMinPanelSize(v) end
+function LSplitPanel:setMinPanelSize(v) end
 
 --- Sets the orientation for this Split_Panel widget.
 ---@param v string
 ---@return nil
-function Split_Panel:setOrientation(v) end
+function LSplitPanel:setOrientation(v) end
 
 --- Sets the second child for this Split_Panel widget.
 ---@param child_idx integer
 ---@return nil
-function Split_Panel:setSecondChild(child_idx) end
+function LSplitPanel:setSecondChild(child_idx) end
 
 --- Sets the split position for this Split_Panel widget.
 ---@param v number
 ---@return nil
-function Split_Panel:setSplitPosition(v) end
+function LSplitPanel:setSplitPosition(v) end
 
 --- Adds StatusBar-specific methods.
----@class Status_Bar
-Status_Bar = {}
+---@class LStatusBar
+LStatusBar = {}
 
 --- Adds a section entry to this Status_Bar widget.
 ---@param text string
 ---@param width? number
 ---@return nil
-function Status_Bar:addSection(text, width) end
+function LStatusBar:addSection(text, width) end
 
 --- Returns the section count of this Status_Bar widget.
 ---@return number
-function Status_Bar:getSectionCount() end
+function LStatusBar:getSectionCount() end
 
 --- Returns the section text of this Status_Bar widget.
 ---@param section_idx integer
 ---@return number
-function Status_Bar:getSectionText(section_idx) end
+function LStatusBar:getSectionText(section_idx) end
 
 --- Resizes the section list for this Status_Bar widget.
 ---@param count integer
 ---@return nil
-function Status_Bar:setSectionCount(count) end
+function LStatusBar:setSectionCount(count) end
 
 --- Sets the section text for this Status_Bar widget.
 ---@param section_idx integer
 ---@param text string
 ---@return nil
-function Status_Bar:setSectionText(section_idx, text) end
+function LStatusBar:setSectionText(section_idx, text) end
 
 --- Compatibility shim for assigning a widget to a section.
 ---@param section_idx integer
 ---@param widget any
 ---@return nil
-function Status_Bar:setSectionWidget(section_idx, widget) end
+function LStatusBar:setSectionWidget(section_idx, widget) end
 
 --- Adds Switch-specific methods to a widget table.
----@class Switch
-Switch = {}
+---@class LSwitch
+LSwitch = {}
 
 --- Returns the on/off state of this Switch widget.
 ---@return boolean
-function Switch:isOn() end
+function LSwitch:isOn() end
 
 --- Sets the on/off state of this Switch widget.
 ---@param on boolean
 ---@return nil
-function Switch:setOn(on) end
+function LSwitch:setOn(on) end
 
 --- Toggles the on/off state of this Switch widget.
 ---@return nil
-function Switch:toggle() end
+function LSwitch:toggle() end
 
 --- Adds TabBar-specific methods (1-based indices in Lua).
----@class Tab_Bar
-Tab_Bar = {}
+---@class LTabBar
+LTabBar = {}
 
 --- Adds a tab entry to this Tab_Bar widget.
 ---@param label string
 ---@return nil
-function Tab_Bar:addTab(label) end
+function LTabBar:addTab(label) end
 
 --- Returns the active tab of this Tab_Bar widget.
 ---@return number
-function Tab_Bar:getActiveTab() end
+function LTabBar:getActiveTab() end
 
 --- Returns the tab of this Tab_Bar widget.
 ---@param index integer
 ---@return number
-function Tab_Bar:getTab(index) end
+function LTabBar:getTab(index) end
 
 --- Returns the tab count of this Tab_Bar widget.
 ---@return number
-function Tab_Bar:getTabCount() end
+function LTabBar:getTabCount() end
 
 --- Removes the tab from this Tab_Bar widget.
 ---@param index integer
 ---@return nil
-function Tab_Bar:removeTab(index) end
+function LTabBar:removeTab(index) end
 
 --- Sets the active tab for this Tab_Bar widget.
 ---@param index integer
 ---@return nil
-function Tab_Bar:setActiveTab(index) end
+function LTabBar:setActiveTab(index) end
 
 --- Adds TextInput-specific methods to a widget table.
----@class Text_Input
-Text_Input = {}
+---@class LTextInput
+LTextInput = {}
 
 --- Returns the cursor position of this Text_Input widget.
 ---@return number
-function Text_Input:getCursorPosition() end
+function LTextInput:getCursorPosition() end
 
 --- Returns the placeholder of this Text_Input widget.
 ---@return string
-function Text_Input:getPlaceholder() end
+function LTextInput:getPlaceholder() end
 
 --- Returns the text of this Text_Input widget.
 ---@return string
-function Text_Input:getText() end
+function LTextInput:getText() end
 
 --- Returns true if focused is enabled for this Text_Input widget.
 ---@return boolean
-function Text_Input:isFocused() end
+function LTextInput:isFocused() end
 
 --- Sets the max length for this Text_Input widget.
 ---@param n integer
 ---@return nil
-function Text_Input:setMaxLength(n) end
+function LTextInput:setMaxLength(n) end
 
 --- Sets the placeholder for this Text_Input widget.
 ---@param text string
 ---@return nil
-function Text_Input:setPlaceholder(text) end
+function LTextInput:setPlaceholder(text) end
 
 --- Sets the text for this Text_Input widget.
 ---@param text string
 ---@return nil
-function Text_Input:setText(text) end
+function LTextInput:setText(text) end
 
 --- Lua-side wrapper around a GUI [`Theme`].
----@class Theme
-Theme = {}
+---@class LTheme
+LTheme = {}
 
 --- Sets a style for a (widget_type, state) pair.
 ---@param widgetType string
 ---@param state string
 ---@param style table
 ---@return nil
-function Theme:setStyle(widgetType, state, style) end
+function LTheme:setStyle(widgetType, state, style) end
+
+--- Returns the type name of this object.
+---@return string
+function LTheme:type() end
+
+--- Returns true if this object is of the given type.
+---@param name string
+---@return boolean
+function LTheme:typeOf(name) end
 
 --- Adds Toast-specific methods.
----@class Toast
-Toast = {}
+---@class LToast
+LToast = {}
 
 --- Returns the duration of this Toast widget.
 ---@return number
-function Toast:getDuration() end
+function LToast:getDuration() end
 
 --- Returns the message of this Toast widget.
 ---@return string
-function Toast:getMessage() end
+function LToast:getMessage() end
 
 --- Returns the progress of this Toast widget.
 ---@return number
-function Toast:getProgress() end
+function LToast:getProgress() end
 
 --- Returns true if expired is enabled for this Toast widget.
 ---@return boolean
-function Toast:isExpired() end
+function LToast:isExpired() end
 
 --- Sets the duration for this Toast widget.
 ---@param d number
 ---@return nil
-function Toast:setDuration(d) end
+function LToast:setDuration(d) end
 
 --- Sets the message for this Toast widget.
 ---@param msg string
 ---@return nil
-function Toast:setMessage(msg) end
+function LToast:setMessage(msg) end
 
 --- Adds Toolbar-specific methods.
----@class Toolbar
-Toolbar = {}
+---@class LToolbar
+LToolbar = {}
 
 --- Adds a button entry to this Toolbar widget.
 ---@param id string
 ---@param tooltip? string
 ---@return nil
-function Toolbar:addButton(id, tooltip) end
+function LToolbar:addButton(id, tooltip) end
 
 --- Adds a separator entry to this Toolbar widget.
 ---@return nil
-function Toolbar:addSeparator() end
+function LToolbar:addSeparator() end
 
 --- Adds a spacer entry to this Toolbar widget.
 ---@param size? number
 ---@return nil
-function Toolbar:addSpacer(size) end
+function LToolbar:addSpacer(size) end
 
 --- Returns the button of this Toolbar widget.
 ---@param id string
 ---@return boolean
-function Toolbar:getButton(id) end
+function LToolbar:getButton(id) end
 
 --- Returns the orientation of this Toolbar widget.
 ---@return string
-function Toolbar:getOrientation() end
+function LToolbar:getOrientation() end
 
 --- Returns true if button toggled is enabled for this Toolbar widget.
 ---@param id string
 ---@return boolean
-function Toolbar:isButtonToggled(id) end
+function LToolbar:isButtonToggled(id) end
 
 --- Sets the button enabled for this Toolbar widget.
 ---@param id string
 ---@param enabled boolean
 ---@return nil
-function Toolbar:setButtonEnabled(id, enabled) end
+function LToolbar:setButtonEnabled(id, enabled) end
 
 --- Sets the button toggled for this Toolbar widget.
 ---@param id string
 ---@param toggled boolean
 ---@return nil
-function Toolbar:setButtonToggled(id, toggled) end
+function LToolbar:setButtonToggled(id, toggled) end
 
 --- Sets the orientation for this Toolbar widget.
 ---@param v string
 ---@return nil
-function Toolbar:setOrientation(v) end
+function LToolbar:setOrientation(v) end
 
 --- Adds TooltipPanel-specific methods.
----@class Tooltip_Panel
-Tooltip_Panel = {}
+---@class LTooltipPanel
+LTooltipPanel = {}
 
 --- Returns the delay of this Tooltip_Panel widget.
 ---@return number
-function Tooltip_Panel:getDelay() end
+function LTooltipPanel:getDelay() end
 
 --- Returns the target of this Tooltip_Panel widget.
 ---@return nil
-function Tooltip_Panel:getTarget() end
+function LTooltipPanel:getTarget() end
 
 --- Returns the text of this Tooltip_Panel widget.
 ---@return string
-function Tooltip_Panel:getText() end
+function LTooltipPanel:getText() end
 
 --- Sets the delay for this Tooltip_Panel widget.
 ---@param v number
 ---@return nil
-function Tooltip_Panel:setDelay(v) end
+function LTooltipPanel:setDelay(v) end
 
 --- Sets the target for this Tooltip_Panel widget.
 ---@param target? integer
 ---@return nil
-function Tooltip_Panel:setTarget(target) end
+function LTooltipPanel:setTarget(target) end
 
 --- Sets the text for this Tooltip_Panel widget.
 ---@param text string
 ---@return nil
-function Tooltip_Panel:setText(text) end
+function LTooltipPanel:setText(text) end
 
 --- Adds TreeView-specific methods (1-based indices in Lua).
----@class Tree_View
-Tree_View = {}
+---@class LTreeView
+LTreeView = {}
 
 --- Adds a node entry to this Tree_View widget.
 ---@param text string
 ---@param parent_index? integer
 ---@return nil
-function Tree_View:addNode(text, parent_index) end
+function LTreeView:addNode(text, parent_index) end
 
 --- Clears all nodes entries from this Tree_View widget.
 ---@return nil
-function Tree_View:clearNodes() end
+function LTreeView:clearNodes() end
 
 --- Performs the collapse all operation on this Tree_View widget.
 ---@return nil
-function Tree_View:collapseAll() end
+function LTreeView:collapseAll() end
 
 --- Performs the collapse node operation on this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:collapseNode(index) end
+function LTreeView:collapseNode(index) end
 
 --- Performs the expand all operation on this Tree_View widget.
 ---@return nil
-function Tree_View:expandAll() end
+function LTreeView:expandAll() end
 
 --- Performs the expand node operation on this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:expandNode(index) end
+function LTreeView:expandNode(index) end
 
 --- Returns the child nodes of this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:getChildNodes(index) end
+function LTreeView:getChildNodes(index) end
 
 --- Returns the node count of this Tree_View widget.
 ---@return number
-function Tree_View:getNodeCount() end
+function LTreeView:getNodeCount() end
 
 --- Returns the node depth of this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:getNodeDepth(index) end
+function LTreeView:getNodeDepth(index) end
 
 --- Returns the node text of this Tree_View widget.
 ---@param index integer
 ---@return string
-function Tree_View:getNodeText(index) end
+function LTreeView:getNodeText(index) end
 
 --- Returns the parent node of this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:getParentNode(index) end
+function LTreeView:getParentNode(index) end
 
 --- Returns the selected node of this Tree_View widget.
 ---@return number
-function Tree_View:getSelectedNode() end
+function LTreeView:getSelectedNode() end
 
 --- Returns true if expanded is enabled for this Tree_View widget.
 ---@param index integer
 ---@return boolean
-function Tree_View:isExpanded(index) end
+function LTreeView:isExpanded(index) end
 
 --- Returns true if node expanded is enabled for this Tree_View widget.
 ---@param index integer
 ---@return boolean
-function Tree_View:isNodeExpanded(index) end
+function LTreeView:isNodeExpanded(index) end
 
 --- Removes the node from this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:removeNode(index) end
+function LTreeView:removeNode(index) end
 
 --- Sets the node icon for this Tree_View widget.
 ---@param index integer
 ---@param icon string
 ---@return nil
-function Tree_View:setNodeIcon(index, icon) end
+function LTreeView:setNodeIcon(index, icon) end
 
 --- Sets the node text for this Tree_View widget.
 ---@param index integer
 ---@param text string
 ---@return nil
-function Tree_View:setNodeText(index, text) end
+function LTreeView:setNodeText(index, text) end
 
 --- Sets the selected node for this Tree_View widget.
 ---@param index integer
 ---@return nil
-function Tree_View:setSelectedNode(index) end
+function LTreeView:setSelectedNode(index) end
 
 --- Toggles the expanded/collapsed status of a Tree_View node.
 ---@param index integer
 ---@return nil
-function Tree_View:toggleNode(index) end
+function LTreeView:toggleNode(index) end
 
 --- Adds a child widget to this container.
 ---@param child table|integer
@@ -21654,8 +23115,6 @@ lurek.ui.getWidgetCount = function() end
 ---@return number
 lurek.ui.getZOrder = function() end
 
-lurek.ui.isDefaultPrevented = function() end
-
 --- Returns whether the widget is enabled.
 ---@return boolean
 lurek.ui.isEnabled = function() end
@@ -21668,12 +23127,6 @@ lurek.ui.isVisible = function() end
 ---@param key string
 ---@return boolean
 lurek.ui.keypressed = function(key) end
-
---- Placeholder for future sandboxed document loading.
----@param path string
----@param opts? table
----@return HtmlDocument
-lurek.ui.loadDocument = function(path, opts) end
 
 --- Load a widget tree from a Lua table definition and attach it to the UI
 ---@param def table
@@ -21755,12 +23208,6 @@ lurek.ui.newDialog = function(title) end
 --- Creates and returns a new docking panel that arranges children along its edges.
 ---@return table
 lurek.ui.newDockPanel = function() end
-
---- Creates a detached HTML document from markup and optional CSS/viewport options.
----@param html? string
----@param opts? table
----@return HtmlDocument
-lurek.ui.newDocument = function(html, opts) end
 
 --- Creates an image display widget.
 ---@return table
@@ -21916,8 +23363,6 @@ lurek.ui.newWindow = function(title) end
 ---@return string
 lurek.ui.parseWidgetState = function(state) end
 
-lurek.ui.preventDefault = function() end
-
 --- Removes a child widget from this container.
 ---@param child table|integer
 ---@return nil
@@ -22068,17 +23513,19 @@ lurek.ui.slideIn = function(x, y) end
 ---@param y number
 lurek.ui.slideOut = function(x, y) end
 
-lurek.ui.stopPropagation = function() end
-
---- Returns whether the active HTML facade supports a named feature.
----@param feature string
----@return boolean
-lurek.ui.supports = function(feature) end
-
 --- Forwards text input to the focused text input widget.
 ---@param text string
 ---@return boolean
 lurek.ui.textinput = function(text) end
+
+--- Returns the Lua type name of this widget (e.g. "LButton").
+---@return string
+lurek.ui.type = function() end
+
+--- Returns true if this widget is of the given type, "LWidget", or "Object".
+---@param name string
+---@return boolean
+lurek.ui.typeOf = function(name) end
 
 --- Removes the data-binding key from this widget.
 ---@return nil

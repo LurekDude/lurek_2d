@@ -4,28 +4,26 @@ Full-featured IDE support for the [Lurek2D](https://github.com/lurek2d/lurek2d) 
 
 ## Overview
 
-Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts. This extension turns VS Code into the primary development environment for Lurek2D games with **126 commands**, covering IntelliSense, debugging, testing, build/run, visual editors, and AI-assisted development.
+Lurek2D is a 2D game engine written in Rust that loads and executes Lua game scripts. This extension turns VS Code into the primary development environment for Lurek2D games with **85 commands**, covering Lurek-specific diagnostics, type inference, CodeLens markers, debugging, testing, build/run, visual editors, and AI-assisted development.
+
+> **Works alongside sumneko.lua (Lua Language Server)** — this extension adds only Lurek-unique features (engine API diagnostics, factory-type inference, callback markers, asset path completion). General Lua features (completion, hover, signature help, symbol outline, find references, rename, formatting, folding, LuaCATS) are handled by sumneko.lua to avoid duplication.
 
 ## Features
 
-### IntelliSense
+### Lurek-Specific IntelliSense (what this extension adds)
 
-- **778+ API completions** - Full `lurek.*` namespace with parameter types, descriptions, and return values
-- **Hover documentation** - Inline docs for every `lurek.*` function with signatures and examples
-- **Signature help** - Parameter hints as you type function arguments
-- **Go to definition** - Navigate to `lurek.*` API virtual definitions
-- **Find references** - Locate all usages of functions and variables
-- **Symbol outline** - Document symbols for functions, callbacks, and locals
-- **Semantic highlighting** - Color-coded `lurek.*` API calls, callbacks, and deprecated functions
-- **Inlay hints** - Inline type annotations for `lurek.*` return values
-- **Code lens** - Quick links on `lurek.*` callbacks (load, update, draw, etc.)
-- **Diagnostics** - Warns about unknown `lurek.*` functions, deprecated APIs, missing callbacks
-- **Code actions** - Quick fixes for common issues, missing scaffolding, color picker integration
-- **Rename symbol** - Safe rename across the project (guards `lurek.*` API names)
-- **LuaJIT hints** - Warns about LuaJIT-specific pitfalls (64-bit integers, goto scoping, etc.)
-- **Type inference** - Infers return types from `lurek.*` constructors (newImage, newBody, etc.)
-- **LuaCATS support** - Parses `---@class`, `---@param`, `---@return` annotations for user types
-- **Asset path completion** - Autocomplete file paths in `lurek.renders.newImage()` and similar
+- **4000+ lurek.* API items** — 1201 module functions and 2960 class methods across 50 modules and 223 types (e.g. `Body`, `Image`, `World`, `Card`, `Entity`)
+- **Type inference** — Tracks `local img = lurek.graphics.newImage(...)` and suggests `Image` methods on `img:` — works even for module aliases (`local gfx = lurek.graphics`)
+- **Go to definition** — Navigate to `lurek.*` virtual API definitions
+- **Semantic highlighting** — Color-codes `lurek.*` calls, callbacks (⚡), deprecated functions distinctly from generic Lua
+- **Inlay hints** — Inline type annotations for `lurek.*` return values
+- **13 Lurek diagnostic rules** — Warns about deprecated APIs, wrong enum values, per-frame allocations, missing `lurek.load` callback, incorrect conf.lua fields, thread RNG misuse, and more
+- **Code actions** — Quick fixes for Lurek-specific issues: missing scaffold, color picker integration
+- **CodeLens markers** — ⚡ callbacks, ▶ test functions, 📦 library files, 🎮 demo files, 📖 examples, 🧪 test files
+- **LuaJIT hints** — Warns about LuaJIT pitfalls (64-bit integers, goto scoping, bitwise ops)
+- **Asset path completion** — Autocompletes file paths in `lurek.graphics.newImage()` and similar
+
+> **Note:** General Lua features (completion, hover, signature help, symbol outline, find references, rename, formatting, folding, LuaCATS `---@class`/`---@param`) are provided by **sumneko.lua / Lua Language Server**. This extension deliberately does not duplicate those to avoid double completions and conflicting hover popups.
 
 ### Debugging (16 commands)
 
@@ -84,7 +82,7 @@ cd extensions/vscode
 npm install
 node esbuild.config.mjs --production
 npx @vscode/vsce package --no-dependencies
-code --install-extension lurek2d-toolkit-0.9.0.vsix
+code --install-extension lurek2d-toolkit-1.0.0.vsix
 ```
 
 ### From Source (Development)

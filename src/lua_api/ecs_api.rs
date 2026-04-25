@@ -735,6 +735,19 @@ impl LuaUserData for LuaUniverse {
                 Ok(this.inner.borrow().relationships.has_link(from, &name, to))
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LUniverse"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LUniverse" || name == "Object")
+        });
     }
 }
 

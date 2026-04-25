@@ -238,7 +238,7 @@ impl LuaUserData for LuaSignal {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Signal"));
+        methods.add_method("type", |_, _, ()| Ok("LSignal"));
 
         // -- typeOf --
         /// Returns true if the given type name matches this object's type or any parent type.

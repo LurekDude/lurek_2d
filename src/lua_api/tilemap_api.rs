@@ -285,6 +285,19 @@ impl LuaUserData for LuaTileSet {
                     .map(|id| id + 1))
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTileSet"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTileSet" || name == "Object")
+        });
     }
 }
 
@@ -940,6 +953,19 @@ impl LuaUserData for LuaTileMap {
                 Ok(())
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTileMap"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTileMap" || name == "Object")
+        });
     }
 }
 
@@ -1044,6 +1070,19 @@ impl LuaUserData for LuaAutoTileSheet {
             }
             let r = this.inner.borrow().get_quad(tile_id - 1);
             Ok((r.x, r.y, r.width, r.height))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAutoTileSheet"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAutoTileSheet" || name == "Object")
         });
     }
 }
@@ -1183,6 +1222,19 @@ impl LuaUserData for LuaChunkMap {
         methods.add_method("chunkTileRange", |_, this, (cx, cy): (i32, i32)| {
             let (x0, y0, x1, y1) = this.inner.borrow().chunk_tile_range(cx, cy);
             Ok((x0, y0, x1, y1))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LChunkMap"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LChunkMap" || name == "Object")
         });
     }
 }
@@ -1362,6 +1414,19 @@ impl LuaUserData for LuaLargeMapRenderer {
         /// @return integer
         methods.add_method("getTilesetColumns", |_, this, ()| {
             Ok(this.inner.borrow().get_tileset_columns())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LLargeMapRenderer"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LLargeMapRenderer" || name == "Object")
         });
     }
 }
@@ -1551,6 +1616,19 @@ impl LuaUserData for LuaIsoMap {
                 .set_part_order(order)
                 .map_err(LuaError::external)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LIsoMap"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LIsoMap" || name == "Object")
+        });
     }
 }
 
@@ -1701,6 +1779,19 @@ impl LuaUserData for LuaMapBlock {
         methods.add_method("getWeight", |_, this, ()| {
             Ok(this.inner.borrow().get_weight())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMapBlock"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMapBlock" || name == "Object")
+        });
     }
 }
 
@@ -1768,6 +1859,19 @@ impl LuaUserData for LuaMapGroup {
         /// @return integer
         methods.add_method("getScriptCount", |_, this, ()| {
             Ok(this.inner.borrow().get_script_count())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMapGroup"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMapGroup" || name == "Object")
         });
     }
 }
@@ -1865,6 +1969,19 @@ impl LuaUserData for LuaMapScript {
             this.inner.borrow_mut().add_step(step);
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMapScript"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMapScript" || name == "Object")
+        });
     }
 }
 
@@ -1909,6 +2026,19 @@ impl LuaUserData for LuaMapGen {
                 })
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMapGen"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMapGen" || name == "Object")
+        });
     }
 }
 

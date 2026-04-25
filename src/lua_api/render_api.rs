@@ -143,7 +143,7 @@ impl LuaUserData for LuaImageData {
 
         /// Returns the type name "ImageData".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ImageData"));
+        methods.add_method("type", |_, _, ()| Ok("LImageData"));
         /// Returns true when the given name matches "ImageData" or a parent type.
         /// @param name : string
         /// @return boolean
@@ -200,7 +200,7 @@ impl LuaUserData for LuaNineSlice {
         );
         /// Returns the type name "NineSlice".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("NineSlice"));
+        methods.add_method("type", |_, _, ()| Ok("LNineSlice"));
         /// Returns true when the given name matches "NineSlice" or a parent type.
         /// @param name : string
         /// @return boolean
@@ -267,7 +267,7 @@ impl LuaUserData for LuaImage {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Image"));
+        methods.add_method("type", |_, _, ()| Ok("LImage"));
     }
 }
 
@@ -408,7 +408,7 @@ impl LuaUserData for LuaFont {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Font"));
+        methods.add_method("type", |_, _, ()| Ok("LFont"));
     }
 }
 
@@ -488,7 +488,7 @@ impl LuaUserData for LuaCanvas {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Canvas"));
+        methods.add_method("type", |_, _, ()| Ok("LCanvas"));
     }
 }
 
@@ -605,7 +605,7 @@ impl LuaUserData for LuaSpriteBatch {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("SpriteBatch"));
+        methods.add_method("type", |_, _, ()| Ok("LSpriteBatch"));
     }
 }
 
@@ -720,7 +720,7 @@ impl LuaUserData for LuaMesh {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Mesh"));
+        methods.add_method("type", |_, _, ()| Ok("LMesh"));
     }
 }
 
@@ -793,7 +793,7 @@ impl LuaUserData for LuaShader {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Shader"));
+        methods.add_method("type", |_, _, ()| Ok("LShader"));
     }
 }
 
@@ -868,7 +868,7 @@ impl LuaUserData for LuaQuad {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Quad"));
+        methods.add_method("type", |_, _, ()| Ok("LQuad"));
     }
 }
 
@@ -1321,7 +1321,7 @@ impl LuaUserData for LuaShape {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Shape"));
+        methods.add_method("type", |_, _, ()| Ok("LShape"));
     }
 }
 
@@ -1375,7 +1375,7 @@ impl LuaUserData for LuaDrawLayer {
 
         /// Returns the string type identifier of this draw layer (e.g. `'sprite'`).
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("DrawLayer"));
+        methods.add_method("type", |_, _, ()| Ok("LDrawLayer"));
 
         /// Returns true if this object is an instance of the given type name.
         /// @param name : string

@@ -243,6 +243,12 @@ Doll = {}
 ---@class DollTemplate
 DollTemplate = {}
 
+---@class LCard
+LCard = {}
+
+---@class LCardStack
+LCardStack = {}
+
 ---@class ModifierEntry
 ModifierEntry = {}
 
@@ -718,7 +724,7 @@ library.cardgame.HistoryAction = {}
 ---@return number
 function library.cardgame.getIdCounter() end
 
---- Reset the ID counter to 1.  Call between game sessions to reclaim the integer range.  Does NOT invalidate already-created cards — callers must ensure no stale references remain.
+--- Reset the ID counter to 1.  Call between game sessions to reclaim the integer range.  Does NOT invalidate already-created cards � callers must ensure no stale references remain.
 ---@return nil
 function library.cardgame.resetIdCounter() end
 
@@ -748,7 +754,7 @@ function library.cardgame.newCardTypeDef(name) end
 
 --- Create a new card instance.  Seeds fields from the registry if the type is defined.  Each card receives a unique auto-incrementing integer ID. Card fields:
 ---@param card_type string
----@return Card
+---@return LCard
 function library.cardgame.newCard(card_type) end
 
 --- Return the numeric stat value for key, or 0 if not set.
@@ -866,13 +872,13 @@ function Card:getTilePosition() end
 
 --- Create a new unbounded Stack. Stack fields:
 ---@param name string
----@return Stack
+---@return LCardStack
 function library.cardgame.newStack(name) end
 
 --- Create a new Stack with a fixed capacity limit.
 ---@param name string
 ---@param cap number
----@return Stack
+---@return LCardStack
 function library.cardgame.newStackWithCapacity(name, cap) end
 
 --- Return the number of cards.
@@ -897,21 +903,21 @@ function Stack:capacity() end
 function Stack:setCapacity(cap) end
 
 --- Push a card onto the top of the stack; returns false when full.
----@param card Card
+---@param card LCard
 ---@return boolean
 function Stack:pushTop(card) end
 
 --- Push a card onto the bottom of the stack; returns false when full.
----@param card Card
+---@param card LCard
 ---@return boolean
 function Stack:pushBottom(card) end
 
 --- Remove and return the top card, or nil if empty.
----@return Card|nil
+---@return LCard|nil
 function Stack:popTop() end
 
 --- Remove and return the bottom card, or nil if empty.
----@return Card|nil
+---@return LCard|nil
 function Stack:popBottom() end
 
 --- Pop up to n cards from the top and return them.
@@ -920,27 +926,27 @@ function Stack:popBottom() end
 function Stack:popMany(n) end
 
 --- Return the top card without removing it.
----@return Card|nil
+---@return LCard|nil
 function Stack:peekTop() end
 
 --- Return the bottom card without removing it.
----@return Card|nil
+---@return LCard|nil
 function Stack:peekBottom() end
 
 --- Return the card at the given 1-based index without removing it.
 ---@param idx number
----@return Card|nil
+---@return LCard|nil
 function Stack:peekAt(idx) end
 
 --- Insert card at position idx (1-based, clamped); returns false when full.
 ---@param idx number
----@param card Card
+---@param card LCard
 ---@return boolean
 function Stack:insertAt(idx, card) end
 
 --- Remove and return the card at 1-based position idx, or nil if out of range.
 ---@param idx number
----@return Card|nil
+---@return LCard|nil
 function Stack:removeAt(idx) end
 
 --- Move a card from one 1-based index to another within the same stack.
@@ -995,7 +1001,7 @@ function Stack:findByTagAll(tag) end
 
 --- Remove and return the Card with the given id, or nil if not found.
 ---@param id number
----@return Card|nil
+---@return LCard|nil
 function Stack:removeById(id) end
 
 --- Return true if a card with the given id is in the stack.
@@ -1114,26 +1120,26 @@ function Slot:capacity() end
 function Slot:setCapacity(cap) end
 
 --- Push a card into the slot; returns true on success, false+error when full.
----@param card Card
+---@param card LCard
 ---@return boolean
 function Slot:push(card) end
 
 --- Remove and return the last pushed card, or nil if empty.
----@return Card|nil
+---@return LCard|nil
 function Slot:pop() end
 
 --- Remove and return the item at 1-based index, or nil if out of range.
 ---@param idx number
----@return Card|nil
+---@return LCard|nil
 function Slot:removeAt(idx) end
 
 --- Return the last pushed item without removing it.
----@return Card|nil
+---@return LCard|nil
 function Slot:peek() end
 
 --- Return the item at 1-based index without removing it.
 ---@param idx number
----@return Card|nil
+---@return LCard|nil
 function Slot:peekAt(idx) end
 
 --- Clear all items and return them.
@@ -1245,7 +1251,7 @@ function library.cardgame.newStackManager() end
 
 --- Register an existing stack under a name.
 ---@param name string
----@param stack Stack
+---@param stack LCardStack
 ---@return nil
 function StackManager:addStack(name, stack) end
 
@@ -1262,7 +1268,7 @@ function StackManager:createStackCapped(name, cap) end
 
 --- Deregister and return a stack, or nil if not found.
 ---@param name string
----@return Stack|nil
+---@return LCardStack|nil
 function StackManager:removeStack(name) end
 
 --- Return true if a stack with the given name is registered.
@@ -1272,7 +1278,7 @@ function StackManager:hasStack(name) end
 
 --- Return the registered Stack, or nil if not found.
 ---@param name string
----@return Stack|nil
+---@return LCardStack|nil
 function StackManager:getStack(name) end
 
 --- Return a sorted list of all registered stack names.
@@ -1287,20 +1293,20 @@ function StackManager:totalItems() end
 ---@param from_name string
 ---@param idx number
 ---@param to_name string
----@return Card|nil
+---@return LCard|nil
 function StackManager:moveItem(from_name, idx, to_name) end
 
 --- Move the first card of a given type from one stack to another.
 ---@param from_name string
 ---@param card_type string
 ---@param to_name string
----@return Card|nil
+---@return LCard|nil
 function StackManager:moveItemByType(from_name, card_type, to_name) end
 
 --- Move the top card from one stack to another.
 ---@param from_name string
 ---@param to_name string
----@return Card|nil
+---@return LCard|nil
 function StackManager:moveTop(from_name, to_name) end
 
 --- Create a new build entry for use with DeckBuilder.
@@ -1367,17 +1373,17 @@ function DeckBuilder:addRequiredCategory(cat, min_count, max_count) end
 function DeckBuilder:validateEntries() end
 
 --- Validate an already-built Stack against size constraints.
----@param stack Stack
+---@param stack LCardStack
 ---@return table
 function DeckBuilder:validateStack(stack) end
 
 --- Build and return a Stack using the builder's own name.
----@return Stack
+---@return LCardStack
 function DeckBuilder:build() end
 
 --- Build and return a Stack with a custom name.
 ---@param stack_name string
----@return Stack
+---@return LCardStack
 function DeckBuilder:buildNamed(stack_name) end
 
 --- Create a Pushed action recording which card was pushed.
@@ -1542,7 +1548,7 @@ function library.cardgame.sortedIndicesByStat(items, stat) end
 ---@return table
 function library.cardgame.sortedIndicesByCategory(items) end
 
---- Group 1-based indices of items by the integer value of a named stat. Returns a map of stat_value (floored to integer) Ôćĺ array of 1-based indices.
+--- Group 1-based indices of items by the integer value of a named stat. Returns a map of stat_value (floored to integer) ��� array of 1-based indices.
 ---@param items table
 ---@param stat string
 ---@return table

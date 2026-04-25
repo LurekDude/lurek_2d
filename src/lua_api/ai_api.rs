@@ -181,7 +181,7 @@ impl LuaUserData for LuaAIWorld {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("AIWorld"));
+        methods.add_method("type", |_, _, ()| Ok("LAIWorld"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -432,7 +432,7 @@ impl LuaUserData for LuaAgent {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Agent"));
+        methods.add_method("type", |_, _, ()| Ok("LAgent"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -568,7 +568,7 @@ impl LuaUserData for LuaAIBlackboard {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("AIBlackboard"));
+        methods.add_method("type", |_, _, ()| Ok("LAIBlackboard"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -669,7 +669,7 @@ impl LuaUserData for LuaStateMachine {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("StateMachine"));
+        methods.add_method("type", |_, _, ()| Ok("LStateMachine"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -732,7 +732,7 @@ impl LuaUserData for LuaBehaviorTree {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("BehaviorTree"));
+        methods.add_method("type", |_, _, ()| Ok("LBehaviorTree"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -905,7 +905,7 @@ impl LuaUserData for LuaBTNode {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("BTNode"));
+        methods.add_method("type", |_, _, ()| Ok("LBTNode"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1132,7 +1132,7 @@ impl LuaUserData for LuaSteeringManager {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("SteeringManager"));
+        methods.add_method("type", |_, _, ()| Ok("LSteeringManager"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1431,7 +1431,7 @@ impl LuaUserData for LuaQLearner {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("QLearner"));
+        methods.add_method("type", |_, _, ()| Ok("LQLearner"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1584,7 +1584,7 @@ impl LuaUserData for LuaUtilityAI {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("UtilityAI"));
+        methods.add_method("type", |_, _, ()| Ok("LUtilityAI"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1753,7 +1753,7 @@ impl LuaUserData for LuaGOAPPlanner {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("GOAPPlanner"));
+        methods.add_method("type", |_, _, ()| Ok("LGOAPPlanner"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1964,7 +1964,7 @@ impl LuaUserData for LuaInfluenceMap {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("InfluenceMap"));
+        methods.add_method("type", |_, _, ()| Ok("LInfluenceMap"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -2108,7 +2108,7 @@ impl LuaUserData for LuaSquad {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Squad"));
+        methods.add_method("type", |_, _, ()| Ok("LSquad"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -2242,7 +2242,7 @@ impl LuaUserData for LuaCommandQueue {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("CommandQueue"));
+        methods.add_method("type", |_, _, ()| Ok("LCommandQueue"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -2339,6 +2339,19 @@ impl LuaUserData for LuaTraitProfile {
         methods.add_method("archetype", |_, this, ()| {
             Ok(this.inner.borrow().archetype().map(|s| s.to_string()))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTraitProfile"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTraitProfile" || name == "Object")
+        });
     }
 }
 
@@ -2424,6 +2437,19 @@ impl LuaUserData for LuaStimulusWorld {
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.borrow_mut().clear();
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LStimulusWorld"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LStimulusWorld" || name == "Object")
         });
     }
 }
@@ -2521,6 +2547,19 @@ impl LuaUserData for LuaContextSteering {
         methods.add_method("slotCount", |_, this, ()| {
             Ok(this.inner.borrow().slot_count() as i64)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LContextSteering"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LContextSteering" || name == "Object")
+        });
     }
 }
 
@@ -2573,6 +2612,19 @@ impl LuaUserData for LuaNeedSystem {
         /// @return number
         methods.add_method("valueOf", |_, this, name: String| {
             Ok(this.inner.borrow().value_of(&name))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNeedSystem"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNeedSystem" || name == "Object")
         });
     }
 }
@@ -2644,6 +2696,19 @@ impl LuaUserData for LuaAIDirector {
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAIDirector"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAIDirector" || name == "Object")
         });
     }
 }
@@ -2733,6 +2798,19 @@ impl LuaUserData for LuaHTNDomain {
         methods.add_method("taskCount", |_, this, ()| {
             Ok(this.inner.borrow().task_count() as i64)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LHTNDomain"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LHTNDomain" || name == "Object")
+        });
     }
 }
 
@@ -2779,6 +2857,19 @@ impl LuaUserData for LuaMCTSEngine {
                 Ok(result.map(|a| a as i64))
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LMCTSEngine"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LMCTSEngine" || name == "Object")
+        });
     }
 }
 
@@ -2850,6 +2941,19 @@ impl LuaUserData for LuaEmotionModel {
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LEmotionModel"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LEmotionModel" || name == "Object")
         });
     }
 }
@@ -2933,6 +3037,19 @@ impl LuaUserData for LuaORCASolver {
         methods.add_method("agentCount", |_, this, ()| {
             Ok(this.inner.borrow().agent_count() as i64)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LORCASolver"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LORCASolver" || name == "Object")
+        });
     }
 }
 
@@ -3000,6 +3117,19 @@ impl LuaUserData for LuaNeuralNet {
         /// @return integer
         methods.add_method("layerCount", |_, this, ()| {
             Ok(this.inner.borrow().layer_count() as i64)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNeuralNet"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNeuralNet" || name == "Object")
         });
     }
 }
@@ -3070,6 +3200,19 @@ impl LuaUserData for LuaGeneticAlgorithm {
             }
             Ok(t)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LGeneticAlgorithm"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LGeneticAlgorithm" || name == "Object")
+        });
     }
 }
 
@@ -3121,6 +3264,19 @@ impl LuaUserData for LuaBandit {
         /// @return integer
         methods.add_method("totalPulls", |_, this, ()| {
             Ok(this.inner.borrow().total_pulls as i64)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LBandit"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LBandit" || name == "Object")
         });
     }
 }
@@ -3188,6 +3344,19 @@ impl LuaUserData for LuaNeuroevolution {
         /// @return integer
         methods.add_method("generation", |_, this, ()| {
             Ok(this.inner.borrow().generation as i64)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LNeuroevolution"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNeuroevolution" || name == "Object")
         });
     }
 }
@@ -3258,6 +3427,19 @@ impl LuaUserData for LuaStrategyAI {
         methods.add_method("timeUntilNext", |_, this, ()| {
             Ok(this.inner.borrow().time_until_next())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LStrategyAI"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LStrategyAI" || name == "Object")
+        });
     }
 }
 
@@ -3303,6 +3485,19 @@ impl LuaUserData for LuaAILod {
         /// @return string
         methods.add_method("tierName", |_, this, tier: usize| {
             Ok(this.inner.borrow().tier(tier).map(|t| t.name.clone()))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LAILod"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LAILod" || name == "Object")
         });
     }
 }

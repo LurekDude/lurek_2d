@@ -16,7 +16,7 @@ import json, re, sys
 from pathlib import Path
 
 ROOT = Path('.').resolve()
-API_JSON = ROOT / 'logs' / 'lua_api_data.json'
+API_JSON = ROOT / 'logs' / 'data' / 'lua_api_data.json'
 EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
 try:

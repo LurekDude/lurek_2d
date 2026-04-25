@@ -405,6 +405,19 @@ impl LuaUserData for LuaSource {
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getFadeIn")?;
             Ok(st.mixer.get_fade_in(key))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSource"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSource" || name == "Object")
+        });
     }
 }
 
@@ -512,7 +525,7 @@ impl LuaUserData for LuaBus {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("Bus"));
+        methods.add_method("type", |_, _, ()| Ok("LBus"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1040,7 +1053,7 @@ impl LuaUserData for LuaMidiPlayer {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("MidiPlayer"));
+        methods.add_method("type", |_, _, ()| Ok("LMidiPlayer"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
@@ -1142,7 +1155,7 @@ impl LuaUserData for LuaSoundPool {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _this, ()| Ok("SoundPool"));
+        methods.add_method("type", |_, _this, ()| Ok("LSoundPool"));
 
         // -- typeOf --
         /// Returns true if the type name matches.
@@ -1231,6 +1244,19 @@ impl LuaUserData for LuaDecoder {
         /// Releases the decoder (no-op).
         /// @return nil
         methods.add_method("release", |_, _, ()| Ok(()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LDecoder"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LDecoder" || name == "Object")
+        });
     }
 }
 
@@ -2989,6 +3015,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 
+/// Decoded PCM audio buffer that can be created from a file or synthesised sample-by-sample.
 impl mlua::UserData for SoundData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
         // â”€â”€ getSampleCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -2996,7 +3023,7 @@ impl mlua::UserData for SoundData {
         /// @return integer
         methods.add_method("getSampleCount", |_, this, ()| Ok(this.sample_count()));
         // â”€â”€ getSampleRate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Get the sample rate.
+        /// Returns the sample rate of this audio buffer in Hz (e.g. 44100 or 48000).
         /// @return integer
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.sample_rate()));
         // â”€â”€ getChannelCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -3008,7 +3035,7 @@ impl mlua::UserData for SoundData {
         /// @return number
         methods.add_method("getDuration", |_, this, ()| Ok(this.duration()));
         // â”€â”€ getBitDepth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Get the bit depth.
+        /// Returns the bit depth of this audio buffer (typically 16 or 32 bits per sample).
         /// @return integer
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.bit_depth()));
         // â”€â”€ getSample â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

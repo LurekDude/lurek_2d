@@ -300,20 +300,50 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
 
     result: Dict[str, str] = {}
 
+    userdata_impl_re = re.compile(
+        r"impl(?:<[^>]*>)?\s+(?:(?:\w+::)*(?:LuaUserData|UserData))\s+for\s+(\w+)"
+    )
+
+    # Pass 0: extract canonical Lua type names from add_method("type", ...) declarations.
+    # These are the authoritative names the user sees from obj:type().
+    type_returns: Dict[str, str] = {}  # struct_name -> lua_type_name
+    type_ret_re = re.compile(r'add_method\("type",\s*\|[^|]*\|\s*Ok\("(\w+)"(?:\.to_string\(\))?\)')
+    current_struct: Optional[str] = None
+    brace_depth = 0
+    for line in lines:
+        impl_m = userdata_impl_re.search(line)
+        if impl_m and "{" in line:
+            current_struct = impl_m.group(1)
+            brace_depth = line.count("{") - line.count("}")
+            continue
+        if current_struct:
+            brace_depth += line.count("{") - line.count("}")
+            if brace_depth <= 0:
+                current_struct = None
+                brace_depth = 0
+                continue
+            tm = type_ret_re.search(line)
+            if tm:
+                type_returns[current_struct] = tm.group(1)
+
+    def _canonical_name(struct_name: str) -> str:
+        """Return the Lua-visible class name for a Rust struct."""
+        if struct_name in type_returns:
+            return type_returns[struct_name]
+        if struct_name.startswith("Lua"):
+            return "L" + struct_name[3:]
+        return "L" + struct_name  # non-Lua-prefixed userdata gets L prefix
+
     # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority — struct-level docs)
     for i, line in enumerate(lines):
         m = re.match(r"\s*(?:pub(?:\([^)]*\))?\s+)?struct (Lua\w+)", line)
         if not m:
             continue
         struct_name = m.group(1)
-        class_name = struct_name[3:] if struct_name.startswith("Lua") else struct_name
+        class_name = _canonical_name(struct_name)
         desc = _collect_doc_above(lines, i)
         if desc:
             result[class_name] = desc
-
-    userdata_impl_re = re.compile(
-        r"impl(?:<[^>]*>)?\s+(?:(?:\w+::)*(?:LuaUserData|UserData))\s+for\s+(\w+)"
-    )
 
     # Pass 2: impl LuaUserData for Xxx (fallback for types defined in other src/ files)
     for i, line in enumerate(lines):
@@ -321,7 +351,7 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         if not m:
             continue
         struct_name = m.group(1)
-        class_name = struct_name[3:] if struct_name.startswith("Lua") else struct_name
+        class_name = _canonical_name(struct_name)
         if class_name in result:
             continue  # already found via pub struct
         desc = _collect_doc_above(lines, i)
@@ -334,7 +364,8 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         if not m:
             continue
         raw_name = m.group(1)  # e.g. "accordion", "gui_window"
-        class_name = raw_name.title()  # "Accordion", "Gui_Window"
+        # camelCase with L prefix: "text_input" -> "LTextInput"
+        class_name = "L" + "".join(p.capitalize() for p in raw_name.split("_"))
         if class_name in result:
             continue  # already found via struct or impl
         desc = _collect_doc_above(lines, i)
@@ -539,6 +570,41 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 type_names[c_struct] = m2.group(1)
                 c_struct = None
 
+    # Build a map from Rust struct name -> Lua type name via add_method("type", ...) return values.
+    # This gives the canonical L-prefix name for every userdata type, including non-Lua-prefixed structs.
+    _type_ret_re2 = re.compile(r'add_method\("type",\s*\|[^|]*\|\s*Ok\("(\w+)"(?:\.to_string\(\))?\)')
+    _ud_impl_re2 = re.compile(
+        r"impl(?:<[^>]*>)?\s+(?:(?:\w+::)*(?:LuaUserData|UserData))\s+for\s+(\w+)"
+    )
+    type_returns: Dict[str, str] = {}  # struct_name -> lua_type_name (from type() method)
+    _cur_s: Optional[str] = None
+    _bd = 0
+    for _l in lines:
+        _im = _ud_impl_re2.search(_l)
+        if _im and "{" in _l:
+            _cur_s = _im.group(1)
+            _bd = _l.count("{") - _l.count("}")
+            continue
+        if _cur_s:
+            _bd += _l.count("{") - _l.count("}")
+            if _bd <= 0:
+                _cur_s = None
+                _bd = 0
+                continue
+            _tm = _type_ret_re2.search(_l)
+            if _tm:
+                type_returns[_cur_s] = _tm.group(1)
+
+    def _display_name(struct_name: str) -> str:
+        """Return the canonical Lua-visible class name for a Rust struct."""
+        if struct_name in type_returns:
+            return type_returns[struct_name]
+        if struct_name in type_names:
+            return type_names[struct_name]
+        if struct_name.startswith("Lua"):
+            return "L" + struct_name[3:]
+        return "L" + struct_name  # non-Lua-prefixed userdata gets L prefix
+
     set_multiline_re = re.compile(r'(\w+)\.set\(\s*$')
     set_inline_re = re.compile(r'(\w+)\.set\(\s*"(\w+)"\s*,\s*lua\.create_function')
     # NEW: named fn reference pattern — .set("luaName", lua.create_function(fn_name)?)
@@ -583,12 +649,9 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
 
         add_m = add_method_re.search(stripped)
         if add_m:
-            w_type = add_m.group(1).title()     # e.g. "button" -> "Button"
-            current_widget_type = w_type
-
-        add_m = add_method_re.search(stripped)
-        if add_m:
-            w_type = add_m.group(1).title()     # e.g. "button" -> "Button"
+            raw_w = add_m.group(1)  # e.g. "button", "text_input"
+            # camelCase with L prefix: "text_input" -> "LTextInput"
+            w_type = "L" + "".join(p.capitalize() for p in raw_w.split("_"))
             current_widget_type = w_type
 
         if brace_depth <= 0:
@@ -677,7 +740,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
         if method_m and not method_self_re.search(stripped):
             func_name = method_m.group(1)
             owner = current_impl_type or "Unknown"
-            display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+            display_owner = _display_name(owner)
             docstring = _collect_docstring_above(lines, i)
             desc = _first_desc_line(docstring)
             params, returns = _extract_params_returns(docstring)
@@ -700,7 +763,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
         if method_function_m:
             func_name = method_function_m.group(1)
             owner = current_impl_type or "Unknown"
-            display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+            display_owner = _display_name(owner)
             docstring = _collect_docstring_above(lines, i)
             desc = _first_desc_line(docstring)
             params, returns = _extract_params_returns(docstring)
@@ -726,7 +789,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if name_m:
                 func_name = name_m.group(1)
                 owner = current_impl_type or "Unknown"
-                display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+                display_owner = _display_name(owner)
                 docstring = _collect_docstring_above(lines, i)
                 desc = _first_desc_line(docstring)
                 params, returns = _extract_params_returns(docstring)
@@ -751,7 +814,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if name_m:
                 func_name = name_m.group(1)
                 owner = current_impl_type or "Unknown"
-                display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+                display_owner = _display_name(owner)
                 docstring = _collect_docstring_above(lines, i)
                 desc = _first_desc_line(docstring)
                 params, returns = _extract_params_returns(docstring)
@@ -776,7 +839,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             func_name = method_self_m.group(1)   # Lua name (string key)
             rust_fn   = method_self_m.group(2)   # Rust fn name after Self::
             owner = current_impl_type or "Unknown"
-            display_owner = type_names.get(owner, owner.replace("Lua", "") if owner.startswith("Lua") else owner)
+            display_owner = _display_name(owner)
             # Look up docstring on the named pub fn declaration
             docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
             desc = _first_desc_line(docstring)

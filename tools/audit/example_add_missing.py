@@ -27,7 +27,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-API_JSON = ROOT / 'logs' / 'lua_api_data.json'
+API_JSON = ROOT / 'logs' / 'data' / 'lua_api_data.json'
 EXAMPLES_DIR = ROOT / 'content' / 'examples'
 
 # filename = module name exactly (src/render/ -> render.lua, src/ecs/ -> ecs.lua)

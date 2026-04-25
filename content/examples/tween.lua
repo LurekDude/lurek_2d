@@ -369,3 +369,146 @@ do  -- Spring:getPosition
   end
 end
 
+-- ---- Stub: Spring:type ---------------------------------------------------
+--@api-stub: Spring:type
+do  -- Spring:type
+  local cam = { x = 0 }
+  local sp = lurek.tween.spring(cam, { x = 320 })
+  assert(sp:type() == "Spring")
+end
+
+-- ---- Stub: Spring:typeOf -------------------------------------------------
+--@api-stub: Spring:typeOf
+do  -- Spring:typeOf
+  local cam = { x = 0 }
+  local sp = lurek.tween.spring(cam, { x = 320 })
+  assert(sp:typeOf("Spring") == true)
+end
+
+-- -----------------------------------------------------------------------------
+-- Tween methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: Tween:onComplete ----------------------------------------------
+--@api-stub: Tween:onComplete
+do  -- Tween:onComplete
+  local box = { x = 0 }
+  -- onComplete registers a callback; tween auto-starts via lurek.tween.tween.
+  lurek.tween.tween(0.5, box, { x = 100 }):onComplete(function()
+    lurek.log.debug("done", "tween")
+  end)
+end
+
+-- ---- Stub: Tween:onUpdate ------------------------------------------------
+--@api-stub: Tween:onUpdate
+do  -- Tween:onUpdate
+  local box = { x = 0 }
+  lurek.tween.tween(0.5, box, { x = 100 }):onUpdate(function(t)
+    lurek.log.debug("t=" .. t, "tween")
+  end)
+end
+
+-- ---- Stub: Tween:onCancel ------------------------------------------------
+--@api-stub: Tween:onCancel
+do  -- Tween:onCancel
+  local box = { x = 0 }
+  local tw = lurek.tween.tween(0.5, box, { x = 100 })
+  tw:onCancel(function() lurek.log.debug("cancelled", "tween") end)
+  tw:cancel()
+end
+
+-- ---- Stub: Tween:type ----------------------------------------------------
+--@api-stub: Tween:type
+do  -- Tween:type
+  local box = { x = 0 }
+  local tw = lurek.tween.tween(0.5, box, { x = 100 })
+  assert(tw:type() == "Tween")
+end
+
+-- ---- Stub: Tween:typeOf --------------------------------------------------
+--@api-stub: Tween:typeOf
+do  -- Tween:typeOf
+  local box = { x = 0 }
+  local tw = lurek.tween.tween(0.5, box, { x = 100 })
+  assert(tw:typeOf("Tween") == true)
+end
+
+-- -----------------------------------------------------------------------------
+-- TweenParallel methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: TweenParallel:add ---------------------------------------------
+--@api-stub: TweenParallel:add
+do  -- TweenParallel:add
+  local a = { x = 0 }
+  local b = { y = 0 }
+  local tw1 = lurek.tween.tween(0.4, a, { x = 80 })
+  local par = lurek.tween.parallel()
+  par:add(tw1)
+  par:tween(0.4, b, { y = 80 })
+  par:start()
+end
+
+-- ---- Stub: TweenParallel:onComplete --------------------------------------
+--@api-stub: TweenParallel:onComplete
+do  -- TweenParallel:onComplete
+  local actor = { x = 0, alpha = 1 }
+  lurek.tween.parallel()
+    :tween(0.6, actor, { x = 200 })
+    :tween(0.6, actor, { alpha = 0 })
+    :onComplete(function() lurek.log.debug("parallel done", "tween") end)
+    :start()
+end
+
+-- ---- Stub: TweenParallel:type --------------------------------------------
+--@api-stub: TweenParallel:type
+do  -- TweenParallel:type
+  local par = lurek.tween.parallel()
+  assert(par:type() == "TweenParallel")
+end
+
+-- ---- Stub: TweenParallel:typeOf ------------------------------------------
+--@api-stub: TweenParallel:typeOf
+do  -- TweenParallel:typeOf
+  local par = lurek.tween.parallel()
+  assert(par:typeOf("TweenParallel") == true)
+end
+
+-- -----------------------------------------------------------------------------
+-- TweenSequence methods
+-- -----------------------------------------------------------------------------
+
+-- ---- Stub: TweenSequence:callback ----------------------------------------
+--@api-stub: TweenSequence:callback
+do  -- TweenSequence:callback
+  local door = { y = 0 }
+  lurek.tween.sequence()
+    :tween(0.3, door, { y = 64 })
+    :callback(function() lurek.log.debug("door open", "scene") end)
+    :tween(0.3, door, { y = 0 })
+    :start()
+end
+
+-- ---- Stub: TweenSequence:onComplete --------------------------------------
+--@api-stub: TweenSequence:onComplete
+do  -- TweenSequence:onComplete
+  local door = { y = 0 }
+  lurek.tween.sequence()
+    :tween(0.4, door, { y = 64 })
+    :onComplete(function() lurek.log.debug("sequence done", "scene") end)
+    :start()
+end
+
+-- ---- Stub: TweenSequence:type --------------------------------------------
+--@api-stub: TweenSequence:type
+do  -- TweenSequence:type
+  local seq = lurek.tween.sequence()
+  assert(seq:type() == "TweenSequence")
+end
+
+-- ---- Stub: TweenSequence:typeOf ------------------------------------------
+--@api-stub: TweenSequence:typeOf
+do  -- TweenSequence:typeOf
+  local seq = lurek.tween.sequence()
+  assert(seq:typeOf("TweenSequence") == true)
+end

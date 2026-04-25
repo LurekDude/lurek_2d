@@ -575,6 +575,19 @@ impl LuaUserData for LuaGlobe {
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("Globe(\"{}\")", this.name))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LGlobe"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LGlobe" || name == "Object")
+        });
     }
 }
 
@@ -661,6 +674,19 @@ impl LuaUserData for LuaGlobeRegistry {
                 t.set(i + 1, n.clone())?;
             }
             Ok(t)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LGlobeRegistry"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LGlobeRegistry" || name == "Object")
         });
     }
 }

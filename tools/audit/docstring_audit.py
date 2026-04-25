@@ -33,7 +33,7 @@ from typing import Dict, List, Optional, Tuple
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_LUA_API_DIR = WORKSPACE_ROOT / "src" / "lua_api"
-OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "docstring_audit.json"
+OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "data" / "docstring_audit.json"
 
 # ---------------------------------------------------------------------------
 # Rust-type → Lua-type mapping (used only to determine if a param is typed)

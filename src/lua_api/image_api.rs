@@ -64,6 +64,19 @@ impl LuaUserData for LuaProvinceGrid {
             }
             Ok(t)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LProvinceGrid"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LProvinceGrid" || name == "Object")
+        });
     }
 }
 
@@ -265,6 +278,19 @@ impl LuaUserData for LuaLayeredImage {
         methods.add_method("save", |_, this, path: String| {
             serial::save_layered(&this.inner, &path).map_err(LuaError::external)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LLayeredImage"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LLayeredImage" || name == "Object")
+        });
     }
 }
 
@@ -308,6 +334,19 @@ impl LuaUserData for LuaCompressedImageData {
         /// @return string
         methods.add_method("getFormat", |_, this, ()| {
             Ok(this.inner.get_format().to_string())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCompressedImageData"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCompressedImageData" || name == "Object")
         });
     }
 }
@@ -524,28 +563,29 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     Ok(())
 }
 
+/// RGBA pixel buffer for software image manipulation, pixel access, and encoding.
 impl mlua::UserData for ImageData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        /// Returns the width.
+        /// Returns the width of the image in pixels.
         ///
-        /// @return table|nil
+        /// @return integer
         methods.add_method("getWidth", |_, this, ()| Ok(this.width()));
-        /// Returns the height.
+        /// Returns the height of the image in pixels.
         ///
-        /// @return table|nil
+        /// @return integer
         methods.add_method("getHeight", |_, this, ()| Ok(this.height()));
-        /// Returns the dimensions.
+        /// Returns the width and height of the image as two integers.
         ///
-        /// @return table|nil
+        /// @return integer, integer
         methods.add_method("getDimensions", |_, this, ()| {
             let (w, h) = this.dimensions();
             Ok((w, h))
         });
-        /// Returns the pixel.
+        /// Returns the RGBA colour components of the pixel at (x, y) as four integers (0-255).
         ///
         /// @param x integer
         /// @param y integer
-        /// @return nil
+        /// @return integer, integer, integer, integer
         methods.add_method("getPixel", |_, this, (x, y): (u32, u32)| {
             this.get_pixel(x, y).ok_or_else(|| {
                 LuaError::RuntimeError(format!(
@@ -557,6 +597,15 @@ impl mlua::UserData for ImageData {
                 ))
             })
         });
+        /// Sets the RGBA colour of the pixel at (x, y); returns an error if coordinates are out of bounds.
+        ///
+        /// @param x integer
+        /// @param y integer
+        /// @param r integer   red [0-255]
+        /// @param g integer   green [0-255]
+        /// @param b integer   blue [0-255]
+        /// @param a integer   alpha [0-255]
+        /// @return nil
         methods.add_method_mut(
             "setPixel",
             |_, this, (x, y, r, g, b, a): (u32, u32, u8, u8, u8, u8)| {
@@ -573,10 +622,10 @@ impl mlua::UserData for ImageData {
                 }
             },
         );
-        /// Encode.
+        /// Encodes the image into a byte string in the specified format (currently "png").
         ///
-        /// @param format string
-        /// @return nil
+        /// @param format string   encoding format; "png" is the only supported value
+        /// @return string
         methods.add_method("encode", |_, this, format: String| match format.as_str() {
             "png" => this.encode_png().map_err(LuaError::RuntimeError),
             _ => Err(LuaError::RuntimeError(format!(
@@ -584,12 +633,12 @@ impl mlua::UserData for ImageData {
                 format
             ))),
         });
-        /// Returns the string.
+        /// Returns the raw pixel bytes of the image as a Lua string.
         ///
-        /// @return table|nil
+        /// @return string
         methods.add_method("getString", |_, this, ()| Ok(this.get_string()));
 
-        /// Map pixel.
+        /// Calls func(x, y, r, g, b, a) for each pixel and writes the returned RGBA back.
         ///
         /// @param func function
         /// @return nil
@@ -611,7 +660,7 @@ impl mlua::UserData for ImageData {
         });
 
         // -- brightness --
-        /// Brightness.
+        /// Adjusts the brightness of every pixel by the given factor (< 1.0 darkens, > 1.0 brightens).
         ///
         /// @param factor number
         /// @return nil
@@ -620,7 +669,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- contrast --
-        /// Contrast.
+        /// Adjusts the contrast of every pixel by the given factor (< 1.0 reduces, > 1.0 increases).
         ///
         /// @param factor number
         /// @return nil
@@ -629,7 +678,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- saturation --
-        /// Saturation.
+        /// Adjusts colour saturation; 0.0 produces grayscale, 1.0 is unchanged, > 1.0 boosts saturation.
         ///
         /// @param factor number
         /// @return nil
@@ -638,7 +687,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- gamma --
-        /// Gamma.
+        /// Applies gamma correction; values < 1.0 brighten shadows, > 1.0 darken them.
         ///
         /// @param gamma number
         /// @return nil
@@ -647,6 +696,13 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- tint --
+        /// Blends an RGB tint colour into every pixel, controlled by factor (0.0 = no change, 1.0 = full tint).
+        ///
+        /// @param tr integer   red component [0-255]
+        /// @param tg integer   green component [0-255]
+        /// @param tb integer   blue component [0-255]
+        /// @param factor number   blend weight [0.0-1.0]
+        /// @return nil
         methods.add_method_mut(
             "tint",
             |_, this, (tr, tg, tb, factor): (u8, u8, u8, f32)| {
@@ -655,7 +711,7 @@ impl mlua::UserData for ImageData {
             },
         );
         // -- grayscale --
-        /// Grayscale.
+        /// Converts the image to grayscale using luminance weights (BT.601).
         ///
         /// @return nil
         methods.add_method_mut("grayscale", |_, this, ()| {
@@ -663,7 +719,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- sepia --
-        /// Sepia.
+        /// Applies a warm sepia tone to the image using standard sepia matrix weights.
         ///
         /// @return nil
         methods.add_method_mut("sepia", |_, this, ()| {
@@ -671,7 +727,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- invert --
-        /// Invert.
+        /// Inverts every colour channel (subtracts each R/G/B value from 255); alpha is preserved.
         ///
         /// @return nil
         methods.add_method_mut("invert", |_, this, ()| {
@@ -679,55 +735,55 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- threshold --
-        /// Threshold.
+        /// Converts the image to black-and-white: pixels above value become white, at or below become black.
         ///
-        /// @param value u8
+        /// @param value integer   threshold [0-255]
         /// @return nil
         methods.add_method_mut("threshold", |_, this, value: u8| {
             this.threshold(value);
             Ok(())
         });
         // -- posterize --
-        /// Posterize.
+        /// Reduces each channel to `levels` discrete steps, creating a flat poster-paint look.
         ///
-        /// @param levels u8
+        /// @param levels integer   number of colour levels per channel [1-255]
         /// @return nil
         methods.add_method_mut("posterize", |_, this, levels: u8| {
             this.posterize(levels);
             Ok(())
         });
         // -- fill --
-        /// Fill.
+        /// Fills every pixel with the given solid RGBA colour, overwriting all existing content.
         ///
-        /// @param r u8
-        /// @param g u8
-        /// @param b u8
-        /// @param a u8
+        /// @param r integer   red [0-255]
+        /// @param g integer   green [0-255]
+        /// @param b integer   blue [0-255]
+        /// @param a integer   alpha [0-255]
         /// @return nil
         methods.add_method_mut("fill", |_, this, (r, g, b, a): (u8, u8, u8, u8)| {
             this.fill(r, g, b, a);
             Ok(())
         });
         // -- noise --
-        /// Noise.
+        /// Adds random noise to every pixel channel; amount controls the maximum per-channel perturbation.
         ///
-        /// @param amount u8
+        /// @param amount integer   max perturbation per channel [0-255]
         /// @return nil
         methods.add_method_mut("noise", |_, this, amount: u8| {
             this.noise(amount);
             Ok(())
         });
         // -- alphaMask --
-        /// Alpha mask.
+        /// Scales every pixel's alpha channel by factor; use to fade an image in or out uniformly.
         ///
-        /// @param factor number
+        /// @param factor number   multiplier for the alpha channel [0.0-1.0]
         /// @return nil
         methods.add_method_mut("alphaMask", |_, this, factor: f32| {
             this.alpha_mask(factor);
             Ok(())
         });
         // -- flipHorizontal --
-        /// Flip horizontal.
+        /// Flips the image left-to-right (mirror across vertical axis), modifying in place.
         ///
         /// @return nil
         methods.add_method_mut("flipHorizontal", |_, this, ()| {
@@ -735,7 +791,7 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- flipVertical --
-        /// Flip vertical.
+        /// Flips the image top-to-bottom (mirror across horizontal axis), modifying in place.
         ///
         /// @return nil
         methods.add_method_mut("flipVertical", |_, this, ()| {
@@ -743,14 +799,14 @@ impl mlua::UserData for ImageData {
             Ok(())
         });
         // -- rotate90cw --
-        /// Rotate90cw.
+        /// Returns a new ImageData rotated 90 degrees clockwise; the original is not modified.
         ///
         /// @return ImageData
         methods.add_method("rotate90cw", |lua, this, ()| {
             lua.create_userdata(this.rotate_90_cw())
         });
         // -- crop --
-        /// Crop.
+        /// Returns a new ImageData containing the rectangular sub-region at (x, y) of the given width and height.
         ///
         /// @param x integer
         /// @param y integer
@@ -773,7 +829,7 @@ impl mlua::UserData for ImageData {
                 .and_then(|img| lua.create_userdata(img))
         });
         // -- resizeNearest --
-        /// Resize nearest.
+        /// Returns a new ImageData scaled to (new_w, new_h) using nearest-neighbour interpolation.
         ///
         /// @param new_w integer
         /// @param new_h integer
@@ -782,7 +838,7 @@ impl mlua::UserData for ImageData {
             lua.create_userdata(this.resize_nearest(new_w, new_h))
         });
         // -- blur --
-        /// Blur.
+        /// Returns a new ImageData with a box blur applied using the given pixel radius.
         ///
         /// @param radius integer
         /// @return ImageData
@@ -790,7 +846,7 @@ impl mlua::UserData for ImageData {
             lua.create_userdata(this.blur(radius))
         });
         // -- sharpen --
-        /// Sharpen.
+        /// Returns a new ImageData with a sharpening convolution kernel applied.
         ///
         /// @return ImageData
         methods.add_method("sharpen", |lua, this, ()| {
@@ -1002,7 +1058,7 @@ impl mlua::UserData for ImageData {
         /// Returns the type name of this object.
         ///
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("ImageData"));
+        methods.add_method("type", |_, _, ()| Ok("LImageData"));
         // -- typeOf --
         /// Returns true if this object is of the given type name.
         ///
@@ -1071,6 +1127,19 @@ impl LuaUserData for LuaPaletteLUT {
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LPaletteLUT"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LPaletteLUT" || name == "Object")
         });
     }
 }

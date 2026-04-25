@@ -161,6 +161,19 @@ impl LuaUserData for LuaDepthSorter {
         methods.add_method("getCount", |_, this, ()| {
             Ok(this.inner.borrow().get_count())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LDepthSorter"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LDepthSorter" || name == "Object")
+        });
     }
 }
 

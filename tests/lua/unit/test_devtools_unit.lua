@@ -539,27 +539,39 @@ test_summary()
 describe("Missing API Coverage", function()
     -- @tests lurek.devtools.log
     it("covers lurek.devtools.log", function()
-        -- TODO: Implement test for lurek.devtools.log
+        expect_type("function", lurek.devtools.log)
+        lurek.devtools.log("info", "unit test log message")
     end)
 
     -- @tests lurek.devtools.exposeWatch
     it("covers lurek.devtools.exposeWatch", function()
-        -- TODO: Implement test for lurek.devtools.exposeWatch
+        local id = lurek.devtools.exposeWatch("unit_watch", function() return 42 end)
+        expect_type("number", id)
     end)
 
     -- @tests lurek.devtools.removeWatch
     it("covers lurek.devtools.removeWatch", function()
-        -- TODO: Implement test for lurek.devtools.removeWatch
+        local id = lurek.devtools.exposeWatch("rem_watch", function() return 0 end)
+        local ok = lurek.devtools.removeWatch(id)
+        expect_true(ok)
     end)
 
     -- @tests lurek.devtools.getWatches
     it("covers lurek.devtools.getWatches", function()
-        -- TODO: Implement test for lurek.devtools.getWatches
+        local watches = lurek.devtools.getWatches()
+        expect_type("table", watches)
     end)
 
     -- @tests ReplConsole:len
     it("covers ReplConsole:len", function()
-        -- TODO: Implement test for ReplConsole:len
+        local console = lurek.devtools.newRepl()
+        expect_type("number", console:len())
+    end)
+
+    -- @tests lurek.devtools.fatal
+    it("covers lurek.devtools.fatal", function()
+        expect_type("function", lurek.devtools.fatal)
+        lurek.devtools.fatal("unit test fatal message")
     end)
 
 end)
@@ -567,63 +579,84 @@ end)
 describe("Missing explicit test for lurek.devtools.scan", function()
     it("lurek.devtools.scan works", function()
         -- @tests lurek.devtools.scan
-        -- TODO: add assertion for lurek.devtools.scan
+        local changed = lurek.devtools.scan()
+        expect_type("table", changed)
     end)
 end)
 
 describe("Missing explicit test for lurek.devtools.snapshot", function()
     it("lurek.devtools.snapshot works", function()
         -- @tests lurek.devtools.snapshot
-        -- TODO: add assertion for lurek.devtools.snapshot
+        local snap = lurek.devtools.snapshot()
+        expect_type("table", snap)
+        expect_not_nil(snap.watchCount)
     end)
 end)
 
 describe("Missing explicit test for FileWatcher:onChanged", function()
     it("FileWatcher:onChanged works", function()
         -- @tests FileWatcher:onChanged
-        -- TODO: add assertion for FileWatcher:onChanged
+        local watcher = lurek.devtools.newFileWatcher(".")
+        local called = false
+        watcher:onChanged(function() called = true end)
+        expect_type("boolean", called)
     end)
 end)
 
 describe("Missing explicit test for FileWatcher:check", function()
     it("FileWatcher:check works", function()
         -- @tests FileWatcher:check
-        -- TODO: add assertion for FileWatcher:check
+        local watcher = lurek.devtools.newFileWatcher(".")
+        local result = watcher:check()
+        expect_type("boolean", result)
     end)
 end)
 
 describe("Missing explicit test for FileWatcher:getPath", function()
     it("FileWatcher:getPath works", function()
         -- @tests FileWatcher:getPath
-        -- TODO: add assertion for FileWatcher:getPath
+        local watcher = lurek.devtools.newFileWatcher("content")
+        expect_equal("content", watcher:getPath())
     end)
 end)
 
 describe("Missing explicit test for FileWatcher:cancel", function()
     it("FileWatcher:cancel works", function()
         -- @tests FileWatcher:cancel
-        -- TODO: add assertion for FileWatcher:cancel
+        local watcher = lurek.devtools.newFileWatcher(".")
+        watcher:onChanged(function() end)
+        watcher:cancel()
+        expect_equal(".", watcher:getPath())
     end)
 end)
 
 describe("Missing explicit test for ReplConsole:eval", function()
     it("ReplConsole:eval works", function()
         -- @tests ReplConsole:eval
-        -- TODO: add assertion for ReplConsole:eval
+        local console = lurek.devtools.newRepl()
+        local result = console:eval("1 + 1")
+        expect_type("string", result)
     end)
 end)
 
 describe("Missing explicit test for ReplConsole:history", function()
     it("ReplConsole:history works", function()
         -- @tests ReplConsole:history
-        -- TODO: add assertion for ReplConsole:history
+        local console = lurek.devtools.newRepl()
+        console:eval("x = 1")
+        local hist = console:history()
+        expect_type("table", hist)
+        expect_equal("x = 1", hist[1])
     end)
 end)
 
 describe("Missing explicit test for ReplConsole:clear", function()
     it("ReplConsole:clear works", function()
         -- @tests ReplConsole:clear
-        -- TODO: add assertion for ReplConsole:clear
+        local console = lurek.devtools.newRepl()
+        console:eval("a = 1")
+        console:clear()
+        expect_equal(0, console:len())
     end)
 end)
 

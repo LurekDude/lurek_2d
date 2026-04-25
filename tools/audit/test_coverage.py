@@ -29,7 +29,7 @@ WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
 SRC_DIR = WORKSPACE_ROOT / "src"
 TESTS_DIR = WORKSPACE_ROOT / "tests" / "rust"
 LUA_TESTS_DIR = WORKSPACE_ROOT / "tests" / "lua"
-DEFAULT_JSON_OUTPUT = WORKSPACE_ROOT / "logs" / "test_coverage.json"
+DEFAULT_JSON_OUTPUT = WORKSPACE_ROOT / "logs" / "data" / "test_coverage.json"
 
 
 def _snake_to_parts(name: str) -> Set[str]:

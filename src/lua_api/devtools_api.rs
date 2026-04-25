@@ -151,6 +151,19 @@ impl LuaUserData for LuaFileWatcher {
             }
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LFileWatcher"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LFileWatcher" || name == "Object")
+        });
     }
 }
 
@@ -943,5 +956,18 @@ impl LuaUserData for LuaReplConsole {
         /// Returns the number of history entries.
         /// @return integer
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LReplConsole"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LReplConsole" || name == "Object")
+        });
     }
 }

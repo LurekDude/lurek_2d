@@ -353,6 +353,19 @@ impl LuaUserData for LuaHtmlDocument {
             )?;
             Ok(consumed || prevented)
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LHtmlDocument"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LHtmlDocument" || name == "Object")
+        });
     }
 }
 
@@ -684,6 +697,19 @@ impl LuaUserData for LuaHtmlElement {
             }
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LHtmlElement"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LHtmlElement" || name == "Object")
+        });
     }
 }
 
@@ -861,6 +887,7 @@ fn create_html_event_table<'lua>(
         table.set("value", value.clone())?;
     }
     let prevent_flags = flags.clone();
+    /// Prevents the default browser action associated with this event.
     table.set(
         "preventDefault",
         lua.create_function(move |_, ()| {
@@ -869,6 +896,7 @@ fn create_html_event_table<'lua>(
         })?,
     )?;
     let stop_flags = flags.clone();
+    /// Stops the event from bubbling up to parent elements.
     table.set(
         "stopPropagation",
         lua.create_function(move |_, ()| {
@@ -876,6 +904,8 @@ fn create_html_event_table<'lua>(
             Ok(())
         })?,
     )?;
+    /// Returns true if `preventDefault` has been called on this event.
+    /// @return boolean
     table.set(
         "isDefaultPrevented",
         lua.create_function(move |_, ()| Ok(flags.borrow().default_prevented))?,

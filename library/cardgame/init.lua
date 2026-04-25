@@ -23,11 +23,11 @@ local function _log_debug(msg)
     end
 end
 
--- ÔöÇÔöÇ ID counter ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ ID counter ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local _next_id = 1
 
--- ÔöÇÔöÇ Card Type Registry ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Card Type Registry ������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local _card_types = {}
 
@@ -37,7 +37,7 @@ local _card_types = {}
 function M.getIdCounter() return _next_id end
 
 --- Reset the ID counter to 1.  Call between game sessions to reclaim the
---- integer range.  Does NOT invalidate already-created cards — callers must
+--- integer range.  Does NOT invalidate already-created cards � callers must
 --- ensure no stale references remain.
 function M.resetIdCounter()
     _next_id = 1
@@ -72,7 +72,7 @@ end
 --- Clear all card type definitions from the module registry.
 function M.clearCardTypes() _card_types = {} end
 
--- ÔöÇÔöÇ CardTypeDef ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ CardTypeDef ���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 --- Create a new card type definition (blueprint).
 ---
@@ -102,9 +102,9 @@ function M.newCardTypeDef(name)
     }
 end
 
--- ÔöÇÔöÇ Card ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Card ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
----@class Card
+---@class LCard
 ---@field id number
 ---@field card_type string
 ---@field name string
@@ -152,7 +152,7 @@ Card.__index = Card
 --- @tfield number tile_h     Board grid height in cells (default 1).
 ---
 --- @tparam string card_type  Registered type name.
---- @treturn Card
+--- @treturn LCard
 function M.newCard(card_type)
     assert(type(card_type) == "string", "newCard: card_type must be a string")
     local id = _next_id
@@ -298,15 +298,15 @@ function Card:setTilePosition(x, y) self.tile_x = x; self.tile_y = y end
 -- @treturn number, number  x, y
 function Card:getTilePosition() return self.tile_x, self.tile_y end
 
--- ÔöÇÔöÇ Stack ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Stack ���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
----@class Stack
+---@class LCardStack
 ---@field name string
----@field cards Card[]
+---@field cards LCard[]
 ---@field _cap number|nil
 ---@field ordered boolean
 ---@field public boolean
----@field size fun(self: Stack): number
+---@field size fun(self: LCardStack): number
 local Stack = {}
 Stack.__index = Stack
 
@@ -318,8 +318,8 @@ Stack.__index = Stack
 --- @tfield boolean ordered Whether the stack preserves insertion order (default true).
 --- @tfield boolean public  Whether the stack contents are publicly visible (default false).
 ---
---- @tparam string name  Stack name.
---- @treturn Stack
+--- @tparam string name  LCardStack name.
+--- @treturn LCardStack
 function M.newStack(name)
     assert(type(name) == "string" and #name > 0, "newStack: name must be a non-empty string")
     return setmetatable({
@@ -332,9 +332,9 @@ function M.newStack(name)
 end
 
 --- Create a new Stack with a fixed capacity limit.
---- @tparam string name  Stack name.
---- @tparam number cap  Maximum card count (must be >= 1).
---- @treturn Stack
+--- @tparam string name  LCardStack name.
+--- @tparam number cap  Maximum LCard count (must be >= 1).
+--- @treturn LCardStack
 function M.newStackWithCapacity(name, cap)
     assert(type(cap) == "number" and cap >= 1, "newStackWithCapacity: cap must be >= 1")
     local s = M.newStack(name)
@@ -359,34 +359,34 @@ function Stack:capacity() return self._cap end
 function Stack:setCapacity(cap) self._cap = cap end
 
 --- Push a card onto the top of the stack; returns false when full.
---- @param card Card
+--- @param card LCard
 --- @treturn boolean
 function Stack:pushTop(card)
     if self:isFull() then return false end
     self.cards[#self.cards+1] = card; return true
 end
 --- Push a card onto the bottom of the stack; returns false when full.
---- @param card Card
+--- @param card LCard
 --- @treturn boolean
 function Stack:pushBottom(card)
     if self:isFull() then return false end
     table.insert(self.cards, 1, card); return true
 end
 --- Remove and return the top card, or nil if empty.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:popTop()
     if #self.cards == 0 then return nil end
     return table.remove(self.cards)
 end
 --- Remove and return the bottom card, or nil if empty.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:popBottom()
     if #self.cards == 0 then return nil end
     return table.remove(self.cards, 1)
 end
 --- Pop up to n cards from the top and return them.
 --- @param n number
---- @treturn table  Array of Card (may be shorter than n if stack empties).
+--- @treturn table  Array of LCard (may be shorter than n if LCardStack empties).
 function Stack:popMany(n)
     local out = {}
     for _ = 1, math.min(n, #self.cards) do
@@ -396,19 +396,19 @@ function Stack:popMany(n)
 end
 
 --- Return the top card without removing it.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:peekTop()    return self.cards[#self.cards] end
 --- Return the bottom card without removing it.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:peekBottom() return self.cards[1] end
 --- Return the card at the given 1-based index without removing it.
 --- @param idx number
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:peekAt(idx)  return self.cards[idx] end
 
 --- Insert card at position idx (1-based, clamped); returns false when full.
 --- @param idx number
---- @param card Card
+--- @param card LCard
 --- @treturn boolean
 function Stack:insertAt(idx, card)
     if self:isFull() then return false end
@@ -418,7 +418,7 @@ function Stack:insertAt(idx, card)
 end
 --- Remove and return the card at 1-based position idx, or nil if out of range.
 --- @param idx number
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:removeAt(idx)
     if idx < 1 or idx > #self.cards then return nil end
     return table.remove(self.cards, idx)
@@ -479,7 +479,7 @@ function Stack:findByTag(tag)
 end
 --- Return all Card objects with the given category.
 --- @param cat string
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function Stack:findByCategoryAll(cat)
     local out = {}
     for _, c in ipairs(self.cards) do if c.category == cat then out[#out+1] = c end end
@@ -487,7 +487,7 @@ function Stack:findByCategoryAll(cat)
 end
 --- Return all Card objects with the given type name.
 --- @tparam string type_name
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function Stack:findByTypeAll(type_name)
     local out = {}
     for _, c in ipairs(self.cards) do if c.card_type == type_name then out[#out+1] = c end end
@@ -495,7 +495,7 @@ function Stack:findByTypeAll(type_name)
 end
 --- Return all Card objects that have the given tag.
 --- @tparam string tag
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function Stack:findByTagAll(tag)
     local out = {}
     for _, c in ipairs(self.cards) do if c:hasTag(tag) then out[#out+1] = c end end
@@ -503,7 +503,7 @@ function Stack:findByTagAll(tag)
 end
 --- Remove and return the Card with the given id, or nil if not found.
 --- @param id number
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Stack:removeById(id)
     for i, c in ipairs(self.cards) do
         if c.id == id then return table.remove(self.cards, i) end
@@ -617,7 +617,7 @@ function Stack:setPublic(b)   self.public = b end
 --- @param n string
 function Stack:setName(n)     self.name = n end
 
--- ÔöÇÔöÇ Slot ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Slot ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local Slot = {}
 Slot.__index = Slot
@@ -662,7 +662,7 @@ function Slot:capacity() return self._cap end
 function Slot:setCapacity(cap) self._cap = cap end
 
 --- Push a card into the slot; returns true on success, false+error when full.
---- @param card Card
+--- @param card LCard
 --- @treturn boolean
 function Slot:push(card)
     if self:isFull() then return false, 'slot is full' end
@@ -670,24 +670,24 @@ function Slot:push(card)
     return true
 end
 --- Remove and return the last pushed card, or nil if empty.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Slot:pop()
     if #self.items == 0 then return nil end
     return table.remove(self.items)
 end
 --- Remove and return the item at 1-based index, or nil if out of range.
 --- @param idx number
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Slot:removeAt(idx)
     if idx < 1 or idx > #self.items then return nil end
     return table.remove(self.items, idx)
 end
 --- Return the last pushed item without removing it.
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Slot:peek()      return self.items[#self.items] end
 --- Return the item at 1-based index without removing it.
 --- @param idx number
---- @treturn Card|nil
+--- @treturn LCard|nil
 function Slot:peekAt(idx) return self.items[idx] end
 --- Clear all items and return them.
 --- @treturn table
@@ -713,7 +713,7 @@ function Slot:hasItemOfType(t)
     return false
 end
 
--- ÔöÇÔöÇ CardPool ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ CardPool ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local PoolEntry = {}
 PoolEntry.__index = PoolEntry
@@ -736,7 +736,7 @@ function M.newCardPool(name)
 end
 
 --- Add a type with a draw weight (minimum 1).
---- @tparam string type_name  Card type name (must be non-empty).
+--- @tparam string type_name  LCard type name (must be non-empty).
 --- @tparam number weight  Draw weight (clamped to minimum 1).
 function CardPool:add(type_name, weight)
     assert(type(type_name) == "string" and #type_name > 0, "CardPool:add: type_name must be a non-empty string")
@@ -821,7 +821,7 @@ function CardPool:drawTypes(n)
 end
 --- Draw n Card instances by weighted random selection (with replacement).
 --- @param n number
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function CardPool:drawItems(n)
     local types = self:drawTypes(n)
     local out = {}
@@ -848,7 +848,7 @@ function CardPool:drawUniqueTypes(n)
 end
 --- Draw up to n unique Card instances by weighted selection without replacement.
 --- @param n number
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function CardPool:drawUniqueItems(n)
     local types = self:drawUniqueTypes(n)
     local out = {}
@@ -863,7 +863,7 @@ end
 -- @see lurek.math
 -- @param n number
 -- @param seed number
--- @treturn table  Array of Card objects.
+-- @treturn table  Array of LCard objects.
 function CardPool:drawItemsSeeded(n, seed)
     -- Pin the global RNG to the requested seed for the duration of the draw,
     -- then restore the previous state so external callers are not perturbed.
@@ -879,7 +879,7 @@ function CardPool:drawItemsSeeded(n, seed)
 end
 --- Draw cards matching a rarity distribution table {rarity=count,...}.
 --- @param distribution table  Map of rarity string to draw count.
---- @treturn table  Array of Card objects.
+--- @treturn table  Array of LCard objects.
 function CardPool:drawByRarity(distribution)
     local out = {}
     for rarity, count in pairs(distribution) do
@@ -898,7 +898,7 @@ function CardPool:drawByRarity(distribution)
     return out
 end
 
--- ÔöÇÔöÇ StackManager ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ StackManager ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local StackManager = {}
 StackManager.__index = StackManager
@@ -911,7 +911,7 @@ end
 
 --- Register an existing stack under a name.
 --- @param name string
---- @param stack Stack
+--- @param stack LCardStack
 function StackManager:addStack(name, stack)       self.stacks[name] = stack end
 --- Create and register a new unbounded stack.
 --- @param name string
@@ -922,7 +922,7 @@ function StackManager:createStack(name)            self.stacks[name] = M.newStac
 function StackManager:createStackCapped(name, cap) self.stacks[name] = M.newStackWithCapacity(name, cap) end
 --- Deregister and return a stack, or nil if not found.
 --- @param name string
---- @treturn Stack|nil
+--- @treturn LCardStack|nil
 function StackManager:removeStack(name)
     local s = self.stacks[name]; self.stacks[name] = nil; return s
 end
@@ -932,7 +932,7 @@ end
 function StackManager:hasStack(name)  return self.stacks[name] ~= nil end
 --- Return the registered Stack, or nil if not found.
 --- @param name string
---- @treturn Stack|nil
+--- @treturn LCardStack|nil
 function StackManager:getStack(name)  return self.stacks[name] end
 
 --- Return a sorted list of all registered stack names.
@@ -956,7 +956,7 @@ end
 --- @param from_name string
 --- @param idx number  1-based index.
 --- @param to_name string
---- @treturn Card|nil, string|nil  Moved card or nil+error.
+--- @treturn LCard|nil, string|nil  Moved LCard or nil+error.
 function StackManager:moveItem(from_name, idx, to_name)
     local from_s = self.stacks[from_name]
     local to_s = self.stacks[to_name]
@@ -974,7 +974,7 @@ end
 --- @param from_name string
 --- @param card_type string
 --- @param to_name string
---- @treturn Card|nil, string|nil
+--- @treturn LCard|nil, string|nil
 function StackManager:moveItemByType(from_name, card_type, to_name)
     local from_s = self.stacks[from_name]
     if not from_s then return nil, 'stack not found' end
@@ -986,17 +986,17 @@ end
 --- Move the top card from one stack to another.
 --- @param from_name string
 --- @param to_name string
---- @treturn Card|nil, string|nil
+--- @treturn LCard|nil, string|nil
 function StackManager:moveTop(from_name, to_name)
     local from_s = self.stacks[from_name]
     if not from_s or from_s:isEmpty() then return nil, 'empty or not found' end
     return self:moveItem(from_name, from_s:size(), to_name)
 end
 
--- ÔöÇÔöÇ BuildEntry ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ BuildEntry ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 --- Create a new build entry for use with DeckBuilder.
---- @param type_name string  Card type to include.
+--- @param type_name string  LCard type to include.
 --- @param count number  Number of copies.
 --- @treturn table  BuildEntry.
 function M.newBuildEntry(type_name, count)
@@ -1009,7 +1009,7 @@ function M.newBuildEntry(type_name, count)
     }
 end
 
--- ÔöÇÔöÇ DeckBuilder ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ DeckBuilder ���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local DeckBuilder = {}
 DeckBuilder.__index = DeckBuilder
@@ -1036,7 +1036,7 @@ function M.newDeckBuilder(name)
 end
 
 --- Add count copies of type_name to the build list.
---- @tparam string type_name  Card type name (must be non-empty).
+--- @tparam string type_name  LCard type name (must be non-empty).
 --- @tparam number count  Number of copies (must be >= 1).
 function DeckBuilder:add(type_name, count)
     assert(type(type_name) == "string" and #type_name > 0, "DeckBuilder:add: type_name must be a non-empty string")
@@ -1047,7 +1047,7 @@ end
 --- Add count copies with per-card stat overrides and extra tags.
 --- @param type_name string
 --- @param count number
---- @param stat_overrides table  Map of stat_name Ôćĺ value.
+--- @param stat_overrides table  Map of stat_name ��� value.
 --- @param extra_tags table  Array of tag strings.
 function DeckBuilder:addWith(type_name, count, stat_overrides, extra_tags)
     local e = M.newBuildEntry(type_name, count)
@@ -1129,7 +1129,7 @@ function DeckBuilder:validateEntries()
 end
 
 --- Validate an already-built Stack against size constraints.
---- @param stack Stack
+--- @param stack LCardStack
 --- @treturn table  Array of error strings.
 function DeckBuilder:validateStack(stack)
     local errors = {}
@@ -1140,12 +1140,12 @@ function DeckBuilder:validateStack(stack)
 end
 
 --- Build and return a Stack using the builder's own name.
---- @treturn Stack
+--- @treturn LCardStack
 function DeckBuilder:build() return self:buildNamed(self.name) end
 
 --- Build and return a Stack with a custom name.
 --- @tparam string stack_name
---- @treturn Stack
+--- @treturn LCardStack
 function DeckBuilder:buildNamed(stack_name)
     local stack = M.newStack(stack_name)
     for _, entry in ipairs(self.entries) do
@@ -1162,7 +1162,7 @@ function DeckBuilder:buildNamed(stack_name)
     return stack
 end
 
--- ÔöÇÔöÇ HistoryAction constructors ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ HistoryAction constructors ������������������������������������������������������������������������������������������������������������������������������������
 
 M.HistoryAction = {}
 --- Create a Pushed action recording which card was pushed.
@@ -1207,7 +1207,7 @@ function M.HistoryAction.built(count) return { kind = 'built', count = count } e
 --- @treturn table
 function M.HistoryAction.custom(label) return { kind = 'custom', label = label } end
 
--- ÔöÇÔöÇ StackHistory ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ StackHistory ������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local StackHistory = {}
 StackHistory.__index = StackHistory
@@ -1229,7 +1229,7 @@ end
 --- Append an action entry to the log.
 --- @param stack_name string
 --- @param action table  A HistoryAction table.
---- @param size_after number  Stack size after the action.
+--- @param size_after number  LCardStack size after the action.
 function StackHistory:record(stack_name, action, size_after)
     local entry = { seq = self._next_seq, stack_name = stack_name, action = action, size_after = size_after }
     self._next_seq = self._next_seq + 1
@@ -1274,14 +1274,14 @@ end
 --- Clear all recorded entries.
 function StackHistory:clear() self._entries = {} end
 
--- ÔöÇÔöÇ CardGroup ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ CardGroup ���������������������������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 local CardGroup = {}
 CardGroup.__index = CardGroup
 
 --- Create a new CardGroup with a label, index list, and optional score.
 --- @param label string  Human-readable group label.
---- @param indices table  Array of 1-based indices into a card list.
+--- @param indices table  Array of 1-based indices into a LCard list.
 --- @param score number|nil  Optional numeric score (default 0).
 --- @treturn CardGroup
 function M.newCardGroup(label, indices, score)
@@ -1289,8 +1289,8 @@ function M.newCardGroup(label, indices, score)
 end
 
 --- Collect the actual card objects referenced by this group's indices.
---- @param cards table  Flat array of Card objects.
---- @treturn table  Array of Card objects.
+--- @param cards table  Flat array of LCard objects.
+--- @treturn table  Array of LCard objects.
 function CardGroup:itemsFrom(cards)
     local out = {}
     for _, idx in ipairs(self.indices) do
@@ -1306,7 +1306,7 @@ function CardGroup:size() return #self.indices end
 -- @treturn boolean
 function CardGroup:isEmpty() return #self.indices == 0 end
 --- Return the highest value of a stat across grouped cards.
--- @param cards table  flat card list
+-- @param cards table  flat LCard list
 -- @param stat  string
 -- @treturn number
 function CardGroup:maxStat(cards, stat)
@@ -1344,11 +1344,11 @@ function CardGroup:allHaveTag(cards, tag)
     return true
 end
 
--- ÔöÇÔöÇ M.checkDeckLimit ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ M.checkDeckLimit ������������������������������������������������������������������������������������������������������������������������������������������������������������������
 
 --- Validate that a card list does not exceed per-type max_per_deck limits.
 -- Returns nil on success or an error string describing the first violation.
--- @param cards table  list of Card objects
+-- @param cards table  list of LCard objects
 -- @treturn string|nil
 function M.checkDeckLimit(cards)
     local counts = {}
@@ -1365,11 +1365,11 @@ function M.checkDeckLimit(cards)
 end
 
 
--- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
--- PARITY ADDITIONS ÔÇö Phase 2A  (cardgame)
--- ÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉÔĽÉ
+-- Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�
+-- PARITY ADDITIONS ��� Phase 2A  (cardgame)
+-- Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�Լ�
 
--- ÔöÇÔöÇ HistoryAction: add missing variants ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ HistoryAction: add missing variants ������������������������������������������������������������������������������������������
 
 M.HistoryAction = M.HistoryAction or {}
 M.HistoryAction.Moved   = "moved"
@@ -1377,7 +1377,7 @@ M.HistoryAction.Shuffled = "shuffled"
 M.HistoryAction.Sorted  = "sorted"
 M.HistoryAction.Built   = "built"
 
--- ÔöÇÔöÇ Module-level analytics free functions ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Module-level analytics free functions ���������������������������������������������������������������������������������������
 
 --- Group card-like items by category field.
 -- Returns table: category -> {item,...}.
@@ -1461,11 +1461,11 @@ function M.sortedIndicesByCategory(items)
     return indices
 end
 
--- ÔöÇÔöÇ Missing parity analysis functions ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+-- ������ Missing parity analysis functions ���������������������������������������������������������������������������������������������������������������
 
 --- Group 1-based indices of items by the integer value of a named stat.
---- Returns a map of stat_value (floored to integer) Ôćĺ array of 1-based indices.
---- @param items table  List of Card objects.
+--- Returns a map of stat_value (floored to integer) ��� array of 1-based indices.
+--- @param items table  List of LCard objects.
 --- @param stat string  Stat name to group by.
 --- @treturn table  {[stat_value] = {1-based indices}}.
 function M.groupByStat(items, stat)
@@ -1481,7 +1481,7 @@ end
 --- Group 1-based indices by the value portion of a prefixed tag.
 --- Tags of the form "prefix:value" are grouped under "value".
 --- Tags that do not start with prefix: are ignored.
---- @param items table  List of Card objects.
+--- @param items table  List of LCard objects.
 --- @param prefix string  Tag prefix to match (e.g. "suit" matches "suit:hearts").
 --- @treturn table  {[tag_value] = {1-based indices}}.
 function M.groupByTagPrefix(items, prefix)
@@ -1503,7 +1503,7 @@ end
 
 --- Find all groups where exactly n items share the same integer stat value.
 --- Analogous to "n-of-a-kind" detection in card games.
---- @param items table  List of Card objects.
+--- @param items table  List of LCard objects.
 --- @param stat string  Stat name to compare.
 --- @param n number  Exact group size required.
 --- @treturn table  Array of CardGroup objects (one per qualifying set).
@@ -1525,7 +1525,7 @@ end
 --- Find all runs of consecutive integer stat values with length >= min_run.
 --- Useful for "straight" or sequential-run detection in card games.
 --- Each run is returned as a CardGroup whose indices reference the original list.
---- @param items table  List of Card objects.
+--- @param items table  List of LCard objects.
 --- @param stat string  Stat name to use for sequencing.
 --- @param min_run number  Minimum run length to include.
 --- @treturn table  Array of CardGroup objects (one per run found).

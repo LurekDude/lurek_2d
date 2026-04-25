@@ -121,7 +121,7 @@ impl LuaUserData for LuaDoorManager {
         // -- type --
         /// Returns the type string "DoorManager".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("DoorManager"));
+        methods.add_method("type", |_, _, ()| Ok("LDoorManager"));
 
         // -- typeOf --
         /// Returns the type string "DoorManager".
@@ -184,7 +184,7 @@ impl LuaUserData for LuaHeightMap {
         // -- type --
         /// Returns the type string "HeightMap".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("HeightMap"));
+        methods.add_method("type", |_, _, ()| Ok("LHeightMap"));
 
         // -- typeOf --
         /// Returns the type string "HeightMap".
@@ -259,7 +259,7 @@ impl LuaUserData for LuaPointLight {
         // -- type --
         /// Returns the type string "PointLight".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("PointLight"));
+        methods.add_method("type", |_, _, ()| Ok("LPointLight"));
 
         // -- typeOf --
         /// Returns the type string "PointLight".
@@ -747,6 +747,19 @@ impl LuaUserData for LuaRaycaster {
                 Ok(quad_count)
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LRaycaster"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LRaycaster" || name == "Object")
+        });
     }
 }
 
@@ -846,7 +859,7 @@ impl LuaUserData for LuaSpriteManager {
         // -- type --
         /// Returns the type string "SpriteManager".
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("SpriteManager"));
+        methods.add_method("type", |_, _, ()| Ok("LSpriteManager"));
 
         // -- typeOf --
         /// Returns the type string "SpriteManager".

@@ -72,6 +72,19 @@ impl LuaUserData for LuaTweenState {
             this.inner.reset();
             Ok(())
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTweenState"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTweenState" || name == "Object")
+        });
     }
 }
 
@@ -535,7 +548,8 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
-        /// @param fn function
+        /// @param self Tween
+        /// @param f function
         /// @return Tween
         methods.add_function(
             "onComplete",
@@ -553,7 +567,8 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onUpdate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
-        /// @param fn function
+        /// @param self Tween
+        /// @param f function
         /// @return Tween
         methods.add_function("onUpdate", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -568,7 +583,8 @@ impl LuaUserData for LuaTween {
 
         // â”€â”€ onCancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         /// Sets a callback called when the tween is cancelled. Returns self.
-        /// @param fn function
+        /// @param self Tween
+        /// @param f function
         /// @return Tween
         methods.add_function("onCancel", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
@@ -579,6 +595,19 @@ impl LuaUserData for LuaTween {
                 tw.on_cancel = Some(lua.create_registry_value(f)?);
             }
             Ok(ud)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTween"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTween" || name == "Object")
         });
     }
 }
@@ -706,6 +735,19 @@ impl LuaUserData for LuaTweenSequence {
                 Ok(ud)
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTweenSequence"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTweenSequence" || name == "Object")
+        });
     }
 }
 
@@ -825,6 +867,19 @@ impl LuaUserData for LuaTweenParallel {
                 Ok(ud)
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LTweenParallel"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LTweenParallel" || name == "Object")
+        });
     }
 }
 
@@ -911,6 +966,19 @@ impl LuaUserData for LuaSpring {
         /// @return number?
         methods.add_method("getPosition", |_, this, field: String| {
             Ok(this.system.get_position(&field).map(|p| p as f64))
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LSpring"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LSpring" || name == "Object")
         });
     }
 }

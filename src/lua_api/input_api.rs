@@ -36,6 +36,19 @@ impl LuaUserData for LuaCursor {
                 CursorKind::Custom { .. } => "custom",
             })
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCursor"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCursor" || name == "Object")
+        });
     }
 }
 
@@ -133,6 +146,19 @@ impl LuaUserData for LuaCombo {
             tbl.set("gap_ms", step.max_gap_ms)?;
             Ok(LuaValue::Table(tbl))
         });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LCombo"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCombo" || name == "Object")
+        });
     }
 }
 
@@ -169,6 +195,19 @@ impl LuaUserData for LuaInputRecording {
         /// @return integer
         methods.add_method("frameCount", |_, this, ()| {
             Ok(this.inner.frames.len() as i64)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LInputRecording"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LInputRecording" || name == "Object")
         });
     }
 }

@@ -1876,12 +1876,14 @@ end)
 describe("Missing API Coverage", function()
     -- @tests DataFrame:min
     it("covers DataFrame:min", function()
-        -- TODO: Implement test for DataFrame:min
+        local df = lurek.dataframe.fromCSV("v\n10\n2\n7")
+        expect_equal(2, df:min("v"))
     end)
 
     -- @tests DataFrame:max
     it("covers DataFrame:max", function()
-        -- TODO: Implement test for DataFrame:max
+        local df = lurek.dataframe.fromCSV("v\n10\n2\n7")
+        expect_equal(10, df:max("v"))
     end)
 
     -- @tests DataFrame:withEval

@@ -256,14 +256,14 @@ impl LuaUserData for LuaNavGrid {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("NavGrid"));
+        methods.add_method("type", |_, _, ()| Ok("LNavGrid"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
         /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "NavGrid" || name == "Object")
+            Ok(name == "LNavGrid" || name == "Object")
         });
     }
 }
@@ -557,14 +557,14 @@ impl LuaUserData for LuaUnitPathfinder {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("UnitPathfinder"));
+        methods.add_method("type", |_, _, ()| Ok("LUnitPathfinder"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
         /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "UnitPathfinder" || name == "Object")
+            Ok(name == "LUnitPathfinder" || name == "Object")
         });
     }
 }
@@ -685,14 +685,14 @@ impl LuaUserData for LuaFlowField {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("FlowField"));
+        methods.add_method("type", |_, _, ()| Ok("LFlowField"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
         /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "FlowField" || name == "Object")
+            Ok(name == "LFlowField" || name == "Object")
         });
     }
 }
@@ -832,14 +832,14 @@ impl LuaUserData for LuaPathGrid {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("PathGrid"));
+        methods.add_method("type", |_, _, ()| Ok("LPathGrid"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
         /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "PathGrid" || name == "Object")
+            Ok(name == "LPathGrid" || name == "Object")
         });
     }
 }
@@ -924,14 +924,14 @@ impl LuaUserData for LuaAiFlowField {
         // -- type --
         /// Returns the type name of this object.
         /// @return string
-        methods.add_method("type", |_, _, ()| Ok("FlowField"));
+        methods.add_method("type", |_, _, ()| Ok("LAIFlowField"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
         /// @param name string
         /// @return boolean
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "FlowField" || name == "Object")
+            Ok(name == "LAIFlowField" || name == "Object")
         });
     }
 }
@@ -1092,6 +1092,19 @@ impl LuaUserData for LuaHexGrid {
                     .distance((c1 - 1, r1 - 1), (c2 - 1, r2 - 1)))
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LHexGrid"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LHexGrid" || name == "Object")
+        });
     }
 }
 
@@ -1156,6 +1169,19 @@ impl LuaUserData for LuaJpsGrid {
                 }
             },
         );
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return string
+        methods.add_method("type", |_, _, ()| Ok("LJpsGrid"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param name string
+        /// @return boolean
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LJpsGrid" || name == "Object")
+        });
     }
 }
 

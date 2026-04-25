@@ -4,8 +4,8 @@
 
 | Category | Covered | Total | Coverage |
 |----------|---------|-------|----------|
-| Rust public functions | 3228 | 4155 | 77.7% |
-| Lua API functions | 4043 | 4067 | 99.4% |
+| Rust public functions | 3253 | 4229 | 76.9% |
+| Lua API functions | 4353 | 4379 | 99.4% |
 
 ## Rust Coverage by Module
 
@@ -29,12 +29,13 @@
 | filesystem | 64 | 73 | 87.7% |
 | globe | 94 | 117 | 80.3% |
 | graph | 98 | 120 | 81.7% |
+| html | 24 | 73 | 32.9% |
 | i18n | 25 | 30 | 83.3% |
 | image | 91 | 149 | 61.1% |
 | input | 78 | 92 | 84.8% |
 | light | 52 | 89 | 58.4% |
 | log | 23 | 25 | 92.0% |
-| lua_api | 66 | 85 | 77.6% |
+| lua_api | 67 | 86 | 77.9% |
 | math | 218 | 241 | 90.5% |
 | minimap | 81 | 82 | 98.8% |
 | mods | 17 | 20 | 85.0% |
@@ -67,54 +68,55 @@
 
 | Module | Covered | Total | Coverage |
 |--------|---------|-------|----------|
-| ai | 291 | 292 | 99.7% |
-| animation | 53 | 53 | 100.0% |
-| audio | 214 | 215 | 99.5% |
+| ai | 321 | 322 | 99.7% |
+| animation | 63 | 63 | 100.0% |
+| audio | 218 | 219 | 99.5% |
 | automation | 28 | 28 | 100.0% |
-| camera | 47 | 47 | 100.0% |
+| camera | 49 | 49 | 100.0% |
 | compute | 76 | 77 | 98.7% |
-| data | 62 | 62 | 100.0% |
-| dataframe | 114 | 116 | 98.3% |
+| data | 68 | 68 | 100.0% |
+| dataframe | 116 | 118 | 98.3% |
 | debugbridge | 14 | 14 | 100.0% |
-| devtools | 53 | 54 | 98.1% |
-| docs | 75 | 75 | 100.0% |
-| ecs | 61 | 61 | 100.0% |
+| devtools | 58 | 58 | 100.0% |
+| docs | 85 | 85 | 100.0% |
+| ecs | 63 | 63 | 100.0% |
 | effect | 157 | 158 | 99.4% |
 | engine | 10 | 10 | 100.0% |
 | event | 26 | 26 | 100.0% |
-| filesystem | 54 | 54 | 100.0% |
-| globe | 53 | 53 | 100.0% |
+| filesystem | 60 | 60 | 100.0% |
+| globe | 57 | 57 | 100.0% |
 | graph | 126 | 126 | 100.0% |
+| html | 56 | 59 | 94.9% |
 | i18n | 31 | 31 | 100.0% |
-| image | 80 | 80 | 100.0% |
-| input | 81 | 81 | 100.0% |
-| light | 86 | 86 | 100.0% |
+| image | 90 | 90 | 100.0% |
+| input | 87 | 87 | 100.0% |
+| light | 90 | 90 | 100.0% |
 | log | 18 | 18 | 100.0% |
-| math | 217 | 220 | 98.6% |
+| math | 243 | 246 | 98.8% |
 | minimap | 76 | 76 | 100.0% |
-| mods | 47 | 47 | 100.0% |
-| network | 47 | 47 | 100.0% |
+| mods | 53 | 53 | 100.0% |
+| network | 51 | 51 | 100.0% |
 | parallax | 44 | 44 | 100.0% |
-| particle | 96 | 98 | 98.0% |
-| pathfind | 89 | 90 | 98.9% |
+| particle | 98 | 100 | 98.0% |
+| pathfind | 93 | 94 | 98.9% |
 | patterns | 170 | 170 | 100.0% |
-| physics | 189 | 193 | 97.9% |
+| physics | 201 | 205 | 98.0% |
 | pipeline | 61 | 62 | 98.4% |
 | procgen | 18 | 18 | 100.0% |
-| raycaster | 55 | 59 | 93.2% |
-| render | 175 | 175 | 100.0% |
-| save | 26 | 26 | 100.0% |
-| scene | 53 | 53 | 100.0% |
+| raycaster | 57 | 61 | 93.4% |
+| render | 197 | 197 | 100.0% |
+| save | 28 | 28 | 100.0% |
+| scene | 55 | 55 | 100.0% |
 | serial | 10 | 10 | 100.0% |
-| spine | 30 | 30 | 100.0% |
-| sprite | 20 | 20 | 100.0% |
+| spine | 34 | 34 | 100.0% |
+| sprite | 24 | 24 | 100.0% |
 | system | 26 | 26 | 100.0% |
-| terminal | 83 | 83 | 100.0% |
+| terminal | 87 | 87 | 100.0% |
 | thread | 37 | 37 | 100.0% |
-| tilemap | 166 | 168 | 98.8% |
-| timer | 47 | 47 | 100.0% |
-| tween | 35 | 35 | 100.0% |
-| ui | 366 | 366 | 100.0% |
+| tilemap | 186 | 188 | 98.9% |
+| timer | 49 | 49 | 100.0% |
+| tween | 58 | 58 | 100.0% |
+| ui | 380 | 380 | 100.0% |
 | window | 50 | 50 | 100.0% |
 
 ## Uncovered Rust Functions (top 50)
@@ -169,31 +171,33 @@
 - `StimulusWorld::add_auditory` in `src/ai/perception.rs:236`
 - `StimulusWorld::add_custom` in `src/ai/perception.rs:262`
 - `StimulusWorld::stimuli` in `src/ai/perception.rs:306`
-- ... and 877 more
+- ... and 926 more
 
 ## Uncovered Lua API Functions (top 50)
 
-- `InfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1843`
-- `Bus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:535`
-- `Array:eigenPower` (method) in `src/lua_api/compute_api.rs:855`
-- `DataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:727`
-- `DataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:744`
-- `lurek.devtools.fatal` (function) in `src/lua_api/devtools_api.rs:217`
-- `Overlay:triggerShake` (method) in `src/lua_api/effect_api.rs:743`
-- `NoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1203`
-- `NoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1328`
-- `NoiseGenerator:generateMap` (method) in `src/lua_api/math_api.rs:1339`
-- `Trail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1420`
-- `Trail:setTailColor` (method) in `src/lua_api/particle_api.rs:1436`
-- `FlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:604`
-- `World:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:689`
-- `World:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:710`
-- `World:setJointLimits` (method) in `src/lua_api/physics_api.rs:726`
-- `World:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:748`
-- `Pipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1212`
-- `Raycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:552`
-- `Raycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:573`
-- `Raycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:602`
-- `Raycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:622`
-- `ChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1160`
-- `MapBlock:setSide` (method) in `src/lua_api/tilemap_api.rs:1602`
+- `LInfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1843`
+- `LBus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:548`
+- `LArray:eigenPower` (method) in `src/lua_api/compute_api.rs:855`
+- `LDataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:740`
+- `LDataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:757`
+- `LOverlay:triggerShake` (method) in `src/lua_api/effect_api.rs:743`
+- `lurek.html.preventDefault` (function) in `src/lua_api/html_api.rs:891`
+- `lurek.html.stopPropagation` (function) in `src/lua_api/html_api.rs:900`
+- `lurek.html.isDefaultPrevented` (function) in `src/lua_api/html_api.rs:909`
+- `LNoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1309`
+- `LNoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1434`
+- `LNoiseGenerator:generateMap` (method) in `src/lua_api/math_api.rs:1445`
+- `LTrail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1420`
+- `LTrail:setTailColor` (method) in `src/lua_api/particle_api.rs:1436`
+- `LFlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:604`
+- `LWorld:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:690`
+- `LWorld:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:711`
+- `LWorld:setJointLimits` (method) in `src/lua_api/physics_api.rs:727`
+- `LWorld:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:749`
+- `LPipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1211`
+- `LRaycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:552`
+- `LRaycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:573`
+- `LRaycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:602`
+- `LRaycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:622`
+- `LChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1199`
+- `LMapBlock:setSide` (method) in `src/lua_api/tilemap_api.rs:1680`

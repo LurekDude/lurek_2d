@@ -1232,42 +1232,63 @@ describe("Missing API Coverage", function()
 
     -- @tests Queue:len
     it("covers Queue:len", function()
-        -- TODO: Implement test for Queue:len
+        local queue = lurek.patterns.newQueue()
+        queue:enqueue("a")
+        queue:enqueue("b")
+        expect_equal(2, queue:len())
     end)
 
     -- @tests List:add
     it("covers List:add", function()
-        -- TODO: Implement test for List:add
+        local list = lurek.patterns.newList()
+        list:add("x")
+        expect_equal(1, list:len())
     end)
 
     -- @tests List:get
     it("covers List:get", function()
-        -- TODO: Implement test for List:get
+        local list = lurek.patterns.newList()
+        list:add("hello")
+        expect_equal("hello", list:get(1))
     end)
 
     -- @tests List:set
     it("covers List:set", function()
-        -- TODO: Implement test for List:set
+        local list = lurek.patterns.newList()
+        list:add("old")
+        list:set(1, "new")
+        expect_equal("new", list:get(1))
     end)
 
     -- @tests List:len
     it("covers List:len", function()
-        -- TODO: Implement test for List:len
+        local list = lurek.patterns.newList()
+        list:add("a")
+        list:add("b")
+        expect_equal(2, list:len())
     end)
 
     -- @tests Set:add
     it("covers Set:add", function()
-        -- TODO: Implement test for Set:add
+        local set = lurek.patterns.newSet()
+        set:add("alpha")
+        expect_true(set:has("alpha"))
     end)
 
     -- @tests Set:has
     it("covers Set:has", function()
-        -- TODO: Implement test for Set:has
+        local set = lurek.patterns.newSet()
+        set:add("x")
+        expect_true(set:has("x"))
+        expect_false(set:has("y"))
     end)
 
     -- @tests Set:len
     it("covers Set:len", function()
-        -- TODO: Implement test for Set:len
+        local set = lurek.patterns.newSet()
+        set:add("a")
+        set:add("b")
+        expect_equal(2, set:len())
     end)
 
 end)

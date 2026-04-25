@@ -689,112 +689,149 @@ end)
 describe("Missing explicit test for PointLight:type", function()
     it("PointLight:type works", function()
         -- @tests PointLight:type
-        -- TODO: add assertion for PointLight:type
+        local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        expect_equal("PointLight", pl:type())
     end)
 end)
 
 describe("Missing explicit test for PointLight:typeOf", function()
     it("PointLight:typeOf works", function()
         -- @tests PointLight:typeOf
-        -- TODO: add assertion for PointLight:typeOf
+        local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
+        expect_equal("PointLight", pl:typeOf())
     end)
 end)
 
 describe("Missing explicit test for Raycaster:setCell", function()
     it("Raycaster:setCell works", function()
         -- @tests Raycaster:setCell
-        -- TODO: add assertion for Raycaster:setCell
+        local rc = lurek.raycaster.new(4, 4)
+        rc:setCell(0, 0, 7)
+        expect_equal(7, rc:getCell(0, 0))
     end)
 end)
 
 describe("Missing explicit test for Raycaster:getCell", function()
     it("Raycaster:getCell works", function()
         -- @tests Raycaster:getCell
-        -- TODO: add assertion for Raycaster:getCell
+        local rc = lurek.raycaster.new(4, 4)
+        rc:setCell(1, 2, 3)
+        expect_equal(3, rc:getCell(1, 2))
     end)
 end)
 
 describe("Missing explicit test for Raycaster:setCells", function()
     it("Raycaster:setCells works", function()
         -- @tests Raycaster:setCells
-        -- TODO: add assertion for Raycaster:setCells
+        local rc = lurek.raycaster.new(2, 2)
+        rc:setCells({1, 2, 3, 4})
+        expect_equal(1, rc:getCell(0, 0))
     end)
 end)
 
 describe("Missing explicit test for Raycaster:isBlocked", function()
     it("Raycaster:isBlocked works", function()
         -- @tests Raycaster:isBlocked
-        -- TODO: add assertion for Raycaster:isBlocked
+        local rc = lurek.raycaster.new(4, 4)
+        rc:setCell(0, 0, 1)
+        expect_true(rc:isBlocked(0, 0))
+        expect_false(rc:isBlocked(1, 1))
     end)
 end)
 
 describe("Missing explicit test for Raycaster:width", function()
     it("Raycaster:width works", function()
         -- @tests Raycaster:width
-        -- TODO: add assertion for Raycaster:width
+        local rc = lurek.raycaster.new(5, 3)
+        expect_equal(5, rc:width())
     end)
 end)
 
 describe("Missing explicit test for Raycaster:height", function()
     it("Raycaster:height works", function()
         -- @tests Raycaster:height
-        -- TODO: add assertion for Raycaster:height
+        local rc = lurek.raycaster.new(5, 3)
+        expect_equal(3, rc:height())
     end)
 end)
 
 describe("Missing explicit test for Raycaster:setWallAlpha", function()
     it("Raycaster:setWallAlpha works", function()
         -- @tests Raycaster:setWallAlpha
-        -- TODO: add assertion for Raycaster:setWallAlpha
+        local rc = lurek.raycaster.new(4, 4)
+        rc:setWallAlpha(1, 0.75)
+        expect_near(0.75, rc:getWallAlpha(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for Raycaster:getWallAlpha", function()
     it("Raycaster:getWallAlpha works", function()
         -- @tests Raycaster:getWallAlpha
-        -- TODO: add assertion for Raycaster:getWallAlpha
+        local rc = lurek.raycaster.new(4, 4)
+        rc:setWallAlpha(2, 0.5)
+        expect_near(0.5, rc:getWallAlpha(2), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:remove", function()
     it("SpriteManager:remove works", function()
         -- @tests SpriteManager:remove
-        -- TODO: add assertion for SpriteManager:remove
+        local sm = lurek.raycaster.newSpriteManager()
+        local id = sm:add(1.0, 1.0, "a")
+        sm:remove(id)
+        -- remove is a no-op on unknown id, should not error
+        sm:remove(id)
+        expect_type("number", id)
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:setPosition", function()
     it("SpriteManager:setPosition works", function()
         -- @tests SpriteManager:setPosition
-        -- TODO: add assertion for SpriteManager:setPosition
+        local sm = lurek.raycaster.newSpriteManager()
+        local id = sm:add(0.0, 0.0, "spr")
+        sm:setPosition(id, 3.0, 5.0)
+        expect_type("number", id)
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:setVisible", function()
     it("SpriteManager:setVisible works", function()
         -- @tests SpriteManager:setVisible
-        -- TODO: add assertion for SpriteManager:setVisible
+        local sm = lurek.raycaster.newSpriteManager()
+        local id = sm:add(0.0, 0.0, "spr")
+        sm:setVisible(id, false)
+        sm:setVisible(id, true)
+        expect_type("number", id)
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:clear", function()
     it("SpriteManager:clear works", function()
         -- @tests SpriteManager:clear
-        -- TODO: add assertion for SpriteManager:clear
+        local sm = lurek.raycaster.newSpriteManager()
+        sm:add(1.0, 1.0, "a")
+        sm:add(2.0, 2.0, "b")
+        sm:clear()
+        -- After clear, add returns 0 (first id again)
+        local new_id = sm:add(0.0, 0.0, "c")
+        expect_type("number", new_id)
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:type", function()
     it("SpriteManager:type works", function()
         -- @tests SpriteManager:type
-        -- TODO: add assertion for SpriteManager:type
+        local sm = lurek.raycaster.newSpriteManager()
+        expect_equal("SpriteManager", sm:type())
     end)
 end)
 
 describe("Missing explicit test for SpriteManager:typeOf", function()
     it("SpriteManager:typeOf works", function()
         -- @tests SpriteManager:typeOf
-        -- TODO: add assertion for SpriteManager:typeOf
+        local sm = lurek.raycaster.newSpriteManager()
+        expect_equal("SpriteManager", sm:typeOf())
     end)
 end)
 

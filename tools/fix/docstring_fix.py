@@ -34,7 +34,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-AUDIT_JSON = WORKSPACE_ROOT / "logs" / "docstring_audit.json"
+AUDIT_JSON = WORKSPACE_ROOT / "logs" / "data" / "docstring_audit.json"
 
 # ── Rust → Lua type map ─────────────────────────────────────────────────────
 

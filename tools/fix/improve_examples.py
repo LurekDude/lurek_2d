@@ -25,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 EXAMPLES_DIR = ROOT / "content" / "examples"
-API_JSON = ROOT / "logs" / "lua_api_data.json"
+API_JSON = ROOT / "logs" / "data" / "lua_api_data.json"
 
 # Map module name -> example file stem
 MODULE_TO_EXAMPLE: dict[str, str] = {

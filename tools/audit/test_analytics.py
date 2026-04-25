@@ -30,10 +30,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 WORKSPACE_ROOT = Path(__file__).resolve().parent.parent.parent
-LUA_API_DATA = WORKSPACE_ROOT / "logs" / "lua_api_data.json"
+LUA_API_DATA = WORKSPACE_ROOT / "logs" / "data" / "lua_api_data.json"
 LUA_TESTS_DIR = WORKSPACE_ROOT / "tests" / "lua"
-COVERAGE_JSON = WORKSPACE_ROOT / "logs" / "lua_api_test_coverage.json"
-OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "test_analytics.json"
+COVERAGE_JSON = WORKSPACE_ROOT / "logs" / "data" / "lua_api_test_coverage.json"
+OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "data" / "test_analytics.json"
 
 # ── Regex patterns ────────────────────────────────────────────────────────────
 
