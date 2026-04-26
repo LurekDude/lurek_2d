@@ -873,392 +873,479 @@ end
 -- ---- Stub: LLight:setPosition --------------------------------------------
 --@api-stub: LLight:setPosition
 -- Sets the light's world-space position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setPosition(0.0, 0.0)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getPosition --------------------------------------------
+-- Call each frame when following a moving entity.
+do  -- LLight:setPosition
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setPosition(512, 256)
+  local x, y = lt:getPosition()
+  lurek.log.info("position=" .. x .. "," .. y, "light")
+end
 --@api-stub: LLight:getPosition
 -- Returns the light's world-space position.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getPosition()  -- -> number, number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setRadius ----------------------------------------------
+-- Use to synchronise UI rings or particle emitters with the light source.
+do  -- LLight:getPosition
+  local lt = lurek.light.newLight(100, 200, 150)
+  local x, y = lt:getPosition()
+  lurek.log.info("x=" .. x .. " y=" .. y, "light")
+end
 --@api-stub: LLight:setRadius
 -- Sets the light's influence radius.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setRadius(1.0)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getRadius ----------------------------------------------
+-- Larger radius covers more of the scene but costs more GPU.
+do  -- LLight:setRadius
+  local lt = lurek.light.newLight(400, 300, 100)
+  lt:setRadius(250)
+  lurek.log.info("radius=" .. lt:getRadius(), "light")
+end
 --@api-stub: LLight:getRadius
 -- Returns the light's influence radius.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getRadius()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setColor -----------------------------------------------
+-- Use to scale volumetric particle emission to match the light area.
+do  -- LLight:getRadius
+  local lt = lurek.light.newLight(400, 300, 180)
+  lurek.log.info("radius=" .. lt:getRadius(), "light")
+end
 --@api-stub: LLight:setColor
 -- Sets the light's tint color.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setColor(1.0, 0.8, 0.2, [a])
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getColor -----------------------------------------------
+-- Use to change torch colour at night or shift a spell's light colour.
+do  -- LLight:setColor
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setColor(1.0, 0.6, 0.2, 1.0)   -- warm orange
+  local r, g, b, a = lt:getColor()
+  lurek.log.info("color r=" .. r .. " g=" .. g, "light")
+end
 --@api-stub: LLight:getColor
 -- Returns the light's tint color as (r, g, b, a).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getColor()  -- -> number, number, number, number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setIntensity -------------------------------------------
+-- Use to read the current colour for UI colour-picker sync.
+do  -- LLight:getColor
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setColor(0.2, 0.4, 1.0, 1.0)   -- cool blue
+  local r, g, b, a = lt:getColor()
+  lurek.log.info("r=" .. r .. " g=" .. g .. " b=" .. b, "light")
+end
 --@api-stub: LLight:setIntensity
 -- Sets the brightness multiplier.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setIntensity(1)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getIntensity -------------------------------------------
+-- Values > 1.0 overbright; < 1.0 dim; 0.0 turns off the light.
+do  -- LLight:setIntensity
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setIntensity(2.5)
+  lurek.log.info("intensity=" .. lt:getIntensity(), "light")
+end
 --@api-stub: LLight:getIntensity
 -- Returns the brightness multiplier.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getIntensity()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setEnergy ----------------------------------------------
+-- Use when saving light state to a scene file.
+do  -- LLight:getIntensity
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setIntensity(0.8)
+  lurek.log.info("intensity=" .. lt:getIntensity(), "light")
+end
 --@api-stub: LLight:setEnergy
 -- Sets the energy scaling factor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setEnergy(e)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getEnergy ----------------------------------------------
+-- Multiplied with intensity to control the total output of the light.
+do  -- LLight:setEnergy
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setEnergy(1.5)
+  lurek.log.info("energy=" .. lt:getEnergy(), "light")
+end
 --@api-stub: LLight:getEnergy
 -- Returns the energy scaling factor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getEnergy()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setBlendMode -------------------------------------------
+-- Use for dynamic difficulty: dim all lights at dusk to a lower energy level.
+do  -- LLight:getEnergy
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setEnergy(0.7)
+  lurek.log.info("energy=" .. lt:getEnergy(), "light")
+end
 --@api-stub: LLight:setBlendMode
 -- Sets the blend mode ('add', 'sub', or 'mix').
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setBlendMode(mode)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getBlendMode -------------------------------------------
+-- 'add' brightens overlap; 'sub' creates dark patches; 'mix' blends neutrally.
+do  -- LLight:setBlendMode
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setBlendMode("add")
+  lurek.log.info("blend_mode=" .. lt:getBlendMode(), "light")
+end
 --@api-stub: LLight:getBlendMode
 -- Returns the blend mode as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getBlendMode()  -- -> string
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setFalloff ---------------------------------------------
+-- Use when serialising a light's full properties to a scene file.
+do  -- LLight:getBlendMode
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setBlendMode("mix")
+  lurek.log.info("blend_mode=" .. lt:getBlendMode(), "light")
+end
 --@api-stub: LLight:setFalloff
 -- Sets the falloff mode ('linear', 'smooth', or 'constant').
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setFalloff(mode)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getFalloff ---------------------------------------------
+-- 'smooth' (cosine) is the most natural; 'constant' creates hard-edged zones.
+do  -- LLight:setFalloff
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFalloff("smooth")
+  lurek.log.info("falloff=" .. lt:getFalloff(), "light")
+end
 --@api-stub: LLight:getFalloff
 -- Returns the falloff mode as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getFalloff()  -- -> string
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setShadowEnabled ---------------------------------------
+-- Use when building a light property inspector UI.
+do  -- LLight:getFalloff
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFalloff("linear")
+  lurek.log.info("falloff=" .. lt:getFalloff(), "light")
+end
 --@api-stub: LLight:setShadowEnabled
 -- Sets whether this light casts shadows.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setShadowEnabled(0.2)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:isShadowEnabled ----------------------------------------
+-- Disable on many distant lights for performance; keep on hero's torch.
+do  -- LLight:setShadowEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowEnabled(true)
+  lurek.log.info("shadow=" .. tostring(lt:isShadowEnabled()), "light")
+end
 --@api-stub: LLight:isShadowEnabled
 -- Returns whether this light casts shadows.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:isShadowEnabled()  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setShadowColor -----------------------------------------
+-- Use to skip shadow rendering on disabled lights in the scene graph.
+do  -- LLight:isShadowEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowEnabled(false)
+  lurek.log.info("shadow=" .. tostring(lt:isShadowEnabled()), "light")
+end
 --@api-stub: LLight:setShadowColor
 -- Sets the shadow region color.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setShadowColor(1.0, 0.8, 0.2, [a])
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getShadowColor -----------------------------------------
+-- Warm shadow colours add mood; cool blue shadows work for night levels.
+do  -- LLight:setShadowColor
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowEnabled(true)
+  lt:setShadowColor(0.0, 0.0, 0.2, 0.8)   -- dark blue shadows
+  local r, g, b, a = lt:getShadowColor()
+  lurek.log.info("shadow_color b=" .. b .. " a=" .. a, "light")
+end
 --@api-stub: LLight:getShadowColor
 -- Returns the shadow region color as (r, g, b, a).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getShadowColor()  -- -> number, number, number, number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setShadowFilter ----------------------------------------
+-- Use when saving per-light shadow settings to a JSON config.
+do  -- LLight:getShadowColor
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowColor(0.1, 0.1, 0.3, 0.9)
+  local r, g, b, a = lt:getShadowColor()
+  lurek.log.info("shadow_color=" .. r .. "," .. g .. "," .. b, "light")
+end
 --@api-stub: LLight:setShadowFilter
 -- Sets the shadow edge filter ('none', 'pcf5', or 'pcf13').
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setShadowFilter(filter)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getShadowFilter ----------------------------------------
+-- 'pcf5' gives soft 5-tap edges; 'pcf13' is higher quality but slower.
+do  -- LLight:setShadowFilter
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowEnabled(true)
+  lt:setShadowFilter("pcf5")
+  lurek.log.info("shadow_filter=" .. lt:getShadowFilter(), "light")
+end
 --@api-stub: LLight:getShadowFilter
 -- Returns the shadow edge filter as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getShadowFilter()  -- -> string
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setShadowSmooth ----------------------------------------
+-- Use to show the quality preset in a graphics options menu.
+do  -- LLight:getShadowFilter
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowFilter("pcf13")
+  lurek.log.info("shadow_filter=" .. lt:getShadowFilter(), "light")
+end
 --@api-stub: LLight:setShadowSmooth
 -- Sets the shadow edge smoothing factor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setShadowSmooth(s)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getShadowSmooth ----------------------------------------
+-- Higher values blur shadow edges more; 0.0 is hard.
+do  -- LLight:setShadowSmooth
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowSmooth(2.0)
+  lurek.log.info("shadow_smooth=" .. lt:getShadowSmooth(), "light")
+end
 --@api-stub: LLight:getShadowSmooth
 -- Returns the shadow edge smoothing factor.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getShadowSmooth()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setLightMask -------------------------------------------
+-- Read this when exporting a scene's shadow quality config.
+do  -- LLight:getShadowSmooth
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowSmooth(1.5)
+  lurek.log.info("shadow_smooth=" .. lt:getShadowSmooth(), "light")
+end
 --@api-stub: LLight:setLightMask
 -- Sets the light interaction bitmask.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setLightMask(mask)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getLightMask -------------------------------------------
+-- Only layers whose bit is set in this mask receive lighting from this source.
+do  -- LLight:setLightMask
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightMask(0b00000011)   -- illuminate layers 1 and 2
+  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
+end
 --@api-stub: LLight:getLightMask
 -- Returns the light interaction bitmask.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getLightMask()  -- -> integer
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setShadowMask ------------------------------------------
+-- Use to inspect which layers this light illuminates.
+do  -- LLight:getLightMask
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightMask(0b11111111)   -- illuminate all layers
+  lurek.log.info("light_mask=" .. lt:getLightMask(), "light")
+end
 --@api-stub: LLight:setShadowMask
 -- Sets the shadow casting bitmask.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setShadowMask(mask)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getShadowMask ------------------------------------------
+-- Only layers whose bit is set can cast shadows from this light.
+do  -- LLight:setShadowMask
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowEnabled(true)
+  lt:setShadowMask(0b00001111)   -- only first 4 layers cast shadows
+  lurek.log.info("shadow_mask=" .. lt:getShadowMask(), "light")
+end
 --@api-stub: LLight:getShadowMask
 -- Returns the shadow casting bitmask.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getShadowMask()  -- -> integer
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setEnabled ---------------------------------------------
+-- Use to verify shadow layer configuration is correct for the scene.
+do  -- LLight:getShadowMask
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setShadowMask(0b11111111)
+  lurek.log.info("shadow_mask=" .. lt:getShadowMask(), "light")
+end
 --@api-stub: LLight:setEnabled
 -- Sets whether this light is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setEnabled(0.2)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:isEnabled ----------------------------------------------
+-- Disable instead of removing when a light needs to flicker or be toggled.
+do  -- LLight:setEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setEnabled(false)
+  lurek.log.info("enabled=" .. tostring(lt:isEnabled()), "light")
+  lt:setEnabled(true)
+  lurek.log.info("re-enabled=" .. tostring(lt:isEnabled()), "light")
+end
 --@api-stub: LLight:isEnabled
 -- Returns whether this light is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:isEnabled()  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setLightType -------------------------------------------
+-- Use to skip rendering lights that are turned off.
+do  -- LLight:isEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("enabled by default=" .. tostring(lt:isEnabled()), "light")
+end
 --@api-stub: LLight:setLightType
 -- Sets the geometric light type ('point', 'directional', or 'spot').
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setLightType(t)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getLightType -------------------------------------------
+-- Spot lights use inner/outer cone angles; directional lights are infinite.
+do  -- LLight:setLightType
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setDirection(math.pi / 2)
+  lt:setInnerAngle(math.pi / 8)
+  lt:setOuterAngle(math.pi / 4)
+  lurek.log.info("type=" .. lt:getLightType(), "light")
+end
 --@api-stub: LLight:getLightType
 -- Returns the geometric light type as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getLightType()  -- -> string
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setDirection -------------------------------------------
+-- Use when serialising scene lights to a JSON file.
+do  -- LLight:getLightType
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("point")
+  lurek.log.info("type=" .. lt:getLightType(), "light")
+end
 --@api-stub: LLight:setDirection
 -- Sets the direction angle in radians.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setDirection(dir)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getDirection -------------------------------------------
+-- Use with spot/directional lights to orient the cone.
+do  -- LLight:setDirection
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setDirection(math.pi / 4)   -- point northeast
+  lurek.log.info("direction=" .. lt:getDirection(), "light")
+end
 --@api-stub: LLight:getDirection
 -- Returns the direction angle in radians.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getDirection()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setInnerAngle ------------------------------------------
+-- Use to rotate a flashlight icon to match the light direction.
+do  -- LLight:getDirection
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setDirection(math.pi)
+  lurek.log.info("direction=" .. lt:getDirection(), "light")
+end
 --@api-stub: LLight:setInnerAngle
 -- Sets the inner cone angle in radians for spot lights.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setInnerAngle(1.0)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getInnerAngle ------------------------------------------
+-- Pixels inside this angle are fully lit; between inner and outer is penumbra.
+do  -- LLight:setInnerAngle
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setInnerAngle(math.pi / 8)
+  lurek.log.info("inner_angle=" .. lt:getInnerAngle(), "light")
+end
 --@api-stub: LLight:getInnerAngle
 -- Returns the inner cone angle in radians.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getInnerAngle()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setOuterAngle ------------------------------------------
+-- Use for inspector display or comparing preset spot-light configs.
+do  -- LLight:getInnerAngle
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setInnerAngle(math.pi / 6)
+  lurek.log.info("inner_angle=" .. lt:getInnerAngle(), "light")
+end
 --@api-stub: LLight:setOuterAngle
 -- Sets the outer cone angle in radians for spot lights.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setOuterAngle(1.0)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getOuterAngle ------------------------------------------
+-- Beyond this angle the light contributes nothing.
+do  -- LLight:setOuterAngle
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setInnerAngle(math.pi / 8)
+  lt:setOuterAngle(math.pi / 4)
+  lurek.log.info("outer_angle=" .. lt:getOuterAngle(), "light")
+end
 --@api-stub: LLight:getOuterAngle
 -- Returns the outer cone angle in radians.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getOuterAngle()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setAttenuation -----------------------------------------
+-- Read when building a light presets config.
+do  -- LLight:getOuterAngle
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setLightType("spot")
+  lt:setOuterAngle(math.pi / 3)
+  lurek.log.info("outer_angle=" .. lt:getOuterAngle(), "light")
+end
 --@api-stub: LLight:setAttenuation
 -- Sets the custom attenuation coefficients (constant, linear, quadratic).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setAttenuation(c, l, q)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getAttenuation -----------------------------------------
+-- Use for physically-based inverse-square falloff.
+do  -- LLight:setAttenuation
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setAttenuation(1.0, 0.09, 0.032)   -- typical indoor point light
+  local c, l, q = lt:getAttenuation()
+  lurek.log.info("attenuation c=" .. c .. " l=" .. l .. " q=" .. q, "light")
+end
 --@api-stub: LLight:getAttenuation
 -- Returns the custom attenuation coefficients as (constant, linear, quadratic).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getAttenuation()  -- -> number, number, number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setFlicker ---------------------------------------------
+-- Use to validate attenuation settings before baking static shadows.
+do  -- LLight:getAttenuation
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setAttenuation(1.0, 0.14, 0.07)
+  local c, l, q = lt:getAttenuation()
+  lurek.log.info("c=" .. c .. " l=" .. l .. " q=" .. q, "light")
+end
 --@api-stub: LLight:setFlicker
 -- Sets the flicker effect speed and strength (enables flicker).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setFlicker(120.0, strength)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getFlicker ---------------------------------------------
+-- Use for candles, fire, or damaged electrical lights.
+do  -- LLight:setFlicker
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFlicker(8.0, 0.15)   -- speed=8 Hz, strength=15%
+  local speed, strength = lt:getFlicker()
+  lurek.log.info("flicker speed=" .. speed .. " strength=" .. strength, "light")
+end
 --@api-stub: LLight:getFlicker
 -- Returns the flicker effect speed and strength.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getFlicker()  -- -> number, number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setFlickerEnabled --------------------------------------
+-- Use to copy flicker settings from one light to another.
+do  -- LLight:getFlicker
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFlicker(5.0, 0.2)
+  local speed, strength = lt:getFlicker()
+  lurek.log.info("speed=" .. speed .. " strength=" .. strength, "light")
+end
 --@api-stub: LLight:setFlickerEnabled
 -- Sets whether the flicker effect is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setFlickerEnabled(0.2)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:isFlickerEnabled ---------------------------------------
+-- Toggle flicker on and off during gameplay without losing the configuration.
+do  -- LLight:setFlickerEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFlicker(6.0, 0.1)
+  lt:setFlickerEnabled(true)
+  lurek.log.info("flicker=" .. tostring(lt:isFlickerEnabled()), "light")
+end
 --@api-stub: LLight:isFlickerEnabled
 -- Returns whether the flicker effect is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:isFlickerEnabled()  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setGroupId ---------------------------------------------
+-- Use to decide whether to update the flicker animation each frame.
+do  -- LLight:isFlickerEnabled
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setFlicker(4.0, 0.1)
+  lt:setFlickerEnabled(false)
+  lurek.log.info("flicker_enabled=" .. tostring(lt:isFlickerEnabled()), "light")
+end
 --@api-stub: LLight:setGroupId
 -- Sets the group identifier for batch operations.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setGroupId(1)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getGroupId ---------------------------------------------
+-- Lights in the same group can be dimmed or coloured together.
+do  -- LLight:setGroupId
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setGroupId("dungeon_torches")
+  lurek.log.info("group_id=" .. lt:getGroupId(), "light")
+end
 --@api-stub: LLight:getGroupId
 -- Returns the group identifier.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getGroupId()  -- -> integer
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setVolumetric ------------------------------------------
+-- Use when building batch light controllers.
+do  -- LLight:getGroupId
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setGroupId("cave_ambience")
+  lurek.log.info("group_id=" .. lt:getGroupId(), "light")
+end
 --@api-stub: LLight:setVolumetric
 -- Sets whether this light hints at volumetric scattering.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setVolumetric(0.2)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:isVolumetric -------------------------------------------
+-- Only effective when the volumetric post-process pass is enabled.
+do  -- LLight:setVolumetric
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setVolumetric(true)
+  lurek.log.info("volumetric=" .. tostring(lt:isVolumetric()), "light")
+end
 --@api-stub: LLight:isVolumetric
 -- Returns whether this light hints at volumetric scattering.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:isVolumetric()  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:remove -------------------------------------------------
+-- Use to skip volumetric shafts on hardware that cannot support them.
+do  -- LLight:isVolumetric
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setVolumetric(false)
+  lurek.log.info("volumetric=" .. tostring(lt:isVolumetric()), "light")
+end
 --@api-stub: LLight:remove
 -- Removes this light from the world.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:remove()
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:isValid ------------------------------------------------
+-- Use when a torch is extinguished or a light source object is destroyed.
+do  -- LLight:remove
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("valid before remove=" .. tostring(lt:isValid()), "light")
+  lt:remove()
+  lurek.log.info("valid after remove=" .. tostring(lt:isValid()), "light")
+end
 --@api-stub: LLight:isValid
 -- Returns whether this light handle is still valid.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:isValid()  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:addFlicker ---------------------------------------------
+-- Check before calling methods on lights stored in Lua tables across frames.
+do  -- LLight:isValid
+  local lt = lurek.light.newLight(400, 300, 200)
+  lurek.log.info("valid=" .. tostring(lt:isValid()), "light")
+end
 --@api-stub: LLight:addFlicker
--- Convenience method to set a flicker effect using amplitude range and
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:addFlicker(min, max, hz)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:transitionTo -------------------------------------------
+-- Convenience method to set a flicker effect using amplitude range and optional speed.
+-- Equivalent to setFlicker(speed, amp) but uses a min/max range for natural randomness.
+do  -- LLight:addFlicker
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:addFlicker(0.8, 1.2, 8.0)   -- amplitude between 80%–120% of base, 8 Hz
+  lurek.log.info("flicker active=" .. tostring(lt:isFlickerEnabled()), "light")
+end
 --@api-stub: LLight:transitionTo
--- Begins a smooth linear transition of the light's color, intensity,
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:transitionTo(target, duration)
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:updateTransition ---------------------------------------
+-- Begins a smooth linear transition of the light's color, intensity, and radius.
+-- Use to simulate dynamic lighting changes like a fire growing or a flashlight dying.
+do  -- LLight:transitionTo
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setColor(1.0, 1.0, 0.8, 1.0)
+  lt:transitionTo({r=0.0, g=0.0, b=1.0, a=1.0, intensity=0.3, radius=100}, 2.0)
+  lt:updateTransition(0.5)
+  lurek.log.info("transition progress=" .. lt:transitionProgress(), "light")
+end
 --@api-stub: LLight:updateTransition
--- Advances the active transition by `dt` seconds and applies the
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:updateTransition(0.016)  -- -> boolean
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:stopTransition -----------------------------------------
+-- Advances the active transition by dt seconds and applies the interpolated values.
+-- Call once per frame during a light colour/intensity change animation.
+do  -- LLight:updateTransition
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:transitionTo({r=1.0, g=0.0, b=0.0, a=1.0}, 1.0)
+  lt:updateTransition(0.25)
+  lurek.log.info("progress=" .. lt:transitionProgress(), "light")
+end
 --@api-stub: LLight:stopTransition
 -- Cancels the active light transition.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:stopTransition()
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:transitionProgress -------------------------------------
+-- Use when the player interrupts a scripted lighting change.
+do  -- LLight:stopTransition
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:transitionTo({intensity=0.1}, 5.0)
+  lt:stopTransition()
+  lurek.log.info("progress after stop=" .. lt:transitionProgress(), "light")
+end
 --@api-stub: LLight:transitionProgress
--- Returns the fractional progress `[0, 1]` of the active transition,
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:transitionProgress()  -- -> number
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:setCookie ----------------------------------------------
+-- Returns the fractional progress [0, 1] of the active transition, or 1.0 if none.
+-- Use to trigger events at a specific point in the light change animation.
+do  -- LLight:transitionProgress
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:transitionTo({intensity=0.2}, 2.0)
+  lt:updateTransition(1.0)   -- advance halfway
+  lurek.log.info("transition_progress=" .. lt:transitionProgress(), "light")
+end
 --@api-stub: LLight:setCookie
 -- Sets the texture path used as a light cookie (mask) for projection.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:setCookie("assets/hero.png")
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:getCookie ----------------------------------------------
+-- Use to project a window-frame gobo pattern or foliage shadow.
+do  -- LLight:setCookie
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setCookie("assets/cookie_window.png")
+  lurek.log.info("cookie=" .. tostring(lt:getCookie()), "light")
+end
 --@api-stub: LLight:getCookie
--- Returns the current cookie texture path, or `nil` if unset.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:getCookie()  -- -> string?
--- (replace lLight_stub with your real LLight instance above)
-
--- ---- Stub: LLight:clearCookie --------------------------------------------
+-- Returns the current cookie texture path, or nil if unset.
+-- Use when saving a light's full configuration to a scene file.
+do  -- LLight:getCookie
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setCookie("assets/gobo_slats.png")
+  lurek.log.info("cookie=" .. tostring(lt:getCookie()), "light")
+end
 --@api-stub: LLight:clearCookie
 -- Removes the cookie texture assignment.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lLight_stub:clearCookie()
--- (replace lLight_stub with your real LLight instance above)
-
+-- Use when switching from a window-frame light to a plain point light.
+do  -- LLight:clearCookie
+  local lt = lurek.light.newLight(400, 300, 200)
+  lt:setCookie("assets/gobo.png")
+  lt:clearCookie()
+  lurek.log.info("cookie after clear=" .. tostring(lt:getCookie()), "light")
+end

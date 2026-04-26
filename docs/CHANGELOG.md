@@ -2,6 +2,24 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9] - 2026-04-27
+
+### feat(examples): fill all 4022 api stubs — 0 pending, 100% real coverage
+
+- **`content/examples/camera.lua`**: filled 47 LCamera stubs (setPosition/getPosition, setZoom/getZoom, setRotation/getRotation, setViewport/getViewport, setBounds/removeBounds, setTarget/clearTarget, setFollowSmooth/setDeadZone/setLookAhead, shake/update, toWorld/toScreen, getVisibleArea, lookAt/move, followPath/stopPath/updatePath/pathProgress, zoomTo/stopZoom/updateZoom, parallax, apply/reset/attach/detach, effects).
+- **`content/examples/image.lua`**: filled 57 LImageData stubs (getWidth/getHeight/getDimensions/getPixel/setPixel/encode/getString, mapPixel/mapPixels, brightness/contrast/saturation/gamma/tint/grayscale/sepia/invert/threshold/posterize, fill/noise/alphaMask, flipHorizontal/flipVertical/rotate90cw/crop/resizeNearest/resize/blur/sharpen, drawRect/drawCircle/drawLine, blit/getRegion/diff/convolve/applyPaletteLut/setRawData/paste) and LLayeredImage stubs (getWidth/getHeight/layerCount/addLayer/removeLayer/getLayer/setLayer/getOpacity/setOpacity/isVisible/setVisible/getName/setName/swapLayers/moveLayer/merge/save).
+- **`content/examples/light.lua`**: filled 56 LLight stubs (setPosition/getPosition, setRadius/getRadius, setColor/getColor, setIntensity/getIntensity, setEnergy/getEnergy, setBlendMode/getBlendMode, setFalloff/getFalloff, setShadowEnabled/isShadowEnabled, setShadowColor/getShadowColor, setShadowFilter/getShadowFilter, setShadowSmooth/getShadowSmooth, setLightMask/getLightMask, setShadowMask/getShadowMask, setEnabled/isEnabled, setLightType/getLightType, setDirection/getDirection, setInnerAngle/getInnerAngle, setOuterAngle/getOuterAngle, setAttenuation/getAttenuation, setFlicker/getFlicker/setFlickerEnabled/isFlickerEnabled, setGroupId/getGroupId, setVolumetric/isVolumetric, remove/isValid/addFlicker, transitionTo/updateTransition/stopTransition/transitionProgress, setCookie/getCookie/clearCookie).
+- **`content/examples/graph.lua`**: filled 75 LGraphEdge + LGraphNode stubs covering type/capacity/throughput/travelTime/weight/speedModifier/cooldown/bidirectional/active/itemsInTransit/allowedTypes and node capacity/itemCount/active/overflowPolicy/flowMode/push-pull rates/filters/processTime/queue/items/edges/conversions/tags/supply/demand/enqueue/dequeue.
+- **`content/examples/audio.lua`**: filled LSoundData:getSample stub.
+- **`content/examples/docs.lua`**: filled 7 docs module stubs (loadToml, exportCompletions, exportHover, exportSignatures, exportAll, exportMarkdown, exportCheatsheet).
+- **`content/examples/filesystem.lua`**: filled 3 filesystem stubs (mount, listRecursive, stat).
+- **`content/examples/html.lua`**: filled lurek.html.loadDocument stub.
+- **`content/examples/image.lua`**: filled lurek.image.newCompressedData and newProvinceGrid stubs.
+- **`content/examples/input.lua`**: filled lurek.input.loadGamepadMappings stub.
+- **`content/examples/network.lua`**: filled lurek.network.newHost stub.
+- **`work/dedup_stubs.py`**: new session script that removes duplicate `--@api-stub:` blocks that still carry `-- TODO:`, keeping the first (filled) occurrence — removed 15 stale blocks across 6 files.
+- Result: `example_coverage.py --report --no-stubs` exits 0 with **4022 real / 0 pending / 0 missing — 100% real coverage** across all 50 modules.
+
 ## [1.0.8] - 2026-04-26
 
 ### fix(tools,examples): 3-tier example coverage model; dedup L-prefix stubs

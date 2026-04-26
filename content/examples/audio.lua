@@ -2367,12 +2367,13 @@ do  -- LSoundData:getBitDepth
   lurek.log.info("bit_depth=" .. sd:getBitDepth(), "audio")
 end
 --@api-stub: LSoundData:getSample
--- Get a specific sample by index.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lSoundData_stub:getSample(1)  -- -> number
--- (replace lSoundData_stub with your real LSoundData instance above)
-
--- ---- Stub: LSoundData:drawWaveform ---------------------------------------
+-- Returns the sample value at the given channel and index.
+-- Use to read a specific frame of waveform data for visualisation or analysis.
+do  -- LSoundData:getSample
+  local sd = lurek.audio.newSineWave(440, 1.0, 44100, 0.5)
+  local s = sd:getSample(1, 0)   -- channel 1, frame 0
+  lurek.log.info("sample[0]=" .. tostring(s), "audio")
+end
 --@api-stub: LSoundData:drawWaveform
 -- Draws the waveform onto an ImageData buffer.
 -- Use to render a waveform visualisation for an audio editor UI.

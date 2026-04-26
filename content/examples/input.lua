@@ -875,16 +875,6 @@ end
 -- =============================================================================
 
 -- ---- Stub: lurek.input.loadGamepadMappings -------------------------------
---@api-stub: lurek.input.loadGamepadMappings
--- Loads SDL2 GameControllerDB-format mappings from a file.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.input.loadGamepadMappings("assets/hero.png")  -- -> integer
-
--- -----------------------------------------------------------------------------
--- LCombo methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LCombo:type ---------------------------------------------------
 --@api-stub: LCombo:type
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.

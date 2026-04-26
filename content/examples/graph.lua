@@ -1431,529 +1431,709 @@ end
 -- ---- Stub: LGraphEdge:getType --------------------------------------------
 --@api-stub: LGraphEdge:getType
 -- Returns the edge type string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getType()  -- -> string
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setType --------------------------------------------
+-- Use to filter edges by conveyor/pipe/road type in route queries.
+do  -- LGraphEdge:getType
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  lurek.log.info("edge type=" .. edge:getType(), "graph")
+end
 --@api-stub: LGraphEdge:setType
 -- Sets the edge type string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setType(t)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getFrom --------------------------------------------
+-- Use to upgrade a dirt road edge to a paved road at runtime.
+do  -- LGraphEdge:setType
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "dirt_road")
+  edge:setType("paved_road")
+  lurek.log.info("edge type=" .. edge:getType(), "graph")
+end
 --@api-stub: LGraphEdge:getFrom
 -- Returns the source node handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getFrom()  -- -> Node
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getTo ----------------------------------------------
+-- Use to trace routes backwards from a destination node.
+do  -- LGraphEdge:getFrom
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
+  local edge = g:addEdge(na, nb, "pipe")
+  local from = edge:getFrom()
+  lurek.log.info("from type=" .. from:getType(), "graph")
+end
 --@api-stub: LGraphEdge:getTo
 -- Returns the destination node handle.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getTo()  -- -> Node
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getCapacity ----------------------------------------
+-- Use to traverse the graph from source to sink.
+do  -- LGraphEdge:getTo
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("source", 8); local nb = g:addNode("sink", 8)
+  local edge = g:addEdge(na, nb, "pipe")
+  local to = edge:getTo()
+  lurek.log.info("to type=" .. to:getType(), "graph")
+end
 --@api-stub: LGraphEdge:getCapacity
 -- Returns the edge capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getCapacity()  -- -> integer
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setCapacity ----------------------------------------
+-- Use to check if an edge can accept more items in a flow simulation.
+do  -- LGraphEdge:getCapacity
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  edge:setCapacity(50)
+  lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
+end
 --@api-stub: LGraphEdge:setCapacity
 -- Sets the edge capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setCapacity(c)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getThroughput --------------------------------------
+-- Use to simulate bottlenecks in a factory conveyor network.
+do  -- LGraphEdge:setCapacity
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  edge:setCapacity(100)
+  lurek.log.info("capacity=" .. edge:getCapacity(), "graph")
+end
 --@api-stub: LGraphEdge:getThroughput
 -- Returns items per second this edge can transfer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getThroughput()  -- -> number
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setThroughput --------------------------------------
+-- Use in UI to display belt speed to the player.
+do  -- LGraphEdge:getThroughput
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  edge:setThroughput(5.0)
+  lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
+end
 --@api-stub: LGraphEdge:setThroughput
 -- Sets items per second this edge can transfer.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setThroughput(t)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getTravelTime --------------------------------------
+-- Upgrade belts by raising throughput when the player researches better technology.
+do  -- LGraphEdge:setThroughput
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  edge:setThroughput(15.0)
+  lurek.log.info("throughput=" .. edge:getThroughput(), "graph")
+end
 --@api-stub: LGraphEdge:getTravelTime
 -- Returns the travel time in seconds for items on this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getTravelTime()  -- -> number
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setTravelTime --------------------------------------
+-- Use in UI to show ETA for deliveries.
+do  -- LGraphEdge:getTravelTime
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setTravelTime(3.5)
+  lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
+end
 --@api-stub: LGraphEdge:setTravelTime
 -- Sets the travel time in seconds for items on this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setTravelTime(t)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getWeight ------------------------------------------
+-- Simulate road distance or network latency with this value.
+do  -- LGraphEdge:setTravelTime
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setTravelTime(2.0)
+  lurek.log.info("travel_time=" .. edge:getTravelTime(), "graph")
+end
 --@api-stub: LGraphEdge:getWeight
 -- Returns the pathfinding weight of this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getWeight()  -- -> number
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setWeight ------------------------------------------
+-- Use in A* or Dijkstra queries to find least-cost routes.
+do  -- LGraphEdge:getWeight
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setWeight(1.5)
+  lurek.log.info("weight=" .. edge:getWeight(), "graph")
+end
 --@api-stub: LGraphEdge:setWeight
 -- Sets the pathfinding weight of this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setWeight(64.0)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getSpeedModifier -----------------------------------
+-- Raise weight on flooded roads to route deliveries around them.
+do  -- LGraphEdge:setWeight
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setWeight(5.0)
+  lurek.log.info("weight=" .. edge:getWeight(), "graph")
+end
 --@api-stub: LGraphEdge:getSpeedModifier
 -- Returns the speed modifier applied to items in transit.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getSpeedModifier()  -- -> number
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setSpeedModifier -----------------------------------
+-- Use to check uphill road penalties on unit movement.
+do  -- LGraphEdge:getSpeedModifier
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "uphill_road")
+  edge:setSpeedModifier(0.6)
+  lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
+end
 --@api-stub: LGraphEdge:setSpeedModifier
 -- Sets the speed modifier applied to items in transit.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setSpeedModifier(m)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getCooldown ----------------------------------------
+-- Use 2.0 for a conveyor boost and 0.5 for a swamp tile.
+do  -- LGraphEdge:setSpeedModifier
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "boost_belt")
+  edge:setSpeedModifier(2.0)
+  lurek.log.info("speed_modifier=" .. edge:getSpeedModifier(), "graph")
+end
 --@api-stub: LGraphEdge:getCooldown
 -- Returns the cooldown duration in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getCooldown()  -- -> number
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setCooldown ----------------------------------------
+-- Use to show a recharge timer in the UI for a warp-gate edge.
+do  -- LGraphEdge:getCooldown
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "warp_gate")
+  edge:setCooldown(5.0)
+  lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
+end
 --@api-stub: LGraphEdge:setCooldown
 -- Sets the cooldown duration in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setCooldown(c)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:isOnCooldown ---------------------------------------
+-- Use to prevent edge spam by requiring a delay between shipments.
+do  -- LGraphEdge:setCooldown
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "express_belt")
+  edge:setCooldown(2.0)
+  lurek.log.info("cooldown=" .. edge:getCooldown(), "graph")
+end
 --@api-stub: LGraphEdge:isOnCooldown
 -- Returns true if the edge is currently on cooldown.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:isOnCooldown()  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:isBidirectional ------------------------------------
+-- Use to decide whether to route to an alternate edge.
+do  -- LGraphEdge:isOnCooldown
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  lurek.log.info("on_cooldown=" .. tostring(edge:isOnCooldown()), "graph")
+end
 --@api-stub: LGraphEdge:isBidirectional
 -- Returns true if items can travel the edge in either direction.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:isBidirectional()  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setBidirectional -----------------------------------
+-- Use to determine if a road edge is one-way.
+do  -- LGraphEdge:isBidirectional
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setBidirectional(true)
+  lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
+end
 --@api-stub: LGraphEdge:setBidirectional
 -- Sets whether items can travel the edge in either direction.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setBidirectional(0.2)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:isActive -------------------------------------------
+-- Use for undirected edges like water pipes or two-way roads.
+do  -- LGraphEdge:setBidirectional
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "road")
+  edge:setBidirectional(false)
+  lurek.log.info("bidirectional=" .. tostring(edge:isBidirectional()), "graph")
+end
 --@api-stub: LGraphEdge:isActive
 -- Returns true if the edge is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:isActive()  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:setActive ------------------------------------------
+-- Inactive edges are excluded from flow and pathfinding.
+do  -- LGraphEdge:isActive
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
+end
 --@api-stub: LGraphEdge:setActive
 -- Sets the active state of this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:setActive(1.0)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:getItemsInTransit ----------------------------------
+-- Deactivate an edge when a bridge is damaged without removing it from the graph.
+do  -- LGraphEdge:setActive
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "bridge")
+  edge:setActive(false)
+  lurek.log.info("active=" .. tostring(edge:isActive()), "graph")
+end
 --@api-stub: LGraphEdge:getItemsInTransit
 -- Returns a table of GraphItem handles currently in transit on this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:getItemsInTransit()  -- -> table
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:addAllowedType -------------------------------------
+-- Use to render item icons moving along a belt in the UI.
+do  -- LGraphEdge:getItemsInTransit
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  local items = edge:getItemsInTransit()
+  lurek.log.info("items_in_transit=" .. #items, "graph")
+end
 --@api-stub: LGraphEdge:addAllowedType
 -- Adds an item type to the edge allow-list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:addAllowedType(t)
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:removeAllowedType ----------------------------------
+-- Use to restrict a pipe to only carry "water" or "oil" items.
+do  -- LGraphEdge:addAllowedType
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "pipe")
+  edge:addAllowedType("water")
+  lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
+end
 --@api-stub: LGraphEdge:removeAllowedType
 -- Removes an item type from the edge allow-list.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:removeAllowedType(t)  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:clearAllowedTypes ----------------------------------
+-- Use to revoke a chemical item's transit rights after a research event.
+do  -- LGraphEdge:removeAllowedType
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "pipe")
+  edge:addAllowedType("acid")
+  edge:removeAllowedType("acid")
+  lurek.log.info("acid allowed after remove=" .. tostring(edge:isItemTypeAllowed("acid")), "graph")
+end
 --@api-stub: LGraphEdge:clearAllowedTypes
 -- Clears the edge allow-list so all item types are permitted.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:clearAllowedTypes()
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:isItemTypeAllowed ----------------------------------
+-- Use to reset a multi-purpose conveyor back to its default state.
+do  -- LGraphEdge:clearAllowedTypes
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  edge:addAllowedType("iron")
+  edge:clearAllowedTypes()
+  lurek.log.info("iron allowed after clear=" .. tostring(edge:isItemTypeAllowed("iron")), "graph")
+end
 --@api-stub: LGraphEdge:isItemTypeAllowed
 -- Returns true if the given item type is allowed on this edge.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:isItemTypeAllowed(t)  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:type -----------------------------------------------
+-- Use before dispatching an item to check routing compatibility.
+do  -- LGraphEdge:isItemTypeAllowed
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "pipe")
+  edge:addAllowedType("gas")
+  lurek.log.info("gas allowed=" .. tostring(edge:isItemTypeAllowed("gas")), "graph")
+  lurek.log.info("water allowed=" .. tostring(edge:isItemTypeAllowed("water")), "graph")
+end
 --@api-stub: LGraphEdge:type
 -- Returns the type name "GraphEdge".
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:type()  -- -> string
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
--- ---- Stub: LGraphEdge:typeOf ---------------------------------------------
+-- Use for generic object type dispatching in a mixed-object container.
+do  -- LGraphEdge:type
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  lurek.log.info("type=" .. edge:type(), "graph")
+end
 --@api-stub: LGraphEdge:typeOf
 -- Returns true when the given name matches "GraphEdge" or a parent type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphEdge_stub:typeOf("hero")  -- -> boolean
--- (replace lGraphEdge_stub with your real LGraphEdge instance above)
-
-
--- -----------------------------------------------------------------------------
--- LGraphNode methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LGraphNode:getType --------------------------------------------
+-- Use to check instance types in polymorphic collections.
+do  -- LGraphEdge:typeOf
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  local edge = g:addEdge(na, nb, "belt")
+  lurek.log.info("is GraphEdge=" .. tostring(edge:typeOf("GraphEdge")), "graph")
+  lurek.log.info("is Other=" .. tostring(edge:typeOf("Other")), "graph")
+end
 --@api-stub: LGraphNode:getType
 -- Returns the node type string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getType()  -- -> string
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setType --------------------------------------------
+-- Use to query node type in a heterogeneous supply-chain graph.
+do  -- LGraphNode:getType
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  lurek.log.info("node type=" .. n:getType(), "graph")
+end
 --@api-stub: LGraphNode:setType
 -- Sets the node type string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setType(t)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getCapacity ----------------------------------------
+-- Use to upgrade a node type (e.g. "furnace" → "blast_furnace") during play.
+do  -- LGraphNode:setType
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setType("blast_furnace")
+  lurek.log.info("node type=" .. n:getType(), "graph")
+end
 --@api-stub: LGraphNode:getCapacity
 -- Returns the node capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getCapacity()  -- -> integer
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setCapacity ----------------------------------------
+-- Use to render a capacity bar in the factory overlay UI.
+do  -- LGraphNode:getCapacity
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("warehouse", 100)
+  lurek.log.info("capacity=" .. n:getCapacity(), "graph")
+end
 --@api-stub: LGraphNode:setCapacity
 -- Sets the node capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setCapacity(c)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getItemCount ---------------------------------------
+-- Upgrade storage capacity with a tech research unlock.
+do  -- LGraphNode:setCapacity
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("warehouse", 50)
+  n:setCapacity(200)
+  lurek.log.info("capacity=" .. n:getCapacity(), "graph")
+end
 --@api-stub: LGraphNode:getItemCount
 -- Returns the number of items currently at this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getItemCount()  -- -> integer
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:isFull ---------------------------------------------
+-- Use to trigger a delivery when a node is almost full.
+do  -- LGraphNode:getItemCount
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  lurek.log.info("items=" .. n:getItemCount(), "graph")
+end
 --@api-stub: LGraphNode:isFull
 -- Returns true if the node has reached its capacity.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:isFull()  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:isActive -------------------------------------------
+-- Use to pause input belts before overflow.
+do  -- LGraphNode:isFull
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 4)
+  lurek.log.info("full=" .. tostring(n:isFull()), "graph")
+end
 --@api-stub: LGraphNode:isActive
 -- Returns true if the node is active.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:isActive()  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setActive ------------------------------------------
+-- Inactive nodes are skipped during flow and pathfinding.
+do  -- LGraphNode:isActive
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("reactor", 8)
+  lurek.log.info("active=" .. tostring(n:isActive()), "graph")
+end
 --@api-stub: LGraphNode:setActive
 -- Sets the active state of this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setActive(1.0)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getOverflowPolicy ----------------------------------
+-- Deactivate a node during a power failure event.
+do  -- LGraphNode:setActive
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("reactor", 8)
+  n:setActive(false)
+  lurek.log.info("active=" .. tostring(n:isActive()), "graph")
+end
 --@api-stub: LGraphNode:getOverflowPolicy
 -- Returns the overflow policy as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getOverflowPolicy()  -- -> string
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setOverflowPolicy ----------------------------------
+-- Policies may include 'drop', 'block', or 'overflow_to_queue'.
+do  -- LGraphNode:getOverflowPolicy
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("silo", 50)
+  n:setOverflowPolicy("drop")
+  lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
+end
 --@api-stub: LGraphNode:setOverflowPolicy
 -- Sets the overflow policy from a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setOverflowPolicy(p)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getFlowMode ----------------------------------------
+-- 'block' stalls incoming edges; 'drop' discards surplus items.
+do  -- LGraphNode:setOverflowPolicy
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("silo", 50)
+  n:setOverflowPolicy("block")
+  lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
+end
 --@api-stub: LGraphNode:getFlowMode
 -- Returns the flow mode as a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getFlowMode()  -- -> string
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setFlowMode ----------------------------------------
+-- Modes like 'push', 'pull', or 'balanced' control item distribution.
+do  -- LGraphNode:getFlowMode
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("distributor", 16)
+  n:setFlowMode("push")
+  lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
+end
 --@api-stub: LGraphNode:setFlowMode
 -- Sets the flow mode from a string.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setFlowMode(m)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getPushRate ----------------------------------------
+-- Use 'pull' for consumer nodes and 'push' for producer nodes.
+do  -- LGraphNode:setFlowMode
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("factory", 16)
+  n:setFlowMode("pull")
+  lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
+end
 --@api-stub: LGraphNode:getPushRate
 -- Returns items per second this node pushes.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getPushRate()  -- -> number
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setPushRate ----------------------------------------
+-- Use to display production rate in the factory HUD.
+do  -- LGraphNode:getPushRate
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine", 32)
+  n:setPushRate(2.5)
+  lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
+end
 --@api-stub: LGraphNode:setPushRate
 -- Sets items per second this node pushes.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setPushRate(1.0)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getPullRate ----------------------------------------
+-- Increase push rate when the player upgrades the mine.
+do  -- LGraphNode:setPushRate
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine", 32)
+  n:setPushRate(5.0)
+  lurek.log.info("push_rate=" .. n:getPushRate(), "graph")
+end
 --@api-stub: LGraphNode:getPullRate
 -- Returns items per second this node pulls.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getPullRate()  -- -> number
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setPullRate ----------------------------------------
+-- Use to balance supply with consumer demand in the factory.
+do  -- LGraphNode:getPullRate
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setPullRate(3.0)
+  lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
+end
 --@api-stub: LGraphNode:setPullRate
 -- Sets items per second this node pulls.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setPullRate(1.0)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getPushFilter --------------------------------------
+-- Throttle a consumer to avoid starving other consumers.
+do  -- LGraphNode:setPullRate
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("assembler", 16)
+  n:setPullRate(1.5)
+  lurek.log.info("pull_rate=" .. n:getPullRate(), "graph")
+end
 --@api-stub: LGraphNode:getPushFilter
 -- Returns the push filter string, or nil if unset.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getPushFilter()  -- -> string?
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setPushFilter --------------------------------------
+-- Use to validate that the filter was configured correctly before the game starts.
+do  -- LGraphNode:getPushFilter
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("sorter", 8)
+  n:setPushFilter("iron_ore")
+  lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
+end
 --@api-stub: LGraphNode:setPushFilter
 -- Sets the push filter string, or nil to clear.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setPushFilter([f])
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getPullFilter --------------------------------------
+-- Use to restrict a node to only push a specific item type.
+do  -- LGraphNode:setPushFilter
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("sorter", 8)
+  n:setPushFilter("copper_ore")
+  lurek.log.info("push_filter=" .. tostring(n:getPushFilter()), "graph")
+end
 --@api-stub: LGraphNode:getPullFilter
 -- Returns the pull filter string, or nil if unset.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getPullFilter()  -- -> string?
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setPullFilter --------------------------------------
+-- Use to display the configured demand type in the factory UI.
+do  -- LGraphNode:getPullFilter
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setPullFilter("coal")
+  lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
+end
 --@api-stub: LGraphNode:setPullFilter
 -- Sets the pull filter string, or nil to clear.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setPullFilter([f])
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getProcessTime -------------------------------------
+-- Restrict what a consumer node accepts to avoid mixing item types.
+do  -- LGraphNode:setPullFilter
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setPullFilter("iron_ore")
+  lurek.log.info("pull_filter=" .. tostring(n:getPullFilter()), "graph")
+end
 --@api-stub: LGraphNode:getProcessTime
 -- Returns the processing time in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getProcessTime()  -- -> number
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setProcessTime -------------------------------------
+-- Use in UI to display a progress bar duration for a crafting node.
+do  -- LGraphNode:getProcessTime
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("assembler", 8)
+  n:setProcessTime(4.0)
+  lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
+end
 --@api-stub: LGraphNode:setProcessTime
 -- Sets the processing time in seconds.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setProcessTime(t)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:isQueueEnabled -------------------------------------
+-- Lower this on upgrade to simulate faster crafting machines.
+do  -- LGraphNode:setProcessTime
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("assembler", 8)
+  n:setProcessTime(2.0)
+  lurek.log.info("process_time=" .. n:getProcessTime(), "graph")
+end
 --@api-stub: LGraphNode:isQueueEnabled
 -- Returns true if the node queue is enabled.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:isQueueEnabled()  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setQueueEnabled ------------------------------------
+-- Queuing allows items to wait at a node instead of backing up the network.
+do  -- LGraphNode:isQueueEnabled
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 32)
+  n:setQueueEnabled(true)
+  lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
+end
 --@api-stub: LGraphNode:setQueueEnabled
 -- Enables or disables the node queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setQueueEnabled(e)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getQueueCapacity -----------------------------------
+-- Disable on pass-through nodes to reduce memory overhead.
+do  -- LGraphNode:setQueueEnabled
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("splitter", 8)
+  n:setQueueEnabled(false)
+  lurek.log.info("queue_enabled=" .. tostring(n:isQueueEnabled()), "graph")
+end
 --@api-stub: LGraphNode:getQueueCapacity
 -- Returns the queue capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getQueueCapacity()  -- -> integer
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setQueueCapacity -----------------------------------
+-- Use to display remaining queue slots in the factory UI.
+do  -- LGraphNode:getQueueCapacity
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 32)
+  n:setQueueEnabled(true); n:setQueueCapacity(10)
+  lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
+end
 --@api-stub: LGraphNode:setQueueCapacity
 -- Sets the queue capacity (-1 = unlimited).
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setQueueCapacity(c)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getQueueSize ---------------------------------------
+-- Limit queue to prevent runaway memory use on throughput bottlenecks.
+do  -- LGraphNode:setQueueCapacity
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 32)
+  n:setQueueEnabled(true); n:setQueueCapacity(20)
+  lurek.log.info("queue_capacity=" .. n:getQueueCapacity(), "graph")
+end
 --@api-stub: LGraphNode:getQueueSize
 -- Returns the number of items currently in the queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getQueueSize()  -- -> integer
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getItems -------------------------------------------
+-- Use to trigger overflow warnings when the queue approaches capacity.
+do  -- LGraphNode:getQueueSize
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  n:setQueueEnabled(true)
+  lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
+end
 --@api-stub: LGraphNode:getItems
 -- Returns a table of GraphItem handles at this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getItems()  -- -> table
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getEdges -------------------------------------------
+-- Use to iterate items and apply buffs or transformations.
+do  -- LGraphNode:getItems
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  local items = n:getItems()
+  lurek.log.info("item_count=" .. #items, "graph")
+end
 --@api-stub: LGraphNode:getEdges
 -- Returns a table of Edge handles connected to this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getEdges([dir])  -- -> table
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:setConversion --------------------------------------
+-- Use to traverse the graph from a given node.
+do  -- LGraphNode:getEdges
+  local g = lurek.graph.newGraph()
+  local na = g:addNode("a", 8); local nb = g:addNode("b", 8)
+  g:addEdge(na, nb, "belt")
+  local edges = na:getEdges()
+  lurek.log.info("edge_count=" .. #edges, "graph")
+end
 --@api-stub: LGraphNode:setConversion
 -- Adds or replaces a conversion rule on this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:setConversion()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:clearConversion ------------------------------------
+-- Use a furnace node to automatically convert "iron_ore" → "iron_ingot".
+do  -- LGraphNode:setConversion
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setConversion("iron_ore", "iron_ingot", 1)
+  lurek.log.info("conversion added to furnace", "graph")
+end
 --@api-stub: LGraphNode:clearConversion
 -- Removes the conversion rule for the given input type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:clearConversion(in_type)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:clearAllConversions --------------------------------
+-- Use when the furnace recipe is changed by the player.
+do  -- LGraphNode:clearConversion
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("furnace", 16)
+  n:setConversion("iron_ore", "iron_ingot", 1)
+  n:clearConversion("iron_ore")
+  lurek.log.info("conversion cleared", "graph")
+end
 --@api-stub: LGraphNode:clearAllConversions
 -- Removes all conversion rules from this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:clearAllConversions()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:addTag ---------------------------------------------
+-- Use when upgrading a furnace to a different machine type.
+do  -- LGraphNode:clearAllConversions
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("multi_furnace", 32)
+  n:setConversion("iron_ore", "iron_ingot", 1)
+  n:setConversion("copper_ore", "copper_ingot", 1)
+  n:clearAllConversions()
+  lurek.log.info("all conversions cleared", "graph")
+end
 --@api-stub: LGraphNode:addTag
 -- Attaches a string tag to this node for fast group queries.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:addTag("enemy")
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:removeTag ------------------------------------------
+-- Use to find all "storage" or "producer" nodes in a single query.
+do  -- LGraphNode:addTag
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("warehouse", 100)
+  n:addTag("storage"); n:addTag("secure")
+  lurek.log.info("has storage=" .. tostring(n:hasTag("storage")), "graph")
+end
 --@api-stub: LGraphNode:removeTag
 -- Removes a tag from this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:removeTag("enemy")  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:hasTag ---------------------------------------------
+-- Use to revoke the "available" tag when a node is taken offline.
+do  -- LGraphNode:removeTag
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  n:addTag("available"); n:removeTag("available")
+  lurek.log.info("has available=" .. tostring(n:hasTag("available")), "graph")
+end
 --@api-stub: LGraphNode:hasTag
 -- Returns true if this node has the given tag.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:hasTag("enemy")  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:clearTags ------------------------------------------
+-- Use to query which nodes are eligible depots in a delivery query.
+do  -- LGraphNode:hasTag
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("station", 64)
+  n:addTag("train_stop")
+  lurek.log.info("has train_stop=" .. tostring(n:hasTag("train_stop")), "graph")
+end
 --@api-stub: LGraphNode:clearTags
 -- Removes all tags from this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:clearTags()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:getTags --------------------------------------------
+-- Use when resetting a repurposed node.
+do  -- LGraphNode:clearTags
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  n:addTag("a"); n:addTag("b"); n:clearTags()
+  lurek.log.info("tags after clear=" .. #n:getTags(), "graph")
+end
 --@api-stub: LGraphNode:getTags
 -- Returns a table of tag strings on this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:getTags()  -- -> table
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:addSupply ------------------------------------------
+-- Use when saving a node's full metadata to a save file.
+do  -- LGraphNode:getTags
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 32)
+  n:addTag("port"); n:addTag("western")
+  local tags = n:getTags()
+  lurek.log.info("tag count=" .. #tags, "graph")
+end
 --@api-stub: LGraphNode:addSupply
 -- Declares a supply of the given item type and quantity at this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:addSupply(item_type, quantity)
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:removeSupply ---------------------------------------
+-- Use on mine nodes to advertise available resources for routing.
+do  -- LGraphNode:addSupply
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine", 100)
+  n:addSupply("iron_ore", 500)
+  lurek.log.info("supply added", "graph")
+end
 --@api-stub: LGraphNode:removeSupply
 -- Removes the supply declaration for the given item type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:removeSupply(item_type)  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:clearSupplies --------------------------------------
+-- Use when a mine runs out of a specific ore type.
+do  -- LGraphNode:removeSupply
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine", 100)
+  n:addSupply("iron_ore", 500)
+  n:removeSupply("iron_ore")
+  lurek.log.info("supply removed", "graph")
+end
 --@api-stub: LGraphNode:clearSupplies
 -- Removes all supply declarations from this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:clearSupplies()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:addDemand ------------------------------------------
+-- Use when a node changes role from mine to depot.
+do  -- LGraphNode:clearSupplies
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("mine", 100)
+  n:addSupply("gold_ore", 200)
+  n:clearSupplies()
+  lurek.log.info("all supplies cleared", "graph")
+end
 --@api-stub: LGraphNode:addDemand
 -- Declares a demand for the given item type, quantity, and priority.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:addDemand(item_type, quantity, [priority])
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:removeDemand ---------------------------------------
+-- Use on factory nodes to signal which materials they need from suppliers.
+do  -- LGraphNode:addDemand
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("factory", 32)
+  n:addDemand("steel", 100, 1)   -- priority 1 (high)
+  lurek.log.info("demand declared for steel", "graph")
+end
 --@api-stub: LGraphNode:removeDemand
 -- Removes the demand declaration for the given item type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:removeDemand(item_type)  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:clearDemands ---------------------------------------
+-- Use when the factory switches to a different recipe.
+do  -- LGraphNode:removeDemand
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("factory", 32)
+  n:addDemand("steel", 100, 1)
+  n:removeDemand("steel")
+  lurek.log.info("demand removed", "graph")
+end
 --@api-stub: LGraphNode:clearDemands
 -- Removes all demand declarations from this node.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:clearDemands()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:enqueue --------------------------------------------
+-- Use when a factory is decommissioned.
+do  -- LGraphNode:clearDemands
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("factory", 32)
+  n:addDemand("wood", 50, 2); n:addDemand("stone", 50, 2)
+  n:clearDemands()
+  lurek.log.info("all demands cleared", "graph")
+end
 --@api-stub: LGraphNode:enqueue
 -- Pushes an item into the node queue.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:enqueue(item_ud)  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:dequeue --------------------------------------------
+-- Use to seed a node's queue with initial items at level start.
+do  -- LGraphNode:enqueue
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 32)
+  n:setQueueEnabled(true)
+  n:enqueue("iron_ingot")
+  lurek.log.info("queue_size=" .. n:getQueueSize(), "graph")
+end
 --@api-stub: LGraphNode:dequeue
 -- Pops the next item from the node queue, or nil if empty.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:dequeue()
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:type -----------------------------------------------
+-- Use in a consumer loop to process queued items one per tick.
+do  -- LGraphNode:dequeue
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("buffer", 32)
+  n:setQueueEnabled(true)
+  n:enqueue("coal")
+  local item = n:dequeue()
+  lurek.log.info("dequeued=" .. tostring(item), "graph")
+end
 --@api-stub: LGraphNode:type
 -- Returns the type name "GraphNode".
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:type()  -- -> string
--- (replace lGraphNode_stub with your real LGraphNode instance above)
-
--- ---- Stub: LGraphNode:typeOf ---------------------------------------------
+-- Use for generic object type dispatching in a mixed-object container.
+do  -- LGraphNode:type
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 8)
+  lurek.log.info("type=" .. n:type(), "graph")
+end
 --@api-stub: LGraphNode:typeOf
 -- Returns true when the given name matches "GraphNode" or a parent type.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
--- lGraphNode_stub:typeOf("hero")  -- -> boolean
--- (replace lGraphNode_stub with your real LGraphNode instance above)
+-- Use to check instance types in polymorphic collections.
+do  -- LGraphNode:typeOf
+  local g = lurek.graph.newGraph()
+  local n = g:addNode("depot", 8)
+  lurek.log.info("is GraphNode=" .. tostring(n:typeOf("GraphNode")), "graph")
+  lurek.log.info("is Other=" .. tostring(n:typeOf("Other")), "graph")
+end

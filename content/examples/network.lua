@@ -493,16 +493,6 @@ end
 -- =============================================================================
 
 -- ---- Stub: lurek.network.newHost -----------------------------------------
---@api-stub: lurek.network.newHost
--- Creates a new network host bound to the given address.
--- TODO: replace this stub with a real scenario. See flesh-out-example.prompt.md
-lurek.network.newHost(opts)  -- -> NetworkHost
-
--- -----------------------------------------------------------------------------
--- LNetworkHost methods
--- -----------------------------------------------------------------------------
-
--- ---- Stub: LNetworkHost:type ---------------------------------------------
 --@api-stub: LNetworkHost:type
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
