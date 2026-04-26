@@ -2,6 +2,43 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.6] - 2026-04-29
+
+### fix(docs): resolve ~150 LuaLS warnings across 12 Lua unit test files
+
+Root causes addressed:
+
+1. **`gen_lua_api.py` parser** — multi-line `tbl.set(` handler only checked one line ahead for the string name. `ui_api.rs` has blank separator lines between `tbl.set(` and `"functionName",`. Fixed: scanner now skips up to 5 blank/`//`-comment lines. Recovery: `ui` module went from 1 parsed function to 122.
+2. **Particle flat-forward methods** — `particle_api.rs` registers all `LParticleSystem` class methods as `lurek.particle.METHOD(ps,...)` wrappers with no docstrings, so they were absent from the stub. Fixed: `gen_luadoc.py` now emits `lurek.particle.METHOD = LParticleSystem.METHOD` for each undocumented wrapper.
+3. **`patterns.newEventBus` / `newStack` return types** — returned bare `EventBus`/`Stack` which conflicted with library-defined classes. Fixed: `_FUNCTION_RETURN_OVERRIDES` overrides return types to `LEventBus`/`LStack`.
+4. **`serial` encode-function param types** — declared `(value table)` in Rust docstrings but accept any Lua value. Fixed: `_PARAM_TYPE_OVERRIDES` overrides to `any`.
+5. **`LTweenState.paused` field** — registered via `add_field_method_get` (not picked up by doc scanner). Fixed: hardcoded `---@field paused boolean` in class emission block.
+6. **Parallax opaque-type aliases** — `newLayer()`/`newSet()` return `LuaParallaxLayer`/`LuaParallaxSet` (with `Lua` prefix) while the registered classes are `LParallaxLayer`/`LParallaxSet`. Fixed: added both to `_OPAQUE_ALIASES`.
+
+**Files changed:**
+- `tools/docs/gen_lua_api.py` — parser lookahead fix for blank lines in multi-line `tbl.set(`.
+- `tools/docs/gen_luadoc.py` — `_FUNCTION_RETURN_OVERRIDES`, `_PARAM_TYPE_OVERRIDES`, `LTweenState.paused`, particle flat-fwd, parallax opaque aliases.
+- `logs/data/lua_api_data.json` — regenerated (4372 functions, 50 modules, 100% documented).
+- `docs/api/lurek.lua` — regenerated (24125 lines).
+
+## [1.0.9-fix.5] - 2026-04-26
+
+### fix(docs): correctly generate lurek.input subtable namespaces in lurek.lua
+
+Root cause (two bugs introduced in fix.4 and compounded in fix.5):
+
+1. **Remap bug** — `gen_luadoc.py` had `if name.startswith(f"lurek.{mod_name}."): name = f"lurek.{lua_ns}.{func['name']}"`. For the `input` module (`mod_name == lua_ns == "input"`), this stripped every subtable path: `lurek.input.keyboard.isDown` → `lurek.input.isDown`. Multiple subtable functions sharing the same short name (`isDown`, `getPosition`) were emitted as duplicates at the wrong namespace, causing ~60 duplicate-definition LuaLS warnings.
+
+2. **Wrong class stubs** — fix.5 defined `LInputKeyboard` etc. as classes with colon-method stubs (`function LInputKeyboard:isDown() end`) that had empty parameter lists but annotated params. Every call site mismatch generated a LuaLS warning.
+
+**Fixes applied:**
+- **`tools/docs/gen_luadoc.py`**:
+  - Removed `_INPUT_SUBTABLE_STUBS` entirely — phantom class definitions deleted.
+  - Removed `"input"` from `_MODULE_CONSTANTS` — no more fake `---@field keyboard LInputKeyboard` on `lurek.input`.
+  - Fixed remap guard: `if mod_name != lua_ns and name.startswith(...)` — remap only fires when the folder name differs from the Lua namespace (e.g. `timer→time`); preserves nested paths like `lurek.input.keyboard.isDown`.
+  - Added `_NESTED_NAMESPACES = {"input": ["keyboard","mouse","gamepad","touch"]}` — emits `---@class lurek.input.keyboard` / `lurek.input.keyboard = {}` etc. so the LuaLS knows these sub-tables exist.
+- **`docs/api/lurek.lua`**: regenerated — 9 keyboard, 17 mouse, 21 gamepad, 4 touch functions now at correct namespaces; zero duplicate `isDown` definitions at flat `lurek.input` level.
+
 ## [1.0.9-fix.4] - 2026-04-28
 
 ### fix(examples): resolve Lua Language Server warnings across examples, tests, and stub generator

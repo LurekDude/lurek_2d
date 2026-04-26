@@ -662,8 +662,16 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
         set_m = set_multiline_re.search(stripped)
         if set_m and i + 1 < len(lines):
             table_var = set_m.group(1)
-            next_stripped = lines[i + 1].strip()
-            name_m = name_next_re.match(next_stripped)
+            # Look ahead past any blank lines or single-line comments to find the name
+            name_m = None
+            for _la in range(1, 6):
+                if i + _la >= len(lines):
+                    break
+                _ahead = lines[i + _la].strip()
+                if _ahead == "" or _ahead.startswith("//"):
+                    continue  # skip blanks and non-doc comments between set( and "name"
+                name_m = name_next_re.match(_ahead)
+                break  # first non-blank non-comment line is decisive
             if name_m:
                 func_name = name_m.group(1)
                 is_func = any("create_function" in lines[k] for k in range(i + 1, min(i + 5, len(lines))))

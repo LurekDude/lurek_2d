@@ -409,12 +409,15 @@ def main():
         "TextureKey":   "any",   # internal render key — not exposed as userdata
         "Tint":         "any",   # plain color tint — not a userdata type
         # Struct-name → L-prefix where casing or suffix differs
-        "AiFlowField":  "LAIFlowField",  # LuaAiFlowField struct but type() returns LAIFlowField
-        "Camera2D":     "LCamera",       # LuaCamera2D struct but type() returns LCamera
-        "Edge":         "LGraphEdge",    # LuaEdge shorthand → full graph type
-        "Node":         "LGraphNode",    # LuaNode shorthand → full graph type
-        "Step":         "LPipelineStep", # LuaStep shorthand → full pipeline type
-        "ThreadHandle": "LThread",       # LuaThreadHandle → LThread
+        "AiFlowField":    "LAIFlowField",    # LuaAiFlowField struct but type() returns LAIFlowField
+        "Camera2D":       "LCamera",         # LuaCamera2D struct but type() returns LCamera
+        "Edge":           "LGraphEdge",      # LuaEdge shorthand → full graph type
+        "Node":           "LGraphNode",      # LuaNode shorthand → full graph type
+        "Step":           "LPipelineStep",   # LuaStep shorthand → full pipeline type
+        "ThreadHandle":   "LThread",         # LuaThreadHandle → LThread
+        # parallax_api.rs uses "Lua" prefix in @return docstrings but registers as "L" prefix
+        "LuaParallaxLayer": "LParallaxLayer",
+        "LuaParallaxSet":   "LParallaxSet",
     }
     # Auto-derive: if a referenced type "Foo" has a declared counterpart "LFoo" (exact match),
     # alias it.  Case-insensitive fallback for minor capitalisation differences.
@@ -433,6 +436,27 @@ def main():
     # Types defined as @class in docs/api/library.lua — skip generating aliases for them
     # to avoid 'duplicate-doc-alias' warnings from the Lua language server.
     _SKIP_ALIAS = {"EventBus", "Scheduler", "Stack"}
+
+    # Direct return-type overrides for specific functions whose docstring return type
+    # would collide with a @class already declared in library.lua (making a @alias a
+    # duplicate-doc error).  These bypass the opaque-alias system entirely by
+    # overwriting inferred_return before write_function_doc is called.
+    _FUNCTION_RETURN_OVERRIDES: dict[str, str] = {
+        "lurek.patterns.newEventBus": "LEventBus",
+        "lurek.patterns.newStack":    "LStack",
+    }
+
+    # Per-function parameter type overrides.  Key = full function name (e.g. "lurek.serial.toJson").
+    # Value = {param_name: new_type}.  Applied before write_function_doc to fix cases where the
+    # Rust docstring says `table` but the runtime actually accepts any Lua value.
+    _PARAM_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
+        "lurek.serial.toJson":       {"value": "any"},
+        "lurek.serial.toToml":       {"value": "any"},
+        "lurek.serial.toCsv":        {"value": "any"},
+        "lurek.serial.encodeMsgPack": {"value": "any"},
+        "lurek.serial.encode":       {"value": "any"},
+        "lurek.serial.validate":     {"value": "any"},
+    }
 
     for type_name in opaque_types:
         if type_name in _SKIP_ALIAS:
@@ -465,12 +489,14 @@ def main():
             ("WEST_WALL",  "integer", "west-facing wall tile type (3)"),
             ("OBJECT",     "integer", "object tile type (4)"),
         ],
-        "input": [
-            ("keyboard", "LInputKeyboard", "keyboard state subtable"),
-            ("mouse",    "LInputMouse",    "mouse state subtable"),
-            ("gamepad",  "LInputGamepad",  "gamepad state subtable"),
-            ("touch",    "LInputTouch",    "touch state subtable"),
-        ],
+
+    }
+
+    # Modules that register functions under nested sub-namespaces.
+    # These sub-tables must be declared before their functions are emitted so
+    # the Lua language server can resolve lurek.input.keyboard.isDown etc.
+    _NESTED_NAMESPACES: dict[str, list[str]] = {
+        "input": ["keyboard", "mouse", "gamepad", "touch"],
     }
 
     for mod_name in sorted(lua_api.keys()):
@@ -481,6 +507,11 @@ def main():
             out.append(f"---@field {const_name} {const_type}  {const_desc}")
         out.append(f"lurek.{lua_ns} = {{}}")
         out.append("")
+        # Emit declarations for nested sub-namespaces (e.g. lurek.input.keyboard).
+        for sub_ns in _NESTED_NAMESPACES.get(mod_name, []):
+            out.append(f"---@class lurek.{lua_ns}.{sub_ns}")
+            out.append(f"lurek.{lua_ns}.{sub_ns} = {{}}")
+            out.append("")
 
         classes = mod_data.get("classes", {})
         for class_name in sorted(classes.keys()):
@@ -499,6 +530,8 @@ def main():
                 out.append("---@field x number  x component")
                 out.append("---@field y number  y component")
                 out.append("---@field z number  z component")
+            elif class_name == "LTweenState":
+                out.append("---@field paused boolean  whether the tween is currently paused")
             out.append(f"{class_name} = {{}}")
             out.append("")
 
@@ -519,10 +552,45 @@ def main():
             name = func.get("lua_name", f"lurek.{lua_ns}.{func['name']}")
             if ":" in name:
                 continue
-            # Remap stored lua_name if it uses the old module-folder namespace
-            if name.startswith(f"lurek.{mod_name}."):
-                name = f"lurek.{lua_ns}.{func['name']}"
+            # Remap stored lua_name only when the module folder name differs from
+            # the Lua namespace (e.g. timer→time, event→signal).  When mod_name==lua_ns
+            # the lua_name is already correct — preserve nested paths (keyboard.isDown etc.).
+            if mod_name != lua_ns and name.startswith(f"lurek.{mod_name}."):
+                name = f"lurek.{lua_ns}." + name[len(f"lurek.{mod_name}."):]
+            # Apply return-type override (used when bare type name collides with library.lua).
+            # Clear returns_doc AND full_doc so parse_returns falls through to inferred_return.
+            if name in _FUNCTION_RETURN_OVERRIDES:
+                func = {**func,
+                        "inferred_return": _FUNCTION_RETURN_OVERRIDES[name],
+                        "returns_doc": "",
+                        "full_doc": ""}
+            # Apply per-param type overrides (used when Rust docstring says `table` but
+            # the API actually accepts any Lua value).
+            if name in _PARAM_TYPE_OVERRIDES and func.get("typed_params"):
+                param_ovr = _PARAM_TYPE_OVERRIDES[name]
+                new_typed: list = []
+                for p in func["typed_params"]:
+                    pname = p[0] if p else ""
+                    if pname in param_ovr:
+                        new_typed.append([p[0], param_ovr[pname]] + list(p[2:]))
+                    else:
+                        new_typed.append(p)
+                func = {**func, "typed_params": new_typed}
             write_function_doc(out, func, name)
+
+        # ── Particle flat-forwarding wrappers ─────────────────────────────────────────
+        # particle_api.rs registers every LParticleSystem method *also* as a module-level
+        # function  lurek.particle.METHOD(ps, ...)  via its flat_methods list.  These have
+        # no Rust docstrings so they don't appear in the JSON.  Emit type assignments here
+        # so LuaLS can resolve  lurek.particle.stop(ps)  without an undefined-field error.
+        if mod_name == "particle" and "LParticleSystem" in classes:
+            out.append("-- Flat forwarding: lurek.particle.METHOD(ps,...) == ps:METHOD(...)")
+            emitted_fns = {f.get("name", "") for f in functions}
+            for m in sorted(classes["LParticleSystem"]["methods"], key=lambda x: x.get("name", "")):
+                mname = m.get("name", "")
+                if mname and mname not in emitted_fns:
+                    out.append(f"lurek.particle.{mname} = LParticleSystem.{mname}")
+            out.append("")
 
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
