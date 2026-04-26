@@ -805,8 +805,8 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- Light:type
-  local lamp = local lamp = lurek.light.newLight(0, 0, 120)
-    lamp:setPosition(320, 240)
+  local lamp = lurek.light.newLight(0, 0, 120)
+  lamp:setPosition(320, 240)
   local t = lamp:type()
   lurek.log.info("Light:type = " .. t, "light")
 end
@@ -814,8 +814,8 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- Light:typeOf
-  local lamp = local lamp = lurek.light.newLight(0, 0, 120)
-    lamp:setPosition(320, 240)
+  local lamp = lurek.light.newLight(0, 0, 120)
+  lamp:setPosition(320, 240)
   lurek.log.info("is Light: " .. tostring(lamp:typeOf("Light")), "light")
   lurek.log.info("is wrong: " .. tostring(lamp:typeOf("Unknown")), "light")
 end

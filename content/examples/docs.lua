@@ -854,7 +854,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LDocEntry:type
-  local catalog = local catalog = lurek.docs.scanModule("audio")
+  local catalog = lurek.docs.scanModule("audio")
     local entry = catalog:getEntries()[1]
   local t = catalog:type()
   lurek.log.info("LDocEntry:type = " .. t, "docs")
@@ -863,7 +863,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LDocEntry:typeOf
-  local catalog = local catalog = lurek.docs.scanModule("audio")
+  local catalog = lurek.docs.scanModule("audio")
     local entry = catalog:getEntries()[1]
   lurek.log.info("is LDocEntry: " .. tostring(catalog:typeOf("LDocEntry")), "docs")
   lurek.log.info("is wrong: " .. tostring(catalog:typeOf("Unknown")), "docs")
@@ -872,7 +872,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LQualityReport:type
-  local q = local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
+  local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   local t = q:type()
   lurek.log.info("LQualityReport:type = " .. t, "docs")
 end
@@ -880,7 +880,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LQualityReport:typeOf
-  local q = local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
+  local q = lurek.docs.quality(lurek.docs.loadAll("docs/api"))
   lurek.log.info("is LQualityReport: " .. tostring(q:typeOf("LQualityReport")), "docs")
   lurek.log.info("is wrong: " .. tostring(q:typeOf("Unknown")), "docs")
 end
@@ -888,10 +888,12 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LSchema:type
-  local schema = local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
-    local result = schema:validate({ hp = -5 })
-    local count = (type(result) == "table") and #result or (result and 0 or 1)
-    if count > 0 then
+  local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
+  local result = schema:validate({ hp = -5 })
+  local count = (type(result) == "table") and #result or (result and 0 or 1)
+  if count > 0 then
+    lurek.log.info("validation errors: " .. count, "docs")
+  end
   local t = schema:type()
   lurek.log.info("LSchema:type = " .. t, "docs")
 end
@@ -899,10 +901,12 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LSchema:typeOf
-  local schema = local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
-    local result = schema:validate({ hp = -5 })
-    local count = (type(result) == "table") and #result or (result and 0 or 1)
-    if count > 0 then
+  local schema = lurek.docs.schema({ hp = { type = "integer", required = true, min = 0 } }, "Stats")
+  local result = schema:validate({ hp = -5 })
+  local count = (type(result) == "table") and #result or (result and 0 or 1)
+  if count > 0 then
+    lurek.log.info("validation errors: " .. count, "docs")
+  end
   lurek.log.info("is LSchema: " .. tostring(schema:typeOf("LSchema")), "docs")
   lurek.log.info("is wrong: " .. tostring(schema:typeOf("Unknown")), "docs")
 end

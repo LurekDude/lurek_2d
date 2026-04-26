@@ -912,9 +912,10 @@ end
 -- Useful for runtime type inspection.
 do  -- LInputRecording:type
   local obj = lurek.input.startRecording()
-    local rec = lurek.input.stopRecording()
-    if rec then
-      local json = rec:toJson()
+  local rec = lurek.input.stopRecording()
+  if rec then
+    local _ = rec:toJson()
+  end
   local t = obj:type()
   lurek.log.info("LInputRecording:type = " .. t, "input")
 end
@@ -923,9 +924,10 @@ end
 -- Use for runtime type checks.
 do  -- LInputRecording:typeOf
   local obj = lurek.input.startRecording()
-    local rec = lurek.input.stopRecording()
-    if rec then
-      local json = rec:toJson()
+  local rec = lurek.input.stopRecording()
+  if rec then
+    local _ = rec:toJson()
+  end
   lurek.log.info("is LInputRecording: " .. tostring(obj:typeOf("LInputRecording")), "input")
   lurek.log.info("is wrong: " .. tostring(obj:typeOf("Unknown")), "input")
 end

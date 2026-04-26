@@ -1781,16 +1781,16 @@ end
 do  -- LGraphNode:getOverflowPolicy
   local g = lurek.graph.newGraph()
   local n = g:addNode("silo", 50)
-  n:setOverflowPolicy("drop")
+  n:setOverflowPolicy("destroy")
   lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
 end
 --@api-stub: LGraphNode:setOverflowPolicy
 -- Sets the overflow policy from a string.
--- 'block' stalls incoming edges; 'drop' discards surplus items.
+-- 'reject' stalls incoming items; 'destroy' discards surplus items; 'queue' buffers them.
 do  -- LGraphNode:setOverflowPolicy
   local g = lurek.graph.newGraph()
   local n = g:addNode("silo", 50)
-  n:setOverflowPolicy("block")
+  n:setOverflowPolicy("reject")
   lurek.log.info("overflow_policy=" .. n:getOverflowPolicy(), "graph")
 end
 --@api-stub: LGraphNode:getFlowMode
@@ -1799,12 +1799,12 @@ end
 do  -- LGraphNode:getFlowMode
   local g = lurek.graph.newGraph()
   local n = g:addNode("distributor", 16)
-  n:setFlowMode("push")
+  n:setFlowMode("both")
   lurek.log.info("flow_mode=" .. n:getFlowMode(), "graph")
 end
 --@api-stub: LGraphNode:setFlowMode
 -- Sets the flow mode from a string.
--- Use 'pull' for consumer nodes and 'push' for producer nodes.
+-- Use 'pull' for consumer nodes, 'push' for producer nodes, 'both' for bidirectional.
 do  -- LGraphNode:setFlowMode
   local g = lurek.graph.newGraph()
   local n = g:addNode("factory", 16)
