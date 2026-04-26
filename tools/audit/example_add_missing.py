@@ -48,7 +48,9 @@ MODULE_TO_EXAMPLE: dict[str, str] = {
     'engine':      'engine.lua',
     'event':       'event.lua',
     'filesystem':  'filesystem.lua',
+    'globe':       'globe.lua',
     'graph':       'graph.lua',
+    'html':        'html.lua',
     'i18n':        'i18n.lua',
     'image':       'image.lua',
     'input':       'input.lua',
@@ -100,7 +102,9 @@ NAMESPACE_MAP: dict[str, str] = {
     'engine':      'engine',
     'event':       'event',
     'filesystem':  'filesystem',
+    'globe':       'globe',
     'graph':       'graph',
+    'html':        'html',
     'i18n':        'i18n',
     'image':       'image',
     'input':       'input',
@@ -179,12 +183,19 @@ def load_code_text(path: Path) -> str:
     return '\n'.join(ln for ln in raw.splitlines() if not ln.lstrip().startswith('--'))
 
 
-def is_covered(entry: Entry, code_text: str) -> bool:
+def is_covered(entry: "Entry", raw_text: str, ns: str) -> bool:
+    """Return True if the file already contains an --@api-stub: marker for this entry.
+
+    Matches exactly how example_coverage.py checks coverage: requires the
+    machine-readable ``--@api-stub: <id>`` tag in the raw file.  This avoids
+    false-positives from broad regex matches on common names like ``:new(`` or
+    ``:update(`` that appear in unrelated code.
+    """
     if entry.is_method:
-        pat = r':' + re.escape(entry.name) + r'\s*\('
+        stub_id = f'{entry.owner_type}:{entry.name}'
     else:
-        pat = r'\b' + re.escape(entry.name) + r'\s*\('
-    return bool(re.search(pat, code_text))
+        stub_id = f'lurek.{ns}.{entry.name}'
+    return f'--@api-stub: {stub_id}' in raw_text
 
 
 def _make_call_args(sig: str) -> str:
@@ -273,7 +284,6 @@ def patch_example(
     # Load or initialise the example file
     if ex_path.exists():
         raw = ex_path.read_text(encoding='utf-8', errors='replace')
-        code_text = load_code_text(ex_path)
     else:
         # Create a minimal header if file doesn't exist yet
         raw = (
@@ -281,12 +291,11 @@ def patch_example(
             f'-- Lurek2D lurek.{ns} API Reference\n'
             f'-- Run with: cargo run -- content/examples/{ex_filename[:-4]}\n\n'
         )
-        code_text = ''
         if verbose:
             print(f'  [NEW] Creating {ex_filename}')
 
     # Find missing entries
-    missing = [e for e in entries if not is_covered(e, code_text)]
+    missing = [e for e in entries if not is_covered(e, raw, ns)]
     if not missing:
         return 0
 
