@@ -3240,7 +3240,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LineChart:type
-  local chart = local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
+  local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
     chart:setYMax(100)
   local t = chart:type()
   lurek.log.info("LineChart:type = " .. t, "ui")
@@ -3249,7 +3249,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LineChart:typeOf
-  local chart = local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
+  local chart = new_example_image_widget():newLineChart({0.1,0.3,0.5,0.7})
     chart:setYMax(100)
   lurek.log.info("is LineChart: " .. tostring(chart:typeOf("LineChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
@@ -3268,7 +3268,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LAreaChart:type
-  local w = local w = new_example_image_widget():newPanel()
+  local w = new_example_image_widget():newPanel()
     w:setYMax(100)
   local t = w:type()
   lurek.log.info("LAreaChart:type = " .. t, "ui")
@@ -3277,7 +3277,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LAreaChart:typeOf
-  local w = local w = new_example_image_widget():newPanel()
+  local w = new_example_image_widget():newPanel()
     w:setYMax(100)
   lurek.log.info("is LAreaChart: " .. tostring(w:typeOf("LAreaChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
@@ -3286,7 +3286,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LBarChart:type
-  local w = local w = new_example_image_widget():newPanel()
+  local w = new_example_image_widget():newPanel()
     w:drawToImage()
   local t = w:type()
   lurek.log.info("LBarChart:type = " .. t, "ui")
@@ -3295,7 +3295,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LBarChart:typeOf
-  local w = local w = new_example_image_widget():newPanel()
+  local w = new_example_image_widget():newPanel()
     w:drawToImage()
   lurek.log.info("is LBarChart: " .. tostring(w:typeOf("LBarChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(w:typeOf("Unknown")), "ui")
@@ -3320,7 +3320,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LPieChart:type
-  local chart = local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
+  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
     chart:drawToImage()
   local t = chart:type()
   lurek.log.info("LPieChart:type = " .. t, "ui")
@@ -3329,7 +3329,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LPieChart:typeOf
-  local chart = local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
+  local chart = new_example_image_widget():newPieChart({{label="HP",value=70}})
     chart:drawToImage()
   lurek.log.info("is LPieChart: " .. tostring(chart:typeOf("LPieChart")), "ui")
   lurek.log.info("is wrong: " .. tostring(chart:typeOf("Unknown")), "ui")
@@ -3338,7 +3338,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LScatterPlot:type
-  local plot = local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
+  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
     plot:setXRange(1)
   local t = plot:type()
   lurek.log.info("LScatterPlot:type = " .. t, "ui")
@@ -3347,7 +3347,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LScatterPlot:typeOf
-  local plot = local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
+  local plot = new_example_image_widget():newScatterPlot({{1,2},{3,4},{5,6}})
     plot:setXRange(1)
   lurek.log.info("is LScatterPlot: " .. tostring(plot:typeOf("LScatterPlot")), "ui")
   lurek.log.info("is wrong: " .. tostring(plot:typeOf("Unknown")), "ui")
@@ -3356,7 +3356,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LTheme:type
-  local theme = local theme = new_example_image_widget():newTheme()
+  local theme = new_example_image_widget():newTheme()
     theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
     theme:setStyle("button.text_color",  {1, 1, 1, 1})
   local t = theme:type()
@@ -3366,7 +3366,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LTheme:typeOf
-  local theme = local theme = new_example_image_widget():newTheme()
+  local theme = new_example_image_widget():newTheme()
     theme:setStyle("button.background", {0.2, 0.4, 0.8, 1})
     theme:setStyle("button.text_color",  {1, 1, 1, 1})
   lurek.log.info("is LTheme: " .. tostring(theme:typeOf("LTheme")), "ui")

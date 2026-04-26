@@ -1704,7 +1704,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LargeMapRenderer:type
-  local r = local r = lurek.tilemap.newLargeMapR
+  local r = lurek.tilemap.newLargeMapR
   local t = r:type()
   lurek.log.info("LargeMapRenderer:type = " .. t, "tilemap")
 end
@@ -1712,7 +1712,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LargeMapRenderer:typeOf
-  local r = local r = lurek.tilemap.newLargeMapR
+  local r = lurek.tilemap.newLargeMapR
   lurek.log.info("is LargeMapRenderer: " .. tostring(r:typeOf("LargeMapRenderer")), "tilemap")
   lurek.log.info("is wrong: " .. tostring(r:typeOf("Unknown")), "tilemap")
 end

@@ -20,6 +20,15 @@ All notable changes to Lurek2D are recorded here.
 - **`work/dedup_stubs.py`**: new session script that removes duplicate `--@api-stub:` blocks that still carry `-- TODO:`, keeping the first (filled) occurrence — removed 15 stale blocks across 6 files.
 - Result: `example_coverage.py --report --no-stubs` exits 0 with **4022 real / 0 pending / 0 missing — 100% real coverage** across all 50 modules.
 
+## [1.0.9-fix.2] - 2026-04-27
+
+### fix(examples): fix remaining Phase-1 double-local syntax errors in physics/tilemap/ui
+
+- **`content/examples/physics.lua`**: removed 2 double-`local` patterns from Phase-1 auto-generated type/typeOf stubs.
+- **`content/examples/tilemap.lua`**: removed 2 double-`local` patterns.
+- **`content/examples/ui.lua`**: removed 12 double-`local` patterns.
+- All `content/examples/*.lua` files now pass `python -c "re.subn(r'local (\w+) = local \1 = ', ...)"` with 0 matches.
+
 ## [1.0.9-fix.1] - 2026-04-27
 
 ### fix(examples): fix Lua syntax errors in docs/graph/input/light stubs

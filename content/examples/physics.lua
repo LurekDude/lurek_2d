@@ -2038,7 +2038,7 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do  -- LZone:type
-  local world = local world = lurek.physics.newWorld(0, 9.81)
+  local world = lurek.physics.newWorld(0, 9.81)
     local zone = world:addZone(0, 0, 100, 100)
   local t = world:type()
   lurek.log.info("LZone:type = " .. t, "physics")
@@ -2047,7 +2047,7 @@ end
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do  -- LZone:typeOf
-  local world = local world = lurek.physics.newWorld(0, 9.81)
+  local world = lurek.physics.newWorld(0, 9.81)
     local zone = world:addZone(0, 0, 100, 100)
   lurek.log.info("is LZone: " .. tostring(world:typeOf("LZone")), "physics")
   lurek.log.info("is wrong: " .. tostring(world:typeOf("Unknown")), "physics")
