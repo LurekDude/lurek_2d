@@ -86,12 +86,17 @@ local rain_timer = 0
 local market_cursor = 1     -- 1..6 for market items
 
 -- Particle systems
+---@type LParticleSystem
 local ps_harvest = nil
+---@type LParticleSystem
 local ps_rain    = nil
+---@type LParticleSystem
 local ps_growth  = nil
+---@type LParticleSystem
 local ps_plant   = nil
 
 -- Camera
+---@type LCamera
 local camera = nil
 
 -- ---------------------------------------------------------------------------
@@ -317,7 +322,7 @@ function lurek.process(dt)
                 inventory.seeds[CROP_TOMATO] = inventory.seeds[CROP_TOMATO] + 1
             end
             -- Tween gold display
-            lurek.tween.to(gold_display, 0.3, { [1] = gold })
+            lurek.tween.to(gold_display, { [1] = gold }, 0.3)
         end
         -- Update tweens / particles even in market
         lurek.tween.update(dt)
@@ -369,7 +374,8 @@ function lurek.process(dt)
 
         if player.tool == TOOL_HOE and plot.state == PLOT_EMPTY then
             plot.state = PLOT_TILLED
-            ps_plant:emit(cx, cy, 8)
+            ps_plant:moveTo(cx, cy)
+            ps_plant:emit(8)
         elseif player.tool == TOOL_SEEDS and plot.state == PLOT_TILLED then
             local st = player.seed_type
             if inventory.seeds[st] > 0 then
@@ -379,13 +385,15 @@ function lurek.process(dt)
                 plot.growth = 0
                 plot.grow_time = CROP_GROW_TIME[st]
                 plot.watered = false
-                ps_plant:emit(cx, cy, 12)
+                ps_plant:moveTo(cx, cy)
+                ps_plant:emit(12)
             end
         elseif player.tool == TOOL_WATER and (plot.state == PLOT_PLANTED or plot.state == PLOT_GROWING) then
             if not plot.watered then
                 plot.watered = true
                 plot.grow_time = CROP_GROW_TIME[plot.crop] * 0.5
-                ps_growth:emit(cx, cy, 6)
+                ps_growth:moveTo(cx, cy)
+                ps_growth:emit(6)
             end
         elseif player.tool == TOOL_SICKLE and plot.state == PLOT_READY then
             local crop = plot.crop
@@ -394,7 +402,8 @@ function lurek.process(dt)
             plot.crop = nil
             plot.growth = 0
             plot.watered = false
-            ps_harvest:emit(cx, cy, 20)
+            ps_harvest:moveTo(cx, cy)
+            ps_harvest:emit(20)
         end
     end
 
@@ -415,7 +424,8 @@ function lurek.process(dt)
     if is_raining then
         rain_timer = rain_timer - dt
         -- Emit rain particles from top
-        ps_rain:emit(math.random(0, SCREEN_W), 0, 2)
+        ps_rain:moveTo(math.random(0, SCREEN_W), 0)
+        ps_rain:emit(2)
         if rain_timer <= 0 then
             is_raining = false
             -- Water all planted/growing plots
@@ -444,7 +454,8 @@ function lurek.process(dt)
                     if p.growth >= p.grow_time then
                         p.state = PLOT_READY
                         local px, py = plot_screen_pos(c, r)
-                        ps_growth:emit(px + PLOT_SIZE * 0.5, py + PLOT_SIZE * 0.5, 8)
+                        ps_growth:moveTo(px + PLOT_SIZE * 0.5, py + PLOT_SIZE * 0.5)
+                        ps_growth:emit(8)
                     end
                 end
             end
@@ -539,10 +550,10 @@ function lurek.draw()
         { color = { COL_PLAYER[1], COL_PLAYER[2], COL_PLAYER[3], 0.35 } })
 
     -- Particles (world-space)
-    ps_harvest:draw()
-    ps_rain:draw()
-    ps_growth:draw()
-    ps_plant:draw()
+    ps_harvest:render()
+    ps_rain:render()
+    ps_growth:render()
+    ps_plant:render()
 
     -- Night overlay
     if night_alpha > 0 then

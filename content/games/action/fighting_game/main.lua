@@ -82,12 +82,12 @@ local match_winner   = ""
 -- Camera shake
 local shake_amount = 0
 local shake_timer  = 0
-local _cam = nil  ---@type Camera2D?
+local _cam = nil  ---@type LCamera?
 
 -- Particles
-local hit_sparks    = nil  ---@type ParticleSystem
-local block_sparks  = nil  ---@type ParticleSystem
-local super_flash   = nil  ---@type ParticleSystem
+local hit_sparks    = nil  ---@type LParticleSystem
+local block_sparks  = nil  ---@type LParticleSystem
+local super_flash   = nil  ---@type LParticleSystem
 
 -- Title blink
 local title_blink = 0

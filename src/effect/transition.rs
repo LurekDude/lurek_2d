@@ -24,6 +24,7 @@ pub enum TransitionKind {
 
 impl TransitionKind {
     /// Parses the kind from a Lua string.  Falls back to `Fade` on unknown input.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "wipe" => TransitionKind::Wipe,

@@ -111,7 +111,9 @@ local bg_pulse = 0
 local result_grade = "F"
 
 -- Particles
+---@type LParticleSystem
 local hit_particles = nil
+---@type LParticleSystem
 local combo_particles = nil
 
 -- Tweens
@@ -205,7 +207,8 @@ local function process_hit(lane)
             life = clamp(life + PERFECT_HEAL, 0, LIFE_MAX)
             hit_flash[lane] = 0.4
             if hit_particles then
-                hit_particles:emit(lane_center_x(lane), HIT_ZONE_Y, 20)
+                hit_particles:moveTo(lane_center_x(lane), HIT_ZONE_Y)
+                hit_particles:emit(20)
             end
         else
             -- Good

@@ -89,9 +89,13 @@ local round_timer = 0
 local ROUND_DELAY = 2.0
 
 -- Camera & particles
+---@type LCamera
 local camera = nil
+---@type LParticleSystem
 local ps_explode = nil
+---@type LParticleSystem
 local ps_trail = nil
+---@type LParticleSystem
 local ps_powerup = nil
 
 -- Tween animation values
@@ -207,7 +211,7 @@ local function collect_powerup(pu)
     elseif pu.kind == POWERUP.SLOWMO then
         slowmo_timer = slowmo_timer + 5.0
     end
-    if ps_powerup then ps_powerup:emit(pu.x, pu.y, 20) end
+    if ps_powerup then ps_powerup:moveTo(pu.x, pu.y) ps_powerup:emit(20) end
 end
 
 -- ---------------------------------------------------------------------------
@@ -411,7 +415,8 @@ function lurek.process(dt)
         b.life = b.life - dt
 
         -- Trail particles
-        ps_trail:emit(b.x, b.y, 2)
+        ps_trail:moveTo(b.x, b.y)
+        ps_trail:emit(2)
 
         -- Check collision with targets
         local hit = false
@@ -439,7 +444,8 @@ function lurek.process(dt)
 
                 -- Explosion particles
                 local col = target_color(t.points)
-                ps_explode:emit(t.x + t.w / 2, t.y + t.h / 2, 25)
+                ps_explode:moveTo(t.x + t.w / 2, t.y + t.h / 2)
+                ps_explode:emit(25)
 
                 -- Power-up drop
                 if targets_destroyed % 5 == 0 then
@@ -474,7 +480,8 @@ function lurek.process(dt)
 
         -- Glow particles
         if math.floor(pu.t * 10) % 3 == 0 then
-            ps_powerup:emit(pu.x, pu.y, 1)
+            ps_powerup:moveTo(pu.x, pu.y)
+            ps_powerup:emit(1)
         end
 
         -- Collect if ball touches power-up
@@ -583,9 +590,9 @@ function lurek.draw()
 
     -- Particles
     lurek.render.setColor(1, 1, 1, 1)
-    ps_explode:draw()
-    ps_trail:draw()
-    ps_powerup:draw()
+    ps_explode:render()
+    ps_trail:render()
+    ps_powerup:render()
 
     -- Crosshair
     lurek.render.setColor(COL_CROSSHAIR[1], COL_CROSSHAIR[2], COL_CROSSHAIR[3], 0.9)

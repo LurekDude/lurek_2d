@@ -136,9 +136,13 @@ local floating_texts  = {}
 local particles       = {}
 
 -- Particle systems (engine)
+---@type LParticleSystem
 local hit_ps          = nil
+---@type LParticleSystem
 local score_ps        = nil
+---@type LParticleSystem
 local level_ps        = nil
+---@type LParticleSystem
 local combo_ps        = nil
 
 -- Tweens
@@ -496,22 +500,22 @@ function lurek.process(dt)
     -- Fire signals from input
     if lurek.input.wasActionPressed("hit") then
         signal_emit("player_hit")
-        if hit_ps then hit_ps:emit(15, GAME_AREA_W / 2, 200) end
+        if hit_ps then hit_ps:moveTo(GAME_AREA_W / 2, 200) hit_ps:emit(15) end
         if health <= 0 then
             signal_emit("game_over")
         end
     end
     if lurek.input.wasActionPressed("score") then
         signal_emit("score_up", { amount = SCORE_PER_HIT })
-        if score_ps then score_ps:emit(10, GAME_AREA_W / 2, 250) end
+        if score_ps then score_ps:moveTo(GAME_AREA_W / 2, 250) score_ps:emit(10) end
     end
     if lurek.input.wasActionPressed("level") then
         signal_emit("level_up")
-        if level_ps then level_ps:emit(25, GAME_AREA_W / 2, SCREEN_H / 2) end
+        if level_ps then level_ps:moveTo(GAME_AREA_W / 2, SCREEN_H / 2) level_ps:emit(25) end
     end
     if lurek.input.wasActionPressed("combo") then
         signal_emit("combo_reached", { combo = COMBO_THRESHOLD })
-        if combo_ps then combo_ps:emit(30, GAME_AREA_W / 2, 180) end
+        if combo_ps then combo_ps:moveTo(GAME_AREA_W / 2, 180) combo_ps:emit(30) end
     end
 
     -- Update effects
@@ -600,10 +604,10 @@ function lurek.draw()
     end
 
     -- Engine particle systems
-    if hit_ps then hit_ps:draw() end
-    if score_ps then score_ps:draw() end
-    if level_ps then level_ps:draw() end
-    if combo_ps then combo_ps:draw() end
+    if hit_ps then hit_ps:render() end
+    if score_ps then score_ps:render() end
+    if level_ps then level_ps:render() end
+    if combo_ps then combo_ps:render() end
 
     -- Screen flash overlay
     if screen_flash.a > 0.01 then

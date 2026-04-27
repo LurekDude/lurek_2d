@@ -25,6 +25,7 @@ impl Lcg {
     ///
     /// # Returns
     /// `u64`.
+    #[allow(clippy::should_implement_trait)]
     pub fn next(&mut self) -> u64 {
         self.state = self
             .state

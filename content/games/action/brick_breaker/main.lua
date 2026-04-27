@@ -266,7 +266,8 @@ function lurek.process(dt)
             ang = clamp(ang, -math.pi+0.15, -0.15)
             b.dx, b.dy = math.cos(ang), math.sin(ang)
             hit_ps:setDirection(-math.pi/2)
-            hit_ps:emit(b.x, PADDLE_Y, 8)
+            hit_ps:moveTo(b.x, PADDLE_Y)
+            hit_ps:emit(8)
         end
 
         -- Brick collision
@@ -277,12 +278,14 @@ function lurek.process(dt)
                 if br.hp <= 0 then
                     br.alive = false;  brick_count = brick_count - 1
                     score = score + 10*level
-                    brick_ps:setColors(c[1],c[2],c[3],1, c[1],c[2],c[3],0)
-                    brick_ps:emit(br.x+BRICK_W/2, br.y+BRICK_H/2, 15)
+                    brick_ps:setColors({c[1],c[2],c[3],1}, {c[1],c[2],c[3],0})
+                    brick_ps:moveTo(br.x+BRICK_W/2, br.y+BRICK_H/2)
+                    brick_ps:emit(15)
                     maybe_drop(br.x, br.y)
                 else
-                    brick_ps:setColors(c[1],c[2],c[3],1, c[1],c[2],c[3],0)
-                    brick_ps:emit(br.x+BRICK_W/2, br.y+BRICK_H/2, 6)
+                    brick_ps:setColors({c[1],c[2],c[3],1}, {c[1],c[2],c[3],0})
+                    brick_ps:moveTo(br.x+BRICK_W/2, br.y+BRICK_H/2)
+                    brick_ps:emit(6)
                 end
                 -- Reflect
                 local dx_p = math.abs(b.x-(br.x+BRICK_W/2)) - BRICK_W/2
@@ -354,8 +357,8 @@ function lurek.draw()
     end
 
     -- Particles
-    brick_ps:draw()
-    hit_ps:draw()
+    brick_ps:render()
+    hit_ps:render()
 
     -- Level flash
     if flash.alpha > 0.01 then

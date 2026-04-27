@@ -313,6 +313,7 @@ pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
 ///
 /// # Returns
 /// `Result<NdArray, String>`.
+#[allow(clippy::needless_range_loop)]
 pub fn linsolve(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     if a.ndim() != 2 || a.shape()[0] != a.shape()[1] {
         return Err(format!(
@@ -516,6 +517,7 @@ pub fn lu_decompose(a: &NdArray) -> Result<LuDecomp, String> {
 /// game AI influence maps and graph centrality — which rarely need more
 /// than the dominant mode. The caller controls iteration budget via
 /// `max_iter` and `tol`.
+#[allow(clippy::needless_range_loop)]
 pub fn eigenvalue_power(a: &NdArray, max_iter: u32, tol: f64) -> Result<(f64, Vec<f64>), String> {
     let shape = a.shape();
     if shape.len() != 2 || shape[0] != shape[1] {

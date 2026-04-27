@@ -80,6 +80,7 @@ pub fn execute_request(
 }
 
 /// Internal: execute the request using a configured agent.
+#[allow(clippy::wildcard_in_or_patterns)]
 fn execute_with_agent(
     agent: &ureq::Agent,
     method: &str,

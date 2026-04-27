@@ -40,7 +40,9 @@ local swap_t, swap_max   = 0, 0.12
 local swap_revert        = false
 
 -- Particle systems
+---@type LParticleSystem
 local match_sparks = nil
+---@type LParticleSystem
 local bomb_burst   = nil
 local drop_dust    = nil
 
@@ -139,9 +141,9 @@ local function clear_matches(marked)
             local px = GRID_X + (c-1)*CELL + CELL/2
             local py = GRID_Y + (r-1)*CELL + CELL/2
             if g.special == "bomb" then
-                if bomb_burst then bomb_burst:emit(px, py, 16) end
+                if bomb_burst then bomb_burst:moveTo(px, py) bomb_burst:emit(16) end
             else
-                if match_sparks then match_sparks:emit(px, py, 5) end
+                if match_sparks then match_sparks:moveTo(px, py) match_sparks:emit(5) end
             end
             ---@type any
             local row = grid[r]
@@ -374,7 +376,7 @@ function lurek.process(dt)
 
     -- Idle: handle click selection / swap
     if game_state == "idle" then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local c = math.floor((mx - GRID_X) / CELL) + 1
         local r = math.floor((my - GRID_Y) / CELL) + 1
 
@@ -430,9 +432,9 @@ function lurek.draw()
         end
     end
 
-    if match_sparks then match_sparks:draw() end
-    if bomb_burst   then bomb_burst:draw()   end
-    if drop_dust    then drop_dust:draw()    end
+    if match_sparks then match_sparks:render() end
+    if bomb_burst   then bomb_burst:render()   end
+    if drop_dust    then drop_dust:render()    end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

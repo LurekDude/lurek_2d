@@ -143,6 +143,7 @@ local lives = 3
 local wave = 1
 
 -- Camera
+---@type LCamera
 local cam = nil
 
 -- Fly-in animation

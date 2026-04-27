@@ -96,6 +96,7 @@ local ps_breakpoint = nil
 local entity_highlight = { alpha = 0 }
 
 -- Camera
+---@type LCamera
 local camera = nil
 
 -- ---------------------------------------------------------------------------

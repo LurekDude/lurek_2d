@@ -92,7 +92,7 @@ function lurek.draw()
   lurek.graphics.circle("line", px, py, 20)
 
   -- HTML HUD on top
-  hud:draw()
+  hud:render()
 end
 
 function lurek.mousemoved(x, y)

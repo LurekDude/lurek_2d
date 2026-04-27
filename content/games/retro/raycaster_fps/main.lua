@@ -139,6 +139,7 @@ local damage_flash_alpha = 0
 local muzzle_flash_timer = 0
 local depth_buffer = {}
 
+---@type LCamera
 local cam = nil
 
 -- ── helpers ───────────────────────────────────────────────────

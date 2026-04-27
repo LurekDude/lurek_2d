@@ -60,7 +60,9 @@ local export_timer   = 0
 -- ---------------------------------------------------------------------------
 -- Particles
 -- ---------------------------------------------------------------------------
+---@type LParticleSystem
 local ps_spawn  = nil
+---@type LParticleSystem
 local ps_stress = nil
 
 -- ---------------------------------------------------------------------------
@@ -69,6 +71,8 @@ local ps_stress = nil
 local panel_offsets = { 0, 0, 0, 0, 0 }   -- slide-in X offset per panel
 local title_alpha = 0
 local title_scale = 0.5
+---@type {a: number, s: number}
+local _title_anim = { a = 0, s = 0.5 }
 
 -- ---------------------------------------------------------------------------
 -- Helpers
@@ -224,10 +228,7 @@ function lurek.init()
     for i = 1, 5 do panel_offsets[i] = -PANEL_W - 20 end
 
     -- Title tween
-    lurek.tween.to(0.8, function(t)
-        title_alpha = t
-        title_scale = lerp(0.5, 1.0, t)
-    end, { ease = "outBack" })
+    lurek.tween.to(_title_anim, { a = 1, s = 1.0 }, 0.8, "outBack")
 
     -- Start with a few balls
     spawn_batch(50)
@@ -245,6 +246,8 @@ function lurek.process(dt)
     ps_spawn:update(dt)
     ps_stress:update(dt)
     lurek.tween.update(dt)
+    title_alpha = _title_anim.a
+    title_scale = _title_anim.s
 
     -- Export timer
     if export_timer > 0 then
@@ -384,8 +387,8 @@ function lurek.draw()
 
     -- Particles
     lurek.render.setColor(1, 1, 1, 1)
-    ps_spawn:draw()
-    ps_stress:draw()
+    ps_spawn:render()
+    ps_stress:render()
     draw_call_count = draw_call_count + 2
 end
 

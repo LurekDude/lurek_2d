@@ -170,6 +170,7 @@ impl ORCASolver {
     ///
     /// # Parameters
     /// - `dt` — `f32`.
+    #[allow(clippy::needless_range_loop)]
     pub fn compute(&mut self, _dt: f32) {
         let n = self.agents.len();
         // Collect positions/velocities/radii to avoid borrow aliasing

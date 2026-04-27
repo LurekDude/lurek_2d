@@ -30,6 +30,7 @@ local bullets   = {}
 local grid      = {}
 local state     = "build"   -- build | combat | gameover | victory
 
+---@type LParticleSystem
 local particle_sys = nil
 
 -- Build path grid: spawn top-left(0,6), base bottom-right(19,7)
@@ -203,7 +204,7 @@ function lurek.process(dt)
 
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c, hover_r = mouse_to_cell(mx, my)
 
     if state == "build" then
@@ -302,7 +303,7 @@ function lurek.process(dt)
                         if e.hp <= 0 then
                             gold  = gold + e.reward
                             score = score + 10
-                            if particle_sys then particle_sys:emit(ex, ey, 8) end
+                            if particle_sys then particle_sys:moveTo(ex, ey) particle_sys:emit(8) end
                         end
                         break
                     end
@@ -377,7 +378,7 @@ function lurek.draw()
         rect(bx - 2, by - 2, 4, 4, { color = {1,0.9,0.3,1} })
     end
 
-    if particle_sys then particle_sys:draw() end
+    if particle_sys then particle_sys:render() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

@@ -32,7 +32,9 @@ local state = {}
 local log_messages = {}
 
 -- Particles
+---@type LParticleSystem
 local hit_particles  = nil
+---@type LParticleSystem
 local card_particles = nil
 
 -- Tweens
@@ -266,14 +268,14 @@ function lurek.process(dt)
                         local dmg = card.value
                         if monster.vuln > 0 then dmg = math.floor(dmg * 1.5) end
                         monster.hp = monster.hp - dmg
-                        if hit_particles then hit_particles:emit(560, 200, 8) end
+                        if hit_particles then hit_particles:moveTo(200, 8) hit_particles:emit(560) end
                         lurek.tween.to(enemy_hp_tween, { v = math.max(0, monster.hp / monster.maxHp) }, 0.3)
                         add_log("You deal " .. dmg .. " damage!")
                         if card.vuln then monster.vuln = (monster.vuln or 0) + card.vuln end
                         if card.stun then monster.stun = (monster.stun or 0) + card.stun end
                     elseif card.type == "block" then
                         player.block = player.block + card.value
-                        if card_particles then card_particles:emit(200, 300, 6) end
+                        if card_particles then card_particles:moveTo(300, 6) card_particles:emit(200) end
                         add_log("You gain " .. card.value .. " block.")
                     elseif card.type == "heal" then
                         player.hp = math.min(player.maxHp, player.hp + card.value)
@@ -303,7 +305,7 @@ function lurek.process(dt)
                 local dmg = math.max(0, monster.atk - player.block)
                 player.hp = player.hp - dmg
                 lurek.tween.to(hp_tween_val, { v = math.max(0, player.hp / player.maxHp) }, 0.3)
-                if hit_particles then hit_particles:emit(200, 300, 6) end
+                if hit_particles then hit_particles:moveTo(300, 6) hit_particles:emit(200) end
                 add_log(monster.name .. " deals " .. dmg .. " damage!")
                 if monster.vuln > 0 then monster.vuln = monster.vuln - 1 end
             end
@@ -318,8 +320,8 @@ end
 
 -- ── Render world ──────────────────────────────────────────
 function lurek.draw()
-    if hit_particles  then hit_particles:draw()  end
-    if card_particles then card_particles:draw() end
+    if hit_particles  then hit_particles:render()  end
+    if card_particles then card_particles:render() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

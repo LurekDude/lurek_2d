@@ -139,7 +139,7 @@ function lurek.draw()
   end
 
   -- HTML dialog.
-  if dialog_open then dialog_doc:draw() end
+  if dialog_open then dialog_doc:render() end
 end
 
 function lurek.mousepressed(x, y, btn)

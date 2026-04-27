@@ -471,7 +471,8 @@ function lurek.process(dt)
         player.noise_timer = player.noise_timer + dt
         if player.noise_timer >= 0.4 then
             player.noise_timer = 0
-            noise_ps:emit(player.x, player.y, 8)
+            noise_ps:moveTo(player.x, player.y)
+            noise_ps:emit(8)
             -- Attract nearby guards
             for _, g in ipairs(guards) do
                 if dist(player.x, player.y, g.x, g.y) < NOISE_ATTRACT_DIST then
@@ -518,7 +519,8 @@ function lurek.process(dt)
             if dist(player.x, player.y, kc.x, kc.y) < TILE * 0.6 then
                 kc.collected = true
                 player.keys_collected = player.keys_collected + 1
-                sparkle_ps:emit(kc.x, kc.y, 12)
+                sparkle_ps:moveTo(kc.x, kc.y)
+                sparkle_ps:emit(12)
                 show_message("Keycard " .. player.keys_collected .. "/3")
             end
         end
@@ -571,7 +573,8 @@ function lurek.process(dt)
         if g.suspicion >= SUSPICION_ALERT then
             if g.mode ~= "chase" then
                 g.mode = "chase"
-                alert_ps:emit(g.x, g.y - 12, 15)
+                alert_ps:moveTo(g.x, g.y - 12)
+                alert_ps:emit(15)
                 alert_flash.alpha = 0.4
                 lurek.tween.tween(0.5, alert_flash, { alpha = 0 }, "linear")
             end
@@ -634,7 +637,8 @@ function lurek.process(dt)
             if dist(g.x, g.y, player.x, player.y) < TILE * 0.5 then
                 player.alive = false
                 game_state = STATE.GAME_OVER
-                alert_ps:emit(player.x, player.y, 20)
+                alert_ps:moveTo(player.x, player.y)
+                alert_ps:emit(20)
                 show_message("DETECTED! Game Over")
                 return
             end
@@ -811,9 +815,9 @@ function lurek.draw()
     end
 
     -- Draw particles (world-space)
-    noise_ps:draw()
-    alert_ps:draw()
-    sparkle_ps:draw()
+    noise_ps:render()
+    alert_ps:render()
+    sparkle_ps:render()
 
     -- Alert flash overlay
     if alert_flash.alpha > 0 then

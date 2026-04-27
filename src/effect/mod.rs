@@ -34,6 +34,7 @@
 /// CPU software-rendering fallback for headless draw-to-image.
 pub mod draw;
 /// Per-effect parameter bag with builder helpers.
+#[allow(clippy::module_inception)]
 pub mod effect;
 /// Enum of all built-in post-processing effect kinds (bloom, blur, CRT, colour grading, …).
 pub mod effect_type;

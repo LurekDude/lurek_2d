@@ -89,9 +89,13 @@ local title_timer = 0
 local title_pulse = 0
 
 -- Particles & tweens
+---@type LParticleSystem
 local ps_sparkle   = nil
+---@type LParticleSystem
 local ps_beat      = nil
+---@type LParticleSystem
 local ps_cursor    = nil
+---@type LCamera
 local camera       = nil
 
 -- ---------------------------------------------------------------------------
@@ -288,7 +292,7 @@ function lurek.init()
     ps_sparkle:setSpeed(30, 80)
     ps_sparkle:setSpread(math.pi * 2)
     ps_sparkle:setSizes(3, 1)
-    ps_sparkle:setColors(1, 1, 1, 1, 1, 1, 1, 0)
+    ps_sparkle:setColors({1, 1, 1, 1}, {1, 1, 1, 0})
 
     -- Beat pulse
     ps_beat = lurek.particle.newSystem({maxParticles=500})
@@ -297,7 +301,7 @@ function lurek.init()
     ps_beat:setSpeed(10, 50)
     ps_beat:setSpread(math.pi * 2)
     ps_beat:setSizes(4, 1)
-    ps_beat:setColors(1, 0.95, 0.4, 1, 1, 0.95, 0.4, 0)
+    ps_beat:setColors({1, 0.95, 0.4, 1}, {1, 0.95, 0.4, 0})
 
     -- Cursor glow
     ps_cursor = lurek.particle.newSystem({maxParticles=500})
@@ -306,7 +310,7 @@ function lurek.init()
     ps_cursor:setSpeed(5, 25)
     ps_cursor:setSpread(math.pi * 2)
     ps_cursor:setSizes(2, 0.5)
-    ps_cursor:setColors(1, 0.95, 0.4, 0.8, 1, 0.95, 0.4, 0)
+    ps_cursor:setColors({1, 0.95, 0.4, 0.8}, {1, 0.95, 0.4, 0})
     ps_cursor:stop()
 end
 
@@ -406,7 +410,7 @@ function lurek.process(dt)
                 ps_sparkle:setPosition(px + CELL_W * 0.5, py + CELL_H * 0.5)
                 ps_sparkle:emit(12)
                 local tc = TRACK_COLORS[active_track]
-                ps_sparkle:setColors(tc[1], tc[2], tc[3], 1, tc[1], tc[2], tc[3], 0)
+                ps_sparkle:setColors({tc[1], tc[2], tc[3], 1}, {tc[1], tc[2], tc[3], 0})
             end
         end
     end

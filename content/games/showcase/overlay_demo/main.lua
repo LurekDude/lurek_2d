@@ -65,6 +65,7 @@ local weather_ps = {}
 -- Fog & vignette
 local fog_active      = false
 local vignette_active = false
+---@type LParticleSystem
 local fog_ps          = nil
 
 -- Intensity
@@ -205,9 +206,9 @@ end
 local function transition_tod(tod)
     current_tod = tod
     local c = TOD_COLORS[tod]
-    lurek.tween.to(tod_tween, 1.2, { r = c.r, g = c.g, b = c.b, a = c.a }, "inOutSine")
+        lurek.tween.to(tod_tween, { r = c.r, g = c.g, b = c.b, a = c.a }, 1.2, "inOutSine")
     local bg = TOD_BG[tod]
-    lurek.tween.to(bg_tween, 1.2, { r = bg[1], g = bg[2], b = bg[3] }, "inOutSine")
+        lurek.tween.to(bg_tween, { r = bg[1], g = bg[2], b = bg[3] }, 1.2, "inOutSine")
 end
 
 local function clear_all()
@@ -369,11 +370,11 @@ function lurek.process(dt)
     -- Intensity +/-
     if lurek.input.wasActionPressed("intensity_up") then
         local target = clamp(intensity.val + INTENSITY_STEP, INTENSITY_MIN, INTENSITY_MAX)
-        lurek.tween.to(intensity, 0.2, { val = target }, "outQuad")
+        lurek.tween.to(intensity, { val = target }, 0.2, "outQuad")
     end
     if lurek.input.wasActionPressed("intensity_down") then
         local target = clamp(intensity.val - INTENSITY_STEP, INTENSITY_MIN, INTENSITY_MAX)
-        lurek.tween.to(intensity, 0.2, { val = target }, "outQuad")
+        lurek.tween.to(intensity, { val = target }, 0.2, "outQuad")
     end
 
     -- Clear all
@@ -449,13 +450,15 @@ function lurek.draw()
     local alpha_mult = intensity.val
     for i = 1, #weather_ps do
         if WEATHER[i].active then
-            weather_ps[i]:draw(alpha_mult)
+            lurek.render.setColor(1, 1, 1, alpha_mult)
+            weather_ps[i]:render()
         end
     end
 
     -- ── Fog overlay ───────────────────────────────────────────
     if fog_active then
-        fog_ps:draw(alpha_mult)
+        lurek.render.setColor(1, 1, 1, alpha_mult)
+        fog_ps:render()
         -- Gradient fog band at bottom
         for row = 0, 5 do
             local a = (1.0 - row / 6.0) * 0.35 * alpha_mult

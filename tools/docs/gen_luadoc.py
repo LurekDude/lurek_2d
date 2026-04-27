@@ -13,6 +13,8 @@ import json
 import os
 import re
 
+from gen_extension_api import BUILTIN_ENUMS, CALLBACKS
+
 # Lua reserved keywords — cannot be used as parameter names in stub declarations.
 LUA_KEYWORDS = {
     "and", "break", "do", "else", "elseif", "end", "false", "for",
@@ -370,6 +372,36 @@ def write_function_doc(out, fn, name):
         out.append(f"{name} = function({signature}) end")
     out.append("")
 
+
+def write_callback_doc(out, callback):
+    desc = callback.get("description", "").strip()
+    if desc:
+        for line in desc.splitlines():
+            out.append(f"--- {line}")
+
+    params = callback.get("parameters", [])
+    arg_names = []
+    for param in params:
+        raw_name = str(param.get("name", "arg")).strip() or "arg"
+        safe_name = (raw_name + "_") if raw_name in LUA_KEYWORDS else raw_name
+        param_type = normalize_param_type(str(param.get("type", "any")), bool(param.get("optional", False)))
+        param_desc = str(param.get("description", "")).strip()
+        if param.get("optional", False):
+            clean_type = re.sub(r"\|nil$", "", param_type) or "any"
+            if param_desc:
+                out.append(f"---@param {safe_name}? {clean_type} {param_desc}".strip())
+            else:
+                out.append(f"---@param {safe_name}? {clean_type}".strip())
+        elif param_desc:
+            out.append(f"---@param {safe_name} {param_type} {param_desc}".strip())
+        else:
+            out.append(f"---@param {safe_name} {param_type}".strip())
+        arg_names.append(safe_name)
+
+    signature = ", ".join(arg_names)
+    out.append(f"function lurek.{callback['name']}({signature}) end")
+    out.append("")
+
 def main():
     if not os.path.exists(INPUT_FILE):
         print(f"API data not found at {INPUT_FILE}")
@@ -453,6 +485,17 @@ def main():
             out.append(f"{type_name} = {{}}")
             out.append("")
 
+    for enum_name in sorted(BUILTIN_ENUMS.keys()):
+        values = BUILTIN_ENUMS[enum_name]
+        if not values:
+            continue
+        union = "|".join(json.dumps(value) for value in values)
+        out.append(f"---@alias {enum_name} {union}")
+        out.append("")
+
+    for callback in CALLBACKS:
+        write_callback_doc(out, callback)
+
     # Module-level constants that the Rust parser cannot auto-discover.
     _MODULE_CONSTANTS = {
         "physics": [
@@ -472,6 +515,12 @@ def main():
             ("NORTH_WALL", "integer", "north-facing wall tile type (2)"),
             ("WEST_WALL",  "integer", "west-facing wall tile type (3)"),
             ("OBJECT",     "integer", "object tile type (4)"),
+        ],
+        "globe": [
+            ("MAX_PROVINCES", "integer", "Maximum number of provinces the globe supports."),
+            ("LOD_FAR",       "string",  'LOD tier constant "far" — zoomed-out view (zoom < 1.5).'),
+            ("LOD_MID",       "string",  'LOD tier constant "mid" — medium zoom (1.5 \u2264 zoom < 4.0).'),
+            ("LOD_NEAR",      "string",  'LOD tier constant "near" — close-zoom view (zoom \u2265 4.0).'),
         ],
 
     }

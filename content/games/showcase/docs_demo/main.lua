@@ -177,7 +177,9 @@ local MAX_HISTORY = 10
 -- ---------------------------------------------------------------------------
 -- Particles
 -- ---------------------------------------------------------------------------
+---@type LParticleSystem
 local ps_page   = nil
+---@type LParticleSystem
 local ps_search = nil
 
 -- ---------------------------------------------------------------------------
@@ -186,6 +188,16 @@ local ps_search = nil
 local title_alpha  = 0
 local title_scale  = 0.5
 local coverage_bar = 0
+
+-- Tween proxy tables (for lurek.tween.to table-based API)
+---@type {a: number, s: number}
+local _title_tw    = { a = 0, s = 0.5 }
+---@type {v: number}
+local _coverage_tw = { v = 0 }
+---@type {v: number}
+local _panel_tw    = { v = 0 }
+---@type {v: number}
+local _scroll_tw   = { v = 0 }
 
 -- ---------------------------------------------------------------------------
 -- Helpers
@@ -349,30 +361,29 @@ function lurek.init()
     })
 
     -- Title entrance tween
-    lurek.tween.to(0.8, function(t)
-        title_alpha = t
-        title_scale = lerp(0.5, 1.0, t)
-    end, { ease = "outBack" })
+    lurek.tween.to(_title_tw, { a = 1, s = 1.0 }, 0.8, "outBack")
 end
 
--- ── Update ─────────────────────────────────────────────────────────────────
+-- ── Update ───────────────────────────────────────────────────────────────
 function lurek.process(dt)
     ps_page:update(dt)
     ps_search:update(dt)
     lurek.tween.update(dt)
+    title_alpha      = _title_tw.a
+    title_scale      = _title_tw.s
+    coverage_bar     = _coverage_tw.v
+    panel_offset_x   = _panel_tw.v
+    sidebar_scroll_y = _scroll_tw.v
 
     -- ── TITLE ──────────────────────────────────────────────────
     if current_state == STATE.TITLE then
         if lurek.input.wasActionPressed("select") then
             current_state = STATE.BROWSING
             -- Animate coverage bar
-            lurek.tween.to(1.0, function(t)
-                coverage_bar = t
-            end, { ease = "outQuad" })
+            lurek.tween.to(_coverage_tw, { v = 1 }, 1.0, "outQuad")
             -- Slide panel in
-            lurek.tween.to(0.4, function(t)
-                panel_offset_x = lerp(PANEL_W, 0, t)
-            end, { ease = "outCubic" })
+            _panel_tw.v = PANEL_W
+            lurek.tween.to(_panel_tw, { v = 0 }, 0.4, "outCubic")
         end
         return
     end
@@ -398,9 +409,8 @@ function lurek.process(dt)
             end
             -- Smooth sidebar scroll
             local target_y = (selected_ns - 1) * ITEM_H
-            lurek.tween.to(0.2, function(t)
-                sidebar_scroll_y = lerp(sidebar_scroll_y, target_y, t)
-            end, { ease = "outQuad" })
+            _scroll_tw.v = sidebar_scroll_y
+            lurek.tween.to(_scroll_tw, { v = target_y }, 0.2, "outQuad")
         end
         if lurek.input.wasActionPressed("nav_down") then
             selected_func = selected_func + 1
@@ -416,25 +426,22 @@ function lurek.process(dt)
                 current_page = math.min(total_pages(selected_ns), current_page + 1)
             end
             local target_y = (selected_ns - 1) * ITEM_H
-            lurek.tween.to(0.2, function(t)
-                sidebar_scroll_y = lerp(sidebar_scroll_y, target_y, t)
-            end, { ease = "outQuad" })
+            _scroll_tw.v = sidebar_scroll_y
+            lurek.tween.to(_scroll_tw, { v = target_y }, 0.2, "outQuad")
         end
         if lurek.input.wasActionPressed("nav_left") then
             current_page = math.max(1, current_page - 1)
             selected_func = (current_page - 1) * FUNCS_PER_PAGE + 1
-            lurek.tween.to(0.3, function(t)
-                panel_offset_x = lerp(20, 0, t)
-            end, { ease = "outQuad" })
+            _panel_tw.v = 20
+            lurek.tween.to(_panel_tw, { v = 0 }, 0.3, "outQuad")
             ps_page:moveTo(PANEL_X + PANEL_W * 0.5, SCREEN_H * 0.5)
             ps_page:emit(10)
         end
         if lurek.input.wasActionPressed("nav_right") then
             current_page = math.min(total_pages(selected_ns), current_page + 1)
             selected_func = (current_page - 1) * FUNCS_PER_PAGE + 1
-            lurek.tween.to(0.3, function(t)
-                panel_offset_x = lerp(-20, 0, t)
-            end, { ease = "outQuad" })
+            _panel_tw.v = -20
+            lurek.tween.to(_panel_tw, { v = 0 }, 0.3, "outQuad")
             ps_page:moveTo(PANEL_X + PANEL_W * 0.5, SCREEN_H * 0.5)
             ps_page:emit(10)
         end
@@ -538,8 +545,8 @@ function lurek.draw()
 
     -- Particles (world-space)
     lurek.render.setColor(1, 1, 1, 1)
-    ps_page:draw()
-    ps_search:draw()
+    ps_page:render()
+    ps_search:render()
 
 end
 

@@ -439,7 +439,8 @@ local function update_bullet(dt)
             abs_hp = abs_hp - 1
             if abs_hp <= 0 then
                 mushrooms[br][bc] = nil
-                sparks:emit(8, (bc - 0.5) * CELL, (br - 0.5) * CELL)
+                sparks:moveTo((bc - 0.5) * CELL, (br - 0.5) * CELL)
+                sparks:emit(8)
                 add_score(1)
             else
                 mushrooms[br][bc] = hp > 0 and abs_hp or -abs_hp
@@ -463,7 +464,8 @@ local function update_bullet(dt)
                 if seg.row >= 1 and seg.row <= GRID_ROWS and seg.col >= 1 and seg.col <= GRID_COLS then
                     mushrooms[seg.row][seg.col] = 4
                 end
-                burst:emit(10, sx, sy)
+                burst:moveTo(sx, sy)
+                burst:emit(10)
                 add_score(10)
 
                 -- Split centipede into two chains
@@ -512,7 +514,8 @@ local function update_bullet(dt)
             -- Score based on distance to player
             local pdist = math.abs(spider.y - player.row * CELL)
             local pts = pdist < 60 and 900 or (pdist < 120 and 600 or 300)
-            spider_sparks:emit(12, spider.x, spider.y)
+            spider_sparks:moveTo(spider.x, spider.y)
+            spider_sparks:emit(12)
             add_score(pts)
             spider = nil
             bullet = nil
@@ -527,7 +530,8 @@ local function update_bullet(dt)
         local dx = bullet.x - fx
         local dy = bullet.y - fy
         if dx * dx + dy * dy < 12 * 12 then
-            burst:emit(8, fx, fy)
+            burst:moveTo(fx, fy)
+            burst:emit(8)
             add_score(200)
             flea = nil
             bullet = nil
@@ -541,7 +545,8 @@ local function update_bullet(dt)
         local dx = bullet.x - scorpion.x
         local dy = bullet.y - sy
         if dx * dx + dy * dy < 14 * 14 then
-            burst:emit(10, scorpion.x, sy)
+            burst:moveTo(scorpion.x, sy)
+            burst:emit(10)
             add_score(1000)
             scorpion = nil
             bullet = nil

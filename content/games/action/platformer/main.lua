@@ -60,9 +60,13 @@ local cam_x       = 0
 local cam_y_off   = 0
 
 -- Particles
+---@type LParticleSystem
 local dust_ps        = nil
+---@type LParticleSystem
 local coin_ps        = nil
+---@type LParticleSystem
 local stomp_ps       = nil
+---@type LParticleSystem
 local death_ps       = nil
 
 -- Tween / UI
@@ -459,7 +463,8 @@ function lurek.process(dt)
             player.vy = 0
             if not player.on_ground then
                 -- landing dust
-                dust_ps:emit(player.x + PLAYER_W / 2, new_y + PLAYER_H, 6)
+                dust_ps:moveTo(player.x + PLAYER_W / 2, new_y + PLAYER_H)
+                dust_ps:emit(6)
             end
             player.on_ground = true
         end
@@ -478,7 +483,8 @@ function lurek.process(dt)
     -- Spike check
     local foot_tile = tile_at(player.x + PLAYER_W / 2, player.y + PLAYER_H - 1)
     if foot_tile == T_SPIKE then
-        death_ps:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 20)
+        death_ps:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2)
+        death_ps:emit(20)
         lives = lives - 1
         if lives <= 0 then
             game_state = STATE.GAME_OVER
@@ -496,7 +502,8 @@ function lurek.process(dt)
             if math.abs(dx) < 14 and math.abs(dy) < 14 then
                 c.alive = false
                 score = score + 100
-                coin_ps:emit(c.x, c.y, 10)
+                coin_ps:moveTo(c.x, c.y)
+                coin_ps:emit(10)
                 -- Score popup tween
                 score_pop.text = "+100"
                 score_pop.alpha = 1.0
@@ -521,13 +528,15 @@ function lurek.process(dt)
                     e.alive = false
                     player.vy = JUMP_VEL * 0.6
                     score = score + 200
-                    stomp_ps:emit(e.x + e.w / 2, e.y + e.h / 2, 10)
+                    stomp_ps:moveTo(e.x + e.w / 2, e.y + e.h / 2)
+                    stomp_ps:emit(10)
                     score_pop.text = "+200"
                     score_pop.alpha = 1.0
                     score_pop.y = e.y - cam_y_off
                     lurek.tween.to(score_pop, 0.7, { alpha = 0, y = score_pop.y - 30 })
                 else
-                    death_ps:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 20)
+                    death_ps:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2)
+                    death_ps:emit(20)
                     lives = lives - 1
                     if lives <= 0 then
                         game_state = STATE.GAME_OVER
@@ -563,7 +572,8 @@ function lurek.process(dt)
 
     -- Fall off bottom
     if player.y > LEVEL_H + 40 then
-        death_ps:emit(player.x + PLAYER_W / 2, LEVEL_H, 15)
+        death_ps:moveTo(player.x + PLAYER_W / 2, LEVEL_H)
+        death_ps:emit(15)
         lives = lives - 1
         if lives <= 0 then
             game_state = STATE.GAME_OVER
@@ -678,10 +688,10 @@ function lurek.draw()
     end
 
     -- Particles (world space)
-    dust_ps:draw()
-    coin_ps:draw()
-    stomp_ps:draw()
-    death_ps:draw()
+    dust_ps:render()
+    coin_ps:render()
+    stomp_ps:render()
+    death_ps:render()
 end
 
 -- ── Render UI (screen space) ──────────────────────────────────────────────

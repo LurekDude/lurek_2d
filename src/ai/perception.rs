@@ -61,6 +61,7 @@ impl StimulusType {
     ///
     /// # Returns
     /// `Self`.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
             "visual" => Self::Visual,
@@ -259,6 +260,7 @@ impl StimulusWorld {
     ///
     /// # Returns
     /// `u64`.
+    #[allow(clippy::too_many_arguments)]
     pub fn add_custom(&mut self, sense_type: &str, x: f32, y: f32, intensity: f32, radius: f32, decay_rate: f32, tag: Option<String>) -> u64 {
         self.add(Stimulus {
             id: 0,

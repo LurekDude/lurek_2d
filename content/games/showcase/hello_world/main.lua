@@ -90,8 +90,11 @@ local shapes = {}
 -- ---------------------------------------------------------------------------
 -- Engine objects
 -- ---------------------------------------------------------------------------
+---@type LCamera
 local camera = nil
+---@type LParticleSystem
 local ps_confetti = nil
+---@type LParticleSystem
 local ps_spawn = nil
 
 -- Title tween values
@@ -140,10 +143,10 @@ local function spawn_shape(kind)
     shape_count = shape_count + 1
 
     -- Scale-bounce tween on spawn
-    lurek.tween.to(s, 0.4, { scale = 1.0 }, "outBack")
+    lurek.tween.to(s, { scale = 1.0 }, 0.4, "outBack")
 
     -- Particle burst at spawn point
-    if ps_spawn then ps_spawn:emit(x, y, 15) end
+    if ps_spawn then ps_spawn:moveTo(x, y) ps_spawn:emit(15) end
 end
 
 -- ---------------------------------------------------------------------------
@@ -158,7 +161,8 @@ local function randomize_background()
     -- Confetti burst
     if ps_confetti then
         for i = 1, 5 do
-            ps_confetti:emit(math.random(50, SCREEN_W - 50), math.random(50, SCREEN_H - 50), 12)
+            ps_confetti:moveTo(math.random(50, SCREEN_W - 50), math.random(50, SCREEN_H - 50))
+            ps_confetti:emit(12)
         end
     end
 end
@@ -288,7 +292,7 @@ function lurek.process(dt)
             current_state = STATE.RUNNING
             -- Bounce the header on transition
             header_scale.s = 1.5
-            lurek.tween.to(header_scale, 0.5, { s = 1.0 }, "outElastic")
+            lurek.tween.to(header_scale, { s = 1.0 }, 0.5, "outElastic")
         end
         return
     end
@@ -442,8 +446,8 @@ function lurek.draw()
 
     -- ── Particles ─────────────────────────────────────────────
     lurek.render.setColor(1, 1, 1, 1)
-    ps_confetti:draw()
-    ps_spawn:draw()
+    ps_confetti:render()
+    ps_spawn:render()
 
     camera:detach()
 end

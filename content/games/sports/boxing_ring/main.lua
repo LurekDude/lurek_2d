@@ -82,11 +82,15 @@ local combo_count  = 0
 local best_combo   = 0
 local ko_winner    = nil  -- nil | "player" | "opponent"
 
+---@type LCamera
 local camera = nil
 
 -- Particle systems
+---@type LParticleSystem
 local ps_impact = nil
+---@type LParticleSystem
 local ps_sweat  = nil
+---@type LParticleSystem
 local ps_ko     = nil
 
 -- Tween state
@@ -252,7 +256,7 @@ local function try_hit(attacker, defender, atk_def)
     -- Particles
     local hx = (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5
     local hy = RING_FLOOR - FIGHTER_H * 0.6
-    if ps_impact then ps_impact:emit(hx, hy, 12) end
+    if ps_impact then ps_impact:moveTo(hx, hy) ps_impact:emit(12) end
 
     -- Tween HP bars
     if defender.is_player then
@@ -444,10 +448,12 @@ function lurek.process(dt)
 
     -- Sweat when stamina low
     if player.stamina < 25 then
-        ps_sweat:emit(fighter_center_x(player), player.y + 5, 1)
+        ps_sweat:moveTo(fighter_center_x(player), player.y + 5)
+        ps_sweat:emit(1)
     end
     if opponent.stamina < 25 then
-        ps_sweat:emit(fighter_center_x(opponent), opponent.y + 5, 1)
+        ps_sweat:moveTo(fighter_center_x(opponent), opponent.y + 5)
+        ps_sweat:emit(1)
     end
 
     -- Player movement (can't move while staggered)
@@ -519,7 +525,8 @@ function lurek.process(dt)
     if player.hp <= 0 then
         ko_winner = "opponent"
         round_wins[2] = round_wins[2] + 1
-        ps_ko:emit(fighter_center_x(player), player.y, 30)
+        ps_ko:moveTo(fighter_center_x(player), player.y)
+        ps_ko:emit(30)
         current_state = STATE.ROUND_END
         return
     end
@@ -527,7 +534,8 @@ function lurek.process(dt)
         ko_winner = "player"
         round_wins[1] = round_wins[1] + 1
         total_score = total_score + 200
-        ps_ko:emit(fighter_center_x(opponent), opponent.y, 30)
+        ps_ko:moveTo(fighter_center_x(opponent), opponent.y)
+        ps_ko:emit(30)
         current_state = STATE.ROUND_END
         return
     end
@@ -624,9 +632,9 @@ function lurek.draw()
     draw_fighter(opponent, COL_OPPONENT, COL_OPP_GLV)
 
     -- Particles (world space)
-    ps_impact:draw()
-    ps_sweat:draw()
-    ps_ko:draw()
+    ps_impact:render()
+    ps_sweat:render()
+    ps_ko:render()
 
     camera:detach()
 end

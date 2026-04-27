@@ -380,6 +380,7 @@ impl ImageData {
     ///
     /// # Returns
     /// `ImageData`. A new blurred image with the same dimensions.
+    #[allow(clippy::needless_range_loop)]
     pub fn blur(&self, radius: u32) -> ImageData {
         if radius == 0 {
             return self.clone();
@@ -662,6 +663,7 @@ impl ImageData {
     /// # Returns
     /// `Result<ImageData, String>` — error if `ksize == 0`, `ksize` is even,
     /// or `kernel.len() != ksize * ksize`.
+    #[allow(clippy::needless_range_loop)]
     pub fn convolve(&self, kernel: &[f64], ksize: usize) -> Result<ImageData, String> {
         if ksize == 0 {
             return Err("ksize must be >= 1".into());

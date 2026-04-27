@@ -84,7 +84,9 @@ local PLURALS = {
 -- ---------------------------------------------------------------------------
 -- Engine objects
 -- ---------------------------------------------------------------------------
+---@type LCamera
 local camera       = nil
+---@type LParticleSystem
 local ps_confetti  = nil
 
 -- Tween / animation values
@@ -213,7 +215,8 @@ end
 local function emit_confetti()
     if ps_confetti then
         for i = 1, 6 do
-            ps_confetti:emit(math.random(80, SCREEN_W - 80), math.random(80, SCREEN_H - 80), 14)
+            ps_confetti:moveTo(math.random(80, SCREEN_W - 80), math.random(80, SCREEN_H - 80))
+            ps_confetti:emit(14)
         end
     end
 end
@@ -221,7 +224,7 @@ end
 --- Animate text swap fade
 local function do_text_fade()
     text_fade.a = 0.0
-    lurek.tween.to(text_fade, 0.25, { a = 1.0 }, "outQuad")
+    lurek.tween.to(text_fade, { a = 1.0 }, 0.25, "outQuad")
 end
 
 --- Slide menu buttons to their target positions
@@ -229,7 +232,7 @@ local function slide_menu_buttons()
     for i, btn in ipairs(menu_buttons) do
         btn.y = btn.target_y + 40
         btn.alpha = 0
-        lurek.tween.to(btn, 0.4 + i * 0.08, { y = btn.target_y, alpha = 1.0 }, "outBack")
+        lurek.tween.to(btn, { y = btn.target_y, alpha = 1.0 }, 0.4 + i * 0.08, "outBack")
     end
 end
 
@@ -339,10 +342,10 @@ end
 local function _ready_setup()
     -- Title fade-in and subtitle stagger
     title_alpha.a = 0.0
-    lurek.tween.to(title_alpha, 0.8, { a = 1.0 }, "outQuad")
-    lurek.tween.to(subtitle_alpha, 1.0, { a = 1.0 }, "outQuad")
+    lurek.tween.to(title_alpha, { a = 1.0 }, 0.8, "outQuad")
+    lurek.tween.to(subtitle_alpha, { a = 1.0 }, 1.0, "outQuad")
     title_scale.s = 1.3
-    lurek.tween.to(title_scale, 0.6, { s = 1.0 }, "outBack")
+    lurek.tween.to(title_scale, { s = 1.0 }, 0.6, "outBack")
 end
 
 -- ---------------------------------------------------------------------------
@@ -423,7 +426,7 @@ function lurek.draw()
     else
         -- Particles in world space
         lurek.render.setColor(1, 1, 1, 1)
-        ps_confetti:draw()
+        ps_confetti:render()
     end
 
     camera:detach()

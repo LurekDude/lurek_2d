@@ -92,7 +92,7 @@ end
 
 -- ── Helper: which business is clicked ───────────────────────────────────
 local function biz_at_mouse()
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     for i, b in ipairs(businesses) do
         if b.owned then
             local y = biz_y(i) + b.slide_y

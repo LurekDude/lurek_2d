@@ -82,12 +82,17 @@ local patience_timer = 0
 local last_cam_x, last_cam_y = 0, 0
 
 -- Particle systems
+---@type LParticleSystem
 local ps_flash    = nil
+---@type LParticleSystem
 local ps_leaves   = nil
+---@type LParticleSystem
 local ps_firefly  = nil
+---@type LParticleSystem
 local ps_footprint = nil
 
 -- Camera object
+---@type LCamera
 local camera = nil
 
 -- Score popup
@@ -210,7 +215,8 @@ local function take_photo()
     -- Flash
     local sx = SCREEN_W * 0.5
     local sy = SCREEN_H * 0.5
-    ps_flash:emit(sx, sy, 30)
+    ps_flash:moveTo(sx, sy)
+    ps_flash:emit(30)
 
     -- Find best animal in viewfinder
     local best_animal = nil
@@ -239,12 +245,12 @@ local function take_photo()
         score_popup.text = string.format("+%d  %s", best_score, best_animal.name)
         score_popup.alpha = 1
         score_popup.y = SCREEN_H * 0.35
-        lurek.tween.to(score_popup, 1.5, { alpha = 0, y = SCREEN_H * 0.25 })
+        lurek.tween.to(score_popup, { alpha = 0, y = SCREEN_H * 0.25 }, 1.5)
     else
         score_popup.text = "Nothing captured..."
         score_popup.alpha = 1
         score_popup.y = SCREEN_H * 0.35
-        lurek.tween.to(score_popup, 1.2, { alpha = 0, y = SCREEN_H * 0.28 })
+        lurek.tween.to(score_popup, { alpha = 0, y = SCREEN_H * 0.28 }, 1.2)
     end
 
     -- Check complete: all 8 daytime species
@@ -367,7 +373,8 @@ local function update_animal(a, dt)
     -- Footprint particles for ground animals
     if not def.sky and not def.water and (a.behavior == "wander" or a.behavior == "flee") then
         if math.random() < 0.05 then
-            ps_footprint:emit(a.x + def.w * 0.5, a.y + def.h, 1)
+            ps_footprint:moveTo(a.x + def.w * 0.5, a.y + def.h)
+            ps_footprint:emit(1)
         end
     end
 end
@@ -538,11 +545,11 @@ function lurek.process(dt)
     -- Zoom
     if lurek.input.wasActionPressed("zoom_in") then
         zoom_index = math.min(#ZOOM_LEVELS, zoom_index + 1)
-        lurek.tween.to(zoom_display, 0.3, { [1] = ZOOM_LEVELS[zoom_index] })
+        lurek.tween.to(zoom_display, { [1] = ZOOM_LEVELS[zoom_index] }, 0.3)
     end
     if lurek.input.wasActionPressed("zoom_out") then
         zoom_index = math.max(1, zoom_index - 1)
-        lurek.tween.to(zoom_display, 0.3, { [1] = ZOOM_LEVELS[zoom_index] })
+        lurek.tween.to(zoom_display, { [1] = ZOOM_LEVELS[zoom_index] }, 0.3)
     end
 
     -- Take photo
@@ -563,7 +570,7 @@ function lurek.process(dt)
     if new_phase ~= tod_phase then
         tod_phase = new_phase
         local target_bg = TOD_BG[tod_phase]
-        lurek.tween.to({ bg_r, bg_g, bg_b }, 3.0, { target_bg[1], target_bg[2], target_bg[3] })
+        lurek.tween.to({ bg_r, bg_g, bg_b }, { target_bg[1], target_bg[2], target_bg[3] }, 3.0)
     end
     -- Smooth bg transition
     local target_bg = TOD_BG[tod_phase]
@@ -582,7 +589,8 @@ function lurek.process(dt)
 
     -- Fireflies at night
     if tod_phase == TOD_NIGHT then
-        ps_firefly:emit(cam_x + math.random(50, SCREEN_W - 50), cam_y + math.random(200, 500), 1)
+        ps_firefly:moveTo(cam_x + math.random(50, SCREEN_W - 50), cam_y + math.random(200, 500))
+        ps_firefly:emit(1)
     end
 
     -- Update camera
@@ -667,9 +675,9 @@ function lurek.draw()
     end
 
     -- Particles (world-space)
-    ps_leaves:draw()
-    ps_firefly:draw()
-    ps_footprint:draw()
+    ps_leaves:render()
+    ps_firefly:render()
+    ps_footprint:render()
 
     -- Night overlay
     if tod_phase == TOD_NIGHT then
@@ -828,5 +836,5 @@ function lurek.draw_ui()
     end
 
     -- Camera flash particles (screen space)
-    ps_flash:draw()
+    ps_flash:render()
 end

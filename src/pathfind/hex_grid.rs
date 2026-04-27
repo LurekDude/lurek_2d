@@ -300,6 +300,7 @@ impl HexGrid {
     }
 
     /// Cube-to-offset coordinate conversion.
+    #[allow(clippy::wrong_self_convention)]
     fn from_cube(&self, x: i32, _y: i32, z: i32) -> (u32, u32) {
         match self.layout {
             HexLayout::PointyTop => {

@@ -113,9 +113,9 @@ local world_offset   = 0
 local next_obstacle  = 300
 
 -- ── Particles ─────────────────────────────────────────────────────────────
-local dust_ps       = nil  ---@type ParticleSystem
-local coin_ps       = nil  ---@type ParticleSystem
-local death_ps      = nil  ---@type ParticleSystem
+local dust_ps       = nil  ---@type LParticleSystem
+local coin_ps       = nil  ---@type LParticleSystem
+local death_ps      = nil  ---@type LParticleSystem
 
 -- ── Tween targets ─────────────────────────────────────────────────────────
 local coin_flash    = { scale = 1 }

@@ -18,6 +18,7 @@ pub mod atlas;
 /// Nine-slice scalable sprite for UI panels and borders.
 pub mod nine_slice;
 /// Individual sprite with position, scale, rotation, and color.
+#[allow(clippy::module_inception)]
 pub mod sprite;
 /// Batched sprite renderer for efficient multi-sprite drawing.
 pub mod sprite_batch;

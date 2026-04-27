@@ -470,7 +470,7 @@ function lurek.process(dt)
         if #stations >= 2 and #trains < MAX_TRAINS and gold >= 100 then
             mode = "track"
             -- find a station near mouse or use first available pair
-            local mx, my = lurek.input.getPosition()
+            local mx, my = lurek.input.mouse.getPosition()
             local gx = math.floor((mx - MAP_X) / TILE)
             local gy = math.floor((my - MAP_Y) / TILE)
             local nearest = nil
@@ -487,10 +487,10 @@ function lurek.process(dt)
 
     -- Click handling
     if lurek.input.wasActionPressed("place") and not route_pick then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
     elseif lurek.input.wasActionPressed("place") and route_pick then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         handle_click(mx, my)
     end
 

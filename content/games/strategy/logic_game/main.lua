@@ -75,7 +75,9 @@ local selected   = 1         -- selected program slot
 local msg        = ""
 local msg_timer  = 0.0
 
+---@type LParticleSystem
 local step_particles = nil
+---@type LParticleSystem
 local win_particles  = nil
 
 local function load_level(idx)
@@ -227,7 +229,8 @@ function lurek.process(dt)
                     run_win = true
                     set_msg("Level complete! N=next level, R=restart", 60)
                     if win_particles then
-                        win_particles:emit(OX + goal.x * CELL, OY + goal.y * CELL, 40)
+                        win_particles:moveTo(OX + goal.x * CELL, OY + goal.y * CELL)
+                        win_particles:emit(40)
                     end
                 else
                     set_msg("Program ended — goal not reached. R to reset.", 60)
@@ -241,7 +244,8 @@ function lurek.process(dt)
                 if grid[ny] and grid[ny][nx] and grid[ny][nx] ~= WALL then
                     robot.x, robot.y = nx, ny
                     if step_particles then
-                        step_particles:emit(OX + robot.x * CELL + CELL/2, OY + robot.y * CELL + CELL/2, 4)
+                        step_particles:moveTo(OX + robot.x * CELL + CELL/2, OY + robot.y * CELL + CELL/2)
+                        step_particles:emit(4)
                     end
                 else
                     set_msg("Blocked by wall!", 1.5)
@@ -297,8 +301,8 @@ function lurek.draw()
     -- Robot
     rect(OX + (robot.x-1)*CELL + 8, OY + (robot.y-1)*CELL + 8, CELL-18, CELL-18, { color = {0.3,0.7,1.0,1} })
 
-    if step_particles then step_particles:draw() end
-    if win_particles  then win_particles:draw()  end
+    if step_particles then step_particles:render() end
+    if win_particles  then win_particles:render()  end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

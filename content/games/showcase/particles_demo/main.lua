@@ -167,6 +167,7 @@ local time_acc = 0
 -- ============================================================
 -- Particle system
 -- ============================================================
+---@type LParticleSystem
 local psys = nil
 
 local function apply_preset(idx)
@@ -205,7 +206,7 @@ local function apply_preset(idx)
     psys:setSpin(-1, 1)
     psys:setRotation(0, math.pi * 2)
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     if idx == 6 then
         psys:setPosition(SCREEN_W / 2, 10)
     else
@@ -438,7 +439,7 @@ function lurek.process(dt)
 
     -- Mouse follow (except snow which emits from top)
     if psys then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         if preset_index == 6 then
             psys:setPosition(SCREEN_W / 2, 10)
         else
@@ -468,10 +469,10 @@ function lurek.process(dt)
         local r2, g2, b2 = hue_to_rgb(h + 0.15)
         local r3, g3, b3 = hue_to_rgb(h + 0.35)
         psys:setColors(
-            r1, g1, b1, 1.0,
-            r2, g2, b2, 0.8,
-            r3, g3, b3, 0.3,
-            r3, g3, b3, 0.0
+            {r1, g1, b1, 1.0},
+            {r2, g2, b2, 0.8},
+            {r3, g3, b3, 0.3},
+            {r3, g3, b3, 0.0}
         )
     end
 

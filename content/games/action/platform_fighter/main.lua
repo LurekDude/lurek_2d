@@ -96,9 +96,13 @@ local ko_who      = ""
 local match_winner = ""
 
 -- Particles
+---@type LParticleSystem
 local hit_burst_ps   = nil
+---@type LParticleSystem
 local ko_explode_ps  = nil
+---@type LParticleSystem
 local land_dust_ps   = nil
+---@type LParticleSystem
 local proj_trail_ps  = nil
 
 -- Tweens
@@ -197,7 +201,8 @@ local function collide_platforms(f, dt)
                 f.jumps_left = MAX_JUMPS
                 -- Landing dust
                 if not was_grounded and land_dust_ps then
-                    land_dust_ps:emit(f.x + FIGHTER_W * 0.5, plat.y, 5)
+                    land_dust_ps:moveTo(f.x + FIGHTER_W * 0.5, plat.y)
+                    land_dust_ps:emit(5)
                 end
                 break
             end
@@ -267,7 +272,8 @@ local function check_melee_hit(attacker, defender)
         if hit_burst_ps then
             local hx = (attacker.x + defender.x) * 0.5 + FIGHTER_W * 0.5
             local hy = (attacker.y + defender.y) * 0.5 + FIGHTER_H * 0.5
-            hit_burst_ps:emit(hx, hy, 12)
+            hit_burst_ps:moveTo(hx, hy)
+            hit_burst_ps:emit(12)
         end
     end
 end
@@ -296,7 +302,8 @@ local function check_projectile_hits()
                         tween_to(0.4, function(t) dmg_flash_p2 = 1.0 - t end)
                     end
                     if hit_burst_ps then
-                        hit_burst_ps:emit(proj.x, proj.y, 10)
+                        hit_burst_ps:moveTo(proj.x, proj.y)
+                        hit_burst_ps:emit(10)
                     end
                     table.insert(to_remove, i)
                     break
@@ -316,7 +323,8 @@ local function check_blast_zones(f)
     if cx < BLAST_LEFT or cx > BLAST_RIGHT or cy < BLAST_TOP or cy > BLAST_BOTTOM then
         -- KO explosion
         if ko_explode_ps then
-            ko_explode_ps:emit(clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H), 30)
+            ko_explode_ps:moveTo(clamp(f.x, 0, SCREEN_W), clamp(f.y, 0, SCREEN_H))
+            ko_explode_ps:emit(30)
         end
         f.stocks = f.stocks - 1
         if f.stocks > 0 then

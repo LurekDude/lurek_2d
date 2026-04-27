@@ -216,9 +216,13 @@ local function spawn_enemies_for_room(rx, ry)
 end
 
 -- ── Particles ─────────────────────────────────────────────────────────────
+---@type LParticleSystem
 local death_particles = nil
+---@type LParticleSystem
 local dash_particles  = nil
+---@type LParticleSystem
 local land_particles  = nil
+---@type LParticleSystem
 local pickup_particles = nil
 
 -- ── Tween state ───────────────────────────────────────────────────────────
@@ -331,7 +335,8 @@ local function update_enemies(dt)
             e.hp = e.hp - 2
             if e.hp <= 0 then
                 if death_particles then
-                    death_particles:emit(e.x + e.w / 2, e.y + e.h / 2, 8)
+                    death_particles:moveTo(e.x + e.w / 2, e.y + e.h / 2)
+                    death_particles:emit(8)
                 end
                 table.remove(enemies, i)
             end
@@ -373,7 +378,8 @@ local function try_break_dash_gates()
                 if room[row][col] == 3 and player.has_dash then
                     room[row][col] = 0
                     if death_particles then
-                        death_particles:emit((col - 0.5) * TILE, (row - 0.5) * TILE, 6)
+                        death_particles:moveTo((col - 0.5) * TILE, (row - 0.5) * TILE)
+                        death_particles:emit(6)
                     end
                 end
             end
@@ -520,7 +526,8 @@ function lurek.process(dt)
         player.vx = player.dash_dir * DASH_SPEED
         player.vy = 0
         if dash_particles then
-            dash_particles:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 1)
+            dash_particles:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2)
+            dash_particles:emit(1)
         end
         if player.dash_timer <= 0 then
             player.dashing = false
@@ -596,7 +603,8 @@ function lurek.process(dt)
             player.on_ground = true
             player.jumps_left = player.has_double and 2 or 1
             if was_in_air and land_particles then
-                land_particles:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H, 4)
+                land_particles:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H)
+                land_particles:emit(4)
             end
         end
         player.vy = 0
@@ -650,7 +658,8 @@ function lurek.process(dt)
                 if it.type == "dash" then player.has_dash = true end
                 if it.type == "double" then player.has_double = true; player.jumps_left = 2 end
                 if pickup_particles then
-                    pickup_particles:emit(it.x, it.y, 15)
+                    pickup_particles:moveTo(it.x, it.y)
+                    pickup_particles:emit(15)
                 end
             end
         end
@@ -663,7 +672,8 @@ function lurek.process(dt)
                 hp.collected = true
                 player.hp = math.min(player.hp + 1, MAX_HP)
                 if pickup_particles then
-                    pickup_particles:emit(hp.x, hp.y, 8)
+                    pickup_particles:moveTo(hp.x, hp.y)
+                    pickup_particles:emit(8)
                 end
             end
         end

@@ -11,6 +11,7 @@
 ///
 /// Each box is specified by its top-left origin and size:
 /// `(ax, ay, aw, ah)` for box A and `(bx, by, bw, bh)` for box B.
+#[allow(clippy::too_many_arguments)]
 pub fn test_aabb(ax: f32, ay: f32, aw: f32, ah: f32, bx: f32, by: f32, bw: f32, bh: f32) -> bool {
     ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by
 }

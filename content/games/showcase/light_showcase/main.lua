@@ -362,7 +362,7 @@ function lurek.process(dt)
     if math.abs(slide_offset - slide_target) < 0.5 then slide_offset = slide_target end
 
     -- Mouse position
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
 
     -- Per-screen updates
     if state == STATE_SCREEN_1 then

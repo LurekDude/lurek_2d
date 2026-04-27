@@ -98,6 +98,7 @@ local weather     = "clear"
 local weather_particles  = {}
 local sparkle_particles  = {}
 local torch_time  = 0
+---@type LCamera
 local cam         = nil
 
 for y = 1, MAP_H do explored[y] = {} end

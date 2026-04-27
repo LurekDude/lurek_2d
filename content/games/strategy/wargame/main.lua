@@ -85,7 +85,9 @@ local state   = "select"   -- select | move | attack | enemy_turn | win | lose
 local score   = 0
 local log     = {}
 
+---@type LParticleSystem
 local attack_sparks = nil
+---@type LParticleSystem
 local death_sparks  = nil
 local move_dust     = nil
 
@@ -161,11 +163,11 @@ local function do_attack(att, target)
     target.hp = target.hp - dmg
     add_log(att.team .. " " .. att.icon .. " → " .. target.team .. " " .. target.icon .. " -" .. dmg)
     local tx, ty = hex_to_pixel(target.c, target.r)
-    if attack_sparks then attack_sparks:emit(tx + HEX_W/2, ty + HEX_H/2, 8) end
+    if attack_sparks then attack_sparks:moveTo(tx + HEX_W/2, ty + HEX_H/2) attack_sparks:emit(8) end
     if target.hp <= 0 then
         add_log(target.icon .. " destroyed!")
         local ex, ey = hex_to_pixel(target.c, target.r)
-        if death_sparks then death_sparks:emit(ex + HEX_W/2, ey + HEX_H/2, 12) end
+        if death_sparks then death_sparks:moveTo(ex + HEX_W/2, ey + HEX_H/2) death_sparks:emit(12) end
         if target.team == "enemy" then score = score + 25 end
         for i, u in ipairs(units) do if u.id == target.id then table.remove(units, i) break end end
     end
@@ -351,7 +353,7 @@ function lurek.process(dt)
 
     if state == "enemy_turn" then enemy_ai(dt) return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c, hover_r = pixel_to_hex(mx, my)
 
     if lurek.input.wasActionPressed("end_turn") and turn == "player" then
@@ -388,7 +390,7 @@ function lurek.process(dt)
             for _, t in ipairs(reachable) do
                 if t.c == hc and t.r == hr then
                     local ox, oy = hex_to_pixel(actor.c, actor.r)
-                    if move_dust then move_dust:emit(ox + HEX_W/2, oy + HEX_H/2, 5) end
+                    if move_dust then move_dust:moveTo(ox + HEX_W/2, oy + HEX_H/2) move_dust:emit(5) end
                     actor.c = hc ; actor.r = hr
                     actor.moved = true
                     reachable = {}
@@ -491,9 +493,9 @@ function lurek.draw()
         ::skip::
     end
 
-    if attack_sparks then attack_sparks:draw() end
-    if death_sparks  then death_sparks:draw()  end
-    if move_dust     then move_dust:draw()     end
+    if attack_sparks then attack_sparks:render() end
+    if death_sparks  then death_sparks:render()  end
+    if move_dust     then move_dust:render()     end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

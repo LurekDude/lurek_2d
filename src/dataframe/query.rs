@@ -666,6 +666,7 @@ impl DataFrame {
     ///
     /// # Returns
     /// `Result<(), String>`.
+    #[allow(clippy::needless_range_loop)]
     pub fn with_rolling_mean(
         &mut self,
         col: ColRef,
@@ -973,6 +974,7 @@ impl DataFrame {
     ///
     /// # Returns
     /// `Result<DataFrame, String>`.
+    #[allow(clippy::needless_range_loop)]
     pub fn group_agg(
         &self,
         group_col: ColRef,
@@ -1084,6 +1086,7 @@ impl DataFrame {
     ///
     /// # Returns
     /// `Result<DataFrame, String>`.
+    #[allow(clippy::needless_range_loop)]
     pub fn pivot(
         &self,
         row_col: ColRef,

@@ -195,7 +195,8 @@ local function try_interact(hotspot)
         else
             flags.key_found = true
             add_item("key")
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 15)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            sparkle_ps:emit(15)
             start_pickup_anim(hotspot.x + hotspot.w / 2, hotspot.y, "+Key")
             show_dialog("You found a small brass key hidden under the pillow!")
         end
@@ -209,7 +210,8 @@ local function try_interact(hotspot)
             flags.drawer_opened = true
             remove_item("key")
             add_item("flashlight")
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 15)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            sparkle_ps:emit(15)
             start_pickup_anim(hotspot.x + hotspot.w / 2, hotspot.y, "+Flashlight")
             show_dialog("You unlock the drawer with the key and find a flashlight inside!")
         end
@@ -222,8 +224,10 @@ local function try_interact(hotspot)
         else
             flags.attic_revealed = true
             ROOMS.hallway.exits.up = "attic"
-            burst_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 25)
-            dust_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h, 20)
+            burst_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            burst_ps:emit(25)
+            dust_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h)
+            dust_ps:emit(20)
             show_dialog("The flashlight reveals a hidden door! It creaks open to reveal stairs to the attic.")
         end
 
@@ -233,7 +237,8 @@ local function try_interact(hotspot)
         else
             flags.knife_got = true
             add_item("knife")
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 12)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            sparkle_ps:emit(12)
             start_pickup_anim(hotspot.x + hotspot.w / 2, hotspot.y, "+Knife")
             show_dialog("You pick up the sturdy kitchen knife.")
         end
@@ -244,7 +249,8 @@ local function try_interact(hotspot)
         else
             flags.rope_got = true
             add_item("rope")
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 12)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            sparkle_ps:emit(12)
             start_pickup_anim(hotspot.x + hotspot.w / 2, hotspot.y, "+Rope")
             show_dialog("You take the coil of rope.")
         end
@@ -259,7 +265,8 @@ local function try_interact(hotspot)
             flags.egg_got = true
             remove_item("grappling_hook")
             add_item("golden_egg")
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + 40, 20)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + 40)
+            sparkle_ps:emit(20)
             start_pickup_anim(hotspot.x + hotspot.w / 2, hotspot.y + 40, "+Golden Egg")
             show_dialog("You throw the grappling hook and climb the tree! Inside the nest gleams a beautiful golden egg!")
         end
@@ -272,8 +279,10 @@ local function try_interact(hotspot)
         else
             flags.egg_placed = true
             remove_item("golden_egg")
-            burst_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2, 40)
-            sparkle_ps:emit(hotspot.x + hotspot.w / 2, hotspot.y, 30)
+            burst_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y + hotspot.h / 2)
+            burst_ps:emit(40)
+            sparkle_ps:moveTo(hotspot.x + hotspot.w / 2, hotspot.y)
+            sparkle_ps:emit(30)
             game_state = STATE.WIN
         end
 
@@ -708,8 +717,8 @@ function lurek.draw()
         text_("Press [Escape] to quit.", SCREEN_W / 2 - 90, 440, 12)
 
         -- Draw particles on win screen
-        sparkle_ps:draw()
-        burst_ps:draw()
+        sparkle_ps:render()
+        burst_ps:render()
         return
     end
 
@@ -727,9 +736,9 @@ function lurek.draw()
     draw_exit_arrows()
 
     -- Particles
-    sparkle_ps:draw()
-    burst_ps:draw()
-    dust_ps:draw()
+    sparkle_ps:render()
+    burst_ps:render()
+    dust_ps:render()
 
     -- Pickup animation
     if pickup_anim.active then

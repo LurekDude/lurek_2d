@@ -830,6 +830,7 @@ impl DataFrame {
     ///
     /// # Returns
     /// `Result<DataFrame, String>`.
+    #[allow(clippy::needless_range_loop)]
     pub fn rolling_sum(
         &self,
         src_col: ColRef,

@@ -397,9 +397,7 @@ impl HtmlDocument {
         class_name: &str,
         force: Option<bool>,
     ) -> Option<bool> {
-        if self.element(element_id).is_none() {
-            return None;
-        }
+        self.element(element_id)?;
         let state = self.elements[element_id].toggle_class(class_name, force);
         self.mark_dirty();
         Some(state)

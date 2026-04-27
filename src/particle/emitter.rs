@@ -102,6 +102,7 @@ impl ParticleSystem {
     /// 2. Update existing particles (position, velocity, lifetime, radial/tangential accel, damping).
     /// 3. Remove dead particles.
     /// 4. Emit new particles if active.
+    #[allow(clippy::unnecessary_unwrap)]
     pub fn update(&mut self, dt: f32) {
         if self.state == EmitterState::Paused {
             return;

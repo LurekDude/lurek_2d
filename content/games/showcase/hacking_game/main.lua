@@ -127,8 +127,11 @@ local flicker_alpha = 1.0
 local trace_bar_pulse = { value = 0 }
 
 -- Particles & tweens
+---@type LParticleSystem
 local ps_download = nil
+---@type LParticleSystem
 local ps_trace    = nil
+---@type LCamera
 local camera      = nil
 
 -- ---------------------------------------------------------------------------
@@ -701,8 +704,8 @@ function lurek.draw()
 
     -- Particles (world space)
     lurek.render.setColor(1, 1, 1, 1)
-    ps_download:draw()
-    ps_trace:draw()
+    ps_download:render()
+    ps_trace:render()
 
     -- Slight CRT flicker overlay
     lurek.render.setColor(0, 0.02, 0, (1.0 - flicker_alpha) * 0.3)

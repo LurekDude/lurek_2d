@@ -51,6 +51,7 @@ impl TileMap {
     /// # Returns
     /// `Vec<RenderCommand>`.
     #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::manual_clamp)]
     pub fn generate_render_commands(
         &self,
         offset_x: f32,

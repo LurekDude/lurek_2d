@@ -302,7 +302,7 @@ impl ContextSteering {
                 }
                 ContextBehaviorKind::Wander { jitter, .. } => {
                     // Perturb wander angle each evaluation
-                    let hash_jitter = ((ay * 7.3 + ax * 3.7 + vx + vy).sin() * 43758.5453123) % 1.0;
+                    let hash_jitter = ((ay * 7.3 + ax * 3.7 + vx + vy).sin() * 43_758.547) % 1.0;
                     self.wander_angle += (hash_jitter * 2.0 - 1.0) * jitter;
                     fill_cone(ring, self.wander_angle, slot_angle, b.weight, n);
                 }
@@ -373,6 +373,7 @@ impl ContextSteering {
 /// Fills a gaussian-like lobe of slots centered on `target_angle`.
 /// Slots within one slot_angle of the center get full weight; adjacent slots
 /// decay by cosine to create smooth blending across directions.
+#[allow(clippy::needless_range_loop)]
 fn fill_cone(ring: &mut [f32], target_angle: f32, slot_angle: f32, weight: f32, n: usize) {
     for i in 0..n {
         let slot_dir = i as f32 * slot_angle;

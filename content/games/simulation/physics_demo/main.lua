@@ -405,7 +405,7 @@ function lurek.init()
 
   -- ramp placement
   lurek.input.bind("key_r", function()
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     ramps[#ramps + 1] = {
       x = mx - 40, y = my - 10, w = 80, h = 40,
       dir = (math.random() > 0.5) and "right" or "left",
@@ -414,7 +414,7 @@ function lurek.init()
 
   -- pin nearest object
   lurek.input.bind("key_p", function()
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local best_i, best_d = nil, math.huge
     for i, o in ipairs(objects) do
       local d = dist(mx, my, o.x, o.y)
@@ -434,7 +434,7 @@ function lurek.init()
       state = "RUNNING"
       return
     end
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     if mx == nil then mx = 0 end
     if my == nil then my = 0 end
     local idx = find_at(mx, my)
@@ -478,7 +478,7 @@ function lurek.process(dt)
       end
       dragging = nil
     else
-      local mx, my = lurek.input.getPosition()
+      local mx, my = lurek.input.mouse.getPosition()
       if mx == nil then mx = 0 end
       if my == nil then my = 0 end
       throw_vx = (mx - prev_mouse_x) / math.max(sdt, 0.001)

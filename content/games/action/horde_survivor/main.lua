@@ -107,14 +107,18 @@ local spawn_interval = SPAWN_INTERVAL_START
 local upgrade_choices = {}
 
 -- Particle systems & tweens
+---@type LParticleSystem
 local death_burst     = nil
+---@type LParticleSystem
 local xp_sparkle      = nil
+---@type LParticleSystem
 local levelup_flash   = nil
 local xp_bar_tween    = nil
 local damage_flash    = 0
 local flash_tween     = nil
 
 -- Camera
+---@type LCamera
 local cam = nil
 
 -- Upgrade definitions
@@ -621,9 +625,9 @@ function lurek.draw()
     circ("line", player.x, player.y, PLAYER_RADIUS)
 
     -- Particles
-    death_burst:draw()
-    xp_sparkle:draw()
-    levelup_flash:draw()
+    death_burst:render()
+    xp_sparkle:render()
+    levelup_flash:render()
 
     -- Damage flash overlay
     if damage_flash > 0 then

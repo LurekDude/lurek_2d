@@ -301,7 +301,8 @@ function lurek.process(dt)
     end
 
     -- Emit glow at player position
-    glow_particles:emit(player.x, player.y, 1)
+    glow_particles:moveTo(player.x, player.y)
+    glow_particles:emit(1)
 
     -- Toggle torches
     if lurek.input.wasActionPressed("torches") then
@@ -438,7 +439,7 @@ function lurek.draw()
         -- Draw torch flame particles
         lurek.render.setColor(1, 1, 1, 1)
         for _, tp in ipairs(torch_particles) do
-            tp.system:draw()
+            tp.system:render()
         end
     end
 
@@ -461,7 +462,7 @@ function lurek.draw()
 
     -- Player glow particles
     lurek.render.setColor(1, 1, 1, 1)
-    glow_particles:draw()
+    glow_particles:render()
 
     camera:detach()
 end

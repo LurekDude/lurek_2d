@@ -87,12 +87,15 @@ local EFFECT_DEFS = {
 local effects = {}          -- effects[i] = { enabled, intensity, target_intensity }
 local selected_idx = 1      -- currently selected effect for intensity control
 local compare_mode = false  -- true while Space held (bypass all effects)
+---@type LCamera
 local camera = nil
 local title_timer = 0
 local grain_seed = 0        -- rolling noise seed
 
 -- Particles
+---@type LParticleSystem
 local toggle_particles = nil
+---@type LParticleSystem
 local sparkle_particles = nil
 
 -- ---------------------------------------------------------------------------
@@ -476,7 +479,8 @@ function lurek.process(dt)
             -- Burst particles at the HUD indicator position
             local px = SCREEN_W - 195
             local py = 14 + (i - 1) * 18
-            toggle_particles:emit(px, py, 12)
+            toggle_particles:moveTo(px, py)
+            toggle_particles:emit(12)
             -- Auto-select this effect for intensity editing
             if effects[i].enabled then selected_idx = i end
         end
@@ -492,16 +496,18 @@ function lurek.process(dt)
         local e = effects[selected_idx]
         if e.enabled then
             e.target_intensity = clamp(e.target_intensity + 0.1, 0.1, 1.0)
-            lurek.tween.to(e, 0.25, { intensity = e.target_intensity }, "inOutSine")
-            sparkle_particles:emit(SCREEN_W - 195, 14 + (selected_idx - 1) * 18, 8)
+            lurek.tween.to(e, { intensity = e.target_intensity }, 0.25, "inOutSine")
+            sparkle_particles:moveTo(SCREEN_W - 195, 14 + (selected_idx - 1) * 18)
+            sparkle_particles:emit(8)
         end
     end
     if lurek.input.wasActionPressed("intensity_dn") then
         local e = effects[selected_idx]
         if e.enabled then
             e.target_intensity = clamp(e.target_intensity - 0.1, 0.1, 1.0)
-            lurek.tween.to(e, 0.25, { intensity = e.target_intensity }, "inOutSine")
-            sparkle_particles:emit(SCREEN_W - 195, 14 + (selected_idx - 1) * 18, 8)
+            lurek.tween.to(e, { intensity = e.target_intensity }, 0.25, "inOutSine")
+            sparkle_particles:moveTo(SCREEN_W - 195, 14 + (selected_idx - 1) * 18)
+            sparkle_particles:emit(8)
         end
     end
 
@@ -510,7 +516,7 @@ function lurek.process(dt)
         for i, def in ipairs(EFFECT_DEFS) do
             effects[i].enabled = false
             effects[i].target_intensity = def.default_int
-            lurek.tween.to(effects[i], 0.3, { intensity = def.default_int }, "inOutSine")
+            lurek.tween.to(effects[i], { intensity = def.default_int }, 0.3, "inOutSine")
         end
         selected_idx = 1
     end
@@ -553,8 +559,8 @@ function lurek.draw()
 
     -- Particle systems (world space)
     lurek.render.setColor(1, 1, 1, 1)
-    toggle_particles:draw()
-    sparkle_particles:draw()
+    toggle_particles:render()
+    sparkle_particles:render()
 
     camera:detach()
 end

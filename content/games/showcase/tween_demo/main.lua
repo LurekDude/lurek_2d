@@ -103,7 +103,9 @@ local tweens  = {}
 -- ============================================================
 -- Particle systems
 -- ============================================================
+---@type LParticleSystem
 local psys_burst = nil
+---@type LParticleSystem
 local psys_flash = nil
 
 -- ============================================================

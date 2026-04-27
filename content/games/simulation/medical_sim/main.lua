@@ -85,6 +85,7 @@ local particles = {}
 local tweens    = {}
 
 -- Camera / FPS
+---@type LCamera
 local camera = nil
 local fps    = 0
 

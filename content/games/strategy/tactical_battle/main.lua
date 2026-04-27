@@ -48,7 +48,9 @@ local log_msgs = {}
 local score    = 0
 
 -- Particle systems
+---@type LParticleSystem
 local attack_sparks = nil
+---@type LParticleSystem
 local death_burst   = nil
 local move_dust     = nil
 
@@ -125,12 +127,14 @@ local function do_attack(attacker, target)
     if attack_sparks then
         local tx = OX + (target.c - 1) * CELL + CELL/2 - CELL/2
         local ty = OY + (target.r - 1) * CELL + CELL/2 - OY/2
-        attack_sparks:emit(tx, ty, 8)
+        attack_sparks:moveTo(tx, ty)
+        attack_sparks:emit(8)
     end
     if target.hp <= 0 then
         add_log(target.kind .. " defeated!")
         if death_burst then
-            death_burst:emit(OX + (target.c-1)*CELL + CELL/2 - CELL/2, OY + (target.r-1)*CELL + CELL/2 - OY/2, 12)
+            death_burst:moveTo(OX + (target.c-1)*CELL + CELL/2 - CELL/2, OY + (target.r-1)*CELL + CELL/2 - OY/2)
+            death_burst:emit(12)
         end
         if target.team == "enemy" then score = score + 20 end
         for i, u in ipairs(units) do if u.id == target.id then table.remove(units, i) break end end
@@ -354,7 +358,7 @@ function lurek.process(dt)
         return
     end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c = math.floor((mx - OX) / CELL) + 1
     hover_r = math.floor((my - OY) / CELL) + 1
 
@@ -381,7 +385,7 @@ function lurek.process(dt)
             if selected and not selected.moved then
                 for _, t in ipairs(move_tiles) do
                     if t.c == hc and t.r == hr then
-                        if move_dust then move_dust:emit(OX + (selected.c-1)*CELL + CELL/2, OY + (selected.r-1)*CELL + CELL/2, 5) end
+                        if move_dust then move_dust:moveTo(OX + (selected.c-1)*CELL + CELL/2, OY + (selected.r-1)*CELL + CELL/2) if move_dust then move_dust:emit(5) end end
                         selected.c     = hc
                         selected.r     = hr
                         selected.moved = true
@@ -479,9 +483,9 @@ function lurek.draw()
         ::skip::
     end
 
-    if attack_sparks then attack_sparks:draw() end
-    if death_burst   then death_burst:draw()   end
-    if move_dust     then move_dust:draw()     end
+    if attack_sparks then attack_sparks:render() end
+    if death_burst   then death_burst:render()   end
+    if move_dust     then move_dust:render()     end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

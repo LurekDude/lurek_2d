@@ -71,6 +71,7 @@ impl IKConstraint {
     ///
     /// # Parameters
     /// - `bones` — `&mut Vec<Bone>`. The skeleton's bone array (modified in place).
+    #[allow(clippy::ptr_arg)]
     pub fn solve(&self, bones: &mut Vec<Bone>) {
         if self.bone_chain.len() < 2 {
             return;

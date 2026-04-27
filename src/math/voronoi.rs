@@ -61,6 +61,7 @@ fn circumcenter(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32) -> Option<
 
 /// Return `true` if point `(px, py)` lies strictly inside the circumcircle
 /// of triangle `(ax,ay)–(bx,by)–(cx,cy)`.
+#[allow(clippy::too_many_arguments)]
 fn in_circumcircle(ax: f32, ay: f32, bx: f32, by: f32, cx: f32, cy: f32, px: f32, py: f32) -> bool {
     let d = 2.0 * ((bx - ax) * (cy - ay) - (by - ay) * (cx - ax));
     if d.abs() < 1e-10 {

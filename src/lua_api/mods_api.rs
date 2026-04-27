@@ -12,7 +12,7 @@ use std::collections::{HashMap, HashSet};
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Reads a Lua info table into a [`ModInfo`].
+// Reads a Lua info table into a [`ModInfo`].
 fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     let id: String = tbl
         .get::<_, String>("id")
@@ -55,7 +55,7 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     Ok(info)
 }
 
-/// Writes a [`ModInfo`] to a Lua table.
+// Writes a [`ModInfo`] to a Lua table.
 fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
     t.set("id", info.id.as_str())?;
@@ -100,7 +100,7 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
     Ok(t)
 }
 
-/// Converts an iterator of [`ModInfo`] references into a Lua array of info tables.
+// Converts an iterator of [`ModInfo`] references into a Lua array of info tables.
 fn mod_infos_to_table<'a, 'lua>(
     lua: &'lua Lua,
     infos: impl Iterator<Item = &'a ModInfo>,
@@ -112,7 +112,7 @@ fn mod_infos_to_table<'a, 'lua>(
     Ok(t)
 }
 
-/// Converts a string slice into a Lua array of strings.
+// Converts a string slice into a Lua array of strings.
 fn string_slice_to_table<'a>(lua: &'a Lua, items: &[String]) -> LuaResult<LuaTable<'a>> {
     let t = lua.create_table()?;
     for (i, s) in items.iter().enumerate() {
@@ -128,7 +128,7 @@ fn string_slice_to_table<'a>(lua: &'a Lua, items: &[String]) -> LuaResult<LuaTab
 /// Lua-side wrapper around [`ModInfo`] with per-mod hook and config storage.
 ///
 /// # Fields
-/// - `inner` â€” `ModInfo`.
+/// - `inner` - `ModInfo`.
 ///
 pub struct LuaMod {
     pub(super) inner: ModInfo,
@@ -150,119 +150,90 @@ impl LuaMod {
 impl LuaUserData for LuaMod {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getId --
-        /// Returns the unique mod identifier
-        /// Returns the id.
-        ///
-        /// @return string
+        /// Returns the unique mod identifier.
+        /// @return | string | Returns the mod identifier.
         methods.add_method("getId", |_, this, ()| Ok(this.inner.id.clone()));
 
         // -- getName --
         /// Returns the localized or human-readable display name of the mod.
-        /// Returns the name.
-        ///
-        /// @return string
-        /// Method to perform an operation on the mods object.
+        /// @return | string | Returns the mod display name.
         methods.add_method("getName", |_, this, ()| Ok(this.inner.name.clone()));
 
         // -- getVersion --
-        /// Returns the version string
-        /// Returns the version.
-        ///
-        /// @return string
+        /// Returns the version string.
+        /// @return | string | Returns the mod version string.
         methods.add_method("getVersion", |_, this, ()| Ok(this.inner.version.clone()));
 
         // -- getAuthor --
-        /// Returns the author name string from this mod's metadata manifest
-        /// Returns the author.
-        ///
-        /// @return string
+        /// Returns the author name string from this mod's metadata manifest.
+        /// @return | string | Returns the author name.
         methods.add_method("getAuthor", |_, this, ()| Ok(this.inner.author.clone()));
 
         // -- getDescription --
-        /// Returns the mod description
-        /// Returns the description.
-        ///
-        /// @return string
+        /// Returns the mod description.
+        /// @return | string | Returns the mod description.
         methods.add_method("getDescription", |_, this, ()| {
             Ok(this.inner.description.clone())
         });
 
         // -- getDependencies --
-        /// Returns the list of required mod IDs
-        /// Returns the dependencies.
-        ///
-        /// @return table
+        /// Returns the list of required mod IDs.
+        /// @return | table | Returns the dependency ID array.
         methods.add_method("getDependencies", |lua, this, ()| {
             string_slice_to_table(lua, &this.inner.dependencies)
         });
 
         // -- getPriority --
-        /// Returns the load-order priority
-        /// Returns the priority.
-        ///
-        /// @return integer
+        /// Returns the load-order priority.
+        /// @return | integer | Returns the mod priority value.
         methods.add_method("getPriority", |_, this, ()| Ok(this.inner.priority));
 
         // -- isEnabled --
-        /// Returns whether the mod is enabled
-        /// Returns true if enabled.
-        ///
-        /// @return boolean
+        /// Returns whether the mod is enabled.
+        /// @return | boolean | Returns whether the mod is enabled.
         methods.add_method("isEnabled", |_, this, ()| Ok(this.inner.enabled));
 
         // -- setEnabled --
-        /// Enables or disables this mod; disabled mods are skipped during loading
-        /// Sets the enabled.
-        ///
-        /// @param enabled boolean
-        /// @return nil
+        /// Enables or disables this mod.
+        /// @param | enabled | boolean | Whether the mod should be enabled.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setEnabled", |_, this, enabled: bool| {
             this.inner.enabled = enabled;
             Ok(())
         });
 
         // -- isLoaded --
-        /// Returns whether the mod has been loaded
-        /// Returns true if loaded.
-        ///
-        /// @return boolean
+        /// Returns whether the mod has been loaded.
+        /// @return | boolean | Returns whether the mod is loaded.
         methods.add_method("isLoaded", |_, this, ()| Ok(this.inner.loaded));
 
         // -- getApiVersion --
-        /// Returns the required engine API version string, or nil if not set
-        /// Returns the api version.
-        ///
-        /// @return string?
+        /// Returns the required engine API version string when one is set.
+        /// @return | string | Returns the required API version string.
         methods.add_method("getApiVersion", |_, this, ()| {
             Ok(this.inner.api_version.clone())
         });
 
         // -- setApiVersion --
-        /// Sets the required engine API version string
-        /// Sets the api version.
-        ///
-        /// @param api_version string
-        /// @return nil
+        /// Sets the required engine API version string.
+        /// @param | api_version | string | Required engine API version string.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setApiVersion", |_, this, api_version: String| {
             this.inner.api_version = Some(api_version);
             Ok(())
         });
 
         // -- getCapabilities --
-        /// Returns an array of declared capability flags
-        /// Returns the capabilities.
-        ///
-        /// @return table
+        /// Returns an array of declared capability flags.
+        /// @return | table | Returns the capability string array.
         methods.add_method("getCapabilities", |lua, this, ()| {
             string_slice_to_table(lua, &this.inner.capabilities)
         });
 
         // -- setCapabilities --
-        /// Replaces the capability list with the given array of strings
-        /// Sets the capabilities.
-        ///
-        /// @param caps table
-        /// @return nil
+        /// Replaces the capability list with the given array of strings.
+        /// @param | caps | table | Capability string array.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setCapabilities", |_, this, caps: LuaTable| {
             this.inner.capabilities = caps.sequence_values::<String>().flatten().collect();
             Ok(())
@@ -270,7 +241,7 @@ impl LuaUserData for LuaMod {
 
         // -- getConfigSchema --
         /// Returns the config schema as an array of `{key, type, default}` tables.
-        /// @return table
+        /// @return | table | Returns the config schema table.
         methods.add_method("getConfigSchema", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, (key, type_hint, default)) in this.inner.config_schema.iter().enumerate() {
@@ -285,8 +256,8 @@ impl LuaUserData for LuaMod {
 
         // -- setConfigSchema --
         /// Replaces the config schema with the given array of `{key, type, default}` tables.
-        /// @param schema table
-        /// @return nil
+    /// @param | schema | table | Config schema table.
+    /// @return | nil | No value is returned.
         methods.add_method_mut("setConfigSchema", |_, this, schema: LuaTable| {
             this.inner.config_schema = schema
                 .sequence_values::<LuaTable>()
@@ -302,10 +273,10 @@ impl LuaUserData for LuaMod {
         });
 
         // -- setHook --
-        /// Registers a named hook callback, replacing any existing one
-        /// @param name string
-        /// @param func function
-        /// @return nil
+    /// Registers a named hook callback, replacing any existing one.
+    /// @param | name | string | Hook name.
+    /// @param | func | function | Hook callback to store.
+    /// @return | nil | No value is returned.
         methods.add_method_mut("setHook", |lua, this, (name, func): (String, LuaFunction)| {
                 if let Some(old_key) = this.hooks.remove(&name) {
                     lua.remove_registry_value(old_key)?;
@@ -317,11 +288,9 @@ impl LuaUserData for LuaMod {
         );
 
         // -- getHook --
-        /// Returns the hook function for the given name, or nil
-        /// Returns the hook.
-        ///
-        /// @param name string
-        /// @return function?
+        /// Returns the hook function for the given name.
+        /// @param | name | string | Hook name.
+        /// @return | function | Returns the stored hook function.
         methods.add_method("getHook", |lua, this, name: String| {
             if let Some(key) = this.hooks.get(&name) {
                 let func = lua.registry_value::<LuaFunction>(key)?;
@@ -332,20 +301,16 @@ impl LuaUserData for LuaMod {
         });
 
         // -- hasHook --
-        /// Returns whether a hook with the given name exists
-        /// Returns true if hook.
-        ///
-        /// @param name string
-        /// @return boolean
+        /// Returns whether a hook with the given name exists.
+        /// @param | name | string | Hook name.
+        /// @return | boolean | Returns whether the hook exists.
         methods.add_method("hasHook", |_, this, name: String| {
             Ok(this.hooks.contains_key(&name))
         });
 
         // -- getHookNames --
-        /// Returns an array of registered hook names
-        /// Returns the hook names.
-        ///
-        /// @return table
+        /// Returns an array of registered hook names.
+        /// @return | table | Returns the hook name array.
         methods.add_method("getHookNames", |lua, this, ()| {
             let t = lua.create_table()?;
             for (i, name) in this.hooks.keys().enumerate() {
@@ -355,11 +320,9 @@ impl LuaUserData for LuaMod {
         });
 
         // -- setConfig --
-        /// Stores an arbitrary config value for this mod
-        /// Sets the config.
-        ///
-        /// @param value any
-        /// @return nil
+        /// Stores an arbitrary config value for this mod.
+        /// @param | value | any | Config value to store.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setConfig", |lua, this, value: LuaValue| {
             if let Some(old_key) = this.config.take() {
                 lua.remove_registry_value(old_key)?;
@@ -370,10 +333,8 @@ impl LuaUserData for LuaMod {
         });
 
         // -- getConfig --
-        /// Returns the stored config value, or nil
-        /// Returns the config.
-        ///
-        /// @return nil|boolean|number|string|table|function|userdata|thread
+        /// Returns the stored config value.
+        /// @return | table | Returns the stored config value.
         methods.add_method("getConfig", |lua, this, ()| {
             if let Some(key) = &this.config {
                 lua.registry_value::<LuaValue>(key)
@@ -383,10 +344,8 @@ impl LuaUserData for LuaMod {
         });
 
         // -- releaseRefs --
-        /// Releases all hook and config registry references
-        /// Release refs.
-        ///
-        /// @return nil
+        /// Releases all hook and config registry references.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("releaseRefs", |lua, this, ()| {
             for (_, key) in this.hooks.drain() {
                 lua.remove_registry_value(key)?;
@@ -398,21 +357,21 @@ impl LuaUserData for LuaMod {
         });
 
         // -- __tostring --
-        /// Returns a human-readable string for debugging
-        /// @return string
+        /// Returns a human-readable string for debugging.
+        /// @return | string | Returns the debug string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("Mod({})", this.inner.id))
         });
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns the Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LMod"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns whether the object matches the type name.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LMod" || name == "Object")
         });
@@ -446,11 +405,9 @@ impl Default for LuaModManager {
 impl LuaUserData for LuaModManager {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- registerMod --
-        /// Registers a mod from its Mod userdata
-        /// Register mod.
-        ///
-        /// @param mod_ud LMod
-        /// @return nil
+        /// Registers a mod from its mod userdata.
+        /// @param | mod_ud | LMod | Mod userdata to register.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("registerMod", |_, this, ud: LuaAnyUserData| {
             let info = ud.borrow::<LuaMod>()?.inner.clone();
             this.inner.register_mod(info);
@@ -458,75 +415,59 @@ impl LuaUserData for LuaModManager {
         });
 
         // -- unregisterMod --
-        /// Removes a mod by ID and returns whether it was found
-        /// Unregister mod.
-        ///
-        /// @param mod_id string
-        /// @return boolean
+        /// Removes a mod by ID and returns whether it was found.
+        /// @param | mod_id | string | Mod identifier to remove.
+        /// @return | boolean | Returns whether the mod was removed.
         methods.add_method_mut("unregisterMod", |_, this, mod_id: String| {
             Ok(this.inner.unregister_mod(&mod_id))
         });
 
         // -- hasMod --
-        /// Returns whether a mod with the given ID is registered
-        /// Returns true if mod.
-        ///
-        /// @param mod_id string
-        /// @return boolean
+        /// Returns whether a mod with the given ID is registered.
+        /// @param | mod_id | string | Mod identifier to check.
+        /// @return | boolean | Returns whether the mod exists.
         methods.add_method("hasMod", |_, this, mod_id: String| {
             Ok(this.inner.has_mod(&mod_id))
         });
 
         // -- getModCount --
-        /// Returns the number of registered mods
-        /// Returns the mod count.
-        ///
-        /// @return integer
+        /// Returns the number of registered mods.
+        /// @return | integer | Returns the registered mod count.
         methods.add_method("getModCount", |_, this, ()| Ok(this.inner.mod_count()));
 
         // -- getAllMods --
-        /// Returns an array of info tables for all registered mods
-        /// Returns the all mods.
-        ///
-        /// @return table
+        /// Returns an array of info tables for all registered mods.
+        /// @return | table | Returns the full mod info array.
         methods.add_method("getAllMods", |lua, this, ()| {
             mod_infos_to_table(lua, this.inner.all_mods().iter())
         });
 
         // -- getLoadOrder --
-        /// Returns an array of info tables in effective load order
-        /// Returns the load order.
-        ///
-        /// @return table
+        /// Returns an array of info tables in effective load order.
+        /// @return | table | Returns the load-order info array.
         methods.add_method("getLoadOrder", |lua, this, ()| {
             let order = this.inner.load_order();
             mod_infos_to_table(lua, order.into_iter())
         });
 
         // -- validateDependencies --
-        /// Returns an array of mod IDs with missing dependencies
-        /// Validate dependencies.
-        ///
-        /// @return table
+        /// Returns an array of mod IDs with missing dependencies.
+        /// @return | table | Returns the missing dependency ID array.
         methods.add_method("validateDependencies", |lua, this, ()| {
             string_slice_to_table(lua, &this.inner.validate_dependencies())
         });
 
         // -- hasCircularDependencies --
-        /// Returns whether any circular dependency cycles exist
-        /// Returns true if circular dependencies.
-        ///
-        /// @return boolean
+        /// Returns whether any circular dependency cycles exist.
+        /// @return | boolean | Returns whether dependency cycles exist.
         methods.add_method("hasCircularDependencies", |_, this, ()| {
             Ok(this.inner.has_circular_dependencies())
         });
 
         // -- setLoadOrder --
-        /// Sets an explicit load order from an array of mod ID strings
-        /// Sets the load order.
-        ///
-        /// @param order table
-        /// @return nil
+        /// Sets an explicit load order from an array of mod ID strings.
+        /// @param | order | table | Array of mod IDs in load order.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setLoadOrder", |_, this, order_table: LuaTable| {
             let order: Vec<String> = order_table.sequence_values::<String>().flatten().collect();
             this.inner.set_load_order(order);
@@ -534,81 +475,69 @@ impl LuaUserData for LuaModManager {
         });
 
         // -- clearLoadOrder --
-        /// Clears the custom load order, reverting to priority-based sorting
-        /// Clears load order.
-        ///
-        /// @return nil
+        /// Clears the custom load order.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("clearLoadOrder", |_, this, ()| {
             this.inner.clear_load_order();
             Ok(())
         });
 
         // -- scanFolder --
-        /// Scans a directory for mods with mod.toml and registers them
-        /// Scan folder.
-        ///
-        /// @param path string
-        /// @return table
+        /// Scans a directory for mods with `mod.toml` and registers them.
+        /// @param | path | string | Directory path to scan.
+        /// @return | table | Returns the discovered mod info array.
         methods.add_method_mut("scanFolder", |lua, this, path: String| {
             let found = this.inner.scan_folder(&path);
             mod_infos_to_table(lua, found.iter())
         });
 
         // -- getModPath --
-        /// Returns the filesystem path of a registered mod, or nil
-        /// Returns the mod path.
-        ///
-        /// @param mod_id string
-        /// @return string?
+        /// Returns the filesystem path of a registered mod.
+        /// @param | mod_id | string | Mod identifier to inspect.
+        /// @return | string | Returns the registered mod path.
         methods.add_method("getModPath", |_, this, mod_id: String| {
             Ok(this.inner.get_mod(&mod_id).and_then(|m| m.path.clone()))
         });
 
         // -- markForReload --
-        /// Marks a registered mod for hot-reload
-        /// Mark for reload.
-        ///
-        /// @param mod_id string
-        /// @return boolean
+        /// Marks a registered mod for hot-reload.
+        /// @param | mod_id | string | Mod identifier to queue.
+        /// @return | boolean | Returns whether the mod was queued.
         methods.add_method_mut("markForReload", |_, this, mod_id: String| {
             Ok(this.inner.mark_for_reload(&mod_id))
         });
 
         // -- getReloadQueue --
-        /// Returns the array of mod IDs pending hot-reload
-        /// Returns the reload queue.
-        ///
-        /// @return table
+        /// Returns the array of mod IDs pending hot-reload.
+        /// @return | table | Returns the queued mod ID array.
         methods.add_method("getReloadQueue", |lua, this, ()| {
             string_slice_to_table(lua, this.inner.get_reload_queue())
         });
 
         // -- clearReloadQueue --
-        /// Clears the reload queue without reloading
-        /// Clears reload queue.
-        ///
-        /// @return nil
+        /// Clears the reload queue without reloading.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("clearReloadQueue", |_, this, ()| {
             this.inner.clear_reload_queue();
             Ok(())
         });
 
         // -- __tostring --
-        /// Returns a human-readable string for debugging
-        /// @return string
+        /// Returns a human-readable string for debugging.
+        /// @return | string | Returns the debug string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("ModManager({} mods)", this.inner.mod_count()))
         });
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns the Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LModManager"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns whether the object matches the type name.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LModManager" || name == "Object")
         });
@@ -621,7 +550,7 @@ impl LuaUserData for LuaModManager {
 
 /// A typed content registry for mod-contributed assets and objects.
 pub struct LuaContentRegistry {
-    /// Map: type_name → (id → LuaRegistryKey)
+    /// Map: type_name -> (id -> LuaRegistryKey)
     entries: HashMap<String, HashMap<String, LuaRegistryKey>>,
     /// Registered type names.
     types: HashSet<String>,
@@ -629,6 +558,7 @@ pub struct LuaContentRegistry {
 
 impl LuaContentRegistry {
     /// Creates a new empty [`LuaContentRegistry`].
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             entries: HashMap::new(),
@@ -640,9 +570,9 @@ impl LuaContentRegistry {
 impl LuaUserData for LuaContentRegistry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- registerType --
-        /// Register a new content type.
-        /// @param type_name string — type identifier (e.g. "weapon", "spell")
-        /// @return nil
+        /// Registers a new content type.
+        /// @param | type_name | string | Type identifier such as `weapon` or `spell`.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("registerType", |_, this, type_name: String| {
             this.types.insert(type_name.clone());
             this.entries.entry(type_name).or_default();
@@ -650,11 +580,11 @@ impl LuaUserData for LuaContentRegistry {
         });
 
         // -- register --
-        /// Register a content entry.
-        /// @param type_name string — registered type name
-        /// @param id string — unique identifier for this entry
-        /// @param obj any — the content object to store
-        /// @return nil
+        /// Registers a content entry.
+        /// @param | type_name | string | Registered content type name.
+        /// @param | id | string | Unique identifier for the entry.
+        /// @param | obj | any | Content object to store.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("register", |lua, this, (type_name, id, obj): (String, String, LuaValue)| {
             if !this.types.contains(&type_name) {
                 return Err(LuaError::RuntimeError(format!("content type '{}' not registered", type_name)));
@@ -665,10 +595,10 @@ impl LuaUserData for LuaContentRegistry {
         });
 
         // -- get --
-        /// Retrieve a content entry.
-        /// @param type_name string — registered type name
-        /// @param id string — content identifier
-        /// @return nil|boolean|number|string|table|function|userdata|thread
+        /// Retrieves a content entry.
+        /// @param | type_name | string | Registered content type name.
+        /// @param | id | string | Content identifier.
+        /// @return | table | Returns the stored content entry.
         methods.add_method("get", |lua, this, (type_name, id): (String, String)| {
             let val = this.entries
                 .get(&type_name)
@@ -680,9 +610,9 @@ impl LuaUserData for LuaContentRegistry {
         });
 
         // -- getAll --
-        /// Get all entries for a type.
-        /// @param type_name string — registered type name
-        /// @return table — map of {id: any}
+        /// Returns all entries for a type.
+        /// @param | type_name | string | Registered content type name.
+        /// @return | table | Returns the map of entries for the type.
         methods.add_method("getAll", |lua, this, type_name: String| {
             let tbl = lua.create_table()?;
             if let Some(map) = this.entries.get(&type_name) {
@@ -695,8 +625,8 @@ impl LuaUserData for LuaContentRegistry {
         });
 
         // -- getTypes --
-        /// Get all registered type names.
-        /// @return table — array of type name strings
+        /// Returns all registered type names.
+        /// @return | table | Returns the registered type name array.
         methods.add_method("getTypes", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, t) in this.types.iter().enumerate() {
@@ -707,20 +637,20 @@ impl LuaUserData for LuaContentRegistry {
 
         // -- __tostring --
         /// Returns a human-readable string for debugging.
-        /// @return string
+        /// @return | string | Returns the debug string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(format!("ContentRegistry({} types)", this.types.len()))
         });
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns the Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LContentRegistry"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns whether the object matches the type name.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LContentRegistry" || name == "Object")
         });
@@ -732,17 +662,17 @@ impl LuaUserData for LuaContentRegistry {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.mods` API table with the Lua VM.
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param _state Rc<RefCell<SharedState>>
-///
+/// @param | lua | Lua | Active Lua state.
+/// @param | lurek | table | Root `lurek` table.
+/// @param | _state | SharedState | Shared engine state.
+/// @return | nil | Registers the mods API table.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newMod --
     /// Creates a new Mod from an info table with at least an `id` field.
-    /// @param info table
-    /// @return LMod
+    /// @param | info | table | Mod info table.
+    /// @return | LMod | Returns the new mod userdata.
     tbl.set("newMod", lua.create_function(|lua, info: LuaTable| {
             let mod_info = mod_info_from_table(&info)?;
             lua.create_userdata(LuaMod::new(mod_info))
@@ -751,28 +681,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- newModManager --
     /// Creates a new empty ModManager.
-    /// @return LModManager
+    /// @return | LModManager | Returns the new mod manager userdata.
     tbl.set("newModManager", lua.create_function(|lua, ()| lua.create_userdata(LuaModManager::new()))?,
     )?;
 
     // -- newRegistry --
     /// Creates a new empty ContentRegistry for mod-contributed assets.
-    /// @return LContentRegistry
+    /// @return | LContentRegistry | Returns the new content registry userdata.
     tbl.set("newRegistry", lua.create_function(|lua, ()| lua.create_userdata(LuaContentRegistry::new()))?,
     )?;
 
     // -- checkApiVersion --
     /// Checks whether a mod's required `api_version` is compatible with the given `host_version`.
-    ///
-    /// Both version strings must be of the form "MAJOR.MINOR.PATCH". A mod is
-    /// compatible when its MAJOR equals the host MAJOR and its MINOR â‰¤ the host
-    /// MINOR. Returns `true` if compatible, `false` otherwise. Always returns
-    /// `true` when the mod has no `api_version` set.
-    ///
-    /// @param mod_ud LMod
-    /// @param host_version string
-    /// @return boolean
-    /// @return string?
+    /// @param | mod_ud | LMod | Mod userdata to validate.
+    /// @param | host_version | string | Host API version string.
+    /// @return | boolean, string | Returns compatibility status and an error message when incompatible.
     tbl.set("checkApiVersion", lua.create_function(|lua, (mod_ud, host_version): (LuaAnyUserData, String)| {
             let api_ver = {
                 let m = mod_ud.borrow::<LuaMod>()?;

@@ -911,6 +911,7 @@ impl PostFxPipeline {
     /// - `width` / `height` — Frame dimensions in pixels.
     /// - `total_time` — Elapsed seconds since engine start (for auto-uniform p[3].x).
     /// - `frame_count` — Monotonic frame counter (for auto-uniform p[3].y).
+    #[allow(clippy::too_many_arguments)]
     pub fn apply(
         &self,
         device: &wgpu::Device,

@@ -261,6 +261,7 @@ impl ImageData {
     /// - `g` — `u8`. Green channel.
     /// - `b` — `u8`. Blue channel.
     /// - `a` — `u8`. Alpha channel.
+    #[allow(clippy::too_many_arguments)]
     pub fn draw_circle(&mut self, cx: i32, cy: i32, radius: u32, r: u8, g: u8, b: u8, a: u8) {
         let rad = radius as i32;
         let y0 = (cy - rad).max(0) as u32;

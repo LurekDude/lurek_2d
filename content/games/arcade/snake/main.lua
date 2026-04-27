@@ -253,7 +253,8 @@ function lurek.process(dt)
             -- Particle burst at food location (screen coords)
             local px = f[1] * CELL + CELL / 2
             local py = f[2] * CELL + HUD_H + CELL / 2
-            food_particles:emit(18, px, py)
+            food_particles:moveTo(px, py)
+            food_particles:emit(18)
 
             -- Tween score display
             local target = score
@@ -345,7 +346,7 @@ function lurek.draw()
     end
 
     -- Particles (food burst) — drawn in world space
-    food_particles:draw()
+    food_particles:render()
 
     cam:reset()
 end

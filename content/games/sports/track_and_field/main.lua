@@ -124,9 +124,13 @@ local medals         = { gold = 0, silver = 0, bronze = 0 }
 local total_points   = 0
 
 -- Particles
+---@type LParticleSystem
 local ps_dust        = nil
+---@type LParticleSystem
 local ps_impact      = nil
+---@type LParticleSystem
 local ps_trail       = nil
+---@type LParticleSystem
 local ps_confetti    = nil
 
 -- Tween targets
@@ -135,6 +139,7 @@ local tw_distance    = { value = 0 }
 local tw_medal_alpha = { value = 0 }
 
 -- Camera
+---@type LCamera
 local camera         = nil
 
 -- ---------------------------------------------------------------------------

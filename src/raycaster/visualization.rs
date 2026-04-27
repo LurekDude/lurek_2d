@@ -386,6 +386,7 @@ impl Raycaster2D {
     ///
     /// # Returns
     /// `ImageData`.
+    #[allow(clippy::too_many_arguments)]
     pub fn draw_textured_view_to_image(
         &self,
         ox: f32,

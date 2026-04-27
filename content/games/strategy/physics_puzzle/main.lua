@@ -20,8 +20,11 @@ local score    = 0
 local preview  = { type = "plank", x = 0, y = 0, angle = 0 }
 
 -- Particle systems
+---@type LParticleSystem
 local ball_trail    = nil
+---@type LParticleSystem
 local win_burst     = nil
+---@type LParticleSystem
 local bounce_sparks = nil
 
 -- Shape types
@@ -120,7 +123,7 @@ local function update_physics(dt)
                 local dot = ball.vx * nx + ball.vy * ny
                 ball.vx   = (ball.vx - 2 * dot * nx) * 0.7
                 ball.vy   = (ball.vy - 2 * dot * ny) * 0.7
-                if bounce_sparks then bounce_sparks:emit(ball.x, ball.y, 3) end
+                if bounce_sparks then bounce_sparks:moveTo(ball.x, ball.y) bounce_sparks:emit(3) end
             end
         end
     end
@@ -129,7 +132,7 @@ local function update_physics(dt)
     if circle_goal(ball.x, ball.y, ball.r, goal.x, goal.y, goal.r) then
         state = "win"
         score = score + (10 - math.floor(sim_time))
-        if win_burst then win_burst:emit(goal.x, goal.y, 30) end
+        if win_burst then win_burst:moveTo(goal.x, goal.y) win_burst:emit(30) end
         return
     end
 
@@ -253,7 +256,7 @@ function lurek.process(dt)
 
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     preview.x = mx
     preview.y = my
 
@@ -305,7 +308,7 @@ function lurek.process(dt)
 
     if state == "simulating" then
         update_physics(dt)
-        if ball_trail then ball_trail:emit(ball.x, ball.y, 1) end
+        if ball_trail then ball_trail:moveTo(ball.x, ball.y) ball_trail:emit(1) end
     end
 end
 
@@ -343,9 +346,9 @@ function lurek.draw()
         circ(ball.x, ball.y, ball.r, { color = {0.3,0.6,1.0,1}, segments = 12 })
     end
 
-    if ball_trail    then ball_trail:draw()    end
-    if win_burst     then win_burst:draw()     end
-    if bounce_sparks then bounce_sparks:draw() end
+    if ball_trail    then ball_trail:render()    end
+    if win_burst     then win_burst:render()     end
+    if bounce_sparks then bounce_sparks:render() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

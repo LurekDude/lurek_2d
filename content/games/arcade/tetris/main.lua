@@ -172,7 +172,8 @@ local function clear_lines()
                 local row_y = BOARD_Y + (y - 1) * CELL + CELL / 2
                 for x = 0, COLS - 1 do
                     local px = BOARD_X + x * CELL + CELL / 2
-                    sparks:emit(3, px, row_y)
+                    sparks:moveTo(px, row_y)
+                    sparks:emit(3)
                 end
             end
             table.remove(board, y)
@@ -520,7 +521,7 @@ function lurek.draw()
     end
 
     -- Particles (line-clear sparkles)
-    -- sparks:draw() handled automatically by the particle system
+    -- sparks:render() handled automatically by the particle system
 
     -- Line-clear flash overlay
     if flash_alpha > 0.01 then

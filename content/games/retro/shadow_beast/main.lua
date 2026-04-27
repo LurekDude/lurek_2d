@@ -132,6 +132,7 @@ local enemies    = {}
 local particles  = {}
 local atmo_motes = {}
 
+---@type LCamera
 local cam        = nil
 local death_tween = nil
 local hit_tween   = nil

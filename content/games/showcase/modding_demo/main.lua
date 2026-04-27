@@ -131,6 +131,7 @@ local chaos_elapsed  = 0
 -- ---------------------------------------------------------------------------
 -- Engine objects
 -- ---------------------------------------------------------------------------
+---@type LCamera
 local camera         = nil
 ---@type any
 local ps_activate    = nil  -- mod activation particles

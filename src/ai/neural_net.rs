@@ -55,6 +55,7 @@ impl Activation {
     ///
     /// # Returns
     /// `Self`.
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "relu"    => Self::ReLU,
@@ -160,6 +161,7 @@ impl NeuralLayer {
     ///
     /// # Returns
     /// `Vec<f32>`.
+    #[allow(clippy::needless_range_loop)]
     pub fn forward(&self, input: &[f32]) -> Vec<f32> {
         let mut out = vec![0.0f32; self.outputs];
         for o in 0..self.outputs {

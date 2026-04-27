@@ -46,6 +46,7 @@ local STATE = { TITLE = 1, PLAYING = 2, GAME_OVER = 3 }
 local game_state = STATE.TITLE
 
 -- ── Camera ────────────────────────────────────────────────────────────────
+---@type LCamera
 local cam = nil
 local cam_y = 0  -- world Y of camera top (grows negative as we climb)
 
@@ -65,10 +66,15 @@ local max_height = 0   -- highest world-y reached (more negative = higher)
 local highest_plat_y = 0  -- world-y of the highest generated platform
 
 -- ── Particles ─────────────────────────────────────────────────────────────
+---@type LParticleSystem
 local dust_ps    = nil
+---@type LParticleSystem
 local crumble_ps = nil
+---@type LParticleSystem
 local spring_ps  = nil
+---@type LParticleSystem
 local enemy_ps   = nil
+---@type LParticleSystem
 local bullet_ps  = nil
 
 -- ── Tween / UI ────────────────────────────────────────────────────────────
@@ -376,7 +382,8 @@ function lurek.process(dt)
             x = player.x + PLAYER_W / 2 - BULLET_SIZE / 2,
             y = player.y - BULLET_SIZE,
         }
-        bullet_ps:emit(player.x + PLAYER_W / 2, player.y, 4)
+        bullet_ps:moveTo(player.x + PLAYER_W / 2, player.y)
+        bullet_ps:emit(4)
     end
 
     -- Gravity
@@ -407,12 +414,14 @@ function lurek.process(dt)
                     if prev_foot <= p.y and foot_y >= p.y and foot_y <= p.y + p.h + 8 then
                         -- Land on platform!
                         player.y = p.y - PLAYER_H
-                        dust_ps:emit(player.x + PLAYER_W / 2, p.y, 5)
+                        dust_ps:moveTo(player.x + PLAYER_W / 2, p.y)
+                        dust_ps:emit(5)
 
                         if p.ptype == P_SPRING then
                             -- Spring bounce: 2x height
                             player.vy = SPRING_VEL
-                            spring_ps:emit(p.x + p.w / 2, p.y, 12)
+                            spring_ps:moveTo(p.x + p.w / 2, p.y)
+                            spring_ps:emit(12)
                             -- Animate spring stretch
                             p.spring_stretch = 6
                             lurek.tween.to(p, 0.3, { spring_stretch = 0 })
@@ -452,7 +461,8 @@ function lurek.process(dt)
             p.crumble_timer = p.crumble_timer - dt
             if p.crumble_timer <= 0 then
                 p.alive = false
-                crumble_ps:emit(p.x + p.w / 2, p.y + p.h / 2, 15)
+                crumble_ps:moveTo(p.x + p.w / 2, p.y + p.h / 2)
+                crumble_ps:emit(15)
             end
         end
     end
@@ -479,7 +489,8 @@ function lurek.process(dt)
                 -- Player dies — falls down
                 player.alive = false
                 player.vy = 200
-                enemy_ps:emit(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2, 15)
+                enemy_ps:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2)
+                enemy_ps:emit(15)
             end
         elseif not e.plat.alive then
             e.alive = false
@@ -499,8 +510,10 @@ function lurek.process(dt)
                 local dy = (b.y + BULLET_SIZE / 2) - (e.y + ENEMY_RADIUS)
                 if math.sqrt(dx * dx + dy * dy) < ENEMY_RADIUS + BULLET_SIZE then
                     e.alive = false
-                    enemy_ps:emit(e.x, e.y + ENEMY_RADIUS, 12)
-                    bullet_ps:emit(b.x, b.y, 5)
+                    enemy_ps:moveTo(e.x, e.y + ENEMY_RADIUS)
+                    enemy_ps:emit(12)
+                    bullet_ps:moveTo(b.x, b.y)
+                    bullet_ps:emit(5)
                     score_pop.text = "+50"
                     score_pop.alpha = 1.0
                     score_pop.y = e.y
@@ -654,11 +667,11 @@ function lurek.draw()
     rect(px + 11, py + 5, 2, 2)
 
     -- ── Particles (world space) ───────────────────────────────────────────
-    dust_ps:draw()
-    crumble_ps:draw()
-    spring_ps:draw()
-    enemy_ps:draw()
-    bullet_ps:draw()
+    dust_ps:render()
+    crumble_ps:render()
+    spring_ps:render()
+    enemy_ps:render()
+    bullet_ps:render()
 end
 
 -- ── Render UI (screen space) ──────────────────────────────────────────────

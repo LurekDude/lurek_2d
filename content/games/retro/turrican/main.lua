@@ -133,13 +133,18 @@ local facing = 1    -- 1 = right, -1 = left
 local current_level = 1
 local level_w = 0
 
+---@type LCamera
 local camera = nil
 local cam_x = 0
 
 -- Particle systems
+---@type LParticleSystem
 local ps_impact   = nil
+---@type LParticleSystem
 local ps_explode  = nil
+---@type LParticleSystem
 local ps_beam     = nil
+---@type LParticleSystem
 local ps_pickup   = nil
 
 -- Tween
@@ -472,7 +477,8 @@ function lurek.process(dt)
         local a = beam_angle
         local ex = bx + math.cos(a) * K.BEAM_RANGE * facing
         local ey = by + math.sin(a) * K.BEAM_RANGE
-        ps_beam:emit(2, ex, ey)
+        ps_beam:moveTo(ex, ey)
+        ps_beam:emit(2)
 
         -- Beam vs enemies
         for i = #enemies, 1, -1 do
@@ -491,7 +497,8 @@ function lurek.process(dt)
                         e.hp = e.hp - 4 * dt
                         if e.hp <= 0 then
                             score = score + EN.SCORE
-                            ps_explode:emit(25, ecx, ecy)
+                            ps_explode:moveTo(ecx, ecy)
+                            ps_explode:emit(25)
                             table.remove(enemies, i)
                         end
                     end
@@ -517,7 +524,8 @@ function lurek.process(dt)
         -- Tile hit
         if not remove and tile_collision(b.x, b.y, K.BW, K.BH) then
             remove = true
-            ps_impact:emit(6, b.x, b.y)
+            ps_impact:moveTo(b.x, b.y)
+            ps_impact:emit(6)
         end
 
         -- Enemy hit
@@ -527,10 +535,12 @@ function lurek.process(dt)
                 if aabb(b.x, b.y, K.BW, K.BH, e.x, e.y, EN.W[e.kind], EN.H[e.kind]) then
                     e.hp = e.hp - 1
                     remove = true
-                    ps_impact:emit(8, b.x, b.y)
+                    ps_impact:moveTo(b.x, b.y)
+                    ps_impact:emit(8)
                     if e.hp <= 0 then
                         score = score + EN.SCORE
-                        ps_explode:emit(20, e.x + EN.W[e.kind] / 2, e.y + EN.H[e.kind] / 2)
+                        ps_explode:moveTo(e.x + EN.W[e.kind] / 2, e.y + EN.H[e.kind] / 2)
+                        ps_explode:emit(20)
                         table.remove(enemies, j)
                     end
                     break
@@ -616,7 +626,8 @@ function lurek.process(dt)
         p.t = p.t + dt * 3
         if aabb(player.x, player.y, K.PW, K.PH, p.x + 4, p.y + 4, 24, 24) then
             score = score + PU.SCORE
-            ps_pickup:emit(15, p.x + 16, p.y + 16)
+            ps_pickup:moveTo(p.x + 16, p.y + 16)
+            ps_pickup:emit(15)
             if p.kind == PU.SPREAD then
                 has_spread = true
                 -- Weapon switch flash
@@ -796,10 +807,10 @@ function lurek.draw()
     end
 
     -- Particles
-    ps_impact:draw()
-    ps_explode:draw()
-    ps_beam:draw()
-    ps_pickup:draw()
+    ps_impact:render()
+    ps_explode:render()
+    ps_beam:render()
+    ps_pickup:render()
 
     camera:reset()
 

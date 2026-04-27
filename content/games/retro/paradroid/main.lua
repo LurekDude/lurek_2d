@@ -630,7 +630,7 @@ function lurek.draw()
 
     -- Particles
     for _, em in ipairs(emitters) do
-        em.em:draw()
+        em.em:render()
     end
 
     -- Transfer overlay

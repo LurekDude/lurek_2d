@@ -33,7 +33,9 @@ local info_text = ""
 local info_timer = 0
 
 -- Particles
+---@type LParticleSystem
 local expand_burst = nil
+---@type LParticleSystem
 local city_sparkle = nil
 
 -- ── Helpers ───────────────────────────────────────────────
@@ -210,7 +212,7 @@ function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if lurek.input.wasActionPressed("next_turn") then next_turn() return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local hq, hr = pixel_to_hex(mx, my)
     local hkey   = hex_key(hq, hr)
     local hex    = hexes[hkey]
@@ -227,7 +229,7 @@ function lurek.process(dt)
                     hex.owner      = "player"
                     owned          = owned + 1
                     local px, py   = hex_to_pixel(hq, hr)
-                    if expand_burst then expand_burst:emit(px + W/2 - OX, py + H/2 - OY, 8) end
+                    if expand_burst then expand_burst:moveTo(px + W/2 - OX, py + H/2 - OY) expand_burst:emit(8) end
                     show_info("Claimed " .. TERRAIN[hex.terrain].label)
                 else
                     show_info("Need 30 gold + 10 wood to expand")
@@ -245,7 +247,7 @@ function lurek.process(dt)
                 resources.food = resources.food - 20
                 selected.city  = true
                 local px, py   = hex_to_pixel(selected.q, selected.r)
-                if city_sparkle then city_sparkle:emit(px + W/2 - OX, py + H/2 - OY, 10) end
+                if city_sparkle then city_sparkle:moveTo(px + W/2 - OX, py + H/2 - OY) city_sparkle:emit(10) end
                 show_info("City built! Double resources from this hex")
                 score = score + 50
             else
@@ -287,8 +289,8 @@ function lurek.draw()
         end
     end
 
-    if expand_burst then expand_burst:draw() end
-    if city_sparkle then city_sparkle:draw() end
+    if expand_burst then expand_burst:render() end
+    if city_sparkle then city_sparkle:render() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

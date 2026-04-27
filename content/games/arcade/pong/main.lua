@@ -311,7 +311,7 @@ function lurek.draw()
 
     -- Particle sparks
     if sparks then
-        sparks:draw()
+        sparks:render()
     end
 
     -- Game-over overlay

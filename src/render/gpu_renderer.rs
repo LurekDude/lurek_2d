@@ -579,6 +579,7 @@ fn compute_1d_shadow_map(
 
     let inv_radius = 1.0 / light_radius;
 
+    #[allow(clippy::needless_range_loop)]
     for i in 0..SHADOW_MAP_RES {
         // Map angular slot to a ray direction in [-π, π] covering the full circle.
         let angle = (i as f32 * inv_res) * std::f32::consts::TAU - PI;
@@ -1328,6 +1329,7 @@ impl GpuRenderer {
     /// - `camera` — camera-view matrix (same one uploaded as `view_col*` uniform).
     /// - `vp_w`, `vp_h` — viewport dimensions in logical pixels.
     #[inline]
+    #[allow(clippy::too_many_arguments)]
     fn aabb_visible_2d(
         x: f32,
         y: f32,
@@ -5979,6 +5981,7 @@ fn bitmap_char(ch: char) -> [u8; 7] {
 /// Renders debug text using the built-in 5×7 bitmap font.
 /// Pushes colored quads into the vertex/index buffers — no font texture needed.
 #[allow(dead_code)]
+#[allow(clippy::too_many_arguments)]
 fn render_text(
     cv: &mut Vec<ColorVertex>,
     ci: &mut Vec<u32>,

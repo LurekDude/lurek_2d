@@ -1,8 +1,4 @@
-//! `lurek.signal` " Event queue polling and pub-sub signal dispatching.
-//!
-//! Provides `Signal` userdata for named-event pub-sub with once-fire handles,
-//! per-handle filter predicates, wildcard subscriptions, and integration with the
-//! engine event bus for built-in events (resize, focus, quit, etc.).
+//! `lurek.signal` - Event queue polling and pub-sub signal dispatch.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -34,7 +30,9 @@ impl LuaUserData for LuaSignal {
         /// @param | name | string | The event name to subscribe to (case-sensitive)
         /// @param | callback | function | The Lua function to invoke when the event fires
         /// @return | integer | A unique handle ID for this subscription
-        methods.add_method("register", |lua, this, (name, callback): (String, LuaFunction)| {
+        methods.add_method(
+            "register",
+            |lua, this, (name, callback): (String, LuaFunction)| {
                 let key = lua.create_registry_value(callback)?;
                 let handle = this.inner.borrow_mut().subscribe(&name);
                 this.callbacks.borrow_mut().insert(handle, key);
@@ -174,7 +172,9 @@ impl LuaUserData for LuaSignal {
         /// @param | name | string | The event name to subscribe to (case-sensitive)
         /// @param | callback | function | The Lua function to invoke exactly once
         /// @return | integer | A unique handle ID for this one-shot subscription
-        methods.add_method("once", |lua, this, (name, callback): (String, LuaFunction)| {
+        methods.add_method(
+            "once",
+            |lua, this, (name, callback): (String, LuaFunction)| {
                 let key = lua.create_registry_value(callback)?;
                 let handle = this.inner.borrow_mut().subscribe(&name);
                 this.callbacks.borrow_mut().insert(handle, key);
@@ -189,7 +189,9 @@ impl LuaUserData for LuaSignal {
         /// @param | callback | function | The Lua function to invoke when the filter passes
         /// @param | filter | function | A predicate function that receives emit args and returns boolean
         /// @return | integer | A unique handle ID for this filtered subscription
-        methods.add_method("registerWithFilter", |lua, this, (name, callback, filter): (String, LuaFunction, LuaFunction)| {
+        methods.add_method(
+            "registerWithFilter",
+            |lua, this, (name, callback, filter): (String, LuaFunction, LuaFunction)| {
                 let cb_key = lua.create_registry_value(callback)?;
                 let filter_key = lua.create_registry_value(filter)?;
                 let handle = this.inner.borrow_mut().subscribe(&name);
@@ -204,7 +206,9 @@ impl LuaUserData for LuaSignal {
         /// @param | name | string | An event name or wildcard pattern (e.g. "player.*")
         /// @param | func | function | The Lua function to invoke when a matching event fires
         /// @return | integer | A unique handle ID for this subscription
-        methods.add_method("connect", |lua, this, (name, func): (String, LuaFunction)| {
+        methods.add_method(
+            "connect",
+            |lua, this, (name, func): (String, LuaFunction)| {
                 let key = lua.create_registry_value(func)?;
                 let handle = if Signal::is_wildcard(&name) {
                     this.inner.borrow_mut().subscribe_wildcard(&name)
@@ -224,7 +228,7 @@ impl LuaUserData for LuaSignal {
         // -- typeOf --
         /// Returns true if the given type name matches this object's type or any parent type.
         /// @param | name | string | type name to test
-        /// @return | boolean | Boolean result.
+        /// @return | boolean | True if the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSignal" || name == "Object")
         });
@@ -236,6 +240,7 @@ impl LuaUserData for LuaSignal {
 // ---------------------------------------------------------------------------
 
 /// Registers the `lurek.signal` API table with the Lua VM.
+#[allow(clippy::type_complexity)]
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
@@ -244,7 +249,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | code | integer? | Optional OS exit code (default 0)
     /// @return | nil | No return value.
     let s = state.clone();
-    tbl.set("exit", lua.create_function(move |_, code: Option<i32>| {
+    tbl.set(
+        "exit",
+        lua.create_function(move |_, code: Option<i32>| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
             st.exit_code = code.unwrap_or(0);
@@ -256,7 +263,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns an iterator function that pops events one at a time from the engine event queue.
     /// @return | function | An iterator function that yields (name, ...) tuples
     let s = state.clone();
-    tbl.set("poll", lua.create_function(move |lua, ()| {
+    tbl.set(
+        "poll",
+        lua.create_function(move |lua, ()| {
             let s2 = s.clone();
             lua.create_function(move |lua, ()| match s2.borrow_mut().event_queue.poll() {
                 Some(event) => event_to_lua_multi(lua, &event),
@@ -269,7 +278,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Discards every pending event in the engine event queue without processing them.
     /// @return | nil | No return value.
     let s = state.clone();
-    tbl.set("clear", lua.create_function(move |_, ()| {
+    tbl.set(
+        "clear",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().event_queue.clear();
             Ok(())
         })?,
@@ -278,7 +289,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- newSignal --
     /// Creates and returns a new independent Signal pub-sub dispatcher.
     /// @return | LSignal | A new empty Signal instance
-    tbl.set("newSignal", lua.create_function(|_, ()| {
+    tbl.set(
+        "newSignal",
+        lua.create_function(|_, ()| {
             Ok(LuaSignal {
                 inner: Rc::new(RefCell::new(Signal::new())),
                 callbacks: Rc::new(RefCell::new(HashMap::new())),
@@ -292,7 +305,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Synchronises OS-level windowing events into the engine event queue.
     /// @return | nil | No return value.
     let s = state.clone();
-    tbl.set("pump", lua.create_function(move |_, ()| {
+    tbl.set(
+        "pump",
+        lua.create_function(move |_, ()| {
             s.borrow().event_queue.pump();
             Ok(())
         })?,
@@ -303,7 +318,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | timeout | number? | Maximum seconds to wait (nil = wait indefinitely)
     /// @return | boolean, string, table | Success flag, event name, and payload array
     let s = state.clone();
-    tbl.set("wait", lua.create_function(move |lua, timeout: Option<f64>| {
+    tbl.set(
+        "wait",
+        lua.create_function(move |lua, timeout: Option<f64>| {
             let timeout_ms = timeout.map(|t| (t * 1000.0) as u64);
             match s.borrow_mut().event_queue.wait(timeout_ms) {
                 Some(event) => {
@@ -339,7 +356,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Requests that the engine perform a full restart at the beginning of the next frame.
     /// @return | nil | No return value.
     let s = state.clone();
-    tbl.set("restart", lua.create_function(move |_, ()| {
+    tbl.set(
+        "restart",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().restart_requested = true;
             Ok(())
         })?,
@@ -349,7 +368,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Alias for `exit()` - requests the engine to stop gracefully at the end of the current frame with exit code 0.
     /// @return | nil | No return value.
     let s = state.clone();
-    tbl.set("quit", lua.create_function(move |_, ()| {
+    tbl.set(
+        "quit",
+        lua.create_function(move |_, ()| {
             let mut st = s.borrow_mut();
             st.quit_requested = true;
             st.exit_code = 0;
@@ -367,7 +388,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | name | string | The event name to defer
     /// @return | nil | No return value.
     let deferred = deferred_queue.clone();
-    tbl.set("pushDeferred", lua.create_function(move |_, args: LuaMultiValue| {
+    tbl.set(
+        "pushDeferred",
+        lua.create_function(move |_, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let name: String = match iter.next() {
                 Some(LuaValue::String(s)) => s
@@ -394,7 +417,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | integer | The number of deferred events moved to the main queue
     let deferred = deferred_queue.clone();
     let s = state.clone();
-    tbl.set("flushDeferred", lua.create_function(move |_, ()| {
+    tbl.set(
+        "flushDeferred",
+        lua.create_function(move |_, ()| {
             let mut buf = deferred.borrow_mut();
             let count = buf.len() as u32;
             let mut st = s.borrow_mut();
@@ -416,7 +441,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | nil | No return value.
     let cap = history_cap.clone();
     let hist = history_buf.clone();
-    tbl.set("enableHistory", lua.create_function(move |_, capacity: usize| {
+    tbl.set(
+        "enableHistory",
+        lua.create_function(move |_, capacity: usize| {
             *cap.borrow_mut() = capacity;
             let mut buf = hist.borrow_mut();
             while buf.len() > capacity {
@@ -430,7 +457,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns an array of recently pushed events as tables.
     /// @return | table | Array of {name: string, args: table} event records
     let hist = history_buf.clone();
-    tbl.set("getHistory", lua.create_function(move |lua, ()| {
+    tbl.set(
+        "getHistory",
+        lua.create_function(move |lua, ()| {
             let buf = hist.borrow();
             let out = lua.create_table()?;
             for (i, (name, args)) in buf.iter().enumerate() {
@@ -457,7 +486,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Clears all recorded event history entries from the ring buffer.
     /// @return | nil | No return value.
     let hist_c = history_buf.clone();
-    tbl.set("clearHistory", lua.create_function(move |_, ()| {
+    tbl.set(
+        "clearHistory",
+        lua.create_function(move |_, ()| {
             hist_c.borrow_mut().clear();
             Ok(())
         })?,
@@ -470,7 +501,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     let hist_p = history_buf;
     let cap_p = history_cap;
-    tbl.set("push", lua.create_function(move |_, args: LuaMultiValue| {
+    tbl.set(
+        "push",
+        lua.create_function(move |_, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let name: String = match iter.next() {
                 Some(LuaValue::String(s)) => s

@@ -20,6 +20,7 @@ use std::collections::HashMap;
 ///
 /// `default_font` is the `FontKey` to use for labels and marker text.
 /// Pass `None` to suppress all text rendering.
+#[allow(clippy::too_many_arguments)]
 pub fn emit_globe_frame(
     spec: &GlobeSpec,
     camera: &OrbitCamera,
@@ -173,6 +174,7 @@ pub fn emit_globe_frame(
 ///
 /// Returns `[x0, y0, x1, y1, …]`. May return fewer points if the arc is
 /// entirely on the back of the globe.
+#[allow(clippy::too_many_arguments)]
 pub fn project_arc(
     lat_a: f32,
     lon_a: f32,

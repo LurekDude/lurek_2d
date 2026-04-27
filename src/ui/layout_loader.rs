@@ -420,12 +420,12 @@ fn apply_base_props(ctx: &mut GuiContext, idx: usize, def: &WidgetDef) {
     match ctx.widgets.get_mut(idx) {
         Some(WidgetKind::Slider(sl)) => {
             if let Some(v) = def.value {
-                sl.value = v as f64;
+                sl.value = v;
             }
         }
         Some(WidgetKind::ProgressBar(pb)) => {
             if let Some(v) = def.value {
-                pb.value = v as f64;
+                pb.value = v;
             }
         }
         Some(WidgetKind::SpinBox(sb)) => {
@@ -525,6 +525,7 @@ fn widget_kind_color(kind: &WidgetKind) -> [u8; 4] {
 /// - `img_h` — `u32`. Image height in pixels.
 /// - `rect` — `&crate::math::Rect`. Rectangle in image-space pixels.
 /// - `color` — `[u8; 4]`. RGBA fill colour.
+#[allow(clippy::ptr_arg)]
 fn fill_rect(
     pixels: &mut Vec<u8>,
     img_w: u32,

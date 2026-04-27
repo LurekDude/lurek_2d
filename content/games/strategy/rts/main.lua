@@ -30,6 +30,7 @@ local wave_timer = 30.0
 local score      = 0
 
 -- Particle systems
+---@type LParticleSystem
 local death_sparks = nil
 local select_ring  = nil
 
@@ -242,7 +243,7 @@ function lurek.process(dt)
     cam.y = math.max(0, math.min(MAP_H - H + ui_panel_h, cam.y))
 
     -- Mouse world pos
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local wx, wy = mx + cam.x, my + cam.y
 
     -- Select units
@@ -252,7 +253,7 @@ function lurek.process(dt)
             if e.team == "player" and e.kind == UNIT and e.hp > 0 then
                 if math.abs(e.x - wx) < 14 and math.abs(e.y - wy) < 14 then
                     selected[#selected + 1] = e.id
-                    if select_ring then select_ring:emit(e.x - cam.x, e.y - cam.y, 5) end
+                    if select_ring then select_ring:moveTo(e.x - cam.x, e.y - cam.y) select_ring:emit(5) end
                 end
             end
         end
@@ -337,7 +338,7 @@ function lurek.process(dt)
                     e.atkCD = 1.0
                     target.hp = target.hp - e.atk
                     if target.hp <= 0 then
-                        if death_sparks then death_sparks:emit(target.x - cam.x, target.y - cam.y, 6) end
+                        if death_sparks then death_sparks:moveTo(target.x - cam.x, target.y - cam.y) death_sparks:emit(6) end
                         if target.team == "enemy" then score = score + 10 end
                     end
                 end
@@ -438,8 +439,8 @@ function lurek.draw()
         ::skip::
     end
 
-    if death_sparks then death_sparks:draw() end
-    if select_ring  then select_ring:draw()  end
+    if death_sparks then death_sparks:render() end
+    if select_ring  then select_ring:render()  end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

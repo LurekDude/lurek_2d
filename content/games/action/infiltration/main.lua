@@ -166,8 +166,8 @@ local msg_timer    = 0
 local hack = { sequence = {}, input_idx = 1, target_door = nil, timer = 0 }
 
 -- Particles
-local emp_particles  = nil ---@type ParticleSystem?
-local hack_particles = nil ---@type ParticleSystem?
+local emp_particles  = nil ---@type LParticleSystem?
+local hack_particles = nil ---@type LParticleSystem?
 
 -- Tween state
 local tween_alert_pulse = nil
@@ -380,7 +380,8 @@ function lurek.process(dt)
                     local hack_ps = hack_particles
                     if hack_ps ~= nil then
                         ---@diagnostic disable-next-line
-                        hack_ps:emit(px, py, 8)
+                        hack_ps:moveTo(px, py)
+                        hack_ps:emit(8)
                     end
                     if hack.input_idx > #hack.sequence then
                         -- Hack success
@@ -543,7 +544,8 @@ function use_gadget(idx)
         local emp = emp_particles
         if emp ~= nil then
             ---@diagnostic disable-next-line
-            emp:emit(px, py, 40)
+            emp:moveTo(px, py)
+            emp:emit(40)
         end
         -- Tween: camera disable fade
         tween_cam_fade = { t = 0, dur = 0.6 }
@@ -576,7 +578,8 @@ function do_interact()
         local hack_ps = hack_particles
         if hack_ps ~= nil then
             ---@diagnostic disable-next-line
-            hack_ps:emit(px, py, 20)
+            hack_ps:moveTo(px, py)
+            hack_ps:emit(20)
         end
         return
     end
@@ -699,13 +702,13 @@ function lurek.draw()
     local emp = emp_particles
     if emp ~= nil then
         ---@diagnostic disable-next-line
-        emp:draw()
+        emp:render()
     end
 
     local hack_ps = hack_particles
     if hack_ps ~= nil then
         ---@diagnostic disable-next-line
-        hack_ps:draw()
+        hack_ps:render()
     end
 end
 

@@ -70,6 +70,7 @@ pub fn easing_gallery_to_image(
 ///
 /// # Returns
 /// `ImageData`.
+#[allow(clippy::type_complexity)]
 pub fn easing_comparison_to_image(
     curves: &[(&str, (u8, u8, u8), fn(f32) -> f32)],
     width: u32,
@@ -112,6 +113,7 @@ pub fn easing_comparison_to_image(
 ///
 /// # Returns
 /// `ImageData`.
+#[allow(clippy::type_complexity)]
 pub fn bezier_curves_to_image(
     curves: &[(Vec<crate::math::vec2::Vec2>, (u8, u8, u8))],
     width: u32,

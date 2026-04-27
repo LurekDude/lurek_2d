@@ -15,6 +15,7 @@ use crate::image::ImageData;
 ///
 /// # Returns
 /// `ImageData`.
+#[allow(clippy::type_complexity)]
 pub fn polygon_gallery_to_image(width: u32, height: u32) -> ImageData {
     let mut img = ImageData::new(width, height);
     img.fill(15, 15, 25, 255);

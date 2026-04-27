@@ -55,6 +55,7 @@ pub fn province_intensity(
 ///
 /// Accepts an iterator of `(lat_deg, lon_deg)` centroid pairs and returns a `Vec<f32>`
 /// of intensities in the same order.
+#[allow(clippy::extra_unused_lifetimes)]
 pub fn compute_intensities<'a>(
     centroids: impl Iterator<Item = (f32, f32)>,
     sun_dir: &Vec3,

@@ -40,6 +40,7 @@ impl RangeMap {
     /// `costs` is a row-major slice of movement costs per cell; `0.0` or negative means blocked.
     /// `blocked` is a parallel bool slice (`true` = impassable regardless of cost).
     /// `diagonal` allows 8-directional movement when `true`, otherwise 4-directional.
+    #[allow(clippy::too_many_arguments)]
     pub fn from_grid(
         width: u32,
         height: u32,

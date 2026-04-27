@@ -86,6 +86,7 @@ fn aabb_area(min_x: f32, min_y: f32, max_x: f32, max_y: f32) -> f32 {
 
 /// Returns the merged AABB of two axis-aligned boxes.
 #[inline]
+#[allow(clippy::too_many_arguments)]
 fn merged_bounds(
     ax1: f32,
     ay1: f32,
@@ -101,6 +102,7 @@ fn merged_bounds(
 
 /// Returns `true` when the two AABBs overlap (touching edges count as overlap).
 #[inline]
+#[allow(clippy::too_many_arguments)]
 fn aabbs_overlap(
     ax1: f32,
     ay1: f32,
@@ -142,6 +144,7 @@ fn aabb_circle_overlap(
 /// Uses the parametric slab method: clip the segment against each axis pair
 /// and check if the surviving interval is non-empty.
 #[inline]
+#[allow(clippy::too_many_arguments)]
 fn aabb_segment_overlap(
     min_x: f32,
     min_y: f32,
@@ -200,6 +203,7 @@ fn aabb_segment_overlap(
 
 impl AabbTree {
     /// Creates an empty AABB tree.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             nodes: Vec::new(),

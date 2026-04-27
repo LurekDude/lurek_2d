@@ -63,6 +63,7 @@ local win_timer     = 0
 local heart_scale   = { v = 0 }
 local heart_tween   = nil
 local dk_throw_tween = nil
+---@type LCamera
 local cam           = nil
 
 -- ── Helper: compute y on a platform at given x ────────────────────────────
@@ -435,7 +436,8 @@ function lurek.process(dt)
                     player.on_ground = true
                     if player.jumping then
                         player.jumping = false
-                        dust:emit(5, player.x + player.w / 2, surf)
+                        dust:moveTo(player.x + player.w / 2, surf)
+                        dust:emit(5)
                     end
                     break
                 end
@@ -595,13 +597,15 @@ function lurek.process(dt)
                                  bx, by, b.r * 2, b.r * 2) then
                     if hammer.active then
                         -- Smash barrel
-                        sparks:emit(15, b.x, b.y)
+                        sparks:moveTo(b.x, b.y)
+                        sparks:emit(15)
                         score = score + 300
                         b.active = false
                     else
                         -- Player hit
                         lives = lives - 1
-                        sparks:emit(10, player.x + player.w / 2, player.y + player.h / 2)
+                        sparks:moveTo(player.x + player.w / 2, player.y + player.h / 2)
+                        sparks:emit(10)
                         if lives <= 0 then
                             state = STATE.GAME_OVER
                         else
@@ -855,8 +859,8 @@ function lurek.draw()
 
     -- ── Draw particles ────────────────────────────────────────────────
     lurek.render.setColor(1, 1, 1, 1)
-    sparks:draw()
-    dust:draw()
+    sparks:render()
+    dust:render()
 
     -- ── Win animation heart ───────────────────────────────────────────
     if state == STATE.WIN_ANIM then

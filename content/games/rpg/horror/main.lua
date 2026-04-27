@@ -422,7 +422,8 @@ function lurek.process(dt)
     if flashlight_on and battery > 0 then
         local fx = player.x + facing.x * 40
         local fy = player.y + facing.y * 40
-        dust_ps:emit(fx, fy, 1)
+        dust_ps:moveTo(fx, fy)
+        dust_ps:emit(1)
     end
 
     -- Recharge station check
@@ -439,7 +440,8 @@ function lurek.process(dt)
             local ky = (kp.row - 0.5) * TILE_SIZE
             if dist(player.x, player.y, kx, ky) < TILE_SIZE * 0.6 then
                 keys_found[i] = true
-                glow_ps:emit(kx, ky, 12)
+                glow_ps:moveTo(kx, ky)
+                glow_ps:emit(12)
                 local count = 0
                 for j = 1, #keys_found do if keys_found[j] then count = count + 1 end end
                 show_message("Key found! (" .. count .. "/5)", 2.0)
@@ -473,7 +475,8 @@ function lurek.process(dt)
         end
         if all_keys then
             game_state = STATE.WON
-            flash_ps:emit(player.x, player.y, 20)
+            flash_ps:moveTo(player.x, player.y)
+            flash_ps:emit(20)
             return
         else
             local count = 0
@@ -578,7 +581,8 @@ function lurek.process(dt)
     -- Enemy contact = death
     if dist(player.x, player.y, enemy.x, enemy.y) < (PLAYER_RAD + ENEMY_RAD) then
         game_state = STATE.DEAD
-        flash_ps:emit(player.x, player.y, 15)
+        flash_ps:moveTo(player.x, player.y)
+        flash_ps:emit(15)
         start_shake(10)
         show_message("It caught you.", 3)
         return
@@ -597,7 +601,8 @@ function lurek.process(dt)
         scare_fade  = 3.0
         scare_active = true
         start_shake(4)
-        flash_ps:emit(player.x, player.y, 8)
+        flash_ps:moveTo(player.x, player.y)
+        flash_ps:emit(8)
     end
     if scare_active then
         scare_fade = scare_fade - dt
@@ -668,7 +673,7 @@ function lurek.draw()
         lurek.render.setColor(0.6, 0.3, 0.3, 0.8)
         text_("The darkness consumed you.", player.x - 100, player.y + 30, 14)
         text_("Press [Escape] to quit.", player.x - 90, player.y + 60, 12)
-        flash_ps:draw()
+        flash_ps:render()
         return
     end
 
@@ -684,7 +689,7 @@ function lurek.draw()
         lurek.render.setColor(0.4, 0.7, 0.4, 0.8)
         text_("You made it out alive.", player.x - 90, player.y + 30, 14)
         text_("Press [Escape] to quit.", player.x - 90, player.y + 60, 12)
-        flash_ps:draw()
+        flash_ps:render()
         return
     end
 
@@ -828,9 +833,9 @@ function lurek.draw()
     )
 
     -- ── Particles ─────────────────────────────────────────────
-    dust_ps:draw()
-    flash_ps:draw()
-    glow_ps:draw()
+    dust_ps:render()
+    flash_ps:render()
+    glow_ps:render()
 
     -- ── Sanity color overlay ──────────────────────────────────
     if sanity < 50 then

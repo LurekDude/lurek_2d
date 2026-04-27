@@ -107,7 +107,7 @@ end
 function lurek.draw()
   lurek.graphics.setColor(0.1, 0.1, 0.18, 1)
   lurek.graphics.rectangle("fill", 0, 0, lurek.window.getWidth(), lurek.window.getHeight())
-  inv_doc:draw()
+  inv_doc:render()
 end
 
 function lurek.mousemoved(x, y)   inv_doc:mousemoved(x, y) end

@@ -52,6 +52,7 @@ local math_game = {
 local mini_order = { "reaction", "memory", "typing", "math" }
 local mini_idx   = 0
 
+---@type LParticleSystem
 local celebration_sys = nil
 local flash_col       = nil
 local flash_t         = 0
@@ -89,7 +90,7 @@ local function next_mini()
     end
     if round > MAX_ROUNDS then
         state = "scoreboard"
-        if celebration_sys then celebration_sys:emit(W/2, H/2, 60) end
+        if celebration_sys then celebration_sys:moveTo(W/2, H/2) celebration_sys:emit(60) end
         return
     end
     state = mini_order[mini_idx]
@@ -333,7 +334,7 @@ end
 
 -- ── Render world ──────────────────────────────────────────
 function lurek.draw()
-    if celebration_sys then celebration_sys:draw() end
+    if celebration_sys then celebration_sys:render() end
     -- Flash overlay
     if flash_t > 0 and flash_col then
         local a = flash_t / 0.3 * flash_col[4]

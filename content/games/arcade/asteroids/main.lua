@@ -341,7 +341,8 @@ function lurek.process(dt)
         local exhaust_angle = ship.angle + math.pi
         local ex = ship.x + math.cos(exhaust_angle) * SHIP_SIZE
         local ey = ship.y + math.sin(exhaust_angle) * SHIP_SIZE
-        thrust_sparks:emit(2, ex, ey)
+        thrust_sparks:moveTo(ex, ey)
+        thrust_sparks:emit(2)
     end
 
     -- Apply drag & move ship
@@ -401,7 +402,8 @@ function lurek.process(dt)
 
                 -- Explosion particles
                 local burst = ({ large = 20, medium = 12, small = 6 })[a.size]
-                explosions:emit(burst, a.x, a.y)
+                explosions:moveTo(burst, a.x)
+                explosions:emit(a.y)
 
                 -- Split asteroid
                 if a.size == "large" then
@@ -432,7 +434,8 @@ function lurek.process(dt)
             local a = asteroids[j]
             if circles_hit(ship.x, ship.y, SHIP_SIZE * 0.6, a.x, a.y, a.radius * 0.85) then
                 lives = lives - 1
-                explosions:emit(30, ship.x, ship.y)
+                explosions:moveTo(ship.x, ship.y)
+                explosions:emit(30)
                 if lives <= 0 then
                     state = STATE.GAME_OVER
                 else

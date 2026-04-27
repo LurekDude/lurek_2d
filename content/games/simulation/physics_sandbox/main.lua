@@ -495,7 +495,7 @@ end
 -- Process: SANDBOX
 -- ---------------------------------------------------------------------------
 local function process_sandbox(dt)
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     mx = mx or 0
     my = my or 0
 
@@ -721,7 +721,7 @@ local function render_sandbox()
 
     -- build mode drag preview
     if current_mode == MODE.BUILD and dragging_build then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local x1 = math.min(drag_start_x, mx)
         local y1 = math.min(drag_start_y, my)
         local x2 = math.max(drag_start_x, mx)
@@ -735,7 +735,7 @@ local function render_sandbox()
 
     -- destroy mode cursor indicator
     if current_mode == MODE.DESTROY then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         circ(mx, my, EXPLOSION_RADIUS,
             { r = 1.0, g = 0.3, b = 0.2, a = 0.15 })
         circ(mx, my, 8,
@@ -744,7 +744,7 @@ local function render_sandbox()
 
     -- rope mode indicator
     if current_mode == MODE.ROPE and rope_first then
-        local mx, my = lurek.input.getPosition()
+        local mx, my = lurek.input.mouse.getPosition()
         local a = objects[rope_first]
         if a then
             ln(a.x, a.y, mx, my,

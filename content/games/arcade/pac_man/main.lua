@@ -179,6 +179,7 @@ local score_pop_alpha = 0
 local title_blink = 0
 
 -- Camera
+---@type LCamera
 local cam = nil
 
 -- ── Distance helpers ──────────────────────────────────────────────────────
@@ -584,7 +585,7 @@ function lurek.process(dt)
         dots_eaten = dots_eaten + 1
         -- Sparkle
         local px, py = tile_px(pac.col, pac.row)
-        if sparks then sparks:emit(3, px, py) end
+        if sparks then sparks:moveTo(px, py) sparks:emit(3) end
 
     elseif tile == "O" then
         maze[pac.row][pac.col] = "E"
@@ -593,7 +594,7 @@ function lurek.process(dt)
         activate_frightened()
         -- Sparkle (larger burst)
         local px, py = tile_px(pac.col, pac.row)
-        if sparks then sparks:emit(8, px, py) end
+        if sparks then sparks:moveTo(px, py) sparks:emit(8) end
     end
 
     -- Level complete?
@@ -666,7 +667,7 @@ function lurek.process(dt)
 
                 -- Ghost eaten burst
                 local px, py = tile_px(g.col, g.row)
-                if ghost_burst then ghost_burst:emit(20, px, py) end
+                if ghost_burst then ghost_burst:moveTo(px, py) ghost_burst:emit(20) end
 
                 -- Score pop
                 score_pop_val = pts

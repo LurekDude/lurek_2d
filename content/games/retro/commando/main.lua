@@ -140,6 +140,7 @@ local next_boss_dist = BOSS_DIST
 local particles = {}
 local score_pops = {}
 
+---@type LCamera
 local cam = nil
 
 -- ---------------------------------------------------------------------------

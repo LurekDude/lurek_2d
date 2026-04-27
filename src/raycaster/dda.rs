@@ -642,6 +642,7 @@ impl Raycaster2D {
     /// # Returns
     /// `Vec<(f32, f32)>` — one `(tex_u, tex_v)` per pixel column;
     /// length equals `self.width()`.
+    #[allow(clippy::too_many_arguments)]
     pub fn cast_floor_row(
         &self,
         cam_x: f32,

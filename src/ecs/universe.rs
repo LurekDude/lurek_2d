@@ -1205,6 +1205,7 @@ impl Universe {
     ///
     /// # Returns
     /// `(Vec<(u32, String)>, Vec<(u32, String)>)` — (add_events, remove_events).
+    #[allow(clippy::type_complexity)]
     pub fn take_component_events(&mut self) -> (Vec<(u32, String)>, Vec<(u32, String)>) {
         let adds = std::mem::take(&mut self.add_events);
         let removes = std::mem::take(&mut self.remove_events);

@@ -643,7 +643,7 @@ function lurek.process(dt)
     -- ===== PLAYER TURN =====
     if state ~= STATE_PLAYER_TURN then return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
 
     -- End turn
     if lurek.input.isActionDown("end_turn") then

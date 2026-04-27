@@ -289,7 +289,8 @@ local function apply_stress()
             if debris_ps then
                 local mx = (a.x + c.x) / 2
                 local my = (a.y + c.y) / 2
-                debris_ps:emit(mx, my, 30)
+                debris_ps:moveTo(mx, my)
+                debris_ps:emit(30)
             end
         end
         ::continue::
@@ -327,7 +328,8 @@ local function simulate_vehicle(dt)
         score_display = { value = 0 }
         lurek.tween.to(score_display, { value = remaining + efficiency }, 1.2, "outQuad")
         if confetti_ps then
-            confetti_ps:emit(SCREEN_W / 2, SCREEN_H / 3, 80)
+            confetti_ps:moveTo(SCREEN_W / 2, SCREEN_H / 3)
+            confetti_ps:emit(80)
         end
         if current_level >= levels_unlocked then
             levels_unlocked = math.min(current_level + 1, #LEVELS)
@@ -339,7 +341,8 @@ local function simulate_vehicle(dt)
         state = STATE.FAIL
         result_msg = string.format("Bridge collapsed on Level %d!", current_level)
         if splash_ps then
-            splash_ps:emit(vehicle.x + vehicle.w / 2, river_y, 40)
+            splash_ps:moveTo(vehicle.x + vehicle.w / 2, river_y)
+            splash_ps:emit(40)
         end
     end
 end
@@ -627,7 +630,8 @@ function lurek.process(dt)
                                 -- Sparks at midpoint
                                 local sx = (a.x + c.x) / 2
                                 local sy = (a.y + c.y) / 2
-                                sparks_ps:emit(sx, sy, 12)
+                                sparks_ps:moveTo(sx, sy)
+                                sparks_ps:emit(12)
                             end
                         end
                         selected_node = nil
@@ -653,7 +657,8 @@ function lurek.process(dt)
                                         type = beam_type, stress = 0, broken = false,
                                     }
                                     budget_spent = budget_spent + bt.cost
-                                    sparks_ps:emit(mx, my, 12)
+                                    sparks_ps:moveTo(mx, my)
+                                    sparks_ps:emit(12)
                                 end
                             end
                             selected_node = new_idx

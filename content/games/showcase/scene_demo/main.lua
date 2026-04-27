@@ -111,12 +111,16 @@ local coins      = {}
 local game_score = 0
 
 -- Particles & tweens
+---@type LParticleSystem
 local ps_coin      = nil
+---@type LParticleSystem
 local ps_transition = nil
+---@type LParticleSystem
 local ps_hover     = nil
 local menu_scales  = { 1.0, 1.0, 1.0 }
 
 -- Camera
+---@type LCamera
 local camera = nil
 
 -- FPS
@@ -288,9 +292,10 @@ scenes.menu = {
         if prev ~= menu_index then
             menu_scales[prev] = 1.0
             menu_scales[menu_index] = 1.0
-            lurek.tween.to(menu_scales, 0.25, { [menu_index] = 1.3 }, "outBack")
+            lurek.tween.to(menu_scales, { [menu_index] = 1.3 }, 0.25, "outBack")
             if ps_hover then
-                ps_hover:emit(SCREEN_W / 2, 250 + (menu_index - 1) * 60, 8)
+                ps_hover:moveTo(SCREEN_W / 2, 250 + (menu_index - 1) * 60)
+                ps_hover:emit(8)
             end
         end
 
@@ -327,7 +332,7 @@ scenes.menu = {
         -- Hover glow particles
         if ps_hover then
             lurek.render.setColor(1, 1, 1, 1)
-            ps_hover:draw()
+            ps_hover:render()
         end
     end,
 }
@@ -463,7 +468,7 @@ scenes.gameplay = {
                     game_score = game_score + COIN_VALUE * settings.difficulty
 
                     -- Sparkle particles
-                    if ps_coin then ps_coin:emit(c.x, c.y, 15) end
+                    if ps_coin then ps_coin:moveTo(c.x, c.y) ps_coin:emit(15) end
 
                     -- Score popup with tween
                     local popup = {
@@ -472,7 +477,7 @@ scenes.gameplay = {
                         life = 1.0, max_life = 1.0,
                     }
                     score_popups[#score_popups + 1] = popup
-                    lurek.tween.to(popup, 0.8, { y = c.y - 40 }, "outQuad")
+                    lurek.tween.to(popup, { y = c.y - 40 }, 0.8, "outQuad")
                 end
             end
         end
@@ -532,7 +537,7 @@ scenes.gameplay = {
         -- Coin sparkle particles
         if ps_coin then
             lurek.render.setColor(1, 1, 1, 1)
-            ps_coin:draw()
+            ps_coin:render()
         end
 
         -- Score popups
@@ -615,9 +620,10 @@ local function draw_transition(progress)
 
     -- Transition particles in the middle of the effect
     if ps_transition and progress > 0.2 and progress < 0.8 then
-        ps_transition:emit(SCREEN_W / 2, SCREEN_H / 2, 3)
+        ps_transition:moveTo(SCREEN_W / 2, SCREEN_H / 2)
+        ps_transition:emit(3)
         lurek.render.setColor(1, 1, 1, 1)
-        ps_transition:draw()
+        ps_transition:render()
     end
 end
 
@@ -688,9 +694,9 @@ function lurek.init()
     ps_coin:setSpread(6.28)
     ps_coin:setSizes(3, 1.5, 0)
     ps_coin:setColors(
-        1, 0.9, 0.3, 1,
-        1, 0.7, 0.1, 0.6,
-        1, 0.5, 0.0, 0
+        {1, 0.9, 0.3, 1},
+        {1, 0.7, 0.1, 0.6},
+        {1, 0.5, 0.0, 0}
     )
 
     -- Transition particles
@@ -702,9 +708,9 @@ function lurek.init()
     ps_transition:setSpread(6.28)
     ps_transition:setSizes(2, 1, 0)
     ps_transition:setColors(
-        0.8, 0.8, 1.0, 0.8,
-        0.4, 0.4, 0.8, 0.3,
-        0.2, 0.2, 0.5, 0
+        {0.8, 0.8, 1.0, 0.8},
+        {0.4, 0.4, 0.8, 0.3},
+        {0.2, 0.2, 0.5, 0}
     )
 
     -- Menu hover glow
@@ -716,8 +722,8 @@ function lurek.init()
     ps_hover:setSpread(6.28)
     ps_hover:setSizes(2, 1)
     ps_hover:setColors(
-        1, 0.95, 0.5, 0.8,
-        1, 0.8, 0.2, 0
+        {1, 0.95, 0.5, 0.8},
+        {1, 0.8, 0.2, 0}
     )
 
     -- Start at title scene directly (no transition)

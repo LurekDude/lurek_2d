@@ -103,7 +103,7 @@ pub fn pick(
 
         if point_in_polygon(pt, &screen_verts) {
             let z = c_cam.z;
-            if best.as_ref().map_or(true, |(prev_z, _)| z > *prev_z) {
+            if best.as_ref().is_none_or(|(prev_z, _)| z > *prev_z) {
                 best = Some((z, PickResult {
                     province_id: province.id,
                     screen_pos: (sx, sy),

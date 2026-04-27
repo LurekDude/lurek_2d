@@ -478,6 +478,7 @@ impl TerrainMap {
     ///
     /// # Returns
     /// `Some(TerrainMap)` on success; `None` if the buffer is too short or malformed.
+    #[allow(clippy::needless_range_loop)]
     pub fn from_bytes(bytes: &[u8]) -> Option<Self> {
         if bytes.len() < 12 {
             return None;

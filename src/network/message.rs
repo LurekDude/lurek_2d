@@ -86,6 +86,7 @@ pub fn unpack(data: &[u8]) -> Result<NetValue, NetworkError> {
 ///
 /// # Returns
 /// `usize` — approximate byte size after MessagePack encoding.
+#[allow(clippy::if_same_then_else)]
 pub fn estimate_size(value: &NetValue) -> usize {
     match value {
         NetValue::Nil => 1,

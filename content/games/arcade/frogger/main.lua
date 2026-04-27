@@ -149,6 +149,7 @@ local fly = { active = false, slot = 0, timer = 0 }
 local turtle_timers = {}                -- { [lane_idx] = { phase, timer } }
 
 -- Camera / FX
+---@type LCamera
 local cam = nil
 local particles = {}
 local score_pops = {}

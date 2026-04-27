@@ -102,6 +102,7 @@ pub fn waveform_to_png(
 ///
 /// # Returns
 /// `Result<(), String>`. Returns an error string if the file cannot be decoded or saved.
+#[allow(clippy::needless_range_loop)]
 pub fn spectrogram_to_png(
     input_wav: &str,
     output_png: &str,

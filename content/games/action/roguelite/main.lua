@@ -96,9 +96,13 @@ local title_blink    = 0
 local boss = nil
 
 -- Particle emitters
+---@type LParticleSystem
 local death_burst    = nil
+---@type LParticleSystem
 local slash_sparks   = nil
+---@type LParticleSystem
 local dash_trail     = nil
+---@type LParticleSystem
 local proj_sparks    = nil
 
 -- Tween handles
@@ -289,7 +293,8 @@ local function damage_player(amount)
     dmg_flash_tw = tween_api.to(player, 0.3, { flash = 0 })
 
     if death_burst then
-        death_burst:emit(player.x, player.y, 8)
+        death_burst:moveTo(player.x, player.y)
+        death_burst:emit(8)
     end
 
     if player.hp <= 0 then
@@ -305,7 +310,8 @@ local function damage_enemy(e, amount)
         kills_total = kills_total + 1
         score = score + 100
         if death_burst then
-            death_burst:emit(e.x, e.y, 15)
+            death_burst:moveTo(e.x, e.y)
+            death_burst:emit(15)
         end
         return true -- dead
     end
@@ -325,7 +331,8 @@ local function do_melee()
         range = MELEE_RANGE, timer = 0.15,
     }
     if slash_sparks then
-        slash_sparks:emit(player.x + player.facing_x * 20, player.y + player.facing_y * 20, 6)
+        slash_sparks:moveTo(player.x + player.facing_x * 20, player.y + player.facing_y * 20)
+        slash_sparks:emit(6)
     end
 
     -- hit enemies in arc
@@ -682,7 +689,8 @@ function lurek.process(dt)
         player.x = player.x + player.dash_dx * dt
         player.y = player.y + player.dash_dy * dt
         if dash_trail then
-            dash_trail:emit(player.x, player.y, 3)
+            dash_trail:moveTo(player.x, player.y)
+            dash_trail:emit(3)
         end
         if player.dash_timer <= 0 then player.dashing = false end
     else
@@ -738,7 +746,7 @@ function lurek.process(dt)
         end
 
         if hit then
-            if proj_sparks then proj_sparks:emit(p.x, p.y, 8) end
+            if proj_sparks then proj_sparks:moveTo(p.x, p.y) proj_sparks:emit(8) end
             table.remove(projectiles, i)
         elseif p.traveled > RANGED_MAX_DIST or not point_in_arena(p.x, p.y) then
             table.remove(projectiles, i)

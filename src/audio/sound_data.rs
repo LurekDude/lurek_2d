@@ -386,6 +386,7 @@ impl SoundData {
     /// - `g` â€” `u8`.
     /// - `b` â€” `u8`.
     /// - `a` â€” `u8`.
+    #[allow(clippy::too_many_arguments)]
     pub fn draw_waveform(
         &self,
         img: &mut crate::image::ImageData,

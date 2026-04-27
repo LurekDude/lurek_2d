@@ -142,6 +142,7 @@ fn draw_grid_and_axes(
 }
 
 /// Helper to draw a filled circle safely (no out-of-bounds panics).
+#[allow(clippy::too_many_arguments)]
 fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
     let w = img.width() as i32;
     let h = img.height() as i32;

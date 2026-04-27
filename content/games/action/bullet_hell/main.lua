@@ -122,6 +122,7 @@ local spawn_timer = 0
 local particles = {}
 local score_pops = {}
 
+---@type LCamera
 local cam = nil
 local bomb_flash = 0
 

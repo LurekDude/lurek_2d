@@ -92,6 +92,7 @@ local portrait_tweens = { Luna = {x=0, alpha=0}, Sol = {x=0, alpha=0}, Nova = {x
 local text_box_alpha  = 0
 
 -- Camera
+---@type LCamera
 local camera = nil
 
 -- Ending tracking

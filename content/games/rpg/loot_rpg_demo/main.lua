@@ -14,12 +14,16 @@ local STATE_GAME_OVER = "GAME_OVER"
 local state = STATE_TITLE
 
 -- Camera & particles
+---@type LCamera
 local cam          = nil
+---@type LParticleSystem
 local lootSparkle  = nil
+---@type LParticleSystem
 local combatFlash  = nil
 
 -- Tween handles
 local hpBarTween   = nil
+---@type LTween
 local lootGlowTween = nil
 
 -- Player
@@ -160,7 +164,7 @@ local function processCombatTurn()
     combat.enemyHp  = combat.enemyHp - playerDmg
     table.insert(combat.log, "You dealt " .. playerDmg .. " damage.")
 
-    if combatFlash then combatFlash:emit(400, 300, 5) end
+    if combatFlash then combatFlash:moveTo(300, 5) combatFlash:emit(400) end
 
     if combat.enemyHp <= 0 then
         combat.enemyHp = 0
@@ -201,7 +205,7 @@ local function generateLoot()
     if lootGlowTween then lootGlowTween:cancel() end
     lootGlowTween = lurek.tween.tween(0.6, lootGlow, { alpha = 1.0 }, "linear")
 
-    if lootSparkle then lootSparkle:emit(400, 300, 20) end
+    if lootSparkle then lootSparkle:moveTo(300, 20) lootSparkle:emit(400) end
 end
 
 local function collectLoot()
@@ -400,8 +404,8 @@ end
 -- ============================================================
 
 function lurek.draw()
-    if lootSparkle then lootSparkle:draw() end
-    if combatFlash then combatFlash:draw() end
+    if lootSparkle then lootSparkle:render() end
+    if combatFlash then combatFlash:render() end
 end
 
 -- ============================================================

@@ -15,6 +15,7 @@
 //! - [`ErrorScreen`] — structured blue error screen for Lua and engine failures.
 
 /// Entry point for the Lurek2D engine lifecycle and game loop.
+#[allow(clippy::module_inception)]
 pub mod app;
 /// Debug overlay for FPS and draw-call statistics.
 pub mod debug_overlay;

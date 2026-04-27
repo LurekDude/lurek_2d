@@ -19,6 +19,7 @@ use crate::image::ImageData;
 ///
 /// # Returns
 /// `ImageData`.
+#[allow(clippy::too_many_arguments)]
 pub fn draw_graph_operations_to_image(
     positions: &[(f32, f32)],
     labels: &[&str],
@@ -85,6 +86,7 @@ pub fn draw_graph_operations_to_image(
 ///
 /// # Returns
 /// `ImageData`.
+#[allow(clippy::too_many_arguments)]
 pub fn draw_graph_item_flow_to_image(
     node_pos: &[(f32, f32)],
     node_names: &[&str],

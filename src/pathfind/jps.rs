@@ -54,7 +54,7 @@ impl JpsGrid {
     /// # Returns
     /// `bool`.
     pub fn is_blocked(&self, x: u32, y: u32) -> bool {
-        self.idx(x, y).map_or(true, |i| self.blocked[i])
+        self.idx(x, y).is_none_or(|i| self.blocked[i])
     }
 
     /// Find a path using Jump Point Search.

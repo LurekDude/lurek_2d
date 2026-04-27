@@ -346,6 +346,7 @@ pub fn zscore(a: &NdArray) -> Result<NdArray, String> {
 ///
 /// # Returns
 /// `Result<NdArray, String>`.
+#[allow(clippy::needless_range_loop)]
 pub fn convolve1d(signal: &NdArray, kernel: &NdArray) -> Result<NdArray, String> {
     if signal.ndim() != 1 {
         return Err(format!(

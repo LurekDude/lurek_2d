@@ -124,6 +124,7 @@ local lives = 3
 local wave = 1
 
 -- Tween / particles / camera
+---@type LCamera
 local cam = nil
 local particles = {}
 local score_pops = {}        -- { x, y, text, alpha, dy }

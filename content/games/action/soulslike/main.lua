@@ -149,7 +149,7 @@ local function update_boss_phase()
         boss.phase   = 3
         boss.enraged = true
         boss.flash   = 0.6
-        if enrage_ps then enrage_ps:emit(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.5, 30) end
+        if enrage_ps then enrage_ps:moveTo(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.5) enrage_ps:emit(30) end
     elseif ratio <= 0.66 and boss.phase < 2 then
         boss.phase = 2
         boss.flash = 0.4
@@ -178,7 +178,8 @@ local function player_try_hit_boss()
         local cam = _cam
         if cam ~= nil then cam:shake(3, 0.1) end
         if hit_ps then
-            hit_ps:emit(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.3, 10)
+            hit_ps:moveTo(boss.x + BOSS_W * 0.5, boss.y + BOSS_H * 0.3)
+            hit_ps:emit(10)
         end
         update_boss_phase()
         if boss.hp <= 0 then
@@ -241,7 +242,8 @@ local function boss_deal_damage(dmg)
         player.hp = math.max(0, player.hp - reduced)
         player.stamina = math.max(0, player.stamina - BLOCK_COST_PER_HIT)
         if block_ps then
-            block_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.3, 8)
+            block_ps:moveTo(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.3)
+            block_ps:emit(8)
         end
         local cam = _cam
         if cam ~= nil then cam:shake(2, 0.08) end
@@ -256,7 +258,7 @@ local function boss_deal_damage(dmg)
         game_state  = STATE.PLAYER_DIED
         death_timer = 0
         death_alpha = 0
-        if death_ps then death_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.5, 25) end
+        if death_ps then death_ps:moveTo(player.x + PLAYER_W * 0.5, player.y + PLAYER_H * 0.5) death_ps:emit(25) end
     end
 end
 
@@ -302,7 +304,8 @@ local function update_player(dt)
         player.x = player.x + player.dodge_dir * (DODGE.dist / DODGE.dur) * dt
         player.x = arena_clamp_x(player.x, PLAYER_W)
         if dodge_ps and player.dodge_timer < DODGE.dur * 0.5 then
-            dodge_ps:emit(player.x + PLAYER_W * 0.5, player.y + PLAYER_H, 3)
+            dodge_ps:moveTo(player.x + PLAYER_W * 0.5, player.y + PLAYER_H)
+            dodge_ps:emit(3)
         end
         return
     end

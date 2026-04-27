@@ -315,7 +315,7 @@ function lurek.draw()
     end
 
     -- Hover tile highlight
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     local hc = math.floor(mx / TILE) + 1
     local hr = math.floor(my / TILE) + 1
     if hr <= MAP_ROWS and my < MAP_ROWS * TILE then

@@ -120,8 +120,11 @@ local function queue_wave(wn)
 end
 
 -- Particle systems
+---@type LParticleSystem
 local hit_sparks  = nil
+---@type LParticleSystem
 local death_burst = nil
+---@type LParticleSystem
 local place_flash = nil
 
 -- ── Input bindings ────────────────────────────────────────
@@ -230,7 +233,7 @@ function lurek.process(dt)
     if lurek.input.wasActionPressed("quit") then lurek.event.quit() return end
     if game_state == "gameover" or game_state == "victory" then return end
 
-    local mx, my = lurek.input.getPosition()
+    local mx, my = lurek.input.mouse.getPosition()
     hover_c = math.floor((mx - OX) / CELL) + 1
     hover_r = math.floor((my - OY) / CELL) + 1
 
@@ -256,7 +259,7 @@ function lurek.process(dt)
                 }
                 local wx = OX + (c-1)*CELL + CELL/2
                 local wy = OY + (r-1)*CELL + CELL/2
-                if place_flash then place_flash:emit(wx, wy, 8) end
+                if place_flash then place_flash:moveTo(wx, wy) place_flash:emit(8) end
             end
         end
     end
@@ -339,12 +342,12 @@ function lurek.process(dt)
                             local ex, ey = path_world(e.progress)
                             if math.sqrt((bx-ex)^2+(by-ey)^2) < b.splash then
                                 e.hp = e.hp - b.dmg
-                                if hit_sparks then hit_sparks:emit(ex, ey, 3) end
+                                if hit_sparks then hit_sparks:moveTo(ex, ey) hit_sparks:emit(3) end
                             end
                         end
                     else
                         b.target.hp = b.target.hp - b.dmg
-                        if hit_sparks then hit_sparks:emit(b.tx, b.ty, 3) end
+                        if hit_sparks then hit_sparks:moveTo(b.tx, b.ty) hit_sparks:emit(3) end
                     end
                 end
                 table.remove(bullets, i)
@@ -355,7 +358,7 @@ function lurek.process(dt)
         for i = #enemies, 1, -1 do
             if enemies[i].hp <= 0 then
                 local ex, ey = path_world(enemies[i].progress)
-                if death_burst then death_burst:emit(ex, ey, 6) end
+                if death_burst then death_burst:moveTo(ex, ey) death_burst:emit(6) end
                 gold  = gold + enemies[i].reward
                 score = score + 10
                 table.remove(enemies, i)
@@ -421,9 +424,9 @@ function lurek.draw()
         rect(bx - 2, by - 2, 5, 5, { color = {1,0.9,0.3,1} })
     end
 
-    if hit_sparks  then hit_sparks:draw()  end
-    if death_burst then death_burst:draw() end
-    if place_flash then place_flash:draw() end
+    if hit_sparks  then hit_sparks:render()  end
+    if death_burst then death_burst:render() end
+    if place_flash then place_flash:render() end
 end
 
 -- ── Render UI ─────────────────────────────────────────────

@@ -128,8 +128,11 @@ local _slide         = { value = 0 }  -- tween slide
 local scroll_offset  = 0   -- lore scroll
 
 -- Particles & systems
+---@type LParticleSystem
 local ps_flash    = nil
+---@type LParticleSystem
 local ps_complete = nil
+---@type LCamera
 local camera      = nil
 
 -- ---------------------------------------------------------------------------
@@ -446,8 +449,8 @@ function lurek.draw()
 
     -- Particles
     lurek.render.setColor(1, 1, 1, 1)
-    ps_complete:draw()
-    ps_flash:draw()
+    ps_complete:render()
+    ps_flash:render()
 
     camera:detach()
 end
