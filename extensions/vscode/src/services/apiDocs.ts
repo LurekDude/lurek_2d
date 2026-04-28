@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-export type ApiEntryKind = "module" | "function" | "callback" | "method" | "section";
+export type ApiEntryKind = "module" | "class" | "function" | "callback" | "method" | "alias" | "section";
 
 export interface ApiEntry {
   label: string;
@@ -58,20 +58,30 @@ function listLuaCatsEntries(content: string): ApiEntry[] {
       continue;
     }
 
-    const functionMatch = trimmed.match(/^function\s+(lurek\.[A-Za-z0-9_]+\.[A-Za-z0-9_]+)\(/);
-    if (functionMatch) {
-      const label = functionMatch[1];
+    const classMatch = trimmed.match(/^---@class\s+([A-Z][A-Za-z0-9_]*)\s*$/);
+    if (classMatch) {
+      const label = classMatch[1];
       if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "function" });
+        entries.set(label, { label, line: index, kind: "class" });
       }
       continue;
     }
 
-    const callbackMatch = trimmed.match(/^function\s+(lurek\.[A-Za-z0-9_]+)\(/);
-    if (callbackMatch && callbackMatch[1].split(".").length === 2) {
-      const label = callbackMatch[1];
+    const aliasMatch = trimmed.match(/^---@alias\s+([A-Za-z_][A-Za-z0-9_]*)\s+.+$/);
+    if (aliasMatch) {
+      const label = aliasMatch[1];
       if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "callback" });
+        entries.set(label, { label, line: index, kind: "alias" });
+      }
+      continue;
+    }
+
+    const lurekFunctionMatch = trimmed.match(/^(?:function\s+)?(lurek(?:\.[A-Za-z0-9_]+)+)(?:\s*=\s*function)?\s*\(/);
+    if (lurekFunctionMatch) {
+      const label = lurekFunctionMatch[1];
+      const kind = label.split(".").length === 2 ? "callback" : "function";
+      if (!entries.has(label)) {
+        entries.set(label, { label, line: index, kind });
       }
       continue;
     }
@@ -104,7 +114,9 @@ function findLuaCatsSymbolLine(content: string, symbol: string): number {
   const lines = content.split("\n");
   const targets = [
     `function ${symbol}(`,
+    `${symbol} = function(`,
     `---@class ${symbol}`,
+    `---@alias ${symbol} `,
   ];
 
   for (let index = 0; index < lines.length; index++) {
@@ -209,8 +221,9 @@ function buildLuaCatsBlocks(content: string): Array<{ startLine: number; text: s
 
 function isLuaCatsEntry(trimmed: string): boolean {
   return /^---@class\s+lurek\./.test(trimmed)
-    || /^function\s+lurek\.[A-Za-z0-9_]+\.[A-Za-z0-9_]+\(/.test(trimmed)
-    || /^function\s+lurek\.[A-Za-z0-9_]+\(/.test(trimmed)
+    || /^---@class\s+[A-Z][A-Za-z0-9_]*\s*$/.test(trimmed)
+    || /^---@alias\s+[A-Za-z_][A-Za-z0-9_]*\s+/.test(trimmed)
+    || /^(?:function\s+)?lurek(?:\.[A-Za-z0-9_]+)+(?:\s*=\s*function)?\s*\(/.test(trimmed)
     || /^function\s+[A-Za-z_][A-Za-z0-9_]*[:.][A-Za-z0-9_]+\(/.test(trimmed);
 }
 

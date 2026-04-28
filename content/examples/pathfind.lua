@@ -286,7 +286,7 @@ end
 
 --@api-stub: LNavGrid:type
 -- Returns the type name of this object.
--- Returns the literal string "NavGrid"; use in generic dispatch tables to switch on userdata kind.
+-- Returns the literal string "LNavGrid"; use in generic dispatch tables to switch on userdata kind.
 do  -- NavGrid:type
   local grid = lurek.pathfind.newNavGrid(8, 8)
   local kind = grid:type()
@@ -298,7 +298,7 @@ end
 -- Accepts the literal type name or "Object" (the engine root type) for polymorphic checks.
 do  -- NavGrid:typeOf
   local grid = lurek.pathfind.newNavGrid(8, 8)
-  if grid:typeOf("NavGrid") then
+  if grid:typeOf("LNavGrid") then
     lurek.log.debug("confirmed nav grid", "pathfind")
   end
 end

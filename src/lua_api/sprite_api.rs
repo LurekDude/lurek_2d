@@ -1,4 +1,4 @@
-//! `lurek.sprite` â€” Sprite-sheet UV layout, named frame groups, atlas parsing,
+//! `lurek.sprite` - Sprite-sheet UV layout, named frame groups, atlas parsing,
 //! and RPGMaker character-sheet helpers.
 
 use super::SharedState;
@@ -22,9 +22,9 @@ pub struct LuaSpriteSheet {
 impl LuaUserData for LuaSpriteSheet {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getFrame --
-        /// Returns the quad for the 0-based frame index, or nil if out of range.
-        /// @param index integer
-        /// @return table?
+        /// Returns the quad for the 0-based frame index.
+        /// @param | index | integer | Zero-based frame index.
+        /// @return | table | Frame quad table.
         methods.add_method("getFrame", |lua, this, index: usize| {
             match this.inner.get_frame(index) {
                 Some(r) => {
@@ -37,15 +37,15 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- getFrameCount --
         /// Returns the total number of frames in the sheet.
-        /// @return integer
+        /// @return | integer | Total frame count.
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.get_frame_count())
         });
 
         // -- getRow --
         /// Returns a sequential table of quad tables for every frame in the given row.
-        /// @param row integer
-        /// @return table
+        /// @param | row | integer | Row index.
+        /// @return | table | Array of frame quad tables.
         methods.add_method("getRow", |lua, this, row: u32| {
             let frames = this.inner.get_row(row);
             frames_to_table(lua, &frames)
@@ -53,17 +53,17 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- getColumn --
         /// Returns a sequential table of quad tables for every frame in the given column.
-        /// @param col integer
-        /// @return table
+        /// @param | col | integer | Column index.
+        /// @return | table | Array of frame quad tables.
         methods.add_method("getColumn", |lua, this, col: u32| {
             let frames = this.inner.get_column(col);
             frames_to_table(lua, &frames)
         });
 
         // -- getGroupFrames --
-        /// Returns a sequential table of quad tables for the named frame group, or nil.
-        /// @param name string
-        /// @return table?
+        /// Returns a sequential table of quad tables for the named frame group.
+        /// @param | name | string | Frame group name.
+        /// @return | table | Array of frame quad tables.
         methods.add_method("getGroupFrames", |lua, this, name: String| {
             match this.inner.get_group(&name) {
                 Some(frames) => {
@@ -76,7 +76,7 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- getGroupNames --
         /// Returns a sequential table of all defined group names.
-        /// @return table
+        /// @return | table | Array of group name strings.
         methods.add_method("getGroupNames", |lua, this, ()| {
             let names = this.inner.get_group_names();
             let t = lua.create_table()?;
@@ -88,10 +88,10 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- nameGroup --
         /// Registers a named frame group starting at `start_frame` with `count` frames.
-        /// @param name string
-        /// @param start_frame integer
-        /// @param count integer
-        /// @return nil
+        /// @param | name | string | Frame group name.
+        /// @param | start_frame | integer | Zero-based first frame index.
+        /// @param | count | integer | Number of frames in the group.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("nameGroup", |_, this, (name, start, count): (String, usize, usize)| {
                 this.inner.name_group(name, start, count);
                 Ok(())
@@ -100,7 +100,8 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- getFrameSize --
         /// Returns the width and height of a single frame cell in pixels.
-        /// @return integer, integer
+        /// @return | integer | Frame width in pixels.
+        /// @return | integer | Frame height in pixels.
         methods.add_method("getFrameSize", |_, this, ()| {
             let (w, h) = this.inner.get_frame_size();
             Ok((w, h))
@@ -108,7 +109,8 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- getGridSize --
         /// Returns the number of columns and rows in the grid.
-        /// @return integer, integer
+        /// @return | integer | Number of columns in the sprite grid.
+        /// @return | integer | Number of rows in the sprite grid.
         methods.add_method("getGridSize", |_, this, ()| {
             let (cols, rows) = this.inner.get_grid_size();
             Ok((cols, rows))
@@ -116,10 +118,9 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- drawToImage --
         /// Renders the sheet grid as a debug view into a new ImageData.
-        /// Frame borders are red; first frames of named groups are green.
-        /// @param width integer
-        /// @param height integer
-        /// @return ImageData
+        /// @param | width | integer | Output image width.
+        /// @param | height | integer | Output image height.
+        /// @return | ImageData | Generated debug image.
         methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
             lua.create_userdata(img)
@@ -127,13 +128,13 @@ impl LuaUserData for LuaSpriteSheet {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LSpriteSheet"));
 
         // -- typeOf --
-        /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// Returns whether this object is of the given type.
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSpriteSheet" || name == "Object")
         });
@@ -152,9 +153,9 @@ pub struct LuaSpriteAtlas {
 impl LuaUserData for LuaSpriteAtlas {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getEntry --
-        /// Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
-        /// @param name string
-        /// @return table?
+        /// Returns the named region as a table.
+        /// @param | name | string | Region name.
+        /// @return | table | Region table.
         methods.add_method("getEntry", |lua, this, name: String| {
             match this.inner.get_entry(&name) {
                 Some(e) => {
@@ -172,9 +173,9 @@ impl LuaUserData for LuaSpriteAtlas {
         });
 
         // -- getByIndex --
-        /// Returns the region at the given 1-based insertion index, or nil.
-        /// @param index integer
-        /// @return table?
+        /// Returns the region at the given 1-based insertion index.
+        /// @param | index | integer | One-based region index.
+        /// @return | table | Region table.
         methods.add_method("getByIndex", |lua, this, index: usize| {
             match this.inner.get_by_index(index.saturating_sub(1)) {
                 Some(e) => {
@@ -193,12 +194,12 @@ impl LuaUserData for LuaSpriteAtlas {
 
         // -- entryCount --
         /// Returns the total number of named regions in the atlas.
-        /// @return integer
+        /// @return | integer | Total region count.
         methods.add_method("entryCount", |_, this, ()| Ok(this.inner.entry_count()));
 
         // -- entryNames --
         /// Returns a sequential table of all region names.
-        /// @return table
+        /// @return | table | Array of region name strings.
         methods.add_method("entryNames", |lua, this, ()| {
             let names = this.inner.entry_names();
             let t = lua.create_table()?;
@@ -209,12 +210,11 @@ impl LuaUserData for LuaSpriteAtlas {
         });
 
         // -- getFlipped --
-        /// Returns a copy of the named region with `flip_x` and `flip_y` flags set.
-        /// Returns nil if the region name is not found.
-        /// @param name string
-        /// @param flip_x boolean
-        /// @param flip_y boolean
-        /// @return table?
+        /// Returns a copy of the named region with flip flags set.
+        /// @param | name | string | Region name.
+        /// @param | flip_x | boolean | Whether to flip the region horizontally.
+        /// @param | flip_y | boolean | Whether to flip the region vertically.
+        /// @return | table | Flipped region table.
         methods.add_method("getFlipped", |lua, this, (name, flip_x, flip_y): (String, bool, bool)| match this
                 .inner
                 .get_entry(&name)
@@ -238,13 +238,13 @@ impl LuaUserData for LuaSpriteAtlas {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LSpriteAtlas"));
 
         // -- typeOf --
-        /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// Returns whether this object is of the given type.
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSpriteAtlas" || name == "Object")
         });
@@ -255,27 +255,17 @@ impl LuaUserData for LuaSpriteAtlas {
 // Register
 // -------------------------------------------------------------------------------
 
-/// Registers the `lurek.sprite.*` Lua namespace.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param _state Rc<RefCell<SharedState>>
-///
-/// Factory functions:
-/// - `lurek.sprite.newSheet(tw, th, fw, fh)` â†’ SpriteSheet
-/// - `lurek.sprite.newRPGMakerSheet(tw, th)` â†’ SpriteSheet
-/// - `lurek.sprite.parseAtlas(json_str)` â†’ SpriteAtlas
-/// - `lurek.sprite.newAtlasSheet(atlas, sheet_w, sheet_h)` â†’ SpriteSheet
+/// Registers the `lurek.sprite` API table with the Lua VM.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // â”€â”€ newSheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a sprite sheet with a uniform grid of `frame_w Ă— frame_h` frames.
-    /// @param texture_width integer
-    /// @param texture_height integer
-    /// @param frame_width integer
-    /// @param frame_height integer
-    /// @return SpriteSheet
+    // -- newSheet --
+    /// Creates a sprite sheet with a uniform grid of `frame_w Ă- frame_h` frames.
+    /// @param | texture_width | integer | Source texture width in pixels.
+    /// @param | texture_height | integer | Source texture height in pixels.
+    /// @param | frame_width | integer | Frame width in pixels.
+    /// @param | frame_height | integer | Frame height in pixels.
+    /// @return | LSpriteSheet | New sprite sheet object.
     tbl.set("newSheet", lua.create_function(|lua, (tw, th, fw, fh): (u32, u32, u32, u32)| {
             lua.create_userdata(LuaSpriteSheet {
                 inner: SpriteSheet::new(tw, th, fw, fh),
@@ -283,11 +273,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€ newRPGMakerSheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates an RPGMaker VX/Ace character sheet (3 cols Ă— 4 rows) with "down", "left", "right", "up" groups.
-    /// @param texture_width integer
-    /// @param texture_height integer
-    /// @return SpriteSheet
+    // -- newRPGMakerSheet --
+    /// Creates an RPGMaker VX/Ace character sheet (3 cols Ă- 4 rows) with "down", "left", "right", "up" groups.
+    /// @param | texture_width | integer | Source texture width in pixels.
+    /// @param | texture_height | integer | Source texture height in pixels.
+    /// @return | LSpriteSheet | New sprite sheet object.
     tbl.set("newRPGMakerSheet", lua.create_function(|lua, (tw, th): (u32, u32)| {
             lua.create_userdata(LuaSpriteSheet {
                 inner: SpriteSheet::from_rpgmaker(tw, th),
@@ -295,10 +285,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€ parseAtlas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- parseAtlas --
     /// Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
-    /// @param json_str string
-    /// @return SpriteAtlas
+    /// @param | json_str | string | TexturePacker JSON string.
+    /// @return | LSpriteAtlas | Parsed sprite atlas object.
     tbl.set("parseAtlas", lua.create_function(
             |lua, json_str: String| match parse_texturepacker_json(&json_str) {
                 Ok(atlas) => {
@@ -310,13 +300,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
 
-    // â”€â”€ newAtlasSheet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newAtlasSheet --
     /// Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
-    /// Each atlas region becomes a frame; regions are also registered as single-frame named groups.
-    /// @param atlas SpriteAtlas
-    /// @param sheet_width integer
-    /// @param sheet_height integer
-    /// @return SpriteSheet
+    /// @param | atlas | LSpriteAtlas | Source atlas object.
+    /// @param | sheet_width | integer | Virtual sheet width in pixels.
+    /// @param | sheet_height | integer | Virtual sheet height in pixels.
+    /// @return | LSpriteSheet | New sprite sheet object.
     tbl.set("newAtlasSheet", lua.create_function(|lua, (atlas_ud, sw, sh): (LuaAnyUserData, u32, u32)| {
             let atlas = atlas_ud.borrow::<LuaSpriteAtlas>()?;
             lua.create_userdata(LuaSpriteSheet {
@@ -325,11 +314,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€ parseAsepriteAtlas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Parses an Aseprite JSON export string and returns a `SpriteAtlas`.
-    /// Supports both array and hash Aseprite export formats.
-    /// @param json_str string
-    /// @return SpriteAtlas
+    // -- parseAsepriteAtlas --
+    /// Parses an Aseprite JSON export string and returns a sprite atlas.
+    /// @param | json_str | string | Aseprite JSON export string.
+    /// @return | LSpriteAtlas | Parsed sprite atlas object.
     tbl.set("parseAsepriteAtlas", lua.create_function(|lua, json_str: String| {
             let atlas = parse_aseprite_json(&json_str).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaSpriteAtlas { inner: atlas })
@@ -344,7 +332,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Converts a `Rect` to a Lua table `{x, y, w, h}`.
+// Converts a `Rect` to a Lua table `{x, y, w, h}`.
 fn quad_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
     let t = lua.create_table()?;
     t.set("x", r.x)?;
@@ -354,7 +342,7 @@ fn quad_table(lua: &Lua, r: Rect) -> LuaResult<LuaTable<'_>> {
     Ok(t)
 }
 
-/// Converts a slice of `Rect` values to a 1-indexed Lua table of quad tables.
+// Converts a slice of `Rect` values to a 1-indexed Lua table of quad tables.
 fn frames_to_table<'lua>(lua: &'lua Lua, frames: &[Rect]) -> LuaResult<LuaTable<'lua>> {
     let t = lua.create_table()?;
     for (i, r) in frames.iter().enumerate() {

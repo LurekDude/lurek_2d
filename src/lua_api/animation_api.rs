@@ -1,5 +1,4 @@
-//! `lurek.animation` — Sprite animation: frame pools, named clips, speed control, playback events,
-//! crossfade blending, stat-machine FSMs, and Aseprite JSON import.
+//! `lurek.animation` - Sprite animation with named clips, blending, state machines, and Aseprite import.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -25,24 +24,24 @@ impl LuaUserData for LuaAnimation {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addFrame --
         /// Adds a single frame to the frame pool by source rectangle.
-        /// @param x number
-        /// @param y number
-        /// @param w number
-        /// @param h number
-        /// @return integer
+        /// @param | x | number | Source rectangle X coordinate.
+        /// @param | y | number | Source rectangle Y coordinate.
+        /// @param | w | number | Source rectangle width.
+        /// @param | h | number | Source rectangle height.
+        /// @return | integer | Returns the added frame index.
         methods.add_method_mut("addFrame", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
             Ok(this.inner.add_frame(Rect::new(x, y, w, h)))
         });
 
         // -- addFramesFromGrid --
         /// Slices a sprite-sheet grid into frames and appends them.
-        /// @param tex_w integer
-        /// @param tex_h integer
-        /// @param frame_w integer
-        /// @param frame_h integer
-        /// @param start integer
-        /// @param count integer
-        /// @return integer
+        /// @param | tex_w | integer | Source texture width in pixels.
+        /// @param | tex_h | integer | Source texture height in pixels.
+        /// @param | frame_w | integer | Frame width in pixels.
+        /// @param | frame_h | integer | Frame height in pixels.
+        /// @param | start | integer | Starting frame index in the grid.
+        /// @param | count | integer | Number of frames to append.
+        /// @return | integer | Returns the total number of frames added.
         methods.add_method_mut("addFramesFromGrid", |_, this, (tw, th, fw, fh, start, count): (u32, u32, u32, u32, usize, usize)| {
                 Ok(this
                     .inner
@@ -52,11 +51,11 @@ impl LuaUserData for LuaAnimation {
 
         // -- addClip --
         /// Adds a named clip from explicit frame indices.
-        /// @param name string
-        /// @param indices table
-        /// @param fps number
-        /// @param looping boolean
-        /// @return nil
+        /// @param | name | string | Clip name.
+        /// @param | indices | table | Ordered frame indices for the clip.
+        /// @param | fps | number | Clip playback rate in frames per second.
+        /// @param | looping | boolean | Whether the clip should loop.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("addClip", |_, this, (name, indices_tbl, fps, looping): (String, LuaTable, f32, bool)| {
                 let mut indices: Vec<usize> = Vec::new();
                 for v in indices_tbl.sequence_values::<usize>() {
@@ -69,16 +68,16 @@ impl LuaUserData for LuaAnimation {
 
         // -- addClipFromGrid --
         /// Adds a named clip sliced from a sprite-sheet grid.
-        /// @param name string
-        /// @param tex_w integer
-        /// @param tex_h integer
-        /// @param frame_w integer
-        /// @param frame_h integer
-        /// @param start integer
-        /// @param count integer
-        /// @param fps number
-        /// @param looping boolean
-        /// @return nil
+        /// @param | name | string | Clip name.
+        /// @param | tex_w | integer | Source texture width in pixels.
+        /// @param | tex_h | integer | Source texture height in pixels.
+        /// @param | frame_w | integer | Frame width in pixels.
+        /// @param | frame_h | integer | Frame height in pixels.
+        /// @param | start | integer | Starting frame index in the grid.
+        /// @param | count | integer | Number of frames to include.
+        /// @param | fps | number | Clip playback rate in frames per second.
+        /// @param | looping | boolean | Whether the clip should loop.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("addClipFromGrid", |_,
              this,
              (name, tw, th, fw, fh, start, count, fps, looping): (
@@ -100,13 +99,13 @@ impl LuaUserData for LuaAnimation {
 
         // -- play --
         /// Starts playback of the named clip.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Clip name to start.
+        /// @return | boolean | Returns true if the clip started.
         methods.add_method_mut("play", |_, this, name: String| Ok(this.inner.play(&name)));
 
         // -- stop --
         /// Stops playback and resets to frame 0.
-        /// @return nil
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("stop", |_, this, ()| {
             this.inner.stop();
             Ok(())
@@ -114,7 +113,7 @@ impl LuaUserData for LuaAnimation {
 
         // -- pause --
         /// Pauses playback at the current frame.
-        /// @return nil
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("pause", |_, this, ()| {
             this.inner.pause();
             Ok(())
@@ -122,7 +121,7 @@ impl LuaUserData for LuaAnimation {
 
         // -- resume --
         /// Resumes playback from the current frame.
-        /// @return nil
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("resume", |_, this, ()| {
             this.inner.resume();
             Ok(())
@@ -130,16 +129,16 @@ impl LuaUserData for LuaAnimation {
 
         // -- update --
         /// Advances the animation by dt seconds.
-        /// @param dt number
-        /// @return nil
+        /// @param | dt | number | Delta time in seconds.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.update(dt);
             Ok(())
         });
 
         // -- getQuad --
-        /// Returns the source quad (x, y, w, h) for the current frame, or nil.
-        /// @return table?
+        /// Returns the source quad for the current frame.
+        /// @return | table | Returns a table with x, y, w, and h fields, or nil if no frame is active.
         methods.add_method("getQuad", |lua, this, ()| {
             if let Some(q) = this.inner.current_quad() {
                 let t = lua.create_table()?;
@@ -155,7 +154,7 @@ impl LuaUserData for LuaAnimation {
 
         // -- pollEvents --
         /// Drains and returns all pending animation events as a table.
-        /// @return table
+        /// @return | table | Returns an array of event tables.
         methods.add_method_mut("pollEvents", |lua, this, ()| {
             let events = this.inner.drain_events();
             let tbl = lua.create_table()?;
@@ -172,30 +171,30 @@ impl LuaUserData for LuaAnimation {
 
         // -- isPlaying --
         /// Returns true if a clip is currently playing.
-        /// @return boolean
+        /// @return | boolean | Returns true when a clip is playing.
         methods.add_method("isPlaying", |_, this, ()| Ok(this.inner.is_playing()));
 
         // -- isLooping --
         /// Returns true if the current clip is set to loop.
-        /// @return boolean
+        /// @return | boolean | Returns true when the current clip loops.
         methods.add_method("isLooping", |_, this, ()| Ok(this.inner.is_looping()));
 
         // -- getClip --
-        /// Returns the name of the currently playing clip, or nil.
-        /// @return string?
+        /// Returns the name of the currently playing clip.
+        /// @return | string | Returns the current clip name, or nil if no clip is active.
         methods.add_method("getClip", |_, this, ()| {
             Ok(this.inner.get_current_clip().map(|s| s.to_owned()))
         });
 
         // -- getSpeed --
         /// Returns the playback speed multiplier.
-        /// @return number
+        /// @return | number | Returns the playback speed multiplier.
         methods.add_method("getSpeed", |_, this, ()| Ok(this.inner.get_speed()));
 
         // -- setSpeed --
         /// Sets the playback speed multiplier.
-        /// @param speed number
-        /// @return nil
+        /// @param | speed | number | Playback speed multiplier.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("setSpeed", |_, this, speed: f32| {
             this.inner.set_speed(speed);
             Ok(())
@@ -203,29 +202,29 @@ impl LuaUserData for LuaAnimation {
 
         // -- getFrameCount --
         /// Returns the total number of frames in the frame pool.
-        /// @return integer
+        /// @return | integer | Returns the total frame count.
         methods.add_method("getFrameCount", |_, this, ()| {
             Ok(this.inner.get_frame_count())
         });
 
         // -- getClipCount --
         /// Returns the number of registered clips.
-        /// @return integer
+        /// @return | integer | Returns the number of clips.
         methods.add_method("getClipCount", |_, this, ()| {
             Ok(this.inner.get_clip_count())
         });
 
         // -- getCurrentFrame --
         /// Returns the current position within the active clip (0-based).
-        /// @return integer
+        /// @return | integer | Returns the current clip-local frame index.
         methods.add_method("getCurrentFrame", |_, this, ()| {
             Ok(this.inner.current_frame())
         });
 
         // -- setFrame --
         /// Sets the playback position within the current clip.
-        /// @param index integer
-        /// @return nil
+        /// @param | index | integer | Clip-local frame index to select.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("setFrame", |_, this, index: usize| {
             this.inner.set_frame(index);
             Ok(())
@@ -233,17 +232,17 @@ impl LuaUserData for LuaAnimation {
 
         // -- crossfade --
         /// Begins a smooth crossfade from the current clip to a new named clip.
-        /// @param clip_name string
-        /// @param duration number
-        /// @return boolean
+        /// @param | clip_name | string | Target clip name.
+        /// @param | duration | number | Crossfade duration in seconds.
+        /// @return | boolean | Returns true if the crossfade started.
         methods.add_method_mut("crossfade", |_, this, (clip_name, duration): (String, f32)| {
                 Ok(this.inner.crossfade(&clip_name, duration))
             },
         );
 
         // -- getBlendState --
-        /// Returns the two quads and blend factor during a crossfade, or nil when not blending.
-        /// @return table?
+        /// Returns the active crossfade state.
+        /// @return | table | Returns a table with from, to, and blend fields, or nil when not blending.
         methods.add_method("getBlendState", |lua, this, ()| {
             match this.inner.get_blend_state() {
                 None => Ok(LuaValue::Nil),
@@ -269,9 +268,9 @@ impl LuaUserData for LuaAnimation {
 
         // -- drawToImage --
         /// Renders the current animation frame into a new ImageData (white bg, blue frame rect).
-        /// @param width integer
-        /// @param height integer
-        /// @return ImageData
+        /// @param | width | integer | Output image width in pixels.
+        /// @param | height | integer | Output image height in pixels.
+        /// @return | ImageData | Returns the rendered image data.
         methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
             lua.create_userdata(img)
@@ -279,13 +278,13 @@ impl LuaUserData for LuaAnimation {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns LAnimation.
         methods.add_method("type", |_, _, ()| Ok("LAnimation"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns true for LAnimation or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LAnimation" || name == "Object")
         });
@@ -305,8 +304,8 @@ impl LuaUserData for LuaAnimStateMachine {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- update --
         /// Advances the FSM by `dt` seconds, evaluating transitions.
-        /// @param dt number
-        /// @return nil
+        /// @param | dt | number | Delta time in seconds.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("update", |_, this, dt: f32| {
             this.inner.update(dt);
             Ok(())
@@ -314,25 +313,25 @@ impl LuaUserData for LuaAnimStateMachine {
 
         // -- getState --
         /// Returns the name of the currently active state.
-        /// @return string
+        /// @return | string | Returns the active state name.
         methods.add_method("getState", |_, this, ()| {
             Ok(this.inner.get_state().to_owned())
         });
 
         // -- forceState --
         /// Immediately jumps to the named state, bypassing transition conditions.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | State name to activate.
+        /// @return | boolean | Returns true if the state changed.
         methods.add_method_mut("forceState", |_, this, name: String| {
             Ok(this.inner.force_state(&name))
         });
 
         // -- addState --
         /// Registers a new named state that plays a clip from the embedded animation.
-        /// @param name string
-        /// @param clip string
-        /// @param looping boolean
-        /// @return nil
+        /// @param | name | string | State name.
+        /// @param | clip | string | Clip played by the state.
+        /// @param | looping | boolean | Whether the state clip loops.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("addState", |_, this, (name, clip, looping): (String, String, bool)| {
                 this.inner.add_state(&name, &clip, looping);
                 Ok(())
@@ -340,12 +339,11 @@ impl LuaUserData for LuaAnimStateMachine {
         );
 
         // -- addTransition --
-        /// Adds a conditional transition between two states.
-        /// Condition format: `"<param> <op> <value>"`, e.g. `"speed > 0.5"` or `"jumping == true"`.
-        /// @param from_state string
-        /// @param to_state string
-        /// @param condition string
-        /// @return nil
+        /// Adds a conditional transition between two states using a condition string like "speed > 0.5".
+        /// @param | from_state | string | Source state name.
+        /// @param | to_state | string | Destination state name.
+        /// @param | condition | string | Transition condition expression.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("addTransition", |_, this, (from_state, to_state, condition): (String, String, String)| {
                 this.inner
                     .add_transition(&from_state, &to_state, &condition);
@@ -355,9 +353,9 @@ impl LuaUserData for LuaAnimStateMachine {
 
         // -- setParam --
         /// Sets an FSM parameter value (number, boolean, or integer supported).
-        /// @param name string
-        /// @param value number|boolean
-        /// @return nil
+        /// @param | name | string | Parameter name.
+        /// @param | value | any | Parameter value as a boolean, integer, or number.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("setParam", |_, this, (name, value): (String, LuaValue)| {
             let param = match value {
                 LuaValue::Boolean(b) => AnimParamValue::Bool(b),
@@ -378,8 +376,8 @@ impl LuaUserData for LuaAnimStateMachine {
         });
 
         // -- getQuad --
-        /// Returns the source quad for the current animation frame, or nil.
-        /// @return table?
+        /// Returns the source quad for the current animation frame.
+        /// @return | table | Returns a table with x, y, w, and h fields, or nil if no frame is active.
         methods.add_method("getQuad", |lua, this, ()| {
             let anim = this.inner.get_animation();
             if let Some(q) = anim.current_quad() {
@@ -396,13 +394,13 @@ impl LuaUserData for LuaAnimStateMachine {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns LAnimStateMachine.
         methods.add_method("type", |_, _, ()| Ok("LAnimStateMachine"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns true for LAnimStateMachine or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LAnimStateMachine" || name == "Object")
         });
@@ -431,17 +429,11 @@ impl LuaUserData for LuaBlendLayerSet {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addLayer --
         /// Appends a new blend layer.
-        ///
-        /// # Usage
-        /// ```lua
-        /// bls:addLayer("upper_body", "run", 1.0)
-        /// bls:addLayer("lower_body", "walk", 0.8, {"hip", "leg_l", "leg_r"})
-        /// ```
-        /// @param name string
-        /// @param clip_name string
-        /// @param weight number
-        /// @param bones table?
-        /// @return boolean
+        /// @param | name | string | Layer name.
+        /// @param | clip_name | string | Clip used by the layer.
+        /// @param | weight | number | Blend weight in the range 0 to 1.
+        /// @param | bones | table | Optional list of bone names for the mask.
+        /// @return | boolean | Returns true when the layer is added.
         methods.add_method_mut("addLayer", |_, this, (name, clip_name, weight, bones): (String, String, f32, Option<LuaTable>)| {
                 let mask = if let Some(t) = bones {
                     let mut names: Vec<String> = Vec::new();
@@ -463,8 +455,8 @@ impl LuaUserData for LuaBlendLayerSet {
 
         // -- removeLayer --
         /// Removes a blend layer by name.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Layer name.
+        /// @return | boolean | Returns true when the layer is removed.
         methods.add_method_mut("removeLayer", |_, this, name: String| {
             this.inner
                 .remove_layer(&name)
@@ -474,9 +466,9 @@ impl LuaUserData for LuaBlendLayerSet {
 
         // -- setWeight --
         /// Sets the blend weight of a named layer (clamped to [0, 1]).
-        /// @param name string
-        /// @param weight number
-        /// @return boolean
+        /// @param | name | string | Layer name.
+        /// @param | weight | number | New blend weight.
+        /// @return | boolean | Returns true when the weight is updated.
         methods.add_method_mut("setWeight", |_, this, (name, weight): (String, f32)| {
             this.inner
                 .set_weight(&name, weight)
@@ -485,18 +477,18 @@ impl LuaUserData for LuaBlendLayerSet {
         });
 
         // -- getWeight --
-        /// Returns the blend weight of a named layer, or nil if not found.
-        /// @param name string
-        /// @return number?
+        /// Returns the blend weight of a named layer.
+        /// @param | name | string | Layer name.
+        /// @return | number | Returns the layer weight, or nil if the layer is missing.
         methods.add_method("getWeight", |_, this, name: String| {
             Ok(this.inner.get_weight(&name))
         });
 
         // -- setMask --
         /// Replaces the bone mask of a layer.
-        /// @param name string
-        /// @param bones table
-        /// @return boolean
+        /// @param | name | string | Layer name.
+        /// @param | bones | table | List of bone names for the new mask.
+        /// @return | boolean | Returns true when the mask is updated.
         methods.add_method_mut("setMask", |_, this, (name, bones): (String, LuaTable)| {
             let mut bone_names: Vec<String> = Vec::new();
             for pair in bones.pairs::<LuaValue, String>() {
@@ -511,7 +503,7 @@ impl LuaUserData for LuaBlendLayerSet {
 
         // -- listLayers --
         /// Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
-        /// @return table
+        /// @return | table | Returns an array of layer info tables.
         methods.add_method("listLayers", |lua, this, ()| {
             let out = lua.create_table()?;
             for (i, layer) in this.inner.layers().iter().enumerate() {
@@ -531,18 +523,18 @@ impl LuaUserData for LuaBlendLayerSet {
 
         // -- len --
         /// Returns the number of blend layers.
-        /// @return integer
+        /// @return | integer | Returns the number of layers.
         methods.add_method("len", |_, this, ()| Ok(this.inner.len()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns LBlendLayerSet.
         methods.add_method("type", |_, _, ()| Ok("LBlendLayerSet"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns true for LBlendLayerSet or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LBlendLayerSet" || name == "Object")
         });
@@ -559,7 +551,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── new ──────────────────────────────────────────────────────────────────
     /// Creates a new, empty Animation controller.
-    /// @return Animation
+    /// @return | Animation | Returns a new animation controller.
     tbl.set("new", lua.create_function(|lua, ()| {
             lua.create_userdata(LuaAnimation {
                 inner: Animation::new(),
@@ -568,11 +560,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // ── fromAseprite ─────────────────────────────────────────────────────────
-    /// Parses an Aseprite JSON export string and builds an Animation with clips and frames.
-    /// @return table|nil
-    /// Returns nil and an error message on parse failure.
-    /// @param json_str string
-    /// Animation?
+    /// Parses an Aseprite JSON export string and builds an animation.
+    /// @param | json_str | string | Aseprite JSON export text.
+    /// @return | Animation | Returns a new animation controller.
     tbl.set("fromAseprite", lua.create_function(
             |lua, json_str: String| match load_aseprite_json(&json_str) {
                 Ok(parsed) => {
@@ -587,9 +577,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
 
     // ── newStateMachine ───────────────────────────────────────────────────────
     /// Creates an animation FSM from an Animation controller and an initial state name.
-    /// @param anim Animation
-    /// @param initial_state string
-    /// @return AnimStateMachine
+    /// @param | anim | Animation | Source animation controller.
+    /// @param | initial_state | string | Initial state name.
+    /// @return | AnimStateMachine | Returns a new animation state machine.
     tbl.set("newStateMachine", lua.create_function(|lua, (anim_ud, initial): (LuaAnyUserData, String)| {
             let anim = anim_ud.take::<LuaAnimation>()?.inner;
             lua.create_userdata(LuaAnimStateMachine {
@@ -599,12 +589,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- newCurve --
-    /// Creates a new empty [`AnimCurve`] with linear interpolation.
-    ///
-    /// Add keyframes with `curve:addKeyframe(time, value)` and read the
-    /// interpolated value with `curve:eval(t)`.
-    ///
-    /// @return AnimCurve
+    /// Creates a new empty animation curve with linear interpolation.
+    /// @return | AnimCurve | Returns a new animation curve.
     tbl.set("newCurve", lua.create_function(|lua, ()| {
             lua.create_userdata(LuaAnimCurve {
                 inner: crate::animation::curve::AnimCurve::new(),
@@ -614,12 +600,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- newSyncGroup --
-    /// Creates a new empty [`AnimSyncGroup`].
-    ///
-    /// Add animation handles with `group:add(handle)`.  Call `group:tick(dt)`
-    /// from `lurek.process` to advance all member animations at once.
-    ///
-    /// @return AnimSyncGroup
+    /// Creates a new empty animation sync group.
+    /// @return | AnimSyncGroup | Returns a new animation sync group.
     tbl.set("newSyncGroup", lua.create_function(|lua, ()| {
             lua.create_userdata(LuaAnimSyncGroup {
                 inner: crate::animation::sync_group::AnimSyncGroup::new(),
@@ -628,20 +610,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- newBlendLayerSet --
-    /// Creates a new empty [`BlendLayerSet`] for compositing multiple animation clips.
-    ///
-    /// Layers are evaluated bottom-to-top; each carries a clip name, a blend weight,
-    /// and an optional bone mask.  Use `:addLayer`, `:setWeight`, and `:setMask` to
-    /// configure the set, then read the layer list with `:listLayers` to drive your
-    /// animation system.
-    ///
-    /// # Usage
-    /// ```lua
-    /// local bls = lurek.animation.newBlendLayerSet()
-    /// bls:addLayer("base",  "idle", 1.0)
-    /// bls:addLayer("upper", "wave", 0.6, {"spine", "arm_r"})
-    /// ```
-    /// @return BlendLayerSet
+    /// Creates a new empty blend layer set for compositing multiple animation clips.
+    /// @return | BlendLayerSet | Returns a new blend layer set.
     tbl.set("newBlendLayerSet", lua.create_function(|lua, ()| {
             lua.create_userdata(LuaBlendLayerSet {
                 inner: BlendLayerSet::new(),
@@ -667,27 +637,19 @@ pub struct LuaAnimCurve {
 impl LuaUserData for LuaAnimCurve {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- addKeyframe --
-        /// Inserts a keyframe at the given time. If a keyframe at the same time already
-        /// exists, it is replaced. Keyframes are stored in ascending time order.
-        ///
-        /// @param time number
-        /// @param value number
-        /// @return nil
+        /// Inserts or replaces a keyframe at the given time.
+        /// @param | time | number | Keyframe time.
+        /// @param | value | number | Keyframe value.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("addKeyframe", |_, this, (t, v): (f32, f32)| {
             this.inner.add_keyframe(t, v);
             Ok(())
         });
 
         // -- eval --
-        /// Returns the interpolated value at the given time using the curve's easing.
-        ///
-        /// If a custom easing callback was set via `setCustomEasing`, it is called with
-        /// the raw time `t` and its return value is used directly.
-        /// Returns `0.0` if the curve has no keyframes.
-        /// Clamps to the first/last keyframe value when `t` is out of range.
-        ///
-        /// @param t number
-        /// @return number
+        /// Returns the interpolated curve value at the given time.
+        /// @param | t | number | Sample time.
+        /// @return | number | Returns the evaluated curve value.
         methods.add_method("eval", |lua, this, t: f32| {
             if let Some(key) = &this.custom_easing {
                 let func: mlua::Function = lua.registry_value(key)?;
@@ -699,11 +661,8 @@ impl LuaUserData for LuaAnimCurve {
 
         // -- setEasing --
         /// Sets the easing kind applied between all keyframe segments.
-        ///
-        /// `mode` is one of `"step"`, `"linear"`, `"ease_in"`, `"ease_out"`, `"ease_in_out"`.
-        ///
-        /// @param mode string
-        /// @return nil
+        /// @param | mode | string | Easing mode: step, linear, ease_in, ease_out, or ease_in_out.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("setEasing", |_, this, mode: String| {
             use crate::animation::curve::EasingKind;
             this.inner.easing = match mode.as_str() {
@@ -723,21 +682,15 @@ impl LuaUserData for LuaAnimCurve {
 
         // -- keyframeCount --
         /// Returns the number of keyframes currently stored.
-        ///
-        /// @return integer
+        /// @return | integer | Returns the number of keyframes.
         methods.add_method("keyframeCount", |_, this, ()| {
             Ok(this.inner.keyframe_count())
         });
 
         // -- setCustomEasing --
-        /// Set a custom Lua easing function for this curve.
-        ///
-        /// When set, `eval(t)` will call this function with the raw time value and
-        /// return its result directly, bypassing the built-in easing modes.
-        /// Pass `nil` to clear any previously set custom easing.
-        ///
-        /// @param fn function(t: number) → number — receives time t, returns output value
-        /// @return nil
+        /// Sets or clears a custom Lua easing function for this curve.
+        /// @param | fn | any | Lua function receiving time and returning a number, or nil to clear it.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("setCustomEasing", |lua, this, func: LuaValue| {
             use crate::animation::curve::EasingKind;
             if let Some(old_key) = this.custom_easing.take() {
@@ -763,8 +716,7 @@ impl LuaUserData for LuaAnimCurve {
 
         // -- clear --
         /// Removes all keyframes from this animation curve, resetting it to empty.
-        ///
-        /// @return nil
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -772,13 +724,13 @@ impl LuaUserData for LuaAnimCurve {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns LAnimCurve.
         methods.add_method("type", |_, _, ()| Ok("LAnimCurve"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns true for LAnimCurve or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LAnimCurve" || name == "Object")
         });
@@ -805,12 +757,8 @@ impl LuaUserData for LuaAnimSyncGroup {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- add --
         /// Adds an animation handle to the group.
-        ///
-        /// The handle is the integer returned by `lurek.animation.new()`.
-        /// Adding a duplicate is safe and is silently ignored.
-        ///
-        /// @param handle integer
-        /// @return nil
+        /// @param | handle | integer | Animation handle to add.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("add", |_, _this, _handle: LuaValue| {
             // AnimSyncGroup keys are slotmap DefaultKeys; Lua exposes them as
             // opaque integers.  For now we store the key index as a usize.
@@ -820,15 +768,13 @@ impl LuaUserData for LuaAnimSyncGroup {
 
         // -- remove --
         /// Removes an animation handle from the group.
-        ///
-        /// @param handle integer
-        /// @return nil
+        /// @param | handle | integer | Animation handle to remove.
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("remove", |_, _this, _handle: LuaValue| Ok(()));
 
         // -- clear --
         /// Removes all animation handles from the group.
-        ///
-        /// @return nil
+        /// @return | nil | Returns nothing.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
             Ok(())
@@ -836,19 +782,18 @@ impl LuaUserData for LuaAnimSyncGroup {
 
         // -- memberCount --
         /// Returns the number of animations currently in the group.
-        ///
-        /// @return integer
+        /// @return | integer | Returns the number of member animations.
         methods.add_method("memberCount", |_, this, ()| Ok(this.inner.member_count()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns LAnimSyncGroup.
         methods.add_method("type", |_, _, ()| Ok("LAnimSyncGroup"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | Returns true for LAnimSyncGroup or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LAnimSyncGroup" || name == "Object")
         });

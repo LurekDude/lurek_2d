@@ -1,4 +1,4 @@
-//! `lurek.runtime` â€” Runtime engine metadata and introspection.
+//! `lurek.runtime` - Runtime engine metadata and introspection.
 //!
 //! Exposes read-only properties about the running engine: version, target
 //! frame budget, memory usage, host platform, and total uptime.
@@ -9,29 +9,24 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 /// Registers the `lurek.runtime.*` namespace.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param state Rc<RefCell<SharedState>>
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- getVersion --
     /// Returns the engine version string (from `Cargo.toml`).
-    /// @return string
+    /// @return | string | Engine version string.
     tbl.set("getVersion", lua.create_function(|_, ()| Ok(env!("CARGO_PKG_VERSION")))?,
     )?;
 
     // -- getFrameBudget --
-    /// Returns the target frame budget in milliseconds (default: 1000 / 60 â‰ 16.667 ms).
-    /// @return number
+    /// Returns the target frame budget in milliseconds (default: 1000 / 60 ~ 16.667 ms).
+    /// @return | number | Target frame budget in milliseconds.
     tbl.set("getFrameBudget", lua.create_function(|_, ()| Ok(1000.0_f64 / 60.0_f64))?,
     )?;
 
     // -- memoryUsage --
-    /// Returns a table with `lua_bytes` (Lua GC heap usage in bytes) and
-    /// `lua_kb` (same in kilobytes, rounded to two decimal places).
-    /// @return table
+    /// Returns Lua memory usage in bytes and kilobytes.
+    /// @return | table | Table with `lua_bytes` and `lua_kb` fields.
     tbl.set("memoryUsage", lua.create_function(|lua, ()| {
             let bytes = lua.used_memory();
             let out = lua.create_table()?;
@@ -42,9 +37,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- platform --
-    /// Returns a string identifying the host operating system:
-    /// `"windows"`, `"linux"`, or `"macos"`.
-    /// @return string
+    /// Returns the host operating system name.
+    /// @return | string | One of `windows`, `linux`, `macos`, or `unknown`.
     tbl.set("platform", lua.create_function(|_, ()| {
             let name = if cfg!(target_os = "windows") {
                 "windows"
@@ -61,7 +55,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- uptime --
     /// Returns the total engine uptime in seconds (sum of all processed deltas).
-    /// @return number
+    /// @return | number | Total engine uptime in seconds.
     let s = state.clone();
     tbl.set("uptime", lua.create_function(move |_, ()| Ok(s.borrow().total_time))?,
     )?;
@@ -69,30 +63,26 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     // -- fps --
     /// Returns the current measured frames-per-second.
-    /// @return number
+    /// @return | number | Current frames-per-second estimate.
     tbl.set("fps", lua.create_function(move |_, ()| Ok(s.borrow().fps))?)?;
 
     // -- frameCount --
     /// Returns the total number of frames processed since engine start.
-    /// @return integer
+    /// @return | integer | Total processed frame count.
     let s = state.clone();
     tbl.set("frameCount", lua.create_function(move |_, ()| Ok(s.borrow().clock.frame_count()))?,
     )?;
 
     // -- isDebug --
     /// Returns `true` if the engine was compiled in debug mode.
-    /// @return boolean
+    /// @return | boolean | Whether debug assertions are enabled.
     tbl.set("isDebug", lua.create_function(|_, ()| Ok(cfg!(debug_assertions)))?,
     )?;
 
     // -- setResourceBudget --
     /// Sets the maximum resident texture memory budget in bytes.
-    ///
-    /// When the total pixel data of all loaded textures exceeds this value the
-    /// engine automatically evicts the least-recently-used textures each frame.
-    /// Pass `0` to disable the budget (unlimited, the default).
-    ///
-    /// @param budget_bytes integer
+    /// @param | budget_bytes | integer | Maximum texture memory budget in bytes, or 0 for unlimited.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setResourceBudget", lua.create_function(move |_, budget_bytes: u64| {
             s.borrow_mut().resource_budget_bytes = budget_bytes;
@@ -102,13 +92,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getResourceStats --
     /// Returns a table with resident resource memory statistics.
-    ///
-    /// Fields:
-    /// - `texture_bytes` â€” Total pixel data in memory (width Ă— height Ă— 4 per texture).
-    /// - `budget_bytes`  â€” Configured budget; `0` means unlimited.
-    /// - `texture_count` â€” Number of loaded textures.
-    ///
-    /// @return table
+    /// @return | table | Table with `texture_bytes`, `budget_bytes`, and `texture_count` fields.
     let s = state.clone();
     tbl.set("getResourceStats", lua.create_function(move |lua, ()| {
             let st = s.borrow();

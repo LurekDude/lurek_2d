@@ -294,7 +294,7 @@ describe("lurek.i18n.onChange / offChange", function()
         local function cb() count = count + 1 end
         lurek.i18n.onChange(cb)
         lurek.i18n.setLanguage("en")
-        lurek.i18n.offChange(cb)
+        lurek.i18n.offChange()
         lurek.i18n.setLanguage("en")
         expect_equal(1, count, "callback fired once, then removed")
     end)

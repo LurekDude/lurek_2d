@@ -13,7 +13,7 @@
 
 The `app` module is Lurek2D's application entry point and engine lifecycle orchestrator — the Edge/Integration tier topmost layer. It owns the winit 0.30 event loop, the wgpu device and surface, the Lua VM instance, and the main frame pacing loop. Nothing else in the engine imports from `app`; it is the integration layer that wires all subsystems together.
 
-**Startup.** `App::run()` is the single public entry point. It creates the OS window via winit, initialises the wgpu device and swap chain, constructs `SharedState`, creates the Lua VM via `lua_api::create_lua_vm()`, and enters the winit event loop. If no game folder is provided on the command line, it renders a branded splash screen. Drag-and-drop of a folder or `.lurek` archive from the OS file manager also starts a game session mid-run.
+**Startup.** `App::run()` is the single public entry point. It creates the OS window via winit, initialises the wgpu device and swap chain, constructs `SharedState`, creates the Lua VM via `lua_api::create_lua_vm()`, and enters the winit event loop. If no game folder is provided on the command line, it shows the native window immediately after GPU setup so the first redraw can present the branded splash screen before `init_lua()` runs. Drag-and-drop of a folder or `.lurek` archive from the OS file manager also starts a game session mid-run.
 
 **Frame loop.** The internal `LurekApp` struct implements winit's `ApplicationHandler` trait. Each frame the loop:
 1. Dispatches OS events (keyboard, mouse, gamepad via gilrs, resize, drag-drop, close).

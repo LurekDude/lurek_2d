@@ -34,7 +34,7 @@ describe("lurek.network.newHost", function()
   -- @tests lurek.network.newHost
   -- @description Verifies newHost can create a client host with default options.
     xit("creates a client host with no arguments", function()
-    local host = lurek.network.newHost()
+    local host = lurek.network.newHost({})
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
@@ -76,8 +76,8 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.service
   -- @description Verifies service returns nil when no events are pending.
     xit("service returns nil when no events", function()
-    local host = lurek.network.newHost()
-    local event = host:service(0)
+    local host = lurek.network.newHost({})
+    local event = host:service()
     expect_equal(event, nil)
     host:destroy()
   end)
@@ -85,7 +85,7 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.getAddress
   -- @description Verifies getAddress returns string host information and a numeric port.
     xit("getAddress returns address and port", function()
-    local host = lurek.network.newHost()
+    local host = lurek.network.newHost({})
     local addr, port = host:getAddress()
     expect_equal(type(addr), "string")
     expect_equal(type(port), "number")
@@ -95,8 +95,8 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.getPeerCount
   -- @description Verifies getPeerCount reports the default peer limit.
     xit("getPeerCount returns peer limit", function()
-    local host = lurek.network.newHost()
-    local count = host:getPeerCount()
+    local host = lurek.network.newHost({})
+    local count = host:getPeerLimit()
     expect_equal(4, count)
     host:destroy()
   end)
@@ -104,7 +104,7 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.flush
   -- @description Verifies flush is safe when there is no pending data.
     xit("flush succeeds with no pending data", function()
-    local host = lurek.network.newHost()
+    local host = lurek.network.newHost({})
     local ok, err = pcall(function() host:flush() end)
     expect_equal(ok, true)
     host:destroy()
@@ -113,16 +113,16 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.destroy
   -- @description Verifies destroy invalidates the host for later method calls.
     xit("destroy makes host unusable", function()
-    local host = lurek.network.newHost()
+    local host = lurek.network.newHost({})
     host:destroy()
-    local ok, err = pcall(function() host:service(0) end)
+    local ok, err = pcall(function() host:service() end)
     expect_equal(ok, false)
   end)
 
   -- @tests lurek.network.Host.setBandwidthLimit
   -- @description Verifies setBandwidthLimit accepts numeric limits without error.
     xit("setBandwidthLimit does not error", function()
-    local host = lurek.network.newHost()
+    local host = lurek.network.newHost({})
     local ok, err = pcall(function() host:setBandwidthLimit(100000, 50000) end)
     expect_equal(ok, true)
     host:destroy()
@@ -131,8 +131,8 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.getPeers
   -- @description Verifies getPeers returns an empty table when there are no connections.
     xit("getPeers returns empty table when no connections", function()
-    local host = lurek.network.newHost()
-    local peers = host:getPeers()
+    local host = lurek.network.newHost({})
+    local peers = host:getConnectedPeerIds()
     expect_equal(type(peers), "table")
     local count = 0
     for _ in pairs(peers) do count = count + 1 end
@@ -143,8 +143,8 @@ describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.getStats
   -- @description Verifies getStats returns a table payload.
     xit("getStats returns a table", function()
-    local host = lurek.network.newHost()
-    local stats = host:getStats()
+    local host = lurek.network.newHost({})
+    local stats = host:getBandwidthLimit()
     expect_equal(type(stats), "table")
     host:destroy()
   end)
@@ -381,89 +381,95 @@ describe("lurek.net time", function()
 end) -- lurek.net time
 end -- if lurek.net
 
-if _G.enet then
+---@type { enet?: { host_create: function, linked_version: fun(): string } }
+local global_env = _G
+
+if global_env.enet then
   -- @description Covers suite: enet global alias.
   describe("enet global alias", function()
     -- @tests enet
     -- @description Verifies the global enet alias is available when registered.
     it("enet is a table", function()
-      expect_equal(type(_G.enet), "table")
+      expect_equal(type(global_env.enet), "table")
     end)
 
     -- @tests enet.host_create
     -- @description Verifies the global enet alias exposes host_create.
     it("enet.host_create is a function", function()
-      expect_equal(type(_G.enet.host_create), "function")
+      expect_equal(type(global_env.enet.host_create), "function")
     end)
 
     -- @tests enet.linked_version
     -- @description Verifies the global enet alias exposes linked_version.
     it("enet.linked_version returns a string", function()
-      expect_equal(type(_G.enet.linked_version()), "string")
+      expect_equal(type(global_env.enet.linked_version()), "string")
     end)
   end) -- enet global alias
-end -- if _G.enet
+end -- if global_env.enet
+
+  ---@type { MAX_PEERS: integer, DEFAULT_PEERS: integer, MAX_CHANNELS: integer, DEFAULT_CHANNELS: integer }
+  local network_consts = lurek.network
 
 -- @description Covers suite: lurek.network constants.
 describe("lurek.network constants", function()
   -- @tests lurek.network.MAX_PEERS
   -- @description Verifies MAX_PEERS is numeric in the high-level namespace.
   it("MAX_PEERS is a number", function()
-    expect_type("number", lurek.network.MAX_PEERS)
+    expect_type("number", network_consts.MAX_PEERS)
   end)
 
   -- @tests lurek.network.MAX_PEERS
   -- @description Verifies MAX_PEERS equals 4096.
   it("MAX_PEERS equals 4096", function()
-    expect_equal(lurek.network.MAX_PEERS, 4096)
+    expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies DEFAULT_PEERS is numeric.
   it("DEFAULT_PEERS is a number", function()
-    expect_type("number", lurek.network.DEFAULT_PEERS)
+    expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies DEFAULT_PEERS equals 166.
   it("DEFAULT_PEERS equals 166", function()
-    expect_equal(lurek.network.DEFAULT_PEERS, 166)
+    expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
   -- @tests lurek.network.MAX_CHANNELS
   -- @description Verifies MAX_CHANNELS is numeric.
   it("MAX_CHANNELS is a number", function()
-    expect_type("number", lurek.network.MAX_CHANNELS)
+    expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
   -- @tests lurek.network.MAX_CHANNELS
   -- @description Verifies MAX_CHANNELS equals 255.
   it("MAX_CHANNELS equals 255", function()
-    expect_equal(lurek.network.MAX_CHANNELS, 255)
+    expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies DEFAULT_CHANNELS is numeric.
   it("DEFAULT_CHANNELS is a number", function()
-    expect_type("number", lurek.network.DEFAULT_CHANNELS)
+    expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies DEFAULT_CHANNELS equals 1.
   it("DEFAULT_CHANNELS equals 1", function()
-    expect_equal(lurek.network.DEFAULT_CHANNELS, 2)
+    expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies DEFAULT_PEERS does not exceed MAX_PEERS.
   it("DEFAULT_PEERS is less than or equal to MAX_PEERS", function()
-    expect_true(lurek.network.DEFAULT_PEERS <= lurek.network.MAX_PEERS)
+    expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies DEFAULT_CHANNELS does not exceed MAX_CHANNELS.
   it("DEFAULT_CHANNELS is less than or equal to MAX_CHANNELS", function()
-    expect_true(lurek.network.DEFAULT_CHANNELS <= lurek.network.MAX_CHANNELS)
+    expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
 end)
 
@@ -484,61 +490,61 @@ describe("lurek.network constants", function()
   -- @tests lurek.network.MAX_PEERS
   -- @description Verifies MAX_PEERS is exported as a numeric constant.
   it("MAX_PEERS is a number", function()
-    expect_type("number", lurek.network.MAX_PEERS)
+    expect_type("number", network_consts.MAX_PEERS)
   end)
 
   -- @tests lurek.network.MAX_PEERS
   -- @description Verifies MAX_PEERS matches the documented hard limit of 8 peers.
   it("MAX_PEERS equals 8", function()
-    expect_equal(lurek.network.MAX_PEERS, 4096)
+    expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies DEFAULT_PEERS is exported as a numeric constant.
   it("DEFAULT_PEERS is a number", function()
-    expect_type("number", lurek.network.DEFAULT_PEERS)
+    expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies DEFAULT_PEERS keeps the expected default peer count of 4.
   it("DEFAULT_PEERS equals 4", function()
-    expect_equal(lurek.network.DEFAULT_PEERS, 166)
+    expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
   -- @tests lurek.network.MAX_CHANNELS
   -- @description Verifies MAX_CHANNELS is exported as a numeric constant.
   it("MAX_CHANNELS is a number", function()
-    expect_type("number", lurek.network.MAX_CHANNELS)
+    expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
   -- @tests lurek.network.MAX_CHANNELS
   -- @description Verifies MAX_CHANNELS matches the documented ENet ceiling of 255.
   it("MAX_CHANNELS equals 255", function()
-    expect_equal(lurek.network.MAX_CHANNELS, 255)
+    expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies DEFAULT_CHANNELS is exported as a numeric constant.
   it("DEFAULT_CHANNELS is a number", function()
-    expect_type("number", lurek.network.DEFAULT_CHANNELS)
+    expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies DEFAULT_CHANNELS keeps the default single-channel configuration.
   it("DEFAULT_CHANNELS equals 1", function()
-    expect_equal(lurek.network.DEFAULT_CHANNELS, 2)
+    expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
   -- @tests lurek.network.DEFAULT_PEERS
   -- @description Verifies the default peer count never exceeds the advertised peer cap.
   it("DEFAULT_PEERS does not exceed MAX_PEERS", function()
-    expect_true(lurek.network.DEFAULT_PEERS <= lurek.network.MAX_PEERS)
+    expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
   -- @tests lurek.network.DEFAULT_CHANNELS
   -- @description Verifies the default channel count stays within the exported channel limit.
   it("DEFAULT_CHANNELS does not exceed MAX_CHANNELS", function()
-    expect_true(lurek.network.DEFAULT_CHANNELS <= lurek.network.MAX_CHANNELS)
+    expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
 end)
 
@@ -687,10 +693,10 @@ describe("lurek.network server/client roles", function()
     end)
 
     it("should expose updated constants", function()
-        expect_equal(lurek.network.MAX_PEERS, 4096)
-        expect_equal(lurek.network.DEFAULT_PEERS, 166)
-        expect_equal(lurek.network.DEFAULT_CHANNELS, 2)
-        expect_equal(lurek.network.MAX_CHANNELS, 255)
+      expect_equal(network_consts.MAX_PEERS, 4096)
+      expect_equal(network_consts.DEFAULT_PEERS, 166)
+      expect_equal(network_consts.DEFAULT_CHANNELS, 2)
+      expect_equal(network_consts.MAX_CHANNELS, 255)
     end)
 end)
 

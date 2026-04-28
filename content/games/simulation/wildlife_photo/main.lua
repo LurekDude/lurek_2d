@@ -569,8 +569,6 @@ function lurek.process(dt)
     local new_phase = get_tod_phase(tod_timer)
     if new_phase ~= tod_phase then
         tod_phase = new_phase
-        local target_bg = TOD_BG[tod_phase]
-        lurek.tween.to({ bg_r, bg_g, bg_b }, { target_bg[1], target_bg[2], target_bg[3] }, 3.0)
     end
     -- Smooth bg transition
     local target_bg = TOD_BG[tod_phase]

@@ -1,4 +1,4 @@
-//! Registers the `lurek.debugbridge.*` TCP debug server API.
+//! `lurek.debugbridge` - TCP debug server bindings for runtime inspection and control.
 //!
 //! Embeds a JSON-over-TCP server (127.0.0.1 only) inside the running game.
 //! External tools (VS Code extension, MCP server) connect to inspect and
@@ -6,10 +6,14 @@
 //! Lua-dependent methods are queued and dispatched via `poll()` on the main thread.
 
 use std::net::TcpListener;
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
 
 use mlua::prelude::*;
+
+use super::SharedState;
 
 use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingResponse};
 
@@ -18,11 +22,11 @@ use crate::debugbridge::{server_thread, BridgeShared, PendingRequest, PendingRes
 // ---------------------------------------------------------------------------
 
 /// Registers the `lurek.debugbridge` namespace.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-///
-pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
+pub fn register(
+    lua: &Lua,
+    lurek: &LuaTable,
+    _state: Rc<RefCell<SharedState>>,
+) -> LuaResult<()> {
     let db = lua.create_table()?;
 
     // Shared state between Lua closures and the TCP thread
@@ -31,14 +35,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     // Store thread join handle
     let thread_handle: Arc<Mutex<Option<std::thread::JoinHandle<()>>>> = Arc::new(Mutex::new(None));
 
-    // ----- Lifecycle -----
+    // -- start --
 
     /// Start the TCP debug server on 127.0.0.1:port.
+    /// @param | port | integer? | Optional TCP port to bind on localhost.
+    /// @return | boolean | Whether the server was started.
     let sh = shared.clone();
     let run = running.clone();
     let th = thread_handle.clone();
-    /// @param port u16?
-    /// @return boolean
     db.set("start", lua.create_function(move |_, port: Option<u16>| {
             if run.load(Ordering::Relaxed) {
                 return Ok(false);
@@ -66,7 +70,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- stop --
     /// Stop the TCP debug server and close all connections.
+    /// @return | nil | No value is returned.
     let run = running.clone();
     let th = thread_handle.clone();
     db.set("stop", lua.create_function(move |_, ()| {
@@ -81,32 +87,33 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- isRunning --
     /// Returns whether the server is currently running.
+    /// @return | boolean | Whether the debug server is active.
     let run = running.clone();
-    /// @return bool
     db.set("isRunning", lua.create_function(move |_, ()| Ok(run.load(Ordering::Relaxed)))?,
     )?;
 
+    // -- getPort --
     /// Returns the server port (0 if not running).
+    /// @return | integer | Bound TCP port, or 0 when stopped.
     let sh = shared.clone();
-    /// @return integer
     db.set("getPort", lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.port).unwrap_or(0)))?,
     )?;
 
+    // -- getClientCount --
     /// Returns the number of connected TCP clients.
+    /// @return | integer | Number of currently connected clients.
     let sh = shared.clone();
-    /// @return integer
     db.set("getClientCount", lua.create_function(move |_, ()| Ok(sh.lock().map(|s| s.client_count).unwrap_or(0)))?,
     )?;
 
+    // -- poll --
     /// Poll for pending Lua-dependent requests from TCP clients.
-    /// Must be called each frame from lurek.update(). Automatically records
-    /// the current frame delta from `lurek.timer.getDelta()` into the performance
-    /// buffer â€” no manual `recordFrame()` call is needed.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
-    /// @return table|nil
     db.set("poll", lua.create_function(move |lua, ()| {
-            // Auto-record frame time from lurek.timer.getDelta â€” no manual call needed.
+            // Auto-record frame time from lurek.timer.getDelta - no manual call needed.
             if let Ok(lurek_tbl) = lua.globals().get::<_, LuaTable>("lurek") {
                 if let Ok(time_tbl) = lurek_tbl.get::<_, LuaTable>("time") {
                     if let Ok(get_delta) = time_tbl.get::<_, LuaFunction>("getDelta") {
@@ -135,7 +142,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
                             .and_then(|v| v.as_str())
                             .unwrap_or("");
                         // LUA-EVAL-JUSTIFIED: lua.load() here is the core feature of the debug-bridge
-                        // eval endpoint â€” it executes user-supplied Lua code from the connected
+                        // eval endpoint - it executes user-supplied Lua code from the connected
                         // debug client.  This cannot be expressed as a Rust tbl.set() call
                         // because the code string is dynamic and unknown at registration time.
                         match lua.load(code).eval::<LuaMultiValue>() {
@@ -276,13 +283,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ----- Print Capture -----
+    // -- capturePrint --
 
     /// Captures a print message and broadcasts it to connected clients.
+    /// @param | msg | string | Print message text.
+    /// @param | source | string? | Optional source name for the message.
+    /// @param | line | integer? | Optional source line number.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
-    /// @param msg string
-    /// @param source string?
-    /// @param line integer?
     db.set("capturePrint", lua.create_function(
             move |_, (msg, source, line): (String, Option<String>, Option<u32>)| {
                 let mut s = sh
@@ -296,10 +304,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         )?,
     )?;
 
+    // -- getPrintHistory --
     /// Returns the print history.
+    /// @param | count | integer? | Optional maximum number of recent entries to return.
+    /// @return | table | Print history entries.
     let sh = shared.clone();
-    /// @param count integer?
-    /// @return table
     db.set("getPrintHistory", lua.create_function(move |lua, count: Option<usize>| {
             let s = sh
                 .lock()
@@ -324,7 +333,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- clearPrintHistory --
     /// Clears the print history.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
     db.set("clearPrintHistory", lua.create_function(move |_, ()| {
             let mut s = sh
@@ -335,9 +346,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- setMaxPrintHistory --
     /// Sets the maximum print history size.
+    /// @param | max | integer | Maximum number of entries to retain.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
-    /// @param max integer
     db.set("setMaxPrintHistory", lua.create_function(move |_, max: usize| {
             let mut s = sh
                 .lock()
@@ -347,11 +360,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ----- Performance -----
+    // -- getPerformance --
 
     /// Returns performance statistics.
+    /// @return | table | Performance metrics table.
     let sh = shared.clone();
-    /// @return table
     db.set("getPerformance", lua.create_function(move |lua, ()| {
             let s = sh
                 .lock()
@@ -369,11 +382,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // ----- Screenshots -----
+    // -- requestScreenshot --
 
     /// Flags a screenshot request for the next frame.
+    /// @param | scale | integer? | Optional screenshot scale factor clamped to 1 through 8.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
-    /// @param scale integer?
     db.set("requestScreenshot", lua.create_function(move |_, scale: Option<u32>| {
             let mut s = sh
                 .lock()
@@ -384,20 +398,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
+    // -- isScreenshotRequested --
     /// Returns whether a screenshot is currently requested.
+    /// @return | boolean | Whether a screenshot request is pending.
     let sh = shared.clone();
-    /// @return bool
     db.set("isScreenshotRequested", lua.create_function(move |_, ()| {
             Ok(sh.lock().map(|s| s.screenshot_requested).unwrap_or(false))
         })?,
     )?;
 
-    // ----- Broadcast -----
+    // -- broadcast --
 
     /// Broadcasts a JSON event to all connected clients.
+    /// @param | event | string | Event name to broadcast.
+    /// @param | json_data | string | JSON payload string for the event.
+    /// @return | nil | No value is returned.
     let sh = shared.clone();
-    /// @param event string
-    /// @param json_data string
     db.set("broadcast", lua.create_function(move |_, (event, json_data): (String, String)| {
             let mut s = sh
                 .lock()
@@ -417,7 +433,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
 // Helpers
 // ---------------------------------------------------------------------------
 
-/// Convert a Lua value to a serde_json::Value for TCP responses.
+// Convert a Lua value to a serde_json::Value for TCP responses.
 fn lua_value_to_json(val: &LuaValue) -> serde_json::Value {
     match val {
         LuaValue::Nil => serde_json::Value::Null,

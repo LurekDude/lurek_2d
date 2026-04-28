@@ -770,9 +770,9 @@
   },
   "scripts": {
     "vscode:prepublish": "npm run build",
-    "prebuild": "npx tsx tools/generate-api-data.ts",
+    "prebuild": "npm run generate-api && npm run generate-luacats",
     "build": "node esbuild.config.mjs --production",
-    "watch": "npm run generate-api && node esbuild.config.mjs --watch",
+    "watch": "npm run generate-api && npm run generate-luacats && node esbuild.config.mjs --watch",
     "test": "node esbuild.config.mjs --test && node ./dist/test/runTest.js",
     "lint": "eslint src --ext ts",
     "generate-api": "npx tsx tools/generate-api-data.ts",

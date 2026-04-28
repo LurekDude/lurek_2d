@@ -88,6 +88,31 @@ GAMEPAD_AXES: list[str] = [
     "leftx","lefty","rightx","righty","triggerleft","triggerright",
 ]
 
+UI_NON_WIDGET_CLASSES: set[str] = {
+    "LTheme",
+    "LLineChart",
+    "LBarChart",
+    "LScatterPlot",
+    "LPieChart",
+    "LAreaChart",
+    "LUiWidget",
+}
+
+
+def _synthesize_ui_widget_classes(mod_data: dict) -> dict[str, dict]:
+    classes = dict(mod_data.get("classes", {}))
+
+    for raw_fn in mod_data.get("functions", []):
+        return_type = (raw_fn.get("inferred_return") or raw_fn.get("returns_doc") or "").strip()
+        for candidate in [part.strip() for part in return_type.split(",")]:
+            if not candidate.startswith("L"):
+                continue
+            if candidate in UI_NON_WIDGET_CLASSES:
+                continue
+            classes.setdefault(candidate, {"description": "", "methods": []})
+
+    return classes
+
 # Enum string values for common "mode" parameters.
 # Kept in the script (not hardcoded in TypeScript) so they update with each release.
 BUILTIN_ENUMS: dict[str, list[str]] = {
@@ -115,8 +140,8 @@ def _build_signature(full_path: str, params: list[dict]) -> str:
 
 def _convert_function(raw: dict) -> dict:
     """Convert one function entry from lua_api_data.json to the extension schema."""
-    is_method = raw.get("kind", "function") == "method"
     full_path = raw.get("lua_name", raw["name"])
+    is_method = raw.get("kind", "function") == "method"
     owner = raw.get("owner_type") or None
 
     params: list[dict] = []
@@ -147,9 +172,11 @@ def convert(data: dict, verbose: bool = False) -> dict:
     """Convert lua_api_data.json content to the extension-ready dict."""
     api_root = data.get("lua_api", data)
     raw_modules: dict = api_root.get("modules", {})
+    raw_enums: dict[str, list[str]] = api_root.get("enums") or BUILTIN_ENUMS
 
     modules_out: list[dict] = []
     classes_out: dict[str, dict] = {}
+    ui_widget_classes: set[str] = set()
 
     for mod_name, mod_data in sorted(raw_modules.items()):
         functions: list[dict] = []
@@ -165,7 +192,10 @@ def convert(data: dict, verbose: bool = False) -> dict:
 
         # Also extract methods from the classes dict (lua_api_data.json stores methods
         # under mod_data["classes"][ClassName]["methods"], not in mod_data["functions"]).
-        for class_name, class_data in mod_data.get("classes", {}).items():
+        class_entries = _synthesize_ui_widget_classes(mod_data) if mod_name == "ui" else mod_data.get("classes", {})
+        for class_name, class_data in class_entries.items():
+            if mod_name == "ui" and class_name not in UI_NON_WIDGET_CLASSES:
+                ui_widget_classes.add(class_name)
             cls_desc = class_data.get("description", "")
             if class_name not in classes_out:
                 classes_out[class_name] = {"name": class_name, "description": cls_desc, "methods": []}
@@ -182,6 +212,24 @@ def convert(data: dict, verbose: bool = False) -> dict:
             "methods": [],
         })
 
+    ui_base = classes_out.get("LUiWidget")
+    if ui_base:
+        base_methods = ui_base.get("methods", [])
+        for class_name, class_data in classes_out.items():
+            if class_name == "LUiWidget" or class_name not in ui_widget_classes:
+                continue
+
+            existing_names = {method.get("name") for method in class_data.get("methods", [])}
+            for base_method in base_methods:
+                method_name = base_method.get("name")
+                if not method_name or method_name in existing_names:
+                    continue
+
+                cloned = dict(base_method)
+                cloned["fullPath"] = f"{class_name}.{method_name}"
+                cloned["objectType"] = class_name
+                class_data["methods"].append(cloned)
+
     if verbose:
         total_fn  = sum(len(m["functions"]) for m in modules_out)
         total_mth = sum(len(c["methods"]) for c in classes_out.values())
@@ -195,7 +243,7 @@ def convert(data: dict, verbose: bool = False) -> dict:
         "generated": str(date.today()),
         "modules": modules_out,
         "classes": sorted(classes_out.values(), key=lambda c: c["name"]),
-        "enums": BUILTIN_ENUMS,
+        "enums": raw_enums,
         "callbacks": CALLBACKS,
         "keyNames": KEY_NAMES,
         "gamepadButtons": GAMEPAD_BUTTONS,

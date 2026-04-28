@@ -1038,9 +1038,9 @@ end)
 -- @description Verifies DataFrame runtime type reporting through type() and typeOf().
 describe("type", function()
     -- @description Verifies that DataFrame:type() returns the string DataFrame.
-    it("DataFrame type() returns DataFrame", function()
+    it("DataFrame type() returns LDataFrame", function()
         local df = make_test_df()
-        expect_equal("DataFrame", df:type())
+        expect_equal("LDataFrame", df:type())
     end)
 
     -- @description Verifies that DataFrame:typeOf("DataFrame") returns true.
@@ -1153,9 +1153,9 @@ describe("Database", function()
     end)
 
     -- @description Verifies that Database:type() returns the string Database.
-    it("Database type() returns Database", function()
+    it("Database type() returns LDatabase", function()
         local db = lurek.dataframe.newDatabase()
-        expect_equal("Database", db:type())
+        expect_equal("LDatabase", db:type())
     end)
 
     -- @description Verifies that Database:typeOf("Database") returns true.

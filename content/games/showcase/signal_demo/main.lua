@@ -118,8 +118,10 @@ end
 -- ---------------------------------------------------------------------------
 local _cam = nil ---@type any
 local health          = MAX_HEALTH
+local health_display_state = { val = MAX_HEALTH }
 local health_display  = MAX_HEALTH
 local score           = 0
+local score_display_state = { val = 0 }
 local score_display   = 0
 local combo           = 0
 local level           = 1
@@ -239,7 +241,7 @@ local function register_subscribers()
     signal_subscribe("player_hit", "HealthDrain", function()
         health = clamp(health - HIT_DAMAGE, 0, MAX_HEALTH)
         health_tween = lurek.tween.to(
-            { val = health_display },
+            health_display_state,
             { val = health },
             0.4, "outQuad"
         )
@@ -267,7 +269,7 @@ local function register_subscribers()
         local amount = (data and data.amount) or SCORE_PER_HIT
         score = score + amount
         score_tween = lurek.tween.to(
-            { val = score_display },
+            score_display_state,
             { val = score },
             0.3, "outQuad"
         )
@@ -490,12 +492,8 @@ function lurek.process(dt)
     lurek.render.setBackgroundColor(bg_color.r, bg_color.g, bg_color.b)
 
     -- Tween-driven display values
-    if health_tween then
-        health_display = health_tween.val or health_display
-    end
-    if score_tween then
-        score_display = score_tween.val or score_display
-    end
+    health_display = health_display_state.val
+    score_display = score_display_state.val
 
     -- Fire signals from input
     if lurek.input.wasActionPressed("hit") then

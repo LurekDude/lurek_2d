@@ -15,9 +15,11 @@ hero:define("defense",   5, { min = 0, max = 100 })
 hero:setActionPoints(6)
 hero:setMorale(100)
 
+local ap_current, ap_max = hero:getActionPoints()
+
 print(string.format("[example.stats] hero hp=%d attack=%d defense=%d AP=%d/%d",
     hero:get("hp"), hero:get("attack"), hero:get("defense"),
-    hero:getActionPoints().current, hero:getActionPoints().max))
+    ap_current, ap_max))
 
 -- ── 2. Apply buffs — flat add and multiplicative — observe effective stat ─────
 local strength_buff = hero:addBuff("attack",  5,  1.0, 10, "potion")     -- +5 for 10s
@@ -41,11 +43,13 @@ local _ = strength_buff
 
 -- ── 5. Action points and turn cycle ───────────────────────────────────────────
 hero:spendActionPoints(4)
+local ap_after_spend = select(1, hero:getActionPoints())
 print(string.format("[example.stats] spent 4 AP -> %d remaining",
-    hero:getActionPoints().current))
+    ap_after_spend))
 hero:beginTurn()
+local ap_after_begin_turn = select(1, hero:getActionPoints())
 print(string.format("[example.stats] after beginTurn: AP=%d (refilled)",
-    hero:getActionPoints().current))
+    ap_after_begin_turn))
 
 -- ── 6. XP, levelling, flags ───────────────────────────────────────────────────
 hero:setLevelThresholds(M.newLinearThresholds(100, 50))  -- L2=100, L3=150, L4=200...

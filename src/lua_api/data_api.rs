@@ -165,7 +165,9 @@ impl LuaUserData for LuaRingBuffer {
         // -- isFull --
         /// Returns true if the buffer has reached its capacity.
         /// @return | boolean | True when the buffer has reached capacity.
-        methods.add_method("isFull", |_, this, ()| Ok(this.inner.len() >= this.capacity),
+        methods.add_method(
+            "isFull",
+            |_, this, ()| Ok(this.inner.len() >= this.capacity),
         );
 
         // -- clear --
@@ -293,8 +295,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- pack --
     /// Packs values into a binary byte string using the format string.
     /// @param | format | string | Pack format string.
+    /// @param | ... | any | Values to encode using the format string.
     /// @return | string | Packed bytes as a Lua string.
-    tbl.set("pack", lua.create_function(|lua, (fmt, vals): (String, LuaMultiValue)| {
+    tbl.set(
+        "pack",
+        lua.create_function(|lua, (fmt, vals): (String, LuaMultiValue)| {
             let pvs = lua_values_to_pack(vals);
             let bd = data::pack(&fmt, &pvs).map_err(LuaError::RuntimeError)?;
             lua.create_string(bd.as_bytes())
@@ -306,8 +311,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Pack format string.
     /// @param | data | string | Packed byte string to read from.
     /// @param | offset | integer? | Optional starting byte offset.
-    /// @return | any, integer | Unpacked Lua values followed by the next byte offset.
-    tbl.set("unpack", lua.create_function(
+    /// @return | any | Unpacked Lua value or values.
+    /// @return | integer | Next byte offset after the unpacked values.
+    tbl.set(
+        "unpack",
+        lua.create_function(
             |lua, (fmt, raw, offset): (String, LuaString, Option<usize>)| {
                 let (values, next_pos) = data::unpack(&fmt, raw.as_bytes(), offset.unwrap_or(0))
                     .map_err(LuaError::RuntimeError)?;
@@ -321,8 +329,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- getPackedSize --
     /// Returns the number of bytes the given format and values would occupy.
     /// @param | format | string | Pack format string.
+    /// @param | ... | any | Values whose packed size should be measured.
     /// @return | integer | Total packed size in bytes.
-    tbl.set("getPackedSize", lua.create_function(|_, (fmt, vals): (String, LuaMultiValue)| {
+    tbl.set(
+        "getPackedSize",
+        lua.create_function(|_, (fmt, vals): (String, LuaMultiValue)| {
             let pvs = lua_values_to_pack(vals);
             data::get_packed_size(&fmt, &pvs)
                 .map_err(LuaError::RuntimeError)
@@ -336,7 +347,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | data | string | Raw bytes to compress.
     /// @param | level | integer? | Optional compression level.
     /// @return | string | Compressed bytes as a Lua string.
-    tbl.set("compress", lua.create_function(
+    tbl.set(
+        "compress",
+        lua.create_function(
             |lua, (format_str, raw_data, level): (String, LuaString, Option<u32>)| {
                 let format =
                     CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
@@ -352,7 +365,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Compression format name.
     /// @param | data | string | Compressed bytes to decompress.
     /// @return | string | Decompressed bytes as a Lua string.
-    tbl.set("decompress", lua.create_function(|lua, (format_str, compressed): (String, LuaString)| {
+    tbl.set(
+        "decompress",
+        lua.create_function(|lua, (format_str, compressed): (String, LuaString)| {
             let format = CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             let result =
                 data::decompress(compressed.as_bytes(), format).map_err(LuaError::RuntimeError)?;
@@ -365,7 +380,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Encoding format name.
     /// @param | data | string | Raw bytes to encode.
     /// @return | string | Encoded text.
-    tbl.set("encode", lua.create_function(|_, (format_str, raw_data): (String, LuaString)| {
+    tbl.set(
+        "encode",
+        lua.create_function(|_, (format_str, raw_data): (String, LuaString)| {
             let format = EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             Ok(data::encode(format, raw_data.as_bytes()))
         })?,
@@ -376,7 +393,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Encoding format name.
     /// @param | encoded | string | Encoded text to decode.
     /// @return | string | Decoded raw bytes as a Lua string.
-    tbl.set("decode", lua.create_function(|lua, (format_str, encoded): (String, String)| {
+    tbl.set(
+        "decode",
+        lua.create_function(|lua, (format_str, encoded): (String, String)| {
             let format = EncodeFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             let result = data::decode(format, &encoded).map_err(LuaError::RuntimeError)?;
             lua.create_string(&result)
@@ -388,7 +407,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | algorithm | string | Hash algorithm name.
     /// @param | data | string | Raw bytes to hash.
     /// @return | string | Hex-encoded digest string.
-    tbl.set("hash", lua.create_function(|_, (algo_str, raw_data): (String, LuaString)| {
+    tbl.set(
+        "hash",
+        lua.create_function(|_, (algo_str, raw_data): (String, LuaString)| {
             let algo = HashAlgorithm::parse_str(&algo_str).map_err(LuaError::RuntimeError)?;
             Ok(data::hash(algo, raw_data.as_bytes()))
         })?,
@@ -398,14 +419,18 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Returns the CRC-32 checksum of the input data as an integer.
     /// @param | data | string | Input bytes to checksum.
     /// @return | integer | CRC-32 value in the range `[0, 2^32)`.
-    tbl.set("crc32", lua.create_function(|_, raw_data: LuaString| Ok(data::crc32(raw_data.as_bytes())))?,
+    tbl.set(
+        "crc32",
+        lua.create_function(|_, raw_data: LuaString| Ok(data::crc32(raw_data.as_bytes())))?,
     )?;
 
     // -- newByteData --
     /// Instantiates a raw byte data container object.
     /// @param | value | integer | number | string source data, or buffer size in bytes.
     /// @return | ByteData | New byte buffer instance.
-    tbl.set("newByteData", lua.create_function(|lua, value: LuaValue| {
+    tbl.set(
+        "newByteData",
+        lua.create_function(|lua, value: LuaValue| {
             let bd = match value {
                 LuaValue::Integer(n) => ByteData::new(n.max(0) as usize),
                 LuaValue::Number(n) => ByteData::new(n.max(0.0) as usize),
@@ -429,7 +454,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | offset | integer? | Optional starting byte offset.
     /// @param | size | integer? | Optional view size in bytes.
     /// @return | LDataView | New read-only data view.
-    tbl.set("newDataView", lua.create_function(
+    tbl.set(
+        "newDataView",
+        lua.create_function(
             |lua, (raw, offset, size): (LuaString, Option<usize>, Option<usize>)| {
                 let bytes: Arc<Vec<u8>> = Arc::new(raw.as_bytes().to_vec());
                 let total = bytes.len();
@@ -444,8 +471,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- write --
     /// Writes values using the Lurek2D Binary Pack Format.
     /// @param | format | string | Binary pack format string.
+    /// @param | ... | any | Values to write using the binary format.
     /// @return | string | Packed bytes as a Lua string.
-    tbl.set("write", lua.create_function(|lua, (fmt, vals): (String, LuaMultiValue)| {
+    tbl.set(
+        "write",
+        lua.create_function(|lua, (fmt, vals): (String, LuaMultiValue)| {
             let bvs = lua_values_to_bin(vals);
             let bd = data::bin_write(&fmt, &bvs).map_err(LuaError::RuntimeError)?;
             lua.create_string(bd.as_bytes())
@@ -458,7 +488,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | data | string | Packed byte string to read from.
     /// @param | offset | integer? | Optional starting byte offset.
     /// @return | any | Decoded Lua values.
-    tbl.set("read", lua.create_function(
+    tbl.set(
+        "read",
+        lua.create_function(
             |lua, (fmt, raw, offset): (String, LuaString, Option<usize>)| {
                 let (bvs, _) = data::bin_read(&fmt, raw.as_bytes(), offset.unwrap_or(0))
                     .map_err(LuaError::RuntimeError)?;
@@ -472,7 +504,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Returns the byte size of a Lurek2D Binary Pack Format string.
     /// @param | format | string | Binary pack format string.
     /// @return | integer | Size of the format in bytes.
-    tbl.set("size", lua.create_function(|_, fmt: String| {
+    tbl.set(
+        "size",
+        lua.create_function(|_, fmt: String| {
             data::bin_measure_size(&fmt).map_err(LuaError::RuntimeError)
         })?,
     )?;
@@ -481,7 +515,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Parses a TOML string into a Lua table.
     /// @param | text | string | TOML document text.
     /// @return | table | Parsed TOML value as a Lua table.
-    tbl.set("parseToml", lua.create_function(|lua, text: String| {
+    tbl.set(
+        "parseToml",
+        lua.create_function(|lua, text: String| {
             let value = toml_convert::parse_toml(&text).map_err(LuaError::RuntimeError)?;
             toml_value_to_lua(lua, &value)
         })?,
@@ -491,7 +527,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Encodes a Lua table into a TOML string.
     /// @param | tbl | table | Lua table to encode as TOML.
     /// @return | string | Encoded TOML document text.
-    tbl.set("encodeToml", lua.create_function(|_, tbl: LuaTable| {
+    tbl.set(
+        "encodeToml",
+        lua.create_function(|_, tbl: LuaTable| {
             let value = lua_table_to_toml_value(&LuaValue::Table(tbl))?;
             toml_convert::encode_toml(&value).map_err(LuaError::RuntimeError)
         })?,
@@ -501,7 +539,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Creates a fixed-capacity ring buffer that can store any Lua value.
     /// @param | capacity | integer | Maximum number of elements to retain.
     /// @return | LRingBuffer | New ring buffer instance.
-    tbl.set("newRingBuffer", lua.create_function(|_, capacity: usize| {
+    tbl.set(
+        "newRingBuffer",
+        lua.create_function(|_, capacity: usize| {
             if capacity == 0 {
                 return Err(LuaError::RuntimeError(
                     "newRingBuffer: capacity must be greater than 0".to_string(),
@@ -518,7 +558,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Serializes a Lua value (table, string, number, boolean, or nil) to MessagePack binary.
     /// @param | value | any | Lua value to serialize.
     /// @return | string | MessagePack bytes as a Lua string.
-    tbl.set("toMsgPack", lua.create_function(|lua, value: LuaValue| {
+    tbl.set(
+        "toMsgPack",
+        lua.create_function(|lua, value: LuaValue| {
             let serial = crate::serial::lua_table::from_lua(&value).map_err(LuaError::external)?;
             let json_val = serial_value_to_json(&serial);
             let bytes =
@@ -531,7 +573,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// Deserializes a MessagePack binary string back into a Lua value.
     /// @param | bytes | string | MessagePack bytes to decode.
     /// @return | any | Decoded Lua value.
-    tbl.set("fromMsgPack", lua.create_function(|lua, bytes: LuaString| {
+    tbl.set(
+        "fromMsgPack",
+        lua.create_function(|lua, bytes: LuaString| {
             let raw: &[u8] = bytes.as_bytes();
             let json_val =
                 crate::data::msgpack::from_msgpack(raw).map_err(LuaError::RuntimeError)?;
@@ -543,7 +587,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- newWriter --
     /// Creates a new write-cursor for building binary data.
     /// @return | LDataWriter | New binary data writer.
-    tbl.set("newWriter", lua.create_function(|lua, ()| {
+    tbl.set(
+        "newWriter",
+        lua.create_function(|lua, ()| {
             lua.create_userdata(LuaDataWriter {
                 inner: DataWriter::new(),
             })
@@ -909,7 +955,9 @@ impl mlua::UserData for ByteData {
         /// @param | bit_offset | integer | Bit index within the byte in the range `[0, 7]`.
         /// @param | value | boolean | True to set the bit, false to clear it.
         /// @return | nil | No value is returned.
-        methods.add_method_mut("setBit", |_, this, (byte_offset, bit_offset, value): (usize, u8, bool)| {
+        methods.add_method_mut(
+            "setBit",
+            |_, this, (byte_offset, bit_offset, value): (usize, u8, bool)| {
                 if byte_offset >= this.len() {
                     return Err(LuaError::RuntimeError(format!(
                         "lurek.data: setBit byte_offset {} out of range (size={})",
@@ -939,7 +987,9 @@ impl mlua::UserData for ByteData {
         /// @param | byte_offset | integer | Zero-based byte index.
         /// @param | bit_offset | integer | Bit index within the byte in the range `[0, 7]`.
         /// @return | boolean | Bit value at the requested position.
-        methods.add_method("getBit", |_, this, (byte_offset, bit_offset): (usize, u8)| {
+        methods.add_method(
+            "getBit",
+            |_, this, (byte_offset, bit_offset): (usize, u8)| {
                 if byte_offset >= this.len() {
                     return Err(LuaError::RuntimeError(format!(
                         "lurek.data: getBit byte_offset {} out of range (size={})",
@@ -964,7 +1014,9 @@ impl mlua::UserData for ByteData {
         /// @param | bit_offset | integer | Starting bit within the starting byte in the range `[0, 7]`.
         /// @param | count | integer | Number of bits to read in the range `[1, 32]`.
         /// @return | integer | Bits packed LSB-first into a 32-bit integer.
-        methods.add_method("readBits", |_, this, (byte_offset, bit_offset, count): (usize, u8, u8)| {
+        methods.add_method(
+            "readBits",
+            |_, this, (byte_offset, bit_offset, count): (usize, u8, u8)| {
                 if count == 0 || count > 32 {
                     return Err(LuaError::RuntimeError(format!(
                         "lurek.data: readBits count {} out of range [1..32]",

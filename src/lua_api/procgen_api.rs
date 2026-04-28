@@ -128,7 +128,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | h | integer | Diagram height.
     /// @param | pts | table | Array of `{ x, y }` seed point tables.
     /// @param | opts | table? | Optional Voronoi generation settings.
-    /// @return | table, table, table | Region IDs, nearest distances, and second-nearest distances.
+    /// @return | table | Region ID values for each cell.
+    /// @return | table | Distance to the nearest seed for each cell.
+    /// @return | table | Distance to the second-nearest seed for each cell.
     tbl.set("voronoi", lua.create_function(
             |lua, (w, h, pts_tbl, opts_tbl): (u32, u32, LuaTable, Option<LuaTable>)| {
                 let mut points: Vec<(f32, f32)> = Vec::new();

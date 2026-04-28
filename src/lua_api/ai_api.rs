@@ -227,7 +227,8 @@ impl LuaUserData for LuaAgent {
 
         // -- getPosition --
         /// Returns the agent's current position.
-        /// @return | number, number | Current world-space x and y coordinates.
+        /// @return | number | Current world-space X coordinate.
+        /// @return | number | Current world-space Y coordinate.
         methods.add_method("getPosition", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -252,7 +253,8 @@ impl LuaUserData for LuaAgent {
 
         // -- getVelocity --
         /// Returns the agent's current velocity.
-        /// @return | number, number | Current velocity x and y components.
+        /// @return | number | Current velocity X component.
+        /// @return | number | Current velocity Y component.
         methods.add_method("getVelocity", |_, this, ()| {
             let w = this.world.borrow();
             if let Some(idx) = w.get_agent_index(&this.name) {
@@ -1095,7 +1097,8 @@ impl LuaUserData for LuaSteeringManager {
 
         // -- getLastSteering --
         /// Returns the last computed steering force.
-        /// @return | number, number | Last computed force x and y components.
+        /// @return | number | Last computed force X component.
+        /// @return | number | Last computed force Y component.
         methods.add_method("getLastSteering", |_, this, ()| {
             Ok(this.inner.borrow().last_force())
         });
@@ -1109,7 +1112,8 @@ impl LuaUserData for LuaSteeringManager {
         /// @param | maxSpeed | number | Agent maximum speed.
         /// @param | maxForce | number | Agent maximum steering force.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | number, number | Combined steering force x and y components.
+        /// @return | number | Combined steering force X component.
+        /// @return | number | Combined steering force Y component.
         methods.add_method("calculate", |_, this, (px, py, vx, vy, max_speed, max_force, dt): (f32, f32, f32, f32, f32, f32, f32)| {
                 let force = this.inner.borrow_mut().calculate(
                     (px, py),
@@ -1181,7 +1185,8 @@ impl LuaUserData for LuaSteeringManager {
         /// Invokes all registered custom steering callbacks and returns the combined force.
         /// @param | agent | LAgent | Agent passed to each custom steering callback.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | number, number | Combined force x and y components.
+        /// @return | number | Combined force X component.
+        /// @return | number | Combined force Y component.
         methods.add_method(
             "applyCustomSteering",
             |lua, this, (agent_ud, dt): (LuaAnyUserData, f32)| {
@@ -1887,7 +1892,8 @@ impl LuaUserData for LuaInfluenceMap {
         // -- getMaxPosition --
         /// Returns the world-space position of the maximum value.
         /// @param | layer | string | Layer name to query.
-        /// @return | number, number | World-space x and y position of the maximum value.
+        /// @return | number | World-space X position of the maximum value.
+        /// @return | number | World-space Y position of the maximum value.
         methods.add_method("getMaxPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().max_position(&layer))
         });
@@ -1895,7 +1901,8 @@ impl LuaUserData for LuaInfluenceMap {
         // -- getMinPosition --
         /// Returns the world-space position of the minimum value.
         /// @param | layer | string | Layer name to query.
-        /// @return | number, number | World-space x and y position of the minimum value.
+        /// @return | number | World-space X position of the minimum value.
+        /// @return | number | World-space Y position of the minimum value.
         methods.add_method("getMinPosition", |_, this, layer: String| {
             Ok(this.inner.borrow().min_position(&layer))
         });
@@ -2069,7 +2076,8 @@ impl LuaUserData for LuaSquad {
         /// @param | memberIdx | integer | One-based member index.
         /// @param | leaderX | number | Leader x coordinate.
         /// @param | leaderY | number | Leader y coordinate.
-        /// @return | number, number | World-space x and y position for the member slot.
+        /// @return | number | World-space X position for the member slot.
+        /// @return | number | World-space Y position for the member slot.
         methods.add_method(
             "getFormationPosition",
             |_, this, (member_idx, leader_x, leader_y): (usize, f32, f32)| {
@@ -2219,7 +2227,8 @@ impl LuaUserData for LuaCommandQueue {
 
         // -- getCurrentTarget --
         /// Returns the target coordinates of the front command.
-        /// @return | number, number | Front command target x and y coordinates.
+        /// @return | number | Front command target X coordinate.
+        /// @return | number | Front command target Y coordinate.
         methods.add_method("getCurrentTarget", |_, this, ()| {
             Ok(this.inner.borrow().current_target())
         });
@@ -2533,7 +2542,8 @@ impl LuaUserData for LuaContextSteering {
         /// @param | ay | number | Agent y position.
         /// @param | vx | number | Agent velocity x component.
         /// @param | vy | number | Agent velocity y component.
-        /// @return | number, number | Chosen direction x and y components.
+        /// @return | number | Chosen direction X component.
+        /// @return | number | Chosen direction Y component.
         methods.add_method_mut(
             "evaluate",
             |_, this, (ax, ay, vx, vy): (f32, f32, f32, f32)| {
@@ -3060,7 +3070,8 @@ impl LuaUserData for LuaORCASolver {
         // -- getSafeVelocity --
         /// Returns the safe velocity for an agent.
         /// @param | index | integer | Agent index to query.
-        /// @return | number, number | Safe velocity x and y components.
+        /// @return | number | Safe velocity X component.
+        /// @return | number | Safe velocity Y component.
         methods.add_method("getSafeVelocity", |_, this, idx: usize| {
             let solver = this.inner.borrow();
             let v = solver

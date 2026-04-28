@@ -80,6 +80,10 @@ export interface TypeInfo {
 export const FACTORY_TYPES: Record<string, TypeInfo> = {
   "lurek.graphics.newImage": {
     typeName: "LImage",
+    fields: [
+      { name: "width", type: "number", desc: "Image width in pixels" },
+      { name: "height", type: "number", desc: "Image height in pixels" },
+    ],
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -94,6 +98,10 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
   },
   "lurek.graphics.newCanvas": {
     typeName: "LCanvas",
+    fields: [
+      { name: "width", type: "number", desc: "Canvas width in pixels" },
+      { name: "height", type: "number", desc: "Canvas height in pixels" },
+    ],
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -490,6 +498,7 @@ export const FACTORY_TYPES: Record<string, TypeInfo> = {
 
 // ── Known lurek sub-modules (for alias detection) ─────────
 const LUREK_MODULES = [
+  "graphics",
   "render", "audio", "physics", "input", "timer", "filesystem",
   "compute", "data", "image", "ecs", "window", "thread",
   "animation", "camera", "automation", "event", "math",
@@ -510,6 +519,8 @@ export interface VarType {
 export interface ModuleAlias {
   varName: string;
   modulePath: string; // e.g. "lurek.graphics"
+  alias?: string;
+  module?: string;
   line: number;
 }
 
@@ -557,7 +568,25 @@ export function scanDocument(document: vscode.TextDocument): {
     if (aliasMatch) {
       const [, varName, modulePath, moduleName] = aliasMatch;
       if ((_apiDataSingleton?.getModuleNames() ?? LUREK_MODULES).includes(moduleName)) {
-        moduleAliases.push({ varName, modulePath, line: i });
+        moduleAliases.push({ varName, modulePath, alias: varName, module: modulePath, line: i });
+      }
+    }
+
+    // Match: local var = alias.factory(...)
+    const aliasedFactoryMatch = line.match(
+      /\blocal\s+(\w+)\s*=\s*(\w+)\.(\w+)\s*\(/
+    );
+    if (aliasedFactoryMatch) {
+      const [, varName, aliasName, factoryName] = aliasedFactoryMatch;
+      const aliasInfo = moduleAliases.find(
+        (alias) => alias.varName === aliasName && alias.line < i
+      );
+      if (aliasInfo) {
+        const factoryCall = `${aliasInfo.modulePath}.${factoryName}`;
+        const returnTypeName = getReturnTypeName(factoryCall);
+        if (returnTypeName) {
+          varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
+        }
       }
     }
 

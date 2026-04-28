@@ -209,7 +209,9 @@ describe("math constants and utility", function()
 
     -- @description Asserts huge is larger than 1e300.
     it("has huge", function()
-        expect_true(lurek.math.huge > 1e300)
+        ---@type { huge: number }
+        local lurek_math = lurek.math
+        expect_true(lurek_math.huge > 1e300)
     end)
 
     -- @description Asserts lerp from 0 to 10 at t=0.5 returns 5 within 0.0001.
@@ -1704,7 +1706,7 @@ describe("lurek.math Vec3 splat", function()
   -- @tests lurek.math.Vec3.splat
   -- @description splat(5) creates Vec3 with all components equal to 5.
   xit("splat(5) gives Vec3(5,5,5)", function()
-        ---@type Vec3
+      ---@type LVec3
     local v = lurek.math.vec3(5, 5, 5)
     expect_equal(5, v.x)
     expect_equal(5, v.y)
@@ -1713,7 +1715,7 @@ describe("lurek.math Vec3 splat", function()
   -- @tests lurek.math.Vec3.splat
   -- @description splat(0) creates a zero vector.
   xit("splat(0) gives zero Vec3", function()
-        ---@type Vec3
+      ---@type LVec3
     local v = lurek.math.vec3(0, 0, 0)
     expect_equal(0, v.x)
     expect_equal(0, v.y)
@@ -1795,7 +1797,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
   -- @tests lurek.math.CatmullRomSpline.addPoint
   -- @description adding two points increases count to 2.
   xit("addPoint increases point count", function()
-        ---@type CatmullRom
+    ---@type LCatmullRom
     local s = lurek.math.catmullRom({})
     s:addPoint(0, 0)
     s:addPoint(1, 1)
@@ -1804,7 +1806,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
   -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description removePoint(2) removes the second point, reducing count by 1.
   xit("removePoint reduces count by 1", function()
-        ---@type CatmullRom
+      ---@type LCatmullRom
     local s = lurek.math.catmullRom({})
     s:addPoint(0, 0)
     s:addPoint(1, 1)
@@ -1815,7 +1817,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
   -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description removePoint with out-of-range index leaves count unchanged.
   xit("removePoint out-of-range is safe", function()
-        ---@type CatmullRom
+      ---@type LCatmullRom
     local s = lurek.math.catmullRom({})
     s:addPoint(0, 0)
     s:removePoint(99)
@@ -1825,7 +1827,7 @@ describe("lurek.math CatmullRomSpline addPoint and removePoint", function()
   -- @tests lurek.math.CatmullRomSpline.removePoint
   -- @description add then remove all points leaves an empty spline.
   xit("adding then removing all points gives empty spline", function()
-        ---@type CatmullRom
+      ---@type LCatmullRom
     local s = lurek.math.catmullRom({})
     s:addPoint(0, 0)
     s:addPoint(1, 0)
@@ -3189,18 +3191,18 @@ end)
 describe("Vec3 arithmetic (@covers)", function()
     it("dot computes the inner product", function()
         -- @covers Vec3:dot
-        ---@type Vec3
+        ---@type LVec3
         local a = lurek.math.vec3(1.0, 0.0, 0.0)
-        ---@type Vec3
+        ---@type LVec3
         local b = lurek.math.vec3(0.0, 1.0, 0.0)
         expect_near(0.0, a:dot(b), 1e-5)
     end)
 
     it("add returns a new summed vector", function()
         -- @covers Vec3:add
-        ---@type Vec3
+        ---@type LVec3
         local a = lurek.math.vec3(1.0, 2.0, 3.0)
-        ---@type Vec3
+        ---@type LVec3
         local b = lurek.math.vec3(4.0, 5.0, 6.0)
         local r = a:add(b)
         expect_not_nil(r)
@@ -3208,9 +3210,9 @@ describe("Vec3 arithmetic (@covers)", function()
 
     it("sub returns a new difference vector", function()
         -- @covers Vec3:sub
-        ---@type Vec3
+        ---@type LVec3
         local a = lurek.math.vec3(4.0, 5.0, 6.0)
-        ---@type Vec3
+        ---@type LVec3
         local b = lurek.math.vec3(1.0, 2.0, 3.0)
         local r = a:sub(b)
         expect_not_nil(r)

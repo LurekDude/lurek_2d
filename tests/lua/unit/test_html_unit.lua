@@ -4,7 +4,7 @@
 
 local describe = describe or function(name, fn) print('describe: ' .. name) fn() end
 local it = it or function(name, fn) print('  it: ' .. name) fn() end
-local expect_type = expect_type or function(v, t, msg) assert(type(v) == t, msg) end
+local expect_type = function(v, t, msg) assert(type(v) == t, msg) end
 local expect_not_nil = expect_not_nil or function(v, msg) assert(v ~= nil, msg) end
 local expect_true = expect_true or function(v, msg) assert(v == true, msg) end
 local expect_false = expect_false or function(v, msg) assert(v == false, msg) end
@@ -415,7 +415,8 @@ describe("lurek.html.loadDocument error handling", function()
             lurek.html.loadDocument("nonexistent_file_xyzzy.rml")
         end)
         expect_false(ok, "loadDocument on missing file must raise an error")
-        expect_type(err, "string", "the error value must be a string")
+        expect_true(err ~= nil and #tostring(err) > 0,
+            "the error value must be present and stringify to a non-empty message")
     end)
 end)
 

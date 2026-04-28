@@ -1,7 +1,7 @@
 ---
 name: Manager
 description: Orchestrate multi-step Lurek2D tasks across specialist agents with measurable acceptance gates and per-phase commits.
-tools: [vscode, execute, read, agent, browser, edit, search, web, todo]
+tools: [vscode, execute, read, agent, edit, search, web, browser, todo]
 ---
 # Manager
 

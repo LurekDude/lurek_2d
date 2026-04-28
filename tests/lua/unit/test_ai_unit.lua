@@ -119,7 +119,7 @@ describe("lurek.ai AIWorld", function()
     it("creates a new world", function()
         local w = lurek.ai.newWorld()
         expect_not_nil(w, "world exists")
-        expect_equal("AIWorld", w:type(), "type check")
+        expect_equal("LAIWorld", w:type(), "type check")
     end)
 
     -- @description Adds a named agent to the world and verifies the agent count increments.
@@ -177,7 +177,7 @@ describe("lurek.ai AIWorld", function()
         local w = lurek.ai.newWorld()
         local bb = w:getGlobalBlackboard()
         expect_not_nil(bb, "global bb exists")
-        expect_equal("Blackboard", bb:type())
+        expect_equal("LAIBlackboard", bb:type())
     end)
 
     -- @description Verifies a world can hold multiple simultaneously registered agents.
@@ -209,7 +209,7 @@ describe("lurek.ai Agent", function()
     it("type returns Agent", function()
         local w = lurek.ai.newWorld()
         local a = w:addAgent("hero")
-        expect_equal("Agent", a:type())
+        expect_equal("LAgent", a:type())
     end)
 
     -- @description Verifies an agent returns the exact name it was created with.
@@ -315,7 +315,7 @@ describe("lurek.ai Agent", function()
         local a = w:addAgent("a")
         local bb = a:getBlackboard()
         expect_not_nil(bb)
-        expect_equal("Blackboard", bb:type())
+        expect_equal("LAIBlackboard", bb:type())
     end)
 
     -- @description Verifies newly created agents start at the origin by default.
@@ -336,7 +336,7 @@ describe("lurek.ai Blackboard", function()
     -- @description Confirms blackboard userdata reports the expected runtime type string.
     it("type returns Blackboard", function()
         local bb = lurek.ai.newBlackboard()
-        expect_equal("Blackboard", bb:type())
+        expect_equal("LAIBlackboard", bb:type())
     end)
 
     -- @description Stores a numeric value and verifies it round-trips through the blackboard.
@@ -456,7 +456,7 @@ describe("lurek.ai StateMachine", function()
     -- @description Confirms state-machine userdata reports the expected runtime type string.
     it("type returns StateMachine", function()
         local fsm = lurek.ai.newStateMachine()
-        expect_equal("StateMachine", fsm:type())
+        expect_equal("LStateMachine", fsm:type())
     end)
 
     -- @description Adds a minimal state and verifies the operation succeeds without errors.
@@ -541,7 +541,7 @@ describe("lurek.ai BehaviorTree", function()
     -- @description Confirms behavior-tree userdata reports the expected runtime type string.
     it("type returns BehaviorTree", function()
         local bt = lurek.ai.newBehaviorTree()
-        expect_equal("BehaviorTree", bt:type())
+        expect_equal("LBehaviorTree", bt:type())
     end)
 
     -- @description Verifies a fresh behavior tree starts with a success status before any execution occurs.
@@ -568,49 +568,49 @@ describe("lurek.ai BTNode", function()
     -- @description Confirms selector factories return BTNode userdata.
     it("newSelector returns BTNode type", function()
         local n = lurek.ai.newSelector()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms sequence factories return BTNode userdata.
     it("newSequence returns BTNode type", function()
         local n = lurek.ai.newSequence()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms parallel factories return BTNode userdata.
     it("newParallel returns BTNode type", function()
         local n = lurek.ai.newParallel()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms inverter factories return BTNode userdata.
     it("newInverter returns BTNode type", function()
         local n = lurek.ai.newInverter()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms repeater factories return BTNode userdata.
     it("newRepeater returns BTNode type", function()
         local n = lurek.ai.newRepeater()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms succeeder factories return BTNode userdata.
     it("newSucceeder returns BTNode type", function()
         local n = lurek.ai.newSucceeder()
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms action-node factories return BTNode userdata.
     it("newAction returns BTNode type", function()
         local n = lurek.ai.newAction(function() return "success" end)
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Confirms condition-node factories return BTNode userdata.
     it("newCondition returns BTNode type", function()
         local n = lurek.ai.newCondition(function() return true end)
-        expect_equal("BTNode", n:type())
+        expect_equal("LBTNode", n:type())
     end)
 
     -- @description Verifies selector nodes report the correct node-type identifier.
@@ -769,7 +769,7 @@ describe("lurek.ai SteeringManager", function()
     -- @description Confirms steering-manager userdata reports the expected runtime type string.
     it("type returns SteeringManager", function()
         local sm = lurek.ai.newSteeringManager()
-        expect_equal("SteeringManager", sm:type())
+        expect_equal("LSteeringManager", sm:type())
     end)
 
     -- @description Adds a seek behavior and verifies the registered behavior count increments from zero to one.
@@ -877,7 +877,7 @@ describe("lurek.ai PathGrid", function()
     -- @description Confirms path-grid userdata reports the expected runtime type string.
     it("type returns PathGrid", function()
         local g = lurek.pathfind.newPathGrid(10, 10, 32)
-        expect_equal("PathGrid", g:type())
+        expect_equal("LPathGrid", g:type())
     end)
 
     -- @description Verifies width, height, and cell-size accessors reflect the constructor arguments.
@@ -963,7 +963,7 @@ describe("lurek.ai FlowField", function()
     it("type returns FlowField", function()
         local g = lurek.pathfind.newPathGrid(5, 5, 10)
         local ff = lurek.pathfind.newPathFlowField(g)
-        expect_equal("FlowField", ff:type())
+        expect_equal("LAIFlowField", ff:type())
     end)
 
     -- @description Verifies flow-field dimensions mirror those of the underlying grid.
@@ -1038,7 +1038,7 @@ describe("lurek.ai QLearner", function()
     -- @description Confirms Q-learner userdata reports the expected runtime type string.
     it("type returns QLearner", function()
         local q = lurek.ai.newQLearner(4, 3)
-        expect_equal("QLearner", q:type())
+        expect_equal("LQLearner", q:type())
     end)
 
     -- @description Verifies state and action counts round-trip from the constructor arguments.
@@ -1157,7 +1157,7 @@ describe("lurek.ai UtilityAI", function()
     -- @description Confirms utility-AI userdata reports the expected runtime type string.
     it("type returns UtilityAI", function()
         local u = lurek.ai.newUtilityAI()
-        expect_equal("UtilityAI", u:type())
+        expect_equal("LUtilityAI", u:type())
     end)
 
     -- @description Adds one scored action and verifies the action count increments.
@@ -1218,7 +1218,7 @@ describe("lurek.ai GOAPPlanner", function()
     -- @description Confirms GOAP planner userdata reports the expected runtime type string.
     it("type returns GOAPPlanner", function()
         local g = lurek.ai.newGOAPPlanner()
-        expect_equal("GOAPPlanner", g:type())
+        expect_equal("LGOAPPlanner", g:type())
     end)
 
     -- @description Adds one action and verifies the planner action count increments.
@@ -1313,7 +1313,7 @@ describe("lurek.ai InfluenceMap", function()
     -- @description Confirms influence-map userdata reports the expected runtime type string.
     it("type returns InfluenceMap", function()
         local im = lurek.ai.newInfluenceMap(10, 10, 32)
-        expect_equal("InfluenceMap", im:type())
+        expect_equal("LInfluenceMap", im:type())
     end)
 
     -- @description Verifies width, height, and cell-size accessors reflect the constructor arguments.
@@ -1437,7 +1437,7 @@ describe("lurek.ai Squad", function()
     -- @description Confirms squad userdata reports the expected runtime type string.
     it("type returns Squad", function()
         local sq = lurek.ai.newSquad("alpha")
-        expect_equal("Squad", sq:type())
+        expect_equal("LSquad", sq:type())
     end)
 
     -- @description Verifies a squad returns the exact name it was created with.
@@ -1512,7 +1512,7 @@ describe("lurek.ai Squad", function()
         local sq = lurek.ai.newSquad("team")
         local bb = sq:getBlackboard()
         expect_not_nil(bb)
-        expect_equal("Blackboard", bb:type())
+        expect_equal("LAIBlackboard", bb:type())
     end)
 end)
 
@@ -1524,7 +1524,7 @@ describe("lurek.ai CommandQueue", function()
     -- @description Confirms command-queue userdata reports the expected runtime type string.
     it("type returns CommandQueue", function()
         local cq = lurek.ai.newCommandQueue()
-        expect_equal("CommandQueue", cq:type())
+        expect_equal("LCommandQueue", cq:type())
     end)
 
     -- @description Verifies a fresh command queue reports empty state.
@@ -1620,73 +1620,73 @@ end)
 describe("lurek.ai type system", function()
     -- @description Confirms AIWorld userdata returns the correct type string.
     it("AIWorld:type() returns AIWorld", function()
-        expect_equal("AIWorld", lurek.ai.newWorld():type())
+        expect_equal("LAIWorld", lurek.ai.newWorld():type())
     end)
 
     -- @description Confirms Blackboard userdata returns the correct type string.
     it("Blackboard:type() returns Blackboard", function()
-        expect_equal("Blackboard", lurek.ai.newBlackboard():type())
+        expect_equal("LAIBlackboard", lurek.ai.newBlackboard():type())
     end)
 
     -- @description Confirms StateMachine userdata returns the correct type string.
     it("StateMachine:type() returns StateMachine", function()
-        expect_equal("StateMachine", lurek.ai.newStateMachine():type())
+        expect_equal("LStateMachine", lurek.ai.newStateMachine():type())
     end)
 
     -- @description Confirms BehaviorTree userdata returns the correct type string.
     it("BehaviorTree:type() returns BehaviorTree", function()
-        expect_equal("BehaviorTree", lurek.ai.newBehaviorTree():type())
+        expect_equal("LBehaviorTree", lurek.ai.newBehaviorTree():type())
     end)
 
     -- @description Confirms BTNode userdata returns the correct type string.
     it("BTNode:type() returns BTNode", function()
-        expect_equal("BTNode", lurek.ai.newSelector():type())
+        expect_equal("LBTNode", lurek.ai.newSelector():type())
     end)
 
     -- @description Confirms SteeringManager userdata returns the correct type string.
     it("SteeringManager:type() returns SteeringManager", function()
-        expect_equal("SteeringManager", lurek.ai.newSteeringManager():type())
+        expect_equal("LSteeringManager", lurek.ai.newSteeringManager():type())
     end)
 
     -- @description Confirms PathGrid userdata returns the correct type string.
     it("PathGrid:type() returns PathGrid", function()
-        expect_equal("PathGrid", lurek.pathfind.newPathGrid(5, 5, 10):type())
+        expect_equal("LPathGrid", lurek.pathfind.newPathGrid(5, 5, 10):type())
     end)
 
     -- @description Confirms FlowField userdata returns the correct type string.
     it("FlowField:type() returns FlowField", function()
         local g = lurek.pathfind.newPathGrid(5, 5, 10)
-        expect_equal("FlowField", lurek.pathfind.newPathFlowField(g):type())
+        expect_equal("LAIFlowField", lurek.pathfind.newPathFlowField(g):type())
     end)
 
     -- @description Confirms QLearner userdata returns the correct type string.
     it("QLearner:type() returns QLearner", function()
-        expect_equal("QLearner", lurek.ai.newQLearner(2, 2):type())
+        expect_equal("LQLearner", lurek.ai.newQLearner(2, 2):type())
     end)
 
     -- @description Confirms UtilityAI userdata returns the correct type string.
     it("UtilityAI:type() returns UtilityAI", function()
-        expect_equal("UtilityAI", lurek.ai.newUtilityAI():type())
+        expect_equal("LUtilityAI", lurek.ai.newUtilityAI():type())
     end)
 
     -- @description Confirms GOAPPlanner userdata returns the correct type string.
     it("GOAPPlanner:type() returns GOAPPlanner", function()
-        expect_equal("GOAPPlanner", lurek.ai.newGOAPPlanner():type())
+        expect_equal("LGOAPPlanner", lurek.ai.newGOAPPlanner():type())
     end)
 
     -- @description Confirms InfluenceMap userdata returns the correct type string.
-    it("InfluenceMap:type() returns InfluenceMap", function()
-        expect_equal("InfluenceMap", lurek.ai.newInfluenceMap(5, 5, 10):type())
+    it("InfluenceMap:type() returns LInfluenceMap", function()
+        expect_equal("LInfluenceMap", lurek.ai.newInfluenceMap(5, 5, 10):type())
     end)
 
     -- @description Confirms Squad userdata returns the correct type string.
-    it("Squad:type() returns Squad", function()
-        expect_equal("Squad", lurek.ai.newSquad("s"):type())
+    it("Squad:type() returns LSquad", function()
+        expect_equal("LSquad", lurek.ai.newSquad("s"):type())
     end)
 
     -- @description Confirms CommandQueue userdata returns the correct type string.
-    it("CommandQueue:type() returns CommandQueue", function()
-        expect_equal("CommandQueue", lurek.ai.newCommandQueue():type())
+    it("CommandQueue:type() returns LCommandQueue", function()
+        expect_equal("LCommandQueue", lurek.ai.newCommandQueue():type())
     end)
 
     -- @description Verifies AIWorld participates in the shared Object type hierarchy.

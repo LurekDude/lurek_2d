@@ -203,8 +203,8 @@ local function init_particles()
     ps_dust:setSpeed(20, 60)
     ps_dust:setDirection(math.pi * 0.5)
     ps_dust:setSpread(math.pi * 0.6)
-    ps_dust:setColor(0.6, 0.5, 0.4, 0.7, 0.6, 0.5, 0.4, 0)
-    ps_dust:setSize(2, 5)
+    ps_dust:setColors({ 0.6, 0.5, 0.4, 0.7 }, { 0.6, 0.5, 0.4, 0 })
+    ps_dust:setSizes(2, 5)
 
     ps_impact = lurek.particle.newSystem({maxParticles=500})
     ps_impact:setEmissionRate(0)
@@ -212,8 +212,8 @@ local function init_particles()
     ps_impact:setSpeed(40, 100)
     ps_impact:setDirection(math.pi * 1.5)
     ps_impact:setSpread(math.pi)
-    ps_impact:setColor(0.7, 0.6, 0.4, 1, 0.7, 0.6, 0.4, 0)
-    ps_impact:setSize(3, 7)
+    ps_impact:setColors({ 0.7, 0.6, 0.4, 1 }, { 0.7, 0.6, 0.4, 0 })
+    ps_impact:setSizes(3, 7)
 
     ps_trail = lurek.particle.newSystem({maxParticles=500})
     ps_trail:setEmissionRate(0)
@@ -221,8 +221,8 @@ local function init_particles()
     ps_trail:setSpeed(10, 30)
     ps_trail:setDirection(math.pi)
     ps_trail:setSpread(0.3)
-    ps_trail:setColor(0.9, 0.85, 0.7, 0.6, 0.9, 0.85, 0.7, 0)
-    ps_trail:setSize(2, 4)
+    ps_trail:setColors({ 0.9, 0.85, 0.7, 0.6 }, { 0.9, 0.85, 0.7, 0 })
+    ps_trail:setSizes(2, 4)
 
     ps_confetti = lurek.particle.newSystem({maxParticles=500})
     ps_confetti:setEmissionRate(0)
@@ -230,8 +230,8 @@ local function init_particles()
     ps_confetti:setSpeed(50, 150)
     ps_confetti:setDirection(math.pi * 1.5)
     ps_confetti:setSpread(math.pi * 0.8)
-    ps_confetti:setColor(1, 0.8, 0.2, 1, 0.2, 0.6, 1, 0)
-    ps_confetti:setSize(3, 6)
+    ps_confetti:setColors({ 1, 0.8, 0.2, 1 }, { 0.2, 0.6, 1, 0 })
+    ps_confetti:setSizes(3, 6)
 end
 
 -- ---------------------------------------------------------------------------
@@ -412,7 +412,7 @@ local function finish_event()
 
     -- Tween medal reveal
     tw_medal_alpha.value = 0
-    lurek.tween.to(tw_medal_alpha, 0.6, { value = 1 })
+    lurek.tween.to(tw_medal_alpha, { value = 1 }, 0.6)
 
     -- Stamina cost
     p_stamina = clamp(p_stamina - 15, 10, p_max_stamina)
@@ -528,7 +528,7 @@ local function update_long_jump(dt)
             ps_impact:emit(20)
 
             -- Tween distance counter
-            lurek.tween.to(tw_distance, 0.5, { value = best_distance })
+            lurek.tween.to(tw_distance, { value = best_distance }, 0.5)
 
             if attempt < max_attempts then
                 attempt = attempt + 1
@@ -568,7 +568,7 @@ local function update_javelin(dt)
             ps_impact:setPosition(px, TRACK_Y)
             ps_impact:emit(15)
 
-            lurek.tween.to(tw_distance, 0.5, { value = best_distance })
+            lurek.tween.to(tw_distance, { value = best_distance }, 0.5)
 
             if attempt < max_attempts then
                 attempt = attempt + 1
@@ -880,7 +880,7 @@ function lurek.process(dt)
     -- Camera follow
     if camera then
         local target_x = clamp(px - SCREEN_W * 0.35, 0, math.max(0, TRACK_RIGHT - SCREEN_W + 100))
-        local cx = lerp(camera:getX(), target_x, dt * 4)
+        local cx = lerp(camera:getPosition(), target_x, dt * 4)
         camera:setPosition(cx, 0)
     end
 

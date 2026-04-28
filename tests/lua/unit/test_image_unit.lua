@@ -1234,9 +1234,9 @@ end)
 
 -- ── ImageEffect chain API (merged from test_image_effect.lua) ──
 
----@param fx ImageEffect
+---@param fx LImageEffect
 ---@param key integer|string
----@return PostFxEffect
+---@return LPostFxEffect
 local function require_effect(fx, key)
     local effect = fx:getEffect(key)
     if effect == nil then

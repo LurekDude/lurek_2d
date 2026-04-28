@@ -1382,9 +1382,9 @@ end)
 -- @description Verifies type() and typeOf() results for graph, node, edge, and item userdata objects.
 describe("Type system", function()
     -- @description Confirms graph userdata reports its type name as Graph.
-    it("Graph type() returns Graph", function()
+    it("Graph type() returns LGraph", function()
         local g = lurek.graph.newGraph()
-        expect_equal("Graph", g:type())
+        expect_equal("LGraph", g:type())
     end)
 
     -- @description Confirms graph userdata recognizes Graph in typeOf.
@@ -1400,10 +1400,10 @@ describe("Type system", function()
     end)
 
     -- @description Confirms node userdata reports its type name as GraphNode.
-    it("Node type() returns GraphNode", function()
+    it("Node type() returns LGraphNode", function()
         local g = lurek.graph.newGraph()
         local n = g:addNode()
-        expect_equal("GraphNode", n:type())
+        expect_equal("LGraphNode", n:type())
     end)
 
     -- @description Confirms node userdata recognizes GraphNode in typeOf.
@@ -1414,9 +1414,9 @@ describe("Type system", function()
     end)
 
     -- @description Confirms edge userdata reports its type name as GraphEdge.
-    it("Edge type() returns GraphEdge", function()
+    it("Edge type() returns LGraphEdge", function()
         local g, n1, n2, e = make_simple_graph()
-        expect_equal("GraphEdge", e:type())
+        expect_equal("LGraphEdge", e:type())
     end)
 
     -- @description Confirms edge userdata recognizes GraphEdge in typeOf.
@@ -1426,10 +1426,10 @@ describe("Type system", function()
     end)
 
     -- @description Confirms item userdata reports its type name as GraphItem.
-    it("Item type() returns GraphItem", function()
+    it("Item type() returns LGraphItem", function()
         local g = lurek.graph.newGraph()
         local item = g:createItem()
-        expect_equal("GraphItem", item:type())
+        expect_equal("LGraphItem", item:type())
     end)
 
     -- @description Confirms item userdata recognizes GraphItem in typeOf.

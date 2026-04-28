@@ -42,9 +42,18 @@ def _load_gen_lua_api():
     return mod
 
 
+def _load_gen_extension_api():
+    spec = importlib.util.spec_from_file_location(
+        "gen_extension_api", TOOLS_DIR / "docs" / "gen_extension_api.py"
+    )
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
 # ── Lua API extraction ─────────────────────────────────────────────────────────
 
-def extract_lua_api(gen_lua_api, verbose: bool = False) -> dict:
+def extract_lua_api(gen_lua_api, gen_extension_api, verbose: bool = False) -> dict:
     """Extract all Lua API data using gen_lua_api module."""
     src_dir = SRC_DIR / "lua_api"
     all_fns = gen_lua_api.collect_all_functions(src_dir)
@@ -118,6 +127,7 @@ def extract_lua_api(gen_lua_api, verbose: bool = False) -> dict:
             "coverage_pct": round(documented / total * 100, 1) if total else 0,
             "modules": len(all_fns),
         },
+        "enums": dict(gen_extension_api.BUILTIN_ENUMS),
         "modules": modules,
     }
 
@@ -426,7 +436,8 @@ def main() -> int:
 
     print("--- Scanning Lua API ---")
     gen_lua_api = _load_gen_lua_api()
-    lua_api = extract_lua_api(gen_lua_api, verbose=args.verbose)
+    gen_extension_api = _load_gen_extension_api()
+    lua_api = extract_lua_api(gen_lua_api, gen_extension_api, verbose=args.verbose)
 
     # Apply docs overlay (fills descriptions that cannot live in Rust source)
     overlay_path = WORKSPACE_ROOT / "logs" / "docs_overlay.json"

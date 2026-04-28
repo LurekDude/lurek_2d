@@ -1,4 +1,4 @@
-//! `lurek.filesystem` â€” Sandboxed file I/O, directory queries, and async asset loading.
+//! `lurek.filesystem` - Sandboxed file I/O, directory queries, and async asset loading.
 //!
 //! All paths are resolved through the game's [`GameFS`] sandbox. Supports file
 //! read/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,
@@ -26,30 +26,30 @@ impl LuaUserData for LuaFileData {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getSize --
         /// Returns the file size in bytes.
-        /// @return integer
+        /// @return | integer | File size in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.len() as i64));
 
         // -- getString --
         /// Returns the file content as a Lua string.
-        /// @return string
+        /// @return | string | File contents as a Lua string.
         methods.add_method("getString", |lua, this, ()| {
             lua.create_string(&this.inner.bytes)
         });
 
         // -- getFilename --
         /// Returns the virtual path this data was loaded from.
-        /// @return string
+        /// @return | string | Virtual path of this file data.
         methods.add_method("getFilename", |_, this, ()| Ok(this.inner.path.clone()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua type name.
         methods.add_method("type", |_, _, ()| Ok("LFileData"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LFileData" || name == "Object")
         });
@@ -69,8 +69,8 @@ impl LuaUserData for LuaFileHandle {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- read --
         /// Reads bytes from the file, returning them as a string.
-        /// @param count integer?
-        /// @return string
+        /// @param | count | integer | Maximum bytes to read, or nil to read the rest of the file.
+        /// @return | string | Bytes read from the file as a Lua string.
         methods.add_method("read", |_, this, count: Option<usize>| {
             let bytes = this
                 .inner
@@ -82,7 +82,7 @@ impl LuaUserData for LuaFileHandle {
 
         // -- readLine --
         /// Reads the next line from the file without the trailing newline.
-        /// @return string?
+        /// @return | string | Next line, or nil at end of file.
         methods.add_method("readLine", |_, this, ()| {
             this.inner
                 .borrow_mut()
@@ -92,8 +92,8 @@ impl LuaUserData for LuaFileHandle {
 
         // -- write --
         /// Writes a string to the file and returns the number of bytes written.
-        /// @param data string
-        /// @return integer
+        /// @param | data | string | Text to write.
+        /// @return | integer | Number of bytes written.
         methods.add_method("write", |_, this, data: String| {
             this.inner
                 .borrow_mut()
@@ -103,8 +103,8 @@ impl LuaUserData for LuaFileHandle {
 
         // -- seek --
         /// Seeks the file position to the given byte offset from the start.
-        /// @param pos integer
-        /// @return integer
+        /// @param | pos | integer | Byte offset from the start of the file.
+        /// @return | integer | New byte offset after seeking.
         methods.add_method("seek", |_, this, pos: u64| {
             this.inner
                 .borrow_mut()
@@ -114,53 +114,53 @@ impl LuaUserData for LuaFileHandle {
 
         // -- tell --
         /// Returns the current read/write byte offset from the start of the file.
-        /// @return integer
+        /// @return | integer | Current byte offset.
         methods.add_method("tell", |_, this, ()| {
             this.inner.borrow_mut().tell().map_err(LuaError::external)
         });
 
         // -- getSize --
         /// Returns the size of the open file in bytes.
-        /// @return integer
+        /// @return | integer | File size in bytes.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.borrow().get_size()));
 
         // -- getMode --
         /// Returns the access mode the file was opened with.
-        /// @return string
+        /// @return | string | File access mode.
         methods.add_method("getMode", |_, this, ()| {
             Ok(this.inner.borrow().get_mode().as_str().to_string())
         });
 
         // -- flush --
         /// Flushes all buffered writes to disk without closing the handle.
-        /// @return nil
+        /// @return | nil | No return value.
         methods.add_method("flush", |_, this, ()| {
             this.inner.borrow_mut().flush().map_err(LuaError::external)
         });
 
         // -- close --
         /// Flushes any pending writes and closes the file handle.
-        /// @return nil
+        /// @return | nil | No return value.
         methods.add_method("close", |_, this, ()| {
             this.inner.borrow_mut().close().map_err(LuaError::external)
         });
 
         // -- isEOF --
         /// Returns whether the read cursor has reached the end of the file.
-        /// @return boolean
+        /// @return | boolean | True when the file is at end-of-file.
         methods.add_method("isEOF", |_, this, ()| {
             this.inner.borrow_mut().is_eof().map_err(LuaError::external)
         });
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua type name.
         methods.add_method("type", |_, _, ()| Ok("LFileHandle"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LFileHandle" || name == "Object")
         });
@@ -172,7 +172,6 @@ impl LuaUserData for LuaFileHandle {
 // -------------------------------------------------------------------------------
 
 /// Lua userdata wrapper around a [`ZipMount`].
-///
 /// Obtained from `lurek.filesystem.mountZip(archive_path, prefix)`.
 struct LuaZipMount {
     inner: ZipMount,
@@ -182,8 +181,8 @@ impl LuaUserData for LuaZipMount {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- readFile --
         /// Reads a file from the ZIP and returns it as a string of bytes.
-        /// @param virtual_path string
-        /// @return string
+        /// @param | virtual_path | string | Virtual path inside the mounted ZIP archive.
+        /// @return | string | File contents as a Lua string.
         methods.add_method("readFile", |_, this, virtual_path: String| {
             let bytes = this
                 .inner
@@ -194,15 +193,15 @@ impl LuaUserData for LuaZipMount {
 
         // -- contains --
         /// Returns true if `virtual_path` exists inside this ZIP mount.
-        /// @param virtual_path string
-        /// @return boolean
+        /// @param | virtual_path | string | Virtual path to check inside the archive.
+        /// @return | boolean | True when the path exists in the ZIP mount.
         methods.add_method("contains", |_, this, virtual_path: String| {
             Ok(this.inner.contains(&virtual_path))
         });
 
         // -- listFiles --
         /// Returns a sorted array of all virtual paths exposed by this ZIP mount.
-        /// @return table
+        /// @return | table | Array of virtual path strings.
         methods.add_method("listFiles", |lua, this, ()| {
             let files = this.inner.list_files();
             let tbl = lua.create_table()?;
@@ -214,18 +213,18 @@ impl LuaUserData for LuaZipMount {
 
         // -- prefix --
         /// Returns the virtual path prefix this archive was mounted under.
-        /// @return string
+        /// @return | string | Virtual mount prefix.
         methods.add_method("prefix", |_, this, ()| Ok(this.inner.prefix.clone()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua type name.
         methods.add_method("type", |_, _, ()| Ok("LZipMount"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LZipMount" || name == "Object")
         });
@@ -234,35 +233,32 @@ impl LuaUserData for LuaZipMount {
 
 // -------------------------------------------------------------------------------
 /// Registers the `lurek.filesystem` API table with the Lua VM.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param state Rc<RefCell<SharedState>>
-///
+/// Returns `Ok(())` on success.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // â”€â”€ ZIP mounting â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- ZIP mounting -------------------------------------------------
 
-    /// Mounts a ZIP archive at a virtual path prefix, making its contents readable
-    /// via the returned `ZipMount` userdata.  Returns a `ZipMount` handle.
-    /// @param archive_path string
-    /// @param prefix string  (virtual mount point, e.g. "mods/extra")
-    /// @return ZipMount
+    // -- mountZip --
+    /// Mounts a ZIP archive at a virtual path prefix and returns a mount handle.
+    /// @param | archive_path | string | Path to the ZIP archive file.
+    /// @param | prefix | string | Virtual mount point, for example `mods/extra`.
+    /// @return | LZipMount | Mounted ZIP archive handle.
     tbl.set("mountZip", lua.create_function(|lua, (archive_path, prefix): (String, String)| {
             let mount = ZipMount::new(&archive_path, &prefix).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaZipMount { inner: mount })
         })?,
     )?;
 
-    // â”€â”€ File watcher â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- File watcher -------------------------------------------------
 
     let watcher_rc = Rc::new(RefCell::new(FileWatcher::new()));
 
     let wrc = watcher_rc.clone();
+    // -- watchPath --
     /// Adds `path` to the polled file-watch list.
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | Path to start watching.
+    /// @return | nil | No return value.
     tbl.set("watchPath", lua.create_function(move |_, path: String| {
             wrc.borrow_mut().watch(&path);
             Ok(())
@@ -270,9 +266,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     let wrc = watcher_rc.clone();
+    // -- unwatchPath --
     /// Removes `path` from the polled file-watch list.  No-op if not watched.
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | Path to stop watching.
+    /// @return | nil | No return value.
     tbl.set("unwatchPath", lua.create_function(move |_, path: String| {
             wrc.borrow_mut().unwatch(&path);
             Ok(())
@@ -280,10 +277,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     let wrc = watcher_rc.clone();
-    /// Polls all watched paths and returns an array of paths that changed since the
-    /// @return table
-    /// last call.  Call once per second or per slow-update tick for hot reload.
-    /// table   array of changed path strings
+    // -- pollWatchers --
+    /// Polls watched paths and returns the ones that changed since the last poll.
+    /// @return | table | Array of changed path strings.
     tbl.set("pollWatchers", lua.create_function(move |lua, ()| {
             let changed = wrc.borrow_mut().poll();
             let tbl = lua.create_table()?;
@@ -296,8 +292,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- read --
     /// Reads a text file and returns its contents as a string.
-    /// @param path string
-    /// @return string
+    /// @param | path | string | Virtual path to the text file.
+    /// @return | string | File contents.
     let s = state.clone();
     tbl.set("read", lua.create_function(move |_, path: String| {
             s.borrow().fs.read_string(&path).map_err(LuaError::external)
@@ -306,9 +302,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- write --
     /// Writes a string to a file in the save directory.
-    /// @param path string
-    /// @param data string
-    /// @return nil
+    /// @param | path | string | Save path to write.
+    /// @param | data | string | Text to write.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("write", lua.create_function(move |_, (path, data): (String, String)| {
             s.borrow()
@@ -320,17 +316,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- exists --
     /// Returns whether the given file or directory exists.
-    /// @param path string
-    /// @return boolean
+    /// @param | path | string | Virtual path to check.
+    /// @return | boolean | True when the path exists.
     let s = state.clone();
     tbl.set("exists", lua.create_function(move |_, path: String| Ok(s.borrow().fs.exists(&path)))?,
     )?;
 
     // -- append --
     /// Opens the file in append mode and writes the given string at the end.
-    /// @param path string
-    /// @param data string
-    /// @return nil
+    /// @param | path | string | Save path to append to.
+    /// @param | data | string | Text to append.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("append", lua.create_function(move |_, (path, data): (String, String)| {
             s.borrow()
@@ -342,9 +338,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- openFile --
     /// Opens a file and returns a readable/writable file handle.
-    /// @param path string
-    /// @param mode string
-    /// @return FileHandle
+    /// @param | path | string | Virtual path to open.
+    /// @param | mode | string | File access mode.
+    /// @return | LFileHandle | Open file handle.
     let s = state.clone();
     tbl.set("openFile", lua.create_function(move |_, (path, mode): (String, String)| {
             let handle = s
@@ -360,8 +356,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDirectoryItems --
     /// Returns a table containing the names of every file and subdirectory in the given path.
-    /// @param path string
-    /// @return table
+    /// @param | path | string | Directory path to list.
+    /// @return | table | Array of entry names.
     let s = state.clone();
     tbl.set("getDirectoryItems", lua.create_function(move |_, path: String| {
             s.borrow()
@@ -373,24 +369,24 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- isFile --
     /// Returns whether the given path is a regular file.
-    /// @param path string
-    /// @return boolean
+    /// @param | path | string | Virtual path to check.
+    /// @return | boolean | True when the path is a regular file.
     let s = state.clone();
     tbl.set("isFile", lua.create_function(move |_, path: String| Ok(s.borrow().fs.is_file(&path)))?,
     )?;
 
     // -- isDirectory --
     /// Returns whether the given path is a directory.
-    /// @param path string
-    /// @return boolean
+    /// @param | path | string | Virtual path to check.
+    /// @return | boolean | True when the path is a directory.
     let s = state.clone();
     tbl.set("isDirectory", lua.create_function(move |_, path: String| Ok(s.borrow().fs.is_directory(&path)))?,
     )?;
 
     // -- createDirectory --
     /// Creates a directory and any missing parent directories in the save area.
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | Save directory path to create.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("createDirectory", lua.create_function(move |_, path: String| {
             s.borrow()
@@ -402,8 +398,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- remove --
     /// Permanently deletes a file or empty directory from the save directory.
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | Save path to remove.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("remove", lua.create_function(move |_, path: String| {
             s.borrow().fs.remove(&path).map_err(LuaError::external)
@@ -412,8 +408,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getInfo --
     /// Returns a table of metadata for a path, or nil if the path does not exist.
-    /// @param path string
-    /// @return table?
+    /// @param | path | string | Virtual path to inspect.
+    /// @return | table | Metadata table, or nil if the path does not exist.
     let s = state.clone();
     tbl.set("getInfo", lua.create_function(
             move |lua, path: String| match s.borrow().fs.get_info(&path) {
@@ -432,14 +428,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getSource --
     /// Returns the absolute path of the directory the game was loaded from.
-    /// @return string
+    /// @return | string | Absolute source directory path.
     let s = state.clone();
     tbl.set("getSource", lua.create_function(move |_, ()| Ok(s.borrow().fs.get_source()))?,
     )?;
 
     // -- getSaveDirectory --
     /// Returns the sandboxed save data directory path.
-    /// @return string
+    /// @return | string | Absolute save directory path.
     let s = state.clone();
     tbl.set("getSaveDirectory", lua.create_function(move |_, ()| {
             Ok(s.borrow()
@@ -452,7 +448,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getWorkingDirectory --
     /// Returns the current working directory path.
-    /// @return string
+    /// @return | string | Current working directory path.
     tbl.set("getWorkingDirectory", lua.create_function(move |_, ()| {
             GameFS::get_working_directory().map_err(LuaError::external)
         })?,
@@ -460,21 +456,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getUserDirectory --
     /// Returns the current user's home directory path.
-    /// @return string
+    /// @return | string | Current user's home directory path.
     tbl.set("getUserDirectory", lua.create_function(move |_, ()| Ok(GameFS::get_user_directory()))?,
     )?;
 
     // -- getIdentity --
     /// Returns the identity string used to locate the game's save directory.
-    /// @return string
+    /// @return | string | Filesystem identity string.
     let s = state.clone();
     tbl.set("getIdentity", lua.create_function(move |_, ()| Ok(s.borrow().filesystem_identity.clone()))?,
     )?;
 
     // -- setIdentity --
     /// Sets the identity string that names the game's sandboxed save-data directory.
-    /// @param name string
-    /// @return nil
+    /// @param | name | string | New filesystem identity string.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("setIdentity", lua.create_function(move |_, name: String| {
             s.borrow_mut().filesystem_identity = name;
@@ -484,8 +480,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- lines --
     /// Returns an iterator function over the lines of a text file.
-    /// @param path string
-    /// @return function
+    /// @param | path | string | Virtual path to the text file.
+    /// @return | function | Iterator function that returns the next line, or nil at end of file.
     let s = state.clone();
     tbl.set("lines", lua.create_function(move |lua, path: String| {
             let lines = s
@@ -501,8 +497,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- readAsync --
     /// Starts loading a file in the background and returns an opaque handle.
-    /// @param path string
-    /// @return integer
+    /// @param | path | string | Virtual path to load asynchronously.
+    /// @return | integer | Async load handle.
     let s = state.clone();
     tbl.set("readAsync", lua.create_function(move |_, path: String| {
             s.borrow_mut()
@@ -513,18 +509,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- pollAsync --
     /// Polls an async load handle, returning status and optional data.
-    /// @param handle integer
-    /// string, string?
+    /// @param | handle | integer | Async load handle returned by `readAsync`.
+    /// @return | string | Current async load status.
+    /// @return | string | Loaded payload when the async read completes.
     let s = state.clone();
-    /// @return string|nil
     tbl.set("pollAsync", lua.create_function(move |_, handle_id: u64| Ok(s.borrow().poll_async_load(handle_id)))?,
     )?;
 
     // -- mount --
     /// Mounts a directory at a virtual path inside the game filesystem.
-    /// @param source string
-    /// @param mountpoint string
-    /// @return boolean
+    /// @param | source | string | Source directory path.
+    /// @param | mountpoint | string | Virtual mount point.
+    /// @return | boolean | True when the mount succeeds.
     let s = state.clone();
     tbl.set("mount", lua.create_function(move |_, (src, mp): (String, String)| {
             s.borrow_mut()
@@ -537,16 +533,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- unmount --
     /// Removes a virtual mount layer by mountpoint.
-    /// @param mountpoint string
-    /// @return boolean
+    /// @param | mountpoint | string | Virtual mount point to remove.
+    /// @return | boolean | True when a mount was removed.
     let s = state.clone();
     tbl.set("unmount", lua.create_function(move |_, mp: String| Ok(s.borrow_mut().fs.unmount(&mp)))?,
     )?;
 
     // -- load --
     /// Loads and compiles a Lua file from the VFS, returning it as a callable function.
-    /// @param path string
-    /// @return function
+    /// @param | path | string | Virtual path to the Lua chunk.
+    /// @return | function | Compiled Lua function.
     let s = state.clone();
     tbl.set("load", lua.create_function(move |ctx, path: String| {
             let bytes = s
@@ -560,8 +556,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newFileData --
     /// Loads a file from the VFS into a FileData buffer.
-    /// @param path string
-    /// @return FileData
+    /// @param | path | string | Virtual path to load.
+    /// @return | LFileData | Loaded file data buffer.
     let s = state.clone();
     tbl.set("newFileData", lua.create_function(move |_, path: String| {
             let bytes = s
@@ -576,13 +572,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- copy --
-    /// Copies a file within the sandbox.
-    ///
-    /// The source is resolved inside the game root; the destination must be inside `save/`.
-    ///
-    /// @param src string
-    /// @param dst string
-    /// @return nil
+    /// Copies a file within the sandbox from the game root into `save/`.
+    /// @param | src | string | Source path relative to the game root.
+    /// @param | dst | string | Destination path inside `save/`.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("copy", lua.create_function(move |_, (src, dst): (String, String)| {
             s.borrow()
@@ -593,13 +586,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- move --
-    /// Moves (renames) a file within the `save/` directory.
-    ///
-    /// Both source and destination must be inside `save/`.
-    ///
-    /// @param src string
-    /// @param dst string
-    /// @return nil
+    /// Moves or renames a file within the `save/` directory.
+    /// @param | src | string | Source path inside `save/`.
+    /// @param | dst | string | Destination path inside `save/`.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("move", lua.create_function(move |_, (src, dst): (String, String)| {
             s.borrow()
@@ -611,9 +601,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- removeDir --
     /// Recursively deletes a directory and all its contents within `save/`.
-    ///
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | Directory path inside `save/`.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("removeDir", lua.create_function(move |_, path: String| {
             s.borrow().fs.remove_dir(&path).map_err(LuaError::external)
@@ -622,16 +611,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- glob --
     /// Returns a sorted list of paths matching a simple wildcard pattern.
-    ///
-    /// `*` matches any run of characters within a single path component;
-    /// `?` matches exactly one character.  Patterns are relative to the game root.
-    ///
-    /// Example: `lurek.filesystem.glob("save/*.json")`
-    ///
-    /// @param pattern string
-    /// table  array of matching relative paths
+    /// @param | pattern | string | Relative pattern where `*` matches many characters and `?` matches one character.
+    /// @return | table | Array of matching relative paths.
     let s = state.clone();
-    /// @return table
     tbl.set("glob", lua.create_function(move |lua, pattern: String| {
             let paths = s.borrow().fs.glob(&pattern).map_err(LuaError::external)?;
             let tbl = lua.create_table()?;
@@ -644,11 +626,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- listRecursive --
     /// Returns a sorted list of all files under `path`, recursively.
-    ///
-    /// Paths are relative to the game root and use `/` separators.
-    ///
-    /// @param path string
-    /// @return table  array of relative file paths
+    /// @param | path | string | Root path to scan recursively.
+    /// @return | table | Array of relative file paths using `/` separators.
     let s = state.clone();
     tbl.set("listRecursive", lua.create_function(move |lua, path: String| {
             let paths = s
@@ -666,16 +645,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- stat --
     /// Returns lightweight file statistics for the given path.
-    ///
-    /// Returns a table with fields:
-    /// - `size`   (integer) â€” File size in bytes (0 for directories).
-    /// - `isFile` (boolean) â€” `true` if the path is a regular file.
-    /// - `isDir`  (boolean) â€” `true` if the path is a directory.
-    ///
-    /// Raises a Lua error if the path is inaccessible or outside the sandbox.
-    ///
-    /// @param path string
-    /// @return table  { size: integer, isFile: boolean, isDir: boolean }
+    /// @param | path | string | Virtual path to inspect.
+    /// @return | table | Table with `size`, `isFile`, and `isDir` fields.
     let s = state.clone();
     tbl.set("stat", lua.create_function(move |lua, path: String| {
             let (size, is_file, is_dir) = s.borrow().fs.stat(&path).map_err(LuaError::external)?;
@@ -688,13 +659,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- createTempFile --
-    /// Creates an empty temporary file in the `save/` sandbox and returns its
-    /// relative path.
-    ///
-    /// The caller is responsible for deleting the file when done.
-    ///
-    /// @param prefix string?  Optional name prefix (default `"tmp"`).
-    /// @return string  Relative path of the created temp file (e.g. `"save/tmp123.tmp"`).
+    /// Creates an empty temporary file in the `save/` sandbox and returns its relative path.
+    /// @param | prefix | string | Name prefix, or nil to use `tmp`.
+    /// @return | string | Relative path of the created temp file.
     let s = state.clone();
     tbl.set("createTempFile", lua.create_function(move |_, prefix: Option<String>| {
             let prefix = prefix.as_deref().unwrap_or("tmp");
@@ -706,11 +673,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- mkdir --
-    /// Creates a directory (and any missing parents) relative to the game root.
-    /// Unlike `createDirectory`, this is not restricted to `save/`.
-    /// Mainly useful for evidence test output folders.
-    /// @param path string
-    /// @return nil
+    /// Creates a directory and any missing parents relative to the game root.
+    /// @param | path | string | Relative directory path to create.
+    /// @return | nil | No return value.
     let s = state.clone();
     tbl.set("mkdir", lua.create_function(move |_, path: String| {
             let abs = s.borrow().fs.base_dir().join(&path);
@@ -721,10 +686,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- toAbsolutePath --
-    /// Resolves a path relative to the game root to an absolute OS path string.
-    /// Useful when passing paths to Lua's `io.open`.
-    /// @param path string
-    /// @return string
+    /// Resolves a relative game path to an absolute OS path string.
+    /// @param | path | string | Relative path to resolve.
+    /// @return | string | Absolute OS path string.
     let s = state.clone();
     tbl.set("toAbsolutePath", lua.create_function(move |_, path: String| {
             let abs = s.borrow().fs.base_dir().join(&path);

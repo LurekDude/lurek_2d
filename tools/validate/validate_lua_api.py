@@ -170,7 +170,7 @@ def check_no_return_any(lines: list[str]) -> None:
 
 
 def check_no_optional_or_union_returns(lines: list[str]) -> None:
-    """Return types must be fixed; reject `?` and nil-union patterns."""
+    """Return types must be fixed; reject `?` and nil-union patterns while allowing bare `nil`."""
     return_re = re.compile(r'^\s*///\s+@return\s*\|\s*([^|]+?)\s*\|')
     for i, line in enumerate(lines):
         match = return_re.match(line)
@@ -180,7 +180,9 @@ def check_no_optional_or_union_returns(lines: list[str]) -> None:
         if '?' in type_part:
             _err(i + 1,
                  'optional return type is forbidden -- use fixed return values like `boolean, number`')
-        if re.search(r'(^|,)\s*nil\s*(,|$)', type_part) or '|nil' in type_part.replace(' ', ''):
+        normalized = [part.strip() for part in type_part.split(',') if part.strip()]
+        has_nil_union = 'nil' in normalized and len(normalized) > 1
+        if has_nil_union or '|nil' in type_part.replace(' ', ''):
             _err(i + 1,
                  'nil-union return type is forbidden -- use fixed return values like `boolean, table`')
 

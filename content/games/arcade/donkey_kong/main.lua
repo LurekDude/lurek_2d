@@ -38,6 +38,7 @@ local state = STATE.TITLE
 -- 6 platforms from bottom to top, alternating tilt direction
 local platforms = {}
 local ladders   = {}
+---@type { x: number, y: number }?
 local hammer_spawn = nil
 
 -- ── Game state ────────────────────────────────────────────────────────────
@@ -56,12 +57,16 @@ local lives  = 3
 local hammer = { active = false, timer = 0, x = 0, y = 0, collected = false }
 
 -- Visual effects
+---@type LParticleSystem
 local sparks        = nil
+---@type LParticleSystem
 local dust          = nil
 local title_blink   = 0
 local win_timer     = 0
 local heart_scale   = { v = 0 }
+---@type LTween?
 local heart_tween   = nil
+---@type LTween?
 local dk_throw_tween = nil
 ---@type LCamera
 local cam           = nil
@@ -211,7 +216,7 @@ local function spawn_barrel()
     }
     -- DK throw animation
     dk.arm_angle = 0
-    dk_throw_tween = lurek.tween.to(dk, 0.3, { arm_angle = 1 })
+    dk_throw_tween = lurek.tween.to(dk, { arm_angle = 1 }, 0.3)
 end
 
 -- ── Reset game ────────────────────────────────────────────────────────────
@@ -650,7 +655,7 @@ function lurek.process(dt)
                     win_timer = 0
                     score = score + 1000
                     heart_scale.v = 0
-                    heart_tween = lurek.tween.to(heart_scale, 0.6, { v = 1 })
+                    heart_tween = lurek.tween.to(heart_scale, { v = 1 }, 0.6)
                 end
             end
         end

@@ -30,7 +30,7 @@ describe("lurek.minimap.newMinimap", function()
     -- @description Verifies the minimap userdata reports the correct type and type hierarchy.
     it("reports correct type", function()
         local m = lurek.minimap.newMinimap(10, 10)
-        expect_equal("Minimap", m:type())
+        expect_equal("LMinimap", m:type())
         expect_true(m:typeOf("Minimap"))
         expect_true(m:typeOf("Object"))
         expect_false(m:typeOf("Image"))

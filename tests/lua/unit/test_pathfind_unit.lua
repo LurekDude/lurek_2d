@@ -449,7 +449,7 @@ describe("NavGrid.type / typeOf", function()
     -- @description Verifies NavGrid:typeOf matches NavGrid and rejects unrelated userdata types.
     it("typeOf() checks identity against a type name", function()
         local g = lurek.pathfind.newNavGrid(4, 4)
-        expect_true(g:typeOf("NavGrid"))
+        expect_true(g:typeOf("LNavGrid"))
         expect_false(g:typeOf("FlowField"))
     end)
 end)

@@ -71,17 +71,17 @@ end
 -- Useful for runtime polymorphism when a function might receive a Thread, Channel, or Promise.
 do  -- ThreadHandle:type
   local t = lurek.thread.newThread("-- noop")
-  if t:type() == "Thread" then
+  if t:type() == "LThread" then
     lurek.log.debug("got a thread handle", "thread")
   end
 end
 
 --@api-stub: ThreadHandle:typeOf
 -- Returns whether this object is of the given type.
--- Accepts "Thread" or "Object"; use to validate args in helper functions that wrap thread management.
+-- Accepts "LThread", the legacy alias, or "Object"; use to validate args in helper functions that wrap thread management.
 do  -- ThreadHandle:typeOf
   local t = lurek.thread.newThread("-- noop")
-  assert(t:typeOf("Thread"))
+  assert(t:typeOf("LThread"))
   assert(t:typeOf("Object"))
 end
 
@@ -276,20 +276,20 @@ end
 
 --@api-stub: LChannel:type
 -- Returns the type of the object.
--- Returns "Channel"; useful for runtime checks in generic message routers.
+-- Returns "LChannel"; useful for runtime checks in generic message routers.
 do  -- Channel:type
   local ch = lurek.thread.newChannel()
-  if ch:type() == "Channel" then
+  if ch:type() == "LChannel" then
     lurek.log.debug("got a channel", "thread")
   end
 end
 
 --@api-stub: LChannel:typeOf
 -- Checks if the object is of the specified type.
--- Accepts "Channel" or "Object"; guards helpers that wrap channel send/receive.
+-- Accepts "LChannel", the legacy alias, or "Object"; guards helpers that wrap channel send/receive.
 do  -- Channel:typeOf
   local ch = lurek.thread.newChannel()
-  assert(ch:typeOf("Channel"))
+  assert(ch:typeOf("LChannel"))
 end
 
 --@api-stub: LChannel:push

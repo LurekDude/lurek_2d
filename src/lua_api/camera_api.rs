@@ -44,7 +44,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- getPosition --
         /// Returns the camera's current world-space position as two values.
-        /// @return | number, number | The X and Y coordinates in world space
+        /// @return | number | Camera X coordinate in world space.
+        /// @return | number | Camera Y coordinate in world space.
         methods.add_method("getPosition", |_, this, ()| {
             Ok(this.inner.borrow().get_position())
         });
@@ -94,7 +95,10 @@ impl LuaUserData for LuaCamera2D {
 
         // -- getViewport --
         /// Returns the current screen-space viewport rectangle as four values.
-        /// @return | number, number, number, number | The x, y, width, and height in screen pixels
+        /// @return | number | Viewport X position in screen pixels.
+        /// @return | number | Viewport Y position in screen pixels.
+        /// @return | number | Viewport width in screen pixels.
+        /// @return | number | Viewport height in screen pixels.
         methods.add_method("getViewport", |_, this, ()| {
             Ok(this.inner.borrow().get_viewport())
         });
@@ -189,7 +193,8 @@ impl LuaUserData for LuaCamera2D {
         /// Converts screen-space pixel coordinates to world-space coordinates accounting for the camera's position, zoom, rotation, and viewport.
         /// @param | sx | number | Screen X coordinate in pixels
         /// @param | sy | number | Screen Y coordinate in pixels
-        /// @return | number, number | The corresponding world-space X and Y coordinates
+        /// @return | number | Corresponding world-space X coordinate.
+        /// @return | number | Corresponding world-space Y coordinate.
         methods.add_method("toWorld", |_, this, (sx, sy): (f32, f32)| {
             Ok(this.inner.borrow().to_world_coords(sx, sy))
         });
@@ -198,14 +203,18 @@ impl LuaUserData for LuaCamera2D {
         /// Converts world-space coordinates to screen-space pixel coordinates accounting for the camera's position, zoom, rotation, and viewport.
         /// @param | wx | number | World X coordinate
         /// @param | wy | number | World Y coordinate
-        /// @return | number, number | The corresponding screen-space X and Y coordinates
+        /// @return | number | Corresponding screen-space X coordinate.
+        /// @return | number | Corresponding screen-space Y coordinate.
         methods.add_method("toScreen", |_, this, (wx, wy): (f32, f32)| {
             Ok(this.inner.borrow().to_screen_coords(wx, wy))
         });
 
         // -- getVisibleArea --
         /// Returns the axis-aligned bounding rectangle of the currently visible world area as four values.
-        /// @return | number, number, number, number | The x, y, width, and height of the visible world area
+        /// @return | number | Visible area X position in world space.
+        /// @return | number | Visible area Y position in world space.
+        /// @return | number | Visible area width in world units.
+        /// @return | number | Visible area height in world units.
         methods.add_method("getVisibleArea", |_, this, ()| {
             Ok(this.inner.borrow().get_visible_area())
         });
@@ -232,8 +241,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- followPath --
         /// Animates the camera along a sequence of world-space waypoints over the given duration (seconds).
-        /// @param | points | table | Value for points.
-        /// @param | duration | number | Value for duration.
+        /// @param | points | table | Point array.
+        /// @param | duration | number | Duration in seconds.
         /// @return | nil | No return value.
         methods.add_method("followPath", |_, this, (points, duration): (LuaTable, f32)| {
                 let mut waypoints: Vec<[f32; 2]> = Vec::new();
@@ -259,7 +268,7 @@ impl LuaUserData for LuaCamera2D {
         // -- updatePath --
         /// Advances the path animation by `dt` seconds and applies the resulting position to the camera.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | boolean | Boolean result.
+            /// @return | boolean | True if the path updated and produced a new position.
         methods.add_method("updatePath", |_, this, dt: f32| {
             let pos = this.path.borrow_mut().as_mut().and_then(|p| p.update(dt));
             if let Some((x, y)) = pos {
@@ -272,7 +281,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- pathProgress --
         /// Returns the fractional progress `[0, 1]` of the active path, or `1` if no path is running.
-        /// @return | number | Returned number.
+            /// @return | number | Current path progress from 0 to 1.
         methods.add_method("pathProgress", |_, this, ()| {
             Ok(this
                 .path
@@ -284,8 +293,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- zoomTo --
         /// Smoothly tweens the camera zoom from its current level to `target_zoom` over `duration` seconds.
-        /// @param | target_zoom | number | Value for target_zoom.
-        /// @param | duration | number | Value for duration.
+        /// @param | target_zoom | number | Target zoom.
+        /// @param | duration | number | Duration in seconds.
         /// @return | nil | No return value.
         methods.add_method("zoomTo", |_, this, (target_zoom, duration): (f32, f32)| {
             let current = this.inner.borrow().get_zoom();
@@ -304,7 +313,7 @@ impl LuaUserData for LuaCamera2D {
         // -- updateZoom --
         /// Advances the zoom tween by `dt` seconds and applies the resulting zoom level to the camera.
         /// @param | dt | number | Delta time in seconds.
-        /// @return | boolean | Boolean result.
+            /// @return | boolean | True if the zoom tween updated and produced a zoom value.
         methods.add_method("updateZoom", |_, this, dt: f32| {
             let zoom = this
                 .zoom_tween
@@ -321,8 +330,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- setParallaxFactor --
         /// Sets the parallax scroll factor for the named render layer.
-        /// @param | layer | string | Value for layer.
-        /// @param | factor | number | Value for factor.
+        /// @param | layer | string | Layer index.
+        /// @param | factor | number | Factor value.
         /// @return | nil | No return value.
         methods.add_method("setParallaxFactor", |_, this, (layer, factor): (String, f32)| {
                 this.parallax.borrow_mut().insert(layer, factor);
@@ -470,7 +479,8 @@ impl LuaUserData for LuaCamera2D {
 
         // -- getEffectOffset --
         /// Returns the current world-space x/y offset contributed by the sway and shake effects.
-        /// @return | number, number | The x and y offset in world units
+        /// @return | number | World-space X offset in world units.
+        /// @return | number | World-space Y offset in world units.
         methods.add_method("getEffectOffset", |_, this, ()| {
             Ok(this.inner.borrow().effect_offset())
         });
@@ -502,7 +512,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a new Camera2D with the given viewport dimensions.
     /// @param | viewport_w | number? | Viewport width in pixels (default 800)
     /// @param | viewport_h | number? | Viewport height in pixels (default 600)
-    /// @return | LCamera | Returned value.
+    /// @return | LCamera | New Camera2D with the given viewport dimensions.
     let s = state.clone();
     tbl.set("new", lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
@@ -521,7 +531,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Creates a new 2D camera with the given viewport dimensions.
     /// @param | viewport_w | number? | Viewport width in pixels (default 800)
     /// @param | viewport_h | number? | Viewport height in pixels (default 600)
-    /// @return | LCamera | Returned value.
+    /// @return | LCamera | New 2D camera with the given viewport dimensions.
     let s = state.clone();
     tbl.set("newCamera", lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);

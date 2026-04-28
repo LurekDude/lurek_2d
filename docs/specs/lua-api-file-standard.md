@@ -119,7 +119,7 @@ Rules:
 | `Option<T>` parameter | `type?` (e.g. `string?`) |
 | `LuaTable` | `table` |
 | `LuaFunction` | `function` |
-| `LuaValue` | `any` |
+| `LuaValue` | Concrete Lua type or constrained union when known (for example `table|integer`); otherwise use `LuaValue`, the generated alias for an unconstrained Lua runtime value |
 | `Vec<T>` | `table` |
 | UserData wrapper | Lua-visible display name (e.g. `LCamera`, `LButton`, `LScheduler`) |
 | No return value | `nil` |
@@ -134,6 +134,7 @@ Rules:
 6. **Fixed return shape only**: Allowed: `nil`, one fixed type, or a fixed tuple like `boolean, number`. Forbidden: `?`, `|nil`, and other unions in `@return`.
 7. **Placement**: Docstring sits above the optional `let s = state.clone();` line and the corresponding registration call.
 8. **Every function/method MUST have at least a description and `@return`**.
+9. **Prefer precise dynamic types**: For `LuaValue` inputs, document the accepted Lua shape explicitly (`table|integer`, `string|table`, and so on) whenever it is known. Only use `LuaValue` when the value is truly unconstrained at the Lua API surface. Do not introduce raw `any` or `unknown` placeholders in source docstrings.
 
 ### 2.6 Description Line Rules
 
@@ -416,7 +417,7 @@ The scanner collects `///` lines by scanning UPWARD from the binding call. It sk
 
 The scanner extracts class names from:
 - `pub struct LuaFoo` declarations
-- `impl LuaUserData for LuaFoo` blocks  
+- `impl LuaUserData for LuaFoo` blocks
 - `methods.add_method("type", |_,_,()| Ok("DisplayName"))` for the Lua-visible name
 - Widget factory functions `fn add_button_methods(...)`
 
@@ -437,4 +438,4 @@ Before committing a `*_api.rs` file, verify:
 - [ ] UserData types have `type()` and `typeOf()` methods
 - [ ] Last two lines of `register()`: `lurek.set("module", tbl)?;` + `Ok(())`
 - [ ] No `# Parameters` / `# Returns` sections
-- [ ] No `@return any`, `?`, `|nil`, or union-style returns
+- [ ] No `@return any`, `?`, `|nil`, or union-style returns; use `unknown` for truly unconstrained dynamic values

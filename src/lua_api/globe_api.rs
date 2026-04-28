@@ -188,7 +188,9 @@ impl LuaUserData for LuaGlobe {
 
         // -- getCamera --
         /// Get the current camera (lat, lon, zoom).
-        /// @return | number, number, number | Latitude, longitude, and zoom.
+        /// @return | number | Camera latitude in degrees.
+        /// @return | number | Camera longitude in degrees.
+        /// @return | number | Camera zoom level.
         methods.add_method("getCamera", |_, this, ()| {
             this.with(|g| (g.camera.lat_deg, g.camera.lon_deg, g.camera.zoom))
         });
@@ -222,7 +224,8 @@ impl LuaUserData for LuaGlobe {
         /// Returns (lat, lon) of the screen point on the globe surface, or nil.
         /// @param | sx | number | Screen x coordinate.
         /// @param | sy | number | Screen y coordinate.
-        /// @return | number, number | Screen-space coordinates for the picked point.
+        /// @return | number | Picked latitude in degrees.
+        /// @return | number | Picked longitude in degrees.
         methods.add_method("pickLatLon", |_lua, this, (sx, sy): (f32, f32)| {
             this.with(|g| match g.pick_screen(sx, sy) {
                 Some(r) => (

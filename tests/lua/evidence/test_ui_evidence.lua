@@ -455,6 +455,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         local W, H = 220, 90
 
         local hp = lurek.ui.newProgressBar(0, 100)
+		hp.setValue(80)
         hp.setPosition(10, 10)
         hp.setSize(200, 18)
         hp.setValue(80)

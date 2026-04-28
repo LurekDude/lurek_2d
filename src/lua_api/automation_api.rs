@@ -1,4 +1,4 @@
-//! `lurek.automation` â€” Automated input simulation via timed step scripts.
+//! `lurek.automation` - Automated input simulation via timed step scripts.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -12,11 +12,6 @@ use crate::automation::{Action, Script, Simulator, Step};
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.automation` API table with the Lua VM.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param state Rc<RefCell<SharedState>>
-///
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let simulator = Rc::new(RefCell::new(Simulator::new()));
@@ -24,11 +19,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // used by `waitUntil` to gate playback advancement.
     let wait_state: Rc<RefCell<Option<(LuaRegistryKey, f32, f32)>>> = Rc::new(RefCell::new(None));
 
-    // â”€â”€ load â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- load --
     /// Loads a named script from a Lua data table containing a steps array.
-    /// @param name string
-    /// @param data table
-    /// @return nil
+    /// @param | name | string | Script name to register.
+    /// @param | data | table | Script data table containing a `steps` array.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("load", lua.create_function(move |_, (name, data): (String, LuaTable)| {
             let steps_table: LuaTable = data.get::<_, LuaTable>("steps").map_err(|_| {
@@ -47,42 +42,42 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ unload â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- unload --
     /// Removes a loaded script by name, returning true if it existed.
-    /// @param name string
-    /// @return boolean
+    /// @param | name | string | Script name to remove.
+    /// @return | boolean | True when the script existed and was removed.
     let sim = simulator.clone();
     tbl.set("unload", lua.create_function(move |_, name: String| Ok(sim.borrow_mut().unload(&name)))?,
     )?;
 
-    // â”€â”€ hasScript â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- hasScript --
     /// Returns true if a script with the given name is registered.
-    /// @param name string
-    /// @return boolean
+    /// @param | name | string | Script name to check.
+    /// @return | boolean | True when the script is registered.
     let sim = simulator.clone();
     tbl.set("hasScript", lua.create_function(move |_, name: String| Ok(sim.borrow().has_script(&name)))?,
     )?;
 
-    // â”€â”€ getScripts â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getScripts --
     /// Returns an array of all registered script names.
-    /// @return table
+    /// @return | table | Array of registered script names.
     let sim = simulator.clone();
     tbl.set("getScripts", lua.create_function(move |_, ()| Ok(sim.borrow().get_scripts()))?,
     )?;
 
-    // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- start --
     /// Starts playback of the named script from the beginning.
-    /// @param name string
-    /// @return nil
+    /// @param | name | string | Script name to play.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("start", lua.create_function(move |_, name: String| {
             sim.borrow_mut().start(&name).map_err(LuaError::external)
         })?,
     )?;
 
-    // â”€â”€ stop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- stop --
     /// Stops playback and resets the simulator to idle.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("stop", lua.create_function(move |_, ()| {
             sim.borrow_mut().stop();
@@ -90,9 +85,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ pause â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- pause --
     /// Pauses playback at the current step position.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("pause", lua.create_function(move |_, ()| {
             sim.borrow_mut().pause();
@@ -100,9 +95,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ resume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- resume --
     /// Resumes playback from a paused position.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("resume", lua.create_function(move |_, ()| {
             sim.borrow_mut().resume();
@@ -110,18 +105,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Advances the playback clock by `dt` seconds, dispatching due steps.
-    /// If `waitUntil` is active the predicate is polled before forwarding `dt`;
-    /// until the predicate returns `true` or the timeout expires the simulator
-    /// clock is frozen.
-    /// @param dt number
-    /// @return nil
+    // -- update --
+    /// Advances the playback clock by `dt` seconds.
+    /// @param | dt | number | Seconds to advance while dispatching due steps.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     let s = state.clone();
     let ws = wait_state.clone();
     tbl.set("update", lua.create_function(move |lua, dt: f32| {
-            // Handle waitUntil gate â€” poll predicate before advancing.
+            // Handle waitUntil gate - poll predicate before advancing.
             if ws.borrow().is_some() {
                 let (resolved, timed_out) = {
                     let state_opt = ws.borrow();
@@ -148,60 +140,60 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ isRunning â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isRunning --
     /// Returns true if the simulator is actively playing a script.
-    /// @return boolean
+    /// @return | boolean | True when a script is currently playing.
     let sim = simulator.clone();
     tbl.set("isRunning", lua.create_function(move |_, ()| Ok(sim.borrow().is_running()))?,
     )?;
 
-    // â”€â”€ isPaused â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isPaused --
     /// Returns true if playback is currently paused.
-    /// @return boolean
+    /// @return | boolean | True when playback is paused.
     let sim = simulator.clone();
     tbl.set("isPaused", lua.create_function(move |_, ()| Ok(sim.borrow().is_paused()))?,
     )?;
 
-    // â”€â”€ isComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isComplete --
     /// Returns true if all steps in the active script have been dispatched.
-    /// @return boolean
+    /// @return | boolean | True when the active script has finished.
     let sim = simulator.clone();
     tbl.set("isComplete", lua.create_function(move |_, ()| Ok(sim.borrow().is_complete()))?,
     )?;
 
-    // â”€â”€ getCurrentStep â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getCurrentStep --
     /// Returns the index of the next step to be dispatched.
-    /// @return integer
+    /// @return | integer | Zero-based step index.
     let sim = simulator.clone();
     tbl.set("getCurrentStep", lua.create_function(move |_, ()| Ok(sim.borrow().current_step()))?,
     )?;
 
-    // â”€â”€ getStepCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getStepCount --
     /// Returns the total number of steps in the active script.
-    /// @return integer
+    /// @return | integer | Total number of steps.
     let sim = simulator.clone();
     tbl.set("getStepCount", lua.create_function(move |_, ()| Ok(sim.borrow().step_count()))?,
     )?;
 
-    // â”€â”€ getCurrentScript â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Returns the name of the active script, or nil if idle.
-    /// @return string?
+    // -- getCurrentScript --
+    /// Returns the name of the active script.
+    /// @return | string | Active script name.
     let sim = simulator.clone();
     tbl.set("getCurrentScript", lua.create_function(move |_, ()| Ok(sim.borrow().current_script().map(|s| s.to_string())))?,
     )?;
 
-    // â”€â”€ getElapsedTime â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getElapsedTime --
     /// Returns seconds elapsed since playback started.
-    /// @return number
+    /// @return | number | Elapsed playback time in seconds.
     let sim = simulator.clone();
     tbl.set("getElapsedTime", lua.create_function(move |_, ()| Ok(sim.borrow().elapsed_time()))?,
     )?;
 
-    // â”€â”€ loadFromToml â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- loadFromToml --
     /// Parses a TOML string and registers it as a named script.
-    /// @param name string
-    /// @param toml_str string
-    /// @return nil
+    /// @param | name | string | Script name to register.
+    /// @param | toml_str | string | TOML string to parse into a script.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("loadFromToml", lua.create_function(move |_, (name, toml_str): (String, String)| {
             let script = Script::from_toml(&name, &toml_str)
@@ -211,34 +203,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getStepLimit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Returns the step limit for the named script, or nil if not found.
-    /// @param name string
-    /// @return integer?
+    // -- getStepLimit --
+    /// Returns the step limit for the named script.
+    /// @param | name | string | Script name to inspect.
+    /// @return | integer | Step limit value.
     let sim = simulator.clone();
     tbl.set("getStepLimit", lua.create_function(move |_, name: String| {
             Ok(sim.borrow().get_script_step_limit(&name).map(|v| v as u64))
         })?,
     )?;
 
-    // â”€â”€ setStepLimit â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Sets the step limit for the named script (clamped to 1..MAX_STEPS).
-    /// Returns true if the script was found, false otherwise.
-    /// @param name string
-    /// @param n integer
-    /// @return boolean
+    // -- setStepLimit --
+    /// Sets the step limit for the named script.
+    /// @param | name | string | Script name to update.
+    /// @param | n | integer | New step limit value.
+    /// @return | boolean | True when the script was found and updated.
     let sim = simulator.clone();
     tbl.set("setStepLimit", lua.create_function(move |_, (name, n): (String, u64)| {
             Ok(sim.borrow_mut().set_script_step_limit(&name, n as usize))
         })?,
     )?;
 
-    // â”€â”€ saveMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Saves a currently-loaded script under a macro name for fast replay.
-    /// The script must already be loaded via `load` or `loadFromToml`.
-    /// @param macro_name string
-    /// @param script_name string
-    /// @return nil
+    // -- saveMacro --
+    /// Saves a loaded script under a macro name for fast replay.
+    /// @param | macro_name | string | Macro name to save.
+    /// @param | script_name | string | Existing script name to copy.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("saveMacro", lua.create_function(move |_, (macro_name, script_name): (String, String)| {
             let script = sim.borrow().get_script(&script_name).ok_or_else(|| {
@@ -249,11 +239,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ playMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- playMacro --
     /// Loads and starts playback of a previously saved macro.
-    /// Errors if the macro name has not been saved.
-    /// @param name string
-    /// @return nil
+    /// @param | name | string | Macro name to play.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("playMacro", lua.create_function(move |_, name: String| {
             sim.borrow_mut()
@@ -262,26 +251,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ hasMacro â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- hasMacro --
     /// Returns true if a macro with the given name has been saved.
-    /// @param name string
-    /// @return boolean
+    /// @param | name | string | Macro name to check.
+    /// @return | boolean | True when the macro exists.
     let sim = simulator.clone();
     tbl.set("hasMacro", lua.create_function(move |_, name: String| Ok(sim.borrow().has_macro(&name)))?,
     )?;
 
-    // â”€â”€ listMacros â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- listMacros --
     /// Returns an array of all saved macro names.
-    /// @return table
+    /// @return | table | Array of saved macro names.
     let sim = simulator.clone();
     tbl.set("listMacros", lua.create_function(move |_, ()| Ok(sim.borrow().list_macros()))?,
     )?;
 
-    // â”€â”€ setPlaybackSpeed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double).
-    /// Negative values are clamped to 0 (frozen clock).
-    /// @param factor number
-    /// @return nil
+    // -- setPlaybackSpeed --
+    /// Sets the playback speed multiplier.
+    /// @param | factor | number | Multiplier applied to playback time.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("setPlaybackSpeed", lua.create_function(move |_, factor: f32| {
             sim.borrow_mut().set_playback_speed(factor);
@@ -289,19 +277,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getPlaybackSpeed â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPlaybackSpeed --
     /// Returns the current playback speed multiplier (default 1.0).
-    /// @return number
+    /// @return | number | Current playback speed multiplier.
     let sim = simulator.clone();
     tbl.set("getPlaybackSpeed", lua.create_function(move |_, ()| Ok(sim.borrow().get_playback_speed()))?,
     )?;
 
-    // â”€â”€ setHighlightMode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setHighlightMode --
     /// Enables or disables the highlight overlay hint.
-    /// When true, a game render pass can visualise the current simulated cursor/key
-    /// position by calling `lurek.automation:isHighlightMode()`.
-    /// @param enable boolean
-    /// @return nil
+    /// @param | enable | boolean | True to enable the hint overlay.
+    /// @return | nil | No value is returned.
     let sim = simulator.clone();
     tbl.set("setHighlightMode", lua.create_function(move |_, enable: bool| {
             sim.borrow_mut().set_highlight_mode(enable);
@@ -309,19 +295,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ isHighlightMode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isHighlightMode --
     /// Returns whether the highlight overlay hint is active.
-    /// @return boolean
+    /// @return | boolean | True when highlight mode is enabled.
     let sim = simulator.clone();
     tbl.set("isHighlightMode", lua.create_function(move |_, ()| Ok(sim.borrow().is_highlight_mode()))?,
     )?;
 
-    // â”€â”€ waitUntil â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Pauses playback advancement until predicate() returns true or timeout seconds elapse.
-    /// While waiting, `update` does not forward elapsed time to the simulator.
-    /// @param predicate function -- must return boolean
-    /// @param timeout number -- maximum seconds to wait before auto-resuming
-    /// @return nil
+    // -- waitUntil --
+    /// Pauses playback advancement until a predicate returns true or a timeout expires.
+    /// @param | predicate | function | Callback that must return a boolean.
+    /// @param | timeout | number | Maximum seconds to wait before resuming.
+    /// @return | nil | No value is returned.
     let ws = wait_state.clone();
     tbl.set("waitUntil", lua.create_function(move |lua, (predicate, timeout): (LuaFunction, f32)| {
             let key = lua.create_registry_value(predicate)?;
@@ -330,8 +315,6 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    /// Namespace containing the automation API module.
-    /// Provides automation scripts playback for tests.
     lurek.set("automation", tbl)?;
     Ok(())
 }

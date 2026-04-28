@@ -20,7 +20,7 @@ pub struct LuaScheduler {
 }
 
 impl LuaScheduler {
-    /// Creates a new empty scheduler with no pending events.
+    // Creates a new empty scheduler with no pending events.
     fn new() -> Self {
         Self {
             scheduler: Scheduler::new(),
@@ -29,7 +29,7 @@ impl LuaScheduler {
         }
     }
 
-    /// Remove a callback registry key for an expired or cancelled event.
+    // Remove a callback registry key for an expired or cancelled event.
     fn remove_callback(
         lua: &Lua,
         callbacks: &mut HashMap<u32, LuaRegistryKey>,
@@ -46,9 +46,9 @@ impl LuaUserData for LuaScheduler {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- after --
         /// Schedules a callback to fire once after a delay.
-        /// @param | delay | number | Value for delay.
+        /// @param | delay | number | Delay in seconds.
         /// @param | callback | function | Callback function.
-        /// @return | integer | Returned integer.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("after", |lua, this, (delay, func): (f64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let id = this.scheduler.after(delay);
@@ -58,9 +58,9 @@ impl LuaUserData for LuaScheduler {
 
         // -- afterFrames --
         /// Schedules a callback to fire once after `n` frames.
-        /// @param | n | integer | Value for n.
+        /// @param | n | integer | Number of frames to wait.
         /// @param | callback | function | Callback function.
-        /// @return | integer | Returned integer.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("afterFrames", |lua, this, (n, func): (u64, LuaFunction)| {
             let key = lua.create_registry_value(func)?;
             let id = this.scheduler.after_frames(n);
@@ -70,10 +70,10 @@ impl LuaUserData for LuaScheduler {
 
         // -- afterNamed --
         /// Schedules a named one-shot callback, replacing any existing event with the same name.
-        /// @param | name | string | Name value.
-        /// @param | delay | number | Value for delay.
+        /// @param | name | string | Scheduler event name.
+        /// @param | delay | number | Delay in seconds.
         /// @param | callback | function | Callback function.
-        /// @return | integer | Returned integer.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("afterNamed", |lua, this, (name, delay, func): (String, f64, LuaFunction)| {
                 if let Some(old_id) = this.named_ids.remove(&name) {
                     this.scheduler.cancel(old_id);
@@ -89,10 +89,10 @@ impl LuaUserData for LuaScheduler {
 
         // -- every --
         /// Schedules a callback to fire repeatedly at the given interval.
-        /// @param | interval | number | Value for interval.
+        /// @param | interval | number | Interval in seconds.
         /// @param | callback | function | Callback function.
-        /// @param | count | integer? | Value for count.
-        /// @return | integer | Returned integer.
+        /// @param | count | integer? | Optional repeat count; defaults to infinite.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("every", |lua, this, (interval, func, count): (f64, LuaFunction, Option<i32>)| {
                 let key = lua.create_registry_value(func)?;
                 let id = this.scheduler.every(interval, count.unwrap_or(-1));
@@ -103,10 +103,10 @@ impl LuaUserData for LuaScheduler {
 
         // -- everyFrames --
         /// Schedules a callback to fire every `n` frames.
-        /// @param | n | integer | " frame interval
-        /// @param | func | function | " callback
-        /// @param | count | integer? | " repetitions (-1 = infinite, default)
-        /// @return | integer | " event ID
+        /// @param | n | integer | Frame interval between callbacks.
+        /// @param | func | function | Callback function.
+        /// @param | count | integer? | Optional repeat count; defaults to infinite.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("everyFrames", |lua, this, (n, func, count): (u64, LuaFunction, Option<i32>)| {
                 let key = lua.create_registry_value(func)?;
                 let id = this.scheduler.every_frames(n, count.unwrap_or(-1));
@@ -117,11 +117,11 @@ impl LuaUserData for LuaScheduler {
 
         // -- everyNamed --
         /// Schedules a named repeating callback, replacing any existing event with the same name.
-        /// @param | name | string | Name value.
-        /// @param | interval | number | Value for interval.
+        /// @param | name | string | Scheduler event name.
+        /// @param | interval | number | Interval in seconds.
         /// @param | callback | function | Callback function.
-        /// @param | count | integer? | Value for count.
-        /// @return | integer | Returned integer.
+        /// @param | count | integer? | Optional repeat count; defaults to infinite.
+        /// @return | integer | Scheduled event ID.
         methods.add_method_mut("everyNamed", |lua, this, (name, interval, func, count): (String, f64, LuaFunction, Option<i32>)| {
                 if let Some(old_id) = this.named_ids.remove(&name) {
                     this.scheduler.cancel(old_id);
@@ -139,8 +139,8 @@ impl LuaUserData for LuaScheduler {
 
         // -- cancel --
         /// Cancels a scheduled event by its numeric ID.
-        /// @param | id | integer | Object identifier.
-        /// @return | boolean | Boolean result.
+        /// @param | id | integer | Scheduled event ID.
+        /// @return | boolean | True if the scheduled event was found and cancelled.
         methods.add_method_mut("cancel", |lua, this, id: u32| {
             let removed = this.scheduler.cancel(id);
             if removed {
@@ -178,20 +178,20 @@ impl LuaUserData for LuaScheduler {
 
         // -- pause --
         /// Pauses a scheduled event by its ID.
-        /// @param | id | integer | Object identifier.
-        /// @return | boolean | Boolean result.
+        /// @param | id | integer | Scheduled event ID.
+        /// @return | boolean | True if the event was found and paused.
         methods.add_method_mut("pause", |_, this, id: u32| Ok(this.scheduler.pause(id)));
 
         // -- resume --
         /// Resumes a paused event by its ID.
-        /// @param | id | integer | Object identifier.
-        /// @return | boolean | Boolean result.
+        /// @param | id | integer | Scheduled event ID.
+        /// @return | boolean | True if the event was found and resumed.
         methods.add_method_mut("resume", |_, this, id: u32| Ok(this.scheduler.resume(id)));
 
         // -- isPaused --
         /// Returns whether the given event is currently paused.
-        /// @param | id | integer | Object identifier.
-        /// @return | boolean | Boolean result.
+        /// @param | id | integer | Scheduled event ID.
+        /// @return | boolean | True when the event is currently paused.
         methods.add_method("isPaused", |_, this, id: u32| {
             Ok(this.scheduler.is_paused(id))
         });
@@ -223,7 +223,8 @@ impl LuaUserData for LuaScheduler {
         // -- getRemaining --
         /// Returns whether the event exists and how many seconds remain until it fires next.
         /// @param | id | integer | The event identifier to query
-        /// @return | boolean, number | Found flag and remaining seconds
+        /// @return | boolean | True when the event exists.
+        /// @return | number | Remaining seconds until the event fires next.
         methods.add_method("getRemaining", |_, this, id: u32| {
             match this.scheduler.get_remaining(id) {
                 Some(value) => Ok((true, value)),
@@ -234,7 +235,8 @@ impl LuaUserData for LuaScheduler {
         // -- getInterval --
         /// Returns whether the event exists and its configured base interval in seconds.
         /// @param | id | integer | The event identifier to query
-        /// @return | boolean, number | Found flag and interval in seconds
+        /// @return | boolean | True when the event exists.
+        /// @return | number | Configured base interval in seconds.
         methods.add_method("getInterval", |_, this, id: u32| {
             match this.scheduler.get_interval(id) {
                 Some(value) => Ok((true, value)),
@@ -245,7 +247,8 @@ impl LuaUserData for LuaScheduler {
         // -- getRepeatCount --
         /// Returns whether the event exists and its remaining repetition count.
         /// @param | id | integer | The event identifier to query
-        /// @return | boolean, integer | Found flag and remaining repetition count
+        /// @return | boolean | True when the event exists.
+        /// @return | integer | Remaining repetition count.
         methods.add_method("getRepeatCount", |_, this, id: u32| {
             match this.scheduler.get_repeat_count(id) {
                 Some(value) => Ok((true, value)),

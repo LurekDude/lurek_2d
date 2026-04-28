@@ -33,8 +33,7 @@ impl CallbackRegistry {
 
     /// Stores `key` in the registry and returns a new opaque ID.
     ///
-    /// @param key  A [`LuaRegistryKey`] obtained from `lua.create_registry_value(…)`.
-    /// @return     A `u32` identifier that can be passed to domain code.
+    /// `key` must be a [`LuaRegistryKey`] obtained from `lua.create_registry_value(...)`.
     pub fn register(&mut self, key: LuaRegistryKey) -> u32 {
         let id = self.next_id;
         self.next_id = self.next_id.saturating_add(1);
@@ -44,24 +43,21 @@ impl CallbackRegistry {
 
     /// Returns a reference to the registry key associated with `id`, or `None`.
     ///
-    /// @param id  The opaque callback ID returned by [`register`][CallbackRegistry::register].
-    /// @return    `Some(&LuaRegistryKey)` if the ID is live, `None` otherwise.
+    /// `id` is the opaque callback ID returned by [`register`][CallbackRegistry::register].
     pub fn get(&self, id: u32) -> Option<&LuaRegistryKey> {
         self.map.get(&id)
     }
 
     /// Removes and returns the registry key associated with `id`, or `None`.
     ///
-    /// @param id  The opaque callback ID to remove.
-    /// @return    `Some(LuaRegistryKey)` if the ID was present, `None` otherwise.
+    /// `id` is the opaque callback ID to remove.
     pub fn remove(&mut self, id: u32) -> Option<LuaRegistryKey> {
         self.map.remove(&id)
     }
 
     /// Returns `true` if `id` is currently stored in the registry.
     ///
-    /// @param id  The opaque callback ID to check.
-    /// @return    `true` if present, `false` otherwise.
+    /// `id` is the opaque callback ID to check.
     pub fn contains(&self, id: u32) -> bool {
         self.map.contains_key(&id)
     }
@@ -72,15 +68,11 @@ impl CallbackRegistry {
     }
 
     /// Returns the number of registered callbacks.
-    ///
-    /// @return  Number of live entries.
     pub fn len(&self) -> usize {
         self.map.len()
     }
 
     /// Returns `true` if no callbacks are registered.
-    ///
-    /// @return  `true` when the registry is empty.
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
     }
@@ -88,12 +80,9 @@ impl CallbackRegistry {
     /// Looks up `id`, calls the stored Lua function with `args`, and returns the result.
     ///
     /// Returns a descriptive [`mlua::Error`] if the ID is not found or if the
-    /// stored value is not callable.
-    ///
-    /// @param id    The opaque callback ID to invoke.
-    /// @param lua   The active [`Lua`] VM handle.
-    /// @param args  Arguments forwarded to the Lua function via [`mlua::IntoLuaMulti`].
-    /// @return      The Lua function's return value converted via [`mlua::FromLuaMulti`].
+    /// stored value is not callable. `id` is the opaque callback ID to invoke,
+    /// `lua` is the active [`Lua`] VM handle, and `args` are forwarded through
+    /// [`mlua::IntoLuaMulti`].
     pub fn invoke<'lua, A, R>(&self, id: u32, lua: &'lua Lua, args: A) -> LuaResult<R>
     where
         A: mlua::IntoLuaMulti<'lua>,

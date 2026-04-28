@@ -478,8 +478,8 @@
 - `NdArray::display_string` in `src/compute/array.rs:453`
 - `next_power_of_two` in `src/compute/fft.rs:89`
 - `affine2d` in `src/compute/linalg.rs:127`
-- `lu_decompose` in `src/compute/linalg.rs:429`
-- `eigenvalue_power` in `src/compute/linalg.rs:519`
+- `lu_decompose` in `src/compute/linalg.rs:430`
+- `eigenvalue_power` in `src/compute/linalg.rs:521`
 - `sub_scalar` in `src/compute/ops.rs:172`
 - `div_scalar` in `src/compute/ops.rs:220`
 - `pow_scalar` in `src/compute/ops.rs:232`
@@ -696,21 +696,21 @@
 - `DataFrame::with_eval` in `src/dataframe/frame.rs:619`
 - `DataFrame::pivot_table` in `src/dataframe/frame.rs:659`
 - `DataFrame::rolling_mean` in `src/dataframe/frame.rs:775`
-- `DataFrame::rolling_sum` in `src/dataframe/frame.rs:833`
-- `DataFrame::rank_column` in `src/dataframe/frame.rs:885`
-- `Database::get_table_mut` in `src/dataframe/frame.rs:1139`
-- `Database::table_count` in `src/dataframe/frame.rs:1182`
-- `Database::clone_db` in `src/dataframe/frame.rs:1206`
+- `DataFrame::rolling_sum` in `src/dataframe/frame.rs:834`
+- `DataFrame::rank_column` in `src/dataframe/frame.rs:886`
+- `Database::get_table_mut` in `src/dataframe/frame.rs:1140`
+- `Database::table_count` in `src/dataframe/frame.rs:1183`
+- `Database::clone_db` in `src/dataframe/frame.rs:1207`
 - `DataFrame::group_by` in `src/dataframe/query.rs:218`
 - `DataFrame::count_by` in `src/dataframe/query.rs:361`
 - `DataFrame::drop_nil` in `src/dataframe/query.rs:394`
 - `DataFrame::stddev` in `src/dataframe/query.rs:520`
 - `DataFrame::describe` in `src/dataframe/query.rs:548`
 - `DataFrame::fill_nil` in `src/dataframe/query.rs:622`
-- `DataFrame::with_rolling_mean` in `src/dataframe/query.rs:669`
-- `DataFrame::with_rolling_sum` in `src/dataframe/query.rs:721`
-- `DataFrame::with_rolling_min` in `src/dataframe/query.rs:761`
-- `DataFrame::with_rolling_max` in `src/dataframe/query.rs:805`
+- `DataFrame::with_rolling_mean` in `src/dataframe/query.rs:670`
+- `DataFrame::with_rolling_sum` in `src/dataframe/query.rs:722`
+- `DataFrame::with_rolling_min` in `src/dataframe/query.rs:762`
+- `DataFrame::with_rolling_max` in `src/dataframe/query.rs:806`
 - *...and 19 more*
 
 ### `debugbridge` — 8/9 (88.9%)
@@ -1185,8 +1185,8 @@
 
 **Uncovered public functions** (23):
 
-- `emit_globe_frame` in `src/globe/draw.rs:23`
-- `project_arc` in `src/globe/draw.rs:176`
+- `emit_globe_frame` in `src/globe/draw.rs:24`
+- `project_arc` in `src/globe/draw.rs:178`
 - `LabelStore::move_to` in `src/globe/label.rs:88`
 - `LabelStore::iter_visible` in `src/globe/label.rs:104`
 - `LayerStore::set_province_color` in `src/globe/layer.rs:44`
@@ -1477,8 +1477,8 @@
 
 **Uncovered public functions** (58):
 
-- `ImageData::draw_label` in `src/image/image_data.rs:337`
-- `ImageData::set_raw_data` in `src/image/image_data.rs:462`
+- `ImageData::draw_label` in `src/image/image_data.rs:338`
+- `ImageData::set_raw_data` in `src/image/image_data.rs:463`
 - `save_image` in `src/image/serial.rs:89`
 - `load_image` in `src/image/serial.rs:104`
 - `save_layered` in `src/image/serial.rs:127`
@@ -1684,32 +1684,32 @@
 
 **Uncovered public functions** (2):
 
-- `RotatingFileSink::write_with_rotation` in `src/log/sinks.rs:169`
-- `Sink::rotating_file` in `src/log/sinks.rs:393`
+- `RotatingFileSink::write_with_rotation` in `src/log/sinks.rs:170`
+- `Sink::rotating_file` in `src/log/sinks.rs:394`
 
 ### `lua_api` — 67/86 (77.9%)
 
 **Uncovered public functions** (19):
 
-- `Step::vec_from_lua_table` in `src/lua_api/automation_api.rs:399`
-- `CallbackRegistry::invoke` in `src/lua_api/callback_registry.rs:97`
+- `Step::vec_from_lua_table` in `src/lua_api/automation_api.rs:326`
+- `CallbackRegistry::invoke` in `src/lua_api/callback_registry.rs:86`
 - `add_type_methods` in `src/lua_api/lua_types.rs:43`
-- `ParticleConfig::from_lua_opts` in `src/lua_api/particle_api.rs:1675`
-- `LuaStep::execute_sync` in `src/lua_api/pipeline_api.rs:52`
-- `pipeline_result_to_lua` in `src/lua_api/pipeline_api.rs:501`
-- `cancel_remaining_steps` in `src/lua_api/pipeline_api.rs:543`
-- `fire_step_callbacks` in `src/lua_api/pipeline_api.rs:557`
-- `finalize_pipeline_result` in `src/lua_api/pipeline_api.rs:598`
-- `CellularOpts::from_lua_table` in `src/lua_api/procgen_api.rs:712`
-- `VoronoiOpts::from_lua_table` in `src/lua_api/procgen_api.rs:740`
+- `ParticleConfig::from_lua_opts` in `src/lua_api/particle_api.rs:1681`
+- `LuaStep::execute_sync` in `src/lua_api/pipeline_api.rs:39`
+- `pipeline_result_to_lua` in `src/lua_api/pipeline_api.rs:415`
+- `cancel_remaining_steps` in `src/lua_api/pipeline_api.rs:454`
+- `fire_step_callbacks` in `src/lua_api/pipeline_api.rs:465`
+- `finalize_pipeline_result` in `src/lua_api/pipeline_api.rs:501`
+- `CellularOpts::from_lua_table` in `src/lua_api/procgen_api.rs:663`
+- `VoronoiOpts::from_lua_table` in `src/lua_api/procgen_api.rs:688`
 - `create_lua_vm` in `src/lua_api/register.rs:32`
-- `create_test_vm` in `src/lua_api/register.rs:304`
-- `get_processor_count` in `src/lua_api/system_api.rs:21`
-- `get_memory_size` in `src/lua_api/system_api.rs:30`
-- `open_url` in `src/lua_api/system_api.rs:46`
-- `get_preferred_locales` in `src/lua_api/system_api.rs:84`
-- `get_power_info` in `src/lua_api/system_api.rs:134`
-- `LuaSpring::tick_with` in `src/lua_api/tween_api.rs:124`
+- `create_test_vm` in `src/lua_api/register.rs:303`
+- `get_processor_count` in `src/lua_api/system_api.rs:19`
+- `get_memory_size` in `src/lua_api/system_api.rs:26`
+- `open_url` in `src/lua_api/system_api.rs:36`
+- `get_preferred_locales` in `src/lua_api/system_api.rs:72`
+- `get_power_info` in `src/lua_api/system_api.rs:119`
+- `LuaSpring::tick_with` in `src/lua_api/tween_api.rs:106`
 
 ### `math` — 218/241 (90.5%)
 
@@ -2161,10 +2161,10 @@
 
 - `emission_offset` in `src/particle/emission.rs:13`
 - `emission_shape_offset` in `src/particle/emission.rs:76`
-- `ParticleSystem::move_to` in `src/particle/emitter.rs:426`
-- `ParticleSystem::clone_config` in `src/particle/emitter.rs:437`
-- `ParticleSystem::warm_up` in `src/particle/emitter.rs:605`
-- `ParticleSystem::clear_bounds` in `src/particle/emitter.rs:667`
+- `ParticleSystem::move_to` in `src/particle/emitter.rs:427`
+- `ParticleSystem::clone_config` in `src/particle/emitter.rs:438`
+- `ParticleSystem::warm_up` in `src/particle/emitter.rs:606`
+- `ParticleSystem::clear_bounds` in `src/particle/emitter.rs:668`
 - `interpolate_sizes` in `src/particle/math.rs:22`
 - `interpolate_colors` in `src/particle/math.rs:51`
 - `interpolate_alphas` in `src/particle/math.rs:84`
@@ -2587,7 +2587,7 @@
 
 **Uncovered public functions** (3):
 
-- `Lcg::next_f32` in `src/procgen/lcg.rs:40`
+- `Lcg::next_f32` in `src/procgen/lcg.rs:41`
 - `LSystem::new_from_pairs` in `src/procgen/lsystem.rs:56`
 - `WorldGraph::to_regions_list` in `src/procgen/world_graph.rs:253`
 
@@ -2661,14 +2661,14 @@
 - `Raycaster2D::set_wall_alpha` in `src/raycaster/dda.rs:134`
 - `Raycaster2D::get_wall_alpha` in `src/raycaster/dda.rs:148`
 - `Raycaster2D::cast_ray_multi` in `src/raycaster/dda.rs:271`
-- `Raycaster2D::cast_floor_row` in `src/raycaster/dda.rs:645`
+- `Raycaster2D::cast_floor_row` in `src/raycaster/dda.rs:646`
 - `HeightMap::set_ceiling_rect` in `src/raycaster/heightmap.rs:123`
 - `Raycaster2D::draw_top_down_to_image` in `src/raycaster/visualization.rs:29`
 - `Raycaster2D::draw_view_to_image` in `src/raycaster/visualization.rs:108`
 - `Raycaster2D::draw_depth_map_to_image` in `src/raycaster/visualization.rs:190`
 - `Raycaster2D::draw_line_of_sight_to_image` in `src/raycaster/visualization.rs:251`
 - `Raycaster2D::draw_camera_sweep_to_image` in `src/raycaster/visualization.rs:330`
-- `Raycaster2D::draw_textured_view_to_image` in `src/raycaster/visualization.rs:389`
+- `Raycaster2D::draw_textured_view_to_image` in `src/raycaster/visualization.rs:390`
 
 ### `render` — 42/59 (71.2%)
 
@@ -2743,9 +2743,9 @@
 - `Font::atlas_data` in `src/render/font.rs:275`
 - `Font::cell_width` in `src/render/font.rs:304`
 - `Font::has_box_drawing` in `src/render/font.rs:312`
-- `GpuRenderer::upload_texture` in `src/render/gpu_renderer.rs:906`
-- `GpuRenderer::create_canvas` in `src/render/gpu_renderer.rs:946`
-- `GpuRenderer::render_frame` in `src/render/gpu_renderer.rs:1378`
+- `GpuRenderer::upload_texture` in `src/render/gpu_renderer.rs:907`
+- `GpuRenderer::create_canvas` in `src/render/gpu_renderer.rs:947`
+- `GpuRenderer::render_frame` in `src/render/gpu_renderer.rs:1380`
 - `Mesh::set_texture` in `src/render/mesh.rs:203`
 - `Mesh::set_draw_mode` in `src/render/mesh.rs:211`
 - `PostFxPipeline::register_custom` in `src/render/postfx_pipeline.rs:854`
@@ -3478,7 +3478,7 @@
 
 **Uncovered public functions** (75):
 
-- `BarChart::add_category` in `src/ui/chart.rs:338`
+- `BarChart::add_category` in `src/ui/chart.rs:339`
 - `Layout::perform_layout` in `src/ui/containers.rs:172`
 - `ScrollPanel::max_scroll` in `src/ui/containers.rs:276`
 - `ScrollPanel::clamp_scroll` in `src/ui/containers.rs:283`

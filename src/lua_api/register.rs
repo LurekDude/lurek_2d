@@ -13,8 +13,8 @@ use crate::runtime::SharedState;
 use super::{
     ai_api, animation_api, audio_api, automation_api, camera_api, compute_api, data_api,
     dataframe_api, debugbridge_api, devtools_api, docs_api, ecs_api, effect_api, engine_api,
-    event_api, filesystem_api, globe_api, graph_api, html_api, i18n_api, image_api, input_api, light_api,
-    log_api, math_api, minimap_api, mods_api, network_api, parallax_api, particle_api,
+    event_api, filesystem_api, globe_api, graph_api, html_api, i18n_api, image_api, input_api,
+    light_api, log_api, math_api, minimap_api, mods_api, network_api, parallax_api, particle_api,
     pathfind_api, patterns_api, physics_api, pipeline_api, procgen_api, raycaster_api, render_api,
     save_api, scene_api, serial_api, spine_api, sprite_api, system_api, terminal_api, thread_api,
     tilemap_api, timer_api, tween_api, ui_api, window_api,
@@ -23,11 +23,11 @@ use super::{
 /// Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the
 /// provided module flags, and returns the ready `Lua` instance.
 ///
-/// - `state` â€” Shared engine state passed (via `Rc<RefCell>` clone) to every Lua closure.
-/// - `modules` â€” Module enable/disable flags read from `conf.toml`. Mandatory APIs
+/// - `state` - Shared engine state passed (via `Rc<RefCell>` clone) to every Lua closure.
+/// - `modules` - Module enable/disable flags read from `conf.toml`. Mandatory APIs
 ///   (`math`, `log`, `event`) are always registered regardless of flags.
 ///
-/// `LuaResult<Lua>` â€” A configured Lua VM with `lurek.*` as a global, or a Lua error if
+/// `LuaResult<Lua>` - A configured Lua VM with `lurek.*` as a global, or a Lua error if
 /// any sub-API fails to register
 pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -> LuaResult<Lua> {
     let lua = Lua::new();
@@ -55,7 +55,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     let lurek = lua.create_table()?;
     lua.globals().set("lurek", lurek.clone())?;
 
-    // event: lurek.event (always registered â€” mandatory API)
+    // event: lurek.event (always registered - mandatory API)
     event_api::register(&lua, &lurek, state.clone())?;
 
     // timer: lurek.timer
@@ -78,7 +78,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         animation_api::register(&lua, &lurek, state.clone())?;
     }
 
-    // sprite: lurek.sprite (pure math/UV â€” always registered, no config flag)
+    // sprite: lurek.sprite (pure math/UV - always registered, no config flag)
     sprite_api::register(&lua, &lurek, state.clone())?;
 
     // tween: lurek.tween
@@ -103,7 +103,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
 
     // debugbridge: lurek.debugbridge
     if modules.debug {
-        debugbridge_api::register(&lua, &lurek)?;
+        debugbridge_api::register(&lua, &lurek, state.clone())?;
     }
 
     // i18n: lurek.i18n
@@ -116,29 +116,29 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         input_api::register(&lua, &lurek, state.clone())?;
     }
 
-    // save: lurek.save (always registered â€” no config flag)
+    // save: lurek.save (always registered - no config flag)
     save_api::register(&lua, &lurek, state.clone())?;
 
-    // docs: lurek.docs (always registered â€” no config flag)
-    docs_api::register(&lua, &lurek)?;
+    // docs: lurek.docs (always registered - no config flag)
+    docs_api::register(&lua, &lurek, state.clone())?;
 
-    // log: lurek.log (always registered â€” no config flag)
-    log_api::register(&lua, &lurek)?;
+    // log: lurek.log (always registered - no config flag)
+    log_api::register(&lua, &lurek, state.clone())?;
     engine_api::register(&lua, &lurek, state.clone())?;
 
-    // data: lurek.data (always registered â€” no config flag)
+    // data: lurek.data (always registered - no config flag)
     data_api::register(&lua, &lurek, state.clone())?;
 
-    // mods: lurek.mods (always registered â€” no config flag)
+    // mods: lurek.mods (always registered - no config flag)
     mods_api::register(&lua, &lurek, state.clone())?;
 
-    // serial: lurek.serial (always registered â€” no config flag)
+    // serial: lurek.serial (always registered - no config flag)
     serial_api::register(&lua, &lurek, state.clone())?;
 
-    // dataframe: lurek.dataframe (always registered â€” no config flag)
+    // dataframe: lurek.dataframe (always registered - no config flag)
     dataframe_api::register(&lua, &lurek, state.clone())?;
 
-    // light: lurek.light (always registered â€” no config flag)
+    // light: lurek.light (always registered - no config flag)
     light_api::register(&lua, &lurek, state.clone())?;
 
     // filesystem: lurek.filesystem
@@ -251,7 +251,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         ui_api::register(&lua, &lurek, state.clone())?;
     }
 
-    // html: lurek.html (always registered — lightweight, no GPU)
+    // html: lurek.html (always registered - lightweight, no GPU)
     html_api::register(&lua, &lurek)?;
 
     // tilemap: lurek.tilemap
@@ -259,10 +259,10 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
         tilemap_api::register(&lua, &lurek, state.clone())?;
     }
 
-    // math: lurek.math (always registered â€” mandatory)
+    // math: lurek.math (always registered - mandatory)
     math_api::register(&lua, &lurek, state.clone())?;
 
-    // system: lurek.runtime (always registered â€” OS info, openURL, locales)
+    // system: lurek.runtime (always registered - OS info, openURL, locales)
     system_api::register(&lua, &lurek, state.clone())?;
 
     // physics: lurek.physics

@@ -16,9 +16,9 @@ def write(path, content):
     print(f"  Written: {path}")
 
 
-# ─── 1. Fix extension2.ts ──────────────────────────────────────────────────────
-print("\n=== Fixing extension2.ts ===")
-ext2 = os.path.join(BASE, 'src', 'extension2.ts')
+# ─── 1. Fix extension.ts ───────────────────────────────────────────────────────
+print("\n=== Fixing extension.ts ===")
+ext2 = os.path.join(BASE, 'src', 'extension.ts')
 content = read(ext2)
 
 # Replace "lurek. string literals → "lurek.
@@ -234,8 +234,8 @@ print("\n=== Updating esbuild.config.mjs ===")
 esbuild_path = os.path.join(BASE, 'esbuild.config.mjs')
 content = read(esbuild_path)
 
-old_entry = 'entryPoints: ["src/extension.ts"],'
-new_entry = 'entryPoints: ["src/extension2.ts"],'
+old_entry = 'entryPoints: ["src/extension2.ts"],'
+new_entry = 'entryPoints: ["src/extension.ts"],'
 n = content.count(old_entry)
 content = content.replace(old_entry, new_entry)
 print(f'  Updated entryPoints: {n} replacement(s)')

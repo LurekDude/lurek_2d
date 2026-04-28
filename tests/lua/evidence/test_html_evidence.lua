@@ -9,6 +9,14 @@ describe("evidence: html", function()
         ensure_evidence_dir("html")
     end)
 
+    local function write_artifact(path, contents)
+        local f = io and io.open and io.open(path, "w") or nil
+        if f then
+            f:write(contents)
+            f:close()
+        end
+    end
+
     -- @covers lurek.html.newDocument
     -- @covers HtmlDocument:getHtml
     -- @evidence file
@@ -23,8 +31,7 @@ describe("evidence: html", function()
 </body>
         ]], { width = 800, height = 600 })
         local markup = doc:getHtml()
-        local f = io.open(path, "w")
-        if f then f:write(markup) f:close() end
+        write_artifact(path, markup)
         expect_evidence_created(path)
     end)
 
@@ -49,8 +56,7 @@ describe("evidence: html", function()
             x, y, w, h = el:getRect()
         end
         local json = string.format('{"x":%d,"y":%d,"w":%d,"h":%d}', x, y, w, h)
-        local f = io.open(path, "w")
-        if f then f:write(json) f:close() end
+        write_artifact(path, json)
         expect_evidence_created(path)
     end)
 
@@ -76,8 +82,7 @@ describe("evidence: html", function()
             table.insert(texts, '"' .. el:getText() .. '"')
         end
         local json = "[" .. table.concat(texts, ",") .. "]"
-        local f = io.open(path, "w")
-        if f then f:write(json) f:close() end
+        write_artifact(path, json)
         expect_evidence_created(path)
     end)
 
@@ -100,8 +105,7 @@ describe("evidence: html", function()
             '{"before_has_c":%s,"after_has_c":%s,"after_toggle_a":%s}',
             tostring(before_has_c), tostring(after_has_c), tostring(after_has_a)
         )
-        local f = io.open(path, "w")
-        if f then f:write(json) f:close() end
+        write_artifact(path, json)
         expect_evidence_created(path)
     end)
 
@@ -122,8 +126,7 @@ describe("evidence: html", function()
         doc:mousepressed(50, 50, 1)
         doc:mousereleased(50, 50, 1)
         local json = "[" .. table.concat(events, ",") .. "]"
-        local f = io.open(path, "w")
-        if f then f:write(json) f:close() end
+        write_artifact(path, json)
         expect_evidence_created(path)
     end)
 
@@ -138,8 +141,9 @@ describe("evidence: html", function()
         doc:setViewport(1920, 1080)
         local w, h = doc:getViewport()
         local json = string.format('{"width":%d,"height":%d}', w or 0, h or 0)
-        local f = io.open(path, "w")
-        if f then f:write(json) f:close() end
+        write_artifact(path, json)
         expect_evidence_created(path)
     end)
 end)
+
+test_summary()

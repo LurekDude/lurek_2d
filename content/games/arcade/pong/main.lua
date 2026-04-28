@@ -245,7 +245,7 @@ function lurek.process(dt)
     if ball.x < 0 then
         p2.score = p2.score + 1
         score_pop.scale = 2.0
-        lurek.tween.to(score_pop, 0.3, { scale = 1.0 })
+        lurek.tween.to(score_pop, { scale = 1.0 }, 0.3)
         if p2.score >= WIN_SCORE then
             state = STATE.GAME_OVER
             winner = 2
@@ -256,7 +256,7 @@ function lurek.process(dt)
     if ball.x > W then
         p1.score = p1.score + 1
         score_pop.scale = 2.0
-        lurek.tween.to(score_pop, 0.3, { scale = 1.0 })
+        lurek.tween.to(score_pop, { scale = 1.0 }, 0.3)
         if p1.score >= WIN_SCORE then
             state = STATE.GAME_OVER
             winner = 1

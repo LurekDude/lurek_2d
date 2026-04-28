@@ -52,9 +52,9 @@ describe("Channel creation and messaging", function()
         expect_true(ch ~= nil, "channel is not nil")
     end)
 
-    -- @description Verifies case: newChannel accepts an optional name.
-    it("newChannel accepts an optional name", function()
-        local ch = lurek.thread.newChannel("test_ch")
+    -- @description Verifies case: getChannel creates and returns a named channel.
+    it("getChannel creates and returns a named channel", function()
+        local ch = lurek.thread.getChannel("test_ch")
         expect_true(ch ~= nil, "named channel is not nil")
     end)
 
@@ -67,7 +67,7 @@ describe("Channel creation and messaging", function()
 
     -- @description Verifies case: getChannel finds a previously created named channel.
     it("getChannel finds a previously created named channel", function()
-        lurek.thread.newChannel("test_lookup_ch")
+        lurek.thread.getChannel("test_lookup_ch")
         local ch = lurek.thread.getChannel("test_lookup_ch")
         expect_true(ch ~= nil, "found named channel via getChannel")
     end)
@@ -166,15 +166,15 @@ end)
 -- @description Covers suite: Channel type and typeOf.
 describe("Channel type and typeOf", function()
     -- @description Verifies case: type returns Channel.
-    it("type returns Channel", function()
+    it("type returns LChannel", function()
         local ch = lurek.thread.newChannel()
-        expect_equal("Channel", ch:type())
+        expect_equal("LChannel", ch:type())
     end)
 
     -- @description Verifies case: typeOf with correct name returns true.
-    it("typeOf with correct name returns true", function()
+    it("typeOf with correct L-name returns true", function()
         local ch = lurek.thread.newChannel()
-        expect_true(ch:typeOf("Channel"))
+        expect_true(ch:typeOf("LChannel"))
     end)
 
     -- @description Verifies case: typeOf with wrong name returns false.
@@ -189,15 +189,15 @@ end)
 -- @description Covers suite: Thread type and typeOf.
 describe("Thread type and typeOf", function()
     -- @description Verifies case: type returns Thread.
-    it("type returns Thread", function()
+    it("type returns LThread", function()
         local t = lurek.thread.newThread("return")
-        expect_equal("Thread", t:type())
+        expect_equal("LThread", t:type())
     end)
 
     -- @description Verifies case: typeOf with correct name returns true.
-    it("typeOf with correct name returns true", function()
+    it("typeOf with correct L-name returns true", function()
         local t = lurek.thread.newThread("return")
-        expect_true(t:typeOf("Thread"))
+        expect_true(t:typeOf("LThread"))
     end)
 
     -- @description Verifies case: typeOf with wrong name returns false.

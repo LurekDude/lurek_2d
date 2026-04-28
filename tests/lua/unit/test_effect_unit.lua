@@ -1046,9 +1046,9 @@ describe("overlay type", function()
     -- @tests lurek.effect.newOverlay
     -- @tests Overlay.type
     -- @description Verifies overlay userdata reports its concrete type name.
-    it("reports type as Overlay", function()
+    it("reports type as LOverlay", function()
         local ov = lurek.effect.newOverlay()
-        expect_equal(ov:type(), "Overlay")
+        expect_equal(ov:type(), "LOverlay")
     end)
 
     -- @tests lurek.effect.newOverlay

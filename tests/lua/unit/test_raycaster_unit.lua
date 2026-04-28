@@ -380,9 +380,9 @@ describe("raycaster sprite manager", function()
     expect_equal(type(sm), "userdata")
   end)
 
-  it("type() returns SpriteManager", function()
+    it("type() returns LSpriteManager", function()
     local sm = lurek.raycaster.newSpriteManager()
-    expect_equal(sm:type(), "SpriteManager")
+        expect_equal(sm:type(), "LSpriteManager")
   end)
 
   it("add returns a numeric id", function()
@@ -690,7 +690,7 @@ describe("Missing explicit test for PointLight:type", function()
     it("PointLight:type works", function()
         -- @tests PointLight:type
         local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-        expect_equal("PointLight", pl:type())
+        expect_equal("LPointLight", pl:type())
     end)
 end)
 
@@ -698,7 +698,7 @@ describe("Missing explicit test for PointLight:typeOf", function()
     it("PointLight:typeOf works", function()
         -- @tests PointLight:typeOf
         local pl = lurek.raycaster.newPointLight(0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-        expect_equal("PointLight", pl:typeOf())
+        expect_true(pl:typeOf("LPointLight"))
     end)
 end)
 
@@ -823,7 +823,7 @@ describe("Missing explicit test for SpriteManager:type", function()
     it("SpriteManager:type works", function()
         -- @tests SpriteManager:type
         local sm = lurek.raycaster.newSpriteManager()
-        expect_equal("SpriteManager", sm:type())
+        expect_equal("LSpriteManager", sm:type())
     end)
 end)
 
@@ -831,7 +831,7 @@ describe("Missing explicit test for SpriteManager:typeOf", function()
     it("SpriteManager:typeOf works", function()
         -- @tests SpriteManager:typeOf
         local sm = lurek.raycaster.newSpriteManager()
-        expect_equal("SpriteManager", sm:typeOf())
+        expect_true(sm:typeOf("LSpriteManager"))
     end)
 end)
 
@@ -873,7 +873,7 @@ describe("Raycaster:buildScene", function()
     it("buildScene does not panic on empty grid", function()
         -- @covers Raycaster:buildScene
         local rc = lurek.raycaster.new(8, 8)
-        local ok, _ = pcall(function() rc:buildScene({px=0,py=0,angle=0,fov=1.0,rays=1,max_dist=10,screen_w=320,screen_h=240}) end)
+        local ok, _ = pcall(function() rc:buildScene({px=0,py=0,angle=0,fov=1.0,rays=1,max_dist=10,screen_w=320,screen_h=240}, {}, {}, {}) end)
         -- headless: accept success or a headless-specific nil return
         expect_type("boolean", ok)
     end)

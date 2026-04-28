@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-26T13:35:17.759354+00:00",
+    "generated": "2026-04-28T16:35:27.412176+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "1.0.0",
     "stats": {
@@ -612,14 +612,14 @@
             "kind": "struct",
             "description": "A single fully-connected layer in a neural network.  Weights are stored in row-major order: `weights[output * inputs + input]`.  # Fields - `inputs` — `usize`. - `outputs` — `usize`. - `weights` — `Vec<f32>`. - `biases` — `Vec<f32>`. - `activation` — `Activation`.",
             "file": "src/ai/neural_net.rs",
-            "line": 115
+            "line": 116
           },
           {
             "name": "NeuralNet",
             "kind": "struct",
             "description": "Feedforward neural network stack.  Layers are added sequentially; `forward` propagates input through them all. Weights across all layers are flattened to a single `f32` vector for use with evolutionary algorithms.  # Fields - `layers` — `Vec<NeuralLayer>`.",
             "file": "src/ai/neural_net.rs",
-            "line": 190
+            "line": 192
           }
         ]
       },
@@ -672,28 +672,28 @@
             "kind": "struct",
             "description": "A world-space sensory event that agents can detect.  Each stimulus has a position, intensity, and optional decay rate so it can either persist (decay=0) or fade out over time. Multiple stimuli can coexist; the sensor picks up all within range/cone each tick.  # Fields - `id` — `u64`. - `stimulus_type` — `StimulusType`. - `position` — `(f32, f32)`. - `intensity` — `f32`. - `radius` — `f32`. - `decay_rate` — `f32`. - `source_name` — `Option<String>`. - `tag` — `Option<String>`.",
             "file": "src/ai/perception.rs",
-            "line": 104
+            "line": 105
           },
           {
             "name": "DetectedStimulus",
             "kind": "struct",
             "description": "Result record produced when a sensor successfully detects a stimulus.  Carries enough information for the agent's decision system to localise and characterise the source without needing to query the stimulus world again.  # Fields - `stimulus_id` — `u64`. - `stimulus_type` — `StimulusType`. - `position` — `(f32, f32)`. - `intensity` — `f32`. - `distance` — `f32`. - `source_name` — `Option<String>`. - `tag` — `Option<String>`.",
             "file": "src/ai/perception.rs",
-            "line": 140
+            "line": 141
           },
           {
             "name": "StimulusWorld",
             "kind": "struct",
             "description": "Scene-level registry of active sensory stimuli.  One `StimulusWorld` exists per game scene. Game code registers stimuli when significant events occur; the world decays their intensity each frame and removes them when intensity reaches zero.  # Fields - `stimuli` — `Vec<Stimulus>`. - `next_id` — `u64`.",
             "file": "src/ai/perception.rs",
-            "line": 170
+            "line": 171
           },
           {
             "name": "Sensor",
             "kind": "struct",
             "description": "Agent-level sensing configuration and awareness state.  A `Sensor` is attached to one agent. Each frame, call `detect` to query nearby stimuli and `update_awareness` to evolve the awareness level based on how many stimuli were found. The awareness level drives alert detection with hysteresis to avoid rapid flickering.  ## Sight Cone  The sight cone extends `sight_range` world units ahead of the agent. The cone is symmetric with a half-angle of `sight_angle / 2` degrees measured from the `facing` direction in radians. A `sight_angle` of 360 means the agent sees all around.  ## Hearing  Auditory stimuli are detected if their position is within `hearing_range` world units, regardless of facing direction.  ## Custom Senses  Additional sense channels can be registered with per-channel ranges in `custom_ranges`. A custom stimulus is detected if its type label matches a registered range and the distance is within that range.  # Fields - `sight_range` — `f32`. - `sight_angle` — `f32`. - `hearing_range` — `f32`. - `facing` — `f32`. - `awareness` — `f32`. - `awareness_rise` — `f32`. - `awareness_decay` — `f32`. - `alert_threshold` — `f32`. - `custom_ranges` — `HashMap<String, f32>`.",
             "file": "src/ai/perception.rs",
-            "line": 369
+            "line": 371
           }
         ]
       },
@@ -1239,7 +1239,7 @@
             "kind": "struct",
             "description": "Entry point for the Lurek2D engine. Owns the game loop, GPU renderer, and Lua VM lifecycle.  # Fields - `config` â€” `Config`. - `conf_error` â€” `Option<String>`.",
             "file": "src/app/app.rs",
-            "line": 2595
+            "line": 2596
           }
         ]
       },
@@ -1305,21 +1305,21 @@
             "kind": "mod",
             "description": "Entry point for the Lurek2D engine lifecycle and game loop.",
             "file": "src/app/mod.rs",
-            "line": 18
+            "line": 19
           },
           {
             "name": "debug_overlay",
             "kind": "mod",
             "description": "Debug overlay for FPS and draw-call statistics.",
             "file": "src/app/mod.rs",
-            "line": 20
+            "line": 21
           },
           {
             "name": "error_screen",
             "kind": "mod",
             "description": "Visual error screen for Lua and engine errors.",
             "file": "src/app/mod.rs",
-            "line": 22
+            "line": 23
           }
         ]
       },
@@ -1670,7 +1670,7 @@
             "kind": "fn",
             "description": "Renders a timeâ€“frequency spectrogram of `input_wav` to a PNG file at `output_png`.  Each pixel column corresponds to one 512-sample DFT window.  Frequency bins are mapped vertically from low (bottom) to Nyquist (top).  Magnitude is mapped to a heat-map colour ranging from black (quiet) through dark blue, cyan, and bright yellow (loud).  # Parameters - `input_wav`  â€” `&str`. Path to the source WAV file. - `output_png` â€” `&str`. Destination path for the PNG image. - `width`      â€” `u32`. Output image width in pixels. - `height`     â€” `u32`. Output image height in pixels.  # Returns `Result<(), String>`. Returns an error string if the file cannot be decoded or saved.",
             "file": "src/audio/visualizer.rs",
-            "line": 105
+            "line": 106
           }
         ]
       },
@@ -1977,14 +1977,14 @@
             "kind": "fn",
             "description": "1D convolution of `signal` with `kernel` (full output length).  Output length: `signal.size() + kernel.size() - 1`. Padding is zero-based.  # Parameters - `signal` — `&NdArray` 1D input. - `kernel` — `&NdArray` 1D filter.  # Returns `Result<NdArray, String>`.",
             "file": "src/compute/analytics.rs",
-            "line": 349
+            "line": 350
           },
           {
             "name": "correlate1d",
             "kind": "fn",
             "description": "1D cross-correlation: slide `template` over `signal` (valid output).  Output length: `signal.size() - template.size() + 1`. Each output element is the dot product of the template with the corresponding window of the signal.  # Parameters - `signal`   — `&NdArray` 1D input (length ≥ template length). - `template` — `&NdArray` 1D pattern to search for.  # Returns `Result<NdArray, String>`.",
             "file": "src/compute/analytics.rs",
-            "line": 395
+            "line": 396
           }
         ]
       },
@@ -2107,28 +2107,28 @@
             "kind": "fn",
             "description": "Solve the linear system A·x = b using Gaussian elimination with partial pivoting.  `a` must be a square [n×n] matrix; `b` must be a 1D vector of length n. Returns `x` as a 1D vector of length n.  Returns `Err` if the matrix is singular (or near-singular by zero pivot).  # Parameters - `a` — `&NdArray` shape [n, n]. - `b` — `&NdArray` shape [n].  # Returns `Result<NdArray, String>`.",
             "file": "src/compute/linalg.rs",
-            "line": 316
+            "line": 317
           },
           {
             "name": "LuDecomp",
             "kind": "struct",
             "description": "Result of an LU decomposition with partial pivoting.  Stores the combined L and U factors as a flat row-major n×n buffer: - the unit lower-triangular factor L occupies the strictly lower triangle, - the upper-triangular factor U occupies the upper triangle and diagonal.  # Fields - `lu_data` — flat n×n combined LU buffer. - `perm` — row permutation applied during pivoting. - `n` — dimension of the square matrix. - `det_sign` — sign of the determinant (+1 or −1).",
             "file": "src/compute/linalg.rs",
-            "line": 402
+            "line": 403
           },
           {
             "name": "lu_decompose",
             "kind": "fn",
             "description": "Decomposes a square matrix `a` into P·A = L·U using partial pivoting.  The unit lower-triangular factor L (diagonal 1s, not stored) and upper- triangular factor U are written into a single n×n buffer returned inside [`LuDecomp`].  # Parameters - `a` — a square 2D [`NdArray`] of shape `[n, n]`.  # Returns `Result<LuDecomp, String>`.  # Design Rationale Partial pivoting ensures numerical stability for near-singular matrices that can realistically appear in game AI or physics calculations. The combined LU buffer avoids two separate allocations.",
             "file": "src/compute/linalg.rs",
-            "line": 429
+            "line": 430
           },
           {
             "name": "eigenvalue_power",
             "kind": "fn",
             "description": "Computes the dominant eigenvalue and its eigenvector of a square matrix using the power-iteration method.  Converges to the eigenvalue with the largest absolute value. The returned eigenvector is L2-normalised.  # Parameters - `a`        — square 2D [`NdArray`] of shape `[n, n]`. - `max_iter` — maximum iterations (default 1000 if 0). - `tol`      — convergence tolerance (default 1e-10 if 0.0).  # Returns `Result<(f64, Vec<f64>), String>` — dominant eigenvalue and eigenvector.  # Design Rationale Power iteration is simple, allocation-efficient, and good enough for game AI influence maps and graph centrality — which rarely need more than the dominant mode. The caller controls iteration budget via `max_iter` and `tol`.",
             "file": "src/compute/linalg.rs",
-            "line": 519
+            "line": 521
           }
         ]
       },
@@ -2966,7 +2966,7 @@
             "kind": "enum",
             "description": "Aggregation function variants for group-by and pivot operations.  # Variants - `Mean`  — Arithmetic mean of numeric values. - `Sum`   — Sum of numeric values. - `Min`   — Minimum numeric value. - `Max`   — Maximum numeric value. - `Count` — Count of non-nil values. - `First` — First encountered value. - `Last`  — Last encountered value.",
             "file": "src/dataframe/frame.rs",
-            "line": 1236
+            "line": 1237
           }
         ]
       },
@@ -3228,14 +3228,14 @@
             "kind": "struct",
             "description": "A single log entry captured in the rolling history.  # Fields - `level` — `String`. - `timestamp` — `f64`. - `message` — `String`. - `source` — `String`. - `line` — `u32`. - `category` — `Option<String>`.",
             "file": "src/devtools/logger.rs",
-            "line": 79
+            "line": 80
           },
           {
             "name": "Logger",
             "kind": "struct",
             "description": "Structured in-process logger with level filtering and rolling history.  # Fields - `min_level` — `LogLevel`. - `console_enabled` — `bool`. - `log_file` — `String`. - `history` — `Vec<LogEntry>`. - `max_history` — `usize`. - `epoch` — `Instant`.",
             "file": "src/devtools/logger.rs",
-            "line": 106
+            "line": 107
           }
         ]
       },
@@ -3491,28 +3491,28 @@
             "kind": "struct",
             "description": "Validation rule for a single schema field.  # Fields - `field_type` — `FieldType`. - `required` — `bool`. - `min` — `Option<f64>`. - `max` — `Option<f64>`. - `min_len` — `Option<usize>`. - `max_len` — `Option<usize>`. - `enum_values` — `Vec<String>`. - `pattern` — `Option<String>`. - `default` — `Option<String>`.",
             "file": "src/docs/schema.rs",
-            "line": 101
+            "line": 102
           },
           {
             "name": "SchemaError",
             "kind": "struct",
             "description": "A single validation failure.  # Fields - `field` — `String`. - `message` — `String`.",
             "file": "src/docs/schema.rs",
-            "line": 146
+            "line": 147
           },
           {
             "name": "SchemaResult",
             "kind": "struct",
             "description": "Result returned by [`Schema::validate_pairs`].  # Fields - `ok` — `bool`. - `errors` — `Vec<SchemaError>`.",
             "file": "src/docs/schema.rs",
-            "line": 161
+            "line": 162
           },
           {
             "name": "Schema",
             "kind": "struct",
             "description": "A named collection of [`FieldRule`]s that can validate Lua table data.  # Fields - `name` — `String`. - `rules` — `HashMap<String, FieldRule>`. - `strict` — `bool`.",
             "file": "src/docs/schema.rs",
-            "line": 190
+            "line": 191
           }
         ]
       },
@@ -3579,7 +3579,7 @@
             "kind": "fn",
             "description": "Deep-copies a Lua table recursively. Consult the module-level documentation for the broader usage context and preconditions.  # Parameters - `lua` — `&'lua Lua`. - `t` — `&Table<'lua>`.  # Returns `LuaResult<Table<'lua>>`.",
             "file": "src/ecs/universe.rs",
-            "line": 1522
+            "line": 1523
           }
         ]
       },
@@ -3704,91 +3704,91 @@
             "kind": "mod",
             "description": "Per-effect parameter bag with builder helpers.",
             "file": "src/effect/mod.rs",
-            "line": 37
+            "line": 38
           },
           {
             "name": "effect_type",
             "kind": "mod",
             "description": "Enum of all built-in post-processing effect kinds (bloom, blur, CRT, colour grading, …).",
             "file": "src/effect/mod.rs",
-            "line": 39
+            "line": 40
           },
           {
             "name": "image_effect",
             "kind": "mod",
             "description": "Lightweight per-image effect chain (subset of the full pipeline).",
             "file": "src/effect/mod.rs",
-            "line": 41
+            "line": 42
           },
           {
             "name": "render",
             "kind": "mod",
             "description": "Render-command generation for post-processing effects.",
             "file": "src/effect/mod.rs",
-            "line": 43
+            "line": 44
           },
           {
             "name": "stack",
             "kind": "mod",
             "description": "Ordered pipeline of post-processing passes applied to the rendered scene.",
             "file": "src/effect/mod.rs",
-            "line": 45
+            "line": 46
           },
           {
             "name": "ambient",
             "kind": "mod",
             "description": "Ambient lighting state with time-of-day colour cycling (night → dawn → day → dusk).",
             "file": "src/effect/mod.rs",
-            "line": 50
+            "line": 51
           },
           {
             "name": "atmosphere",
             "kind": "mod",
             "description": "Atmospheric effects: clouds, fog, heat haze, vignette, film grain, lightning.",
             "file": "src/effect/mod.rs",
-            "line": 52
+            "line": 53
           },
           {
             "name": "overlay",
             "kind": "mod",
             "description": "Main `Overlay` struct combining all screen-effect subsystems into one per-frame controller.",
             "file": "src/effect/mod.rs",
-            "line": 54
+            "line": 55
           },
           {
             "name": "presets",
             "kind": "mod",
             "description": "Factory functions that build pre-configured [`PostFxStack`] + effect lists for common visual styles.",
             "file": "src/effect/mod.rs",
-            "line": 56
+            "line": 57
           },
           {
             "name": "screen_effects",
             "kind": "mod",
             "description": "One-shot screen effects: flash (colour burst), shake (jitter), fade (alpha transition).",
             "file": "src/effect/mod.rs",
-            "line": 58
+            "line": 59
           },
           {
             "name": "water_overlay",
             "kind": "mod",
             "description": "Full-screen water surface overlay state driven by UV-distortion shader parameters.",
             "file": "src/effect/mod.rs",
-            "line": 60
+            "line": 61
           },
           {
             "name": "weather",
             "kind": "mod",
             "description": "Weather simulation: rain, snow, hail, dust, leaves, ash, pollen particles.",
             "file": "src/effect/mod.rs",
-            "line": 62
+            "line": 63
           },
           {
             "name": "transition",
             "kind": "mod",
             "description": "Screen-transition data model for `LuaScreenTransition`.",
             "file": "src/effect/mod.rs",
-            "line": 81
+            "line": 82
           }
         ]
       },
@@ -3893,7 +3893,7 @@
             "kind": "struct",
             "description": "Frame-by-frame state machine for a screen transition.  Call [`ScreenTransition::update`] every frame to advance the transition; [`ScreenTransition::progress`] returns a `[0, 1]` value the renderer can use to alpha-blend a solid fill color over the scene.",
             "file": "src/effect/transition.rs",
-            "line": 57
+            "line": 58
           }
         ]
       },
@@ -4194,14 +4194,14 @@
             "kind": "fn",
             "description": "Emit all render commands for one globe frame.  `default_font` is the `FontKey` to use for labels and marker text. Pass `None` to suppress all text rendering.",
             "file": "src/globe/draw.rs",
-            "line": 23
+            "line": 24
           },
           {
             "name": "project_arc",
             "kind": "fn",
             "description": "Pre-project a great-circle arc into a flat screenspace point list.  Returns `[x0, y0, x1, y1, …]`. May return fewer points if the arc is entirely on the back of the globe.",
             "file": "src/globe/draw.rs",
-            "line": 176
+            "line": 178
           }
         ]
       },
@@ -4274,14 +4274,14 @@
             "kind": "fn",
             "description": "Batch-compute light intensities for all provinces.  Accepts an iterator of `(lat_deg, lon_deg)` centroid pairs and returns a `Vec<f32>` of intensities in the same order.",
             "file": "src/globe/lighting.rs",
-            "line": 58
+            "line": 59
           },
           {
             "name": "terminator_alpha",
             "kind": "fn",
             "description": "Compute a day/night terminator alpha for a province for a soft edge.  Returns `0.0` on the night side, `1.0` on the full day side, with a smooth transition zone of `±transition_deg` around the terminator.",
             "file": "src/globe/lighting.rs",
-            "line": 72
+            "line": 73
           }
         ]
       },
@@ -5630,21 +5630,21 @@
             "kind": "fn",
             "description": "Render multiple easing curves overlaid on a single chart.  Each entry provides a name, color, and easing function. A background grid is drawn at 32-pixel intervals.  # Parameters - `curves` — `&[(&str, (u8,u8,u8), fn(f32) -> f32)]`. Named, colored easings. - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/easing.rs",
-            "line": 73
+            "line": 74
           },
           {
             "name": "bezier_curves_to_image",
             "kind": "fn",
             "description": "Render multiple cubic Bezier curves with control-point overlays.  Each entry is `(control_points, (r,g,b))`. Control polygons are drawn dimmed, control points as small circles, and the curve in full color.  # Parameters - `curves` — `&[(Vec<crate::math::vec2::Vec2>, (u8,u8,u8))]`. - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/easing.rs",
-            "line": 115
+            "line": 117
           },
           {
             "name": "draw_bezier_advanced_to_image",
             "kind": "fn",
             "description": "Draw a bezier advanced operations overview.  Renders the original curve, its derivative, a segment highlight, control point editing, and transform operations.  # Parameters - `width` — `u32`. Image width. - `height` — `u32`. Image height.  # Returns `ImageData`.",
             "file": "src/image/visualization/easing.rs",
-            "line": 180
+            "line": 182
           }
         ]
       },
@@ -5670,35 +5670,35 @@
             "kind": "fn",
             "description": "Render a gallery of regular polygons (triangle→dodecagon), a five-pointed star, and an arrow shape using `draw_line`.  # Parameters - `width` — `u32`. Image width. - `height` — `u32`. Image height.  # Returns `ImageData`.",
             "file": "src/image/visualization/geometry.rs",
-            "line": 18
+            "line": 19
           },
           {
             "name": "spiral_to_image",
             "kind": "fn",
             "description": "Render concentric colored circles to demonstrate angular segment drawing.  # Parameters - `width` — `u32`. Image width. - `height` — `u32`. Image height.  # Returns `ImageData`.",
             "file": "src/image/visualization/geometry.rs",
-            "line": 93
+            "line": 94
           },
           {
             "name": "filled_primitives_to_image",
             "kind": "fn",
             "description": "Render filled rectangle and circle primitives with HSV-coloured fills.  # Parameters - `width` — `u32`. Image width. - `height` — `u32`. Image height.  # Returns `ImageData`.",
             "file": "src/image/visualization/geometry.rs",
-            "line": 124
+            "line": 125
           },
           {
             "name": "draw_geometry_shapes_to_image",
             "kind": "fn",
             "description": "Draw a comprehensive geometry shapes & queries visualization.  Renders convex hull, polygon area/centroid, point-in-polygon test, Bresenham line, angle measurement, circle containment, and circle-circle intersection — all in a single composite image.  # Parameters - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/geometry.rs",
-            "line": 173
+            "line": 174
           },
           {
             "name": "draw_geometry_intersections_to_image",
             "kind": "fn",
             "description": "Draw geometry intersection tests visualization.  Renders segment-segment, closest-point, circle-line, circle-segment, and line-line intersections in a single composite image.  # Parameters - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/geometry.rs",
-            "line": 287
+            "line": 288
           }
         ]
       },
@@ -5711,14 +5711,14 @@
             "kind": "fn",
             "description": "Render a graph with explicit node positions, labels, edge list, and stats.  # Parameters - `positions` — `&[(f32, f32)]`. Node positions. - `labels` — `&[&str]`. Node labels. - `colors` — `&[(u8, u8, u8)]`. Node colours. - `edges` — `&[(usize, usize)]`. Active edge index pairs. - `removed_edges` — `&[(usize, usize)]`. Dashed/dim edge pairs. - `stats_text` — `&str`. Stats string to draw at bottom-left. - `title` — `&str`. Title text. - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/graph.rs",
-            "line": 22
+            "line": 23
           },
           {
             "name": "draw_graph_item_flow_to_image",
             "kind": "fn",
             "description": "Render a pipeline graph with nodes, directional pipes, and item indicators.  # Parameters - `node_pos` — `&[(f32, f32)]`. Node centre positions. - `node_names` — `&[&str]`. Node labels drawn below each node. - `node_colors` — `&[(u8, u8, u8)]`. Node fill colours. - `items` — `&[(i32, i32, u8, u8, u8, &str)]`. (x, y, r, g, b, label) for item dots. - `stats_text` — `&str`. Bottom-left stats string. - `title` — `&str`. Top title. - `width` — `u32`. - `height` — `u32`.  # Returns `ImageData`.",
             "file": "src/image/visualization/graph.rs",
-            "line": 88
+            "line": 90
           }
         ]
       },
@@ -6516,35 +6516,35 @@
             "kind": "struct",
             "description": "A single log entry retained by a [`SinkKind::Memory`] sink.  # Fields - `level` — `SinkLevel`. - `message` — `String`. - `tag` — `String`. - `fields` — `Option<BTreeMap<String, String>>`. Structured key-value pairs (None for plain entries).",
             "file": "src/log/sinks.rs",
-            "line": 92
+            "line": 93
           },
           {
             "name": "RotatingFileSink",
             "kind": "struct",
             "description": "A file sink that rotates the log file when it exceeds a maximum size.  Files are named `<basename>`, `<basename>.1`, `<basename>.2`, … up to `keep_files` backup copies.  When the active file grows beyond `max_bytes` the sink renames each backup one position higher, opens a fresh file at the base path, and deletes the oldest backup when the count exceeds `keep_files`.  # Fields - `path` — `PathBuf` — Base file path (e.g. `\"lurek2d.log\"`). - `max_bytes` — `u64` — Maximum file size before rotation (default 10 MiB). - `keep_files` — `usize` — Number of rotated backup files to keep (default 3). - `current_size` — `u64` — Bytes written to the current active file.",
             "file": "src/log/sinks.rs",
-            "line": 117
+            "line": 118
           },
           {
             "name": "SinkKind",
             "kind": "enum",
             "description": "The dispatching strategy for a registered sink.  Each variant owns its storage — a file handle, a ring buffer, or a [`RotatingFileSink`] — behind a [`Mutex`] so the sink can be shared safely with the `SinkRegistry`.",
             "file": "src/log/sinks.rs",
-            "line": 284
+            "line": 285
           },
           {
             "name": "Sink",
             "kind": "struct",
             "description": "A registered log output destination.  Each `Sink` owns a [`SinkKind`] backend and an independent [`SinkLevel`] threshold.  The [`SinkRegistry`] assigns the `id` when the sink is added; callers use that id to remove, flush, or read from the sink later.",
             "file": "src/log/sinks.rs",
-            "line": 327
+            "line": 328
           },
           {
             "name": "SinkRegistry",
             "kind": "struct",
             "description": "Per-VM registry of active log sinks.  Lua code keeps one `SinkRegistry` per VM and fans every emitted message out to all registered sinks via [`dispatch`](Self::dispatch) or [`dispatch_structured`](Self::dispatch_structured).  Sink ids are monotonically increasing and never reused within a registry lifetime.",
             "file": "src/log/sinks.rs",
-            "line": 595
+            "line": 596
           }
         ]
       },
@@ -7544,7 +7544,7 @@
             "kind": "fn",
             "description": "Compute the Voronoi diagram for `points`.  One [`VoronoiCell`] is returned per unique input point.  Cells whose site lies on the convex hull are open (no infinite rays emitted).  Near-duplicate points (distance < `1 × 10⁻⁵`) are treated as one site.  # Parameters - `points` — Slice of `(x, y)` seed coordinates.  # Returns `Vec<VoronoiCell>` with one entry per unique input point.",
             "file": "src/math/voronoi.rs",
-            "line": 184
+            "line": 185
           }
         ]
       },
@@ -7888,7 +7888,7 @@
             "kind": "fn",
             "description": "Estimate the serialized size of a [`NetValue`] without allocating.  Useful for pre-flight checks against maximum packet sizes.  # Parameters - `value` — `&NetValue`: the value to measure.  # Returns `usize` — approximate byte size after MessagePack encoding.",
             "file": "src/network/message.rs",
-            "line": 89
+            "line": 90
           }
         ]
       },
@@ -9401,28 +9401,28 @@
             "kind": "fn",
             "description": "Returns `true` when two axis-aligned bounding boxes overlap.  Each box is specified by its top-left origin and size: `(ax, ay, aw, ah)` for box A and `(bx, by, bw, bh)` for box B.",
             "file": "src/physics/collision_helpers.rs",
-            "line": 14
+            "line": 15
           },
           {
             "name": "test_circles",
             "kind": "fn",
             "description": "Returns `true` when two circles overlap.  Each circle is specified by its centre `(ax, ay)` / `(bx, by)` and radius `ar` / `br`.",
             "file": "src/physics/collision_helpers.rs",
-            "line": 21
+            "line": 22
           },
           {
             "name": "test_point_aabb",
             "kind": "fn",
             "description": "Returns `true` when point `(px, py)` lies inside the AABB at origin `(ax, ay)` with size `(aw, ah)`.",
             "file": "src/physics/collision_helpers.rs",
-            "line": 30
+            "line": 31
           },
           {
             "name": "test_circle_aabb",
             "kind": "fn",
             "description": "Returns `true` when a circle (centre `(cx, cy)`, radius `cr`) overlaps the AABB.",
             "file": "src/physics/collision_helpers.rs",
-            "line": 35
+            "line": 36
           }
         ]
       },
@@ -13915,21 +13915,21 @@
             "kind": "mod",
             "description": "Individual sprite with position, scale, rotation, and color.",
             "file": "src/sprite/mod.rs",
-            "line": 21
+            "line": 22
           },
           {
             "name": "sprite_batch",
             "kind": "mod",
             "description": "Batched sprite renderer for efficient multi-sprite drawing.",
             "file": "src/sprite/mod.rs",
-            "line": 23
+            "line": 24
           },
           {
             "name": "sprite_sheet",
             "kind": "mod",
             "description": "Sprite sheet with named frame regions.",
             "file": "src/sprite/mod.rs",
-            "line": 25
+            "line": 26
           }
         ]
       },
@@ -15167,56 +15167,56 @@
             "kind": "struct",
             "description": "A configurable line chart renderer.  # Fields - `config` — `ChartConfig`. - `series` — `Vec<ChartSeries>`. - `y_max` — `f32`. - `x_max` — `f32`.",
             "file": "src/ui/chart.rs",
-            "line": 176
+            "line": 177
           },
           {
             "name": "BarCategory",
             "kind": "struct",
             "description": "A single category group in a bar chart.  # Fields - `label` — `String`. - `values` — `Vec<f32>`.",
             "file": "src/ui/chart.rs",
-            "line": 276
+            "line": 277
           },
           {
             "name": "BarChart",
             "kind": "struct",
             "description": "A configurable grouped bar chart renderer.  # Fields - `config` — `ChartConfig`. - `categories` — `Vec<BarCategory>`. - `series_colors` — `Vec<Color>`. - `series_names` — `Vec<String>`. - `y_max` — `f32`.",
             "file": "src/ui/chart.rs",
-            "line": 292
+            "line": 293
           },
           {
             "name": "ScatterPlot",
             "kind": "struct",
             "description": "A configurable scatter plot renderer.  # Fields - `config` — `ChartConfig`. - `series` — `Vec<ChartSeries>`. - `x_range` — `(f32, f32)`. - `y_range` — `(f32, f32)`.",
             "file": "src/ui/chart.rs",
-            "line": 407
+            "line": 408
           },
           {
             "name": "PieSegment",
             "kind": "struct",
             "description": "A segment in a pie chart.  # Fields - `label` — `String`. - `value` — `f32`. - `color` — `Color`.",
             "file": "src/ui/chart.rs",
-            "line": 497
+            "line": 498
           },
           {
             "name": "PieChart",
             "kind": "struct",
             "description": "A configurable pie chart renderer.  # Fields - `config` — `ChartConfig`. - `segments` — `Vec<PieSegment>`.",
             "file": "src/ui/chart.rs",
-            "line": 512
+            "line": 513
           },
           {
             "name": "AreaChart",
             "kind": "struct",
             "description": "A configurable stacked area chart renderer.  # Fields - `config` — `ChartConfig`. - `layers` — `Vec<AreaLayer>`. - `y_max` — `f32`.",
             "file": "src/ui/chart.rs",
-            "line": 661
+            "line": 662
           },
           {
             "name": "AreaLayer",
             "kind": "struct",
             "description": "A single layer in an area chart.  # Fields - `name` — `String`. - `values` — `Vec<f32>`. - `color` — `Color`.",
             "file": "src/ui/chart.rs",
-            "line": 677
+            "line": 678
           }
         ]
       },

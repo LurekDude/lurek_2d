@@ -504,9 +504,9 @@ describe("lurek.particle object-method syntax", function()
     end)
 
     -- @description Asserts the userdata type method returns the exact string ParticleSystem.
-    it("ps:type() returns 'ParticleSystem'", function()
+    it("ps:type() returns 'LParticleSystem'", function()
         local ps = lurek.particle.newSystem()
-        expect_equal("ParticleSystem", ps:type(), "type")
+        expect_equal("LParticleSystem", ps:type(), "type")
     end)
 
     -- @description Asserts typeOf reports true for the Drawable interface.

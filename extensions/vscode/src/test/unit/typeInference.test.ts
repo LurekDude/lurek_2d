@@ -19,27 +19,27 @@ import { MockTextDocument, MockPosition } from "../mocks/vscode";
 suite("TypeInference — FACTORY_TYPES registry", () => {
   test("contains Image type from lurek.graphics.newImage", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newImage"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newImage"].typeName, "Image");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newImage"].typeName, "LImage");
   });
 
   test("contains Canvas type from lurek.graphics.newCanvas", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newCanvas"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newCanvas"].typeName, "Canvas");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newCanvas"].typeName, "LCanvas");
   });
 
   test("contains Font type from lurek.graphics.newFont", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newFont"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "Font");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "LFont");
   });
 
   test("contains Entity type from lurek.ecs.new", () => {
     assert.ok(FACTORY_TYPES["lurek.ecs.new"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "Entity");
+    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "LEntity");
   });
 
   test("contains World type from lurek.physics.newWorld", () => {
     assert.ok(FACTORY_TYPES["lurek.physics.newWorld"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.physics.newWorld"].typeName, "World");
+    assert.strictEqual(FACTORY_TYPES["lurek.physics.newWorld"].typeName, "LWorld");
   });
 
   test("Canvas has setFilter and getFilter methods", () => {
@@ -71,7 +71,7 @@ suite("TypeInference — scanDocument", () => {
     const result = scanDocument(doc as any);
     assert.strictEqual(result.varTypes.length, 1);
     assert.strictEqual(result.varTypes[0].varName, "canvas");
-    assert.strictEqual(result.varTypes[0].typeName, "Canvas");
+    assert.strictEqual(result.varTypes[0].typeName, "LCanvas");
     assert.strictEqual(result.varTypes[0].factoryCall, "lurek.graphics.newCanvas");
   });
 
@@ -82,7 +82,7 @@ suite("TypeInference — scanDocument", () => {
     const result = scanDocument(doc as any);
     assert.strictEqual(result.varTypes.length, 1);
     assert.strictEqual(result.varTypes[0].varName, "img");
-    assert.strictEqual(result.varTypes[0].typeName, "Image");
+    assert.strictEqual(result.varTypes[0].typeName, "LImage");
   });
 
   test("detects multiple variables in one document", () => {
@@ -171,7 +171,7 @@ suite("TypeInference — scanDocument", () => {
     const result = scanDocument(doc as any);
     const copyVar = result.varTypes.find((v) => v.varName === "copy");
     assert.ok(copyVar, "copy should have been detected via re-assignment");
-    assert.strictEqual(copyVar!.typeName, "Image");
+    assert.strictEqual(copyVar!.typeName, "LImage");
   });
 
   test("ignores lines without factory patterns", () => {
@@ -192,12 +192,12 @@ suite("TypeInference — scanDocument", () => {
 suite("TypeInference — getTypeInfoForVar", () => {
   test("returns TypeInfo for a factory-typed variable", () => {
     const varTypes = [
-      { varName: "canvas", typeName: "Canvas", line: 0, factoryCall: "lurek.graphics.newCanvas" },
+      { varName: "canvas", typeName: "LCanvas", line: 0, factoryCall: "lurek.graphics.newCanvas" },
     ];
     const pos = new MockPosition(5, 0);
     const result = getTypeInfoForVar("canvas", pos as any, varTypes, []);
     assert.ok(result);
-    assert.strictEqual(result!.typeInfo.typeName, "Canvas");
+    assert.strictEqual(result!.typeInfo.typeName, "LCanvas");
     assert.strictEqual(result!.factoryCall, "lurek.graphics.newCanvas");
   });
 
@@ -208,7 +208,7 @@ suite("TypeInference — getTypeInfoForVar", () => {
 
   test("only considers variables declared before the cursor", () => {
     const varTypes = [
-      { varName: "canvas", typeName: "Canvas", line: 10, factoryCall: "lurek.graphics.newCanvas" },
+      { varName: "canvas", typeName: "LCanvas", line: 10, factoryCall: "lurek.graphics.newCanvas" },
     ];
     // Cursor at line 5, variable declared at line 10 — should not match
     const result = getTypeInfoForVar("canvas", new MockPosition(5, 0) as any, varTypes, []);
@@ -219,7 +219,7 @@ suite("TypeInference — getTypeInfoForVar", () => {
 suite("TypeInference — getMethodsForVar", () => {
   test("returns methods for factory-typed variable", () => {
     const varTypes = [
-      { varName: "img", typeName: "Image", line: 0, factoryCall: "lurek.graphics.newImage" },
+      { varName: "img", typeName: "LImage", line: 0, factoryCall: "lurek.graphics.newImage" },
     ];
     const methods = getMethodsForVar("img", new MockPosition(5, 0) as any, varTypes, []);
     assert.ok(methods);

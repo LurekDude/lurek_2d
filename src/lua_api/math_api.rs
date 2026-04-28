@@ -395,19 +395,21 @@ impl LuaUserData for LuaCatmullRom {
     #[allow(clippy::map_identity)]
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- sample --
-        /// Sample the spline at global t in [0, 1].
+        /// Samples the spline at global parameter `t` in `[0, 1]`.
         /// @param | t | number | Spline parameter.
-        /// @return | number, number | Sampled x and y coordinates.
+        /// @return | number | X coordinate at the sampled point.
+        /// @return | number | Y coordinate at the sampled point.
         methods.add_method("sample", |_, this, t: f32| {
             let (x, y) = this.inner.sample(t);
             Ok((x, y))
         });
 
         // -- sampleSegment --
-        /// Sample a specific segment at local t in [0, 1].
+        /// Samples one segment at local parameter `t` in `[0, 1]`.
         /// @param | seg | integer | Segment index.
         /// @param | t | number | Segment-local parameter.
-        /// @return | number, number | Sampled x and y coordinates.
+        /// @return | number | X coordinate at the sampled point.
+        /// @return | number | Y coordinate at the sampled point.
         methods.add_method("sampleSegment", |_, this, (seg, t): (usize, f32)| {
             let (x, y) = this.inner.sample_segment(seg, t);
             Ok((x, y))
@@ -431,7 +433,8 @@ impl LuaUserData for LuaCatmullRom {
         // -- removePoint --
         /// Removes the control point at `index` (0-based) and returns it.
         /// @param | index | integer | Zero-based control point index.
-        /// @return | number, number | Removed point coordinates.
+        /// @return | number | Removed point X coordinate.
+        /// @return | number | Removed point Y coordinate.
         methods.add_method_mut("removePoint", |_, this, idx: usize| {
             this.inner
                 .remove_point(idx)
@@ -466,9 +469,10 @@ pub struct LuaHermite {
 impl LuaUserData for LuaHermite {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- sample --
-        /// Evaluate the spline at parameter t in [0, 1].
+        /// Samples the spline at parameter `t` in `[0, 1]`.
         /// @param | t | number | Spline parameter.
-        /// @return | number, number | Sampled x and y coordinates.
+        /// @return | number | X coordinate at the sampled point.
+        /// @return | number | Y coordinate at the sampled point.
         methods.add_method("sample", |_, this, t: f32| {
             let (x, y) = this.inner.sample(t);
             Ok((x, y))
@@ -685,7 +689,8 @@ impl LuaUserData for LuaTransform {
         /// Transforms a point from local space to world space.
         /// @param | x | number | Local-space x coordinate.
         /// @param | y | number | Local-space y coordinate.
-        /// @return | number, number | World-space x and y coordinates.
+        /// @return | number | World-space X coordinate.
+        /// @return | number | World-space Y coordinate.
         methods.add_method("transformPoint", |_, this, (x, y): (f32, f32)| {
             Ok(this.inner.transform_point(x, y))
         });
@@ -694,7 +699,8 @@ impl LuaUserData for LuaTransform {
         /// Transforms a point from world space back to local space.
         /// @param | x | number | World-space x coordinate.
         /// @param | y | number | World-space y coordinate.
-        /// @return | number, number | Local-space x and y coordinates.
+        /// @return | number | Local-space X coordinate.
+        /// @return | number | Local-space Y coordinate.
         methods.add_method("inverseTransformPoint", |_, this, (x, y): (f32, f32)| {
             Ok(this.inner.inverse_transform_point(x, y))
         });
@@ -733,7 +739,11 @@ impl LuaUserData for LuaTransform {
 
         // -- decompose --
         /// Decomposes this transform into translation, rotation, and scale.
-        /// @return | number, number, number, number, number | Translation x, translation y, angle, scale x, and scale y.
+        /// @return | number | Translation X component.
+        /// @return | number | Translation Y component.
+        /// @return | number | Rotation angle.
+        /// @return | number | Scale X component.
+        /// @return | number | Scale Y component.
         methods.add_method("decompose", |_, this, ()| Ok(this.inner.decompose()));
 
         // -- type --
@@ -765,7 +775,8 @@ impl LuaUserData for LuaBezierCurve {
         // -- evaluate --
         /// Evaluates the curve at parameter t, returning (x, y).
         /// @param | t | number | Curve parameter.
-        /// @return | number, number | Evaluated x and y coordinates.
+        /// @return | number | Evaluated X coordinate.
+        /// @return | number | Evaluated Y coordinate.
         methods.add_method("evaluate", |_, this, t: f32| {
             let p = this.inner.evaluate(t);
             Ok((p.x, p.y))
@@ -796,7 +807,8 @@ impl LuaUserData for LuaBezierCurve {
         // -- getControlPoint --
         /// Returns the control point at 1-based index as (x, y), or nil.
         /// @param | index | integer | One-based control point index.
-        /// @return | number, number | Control point x and y, or nil values when the index is out of range.
+        /// @return | number | Control point X coordinate.
+        /// @return | number | Control point Y coordinate.
         methods.add_method("getControlPoint", |_, this, index: usize| {
             if index == 0 {
                 return Ok((None, None));
@@ -1429,7 +1441,8 @@ impl LuaUserData for LuaNoiseGenerator {
         /// @param | x | number | Sample x coordinate.
         /// @param | y | number | Sample y coordinate.
         /// @param | strength | number | Warp strength.
-        /// @return | number, number | Warped x and y coordinates.
+        /// @return | number | Warped X coordinate.
+        /// @return | number | Warped Y coordinate.
         methods.add_method(
             "warpDomain",
             |_, this, (x, y, strength): (f64, f64, f64)| Ok(this.inner.warp_domain(x, y, strength)),
@@ -1550,7 +1563,10 @@ impl LuaUserData for LuaCircle {
 
         // -- aabb --
         /// Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
-        /// @return | number, number, number, number | Minimum x, minimum y, maximum x, and maximum y.
+        /// @return | number | Minimum X coordinate.
+        /// @return | number | Minimum Y coordinate.
+        /// @return | number | Maximum X coordinate.
+        /// @return | number | Maximum Y coordinate.
         methods.add_method("aabb", |_, this, ()| {
             let (x1, y1, x2, y2) = this.inner.aabb();
             Ok((x1, y1, x2, y2))
@@ -2298,7 +2314,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | ly1 | number | First line point y coordinate.
     /// @param | lx2 | number | Second line point x coordinate.
     /// @param | ly2 | number | Second line point y coordinate.
-    /// @return | boolean, number, number, number, number | Hit flag and hit-point coordinates, with trailing values left nil when absent.
+    /// @return | boolean | True when the line intersects the circle.
+    /// @return | number | First hit-point X coordinate.
+    /// @return | number | First hit-point Y coordinate.
+    /// @return | number | Second hit-point X coordinate.
+    /// @return | number | Second hit-point Y coordinate.
     tbl.set(
         "circleIntersectsLine",
         lua.create_function(
@@ -2324,7 +2344,11 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | sy1 | number | Segment start y coordinate.
     /// @param | sx2 | number | Segment end x coordinate.
     /// @param | sy2 | number | Segment end y coordinate.
-    /// @return | boolean, number, number, number, number | Hit flag and hit-point coordinates, with trailing values left nil when absent.
+    /// @return | boolean | True when the segment intersects the circle.
+    /// @return | number | First hit-point X coordinate.
+    /// @return | number | First hit-point Y coordinate.
+    /// @return | number | Second hit-point X coordinate.
+    /// @return | number | Second hit-point Y coordinate.
     tbl.set(
         "circleIntersectsSegment",
         lua.create_function(
@@ -2350,7 +2374,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | y1 | number | Segment start y coordinate.
     /// @param | x2 | number | Segment end x coordinate.
     /// @param | y2 | number | Segment end y coordinate.
-    /// @return | number, number | Closest point coordinates.
+    /// @return | number | Closest point X coordinate.
+    /// @return | number | Closest point Y coordinate.
     tbl.set(
         "closestPointOnSegment",
         lua.create_function(
@@ -2421,7 +2446,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | y3 | number | Second line start y coordinate.
     /// @param | x4 | number | Second line end x coordinate.
     /// @param | y4 | number | Second line end y coordinate.
-    /// @return | number, number | Intersection coordinates, or nil values when the lines are parallel.
+    /// @return | number | Intersection X coordinate.
+    /// @return | number | Intersection Y coordinate.
     tbl.set(
         "lineIntersect",
         lua.create_function(
@@ -2473,7 +2499,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- polygonCentroid --
     /// Returns the centroid (cx, cy) of a polygon given as a flat {x1,y1,...} table.
     /// @param | polygon | table | Flat polygon vertex list.
-    /// @return | number, number | Centroid x and y coordinates.
+    /// @return | number | Centroid X coordinate.
+    /// @return | number | Centroid Y coordinate.
     tbl.set(
         "polygonCentroid",
         lua.create_function(|_, pts: LuaTable| {
@@ -2497,7 +2524,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | y3 | number | Second segment start y coordinate.
     /// @param | x4 | number | Second segment end x coordinate.
     /// @param | y4 | number | Second segment end y coordinate.
-    /// @return | boolean, number, number | Hit flag and intersection coordinates, with trailing values left nil when absent.
+    /// @return | boolean | True when the segments intersect.
+    /// @return | number | Intersection X coordinate.
+    /// @return | number | Intersection Y coordinate.
     tbl.set(
         "segmentIntersectsSegment",
         lua.create_function(
@@ -2982,7 +3011,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | h | number | Hue value.
     /// @param | s | number | Saturation value.
     /// @param | l | number | Lightness value.
-    /// @return | number, number, number, number | Red, green, blue, and alpha values.
+    /// @return | number | Red component.
+    /// @return | number | Green component.
+    /// @return | number | Blue component.
+    /// @return | number | Alpha component.
     tbl.set(
         "hslToRgb",
         lua.create_function(|_, (h, s, l): (f32, f32, f32)| {
@@ -2994,7 +3026,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- fromHex --
     /// Parses a hex color string (#RRGGBB or #RRGGBBAA) into (r, g, b, a) floats.
     /// @param | hex | string | Hex color string.
-    /// @return | number, number, number, number | Red, green, blue, and alpha values.
+    /// @return | number | Red component.
+    /// @return | number | Green component.
+    /// @return | number | Blue component.
+    /// @return | number | Alpha component.
     tbl.set(
         "fromHex",
         lua.create_function(|_, hex: String| {
@@ -3010,7 +3045,9 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | r | number | Red value.
     /// @param | g | number | Green value.
     /// @param | b | number | Blue value.
-    /// @return | number, number, number | Hue, saturation, and lightness values.
+    /// @return | number | Hue value.
+    /// @return | number | Saturation value.
+    /// @return | number | Lightness value.
     tbl.set(
         "rgbToHsl",
         lua.create_function(|_, (r, g, b): (f32, f32, f32)| {
@@ -3032,7 +3069,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | y2 | number | Second rectangle y coordinate.
     /// @param | w2 | number | Second rectangle width.
     /// @param | h2 | number | Second rectangle height.
-    /// @return | number, number, number, number | Union x, y, width, and height.
+    /// @return | number | Union rectangle X coordinate.
+    /// @return | number | Union rectangle Y coordinate.
+    /// @return | number | Union rectangle width.
+    /// @return | number | Union rectangle height.
     tbl.set(
         "rectUnion",
         lua.create_function(
@@ -3051,7 +3091,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | cy | number | Center y coordinate.
     /// @param | w | number | Rectangle width.
     /// @param | h | number | Rectangle height.
-    /// @return | number, number, number, number | Rectangle x, y, width, and height.
+    /// @return | number | Rectangle X coordinate.
+    /// @return | number | Rectangle Y coordinate.
+    /// @return | number | Rectangle width.
+    /// @return | number | Rectangle height.
     tbl.set(
         "rectFromCenter",
         lua.create_function(|_, (cx, cy, w, h): (f32, f32, f32, f32)| {

@@ -3,13 +3,13 @@
 -- Namespaces: lurek.graph + lurek.pathfind
 
 
---                                                                                                                                        
+--
 -- Graph MST (Minimum Spanning Tree)
---                                                                                                                                        
+--
 describe("graph.mst", function()
 
     local function build_simple_graph()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local n1 = g:addNode("A")
         local n2 = g:addNode("B")
         local n3 = g:addNode("C")
@@ -44,7 +44,7 @@ describe("graph.mst", function()
     end)
 
     it("two-node graph has one MST edge", function()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local a = g:addNode()
         local b = g:addNode()
         g:addEdge(a, b)
@@ -53,20 +53,20 @@ describe("graph.mst", function()
     end)
 
     it("single node graph has empty MST", function()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         g:addNode()
         local tree = g:mst()
         expect_equal(0, #tree)
     end)
 end)
 
---                                                                                                                                        
+--
 -- Graph A* (astar)
---                                                                                                                                        
+--
 describe("graph.astar", function()
 
     local function build_chain(n)
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local nodes = {}
         for i = 1, n do
             nodes[i] = g:addNode("N" .. i)
@@ -92,7 +92,7 @@ describe("graph.astar", function()
     end)
 
     it("returns nil when no path exists", function()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local a = g:addNode()
         local b = g:addNode()
         -- No edge between a and b
@@ -101,7 +101,7 @@ describe("graph.astar", function()
     end)
 
     it("astar path starts and ends at expected nodes", function()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local a   = g:addNode("start")
         local mid = g:addNode("mid")
         local b   = g:addNode("end")
@@ -115,7 +115,7 @@ describe("graph.astar", function()
     end)
 
     it("same-node astar path has length 1", function()
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local a = g:addNode()
         local path = g:astar(a, a)
         -- A path from a node to itself should be [a] or nil depending on impl
@@ -123,9 +123,9 @@ describe("graph.astar", function()
     end)
 end)
 
---                                                                                                                                        
+--
 -- Graph + pathfinding integration
---                                                                                                                                        
+--
 describe("graph + JPS integration", function()
 
     it("worldGraph edge costs match procgen expectations", function()
@@ -140,7 +140,7 @@ describe("graph + JPS integration", function()
         local wg = lurek.procgen.worldGraph(200, 150, 8, 10)
 
         -- Load it into a lurek.graph
-        local g = lurek.graph.newGraph({ directed = false })
+        local g = lurek.graph.newGraph()
         local node_map = {}
         for _, r in ipairs(wg.regions) do
             node_map[r.id] = g:addNode(r.name)

@@ -28,10 +28,14 @@ OUTPUT_FILE = os.path.join(WORKSPACE_ROOT, "docs", "api", "lurek.lua")
 
 BUILTIN_TYPES = {
     "any", "nil", "boolean", "number", "integer", "string", "table",
-    "function", "userdata", "thread", "unknown", "self",
+    "function", "userdata", "thread", "unknown", "self", "LuaValue",
 }
 
+UNKNOWN_SENTINEL = "unknown"
+DYNAMIC_LUA_TYPE = "LuaValue"
+
 TYPE_NORMALIZATIONS = {
+    "any": DYNAMIC_LUA_TYPE,
     "bool": "boolean",
     "int": "integer",
     "u8": "integer",
@@ -45,6 +49,7 @@ TYPE_NORMALIZATIONS = {
     "index": "integer",
     "count": "integer",
     "Thread": "ThreadHandle",
+    "unknown": DYNAMIC_LUA_TYPE,
     "void": "nil",
 }
 
@@ -92,7 +97,7 @@ def split_top_level_types(text):
 
 def normalize_type(type_name):
     if not type_name:
-        return "any"
+        return DYNAMIC_LUA_TYPE
 
     type_name = type_name.strip()
     type_name = re.sub(r"\s*([<>|,{}()\[\]])\s*", r"\1", type_name)
@@ -100,7 +105,7 @@ def normalize_type(type_name):
     for old, new in TYPE_NORMALIZATIONS.items():
         type_name = re.sub(rf"\b{re.escape(old)}\b", new, type_name)
 
-    return type_name or "any"
+    return type_name or DYNAMIC_LUA_TYPE
 
 
 def extract_return_from_full_doc(full_doc):
@@ -124,14 +129,269 @@ def extract_return_from_full_doc(full_doc):
     return ", ".join(types)
 
 
+def extract_return_entries_from_full_doc(full_doc):
+    """Extract typed @return entries with their descriptions from a full docstring."""
+    entries = []
+    for line in full_doc.splitlines():
+        stripped = line.strip()
+        pipe_match = re.match(r"^@return\s*\|\s*([^|]+?)\s*\|\s*(.+)$", stripped)
+        if not pipe_match:
+            continue
+        raw_types = pipe_match.group(1).strip()
+        description = pipe_match.group(2).strip()
+        for part in split_top_level_types(raw_types):
+            entries.append((normalize_type(part.strip()), description))
+    return entries
+
+
+def get_return_entries(fn):
+    full_doc_entries = extract_return_entries_from_full_doc(fn.get("full_doc", ""))
+    if full_doc_entries:
+        return full_doc_entries, True
+
+    ret = parse_returns(fn)
+    ret_desc = fn.get("return_description", "").strip()
+    if not ret:
+        return [], False
+
+    return [(part.strip(), ret_desc) for part in split_top_level_types(ret)], False
+
+
 def normalize_param_type(type_name, is_optional=False):
     normalized = normalize_type(type_name)
-    optional = is_optional or normalized.endswith("?")
     if normalized.endswith("?"):
-        normalized = normalized[:-1] or "any"
-    if optional and normalized != "nil" and "|nil" not in normalized:
-        normalized = f"{normalized}|nil"
+        normalized = normalized[:-1] or DYNAMIC_LUA_TYPE
     return normalized
+
+
+def _normalize_return_text(text):
+    normalized = text.strip().lower()
+    normalized = re.sub(r"^returns?\s*:?\s*", "", normalized)
+    normalized = re.sub(r"\b(a|an|the)\b", " ", normalized)
+    normalized = re.sub(r"[^a-z0-9]+", " ", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def is_redundant_nil_return(ret_type, ret_desc):
+    if normalize_type(ret_type) != "nil":
+        return False
+    normalized = _normalize_return_text(ret_desc)
+    return normalized in {
+        "no return",
+        "no returns",
+        "no return value",
+        "no return values",
+        "no value",
+        "no values",
+        "no value is returned",
+        "no values are returned",
+        "nothing",
+        "nothing is returned",
+        "nothing returned",
+        "nil",
+    }
+
+
+def format_return_description(ret_desc):
+    cleaned = ret_desc.strip()
+    cleaned = re.sub(r"^returns?\s*:?\s*", "", cleaned, flags=re.IGNORECASE)
+    return cleaned
+
+
+def sanitize_return_name(name, fallback):
+    cleaned = name.strip().lower()
+    cleaned = re.sub(r"[^a-z0-9]+", "_", cleaned)
+    cleaned = cleaned.strip("_")
+    if not cleaned:
+        cleaned = fallback
+    if cleaned[0].isdigit():
+        cleaned = f"value_{cleaned}"
+    if cleaned in LUA_KEYWORDS:
+        cleaned = f"{cleaned}_"
+    return cleaned
+
+
+def infer_return_name_candidates(ret_desc):
+    normalized = format_return_description(ret_desc).strip().lower()
+    if not normalized:
+        return []
+
+    pattern_candidates = [
+        (r"\bsuccess flag,\s*event name,\s*and\s*payload array\b", ["success", "event_name", "payload"]),
+        (r"\bvalidation result flag and array of error records\b", ["ok", "errors"]),
+        (r"\bdocumented entry count and live entry count\b", ["documented_count", "live_count"]),
+        (r"\bstatus and payload\b", ["status", "payload"]),
+        (r"\blatitude,\s*longitude,\s*and\s*zoom\b", ["latitude", "longitude", "zoom"]),
+        (r"\bred,\s*green,\s*blue,\s*and\s*alpha\b", ["red", "green", "blue", "alpha"]),
+        (r"\bhue,\s*saturation,\s*and\s*lightness\b", ["hue", "saturation", "lightness"]),
+        (r"\bconstant,\s*linear,\s*and\s*quadratic\b", ["constant", "linear", "quadratic"]),
+        (r"\bwidth and height\b", ["width", "height"]),
+        (r"\bspeed and strength\b", ["speed", "strength"]),
+        (r"\bx,\s*y,\s*width,\s*and\s*height\b", ["x", "y", "width", "height"]),
+        (r"\bminimum x,\s*minimum y,\s*maximum x,\s*and\s*maximum y\b", ["min_x", "min_y", "max_x", "max_y"]),
+        (r"\btranslation x,\s*translation y,\s*angle,\s*scale x,\s*and\s*scale y\b", ["translation_x", "translation_y", "angle", "scale_x", "scale_y"]),
+        (r"\bx and y\b", ["x", "y"]),
+        (r"\bx,\s*y,\s*and\s*z\b", ["x", "y", "z"]),
+    ]
+
+    for pattern, candidates in pattern_candidates:
+        if re.search(pattern, normalized):
+            return candidates
+
+    return []
+
+
+def infer_single_return_name_candidate(ret_desc):
+    normalized = format_return_description(ret_desc).strip().lower()
+    if not normalized:
+        return None
+
+    phrase_patterns = [
+        r"\b(?:the same|new|started|returned|created|updated|current|standalone|requested|registered)\s+([a-z][a-z0-9 /_-]*?)\s+handle\b",
+        r"\b([a-z][a-z0-9 /_-]*?)\s+handle\b",
+        r"\b(?:the same|new|started|created|current|standalone)\s+([a-z][a-z0-9 /_-]*?)\s+state\b",
+        r"\bcopy of (?:the )?([a-z][a-z0-9 /_-]*?)\b(?: at call time)?$",
+    ]
+    for pattern in phrase_patterns:
+        match = re.search(pattern, normalized)
+        if match:
+            phrase = match.group(1).strip()
+            phrase = re.sub(r"\b(?:this|that|current|requested|registered|provided|same|new|started|standalone|active|named|literal|lua-visible|world|agent)\b", " ", phrase)
+            phrase = re.sub(r"\b(?:for|of|to|at|the|a|an)\b", " ", phrase)
+            phrase = re.sub(r"\s+", " ", phrase).strip()
+            if phrase:
+                return sanitize_return_name(phrase, "value")
+
+    single_return_patterns = [
+        (r"\bcontrol point count\b", "count"),
+        (r"\bnoise value\b", "noise"),
+        (r"\bangle\b", "angle"),
+        (r"\bwidth\b", "width"),
+        (r"\bheight\b", "height"),
+        (r"\blatitude\b", "latitude"),
+        (r"\blongitude\b", "longitude"),
+        (r"\bzoom\b", "zoom"),
+        (r"\bx(?: |-)?coordinate\b", "x"),
+        (r"\by(?: |-)?coordinate\b", "y"),
+        (r"\bz(?: |-)?coordinate\b", "z"),
+        (r"\bx(?: |-)?position\b", "x"),
+        (r"\by(?: |-)?position\b", "y"),
+        (r"\bz(?: |-)?position\b", "z"),
+        (r"\bx(?: |-)?component\b", "x"),
+        (r"\by(?: |-)?component\b", "y"),
+        (r"\bz(?: |-)?component\b", "z"),
+        (r"\bx(?: |-)?value\b", "x"),
+        (r"\by(?: |-)?value\b", "y"),
+        (r"\bz(?: |-)?value\b", "z"),
+        (r"\bx axis\b", "x"),
+        (r"\by axis\b", "y"),
+        (r"\bz axis\b", "z"),
+        (r"\bred component\b", "r"),
+        (r"\bgreen component\b", "g"),
+        (r"\bblue component\b", "b"),
+        (r"\balpha component\b", "a"),
+        (r"\bred channel\b", "r"),
+        (r"\bgreen channel\b", "g"),
+        (r"\bblue channel\b", "b"),
+        (r"\balpha channel\b", "a"),
+        (r"\bhorizontal\b", "x"),
+        (r"\bvertical\b", "y"),
+        (r"\btype name\b", "type_name"),
+        (r"\bblackboard\b", "blackboard"),
+        (r"\beasing names\b", "easing_names"),
+        (r"\bevent tables\b", "events"),
+        (r"\bframe count\b", "frame_count"),
+        (r"\bclip name\b", "clip_name"),
+        (r"\bprogress\b", "progress"),
+        (r"\bresult\b", "result"),
+        (r"\bexists\b", "exists"),
+        (r"\bmatches\b", "matches"),
+        (r"\bcontains\b", "contains"),
+        (r"\boverlaps\b", "overlaps"),
+        (r"\bintersects\b", "intersects"),
+        (r"\bis empty\b", "is_empty"),
+    ]
+
+    for pattern, candidate in single_return_patterns:
+        if re.search(pattern, normalized):
+            return candidate
+
+    return None
+
+
+def infer_return_name(ret_type, ret_desc, index, total, fn_name=None):
+    candidates = infer_return_name_candidates(ret_desc)
+    if len(candidates) == total:
+        return sanitize_return_name(candidates[index], f"value{index + 1}")
+
+    normalized_ret_type = normalize_type(ret_type)
+    normalized_ret_desc = format_return_description(ret_desc).strip().lower()
+
+    if total == 1 and normalized_ret_type == "boolean":
+        predicate_patterns = [
+            (r"\bmatches\b", "matches"),
+            (r"\bexists\b", "exists"),
+            (r"\bcontains\b", "contains"),
+            (r"\boverlaps\b", "overlaps"),
+            (r"\bintersects\b", "intersects"),
+            (r"\bis empty\b", "is_empty"),
+        ]
+        for pattern, candidate in predicate_patterns:
+            if re.search(pattern, normalized_ret_desc):
+                return candidate
+
+    single_candidate = infer_single_return_name_candidate(ret_desc)
+    if single_candidate:
+        return sanitize_return_name(single_candidate, f"value{index + 1}")
+
+    if total == 1:
+        if fn_name:
+            bare_name = fn_name.split(":")[-1].split(".")[-1]
+            if re.match(r"^(is|has|can)[A-Z_]", bare_name):
+                snake = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", bare_name).lower()
+                return sanitize_return_name(snake, "result")
+            if bare_name in {"contains", "exists", "matches", "intersects", "overlaps"}:
+                return sanitize_return_name(bare_name, "result")
+        if normalized_ret_type == "table":
+            return "result"
+        if re.match(r"^L[A-Z]", normalized_ret_type):
+            stripped = normalized_ret_type[1:]
+            stripped = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", stripped).lower()
+            stripped = re.sub(r"^ai_", "", stripped)
+            return sanitize_return_name(stripped, "value")
+        return None
+
+    return None
+
+
+def should_emit_return_description(desc, ret_desc):
+    if not ret_desc:
+        return False
+    if not desc:
+        return True
+
+    normalized_desc = _normalize_return_text(desc)
+    normalized_ret = _normalize_return_text(ret_desc)
+    if not normalized_desc or not normalized_ret:
+        return True
+
+    return normalized_desc != normalized_ret
+
+
+def is_low_signal_return_description(ret_desc):
+    normalized = _normalize_return_text(ret_desc)
+    if normalized in {
+        "literal type name",
+        "lua visible type name",
+        "type name for this userdata",
+        "current type name",
+    }:
+        return True
+
+    if re.match(r"^(same|new|started|current|created|returned|requested|registered)\s+.+\s+(handle|state|widget|object)$", normalized):
+        return True
+
+    return False
 
 
 def collect_declared_and_referenced_types(lua_api):
@@ -207,31 +467,33 @@ def guess_type(text, is_return=False):
         return "LFileHandle"
     elif "audio source" in t or "audiosource" in t or "source" in t:
         return "LSource"
-    return "any"
+    return UNKNOWN_SENTINEL
 
 def parse_params(fn):
     pkeys = []
     ptype_map = {}
     pdesc_map = {}
+    popt_map = {}
 
     typed = fn.get("typed_params", [])
     if typed:
         for p in typed:
             pname = p[0].strip()
-            ptype = p[1].strip() if len(p) > 1 else "any"
+            ptype = p[1].strip() if len(p) > 1 else UNKNOWN_SENTINEL
             is_opt = p[2] if len(p) > 2 else False
             param_desc = p[3].strip() if len(p) > 3 else ""
             pname_clean = pname if pname == "..." else re.sub(r'[^a-zA-Z0-9_]', '', pname.replace(' ', '_'))
             if pname_clean and pname_clean not in pkeys:
                 pkeys.append(pname_clean)
                 ptype_map[pname_clean] = normalize_param_type(ptype, is_opt)
+                popt_map[pname_clean] = is_opt
                 if param_desc:
                     pdesc_map[pname_clean] = param_desc
                 elif is_opt:
                     pdesc_map[pname_clean] = "(optional)"
                 else:
                     pdesc_map[pname_clean] = ""
-        return pkeys, ptype_map, pdesc_map
+        return pkeys, ptype_map, pdesc_map, popt_map
 
     # 1. Start with params_doc
     params_doc = fn.get("params_doc", "")
@@ -258,7 +520,7 @@ def parse_params(fn):
                 n_clean = n if n == "..." else re.sub(r'[^a-zA-Z0-9_]', '', n.replace(' ', '_'))
                 if n_clean and n_clean not in pkeys:
                     pkeys.append(n_clean)
-                    ptype_map[n_clean] = guess_type(desc)
+                    ptype_map[n_clean] = normalize_param_type(guess_type(desc))
                     pdesc_map[n_clean] = desc.strip()
 
     # 2. Fallback to inferred_sig if params_doc yielded nothing
@@ -281,10 +543,12 @@ def parse_params(fn):
                     name_clean = name if name == "..." else re.sub(r'[^a-zA-Z0-9_]', '', name.replace(' ', '_'))
                     if name_clean and name_clean not in pkeys:
                         pkeys.append(name_clean)
-                        ptype_map[name_clean] = normalize_param_type("any", is_opt)
+                        ptype_map[name_clean] = normalize_param_type(UNKNOWN_SENTINEL, is_opt)
+                        popt_map[name_clean] = is_opt
                         pdesc_map[name_clean] = "(optional)" if is_opt else ""
 
-    return pkeys, ptype_map, pdesc_map
+    return pkeys, ptype_map, pdesc_map, popt_map
+
 
 def parse_returns(fn):
     ret_doc = fn.get('returns_doc', '').strip()
@@ -305,7 +569,7 @@ def parse_returns(fn):
         if ',' in type_token and re.match(r'^[a-z][a-z0-9_?|]*(?:,\s*[a-z][a-z0-9_?|]*)*$', type_token):
             return type_token
         res = guess_type(type_token, is_return=True)
-        if res != "any":
+        if res != UNKNOWN_SENTINEL:
             return normalize_type(res)
         if re.match(r'^[A-Za-z_][A-Za-z0-9_<>{}, |?]*$', ret_doc):
             return normalize_type(ret_doc)
@@ -316,7 +580,7 @@ def parse_returns(fn):
             return None
         return normalize_type(inferred)
     if ret_doc:
-        return "any"
+        return DYNAMIC_LUA_TYPE
     return None
 
 def write_function_doc(out, fn, name):
@@ -325,15 +589,15 @@ def write_function_doc(out, fn, name):
         for line in desc.splitlines():
             out.append(f"--- {line}")
 
-    pkeys, ptyp, pdesc = parse_params(fn)
+    pkeys, ptyp, pdesc, popt = parse_params(fn)
     param_names = []
 
     for k in pkeys:
         pd = pdesc.get(k, "")
-        t = ptyp.get(k, "any")
+        t = ptyp.get(k, DYNAMIC_LUA_TYPE)
         k = k.replace("?", "")
 
-        is_optional = pd == "(optional)"
+        is_optional = popt.get(k, False)
 
         if k == "...":
             if pd:
@@ -345,25 +609,24 @@ def write_function_doc(out, fn, name):
             safe_k = (k + "_") if k in LUA_KEYWORDS else k
             if is_optional:
                 # LuaCATS optional syntax: name? type (NOT name type|nil)
-                clean_t = re.sub(r"\|nil$", "", t) or "any"
-                out.append(f"---@param {safe_k}? {clean_t}".strip())
+                clean_t = re.sub(r"\|nil$", "", t) or DYNAMIC_LUA_TYPE
+                if pd and pd != "(optional)":
+                    out.append(f"---@param {safe_k}? {clean_t} {pd}".strip())
+                else:
+                    out.append(f"---@param {safe_k}? {clean_t}".strip())
             elif pd:
                 out.append(f"---@param {safe_k} {t} {pd}".strip())
             else:
                 out.append(f"---@param {safe_k} {t}".strip())
             param_names.append(safe_k)
 
-    ret = parse_returns(fn)
-    ret_desc = fn.get("return_description", "").strip()
-    if ret:
-        ret_parts = split_top_level_types(ret)
-        if len(ret_parts) > 1:
-            for r in ret_parts:
-                out.append(f"---@return {r.strip()}")
-        elif ret_desc:
-            out.append(f"---@return {ret} {ret_desc}")
+    ret_entries, has_explicit_return_entries = get_return_entries(fn)
+    for ret_type, ret_desc in ret_entries:
+        raw_ret_desc = ret_desc.strip()
+        if raw_ret_desc:
+            out.append(f"---@return {ret_type} {raw_ret_desc}")
         else:
-            out.append(f"---@return {ret}")
+            out.append(f"---@return {ret_type}")
 
     signature = ', '.join(param_names)
     if ':' in name:
@@ -384,10 +647,10 @@ def write_callback_doc(out, callback):
     for param in params:
         raw_name = str(param.get("name", "arg")).strip() or "arg"
         safe_name = (raw_name + "_") if raw_name in LUA_KEYWORDS else raw_name
-        param_type = normalize_param_type(str(param.get("type", "any")), bool(param.get("optional", False)))
+        param_type = normalize_param_type(str(param.get("type", UNKNOWN_SENTINEL)), bool(param.get("optional", False)))
         param_desc = str(param.get("description", "")).strip()
         if param.get("optional", False):
-            clean_type = re.sub(r"\|nil$", "", param_type) or "any"
+            clean_type = re.sub(r"\|nil$", "", param_type) or DYNAMIC_LUA_TYPE
             if param_desc:
                 out.append(f"---@param {safe_name}? {clean_type} {param_desc}".strip())
             else:
@@ -413,17 +676,17 @@ def main():
     lua_api = data.get("lua_api", {}).get("modules", {})
 
     # Maps internal json key → actual Lua namespace (for modules that register under a different name)
-    _LUA_NAMESPACE = {
-        "timer":      "time",
-        "event":      "signal",
-        "automation": "simulator",
-    }
+    _LUA_NAMESPACE = {}
+
+    source_enums = data.get("lua_api", {}).get("enums") or BUILTIN_ENUMS
 
     out = []
     out.append("---@meta")
     out.append("--- Auto-generated Lurek2D API documentation for LuaCATS.")
     out.append("")
     out.append("lurek = {}")
+    out.append("")
+    out.append("---@alias LuaValue nil|boolean|number|string|table|function|userdata|thread")
     out.append("")
 
     declared_types, referenced_types = collect_declared_and_referenced_types(lua_api)
@@ -432,7 +695,8 @@ def main():
         if token not in declared_types and (token[0].isupper() or token in {"Lua", "LuaValue", "Thread"})
     )
 
-    # LuaValue is mlua's dynamic value type — alias to `any` so LuaLS treats it correctly.
+    # Dynamic mlua carrier types normalize to `LuaValue`, a real project alias for
+    # unconstrained Lua runtime values.
     # Old-name → L-prefix aliases: if a referenced type "Foo" has a declared counterpart "LFoo",
     # emit an alias instead of a duplicate stub class.  This happens when docstring @return tags
     # still use the pre-L-prefix name.
@@ -440,14 +704,13 @@ def main():
     # Manual overrides for types whose canonical L-prefix name cannot be derived automatically
     # (casing mismatches, suffix changes, or genuinely internal/non-userdata types).
     _OPAQUE_ALIASES: dict[str, str] = {
-        "LuaValue":     "any",   # mlua's dynamic value — not a Lurek userdata type
-        "MultiValue":   "any",   # mlua multi-return — not a Lurek userdata type
-        "Environment":  "any",   # OS/Lua environment table — not a Lurek userdata type
+        "MultiValue":   DYNAMIC_LUA_TYPE,   # mlua multi-return carrier
+        "Environment":  DYNAMIC_LUA_TYPE,   # OS/Lua environment table
         "GID":          "integer",  # tilemap global tile ID — integer alias
         "ID":           "integer",  # generic ID — integer alias
         "Radius":       "number",   # plain numeric radius — not a userdata type
-        "TextureKey":   "any",   # internal render key — not exposed as userdata
-        "Tint":         "any",   # plain color tint — not a userdata type
+        "TextureKey":   DYNAMIC_LUA_TYPE,   # internal render key — not exposed as userdata
+        "Tint":         DYNAMIC_LUA_TYPE,   # plain color tint — not a userdata type
         # Struct-name → L-prefix where casing or suffix differs
         "AiFlowField":    "LAIFlowField",    # LuaAiFlowField struct but type() returns LAIFlowField
         "Camera2D":       "LCamera",         # LuaCamera2D struct but type() returns LCamera
@@ -485,8 +748,8 @@ def main():
             out.append(f"{type_name} = {{}}")
             out.append("")
 
-    for enum_name in sorted(BUILTIN_ENUMS.keys()):
-        values = BUILTIN_ENUMS[enum_name]
+    for enum_name in sorted(source_enums.keys()):
+        values = source_enums[enum_name]
         if not values:
             continue
         union = "|".join(json.dumps(value) for value in values)

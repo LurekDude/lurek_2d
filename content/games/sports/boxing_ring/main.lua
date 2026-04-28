@@ -260,9 +260,9 @@ local function try_hit(attacker, defender, atk_def)
 
     -- Tween HP bars
     if defender.is_player then
-        lurek.tween.to(hp_display, 0.3, { player = defender.hp })
+        lurek.tween.to(hp_display, { player = defender.hp }, 0.3)
     else
-        lurek.tween.to(hp_display, 0.3, { opponent = defender.hp })
+        lurek.tween.to(hp_display, { opponent = defender.hp }, 0.3)
     end
 
     return true
@@ -392,7 +392,7 @@ function lurek.process(dt)
             init_round()
             current_state = STATE.FIGHT
             banner.y = -60
-            lurek.tween.to(banner, 0.5, { y = SCREEN_H * 0.35 })
+            lurek.tween.to(banner, { y = SCREEN_H * 0.35 }, 0.5)
         end
         return
     end
@@ -407,7 +407,7 @@ function lurek.process(dt)
                 init_round()
                 current_state = STATE.FIGHT
                 banner.y = -60
-                lurek.tween.to(banner, 0.5, { y = SCREEN_H * 0.35 })
+                lurek.tween.to(banner, { y = SCREEN_H * 0.35 }, 0.5)
             end
         end
         return

@@ -230,17 +230,17 @@ describe("lurek.event.newSignal", function()
   -- @tests lurek.event.newSignal
   -- @tests lurek.event.Signal.type
   -- @description Constructs a Signal userdata and verifies its runtime type string reports Signal.
-  it("type returns Signal", function()
+  it("type returns LSignal", function()
     local sig = lurek.event.newSignal()
-    expect_equal(sig:type(), "Signal")
+    expect_equal(sig:type(), "LSignal")
   end)
 
   -- @tests lurek.event.newSignal
   -- @tests lurek.event.Signal.typeOf
   -- @description Verifies typeOf recognizes the concrete Signal type name on a newly created dispatcher.
-  it("typeOf returns true for Signal type", function()
+  it("typeOf returns true for LSignal type", function()
     local sig = lurek.event.newSignal()
-    expect_true(sig:typeOf("Signal"))
+    expect_true(sig:typeOf("LSignal"))
   end)
 
   -- @tests lurek.event.newSignal
@@ -384,16 +384,16 @@ describe("lurek.event.newSignal", function()
 
     -- @tests lurek.event.newSignal
     -- @description Verifies Signal:type reports the userdata class name.
-    it("should have type 'Signal'", function()
+    it("should have type 'LSignal'", function()
         local sig = lurek.event.newSignal()
-        expect_equal("Signal", sig:type(), "type should be Signal")
+      expect_equal("LSignal", sig:type(), "type should be LSignal")
     end)
 
     -- @tests lurek.event.newSignal
     -- @description Verifies Signal:typeOf recognizes Signal and Object while rejecting unrelated types.
     it("should support typeOf check", function()
         local sig = lurek.event.newSignal()
-        expect_true(sig:typeOf("Signal"), "typeOf('Signal') should be true")
+        expect_true(sig:typeOf("LSignal"), "typeOf('LSignal') should be true")
         expect_true(sig:typeOf("Object"), "typeOf('Object') should be true")
         expect_false(sig:typeOf("Entity"), "typeOf('Entity') should be false")
     end)

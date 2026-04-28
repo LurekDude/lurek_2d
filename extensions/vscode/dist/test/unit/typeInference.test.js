@@ -27,9 +27,39 @@ var assert = __toESM(require("assert"));
 
 // src/providers/typeInference.ts
 var vscode = __toESM(require("vscode"));
+var _apiDataSingleton = null;
+function getReturnTypeName(fullPath) {
+  if (_apiDataSingleton) {
+    const typeName = _apiDataSingleton.getFactoryTypes().get(fullPath);
+    if (typeName) return typeName;
+  }
+  return FACTORY_TYPES[fullPath]?.typeName;
+}
+function getTypeInfoByName(typeName) {
+  if (_apiDataSingleton) {
+    const methods = _apiDataSingleton.getMethods(typeName);
+    if (methods.length > 0) {
+      const legacyEntry = Object.values(FACTORY_TYPES).find((t) => t.typeName === typeName);
+      return {
+        typeName,
+        methods: methods.map((fn) => ({
+          name: fn.name,
+          sig: fn.signature,
+          desc: fn.description
+        })),
+        ...legacyEntry?.fields ? { fields: legacyEntry.fields } : {}
+      };
+    }
+  }
+  return Object.values(FACTORY_TYPES).find((t) => t.typeName === typeName);
+}
 var FACTORY_TYPES = {
   "lurek.graphics.newImage": {
-    typeName: "Image",
+    typeName: "LImage",
+    fields: [
+      { name: "width", type: "number", desc: "Image width in pixels" },
+      { name: "height", type: "number", desc: "Image height in pixels" }
+    ],
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -39,11 +69,15 @@ var FACTORY_TYPES = {
       { name: "setWrap", sig: ":setWrap(horiz, vert)", desc: "Set texture wrap mode" },
       { name: "getWrap", sig: ":getWrap()", desc: "Returns horizontal, vertical wrap" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Image'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LImage'" }
     ]
   },
   "lurek.graphics.newCanvas": {
-    typeName: "Canvas",
+    typeName: "LCanvas",
+    fields: [
+      { name: "width", type: "number", desc: "Canvas width in pixels" },
+      { name: "height", type: "number", desc: "Canvas height in pixels" }
+    ],
     methods: [
       { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
@@ -52,11 +86,11 @@ var FACTORY_TYPES = {
       { name: "setFilter", sig: ":setFilter(min, mag)", desc: "Set texture filter" },
       { name: "renderTo", sig: ":renderTo(fn)", desc: "Render to this canvas" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Canvas'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LCanvas'" }
     ]
   },
   "lurek.graphics.newFont": {
-    typeName: "Font",
+    typeName: "LFont",
     methods: [
       { name: "getWidth", sig: ":getWidth(text)", desc: "Width of text in pixels" },
       { name: "getHeight", sig: ":getHeight()", desc: "Font height in pixels" },
@@ -66,30 +100,30 @@ var FACTORY_TYPES = {
       { name: "getDescent", sig: ":getDescent()", desc: "Returns font descent" },
       { name: "hasGlyphs", sig: ":hasGlyphs(text)", desc: "Check if font has glyphs" },
       { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Font'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LFont'" }
     ]
   },
   "lurek.graphics.newShader": {
-    typeName: "Shader",
+    typeName: "LShader",
     methods: [
       { name: "send", sig: ":send(name, value)", desc: "Set uniform value" },
       { name: "hasUniform", sig: ":hasUniform(name)", desc: "Check if uniform exists" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Shader'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LShader'" }
     ]
   },
   "lurek.graphics.newMesh": {
-    typeName: "Mesh",
+    typeName: "LMesh",
     methods: [
       { name: "setVertices", sig: ":setVertices(verts)", desc: "Set vertex data" },
       { name: "setTexture", sig: ":setTexture(tex)", desc: "Set texture for mesh" },
       { name: "getVertexCount", sig: ":getVertexCount()", desc: "Returns vertex count" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Mesh'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LMesh'" }
     ]
   },
   "lurek.graphics.newSpriteBatch": {
-    typeName: "SpriteBatch",
+    typeName: "LSpriteBatch",
     methods: [
       { name: "add", sig: ":add(quad, x, y, r, sx, sy)", desc: "Add sprite to batch" },
       { name: "clear", sig: ":clear()", desc: "Remove all sprites" },
@@ -97,20 +131,20 @@ var FACTORY_TYPES = {
       { name: "set", sig: ":set(id, quad, x, y, r, sx, sy)", desc: "Update sprite at index" },
       { name: "flush", sig: ":flush()", desc: "Upload data to GPU" },
       { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'SpriteBatch'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LSpriteBatch'" }
     ]
   },
   "lurek.graphics.newQuad": {
-    typeName: "Quad",
+    typeName: "LQuad",
     methods: [
       { name: "getViewport", sig: ":getViewport()", desc: "Returns x, y, w, h" },
       { name: "setViewport", sig: ":setViewport(x, y, w, h)", desc: "Set viewport rect" },
       { name: "getTextureDimensions", sig: ":getTextureDimensions()", desc: "Returns ref width, height" },
-      { name: "type", sig: ":type()", desc: "Returns 'Quad'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LQuad'" }
     ]
   },
   "lurek.audio.newSource": {
-    typeName: "Source",
+    typeName: "LSource",
     methods: [
       { name: "play", sig: ":play()", desc: "Start or resume playback" },
       { name: "pause", sig: ":pause()", desc: "Pause playback" },
@@ -126,11 +160,11 @@ var FACTORY_TYPES = {
       { name: "tell", sig: ":tell()", desc: "Returns current position" },
       { name: "getDuration", sig: ":getDuration()", desc: "Returns duration in seconds" },
       { name: "release", sig: ":release()", desc: "Free audio resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'Source'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LSource'" }
     ]
   },
   "lurek.physics.newWorld": {
-    typeName: "World",
+    typeName: "LWorld",
     methods: [
       { name: "update", sig: ":update(dt)", desc: "Step the simulation" },
       { name: "setGravity", sig: ":setGravity(gx, gy)", desc: "Set gravity vector" },
@@ -140,11 +174,11 @@ var FACTORY_TYPES = {
       { name: "rayCast", sig: ":rayCast(x1, y1, x2, y2, fn)", desc: "Cast a ray" },
       { name: "setCallbacks", sig: ":setCallbacks(begin, end, pre, post)", desc: "Set collision callbacks" },
       { name: "destroy", sig: ":destroy()", desc: "Destroy physics world" },
-      { name: "type", sig: ":type()", desc: "Returns 'World'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LWorld'" }
     ]
   },
   "lurek.physics.newBody": {
-    typeName: "Body",
+    typeName: "LBody",
     methods: [
       { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
       { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set position" },
@@ -160,11 +194,11 @@ var FACTORY_TYPES = {
       { name: "getType", sig: ":getType()", desc: "Returns body type string" },
       { name: "isAwake", sig: ":isAwake()", desc: "Returns true if body is awake" },
       { name: "destroy", sig: ":destroy()", desc: "Remove body from world" },
-      { name: "type", sig: ":type()", desc: "Returns 'Body'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LBody'" }
     ]
   },
   "lurek.graphics.newParticleSystem": {
-    typeName: "ParticleSystem",
+    typeName: "LParticleSystem",
     methods: [
       { name: "emit", sig: ":emit(count)", desc: "Emit particles" },
       { name: "update", sig: ":update(dt)", desc: "Update particle system" },
@@ -180,13 +214,13 @@ var FACTORY_TYPES = {
       { name: "setDirection", sig: ":setDirection(angle)", desc: "Set emission direction" },
       { name: "setSpread", sig: ":setSpread(spread)", desc: "Set emission cone angle" },
       { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'ParticleSystem'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LParticleSystem'" }
     ]
   },
   // ── cardgame types ────────────────────────────────────────
   // lurek.cardgame.clone is an alias — it clones a Card from another (advanced use)
   "lurek.cardgame.clone": {
-    typeName: "Card",
+    typeName: "LCard",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
       { name: "name", type: "string", desc: "Card display name" },
@@ -212,7 +246,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newCard": {
-    typeName: "Card",
+    typeName: "LCard",
     fields: [
       { name: "card_type", type: "string", desc: "The registered card type name" },
       { name: "name", type: "string", desc: "Card display name" },
@@ -240,7 +274,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newDeck": {
-    typeName: "Deck",
+    typeName: "LDeck",
     fields: [
       { name: "name", type: "string", desc: "Deck display name" }
     ],
@@ -264,7 +298,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newDeckBuilder": {
-    typeName: "DeckBuilder",
+    typeName: "LDeckBuilder",
     fields: [
       { name: "min_cards", type: "integer", desc: "Minimum total cards required" },
       { name: "max_cards", type: "integer", desc: "Maximum total cards allowed (0 = no limit)" },
@@ -275,7 +309,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newStackManager": {
-    typeName: "StackManager",
+    typeName: "LStackManager",
     methods: [
       { name: "push", sig: ":push(entry)", desc: "Push an entry onto the stack" },
       { name: "resolve", sig: ":resolve()", desc: "Pop and return the top entry" },
@@ -287,7 +321,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newZone": {
-    typeName: "Zone",
+    typeName: "LZone",
     fields: [
       { name: "name", type: "string", desc: "Zone name" },
       { name: "capacity", type: "integer", desc: "Max capacity (0 = unlimited)" }
@@ -304,7 +338,7 @@ var FACTORY_TYPES = {
     ]
   },
   "lurek.cardgame.newCardPool": {
-    typeName: "CardPool",
+    typeName: "LCardPool",
     fields: [
       { name: "name", type: "string", desc: "Pool name" }
     ],
@@ -319,7 +353,7 @@ var FACTORY_TYPES = {
   },
   // ── entity types ──────────────────────────────────────────
   "lurek.ecs.new": {
-    typeName: "Entity",
+    typeName: "LEntity",
     methods: [
       { name: "getId", sig: ":getId()", desc: "Returns entity ID" },
       { name: "getTag", sig: ":getTag()", desc: "Returns entity tag" },
@@ -332,44 +366,44 @@ var FACTORY_TYPES = {
       { name: "hasComponent", sig: ":hasComponent(name)", desc: "Returns true if entity has component" },
       { name: "destroy", sig: ":destroy()", desc: "Destroy entity" },
       { name: "isAlive", sig: ":isAlive()", desc: "Returns true if entity is alive" },
-      { name: "type", sig: ":type()", desc: "Returns 'Entity'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LEntity'" }
     ]
   },
   // ── timer types ───────────────────────────────────────────
   "lurek.timer.after": {
-    typeName: "Timer",
+    typeName: "LTimer",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
       { name: "pause", sig: ":pause()", desc: "Pause the timer" },
       { name: "resume", sig: ":resume()", desc: "Resume the timer" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'Timer'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" }
     ]
   },
   "lurek.timer.every": {
-    typeName: "Timer",
+    typeName: "LTimer",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
       { name: "pause", sig: ":pause()", desc: "Pause the timer" },
       { name: "resume", sig: ":resume()", desc: "Resume the timer" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'Timer'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" }
     ]
   },
   "lurek.timer.tween": {
-    typeName: "Tween",
+    typeName: "LTween",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Cancel the tween" },
       { name: "pause", sig: ":pause()", desc: "Pause the tween" },
       { name: "resume", sig: ":resume()", desc: "Resume the tween" },
       { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
       { name: "getProgress", sig: ":getProgress()", desc: "Returns progress 0-1" },
-      { name: "type", sig: ":type()", desc: "Returns 'Tween'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LTween'" }
     ]
   },
   // ── tilemap types ─────────────────────────────────────────
   "lurek.tilemap.load": {
-    typeName: "Tilemap",
+    typeName: "LTilemap",
     methods: [
       { name: "draw", sig: ":draw()", desc: "Draw the tilemap" },
       { name: "getWidth", sig: ":getWidth()", desc: "Returns width in tiles" },
@@ -379,24 +413,24 @@ var FACTORY_TYPES = {
       { name: "getLayer", sig: ":getLayer(name)", desc: "Get layer by name" },
       { name: "getLayerCount", sig: ":getLayerCount()", desc: "Returns number of layers" },
       { name: "getProperty", sig: ":getProperty(name)", desc: "Get map property" },
-      { name: "type", sig: ":type()", desc: "Returns 'Tilemap'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LTilemap'" }
     ]
   },
   // ── scene types ───────────────────────────────────────────
   "lurek.scene.new": {
-    typeName: "Scene",
+    typeName: "LScene",
     methods: [
       { name: "enter", sig: ":enter()", desc: "Called when scene becomes active" },
       { name: "exit", sig: ":exit()", desc: "Called when scene is deactivated" },
       { name: "update", sig: ":update(dt)", desc: "Update scene" },
       { name: "draw", sig: ":draw()", desc: "Draw scene" },
       { name: "getName", sig: ":getName()", desc: "Returns scene name" },
-      { name: "type", sig: ":type()", desc: "Returns 'Scene'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LScene'" }
     ]
   },
   // ── data types ────────────────────────────────────────────
   "lurek.data.newStore": {
-    typeName: "DataStore",
+    typeName: "LDataStore",
     methods: [
       { name: "get", sig: ":get(key)", desc: "Get value by key" },
       { name: "set", sig: ":set(key, value)", desc: "Set a key-value pair" },
@@ -406,20 +440,20 @@ var FACTORY_TYPES = {
       { name: "values", sig: ":values()", desc: "Returns all values" },
       { name: "clear", sig: ":clear()", desc: "Remove all entries" },
       { name: "size", sig: ":size()", desc: "Returns number of entries" },
-      { name: "type", sig: ":type()", desc: "Returns 'DataStore'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LDataStore'" }
     ]
   },
   // ── event types ───────────────────────────────────────────
   "lurek.event.on": {
-    typeName: "EventHandle",
+    typeName: "LEventHandle",
     methods: [
       { name: "cancel", sig: ":cancel()", desc: "Unsubscribe from event" },
-      { name: "type", sig: ":type()", desc: "Returns 'EventHandle'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LEventHandle'" }
     ]
   },
   // ── camera types ──────────────────────────────────────────
   "lurek.camera.new": {
-    typeName: "Camera",
+    typeName: "LCamera",
     methods: [
       { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
       { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set camera position" },
@@ -433,12 +467,13 @@ var FACTORY_TYPES = {
       { name: "detach", sig: ":detach()", desc: "Reset camera transform" },
       { name: "worldToScreen", sig: ":worldToScreen(wx, wy)", desc: "Convert world to screen coords" },
       { name: "screenToWorld", sig: ":screenToWorld(sx, sy)", desc: "Convert screen to world coords" },
-      { name: "type", sig: ":type()", desc: "Returns 'Camera'" }
+      { name: "type", sig: ":type()", desc: "Returns 'LCamera'" }
     ]
   }
 };
 var LUREK_MODULES = [
   "graphics",
+  "render",
   "audio",
   "physics",
   "input",
@@ -447,7 +482,7 @@ var LUREK_MODULES = [
   "compute",
   "data",
   "image",
-  "entity",
+  "ecs",
   "window",
   "thread",
   "animation",
@@ -458,15 +493,15 @@ var LUREK_MODULES = [
   "particle",
   "tilemap",
   "scene",
-  "savegame",
-  "modding",
+  "save",
+  "mods",
   "graph",
-  "pathfinding",
+  "pathfind",
   "ai",
   "dataframe",
-  "gui",
+  "ui",
   "minimap",
-  "overlay",
+  "effect",
   "postfx",
   "terminal",
   "cardgame",
@@ -486,9 +521,9 @@ function scanDocument(document) {
     );
     if (factoryMatch) {
       const [, varName, factoryCall] = factoryMatch;
-      const typeInfo = FACTORY_TYPES[factoryCall];
-      if (typeInfo) {
-        varTypes.push({ varName, typeName: typeInfo.typeName, factoryCall, line: i });
+      const returnTypeName = getReturnTypeName(factoryCall);
+      if (returnTypeName) {
+        varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
       }
     }
     const aliasMatch = line.match(
@@ -496,8 +531,24 @@ function scanDocument(document) {
     );
     if (aliasMatch) {
       const [, varName, modulePath, moduleName] = aliasMatch;
-      if (LUREK_MODULES.includes(moduleName)) {
-        moduleAliases.push({ varName, modulePath, line: i });
+      if ((_apiDataSingleton?.getModuleNames() ?? LUREK_MODULES).includes(moduleName)) {
+        moduleAliases.push({ varName, modulePath, alias: varName, module: modulePath, line: i });
+      }
+    }
+    const aliasedFactoryMatch = line.match(
+      /\blocal\s+(\w+)\s*=\s*(\w+)\.(\w+)\s*\(/
+    );
+    if (aliasedFactoryMatch) {
+      const [, varName, aliasName, factoryName] = aliasedFactoryMatch;
+      const aliasInfo = moduleAliases.find(
+        (alias) => alias.varName === aliasName && alias.line < i
+      );
+      if (aliasInfo) {
+        const factoryCall = `${aliasInfo.modulePath}.${factoryName}`;
+        const returnTypeName = getReturnTypeName(factoryCall);
+        if (returnTypeName) {
+          varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
+        }
       }
     }
     const reassignMatch = line.match(
@@ -585,9 +636,7 @@ function getTypeInfoForVar(varName, position, varTypes, classes) {
     (v) => v.varName === varName && v.line < position.line
   );
   if (factoryVar) {
-    const typeInfo = Object.values(FACTORY_TYPES).find(
-      (t) => t.typeName === factoryVar.typeName
-    );
+    const typeInfo = getTypeInfoByName(factoryVar.typeName);
     if (typeInfo) return { typeInfo, factoryCall: factoryVar.factoryCall };
   }
   return void 0;
@@ -597,9 +646,7 @@ function getMethodsForVar(varName, position, varTypes, classes) {
     (v) => v.varName === varName && v.line < position.line
   );
   if (factoryVar) {
-    const typeInfo = Object.values(FACTORY_TYPES).find(
-      (t) => t.typeName === factoryVar.typeName
-    );
+    const typeInfo = getTypeInfoByName(factoryVar.typeName);
     if (typeInfo) return typeInfo.methods;
   }
   for (const cls of classes) {
@@ -731,23 +778,23 @@ var MockTextDocument = class {
 suite("TypeInference \u2014 FACTORY_TYPES registry", () => {
   test("contains Image type from lurek.graphics.newImage", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newImage"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newImage"].typeName, "Image");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newImage"].typeName, "LImage");
   });
   test("contains Canvas type from lurek.graphics.newCanvas", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newCanvas"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newCanvas"].typeName, "Canvas");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newCanvas"].typeName, "LCanvas");
   });
   test("contains Font type from lurek.graphics.newFont", () => {
     assert.ok(FACTORY_TYPES["lurek.graphics.newFont"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "Font");
+    assert.strictEqual(FACTORY_TYPES["lurek.graphics.newFont"].typeName, "LFont");
   });
   test("contains Entity type from lurek.ecs.new", () => {
     assert.ok(FACTORY_TYPES["lurek.ecs.new"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "Entity");
+    assert.strictEqual(FACTORY_TYPES["lurek.ecs.new"].typeName, "LEntity");
   });
   test("contains World type from lurek.physics.newWorld", () => {
     assert.ok(FACTORY_TYPES["lurek.physics.newWorld"]);
-    assert.strictEqual(FACTORY_TYPES["lurek.physics.newWorld"].typeName, "World");
+    assert.strictEqual(FACTORY_TYPES["lurek.physics.newWorld"].typeName, "LWorld");
   });
   test("Canvas has setFilter and getFilter methods", () => {
     const canvas = FACTORY_TYPES["lurek.graphics.newCanvas"];
@@ -775,7 +822,7 @@ suite("TypeInference \u2014 scanDocument", () => {
     const result = scanDocument(doc);
     assert.strictEqual(result.varTypes.length, 1);
     assert.strictEqual(result.varTypes[0].varName, "canvas");
-    assert.strictEqual(result.varTypes[0].typeName, "Canvas");
+    assert.strictEqual(result.varTypes[0].typeName, "LCanvas");
     assert.strictEqual(result.varTypes[0].factoryCall, "lurek.graphics.newCanvas");
   });
   test("detects local var from lurek.graphics.newImage", () => {
@@ -785,7 +832,7 @@ suite("TypeInference \u2014 scanDocument", () => {
     const result = scanDocument(doc);
     assert.strictEqual(result.varTypes.length, 1);
     assert.strictEqual(result.varTypes[0].varName, "img");
-    assert.strictEqual(result.varTypes[0].typeName, "Image");
+    assert.strictEqual(result.varTypes[0].typeName, "LImage");
   });
   test("detects multiple variables in one document", () => {
     const doc = new MockTextDocument(
@@ -867,7 +914,7 @@ suite("TypeInference \u2014 scanDocument", () => {
     const result = scanDocument(doc);
     const copyVar = result.varTypes.find((v) => v.varName === "copy");
     assert.ok(copyVar, "copy should have been detected via re-assignment");
-    assert.strictEqual(copyVar.typeName, "Image");
+    assert.strictEqual(copyVar.typeName, "LImage");
   });
   test("ignores lines without factory patterns", () => {
     const doc = new MockTextDocument(
@@ -886,12 +933,12 @@ suite("TypeInference \u2014 scanDocument", () => {
 suite("TypeInference \u2014 getTypeInfoForVar", () => {
   test("returns TypeInfo for a factory-typed variable", () => {
     const varTypes = [
-      { varName: "canvas", typeName: "Canvas", line: 0, factoryCall: "lurek.graphics.newCanvas" }
+      { varName: "canvas", typeName: "LCanvas", line: 0, factoryCall: "lurek.graphics.newCanvas" }
     ];
     const pos = new MockPosition(5, 0);
     const result = getTypeInfoForVar("canvas", pos, varTypes, []);
     assert.ok(result);
-    assert.strictEqual(result.typeInfo.typeName, "Canvas");
+    assert.strictEqual(result.typeInfo.typeName, "LCanvas");
     assert.strictEqual(result.factoryCall, "lurek.graphics.newCanvas");
   });
   test("returns undefined for unknown variable", () => {
@@ -900,7 +947,7 @@ suite("TypeInference \u2014 getTypeInfoForVar", () => {
   });
   test("only considers variables declared before the cursor", () => {
     const varTypes = [
-      { varName: "canvas", typeName: "Canvas", line: 10, factoryCall: "lurek.graphics.newCanvas" }
+      { varName: "canvas", typeName: "LCanvas", line: 10, factoryCall: "lurek.graphics.newCanvas" }
     ];
     const result = getTypeInfoForVar("canvas", new MockPosition(5, 0), varTypes, []);
     assert.strictEqual(result, void 0);
@@ -909,7 +956,7 @@ suite("TypeInference \u2014 getTypeInfoForVar", () => {
 suite("TypeInference \u2014 getMethodsForVar", () => {
   test("returns methods for factory-typed variable", () => {
     const varTypes = [
-      { varName: "img", typeName: "Image", line: 0, factoryCall: "lurek.graphics.newImage" }
+      { varName: "img", typeName: "LImage", line: 0, factoryCall: "lurek.graphics.newImage" }
     ];
     const methods = getMethodsForVar("img", new MockPosition(5, 0), varTypes, []);
     assert.ok(methods);

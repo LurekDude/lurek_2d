@@ -912,9 +912,9 @@ end)
 -- @description Verifies runtime type reporting and inheritance checks exposed by compute Array userdata.
 describe("type system", function()
     -- @description Confirms the userdata reports its direct runtime type name as Array.
-    it("type() returns Array", function()
+    it("type() returns LArray", function()
         local a = lurek.compute.zeros({2})
-        expect_equal("Array", a:type())
+        expect_equal("LArray", a:type())
     end)
 
     -- @description Confirms typeOf recognizes Array as the userdata's concrete type.

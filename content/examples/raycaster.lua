@@ -141,12 +141,11 @@ do  -- DoorManager:type
 end
 
 --@api-stub: LDoorManager:typeOf
--- Returns the type string "DoorManager".
--- Mirrors love2d's Object:typeOf naming so reusable utility libraries can branch the same way.
+-- Returns true when the userdata matches a requested type name.
+-- Mirrors love2d's Object:typeOf predicate shape so reusable utility libraries can branch the same way.
 do  -- DoorManager:typeOf
   local doors = lurek.raycaster.newDoorManager()
-  local kind = doors:typeOf()
-  if kind == "DoorManager" then lurek.log.debug("dispatched as " .. kind, "raycaster") end
+  if doors:typeOf("DoorManager") then lurek.log.debug("dispatched as DoorManager", "raycaster") end
 end
 
 -- ── HeightMap methods ──
@@ -196,11 +195,11 @@ do  -- HeightMap:type
 end
 
 --@api-stub: LHeightMap:typeOf
--- Returns the type string "HeightMap".
--- Identical to `:type()`; provided for love2d-style code that uses `:typeOf()` everywhere.
+-- Returns true when the userdata matches a requested type name.
+-- Uses the same love2d-style predicate shape as other userdata helpers.
 do  -- HeightMap:typeOf
   local hm = lurek.raycaster.newHeightMap(8, 8)
-  if hm:typeOf() == "HeightMap" then lurek.log.debug("is HeightMap", "raycaster") end
+  if hm:typeOf("HeightMap") then lurek.log.debug("is HeightMap", "raycaster") end
 end
 
 -- ── PointLight methods ──
@@ -251,7 +250,7 @@ do  -- PointLight:color
 end
 
 --@api-stub: LPointLight:type
--- Returns the type string "PointLight".
+-- Returns the type string "LPointLight".
 -- Cheap runtime tag used by editors and serializers to recognise raycaster lights.
 do  -- PointLight:type
   local light = lurek.raycaster.newPointLight(0, 0, 1, 1, 1, 1, 1)
@@ -259,11 +258,11 @@ do  -- PointLight:type
 end
 
 --@api-stub: LPointLight:typeOf
--- Returns the type string "PointLight".
+-- Returns true if the given name matches "LPointLight", the legacy alias, or a parent type.
 -- Same value as `:type()`; provided for parity with love2d-style userdata.
 do  -- PointLight:typeOf
   local light = lurek.raycaster.newPointLight(1, 1, 0.5, 0.5, 1, 2, 1)
-  if light:typeOf() == "PointLight" then lurek.log.debug("light kind ok", "raycaster") end
+  if light:typeOf("LPointLight") then lurek.log.debug("light kind ok", "raycaster") end
 end
 
 -- ── Raycaster methods ──
@@ -378,7 +377,7 @@ do  -- SpriteManager:clear
 end
 
 --@api-stub: LSpriteManager:type
--- Returns the type string "SpriteManager".
+-- Returns the type string "LSpriteManager".
 -- Useful in serializers that walk a heterogeneous level table and dispatch on each userdata's type.
 do  -- SpriteManager:type
   local sprites = lurek.raycaster.newSpriteManager()
@@ -386,11 +385,11 @@ do  -- SpriteManager:type
 end
 
 --@api-stub: LSpriteManager:typeOf
--- Returns the type string "SpriteManager".
+-- Returns true if the given name matches "LSpriteManager", the legacy alias, or a parent type.
 -- Mirrors love2d's Object:typeOf so library code can branch identically across engines.
 do  -- SpriteManager:typeOf
   local sprites = lurek.raycaster.newSpriteManager()
-  if sprites and sprites:typeOf() == "SpriteManager" then lurek.log.debug("sprite mgr ok", "raycaster") end
+  if sprites and sprites:typeOf("LSpriteManager") then lurek.log.debug("sprite mgr ok", "raycaster") end
 end
 -- content/examples/raycaster.lua
 -- Scaffolded coverage of the lurek.raycaster API (42 items).

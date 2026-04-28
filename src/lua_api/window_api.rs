@@ -18,7 +18,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setTitle --
     /// Sets the text displayed in the window's title bar.
     /// @param | title | string | The new window title text
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setTitle", lua.create_function(move |_, title: String| {
             window::set_title(&mut s.borrow_mut().window_state, &title);
@@ -49,7 +49,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDimensions --
     /// Returns the window dimensions as two values (width, height) in logical pixels.
-    /// @return | integer, integer | The width and height in logical pixels
+    /// @return | integer | Window width in logical pixels.
+    /// @return | integer | Window height in logical pixels.
     let s = state.clone();
     tbl.set("getDimensions", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -61,7 +62,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Enables or disables fullscreen mode.
     /// @param | enabled | boolean | True to enter fullscreen, false to exit
     /// @param | fstype | string? | Fullscreen type: "desktop" or "exclusive" (default "desktop")
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setFullscreen", lua.create_function(move |_, (enabled, fstype): (bool, Option<String>)| {
             window::set_fullscreen(
@@ -75,7 +76,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getFullscreen --
     /// Returns the current fullscreen state as two values: a boolean indicating whether fullscreen is active, and a string describing the type ("desktop" or "exclusive").
-    /// @return | boolean, string | Whether fullscreen is active and the fullscreen type
+    /// @return | boolean | True when fullscreen is active.
+    /// @return | string | Fullscreen mode name.
     let s = state.clone();
     tbl.set("getFullscreen", lua.create_function(move |_, ()| Ok(window::get_fullscreen(&s.borrow().window_state)))?,
     )?;
@@ -88,7 +90,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- setVSync --
     /// Sets the vertical synchronisation mode for the window's swap chain.
     /// @param | mode | integer | VSync mode: 1 = on, 0 = off, -1 = adaptive
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setVSync", lua.create_function(move |_, mode: i32| {
             window::set_vsync(&mut s.borrow_mut().window_state, mode);
@@ -140,7 +142,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- minimize --
     /// Minimises the window to the operating system taskbar or dock.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("minimize", lua.create_function(move |_, ()| {
             window::minimize(&mut s.borrow_mut().window_state);
@@ -150,7 +152,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- maximize --
     /// Maximises the window so it fills the entire desktop work area, excluding the taskbar.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("maximize", lua.create_function(move |_, ()| {
             window::maximize(&mut s.borrow_mut().window_state);
@@ -160,7 +162,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- restore --
     /// Restores the window to its previous size and position after a `minimize` or `maximize` call.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("restore", lua.create_function(move |_, ()| {
             window::restore(&mut s.borrow_mut().window_state);
@@ -170,7 +172,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getPosition --
     /// Returns the top-left corner position of the window in screen coordinates as two values (x, y).
-    /// @return | integer, integer | The x and y screen coordinates of the window
+    /// @return | integer | Window X position in screen coordinates.
+    /// @return | integer | Window Y position in screen coordinates.
     let s = state.clone();
     tbl.set("getPosition", lua.create_function(move |_, ()| Ok(window::get_position(&s.borrow().window_state)))?,
     )?;
@@ -179,7 +182,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Moves the top-left corner of the window to the given screen coordinates.
     /// @param | x | integer | The target horizontal screen coordinate in pixels
     /// @param | y | integer | The target vertical screen coordinate in pixels
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setPosition", lua.create_function(move |_, (x, y): (i32, i32)| {
             window::set_position(&mut s.borrow_mut().window_state, x, y);
@@ -203,7 +206,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDesktopDimensions --
     /// Returns the full desktop resolution of the current monitor as two values (width, height) in physical pixels.
-    /// @return | integer, integer | The desktop width and height in pixels
+    /// @return | integer | Desktop width in pixels.
+    /// @return | integer | Desktop height in pixels.
     let s = state.clone();
     tbl.set("getDesktopDimensions", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -294,7 +298,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getMode --
     /// Returns the current window dimensions and mode flags as three values: width, height, and a flags table.
-    /// @return | integer, integer, table | Width, height, and a table of mode flags
+    /// @return | integer | Window width in logical pixels.
+    /// @return | integer | Window height in logical pixels.
+    /// @return | table | Table of current window mode flags.
     let s = state.clone();
     tbl.set("getMode", lua.create_function(move |lua, ()| {
             let st = s.borrow();
@@ -372,7 +378,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getPixelDimensions --
     /// Returns the window dimensions in physical (device) pixels as two values (width, height).
-    /// @return | integer, integer | The physical pixel width and height
+    /// @return | integer | Window width in physical pixels.
+    /// @return | integer | Window height in physical pixels.
     let s = state.clone();
     tbl.set("getPixelDimensions", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -388,9 +395,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Shows a platform-native message box dialog.
     /// @param | title | string | Window title text.
     /// @param | message | string | Message text.
-    /// @param | boxType | string? | Value for boxType.
-    /// @param | btnType | string? | Value for btnType.
-    /// @return | string | Returned string.
+    /// @param | boxType | string? | Message box type.
+    /// @param | btnType | string? | Button layout type.
+    /// @return | string | Button or result identifier returned by the native dialog.
     tbl.set("showMessageBox", lua.create_function(
             |_,
              (title, message, box_type, btn_type): (
@@ -411,19 +418,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- focus --
     /// Requests the window manager to bring the window to the foreground.
-    /// @return | nil | No return value.
+    /// @return | nil | No value is returned.
     tbl.set("focus", lua.create_function(|_, ()| Ok(()))?)?;
 
     // -- getNativeDPIScale --
     /// Returns the native DPI scale factor.
-    /// @return | number | Returned number.
+    /// @return | number | Native DPI scale factor for the current window.
     let s = state.clone();
     tbl.set("getNativeDPIScale", lua.create_function(move |_, ()| Ok(window::get_dpi_scale(&s.borrow().window_state)))?,
     )?;
 
     // -- getDisplayOrientation --
     /// Returns the current display orientation.
-    /// @return | string | Returned string.
+    /// @return | string | Display orientation name: `landscape` or `portrait`.
     let s = state.clone();
     tbl.set("getDisplayOrientation", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -437,7 +444,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getSafeArea --
     /// Returns the safe display area as x, y, w, h.
-    /// @return | number, number, number, number | Returned values.
+    /// @return | number | Safe-area X coordinate.
+    /// @return | number | Safe-area Y coordinate.
+    /// @return | number | Safe-area width.
+    /// @return | number | Safe-area height.
     let s = state.clone();
     tbl.set("getSafeArea", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -452,18 +462,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getSystemTheme --
     /// Returns the OS color theme preference.
-    /// @return | string | Returned string.
+    /// @return | string | OS color theme preference string.
     tbl.set("getSystemTheme", lua.create_function(|_, ()| Ok("unknown"))?,
     )?;
 
     // -- isHighDPIAllowed --
     /// Returns whether high-DPI rendering is allowed.
-    /// @return | boolean | Boolean result.
+    /// @return | boolean | Always false because high-DPI rendering is not currently supported.
     tbl.set("isHighDPIAllowed", lua.create_function(|_, ()| Ok(false))?)?;
 
     // -- getScaleInfo --
     /// Returns viewport scale and offset information as a table.
-    /// @return | table | Returned table.
+    /// @return | table | Table with scale, offset, and virtual game size fields.
     let s = state.clone();
     tbl.set("getScaleInfo", lua.create_function(move |lua, ()| {
             let info = window::get_scale_info(&s.borrow().window_state);
@@ -480,7 +490,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getScaleMode --
     /// Returns the current viewport scale mode string.
-    /// @return | string | Returned string.
+    /// @return | string | Current viewport scale mode name.
     let s = state.clone();
     tbl.set("getScaleMode", lua.create_function(move |_, ()| {
             Ok(window::get_scale_mode(&s.borrow().window_state).to_owned())
@@ -489,8 +499,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- setScaleMode --
     /// Sets the viewport scale mode.
-    /// @param | mode | string | Mode value.
-    /// @return | nil | No return value.
+    /// @param | mode | string | Viewport scale mode name.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     tbl.set("setScaleMode", lua.create_function(move |_, mode: String| {
             window::set_scale_mode_validated(&mut s.borrow_mut().window_state, &mode);
@@ -500,28 +510,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getGameWidth --
     /// Returns the logical game width in virtual pixels.
-    /// @return | number | Returned number.
+    /// @return | number | Logical game width in virtual pixels.
     let s = state.clone();
     tbl.set("getGameWidth", lua.create_function(move |_, ()| Ok(window::get_width(&s.borrow().window_state)))?,
     )?;
 
     // -- getGameHeight --
     /// Returns the logical game height in virtual pixels.
-    /// @return | number | Returned number.
+    /// @return | number | Logical game height in virtual pixels.
     let s = state.clone();
     tbl.set("getGameHeight", lua.create_function(move |_, ()| Ok(window::get_height(&s.borrow().window_state)))?,
     )?;
 
     // -- isFullscreen --
     /// Returns whether the window is in fullscreen mode.
-    /// @return | boolean | Boolean result.
+    /// @return | boolean | Whether the window is currently in fullscreen mode.
     let s = state.clone();
     tbl.set("isFullscreen", lua.create_function(move |_, ()| Ok(window::is_fullscreen(&s.borrow().window_state)))?,
     )?;
 
     // -- isResizable --
     /// Returns whether the window can be resized by the user.
-    /// @return | boolean | Boolean result.
+    /// @return | boolean | Whether the window can be resized by the user.
     let s = state.clone();
     tbl.set("isResizable", lua.create_function(move |_, ()| {
             let st = s.borrow();
@@ -539,8 +549,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- onDpiChange --
     /// Registers a callback invoked (with the new scale factor) when the display DPI changes.
-    /// @param | callback | function | Value for fn.
-    /// @return | nil | No return value.
+    /// @param | callback | function | Callback function.
+    /// @return | nil | No value is returned.
     let dc = dpi_callback.clone();
     tbl.set("onDpiChange", lua.create_function(move |lua, func: LuaFunction| {
             let key = lua.create_registry_value(func)?;
@@ -553,7 +563,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- pollDpiChange --
     /// Checks whether the DPI scale has changed since the last call and fires the onDpiChange callback if so.
-    /// @return | number | Returned number.
+    /// @return | number | Current DPI scale factor after polling for changes.
     let dc = dpi_callback;
     let pd = prev_dpi;
     let s = state.clone();

@@ -26,9 +26,9 @@ pub trait LurekType {
 // ============================================================
 
 /// Adds the standard `type()`, `typeOf(typeName)`, and `__tostring` methods to
+/// any [`LuaUserData`] type that also implements [`LurekType`].
 ///
-/// @param methods : &mut M
-/// any [`LuaUserData`] type that also implements [`LunaType`].
+/// `methods` is the method table being populated inside `LuaUserData::add_methods`.
 ///
 /// Call this as the **first** statement inside `add_methods`:
 ///

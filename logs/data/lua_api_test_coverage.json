@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated": "2026-04-26T13:35:22.930859+00:00",
+    "generated": "2026-04-28T16:35:32.746619+00:00",
     "generator": "tools/audit/lua_api_test_coverage.py",
     "mode": "hybrid",
     "module_filter": null,
-    "total_api_functions": 4022,
-    "marker_covered": 215,
-    "heuristic_covered": 3660,
-    "total_covered": 3899,
-    "coverage_pct": 96.9
+    "total_api_functions": 4378,
+    "marker_covered": 229,
+    "heuristic_covered": 4003,
+    "total_covered": 4256,
+    "coverage_pct": 97.2
   },
   "modules": {
     "ai": {
@@ -28,37 +28,37 @@
           "lua_name": "LInfluenceMap:stampInfluence",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 1843
+          "line": 1837
         },
         {
           "lua_name": "LTraitProfile:set",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 2273
+          "line": 2268
         },
         {
           "lua_name": "LTraitProfile:get",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 2281
+          "line": 2277
         },
         {
           "lua_name": "LTraitProfile:has",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 2327
+          "line": 2328
         },
         {
           "lua_name": "LEmotionModel:add",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 2892
+          "line": 2930
         },
         {
           "lua_name": "LEmotionModel:get",
           "kind": "method",
           "file": "src/lua_api/ai_api.rs",
-          "line": 2914
+          "line": 2954
         }
       ],
       "test_files": [
@@ -83,13 +83,13 @@
           "lua_name": "LBlendLayerSet:len",
           "kind": "method",
           "file": "src/lua_api/animation_api.rs",
-          "line": 549
+          "line": 527
         },
         {
           "lua_name": "LAnimSyncGroup:add",
           "kind": "method",
           "file": "src/lua_api/animation_api.rs",
-          "line": 840
+          "line": 762
         }
       ],
       "test_files": [
@@ -110,7 +110,7 @@
           "lua_name": "LBus:setDuckTarget",
           "kind": "method",
           "file": "src/lua_api/audio_api.rs",
-          "line": 548
+          "line": 543
         }
       ],
       "test_files": [
@@ -189,49 +189,49 @@
           "lua_name": "LArray:any",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 414
+          "line": 412
         },
         {
           "lua_name": "LArray:all",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 419
+          "line": 417
         },
         {
           "lua_name": "LArray:sum",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 426
+          "line": 423
         },
         {
           "lua_name": "LArray:min",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 458
+          "line": 453
         },
         {
           "lua_name": "LArray:max",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 474
+          "line": 468
         },
         {
           "lua_name": "LArray:dot",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 500
+          "line": 494
         },
         {
           "lua_name": "LArray:eigenPower",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 855
+          "line": 841
         },
         {
           "lua_name": "LArray:map",
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
-          "line": 881
+          "line": 865
         }
       ],
       "test_files": [
@@ -253,19 +253,19 @@
           "lua_name": "LRingBuffer:pop",
           "kind": "method",
           "file": "src/lua_api/data_api.rs",
-          "line": 131
+          "line": 125
         },
         {
           "lua_name": "LRingBuffer:len",
           "kind": "method",
           "file": "src/lua_api/data_api.rs",
-          "line": 159
+          "line": 153
         },
         {
           "lua_name": "LDataWriter:len",
           "kind": "method",
           "file": "src/lua_api/data_api.rs",
-          "line": 880
+          "line": 882
         }
       ],
       "test_files": [
@@ -292,31 +292,31 @@
           "lua_name": "LDataFrame:sum",
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
-          "line": 529
+          "line": 517
         },
         {
           "lua_name": "LDataFrame:min",
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
-          "line": 547
+          "line": 535
         },
         {
           "lua_name": "LDataFrame:max",
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
-          "line": 559
+          "line": 547
         },
         {
           "lua_name": "LDataFrame:withRollingMin",
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
-          "line": 740
+          "line": 722
         },
         {
           "lua_name": "LDataFrame:withRollingMax",
           "kind": "method",
           "file": "src/lua_api/dataframe_api.rs",
-          "line": 757
+          "line": 737
         }
       ],
       "test_files": [
@@ -348,7 +348,7 @@
           "lua_name": "LReplConsole:len",
           "kind": "method",
           "file": "src/lua_api/devtools_api.rs",
-          "line": 958
+          "line": 921
         }
       ],
       "test_files": [
@@ -384,13 +384,13 @@
           "lua_name": "LUniverse:get",
           "kind": "method",
           "file": "src/lua_api/ecs_api.rs",
-          "line": 70
+          "line": 68
         },
         {
           "lua_name": "LUniverse:has",
           "kind": "method",
           "file": "src/lua_api/ecs_api.rs",
-          "line": 79
+          "line": 77
         }
       ],
       "test_files": [
@@ -422,19 +422,19 @@
           "lua_name": "LPostFxStack:add",
           "kind": "method",
           "file": "src/lua_api/effect_api.rs",
-          "line": 259
+          "line": 269
         },
         {
           "lua_name": "LPostFxStack:len",
           "kind": "method",
           "file": "src/lua_api/effect_api.rs",
-          "line": 398
+          "line": 408
         },
         {
           "lua_name": "LOverlay:triggerShake",
           "kind": "method",
           "file": "src/lua_api/effect_api.rs",
-          "line": 743
+          "line": 727
         }
       ],
       "test_files": []
@@ -487,19 +487,19 @@
           "lua_name": "LGlobe:pan",
           "kind": "method",
           "file": "src/lua_api/globe_api.rs",
-          "line": 166
+          "line": 162
         },
         {
           "lua_name": "LGlobeRegistry:new",
           "kind": "method",
           "file": "src/lua_api/globe_api.rs",
-          "line": 610
+          "line": 613
         },
         {
           "lua_name": "LGlobeRegistry:get",
           "kind": "method",
           "file": "src/lua_api/globe_api.rs",
-          "line": 632
+          "line": 633
         }
       ],
       "test_files": [
@@ -517,13 +517,13 @@
           "lua_name": "LGraph:mst",
           "kind": "method",
           "file": "src/lua_api/graph_api.rs",
-          "line": 1590
+          "line": 1580
         },
         {
           "lua_name": "LGraph:on",
           "kind": "method",
           "file": "src/lua_api/graph_api.rs",
-          "line": 1688
+          "line": 1678
         }
       ],
       "test_files": [
@@ -543,43 +543,43 @@
           "lua_name": "lurek.html.preventDefault",
           "kind": "function",
           "file": "src/lua_api/html_api.rs",
-          "line": 915
+          "line": 919
         },
         {
           "lua_name": "lurek.html.stopPropagation",
           "kind": "function",
           "file": "src/lua_api/html_api.rs",
-          "line": 924
+          "line": 928
         },
         {
           "lua_name": "lurek.html.isDefaultPrevented",
           "kind": "function",
           "file": "src/lua_api/html_api.rs",
-          "line": 933
+          "line": 937
         },
         {
           "lua_name": "LHtmlDocument:on",
           "kind": "method",
           "file": "src/lua_api/html_api.rs",
-          "line": 234
+          "line": 235
         },
         {
           "lua_name": "LHtmlDocument:off",
           "kind": "method",
           "file": "src/lua_api/html_api.rs",
-          "line": 249
+          "line": 250
         },
         {
           "lua_name": "LHtmlElement:on",
           "kind": "method",
           "file": "src/lua_api/html_api.rs",
-          "line": 691
+          "line": 695
         },
         {
           "lua_name": "LHtmlElement:off",
           "kind": "method",
           "file": "src/lua_api/html_api.rs",
-          "line": 709
+          "line": 713
         }
       ],
       "test_files": [
@@ -597,7 +597,7 @@
           "lua_name": "lurek.i18n.t",
           "kind": "function",
           "file": "src/lua_api/i18n_api.rs",
-          "line": 215
+          "line": 203
         }
       ],
       "test_files": []
@@ -672,91 +672,91 @@
           "lua_name": "LVec2:dot",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 65
+          "line": 64
         },
         {
           "lua_name": "LVec2:x",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 78
+          "line": 77
         },
         {
           "lua_name": "LVec2:y",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 83
+          "line": 82
         },
         {
           "lua_name": "LVec3:dot",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 292
+          "line": 291
         },
         {
           "lua_name": "LVec3:add",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 333
+          "line": 332
         },
         {
           "lua_name": "LVec3:sub",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 344
+          "line": 343
         },
         {
           "lua_name": "LCatmullRom:len",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 419
+          "line": 421
         },
         {
           "lua_name": "LTween:set",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1015
+          "line": 1026
         },
         {
           "lua_name": "LNoiseGenerator:worley3d",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1309
+          "line": 1320
         },
         {
           "lua_name": "LNoiseGenerator:fbm",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1329
+          "line": 1340
         },
         {
           "lua_name": "LNoiseGenerator:warpDomain",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1434
+          "line": 1446
         },
         {
           "lua_name": "LNoiseGenerator:generateMap",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1445
+          "line": 1457
         },
         {
           "lua_name": "LCircle:x",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1563
+          "line": 1578
         },
         {
           "lua_name": "LCircle:y",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1568
+          "line": 1583
         },
         {
           "lua_name": "LAabbTree:len",
           "kind": "method",
           "file": "src/lua_api/math_api.rs",
-          "line": 1686
+          "line": 1698
         }
       ],
       "test_files": [
@@ -799,7 +799,7 @@
           "lua_name": "LContentRegistry:get",
           "kind": "method",
           "file": "src/lua_api/mods_api.rs",
-          "line": 679
+          "line": 602
         }
       ],
       "test_files": []
@@ -835,13 +835,13 @@
           "lua_name": "LTrail:setHeadColor",
           "kind": "method",
           "file": "src/lua_api/particle_api.rs",
-          "line": 1421
+          "line": 1435
         },
         {
           "lua_name": "LTrail:setTailColor",
           "kind": "method",
           "file": "src/lua_api/particle_api.rs",
-          "line": 1437
+          "line": 1451
         }
       ],
       "test_files": [
@@ -861,7 +861,7 @@
           "lua_name": "LFlowField:calculateMulti",
           "kind": "method",
           "file": "src/lua_api/pathfind_api.rs",
-          "line": 604
+          "line": 601
         }
       ],
       "test_files": [
@@ -1065,25 +1065,25 @@
           "lua_name": "LWorld:setJointMotorSpeed",
           "kind": "method",
           "file": "src/lua_api/physics_api.rs",
-          "line": 690
+          "line": 695
         },
         {
           "lua_name": "LWorld:setJointLimitsEnabled",
           "kind": "method",
           "file": "src/lua_api/physics_api.rs",
-          "line": 711
+          "line": 716
         },
         {
           "lua_name": "LWorld:setJointLimits",
           "kind": "method",
           "file": "src/lua_api/physics_api.rs",
-          "line": 727
+          "line": 732
         },
         {
           "lua_name": "LWorld:setMouseJointTarget",
           "kind": "method",
           "file": "src/lua_api/physics_api.rs",
-          "line": 749
+          "line": 755
         }
       ],
       "test_files": [
@@ -1114,13 +1114,13 @@
           "lua_name": "LPipeline:run",
           "kind": "method",
           "file": "src/lua_api/pipeline_api.rs",
-          "line": 761
+          "line": 664
         },
         {
           "lua_name": "LPipeline:addSubPipeline",
           "kind": "method",
           "file": "src/lua_api/pipeline_api.rs",
-          "line": 1211
+          "line": 1087
         }
       ],
       "test_files": []
@@ -1141,57 +1141,51 @@
     "raycaster": {
       "total": 61,
       "marker_covered": 3,
-      "heuristic_covered": 50,
-      "covered": 53,
-      "coverage_pct": 86.9,
+      "heuristic_covered": 51,
+      "covered": 54,
+      "coverage_pct": 88.5,
       "uncovered": [
         {
           "lua_name": "LPointLight:x",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 211
+          "line": 214
         },
         {
           "lua_name": "LPointLight:y",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 214
+          "line": 218
         },
         {
           "lua_name": "LPointLight:set",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 247
-        },
-        {
-          "lua_name": "LRaycaster:drawView",
-          "kind": "method",
-          "file": "src/lua_api/raycaster_api.rs",
-          "line": 552
+          "line": 253
         },
         {
           "lua_name": "LRaycaster:drawDepthMap",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 573
+          "line": 563
         },
         {
           "lua_name": "LRaycaster:drawLineOfSight",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 602
+          "line": 590
         },
         {
           "lua_name": "LRaycaster:drawCameraSweep",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 622
+          "line": 608
         },
         {
           "lua_name": "LSpriteManager:add",
           "kind": "method",
           "file": "src/lua_api/raycaster_api.rs",
-          "line": 784
+          "line": 766
         }
       ],
       "test_files": [
@@ -1200,35 +1194,35 @@
       ]
     },
     "render": {
-      "total": 197,
+      "total": 196,
       "marker_covered": 7,
-      "heuristic_covered": 186,
-      "covered": 193,
+      "heuristic_covered": 185,
+      "covered": 192,
       "coverage_pct": 98.0,
       "uncovered": [
         {
           "lua_name": "lurek.render.arc",
           "kind": "function",
           "file": "src/lua_api/render_api.rs",
-          "line": 1685
+          "line": 1691
         },
         {
           "lua_name": "lurek.render.pop",
           "kind": "function",
           "file": "src/lua_api/render_api.rs",
-          "line": 2885
+          "line": 2889
         },
         {
           "lua_name": "LSpriteBatch:add",
           "kind": "method",
           "file": "src/lua_api/render_api.rs",
-          "line": 524
+          "line": 507
         },
         {
           "lua_name": "LShape:arc",
           "kind": "method",
           "file": "src/lua_api/render_api.rs",
-          "line": 1236
+          "line": 1224
         }
       ],
       "test_files": [
@@ -1323,7 +1317,7 @@
           "lua_name": "lurek.runtime.log",
           "kind": "function",
           "file": "src/lua_api/system_api.rs",
-          "line": 382
+          "line": 331
         }
       ],
       "test_files": [
@@ -1365,7 +1359,7 @@
           "lua_name": "LChannel:pop",
           "kind": "method",
           "file": "src/lua_api/thread_api.rs",
-          "line": 341
+          "line": 321
         }
       ],
       "test_files": [
@@ -1384,7 +1378,7 @@
           "lua_name": "LChunkMap:getChunksInView",
           "kind": "method",
           "file": "src/lua_api/tilemap_api.rs",
-          "line": 1199
+          "line": 1208
         }
       ],
       "test_files": [
@@ -1423,7 +1417,7 @@
           "lua_name": "LTweenParallel.add",
           "kind": "method",
           "file": "src/lua_api/tween_api.rs",
-          "line": 762
+          "line": 689
         }
       ],
       "test_files": [
@@ -1435,13 +1429,18 @@
       ]
     },
     "ui": {
-      "total": 23,
-      "marker_covered": 0,
-      "heuristic_covered": 23,
-      "covered": 23,
+      "total": 380,
+      "marker_covered": 14,
+      "heuristic_covered": 366,
+      "covered": 380,
       "coverage_pct": 100.0,
       "uncovered": [],
-      "test_files": []
+      "test_files": [
+        "tests/lua/evidence/test_charts_evidence.lua",
+        "tests/lua/evidence/test_gui_evidence.lua",
+        "tests/lua/evidence/test_ui_evidence.lua",
+        "tests/lua/integration/test_i18n_ui.lua"
+      ]
     },
     "window": {
       "total": 50,
@@ -1818,11 +1817,6 @@
     },
     {
       "file": "tests/lua/evidence/test_charts_evidence.lua",
-      "line": 11,
-      "marker": "lurek.ui.newLineChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_charts_evidence.lua",
       "line": 12,
       "marker": "LineChart:addSeries"
     },
@@ -1838,11 +1832,6 @@
     },
     {
       "file": "tests/lua/evidence/test_charts_evidence.lua",
-      "line": 35,
-      "marker": "lurek.ui.newBarChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_charts_evidence.lua",
       "line": 36,
       "marker": "BarChart:addSeries"
     },
@@ -1855,11 +1844,6 @@
       "file": "tests/lua/evidence/test_charts_evidence.lua",
       "line": 38,
       "marker": "BarChart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_charts_evidence.lua",
-      "line": 58,
-      "marker": "lurek.ui.newScatterPlot"
     },
     {
       "file": "tests/lua/evidence/test_charts_evidence.lua",
@@ -1883,11 +1867,6 @@
     },
     {
       "file": "tests/lua/evidence/test_charts_evidence.lua",
-      "line": 85,
-      "marker": "lurek.ui.newPieChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_charts_evidence.lua",
       "line": 86,
       "marker": "PieChart:addSegment"
     },
@@ -1895,11 +1874,6 @@
       "file": "tests/lua/evidence/test_charts_evidence.lua",
       "line": 87,
       "marker": "PieChart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_charts_evidence.lua",
-      "line": 105,
-      "marker": "lurek.ui.newAreaChart"
     },
     {
       "file": "tests/lua/evidence/test_charts_evidence.lua",
@@ -2227,98 +2201,68 @@
       "marker": "Graph:findPath"
     },
     {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 11,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 12,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 32,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 33,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 66,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_gui_evidence.lua",
-      "line": 67,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 13,
+      "line": 21,
       "marker": "HtmlDocument:getHtml"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 31,
+      "line": 38,
       "marker": "HtmlDocument:setCss"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 32,
+      "line": 39,
       "marker": "HtmlDocument:relayout"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 33,
+      "line": 40,
       "marker": "HtmlElement:getRect"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 57,
+      "line": 63,
       "marker": "HtmlDocument:queryAll"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 58,
+      "line": 64,
       "marker": "HtmlElement:getText"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 84,
+      "line": 89,
       "marker": "HtmlElement:addClass"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 85,
+      "line": 90,
       "marker": "HtmlElement:hasClass"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 86,
+      "line": 91,
       "marker": "HtmlElement:toggleClass"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 108,
+      "line": 112,
       "marker": "HtmlDocument:on"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 109,
+      "line": 113,
       "marker": "HtmlDocument:mousepressed"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 130,
+      "line": 133,
       "marker": "HtmlDocument:setViewport"
     },
     {
       "file": "tests/lua/evidence/test_html_evidence.lua",
-      "line": 131,
+      "line": 134,
       "marker": "HtmlDocument:getViewport"
     },
     {
@@ -5048,51 +4992,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 20,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 21,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 46,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 47,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 102,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 103,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 128,
-      "marker": "lurek.ui.loadLayout"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 129,
-      "marker": "lurek.ui.renderToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 173,
-      "marker": "lurek.ui.newLineChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 174,
       "marker": "LineChart:setYMax"
     },
@@ -5113,31 +5012,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 180,
-      "marker": "lurek.ui.newBarChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 181,
-      "marker": "lurek.ui.newScatterPlot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 182,
-      "marker": "lurek.ui.newPieChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 183,
-      "marker": "lurek.ui.newAreaChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 196,
-      "marker": "lurek.ui.newBarChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 197,
       "marker": "BarChart:addSeries"
     },
@@ -5150,11 +5024,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 199,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 216,
-      "marker": "lurek.ui.newScatterPlot"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -5178,11 +5047,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 241,
-      "marker": "lurek.ui.newPieChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 242,
       "marker": "PieChart:addSegment"
     },
@@ -5190,11 +5054,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 243,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 258,
-      "marker": "lurek.ui.newAreaChart"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -5210,11 +5069,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 261,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 292,
-      "marker": "lurek.ui.newLineChart"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -5238,31 +5092,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 299,
-      "marker": "lurek.ui.newBarChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 300,
-      "marker": "lurek.ui.newScatterPlot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 301,
-      "marker": "lurek.ui.newPieChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 302,
-      "marker": "lurek.ui.newAreaChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 315,
-      "marker": "lurek.ui.newBarChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 316,
       "marker": "BarChart:addSeries"
     },
@@ -5275,11 +5104,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 318,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 335,
-      "marker": "lurek.ui.newScatterPlot"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -5303,11 +5127,6 @@
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 360,
-      "marker": "lurek.ui.newPieChart"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 361,
       "marker": "PieChart:addSegment"
     },
@@ -5315,11 +5134,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 362,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 377,
-      "marker": "lurek.ui.newAreaChart"
     },
     {
       "file": "tests/lua/evidence/test_ui_evidence.lua",
@@ -5335,136 +5149,6 @@
       "file": "tests/lua/evidence/test_ui_evidence.lua",
       "line": 380,
       "marker": "Chart:drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 414,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 415,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 416,
-      "marker": "lurek.ui.newButton"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 417,
-      "marker": "lurek.ui.newLabel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 448,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 449,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 450,
-      "marker": "lurek.ui.newProgressBar"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 484,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 485,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 486,
-      "marker": "lurek.ui.newButton"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 487,
-      "marker": "lurek.ui.newLabel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 488,
-      "marker": "lurek.ui.newPanel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 489,
-      "marker": "lurek.ui.newSlider"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 545,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 546,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 547,
-      "marker": "lurek.ui.newButton"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 548,
-      "marker": "lurek.ui.newLabel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 579,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 580,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 581,
-      "marker": "lurek.ui.newProgressBar"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 615,
-      "marker": "lurek.ui.drawToImage"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 616,
-      "marker": "lurek.ui.getRoot"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 617,
-      "marker": "lurek.ui.newButton"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 618,
-      "marker": "lurek.ui.newLabel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 619,
-      "marker": "lurek.ui.newPanel"
-    },
-    {
-      "file": "tests/lua/evidence/test_ui_evidence.lua",
-      "line": 620,
-      "marker": "lurek.ui.newSlider"
     },
     {
       "file": "tests/lua/integration/test_ai_ecs_scene.lua",
@@ -5580,11 +5264,6 @@
       "file": "tests/lua/integration/test_i18n_ui.lua",
       "line": 9,
       "marker": "lurek.i18n.setLocale"
-    },
-    {
-      "file": "tests/lua/integration/test_i18n_ui.lua",
-      "line": 10,
-      "marker": "lurek.ui.newLabel"
     },
     {
       "file": "tests/lua/integration/test_i18n_ui.lua",
@@ -6958,82 +6637,82 @@
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3164,
+      "line": 3166,
       "marker": "Vec2:x"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3177,
+      "line": 3179,
       "marker": "Vec2:y"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3191,
+      "line": 3193,
       "marker": "Vec3:dot"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3200,
+      "line": 3202,
       "marker": "Vec3:add"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3210,
+      "line": 3212,
       "marker": "Vec3:sub"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3222,
+      "line": 3224,
       "marker": "CatmullRom:len"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3249,
+      "line": 3251,
       "marker": "Transform:setTransformation"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3260,
+      "line": 3262,
       "marker": "BezierCurve:setControlPoint"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3267,
+      "line": 3269,
       "marker": "BezierCurve:insertControlPoint"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3281,
+      "line": 3283,
       "marker": "Tween:set"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3296,
+      "line": 3298,
       "marker": "Circle:x"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3302,
+      "line": 3304,
       "marker": "Circle:y"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3310,
+      "line": 3312,
       "marker": "AabbTree:len"
     },
     {
       "file": "tests/lua/unit/test_math_unit.lua",
-      "line": 3316,
+      "line": 3318,
       "marker": "AabbTree:len"
     },
     {
       "file": "tests/lua/unit/test_network_unit.lua",
-      "line": 1003,
+      "line": 1009,
       "marker": "NetworkHost:disconnectNow"
     },
     {
       "file": "tests/lua/unit/test_network_unit.lua",
-      "line": 1012,
+      "line": 1018,
       "marker": "NetworkHost:disconnectLater"
     },
     {

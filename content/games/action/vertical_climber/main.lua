@@ -424,7 +424,7 @@ function lurek.process(dt)
                             spring_ps:emit(12)
                             -- Animate spring stretch
                             p.spring_stretch = 6
-                            lurek.tween.to(p, 0.3, { spring_stretch = 0 })
+                            lurek.tween.to(p, { spring_stretch = 0 }, 0.3)
                         elseif p.ptype == P_CRUMBLE then
                             -- Normal bounce, then platform crumbles
                             player.vy = BOUNCE_VEL
@@ -517,7 +517,7 @@ function lurek.process(dt)
                     score_pop.text = "+50"
                     score_pop.alpha = 1.0
                     score_pop.y = e.y
-                    lurek.tween.to(score_pop, 0.6, { alpha = 0, y = score_pop.y - 25 })
+                    lurek.tween.to(score_pop, { alpha = 0, y = score_pop.y - 25 }, 0.6)
                     score = score + 50
                     hit = true
                     break

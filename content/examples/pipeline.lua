@@ -271,17 +271,17 @@ do  -- Step:getAttempt
 end
 
 --@api-stub: Step:type
--- Returns the type name "PipelineStep".
+-- Returns the type name "LPipelineStep".
 -- Useful for runtime introspection alongside duck-typed values pulled from a generic container.
 do  -- Step:type
   local step = lurek.pipeline.newStep("init")
-  if step:type() == "PipelineStep" then
+  if step:type() == "LPipelineStep" then
     lurek.log.debug("got a real step", "boot")
   end
 end
 
 --@api-stub: Step:typeOf
--- Returns true when the given name matches "PipelineStep" or a parent type.
+-- Returns true when the given name matches "LPipelineStep", the legacy alias, or a parent type.
 -- Pass "Object" to test for any pipeline-namespace value when bridging from generic code.
 do  -- Step:typeOf
   local step = lurek.pipeline.newStep("init")
@@ -568,10 +568,10 @@ end
 
 --@api-stub: LPipeline:type
 -- Returns the type name of this object.
--- Always returns "Pipeline"; cheap runtime guard before invoking pipeline-only methods on unknown values.
+-- Always returns "LPipeline"; cheap runtime guard before invoking pipeline-only methods on unknown values.
 do  -- Pipeline:type
   local pl = lurek.pipeline.newPipeline("boot")
-  if pl:type() == "Pipeline" then
+  if pl:type() == "LPipeline" then
     lurek.log.debug("got a pipeline userdata", "boot")
   end
 end
@@ -599,7 +599,7 @@ end
 
 --@api-stub: LPipeline:typeOf
 -- Returns the type identifier string of this pipeline stage object.
--- Pass "Object" to test for any pipeline-namespace value; returns true for "Pipeline" or its parents.
+-- Pass "Object" to test for any pipeline-namespace value; returns true for "LPipeline", the legacy alias, or parents.
 do  -- Pipeline:typeOf
   local pl = lurek.pipeline.newPipeline("boot")
   if pl:typeOf("Object") then

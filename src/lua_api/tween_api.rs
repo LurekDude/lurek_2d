@@ -1,19 +1,4 @@
-//! `lurek.tween` â€” thin Lua registration wrapper for the property tween system.
-//!
-//! # Purpose
-//!
-//! This file is a **registration-only** wrapper following the Thin Wrapper Rule:
-//! it contains `pub fn register()` and the closure bodies that delegate immediately
-//! to domain types in `src/tween/`. All business logic, structs, and state machines
-//! live in `src/tween/handle.rs` (`LuaTween`, `LuaTweenSequence`, `LuaTweenParallel`)
-//! and `src/tween/engine.rs` (`TweenEngine`).
-//!
-//! # Architecture
-//!
-//! `TweenEngine` is a module-local `Rc<RefCell<â€¦>>` that tracks all active handle
-//! objects via `LuaRegistryKey` references. Lua scripts hold UserData handles and
-//! keep them alive for the duration of the animation. The engine never ticks tweens
-//! automatically â€” the script must call `lurek.tween.update(dt)` from `lurek.process`.
+//! `lurek.tween` - Property tweening, sequencing, and spring animation helpers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -42,32 +27,32 @@ impl LuaUserData for LuaTweenState {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- tick --
         /// Advances the tween state by `dt` seconds.
-        /// @param dt number
-        /// @return boolean
+        /// @param | dt | number | Delta time in seconds.
+        /// @return | boolean | True when the tween state reached completion.
         methods.add_method_mut("tick", |_, this, dt: f64| Ok(this.inner.tick(dt)));
 
         // -- isComplete --
         /// Returns whether the tween state has completed.
-        /// @return boolean
+        /// @return | boolean | True when playback is complete.
         methods.add_method("isComplete", |_, this, ()| Ok(this.inner.is_complete()));
 
         // -- t --
         /// Returns the raw 0..1 playback progress.
-        /// @return number
+        /// @return | number | Raw playback progress in the range 0 to 1.
         methods.add_method("t", |_, this, ()| Ok(this.inner.t_raw() as f64));
 
         // -- lerp --
         /// Interpolates from `start` to `finish` using the eased tween progress.
-        /// @param start number
-        /// @param finish number
-        /// @return number
+        /// @param | start | number | Range start value.
+        /// @param | finish | number | Range end value.
+        /// @return | number | Interpolated value at the current eased progress.
         methods.add_method("lerp", |_, this, (start, finish): (f64, f64)| {
             Ok(this.inner.lerp(start, finish))
         });
 
         // -- reset --
         /// Resets the tween state to elapsed time zero.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.reset();
             Ok(())
@@ -75,13 +60,13 @@ impl LuaUserData for LuaTweenState {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | The literal type name.
         methods.add_method("type", |_, _, ()| Ok("LTweenState"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LTweenState" || name == "Object")
         });
@@ -95,11 +80,11 @@ impl LuaUserData for LuaTweenState {
 /// on every update call.
 ///
 /// # Fields
-/// - `system` â€” `SpringSystem`. The multi-axis damped spring simulation.
-/// - `target_table_key` â€” `Option<LuaRegistryKey>`. Registry key for the animated Lua table.
-/// - `on_settle_key` â€” `Option<LuaRegistryKey>`. Optional callback fired when all axes settle.
-/// - `field_names` â€” `Vec<String>`. Ordered list of field names being animated.
-/// - `active` â€” `bool`. `false` once settled or cancelled.
+/// - `system` - `SpringSystem`. The multi-axis damped spring simulation.
+/// - `target_table_key` - `Option<LuaRegistryKey>`. Registry key for the animated Lua table.
+/// - `on_settle_key` - `Option<LuaRegistryKey>`. Optional callback fired when all axes settle.
+/// - `field_names` - `Vec<String>`. Ordered list of field names being animated.
+/// - `active` - `bool`. `false` once settled or cancelled.
 pub struct LuaSpring {
     /// The multi-axis spring simulation.
     pub system: SpringSystem,
@@ -114,13 +99,10 @@ pub struct LuaSpring {
 }
 
 impl LuaSpring {
-    /// Advances the spring by `dt` seconds, writes positions to the target table,
-    /// fires the settle callback if all axes converge, and returns `true` when done.
-    ///
-    /// @param lua &Lua
-    /// - `dt` â€” `f64` â€” Delta-time in seconds.
-    ///
-    /// `LuaResult<bool>` â€” `true` when settled / done, `false` while still moving.
+    /// Advances the spring by `dt` seconds and returns whether it settled.
+    /// @param | lua | Lua | Active Lua state used for registry access.
+    /// @param | dt | number | Delta time in seconds.
+    /// @return | boolean | True when all spring axes settled.
     pub fn tick_with(&mut self, lua: &Lua, dt: f64) -> LuaResult<bool> {
         self.system.update(dt as f32);
         if let Some(ref tgt_key) = self.target_table_key {
@@ -144,33 +126,24 @@ impl LuaSpring {
 }
 
 /// Registers the `lurek.tween` property tweening API.
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param _state Rc<RefCell<SharedState>>
-///
-///
-/// Exposes factory functions (`tween`, `sequence`, `parallel`, `delay`), lifecycle
-/// utilities (`update`, `cancelAll`, `getActiveCount`), and easing introspection
-/// (`registerEasing`, `getEasingNames`). Three UserData types â€” `LuaTween`,
-/// `LuaTweenSequence`, and `LuaTweenParallel` â€” are registered via
-/// `lua.register_userdata_type`.
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param _state Rc<RefCell<SharedState>>
+/// Registers the `lurek.tween` module and its userdata types.
+/// @param | lua | Lua | Active Lua state used to create the module table.
+/// @param | lurek | table | Root `lurek` table that receives the module.
+/// @param | _state | SharedState | Shared engine state placeholder for registration.
+/// @return | nil | No value is returned.
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
     let engine = Rc::new(RefCell::new(TweenEngine::new()));
 
-    // â”€â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Advances all active tweens, sequences, and parallels by `dt` seconds.
-    /// Call this once per frame from `lurek.process(dt)`.
-    /// @param dt number
-    /// @return nil
+    // -- update -------------------------------------------------
+    /// Advances all active tweens, sequences, parallels, and springs by `dt` seconds.
+    /// @param | dt | number | Delta time in seconds for this frame.
+    /// @return | nil | No value is returned.
     let s = engine.clone();
-    // â”€â”€â”€ Bindings â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- Bindings -------------------------------------------------
     tbl.set("update", lua.create_function(move |lua, dt: f64| {
             TweenEngine::update(&s, lua, dt)?;
-            // â”€â”€ springs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+            // -- springs -------------------------------------------------
             let spring_keys = std::mem::take(&mut s.borrow_mut().active_springs);
             let mut still_active = Vec::with_capacity(spring_keys.len());
             for key in spring_keys {
@@ -194,15 +167,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ tween â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a new property tween and registers it for automatic updating.
-    /// `target` is any Lua table; `fields` maps field names to their end values.
-    /// Start values are captured lazily on the first `update()` call.
-    /// @param duration number
-    /// @param target table
-    /// @param fields table
-    /// @param easing? string
-    /// @return Tween
+    // -- tween -------------------------------------------------
+    /// Creates a property tween and registers it for automatic updating.
+    /// @param | duration | number | Tween duration in seconds.
+    /// @param | target | table | Lua table whose numeric fields will be animated.
+    /// @param | fields | table | Mapping of field names to target values.
+    /// @param | easing | string? | Optional easing name; defaults to `linear`.
+    /// @return | LTween | New tween handle.
     let s = engine.clone();
     tbl.set("tween", lua.create_function(
             move |lua,
@@ -229,10 +200,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
 
-    // â”€â”€â”€ sequence â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates an empty TweenSequence. Add steps with :tween(), :delay(), :callback(),
-    /// then call :start() to begin and register it for updating.
-    /// @return TweenSequence
+    // -- sequence -------------------------------------------------
+    /// Creates an empty tween sequence handle.
+    /// @return | LTweenSequence | New sequence handle.
     let s = engine.clone();
     tbl.set("sequence", lua.create_function(move |lua, ()| {
             let seq = LuaTweenSequence::new();
@@ -244,10 +214,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ parallel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates an empty TweenParallel. Add entries with :tween() or :add(tween),
-    /// then call :start() to begin execution.
-    /// @return TweenParallel
+    // -- parallel -------------------------------------------------
+    /// Creates an empty parallel tween handle.
+    /// @return | LTweenParallel | New parallel handle.
     let s = engine.clone();
     tbl.set("parallel", lua.create_function(move |lua, ()| {
             let par = LuaTweenParallel::new();
@@ -258,12 +227,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ delay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a no-op tween that waits `seconds`, then optionally calls `callback`.
-    /// Convenience wrapper around `sequence():delay():start()`.
-    /// @param seconds number
-    /// @param fn function
-    /// @return TweenSequence
+    // -- delay -------------------------------------------------
+    /// Creates a started delay sequence that waits and then optionally calls a callback.
+    /// @param | seconds | number | Delay duration in seconds.
+    /// @param | fn | function? | Optional callback to run after the delay.
+    /// @return | LTweenSequence | Started sequence handle.
     let s = engine.clone();
     tbl.set("delay", lua.create_function(move |lua, (seconds, cb): (f64, Option<LuaFunction>)| {
             use crate::tween::SequenceStep;
@@ -286,9 +254,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ cancelAll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- cancelAll -------------------------------------------------
     /// Cancels all active tweens, sequences, parallels, and springs immediately.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let s = engine.clone();
     tbl.set("cancelAll", lua.create_function(move |lua, ()| {
             TweenEngine::cancel_all(&s, lua)?;
@@ -308,19 +276,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ getActiveCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Returns the number of currently active tween objects (tweens + seqs + pars).
-    /// @return integer
+    // -- getActiveCount -------------------------------------------------
+    /// Returns the number of currently active tween objects.
+    /// @return | integer | Count of active tweens, sequences, parallels, and springs.
     let s = engine.clone();
     tbl.set("getActiveCount", lua.create_function(move |_, ()| Ok(s.borrow().active_count()))?,
     )?;
 
-    // â”€â”€â”€ registerEasing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Registers a custom easing function under `name`. `fn(t)` receives 0..1, returns 0..1.
-    /// Overwrites any previous function registered under the same name.
-    /// @param name string
-    /// @param fn function
-    /// @return nil
+    // -- registerEasing -------------------------------------------------
+    /// Registers a custom easing function under `name`.
+    /// @param | name | string | Easing name used by later tween calls.
+    /// @param | fn | function | Callback that maps progress from 0..1 to 0..1.
+    /// @return | nil | No value is returned.
     let s = engine.clone();
     tbl.set("registerEasing", lua.create_function(move |lua, (name, f): (String, LuaFunction)| {
             let mut state = s.borrow_mut();
@@ -333,9 +300,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ getEasingNames â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Returns a list of all available easing names (built-in + custom).
-    /// @return table
+    // -- getEasingNames -------------------------------------------------
+    /// Returns all available built-in and custom easing names.
+    /// @return | table | Array-style table of easing names.
     let s = engine.clone();
     tbl.set("getEasingNames", lua.create_function(move |lua, ()| {
             let out = lua.create_table()?;
@@ -353,12 +320,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ newState â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a standalone tween timing state without registering it with the engine.
-    /// Useful for unit-style Lua tests and custom interpolation flows.
-    /// @param duration number
-    /// @param easing? string
-    /// @return TweenState
+    // -- newState -------------------------------------------------
+    /// Creates a standalone tween state that is not registered with the engine.
+    /// @param | duration | number | Tween duration in seconds.
+    /// @param | easing | string? | Optional easing name; defaults to `linear`.
+    /// @return | LTweenState | New standalone tween state.
     tbl.set("newState", lua.create_function(|lua, (duration, easing): (f64, Option<String>)| {
             lua.create_userdata(LuaTweenState {
                 inner: TweenState::new(duration, easing.as_deref().unwrap_or("linear")),
@@ -366,14 +332,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
-    // â”€â”€â”€ to â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Sugar for `tween()` with `target` first â€” natural read order.
-    /// Equivalent to `lurek.tween.tween(duration, target, fields, easing)`.
-    /// @param target table
-    /// @param fields table
-    /// @param duration number
-    /// @param easing string?
-    /// @return Tween
+    // -- to -------------------------------------------------
+    /// Creates a tween using `target` as the first argument.
+    /// @param | target | table | Lua table whose numeric fields will be animated.
+    /// @param | fields | table | Mapping of field names to target values.
+    /// @param | duration | number | Tween duration in seconds.
+    /// @param | easing | string? | Optional easing name; defaults to `linear`.
+    /// @return | LTween | New tween handle.
     let s = engine.clone();
     tbl.set("to", lua.create_function(
             move |lua,
@@ -400,17 +365,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
 
-    // â”€â”€â”€ spring â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a physics-based spring animation that drives named fields on `target_table`
-    /// toward the values in `fields_table`. Current field values are read immediately as
-    /// starting positions. Tick via `:update(dt)` or `lurek.tween.update(dt)`.
-    ///
-    /// `opts` may contain: `stiffness` (default 100), `damping` (default 10),
-    /// `precision` (default 0.001).
-    /// @param target_table table
-    /// @param fields_table table
-    /// @param opts table?
-    /// @return Spring
+    // -- spring -------------------------------------------------
+    /// Creates a spring animation that drives named table fields toward target values.
+    /// @param | target_table | table | Lua table whose numeric fields will be animated.
+    /// @param | fields_table | table | Mapping of field names to target values.
+    /// @param | opts | table? | Optional stiffness, damping, and precision settings.
+    /// @return | LSpring | New spring handle.
     let s = engine.clone();
     tbl.set("spring", lua.create_function(
             move |lua, (target_tbl, fields_tbl, opts): (LuaTable, LuaTable, Option<LuaTable>)| {
@@ -461,9 +421,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 /// A managed interpolation from start to end values over time.
 impl LuaUserData for LuaTween {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- cancel -------------------------------------------------
         /// Cancels this tween immediately; fires the `onCancel` callback if set.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_function("cancel", |lua, ud: LuaAnyUserData| {
             let mut tw = ud.borrow_mut::<LuaTween>()?;
             tw.active = false;
@@ -476,56 +436,56 @@ impl LuaUserData for LuaTween {
             Ok(())
         });
 
-        // â”€â”€ pause â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- pause -------------------------------------------------
         /// Pauses this tween; time stops advancing but the tween is not cancelled.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("pause", |_, this, ()| {
             this.paused = true;
             Ok(())
         });
 
-        // â”€â”€ resume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- resume -------------------------------------------------
         /// Resumes a paused tween, continuing from the position where it was paused.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("resume", |_, this, ()| {
             this.paused = false;
             Ok(())
         });
 
-        // â”€â”€ isActive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- isActive -------------------------------------------------
         /// Returns true if the tween is still running (not completed or cancelled).
-        /// @return boolean
+        /// @return | boolean | True when the tween is still active.
         methods.add_method("isActive", |_, this, ()| Ok(this.active));
 
-        // â”€â”€ getProgress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getProgress -------------------------------------------------
         /// Returns raw 0..1 playback progress (not eased, not accounting for yoyo).
-        /// @return number
+        /// @return | number | Raw playback progress in the range 0 to 1.
         methods.add_method("getProgress", |_, this, ()| Ok(this.state.t_raw() as f64));
 
-        // â”€â”€ setRepeat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setRepeat -------------------------------------------------
         /// Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
-        /// @param n integer
-        /// @return nil
+        /// @param | n | integer | Extra cycles after the first; use -1 for infinite repeats.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setRepeat", |_, this, n: i32| {
             this.repeat_count = n;
             this.cycles_remaining = n;
             Ok(())
         });
 
-        // â”€â”€ setYoyo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setYoyo -------------------------------------------------
         /// Enables or disables yoyo (ping-pong) on each repeat cycle.
-        /// @param enabled boolean
-        /// @return nil
+        /// @param | enabled | boolean | True to reverse direction on each repeat cycle.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setYoyo", |_, this, enabled: bool| {
             this.yoyo = enabled;
             Ok(())
         });
 
-        // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets a callback to fire when the tween finishes all cycles. Returns self for chaining.
-        /// @param self Tween
-        /// @param f function
-        /// @return Tween
+        // -- onComplete -------------------------------------------------
+        /// Sets a callback to fire when the tween finishes all cycles.
+        /// @param | self | LTween | Tween handle returned for chaining.
+        /// @param | f | function | Callback to run when the tween completes.
+        /// @return | LTween | The same tween handle.
         methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
                 {
                     let mut tw = ud.borrow_mut::<LuaTween>()?;
@@ -538,11 +498,11 @@ impl LuaUserData for LuaTween {
             },
         );
 
-        // â”€â”€ onUpdate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets a callback called every tick with the current eased `t` (0..=1). Returns self.
-        /// @param self Tween
-        /// @param f function
-        /// @return Tween
+        // -- onUpdate -------------------------------------------------
+        /// Sets a callback called every tick with the current eased progress.
+        /// @param | self | LTween | Tween handle returned for chaining.
+        /// @param | f | function | Callback that receives the current eased progress.
+        /// @return | LTween | The same tween handle.
         methods.add_function("onUpdate", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
                 let mut tw = ud.borrow_mut::<LuaTween>()?;
@@ -554,11 +514,11 @@ impl LuaUserData for LuaTween {
             Ok(ud)
         });
 
-        // â”€â”€ onCancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets a callback called when the tween is cancelled. Returns self.
-        /// @param self Tween
-        /// @param f function
-        /// @return Tween
+        // -- onCancel -------------------------------------------------
+        /// Sets a callback called when the tween is cancelled.
+        /// @param | self | LTween | Tween handle returned for chaining.
+        /// @param | f | function | Callback to run when the tween is cancelled.
+        /// @return | LTween | The same tween handle.
         methods.add_function("onCancel", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             {
                 let mut tw = ud.borrow_mut::<LuaTween>()?;
@@ -572,13 +532,13 @@ impl LuaUserData for LuaTween {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | The literal type name.
         methods.add_method("type", |_, _, ()| Ok("LTween"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LTween" || name == "Object")
         });
@@ -588,14 +548,14 @@ impl LuaUserData for LuaTween {
 /// A chained sequence of animations that run one after another.
 impl LuaUserData for LuaTweenSequence {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ tween â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Appends a tween step: animates `fields` on `target` over `duration`. Returns self.
-        /// @param self TweenSequence
-        /// @param duration number
-        /// @param target table
-        /// @param fields table
-        /// @param easing? string
-        /// @return TweenSequence
+        // -- tween -------------------------------------------------
+        /// Appends a tween step to the sequence.
+        /// @param | self | LTweenSequence | Sequence handle returned for chaining.
+        /// @param | duration | number | Tween duration in seconds.
+        /// @param | target | table | Lua table whose numeric fields will be animated.
+        /// @param | fields | table | Mapping of field names to target values.
+        /// @param | easing | string? | Optional easing name; defaults to `linear`.
+        /// @return | LTweenSequence | The same sequence handle.
         methods.add_function("tween", |lua,
              (ud, duration, target, fields_tbl, easing): (
                 LuaAnyUserData,
@@ -628,12 +588,12 @@ impl LuaUserData for LuaTweenSequence {
             },
         );
 
-        // â”€â”€ delay â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Appends a delay step that waits `seconds` before proceeding. Returns self.
-        /// @param self TweenSequence
-        /// @param seconds number
-        /// @param fn function
-        /// @return TweenSequence
+        // -- delay -------------------------------------------------
+        /// Appends a delay step to the sequence.
+        /// @param | self | LTweenSequence | Sequence handle returned for chaining.
+        /// @param | seconds | number | Delay duration in seconds.
+        /// @param | fn | function? | Optional callback to run after the delay.
+        /// @return | LTweenSequence | The same sequence handle.
         methods.add_function("delay", |lua, (ud, seconds, cb): (LuaAnyUserData, f64, Option<LuaFunction>)| {
                 let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
                 let callback = if let Some(f) = cb {
@@ -651,11 +611,11 @@ impl LuaUserData for LuaTweenSequence {
             },
         );
 
-        // â”€â”€ callback â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Appends an immediate callback step. Returns self.
-        /// @param self TweenSequence
-        /// @param fn function
-        /// @return TweenSequence
+        // -- callback -------------------------------------------------
+        /// Appends an immediate callback step to the sequence.
+        /// @param | self | LTweenSequence | Sequence handle returned for chaining.
+        /// @param | fn | function | Callback to run at this step.
+        /// @return | LTweenSequence | The same sequence handle.
         methods.add_function("callback", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
             let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
             let key = lua.create_registry_value(f)?;
@@ -664,33 +624,33 @@ impl LuaUserData for LuaTweenSequence {
             Ok(ud)
         });
 
-        // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it. Returns self.
-        /// @param self TweenSequence
-        /// @return TweenSequence
+        // -- start -------------------------------------------------
+        /// Marks the sequence as active so `lurek.tween.update(dt)` begins ticking it.
+        /// @param | self | LTweenSequence | Sequence handle returned for chaining.
+        /// @return | LTweenSequence | The same sequence handle.
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenSequence>()?.active = true;
             Ok(ud)
         });
 
-        // â”€â”€ cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- cancel -------------------------------------------------
         /// Cancels the sequence and stops all pending steps.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |_, this, ()| {
             this.active = false;
             Ok(())
         });
 
-        // â”€â”€ isActive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- isActive -------------------------------------------------
         /// Returns true if the sequence has been started and has not yet completed.
-        /// @return boolean
+        /// @return | boolean | True when the sequence is active.
         methods.add_method("isActive", |_, this, ()| Ok(this.active));
 
-        // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets a callback fired when all steps complete. Returns self.
-        /// @param self TweenSequence
-        /// @param fn function
-        /// @return TweenSequence
+        // -- onComplete -------------------------------------------------
+        /// Sets a callback fired when all steps complete.
+        /// @param | self | LTweenSequence | Sequence handle returned for chaining.
+        /// @param | fn | function | Callback to run when the sequence completes.
+        /// @return | LTweenSequence | The same sequence handle.
         methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
                 {
                     let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
@@ -705,13 +665,13 @@ impl LuaUserData for LuaTweenSequence {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | The literal type name.
         methods.add_method("type", |_, _, ()| Ok("LTweenSequence"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LTweenSequence" || name == "Object")
         });
@@ -721,11 +681,11 @@ impl LuaUserData for LuaTweenSequence {
 /// A group of animations that run simultaneously over the same duration.
 impl LuaUserData for LuaTweenParallel {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ add â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Adds an existing LuaTween to the parallel group; marks the tween as owned.
-        /// @param self TweenParallel
-        /// @param tween Tween
-        /// @return nil
+        // -- add -------------------------------------------------
+        /// Adds an existing tween handle to the parallel group.
+        /// @param | self | LTweenParallel | Parallel handle that receives the tween.
+        /// @param | tween | LTween | Tween handle to add to the group.
+        /// @return | nil | No value is returned.
         methods.add_function("add", |lua, (par_ud, tw_ud): (LuaAnyUserData, LuaAnyUserData)| {
                 // Extract tween data into an embedded ParallelEntry, mark original as owned.
                 let entry = {
@@ -749,14 +709,14 @@ impl LuaUserData for LuaTweenParallel {
             },
         );
 
-        // â”€â”€ tween â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Creates and adds an inline tween entry to the parallel group. Returns self.
-        /// @param self TweenParallel
-        /// @param duration number
-        /// @param target table
-        /// @param fields table
-        /// @param easing? string
-        /// @return TweenParallel
+        // -- tween -------------------------------------------------
+        /// Creates and adds an inline tween entry to the parallel group.
+        /// @param | self | LTweenParallel | Parallel handle returned for chaining.
+        /// @param | duration | number | Tween duration in seconds.
+        /// @param | target | table | Lua table whose numeric fields will be animated.
+        /// @param | fields | table | Mapping of field names to target values.
+        /// @param | easing | string? | Optional easing name; defaults to `linear`.
+        /// @return | LTweenParallel | The same parallel handle.
         methods.add_function("tween", |lua,
              (ud, duration, target, fields_tbl, easing): (
                 LuaAnyUserData,
@@ -790,33 +750,33 @@ impl LuaUserData for LuaTweenParallel {
             },
         );
 
-        // â”€â”€ start â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Marks the parallel as active. Returns self.
-        /// @param self TweenParallel
-        /// @return TweenParallel
+        // -- start -------------------------------------------------
+        /// Marks the parallel as active.
+        /// @param | self | LTweenParallel | Parallel handle returned for chaining.
+        /// @return | LTweenParallel | The same parallel handle.
         methods.add_function("start", |_lua, ud: LuaAnyUserData| {
             ud.borrow_mut::<LuaTweenParallel>()?.active = true;
             Ok(ud)
         });
 
-        // â”€â”€ cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- cancel -------------------------------------------------
         /// Cancels the parallel group immediately.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |_, this, ()| {
             this.active = false;
             Ok(())
         });
 
-        // â”€â”€ isActive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- isActive -------------------------------------------------
         /// Returns true if the parallel is running and not yet complete.
-        /// @return boolean
+        /// @return | boolean | True when the parallel is active.
         methods.add_method("isActive", |_, this, ()| Ok(this.active));
 
-        // â”€â”€ onComplete â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets a callback fired when all child tweens finish. Returns self.
-        /// @param self TweenParallel
-        /// @param fn function
-        /// @return TweenParallel
+        // -- onComplete -------------------------------------------------
+        /// Sets a callback fired when all child tweens finish.
+        /// @param | self | LTweenParallel | Parallel handle returned for chaining.
+        /// @param | fn | function | Callback to run when the parallel group completes.
+        /// @return | LTweenParallel | The same parallel handle.
         methods.add_function("onComplete", |lua, (ud, f): (LuaAnyUserData, LuaFunction)| {
                 {
                     let mut par = ud.borrow_mut::<LuaTweenParallel>()?;
@@ -831,13 +791,13 @@ impl LuaUserData for LuaTweenParallel {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | The literal type name.
         methods.add_method("type", |_, _, ()| Ok("LTweenParallel"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LTweenParallel" || name == "Object")
         });
@@ -847,11 +807,10 @@ impl LuaUserData for LuaTweenParallel {
 /// A physics-based spring animation handle.
 impl LuaUserData for LuaSpring {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Advances the spring by `dt` seconds and writes positions to the target table.
-        /// Returns `true` while still moving, `false` when settled.
-        /// @param dt number
-        /// @return boolean
+        // -- update -------------------------------------------------
+        /// Advances the spring by `dt` seconds.
+        /// @param | dt | number | Delta time in seconds.
+        /// @return | boolean | True while the spring is still moving.
         methods.add_method_mut("update", |lua, this, dt: f64| {
             if !this.active {
                 return Ok(false);
@@ -860,21 +819,20 @@ impl LuaUserData for LuaSpring {
             this.tick_with(lua, dt).map(|done| !done)
         });
 
-        // â”€â”€ isSettled â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Returns `true` when all spring axes have converged within `precision`.
-        /// @return boolean
+        // -- isSettled -------------------------------------------------
+        /// Returns whether all spring axes have settled.
+        /// @return | boolean | True when all axes converged within precision.
         methods.add_method("isSettled", |_, this, ()| Ok(this.system.is_settled()));
 
-        // â”€â”€ isActive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Returns `true` if the spring has not been cancelled or settled.
-        /// @return boolean
+        // -- isActive -------------------------------------------------
+        /// Returns whether the spring is still active.
+        /// @return | boolean | True when the spring has not been cancelled or settled.
         methods.add_method("isActive", |_, this, ()| Ok(this.active));
 
-        // â”€â”€ setTarget â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setTarget -------------------------------------------------
         /// Updates target values for all fields present in `fields_table`.
-        /// Clears the settled flag so the spring responds to the new targets.
-        /// @param fields_table table
-        /// @return nil
+        /// @param | fields_table | table | Mapping of field names to new target values.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setTarget", |_, this, fields_tbl: LuaTable| {
             for pair in fields_tbl.pairs::<String, f64>() {
                 let (k, v) = pair?;
@@ -886,10 +844,10 @@ impl LuaUserData for LuaSpring {
             Ok(())
         });
 
-        // â”€â”€ setStiffness â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setStiffness -------------------------------------------------
         /// Updates the stiffness constant on all axes.
-        /// @param value number
-        /// @return nil
+        /// @param | value | number | New stiffness value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setStiffness", |_, this, value: f32| {
             this.system.stiffness = value;
             for axis in this.system.axes.values_mut() {
@@ -898,10 +856,10 @@ impl LuaUserData for LuaSpring {
             Ok(())
         });
 
-        // â”€â”€ setDamping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setDamping -------------------------------------------------
         /// Updates the damping coefficient on all axes.
-        /// @param value number
-        /// @return nil
+        /// @param | value | number | New damping value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setDamping", |_, this, value: f32| {
             this.system.damping = value;
             for axis in this.system.axes.values_mut() {
@@ -910,9 +868,9 @@ impl LuaUserData for LuaSpring {
             Ok(())
         });
 
-        // â”€â”€ cancel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Stops the spring. The engine will drop it on the next `update(dt)` call.
-        /// @return nil
+        // -- cancel -------------------------------------------------
+        /// Stops the spring.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
             if let Some(k) = this.on_settle_key.take() {
@@ -921,23 +879,23 @@ impl LuaUserData for LuaSpring {
             Ok(())
         });
 
-        // â”€â”€ getPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Returns the current interpolated position for the named field, or `nil`.
-        /// @param field string
-        /// @return number?
+        // -- getPosition -------------------------------------------------
+        /// Returns the current interpolated position for the named field.
+        /// @param | field | string | Field name to read from the spring system.
+        /// @return | number | Current field position; missing fields yield `nil` at runtime.
         methods.add_method("getPosition", |_, this, field: String| {
             Ok(this.system.get_position(&field).map(|p| p as f64))
         });
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | The literal type name.
         methods.add_method("type", |_, _, ()| Ok("LSpring"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSpring" || name == "Object")
         });

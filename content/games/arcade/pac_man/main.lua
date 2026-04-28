@@ -168,8 +168,7 @@ local ghost_eat_combo = 0  -- 200, 400, 800, 1600 progression
 -- ── Visual effects ────────────────────────────────────────────────────────
 local sparks         = nil   -- particle system for dot pickup
 local ghost_burst    = nil   -- particle system for ghost eaten
-local pellet_scale   = 1.0  -- tween-driven pulsing
-local pellet_tween   = nil
+local pellet_scale   = 1.0  -- pulsed in process()
 local score_pop_val  = 0    -- floating score text
 local score_pop_x    = 0
 local score_pop_y    = 0
@@ -456,14 +455,6 @@ function lurek.init()
             { 0.2, 0.2, 1.0, 0.0 },
         },
     })
-
-    -- Power pellet pulsing tween (loops)
-    pellet_tween = lurek.tween.to(
-        { val = 1.0 },
-        { val = 1.6 },
-        0.5,
-        "inOutSine"
-    )
 
     -- Camera (identity — no scrolling, but required per spec)
     cam = lurek.camera.new(SCREEN_W / 2, SCREEN_H / 2)

@@ -173,7 +173,8 @@ impl LuaUserData for LuaWorld {
 
         // -- getGravity --
         /// Returns the gravity vector (gx, gy).
-        /// @return | number, number | Gravity vector components.
+        /// @return | number | Gravity X component.
+        /// @return | number | Gravity Y component.
         methods.add_method("getGravity", |_, this, ()| {
             Ok(this.world.borrow().get_gravity())
         });
@@ -660,7 +661,8 @@ impl LuaUserData for LuaWorld {
         // -- getJointBodies --
         /// Returns the two body IDs connected by a joint.
         /// @param | jointId | integer | Joint ID to inspect.
-        /// @return | integer, integer | Connected body IDs.
+        /// @return | integer | First connected body ID.
+        /// @return | integer | Second connected body ID.
         methods.add_method("getJointBodies", |_, this, jid: usize| {
             match this.world.borrow().get_joint_bodies(jid) {
                 Some((a, b)) => Ok((a, b)),
@@ -738,7 +740,8 @@ impl LuaUserData for LuaWorld {
         // -- getJointLimits --
         /// Returns the angular limits on a joint.
         /// @param | jointId | integer | Joint ID to inspect.
-        /// @return | number, number | Lower and upper angular limits.
+        /// @return | number | Lower angular limit.
+        /// @return | number | Upper angular limit.
         methods.add_method("getJointLimits", |_, this, jid: usize| {
             Ok(this.world.borrow().get_joint_limits(jid))
         });
@@ -1065,7 +1068,8 @@ impl LuaUserData for LuaWorld {
         // -- getBodyOneWay --
         /// Returns the one-way normal for a body, or nil if not configured.
         /// @param | bodyId | integer | Body ID to inspect.
-        /// @return | number, number | One-way normal components, or nil values when none are configured.
+        /// @return | number | One-way normal X component.
+        /// @return | number | One-way normal Y component.
         methods.add_method("getBodyOneWay", |_, this, id: usize| {
             match this.world.borrow().get_body_one_way(id) {
                 Some((nx, ny)) => Ok((Some(nx), Some(ny))),
@@ -1781,7 +1785,8 @@ impl LuaUserData for LuaBody {
 
         // -- getPosition --
         /// Returns the body position (x, y).
-        /// @return | number, number | Body position components.
+        /// @return | number | Body X position.
+        /// @return | number | Body Y position.
         methods.add_method("getPosition", |_, this, ()| {
             let w = this.world.borrow();
             match w.get_body(this.id) {
@@ -1818,7 +1823,8 @@ impl LuaUserData for LuaBody {
 
         // -- getVelocity --
         /// Returns the body velocity (vx, vy).
-        /// @return | number, number | Linear velocity components.
+        /// @return | number | Linear velocity X component.
+        /// @return | number | Linear velocity Y component.
         methods.add_method("getVelocity", |_, this, ()| {
             let w = this.world.borrow();
             match w.get_body(this.id) {
@@ -2269,7 +2275,10 @@ impl LuaUserData for LuaPhysicsShape {
 
         // -- getBoundingBox --
         /// Returns the axis-aligned bounding box (x1, y1, x2, y2).
-        /// @return | number, number, number, number | Bounding box corners.
+        /// @return | number | Minimum X coordinate.
+        /// @return | number | Minimum Y coordinate.
+        /// @return | number | Maximum X coordinate.
+        /// @return | number | Maximum Y coordinate.
         methods.add_method("getBoundingBox", |_, this, ()| {
             let d = this.inner.borrow();
             let (x1, y1, x2, y2) = match &d.shape {
@@ -2459,7 +2468,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// Returns the position and velocity of a body (x, y, vx, vy).
     /// @param | world | LWorld | World handle kept for API symmetry.
     /// @param | body | LBody | Body handle to inspect.
-    /// @return | number, number, number, number | Position and velocity components.
+    /// @return | number | Body X position.
+    /// @return | number | Body Y position.
+    /// @return | number | Body X velocity.
+    /// @return | number | Body Y velocity.
     tbl.set(
         "getBody",
         lua.create_function(

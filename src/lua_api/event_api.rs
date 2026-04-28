@@ -230,7 +230,7 @@ impl LuaUserData for LuaSignal {
         /// @param | name | string | type name to test
         /// @return | boolean | True if the object matches the requested type.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "LSignal" || name == "Object")
+            Ok(name == "LSignal" || name == "Signal" || name == "Object")
         });
     }
 }
@@ -316,7 +316,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- wait --
     /// Blocks the current thread until the next engine event arrives or the optional timeout elapses.
     /// @param | timeout | number? | Maximum seconds to wait (nil = wait indefinitely)
-    /// @return | boolean, string, table | Success flag, event name, and payload array
+    /// @return | boolean | True when an event was received before the timeout elapsed.
+    /// @return | string | Name of the received event.
+    /// @return | table | Payload array for the received event.
     let s = state.clone();
     tbl.set(
         "wait",

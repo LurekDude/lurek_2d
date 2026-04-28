@@ -4,9 +4,32 @@ All notable changes to Lurek2D are recorded here.
 
 ## [1.0.9-fix.10] - 2026-04-27
 
+### fix(content): align remaining game scripts with the current tween and type APIs
+
+- Fixed remaining `lurek.tween.to` misuse in `signal_demo`, `tetris`, and `horde_survivor` by animating persistent state tables instead of throwaway inline tables, so the tween engine now updates the values these games actually read.
+- Removed dead no-op tween calls in `pac_man`, `wildlife_photo`, and `physics_demo` where the current scripts already use manual animation paths.
+- Added missing `---@type` annotations for `hammer_spawn`, `heart_tween`, and `dk_throw_tween` in `arcade/donkey_kong/main.lua`.
+
+### fix(app): unblock Windows startup when the first redraw is requested from a hidden window
+
+- Changed the `src/app/app.rs` startup path to show the native window immediately after GPU initialisation and before the first `request_redraw()`, which restores the splash-screen-to-`init_lua()` handoff on Windows release builds that otherwise stalled before `L003_GAME_LOADED` or `L006_SPLASH_SCREEN`.
+
+### fix(lua-api): validate generated class and enum coverage across Lua artifacts
+
+- Added enum data to `logs/data/lua_api_data.json`, switched `tools/docs/gen_luadoc.py` and `tools/docs/gen_extension_api.py` to consume that source enum set, and removed stale namespace remaps so generated LuaCATS paths match the source JSON.
+- Extended `tools/validate/validate_generated_lua_stubs.py` so it now fails on stale generated artifacts and on missing class or enum coverage across `logs/data/lua_api_data.json`, `docs/api/lurek.lua`, and `extensions/vscode/data/lurek-api.json`.
+- Regenerated `logs/data/lua_api_data.json`, `docs/api/lurek.lua`, and `extensions/vscode/data/lurek-api.json` from the updated generators.
+
 ### fix(lua-api): fix all LuaLS type errors in content/games and docs/api/lurek.lua
 
+- Changed `tools/docs/gen_luadoc.py` fallback LuaCATS output from raw `any` and `unknown` placeholders to the generated `LuaValue` alias for unconstrained dynamic values, updated `docs/specs/lua-api-file-standard.md` to match that policy, and regenerated the Lua API data and docs so generated stubs stop surfacing fake placeholder types.
+- Fixed `tools/docs/gen_luadoc.py` so optional parameters keep their inline descriptions in generated `docs/api/lurek.lua` instead of collapsing to bare `---@param name? type` lines.
+- Tightened `src/lua_api/ui_api.rs` and `src/lua_api/window_api.rs` docstrings in the current user-visible hotspots, replacing obvious placeholder wording and narrowing several `LuaValue`-backed params from `any` to concrete `table|integer` docs where the accepted shapes are known.
+- Updated `docs/specs/lua-api-file-standard.md` to require concrete param types or constrained unions for `LuaValue` inputs whenever the accepted Lua shapes are known.
 - Fixed `@return | value |` invalid LuaLS type in `data_api.rs` (6 places), `patterns_api.rs` (13 places), `physics_api.rs` (1 place), `network_api.rs` (1 place) — changed to `@return | any |`.
+- Fixed `tools/docs/gen_luadoc.py` so generated `---@return` lines keep inline comments on the same line with meaningful inferred names such as `x`, `y`, `type_name`, and `matches`, instead of generic placeholders like `value` or `ok`.
+- Tightened the Catmull-Rom and Hermite spline Rust docstrings in `src/lua_api/math_api.rs` so generated sample-method docs read naturally and describe the returned coordinates clearly.
+- Refreshed Rust Lua API docstrings across `src/lua_api/*.rs`: filled missing `@param` descriptions, converted remaining legacy tags to pipe format, and split shared tuple `@return` docs into one documented return line per value so generated LuaCATS stubs carry specific per-return comments.
 - Added `---@type LParticleSystem` annotations for `sparks`, `burst`, and `spider_sparks` in `centipede/main.lua` to resolve "Need check nil" and "Undefined field" errors.
 - Fixed `---@type Camera2D?` annotations to `---@type LCamera?` in `roguelite`, `soulslike`, `another_world`, `light_showcase`, `rhythm_game`, and `tennis_classic`.
 - Fixed `---@type ParticleSystem|nil` to `---@type LParticleSystem|nil` in `debugbridge_demo` and `tennis_classic`.
@@ -14,7 +37,7 @@ All notable changes to Lurek2D are recorded here.
 - Fixed `devtools_demo/main.lua`: `animate_panel()` rewrote callback-based tween to `lurek.tween.to(panel_offsets, {[index]=target}, 0.35, "outQuad")`.
 - Fixed `wildlife_photo/main.lua`: converted `zoom_display` from plain number to `{ value = 1 }` table so `lurek.tween.to` can animate it; restored missing `tod_timer = 0` in `reset_game()`.
 - Fixed `farming_sim/main.lua`: removed broken `lurek.tween.to(gold_display, ...)` call (passing plain number); the existing manual lerp already handles the display animation.
-- Regenerated `logs/data/lua_api_data.json` and `docs/api/lurek.lua`.
+- Regenerated `logs/data/lua_api_data.json`, `docs/api/lurek.lua`, and `docs/api/lurek.md`.
 
 ## [1.0.9-fix.9] - 2026-05-01
 

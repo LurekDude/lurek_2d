@@ -467,8 +467,8 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `BezierCurve:scale`: Scales all control points around a pivot by factor s.
 
 ### `CatmullRom` Methods
-- `CatmullRom:sample`: Sample the spline at global t in [0, 1].
-- `CatmullRom:sampleSegment`: Sample a specific segment at local t in [0, 1].
+- `CatmullRom:sample`: Samples the spline at global parameter `t` in `[0, 1]` and returns `(x, y)`.
+- `CatmullRom:sampleSegment`: Samples one segment at local parameter `t` in `[0, 1]` and returns `(x, y)`.
 - `CatmullRom:len`: Number of control points.
 - `CatmullRom:addPoint`: Appends a control point to the spline.
 - `CatmullRom:removePoint`: Removes the control point at `index` (0-based) and returns it.
@@ -484,7 +484,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `Circle:radius`: Returns the circle radius.
 
 ### `Hermite` Methods
-- `Hermite:sample`: Evaluate the spline at parameter t in [0, 1].
+- `Hermite:sample`: Samples the spline at parameter `t` in `[0, 1]` and returns `(x, y)`.
 
 ### `NoiseGenerator` Methods
 - `NoiseGenerator:perlin1d`: Returns 1D Perlin noise at x.

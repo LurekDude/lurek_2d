@@ -64,15 +64,15 @@ describe("PipelineStep construction", function()
     end)
 
     -- @description Verifies the runtime type string for a step is reported as PipelineStep.
-    it("type() returns 'PipelineStep'", function()
+    it("type() returns 'LPipelineStep'", function()
         local s = lurek.pipeline.newStep("s")
-        expect_equal("PipelineStep", s:type())
+        expect_equal("LPipelineStep", s:type())
     end)
 
     -- @description Verifies the step passes a typeOf check for the PipelineStep type name.
-    it("typeOf('PipelineStep') is true", function()
+    it("typeOf('LPipelineStep') is true", function()
         local s = lurek.pipeline.newStep("s")
-        expect_true(s:typeOf("PipelineStep"))
+        expect_true(s:typeOf("LPipelineStep"))
     end)
 
     -- @description Verifies a newly created step begins in the pending status before any execution.
@@ -186,15 +186,15 @@ describe("Pipeline construction", function()
     end)
 
     -- @description Verifies the runtime type string for a pipeline is reported as Pipeline.
-    it("type() returns 'Pipeline'", function()
+    it("type() returns 'LPipeline'", function()
         local p = lurek.pipeline.newPipeline()
-        expect_equal("Pipeline", p:type())
+        expect_equal("LPipeline", p:type())
     end)
 
     -- @description Verifies the pipeline passes a typeOf check for the Pipeline type name.
-    it("typeOf('Pipeline') is true", function()
+    it("typeOf('LPipeline') is true", function()
         local p = lurek.pipeline.newPipeline()
-        expect_true(p:typeOf("Pipeline"))
+        expect_true(p:typeOf("LPipeline"))
     end)
 
     -- @description Verifies a fresh pipeline reports zero registered steps.

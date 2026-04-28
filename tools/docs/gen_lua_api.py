@@ -91,11 +91,21 @@ def _first_desc_line(docstring: str) -> str:
 
 
 def _extract_params_returns(docstring: str) -> tuple:
-    """Extract # Parameters and # Returns sections from a docstring."""
+    """Extract legacy params_doc/returns_doc fields from a docstring.
+
+    The JSON still carries these compatibility fields for downstream scripts.
+    Prefer the explicit tagged data (`typed_params`, `inferred_return`,
+    `return_description`) when available.
+
+    Supported inputs:
+    - legacy `# Parameters` / `# Returns` sections
+    - current pipe-tagged `@param | ... | ... | ...` / `@return | ... | ...`
+    """
     params = ""
     returns = ""
     if not docstring:
         return params, returns
+
     doc_lines = docstring.split("\n")
     current_section = None
     section_lines: Dict[str, List[str]] = {}
@@ -110,6 +120,38 @@ def _extract_params_returns(docstring: str) -> tuple:
         params = "\n".join(section_lines["parameters"]).strip()
     if "returns" in section_lines:
         returns = "\n".join(section_lines["returns"]).strip()
+    if params or returns:
+        return params, returns
+
+    tagged_params: List[str] = []
+    tagged_return = ""
+    for line in doc_lines:
+        stripped = line.strip()
+
+        param_match = re.match(
+            r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*([^|]+?)\s*\|\s*(.+)",
+            stripped,
+        )
+        if param_match:
+            raw_name = param_match.group(1).strip()
+            display_name = raw_name[:-1] if raw_name.endswith("?") and raw_name != "..." else raw_name
+            lua_type = param_match.group(2).strip().rstrip(",.")
+            desc = param_match.group(3).strip()
+            tagged_params.append(f"- `{display_name}` — `{lua_type}`: {desc}")
+            continue
+
+        return_match = re.match(r"@return\s*\|\s*([^|]+?)\s*\|\s*(.+)", stripped)
+        if return_match and not tagged_return:
+            # Keep only the type token here. The detailed prose is already stored in
+            # `return_description`, and a plain type string is the safest form for
+            # downstream stub generation.
+            tagged_return = return_match.group(1).strip().rstrip(",.")
+
+    if tagged_params:
+        params = "\n".join(tagged_params)
+    if tagged_return:
+        returns = tagged_return
+
     return params, returns
 
 
@@ -621,6 +663,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
         r'^\s*impl(?:<[^>]*>)?\s+(?:(?:(?:\w+::)*(?:LuaUserData|UserData))\s+for\s+)?(\w+)'
     )
     add_method_re = re.compile(r'fn\s+add_(\w+)_methods\(')
+    create_widget_table_re = re.compile(r'fn\s+create_widget_table\s*[<(]')
 
     def _find_pub_fn_docstring(fn_name: str) -> Optional[str]:
         """Find `pub fn fn_name(` in the file and return its docstring."""
@@ -640,6 +683,9 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
         impl_m = impl_re.match(stripped)
         if impl_m:
             current_impl_type = impl_m.group(1)
+
+        if create_widget_table_re.search(stripped):
+            current_widget_type = "LUiWidget"
 
         add_m = add_method_re.search(stripped)
         if add_m:
@@ -675,7 +721,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     owner = "" if table_namespace else (current_widget_type if current_widget_type else "")
                     kind = "method" if owner else "function"
                     lua_name = (
-                        f"{owner}:{func_name}"
+                        f"{owner}.{func_name}"
                         if owner
                         else f"{table_namespace or f'lurek.{_lua_namespace(module)}'}.{func_name}"
                     )
@@ -712,7 +758,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             owner = "" if table_namespace else (current_widget_type if current_widget_type else "")
             kind = "method" if owner else "function"
             lua_name = (
-                f"{owner}:{func_name}"
+                f"{owner}.{func_name}"
                 if owner
                 else f"{table_namespace or f'lurek.{_lua_namespace(module)}'}.{func_name}"
             )
@@ -877,7 +923,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             if not set_inline_re.search(stripped) or rust_fn:
                 owner = current_widget_type if current_widget_type else ""
                 kind = "method" if owner else "function"
-                lua_name = f"{owner}:{func_name}" if owner else f"lurek.{_lua_namespace(module)}.{func_name}"
+                lua_name = f"{owner}.{func_name}" if owner else f"lurek.{_lua_namespace(module)}.{func_name}"
                 # Look up docstring from the named pub fn declaration
                 docstring = _find_pub_fn_docstring(rust_fn) or _collect_docstring_above(lines, i)
                 desc = _first_desc_line(docstring)

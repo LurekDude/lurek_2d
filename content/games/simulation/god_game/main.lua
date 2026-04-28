@@ -268,8 +268,9 @@ end
 local function miracle_earthquake()
     if faith < 20 then return end
     faith = faith - 20
-    local sx, sy = screen_to_grid(lurek.input.mouse.getX(), lurek.input.mouse.getY())
-    spawn_miracle_particles("earthquake", lurek.input.mouse.getX(), lurek.input.mouse.getY())
+    local mx, my = lurek.input.mouse.getPosition()
+    local sx, sy = screen_to_grid(mx, my)
+    spawn_miracle_particles("earthquake", mx, my)
     for dy = -2, 2 do
         for dx = -2, 2 do
             local gx, gy = sx + dx, sy + dy
@@ -283,8 +284,9 @@ end
 local function miracle_lightning()
     if faith < 15 then return end
     faith = faith - 15
-    local gx, gy = screen_to_grid(lurek.input.mouse.getX(), lurek.input.mouse.getY())
-    spawn_miracle_particles("lightning", lurek.input.mouse.getX(), lurek.input.mouse.getY())
+    local mx, my = lurek.input.mouse.getPosition()
+    local gx, gy = screen_to_grid(mx, my)
+    spawn_miracle_particles("lightning", mx, my)
     if in_grid(gx, gy) and grid[gy][gx] == FOREST then
         set_terrain(gx, gy, GRASS)
     end
@@ -333,7 +335,8 @@ end
 
 local function place_wall()
     if faith < 5 then return end
-    local gx, gy = screen_to_grid(lurek.input.mouse.getX(), lurek.input.mouse.getY())
+    local mx, my = lurek.input.mouse.getPosition()
+    local gx, gy = screen_to_grid(mx, my)
     if not in_grid(gx, gy) then return end
     for _, w in ipairs(walls) do
         if w.gx == gx and w.gy == gy then return end
@@ -535,7 +538,8 @@ function lurek.process(dt)
     game_time = game_time + dt * game_speed
 
     -- Cursor grid pos
-    cursor_gx, cursor_gy = screen_to_grid(lurek.input.mouse.getX(), lurek.input.mouse.getY())
+    local mx, my = lurek.input.mouse.getPosition()
+    cursor_gx, cursor_gy = screen_to_grid(mx, my)
 
     -- Terrain sculpting
     if lurek.input.isActionDown("raise") then

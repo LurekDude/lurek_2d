@@ -508,7 +508,7 @@ function lurek.process(dt)
                 score_pop.text = "+100"
                 score_pop.alpha = 1.0
                 score_pop.y = c.y - cam_y_off
-                lurek.tween.to(score_pop, 0.7, { alpha = 0, y = score_pop.y - 30 })
+                lurek.tween.to(score_pop, { alpha = 0, y = score_pop.y - 30 }, 0.7)
             end
         end
     end
@@ -533,7 +533,7 @@ function lurek.process(dt)
                     score_pop.text = "+200"
                     score_pop.alpha = 1.0
                     score_pop.y = e.y - cam_y_off
-                    lurek.tween.to(score_pop, 0.7, { alpha = 0, y = score_pop.y - 30 })
+                    lurek.tween.to(score_pop, { alpha = 0, y = score_pop.y - 30 }, 0.7)
                 else
                     death_ps:moveTo(player.x + PLAYER_W / 2, player.y + PLAYER_H / 2)
                     death_ps:emit(20)
@@ -558,14 +558,14 @@ function lurek.process(dt)
             banner.text = "LEVEL " .. current_lvl
             banner.alpha = 0
             banner.scale = 0.5
-            lurek.tween.to(banner, 0.5, { alpha = 1, scale = 1 })
+            lurek.tween.to(banner, { alpha = 1, scale = 1 }, 0.5)
         else
             -- Won the game
             game_state = STATE.LEVEL_COMPLETE
             banner.text = "YOU WIN!  SCORE: " .. score
             banner.alpha = 0
             banner.scale = 0.5
-            lurek.tween.to(banner, 0.5, { alpha = 1, scale = 1 })
+            lurek.tween.to(banner, { alpha = 1, scale = 1 }, 0.5)
         end
         return
     end

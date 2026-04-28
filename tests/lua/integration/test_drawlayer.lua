@@ -215,9 +215,9 @@ describe("DrawLayer type system", function()
     -- @covers lurek.render.DrawLayer.type
     -- @covers lurek.render.newDrawLayer
     -- @description Verifies DrawLayer objects report their concrete type string.
-    it("has type() method returning DrawLayer", function()
+    it("has type() method returning LDrawLayer", function()
         local layer = lurek.render.newDrawLayer()
-        expect_equal("DrawLayer", layer:type())
+        expect_equal("LDrawLayer", layer:type())
     end)
 
     -- @covers lurek.render.DrawLayer.typeOf

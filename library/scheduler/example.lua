@@ -27,13 +27,13 @@ end, "quest")
 
 -- ── 3. A repeating-style task implemented with a loop ─────────────────────────
 local ticks = 0
-local id_ticker = sched:add(function(yield)
+local id_ticker = assert(sched:add(function(yield)
     while ticks < 4 do
         ticks = ticks + 1
         note(string.format("tick #%d", ticks))
         yield(0.5)
     end
-end, "ticker")
+end, "ticker"))
 
 -- ── 4. A short task that finishes in the same frame as its add ────────────────
 sched:add(function(_yield)

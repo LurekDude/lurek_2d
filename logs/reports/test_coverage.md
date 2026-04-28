@@ -5,7 +5,7 @@
 | Category | Covered | Total | Coverage |
 |----------|---------|-------|----------|
 | Rust public functions | 3253 | 4229 | 76.9% |
-| Lua API functions | 3997 | 4022 | 99.4% |
+| Lua API functions | 4354 | 4378 | 99.5% |
 
 ## Rust Coverage by Module
 
@@ -103,8 +103,8 @@
 | physics | 201 | 205 | 98.0% |
 | pipeline | 61 | 62 | 98.4% |
 | procgen | 18 | 18 | 100.0% |
-| raycaster | 57 | 61 | 93.4% |
-| render | 197 | 197 | 100.0% |
+| raycaster | 58 | 61 | 95.1% |
+| render | 196 | 196 | 100.0% |
 | save | 28 | 28 | 100.0% |
 | scene | 55 | 55 | 100.0% |
 | serial | 10 | 10 | 100.0% |
@@ -116,7 +116,7 @@
 | tilemap | 187 | 188 | 99.5% |
 | timer | 49 | 49 | 100.0% |
 | tween | 58 | 58 | 100.0% |
-| ui | 23 | 23 | 100.0% |
+| ui | 380 | 380 | 100.0% |
 | window | 50 | 50 | 100.0% |
 
 ## Uncovered Rust Functions (top 50)
@@ -163,40 +163,39 @@
 - `NeedSystem::need_names` in `src/ai/needs.rs:318`
 - `NeedSystem::value_of` in `src/ai/needs.rs:329`
 - `NeedSystem::best_advertisement` in `src/ai/needs.rs:344`
-- `NeuralLayer::param_count` in `src/ai/neural_net.rs:152`
-- `NeuralNet::param_count` in `src/ai/neural_net.rs:217`
+- `NeuralLayer::param_count` in `src/ai/neural_net.rs:153`
+- `NeuralNet::param_count` in `src/ai/neural_net.rs:219`
 - `Neuroevolution::chromosome_to_net` in `src/ai/neuroevolution.rs:82`
 - `Neuroevolution::best_network` in `src/ai/neuroevolution.rs:111`
 - `Neuroevolution::best_fitness` in `src/ai/neuroevolution.rs:122`
-- `StimulusWorld::add_auditory` in `src/ai/perception.rs:236`
-- `StimulusWorld::add_custom` in `src/ai/perception.rs:262`
-- `StimulusWorld::stimuli` in `src/ai/perception.rs:306`
+- `StimulusWorld::add_auditory` in `src/ai/perception.rs:237`
+- `StimulusWorld::add_custom` in `src/ai/perception.rs:264`
+- `StimulusWorld::stimuli` in `src/ai/perception.rs:308`
 - ... and 926 more
 
 ## Uncovered Lua API Functions (top 50)
 
-- `LInfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1843`
-- `LBus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:548`
-- `LArray:eigenPower` (method) in `src/lua_api/compute_api.rs:855`
-- `LDataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:740`
-- `LDataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:757`
-- `LOverlay:triggerShake` (method) in `src/lua_api/effect_api.rs:743`
-- `lurek.html.preventDefault` (function) in `src/lua_api/html_api.rs:915`
-- `lurek.html.stopPropagation` (function) in `src/lua_api/html_api.rs:924`
-- `lurek.html.isDefaultPrevented` (function) in `src/lua_api/html_api.rs:933`
-- `LNoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1309`
-- `LNoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1434`
-- `LNoiseGenerator:generateMap` (method) in `src/lua_api/math_api.rs:1445`
-- `LTrail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1421`
-- `LTrail:setTailColor` (method) in `src/lua_api/particle_api.rs:1437`
-- `LFlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:604`
-- `LWorld:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:690`
-- `LWorld:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:711`
-- `LWorld:setJointLimits` (method) in `src/lua_api/physics_api.rs:727`
-- `LWorld:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:749`
-- `LPipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1211`
-- `LRaycaster:drawView` (method) in `src/lua_api/raycaster_api.rs:552`
-- `LRaycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:573`
-- `LRaycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:602`
-- `LRaycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:622`
-- `LChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1199`
+- `LInfluenceMap:stampInfluence` (method) in `src/lua_api/ai_api.rs:1837`
+- `LBus:setDuckTarget` (method) in `src/lua_api/audio_api.rs:543`
+- `LArray:eigenPower` (method) in `src/lua_api/compute_api.rs:841`
+- `LDataFrame:withRollingMin` (method) in `src/lua_api/dataframe_api.rs:722`
+- `LDataFrame:withRollingMax` (method) in `src/lua_api/dataframe_api.rs:737`
+- `LOverlay:triggerShake` (method) in `src/lua_api/effect_api.rs:727`
+- `lurek.html.preventDefault` (function) in `src/lua_api/html_api.rs:919`
+- `lurek.html.stopPropagation` (function) in `src/lua_api/html_api.rs:928`
+- `lurek.html.isDefaultPrevented` (function) in `src/lua_api/html_api.rs:937`
+- `LNoiseGenerator:worley3d` (method) in `src/lua_api/math_api.rs:1320`
+- `LNoiseGenerator:warpDomain` (method) in `src/lua_api/math_api.rs:1446`
+- `LNoiseGenerator:generateMap` (method) in `src/lua_api/math_api.rs:1457`
+- `LTrail:setHeadColor` (method) in `src/lua_api/particle_api.rs:1435`
+- `LTrail:setTailColor` (method) in `src/lua_api/particle_api.rs:1451`
+- `LFlowField:calculateMulti` (method) in `src/lua_api/pathfind_api.rs:601`
+- `LWorld:setJointMotorSpeed` (method) in `src/lua_api/physics_api.rs:695`
+- `LWorld:setJointLimitsEnabled` (method) in `src/lua_api/physics_api.rs:716`
+- `LWorld:setJointLimits` (method) in `src/lua_api/physics_api.rs:732`
+- `LWorld:setMouseJointTarget` (method) in `src/lua_api/physics_api.rs:755`
+- `LPipeline:addSubPipeline` (method) in `src/lua_api/pipeline_api.rs:1087`
+- `LRaycaster:drawDepthMap` (method) in `src/lua_api/raycaster_api.rs:563`
+- `LRaycaster:drawLineOfSight` (method) in `src/lua_api/raycaster_api.rs:590`
+- `LRaycaster:drawCameraSweep` (method) in `src/lua_api/raycaster_api.rs:608`
+- `LChunkMap:getChunksInView` (method) in `src/lua_api/tilemap_api.rs:1208`

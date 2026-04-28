@@ -1,0 +1,18 @@
+[2026-04-28T14:59:40.984Z] INFO  [L081] L081: C:\Users\tombl\Documents\luna2d\lurek.log
+[2026-04-28T14:59:40.986Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-04-28T14:59:40.986Z] INFO  [L080] Game directory: C:\Users\tombl\Documents\luna2d
+[2026-04-28T14:59:42.684Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-04-28T14:59:42.686Z] WARN  GENERAL [Loader Message (0x0)]
+	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
+[2026-04-28T14:59:42.687Z] WARN  	objects: (type: INSTANCE, hndl: 0x2287bdd9e60, name: ?)
+[2026-04-28T14:59:42.779Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-04-28T14:59:42.779Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-04-28T14:59:42.788Z] WARN  Unrecognized present mode 1000361000
+[2026-04-28T14:59:43.122Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-04-28T14:59:43.352Z] WARN  Unrecognized present mode 1000361000
+[2026-04-28T14:59:43.352Z] INFO  [L034] GPU texture dimension limit: 2048
+[2026-04-28T14:59:43.353Z] WARN  Unrecognized present mode 1000361000
+[2026-04-28T14:59:43.651Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-04-28T14:59:43.680Z] WARN  Unrecognized present mode 1000361000
+[2026-04-28T14:59:43.685Z] WARN  Unrecognized present mode 1000361000
+[2026-04-28T14:59:44.191Z] INFO  [L006] Splash screen — no game loaded

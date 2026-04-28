@@ -25,6 +25,41 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 // src/test/unit/luaParser.test.ts
 var assert = __toESM(require("assert"));
 
+// src/generated/lurekApiData.ts
+var LUREK_CALLBACK_NAMES = /* @__PURE__ */ new Set([
+  "load",
+  "update",
+  "draw",
+  "keypressed",
+  "keyreleased",
+  "textinput",
+  "mousepressed",
+  "mousereleased",
+  "mousemoved",
+  "wheelmoved",
+  "gamepadpressed",
+  "gamepadreleased",
+  "gamepadaxis",
+  "joystickadded",
+  "joystickremoved",
+  "focus",
+  "visible",
+  "resize",
+  "quit",
+  "init",
+  "ready",
+  "process",
+  "process_late",
+  "process_physics",
+  "fixedUpdate",
+  "draw_ui",
+  "exit",
+  "touchpressed",
+  "touchmoved",
+  "touchreleased",
+  "textedited"
+]);
+
 // src/services/luaParser.ts
 var LUA_KEYWORDS = /* @__PURE__ */ new Set([
   "and",
@@ -49,29 +84,6 @@ var LUA_KEYWORDS = /* @__PURE__ */ new Set([
   "true",
   "until",
   "while"
-]);
-var LUREK_CALLBACKS = /* @__PURE__ */ new Set([
-  "load",
-  "update",
-  "draw",
-  "keypressed",
-  "keyreleased",
-  "textinput",
-  "mousepressed",
-  "mousereleased",
-  "wheelmoved",
-  "gamepadpressed",
-  "gamepadreleased",
-  "gamepadaxis",
-  "joystickadded",
-  "joystickremoved",
-  "touchpressed",
-  "touchmoved",
-  "touchreleased",
-  "focus",
-  "visible",
-  "resize",
-  "quit"
 ]);
 var OPERATORS = /* @__PURE__ */ new Set([
   "+",
@@ -459,7 +471,7 @@ var LuaDocumentAnalyzer = class {
             description: getPrecedingComment(funcTok.line)
           };
           symbols.push(sym);
-          if (fullName.startsWith("lurek.") && LUREK_CALLBACKS.has(shortName)) {
+          if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
             callbacks.push(sym);
           }
           for (const pName of params.names) {
@@ -518,7 +530,7 @@ var LuaDocumentAnalyzer = class {
               description: getPrecedingComment(cur.line)
             };
             symbols.push(sym);
-            if (fullName.startsWith("lurek.") && LUREK_CALLBACKS.has(shortName)) {
+            if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
               callbacks.push(sym);
             }
             for (const pName of params.names) {
@@ -597,7 +609,16 @@ var LuaDocumentAnalyzer = class {
       const popped = scopeStack.pop();
       scopes.push({ name: popped.name, startLine: popped.startLine, endLine: lastLine, kind: popped.kind });
     }
-    return { symbols, requires, callbacks, scopes, comments };
+    const baseInfo = {
+      symbols,
+      requires,
+      callbacks,
+      scopes,
+      comments,
+      classes: []
+    };
+    baseInfo.classes = this.detectClasses(baseInfo);
+    return baseInfo;
   }
   // ── Position-based queries ─────────────────────────────────
   getSymbolAt(info, line, column) {
@@ -817,7 +838,10 @@ var analyzer = new LuaDocumentAnalyzer();
 suite("LuaParser \u2014 tokenize", () => {
   test("tokenizes empty string", () => {
     const tokens = analyzer.tokenize("");
-    assert.strictEqual(tokens.length, 0);
+    assert.strictEqual(
+      tokens.filter((t) => t.type !== 8 /* EOF */).length,
+      0
+    );
   });
   test("tokenizes a local assignment", () => {
     const tokens = analyzer.tokenize("local x = 42");

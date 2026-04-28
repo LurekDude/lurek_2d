@@ -70,6 +70,7 @@ export interface LuaDocumentInfo {
   callbacks: LuaSymbol[];
   scopes: ScopeInfo[];
   comments: CommentInfo[];
+  classes: ClassInfo[];
 }
 
 // ── Constants ────────────────────────────────────────────────
@@ -644,7 +645,17 @@ export class LuaDocumentAnalyzer {
       scopes.push({ name: popped.name, startLine: popped.startLine, endLine: lastLine, kind: popped.kind });
     }
 
-    return { symbols, requires, callbacks, scopes, comments };
+    const baseInfo: LuaDocumentInfo = {
+      symbols,
+      requires,
+      callbacks,
+      scopes,
+      comments,
+      classes: [],
+    };
+    baseInfo.classes = this.detectClasses(baseInfo);
+
+    return baseInfo;
   }
 
   // ── Position-based queries ─────────────────────────────────

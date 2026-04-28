@@ -222,7 +222,7 @@ local function add_score_popup(x, y, value, mult)
     if mult > 1 then text = text .. " x" .. tostring(mult) end
     local popup = { x = x, y = y, text = text, life = 1.0, max_life = 1.0 }
     score_popups[#score_popups + 1] = popup
-    lurek.tween.to(popup, 1.0, { y = y - 50 }, "outQuad")
+    lurek.tween.to(popup, { y = y - 50 }, 1.0, "outQuad")
 end
 
 -- ---------------------------------------------------------------------------
@@ -440,7 +440,7 @@ function lurek.process(dt)
 
                 -- Combo text pulse
                 combo_scale.s = 1.6
-                lurek.tween.to(combo_scale, 0.3, { s = 1.0 }, "outElastic")
+                lurek.tween.to(combo_scale, { s = 1.0 }, 0.3, "outElastic")
 
                 -- Explosion particles
                 local col = target_color(t.points)

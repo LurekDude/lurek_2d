@@ -174,11 +174,13 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- connect --
         /// Initiates a connection to a remote host, returning the peer ID.
-    /// @param | addr | string | Remote address in `host:port` format.
-    /// @param | channels | integer? | Number of channels to open.
-    /// @param | data | integer? | Optional connection data value.
-    /// @return | integer | Peer ID for the new connection.
-        methods.add_method("connect", |_, this, (addr_str, channels, data): (String, Option<usize>, Option<u32>)| {
+        /// @param | addr | string | Remote address in `host:port` format.
+        /// @param | channels | integer? | Number of channels to open.
+        /// @param | data | integer? | Optional connection data value.
+        /// @return | integer | Peer ID for the new connection.
+        methods.add_method(
+            "connect",
+            |_, this, (addr_str, channels, data): (String, Option<usize>, Option<u32>)| {
                 let addr = parse_addr(&addr_str)?;
                 Ok(this
                     .inner
@@ -206,11 +208,13 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- broadcast --
         /// Broadcasts data to all connected peers on a channel.
-    /// @param | channel_id | integer | Channel index for the packet.
-    /// @param | data | string | Raw payload bytes.
-    /// @param | reliable | boolean? | Whether to send reliably.
-    /// @return | nil | No value is returned.
-        methods.add_method("broadcast", |_, this, (channel_id, data, reliable): (u8, LuaString, Option<bool>)| {
+        /// @param | channel_id | integer | Channel index for the packet.
+        /// @param | data | string | Raw payload bytes.
+        /// @param | reliable | boolean? | Whether to send reliably.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "broadcast",
+            |_, this, (channel_id, data, reliable): (u8, LuaString, Option<bool>)| {
                 this.inner
                     .borrow_mut()
                     .broadcast_bytes(channel_id, data.as_bytes(), reliable.unwrap_or(true))
@@ -230,7 +234,9 @@ impl LuaUserData for LuaNetworkHost {
         /// @param | peer_id | integer | Peer ID to disconnect.
         /// @param | data | integer? | Optional disconnect data value.
         /// @return | nil | No value is returned.
-        methods.add_method("disconnect", |_, this, (peer_id, data): (usize, Option<u32>)| {
+        methods.add_method(
+            "disconnect",
+            |_, this, (peer_id, data): (usize, Option<u32>)| {
                 this.inner
                     .borrow_mut()
                     .disconnect(PeerID(peer_id), data.unwrap_or(0))
@@ -240,10 +246,12 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- disconnectNow --
         /// Immediately disconnects a peer without handshake.
-    /// @param | peer_id | integer | Peer ID to disconnect.
-    /// @param | data | integer? | Optional disconnect data value.
-    /// @return | nil | No value is returned.
-        methods.add_method("disconnectNow", |_, this, (peer_id, data): (usize, Option<u32>)| {
+        /// @param | peer_id | integer | Peer ID to disconnect.
+        /// @param | data | integer? | Optional disconnect data value.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "disconnectNow",
+            |_, this, (peer_id, data): (usize, Option<u32>)| {
                 this.inner
                     .borrow_mut()
                     .disconnect_now(PeerID(peer_id), data.unwrap_or(0))
@@ -253,10 +261,12 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- disconnectLater --
         /// Disconnects a peer after all queued packets have been sent.
-    /// @param | peer_id | integer | Peer ID to disconnect.
-    /// @param | data | integer? | Optional disconnect data value.
-    /// @return | nil | No value is returned.
-        methods.add_method("disconnectLater", |_, this, (peer_id, data): (usize, Option<u32>)| {
+        /// @param | peer_id | integer | Peer ID to disconnect.
+        /// @param | data | integer? | Optional disconnect data value.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "disconnectLater",
+            |_, this, (peer_id, data): (usize, Option<u32>)| {
                 this.inner
                     .borrow_mut()
                     .disconnect_later(PeerID(peer_id), data.unwrap_or(0))
@@ -375,10 +385,12 @@ impl LuaUserData for LuaNetworkHost {
 
         // -- setBandwidthLimit --
         /// Sets the bandwidth limits in bytes per second.
-    /// @param | incoming | integer? | Incoming bandwidth limit in bytes per second.
-    /// @param | outgoing | integer? | Outgoing bandwidth limit in bytes per second.
-    /// @return | nil | No value is returned.
-        methods.add_method("setBandwidthLimit", |_, this, (incoming, outgoing): (Option<u32>, Option<u32>)| {
+        /// @param | incoming | integer? | Incoming bandwidth limit in bytes per second.
+        /// @param | outgoing | integer? | Outgoing bandwidth limit in bytes per second.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "setBandwidthLimit",
+            |_, this, (incoming, outgoing): (Option<u32>, Option<u32>)| {
                 this.inner
                     .borrow_mut()
                     .set_bandwidth_limit(incoming, outgoing)
@@ -509,7 +521,8 @@ impl LuaUserData for LuaNetworkRuntime {
                 });
             let body: Option<String> = opts.get("body").ok();
             let timeout: Option<u64> = opts.get("timeout").ok();
-            let id = this.inner
+            let id = this
+                .inner
                 .borrow_mut()
                 .http_request(&method, &url, headers.as_deref(), body.as_deref(), timeout)
                 .map_err(LuaError::external)?;
@@ -518,10 +531,12 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- httpGet --
         /// Convenience: sends an HTTP GET request.
-    /// @param | url | string | Request URL.
-    /// @param | headers | table? | Optional header table.
-    /// @return | integer | Request ID.
-        methods.add_method("httpGet", |_, this, (url, headers): (String, Option<LuaTable>)| {
+        /// @param | url | string | Request URL.
+        /// @param | headers | table? | Optional header table.
+        /// @return | integer | Request ID.
+        methods.add_method(
+            "httpGet",
+            |_, this, (url, headers): (String, Option<LuaTable>)| {
                 let h: Option<Vec<(String, String)>> = headers.map(|t| {
                     t.pairs::<String, String>()
                         .collect::<Result<Vec<_>, _>>()
@@ -538,11 +553,13 @@ impl LuaUserData for LuaNetworkRuntime {
 
         // -- httpPost --
         /// Convenience: sends an HTTP POST request.
-    /// @param | url | string | Request URL.
-    /// @param | body | string | Request body string.
-    /// @param | headers | table? | Optional header table.
-    /// @return | integer | Request ID.
-        methods.add_method("httpPost", |_, this, (url, body, headers): (String, String, Option<LuaTable>)| {
+        /// @param | url | string | Request URL.
+        /// @param | body | string | Request body string.
+        /// @param | headers | table? | Optional header table.
+        /// @return | integer | Request ID.
+        methods.add_method(
+            "httpPost",
+            |_, this, (url, body, headers): (String, String, Option<LuaTable>)| {
                 let h: Option<Vec<(String, String)>> = headers.map(|t| {
                     t.pairs::<String, String>()
                         .collect::<Result<Vec<_>, _>>()
@@ -777,7 +794,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a new network host bound to the given address.
     /// @param | opts | table | Options table with `addr?`, `maxPeers?`, `peers?`, `channels?`, `inBandwidth?`, and `outBandwidth?` fields.
     /// @return | LNetworkHost | New network host wrapper.
-    tbl.set("newHost", lua.create_function(|_, opts: LuaTable| {
+    tbl.set(
+        "newHost",
+        lua.create_function(|_, opts: LuaTable| {
             let addr_str: String = opts
                 .get::<_, String>("addr")
                 .unwrap_or_else(|_| "0.0.0.0:0".to_string());
@@ -805,7 +824,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a server host that binds to a port and accepts connections.
     /// @param | opts | table | Options table with `port`, `maxPeers?`, `peers?`, and `channels?` fields.
     /// @return | LNetworkHost | New server host wrapper.
-    tbl.set("newServer", lua.create_function(|_, opts: LuaTable| {
+    tbl.set(
+        "newServer",
+        lua.create_function(|_, opts: LuaTable| {
             let port: u16 = opts.get("port").map_err(|_| {
                 LuaError::RuntimeError("newServer: 'port' field is required".into())
             })?;
@@ -826,7 +847,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a client host that connects to a remote server.
     /// @param | opts | table | Options table with `addr`, `channels?`, and `data?` fields.
     /// @return | LNetworkHost | New client host wrapper.
-    tbl.set("newClient", lua.create_function(|_, opts: LuaTable| {
+    tbl.set(
+        "newClient",
+        lua.create_function(|_, opts: LuaTable| {
             let addr_str: String = opts.get("addr").map_err(|_| {
                 LuaError::RuntimeError("newClient: 'addr' field is required".into())
             })?;
@@ -843,7 +866,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     // -- newRuntime --
     /// Creates a background network runtime for async HTTP, TCP, and WebSocket.
     /// @return | LNetworkRuntime | New async network runtime wrapper.
-    tbl.set("newRuntime", lua.create_function(|_, ()| {
+    tbl.set(
+        "newRuntime",
+        lua.create_function(|_, ()| {
             let rt = NetworkRuntime::new().map_err(LuaError::external)?;
             Ok(LuaNetworkRuntime {
                 inner: RefCell::new(rt),
@@ -855,7 +880,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Serializes a Lua value to a binary MessagePack string.
     /// @param | value | any | Lua value to serialize.
     /// @return | string | Binary MessagePack payload.
-    tbl.set("pack", lua.create_function(|lua, value: LuaValue| {
+    tbl.set(
+        "pack",
+        lua.create_function(|lua, value: LuaValue| {
             let net_val = lua_to_netvalue(&value)?;
             let bytes = crate::network::message::pack(&net_val).map_err(LuaError::external)?;
             lua.create_string(&bytes)
@@ -866,7 +893,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Deserializes a MessagePack binary string back to a Lua value.
     /// @param | data | string | Binary MessagePack payload.
     /// @return | any | Deserialized Lua value.
-    tbl.set("unpack", lua.create_function(|lua, data: LuaString| {
+    tbl.set(
+        "unpack",
+        lua.create_function(|lua, data: LuaString| {
             let net_val =
                 crate::network::message::unpack(data.as_bytes()).map_err(LuaError::external)?;
             netvalue_to_lua(lua, &net_val)
@@ -905,7 +934,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
     /// @param | timeout_ms | integer? | Listen timeout in milliseconds.
     /// @return | table | Array of lobby tables with `name`, `host`, `port`, `player_count`, and `max_players` fields.
-    tbl.set("discoverLobbies", lua.create_function(|lua, timeout_ms: Option<u64>| {
+    tbl.set(
+        "discoverLobbies",
+        lua.create_function(|lua, timeout_ms: Option<u64>| {
             let lobbies = crate::network::lobby::discover_lobbies(timeout_ms.unwrap_or(500));
             let arr = lua.create_table()?;
             for (i, info) in lobbies.iter().enumerate() {
@@ -929,7 +960,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | channel | integer? | Channel index to use.
     /// @param | reliable | boolean? | Whether to send reliably.
     /// @return | nil | No value is returned.
-    tbl.set("syncEntity", lua.create_function(
+    tbl.set(
+        "syncEntity",
+        lua.create_function(
             |_lua,
              (host_ud, entity_id, data_tbl, channel, reliable): (
                 LuaAnyUserData,

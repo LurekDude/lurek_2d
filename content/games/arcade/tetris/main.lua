@@ -105,9 +105,11 @@ local hold_used        = false -- can only hold once per spawn
 local sparks                   -- particle system for line clears
 local flash_alpha      = 0     -- screen flash on line clear
 local flash_tween      = nil   -- tween driving flash_alpha
+local flash_state      = { val = 0 }
 local shake_offset_x   = 0     -- screen shake offset
 local shake_offset_y   = 0
 local shake_tween      = nil
+local shake_state      = { x = 0, y = 0 }
 
 -- Title screen animation
 local title_blink      = 0
@@ -191,19 +193,22 @@ local function clear_lines()
         drop_interval = math.max(0.08, 0.5 - (level - 1) * 0.04)
 
         -- Flash effect
+        flash_state.val = 0.6
         flash_alpha = 0.6
         flash_tween = lurek.tween.to(
-            { val = flash_alpha },
+            flash_state,
             { val = 0 },
             0.3,
             "outQuad"
         )
 
         -- Shake effect
+        shake_state.x = 4
+        shake_state.y = 2
         shake_offset_x = 4
         shake_offset_y = 2
         shake_tween = lurek.tween.to(
-            { x = shake_offset_x, y = shake_offset_y },
+            shake_state,
             { x = 0, y = 0 },
             0.25,
             "outElastic"
@@ -249,8 +254,11 @@ local function reset_game()
     hold_piece    = nil
     hold_used     = false
     flash_alpha   = 0
+    flash_state.val = 0
     shake_offset_x = 0
     shake_offset_y = 0
+    shake_state.x = 0
+    shake_state.y = 0
     next_piece = copy_piece(PIECES[math.random(#PIECES)])
     spawn_piece()
     state = STATE.PLAYING
@@ -346,16 +354,9 @@ function lurek.process(dt)
     lurek.tween.update(dt)
 
     -- Update flash/shake values from tweens
-    if flash_tween then
-        -- tween.to returns an object; we track alpha manually via decay
-        flash_alpha = math.max(0, flash_alpha - dt * 2.0)
-    end
-    if shake_tween then
-        shake_offset_x = shake_offset_x * math.max(0, 1 - dt * 8)
-        shake_offset_y = shake_offset_y * math.max(0, 1 - dt * 8)
-        if math.abs(shake_offset_x) < 0.1 then shake_offset_x = 0 end
-        if math.abs(shake_offset_y) < 0.1 then shake_offset_y = 0 end
-    end
+    flash_alpha = flash_state.val
+    shake_offset_x = shake_state.x
+    shake_offset_y = shake_state.y
 
     -- Update particles
     if sparks then sparks:update(dt) end

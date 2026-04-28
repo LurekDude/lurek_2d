@@ -90,9 +90,9 @@ describe("lurek.parallax.newLayer", function()
     -- @tests lurek.parallax.newLayer
     -- @tests LuaParallaxLayer.type
     -- @description Verifies a newly created parallax layer reports the ParallaxLayer type name.
-    it("type() returns 'ParallaxLayer'", function()
+    it("type() returns 'LParallaxLayer'", function()
         local layer = lurek.parallax.newLayer({ texture = load_image() })
-        expect_equal("ParallaxLayer", layer:type())
+        expect_equal("LParallaxLayer", layer:type())
     end)
 
     -- @tests lurek.parallax.newLayer
@@ -510,9 +510,9 @@ describe("lurek.parallax.newSet", function()
     -- @tests lurek.parallax.newSet
     -- @tests LuaParallaxSet.type
     -- @description Verifies a newly created parallax set reports the ParallaxSet type name.
-    it("type() returns 'ParallaxSet'", function()
+    it("type() returns 'LParallaxSet'", function()
         local s = lurek.parallax.newSet("bg")
-        expect_equal("ParallaxSet", s:type())
+        expect_equal("LParallaxSet", s:type())
     end)
 
     -- @tests lurek.parallax.newSet

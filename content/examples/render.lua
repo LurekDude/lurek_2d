@@ -1201,7 +1201,7 @@ end
 -- Boolean: returns true when name == 'Image' or 'Drawable'.
 do  -- Image:typeOf
   local img
-  function lurek.init() img = lurek.render.newImage('img/hero.png'); if img:typeOf('Image') then lurek.log.debug('image') end end
+  function lurek.init() img = lurek.render.newImage('img/hero.png'); if img:typeOf() == 'Image' then lurek.log.debug('image') end end
 end
 
 --@api-stub: LImage:type
@@ -1287,7 +1287,7 @@ end
 -- Boolean class check; useful in helpers that accept Font or string path.
 do  -- Font:typeOf
   local f
-  function lurek.init() f = lurek.render.newFont('assets/fonts/Inter.ttf', 18); if f:typeOf('Font') then lurek.log.debug('font') end end
+  function lurek.init() f = lurek.render.newFont('assets/fonts/Inter.ttf', 18); if f:typeOf() == 'Font' then lurek.log.debug('font') end end
 end
 
 --@api-stub: LFont:type
@@ -1338,7 +1338,7 @@ end
 -- Boolean class check (also matches 'Drawable').
 do  -- Canvas:typeOf
   local c
-  function lurek.init() c = lurek.render.newCanvas(320, 240); if c:typeOf('Canvas') then lurek.log.debug('canvas') end end
+  function lurek.init() c = lurek.render.newCanvas(320, 240); if c:typeOf() == 'Canvas' then lurek.log.debug('canvas') end end
 end
 
 --@api-stub: LCanvas:type
@@ -1391,7 +1391,7 @@ end
 -- Boolean class check.
 do  -- SpriteBatch:typeOf
   local batch
-  function lurek.init() batch = lurek.render.newSpriteBatch(lurek.render.newImage('img/tiles.png'), 64); if batch:typeOf('SpriteBatch') then lurek.log.debug('batch') end end
+  function lurek.init() batch = lurek.render.newSpriteBatch(lurek.render.newImage('img/tiles.png'), 64); if batch:typeOf() == 'SpriteBatch' then lurek.log.debug('batch') end end
 end
 
 --@api-stub: LSpriteBatch:type
@@ -1457,7 +1457,7 @@ end
 -- Boolean class check.
 do  -- Mesh:typeOf
   local m
-  function lurek.init() m = lurek.render.newMesh({ {0,0,0,0,1,1,1,1}, {64,0,1,0,1,1,1,1}, {32,64,0.5,1,1,1,1,1} }); if m:typeOf('Mesh') then lurek.log.debug('mesh') end end
+  function lurek.init() m = lurek.render.newMesh({ {0,0,0,0,1,1,1,1}, {64,0,1,0,1,1,1,1}, {32,64,0.5,1,1,1,1,1} }); if m:typeOf() == 'Mesh' then lurek.log.debug('mesh') end end
 end
 
 --@api-stub: LMesh:type
@@ -1501,7 +1501,7 @@ end
 -- Boolean class check.
 do  -- Shader:typeOf
   local sh
-  function lurek.init() sh = lurek.render.newShader('// shader source'); if sh:typeOf('Shader') then lurek.log.debug('shader') end end
+  function lurek.init() sh = lurek.render.newShader('// shader source'); if sh:typeOf() == 'Shader' then lurek.log.debug('shader') end end
 end
 
 --@api-stub: LShader:type
@@ -1535,7 +1535,7 @@ end
 -- Boolean class check.
 do  -- Quad:typeOf
   local q
-  function lurek.init() q = lurek.render.newQuad(0, 0, 32, 32, 256, 256); if q:typeOf('Quad') then lurek.log.debug('quad') end end
+  function lurek.init() q = lurek.render.newQuad(0, 0, 32, 32, 256, 256); if q:typeOf() == 'Quad' then lurek.log.debug('quad') end end
 end
 
 --@api-stub: LQuad:type
@@ -1710,7 +1710,7 @@ end
 do  -- NineSlice:draw
   local ok_img, img = pcall(lurek.render.newImage, "ui/panel.png")
   local ns = ok_img and lurek.render.newNineSlice(img, 8, 8, 8, 8) or nil
-  if ns then ns:draw(100, 100, 300, 200) end
+  if ns then lurek.render.drawNineSlice(ns, 100, 100, 300, 200) end
   lurek.log.info("nine-slice drawn", "render")
 end
 

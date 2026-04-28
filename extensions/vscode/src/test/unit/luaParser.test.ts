@@ -17,7 +17,10 @@ const analyzer = new LuaDocumentAnalyzer();
 suite("LuaParser — tokenize", () => {
   test("tokenizes empty string", () => {
     const tokens = analyzer.tokenize("");
-    assert.strictEqual(tokens.length, 0);
+    assert.strictEqual(
+      tokens.filter((t) => t.type !== TokenType.EOF).length,
+      0,
+    );
   });
 
   test("tokenizes a local assignment", () => {

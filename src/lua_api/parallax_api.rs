@@ -1,4 +1,4 @@
-//! `lurek.parallax` â€” multi-layer scrolling background system.
+//! `lurek.parallax` - multi-layer scrolling background system.
 //!
 //! Registers `lurek.parallax.newLayer(opts)` and `lurek.parallax.newSet(name)`.
 //! Domain logic lives in `src/parallax/`; this file is the thin Lua bridge only.
@@ -69,8 +69,8 @@ impl LuaParallaxLayer {
         }
     }
 
-    /// Internal helper â€” push all `DrawImageEx` commands for this layer without
-    /// re-borrowing state (caller already holds the mutable reference).
+    // Internal helper - push all `DrawImageEx` commands for this layer without
+    // re-borrowing state (caller already holds the mutable reference).
     fn push_render_commands_internal(
         layer: &ParallaxLayer,
         st: &mut SharedState,
@@ -111,30 +111,25 @@ impl LuaParallaxLayer {
 
 impl LuaUserData for LuaParallaxLayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns the Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LParallaxLayer"));
 
-        // â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- update --
         /// Advances the autonomous scroll accumulator by `dt` seconds.
-        ///
-        /// Call once per frame in `lurek.process` before drawing.
-        /// @param dt number
-        /// @return nil
+        /// @param | dt | number | Elapsed time in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method("update", |_, this, dt: f32| {
             this.layer.borrow_mut().update(dt);
             Ok(())
         });
 
-        // â”€â”€ draw â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- render --
         /// Draws the layer using an explicit camera world position.
-        ///
-        /// Must be called inside a `lurek.render` or `lurek.render_ui` callback.
-        /// Sets the draw color and blend mode to this layer's settings.
-        /// @param cam_x number
-        /// @param cam_y number
-        /// @return nil
+        /// @param | cam_x | number | Camera world X position.
+        /// @param | cam_y | number | Camera world Y position.
+        /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             let layer = this.layer.borrow();
             let mut st = this.state.borrow_mut();
@@ -142,11 +137,9 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
 
-        // â”€â”€ drawAuto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- renderAuto --
         /// Draws the layer using the engine active camera position automatically.
-        ///
-        /// Equivalent to `layer:draw(lurek.camera.x, lurek.camera.y)`.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("renderAuto", |_, this, ()| {
             let layer = this.layer.borrow();
             let cam_x;
@@ -161,83 +154,79 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
 
-        // â”€â”€ resetAutoscroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- resetAutoscroll --
         /// Resets the autonomous scroll accumulator to zero.
-        ///
-        /// Useful when switching scenes to restart ambient drift from the origin.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("resetAutoscroll", |_, this, ()| {
             this.layer.borrow_mut().reset_autoscroll();
             Ok(())
         });
 
-        // â”€â”€ setScrollFactor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setScrollFactor --
         /// Sets the scroll factor relative to camera movement on each axis.
-        ///
-        /// `0` = fully fixed (sky); `1` = moves with camera (no parallax);
-        /// `0.3` = slow far-background layer.
-        /// @param x number
-        /// @param y number
-        /// @return nil
+        /// @param | x | number | Horizontal scroll factor.
+        /// @param | y | number | Vertical scroll factor.
+        /// @return | nil | No value is returned.
         methods.add_method("setScrollFactor", |_, this, (x, y): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
             l.scroll_factor = [x, y];
             Ok(())
         });
 
-        // â”€â”€ getScrollFactor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getScrollFactor --
         /// Returns the scroll factor as `(x, y)`.
-        /// @return number, number
+        /// @return | number | Horizontal scroll factor.
+        /// @return | number | Vertical scroll factor.
         methods.add_method("getScrollFactor", |_, this, ()| {
             let l = this.layer.borrow();
             Ok((l.scroll_factor[0], l.scroll_factor[1]))
         });
 
-        // â”€â”€ setOffset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setOffset --
         /// Sets the static world-pixel position bias added on top of camera scroll.
-        /// @param x number
-        /// @param y number
-        /// @return nil
+        /// @param | x | number | Horizontal offset in world pixels.
+        /// @param | y | number | Vertical offset in world pixels.
+        /// @return | nil | No value is returned.
         methods.add_method("setOffset", |_, this, (x, y): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
             l.offset = [x, y];
             Ok(())
         });
 
-        // â”€â”€ getOffset â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getOffset --
         /// Returns the static offset as `(x, y)`.
-        /// @return number, number
+        /// @return | number | Horizontal offset.
+        /// @return | number | Vertical offset.
         methods.add_method("getOffset", |_, this, ()| {
             let l = this.layer.borrow();
             Ok((l.offset[0], l.offset[1]))
         });
 
-        // â”€â”€ setAutoscroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setAutoscroll --
         /// Sets the autonomous scroll velocity in world-pixels per second.
-        ///
-        /// Positive X scrolls right; positive Y scrolls down.
-        /// @param vx number
-        /// @param vy number
-        /// @return nil
+        /// @param | vx | number | Horizontal autoscroll velocity.
+        /// @param | vy | number | Vertical autoscroll velocity.
+        /// @return | nil | No value is returned.
         methods.add_method("setAutoscroll", |_, this, (vx, vy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
             l.autoscroll = [vx, vy];
             Ok(())
         });
 
-        // â”€â”€ getAutoscroll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getAutoscroll --
         /// Returns the autoscroll velocity as `(vx, vy)`.
-        /// @return number, number
+        /// @return | number | Horizontal autoscroll velocity.
+        /// @return | number | Vertical autoscroll velocity.
         methods.add_method("getAutoscroll", |_, this, ()| {
             let l = this.layer.borrow();
             Ok((l.autoscroll[0], l.autoscroll[1]))
         });
 
-        // â”€â”€ setRepeat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setRepeat --
         /// Sets whether the layer tiles on the X and Y axes.
-        /// @param repeat_x boolean
-        /// @param repeat_y boolean
-        /// @return nil
+        /// @param | repeat_x | boolean | Whether the layer repeats on the X axis.
+        /// @param | repeat_y | boolean | Whether the layer repeats on the Y axis.
+        /// @return | nil | No value is returned.
         methods.add_method("setRepeat", |_, this, (rx, ry): (bool, bool)| {
             let mut l = this.layer.borrow_mut();
             l.repeat_x = rx;
@@ -245,113 +234,105 @@ impl LuaUserData for LuaParallaxLayer {
             Ok(())
         });
 
-        // â”€â”€ setScale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setScale --
         /// Sets the texture display scale factor on each axis.
-        ///
-        /// Values > 1 zoom in (larger tiles); values < 1 zoom out (more tiles).
-        /// @param sx number
-        /// @param sy number
-        /// @return nil
+        /// @param | sx | number | Horizontal scale factor.
+        /// @param | sy | number | Vertical scale factor.
+        /// @return | nil | No value is returned.
         methods.add_method("setScale", |_, this, (sx, sy): (f32, f32)| {
             let mut l = this.layer.borrow_mut();
             l.scale = [sx, sy];
             Ok(())
         });
 
-        // â”€â”€ setZ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setZ --
         /// Sets the draw-order depth. Lower values render first (further back).
-        /// @param z integer
-        /// @return nil
+        /// @param | z | integer | Integer draw-order depth.
+        /// @return | nil | No value is returned.
         methods.add_method("setZ", |_, this, z: i32| {
             this.layer.borrow_mut().z = z;
             Ok(())
         });
 
-        // â”€â”€ getZ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getZ --
         /// Returns the draw-order depth.
-        /// @return integer
+        /// @return | integer | Returns the integer draw-order depth.
         methods.add_method("getZ", |_, this, ()| Ok(this.layer.borrow().z));
 
-        // â”€â”€ setOpacity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setOpacity --
         /// Sets the layer-wide opacity override in `[0.0, 1.0]`.
-        /// @param a number
-        /// @return nil
+        /// @param | a | number | Opacity value in the range `[0.0, 1.0]`.
+        /// @return | nil | No value is returned.
         methods.add_method("setOpacity", |_, this, a: f32| {
             this.layer.borrow_mut().opacity = a.clamp(0.0, 1.0);
             Ok(())
         });
 
-        // â”€â”€ getOpacity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getOpacity --
         /// Returns the current opacity.
-        /// @return number
+        /// @return | number | Returns the current opacity value.
         methods.add_method("getOpacity", |_, this, ()| Ok(this.layer.borrow().opacity));
 
-        // â”€â”€ setTint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setTint --
         /// Sets the multiplicative RGBA tint applied to all pixels of this layer.
-        ///
-        /// All components in `[0.0, 1.0]`. Default: `(1, 1, 1, 1)` (white â€” no tint).
-        /// @param r number
-        /// @param g number
-        /// @param b number
-        /// @param a number
-        /// @return nil
+        /// @param | r | number | Red tint component.
+        /// @param | g | number | Green tint component.
+        /// @param | b | number | Blue tint component.
+        /// @param | a | number | Alpha tint component.
+        /// @return | nil | No value is returned.
         methods.add_method("setTint", |_, this, (r, g, b, a): (f32, f32, f32, f32)| {
             this.layer.borrow_mut().tint = [r, g, b, a];
             Ok(())
         });
 
-        // â”€â”€ getTint â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getTint --
         /// Returns the current tint as `(r, g, b, a)`.
-        /// @return number, number, number, number
+        /// @return | number | Tint red component.
+        /// @return | number | Tint green component.
+        /// @return | number | Tint blue component.
+        /// @return | number | Tint alpha component.
         methods.add_method("getTint", |_, this, ()| {
             let [r, g, b, a] = this.layer.borrow().tint;
             Ok((r, g, b, a))
         });
 
-        // â”€â”€ setBlendMode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setBlendMode --
         /// Sets the GPU blend mode for this layer.
-        ///
-        /// Valid modes: `"normal"` (default), `"additive"`, `"multiply"`, `"replace"`, `"screen"`.
-        /// The legacy aliases `"alpha"` and `"add"` are also accepted.
-        /// Returns an error for unrecognised mode strings.
-        /// @param mode string
-        /// @return nil
+        /// @param | mode | string | Blend mode string such as `normal`, `additive`, or `multiply`.
+        /// @return | nil | No value is returned.
         methods.add_method("setBlendMode", |_, this, mode: String| {
             this.layer.borrow_mut().blend_mode = blend_from_str(&mode)?;
             Ok(())
         });
 
-        // â”€â”€ getBlendMode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getBlendMode --
         /// Returns the current blend mode as a string.
-        /// @return string
+        /// @return | string | Returns the current blend mode string.
         methods.add_method("getBlendMode", |_, this, ()| {
             Ok(blend_to_str(this.layer.borrow().blend_mode).to_string())
         });
 
-        // â”€â”€ setVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setVisible --
         /// Shows or hides this layer.
-        /// @param visible boolean
-        /// @return nil
+        /// @param | visible | boolean | Whether the layer should be visible.
+        /// @return | nil | No value is returned.
         methods.add_method("setVisible", |_, this, v: bool| {
             this.layer.borrow_mut().visible = v;
             Ok(())
         });
 
-        // â”€â”€ isVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- isVisible --
         /// Returns `true` if the layer is currently visible.
-        /// @return boolean
+        /// @return | boolean | Returns whether the layer is visible.
         methods.add_method("isVisible", |_, this, ()| Ok(this.layer.borrow().visible));
 
-        // â”€â”€ setClamp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setClamp --
         /// Clamps the scroll offset to a world-pixel range on each axis.
-        ///
-        /// Prevents the layer from scrolling outside `[min_x, max_x]` Ă— `[min_y, max_y]`.
-        /// Useful for non-repeating layers that have a fixed world size.
-        /// @param min_x number
-        /// @param min_y number
-        /// @param max_x number
-        /// @param max_y number
-        /// @return nil
+        /// @param | min_x | number | Minimum horizontal offset.
+        /// @param | min_y | number | Minimum vertical offset.
+        /// @param | max_x | number | Maximum horizontal offset.
+        /// @param | max_y | number | Maximum vertical offset.
+        /// @return | nil | No value is returned.
         methods.add_method("setClamp", |_, this, (min_x, min_y, max_x, max_y): (f32, f32, f32, f32)| {
                 let mut l = this.layer.borrow_mut();
                 l.clamp_min = Some([min_x, min_y]);
@@ -360,60 +341,54 @@ impl LuaUserData for LuaParallaxLayer {
             },
         );
 
-        // â”€â”€ clearClamp â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- clearClamp --
         /// Removes scroll clamping so the layer scrolls freely.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("clearClamp", |_, this, ()| {
             let mut l = this.layer.borrow_mut();
             l.clamp_min = None;
             l.clamp_max = None;
             Ok(())
         });
-        // â”€â”€ setTiling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+
+        // -- setTiling --
         /// Enables or disables seamless infinite tiling on both axes simultaneously.
-        ///
-        /// When `true`, the layer tiles in both X and Y regardless of the
-        /// per-axis `setRepeat` flags set on this layer.
-        /// @param enabled boolean
-        /// @return nil
+        /// @param | enabled | boolean | Whether seamless tiling should be enabled.
+        /// @return | nil | No value is returned.
         methods.add_method("setTiling", |_, this, enabled: bool| {
             this.layer.borrow_mut().set_tiling(enabled);
             Ok(())
         });
 
-        // â”€â”€ getTiling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getTiling --
         /// Returns `true` if seamless infinite tiling is enabled.
-        /// @return boolean
+        /// @return | boolean | Returns whether seamless tiling is enabled.
         methods.add_method("getTiling", |_, this, ()| {
             Ok(this.layer.borrow().get_tiling())
         });
 
-        // â”€â”€ setTileSize â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        /// Sets explicit tile dimensions in logical pixels, overriding the default
-        /// scaled-texture size.  Values â‰¤ 0 reset to the default texture-based size.
-        /// @param w number
-        /// @param h number
-        /// @return nil
+        // -- setTileSize --
+        /// Sets explicit tile dimensions in logical pixels.
+        /// @param | w | number | Tile width in logical pixels.
+        /// @param | h | number | Tile height in logical pixels.
+        /// @return | nil | No value is returned.
         methods.add_method("setTileSize", |_, this, (w, h): (f32, f32)| {
             this.layer.borrow_mut().set_tile_size(w, h);
             Ok(())
         });
 
-        // â”€â”€ setDepth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setDepth --
         /// Sets the floating-point draw depth for fine-grained layer ordering.
-        ///
-        /// Lower values render first (further back).  Works alongside `setZ` for
-        /// cases where integer ordering is insufficient.
-        /// @param z number
-        /// @return nil
+        /// @param | z | number | Floating-point depth value.
+        /// @return | nil | No value is returned.
         methods.add_method("setDepth", |_, this, z: f32| {
             this.layer.borrow_mut().set_depth(z);
             Ok(())
         });
 
-        // â”€â”€ getDepth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getDepth --
         /// Returns the current floating-point depth.
-        /// @return number
+        /// @return | number | Returns the floating-point depth value.
         methods.add_method("getDepth", |_, this, ()| {
             Ok(this.layer.borrow().get_depth())
         });
@@ -447,7 +422,7 @@ impl LuaParallaxSet {
         }
     }
 
-    /// Sorts `layers` by ascending `z` value of the underlying `ParallaxLayer`.
+    // Sorts `layers` by ascending `z` value of the underlying `ParallaxLayer`.
     fn sort_by_z(&mut self) {
         self.layers.sort_by_key(|l| l.layer.borrow().z);
     }
@@ -455,19 +430,15 @@ impl LuaParallaxSet {
 
 impl LuaUserData for LuaParallaxSet {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Returns the Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LParallaxSet"));
 
-        // â”€â”€ addLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- addLayer --
         /// Adds a layer to this set.
-        ///
-        /// The layer is added by shared reference: mutating the original variable
-        /// after adding is reflected in the set.  The set is re-sorted by `z` on
-        /// every add.
-        /// @param layer LuaParallaxLayer
-        /// @return nil
+        /// @param | layer | LParallaxLayer | Layer userdata to add.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("addLayer", |_, this, layer: LuaAnyUserData| {
             let lu_layer = layer.borrow::<LuaParallaxLayer>()?.clone();
             this.layers.push(lu_layer);
@@ -475,12 +446,10 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
 
-        // â”€â”€ removeLayerAt â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- removeLayerAt --
         /// Removes the layer at the given 1-based index.
-        ///
-        /// Returns `true` if a layer was removed, `false` if the index was out of range.
-        /// @param index integer
-        /// @return boolean
+        /// @param | index | integer | One-based layer index.
+        /// @return | boolean | Returns whether a layer was removed.
         methods.add_method_mut("removeLayerAt", |_, this, index: usize| {
             if index >= 1 && index <= this.layers.len() {
                 this.layers.remove(index - 1);
@@ -490,41 +459,37 @@ impl LuaUserData for LuaParallaxSet {
             }
         });
 
-        // â”€â”€ layerCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- layerCount --
         /// Returns the number of layers in this set.
-        /// @return integer
+        /// @return | integer | Returns the number of layers in the set.
         methods.add_method("layerCount", |_, this, ()| Ok(this.layers.len() as i64));
 
-        // â”€â”€ sortByZ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- sortByZ --
         /// Re-sorts all layers by ascending `z` value.
-        ///
-        /// Call this after changing any layer's `z` value via `layer:setZ()`.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("sortByZ", |_, this, ()| {
             this.sort_by_z();
             Ok(())
         });
 
-        // â”€â”€ setVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setVisible --
         /// Shows or hides all layers in this set.
-        /// @param visible boolean
-        /// @return nil
+        /// @param | visible | boolean | Whether the set should be visible.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setVisible", |_, this, v: bool| {
             this.visible = v;
             Ok(())
         });
 
-        // â”€â”€ isVisible â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- isVisible --
         /// Returns `true` if the set is currently visible.
-        /// @return boolean
+        /// @return | boolean | Returns whether the set is visible.
         methods.add_method("isVisible", |_, this, ()| Ok(this.visible));
 
-        // â”€â”€ update â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- update --
         /// Advances the autoscroll accumulator of every layer by `dt` seconds.
-        ///
-        /// Call once per frame in `lurek.process`.
-        /// @param dt number
-        /// @return nil
+        /// @param | dt | number | Elapsed time in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("update", |_, this, dt: f32| {
             for l in &this.layers {
                 l.layer.borrow_mut().update(dt);
@@ -532,13 +497,11 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
 
-        // â”€â”€ draw â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- render --
         /// Draws all visible layers in ascending `z` order using an explicit camera position.
-        ///
-        /// Must be called inside a `lurek.render` or `lurek.render_ui` callback.
-        /// @param cam_x number
-        /// @param cam_y number
-        /// @return nil
+        /// @param | cam_x | number | Camera world X position.
+        /// @param | cam_y | number | Camera world Y position.
+        /// @return | nil | No value is returned.
         methods.add_method("render", |_, this, (cam_x, cam_y): (f32, f32)| {
             if !this.visible {
                 return Ok(());
@@ -551,9 +514,9 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
 
-        // â”€â”€ drawAuto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- renderAuto --
         /// Draws all visible layers using the engine active camera position.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("renderAuto", |_, this, ()| {
             if !this.visible {
                 return Ok(());
@@ -570,15 +533,15 @@ impl LuaUserData for LuaParallaxSet {
             Ok(())
         });
 
-        // â”€â”€ getName â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getName --
         /// Returns the name of this set.
-        /// @return string
+        /// @return | string | Returns the set name.
         methods.add_method("getName", |_, this, ()| Ok(this.name.clone()));
 
-        // â”€â”€ setName â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setName --
         /// Sets the name of this set.
-        /// @param name string
-        /// @return nil
+        /// @param | name | string | New set name.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setName", |_, this, name: String| {
             this.name = name;
             Ok(())
@@ -591,28 +554,17 @@ impl LuaUserData for LuaParallaxSet {
 // ===============================================================================
 
 /// Registers the `lurek.parallax` sub-table on the given `lurek` global.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param state Rc<RefCell<SharedState>>
-///
-///
-/// Registers `lurek.parallax` onto the given global table.
+/// @param | lua | Lua | Active Lua state.
+/// @param | lurek | table | Root `lurek` table.
+/// @param | state | SharedState | Shared engine state.
+/// @return | nil | Registers the parallax API table.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let parallax = lua.create_table()?;
 
-    // â”€â”€ newLayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newLayer --
     /// Creates a new parallax background layer from an options table.
-    ///
-    /// Required field â€” `texture`: a `LuaImage` returned by `lurek.render.newImage()`.
-    ///
-    /// Optional fields: `scroll_factor_x`, `scroll_factor_y`, `offset_x`, `offset_y`,
-    /// `autoscroll_x`, `autoscroll_y`, `repeat_x`, `repeat_y`, `z`, `opacity`,
-    /// `tint_r`, `tint_g`, `tint_b`, `tint_a`, `blend_mode`, `visible`,
-    /// `scale_x`, `scale_y`.
-    ///
-    /// @param opts table
-    /// @return LParallaxLayer
+    /// @param | opts | table | Layer options including a required `texture` field.
+    /// @return | LParallaxLayer | Returns the new parallax layer userdata.
     let s = state.clone();
     parallax.set("newLayer", lua.create_function(move |_, opts: LuaTable| {
             // --- mandatory: texture ---
@@ -698,13 +650,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ newSet â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newSet --
     /// Creates a new empty parallax set with the given name.
-    ///
-    /// A set groups multiple layers for scene-level management: update all and
-    /// draw all in one call.
-    /// @param name string
-    /// @return LParallaxSet
+    /// @param | name | string | Name assigned to the new set.
+    /// @return | LParallaxSet | Returns the new parallax set userdata.
     let s = state.clone();
     parallax.set("newSet", lua.create_function(move |_, name: String| Ok(LuaParallaxSet::new(name, s.clone())))?,
     )?;

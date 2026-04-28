@@ -796,9 +796,9 @@ end)
 describe("Bus type system", function()
     -- @tests Bus.type
     -- @description Verifies bus userdata reports its concrete runtime type string.
-    it("reports type as Bus", function()
+    it("reports type as LBus", function()
         local bus = lurek.audio.newBus("test")
-        expect_equal(bus:type(), "Bus")
+        expect_equal(bus:type(), "LBus")
     end)
 
     -- @tests Bus.typeOf
@@ -1051,9 +1051,9 @@ end)
 -- @description Covers suite: MidiPlayer type system.
 describe("MidiPlayer type system", function()
     -- @description Verifies case: reports type as MidiPlayer.
-    it("reports type as MidiPlayer", function()
+    it("reports type as LMidiPlayer", function()
         local midi = lurek.audio.newMidiPlayer()
-        expect_equal(midi:type(), "MidiPlayer")
+        expect_equal(midi:type(), "LMidiPlayer")
     end)
 
     -- @description Verifies case: typeOf returns true for MidiPlayer and Object.

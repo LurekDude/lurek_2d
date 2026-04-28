@@ -72,7 +72,8 @@ impl LuaUserData for LuaNavGrid {
 
         // -- getDimensions --
         /// Returns the grid dimensions as width, height.
-        /// @return | integer, integer | Grid width and height in cells.
+        /// @return | integer | Grid width in cells.
+        /// @return | integer | Grid height in cells.
         methods.add_method("getDimensions", |_, this, ()| {
             Ok(this.inner.borrow().get_dimensions())
         });
@@ -263,7 +264,7 @@ impl LuaUserData for LuaNavGrid {
         /// @param | name | string | Type name to compare against.
         /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "LNavGrid" || name == "Object")
+            Ok(name == "LNavGrid" || name == "NavGrid" || name == "Object")
         });
     }
 }
@@ -337,7 +338,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y2 | integer | 1-based goal cell Y coordinate.
         /// @param | unitSize | integer? | Optional unit footprint size in cells.
         /// @param | maxNodes | integer? | Optional node expansion limit.
-        /// @return | table, boolean | Path entries and a completion flag.
+        /// @return | table | Path entries from start toward the goal.
+        /// @return | boolean | True when the full path to the goal was found.
         methods.add_method(
             "findPathBidirectional",
             |lua,
@@ -401,7 +403,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y2 | integer | 1-based goal cell Y coordinate.
         /// @param | maxNodes | integer | Maximum node expansions to allow.
         /// @param | unitSize | integer? | Optional unit footprint size in cells.
-        /// @return | table, boolean | Partial path entries and a completion flag.
+        /// @return | table | Partial path entries from start toward the goal.
+        /// @return | boolean | True when the returned path reaches the goal.
         methods.add_method("findPartialPath", |lua,
              this,
              (x1, y1, x2, y2, max_nodes, unit_size): (
@@ -430,7 +433,8 @@ impl LuaUserData for LuaUnitPathfinder {
         /// @param | y | integer | 1-based origin cell Y coordinate.
         /// @param | maxRadius | integer | Maximum search radius in cells.
         /// @param | unitSize | integer? | Optional unit footprint size in cells.
-        /// @return | integer, integer | 1-based coordinates of the nearest walkable cell.
+        /// @return | integer | 1-based X coordinate of the nearest walkable cell.
+        /// @return | integer | 1-based Y coordinate of the nearest walkable cell.
         methods.add_method(
             "findNearestWalkable",
             |_, this, (x, y, max_radius, unit_size): (u32, u32, u32, Option<u32>)| match this
@@ -615,7 +619,8 @@ impl LuaUserData for LuaFlowField {
         /// Returns the normalised direction vector at a cell (1-based coordinates).
         /// @param | x | integer | 1-based cell X coordinate.
         /// @param | y | integer | 1-based cell Y coordinate.
-        /// @return | number, number | Normalized X and Y direction components.
+        /// @return | number | Normalized X direction component.
+        /// @return | number | Normalized Y direction component.
         methods.add_method("getDirection", |_, this, (x, y): (u32, u32)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
         });
@@ -667,7 +672,8 @@ impl LuaUserData for LuaFlowField {
         /// @param | speed | number | Desired movement speed.
         /// @param | tw | number | Tile width in world units.
         /// @param | th | number | Tile height in world units.
-        /// @return | number, number | Steering velocity X and Y components.
+        /// @return | number | Steering velocity X component.
+        /// @return | number | Steering velocity Y component.
         methods.add_method(
             "steer",
             |_, this, (wx, wy, speed, tw, th): (f32, f32, f32, f32, f32)| {
@@ -881,7 +887,8 @@ impl LuaUserData for LuaAiFlowField {
 
         // -- getGoal --
         /// Returns the goal cell (1-based coordinates) or nil if unset.
-        /// @return | integer, integer | 1-based goal cell coordinates.
+        /// @return | integer | 1-based goal cell X coordinate.
+        /// @return | integer | 1-based goal cell Y coordinate.
         methods.add_method(
             "getGoal",
             |_, this, ()| -> LuaResult<(LuaValue, LuaValue)> {
@@ -899,7 +906,8 @@ impl LuaUserData for LuaAiFlowField {
         /// Returns the normalised direction toward the goal (1-based coordinates).
         /// @param | x | integer | 1-based cell X coordinate.
         /// @param | y | integer | 1-based cell Y coordinate.
-        /// @return | number, number | Normalized X and Y direction components.
+        /// @return | number | Normalized X direction component.
+        /// @return | number | Normalized Y direction component.
         methods.add_method("getDirection", |_, this, (x, y): (usize, usize)| {
             Ok(this.inner.borrow().get_direction(x - 1, y - 1))
         });

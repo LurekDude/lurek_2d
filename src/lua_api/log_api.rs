@@ -10,6 +10,7 @@ use std::cell::RefCell;
 use std::collections::BTreeMap;
 use std::rc::Rc;
 
+use super::SharedState;
 use mlua::prelude::*;
 
 use crate::log as log_domain;
@@ -60,7 +61,7 @@ fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
 // ---------------------------------------------------------------------------
 
 /// Registers the `lurek.log` API table with the Lua VM.
-pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
+pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // Shared sinks registry for this VM - lives as long as the Lua closures do.
@@ -72,7 +73,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("debug", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+    tbl.set(
+        "debug",
+        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::debug!("[{}] {}", t, message);
             dispatch(&s, SinkLevel::Debug, t, &message);
@@ -86,7 +89,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("info", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+    tbl.set(
+        "info",
+        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::info!("[{}] {}", t, message);
             dispatch(&s, SinkLevel::Info, t, &message);
@@ -100,7 +105,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("warn", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+    tbl.set(
+        "warn",
+        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::warn!("[{}] {}", t, message);
             dispatch(&s, SinkLevel::Warn, t, &message);
@@ -114,7 +121,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("error", lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+    tbl.set(
+        "error",
+        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::error!("[{}] {}", t, message);
             dispatch(&s, SinkLevel::Error, t, &message);
@@ -129,7 +138,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("print", lua.create_function(
+    tbl.set(
+        "print",
+        lua.create_function(
             move |_, (level, message, tag): (String, String, Option<String>)| {
                 let t = tag.as_deref().unwrap_or("Lua");
                 let sink_level = match level.to_lowercase().as_str() {
@@ -179,7 +190,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     // -- getLevel --
     /// Returns the name of the current global minimum severity threshold as a lowercase string (e.g.
     /// @return | string | The active log level name
-    tbl.set("getLevel", lua.create_function(|_, ()| Ok(log_domain::get_level()))?,
+    tbl.set(
+        "getLevel",
+        lua.create_function(|_, ()| Ok(log_domain::get_level()))?,
     )?;
 
     // -- addSink --
@@ -187,7 +200,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | config | table | Configuration table with keys: type (string), level (string), path (string, for file/rotating), capacity (integer, for memory), max_bytes (integer, for rotating), keep_files (integer, for rotating)
     /// @return | integer | The unique identifier of the newly created sink
     let s = sinks.clone();
-    tbl.set("addSink", lua.create_function(move |_, config: LuaTable| {
+    tbl.set(
+        "addSink",
+        lua.create_function(move |_, config: LuaTable| {
             let kind: String = config.get("type").unwrap_or_else(|_| "memory".to_string());
             let level_str: String = config.get("level").unwrap_or_else(|_| "debug".to_string());
             let min_level = SinkLevel::from_str(&level_str);
@@ -228,14 +243,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | id | integer | The sink identifier returned by addSink
     /// @return | boolean | True if the sink existed and was removed
     let s = sinks.clone();
-    tbl.set("removeSink", lua.create_function(move |_, id: u64| Ok(s.borrow_mut().remove(id)))?,
+    tbl.set(
+        "removeSink",
+        lua.create_function(move |_, id: u64| Ok(s.borrow_mut().remove(id)))?,
     )?;
 
     // -- clearSinks --
     /// Removes every registered log sink, returning the logging system to its default state where messages go only to the engine log backend (stderr).
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("clearSinks", lua.create_function(move |_, ()| {
+    tbl.set(
+        "clearSinks",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().clear();
             Ok(())
         })?,
@@ -245,7 +264,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// Returns an array-like table where each entry is a table describing one registered sink.
     /// @return | table | Array of sink descriptor tables
     let s = sinks.clone();
-    tbl.set("listSinks", lua.create_function(move |lua, ()| {
+    tbl.set(
+        "listSinks",
+        lua.create_function(move |lua, ()| {
             let out = lua.create_table()?;
             for (i, sink) in s.borrow().sinks.iter().enumerate() {
                 let st = lua.create_table()?;
@@ -267,7 +288,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | drain | boolean? | When true, clears read entries from the buffer (default false)
     /// @return | table | Array of log entry tables
     let s = sinks.clone();
-    tbl.set("readMemory", lua.create_function(move |lua, (id, drain): (u64, Option<bool>)| {
+    tbl.set(
+        "readMemory",
+        lua.create_function(move |lua, (id, drain): (u64, Option<bool>)| {
             let reg = s.borrow();
             let Some(sink) = reg.get(id) else {
                 let out = lua.create_table()?;
@@ -307,7 +330,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | id | integer | The file sink identifier returned by addSink
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("flushFile", lua.create_function(move |_, id: u64| {
+    tbl.set(
+        "flushFile",
+        lua.create_function(move |_, id: u64| {
             if let Some(sink) = s.borrow().get(id) {
                 sink.flush();
             }
@@ -322,7 +347,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("struct", lua.create_function(
+    tbl.set(
+        "struct",
+        lua.create_function(
             move |_, (level_str, message, fields_tbl): (String, String, LuaTable)| {
                 let t = "Lua";
                 let fields = lua_table_to_fields(fields_tbl)?;
@@ -346,7 +373,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("debug_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+    tbl.set(
+        "debug_fields",
+        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Debug, Some(t), &message, &fields);
@@ -361,7 +390,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("info_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+    tbl.set(
+        "info_fields",
+        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Info, Some(t), &message, &fields);
@@ -376,7 +407,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("warn_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+    tbl.set(
+        "warn_fields",
+        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Warn, Some(t), &message, &fields);
@@ -391,7 +424,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable) -> LuaResult<()> {
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
-    tbl.set("error_fields", lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+    tbl.set(
+        "error_fields",
+        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Error, Some(t), &message, &fields);

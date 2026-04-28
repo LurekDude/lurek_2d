@@ -376,7 +376,6 @@ function lurek.init()
   -- gravity toggle
   lurek.input.bind("key_g", function()
     gravity_on = not gravity_on
-    lurek.tween.to({ time_scale }, { [1] = time_scale }, 0.3)  -- pulse feel
   end)
 
   -- bounce cycle

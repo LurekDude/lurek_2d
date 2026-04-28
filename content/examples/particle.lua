@@ -198,18 +198,18 @@ do  -- ParticleSystem:getCount
 end
 
 --@api-stub: LParticleSystem:type
--- Returns the type name "ParticleSystem".
+-- Returns the type name "LParticleSystem".
 -- Discriminator string useful when a callback receives a generic Drawable userdata.
 do  -- ParticleSystem:type
   local sys = lurek.particle.newSystem({})
-  if sys:type() == "ParticleSystem" then
+  if sys:type() == "LParticleSystem" then
     sys:start()
   end
 end
 
 --@api-stub: LParticleSystem:typeOf
 -- Returns true if this matches the given type name.
--- Accepts "ParticleSystem", "Drawable", or "Object" — matches the love2d type hierarchy.
+-- Accepts "LParticleSystem", "ParticleSystem", "Drawable", or "Object".
 do  -- ParticleSystem:typeOf
   local sys = lurek.particle.newSystem({})
   if sys:typeOf("Drawable") then

@@ -695,7 +695,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Checks whether a mod's required `api_version` is compatible with the given `host_version`.
     /// @param | mod_ud | LMod | Mod userdata to validate.
     /// @param | host_version | string | Host API version string.
-    /// @return | boolean, string | Returns compatibility status and an error message when incompatible.
+    /// @return | boolean | True when the mod is compatible with the host API version.
+    /// @return | string | Incompatibility error message.
     tbl.set("checkApiVersion", lua.create_function(|lua, (mod_ud, host_version): (LuaAnyUserData, String)| {
             let api_ver = {
                 let m = mod_ud.borrow::<LuaMod>()?;

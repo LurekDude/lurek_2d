@@ -12,20 +12,50 @@
 
 import * as fs from "fs";
 import * as path from "path";
+import * as child_process from "child_process";
 import { fileURLToPath } from "url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
+const repoRoot = path.resolve(root, "..", "..");
 
 const inputPath = path.join(root, "data", "lurek-api.json");
 const outputPath = path.join(root, "src", "generated", "lurekApiData.ts");
 
+function runPython(scriptPath: string, args: string[] = []): void {
+  const python = process.env.PYTHON ?? "python";
+
+  try {
+    child_process.execFileSync(
+      python,
+      [path.join(repoRoot, scriptPath), ...args],
+      {
+        cwd: repoRoot,
+        stdio: "inherit",
+      },
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`ERROR: Failed to run ${scriptPath}: ${message}`);
+    process.exit(1);
+  }
+}
+
+// Keep the bundled extension API in sync with the latest engine docs before
+// baking JSON into the TypeScript bundle.
+runPython("tools/docs/gen_lua_api_data.py");
+runPython("tools/docs/gen_luadoc.py");
+runPython("tools/docs/gen_extension_api.py", [
+  "--input",
+  path.join(repoRoot, "logs", "data", "lua_api_data.json"),
+  "--output",
+  inputPath,
+]);
+
 if (!fs.existsSync(inputPath)) {
   console.error(
     `ERROR: ${inputPath} not found.\n` +
-      `Run first: python tools/docs/gen_extension_api.py\n` +
-      `  --input  logs/data/lua_api_data.json\n` +
-      `  --output extensions/vscode/data/lurek-api.json`,
+      `Expected build sync to generate it from the repository API data.`,
   );
   process.exit(1);
 }

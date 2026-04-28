@@ -167,13 +167,17 @@ impl LuaUserData for LuaNineSlice {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getInsets --
         /// Returns the four inset values as (top, right, bottom, left).
-        /// @return | number, number, number, number | Top, right, bottom, and left inset values.
+        /// @return | number | Top inset value.
+        /// @return | number | Right inset value.
+        /// @return | number | Bottom inset value.
+        /// @return | number | Left inset value.
         methods.add_method("getInsets", |_, this, ()| {
             Ok((this.top, this.right, this.bottom, this.left))
         });
         // -- getTextureSize --
         /// Returns the width and height of the source texture.
-        /// @return | integer, integer | Source texture width and height in pixels.
+        /// @return | integer | Source texture width in pixels.
+        /// @return | integer | Source texture height in pixels.
         methods.add_method("getTextureSize", |_, this, ()| Ok((this.tex_w, this.tex_h)));
         // -- type --
         /// Returns the Lua type name for this object.
@@ -216,7 +220,8 @@ impl LuaUserData for LuaImage {
 
         // -- getDimensions --
         /// Returns width and height of this image.
-        /// @return | integer, integer | Image width and height in pixels.
+        /// @return | integer | Image width in pixels.
+        /// @return | integer | Image height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             let td = st.textures.get(this.key).ok_or_else(|| {
@@ -341,7 +346,8 @@ impl LuaUserData for LuaFont {
         /// Wraps text to the given width and returns the lines.
         /// @param | text | string | Text to wrap.
         /// @param | limit | number | Maximum line width.
-        /// @return | table, number | Wrapped lines table and the widest wrapped line width.
+        /// @return | table | Wrapped lines as an array of strings.
+        /// @return | number | Width of the widest wrapped line.
         methods.add_method("getWrap", |lua, this, (text, limit): (String, f32)| {
             let st = this.state.borrow();
             let font = st.fonts.get(this.key).ok_or_else(|| {
@@ -431,7 +437,8 @@ impl LuaUserData for LuaCanvas {
 
         // -- getDimensions --
         /// Returns width and height of this canvas.
-        /// @return | integer, integer | Canvas width and height in pixels.
+        /// @return | integer | Canvas width in pixels.
+        /// @return | integer | Canvas height in pixels.
         methods.add_method("getDimensions", |_, this, ()| {
             let st = this.state.borrow();
             let c = st.canvases.get(this.key).ok_or_else(|| {
@@ -616,7 +623,14 @@ impl LuaUserData for LuaMesh {
         // -- getVertex --
         /// Returns vertex data at the given 1-based index.
         /// @param | index | integer | 1-based vertex index.
-        /// @return | number, number, number, number, number, number, number, number | Vertex x, y, u, v, r, g, b, a values.
+        /// @return | number | Vertex X position.
+        /// @return | number | Vertex Y position.
+        /// @return | number | Texture U coordinate.
+        /// @return | number | Texture V coordinate.
+        /// @return | number | Red component.
+        /// @return | number | Green component.
+        /// @return | number | Blue component.
+        /// @return | number | Alpha component.
         methods.add_method("getVertex", |_, this, index: usize| {
             let st = this.state.borrow();
             let mesh = st.meshes.get(this.key).ok_or_else(|| {
@@ -803,7 +817,10 @@ impl LuaUserData for LuaQuad {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getViewport --
         /// Returns the quad viewport rectangle.
-        /// @return | number, number, number, number | Viewport x, y, width, and height.
+        /// @return | number | Viewport X coordinate.
+        /// @return | number | Viewport Y coordinate.
+        /// @return | number | Viewport width.
+        /// @return | number | Viewport height.
         methods.add_method("getViewport", |_, this, ()| {
             Ok((this.x, this.y, this.w, this.h))
         });
@@ -828,7 +845,8 @@ impl LuaUserData for LuaQuad {
 
         // -- getTextureDimensions --
         /// Returns the reference texture dimensions.
-        /// @return | number, number | Reference texture width and height.
+        /// @return | number | Reference texture width.
+        /// @return | number | Reference texture height.
         methods.add_method("getTextureDimensions", |_, this, ()| Ok((this.sw, this.sh)));
 
         // -- typeOf --
@@ -1356,7 +1374,7 @@ impl LuaUserData for LuaDrawLayer {
         /// @param | name | string | Type name to test.
         /// @return | boolean | True when the name matches this type or a parent type.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "DrawLayer" || name == "Object")
+            Ok(name == "LDrawLayer" || name == "DrawLayer" || name == "Object")
         });
     }
 }
@@ -1398,7 +1416,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getColor --
     /// Returns the current drawing color.
-    /// @return | number, number, number, number | Current red, green, blue, and alpha values.
+    /// @return | number | Current red component.
+    /// @return | number | Current green component.
+    /// @return | number | Current blue component.
+    /// @return | number | Current alpha component.
     let s = state.clone();
     graphics.set(
         "getColor",
@@ -1430,7 +1451,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getBackgroundColor --
     /// Returns the current background color.
-    /// @return | number, number, number, number | Current red, green, blue, and alpha values.
+    /// @return | number | Background red component.
+    /// @return | number | Background green component.
+    /// @return | number | Background blue component.
+    /// @return | number | Background alpha component.
     let s = state.clone();
     graphics.set(
         "getBackgroundColor",
@@ -2490,7 +2514,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns wrapped lines and the maximum line width.
     /// @param | text | string | Text to wrap.
     /// @param | limit | number | Maximum line width.
-    /// @return | table, number | Wrapped lines table and maximum line width, or nil and 0 when no active font is set.
+    /// @return | table | Wrapped lines as an array of strings.
+    /// @return | number | Maximum wrapped line width.
     let s = state.clone();
     graphics.set(
         "getFontWrap",
@@ -2654,7 +2679,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // -- getCanvasSize --
     /// Returns the dimensions of a canvas.
     /// @param | canvas | LCanvas | Canvas to inspect.
-    /// @return | integer, integer | Canvas width and height in pixels.
+    /// @return | integer | Canvas width in pixels.
+    /// @return | integer | Canvas height in pixels.
     let s = state.clone();
     graphics.set(
         "getCanvasSize",
@@ -3004,7 +3030,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getScissor --
     /// Returns the active scissor rectangle, or nothing.
-    /// @return | number, number, number, number | Scissor x, y, width, and height, or no values when scissor is disabled.
+    /// @return | number | Scissor X coordinate.
+    /// @return | number | Scissor Y coordinate.
+    /// @return | number | Scissor width.
+    /// @return | number | Scissor height.
     let s = state.clone();
     graphics.set(
         "getScissor",
@@ -3081,7 +3110,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getColorMask --
     /// Returns the current color mask.
-    /// @return | boolean, boolean, boolean, boolean | Red, green, blue, and alpha write flags.
+    /// @return | boolean | Whether red writes are enabled.
+    /// @return | boolean | Whether green writes are enabled.
+    /// @return | boolean | Whether blue writes are enabled.
+    /// @return | boolean | Whether alpha writes are enabled.
     let s = state.clone();
     graphics.set(
         "getColorMask",
@@ -3233,7 +3265,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getStencilMode --
     /// Returns the current stencil mode as (action, compare, value).
-    /// @return | string, string, integer | Current stencil action, compare mode, and reference value.
+    /// @return | string | Current stencil action.
+    /// @return | string | Current stencil comparison mode.
+    /// @return | integer | Current stencil reference value.
     let s = state.clone();
     graphics.set(
         "getStencilMode",
@@ -3307,7 +3341,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDepthMode --
     /// Returns the current depth mode as (mode, write).
-    /// @return | string, boolean | Current depth comparison mode and write flag.
+    /// @return | string | Current depth comparison mode.
+    /// @return | boolean | Whether depth writes are enabled.
     let s = state.clone();
     graphics.set(
         "getDepthMode",
@@ -3350,7 +3385,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDimensions --
     /// Returns window width and height.
-    /// @return | integer, integer | Window width and height in pixels.
+    /// @return | integer | Window width in pixels.
+    /// @return | integer | Window height in pixels.
     let s = state.clone();
     graphics.set(
         "getDimensions",
@@ -3381,7 +3417,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- getDefaultFilter --
     /// Returns the default texture filter mode.
-    /// @return | string, string, integer | Min filter, mag filter, and anisotropy level.
+    /// @return | string | Default minification filter.
+    /// @return | string | Default magnification filter.
+    /// @return | integer | Default anisotropy level.
     let s = state.clone();
     graphics.set(
         "getDefaultFilter",

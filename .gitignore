@@ -37,3 +37,5 @@ extensions/vscode/node_modules/*
 # Transient test output logs and scratch directories
 /evidence_test_out.log
 /test_out.log
+extensions/vscode/.vscode-test/extensions/*
+extensions/vscode/.vscode-test/*

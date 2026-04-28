@@ -213,9 +213,9 @@ end)
 describe("DrawLayer type system", function()
     -- @tests DrawLayer.type
     -- @description Verifies DrawLayer userdata reports its concrete type string.
-    it("has type() method returning DrawLayer", function()
+    it("has type() method returning LDrawLayer", function()
         local layer = lurek.render.newDrawLayer()
-        expect_equal("DrawLayer", layer:type())
+        expect_equal("LDrawLayer", layer:type())
     end)
 
     -- @tests DrawLayer.typeOf

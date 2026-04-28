@@ -2008,10 +2008,11 @@ impl ApplicationHandler for LurekApp {
         }
         self.last_frame = Instant::now();
 
-        // Request a redraw immediately. The first RedrawRequested will render the
-        // splash frame and THEN call init_lua(), ensuring the splash is visible
-        // before Lua VM initialisation blocks the event loop.
+        // Show the native window before requesting the first redraw.
+        // On Windows, a still-hidden window may never receive that redraw,
+        // which would stall startup before init_lua() runs.
         if let Some(win) = &self.window {
+            win.set_visible(true);
             win.request_redraw();
         }
     }

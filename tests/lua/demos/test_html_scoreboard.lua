@@ -25,7 +25,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     it("calls lurek.html.newDocument", function()
         if not src then pending("source missing") return end
         expect_true(
-            src:find("lurek%.ui%.html%.newDocument") ~= nil,
+            src:find("lurek%.html%.newDocument") ~= nil,
             "html-scoreboard must call newDocument"
         )
     end)

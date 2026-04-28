@@ -26,7 +26,7 @@ describe("demo html-hud â€” static analysis", function()
     it("calls lurek.html.newDocument", function()
         if not src then pending("source missing") return end
         expect_true(
-            src:find("lurek%.ui%.html%.newDocument") ~= nil,
+            src:find("lurek%.html%.newDocument") ~= nil,
             "html-hud must call lurek.html.newDocument"
         )
     end)
@@ -39,11 +39,11 @@ describe("demo html-hud â€” static analysis", function()
         )
     end)
 
-    it("calls hud:draw() to render the overlay", function()
+    it("calls hud:render() to render the overlay", function()
         if not src then pending("source missing") return end
         expect_true(
-            src:find(":draw()") ~= nil,
-            "html-hud must call :draw() on the HUD document"
+            src:find(":render%(%s*%)") ~= nil,
+            "html-hud must call :render() on the HUD document"
         )
     end)
 

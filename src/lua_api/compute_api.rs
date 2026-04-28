@@ -1,4 +1,4 @@
-//! `lurek.compute` â€” Dense N-dimensional numerical arrays with NumPy-style operations.
+//! `lurek.compute` - Dense N-dimensional numerical arrays with NumPy-style operations.
 //!
 //! Wraps [`NdArray`] as `Array` userdata supporting element-wise arithmetic, broadcasting,
 //! reshape/transpose/slice, reduction (sum, mean, min, max), linear algebra (matmul, dot,
@@ -19,7 +19,7 @@ use crate::compute::spatial;
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Parse a Lua table of positive integers into a shape vector.
+// Parse a Lua table of positive integers into a shape vector.
 fn parse_shape(value: LuaValue) -> LuaResult<Vec<usize>> {
     let table = value
         .as_table()
@@ -40,13 +40,13 @@ fn parse_shape(value: LuaValue) -> LuaResult<Vec<usize>> {
     Ok(shape)
 }
 
-/// Parse an optional dtype string, defaulting to `"float32"`.
+// Parse an optional dtype string, defaulting to `"float32"`.
 fn parse_dtype(s: Option<String>) -> LuaResult<DataType> {
     let name = s.as_deref().unwrap_or("float32");
     DataType::parse(name).map_err(LuaError::RuntimeError)
 }
 
-/// Parse Lua multi-value arguments into 0-based indices.
+// Parse Lua multi-value arguments into 0-based indices.
 fn parse_lua_indices(args: &[LuaValue]) -> LuaResult<Vec<usize>> {
     args.iter()
         .map(|v| match v {
@@ -105,7 +105,7 @@ impl LuaUserData for LuaArray {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getShape --
         /// Returns the shape as a table of dimension sizes.
-        /// @return table
+        /// @return | table | Array of dimension sizes.
         methods.add_method("getShape", |lua, this, ()| {
             let table = lua.create_table()?;
             for (i, &dim) in this.inner.shape().iter().enumerate() {
@@ -116,30 +116,30 @@ impl LuaUserData for LuaArray {
 
         // -- getDimensions --
         /// Returns the number of dimensions.
-        /// @return integer
+        /// @return | integer | Dimension count.
         methods.add_method("getDimensions", |_, this, ()| Ok(this.inner.ndim()));
 
         // -- getSize --
         /// Returns the total number of elements.
-        /// @return integer
+        /// @return | integer | Total element count.
         methods.add_method("getSize", |_, this, ()| Ok(this.inner.size()));
 
         // -- getDataType --
         /// Returns the element data type name.
-        /// @return string
+        /// @return | string | Data type name.
         methods.add_method("getDataType", |_, this, ()| {
             Ok(this.inner.dtype().name().to_string())
         });
 
         // -- isOnGPU --
         /// Returns false (CPU arrays only).
-        /// @return boolean
+        /// @return | boolean | Always false for CPU arrays.
         methods.add_method("isOnGPU", |_, _this, ()| Ok(false));
 
         // -- get --
         /// Returns the element at the given 1-based indices.
-        /// @param indices : integer...
-        /// @return number
+        /// @param | indices | integer | One-based indices.
+        /// @return | number | Element value.
         methods.add_method("get", |_, this, args: LuaMultiValue| {
             let indices = parse_lua_indices(&args.into_vec())?;
             this.inner
@@ -149,8 +149,8 @@ impl LuaUserData for LuaArray {
 
         // -- set --
         /// Sets the element at the given 1-based indices to a value.
-        /// @param ... : number
-        /// @return nil
+        /// @param | ... | number | One-based indices followed by the new value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("set", |_, this, args: LuaMultiValue| {
             let args_vec = args.into_vec();
             if args_vec.len() < 2 {
@@ -175,7 +175,7 @@ impl LuaUserData for LuaArray {
 
         // -- toTable --
         /// Returns all elements as a flat table of numbers.
-        /// @return table
+        /// @return | table | Flat array of element values.
         methods.add_method("toTable", |lua, this, ()| {
             let values = this.inner.to_f64_vec();
             let table = lua.create_table()?;
@@ -187,8 +187,8 @@ impl LuaUserData for LuaArray {
 
         // -- reshape --
         /// Returns a new array with the given shape and the same data.
-        /// @param shape : table
-        /// @return Array
+        /// @param | shape | table | Target shape table.
+        /// @return | Array | Reshaped array.
         methods.add_method("reshape", |lua, this, shape: LuaValue| {
             let s = parse_shape(shape)?;
             let result = ops::reshape(&this.inner, &s).map_err(LuaError::RuntimeError)?;
@@ -197,7 +197,7 @@ impl LuaUserData for LuaArray {
 
         // -- clone --
         /// Returns a deep copy of this array.
-        /// @return Array
+        /// @return | Array | Deep copy of this array.
         methods.add_method("clone", |lua, this, ()| {
             lua.create_userdata(LuaArray {
                 inner: this.inner.clone(),
@@ -206,7 +206,7 @@ impl LuaUserData for LuaArray {
 
         // -- transpose --
         /// Returns the transposed 2D array.
-        /// @return Array
+        /// @return | Array | Transposed array.
         methods.add_method("transpose", |lua, this, ()| {
             let result = ops::transpose_2d(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -214,8 +214,8 @@ impl LuaUserData for LuaArray {
 
         // -- fill --
         /// Fills all elements with the given value in-place.
-        /// @param val : number
-        /// @return nil
+        /// @param | val | number | Fill value.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("fill", |_, this, val: f64| {
             ops::fill(&mut this.inner, val);
             Ok(())
@@ -223,8 +223,8 @@ impl LuaUserData for LuaArray {
 
         // -- add --
         /// Element-wise addition with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Sum array.
         dispatch_arith!(
             methods,
             "add",
@@ -235,8 +235,8 @@ impl LuaUserData for LuaArray {
 
         // -- sub --
         /// Element-wise subtraction with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Difference array.
         dispatch_arith!(
             methods,
             "sub",
@@ -247,8 +247,8 @@ impl LuaUserData for LuaArray {
 
         // -- mul --
         /// Element-wise multiplication with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Product array.
         dispatch_arith!(
             methods,
             "mul",
@@ -259,8 +259,8 @@ impl LuaUserData for LuaArray {
 
         // -- div --
         /// Element-wise division with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Quotient array.
         dispatch_arith!(
             methods,
             "div",
@@ -271,8 +271,8 @@ impl LuaUserData for LuaArray {
 
         // -- pow --
         /// Raises each element to a scalar exponent.
-        /// @param exp : number
-        /// @return Array
+        /// @param | exp | number | Exponent value.
+        /// @return | Array | Exponentiated array.
         methods.add_method("pow", |lua, this, exp: f64| {
             let result = ops::pow_scalar(&this.inner, exp).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -280,7 +280,7 @@ impl LuaUserData for LuaArray {
 
         // -- sqrt --
         /// Element-wise square root.
-        /// @return Array
+        /// @return | Array | Square-rooted array.
         methods.add_method("sqrt", |lua, this, ()| {
             let result = ops::sqrt(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -288,15 +288,15 @@ impl LuaUserData for LuaArray {
 
         // -- abs --
         /// Element-wise absolute value.
-        /// @return Array
+        /// @return | Array | Absolute-value array.
         methods.add_method("abs", |lua, this, ()| {
             let result = ops::abs(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
         });
 
         // -- neg --
-        /// Returns a new Array with every element negated (multiplied by â’1).
-        /// @return Array
+        /// Returns a new Array with every element negated (multiplied by -1).
+        /// @return | Array | Negated array.
         methods.add_method("neg", |lua, this, ()| {
             let result = ops::neg(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -304,9 +304,9 @@ impl LuaUserData for LuaArray {
 
         // -- clamp --
         /// Clamps each element to the given range.
-        /// @param min : number
-        /// @param max : number
-        /// @return Array
+        /// @param | min | number | Lower bound.
+        /// @param | max | number | Upper bound.
+        /// @return | Array | Clamped array.
         methods.add_method("clamp", |lua, this, (min, max): (f64, f64)| {
             let result = ops::clamp(&this.inner, min, max).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -314,14 +314,14 @@ impl LuaUserData for LuaArray {
 
         // -- eq --
         /// Element-wise equality with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise equality result array.
         dispatch_arith!(methods, "eq", "Element-wise eq.", ops::eq, ops::eq_scalar);
 
         // -- neq --
         /// Element-wise not-equal with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise inequality result array.
         dispatch_arith!(
             methods,
             "neq",
@@ -332,20 +332,20 @@ impl LuaUserData for LuaArray {
 
         // -- gt --
         /// Element-wise greater-than with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise greater-than result array.
         dispatch_arith!(methods, "gt", "Element-wise gt.", ops::gt, ops::gt_scalar);
 
         // -- lt --
         /// Element-wise less-than with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise less-than result array.
         dispatch_arith!(methods, "lt", "Element-wise lt.", ops::lt, ops::lt_scalar);
 
         // -- gte --
         /// Element-wise greater-or-equal with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise greater-or-equal result array.
         dispatch_arith!(
             methods,
             "gte",
@@ -356,8 +356,8 @@ impl LuaUserData for LuaArray {
 
         // -- lte --
         /// Element-wise less-or-equal with an Array or scalar.
-        /// @param other : Array|number
-        /// @return Array
+        /// @param | other | any | Array or scalar operand.
+        /// @return | Array | Element-wise less-or-equal result array.
         dispatch_arith!(
             methods,
             "lte",
@@ -368,8 +368,8 @@ impl LuaUserData for LuaArray {
 
         // -- threshold --
         /// Returns a mask array with 1.0 where elements >= val, else 0.0.
-        /// @param val : number
-        /// @return Array
+        /// @param | val | number | Threshold value.
+        /// @return | Array | Threshold mask array.
         methods.add_method("threshold", |lua, this, val: f64| {
             let result = ops::threshold(&this.inner, val).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -377,9 +377,9 @@ impl LuaUserData for LuaArray {
 
         // -- where --
         /// Selects elements from this where mask is nonzero, else from other.
-        /// @param mask : Array
-        /// @param other : Array
-        /// @return Array
+        /// @param | mask | Array | Mask array.
+        /// @param | other | Array | Fallback array.
+        /// @return | Array | Selected result array.
         methods.add_method("where", |lua, this, (mask, other): (LuaAnyUserData, LuaAnyUserData)| {
                 let mask_arr = mask.borrow::<LuaArray>()?;
                 let other_arr = other.borrow::<LuaArray>()?;
@@ -391,36 +391,35 @@ impl LuaUserData for LuaArray {
 
         // -- countNonZero --
         /// Returns the count of nonzero elements.
-        /// @return integer
+        /// @return | integer | Nonzero element count.
         methods.add_method("countNonZero", |_, this, ()| {
             Ok(ops::count_nonzero(&this.inner))
         });
 
         // -- argmin --
         /// Returns the 1-based flat index of the minimum element.
-        /// @return integer
+        /// @return | integer | One-based flat index of the minimum element.
         methods.add_method("argmin", |_, this, ()| Ok(ops::argmin(&this.inner) + 1));
 
         // -- argmax --
         /// Returns the 1-based flat index of the maximum element.
-        /// @return integer
+        /// @return | integer | One-based flat index of the maximum element.
         methods.add_method("argmax", |_, this, ()| Ok(ops::argmax(&this.inner) + 1));
 
         // -- any --
         /// Returns true if any element is nonzero.
-        /// @return boolean
+        /// @return | boolean | True if any element is nonzero.
         methods.add_method("any", |_, this, ()| Ok(ops::any(&this.inner)));
 
         // -- all --
         /// Returns true if all elements are nonzero.
-        /// @return boolean
+        /// @return | boolean | True if all elements are nonzero.
         methods.add_method("all", |_, this, ()| Ok(ops::all(&this.inner)));
 
         // -- sum --
         /// Sum of all elements, or along an axis (1-based).
-        /// @param axis : integer?
-        /// @return nil
-        /// number|Array
+        /// @param | axis | integer? | Optional one-based axis.
+        /// @return | Array | Reduced array, or scalar number when axis is omitted.
         methods.add_method("sum", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::sum(&this.inner))),
             Some(a) => {
@@ -434,9 +433,8 @@ impl LuaUserData for LuaArray {
 
         // -- mean --
         /// Mean of all elements, or along an axis (1-based).
-        /// @param axis : integer?
-        /// @return nil
-        /// number|Array
+        /// @param | axis | integer? | Optional one-based axis.
+        /// @return | Array | Reduced array, or scalar number when axis is omitted.
         methods.add_method("mean", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::mean(&this.inner))),
             Some(a) => {
@@ -450,9 +448,8 @@ impl LuaUserData for LuaArray {
 
         // -- min --
         /// Minimum of all elements, or along an axis (1-based).
-        /// @param axis : integer?
-        /// @return nil
-        /// number|Array
+        /// @param | axis | integer? | Optional one-based axis.
+        /// @return | Array | Reduced array, or scalar number when axis is omitted.
         methods.add_method("min", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::min_val(&this.inner))),
             Some(a) => {
@@ -466,9 +463,8 @@ impl LuaUserData for LuaArray {
 
         // -- max --
         /// Maximum of all elements, or along an axis (1-based).
-        /// @param axis : integer?
-        /// @return nil
-        /// number|Array
+        /// @param | axis | integer? | Optional one-based axis.
+        /// @return | Array | Reduced array, or scalar number when axis is omitted.
         methods.add_method("max", |lua, this, axis: Option<i64>| match axis {
             None => Ok(LuaValue::Number(ops::max_val(&this.inner))),
             Some(a) => {
@@ -482,8 +478,8 @@ impl LuaUserData for LuaArray {
 
         // -- matmul --
         /// Matrix multiplication of two 2D arrays.
-        /// @param other : Array
-        /// @return Array
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | Array | Matrix product array.
         methods.add_method("matmul", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
             let result =
@@ -493,8 +489,8 @@ impl LuaUserData for LuaArray {
 
         // -- dot --
         /// Dot product of two 1D arrays.
-        /// @param other : Array
-        /// @return number
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | number | Dot product value.
         methods.add_method("dot", |_, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
             spatial::dot(&this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)
@@ -502,8 +498,8 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseAnd --
         /// Bitwise AND of two Int32 arrays.
-        /// @param other : Array
-        /// @return Array
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | Array | Bitwise AND result array.
         methods.add_method("bitwiseAnd", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
             let result =
@@ -513,8 +509,8 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseOr --
         /// Bitwise OR of two Int32 arrays.
-        /// @param other : Array
-        /// @return Array
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | Array | Bitwise OR result array.
         methods.add_method("bitwiseOr", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
             let result =
@@ -524,8 +520,8 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseXor --
         /// Bitwise XOR of two Int32 arrays.
-        /// @param other : Array
-        /// @return Array
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | Array | Bitwise XOR result array.
         methods.add_method("bitwiseXor", |lua, this, other: LuaAnyUserData| {
             let other_arr = other.borrow::<LuaArray>()?;
             let result =
@@ -535,7 +531,7 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseNot --
         /// Bitwise NOT of an Int32 array.
-        /// @return Array
+        /// @return | Array | Bitwise NOT result array.
         methods.add_method("bitwiseNot", |lua, this, ()| {
             let result = ops::bitwise_not(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -543,8 +539,8 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseLShift --
         /// Bitwise left shift of an Int32 array.
-        /// @param amount : integer
-        /// @return Array
+        /// @param | amount | integer | Shift amount.
+        /// @return | Array | Left-shifted array.
         methods.add_method("bitwiseLShift", |lua, this, amount: u32| {
             let result =
                 ops::bitwise_lshift(&this.inner, amount).map_err(LuaError::RuntimeError)?;
@@ -553,8 +549,8 @@ impl LuaUserData for LuaArray {
 
         // -- bitwiseRShift --
         /// Bitwise right shift of an Int32 array.
-        /// @param amount : integer
-        /// @return Array
+        /// @param | amount | integer | Shift amount.
+        /// @return | Array | Right-shifted array.
         methods.add_method("bitwiseRShift", |lua, this, amount: u32| {
             let result =
                 ops::bitwise_rshift(&this.inner, amount).map_err(LuaError::RuntimeError)?;
@@ -563,8 +559,8 @@ impl LuaUserData for LuaArray {
 
         // -- convolve2D --
         /// 2D convolution with zero-padding.
-        /// @param kernel : Array
-        /// @return Array
+        /// @param | kernel | Array | Convolution kernel array.
+        /// @return | Array | Convolution result array.
         methods.add_method("convolve2D", |lua, this, kernel: LuaAnyUserData| {
             let kernel_arr = kernel.borrow::<LuaArray>()?;
             let result = spatial::convolve2d(&this.inner, &kernel_arr.inner)
@@ -574,8 +570,8 @@ impl LuaUserData for LuaArray {
 
         // -- dilate --
         /// Morphological dilation with a diamond structuring element.
-        /// @param radius : integer
-        /// @return Array
+        /// @param | radius | integer | Structuring element radius.
+        /// @return | Array | Dilated array.
         methods.add_method("dilate", |lua, this, radius: usize| {
             let result = spatial::dilate(&this.inner, radius).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -583,8 +579,8 @@ impl LuaUserData for LuaArray {
 
         // -- erode --
         /// Morphological erosion with a diamond structuring element.
-        /// @param radius : integer
-        /// @return Array
+        /// @param | radius | integer | Structuring element radius.
+        /// @return | Array | Eroded array.
         methods.add_method("erode", |lua, this, radius: usize| {
             let result = spatial::erode(&this.inner, radius).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: result })
@@ -592,10 +588,10 @@ impl LuaUserData for LuaArray {
 
         // -- floodFill --
         /// Flood fill from a 1-based (row, col) with a new value.
-        /// @param row : integer
-        /// @param col : integer
-        /// @param val : number
-        /// @return Array
+        /// @param | row | integer | One-based row index.
+        /// @param | col | integer | One-based column index.
+        /// @param | val | number | Fill value.
+        /// @return | Array | Flood-filled result array.
         methods.add_method("floodFill", |lua, this, (row, col, val): (usize, usize, f64)| {
                 let result = spatial::flood_fill(&this.inner, row - 1, col - 1, val)
                     .map_err(LuaError::RuntimeError)?;
@@ -605,11 +601,11 @@ impl LuaUserData for LuaArray {
 
         // -- getRegion --
         /// Extracts a rectangular sub-region (1-based row, col).
-        /// @param row : integer
-        /// @param col : integer
-        /// @param rows : integer
-        /// @param cols : integer
-        /// @return Array
+        /// @param | row | integer | One-based start row.
+        /// @param | col | integer | One-based start column.
+        /// @param | rows | integer | Region row count.
+        /// @param | cols | integer | Region column count.
+        /// @return | Array | Extracted region array.
         methods.add_method("getRegion", |lua, this, (row, col, rows, cols): (usize, usize, usize, usize)| {
                 let result = spatial::get_region(&this.inner, row - 1, col - 1, rows, cols)
                     .map_err(LuaError::RuntimeError)?;
@@ -619,10 +615,10 @@ impl LuaUserData for LuaArray {
 
         // -- setRegion --
         /// Copies a source array into this array at the given 1-based position.
-        /// @param row : integer
-        /// @param col : integer
-        /// @param source : Array
-        /// @return nil
+        /// @param | row | integer | One-based destination row.
+        /// @param | col | integer | One-based destination column.
+        /// @param | source | Array | Source region array.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setRegion", |_, this, (row, col, source): (usize, usize, LuaAnyUserData)| {
                 let src = source.borrow::<LuaArray>()?;
                 spatial::set_region(&mut this.inner, row - 1, col - 1, &src.inner)
@@ -633,16 +629,16 @@ impl LuaUserData for LuaArray {
 
         // -- __tostring --
         /// Returns a human-readable summary string.
-        /// @return string
+        /// @return | string | Human-readable summary string.
         methods.add_meta_method(LuaMetaMethod::ToString, |_, this, ()| {
             Ok(this.inner.display_string())
         });
 
-        // â”€â”€ Analytics â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Analytics -------------------------------------------------
 
         // -- cumsum --
         /// Cumulative sum of all elements (flattened).
-        /// @return Array
+        /// @return | Array | Cumulative-sum array.
         methods.add_method("cumsum", |lua, this, ()| {
             let r = analytics::cumsum(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: r })
@@ -650,8 +646,8 @@ impl LuaUserData for LuaArray {
 
         // -- diff --
         /// Discrete difference applied `order` times.
-        /// @param order : integer?
-        /// @return Array
+        /// @param | order | integer? | Optional difference order.
+        /// @return | Array | Difference array.
         methods.add_method("diff", |lua, this, order: Option<usize>| {
             let r =
                 analytics::diff(&this.inner, order.unwrap_or(1)).map_err(LuaError::RuntimeError)?;
@@ -660,10 +656,10 @@ impl LuaUserData for LuaArray {
 
         // -- histogram --
         /// Compute a histogram. Returns a table of {lo, hi, count} tables.
-        /// @param bins : integer
-        /// @param lo : number?
-        /// @param hi : number?
-        /// @return table
+        /// @param | bins | integer | Number of histogram bins.
+        /// @param | lo | number? | Optional lower bound.
+        /// @param | hi | number? | Optional upper bound.
+        /// @return | table | Array of histogram bin tables.
         methods.add_method("histogram", |lua, this, (bins, lo, hi): (usize, Option<f64>, Option<f64>)| {
                 let bins_data = analytics::histogram(&this.inner, bins, lo, hi)
                     .map_err(LuaError::RuntimeError)?;
@@ -680,17 +676,17 @@ impl LuaUserData for LuaArray {
         );
 
         // -- percentile --
-        /// Compute the p-th percentile (0â€“100).
-        /// @param p : number
-        /// @return number
+        /// Compute the p-th percentile (0-100).
+        /// @param | p | number | Percentile from 0 to 100.
+        /// @return | number | Percentile value.
         methods.add_method("percentile", |_, this, p: f64| {
             analytics::percentile(&this.inner, p).map_err(LuaError::RuntimeError)
         });
 
         // -- covariance --
         /// Population covariance with another 1D array.
-        /// @param other : Array
-        /// @return number
+        /// @param | other | Array | Other one-dimensional array.
+        /// @return | number | Covariance value.
         methods.add_method("covariance", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<LuaArray>()?;
             analytics::covariance(&this.inner, &other.inner).map_err(LuaError::RuntimeError)
@@ -698,8 +694,8 @@ impl LuaUserData for LuaArray {
 
         // -- pearsonCorr --
         /// Pearson correlation coefficient with another 1D array.
-        /// @param other : Array
-        /// @return number
+        /// @param | other | Array | Other one-dimensional array.
+        /// @return | number | Correlation coefficient.
         methods.add_method("pearsonCorr", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<LuaArray>()?;
             analytics::pearson_corr(&this.inner, &other.inner).map_err(LuaError::RuntimeError)
@@ -707,9 +703,9 @@ impl LuaUserData for LuaArray {
 
         // -- normalizeRange --
         /// Linearly rescale values to [out_min, out_max].
-        /// @param out_min : number
-        /// @param out_max : number
-        /// @return Array
+        /// @param | out_min | number | Output minimum.
+        /// @param | out_max | number | Output maximum.
+        /// @return | Array | Rescaled array.
         methods.add_method("normalizeRange", |lua, this, (lo, hi): (f64, f64)| {
             let r =
                 analytics::normalize_range(&this.inner, lo, hi).map_err(LuaError::RuntimeError)?;
@@ -718,7 +714,7 @@ impl LuaUserData for LuaArray {
 
         // -- zscore --
         /// Standardise values to zero mean and unit variance.
-        /// @return Array
+        /// @return | Array | Z-score normalized array.
         methods.add_method("zscore", |lua, this, ()| {
             let r = analytics::zscore(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: r })
@@ -726,8 +722,8 @@ impl LuaUserData for LuaArray {
 
         // -- convolve1d --
         /// 1D convolution with a kernel array (full output).
-        /// @param kernel : Array
-        /// @return Array
+        /// @param | kernel | Array | Kernel array.
+        /// @return | Array | Convolution result array.
         methods.add_method("convolve1d", |lua, this, kernel: LuaAnyUserData| {
             let kernel = kernel.borrow::<LuaArray>()?;
             let r = analytics::convolve1d(&this.inner, &kernel.inner)
@@ -737,8 +733,8 @@ impl LuaUserData for LuaArray {
 
         // -- correlate1d --
         /// 1D cross-correlation with a template array (valid output).
-        /// @param template : Array
-        /// @return Array
+        /// @param | template | Array | Template array.
+        /// @return | Array | Correlation result array.
         methods.add_method("correlate1d", |lua, this, template: LuaAnyUserData| {
             let template = template.borrow::<LuaArray>()?;
             let r = analytics::correlate1d(&this.inner, &template.inner)
@@ -746,20 +742,20 @@ impl LuaUserData for LuaArray {
             lua.create_userdata(LuaArray { inner: r })
         });
 
-        // â”€â”€ Linear algebra â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Linear algebra -------------------------------------------------
 
         // -- normalizeVec --
         /// L2-normalise a 1D vector.
-        /// @return Array
+        /// @return | Array | Normalized vector array.
         methods.add_method("normalizeVec", |lua, this, ()| {
             let r = linalg::normalize_vec(&this.inner).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: r })
         });
 
         // -- outer --
-        /// Outer product of two 1D vectors â†’ 2D array [m, n].
-        /// @param other : Array
-        /// @return Array
+        /// Outer product of two 1D vectors -> 2D array [m, n].
+        /// @param | other | Array | Other input value.
+        /// @return | Array | New array.
         methods.add_method("outer", |lua, this, other: LuaAnyUserData| {
             let other = other.borrow::<LuaArray>()?;
             let r = linalg::outer(&this.inner, &other.inner).map_err(LuaError::RuntimeError)?;
@@ -768,17 +764,17 @@ impl LuaUserData for LuaArray {
 
         // -- cross2d --
         /// Signed 2D cross product with another length-2 array.
-        /// @param other : Array
-        /// @return number
+        /// @param | other | Array | Other input value.
+            /// @return | number | Signed 2D cross product.
         methods.add_method("cross2d", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<LuaArray>()?;
             linalg::cross2d(&this.inner, &other.inner).map_err(LuaError::RuntimeError)
         });
 
         // -- transformPoints --
-        /// Apply this 2Ă—2 or 3Ă—3 matrix to an [N,2] points array.
-        /// @param points : Array
-        /// @return Array
+        /// Apply this 2Ă-2 or 3Ă-3 matrix to an [N,2] points array.
+        /// @param | points | Array | Point array.
+        /// @return | Array | New array.
         methods.add_method("transformPoints", |lua, this, pts: LuaAnyUserData| {
             let pts = pts.borrow::<LuaArray>()?;
             let r = linalg::transform_points(&this.inner, &pts.inner)
@@ -788,7 +784,7 @@ impl LuaUserData for LuaArray {
 
         // -- sobel --
         /// Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
-        /// @return table
+            /// @return | table | Table with gx and gy gradient arrays.
         methods.add_method("sobel", |lua, this, ()| {
             let (gx, gy) = linalg::sobel(&this.inner).map_err(LuaError::RuntimeError)?;
             let t = lua.create_table()?;
@@ -798,9 +794,9 @@ impl LuaUserData for LuaArray {
         });
 
         // -- linsolve --
-        /// Solve AÂ·x = b where this array is A (square [n,n]) and b is a 1D vector.
-        /// @param b : Array
-        /// @return Array
+        /// Solve A*x = b where this array is A (square [n,n]) and b is a 1D vector.
+        /// @param | b | Array | Blue component.
+        /// @return | Array | New array.
         methods.add_method("linsolve", |lua, this, b: LuaAnyUserData| {
             let b = b.borrow::<LuaArray>()?;
             let r = linalg::linsolve(&this.inner, &b.inner).map_err(LuaError::RuntimeError)?;
@@ -813,7 +809,7 @@ impl LuaUserData for LuaArray {
         /// Returns a table `{perm = table, det_sign = int, n = int, lu_data = table}`.
         /// `perm` is a 1-indexed Lua array of row permutation indices.
         /// `lu_data` is a flat 1-indexed array of the combined LU buffer (row-major).
-        /// @return table
+        /// @return | table | LU decomposition data with permutation and matrix buffers.
         methods.add_method("luDecompose", |lua, this, ()| {
             let decomp = crate::compute::linalg::lu_decompose(&this.inner)
                 .map_err(LuaError::RuntimeError)?;
@@ -839,9 +835,9 @@ impl LuaUserData for LuaArray {
         /// Returns a table `{value = f64, vector = table}` where `vector` is a
         /// 1-indexed Lua array of the L2-normalised dominant eigenvector.
         ///
-        /// @param max_iter : int?   (default 1000)
-        /// @param tol      : number? (default 1e-10)
-        /// @return table
+        /// @param | max_iter | int? | (default 1000).
+        /// @param | tol | number? | (default 1e-10).
+        /// @return | table | Table with the dominant eigenvalue and eigenvector.
         methods.add_method("eigenPower", |lua, this, (max_iter, tol): (Option<u32>, Option<f64>)| {
                 let (eigenvalue, vec) = crate::compute::linalg::eigenvalue_power(
                     &this.inner,
@@ -860,12 +856,12 @@ impl LuaUserData for LuaArray {
             },
         );
 
-        // ── Lua extensibility hooks ───────────────────────────────────────────────
+        // -- Lua extensibility hooks -------------------------------------------------
 
         // -- map --
         /// Apply a Lua callback element-wise, returning a new Array of the same shape.
-        /// @param fn function(value: number) → number — called for each element
-        /// @return Array — new array with transformed values
+        /// @param | fn | function(value: | number) -> number - called for each element.
+        /// @return | Array | New array with transformed values.
         methods.add_method("map", |_lua, this, func: LuaFunction| {
             let src = &this.inner;
             let n = src.size();
@@ -883,10 +879,12 @@ impl LuaUserData for LuaArray {
         /// Evaluate a Lua expression string element-wise, returning a new Array.
         /// The expression receives `x` as the current element value.
         /// Example: `arr:eval("x * x + 1")`
-        /// @param expr string — Lua expression using `x` as the input variable
-        /// @return Array — new array with transformed values
+        /// @param | expr | string | - Lua expression using `x` as the input variable.
+        /// @return | Array | New array with transformed values.
         methods.add_method("eval", |lua, this, expr: String| {
             let src_code = format!("return function(x) return {} end", expr);
+            // LUA-EVAL-JUSTIFIED: `lurek.compute.Array:eval(expr)` intentionally compiles
+            // a user-provided Lua expression string; the embedded Lua code is the feature.
             let func: LuaFunction = lua.load(&src_code).eval()?;
             let src = &this.inner;
             let n = src.size();
@@ -902,9 +900,9 @@ impl LuaUserData for LuaArray {
 
         // -- reduce --
         /// Fold the array left-to-right with an accumulator.
-        /// @param fn function(acc: number, value: number) → number — accumulator function
-        /// @param init number — initial accumulator value
-        /// @return number — final accumulated value
+        /// @param | fn | function(acc: | number, value: number) -> number - accumulator function.
+        /// @param | init | number | - initial accumulator value.
+        /// @return | number | Final accumulated value.
         methods.add_method("reduce", |_, this, (func, init): (LuaFunction, f64)| {
             let src = &this.inner;
             let n = src.size();
@@ -917,11 +915,11 @@ impl LuaUserData for LuaArray {
         });
 
         // -- scan --
-        /// Running accumulation — like reduce but returns every intermediate result.
+        /// Running accumulation - like reduce but returns every intermediate result.
         /// The output array has the same shape and dtype as the input.
-        /// @param fn function(acc: number, value: number) → number — accumulator function
-        /// @param init number — initial accumulator value
-        /// @return Array — array of cumulative values (same length as input)
+        /// @param | fn | function(acc: | number, value: number) -> number - accumulator function.
+        /// @param | init | number | - initial accumulator value.
+        /// @return | Array | Array of cumulative values (same length as input).
         methods.add_method("scan", |_lua, this, (func, init): (LuaFunction, f64)| {
             let src = &this.inner;
             let n = src.size();
@@ -936,18 +934,18 @@ impl LuaUserData for LuaArray {
             Ok(LuaArray { inner: out })
         });
 
-        // â”€â”€ Identity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- Identity -------------------------------------------------
 
         // -- type --
         /// Returns the type name "Array".
-        /// @return string
+            /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LArray"));
         // -- typeOf --
         /// Returns true when the given name matches "Array" or a parent type.
-        /// @param name : string
-        /// @return boolean
+        /// @param | name | string | Name string.
+            /// @return | boolean | True if the type name matches Array or Object.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "Array" || name == "Object")
+            Ok(name == "LArray" || name == "Array" || name == "Object")
         });
     }
 }
@@ -958,18 +956,18 @@ impl LuaUserData for LuaArray {
 
 /// Registers the `lurek.compute` API table with the Lua VM.
 ///
-/// @param lua : &Lua
-/// @param lurek : &LuaTable
-/// @param _state : Rc<RefCell<SharedState>>
+/// @param | lua | Lua | Active Lua state.
+/// @param | lurek | table | Root `lurek` API table.
+/// @param | _state | Rc<RefCell<SharedState>> | Shared engine state.
 ///
 pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
     // -- newArray --
     /// Creates a zero-initialized array with the given shape and optional dtype.
-    /// @param shape : table
-    /// @param dtype : string?
-    /// @return Array
+    /// @param | shape | table | Shape table.
+    /// @param | dtype | string? | Element data type.
+    /// @return | Array | New zero-initialized array with the given shape and optional dtype.
     tbl.set("newArray", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
@@ -980,9 +978,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- zeros --
     /// Creates a zero-filled array with the given shape and optional dtype.
-    /// @param shape : table
-    /// @param dtype : string?
-    /// @return Array
+    /// @param | shape | table | Shape table.
+    /// @param | dtype | string? | Element data type.
+    /// @return | Array | New zero-filled array with the given shape and optional dtype.
     tbl.set("zeros", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
@@ -993,9 +991,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- ones --
     /// Creates a one-filled array with the given shape and optional dtype.
-    /// @param shape : table
-    /// @param dtype : string?
-    /// @return Array
+    /// @param | shape | table | Shape table.
+    /// @param | dtype | string? | Element data type.
+    /// @return | Array | New one-filled array with the given shape and optional dtype.
     tbl.set("ones", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
@@ -1006,11 +1004,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- range --
     /// Creates a 1D array from start to stop with optional step and dtype.
-    /// @param start : number
-    /// @param stop : number
-    /// @param step : number?
-    /// @param dtype : string?
-    /// @return Array
+    /// @param | start | number | Start value.
+    /// @param | stop | number | Stop value.
+    /// @param | step | number? | Step value.
+    /// @param | dtype | string? | Element data type.
+    /// @return | Array | New 1D array from start to stop with optional step and dtype.
     tbl.set("range", lua.create_function(
             |lua, (start, stop, step, dtype): (f64, f64, Option<f64>, Option<String>)| {
                 let st = step.unwrap_or(1.0);
@@ -1023,10 +1021,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- fromTable --
     /// Creates an array from a Lua table of numbers with optional shape and dtype.
-    /// @param data : table
-    /// @param shape : table?
-    /// @param dtype : string?
-    /// @return Array
+    /// @param | data | table | Input data table.
+    /// @param | shape | table? | Shape table.
+    /// @param | dtype | string? | Element data type.
+    /// @return | Array | New an array from a Lua table of numbers with optional shape and dtype.
     tbl.set("fromTable", lua.create_function(
             |lua, (data, shape, dtype): (LuaTable, Option<LuaValue>, Option<String>)| {
                 let mut values = Vec::new();
@@ -1046,10 +1044,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     // -- gaussianKernel --
-    /// Creates a sizeĂ—size Gaussian kernel array.
-    /// @param size : integer
-    /// @param sigma : number
-    /// @return Array
+    /// Creates a sizeĂ-size Gaussian kernel array.
+    /// @param | size | integer | Requested size.
+    /// @param | sigma | number | Gaussian sigma value.
+    /// @return | Array | New sizeĂ-size Gaussian kernel array.
     tbl.set("gaussianKernel", lua.create_function(|lua, (size, sigma): (usize, f64)| {
             let k = linalg::gaussian_kernel(size, sigma).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: k })
@@ -1057,9 +1055,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     // -- rotate2dMatrix --
-    /// Creates a 2Ă—2 rotation matrix for the given angle in radians.
-    /// @param angle_rad : number
-    /// @return Array
+    /// Creates a 2Ă-2 rotation matrix for the given angle in radians.
+    /// @param | angle_rad | number | Angle in radians.
+    /// @return | Array | New 2Ă-2 rotation matrix for the given angle in radians.
     tbl.set("rotate2dMatrix", lua.create_function(|lua, angle_rad: f64| {
             let m = linalg::rotate2d_matrix(angle_rad).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: m })
@@ -1067,13 +1065,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     )?;
 
     // -- affine2d --
-    /// Creates a 3Ă—3 homogeneous affine matrix.
-    /// @param tx : number
-    /// @param ty : number
-    /// @param angle_rad : number
-    /// @param sx : number
-    /// @param sy : number
-    /// @return Array
+    /// Creates a 3Ă-3 homogeneous affine matrix.
+    /// @param | tx | number | Translation X offset.
+    /// @param | ty | number | Translation Y offset.
+    /// @param | angle_rad | number | Angle in radians.
+    /// @param | sx | number | Scale factor on the X axis.
+    /// @param | sy | number | Scale factor on the Y axis.
+    /// @return | Array | New 3Ă-3 homogeneous affine matrix.
     tbl.set("affine2d", lua.create_function(
             |lua, (tx, ty, angle_rad, sx, sy): (f64, f64, f64, f64, f64)| {
                 let m =
@@ -1087,10 +1085,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Computes the discrete Fourier transform of a 1D real-valued sample array.
     ///
     /// The input is zero-padded to the next power of two. Returns an array of
-    /// `{re = number, im = number}` tables â€” one per frequency bin.
+    /// `{re = number, im = number}` tables - one per frequency bin.
     ///
-    /// @param samples : table
-    /// @return table
+    /// @param | samples | table | Sample list.
+        /// @return | table | Complex frequency bins as {re, im} tables.
     tbl.set("fft", lua.create_function(|lua, samples: LuaTable| {
             let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
             let output = crate::compute::fft::fft(&data);
@@ -1111,8 +1109,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Accepts a table of `{re, im}` complex-coefficient tables (as returned by
     /// `lurek.compute.fft`) and returns the reconstructed real-valued time-domain samples.
     ///
-    /// @param freqs : table
-    /// @return table
+    /// @param | freqs | table | Frequency list.
+        /// @return | table | Reconstructed real-valued samples.
     tbl.set("ifft", lua.create_function(|lua, freqs: LuaTable| {
             let pairs: Vec<(f64, f64)> = freqs
                 .sequence_values::<LuaTable>()
@@ -1138,8 +1136,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Equivalent to calling `fft` and computing the L2 norm of each complex
     /// coefficient. Useful for audio-amplitude analysis.
     ///
-    /// @param samples : table
-    /// @return table
+    /// @param | samples | table | Sample list.
+        /// @return | table | Magnitude values for each frequency bin.
     tbl.set("fftMagnitude", lua.create_function(|lua, samples: LuaTable| {
             let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
             let mag = crate::compute::fft::fft_magnitude(&data);

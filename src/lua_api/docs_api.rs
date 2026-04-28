@@ -1,4 +1,4 @@
-//! Registers the `lurek.docs.*` documentation management API.
+//! `lurek.docs` - Documentation management and API catalog utilities.
 //!
 //! Provides engine-integrated documentation management: scanning runtime bindings,
 //! loading TOML doc catalogs, validating completeness, computing quality metrics,
@@ -10,6 +10,7 @@ use std::rc::Rc;
 
 use mlua::prelude::*;
 
+use super::SharedState;
 use crate::docs;
 
 // ---------------------------------------------------------------------------
@@ -21,11 +22,11 @@ struct LuaSchema(docs::Schema);
 
 impl LuaUserData for LuaSchema {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- validate --
         /// Validates a Lua table against the schema.
-        /// Returns (ok: boolean, errors: {field, message}[]).
-        /// @param data table
-        /// @return nil
-        /// boolean, table
+        /// @param | data | table | Table to validate.
+        /// @return | boolean | True when the table satisfies the schema.
+        /// @return | table | Array of validation error records.
         methods.add_method("validate", |lua, this, data: LuaTable| {
             // Serialise table fields to (name, type_str, value_str) tuples.
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
@@ -54,9 +55,10 @@ impl LuaUserData for LuaSchema {
             Ok((result.ok, errors_tbl))
         });
 
+        // -- check --
         /// Returns true when the data passes all schema rules.
-        /// @param data table
-        /// @return boolean
+        /// @param | data | table | Table to validate.
+        /// @return | boolean | True when the table passes validation.
         methods.add_method("check", |_, this, data: LuaTable| {
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
             for pair in data.clone().pairs::<String, LuaValue>() {
@@ -75,9 +77,10 @@ impl LuaUserData for LuaSchema {
             Ok(this.0.validate_pairs(&fields).ok)
         });
 
+        // -- assert --
         /// Validates data and throws a Lua error on failure with all error messages joined.
-        /// @param data table
-        /// @return nil
+        /// @param | data | table | Table to validate.
+        /// @return | nil | No value is returned.
         methods.add_method("assert", |_, this, data: LuaTable| {
             let mut fields: Vec<(String, &'static str, String)> = Vec::new();
             for pair in data.clone().pairs::<String, LuaValue>() {
@@ -108,12 +111,14 @@ impl LuaUserData for LuaSchema {
             Ok(())
         });
 
+        // -- getName --
         /// Returns the name identifier of this API schema group.
-        /// @return string
+        /// @return | string | Schema group name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
 
+        // -- getFields --
         /// Returns a table of declared field names.
-        /// @return table
+        /// @return | table | Array of declared field names.
         methods.add_method("getFields", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let mut names: Vec<&String> = this.0.rules.keys().collect();
@@ -126,13 +131,13 @@ impl LuaUserData for LuaSchema {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Type name.
         methods.add_method("type", |_, _, ()| Ok("LSchema"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSchema" || name == "Object")
         });
@@ -150,32 +155,38 @@ struct DocEntry(docs::DocEntry);
 /// Wraps a single doc entry for Lua access.
 impl LuaUserData for DocEntry {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getName --
         /// Returns the symbol name for this documentation entry.
-        /// @return string
+        /// @return | string | Entry name.
         methods.add_method("getName", |_, this, ()| Ok(this.0.name.clone()));
 
+        // -- getQualifiedName --
         /// Returns the qualified name.
-        /// @return string
+        /// @return | string | Fully qualified entry name.
         methods.add_method("getQualifiedName", |_, this, ()| {
             Ok(this.0.qualified_name.clone())
         });
 
+        // -- getModule --
         /// Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
-        /// @return string
+        /// @return | string | Module name.
         methods.add_method("getModule", |_, this, ()| Ok(this.0.module.clone()));
 
+        // -- getKind --
         /// Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
-        /// @return string
+        /// @return | string | Entry kind.
         methods.add_method("getKind", |_, this, ()| Ok(this.0.kind.clone()));
 
+        // -- getDescription --
         /// Returns the human-readable description text for this documentation entry.
-        /// @return string
+        /// @return | string | Description text.
         methods.add_method("getDescription", |_, this, ()| {
             Ok(this.0.description.clone())
         });
 
+        // -- getParameters --
         /// Returns the parameters as a table of `{name, type, description, optional, default?}` records.
-        /// @return table
+        /// @return | table | Array of parameter records.
         methods.add_method("getParameters", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, p) in this.0.parameters.iter().enumerate() {
@@ -192,8 +203,9 @@ impl LuaUserData for DocEntry {
             Ok(tbl)
         });
 
+        // -- getReturns --
         /// Returns the return values as a table of `{type, description}` records.
-        /// @return table
+        /// @return | table | Array of return-value records.
         methods.add_method("getReturns", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, r) in this.0.returns.iter().enumerate() {
@@ -205,53 +217,61 @@ impl LuaUserData for DocEntry {
             Ok(tbl)
         });
 
+        // -- getExample --
         /// Returns the example snippet, or nil.
-        /// @return string?
+        /// @return | string | Example snippet when present.
         methods.add_method("getExample", |_, this, ()| Ok(this.0.example.clone()));
 
+        // -- getSince --
         /// Returns the since version string, or nil.
-        /// @return string?
+        /// @return | string | Since version when present.
         methods.add_method("getSince", |_, this, ()| Ok(this.0.since.clone()));
 
+        // -- getDeprecated --
         /// Returns the deprecation message, or nil.
-        /// @return string?
+        /// @return | string | Deprecation message when present.
         methods.add_method("getDeprecated", |_, this, ()| Ok(this.0.deprecated.clone()));
 
+        // -- getScore --
         /// Returns the quality score in [0,1].
-        /// @return number
+        /// @return | number | Quality score.
         methods.add_method("getScore", |_, this, ()| Ok(docs::quality_score(&this.0)));
 
+        // -- hasDescription --
         /// Returns true when the entry has a non-empty description.
-        /// @return boolean
+        /// @return | boolean | True when the entry has a description.
         methods.add_method("hasDescription", |_, this, ()| {
             Ok(!this.0.description.is_empty())
         });
 
+        // -- hasParameters --
         /// Returns true when the entry has at least one parameter.
-        /// @return boolean
+        /// @return | boolean | True when the entry has parameters.
         methods.add_method("hasParameters", |_, this, ()| {
             Ok(!this.0.parameters.is_empty())
         });
 
+        // -- hasReturnType --
         /// Returns true when the entry declares at least one return type.
-        /// @return boolean
+        /// @return | boolean | True when the entry declares return values.
         methods.add_method("hasReturnType", |_, this, ()| {
             Ok(!this.0.returns.is_empty())
         });
 
+        // -- hasExample --
         /// Returns true when the entry has an example snippet.
-        /// @return boolean
+        /// @return | boolean | True when the entry has an example.
         methods.add_method("hasExample", |_, this, ()| Ok(this.0.example.is_some()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Type name.
         methods.add_method("type", |_, _, ()| Ok("LDocEntry"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LDocEntry" || name == "Object")
         });
@@ -291,8 +311,9 @@ impl ApiCatalog {
 /// Wraps a catalog snapshot of API entries for Lua access.
 impl LuaUserData for ApiCatalog {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getModules --
         /// Returns a sorted list of module names present in the catalog.
-        /// @return table
+        /// @return | table | Array of module names.
         methods.add_method("getModules", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, m) in this.modules().iter().enumerate() {
@@ -301,9 +322,10 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- getEntries --
         /// Returns all entries, optionally filtered to a single module.
-        /// @param module string?
-        /// @return table
+        /// @param | module | string? | Optional module name filter.
+        /// @return | table | Array of matching documentation entries.
         methods.add_method("getEntries", |lua, this, module: Option<String>| {
             let tbl = lua.create_table()?;
             let entries: Vec<&docs::DocEntry> = match module.as_deref() {
@@ -316,17 +338,18 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- getEntry --
         /// Returns a single entry by qualified name, or nil.
-        /// @param qualified_name string
-        /// @return nil
-        /// DocEntry?
+        /// @param | qualified_name | string | Qualified entry name.
+        /// @return | LDocEntry | Matching documentation entry when found.
         methods.add_method("getEntry", |_, this, qualified_name: String| {
             Ok(this.get_entry(&qualified_name).map(|e| DocEntry(e.clone())))
         });
 
+        // -- getTypes --
         /// Returns the names of all entries with kind "type" in the given module.
-        /// @param module_name string
-        /// @return table
+        /// @param | module_name | string | Module name to inspect.
+        /// @return | table | Array of type names.
         methods.add_method("getTypes", |lua, this, module_name: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
@@ -339,9 +362,10 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- getTypeMethods --
         /// Returns entries that are methods of the given type qualified name.
-        /// @param qualified_name string
-        /// @return table
+        /// @param | qualified_name | string | Qualified type name.
+        /// @return | table | Array of matching method entries.
         methods.add_method("getTypeMethods", |lua, this, qualified_name: String| {
             let tbl = lua.create_table()?;
             let prefix = format!("{}:", qualified_name);
@@ -357,9 +381,10 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- entryCount --
         /// Returns the number of entries, optionally scoped to a module.
-        /// @param module string?
-        /// @return integer
+        /// @param | module | string? | Optional module name filter.
+        /// @return | integer | Number of matching entries.
         methods.add_method("entryCount", |_, this, module: Option<String>| {
             Ok(match module.as_deref() {
                 Some(m) => this.0.iter().filter(|e| e.module == m).count(),
@@ -367,9 +392,10 @@ impl LuaUserData for ApiCatalog {
             })
         });
 
+        // -- merge --
         /// Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
-        /// @param other userdata
-        /// @return ApiCatalog
+        /// @param | other | userdata | Another API catalog userdata.
+        /// @return | LApiCatalog | Merged API catalog.
         methods.add_method("merge", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<ApiCatalog>()?;
             let mut merged = this.0.clone();
@@ -386,9 +412,10 @@ impl LuaUserData for ApiCatalog {
             Ok(ApiCatalog(merged))
         });
 
+        // -- filter --
         /// Returns a new catalog containing only entries for which predicate returns true.
-        /// @param predicate function
-        /// @return ApiCatalog
+        /// @param | predicate | function | Predicate called with each entry.
+        /// @return | LApiCatalog | Filtered API catalog.
         methods.add_method("filter", |_lua, this, predicate: LuaFunction| {
             let mut filtered = Vec::new();
             for e in &this.0 {
@@ -401,9 +428,10 @@ impl LuaUserData for ApiCatalog {
             Ok(ApiCatalog(filtered))
         });
 
+        // -- search --
         /// Returns a table of entries whose name, qualified name, or description contains query.
-        /// @param query string
-        /// @return table
+        /// @param | query | string | Search text.
+        /// @return | table | Array of matching entries.
         methods.add_method("search", |lua, this, query: String| {
             let query_lower = query.to_lowercase();
             let tbl = lua.create_table()?;
@@ -420,8 +448,9 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- toTable --
         /// Converts the catalog to a plain Lua table array.
-        /// @return table
+        /// @return | table | Plain Lua table array of entries.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, e) in this.0.iter().enumerate() {
@@ -437,8 +466,9 @@ impl LuaUserData for ApiCatalog {
             Ok(tbl)
         });
 
+        // -- toJSON --
         /// Serialises the catalog to a pretty-printed JSON string.
-        /// @return string
+        /// @return | string | Pretty-printed JSON representation.
         methods.add_method("toJSON", |_, this, ()| {
             let mut entries = Vec::new();
             for e in &this.0 {
@@ -480,13 +510,13 @@ impl LuaUserData for ApiCatalog {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Type name.
         methods.add_method("type", |_, _, ()| Ok("LApiCatalog"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LApiCatalog" || name == "Object")
         });
@@ -503,12 +533,14 @@ struct ValidationReport(docs::ValidationReport);
 /// Wraps a validation report for Lua access.
 impl LuaUserData for ValidationReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- isValid --
         /// Returns true when the report has no missing entries.
-        /// @return boolean
+        /// @return | boolean | True when no entries are missing.
         methods.add_method("isValid", |_, this, ()| Ok(this.0.missing.is_empty()));
 
+        // -- getMissing --
         /// Returns the list of qualified names present in the live API but missing from the catalog.
-        /// @return table
+        /// @return | table | Array of missing qualified names.
         methods.add_method("getMissing", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, m) in this.0.missing.iter().enumerate() {
@@ -517,8 +549,9 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
 
+        // -- getPhantom --
         /// Returns the list of qualified names in the catalog that are not present in the live API.
-        /// @return table
+        /// @return | table | Array of phantom qualified names.
         methods.add_method("getPhantom", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, p) in this.0.phantom.iter().enumerate() {
@@ -527,8 +560,9 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
 
+        // -- getIncomplete --
         /// Returns the list of qualified names whose catalog entry is incomplete.
-        /// @return table
+        /// @return | table | Array of incomplete qualified names.
         methods.add_method("getIncomplete", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (i, inc) in this.0.incomplete.iter().enumerate() {
@@ -537,20 +571,24 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
 
+        // -- missingCount --
         /// Returns the count of missing entries.
-        /// @return integer
+        /// @return | integer | Number of missing entries.
         methods.add_method("missingCount", |_, this, ()| Ok(this.0.missing.len()));
 
+        // -- phantomCount --
         /// Returns the count of phantom entries.
-        /// @return integer
+        /// @return | integer | Number of phantom entries.
         methods.add_method("phantomCount", |_, this, ()| Ok(this.0.phantom.len()));
 
+        // -- incompleteCount --
         /// Returns the count of incomplete entries.
-        /// @return integer
+        /// @return | integer | Number of incomplete entries.
         methods.add_method("incompleteCount", |_, this, ()| Ok(this.0.incomplete.len()));
 
+        // -- getSummary --
         /// Returns a single-line summary of the validation results.
-        /// @return string
+        /// @return | string | Summary string.
         methods.add_method("getSummary", |_, this, ()| {
             Ok(format!(
                 "Missing: {}, Phantom: {}, Incomplete: {}",
@@ -560,8 +598,9 @@ impl LuaUserData for ValidationReport {
             ))
         });
 
+        // -- toTable --
         /// Converts the report to a plain Lua table.
-        /// @return table
+        /// @return | table | Plain Lua table representation.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             let missing = lua.create_table()?;
@@ -584,8 +623,9 @@ impl LuaUserData for ValidationReport {
             Ok(tbl)
         });
 
+        // -- toJSON --
         /// Serialises the report to a pretty-printed JSON string.
-        /// @return string
+        /// @return | string | Pretty-printed JSON representation.
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
                 "missing": this.0.missing,
@@ -598,13 +638,13 @@ impl LuaUserData for ValidationReport {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Type name.
         methods.add_method("type", |_, _, ()| Ok("LValidationReport"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LValidationReport" || name == "Object")
         });
@@ -621,18 +661,21 @@ struct QualityReport(docs::QualityReport);
 /// Wraps documentation quality metrics for Lua access.
 impl LuaUserData for QualityReport {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getOverallScore --
         /// Returns the overall quality score in [0,1].
-        /// @return number
+        /// @return | number | Overall quality score.
         methods.add_method("getOverallScore", |_, this, ()| Ok(this.0.overall_score));
 
+        // -- getGrade --
         /// Returns the letter grade for the overall score.
-        /// @return string
+        /// @return | string | Letter grade.
         methods.add_method("getGrade", |_, this, ()| {
             Ok(docs::quality_grade(this.0.overall_score).to_string())
         });
 
+        // -- getModuleScores --
         /// Returns a table mapping module name to its average quality score.
-        /// @return table
+        /// @return | table | Table mapping module names to scores.
         methods.add_method("getModuleScores", |lua, this, ()| {
             let tbl = lua.create_table()?;
             for (k, v) in &this.0.module_scores {
@@ -641,9 +684,10 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
 
+        // -- getWorst --
         /// Returns up to count entries with the lowest quality scores.
-        /// @param count integer?
-        /// @return table
+        /// @param | count | integer? | Maximum number of entries to return.
+        /// @return | table | Array of lowest-scoring entries.
         methods.add_method("getWorst", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
             let mut sorted = this.0.entries.clone();
@@ -659,9 +703,10 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
 
+        // -- getBest --
         /// Returns up to count entries with the highest quality scores.
-        /// @param count integer?
-        /// @return table
+        /// @param | count | integer? | Maximum number of entries to return.
+        /// @return | table | Array of highest-scoring entries.
         methods.add_method("getBest", |lua, this, count: Option<usize>| {
             let n = count.unwrap_or(10);
             let mut sorted = this.0.entries.clone();
@@ -677,9 +722,10 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
 
+        // -- getByGrade --
         /// Returns entries whose grade exactly matches the given letter grade.
-        /// @param grade string
-        /// @return table
+        /// @param | grade | string | Letter grade to match.
+        /// @return | table | Array of matching entries.
         methods.add_method("getByGrade", |lua, this, grade: String| {
             let tbl = lua.create_table()?;
             let mut idx = 1;
@@ -692,8 +738,9 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
 
+        // -- getSummary --
         /// Returns a multi-line human-readable summary of quality by module.
-        /// @return string
+        /// @return | string | Multi-line summary.
         methods.add_method("getSummary", |_, this, ()| {
             let mut lines = vec![format!(
                 "Overall: {} ({:.0}%)",
@@ -708,8 +755,9 @@ impl LuaUserData for QualityReport {
             Ok(lines.join("\n"))
         });
 
+        // -- toTable --
         /// Converts the quality report to a plain Lua table.
-        /// @return table
+        /// @return | table | Plain Lua table representation.
         methods.add_method("toTable", |lua, this, ()| {
             let tbl = lua.create_table()?;
             // overallScore: quality score in [0,1]
@@ -725,8 +773,9 @@ impl LuaUserData for QualityReport {
             Ok(tbl)
         });
 
+        // -- toJSON --
         /// Serialises the quality report to a pretty-printed JSON string.
-        /// @return string
+        /// @return | string | Pretty-printed JSON representation.
         methods.add_method("toJSON", |_, this, ()| {
             let val = serde_json::json!({
                 "overallScore": this.0.overall_score,
@@ -738,13 +787,13 @@ impl LuaUserData for QualityReport {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Type name.
         methods.add_method("type", |_, _, ()| Ok("LQualityReport"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare.
+        /// @return | boolean | True when the type matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LQualityReport" || name == "Object")
         });
@@ -755,7 +804,7 @@ impl LuaUserData for QualityReport {
 // Internal state
 // ---------------------------------------------------------------------------
 
-/// State shared between all lurek.docs closures via Rc<RefCell>.
+// State shared between all lurek.docs closures via Rc<RefCell>.
 struct DocsState {
     entries: Vec<docs::DocEntry>,
 }
@@ -768,7 +817,7 @@ impl DocsState {
     }
 }
 
-/// Computes a `QualityReport` for the given entry slice.
+// Computes a `QualityReport` for the given entry slice.
 fn compute_quality(entries: &[docs::DocEntry]) -> QualityReport {
     QualityReport(docs::QualityReport::from_entries(entries))
 }
@@ -822,11 +871,11 @@ fn scan_table(
 // ---------------------------------------------------------------------------
 
 /// Registers the `lurek.docs` namespace.
-///
-/// @param lua &Lua
-/// @param lurek_table &LuaTable
-///
-pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
+pub fn register(
+    lua: &Lua,
+    lurek_table: &LuaTable,
+    _state: Rc<RefCell<SharedState>>,
+) -> LuaResult<()> {
     let docs_tbl = lua.create_table()?;
     let state = Rc::new(RefCell::new(DocsState::new()));
 
@@ -834,8 +883,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- scan --------------------------------------------------------------
     /// Scan the lurek.* namespace to build an API catalog from live bindings.
-    /// @param opts table?
-    /// @return ApiCatalog
+    /// @param | opts | table? | Optional scan options table.
+    /// @return | LApiCatalog | Catalog built from live bindings.
     docs_tbl.set("scan", lua.create_function(|lua, _opts: Option<LuaTable>| {
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("lurek")?;
@@ -847,8 +896,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- scanModule --------------------------------------------------------
     /// Scan a single module's bindings.
-    /// @param module_name string
-    /// @return ApiCatalog
+    /// @param | module_name | string | Module name to scan.
+    /// @return | LApiCatalog | Catalog built from the selected module.
     docs_tbl.set("scanModule", lua.create_function(|lua, module_name: String| {
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("lurek")?;
@@ -862,8 +911,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- loadToml ----------------------------------------------------------
     /// Load a TOML doc file into an ApiCatalog.
-    /// @param path string
-    /// @return ApiCatalog
+    /// @param | path | string | Path to the TOML file.
+    /// @return | LApiCatalog | Catalog loaded from the file.
     docs_tbl.set("loadToml", lua.create_function(|lua, path: String| {
             let content = std::fs::read_to_string(&path)
                 .map_err(|e| LuaError::RuntimeError(format!("failed to read {}: {}", path, e)))?;
@@ -894,8 +943,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- loadAll -----------------------------------------------------------
     /// Load all .toml files in a directory and merge into a single ApiCatalog.
-    /// @param directory string
-    /// @return ApiCatalog
+    /// @param | directory | string | Directory containing TOML files.
+    /// @return | LApiCatalog | Merged catalog from all TOML files.
     docs_tbl.set("loadAll", lua.create_function(|lua, directory: String| {
             let mut all_entries = Vec::new();
             if let Ok(read_dir) = std::fs::read_dir(&directory) {
@@ -938,8 +987,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- describe ----------------------------------------------------------
     /// Inject or update a description for a named API entry.
-    /// @param qualified_name string
-    /// @param description string
+    /// @param | qualified_name | string | Qualified entry name.
+    /// @param | description | string | Description text to store.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     docs_tbl.set("describe", lua.create_function(move |_, (qualified_name, description): (String, String)| {
             let mut st = s.borrow_mut();
@@ -972,8 +1022,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- setParamInfo ------------------------------------------------------
     /// Set the parameter metadata for a catalog entry.
-    /// @param qualified_name string
-    /// @param params table
+    /// @param | qualified_name | string | Qualified entry name.
+    /// @param | params | table | Array of parameter metadata records.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     docs_tbl.set("setParamInfo", lua.create_function(move |_, (qualified_name, params): (String, LuaTable)| {
             let mut st = s.borrow_mut();
@@ -1000,8 +1051,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- setReturnInfo -----------------------------------------------------
     /// Set the return type metadata for a catalog entry.
-    /// @param qualified_name string
-    /// @param returns table
+    /// @param | qualified_name | string | Qualified entry name.
+    /// @param | returns | table | Array of return metadata records.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     docs_tbl.set("setReturnInfo", lua.create_function(move |_, (qualified_name, returns): (String, LuaTable)| {
             let mut st = s.borrow_mut();
@@ -1025,13 +1077,14 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- getCatalog --------------------------------------------------------
     /// Return the current internal catalog as an ApiCatalog userdata.
-    /// @return ApiCatalog
+    /// @return | LApiCatalog | Current internal catalog.
     let s = state.clone();
     docs_tbl.set("getCatalog", lua.create_function(move |_, ()| Ok(ApiCatalog(s.borrow().entries.clone())))?,
     )?;
 
     // -- resetCatalog ------------------------------------------------------
     /// Clear all entries from the internal catalog.
+    /// @return | nil | No value is returned.
     let s = state.clone();
     docs_tbl.set("resetCatalog", lua.create_function(move |_, ()| {
             s.borrow_mut().entries.clear();
@@ -1043,8 +1096,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- validate ----------------------------------------------------------
     /// Validate catalog completeness against the live lurek.* bindings.
-    /// @param catalog_ud ApiCatalog?
-    /// @return ValidationReport
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to validate.
+    /// @return | LValidationReport | Validation report.
     docs_tbl.set("validate", lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
             let doc_entries = catalog_ud
                 .map(|ud| ud.borrow::<ApiCatalog>().map(|c| c.0.clone()))
@@ -1085,9 +1138,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- validateModule ----------------------------------------------------
     /// Validate a single module against the live lurek.<module>.* bindings.
-    /// @param module_name string
-    /// @param catalog_ud ApiCatalog?
-    /// @return ValidationReport
+    /// @param | module_name | string | Module name to validate.
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to validate.
+    /// @return | LValidationReport | Validation report.
     docs_tbl.set("validateModule", lua.create_function(
             |lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
                 let doc_entries = catalog_ud
@@ -1136,9 +1189,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- checkStaleness ----------------------------------------------------
     /// Compare catalog entries against source files in a directory for staleness.
-    /// @param catalog_ud ApiCatalog
-    /// @param source_dir string
-    /// @return table
+    /// @param | catalog_ud | LApiCatalog | Catalog to compare.
+    /// @param | source_dir | string | Source directory to inspect.
+    /// @return | table | Table containing stale, current, and missing lists.
     docs_tbl.set("checkStaleness", lua.create_function(|lua, (_catalog_ud, source_dir): (LuaAnyUserData, String)| {
             let tbl = lua.create_table()?;
             let stale = lua.create_table()?;
@@ -1168,8 +1221,8 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- quality -----------------------------------------------------------
     /// Calculate quality metrics for a catalog or the internal catalog.
-    /// @param catalog_ud ApiCatalog?
-    /// @return table
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to inspect.
+    /// @return | LQualityReport | Quality report.
     let s = state.clone();
     docs_tbl.set("quality", lua.create_function(move |_, catalog_ud: Option<LuaAnyUserData>| {
             let entries = match catalog_ud {
@@ -1182,9 +1235,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- qualityModule -----------------------------------------------------
     /// Calculate quality metrics for a single module.
-    /// @param module_name string
-    /// @param catalog_ud ApiCatalog?
-    /// @return table
+    /// @param | module_name | string | Module name to inspect.
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to inspect.
+    /// @return | LQualityReport | Quality report for the module.
     let s = state.clone();
     docs_tbl.set("qualityModule", lua.create_function(
             move |_, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
@@ -1203,8 +1256,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- coverage ----------------------------------------------------------
     /// Return (documented_count, total_live_count) coverage tuple.
-    /// @param catalog_ud ApiCatalog?
-    /// @return integer, integer
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to inspect.
+    /// @return | integer | Number of documented entries.
+    /// @return | integer | Number of live entries discovered in the runtime.
     docs_tbl.set("coverage", lua.create_function(|lua, catalog_ud: Option<LuaAnyUserData>| {
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("lurek")?;
@@ -1221,9 +1275,10 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- coverageModule ----------------------------------------------------
     /// Return (documented_count, total_live_count) for a single module.
-    /// @param module_name string
-    /// @param catalog_ud ApiCatalog?
-    /// @return integer, integer
+    /// @param | module_name | string | Module name to inspect.
+    /// @param | catalog_ud | LApiCatalog? | Optional catalog to inspect.
+    /// @return | integer | Number of documented entries for the module.
+    /// @return | integer | Number of live entries discovered for the module.
     docs_tbl.set("coverageModule", lua.create_function(
             |lua, (module_name, catalog_ud): (String, Option<LuaAnyUserData>)| {
                 let globals = lua.globals();
@@ -1251,8 +1306,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportCompletions -------------------------------------------------
     /// Export VS Code IntelliSense completions JSON to a file.
-    /// @param catalog_ud ApiCatalog
-    /// @param path string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | path | string | Output file path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportCompletions", lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             docs::export_completions(&catalog.0, &path).map_err(LuaError::RuntimeError)
@@ -1261,8 +1317,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportHover -------------------------------------------------------
     /// Export VS Code hover JSON to a file.
-    /// @param catalog_ud ApiCatalog
-    /// @param path string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | path | string | Output file path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportHover", lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             docs::export_hover(&catalog.0, &path).map_err(LuaError::RuntimeError)
@@ -1271,8 +1328,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportSignatures --------------------------------------------------
     /// Export VS Code signature-help JSON to a file.
-    /// @param catalog_ud ApiCatalog
-    /// @param path string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | path | string | Output file path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportSignatures", lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             docs::export_signatures(&catalog.0, &path).map_err(LuaError::RuntimeError)
@@ -1281,8 +1339,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportAll ---------------------------------------------------------
     /// Export completions.json, hover.json, and signatures.json to a directory.
-    /// @param catalog_ud ApiCatalog
-    /// @param output_dir string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | output_dir | string | Output directory path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportAll", lua.create_function(|_, (catalog_ud, output_dir): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             docs::export_all(&catalog.0, &output_dir).map_err(LuaError::RuntimeError)
@@ -1291,8 +1350,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportMarkdown ----------------------------------------------------
     /// Export a Markdown API reference file.
-    /// @param catalog_ud ApiCatalog
-    /// @param path string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | path | string | Output file path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportMarkdown", lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut md = String::from("# API Reference\n\n");
@@ -1337,8 +1397,9 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
 
     // -- exportCheatsheet --------------------------------------------------
     /// Export a one-line-per-function plain-text cheatsheet.
-    /// @param catalog_ud ApiCatalog
-    /// @param path string
+    /// @param | catalog_ud | LApiCatalog | Catalog to export.
+    /// @param | path | string | Output file path.
+    /// @return | nil | No value is returned.
     docs_tbl.set("exportCheatsheet", lua.create_function(|_, (catalog_ud, path): (LuaAnyUserData, String)| {
             let catalog = catalog_ud.borrow::<ApiCatalog>()?;
             let mut lines = Vec::new();
@@ -1368,23 +1429,11 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // â”€â”€ schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Creates a Schema validator from a rules table.
-    ///
-    /// Each key is a field name; the value is a rule table with keys:
-    ///   type        : string  ("string","number","integer","boolean","table","function","any")
-    ///   required    : boolean (default false)
-    ///   min         : number  (for number/integer fields)
-    ///   max         : number  (for number/integer fields)
-    ///   minLen      : integer (for string fields)
-    ///   maxLen      : integer (for string fields)
-    ///   enum        : table   (array of allowed string values)
-    ///   description : string  (human-readable field doc)
-    ///   strict      : boolean (on root table: reject undeclared fields, default false)
-    ///
-    /// @param rules table
-    /// @param name string?
-    /// @return userdata
+    // -- schema --
+    /// Creates a schema validator from a rules table.
+    /// @param | rules | table | Rules table describing fields and constraints.
+    /// @param | name | string? | Optional schema name.
+    /// @return | LSchema | Schema validator userdata.
     docs_tbl.set("schema", lua.create_function(|_, (rules, name): (LuaTable, Option<String>)| {
             use crate::docs::{FieldRule, FieldType, Schema};
             let schema_name = name.unwrap_or_else(|| "schema".to_string());
@@ -1421,14 +1470,10 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // â”€â”€ reflectLive â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Walks the live lurek.* Lua table and returns a structured reflection of all
-    /// registered namespaces, function names, arity, and value types.
-    ///
-    /// Returns a table: { [ns]: { name, type, arity? }[] }
-    ///
-    /// @param ns string?  (if provided, reflects only lurek.<ns>)
-    /// @return table
+    // -- reflectLive --
+    /// Walks the live lurek.* Lua table and returns a structured reflection table.
+    /// @param | ns | string? | Optional namespace to reflect.
+    /// @return | table | Reflection table keyed by namespace.
     docs_tbl.set("reflectLive", lua.create_function(|lua, ns: Option<String>| {
             let globals = lua.globals();
             let luna_tbl: LuaTable = globals.get("lurek")?;
@@ -1480,15 +1525,11 @@ pub fn register(lua: &Lua, lurek_table: &LuaTable) -> LuaResult<()> {
         })?,
     )?;
 
-    // â”€â”€ reflectTable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Reflects any Lua table, returning a structure describing its keys,
-    /// value types, and arity for functions.
-    ///
-    /// Returns an array: { name, type, arity?, isVariadic? }[]
-    ///
-    /// @param tbl table
-    /// @param name string?  (prefix for qualified names, optional)
-    /// @return table
+    // -- reflectTable --
+    /// Reflects any Lua table and returns a structure describing its keys and value types.
+    /// @param | tbl | table | Table to reflect.
+    /// @param | name | string? | Optional prefix for qualified names.
+    /// @return | table | Reflection array for the table.
     docs_tbl.set("reflectTable", lua.create_function(|lua, (tbl, name): (LuaTable, Option<String>)| {
             let prefix = name.unwrap_or_default();
             let items = lua.create_table()?;

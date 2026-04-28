@@ -8,7 +8,14 @@
 
 -- Mock lurek.network.pack/unpack using identity (tables pass through)
 if not lurek then lurek = {} end
-if not lurek.network then lurek.network = {} end
+if not lurek.network then
+    lurek.network = {
+        MAX_PEERS = 4096,
+        DEFAULT_PEERS = 166,
+        MAX_CHANNELS = 255,
+        DEFAULT_CHANNELS = 2,
+    }
+end
 if not lurek.log then
     lurek.log = { debug = function() end }
 end
@@ -395,7 +402,7 @@ describe("RPC Incoming Call Dispatch", function()
         R:poll()
         expect_equal(type(err_msg), "string")
         -- Error message should include the method name
-        local found = string.find(err_msg, "nonexistent")
+        local found = string.find(tostring(err_msg), "nonexistent")
         expect_equal(found ~= nil, true)
     end)
 
@@ -440,7 +447,7 @@ describe("RPC Incoming Call Dispatch", function()
         R:poll()
         expect_equal(type(err_msg), "string")
         -- Error message should include the method name
-        local found = string.find(err_msg, "crashy")
+        local found = string.find(tostring(err_msg), "crashy")
         expect_equal(found ~= nil, true)
     end)
 end)
@@ -470,7 +477,7 @@ describe("RPC Unpack Failure", function()
 
         expect_equal(type(err_msg), "string")
         -- Error should mention the peer
-        local found = string.find(err_msg, "99")
+        local found = string.find(tostring(err_msg), "99")
         expect_equal(found ~= nil, true)
     end)
 end)
@@ -509,7 +516,8 @@ describe("RPC Timeout", function()
         expect_equal(R:getPendingCount(), 0)
         -- timeout result should contain method name
         expect_equal(type(timeout_result), "table")
-        local found = string.find(timeout_result[1], "slow_fn")
+        local timeout_msg = (timeout_result and timeout_result[1]) or ""
+        local found = string.find(tostring(timeout_msg), "slow_fn")
         expect_equal(found ~= nil, true)
     end)
 

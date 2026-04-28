@@ -1,4 +1,4 @@
-//! `lurek.audio` â€” Audio playback, mixing, MIDI synthesis, and DSP effects.
+//! `lurek.audio` - Audio playback, mixing, MIDI synthesis, and DSP effects.
 //!
 //! Registers sources (streamed or static), bus-based mixing, MIDI playback,
 //! streaming decoders, `SoundData` buffers, and spatial audio positioning.
@@ -20,7 +20,7 @@ use slotmap::Key;
 // Helpers
 // -------------------------------------------------------------------------------
 
-/// Extracts a `SoundKey` from either a `LuaSource` UserData or a numeric ID.
+// Extracts a `SoundKey` from either a `LuaSource` UserData or a numeric ID.
 fn sound_key_from_value(val: &LuaValue) -> LuaResult<SoundKey> {
     match val {
         LuaValue::UserData(ud) => {
@@ -35,7 +35,7 @@ fn sound_key_from_value(val: &LuaValue) -> LuaResult<SoundKey> {
     }
 }
 
-/// Builds an error for an invalid or released audio source handle.
+// Builds an error for an invalid or released audio source handle.
 fn invalid_source_handle(function_name: &str) -> LuaError {
     LuaError::RuntimeError(format!(
         "{}: invalid or already-released audio source handle",
@@ -43,7 +43,7 @@ fn invalid_source_handle(function_name: &str) -> LuaError {
     ))
 }
 
-/// Validates that a source key still exists in the mixer.
+// Validates that a source key still exists in the mixer.
 fn ensure_source_exists(
     mixer: &crate::audio::Mixer,
     key: SoundKey,
@@ -56,7 +56,7 @@ fn ensure_source_exists(
     }
 }
 
-/// Extracts and validates a source key from a Lua value.
+// Extracts and validates a source key from a Lua value.
 fn require_sound_key(
     state: &SharedState,
     val: &LuaValue,
@@ -66,15 +66,15 @@ fn require_sound_key(
     ensure_source_exists(&state.mixer, key, function_name)
 }
 
-/// Reconstructs a `QueueableKey` from the packed u64 used in Lua.
+// Reconstructs a `QueueableKey` from the packed u64 used in Lua.
 fn queueable_key_from_u64(raw: u64) -> QueueableKey {
     QueueableKey::from(slotmap::KeyData::from_ffi(raw))
 }
 
-/// Parses `newSoundData` arguments from a Lua multi-value into typed components.
-///
-/// Returns `(path, count, sample_rate, channels)` where `path` is `Some` for
-/// file-based construction and `None` for a silent buffer.
+// Parses `newSoundData` arguments from a Lua multi-value into typed components.
+//
+// Returns `(path, count, sample_rate, channels)` where `path` is `Some` for
+// file-based construction and `None` for a silent buffer.
 fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, usize, u32, u16)> {
     let mut it = args.into_iter();
     let first = it
@@ -121,8 +121,8 @@ fn extract_sound_data_args(args: LuaMultiValue) -> LuaResult<(Option<String>, us
 /// Lua-side wrapper for an audio source resource.
 ///
 /// # Fields
-/// - `state` â€” `Rc<RefCell<SharedState>>`.
-/// - `key` â€” `SoundKey`.
+/// - `state` - `Rc<RefCell<SharedState>>`.
+/// - `key` - `SoundKey`.
 ///
 #[derive(Clone)]
 pub struct LuaSource {
@@ -134,7 +134,7 @@ impl LuaUserData for LuaSource {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- play --
         /// Starts or resumes playback.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("play", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:play")?;
@@ -145,7 +145,7 @@ impl LuaUserData for LuaSource {
 
         // -- stop --
         /// Stops playback and resets seek position.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("stop", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:stop")?;
@@ -155,7 +155,7 @@ impl LuaUserData for LuaSource {
 
         // -- pause --
         /// Pauses playback at the current position.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:pause")?;
@@ -165,7 +165,7 @@ impl LuaUserData for LuaSource {
 
         // -- resume --
         /// Resumes playback from the paused position.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:resume")?;
@@ -175,8 +175,8 @@ impl LuaUserData for LuaSource {
 
         // -- setVolume --
         /// Sets playback volume (0.0 = silent, 1.0 = full).
-        /// @param vol number
-        /// @return nil
+        /// @param | vol | number | Volume multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setVolume")?;
@@ -186,7 +186,7 @@ impl LuaUserData for LuaSource {
 
         // -- getVolume --
         /// Returns the current volume multiplier.
-        /// @return number
+        /// @return | number | Current volume multiplier.
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getVolume")?;
@@ -195,8 +195,8 @@ impl LuaUserData for LuaSource {
 
         // -- setPitch --
         /// Sets the pitch multiplier (1.0 = normal).
-        /// @param pitch number
-        /// @return nil
+        /// @param | pitch | number | Pitch multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPitch")?;
@@ -206,7 +206,7 @@ impl LuaUserData for LuaSource {
 
         // -- getPitch --
         /// Returns the current pitch multiplier.
-        /// @return number
+        /// @return | number | Current pitch multiplier.
         methods.add_method("getPitch", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getPitch")?;
@@ -215,8 +215,8 @@ impl LuaUserData for LuaSource {
 
         // -- setLooping --
         /// Enables or disables looping playback.
-        /// @param looping boolean
-        /// @return nil
+        /// @param | looping | boolean | True to loop playback.
+        /// @return | nil | No value is returned.
         methods.add_method("setLooping", |_, this, looping: bool| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLooping")?;
@@ -226,7 +226,7 @@ impl LuaUserData for LuaSource {
 
         // -- isLooping --
         /// Returns true if looping is enabled.
-        /// @return boolean
+        /// @return | boolean | True when looping is enabled.
         methods.add_method("isLooping", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isLooping")?;
@@ -235,7 +235,7 @@ impl LuaUserData for LuaSource {
 
         // -- isPlaying --
         /// Returns true if currently playing.
-        /// @return boolean
+        /// @return | boolean | True when playback is active.
         methods.add_method("isPlaying", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPlaying")?;
@@ -244,7 +244,7 @@ impl LuaUserData for LuaSource {
 
         // -- isPaused --
         /// Returns true if playback is paused.
-        /// @return boolean
+        /// @return | boolean | True when playback is paused.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isPaused")?;
@@ -253,7 +253,7 @@ impl LuaUserData for LuaSource {
 
         // -- isStopped --
         /// Returns true if playback has stopped.
-        /// @return boolean
+        /// @return | boolean | True when playback is stopped.
         methods.add_method("isStopped", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:isStopped")?;
@@ -262,8 +262,8 @@ impl LuaUserData for LuaSource {
 
         // -- setPan --
         /// Sets stereo panning (-1.0 left to 1.0 right).
-        /// @param pan number
-        /// @return nil
+        /// @param | pan | number | Stereo pan value from -1.0 to 1.0.
+        /// @return | nil | No value is returned.
         methods.add_method("setPan", |_, this, pan: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setPan")?;
@@ -273,7 +273,7 @@ impl LuaUserData for LuaSource {
 
         // -- getPan --
         /// Returns the current stereo panning value.
-        /// @return number
+        /// @return | number | Current stereo pan value.
         methods.add_method("getPan", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getPan")?;
@@ -282,7 +282,7 @@ impl LuaUserData for LuaSource {
 
         // -- clone --
         /// Creates an independent copy of this source.
-        /// @return Source
+        /// @return | LSource | Cloned source handle.
         methods.add_method("clone", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             match st.mixer.clone_source(this.key) {
@@ -296,7 +296,7 @@ impl LuaUserData for LuaSource {
 
         // -- getType --
         /// Returns the source type ("static" or "stream").
-        /// @return string
+        /// @return | string | Source type name.
         methods.add_method("getType", |_, this, ()| {
             let st = this.state.borrow();
             match st.mixer.get_source_type(this.key) {
@@ -308,7 +308,7 @@ impl LuaUserData for LuaSource {
 
         // -- getDuration --
         /// Returns the total duration in seconds.
-        /// @return number
+        /// @return | number | Total duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getDuration")?;
@@ -317,7 +317,7 @@ impl LuaUserData for LuaSource {
 
         // -- tell --
         /// Returns the current playback position in seconds.
-        /// @return number
+        /// @return | number | Current playback position in seconds.
         methods.add_method("tell", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:tell")?;
@@ -326,8 +326,8 @@ impl LuaUserData for LuaSource {
 
         // -- seek --
         /// Seeks to a time position in seconds.
-        /// @param pos number
-        /// @return nil
+        /// @param | pos | number | Playback position in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method("seek", |_, this, pos: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:seek")?;
@@ -338,8 +338,8 @@ impl LuaUserData for LuaSource {
 
         // -- setLowpass --
         /// Applies a low-pass filter at the given cutoff frequency.
-        /// @param cutoff_hz integer
-        /// @return nil
+        /// @param | cutoff_hz | integer | Low-pass cutoff frequency in Hz.
+        /// @return | nil | No value is returned.
         methods.add_method("setLowpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setLowpass")?;
@@ -349,8 +349,8 @@ impl LuaUserData for LuaSource {
 
         // -- setHighpass --
         /// Applies a high-pass filter at the given cutoff frequency.
-        /// @param cutoff_hz integer
-        /// @return nil
+        /// @param | cutoff_hz | integer | High-pass cutoff frequency in Hz.
+        /// @return | nil | No value is returned.
         methods.add_method("setHighpass", |_, this, cutoff_hz: u32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:setHighpass")?;
@@ -360,7 +360,7 @@ impl LuaUserData for LuaSource {
 
         // -- getLowpass --
         /// Returns the low-pass filter cutoff frequency.
-        /// @return number
+        /// @return | number | Low-pass cutoff frequency in Hz.
         methods.add_method("getLowpass", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getLowpass")?;
@@ -369,7 +369,7 @@ impl LuaUserData for LuaSource {
 
         // -- getHighpass --
         /// Returns the high-pass filter cutoff frequency.
-        /// @return number
+        /// @return | number | High-pass cutoff frequency in Hz.
         methods.add_method("getHighpass", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getHighpass")?;
@@ -378,7 +378,7 @@ impl LuaUserData for LuaSource {
 
         // -- clearFilter --
         /// Removes any active filter from this source.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("clearFilter", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:clearFilter")?;
@@ -388,8 +388,8 @@ impl LuaUserData for LuaSource {
 
         // -- fadeIn --
         /// Fades in from silence over the given duration in seconds.
-        /// @param dur number
-        /// @return nil
+        /// @param | dur | number | Fade-in duration in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method("fadeIn", |_, this, dur: f32| {
             let mut st = this.state.borrow_mut();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:fadeIn")?;
@@ -399,7 +399,7 @@ impl LuaUserData for LuaSource {
 
         // -- getFadeIn --
         /// Returns the current fade-in duration in seconds.
-        /// @return number
+        /// @return | number | Current fade-in duration in seconds.
         methods.add_method("getFadeIn", |_, this, ()| {
             let st = this.state.borrow();
             let key = ensure_source_exists(&st.mixer, this.key, "Source:getFadeIn")?;
@@ -408,13 +408,13 @@ impl LuaUserData for LuaSource {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LSource"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LSource" || name == "Object")
         });
@@ -428,8 +428,8 @@ impl LuaUserData for LuaSource {
 /// Lua-side wrapper for an audio bus resource.
 ///
 /// # Fields
-/// - `state` â€” `Rc<RefCell<SharedState>>`.
-/// - `key` â€” `BusKey`.
+/// - `state` - `Rc<RefCell<SharedState>>`.
+/// - `key` - `BusKey`.
 ///
 #[derive(Clone)]
 pub struct LuaBus {
@@ -441,7 +441,7 @@ impl LuaUserData for LuaBus {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- getName --
         /// Returns the unique name string assigned to this audio bus.
-        /// @return string
+        /// @return | string | Bus name.
         methods.add_method("getName", |_, this, ()| {
             let st = this.state.borrow();
             match st.mixer.get_bus(this.key) {
@@ -454,8 +454,8 @@ impl LuaUserData for LuaBus {
 
         // -- setVolume --
         /// Sets the volume for all sources on this bus.
-        /// @param vol number
-        /// @return nil
+        /// @param | vol | number | Volume multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setVolume", |_, this, vol: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -466,7 +466,7 @@ impl LuaUserData for LuaBus {
 
         // -- getVolume --
         /// Returns the current volume multiplier applied to all sources on this bus.
-        /// @return number
+        /// @return | number | Current bus volume multiplier.
         methods.add_method("getVolume", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).map_or(1.0, |b| b.volume()))
@@ -474,8 +474,8 @@ impl LuaUserData for LuaBus {
 
         // -- setPitch --
         /// Sets the pitch multiplier for all sources on this bus.
-        /// @param pitch number
-        /// @return nil
+        /// @param | pitch | number | Pitch multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setPitch", |_, this, pitch: f32| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -486,7 +486,7 @@ impl LuaUserData for LuaBus {
 
         // -- getPitch --
         /// Returns the bus pitch multiplier.
-        /// @return number
+        /// @return | number | Current bus pitch multiplier.
         methods.add_method("getPitch", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).map_or(1.0, |b| b.pitch()))
@@ -494,7 +494,7 @@ impl LuaUserData for LuaBus {
 
         // -- pause --
         /// Pauses all sources on this bus.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("pause", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -505,7 +505,7 @@ impl LuaUserData for LuaBus {
 
         // -- resume --
         /// Resumes all sources on this bus.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("resume", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -516,7 +516,7 @@ impl LuaUserData for LuaBus {
 
         // -- isPaused --
         /// Returns true if this bus is paused.
-        /// @return boolean
+        /// @return | boolean | True when the bus is paused.
         methods.add_method("isPaused", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.get_bus(this.key).is_some_and(|b| b.is_paused()))
@@ -524,28 +524,25 @@ impl LuaUserData for LuaBus {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LBus"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type name matches.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "Bus" || name == "Object")
+            Ok(name == "LBus" || name == "Bus" || name == "Object")
         });
 
         // -- setDuckTarget --
-        /// Configures this bus to duck (lower the volume of) another bus when
-        /// it has active playing sources.
-        ///
-        /// The `Mixer` will reduce the target bus to `duckVolume` while this bus
-        /// is active.  Call `clearDuck` to stop ducking.
-        ///
-        /// @param targetBusName string   name of the bus to duck
-        /// @param duckVolume number      target volume in \[0, 1\] (e.g. 0.2)
-        /// @return nil
-        methods.add_method("setDuckTarget", |_, this, (target_name, duck_vol): (String, f32)| {
+        /// Configures this bus to duck another bus while it has active sources.
+        /// @param | targetBusName | string | Name of the bus to duck.
+        /// @param | duckVolume | number | Target volume to apply while ducking.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "setDuckTarget",
+            |_, this, (target_name, duck_vol): (String, f32)| {
                 let mut st = this.state.borrow_mut();
                 if let Some(bus) = st.mixer.get_bus_mut(this.key) {
                     bus.set_duck_target(&target_name, duck_vol);
@@ -555,10 +552,8 @@ impl LuaUserData for LuaBus {
         );
 
         // -- clearDuck --
-        /// Removes the ducking target from this bus, restoring the target bus
-        /// to its normal volume on next mixer update.
-        ///
-        /// @return nil
+        /// Removes the ducking target from this bus.
+        /// @return | nil | No value is returned.
         methods.add_method("clearDuck", |_, this, ()| {
             let mut st = this.state.borrow_mut();
             if let Some(bus) = st.mixer.get_bus_mut(this.key) {
@@ -568,13 +563,8 @@ impl LuaUserData for LuaBus {
         });
 
         // -- getPeak --
-        /// Returns the average peak amplitude of all sources currently on this bus.
-        ///
-        /// Peak values are stored per-source via `AudioSource:setMeter()` and
-        /// averaged across all sources assigned to this bus.
-        ///
-        /// number   value in \[0, 1\]
-        /// @return nil
+        /// Returns the average peak amplitude of all sources on this bus.
+        /// @return | number | Average peak level for this bus.
         methods.add_method("getPeak", |_, this, ()| {
             let st = this.state.borrow();
             Ok(st.mixer.bus_peak(this.key))
@@ -589,8 +579,8 @@ impl LuaUserData for LuaBus {
 /// Lua-side wrapper for the MIDI player.
 ///
 /// # Fields
-/// - `inner` â€” `Rc<RefCell<MidiPlayer>>`.
-/// - `state` â€” `Rc<RefCell<SharedState>>`.
+/// - `inner` - `Rc<RefCell<MidiPlayer>>`.
+/// - `state` - `Rc<RefCell<SharedState>>`.
 ///
 #[derive(Clone)]
 pub struct LuaMidiPlayer {
@@ -602,8 +592,8 @@ impl LuaUserData for LuaMidiPlayer {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- load --
         /// Loads a MIDI file from the given path.
-        /// @param path string
-        /// @return boolean
+        /// @param | path | string | MIDI file path relative to the game directory.
+        /// @return | boolean | True when the file loads successfully.
         methods.add_method("load", |_, this, path: String| {
             let st = this.state.borrow();
             let full_path = st.game_dir.join(&path);
@@ -612,8 +602,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- loadData --
         /// Loads MIDI data from a Lua string.
-        /// @param data string
-        /// @return boolean
+        /// @param | data | string | Raw MIDI data bytes.
+        /// @return | boolean | True when the data loads successfully.
         methods.add_method("loadData", |_, this, data: mlua::String| {
             let bytes = data.as_bytes().to_vec();
             Ok(this.inner.borrow_mut().load_data(bytes))
@@ -621,22 +611,22 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isLoaded --
         /// Returns true if a MIDI sequence is loaded.
-        /// @return boolean
+        /// @return | boolean | True when a MIDI sequence is loaded.
         methods.add_method("isLoaded", |_, this, ()| {
             Ok(this.inner.borrow().is_loaded())
         });
 
         // -- getFilePath --
         /// Returns the file path of the loaded MIDI, or nil.
-        /// @return string
+        /// @return | string | Loaded MIDI file path, or nil if none is loaded.
         methods.add_method("getFilePath", |_, this, ()| {
             Ok(this.inner.borrow().file_path().map(|s| s.to_string()))
         });
 
         // -- setSoundFont --
         /// Loads a SoundFont file into this player (stub).
-        /// @param path string
-        /// @return nil
+        /// @param | path | string | SoundFont file path.
+        /// @return | nil | No value is returned.
         methods.add_method("setSoundFont", |_, _this, _path: String| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setSoundFont");
             Ok(())
@@ -644,7 +634,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getSoundFontPath --
         /// Returns the SoundFont file path, or nil (stub).
-        /// @return string
+        /// @return | string | SoundFont file path, or nil if none is set.
         methods.add_method("getSoundFontPath", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:getSoundFontPath");
             Ok(Option::<String>::None)
@@ -652,7 +642,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- useDefaultSoundFont --
         /// Reverts to the built-in default SoundFont (stub).
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("useDefaultSoundFont", |_, _this, ()| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:useDefaultSoundFont");
             Ok(())
@@ -660,7 +650,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- play --
         /// Starts or resumes MIDI sequence playback from the current position.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("play", |_, this, ()| {
             let st = this.state.borrow();
             if let Some(handle) = st.mixer.stream_handle() {
@@ -671,7 +661,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- pause --
         /// Pauses the MIDI sequence at the current position; resume with `play()`.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("pause", |_, this, ()| {
             this.inner.borrow_mut().pause();
             Ok(())
@@ -679,7 +669,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- stop --
         /// Stops MIDI playback and resets the playhead to the beginning.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("stop", |_, this, ()| {
             this.inner.borrow_mut().stop();
             Ok(())
@@ -687,22 +677,22 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isPlaying --
         /// Returns true if MIDI is currently playing.
-        /// @return boolean
+        /// @return | boolean | True when MIDI playback is active.
         methods.add_method("isPlaying", |_, this, ()| {
             Ok(this.inner.borrow().is_playing())
         });
 
         // -- isPaused --
         /// Returns true if MIDI playback is paused.
-        /// @return boolean
+        /// @return | boolean | True when MIDI playback is paused.
         methods.add_method("isPaused", |_, this, ()| {
             Ok(this.inner.borrow().is_paused())
         });
 
         // -- seek --
         /// Seeks to a time position in seconds.
-        /// @param secs number
-        /// @return nil
+        /// @param | secs | number | Playback position in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method("seek", |_, this, secs: f64| {
             this.inner.borrow_mut().seek(secs);
             Ok(())
@@ -710,20 +700,20 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- tell --
         /// Returns the current playback position in seconds.
-        /// @return number
+        /// @return | number | Current playback position in seconds.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.borrow().tell()));
 
         // -- getDuration --
         /// Returns the total MIDI duration in seconds.
-        /// @return number
+        /// @return | number | Total MIDI duration in seconds.
         methods.add_method("getDuration", |_, this, ()| {
             Ok(this.inner.borrow().duration())
         });
 
         // -- setLooping --
         /// Enables or disables looping.
-        /// @param looping boolean
-        /// @return nil
+        /// @param | looping | boolean | True to loop playback.
+        /// @return | nil | No value is returned.
         methods.add_method("setLooping", |_, this, looping: bool| {
             this.inner.borrow_mut().set_looping(looping);
             Ok(())
@@ -731,15 +721,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isLooping --
         /// Returns true if looping is enabled.
-        /// @return boolean
+        /// @return | boolean | True when looping is enabled.
         methods.add_method("isLooping", |_, this, ()| {
             Ok(this.inner.borrow().is_looping())
         });
 
         // -- setVolume --
         /// Sets MIDI playback volume.
-        /// @param vol number
-        /// @return nil
+        /// @param | vol | number | Volume multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setVolume", |_, this, vol: f32| {
             this.inner.borrow_mut().set_volume(vol);
             Ok(())
@@ -747,13 +737,13 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getVolume --
         /// Returns the current MIDI volume.
-        /// @return number
+        /// @return | number | Current MIDI volume multiplier.
         methods.add_method("getVolume", |_, this, ()| Ok(this.inner.borrow().volume()));
 
         // -- setBus --
         /// Routes MIDI output through a bus (or nil to clear).
-        /// @param bus_val Bus
-        /// @return nil
+        /// @param | bus_val | LBus? | Bus to route through, or nil to clear routing.
+        /// @return | nil | No value is returned.
         methods.add_method("setBus", |_, this, bus_val: LuaValue| match &bus_val {
             LuaValue::UserData(ud) => {
                 let bus = ud.borrow::<LuaBus>()?;
@@ -771,7 +761,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getBus --
         /// Returns the assigned bus, or nil.
-        /// @return Bus
+        /// @return | LBus | Assigned bus, or nil if no bus is set.
         methods.add_method("getBus", |_, this, ()| {
             match this.inner.borrow().bus_key() {
                 Some(key) => Ok(Some(LuaBus {
@@ -784,8 +774,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setTempo --
         /// Sets playback tempo in BPM.
-        /// @param bpm number
-        /// @return nil
+        /// @param | bpm | number | Tempo in beats per minute.
+        /// @return | nil | No value is returned.
         methods.add_method("setTempo", |_, this, bpm: f64| {
             let original = this.inner.borrow().original_tempo();
             if original > 0.0 {
@@ -798,7 +788,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getTempo --
         /// Returns the current tempo in BPM.
-        /// @return number
+        /// @return | number | Current tempo in beats per minute.
         methods.add_method("getTempo", |_, this, ()| {
             let mp = this.inner.borrow();
             Ok(mp.original_tempo() * mp.tempo_scale() as f64)
@@ -806,15 +796,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getOriginalTempo --
         /// Returns the original MIDI file tempo in BPM.
-        /// @return number
+        /// @return | number | Original tempo in beats per minute.
         methods.add_method("getOriginalTempo", |_, this, ()| {
             Ok(this.inner.borrow().original_tempo())
         });
 
         // -- setTempoScale --
         /// Sets the tempo scale factor (1.0 = original speed).
-        /// @param scale number
-        /// @return nil
+        /// @param | scale | number | Tempo scale factor to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setTempoScale", |_, this, scale: f32| {
             this.inner.borrow_mut().set_tempo_scale(scale);
             Ok(())
@@ -822,23 +812,23 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getTempoScale --
         /// Returns the current tempo scale factor.
-        /// @return number
+        /// @return | number | Current tempo scale factor.
         methods.add_method("getTempoScale", |_, this, ()| {
             Ok(this.inner.borrow().tempo_scale())
         });
 
         // -- getTicksPerBeat --
         /// Returns the PPQ resolution from the MIDI header.
-        /// @return integer
+        /// @return | integer | Ticks per beat from the MIDI header.
         methods.add_method("getTicksPerBeat", |_, this, ()| {
             Ok(this.inner.borrow().ticks_per_beat())
         });
 
         // -- setChannelVolume --
         /// Sets volume for a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @param vol number
-        /// @return nil
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @param | vol | number | Volume multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method("setChannelVolume", |_, this, (ch, vol): (usize, f32)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_volume(ch - 1, vol);
@@ -848,8 +838,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannelVolume --
         /// Returns the volume for a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @return number
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @return | number | Channel volume multiplier.
         methods.add_method("getChannelVolume", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().channel_volume(ch - 1))
@@ -860,9 +850,9 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannelMuted --
         /// Mutes or unmutes a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @param muted boolean
-        /// @return nil
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @param | muted | boolean | True to mute the channel.
+        /// @return | nil | No value is returned.
         methods.add_method("setChannelMuted", |_, this, (ch, muted): (usize, bool)| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().set_channel_muted(ch - 1, muted);
@@ -872,8 +862,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isChannelMuted --
         /// Returns true if a MIDI channel is muted (1-indexed).
-        /// @param ch integer
-        /// @return boolean
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @return | boolean | True when the channel is muted.
         methods.add_method("isChannelMuted", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().is_channel_muted(ch - 1))
@@ -884,10 +874,12 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setChannelInstrument --
         /// Sets the GM instrument for a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @param inst integer
-        /// @return nil
-        methods.add_method("setChannelInstrument", |_, this, (ch, inst): (usize, u8)| {
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @param | inst | integer | General MIDI instrument number.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "setChannelInstrument",
+            |_, this, (ch, inst): (usize, u8)| {
                 if (1..=16).contains(&ch) {
                     this.inner.borrow_mut().set_channel_instrument(ch - 1, inst);
                 }
@@ -897,8 +889,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannelInstrument --
         /// Returns the GM instrument for a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @return integer
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @return | integer | General MIDI instrument number.
         methods.add_method("getChannelInstrument", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 Ok(this.inner.borrow().channel_instrument(ch - 1))
@@ -909,15 +901,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannelCount --
         /// Returns the number of MIDI channels.
-        /// @return integer
+        /// @return | integer | Number of MIDI channels.
         methods.add_method("getChannelCount", |_, this, ()| {
             Ok(this.inner.borrow().channel_count())
         });
 
         // -- soloChannel --
         /// Solos a MIDI channel (1-indexed).
-        /// @param ch integer
-        /// @return nil
+        /// @param | ch | integer | MIDI channel index starting at 1.
+        /// @return | nil | No value is returned.
         methods.add_method("soloChannel", |_, this, ch: usize| {
             if (1..=16).contains(&ch) {
                 this.inner.borrow_mut().solo_channel(ch - 1);
@@ -927,7 +919,7 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- unsoloAll --
         /// Clears solo on all channels.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("unsoloAll", |_, this, ()| {
             this.inner.borrow_mut().unsolo_all();
             Ok(())
@@ -935,15 +927,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getTrackCount --
         /// Returns the number of tracks in the MIDI sequence.
-        /// @return integer
+        /// @return | integer | Number of tracks in the sequence.
         methods.add_method("getTrackCount", |_, this, ()| {
             Ok(this.inner.borrow().track_count())
         });
 
         // -- getTrackName --
         /// Returns the name of a MIDI track (1-indexed), or nil.
-        /// @param idx integer
-        /// @return string
+        /// @param | idx | integer | Track index starting at 1.
+        /// @return | string | Track name, or nil if the track has no name.
         methods.add_method("getTrackName", |_, this, idx: usize| {
             if idx >= 1 {
                 Ok(this
@@ -958,9 +950,9 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setTrackMuted --
         /// Mutes or unmutes a track (1-indexed).
-        /// @param idx integer
-        /// @param muted boolean
-        /// @return nil
+        /// @param | idx | integer | Track index starting at 1.
+        /// @param | muted | boolean | True to mute the track.
+        /// @return | nil | No value is returned.
         methods.add_method("setTrackMuted", |_, this, (idx, muted): (usize, bool)| {
             if idx >= 1 {
                 this.inner.borrow_mut().set_track_muted(idx - 1, muted);
@@ -970,8 +962,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- isTrackMuted --
         /// Returns true if a track is muted (1-indexed).
-        /// @param idx integer
-        /// @return boolean
+        /// @param | idx | integer | Track index starting at 1.
+        /// @return | boolean | True when the track is muted.
         methods.add_method("isTrackMuted", |_, this, idx: usize| {
             if idx >= 1 {
                 Ok(this.inner.borrow().is_track_muted(idx - 1))
@@ -982,15 +974,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getNoteCount --
         /// Returns the total note count in the MIDI sequence.
-        /// @return integer
+        /// @return | integer | Total note count in the sequence.
         methods.add_method("getNoteCount", |_, this, ()| {
             Ok(this.inner.borrow().note_count())
         });
 
         // -- setOnNoteOn --
         /// Registers a note-on callback (stub).
-        /// @param cb function
-        /// @return nil
+        /// @param | cb | function | Callback to register.
+        /// @return | nil | No value is returned.
         methods.add_method("setOnNoteOn", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOn");
             Ok(())
@@ -998,8 +990,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setOnNoteOff --
         /// Registers a note-off callback (stub).
-        /// @param cb function
-        /// @return nil
+        /// @param | cb | function | Callback to register.
+        /// @return | nil | No value is returned.
         methods.add_method("setOnNoteOff", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnNoteOff");
             Ok(())
@@ -1007,8 +999,8 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- setOnEnd --
         /// Registers a playback-end callback (stub).
-        /// @param cb function
-        /// @return nil
+        /// @param | cb | function | Callback to register.
+        /// @return | nil | No value is returned.
         methods.add_method("setOnEnd", |_, _this, _cb: LuaValue| {
             log_msg!(debug, LA01_API_STUB, "MidiPlayer:setOnEnd");
             Ok(())
@@ -1016,15 +1008,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getSampleRate --
         /// Returns the PCM output sample rate in Hz.
-        /// @return integer
+        /// @return | integer | Output sample rate in Hz.
         methods.add_method("getSampleRate", |_, this, ()| {
             Ok(this.inner.borrow().get_output_sample_rate())
         });
 
         // -- setSampleRate --
-        /// Sets the PCM output sample rate in Hz (clamped 8000â€“192000).
-        /// @param rate integer
-        /// @return nil
+        /// Sets the PCM output sample rate in Hz (clamped 8000-192000).
+        /// @param | rate | integer | Output sample rate in Hz.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setSampleRate", |_, this, rate: u32| {
             this.inner.borrow_mut().set_output_sample_rate(rate);
             Ok(())
@@ -1032,15 +1024,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- getChannels --
         /// Returns the PCM output channel count (1 = mono, 2 = stereo).
-        /// @return integer
+        /// @return | integer | Output channel count.
         methods.add_method("getChannels", |_, this, ()| {
             Ok(this.inner.borrow().get_output_channels() as u32)
         });
 
         // -- setChannels --
-        /// Sets the PCM output channel count (clamped 1â€“2).
-        /// @param channels integer
-        /// @return nil
+        /// Sets the PCM output channel count (clamped 1-2).
+        /// @param | channels | integer | Output channel count to set.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setChannels", |_, this, channels: u32| {
             this.inner.borrow_mut().set_output_channels(channels as u16);
             Ok(())
@@ -1048,15 +1040,15 @@ impl LuaUserData for LuaMidiPlayer {
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LMidiPlayer"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type name matches.
         methods.add_method("typeOf", |_, _, name: String| {
-            Ok(name == "MidiPlayer" || name == "Object")
+            Ok(name == "LMidiPlayer" || name == "MidiPlayer" || name == "Object")
         });
     }
 }
@@ -1068,8 +1060,8 @@ impl LuaUserData for LuaMidiPlayer {
 /// Lua-side wrapper for a polyphonic [`crate::audio::SoundPool`].
 ///
 /// # Fields
-/// - `pool` â€” `crate::audio::pool::SoundPool`.
-/// - `state` â€” `Rc<RefCell<SharedState>>`.
+/// - `pool` - `crate::audio::pool::SoundPool`.
+/// - `state` - `Rc<RefCell<SharedState>>`.
 ///
 /// Methods call through to the shared [`crate::engine::SharedState`] mixer for
 /// actual playback operations.
@@ -1082,7 +1074,7 @@ impl LuaUserData for LuaSoundPool {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- play --
         /// Plays the next available voice and returns its SoundKey as an integer.
-        /// @return integer
+        /// @return | integer | Packed source id for the voice that was played.
         methods.add_method_mut("play", |_, this, ()| {
             let key = this.pool.next_voice();
             let game_dir = this.state.borrow().game_dir.clone();
@@ -1092,7 +1084,7 @@ impl LuaUserData for LuaSoundPool {
 
         // -- stopAll --
         /// Stops all voices in this pool.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("stopAll", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -1104,8 +1096,8 @@ impl LuaUserData for LuaSoundPool {
 
         // -- setVolume --
         /// Sets the volume for all voices in this pool.
-        /// @param vol number
-        /// @return nil
+        /// @param | vol | number | Volume multiplier to apply.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setVolume", |_, this, vol: f32| {
             this.pool.set_volume(vol);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -1118,8 +1110,8 @@ impl LuaUserData for LuaSoundPool {
 
         // -- setBus --
         /// Routes all voices through the named bus.
-        /// @param name string
-        /// @return nil
+        /// @param | name | string | Bus name to route voices through.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setBus", |_, this, name: String| {
             this.pool.set_bus(&name);
             let keys: Vec<_> = this.pool.all_keys().to_vec();
@@ -1133,7 +1125,7 @@ impl LuaUserData for LuaSoundPool {
 
         // -- release --
         /// Releases all voices from the mixer and invalidates this pool.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("release", |_, this, ()| {
             let keys: Vec<_> = this.pool.all_keys().to_vec();
             let mut st = this.state.borrow_mut();
@@ -1145,18 +1137,18 @@ impl LuaUserData for LuaSoundPool {
 
         // -- getVoiceCount --
         /// Returns the total number of voices in this pool.
-        /// @return integer
+        /// @return | integer | Number of voices in the pool.
         methods.add_method("getVoiceCount", |_, this, ()| Ok(this.pool.voice_count()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _this, ()| Ok("LSoundPool"));
 
         // -- typeOf --
         /// Returns true if the type name matches.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "SoundPool" || name == "Object")
         });
@@ -1176,7 +1168,7 @@ impl LuaUserData for LuaDecoder {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- decode --
         /// Decodes the next chunk of samples, or nil at EOF.
-        /// @return SoundData
+        /// @return | SoundData | Decoded audio buffer, or nil at end of stream.
         methods.add_method_mut("decode", |lua, this, ()| match this.inner.decode() {
             Some(pcm_i16) => {
                 let samples: Vec<f32> = pcm_i16.iter().map(|&s| s as f32 / 32768.0).collect();
@@ -1189,30 +1181,30 @@ impl LuaUserData for LuaDecoder {
 
         // -- getChannelCount --
         /// Returns the number of audio channels.
-        /// @return integer
+        /// @return | integer | Number of audio channels.
         methods.add_method("getChannelCount", |_, this, ()| {
             Ok(this.inner.channels as u32)
         });
 
         // -- getBitDepth --
         /// Returns the per-sample bit depth of this decoded audio stream.
-        /// @return integer
+        /// @return | integer | Bit depth per sample.
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.inner.bit_depth as u32));
 
         // -- getSampleRate --
         /// Returns the sample rate in Hz.
-        /// @return integer
+        /// @return | integer | Sample rate in Hz.
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.inner.sample_rate));
 
         // -- getDuration --
         /// Returns the total duration in seconds.
-        /// @return number
+        /// @return | number | Total duration in seconds.
         methods.add_method("getDuration", |_, this, ()| Ok(this.inner.get_duration()));
 
         // -- seek --
         /// Seeks to a time offset in seconds.
-        /// @param offset number
-        /// @return nil
+        /// @param | offset | number | Time offset in seconds.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("seek", |_, this, offset: f64| {
             this.inner.seek(offset);
             Ok(())
@@ -1220,7 +1212,7 @@ impl LuaUserData for LuaDecoder {
 
         // -- rewind --
         /// Rewinds to the beginning.
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method_mut("rewind", |_, this, ()| {
             this.inner.rewind();
             Ok(())
@@ -1228,28 +1220,28 @@ impl LuaUserData for LuaDecoder {
 
         // -- tell --
         /// Returns the current position in seconds.
-        /// @return number
+        /// @return | number | Current position in seconds.
         methods.add_method("tell", |_, this, ()| Ok(this.inner.tell()));
 
         // -- isSeekable --
         /// Returns true if seeking is supported.
-        /// @return boolean
+        /// @return | boolean | True when seeking is supported.
         methods.add_method("isSeekable", |_, this, ()| Ok(this.inner.is_seekable()));
 
         // -- release --
         /// Releases the decoder (no-op).
-        /// @return nil
+        /// @return | nil | No value is returned.
         methods.add_method("release", |_, _, ()| Ok(()));
 
         // -- type --
         /// Returns the type name of this object.
-        /// @return string
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LDecoder"));
 
         // -- typeOf --
         /// Returns true if this object is of the given type.
-        /// @param name string
-        /// @return boolean
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type name matches.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LDecoder" || name == "Object")
         });
@@ -1261,21 +1253,22 @@ impl LuaUserData for LuaDecoder {
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.audio` API table with the Lua VM.
-///
-/// @param lua &Lua
-/// @param lurek &LuaTable
-/// @param state Rc<RefCell<SharedState>>
-///
+/// @param | lua | any | Lua state that owns the module table.
+/// @param | lurek | table | Root `lurek` table.
+/// @param | state | any | Shared engine state for the audio system.
+/// @return | nil | No value is returned.
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
-    // â”€â”€ newSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Loads an audio file and returns a Source handle.
-    /// @param path string
-    /// @param source_type string
-    /// @return Source
+    // -- newSource --
+    /// Loads an audio file and returns a source handle.
+    /// @param | path | string | Audio file path relative to the game directory.
+    /// @param | source_type | string | Source type name such as `static` or `stream`.
+    /// @return | LSource | Loaded source handle.
     let s = state.clone();
-    tbl.set("newSource", lua.create_function(move |_, args: LuaMultiValue| {
+    tbl.set(
+        "newSource",
+        lua.create_function(move |_, args: LuaMultiValue| {
             let path: String = args
                 .get(0)
                 .and_then(|v| match v {
@@ -1305,13 +1298,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ play â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Plays a source, with optional bus routing via options table.
-    /// @param source Source
-    /// @param options table
-    /// @return integer
+    // -- play --
+    /// Plays a source with optional bus routing.
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | options | table? | Optional settings table.
+    /// @return | integer | Packed source id.
     let s = state.clone();
-    tbl.set("play", lua.create_function(
+    tbl.set(
+        "play",
+        lua.create_function(
             move |_, (id_val, options): (LuaValue, Option<mlua::Table>)| {
                 let mut st = s.borrow_mut();
                 let key = require_sound_key(&st, &id_val, "lurek.audio.play")?;
@@ -1331,12 +1326,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ stop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- stop --
     /// Stops playback and resets seek position.
-    /// @param source Source
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("stop", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "stop",
+        lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.stop")?;
             st.mixer.stop(key);
@@ -1344,13 +1341,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setVolume --
     /// Sets source playback volume.
-    /// @param source Source
-    /// @param vol number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | vol | number | Volume multiplier to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setVolume", lua.create_function(move |_, (id_val, vol): (LuaValue, f32)| {
+    tbl.set(
+        "setVolume",
+        lua.create_function(move |_, (id_val, vol): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setVolume")?;
             st.mixer.set_volume(key, vol);
@@ -1358,24 +1357,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getVolume --
     /// Returns the source volume.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Current source volume multiplier.
     let s = state.clone();
-    tbl.set("getVolume", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getVolume",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getVolume")?;
             Ok(st.mixer.get_volume(key))
         })?,
     )?;
 
-    // â”€â”€ pause â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- pause --
     /// Pauses playback at the current position.
-    /// @param source Source
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("pause", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "pause",
+        lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.pause")?;
             st.mixer.pause(key);
@@ -1383,12 +1386,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ resume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- resume --
     /// Resumes playback from pause.
-    /// @param source Source
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("resume", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "resume",
+        lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.resume")?;
             st.mixer.resume(key);
@@ -1396,13 +1401,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setPitch --
     /// Sets source pitch multiplier.
-    /// @param source Source
-    /// @param pitch number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | pitch | number | Pitch multiplier to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setPitch", lua.create_function(move |_, (id_val, pitch): (LuaValue, f32)| {
+    tbl.set(
+        "setPitch",
+        lua.create_function(move |_, (id_val, pitch): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setPitch")?;
             st.mixer.set_pitch(key, pitch);
@@ -1410,61 +1417,71 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPitch --
     /// Returns the source pitch multiplier.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Current source pitch multiplier.
     let s = state.clone();
-    tbl.set("getPitch", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getPitch",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getPitch")?;
             Ok(st.mixer.get_pitch(key))
         })?,
     )?;
 
-    // â”€â”€ isPlaying â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isPlaying --
     /// Returns true if the source is playing.
-    /// @param source Source
-    /// @return boolean
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | boolean | True when playback is active.
     let s = state.clone();
-    tbl.set("isPlaying", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "isPlaying",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.isPlaying")?;
             Ok(st.mixer.is_playing(key))
         })?,
     )?;
 
-    // â”€â”€ isPaused â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isPaused --
     /// Returns true if the source is paused.
-    /// @param source Source
-    /// @return boolean
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | boolean | True when playback is paused.
     let s = state.clone();
-    tbl.set("isPaused", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "isPaused",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.isPaused")?;
             Ok(st.mixer.is_paused(key))
         })?,
     )?;
 
-    // â”€â”€ isStopped â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isStopped --
     /// Returns true if the source is stopped.
-    /// @param source Source
-    /// @return boolean
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | boolean | True when playback is stopped.
     let s = state.clone();
-    tbl.set("isStopped", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "isStopped",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.isStopped")?;
             Ok(st.mixer.is_stopped(key))
         })?,
     )?;
 
-    // â”€â”€ setLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setLooping --
     /// Enables or disables looping.
-    /// @param source Source
-    /// @param looping boolean
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | looping | boolean | True to loop playback.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setLooping", lua.create_function(move |_, (id_val, looping): (LuaValue, bool)| {
+    tbl.set(
+        "setLooping",
+        lua.create_function(move |_, (id_val, looping): (LuaValue, bool)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setLooping")?;
             st.mixer.set_looping(key, looping);
@@ -1472,24 +1489,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ isLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- isLooping --
     /// Returns true if looping is enabled.
-    /// @param source Source
-    /// @return boolean
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | boolean | True when looping is enabled.
     let s = state.clone();
-    tbl.set("isLooping", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "isLooping",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.isLooping")?;
             Ok(st.mixer.is_looping(key))
         })?,
     )?;
 
-    // â”€â”€ playLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- playLooping --
     /// Plays the source in a continuous loop.
-    /// @param source Source
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("playLooping", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "playLooping",
+        lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.playLooping")?;
             let game_dir = st.game_dir.clone();
@@ -1498,13 +1519,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setPan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setPan --
     /// Sets stereo panning (-1.0 left to 1.0 right).
-    /// @param source Source
-    /// @param pan number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | pan | number | Stereo pan value from -1.0 to 1.0.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setPan", lua.create_function(move |_, (id_val, pan): (LuaValue, f32)| {
+    tbl.set(
+        "setPan",
+        lua.create_function(move |_, (id_val, pan): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setPan")?;
             st.mixer.set_pan(key, pan);
@@ -1512,56 +1535,68 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getPan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPan --
     /// Returns the source stereo panning.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Current stereo pan value.
     let s = state.clone();
-    tbl.set("getPan", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getPan",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getPan")?;
             Ok(st.mixer.get_pan(key))
         })?,
     )?;
 
-    // â”€â”€ setMasterVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setMasterVolume --
     /// Sets the global master volume.
-    /// @param vol number
-    /// @return nil
+    /// @param | vol | number | Master volume multiplier to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setMasterVolume", lua.create_function(move |_, vol: f32| {
+    tbl.set(
+        "setMasterVolume",
+        lua.create_function(move |_, vol: f32| {
             s.borrow_mut().mixer.set_master_volume(vol);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getMasterVolume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getMasterVolume --
     /// Returns the global master volume.
-    /// @return number
+    /// @return | number | Current master volume multiplier.
     let s = state.clone();
-    tbl.set("getMasterVolume", lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_master_volume()))?,
+    tbl.set(
+        "getMasterVolume",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_master_volume()))?,
     )?;
 
-    // â”€â”€ getActiveSourceCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getActiveSourceCount --
     /// Returns the number of currently playing sources.
-    /// @return integer
+    /// @return | integer | Number of active sources.
     let s = state.clone();
-    tbl.set("getActiveSourceCount", lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_active_source_count()))?,
+    tbl.set(
+        "getActiveSourceCount",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_active_source_count()))?,
     )?;
 
-    // â”€â”€ getSourceCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getSourceCount --
     /// Returns the total number of registered sources.
-    /// @return integer
+    /// @return | integer | Number of registered sources.
     let s = state.clone();
-    tbl.set("getSourceCount", lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_source_count()))?,
+    tbl.set(
+        "getSourceCount",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_source_count()))?,
     )?;
 
-    // â”€â”€ getSourceType â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getSourceType --
     /// Returns the type string ("static" or "stream") of a source.
-    /// @param source Source
-    /// @return string
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | string | Source type name.
     let s = state.clone();
-    tbl.set("getSourceType", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getSourceType",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let st = s.borrow();
             match st.mixer.get_source_type(key) {
@@ -1574,12 +1609,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ clone â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- clone --
     /// Creates an independent copy of a source.
-    /// @param source Source
-    /// @return Source
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | LSource | Cloned source handle.
     let s = state.clone();
-    tbl.set("clone", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "clone",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let mut st = s.borrow_mut();
             match st.mixer.clone_source(key) {
@@ -1594,42 +1631,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ pauseAll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- pauseAll --
     /// Pauses all currently playing sources.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("pauseAll", lua.create_function(move |_, ()| {
+    tbl.set(
+        "pauseAll",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().mixer.pause_all();
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ stopAll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- stopAll --
     /// Stops all currently playing sources.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("stopAll", lua.create_function(move |_, ()| {
+    tbl.set(
+        "stopAll",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().mixer.stop_all();
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ resumeAll â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- resumeAll --
     /// Resumes all paused sources.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("resumeAll", lua.create_function(move |_, ()| {
+    tbl.set(
+        "resumeAll",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().mixer.resume_all();
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ release â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- release --
     /// Releases a source and frees its memory.
-    /// @param source Source
-    /// @return boolean
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | boolean | True when the source is released.
     let s = state.clone();
-    tbl.set("release", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "release",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let mut st = s.borrow_mut();
             if st.mixer.release(key) {
@@ -1642,12 +1687,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ newBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newBus --
     /// Creates a named audio bus for grouping sources.
-    /// @param name string
-    /// @return Bus
+    /// @param | name | string | Bus name.
+    /// @return | LBus | Created bus handle.
     let s = state.clone();
-    tbl.set("newBus", lua.create_function(move |_, name: String| {
+    tbl.set(
+        "newBus",
+        lua.create_function(move |_, name: String| {
             let mut st = s.borrow_mut();
             let key = st.mixer.new_bus(&name);
             Ok(LuaBus {
@@ -1657,13 +1704,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setSourceBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setSourceBus --
     /// Assigns a source to a bus.
-    /// @param source Source
-    /// @param bus Bus
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | bus | LBus | Bus handle to assign.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setSourceBus", lua.create_function(move |_, (id_val, bus_val): (LuaValue, LuaValue)| {
+    tbl.set(
+        "setSourceBus",
+        lua.create_function(move |_, (id_val, bus_val): (LuaValue, LuaValue)| {
             let key = sound_key_from_value(&id_val)?;
             let bus_key = match &bus_val {
                 LuaValue::UserData(ud) => {
@@ -1681,12 +1730,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getSourceBus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getSourceBus --
     /// Returns the bus a source is assigned to, or nil.
-    /// @param source Source
-    /// @return Bus
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | LBus | Assigned bus handle, or nil if no bus is set.
     let s = state.clone();
-    tbl.set("getSourceBus", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getSourceBus",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let st = s.borrow();
             match st.mixer.get_source_bus(key) {
@@ -1699,42 +1750,48 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getMaxSources â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getMaxSources --
     /// Returns the maximum number of simultaneous sources.
-    /// @return integer
+    /// @return | integer | Maximum simultaneous source count.
     tbl.set("getMaxSources", lua.create_function(|_, ()| Ok(64))?)?;
 
-    // â”€â”€ getDuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getDuration --
     /// Returns the total duration of a source in seconds.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Total duration in seconds.
     let s = state.clone();
-    tbl.set("getDuration", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getDuration",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getDuration")?;
             Ok(st.mixer.get_duration(key))
         })?,
     )?;
 
-    // â”€â”€ tell â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- tell --
     /// Returns the current playback position in seconds.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Current playback position in seconds.
     let s = state.clone();
-    tbl.set("tell", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "tell",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.tell")?;
             Ok(st.mixer.get_tell(key))
         })?,
     )?;
 
-    // â”€â”€ seek â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- seek --
     /// Seeks to a time position in seconds.
-    /// @param source Source
-    /// @param pos number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | pos | number | Playback position in seconds.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("seek", lua.create_function(move |_, (id_val, pos): (LuaValue, f32)| {
+    tbl.set(
+        "seek",
+        lua.create_function(move |_, (id_val, pos): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.seek")?;
             let game_dir = st.game_dir.clone();
@@ -1743,13 +1800,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setLowpass --
     /// Applies a low-pass filter to a source.
-    /// @param source Source
-    /// @param cutoff_hz integer
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | cutoff_hz | integer | Low-pass cutoff frequency in Hz.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setLowpass", lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
+    tbl.set(
+        "setLowpass",
+        lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setLowpass")?;
             st.mixer.set_lowpass(key, cutoff_hz);
@@ -1757,13 +1816,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setHighpass --
     /// Applies a high-pass filter to a source.
-    /// @param source Source
-    /// @param cutoff_hz integer
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | cutoff_hz | integer | High-pass cutoff frequency in Hz.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setHighpass", lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
+    tbl.set(
+        "setHighpass",
+        lua.create_function(move |_, (id_val, cutoff_hz): (LuaValue, u32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.setHighpass")?;
             st.mixer.set_highpass(key, cutoff_hz);
@@ -1771,36 +1832,42 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getLowpass --
     /// Returns the low-pass filter cutoff of a source.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Low-pass cutoff frequency in Hz.
     let s = state.clone();
-    tbl.set("getLowpass", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getLowpass",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getLowpass")?;
             Ok(st.mixer.get_lowpass(key))
         })?,
     )?;
 
-    // â”€â”€ getHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getHighpass --
     /// Returns the high-pass filter cutoff of a source.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | High-pass cutoff frequency in Hz.
     let s = state.clone();
-    tbl.set("getHighpass", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getHighpass",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getHighpass")?;
             Ok(st.mixer.get_highpass(key))
         })?,
     )?;
 
-    // â”€â”€ clearFilter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- clearFilter --
     /// Removes any active filter from a source.
-    /// @param source Source
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("clearFilter", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "clearFilter",
+        lua.create_function(move |_, id_val: LuaValue| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.clearFilter")?;
             st.mixer.clear_filter(key);
@@ -1808,13 +1875,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ fadeIn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- fadeIn --
     /// Fades a source in from silence over the given duration.
-    /// @param source Source
-    /// @param dur number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | dur | number | Fade-in duration in seconds.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("fadeIn", lua.create_function(move |_, (id_val, dur): (LuaValue, f32)| {
+    tbl.set(
+        "fadeIn",
+        lua.create_function(move |_, (id_val, dur): (LuaValue, f32)| {
             let mut st = s.borrow_mut();
             let key = require_sound_key(&st, &id_val, "lurek.audio.fadeIn")?;
             st.mixer.set_fade_in(key, dur);
@@ -1822,48 +1891,57 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getFadeIn â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getFadeIn --
     /// Returns the fade-in duration of a source.
-    /// @param source Source
-    /// @return number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Fade-in duration in seconds.
     let s = state.clone();
-    tbl.set("getFadeIn", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getFadeIn",
+        lua.create_function(move |_, id_val: LuaValue| {
             let st = s.borrow();
             let key = require_sound_key(&st, &id_val, "lurek.audio.getFadeIn")?;
             Ok(st.mixer.get_fade_in(key))
         })?,
     )?;
 
-    // â”€â”€ setListener2D â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setListener2D --
     /// Sets the 2D listener position for spatial audio.
-    /// @param x number
-    /// @param y number
-    /// @return nil
+    /// @param | x | number | Listener X position.
+    /// @param | y | number | Listener Y position.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setListener2D", lua.create_function(move |_, (x, y): (f32, f32)| {
+    tbl.set(
+        "setListener2D",
+        lua.create_function(move |_, (x, y): (f32, f32)| {
             s.borrow_mut().mixer.set_listener_position(x, y, 0.0);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getListener2D â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getListener2D --
     /// Returns the 2D listener position (x, y).
-    /// @return number, number
+    /// @return | number | Listener X position.
+    /// @return | number | Listener Y position.
     let s = state.clone();
-    tbl.set("getListener2D", lua.create_function(move |_, ()| {
+    tbl.set(
+        "getListener2D",
+        lua.create_function(move |_, ()| {
             let pos = s.borrow().mixer.get_listener_position();
             Ok((pos[0], pos[1]))
         })?,
     )?;
 
-    // â”€â”€ setListener â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setListener --
     /// Sets the 3D listener position.
-    /// @param x number
-    /// @param y number
-    /// @param z number
-    /// @return nil
+    /// @param | x | number | Listener X position.
+    /// @param | y | number | Listener Y position.
+    /// @param | z | number? | Optional listener Z position.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setListener", lua.create_function(move |_, (x, y, z): (f32, f32, Option<f32>)| {
+    tbl.set(
+        "setListener",
+        lua.create_function(move |_, (x, y, z): (f32, f32, Option<f32>)| {
             s.borrow_mut()
                 .mixer
                 .set_listener_position(x, y, z.unwrap_or(0.0));
@@ -1871,25 +1949,31 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getListener â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getListener --
     /// Returns the 3D listener position (x, y, z).
-    /// @return number, number, number
+    /// @return | number | Listener X position.
+    /// @return | number | Listener Y position.
+    /// @return | number | Listener Z position.
     let s = state.clone();
-    tbl.set("getListener", lua.create_function(move |_, ()| {
+    tbl.set(
+        "getListener",
+        lua.create_function(move |_, ()| {
             let pos = s.borrow().mixer.get_listener_position();
             Ok((pos[0], pos[1], pos[2]))
         })?,
     )?;
 
-    // â”€â”€ setPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setPosition --
     /// Sets the 3D position of a source.
-    /// @param source Source
-    /// @param x number
-    /// @param y number
-    /// @param z number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | x | number | Source X position.
+    /// @param | y | number | Source Y position.
+    /// @param | z | number? | Optional source Z position.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setPosition", lua.create_function(
+    tbl.set(
+        "setPosition",
+        lua.create_function(
             move |_, (id_val, x, y, z): (LuaValue, f32, f32, Option<f32>)| {
                 let key = sound_key_from_value(&id_val)?;
                 s.borrow_mut()
@@ -1900,27 +1984,33 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ getPosition â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPosition --
     /// Returns the 3D position of a source (x, y, z).
-    /// @param source Source
-    /// @return number, number, number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Source X position.
+    /// @return | number | Source Y position.
+    /// @return | number | Source Z position.
     let s = state.clone();
-    tbl.set("getPosition", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getPosition",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let pos = s.borrow().mixer.get_source_position(key);
             Ok((pos[0], pos[1], pos[2]))
         })?,
     )?;
 
-    // â”€â”€ setVelocity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setVelocity --
     /// Sets the velocity of a source for Doppler.
-    /// @param source Source
-    /// @param x number
-    /// @param y number
-    /// @param z number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | x | number | Source velocity on the X axis.
+    /// @param | y | number | Source velocity on the Y axis.
+    /// @param | z | number? | Optional source velocity on the Z axis.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setVelocity", lua.create_function(
+    tbl.set(
+        "setVelocity",
+        lua.create_function(
             move |_, (id_val, x, y, z): (LuaValue, f32, f32, Option<f32>)| {
                 let key = sound_key_from_value(&id_val)?;
                 s.borrow_mut()
@@ -1931,30 +2021,36 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ getVelocity â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getVelocity --
     /// Returns the velocity of a source (x, y, z).
-    /// @param source Source
-    /// @return number, number, number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Source velocity on the X axis.
+    /// @return | number | Source velocity on the Y axis.
+    /// @return | number | Source velocity on the Z axis.
     let s = state.clone();
-    tbl.set("getVelocity", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getVelocity",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let vel = s.borrow().mixer.get_source_velocity(key);
             Ok((vel[0], vel[1], vel[2]))
         })?,
     )?;
 
-    // â”€â”€ setOrientation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setOrientation --
     /// Sets the 6-component orientation of a source.
-    /// @param source Source
-    /// @param fx number
-    /// @param fy number
-    /// @param fz number
-    /// @param ux number
-    /// @param uy number
-    /// @param uz number
-    /// @return nil
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @param | fx | number | Forward X component.
+    /// @param | fy | number | Forward Y component.
+    /// @param | fz | number | Forward Z component.
+    /// @param | ux | number | Up X component.
+    /// @param | uy | number | Up Y component.
+    /// @param | uz | number | Up Z component.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setOrientation", lua.create_function(
+    tbl.set(
+        "setOrientation",
+        lua.create_function(
             move |_, (id_val, fx, fy, fz, ux, uy, uz): (LuaValue, f32, f32, f32, f32, f32, f32)| {
                 let key = sound_key_from_value(&id_val)?;
                 s.borrow_mut()
@@ -1965,84 +2061,99 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ getOrientation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getOrientation --
     /// Returns the 6-component orientation of a source.
-    /// @param source Source
-    /// number, number, number, number, number, number
+    /// @param | source | any | LSource userdata or numeric source id.
+    /// @return | number | Forward vector X component.
+    /// @return | number | Forward vector Y component.
+    /// @return | number | Forward vector Z component.
+    /// @return | number | Up vector X component.
+    /// @return | number | Up vector Y component.
+    /// @return | number | Up vector Z component.
     let s = state.clone();
-    /// @return table|nil
-    tbl.set("getOrientation", lua.create_function(move |_, id_val: LuaValue| {
+    tbl.set(
+        "getOrientation",
+        lua.create_function(move |_, id_val: LuaValue| {
             let key = sound_key_from_value(&id_val)?;
             let o = s.borrow().mixer.get_source_orientation(key);
             Ok((o[0], o[1], o[2], o[3], o[4], o[5]))
         })?,
     )?;
 
-    // â”€â”€ setDopplerScale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setDopplerScale --
     /// Sets the global Doppler effect scale.
-    /// @param scale number
-    /// @return nil
+    /// @param | scale | number | Doppler scale factor to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setDopplerScale", lua.create_function(move |_, scale: f32| {
+    tbl.set(
+        "setDopplerScale",
+        lua.create_function(move |_, scale: f32| {
             s.borrow_mut().mixer.set_doppler_scale(scale);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getDopplerScale â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getDopplerScale --
     /// Returns the current Doppler scale.
-    /// @return number
+    /// @return | number | Current Doppler scale factor.
     let s = state.clone();
-    tbl.set("getDopplerScale", lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_doppler_scale()))?,
+    tbl.set(
+        "getDopplerScale",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_doppler_scale()))?,
     )?;
 
-    // â”€â”€ setDistanceModel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setDistanceModel --
     /// Sets the distance attenuation model.
-    /// @param model string
-    /// @return nil
+    /// @param | model | string | Distance model name.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setDistanceModel", lua.create_function(move |_, model: String| {
+    tbl.set(
+        "setDistanceModel",
+        lua.create_function(move |_, model: String| {
             s.borrow_mut().mixer.set_distance_model(&model);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getDistanceModel â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getDistanceModel --
     /// Returns the current distance model name.
-    /// @return string
+    /// @return | string | Current distance model name.
     let s = state.clone();
-    tbl.set("getDistanceModel", lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_distance_model().to_string()))?,
+    tbl.set(
+        "getDistanceModel",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.get_distance_model().to_string()))?,
     )?;
 
-    // â”€â”€ setMeter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Sets the master peak meter level (0.0â€“1.0).
-    ///
-    /// Game scripts call this to report the current amplitude of their audio
-    /// output.  The stored value is retrievable via `getMeter`.
-    ///
-    /// @param level number   peak level in [0, 1]
-    /// @return nil
+    // -- setMeter --
+    /// Sets the master peak meter level.
+    /// @param | level | number | Peak level in the range [0, 1].
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setMeter", lua.create_function(move |_, level: f32| {
+    tbl.set(
+        "setMeter",
+        lua.create_function(move |_, level: f32| {
             s.borrow_mut().mixer.master_peak = level.clamp(0.0, 1.0);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getMeter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getMeter --
     /// Returns the stored master peak meter level.
-    /// number   value in [0, 1] set by the last `setMeter` call
+    /// @return | number | Peak level from the last `setMeter` call.
     let s = state.clone();
-    /// @return table|nil
-    tbl.set("getMeter", lua.create_function(move |_, ()| Ok(s.borrow().mixer.master_peak))?,
+    tbl.set(
+        "getMeter",
+        lua.create_function(move |_, ()| Ok(s.borrow().mixer.master_peak))?,
     )?;
 
-    // â”€â”€ newMidiPlayer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newMidiPlayer --
     /// Creates a MIDI player, optionally loading a file.
-    /// @param path string
-    /// @return MidiPlayer
+    /// @param | path | string? | Optional MIDI file path to load immediately.
+    /// @return | LMidiPlayer | MIDI player handle.
     let s = state.clone();
-    tbl.set("newMidiPlayer", lua.create_function(move |_, path: Option<String>| {
+    tbl.set(
+        "newMidiPlayer",
+        lua.create_function(move |_, path: Option<String>| {
             let mp = MidiPlayer::new();
             let inner = Rc::new(RefCell::new(mp));
             let result = LuaMidiPlayer {
@@ -2059,12 +2170,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ newSoundData â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newSoundData --
     /// Creates a SoundData from a file or as a silent buffer.
-    /// @param args string|integer
-    /// @return SoundData
+    /// @param | args | any | Filename string or sample count integer.
+    /// @return | SoundData | Created audio buffer.
     let s = state.clone();
-    tbl.set("newSoundData", lua.create_function(move |lua, args: LuaMultiValue| {
+    tbl.set(
+        "newSoundData",
+        lua.create_function(move |lua, args: LuaMultiValue| {
             let (path_opt, count, rate, channels) = extract_sound_data_args(args)?;
             let full_path_buf = path_opt.as_ref().map(|p| s.borrow().game_dir.join(p));
             let full_path = full_path_buf.as_ref().and_then(|p| p.to_str());
@@ -2074,12 +2187,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setMidiSoundFont â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setMidiSoundFont --
     /// Sets the global SoundFont for MIDI synthesis.
-    /// @param path string
-    /// @return nil
+    /// @param | path | string | SoundFont file path relative to the game directory.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setMidiSoundFont", lua.create_function(move |_, path: String| {
+    tbl.set(
+        "setMidiSoundFont",
+        lua.create_function(move |_, path: String| {
             let mut st = s.borrow_mut();
             let full_path = st.game_dir.join(&path);
             let data = std::fs::read(&full_path).map_err(|e| {
@@ -2095,30 +2210,36 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ hasMidiSoundFont â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- hasMidiSoundFont --
     /// Returns true if a SoundFont is loaded.
-    /// @return boolean
+    /// @return | boolean | True when a SoundFont is loaded.
     let s = state.clone();
-    tbl.set("hasMidiSoundFont", lua.create_function(move |_, ()| Ok(s.borrow().midi_state.has_soundfont()))?,
+    tbl.set(
+        "hasMidiSoundFont",
+        lua.create_function(move |_, ()| Ok(s.borrow().midi_state.has_soundfont()))?,
     )?;
 
-    // â”€â”€ clearMidiSoundFont â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- clearMidiSoundFont --
     /// Unloads the active SoundFont.
-    /// @return nil
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("clearMidiSoundFont", lua.create_function(move |_, ()| {
+    tbl.set(
+        "clearMidiSoundFont",
+        lua.create_function(move |_, ()| {
             s.borrow_mut().midi_state.clear_soundfont();
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ newDecoder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newDecoder --
     /// Creates a streaming audio decoder.
-    /// @param source string
-    /// @param buffersize integer
-    /// @return Decoder
+    /// @param | source | string | Audio file path relative to the game directory.
+    /// @param | buffersize | integer? | Optional decoder buffer size.
+    /// @return | LDecoder | Decoder handle.
     let s = state.clone();
-    tbl.set("newDecoder", lua.create_function(move |_, (source, buffersize): (String, Option<usize>)| {
+    tbl.set(
+        "newDecoder",
+        lua.create_function(move |_, (source, buffersize): (String, Option<usize>)| {
             let st = s.borrow();
             let path = st.game_dir.join(&source);
             let path_str = path
@@ -2131,15 +2252,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ newQueueableSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newQueueableSource --
     /// Creates a queueable source for manual PCM buffering.
-    /// @param sample_rate integer
-    /// @param bit_depth integer
-    /// @param channels integer
-    /// @param buffer_count? integer
-    /// @return integer
+    /// @param | sample_rate | integer | Sample rate in Hz.
+    /// @param | bit_depth | integer | Bit depth per sample.
+    /// @param | channels | integer | Channel count.
+    /// @param | buffer_count | integer? | Optional number of queued buffers.
+    /// @return | integer | Packed queueable source id.
     let s = state.clone();
-    tbl.set("newQueueableSource", lua.create_function(
+    tbl.set(
+        "newQueueableSource",
+        lua.create_function(
             move |_,
                   (sample_rate, bit_depth, channels, buffer_count): (
                 u32,
@@ -2157,13 +2280,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ queueSource â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- queueSource --
     /// Pushes a SoundData buffer into a queueable source.
-    /// @param qsource_id integer
-    /// @param sounddata SoundData
-    /// @return nil
+    /// @param | qsource_id | integer | Packed queueable source id.
+    /// @param | sounddata | SoundData | Audio buffer to queue.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("queueSource", lua.create_function(move |_, (qsource_id, sd): (u64, mlua::AnyUserData)| {
+    tbl.set(
+        "queueSource",
+        lua.create_function(move |_, (qsource_id, sd): (u64, mlua::AnyUserData)| {
             let key = queueable_key_from_u64(qsource_id);
             let sd_ref = sd.borrow::<SoundData>()?;
             s.borrow_mut()
@@ -2173,45 +2298,53 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getFreeBufferCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getFreeBufferCount --
     /// Returns the free buffer slots in a queueable source.
-    /// @param qsource_id integer
-    /// @return integer
+    /// @param | qsource_id | integer | Packed queueable source id.
+    /// @return | integer | Number of free buffer slots.
     let s = state.clone();
-    tbl.set("getFreeBufferCount", lua.create_function(move |_, qsource_id: u64| {
+    tbl.set(
+        "getFreeBufferCount",
+        lua.create_function(move |_, qsource_id: u64| {
             let key = queueable_key_from_u64(qsource_id);
             Ok(s.borrow().mixer.queueable_free_buffer_count(key) as u32)
         })?,
     )?;
 
-    // â”€â”€ playQueueable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- playQueueable --
     /// Starts playback of a queueable source.
-    /// @param qsource_id integer
-    /// @return nil
+    /// @param | qsource_id | integer | Packed queueable source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("playQueueable", lua.create_function(move |_, qsource_id: u64| {
+    tbl.set(
+        "playQueueable",
+        lua.create_function(move |_, qsource_id: u64| {
             let key = queueable_key_from_u64(qsource_id);
             s.borrow_mut().mixer.play_queueable(key);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ stopQueueable â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- stopQueueable --
     /// Stops a queueable source and drains its buffers.
-    /// @param qsource_id integer
-    /// @return nil
+    /// @param | qsource_id | integer | Packed queueable source id.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("stopQueueable", lua.create_function(move |_, qsource_id: u64| {
+    tbl.set(
+        "stopQueueable",
+        lua.create_function(move |_, qsource_id: u64| {
             let key = queueable_key_from_u64(qsource_id);
             s.borrow_mut().mixer.stop_queueable(key);
             Ok(())
         })?,
     )?;
 
-    // â”€â”€ getPlaybackDevices â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPlaybackDevices --
     /// Returns a table of available audio output device names.
-    /// @return table
-    tbl.set("getPlaybackDevices", lua.create_function(|lua, ()| {
+    /// @return | table | Array-style table of device names.
+    tbl.set(
+        "getPlaybackDevices",
+        lua.create_function(|lua, ()| {
             let devices = crate::audio::get_playback_devices();
             let t = lua.create_table()?;
             for (i, name) in devices.into_iter().enumerate() {
@@ -2221,29 +2354,35 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getPlaybackDevice â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getPlaybackDevice --
     /// Returns the current audio output device name.
-    /// @return string
-    tbl.set("getPlaybackDevice", lua.create_function(|_, ()| Ok(crate::audio::get_playback_device()))?,
+    /// @return | string | Current output device name.
+    tbl.set(
+        "getPlaybackDevice",
+        lua.create_function(|_, ()| Ok(crate::audio::get_playback_device()))?,
     )?;
 
-    // â”€â”€ setPlaybackDevice â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setPlaybackDevice --
     /// Selects an audio output device by name.
-    /// @param name string
-    /// @return nil
-    tbl.set("setPlaybackDevice", lua.create_function(|_, name: String| {
+    /// @param | name | string | Output device name.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "setPlaybackDevice",
+        lua.create_function(|_, name: String| {
             crate::audio::set_playback_device(&name)
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))
         })?,
     )?;
 
-    // â”€â”€ create_bus â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- create_bus --
     /// Creates a bus by name (functional style).
-    /// @param name string
-    /// @param parent_name string
-    /// @return nil
+    /// @param | name | string | Bus name to create.
+    /// @param | parent_name | string? | Optional parent bus name.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("create_bus", lua.create_function(move |_, (name, parent_name): (String, Option<String>)| {
+    tbl.set(
+        "create_bus",
+        lua.create_function(move |_, (name, parent_name): (String, Option<String>)| {
             if name.is_empty() {
                 return Err(LuaError::external("invalid bus name"));
             }
@@ -2254,13 +2393,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ set_bus_volume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- set_bus_volume --
     /// Sets a bus volume by name.
-    /// @param name string
-    /// @param volume number
-    /// @return nil
+    /// @param | name | string | Bus name.
+    /// @param | volume | number | Volume multiplier to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("set_bus_volume", lua.create_function(move |_, (name, volume): (String, f32)| {
+    tbl.set(
+        "set_bus_volume",
+        lua.create_function(move |_, (name, volume): (String, f32)| {
             let mut st = s.borrow_mut();
             if let Some(bus_key) = st.mixer.get_bus_by_name(&name) {
                 if let Some(bus) = st.mixer.get_bus_mut(bus_key) {
@@ -2272,14 +2413,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ add_effect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- add_effect --
     /// Adds a DSP effect to a bus.
-    /// @param bus_name string
-    /// @param effect_type string
-    /// @param params table
-    /// @return integer
+    /// @param | bus_name | string | Bus name.
+    /// @param | effect_type | string | Effect type name.
+    /// @param | params | table? | Optional effect parameter table.
+    /// @return | integer | Created effect id.
     let s = state.clone();
-    tbl.set("add_effect", lua.create_function(
+    tbl.set(
+        "add_effect",
+        lua.create_function(
             move |_, (bus_name, effect_type_str, params): (String, String, Option<mlua::Table>)| {
                 let st = s.borrow();
                 let bus_key = st
@@ -2302,13 +2445,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ remove_effect â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- remove_effect --
     /// Removes a DSP effect from a bus.
-    /// @param bus_name string
-    /// @param effect_id integer
-    /// @return boolean
+    /// @param | bus_name | string | Bus name.
+    /// @param | effect_id | integer | Effect id to remove.
+    /// @return | boolean | True when the effect is removed.
     let s = state.clone();
-    tbl.set("remove_effect", lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
+    tbl.set(
+        "remove_effect",
+        lua.create_function(move |_, (bus_name, effect_id): (String, u32)| {
             let st = s.borrow();
             let bus_key = st
                 .mixer
@@ -2324,15 +2469,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ set_effect_param â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- set_effect_param --
     /// Sets a parameter on a DSP effect.
-    /// @param bus_name string
-    /// @param effect_id integer
-    /// @param param_name string
-    /// @param value number
-    /// @return boolean
+    /// @param | bus_name | string | Bus name.
+    /// @param | effect_id | integer | Effect id to modify.
+    /// @param | param_name | string | Effect parameter name.
+    /// @param | value | number | Parameter value to set.
+    /// @return | boolean | True when the parameter is updated.
     let s = state.clone();
-    tbl.set("set_effect_param", lua.create_function(
+    tbl.set(
+        "set_effect_param",
+        lua.create_function(
             move |_, (bus_name, effect_id, param_name, value): (String, u32, String, f32)| {
                 let st = s.borrow();
                 let bus_key = st
@@ -2357,28 +2504,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ newSineWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Generate a mono sine-wave SoundData buffer.
-    /// @param freq number
-    /// @param duration number
-    /// @param sampleRate number
-    /// @param amplitude number
-    /// @return SoundData
-    tbl.set("newSineWave", lua.create_function(
+    // -- newSineWave --
+    /// Generates a mono sine-wave SoundData buffer.
+    /// @param | freq | number | Wave frequency in Hz.
+    /// @param | duration | number | Buffer duration in seconds.
+    /// @param | sampleRate | number | Output sample rate in Hz.
+    /// @param | amplitude | number | Peak amplitude.
+    /// @return | SoundData | Generated audio buffer.
+    tbl.set(
+        "newSineWave",
+        lua.create_function(
             |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
                 Ok(SoundData::sine_wave(freq, duration, sample_rate, amplitude))
             },
         )?,
     )?;
 
-    // â”€â”€ newSquareWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Generate a mono square-wave SoundData buffer.
-    /// @param freq number
-    /// @param duration number
-    /// @param sampleRate number
-    /// @param amplitude number
-    /// @return SoundData
-    tbl.set("newSquareWave", lua.create_function(
+    // -- newSquareWave --
+    /// Generates a mono square-wave SoundData buffer.
+    /// @param | freq | number | Wave frequency in Hz.
+    /// @param | duration | number | Buffer duration in seconds.
+    /// @param | sampleRate | number | Output sample rate in Hz.
+    /// @param | amplitude | number | Peak amplitude.
+    /// @return | SoundData | Generated audio buffer.
+    tbl.set(
+        "newSquareWave",
+        lua.create_function(
             |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
                 Ok(SoundData::square_wave(
                     freq,
@@ -2390,14 +2541,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ newSawtoothWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Generate a mono sawtooth-wave SoundData buffer.
-    /// @param freq number
-    /// @param duration number
-    /// @param sampleRate number
-    /// @param amplitude number
-    /// @return SoundData
-    tbl.set("newSawtoothWave", lua.create_function(
+    // -- newSawtoothWave --
+    /// Generates a mono sawtooth-wave SoundData buffer.
+    /// @param | freq | number | Wave frequency in Hz.
+    /// @param | duration | number | Buffer duration in seconds.
+    /// @param | sampleRate | number | Output sample rate in Hz.
+    /// @param | amplitude | number | Peak amplitude.
+    /// @return | SoundData | Generated audio buffer.
+    tbl.set(
+        "newSawtoothWave",
+        lua.create_function(
             |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
                 Ok(SoundData::sawtooth_wave(
                     freq,
@@ -2409,14 +2562,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ newTriangleWave â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Generate a mono triangle-wave SoundData buffer.
-    /// @param freq number
-    /// @param duration number
-    /// @param sampleRate number
-    /// @param amplitude number
-    /// @return SoundData
-    tbl.set("newTriangleWave", lua.create_function(
+    // -- newTriangleWave --
+    /// Generates a mono triangle-wave SoundData buffer.
+    /// @param | freq | number | Wave frequency in Hz.
+    /// @param | duration | number | Buffer duration in seconds.
+    /// @param | sampleRate | number | Output sample rate in Hz.
+    /// @param | amplitude | number | Peak amplitude.
+    /// @return | SoundData | Generated audio buffer.
+    tbl.set(
+        "newTriangleWave",
+        lua.create_function(
             |_, (freq, duration, sample_rate, amplitude): (f32, f32, u32, f32)| {
                 Ok(SoundData::triangle_wave(
                     freq,
@@ -2428,14 +2583,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ newWhiteNoise â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    /// Generate a reproducible white-noise SoundData buffer.
-    /// @param duration number
-    /// @param sampleRate number
-    /// @param amplitude number
-    /// @param seed integer
-    /// @return SoundData
-    tbl.set("newWhiteNoise", lua.create_function(
+    // -- newWhiteNoise --
+    /// Generates a reproducible white-noise SoundData buffer.
+    /// @param | duration | number | Buffer duration in seconds.
+    /// @param | sampleRate | number | Output sample rate in Hz.
+    /// @param | amplitude | number | Peak amplitude.
+    /// @param | seed | integer | Random seed value.
+    /// @return | SoundData | Generated audio buffer.
+    tbl.set(
+        "newWhiteNoise",
+        lua.create_function(
             |_, (duration, sample_rate, amplitude, seed): (f32, u32, f32, u32)| {
                 Ok(SoundData::white_noise(
                     duration,
@@ -2447,12 +2604,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ applyLowpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- applyLowpass --
     /// Applies a first-order IIR low-pass filter to a SoundData in-place.
-    /// @param sounddata SoundData
-    /// @param cutoff_hz number
-    /// @return nil
-    tbl.set("applyLowpass", lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
+    /// @param | sounddata | SoundData | Audio buffer to modify.
+    /// @param | cutoff_hz | number | Low-pass cutoff frequency in Hz.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "applyLowpass",
+        lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
             let mut sd = sd_ud
                 .borrow_mut::<SoundData>()
                 .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
@@ -2461,12 +2620,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ applyHighpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- applyHighpass --
     /// Applies a first-order IIR high-pass filter to a SoundData in-place.
-    /// @param sounddata SoundData
-    /// @param cutoff_hz number
-    /// @return nil
-    tbl.set("applyHighpass", lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
+    /// @param | sounddata | SoundData | Audio buffer to modify.
+    /// @param | cutoff_hz | number | High-pass cutoff frequency in Hz.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "applyHighpass",
+        lua.create_function(|_, (sd_ud, cutoff_hz): (LuaAnyUserData, f32)| {
             let mut sd = sd_ud
                 .borrow_mut::<SoundData>()
                 .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
@@ -2475,13 +2636,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ applyBandpass â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- applyBandpass --
     /// Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
-    /// @param sounddata SoundData
-    /// @param low_hz number
-    /// @param high_hz number
-    /// @return nil
-    tbl.set("applyBandpass", lua.create_function(|_, (sd_ud, low_hz, high_hz): (LuaAnyUserData, f32, f32)| {
+    /// @param | sounddata | SoundData | Audio buffer to modify.
+    /// @param | low_hz | number | High-pass cutoff frequency in Hz.
+    /// @param | high_hz | number | Low-pass cutoff frequency in Hz.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "applyBandpass",
+        lua.create_function(|_, (sd_ud, low_hz, high_hz): (LuaAnyUserData, f32, f32)| {
             let mut sd = sd_ud
                 .borrow_mut::<SoundData>()
                 .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
@@ -2490,12 +2653,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ applyGain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- applyGain --
     /// Scales every sample by gain (clamped to [-1, 1]).
-    /// @param sounddata SoundData
-    /// @param gain number
-    /// @return nil
-    tbl.set("applyGain", lua.create_function(|_, (sd_ud, gain): (LuaAnyUserData, f32)| {
+    /// @param | sounddata | SoundData | Audio buffer to modify.
+    /// @param | gain | number | Gain multiplier to apply.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "applyGain",
+        lua.create_function(|_, (sd_ud, gain): (LuaAnyUserData, f32)| {
             let mut sd = sd_ud
                 .borrow_mut::<SoundData>()
                 .map_err(|_| LuaError::RuntimeError("argument must be a SoundData".into()))?;
@@ -2504,12 +2669,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ mixInto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- mixInto --
     /// Additively mixes another SoundData into the destination in-place.
-    /// @param dest SoundData
-    /// @param src SoundData
-    /// @return nil
-    tbl.set("mixInto", lua.create_function(|_, (dest_ud, src_ud): (LuaAnyUserData, LuaAnyUserData)| {
+    /// @param | dest | SoundData | Destination audio buffer.
+    /// @param | src | SoundData | Source audio buffer.
+    /// @return | nil | No value is returned.
+    tbl.set(
+        "mixInto",
+        lua.create_function(|_, (dest_ud, src_ud): (LuaAnyUserData, LuaAnyUserData)| {
             let src_samples: Vec<f32> = {
                 let src = src_ud
                     .borrow::<SoundData>()
@@ -2530,13 +2697,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ saveWAV â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- saveWAV --
     /// Saves a SoundData as a 16-bit PCM WAV file at the given path.
-    /// @param sounddata SoundData
-    /// @param path string
-    /// @return nil
+    /// @param | sounddata | SoundData | Audio buffer to save.
+    /// @param | path | string | Output file path relative to the game directory.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("saveWAV", lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
+    tbl.set(
+        "saveWAV",
+        lua.create_function(move |_, (sd_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
             let sd = sd_ud
                 .borrow::<SoundData>()
@@ -2549,13 +2718,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setStereoWidth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setStereoWidth --
     /// Sets the stereo width multiplier for a source (1.0 = normal, 0.0 = mono).
-    /// @param src Source
-    /// @param width number
-    /// @return nil
+    /// @param | src | LSource | Source handle.
+    /// @param | width | number | Stereo width multiplier to apply.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setStereoWidth", lua.create_function(move |_, (src_ud, width): (LuaAnyUserData, f32)| {
+    tbl.set(
+        "setStereoWidth",
+        lua.create_function(move |_, (src_ud, width): (LuaAnyUserData, f32)| {
             let key = src_ud
                 .borrow::<LuaSource>()
                 .map_err(|_| LuaError::RuntimeError("argument must be an AudioSource".into()))?
@@ -2567,12 +2738,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getStereoWidth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getStereoWidth --
     /// Returns the current stereo width for a source.
-    /// @param src Source
-    /// @return number
+    /// @param | src | LSource | Source handle.
+    /// @return | number | Current stereo width multiplier.
     let s = state.clone();
-    tbl.set("getStereoWidth", lua.create_function(move |_, src_ud: LuaAnyUserData| {
+    tbl.set(
+        "getStereoWidth",
+        lua.create_function(move |_, src_ud: LuaAnyUserData| {
             let key = src_ud
                 .borrow::<LuaSource>()
                 .map_err(|_| LuaError::RuntimeError("argument must be an AudioSource".into()))?
@@ -2584,14 +2757,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ setRandomPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- setRandomPitch --
     /// Sets a random pitch range applied each time the source is played.
-    /// @param src Source
-    /// @param min number
-    /// @param max number
-    /// @return nil
+    /// @param | src | LSource | Source handle.
+    /// @param | min | number | Minimum random pitch multiplier.
+    /// @param | max | number | Maximum random pitch multiplier.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("setRandomPitch", lua.create_function(move |_, (src_ud, min, max): (LuaAnyUserData, f32, f32)| {
+    tbl.set(
+        "setRandomPitch",
+        lua.create_function(move |_, (src_ud, min, max): (LuaAnyUserData, f32, f32)| {
             let key = src_ud
                 .borrow::<LuaSource>()
                 .map_err(|_| LuaError::RuntimeError("argument must be an AudioSource".into()))?
@@ -2603,12 +2778,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ clearRandomPitch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- clearRandomPitch --
     /// Clears any random pitch range on a source, restoring fixed pitch.
-    /// @param src Source
-    /// @return nil
+    /// @param | src | LSource | Source handle.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("clearRandomPitch", lua.create_function(move |_, src_ud: LuaAnyUserData| {
+    tbl.set(
+        "clearRandomPitch",
+        lua.create_function(move |_, src_ud: LuaAnyUserData| {
             let key = src_ud
                 .borrow::<LuaSource>()
                 .map_err(|_| LuaError::RuntimeError("argument must be an AudioSource".into()))?
@@ -2618,14 +2795,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ crossfade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- crossfade --
     /// Crossfades from one source to another over a duration.
-    /// @param from Source
-    /// @param to Source
-    /// @param duration number
-    /// @return nil
+    /// @param | from | LSource | Source handle to fade out.
+    /// @param | to | LSource | Source handle to fade in.
+    /// @param | duration | number | Crossfade duration in seconds.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("crossfade", lua.create_function(
+    tbl.set(
+        "crossfade",
+        lua.create_function(
             move |_, (from_ud, to_ud, duration): (LuaAnyUserData, LuaAnyUserData, f32)| {
                 let from_key = from_ud
                     .borrow::<LuaSource>()
@@ -2644,12 +2823,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ getBusPeak â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getBusPeak --
     /// Returns the peak signal level of the named bus (stub: always 0.0).
-    /// @param bus_name string
-    /// @return number
+    /// @param | bus_name | string | Bus name.
+    /// @return | number | Peak signal level for the bus.
     let s = state.clone();
-    tbl.set("getBusPeak", lua.create_function(move |_, bus_name: String| {
+    tbl.set(
+        "getBusPeak",
+        lua.create_function(move |_, bus_name: String| {
             s.borrow()
                 .mixer
                 .get_bus_peak(&bus_name)
@@ -2657,12 +2838,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ getBusRms â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- getBusRms --
     /// Returns the RMS signal level of the named bus (stub: always 0.0).
-    /// @param bus_name string
-    /// @return number
+    /// @param | bus_name | string | Bus name.
+    /// @return | number | RMS signal level for the bus.
     let s = state.clone();
-    tbl.set("getBusRms", lua.create_function(move |_, bus_name: String| {
+    tbl.set(
+        "getBusRms",
+        lua.create_function(move |_, bus_name: String| {
             s.borrow()
                 .mixer
                 .get_bus_rms(&bus_name)
@@ -2670,13 +2853,15 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ newPool â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- newPool --
     /// Creates a polyphonic sound pool for the given file with N simultaneous voices.
-    /// @param file_path string
-    /// @param voice_count integer
-    /// @return SoundPool
+    /// @param | file_path | string | Audio file path relative to the game directory.
+    /// @param | voice_count | integer | Number of voices to allocate.
+    /// @return | LSoundPool | Sound pool handle.
     let s = state.clone();
-    tbl.set("newPool", lua.create_function(move |_, (file_path, voice_count): (String, usize)| {
+    tbl.set(
+        "newPool",
+        lua.create_function(move |_, (file_path, voice_count): (String, usize)| {
             let pool = s
                 .borrow_mut()
                 .mixer
@@ -2689,14 +2874,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ processOffline â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- processOffline --
     /// Applies a DSP effect chain to a WAV file and writes output.
-    /// @param input_path string
-    /// @param output_path string
-    /// @param effects table  -- list of {type, p1, p2, p3}
-    /// @return nil
+    /// @param | input_path | string | Input WAV path relative to the game directory.
+    /// @param | output_path | string | Output WAV path relative to the game directory.
+    /// @param | effects | table | Effect list table.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("processOffline", lua.create_function(
+    tbl.set(
+        "processOffline",
+        lua.create_function(
             move |_, (input, output, effects_tbl): (String, String, mlua::Table)| {
                 if input.contains("..") || output.contains("..") {
                     return Err(LuaError::external("path traversal not allowed"));
@@ -2743,14 +2930,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ normalizeFile â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- normalizeFile --
     /// Normalizes a WAV file peak amplitude to target_level and writes output.
-    /// @param input_path string
-    /// @param output_path string
-    /// @param target_level number
-    /// @return nil
+    /// @param | input_path | string | Input WAV path relative to the game directory.
+    /// @param | output_path | string | Output WAV path relative to the game directory.
+    /// @param | target_level | number | Target peak amplitude.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("normalizeFile", lua.create_function(move |_, (input, output, target): (String, String, f32)| {
+    tbl.set(
+        "normalizeFile",
+        lua.create_function(move |_, (input, output, target): (String, String, f32)| {
             if input.contains("..") || output.contains("..") {
                 return Err(LuaError::external("path traversal not allowed"));
             }
@@ -2762,15 +2951,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // â”€â”€ waveformToPng â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- waveformToPng --
     /// Renders the waveform of a WAV file to a PNG image.
-    /// @param input_wav string
-    /// @param output_png string
-    /// @param width integer
-    /// @param height integer
-    /// @return nil
+    /// @param | input_wav | string | Input WAV path relative to the game directory.
+    /// @param | output_png | string | Output PNG path relative to the game directory.
+    /// @param | width | integer | Image width in pixels.
+    /// @param | height | integer | Image height in pixels.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("waveformToPng", lua.create_function(
+    tbl.set(
+        "waveformToPng",
+        lua.create_function(
             move |_, (input, output, width, height): (String, String, u32, u32)| {
                 if input.contains("..") || output.contains("..") {
                     return Err(LuaError::external("path traversal not allowed"));
@@ -2784,15 +2975,17 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
-    // â”€â”€ spectrogramToPng â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // -- spectrogramToPng --
     /// Renders a time-frequency spectrogram of a WAV file to a PNG image.
-    /// @param input_wav string
-    /// @param output_png string
-    /// @param width integer
-    /// @param height integer
-    /// @return nil
+    /// @param | input_wav | string | Input WAV path relative to the game directory.
+    /// @param | output_png | string | Output PNG path relative to the game directory.
+    /// @param | width | integer | Image width in pixels.
+    /// @param | height | integer | Image height in pixels.
+    /// @return | nil | No value is returned.
     let s = state.clone();
-    tbl.set("spectrogramToPng", lua.create_function(
+    tbl.set(
+        "spectrogramToPng",
+        lua.create_function(
             move |_, (input, output, width, height): (String, String, u32, u32)| {
                 if input.contains("..") || output.contains("..") {
                     return Err(LuaError::external("path traversal not allowed"));
@@ -2818,49 +3011,51 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 /// Decoded PCM audio buffer that can be created from a file or synthesised sample-by-sample.
 impl mlua::UserData for SoundData {
     fn add_methods<'lua, M: mlua::UserDataMethods<'lua, Self>>(methods: &mut M) {
-        // â”€â”€ getSampleCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getSampleCount --
         /// Get the total number of samples.
-        /// @return integer
+        /// @return | integer | Total sample count.
         methods.add_method("getSampleCount", |_, this, ()| Ok(this.sample_count()));
-        // â”€â”€ getSampleRate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getSampleRate --
         /// Returns the sample rate of this audio buffer in Hz (e.g. 44100 or 48000).
-        /// @return integer
+        /// @return | integer | Sample rate in Hz.
         methods.add_method("getSampleRate", |_, this, ()| Ok(this.sample_rate()));
-        // â”€â”€ getChannelCount â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getChannelCount --
         /// Get the number of channels.
-        /// @return integer
+        /// @return | integer | Channel count.
         methods.add_method("getChannelCount", |_, this, ()| Ok(this.channel_count()));
-        // â”€â”€ getDuration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getDuration --
         /// Get the audio duration in seconds.
-        /// @return number
+        /// @return | number | Audio duration in seconds.
         methods.add_method("getDuration", |_, this, ()| Ok(this.duration()));
-        // â”€â”€ getBitDepth â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getBitDepth --
         /// Returns the bit depth of this audio buffer (typically 16 or 32 bits per sample).
-        /// @return integer
+        /// @return | integer | Bit depth per sample.
         methods.add_method("getBitDepth", |_, this, ()| Ok(this.bit_depth()));
-        // â”€â”€ getSample â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- getSample --
         /// Get a specific sample by index.
-        /// @param index integer
-        /// @return number
+        /// @param | index | integer | Sample index.
+        /// @return | number | Sample value.
         methods.add_method("getSample", |_, this, index: usize| {
             this.get_sample(index).ok_or_else(|| {
                 LuaError::RuntimeError(format!("Sample index {} out of bounds", index))
             })
         });
 
-        // â”€â”€ drawWaveform â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- drawWaveform --
         /// Draws the waveform onto an ImageData buffer.
-        /// @param target ImageData
-        /// @param x integer
-        /// @param y integer
-        /// @param w integer
-        /// @param h integer
-        /// @param r integer
-        /// @param g integer
-        /// @param b integer
-        /// @param a integer
-        /// @return nil
-        methods.add_method("drawWaveform", |_,
+        /// @param | target | ImageData | Target image buffer.
+        /// @param | x | integer | Left position in pixels.
+        /// @param | y | integer | Top position in pixels.
+        /// @param | w | integer | Width in pixels.
+        /// @param | h | integer | Height in pixels.
+        /// @param | r | integer | Red channel value.
+        /// @param | g | integer | Green channel value.
+        /// @param | b | integer | Blue channel value.
+        /// @param | a | integer | Alpha channel value.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "drawWaveform",
+            |_,
              this,
              (target, x, y, w, h, r, g, b, a): (
                 mlua::AnyUserData,
@@ -2879,11 +3074,11 @@ impl mlua::UserData for SoundData {
             },
         );
 
-        // â”€â”€ setSample â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        // -- setSample --
         /// Set a specific sample by index.
-        /// @param index integer
-        /// @param value number
-        /// @return nil
+        /// @param | index | integer | Sample index.
+        /// @param | value | number | Sample value to store.
+        /// @return | nil | No value is returned.
         methods.add_method_mut("setSample", |_, this, (index, value): (usize, f32)| {
             if this.set_sample(index, value) {
                 Ok(())

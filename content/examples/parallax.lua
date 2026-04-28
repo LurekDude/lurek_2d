@@ -43,7 +43,7 @@ end
 do  -- ParallaxLayer:type
   function lurek.init()
     local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
-    if layer:type() == "ParallaxLayer" then
+    if layer:type() == "LParallaxLayer" then
       lurek.log.debug("got a parallax layer", "scene")
     end
   end
@@ -361,7 +361,7 @@ end
 do  -- ParallaxSet:type
   function lurek.init()
     local set = lurek.parallax.newSet("intro")
-    if set:type() == "ParallaxSet" then
+    if set:type() == "LParallaxSet" then
       lurek.log.debug("got a parallax set", "scene")
     end
   end

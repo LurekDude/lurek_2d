@@ -460,7 +460,7 @@ function lurek.process(dt)
         end
         -- Weapon flash
         flash_alpha.a = 0.6
-        lurek.tween.to(flash_alpha, 0.08, { a = 0 })
+        lurek.tween.to(flash_alpha, { a = 0 }, 0.08)
     end
 
     -- ── Energy beam ───────────────────────────────────────────
@@ -632,7 +632,7 @@ function lurek.process(dt)
                 has_spread = true
                 -- Weapon switch flash
                 flash_alpha.a = 1.0
-                lurek.tween.to(flash_alpha, 0.3, { a = 0 })
+                lurek.tween.to(flash_alpha, { a = 0 }, 0.3)
             elseif p.kind == PU.HEALTH then
                 hp = math.min(hp + 2, K.MAX_HP)
             elseif p.kind == PU.AMMO then
@@ -646,7 +646,7 @@ function lurek.process(dt)
     if check_exit(player.x, player.y, K.PW, K.PH) then
         current_state = STATE.LEVEL_COMPLETE
         banner.y = -60
-        lurek.tween.to(banner, 0.5, { y = SCREEN_H / 2 - 30 })
+        lurek.tween.to(banner, { y = SCREEN_H / 2 - 30 }, 0.5)
     end
 
     -- ── Camera ────────────────────────────────────────────────

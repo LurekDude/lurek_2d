@@ -115,6 +115,7 @@ local xp_sparkle      = nil
 local levelup_flash   = nil
 local xp_bar_tween    = nil
 local damage_flash    = 0
+local damage_flash_state = { val = 0 }
 local flash_tween     = nil
 
 -- Camera
@@ -220,6 +221,7 @@ local function reset_game()
     spawn_timer  = 0
     spawn_interval = SPAWN_INTERVAL_START
     damage_flash = 0
+    damage_flash_state.val = 0
     upgrade_choices = {}
 end
 
@@ -436,9 +438,10 @@ function lurek.process(dt)
         if d < touch_dist and invuln_timer <= 0 then
             hp = hp - ENEMY_CONTACT_DMG
             invuln_timer = INVULN_TIME
+            damage_flash_state.val = 0.4
             damage_flash = 0.4
             flash_tween = lurek.tween.to(
-                { val = 0.4 },
+                damage_flash_state,
                 { val = 0 },
                 0.3,
                 "outQuad"
@@ -478,7 +481,14 @@ function lurek.process(dt)
                             if pd2 < EXPLODER_RADIUS and invuln_timer <= 0 then
                                 hp = hp - EXPLODER_DAMAGE
                                 invuln_timer = INVULN_TIME
+                                damage_flash_state.val = 0.4
                                 damage_flash = 0.4
+                                flash_tween = lurek.tween.to(
+                                    damage_flash_state,
+                                    { val = 0 },
+                                    0.3,
+                                    "outQuad"
+                                )
                             end
                             death_burst:emit(20)
                         end
@@ -517,10 +527,7 @@ function lurek.process(dt)
     end
     xp_gems = gems_next
 
-    -- Update flash tween
-    if flash_tween then
-        damage_flash = math.max(0, damage_flash - dt * 2)
-    end
+    damage_flash = damage_flash_state.val
 
     -- Update particles
     death_burst:update(dt)
