@@ -1,42 +1,36 @@
 ---
-description: "Fix a dependency issue in Cargo.toml: version conflict, missing feature, or unnecessary dependency."
+description: "Fix a Cargo dependency issue."
 ---
+
 # Fix Dependency Issue
 
 ## Goal
-
-Resolve Cargo.toml dependency problems.
+- Resolve Cargo.toml dependency problems.
 
 ## Inputs
-
 - **Issue**: Version conflict, missing features, build failure
 - **Affected crate**: Which dependency has the problem
 
 ## Steps
-
-1. Load [skill: documentation](.github/skills/documentation/SKILL.md) before changing any files.
-2. Read `Cargo.toml` for current dependency configuration
-3. Check the crate's documentation for correct version and features
-4. Fix version pin, feature flags, or remove unnecessary dependency
-5. Run `cargo build` and `cargo test`
+- Load documentation before changing any files.
+- Read Cargo.toml for current dependency configuration
+- Check the crate's documentation for correct version and features
+- Fix version pin, feature flags, or remove unnecessary dependency
+- Run cargo build and cargo test
 
 ## Success Criteria
-
-- [ ] `Cargo.toml` uses semver pins (e.g., `"0.27"` not `"*"`)
-- [ ] mlua uses `features = ["lua54", "vendored"]`
+- [ ] Cargo.toml uses semver pins (e.g., "0.27" not "*")
+- [ ] mlua uses features = ["lua54", "vendored"]
 - [ ] No unnecessary dependencies
-- [ ] `cargo build` and `cargo test` pass
+- [ ] cargo build and cargo test pass
 
 ## Anti-patterns
-
 - Skipping the Success Criteria check before declaring the prompt done.
-- Running `git add .` instead of staging only the files this prompt produced.
+- Running git add . instead of staging only the files this prompt produced.
 
 ## Example Invocation
-
-> Run this prompt via VS Code Copilot Chat: `/fix-dependency-issue`
+- /fix-dependency-issue
 
 ## CAG Metadata
-
 - **Mode**: agent
 - **Loads skills**: documentation

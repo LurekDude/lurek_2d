@@ -1,57 +1,41 @@
-﻿---
+---
 name: quality-pipeline
-description: "Load this skill when running quality checks, audits, or doc generation for the Lurek2D engine. It owns the quality tool taxonomy, execution order, and interpretation of results. Skip it for writing code, tests, or documentation content."
+description: "Load this skill when running quality checks, audits, coverage tools, or doc generation. Skip it for writing code, tests, or doc content."
 ---
 # quality-pipeline
 
 ## Mission
-
-Own the quality tool taxonomy (generators, validators, auditors, fixers), execution order, result interpretation, and tool selection guidance.
+- Own tool choice, run order, and result reading for quality work.
 
 ## When To Load
-
-- Running pre-commit quality checks
-- Choosing the right audit or validation tool for a task
-- Understanding tool output and acting on findings
-- Running the full documentation pipeline
+- Run pre-commit checks.
+- Pick the right audit or validator.
+- Read tool output.
+- Run the full doc pipeline.
 
 ## When To Skip
-
-- Writing Rust code -> use rust-coding skill
-- Writing tests -> use testing-rust skill
-- Writing documentation -> use documentation skill
+- Writing Rust code.
+- Writing tests.
+- Writing docs.
 
 ## Domain Knowledge
-
-**Four tool categories:**
-
-| Category | Purpose | Exit code | Location |
-|----------|---------|-----------|----------|
-| Generators | Produce JSON data and docs from source | 0 always | tools/docs/ |
-| Validators | Check structure/schema, exit 1 on failure | 0=pass, 1=fail | tools/validate/ |
-| Auditors | Measure quality metrics, report gaps | 0 (unless --strict/--threshold) | tools/audit/ |
-| Fixers | Modify files in-place | 0 | tools/fix/ (always --dry-run first) |
-
-**Quick quality check (every commit):** cargo test; cargo clippy -- -D warnings
-
-**Standard pipeline (after API changes):** python tools/gen_all_docs.py (regenerates all docs), then python tools/validate/validate_generated_lua_stubs.py (verify stubs match), then python tools/audit/doc_coverage.py (measure coverage).
-
-**Single module audit:** python tools/audit/audit_module.py NAME (12-phase check).
-
-**Master dashboard:** python tools/audit/quality_report.py combines doc audit, test coverage, module audit, and game validation into one report.
-
-**CAG layer validation:** python tools/validate/cag_validate.py (after .github/ changes).
-
-**Library validation:** python tools/validate/validate_library.py --library NAME --strict (after library/ changes).
-
-**Execution order rule:** always run generators before validators/auditors (generators produce the JSON that validators read).
+- Generators build JSON and docs from source.
+- Validators check rules and fail with exit code 1.
+- Auditors measure quality and gaps.
+- Fixers change files. Use --dry-run first when possible.
+- Quick gate is cargo test and cargo clippy -- -D warnings.
+- After API changes, run python tools/gen_all_docs.py first.
+- Then run validate_generated_lua_stubs.py and doc_coverage.py as needed.
+- Use audit_module.py for one module.
+- Use quality_report.py for a combined report.
+- Use cag_validate.py after .github changes.
+- Use validate_library.py after library/ changes.
+- Run generators before validators and auditors.
 
 ## Companion File Index
-
-None - all guidance is inline.
+- None.
 
 ## References
-
-- tools/README.md - complete tool registry with all scripts
-- tools/gen_all_docs.py - pipeline orchestrator
-- tools/audit/quality_report.py - master quality dashboard
+- tools/README.md
+- tools/gen_all_docs.py
+- tools/audit/quality_report.py

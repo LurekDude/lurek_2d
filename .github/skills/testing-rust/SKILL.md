@@ -1,6 +1,6 @@
-﻿---
+---
 name: testing-rust
-description: "Load this skill when writing Rust unit tests in tests/rust/unit/ for internal Rust code not reachable via lurek.*. Skip it for writing Lua tests (use lua-scripting), implementing features, or Rust tests of public lurek.* behaviour (those MUST be Lua tests per TST-01)."
+description: "Load this skill when writing Rust unit tests in tests/rust/unit/ for Rust-only internals. Skip it for Lua tests, feature work, or tests for lurek.* behavior."
 ---
 # testing-rust
 
@@ -50,3 +50,4 @@ None - all guidance is inline.
 - tests/rust/unit/ - Rust unit test files
 - tools/audit/test_coverage.py - test coverage metrics
 - tools/audit/lua_api_test_coverage.py - Lua @covers coverage
+

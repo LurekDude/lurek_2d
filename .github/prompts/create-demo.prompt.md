@@ -1,57 +1,35 @@
 ---
-description: "Create one or more new Lurek2D demo projects in content/games/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U..."
+description: "Create one or more demos in content/games/."
 ---
 # Create Demo
 
 ## Goal
-
-Create one or more new Lurek2D demo projects in content/games/. Generates conf.toml, main.lua, README.md, and screen.png for each demo. U... The prompt finishes when every Success Criteria item below is checked.
+- Create one or more runnable demos in content/games/.
 
 ## Inputs
-
-- `n1` — value supplied by the user invocation.
-- `n2` — value supplied by the user invocation.
-- `name` — value supplied by the user invocation.
+- demo_scope: one demo or a list of demos.
 
 ## Steps
-
-1. Load [skill: demo-creation](.github/skills/demo-creation/SKILL.md), [skill: lua-scripting](.github/skills/lua-scripting/SKILL.md) before changing any files.
-2. Read this prompt's Inputs and confirm every required argument is present.
-3. Load any skill listed in `loads_skills` of this prompt's frontmatter.
-4. Execute the work as the `Developer` agent.
-5. Run the relevant quality gates from the [skill: quality-pipeline](.github/skills/quality-pipeline/SKILL.md) before declaring done.
-6. Consult the actual `lurek.*` API surface via [docs/api/lurek.md](docs/api/lurek.md), [content/examples/](content/examples/), and [docs/specs/](docs/specs/). Do NOT invent APIs.
+- Load demo-creation, examples-management, and documentation.
+- Create the needed demo folders and core files.
+- Keep each demo runnable and clear.
+- Add README text and assets when needed.
+- Register tests or docs updates that go with the new demo.
 
 ## Success Criteria
-
-- [ ] `cargo run -- content/games/<name>` runs without errors
-- [ ] All 4 callbacks are defined in `main.lua`
-- [ ] `escape` quits via `lurek.event.quit()`
-- [ ] No undeclared globals, no bare `print()` calls
-- [ ] `screen.png` exists and is non-empty
-- [ ] `content/games/README.md` table row and detail block both added
-- [ ] Only ✅ Full library modules are required (if any)
-- [ ] `cargo check` passes with no new errors
+- [ ] The demo folders and core files exist.
+- [ ] Each demo is runnable.
+- [ ] Related docs or tests are updated.
 
 ## Anti-patterns
-
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running `git add .` instead of staging only the files this prompt produced.
+- Create a demo with missing core files.
+- Leave the demo unregistered where required.
+- Mix unrelated code changes.
 
 ## Example Invocation
-
-```
-/create-demo platformer with camera shake and coin collection
-/create-demo roguelike, 2 demos, one with inventory items
-/create-demo card game, complex, use library.item and library.inventory
-/create-demo bullet hell shooter, minimal complexity, 960x540
-/create-demo dialog-driven mystery, use library.dialog
-```
-
----
+- /create-demo demo_scope
 
 ## CAG Metadata
-
 - **Mode**: agent
-- **Loads skills**: demo-creation, lua-scripting
-- **Inputs required**: n1, n2, name
+- **Loads skills**: demo-creation, examples-management, documentation
+- **Inputs required**: demo_scope

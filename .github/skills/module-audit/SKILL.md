@@ -1,6 +1,6 @@
-﻿---
+---
 name: module-audit
-description: "Load this skill when performing end-to-end quality audits on Lurek2D src/ modules: docstrings, AGENT.md sync, test coverage, architecture compliance, wiki pages, API docs, performance, and code quality. Skip it for implementing features, writing game scripts, or pure Lua work."
+description: "Load this skill when running end-to-end audits on src/ modules for docs, tests, architecture, wiki, or code quality. Skip it for feature work, game scripts, or pure Lua."
 ---
 # module-audit
 
@@ -42,3 +42,4 @@ None - all guidance is inline.
 - tools/audit/audit_module.py - 12-phase module audit tool
 - tools/audit/doc_coverage.py - docstring coverage metrics
 - tools/audit/test_coverage.py - test coverage metrics
+

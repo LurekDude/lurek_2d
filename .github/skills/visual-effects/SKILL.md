@@ -1,6 +1,6 @@
-﻿---
+---
 name: visual-effects
-description: "Load this skill when implementing visual post-processing effects, image filters, or shader-based rendering techniques in Lurek2D: full-screen passes using canvas render-to-texture, custom WGSL fragment shaders for blur/bloom/distortion/colour grading, screen-space overlays, or multi-pass render pipelines. Use for: CRT scanlines, vignette, colour correction, bloom, distortion, pixelation, palette swap. Skip it for basic sprite/image drawing (use gpu-programming), or 3D-style rendering (out of scope for Lurek2D)."
+description: "Load this skill when building shader or post-process effects like bloom, blur, CRT, distortion, or palette swap. Skip it for basic drawing or out-of-scope 3D rendering."
 ---
 # visual-effects
 
@@ -50,3 +50,4 @@ None - all guidance is inline.
 
 - src/render/ - render pipeline and shader integration
 - docs/specs/render.md - render module specification
+

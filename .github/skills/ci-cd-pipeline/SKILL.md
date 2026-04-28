@@ -1,54 +1,34 @@
 ---
 name: ci-cd-pipeline
-description: "Load this skill when setting up or maintaining CI/CD for Lurek2D: GitHub Actions workflows, build automation, test pipelines, or release processes. Skip it for local development or code implementation."
+description: "Load this skill when setting up or maintaining CI/CD, GitHub Actions, test pipelines, or release automation. Skip it for local dev work or code changes."
 ---
 # ci-cd-pipeline
 
 ## Mission
-
-# CI/CD Pipeline — Lurek2D Engine
+- Own CI workflow design, job scope, and release automation rules.
 
 ## When To Load
-
-- Creating or updating GitHub Actions workflows
-- Setting up automated testing pipeline
-- Configuring build automation
-- Planning release processes
+- Add or update GitHub Actions workflows.
+- Change CI quality gates.
+- Add release automation.
+- Review pipeline structure or caching.
 
 ## When To Skip
-
-- Local development workflow → use `rust-coding` skill
-- Test writing → use `testing-rust` skill
-- Code quality → use `rust-coding` skill
+- Local development workflow.
+- Rust or Lua code changes.
 
 ## Domain Knowledge
-
-### Owns
-- GitHub Actions workflow configuration
-- Build matrix (platforms, Rust versions)
-- Automated test execution
-- Clippy and format check automation
-- Release and artifact publishing
-
-### Live Repository Contracts
-- `Cargo.toml` — build configuration, dependencies
-- `rust-toolchain.toml` — Rust version specification
-- `.github/` — CI workflow location (if workflows exist)
-
-### Decision Rules
-- **Quality gates in CI**: `cargo fmt --check`, `cargo clippy -- -D warnings`, `cargo test` in every PR
-- **Rust version**: Pin to version in `rust-toolchain.toml`
-- **Build matrix**: Test on Windows, Linux, macOS when available
-- **Cache cargo**: Use `actions/cache` for `~/.cargo` and `target/` directories
-- **Fail fast**: Stop pipeline on first failure
-- **No secrets in logs**: Never echo keys or tokens in CI output
-- **Artifact storage**: Build artifacts attached to release, not committed to repo
-- **CAG validation**: Include `python tools/validate/cag_validate.py` in CI pipeline
+- Keep CI gates aligned with the repo quality gates.
+- Prefer deterministic jobs and explicit tool versions.
+- Keep workflow scope narrow and readable.
+- Cache only what is safe and worth the complexity.
+- Separate fast feedback jobs from slower release or package jobs.
+- Keep workflow logic in CI files, not hidden in undocumented local assumptions.
 
 ## Companion File Index
-
-- (no companion files extracted)
+- None.
 
 ## References
-
-- See related skills in `.github/skills/`.
+- .github/workflows/
+- Cargo.toml
+- rust-toolchain.toml

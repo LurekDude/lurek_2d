@@ -1,55 +1,34 @@
-﻿---
+---
 name: lua-scripting
-description: "Load this skill when writing or reviewing Lua game scripts for Lurek2D. It owns lurek.* API usage patterns, Lua idioms, game script structure, and example code conventions. Skip it for Rust engine code or API design."
+description: "Load this skill when writing or reviewing Lua game scripts and lurek.* usage. Skip it for engine Rust or API design."
 ---
 # lua-scripting
 
 ## Mission
-
-# Lua Scripting — Lurek2D Engine
+- Own Lua game-script structure, lurek.* usage, and script-level clarity.
 
 ## When To Load
-
-- Writing Lua game scripts in `content/examples/`
-- Reviewing Lua code for correctness and style
-- Creating demo or tutorial Lua code
-- Debugging Lua runtime errors
+- Write a Lua game script.
+- Review lurek.* usage in content or tests.
+- Build a script example or demo.
+- Check Lua-side structure and callback flow.
 
 ## When To Skip
-
-- Rust binding implementation → use `rust-coding` skill
-- API surface design → use `lua-api-design` skill
-- Lua VM configuration → handled by mlua in engine
+- Engine Rust code.
+- Public API design.
 
 ## Domain Knowledge
-
-### Owns
-- Lua game script structure and patterns
-- `lurek.*` API usage from the Lua side
-- Lua coding idioms for game development
-- Example game organization (directory structure, main.lua)
-
-### Live Repository Contracts
-- `content/games/action/platformer/main.lua` — minimal game example
-- `content/games/action/brick_breaker/main.lua` — physics usage example
-- `content/games/action/bullet_hell/main.lua` — sprite and texture example
-- `docs/api/lurek.md` — API reference for script authors
-
-### Decision Rules
-- **Entry point**: Every game has a `main.lua` in its directory
-- **Callbacks**: Define `lurek.init()`, `lurek.ready()`, `lurek.process(dt)`, `lurek.process_physics(dt)`, `lurek.process_late(dt)`, `lurek.render()`, `lurek.render_ui()` as the game structure (all optional — see engine-architecture.md § Callback Contract)
-- **API prefix**: Always `lurek.*` — never external engine prefixes or globals
-- **Local variables**: Use `local` for all variables — avoid globals except lurek callbacks
-- **Table patterns**: Use tables for game objects: `local player = {x = 100, y = 200, speed = 150}`
-- **Delta time**: Always multiply movement by `dt` for frame-rate independence
-- **Directory layout**: Each game in its own directory: `content/games/action/platformer/main.lua`
-- **No require()**: Lurek2D doesn't support module loading yet — single-file scripts
-- **Comments**: Use `--` for single-line comments, document non-obvious game logic
+- Use lurek.* only for engine-facing APIs.
+- Keep game state in locals, not accidental globals.
+- Multiply movement and time-based updates by dt.
+- Keep rendering in render callbacks and logic in process callbacks.
+- Keep scripts readable enough for game authors first.
+- Use docs/api/lurek.md and content examples as the source of current script patterns.
 
 ## Companion File Index
-
-- (no companion files extracted)
+- None.
 
 ## References
-
-- See related skills in `.github/skills/`.
+- content/games/
+- content/examples/
+- docs/api/lurek.md

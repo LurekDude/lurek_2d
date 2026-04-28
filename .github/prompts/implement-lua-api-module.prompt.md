@@ -1,58 +1,39 @@
 ---
-description: "Build or rebuild a lurek.* Lua API module from domain module source. Reads domain pub fn signatures, designs the Lua surface, then writes..."
+description: "Build or rebuild a lurek.* Lua API module."
 ---
 # Implement Lua Api Module
 
 ## Goal
-
-Rebuild `src/lua_api/<module>_api.rs` as a thin wrapper over the domain module `src/<module>/`.
-Business logic belongs in the domain module. The lua_api file is a bridge only.
+- Build or rebuild one lurek.* Lua API module from domain code.
 
 ## Inputs
-
-- `LuaRegistryKey` — value supplied by the user invocation.
-- `module` — value supplied by the user invocation.
-- `module_name` — value supplied by the user invocation.
-- `type` — value supplied by the user invocation.
+- module_name: target module.
 
 ## Steps
-
-1. Load [skill: lua-api-design](.github/skills/lua-api-design/SKILL.md), [skill: rust-coding](.github/skills/rust-coding/SKILL.md) before changing any files.
-2. Methods present in `lua_api_old` but missing from the domain → add them to the domain in Step 3
-3. Domain methods not yet exposed in the old API → decide whether to expose them
-4. Business logic inside old closures (loops, conditionals, struct construction) → flag for extraction
-5. Expose every meaningful method. Omit: `new()` (replaced by Lua factory), internal helpers, `Default`.
-6. Lua names: `snake_case` → `camelCase`. Constructor factories use `new` prefix: `newAgent`.
-7. Types: bool→boolean, f64/f32→number, i32/i64→integer, String→string, Option<T>→`type?`, UserData wrapper→wrapper name, no return→nil. NEVER write `any`.
-8. For Lua callback parameters: use `LuaFunction` in the signature; store with `lua.create_registry_value(func)?` → `LuaRegistryKey`.
-9. `add_method` for read-only wrapper access; `add_method_mut` only when the wrapper struct itself is mutated (e.g. updating a stored `Option<LuaRegistryKey>`).
-10. Add `pub fn` with `///` docstring to the domain module (following `rust-coding` skill).
-11. Follow the **Business Logic Migration Pattern** from the `lua-api-design` skill.
-12. Verify it compiles: `cargo check --lib 2>&1 | Select-String "error"`.
+- Load lua-api-design, lua-rust-bridge, rust-coding, documentation, and testing-rust.
+- Read the domain module and current API docs.
+- Design the Lua surface first.
+- Keep src/lua_api/<module>_api.rs thin.
+- Put business logic in src/<module>/.
+- Add docs and tests in the right places.
+- Regenerate API docs if public API changed.
 
 ## Success Criteria
-
-- [ ] Step 0 inventory is complete (both sources listed as a table)
-- [ ] All business logic migrated to domain module (no loops/conditionals in closures)
-- [ ] `python tools/validate/validate_lua_api.py src/lua_api/<module>_api.rs` exits 0
-- [ ] `cargo check --lib 2>&1 | Select-String "error"` produces no output
-- [ ] Every `methods.add_method*(` call has a docstring with `@return` above it
-- [ ] No `impl mlua::UserData` (use prelude `impl LuaUserData`)
-- [ ] No `/// @return any` anywhere in the file
-- [ ] Lua callbacks stored via `LuaRegistryKey` (not raw `LuaFunction` captures)
-- [ ] Module registered in `mod.rs`
+- [ ] The Lua API module is implemented or refreshed.
+- [ ] The wrapper is thin.
+- [ ] Tests and docs are updated.
+- [ ] Generated API docs are refreshed when needed.
 
 ## Anti-patterns
-
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running `git add .` instead of staging only the files this prompt produced.
+- Put business logic in the wrapper.
+- Skip API design.
+- Skip tests.
+- Use git add .
 
 ## Example Invocation
-
-> Run this prompt via VS Code Copilot Chat: `/implement-lua-api-module <LuaRegistryKey> <module> <module_name> <type>`
+- /implement-lua-api-module module_name
 
 ## CAG Metadata
-
 - **Mode**: agent
-- **Loads skills**: lua-api-design, rust-coding
-- **Inputs required**: LuaRegistryKey, module, module_name, type
+- **Loads skills**: lua-api-design, lua-rust-bridge, rust-coding, documentation, testing-rust
+- **Inputs required**: module_name

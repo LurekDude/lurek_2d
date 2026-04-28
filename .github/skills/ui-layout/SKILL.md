@@ -1,6 +1,6 @@
-﻿---
+---
 name: ui-layout
-description: "Load this skill when designing, reviewing, or scaffolding TOML UI layout files for Lurek2D. Use for: authoring content/layouts/ TOML files, grid-snapping coordinates, choosing widget types, creating game or app screen layouts, running render_layout.py, snap_to_grid.py, or fix_layouts.py. Skip it for Rust engine UI code or Lua game-logic scripting."
+description: "Load this skill when designing or reviewing TOML UI layouts in content/layouts/ and related layout tools. Skip it for Rust UI code or Lua game logic."
 ---
 # ui-layout
 
@@ -45,3 +45,4 @@ None - all guidance is inline.
 - content/layouts/ - TOML layout files
 - tools/ui/ - layout tools (render, snap, fix)
 - src/ui/ - Rust UI module
+

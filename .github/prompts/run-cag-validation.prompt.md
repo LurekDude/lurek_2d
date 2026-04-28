@@ -1,39 +1,34 @@
 ---
-description: "Run CAG validation to check all agents, skills, prompts, and instructions for compliance."
+description: "Run CAG validation."
 ---
 # Run Cag Validation
 
 ## Goal
-
-Validate the entire CAG layer using `tools/validate/cag_validate.py`.
+- Validate the CAG layer with tools/validate/cag_validate.py.
 
 ## Inputs
-
-- (none) — this prompt takes no required arguments.
+- None.
 
 ## Steps
-
-1. Load [skill: tools-cag-validation](.github/skills/tools-cag-validation/SKILL.md) before changing any files.
-2. Run `python tools/validate/cag_validate.py` for full validation
-3. Review any errors or warnings
-4. Fix non-compliant files
-5. Re-run validation until clean
+- Load tools-cag-validation.
+- Run python tools/validate/cag_validate.py.
+- Read the errors and warnings.
+- If this prompt is part of a fix task, fix the files and run the command again.
+- Stop only when the final report is clean or the blocking issue is explicit.
 
 ## Success Criteria
-
-- [ ] Validation report with errors, warnings, and info
-- [ ] List of files that need fixing
+- [ ] Validation output is available.
+- [ ] Problem files are listed when the run fails.
+- [ ] Final run is clean when fixes are part of the task.
 
 ## Anti-patterns
-
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running `git add .` instead of staging only the files this prompt produced.
+- Skip the final validation run.
+- Declare done after one failing run.
+- Use git add .
 
 ## Example Invocation
-
-> Run this prompt via VS Code Copilot Chat: `/run-cag-validation`
+- /run-cag-validation
 
 ## CAG Metadata
-
 - **Mode**: agent
 - **Loads skills**: tools-cag-validation

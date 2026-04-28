@@ -1,105 +1,42 @@
-﻿---
+---
 name: documentation
-description: "Load this skill when writing or updating Lurek2D documentation: API reference, architecture docs, tutorials, README, or code comments. It owns doc style, structure, and accuracy verification. Skip it for code implementation."
+description: "Load this skill when writing or updating docs, READMEs, tutorials, API reference, or code comments. Skip it for code changes."
 ---
 # documentation
 
 ## Mission
-
-# Documentation — Lurek2D Engine
+- Own doc style, source checks, generated-doc rules, and user-facing clarity.
 
 ## When To Load
-
-- Writing or updating `docs/` files
-- Updating `README.md`
-- Writing code comments for complex algorithms
-- Creating tutorials or getting-started guides
-- Documenting new API functions
+- Update docs/.
+- Update README.md or CONTRIBUTING.md.
+- Write tutorials or API docs.
+- Add code comments for complex logic.
 
 ## When To Skip
-
-- CAG file documentation → use `tools-cag-validation` skill
-- Code implementation → use `rust-coding` skill
-- API design decisions → use `lua-api-design` skill
+- Engine code changes.
+- CAG file work.
+- API design decisions.
 
 ## Domain Knowledge
-
-### Owns
-- Documentation structure and style
-- API reference format and accuracy
-- Architecture documentation
-- Tutorial and getting-started content
-- Code comment conventions
-
-### Live Repository Contracts
-- `docs/api/lurek.md` — generated Lua API reference (do not hand-edit)
-- `docs/specs/lua-api-file-standard.md` — canonical structure and docstring contract for `src/lua_api/*_api.rs`
-- `src/lua_api/mod.rs` — thin bridge module surface only
-- `src/lua_api/register.rs` — Lua VM factory and module registration order
-- `src/lua_api/lua_types.rs` — shared Lua-visible type helpers and type-name conventions
-- `docs/architecture/engine-architecture.md` — module structure, tier system, rendering pipeline
-- `docs/architecture/philosophy.md` — design assumptions, binding constraints, Zen of Luna
-- `docs/architecture/test-framework.md` — test suite architecture and quality gates
-- `README.md` — project overview and quick start
-
-### Module Group Terminology
-Always use these exact terms when writing architecture or API documentation:
-
-| Term | Meaning |
-|------|---------|
-| **Foundations** | Pure algorithms and data: `math`, `log`, `data`, `serial`, `compute`, `dataframe`, `graph`, `procgen`, `patterns` |
-| **Core Runtime** | Engine lifecycle, timing, events, threading: `runtime`, `event`, `timer`, `thread`, `network`, `filesystem` |
-| **Platform Services** | OS-facing backends: `render`, `audio`, `physics`, `input`, `image`, `window`, `camera`, `light`, `effect` |
-| **Feature Systems** | Game-domain services: `ecs`, `scene`, `animation`, `tween`, `particle`, `tilemap`, `parallax`, `minimap`, `raycaster`, `ui`, `terminal`, `ai`, `pathfind`, `save`, `mods`, `i18n`, `automation`, `sprite`, `spine` |
-| **Edge/Integration** | Composition root: `app`, `lua_api`, `devtools`, `debugbridge`, `docs`, `pipeline`, `bin` |
-| **Lunasome** | Pure-Lua standard libraries under `library/` — NOT Rust source |
-
-`lua_api` is Edge/Integration (composition root), not Lunasome. Lunasome lives in `library/` and is pure Lua.
-
-Legacy gameplay Rust modules still under `src/` are being superseded by `library/` equivalents. Document them as deprecated, not as active Lunasome.
-
-### Testing Docs Conventions
-The test suite has three distinct categories — always distinguish them:
-
-| Category | Location | How to run |
-|----------|----------|-----------|
-| Engine integration tests | `tests/rust/unit/`, `tests/rust/ext/`, `tests/rust/`, `tests/rust/` | `cargo test --test <name>` |
-| Lua BDD harness | `tests/lua/harness.rs` dispatches `tests/lua/**/*.lua` | `cargo test lua_test_<module>` |
-| Example smoke runs | `content/games/<name>/` or `examples/<name>/` directories | `cargo run -- content/games/<name>` |
-
-Never conflate these. A failing integration test and a failing cargo run are different problems.
-
-### Decision Rules
-- **Accuracy first**: Every documented API must match the actual code signature
-- **Working examples**: Code snippets in docs must be runnable
-- **One source of truth**: Don't duplicate information across doc files — cross-reference
-- **Lua perspective**: API reference written for Lua script authors, not Rust developers
-- **Function format**: `lurek.module.function(param1, param2)` — Returns: description
-- **Lua API docstring format**: In `src/lua_api/*_api.rs`, use exactly one description line, then `@param | name | type | description`, then `@return | type[, type...] | description`
-- **Lua-visible types only**: For userdata, write the type exactly as Lua users see it, such as `LButton` or `LCamera`, not the Rust wrapper name like `LuaButton`
-- **Fixed returns only**: Return docs may describe one fixed type or a fixed tuple like `boolean, number`; do not document `?`, `|nil`, or union returns
-- **Docs-only means docs-only**: When the task is docstrings/specs/prompts/skills, do not change Rust logic or run runtime tests just to validate documentation edits
-- **Group model terms**: Always use the exact terms from the table above (e.g., "Platform Services", "Edge/Integration")
-- **require("library.*)**: In code examples, `require("library.combat")` etc. refer to shipped Lua modules under `library/` — never describe `library/` as Rust source
-- **Example paths**: Run commands must use real directory names from `content/games/` or `examples/` — not invented paths
-- **Architecture docs**: Must reflect current module structure — update when modules change
-- **Markdown style**: Headers with `##`, code blocks with language tags, tables for reference data
-
-### Avoid
-- Linking to other game engines as references or comparisons
-- Documenting files or API functions that do not exist in the codebase
-- Inventing workflows not reflected in the actual engine code
-- Using stale or deprecated function signatures
-- Treating `library/` as Rust source — it is pure Lua
-- Describing planned or future features as if they currently exist
+- docs/api/lurek.md is generated. Do not hand-edit it.
+- docs/specs/lua-api-file-standard.md defines the docstring contract for src/lua_api/*_api.rs.
+- Use docs/specs/ for module truth.
+- Keep API docs correct to the actual code signature.
+- Keep examples runnable.
+- Do not duplicate the same facts across many docs.
+- Write Lua API docs for Lua users, not Rust users.
+- Use Lua-visible type names, not internal wrapper names.
+- When the task is docs-only, do not change Rust logic.
+- Keep architecture docs in sync with current modules.
+- library/ is pure Lua, not Rust source.
+- Do not document planned features as if they already exist.
 
 ## Companion File Index
-
-- (no companion files extracted)
+- None.
 
 ## References
-
-- See related skills in `.github/skills/`.
-- [tools/docs/gen_wiki.py](../../../tools/docs/gen_wiki.py) — full wiki regenerator.
-- [tools/docs/gen_test_docs.py](../../../tools/docs/gen_test_docs.py) — generates `logs/reports/` test documentation from the test tree.
-- [tools/fix/add_lua_docstrings.py](../../../tools/fix/add_lua_docstrings.py) — interactive `///` docstring backfill for Lua API bindings.
+- docs/api/lurek.md
+- docs/specs/lua-api-file-standard.md
+- docs/architecture/philosophy.md
+- README.md
