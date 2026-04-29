@@ -1,36 +1,39 @@
 ---
-description: "Analyze game telemetry from logs."
+description: "Analyze game telemetry, SQL results, or DataFrame outputs for balance or KPI questions."
+agent: "Analyst"
 ---
-
 # Analyze Game Telemetry
 
 ## Goal
-- Analyse a Lurek2D log or session-event capture and produce a structured analytics report frame-time histogram, crash frequency, top warning sources that can drive balance or performance follow-up.
+- Produce evidence-backed telemetry findings for a concrete game question.
 
 ## Inputs
-- log_path
-- report_focus
+- Telemetry source or report path.
+- Question or metric target.
+- Relevant cohort, segment, or time window.
+- Balance or KPI concern.
 
 ## Steps
-- Load analytics before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Research agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: analytics](../skills/analytics/SKILL.md) before acting.
+2. Gather only the relevant source material from logs/, logs/data/, SQL exports, DataFrame outputs, and any linked balance notes.
+3. Compute the key metrics, trends, and outliers for the named question, then separate measured facts from interpretation.
+4. Tie each result to likely game balance, economy, or content implications and note what extra data would change the conclusion.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The data or source scope is explicit.
+- [ ] Findings are evidence-backed and quantified where possible.
+- [ ] Assumptions and open questions are separated from facts.
+- [ ] A next owner or next validation step is clear.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Give generic advice with no repo evidence or measured signal.
+- Mix facts, guesses, and recommendations into one vague paragraph.
+- Jump to implementation before identifying the owner and the evidence strength.
 
 ## Example Invocation
-- /analyze-game-telemetry <log_path> <report_focus>
+- /analyze-game-telemetry source=logs/data/session.csv metric=retention cohort=new_players
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: analytics
-- **Inputs required**: log_path, report_focus
+Mode: agent
+Loads skills: analytics
+Inputs required: Telemetry source or report path., Question or metric target., Relevant cohort, segment, or time window., Balance or KPI concern.

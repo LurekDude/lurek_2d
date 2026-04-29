@@ -33,7 +33,7 @@ tools: [read, search, execute, edit]
 
 ## Workflow
 - Read docs/specs/audio.md, target files, and the nearest audio test or example before editing.
-- Load rust-coding and lua-rust-bridge, then add asset-pipeline only if decode or file handling changed.
+- Load rust-coding and error-handling first, then add lua-rust-bridge and asset-pipeline only when binding, decode, or file handling details changed.
 - Keep playback on rodio, file access on GameFS, and streaming decode off the game thread.
 - Clamp Lua-facing volume, pitch, pan, and other public values at the boundary.
 - Preserve the headless path for tests and avoid device-only assumptions unless the task explicitly needs them.
@@ -60,4 +60,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, audio-first
 Personas: EngDev, GameDev
 Primary skills: rust-coding, error-handling
-Secondary skills: lua-rust-bridge, performance-profiling, asset-pipeline
+Secondary skills: lua-rust-bridge, performance-profiling, asset-pipeline, lua-api-design

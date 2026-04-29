@@ -34,7 +34,7 @@ tools: [read, search, execute]
 
 ## Workflow
 - Identify the trust boundaries, attack surfaces, and assets worth protecting before reading line by line.
-- Load error-handling and lua-scripting, then add a narrower skill only if the surface demands it.
+- Load error-handling first, bring in rust-coding for the owning implementation surface, then use lua-scripting and a narrower skill only if the surface demands it.
 - Walk the code by boundary type: unsafe, file paths, sandbox exposure, type conversion, borrow lifetime, and data leakage.
 - Use tools/validate/validate_lua_api.py where boundary contracts can be checked mechanically.
 - Verify every unsafe block has a real SAFETY argument that matches the surrounding invariants.
@@ -62,4 +62,4 @@ tools: [read, search, execute]
 Communication: simple, direct, low-token, risk-first
 Personas: EngDev, GameTest, EngTest
 Primary skills: error-handling, rust-coding
-Secondary skills: lua-scripting, module-architecture
+Secondary skills: lua-scripting, module-architecture, asset-pipeline, dev-debugging

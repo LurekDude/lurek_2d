@@ -18,16 +18,20 @@ description: "Load this skill when creating demo projects in content/games/, inc
 - Engine Rust code.
 
 ## Domain Knowledge
-- Demos live in content/games/.
-- Core files are conf.lua or conf.toml, main.lua, README.md, and screen.png when needed.
-- Keep each demo runnable and self-explanatory.
-- Register new demos where the repo expects them.
-- Keep examples and docs in sync with the demo.
-
+- Demos live under content/games/<category>/<name> and should be runnable with main.lua plus conf.lua or conf.toml.
+- README.md must explain the demo goal fast; screen.png is optional support, not the contract.
+- Demo smoke coverage currently lives in tests/demo_smoke_tests.rs and Lua smoke files under tests/lua/demos/.
+- A demo should showcase one capability cluster clearly, not become a dumping ground for unrelated APIs.
+- If the demo exposes public API behavior, keep related docs and examples in sync with the same capability.
+- Prefer small, robust setup over heavy content that hides the engine feature being demonstrated.
+- Demo registration and smoke coverage should line up with tests/demo_smoke_tests.rs and the Lua smoke/demo files already checked into tests/lua/demos/.
+- A good demo highlights one capability family, has readable content flow, and makes failure modes obvious when the engine feature regresses.
+- Demo-creation owns runnable showcase content, not generic example coverage or reusable library layout.
 ## Companion File Index
 - None.
 
 ## References
 - content/games/
-- tests/lua/content/games/
+- tests/lua/demos/
 - tests/demo_smoke_tests.rs
+- tests/games_load_test.rs

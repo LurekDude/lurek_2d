@@ -33,7 +33,7 @@ tools: [read, search, execute]
 
 ## Workflow
 - Re-read the diff and restate the intended change in one sentence before judging it.
-- Load rust-coding and module-architecture, then add a narrower skill only if the files demand it.
+- Load rust-coding and module-architecture first, add error-handling when the diff changes failure paths or Lua-visible errors, then add a narrower skill only if the files demand it.
 - Confirm the claimed preconditions actually passed before spending time on deeper review.
 - Run tools/audit/doc_coverage.py and tools/audit/test_coverage.py when they apply to the changed surface.
 - Run python tools/validate/cag_validate.py if .github is in scope.
@@ -62,4 +62,4 @@ tools: [read, search, execute]
 Communication: simple, direct, low-token, findings-first
 Personas: EngDev, GameDev
 Primary skills: rust-coding, module-architecture, error-handling
-Secondary skills: lua-api-design, testing-rust
+Secondary skills: lua-api-design, testing-rust, module-audit, documentation

@@ -20,13 +20,15 @@ description: "Load this skill when adding or reviewing content/examples/ or cont
 - CAG files.
 
 ## Domain Knowledge
-- Keep examples self-contained and easy to run.
-- Use examples to show one clear concept or workflow.
-- Prefer realistic API use over placeholder calls.
-- Keep demo structure and example structure distinct.
-- Check coverage gaps with existing example audit tools when needed.
-- Update supporting README text when the example changes materially.
-
+- content/examples/<module>.lua is the one-concept learning surface for public APIs.
+- Examples should exercise real lurek.* usage and help close coverage gaps reported by example_coverage.py or coverage gap reports.
+- Keep example setup tiny and README/conf notes short; this is not the place for long tutorial prose.
+- Examples and showcase games serve different jobs: one concept versus a broader playable slice.
+- Prefer stable APIs already reflected in docs/specs and generated docs.
+- When an example changes materially, sync the supporting README text in the same pass.
+- content/examples/ should help a user understand a module quickly, and tools like example_coverage.py or coverage gap reports are the right way to find under-served APIs.
+- Stub-oriented example cleanup should keep story flow and real arguments, not just chase line-by-line coverage.
+- The skill owns compact learning artifacts, not full demos, libraries, or tutorial docs.
 ## Companion File Index
 - None.
 
@@ -34,3 +36,4 @@ description: "Load this skill when adding or reviewing content/examples/ or cont
 - content/examples/
 - content/games/
 - tools/audit/example_coverage.py
+- logs/reports/coverage_gaps.md

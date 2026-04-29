@@ -1,36 +1,39 @@
 ---
-description: "Design game AI with lurek.ai."
+description: "Design one gameplay AI pattern using the existing lurek.ai surface."
+agent: "Content-Maker"
 ---
-
-# Design Game Ai
+# Design Game AI
 
 ## Goal
-- Design and implement an AI behaviour for a named actor using the lurek.ai.* API FSM, behaviour tree, GOAP planner, steering, or utility AI backed by a deterministic Lua test.
+- Produce one gameplay AI design that fits the current engine surface.
 
 ## Inputs
-- actor_name
-- behaviour_kind
+- Gameplay goal.
+- Target content context.
+- Required AI primitives.
+- Constraints or realism target.
 
 ## Steps
-- Load game-ai before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Developer agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: game-ai](../skills/game-ai/SKILL.md) and [skill: lua-scripting](../skills/lua-scripting/SKILL.md) before acting.
+2. Read existing lurek.ai usage, nearby content, the relevant API docs, and any scenario constraints before editing.
+3. Keep the design inside the shipped AI primitives, make the control loop readable for content authors, and note any engine gap instead of silently inventing new hooks.
+4. Check the design against current examples and content patterns, then list any missing API or test support needed before implementation.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Produce one gameplay AI design that fits the current engine surface.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /design-game-ai <actor_name> <behaviour_kind>
+- /design-game-ai goal=squad_flank context=content/games/tactics
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: game-ai
-- **Inputs required**: actor_name, behaviour_kind
+Mode: agent
+Loads skills: game-ai, lua-scripting
+Inputs required: Gameplay goal., Target content context., Required AI primitives., Constraints or realism target.

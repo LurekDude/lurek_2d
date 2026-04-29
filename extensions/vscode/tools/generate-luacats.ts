@@ -8,7 +8,8 @@ const root = path.resolve(__dirname, "..");
 const repoRoot = path.resolve(root, "..", "..");
 
 const sourcePath = path.join(repoRoot, "docs", "api", "lurek.lua");
-const outputPath = path.join(root, "data", "lurek.lua");
+const outputPath = path.join(root, "data", "lurek.luacats");
+const legacyOutputPath = path.join(root, "data", "lurek.lua");
 
 function runPython(scriptPath: string, args: string[] = []): void {
   const python = process.env.PYTHON ?? "python";
@@ -40,5 +41,8 @@ if (!fs.existsSync(sourcePath)) {
 
 fs.mkdirSync(path.dirname(outputPath), { recursive: true });
 fs.copyFileSync(sourcePath, outputPath);
+if (fs.existsSync(legacyOutputPath)) {
+  fs.rmSync(legacyOutputPath);
+}
 
 console.log(`✓ Copied ${path.relative(root, outputPath)} from docs/api/lurek.lua`);

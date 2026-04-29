@@ -1,44 +1,39 @@
 ---
-description: "Create a new self-contained Lua example."
+description: "Create one Lua example that demonstrates a concrete API or pattern."
+agent: "Content-Maker"
 ---
-
 # Create Lua Example
 
 ## Goal
-- Create a new self-contained Lua example game in content/examples/. Use when demonstrating a Lurek2D API feature or workflow. Produces a r...
+- Add one runnable Lua example with clear teaching value.
 
 ## Inputs
-- EXAMPLE_NAME directory name, lowercase with hyphens (e.g., particle-demo, audio-demo)
-- CONCEPT what API feature or game mechanic this demonstrates (e.g., "keyboard-controlled movement", "physics stacking")
-- COMPLEXITY simple (< 50 lines) or full (< 100 lines)
+- Example name.
+- Target API or pattern.
+- Audience level.
+- Required assets or setup.
 
 ## Steps
-- Load lua-scripting before changing any files.
-- Load skill lua-scripting/SKILL.md
-- Create directory content/examples/<EXAMPLE_NAME>/
-- Write content/examples/<EXAMPLE_NAME>/main.lua with:
-- local variables for all state
-- function lurek.init() initialization
-- function lurek.process(dt) frame logic
-- function lurek.draw() rendering only
-- Optionally: lurek.keypressed, lurek.input.mousepressed callbacks
-- Check all API calls against docs/api/lurek.md:
-- Colors: [0.0, 1.0] float range
-- Shapes: ("fill"/"line", x, y, ...)
+1. Load [skill: examples-management](../skills/examples-management/SKILL.md), [skill: lua-scripting](../skills/lua-scripting/SKILL.md), and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Read content/examples/, nearby Lua examples, the matching API docs or spec, and any asset constraints before editing.
+3. Use the real API exactly as shipped, keep the example small enough to teach one idea, and update light documentation only where it helps discovery.
+4. Run the narrowest example load path and confirm the example still matches the current public API.
 
 ## Success Criteria
-- [ ] content/examples/<EXAMPLE_NAME>/main.lua working, commented Lua script
-- [ ] Any required assets in content/examples/<EXAMPLE_NAME>/ (images, audio)
-- [ ] Verified: cargo run -- content/examples/<EXAMPLE_NAME> opens a window without errors
+- [ ] The prompt goal was completed: Add one runnable Lua example with clear teaching value.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-lua-example <EXAMPLE_NAME>
+- /create-lua-example name=timers target=timer.after
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-scripting
-- **Inputs required**: EXAMPLE_NAME
+Mode: agent
+Loads skills: examples-management, lua-scripting, documentation
+Inputs required: Example name., Target API or pattern., Audience level., Required assets or setup.

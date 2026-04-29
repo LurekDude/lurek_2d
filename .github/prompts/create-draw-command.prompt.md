@@ -1,40 +1,39 @@
 ---
-description: "Create a new RenderCommand variant."
+description: "Create one new render draw command and wire it through the owning render path."
+agent: "Renderer"
 ---
-
 # Create Draw Command
 
 ## Goal
-- Add a new RenderCommand variant to the rendering pipeline.
+- Add one bounded draw command to the render pipeline.
 
 ## Inputs
-- **Command name**: PascalCase variant name (e.g., DrawCircle, DrawLine)
-- **Parameters**: Data fields the command needs
-- **Rendering behavior**: How the wgpu pipeline should render it
+- Command goal.
+- Target renderer path.
+- Required parameters.
+- Expected test or demo path.
 
 ## Steps
-- Load gpu-programming before changing any files.
-- Add variant to RenderCommand enum in src/render/mod.rs
-- Implement rendering in src/render/renderer.rs match arm
-- Add Lua binding in src/lua_api/render_api.rs
-- Update docs/api/lurek.md
-- Write test for the new command
-- Run cargo test and cargo clippy
-- Consult the actual lurek.* API surface via docs/api/lurek.md, content/examples/, and docs/specs/. Do NOT invent APIs.
+1. Load [skill: gpu-programming](../skills/gpu-programming/SKILL.md), [skill: rust-coding](../skills/rust-coding/SKILL.md), and [skill: testing-rust](../skills/testing-rust/SKILL.md) before acting.
+2. Read the render command types, the owning encoder or pass, nearby tests, and the contract docs before editing.
+3. Keep the command shape minimal, follow the current render-command flow, and avoid slipping unrelated scene or gameplay logic into the renderer.
+4. Run the narrowest render test or build check that covers the new command before broadening validation.
 
 ## Success Criteria
-- [ ] RenderCommand variant is data-only (no logic)
-- [ ] Renderer processes command correctly
-- [ ] Lua binding follows lurek.render.* pattern
-- [ ] Tests pass, clippy clean
+- [ ] The prompt goal was completed: Add one bounded draw command to the render pipeline.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-draw-command
+- /create-draw-command command=drawNineSlice
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: gpu-programming
+Mode: agent
+Loads skills: gpu-programming, rust-coding, testing-rust
+Inputs required: Command goal., Target renderer path., Required parameters., Expected test or demo path.

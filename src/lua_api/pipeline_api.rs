@@ -975,7 +975,7 @@ impl LuaUserData for LuaPipeline {
         });
 
         // -- setName --
-        /// Sets the pipeline name.
+        /// Renames the pipeline without changing its steps, dependencies, or current runtime state.
         /// @param | name | string | New pipeline name.
         /// @return | nil | No value is returned.
         methods.add_method("setName", |_, this, name: String| {

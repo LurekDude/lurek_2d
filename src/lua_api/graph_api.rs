@@ -31,28 +31,28 @@ const VALID_EVENTS: &[&str] = &[
 ];
 
 // -- Wrapper Types -------------------------------------------------
-// Lua wrapper around a directed `Graph` with event callback registry.
+/// Lua wrapper around a directed `Graph` with event callback registry.
 #[derive(Clone)]
 struct LuaGraph {
     inner: Rc<RefCell<Graph>>,
     callbacks: Rc<RefCell<HashMap<String, LuaRegistryKey>>>,
 }
 
-// Lua handle for a node inside a `Graph`.
+/// Lua handle for a node inside a `Graph`.
 #[derive(Clone)]
 struct LuaNode {
     graph: Rc<RefCell<Graph>>,
     id: u64,
 }
 
-// Lua handle for an edge inside a `Graph`.
+/// Lua handle for an edge inside a `Graph`.
 #[derive(Clone)]
 struct LuaEdge {
     graph: Rc<RefCell<Graph>>,
     id: u64,
 }
 
-// Lua handle for a graph item (typed item) inside a `Graph`.
+/// Lua handle for a graph item (typed item) inside a `Graph`.
 #[derive(Clone)]
 struct LuaGraphItem {
     graph: Rc<RefCell<Graph>>,
@@ -1153,8 +1153,14 @@ impl LuaUserData for LuaGraph {
         /// @param | node_ud | Node | Node handle to remove.
         /// @return | boolean | True if the node was removed.
         methods.add_method("removeNode", |_, this, node_ud: LuaAnyUserData| {
-            let node = node_ud.borrow::<LuaNode>()?;
-            Ok(this.inner.borrow_mut().remove_node(node.id))
+            let node_id = {
+                let node = node_ud.borrow::<LuaNode>()?;
+                node.id
+            };
+            if !this.inner.borrow().has_node(node_id) {
+                return Err(LuaError::RuntimeError("node not found".into()));
+            }
+            Ok(this.inner.borrow_mut().remove_node(node_id))
         });
 
         // -- hasNode --

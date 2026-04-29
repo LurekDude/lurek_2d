@@ -19,18 +19,21 @@ description: "Load this skill when building lurek.html screens, HUDs, menus, dia
 - Pure game logic.
 
 ## Domain Knowledge
-- Create documents once and update or draw them through the normal frame flow.
-- Keep layout and styling concerns in HTML and CSS, not scattered in Lua.
-- Use relayout when bulk DOM or HTML changes require it.
-- Forward input intentionally so UI can consume it cleanly.
-- Keep UI examples readable and easy to inspect.
-- Use the UI spec as the contract for supported behavior.
-
+- HTML UI in this repo spans src/html/ domain code, src/ui/ integration, and src/lua_api/html_api.rs bindings.
+- Use docs/specs/html.md and docs/specs/ui.md as the behavior contract for supported HTML/CSS features.
+- Keep markup and styling together; do not spread layout decisions across Lua callbacks unless state really changes them.
+- Relayout only when DOM size or structure changes justify it.
+- Showcase HTML screens already exist in content/games/showcase/ and are better anchors than generic web patterns.
+- This skill covers HTML/CSS UI, not TOML layouts under content/layouts/.
+- HTML-driven UI work should respect the current engine-side html/ui split and the showcase content already living under content/games/showcase/.
+- Lua callback wiring should remain explicit so UI behavior stays inspectable and testable from game scripts.
+- This skill owns HTML/CSS documents and flow, not TOML layout grids or Rust widget internals.
 ## Companion File Index
 - None.
 
 ## References
+- docs/specs/html.md
 - docs/specs/ui.md
-- src/lua_api/ui_api.rs
-- src/ui/html/
-- content/examples/ui.lua
+- src/html/
+- src/lua_api/html_api.rs
+- content/games/showcase/

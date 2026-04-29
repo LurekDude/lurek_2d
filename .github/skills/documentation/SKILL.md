@@ -19,24 +19,21 @@ description: "Load this skill when writing or updating docs, READMEs, tutorials,
 - API design decisions.
 
 ## Domain Knowledge
-- docs/api/lurek.md is generated. Do not hand-edit it.
-- docs/specs/lua-api-file-standard.md defines the docstring contract for src/lua_api/*_api.rs.
-- Use docs/specs/ for module truth.
-- Keep API docs correct to the actual code signature.
-- Keep examples runnable.
-- Do not duplicate the same facts across many docs.
-- Write Lua API docs for Lua users, not Rust users.
-- Use Lua-visible type names, not internal wrapper names.
-- When the task is docs-only, do not change Rust logic.
-- Keep architecture docs in sync with current modules.
-- library/ is pure Lua, not Rust source.
-- Do not document planned features as if they already exist.
-
+- docs/api/lurek.md and docs/api/lurek.lua are generated and should never be hand-edited.
+- docs/specs/*.md is the contract layer for modules; src/lua_api/*_api.rs docstrings feed the generated Lua API docs.
+- The current manual generator flow after Rust Lua API changes is gen_lua_api_data.py then gen_luadoc.py; gen_all_docs.py is the broad pipeline.
+- Write for Lua users or engine contributors explicitly; do not mix both audiences in one section.
+- Keep examples runnable and align content/examples or library/example.lua with the documented behavior.
+- Document only what exists now, not planned features or hoped-for APIs.
+- docs/architecture/, docs/handbook.md, CONTRIBUTING.md, and wiki/ each serve different audiences and should not be flattened into one generic doc voice.
+- Generated docs belong to tools/docs; manual docs should explain behavior, tradeoffs, and usage patterns the generators cannot express.
+- Documentation owns clarity and sync for human readers, not API naming decisions or code changes.
 ## Companion File Index
 - None.
 
 ## References
-- docs/api/lurek.md
+- docs/specs/
 - docs/specs/lua-api-file-standard.md
-- docs/architecture/philosophy.md
-- README.md
+- docs/api/lurek.md
+- tools/docs/gen_lua_api_data.py
+- tools/docs/gen_luadoc.py

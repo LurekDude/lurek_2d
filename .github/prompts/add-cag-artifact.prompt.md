@@ -1,36 +1,40 @@
 ---
-description: "Add a new CAG agent, skill, or prompt."
+description: "Add or update one CAG artifact in .github/ with validation and zero drift."
+agent: "CAG-Architect"
+tools: [tools/validate/cag_validate.py, tools/audit/cag_link_check.py]
 ---
-
-# Add Cag Artifact
+# Add CAG Artifact
 
 ## Goal
-- Add a new agent, skill, or prompt under .github/ that conforms to the CAG standards in work/cag-system-overhaul-20260418/reports/standards/ and passes tools/validate/cag_validate.py with no new errors.
+- Add or update one CAG artifact and keep the CAG layer coherent.
 
 ## Inputs
-- artifact_type
-- name
+- Artifact type.
+- Target path or name.
+- Required behavior or routing impact.
+- Any linked docs or validator rule to honor.
 
 ## Steps
-- Load cag-workflow before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the CAG-Architect agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: cag-workflow](../skills/cag-workflow/SKILL.md) and [skill: tools-cag-validation](../skills/tools-cag-validation/SKILL.md) before acting.
+2. Read the target .github file, .github/agents/README.md, docs/architecture/cag-system.md, and the current validator rules before editing.
+3. Place the change in the smallest valid CAG layer, keep wording low-token, and update shared docs when routing, schema, or templates moved.
+4. Run the focused CAG validator first, then rerun the full CAG pass and link check when the change crosses files or shared docs.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Add or update one CAG artifact and keep the CAG layer coherent.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Duplicate a shared CAG rule that already has a single home.
+- Change routing or schema text without updating the shared docs and templates.
+- Leave the CAG layer with warnings after touching .github/.
 
 ## Example Invocation
-- /add-cag-artifact <artifact_type> <name>
+- /add-cag-artifact type=skill name=balance-analytics
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: cag-workflow
-- **Inputs required**: artifact_type, name
+Mode: agent
+Loads skills: cag-workflow, tools-cag-validation
+Inputs required: Artifact type., Target path or name., Required behavior or routing impact., Any linked docs or validator rule to honor.

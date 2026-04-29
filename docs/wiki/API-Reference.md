@@ -666,8 +666,8 @@ Define any of these in `main.lua`. All are optional.
   lurek.timer.setSmoothingFactor( alpha )  -> nil  -- Sets the exponential moving-average smoothing factor (alpha) used by `getSmoothedDelta`.
   lurek.timer.sleep( seconds )  -> nil  -- Blocks the current thread for the specified number of seconds using an OS-level sleep.
   lurek.timer.step( )  -> number  -- Manually advances the engine timer by one frame tick and returns the resulting delta time.
-  lurek.timer.tickRealTimers( )
-  lurek.timer.tickWaits( )
+  lurek.timer.tickRealTimers( )  -> integer  -- Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
+  lurek.timer.tickWaits( )  -> integer  -- Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or fram...
   lurek.timer.waitFrames( frames )  -> nil  -- Yields the current Lua coroutine until at least `frames` engine frames have elapsed.
   lurek.timer.waitSeconds( seconds )  -> nil  -- Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
 ```
@@ -1429,7 +1429,7 @@ Define any of these in `main.lua`. All are optional.
   lurek.window.minimize( )  -> nil  -- Minimises the window to the operating system taskbar or dock.
   lurek.window.onDpiChange( func )  -> nil  -- Registers a callback invoked (with the new scale factor) when the display DPI changes.
   lurek.window.openFileDialog( [opts] )  -> table  -- Opens a blocking native file-open dialog.
-  lurek.window.pollDpiChange( )
+  lurek.window.pollDpiChange( )  -> number  -- Checks whether the DPI scale has changed since the last call and fires the onDpiChange ...
   lurek.window.requestAttention( )  -> nil  -- Flashes the window icon in the operating system taskbar or dock to attract the user's a...
   lurek.window.restore( )  -> nil  -- Restores the window to its previous size and position after a `minimize` or `maximize` ...
   lurek.window.setFullscreen( enabled, [fstype] )  -> nil  -- Enables or disables fullscreen mode.
@@ -1457,7 +1457,7 @@ Define any of these in `main.lua`. All are optional.
   lurek.event.newSignal( )  -> LSignal  -- Creates and returns a new independent Signal pub-sub dispatcher.
   lurek.event.poll( )  -> function  -- Returns an iterator function that pops events one at a time from the engine event queue.
   lurek.event.pump( )  -> nil  -- Synchronises OS-level windowing events into the engine event queue.
-  lurek.event.push( ... )
+  lurek.event.push( ... )  -> nil  -- Pushes a custom named event onto the main engine event queue with optional payload argu...
   lurek.event.pushDeferred( ... )  -> nil  -- Pushes a named event into the deferred buffer instead of the main queue.
   lurek.event.quit( )  -> nil  -- Alias for `exit()` - requests the engine to stop gracefully at the end of the current f...
   lurek.event.restart( )  -> nil  -- Requests that the engine perform a full restart at the beginning of the next frame.
@@ -1493,7 +1493,7 @@ Define any of these in `main.lua`. All are optional.
   lurek.system.getArgs( )  -> table  -- Returns the command-line arguments as a table.
   lurek.system.getBatchResults( results )  -> integer  -- Returns the output table from the most recently completed runBatch call.
   lurek.system.getClipboardText( )  -> string  -- Returns the current contents of the system clipboard.
-  lurek.system.getDebugOverlay( )  -> DebugOverlay
+  lurek.system.getDebugOverlay( )  -> boolean  -- Returns whether the debug overlay is currently visible.
   lurek.system.getEnv( name )  -> string  -- Returns the value of an environment variable, or nil if not set.
   lurek.system.getInfo( )  -> table  -- Returns a table of system information including OS name, CPU model, and installed RAM.
   lurek.system.getLastError( )  -> table  -- Returns the last unhandled error message, or nil.
@@ -1984,7 +1984,7 @@ Define any of these in `main.lua`. All are optional.
   lurek.scene.depth( )  -> integer  -- Returns the number of scenes on the stack; alias for `getStackSize`.
   lurek.scene.deserializeScene( snapshot )  -> nil  -- Restores scene data_refs from a snapshot produced by serializeScene().
   lurek.scene.draw( )  -> nil  -- Draws all scenes in the stack from bottom to top (legacy name; prefer `render`).
-  lurek.scene.fade( [duration] )  -> table  -- Returns a fade cross-dissolve transition config table.
+  lurek.scene.fade( [duration] )  -> table  -- Pre-built named transition factory functions.  Each function accepts optional
   lurek.scene.getActiveScenes( )  -> table  -- Returns a table array of all active scene tables.
   lurek.scene.getCurrent( )  -> table  -- Returns the current top scene table, or nil if the stack is empty.
   lurek.scene.getData( key )  -> table  -- Returns a value from the inter-scene data store, or nil if not found.
@@ -2430,7 +2430,7 @@ Define any of these in `main.lua`. All are optional.
 ```lua
   LBandit:armCount( )  -> integer  -- Returns the number of arms.
   LBandit:bestArm( )  -> integer  -- Returns the best arm index.
-  LBandit:reset( )  -> nil  -- Resets the bandit state.
+  LBandit:reset( )  -> nil  -- Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fr...
   LBandit:select( )  -> integer  -- Selects an arm index using the current bandit strategy.
   LBandit:totalPulls( )  -> integer  -- Returns the total number of pulls.
   LBandit:type( )  -> string  -- Returns the type name of this object.
@@ -3054,6 +3054,7 @@ Define any of these in `main.lua`. All are optional.
 
 ```lua
   LArray:abs( )  -> Array  -- Element-wise absolute value.
+  LArray:add( )  -> Array  -- Element-wise addition with an Array or scalar.
   LArray:all( )  -> boolean  -- Returns true if all elements are nonzero.
   LArray:any( )  -> boolean  -- Returns true if any element is nonzero.
   LArray:argmax( )  -> integer  -- Returns the 1-based flat index of the maximum element.
@@ -3075,8 +3076,10 @@ Define any of these in `main.lua`. All are optional.
   LArray:cumsum( )  -> Array  -- Cumulative sum of all elements (flattened).
   LArray:diff( [order] )  -> Array  -- Discrete difference applied `order` times.
   LArray:dilate( radius )  -> Array  -- Morphological dilation with a diamond structuring element.
+  LArray:div( )  -> Array  -- Element-wise division with an Array or scalar.
   LArray:dot( other )  -> number  -- Dot product of two 1D arrays.
   LArray:eigenPower( [max_iter], [tol] )  -> table  -- Computes the dominant eigenvalue and its eigenvector using power iteration.
+  LArray:eq( )  -> Array  -- Element-wise equality with an Array or scalar.
   LArray:erode( radius )  -> Array  -- Morphological erosion with a diamond structuring element.
   LArray:eval( expr )  -> Array  -- Evaluate a Lua expression string element-wise, returning a new Array.
   LArray:fill( val )  -> nil  -- Fills all elements with the given value in-place.
@@ -3087,16 +3090,22 @@ Define any of these in `main.lua`. All are optional.
   LArray:getRegion( row, col, rows, cols )  -> Array  -- Extracts a rectangular sub-region (1-based row, col).
   LArray:getShape( )  -> table  -- Returns the shape as a table of dimension sizes.
   LArray:getSize( )  -> integer  -- Returns the total number of elements.
+  LArray:gt( )  -> Array  -- Element-wise greater-than with an Array or scalar.
+  LArray:gte( )  -> Array  -- Element-wise greater-or-equal with an Array or scalar.
   LArray:histogram( bins, [lo], [hi] )  -> table  -- Compute a histogram. Returns a table of {lo, hi, count} tables.
   LArray:isOnGPU( )  -> boolean  -- Returns false (CPU arrays only).
   LArray:linsolve( b )  -> Array  -- Solve A*x = b where this array is A (square [n,n]) and b is a 1D vector.
+  LArray:lt( )  -> Array  -- Element-wise less-than with an Array or scalar.
+  LArray:lte( )  -> Array  -- Element-wise less-or-equal with an Array or scalar.
   LArray:luDecompose( )  -> table  -- Decomposes this square matrix into L and U factors with partial pivoting.
   LArray:map( func )  -> Array  -- Apply a Lua callback element-wise, returning a new Array of the same shape.
   LArray:matmul( other )  -> Array  -- Matrix multiplication of two 2D arrays.
   LArray:max( [axis] )  -> Array  -- Maximum of all elements, or along an axis (1-based).
   LArray:mean( [axis] )  -> Array  -- Mean of all elements, or along an axis (1-based).
   LArray:min( [axis] )  -> Array  -- Minimum of all elements, or along an axis (1-based).
+  LArray:mul( )  -> Array  -- Element-wise multiplication with an Array or scalar.
   LArray:neg( )  -> Array  -- Returns a new Array with every element negated (multiplied by -1).
+  LArray:neq( )  -> Array  -- Element-wise not-equal with an Array or scalar.
   LArray:normalizeRange( lo, hi )  -> Array  -- Linearly rescale values to [out_min, out_max].
   LArray:normalizeVec( )  -> Array  -- L2-normalise a 1D vector.
   LArray:outer( other )  -> Array  -- Outer product of two 1D vectors -> 2D array [m, n].
@@ -3110,6 +3119,7 @@ Define any of these in `main.lua`. All are optional.
   LArray:setRegion( row, col, source )  -> nil  -- Copies a source array into this array at the given 1-based position.
   LArray:sobel( )  -> table  -- Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
   LArray:sqrt( )  -> Array  -- Element-wise square root.
+  LArray:sub( )  -> Array  -- Element-wise subtraction with an Array or scalar.
   LArray:sum( [axis] )  -> Array  -- Sum of all elements, or along an axis (1-based).
   LArray:threshold( val )  -> Array  -- Returns a mask array with 1.0 where elements >= val, else 0.0.
   LArray:toTable( )  -> table  -- Returns all elements as a flat table of numbers.
@@ -3284,6 +3294,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LGraph`** methods:
 
+> Lua wrapper around a directed `Graph` with event callback registry.
+
 ```lua
   LGraph:addEdge( from_ud, to_ud, [edge_type] )  -> Edge  -- Adds a directed edge between two nodes and returns its handle.
   LGraph:addItem( item_ud, node_ud )  -> boolean  -- Places an item at a node.
@@ -3327,6 +3339,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LGraphEdge`** methods:
 
+> Lua handle for an edge inside a `Graph`.
+
 ```lua
   LGraphEdge:addAllowedType( t )  -> nil  -- Adds an item type to the edge allow-list.
   LGraphEdge:clearAllowedTypes( )  -> nil  -- Clears the edge allow-list so all item types are permitted.
@@ -3360,6 +3374,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LGraphItem`** methods:
 
+> Lua handle for a graph item (typed item) inside a `Graph`.
+
 ```lua
   LGraphItem:getDecayTime( )  -> number  -- Returns the decay time in seconds (-1 = immortal).
   LGraphItem:getPosition( )  -> nil  -- Returns the item position: node userdata if at a node, (edge, progress)
@@ -3376,6 +3392,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LGraphNode`** methods:
+
+> Lua handle for a node inside a `Graph`.
 
 ```lua
   LGraphNode:addDemand( item_type, quantity, [priority] )  -> nil  -- Declares a demand for the given item type, quantity, and priority.
@@ -3775,7 +3793,7 @@ Define any of these in `main.lua`. All are optional.
   lurek.input.unbind( action )  -> boolean  -- Removes all key bindings for the given action name.
   lurek.input.vibrate( id, low_freq, high_freq, duration_ms )  -> boolean  -- Requests haptic vibration on a gamepad.
   lurek.input.wasActionPressed( action )  -> boolean  -- Returns true if any key bound to the action was pressed this frame.
-  lurek.input.wasActionPressedWithin( action, frames )
+  lurek.input.wasActionPressedWithin( action, frames )  -> boolean  -- Returns true if the action was pressed within the last frame window.
   lurek.input.wasActionReleased( action )  -> boolean  -- Returns true if any key bound to the action was released this frame.
 ```
 
@@ -3973,10 +3991,10 @@ Define any of these in `main.lua`. All are optional.
 
 ```lua
   LCamera:apply( )  -> nil  -- Applies this camera's transform to the render stack.
-  LCamera:attach( )  -> nil  -- Alias for `apply()`.
+  LCamera:attach( )  -> nil  -- Alias for `apply()` that queues this camera's transform onto the render command stack.
   LCamera:clearParallaxFactors( )  -> nil  -- Removes all parallax factor overrides, resetting every layer to the default factor of 1...
   LCamera:clearTarget( )  -> nil  -- Clears the follow target so the camera stops tracking any position.
-  LCamera:detach( )  -> nil  -- Alias for `reset()`.
+  LCamera:detach( )  -> nil  -- Alias for `reset()` that removes this camera's transform from the render command stack.
   LCamera:followPath( points, duration )  -> nil  -- Animates the camera along a sequence of world-space waypoints over the given duration (...
   LCamera:getEffectOffset( )  -> number  -- Returns the current world-space x/y offset contributed by the sway and shake effects.
   LCamera:getEffectiveZoom( )  -> number  -- Returns the current zoom level including contributions from zoom pulse and breathing ef...
@@ -5035,7 +5053,7 @@ Define any of these in `main.lua`. All are optional.
 > Lua wrapper for the Observer pattern.
 
 ```lua
-  LObserver:get( key )  -> any  -- Gets a property value.
+  LObserver:get( key )  -> any  -- Returns the current stored property value for the given observer key, or nil if it has ...
   LObserver:getCount( )  -> integer  -- Returns the total number of active subscriptions.
   LObserver:set( key, new_val )  -> nil  -- Sets a property value and fires subscribed watchers.
   LObserver:subscribe( key, callback, [once] )  -> integer  -- Subscribes to changes on a property key (or "*" for all).
@@ -5200,6 +5218,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LPipeline`** methods:
 
+> Lua-side wrapper around a [`Pipeline`] DAG.
+
 ```lua
   LPipeline:addConditional( name, deps_tbl, cb, cond )  -> LPipeline  -- Adds a conditional step to the pipeline.
   LPipeline:addStep( step_ud )  -> LPipeline  -- Adds a step to the pipeline.
@@ -5224,7 +5244,7 @@ Define any of these in `main.lua`. All are optional.
   LPipeline:run( [context] )  -> table  -- Executes the pipeline synchronously in topological order.
   LPipeline:runAsync( [context] )  -> nil  -- Starts an asynchronous pipeline run.
   LPipeline:setErrorMode( mode )  -> nil  -- Sets the pipeline error mode.
-  LPipeline:setName( name )  -> nil  -- Sets the pipeline name.
+  LPipeline:setName( name )  -> nil  -- Renames the pipeline without changing its steps, dependencies, or current runtime state.
   LPipeline:setOnComplete( [cb] )  -> nil  -- Sets the callback invoked when the pipeline completes.
   LPipeline:setOnStepComplete( [cb] )  -> nil  -- Sets the callback invoked when a step completes successfully.
   LPipeline:setOnStepError( [cb] )  -> nil  -- Sets the callback invoked when a step fails.
@@ -5237,6 +5257,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LPipelineStep`** methods:
+
+> Lua-side wrapper around a single [`PipelineStep`].
 
 ```lua
   LPipelineStep:dependsOn( dep )  -> LPipelineStep  -- Adds a dependency on another step.
@@ -5644,7 +5666,7 @@ Define any of these in `main.lua`. All are optional.
 > Lua-side spring handle: wraps [`SpringSystem`] and a registry reference to the target table.
 
 ```lua
-  LSpring:cancel( )  -> nil  -- Stops the spring.
+  LSpring:cancel( )  -> nil  -- Stops the spring immediately, clears its settle callback, and leaves the current values...
   LSpring:getPosition( field )  -> number  -- Returns the current interpolated position for the named field.
   LSpring:isActive( )  -> boolean  -- Returns whether the spring is still active.
   LSpring:isSettled( )  -> boolean  -- Returns whether all spring axes have settled.
@@ -5799,6 +5821,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LAccordion`** methods:
 
+> Creates a collapsible accordion widget.
+
 ```lua
   LAccordion:addSection( title, [content_idx] )  -> nil  -- Adds a section entry to this Accordion widget.
   LAccordion:getSectionCount( )  -> integer  -- Returns the section count of this Accordion widget.
@@ -5823,6 +5847,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LBadge`** methods:
 
+> Creates a badge widget displaying a numeric count.
+
 ```lua
   LBadge:getCount( )  -> integer  -- Returns the raw count of this Badge widget.
   LBadge:getDisplayText( )  -> string  -- Returns the display text of this Badge widget, e.g. "99+" when over the max.
@@ -5843,12 +5869,16 @@ Define any of these in `main.lua`. All are optional.
 
 **`LButton`** methods:
 
+> Creates and returns a new interactive button widget as a child of this widget.
+
 ```lua
   LButton:getText( )  -> string  -- Returns the text of this Button widget.
   LButton:setText( text )  -> nil  -- Sets the text for this Button widget.
 ```
 
 **`LCheckbox`** methods:
+
+> Creates a checkbox widget.
 
 ```lua
   LCheckbox:getText( )  -> string  -- Returns the text of this Checkbox widget.
@@ -5858,6 +5888,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LColorPicker`** methods:
+
+> Creates a color picker widget.
 
 ```lua
   LColorPicker:getColor( )  -> number  -- Returns the color of this Color_Picker widget.
@@ -5871,6 +5903,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LComboBox`** methods:
 
+> Creates a dropdown combo box widget.
+
 ```lua
   LComboBox:addItem( text )  -> nil  -- Adds a item entry to this Combo_Box widget.
   LComboBox:clearItems( )  -> nil  -- Clears all items entries from this Combo_Box widget.
@@ -5883,6 +5917,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LDialog`** methods:
+
+> Creates a modal dialog widget.
 
 ```lua
   LDialog:addButton( text, [cb] )  -> integer  -- Adds a button entry to this Dialog widget.
@@ -5900,6 +5936,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LDockPanel`** methods:
 
+> Creates and returns a new docking panel that arranges children along its edges.
+
 ```lua
   LDockPanel:dock( child_idx, side )  -> nil  -- Performs the dock operation on this Dock_Panel widget.
   LDockPanel:getDockedCount( )  -> integer  -- Returns the docked count of this Dock_Panel widget.
@@ -5909,6 +5947,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LGuiTable`** methods:
+
+> Creates a data table widget.
 
 ```lua
   LGuiTable:addColumn( header, [width] )  -> nil  -- Adds a column entry to this Gui_Table widget.
@@ -5926,6 +5966,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LGuiWindow`** methods:
 
+> Creates a draggable window widget.
+
 ```lua
   LGuiWindow:getTitle( )  -> string  -- Returns the title of this Gui_Window widget.
   LGuiWindow:isCloseable( )  -> boolean  -- Returns true if closeable is enabled for this Gui_Window widget.
@@ -5940,6 +5982,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LImageWidget`** methods:
 
+> Creates an image display widget.
+
 ```lua
   LImageWidget:getScaleMode( )  -> string  -- Returns the scale mode of this Image_Widget widget.
   LImageWidget:getTint( )  -> number  -- Returns the tint of this Image_Widget widget.
@@ -5949,12 +5993,16 @@ Define any of these in `main.lua`. All are optional.
 
 **`LLabel`** methods:
 
+> Creates a text label widget.
+
 ```lua
   LLabel:getText( )  -> string  -- Returns the text of this Label widget.
   LLabel:setText( text )  -> nil  -- Sets the text for this Label widget.
 ```
 
 **`LLayout`** methods:
+
+> Creates a flexbox layout container.
 
 ```lua
   LLayout:getAlign( )  -> string  -- Returns the align of this Layout widget.
@@ -5985,6 +6033,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LListBox`** methods:
 
+> Creates a selectable list widget.
+
 ```lua
   LListBox:addItem( text )  -> nil  -- Adds a item entry to this List_Box widget.
   LListBox:clearItems( )  -> nil  -- Clears all items entries from this List_Box widget.
@@ -5998,6 +6048,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LMenuBar`** methods:
 
+> Creates a menu bar widget.
+
 ```lua
   LMenuBar:addMenu( menu_idx )  -> nil  -- Adds a menu entry to this Menu_Bar widget.
   LMenuBar:getMenuCount( )  -> integer  -- Returns the menu count of this Menu_Bar widget.
@@ -6006,6 +6058,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LMenuItem`** methods:
+
+> Creates a menu item widget.
 
 ```lua
   LMenuItem:addSubItem( child_idx )  -> nil  -- Adds a sub item entry to this Menu_Item widget.
@@ -6021,6 +6075,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LNinePatch`** methods:
 
+> Creates a 9-patch slicer widget.
+
 ```lua
   LNinePatch:getImageDimensions( )  -> integer  -- Returns the image dimensions of this Nine_Patch widget.
   LNinePatch:getInsets( )  -> integer  -- Returns the insets of this Nine_Patch widget.
@@ -6030,6 +6086,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LPanel`** methods:
+
+> Creates a container panel widget.
 
 ```lua
   LPanel:getTitle( )  -> string  -- Returns the title of this Panel widget.
@@ -6050,6 +6108,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LProgressBar`** methods:
 
+> Creates a progress bar widget.
+
 ```lua
   LProgressBar:getMax( )  -> number  -- Returns the max of this Progress_Bar widget.
   LProgressBar:getMin( )  -> number  -- Returns the min of this Progress_Bar widget.
@@ -6060,6 +6120,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LRadioButton`** methods:
+
+> Creates a grouped radio button widget.
 
 ```lua
   LRadioButton:getGroup( )  -> string  -- Returns the group of this Radio_Button widget.
@@ -6086,6 +6148,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LScrollBar`** methods:
 
+> Creates a scroll bar widget.
+
 ```lua
   LScrollBar:getContentSize( )  -> number  -- Returns the content size of this Scroll_Bar widget.
   LScrollBar:getScrollPosition( )  -> number  -- Returns the scroll position of this Scroll_Bar widget.
@@ -6099,6 +6163,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LScrollPanel`** methods:
 
+> Creates a scrollable panel widget.
+
 ```lua
   LScrollPanel:getContentSize( )  -> number  -- Returns the content size of this Scroll_Panel widget.
   LScrollPanel:getMaxScroll( )  -> number  -- Returns the max scroll of this Scroll_Panel widget.
@@ -6111,6 +6177,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LSeparator`** methods:
 
+> Creates a separator line.
+
 ```lua
   LSeparator:getThickness( )  -> number  -- Returns the thickness of this Separator widget.
   LSeparator:isVertical( )  -> boolean  -- Returns true if vertical is enabled for this Separator widget.
@@ -6119,6 +6187,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LSlider`** methods:
+
+> Creates a value slider widget.
 
 ```lua
   LSlider:getMax( )  -> number  -- Returns the max of this Slider widget.
@@ -6131,6 +6201,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LSpinBox`** methods:
 
+> Creates a numeric spin box widget with increment and decrement buttons.
+
 ```lua
   LSpinBox:decrement( )  -> nil  -- Decrements the value by one step.
   LSpinBox:getValue( )  -> number  -- Returns the current value of this SpinBox widget.
@@ -6141,6 +6213,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LSplitPanel`** methods:
+
+> Creates a resizable split panel.
 
 ```lua
   LSplitPanel:getFirstChild( )  -> integer  -- Returns the first child of this Split_Panel widget.
@@ -6157,6 +6231,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LStatusBar`** methods:
 
+> Creates a status bar widget.
+
 ```lua
   LStatusBar:addSection( text, [width] )  -> nil  -- Adds a section entry to this Status_Bar widget.
   LStatusBar:getSectionCount( )  -> integer  -- Returns the section count of this Status_Bar widget.
@@ -6168,6 +6244,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LSwitch`** methods:
 
+> Creates a toggle switch widget.
+
 ```lua
   LSwitch:isOn( )  -> boolean  -- Returns the on/off state of this Switch widget.
   LSwitch:setOn( on )  -> nil  -- Sets the on/off state of this Switch widget.
@@ -6175,6 +6253,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LTabBar`** methods:
+
+> Creates a tab bar widget.
 
 ```lua
   LTabBar:addTab( label )  -> nil  -- Adds a tab entry to this Tab_Bar widget.
@@ -6186,6 +6266,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LTextInput`** methods:
+
+> Creates a text input widget.
 
 ```lua
   LTextInput:getCursorPosition( )  -> integer  -- Returns the cursor position of this Text_Input widget.
@@ -6209,6 +6291,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LToast`** methods:
 
+> Creates a toast notification widget.
+
 ```lua
   LToast:getDuration( )  -> number  -- Returns the duration of this Toast widget.
   LToast:getMessage( )  -> string  -- Returns the message of this Toast widget.
@@ -6219,6 +6303,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LToolbar`** methods:
+
+> Creates a toolbar widget.
 
 ```lua
   LToolbar:addButton( id, [tooltip] )  -> integer  -- Adds a button entry to this Toolbar widget.
@@ -6234,6 +6320,8 @@ Define any of these in `main.lua`. All are optional.
 
 **`LTooltipPanel`** methods:
 
+> Creates a tooltip panel widget.
+
 ```lua
   LTooltipPanel:getDelay( )  -> number  -- Returns the delay of this Tooltip_Panel widget.
   LTooltipPanel:getTarget( )  -> integer  -- Returns the target of this Tooltip_Panel widget.
@@ -6244,6 +6332,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LTreeView`** methods:
+
+> Creates a collapsible tree view widget.
 
 ```lua
   LTreeView:addNode( text, [parent_index] )  -> integer  -- Adds a node entry to this Tree_View widget.
@@ -6268,6 +6358,8 @@ Define any of these in `main.lua`. All are optional.
 ```
 
 **`LUiWidget`** methods:
+
+> Builds a Lua table with common base-widget methods bound to `idx`.
 
 ```lua
   LUiWidget:addChild( child )  -> nil  -- Adds a child widget to this container.

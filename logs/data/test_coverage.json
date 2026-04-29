@@ -9429,7 +9429,7 @@
         "module": "lua_api",
         "name": "register",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1897
+        "line": 1903
       },
       {
         "module": "lua_api",
@@ -25384,8 +25384,8 @@
     ]
   },
   "lua": {
-    "total": 4378,
-    "covered": 4354,
+    "total": 4388,
+    "covered": 4364,
     "uncovered": 24,
     "coverage_pct": 99.5,
     "covered_items": [
@@ -30228,6 +30228,34 @@
       },
       {
         "module": "compute",
+        "lua_name": "LArray:add",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 228
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:sub",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 240
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:mul",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 252
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:div",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 264
+      },
+      {
+        "module": "compute",
         "lua_name": "LArray:pow",
         "kind": "method",
         "file": "src/lua_api/compute_api.rs",
@@ -30260,6 +30288,48 @@
         "kind": "method",
         "file": "src/lua_api/compute_api.rs",
         "line": 310
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:eq",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 319
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:neq",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 325
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:gt",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 337
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:lt",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 343
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:gte",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 349
+      },
+      {
+        "module": "compute",
+        "lua_name": "LArray:lte",
+        "kind": "method",
+        "file": "src/lua_api/compute_api.rs",
+        "line": 361
       },
       {
         "module": "compute",
@@ -36300,259 +36370,259 @@
         "lua_name": "LGraph:hasNode",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1164
+        "line": 1170
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getNodes",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1172
+        "line": 1178
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getNodeCount",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1191
+        "line": 1197
       },
       {
         "module": "graph",
         "lua_name": "LGraph:addEdge",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1203
+        "line": 1209
       },
       {
         "module": "graph",
         "lua_name": "LGraph:removeEdge",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1222
+        "line": 1228
       },
       {
         "module": "graph",
         "lua_name": "LGraph:hasEdge",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1231
+        "line": 1237
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getEdges",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1239
+        "line": 1245
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getEdgeCount",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1258
+        "line": 1264
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getEdgeBetween",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1267
+        "line": 1273
       },
       {
         "module": "graph",
         "lua_name": "LGraph:createItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1290
+        "line": 1296
       },
       {
         "module": "graph",
         "lua_name": "LGraph:addItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1308
+        "line": 1314
       },
       {
         "module": "graph",
         "lua_name": "LGraph:removeItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1324
+        "line": 1330
       },
       {
         "module": "graph",
         "lua_name": "LGraph:hasItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1333
+        "line": 1339
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getItems",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1341
+        "line": 1347
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getItemCount",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1360
+        "line": 1366
       },
       {
         "module": "graph",
         "lua_name": "LGraph:sendItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1369
+        "line": 1375
       },
       {
         "module": "graph",
         "lua_name": "LGraph:update",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1387
+        "line": 1393
       },
       {
         "module": "graph",
         "lua_name": "LGraph:step",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1396
+        "line": 1402
       },
       {
         "module": "graph",
         "lua_name": "LGraph:tickParallel",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1416
+        "line": 1422
       },
       {
         "module": "graph",
         "lua_name": "LGraph:findPath",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1430
+        "line": 1436
       },
       {
         "module": "graph",
         "lua_name": "LGraph:findPathForItem",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1450
+        "line": 1456
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getDistance",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1467
+        "line": 1473
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getReachable",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1481
+        "line": 1487
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getNeighbors",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1504
+        "line": 1510
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getComponents",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1525
+        "line": 1531
       },
       {
         "module": "graph",
         "lua_name": "LGraph:hasCycle",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1548
+        "line": 1554
       },
       {
         "module": "graph",
         "lua_name": "LGraph:topologicalSort",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1555
+        "line": 1561
       },
       {
         "module": "graph",
         "lua_name": "LGraph:mst",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1580
+        "line": 1586
       },
       {
         "module": "graph",
         "lua_name": "LGraph:colorGraph",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1593
+        "line": 1599
       },
       {
         "module": "graph",
         "lua_name": "LGraph:isBipartite",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1605
+        "line": 1611
       },
       {
         "module": "graph",
         "lua_name": "LGraph:astar",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1614
+        "line": 1620
       },
       {
         "module": "graph",
         "lua_name": "LGraph:processDemand",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1644
+        "line": 1650
       },
       {
         "module": "graph",
         "lua_name": "LGraph:getStats",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1655
+        "line": 1661
       },
       {
         "module": "graph",
         "lua_name": "LGraph:on",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1678
+        "line": 1684
       },
       {
         "module": "graph",
         "lua_name": "LGraph:type",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1697
+        "line": 1703
       },
       {
         "module": "graph",
         "lua_name": "LGraph:typeOf",
         "kind": "method",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1703
+        "line": 1709
       },
       {
         "module": "graph",
         "lua_name": "lurek.graph.newGraph",
         "kind": "function",
         "file": "src/lua_api/graph_api.rs",
-        "line": 1903
+        "line": 1909
       },
       {
         "module": "html",

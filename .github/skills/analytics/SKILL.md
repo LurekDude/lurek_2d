@@ -1,6 +1,6 @@
 ---
 name: analytics
-description: "Load this skill when collecting or reading logs, telemetry, perf counters, or session records for analysis. Skip it for live bug debugging or for adding log output."
+description: "Load this skill when collecting or reading logs, telemetry, SQL results, DataFrame tables, perf counters, or session records for analysis. Skip it for live bug debugging or for adding log output."
 ---
 # analytics
 
@@ -18,17 +18,21 @@ description: "Load this skill when collecting or reading logs, telemetry, perf c
 - Adding or tuning log output.
 
 ## Domain Knowledge
-- Prefer offline parsing over ad hoc guessing.
-- Keep findings tied to saved evidence files.
-- Separate engine telemetry from game telemetry.
-- Report counts, trends, and outliers, not vague impressions.
-- Use tools/audit/ when a repo tool already exists for the analysis.
-- Keep output structured so another agent can act on it.
-
+- Primary evidence lives in logs/data/, logs/reports/, save/, and structured outputs from tools/audit/.
+- src/dataframe/query.rs, sql.rs, and vectorized.rs define the in-engine table and SQL surface available for analysis.
+- Separate engine-quality telemetry from gameplay, economy, progression, and balance telemetry before drawing conclusions.
+- Compare cohorts, versions, or content slices; raw totals alone rarely answer balance questions.
+- Check sample size, missing fields, outliers, and mixed-version data before trusting a metric.
+- Prefer reproducible queries and small derived tables over ad hoc manual counting.
+- This repo already stores useful analysis inputs in logs/data/, logs/reports/, save/, and src/dataframe/ helpers like sql.rs and query.rs, so analysis should start from structured evidence instead of free-form reading.
+- For balance questions, compare encounter outcomes, economy sinks, build variants, or progression slices rather than only total counts.
+- If telemetry cannot answer the question cleanly, report the missing field or broken capture path instead of inventing a proxy metric.
 ## Companion File Index
 - None.
 
 ## References
-- logs/
-- tools/audit/
-- docs/specs/
+- logs/data/
+- logs/reports/
+- src/dataframe/
+- docs/specs/dataframe.md
+- tools/audit/test_analytics.py

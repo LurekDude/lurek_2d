@@ -19,23 +19,21 @@ description: "Load this skill when editing .github agents, skills, prompts, or t
 - Roadmap planning.
 
 ## Domain Knowledge
-- Use docs/specs/<module>.md for one module only.
-- Use a skill for cross-cutting knowledge.
-- Use an agent for a specialist role with routing.
-- Use a prompt for a user-invoked workflow.
-- Skill files need frontmatter with name and description.
-- Skill files need Mission, When To Load, When To Skip, Domain Knowledge, Companion File Index, and References.
-- Do not use fenced code blocks in SKILL.md.
-- Agent files need frontmatter plus Mission, Scope, Inputs, Outputs, Workflow, Routing Table, and Anti-patterns.
-- Prompt files need frontmatter plus Goal, Inputs, Steps, Success Criteria, Anti-patterns, and Example Invocation.
-- Validate with python tools/validate/cag_validate.py.
-- Load order is: system prompt, module specs when needed, skills, prompts, then agents.
-- When work spans 3 or more agents or 5 or more files, start with Manager.
-
+- In this repo, .github/ is a validated contract layer, not loose prose.
+- Front-load trigger keywords in description fields because skill discovery depends on concise matching text.
+- Keep one concern per file type: agent for role, skill for knowledge, prompt for workflow, system prompt for discovery index.
+- SKILL.md files stay code-block free and short; domain knowledge belongs in bullets, not embedded examples.
+- Agent scope must stay distinct and Manager remains the only router between specialists.
+- After .github edits, run cag_validate.py and usually cag_link_check.py before closing the task.
+- Prompt and skill wording should stay short because descriptions are part of the discovery surface and long text wastes token budget before matching even happens.
+- Shared policy should live in one place: system prompt or shared README, not duplicated across every agent, skill, and prompt.
+- If a CAG change alters routing, validator behavior, or shared contracts, update the supporting docs in the same pass rather than leaving hidden drift.
 ## Companion File Index
 - None.
 
 ## References
 - .github/copilot-instructions.md
+- .github/agents/README.md
 - docs/architecture/cag-system.md
 - tools/validate/cag_validate.py
+- tools/audit/cag_link_check.py

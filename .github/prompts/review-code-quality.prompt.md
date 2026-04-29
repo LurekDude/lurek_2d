@@ -1,39 +1,38 @@
 ---
-description: "Run a full code-quality review."
+description: "Review a bounded code slice for defects, risks, and missing validation."
+agent: "Reviewer"
 ---
-
 # Review Code Quality
 
 ## Goal
-- Systematic code review against all Lurek2D quality gates.
+- Return a code review centered on bugs, regressions, and weak assumptions.
 
 ## Inputs
-- **Files**: Which files to review (or "all changed files")
+- Diff, file set, or module.
+- Risk focus.
+- Any expected acceptance bar.
 
 ## Steps
-- Load rust-coding before changing any files.
-- Run cargo build verify compilation
-- Run cargo clippy verify 0 warnings
-- Run cargo fmt --check verify formatting
-- Run cargo test verify all tests pass
-- Check for unsafe blocks without // SAFETY: comments
-- Check module dependency direction (no cross-domain imports)
-- Check Lua API naming consistency (lurek.* namespace)
-- Check visibility (pub(crate) preferred over pub)
-- Check error handling (no .unwrap() in production paths)
-- Report findings with severity: BLOCKER / WARNING / NOTE
+1. Load [skill: rust-coding](../skills/rust-coding/SKILL.md), [skill: module-architecture](../skills/module-architecture/SKILL.md), and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Read the named diff or files, nearby tests, and the owning contract source if one exists.
+3. Prioritize correctness, control-flow risk, error handling, and architecture leakage over style commentary.
+4. End with residual risk and validation gaps after the findings list.
 
 ## Success Criteria
-- [ ] Quality gate results (pass/fail for each check)
-- [ ] Finding list with file paths, severity, and remediation
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-code-quality
+- /review-code-quality path=src/runtime
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: rust-coding
+Mode: agent
+Loads skills: rust-coding, module-architecture, error-handling
+Inputs required: Diff, file set, or module., Risk focus., Any expected acceptance bar.

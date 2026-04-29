@@ -18,17 +18,21 @@ description: "Load this skill when setting up or maintaining CI/CD, GitHub Actio
 - Rust or Lua code changes.
 
 ## Domain Knowledge
-- Keep CI gates aligned with the repo quality gates.
-- Prefer deterministic jobs and explicit tool versions.
-- Keep workflow scope narrow and readable.
-- Cache only what is safe and worth the complexity.
-- Separate fast feedback jobs from slower release or package jobs.
-- Keep workflow logic in CI files, not hidden in undocumented local assumptions.
-
+- The repo currently has no .github/workflows tree, so CI work starts from the local gates that already exist.
+- Quality: Gate, tools/dev/parallel_cargo.py, rust-toolchain.toml, and dist scripts are the current source of truth.
+- Mirror local fmt, clippy, test, doc, and packaging steps instead of inventing a second CI process.
+- Keep jobs deterministic, pin tool versions, and prefer checked-in scripts over long inline shell logic.
+- Split fast feedback from slow packaging or release work so failures stay attributable.
+- Release automation must follow tools/dist/ behavior, not bypass it.
+- Since the repo currently lacks a workflow directory, CI design should be derived from the checked-in local quality pipeline instead of a hypothetical hosted setup.
+- Dist jobs should respect the same packaging scripts, release profile, and generated-doc expectations used locally.
+- This skill owns automation orchestration, not the definition of engineering quality rules themselves.
 ## Companion File Index
 - None.
 
 ## References
-- .github/workflows/
+- .github/
 - Cargo.toml
 - rust-toolchain.toml
+- tools/dev/parallel_cargo.py
+- tools/dist/

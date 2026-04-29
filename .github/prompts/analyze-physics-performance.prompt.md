@@ -1,40 +1,39 @@
 ---
-description: "Analyze physics performance and hot spots."
+description: "Analyze physics step cost, collision pressure, or world-update slowdowns."
+agent: "Optimizer"
 ---
-
 # Analyze Physics Performance
 
 ## Goal
-- ---.
+- Identify the main source of physics cost in one scenario.
 
 ## Inputs
-- BODY_COUNT number of bodies in the scene when slowdown appears
-- PROFILE_DATA optional output from cargo flamegraph or manual timing
+- Physics scenario.
+- Observed slowdown.
+- Relevant test or demo.
+- Any timing capture.
 
 ## Steps
-- Load performance-profiling before changing any files.
-- Load skill performance-profiling/SKILL.md
-- Load skill physics-engine/SKILL.md
-- Read src/physics/world.rs step() function identify the collision detection loop
-- Analyze collision detection complexity: is it O(N ) all-pairs or better?
-- Check for per-frame allocations inside step() (Vec::new, collect, etc.)
-- Measure force accumulation and velocity integration cost separately
-- Identify scaling bottlenecks as body count increases (> 50, > 200, > 1000)
-- If O(N ) is confirmed, recommend broad-phase (spatial hash, AABB sweep-and-prune)
+1. Load [skill: performance-profiling](../skills/performance-profiling/SKILL.md) before acting.
+2. Gather only the relevant source material from physics traces, tests, demo content, and the owning src/physics code path.
+3. Quantify broad-phase, narrow-phase, stepping, or data conversion cost as far as the available evidence allows.
+4. State the likely hotspot, the confidence level, and which owner should validate or change it next.
 
 ## Success Criteria
-- [ ] Complexity analysis of the collision detection loop
-- [ ] Per-frame allocation sites found (if any)
-- [ ] Scaling behaviour table (bodies estimated step time)
-- [ ] Prioritized recommendations
+- [ ] The data or source scope is explicit.
+- [ ] Findings are evidence-backed and quantified where possible.
+- [ ] Assumptions and open questions are separated from facts.
+- [ ] A next owner or next validation step is clear.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Give generic advice with no repo evidence or measured signal.
+- Mix facts, guesses, and recommendations into one vague paragraph.
+- Jump to implementation before identifying the owner and the evidence strength.
 
 ## Example Invocation
-- /analyze-physics-performance
+- /analyze-physics-performance scenario=stacked_crates symptom=low_fps
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: performance-profiling
+Mode: agent
+Loads skills: performance-profiling
+Inputs required: Physics scenario., Observed slowdown., Relevant test or demo., Any timing capture.

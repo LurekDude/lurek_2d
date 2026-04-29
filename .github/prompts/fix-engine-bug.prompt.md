@@ -1,40 +1,39 @@
 ---
-description: "Fix a Lurek2D engine bug."
+description: "Fix one engine bug in the smallest owner slice with focused validation."
+agent: "Developer"
 ---
-
 # Fix Engine Bug
 
 ## Goal
-- Systematic bug fix workflow: reproduce diagnose fix verify.
+- Fix one concrete engine bug at the source.
 
 ## Inputs
-- **Symptom**: What's going wrong (error message, unexpected behavior, crash)
-- **Reproduction**: How to trigger the bug
-- **Affected module**: Which part of the engine
+- Bug symptom.
+- Repro or failing test.
+- Target subsystem.
+- Acceptance gate.
 
 ## Steps
-- Load dev-debugging, error-handling before changing any files.
-- Reproduce the bug with a minimal test case or Lua script
-- Read the relevant code and trace the data flow
-- Identify root cause with specific file and line
-- Implement the fix
-- Write a regression test that would have caught the bug
-- Run cargo test and cargo clippy
+1. Load [skill: dev-debugging](../skills/dev-debugging/SKILL.md), [skill: error-handling](../skills/error-handling/SKILL.md), and [skill: rust-coding](../skills/rust-coding/SKILL.md) before acting.
+2. Reproduce the failure from the smallest reproducer, nearby tests, the owning module, and the accepted contract source.
+3. Change only the logic that controls the failing behavior, keep ownership boundaries intact, and add or update a test when the bug lacked coverage.
+4. Rerun the same reproducer or failing test first, then run the broader required check if the bug is fixed.
 
 ## Success Criteria
-- [ ] Root cause identified and documented
-- [ ] Fix addresses root cause (not just symptoms)
-- [ ] Regression test added
-- [ ] All existing tests pass
-- [ ] cargo clippy clean
+- [ ] The failure was reproduced or tightly localized.
+- [ ] The owner slice was fixed at the source.
+- [ ] The failing check now passes.
+- [ ] No unrelated drift was introduced.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Patch symptoms in a different layer from the one that owns the failure.
+- Skip the smallest reproducer and guess at the fix.
+- Keep editing after the first change instead of rerunning the failing check.
 
 ## Example Invocation
-- /fix-engine-bug
+- /fix-engine-bug subsystem=timer symptom=repeat_callback_skips
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: dev-debugging, error-handling
+Mode: agent
+Loads skills: dev-debugging, error-handling, rust-coding
+Inputs required: Bug symptom., Repro or failing test., Target subsystem., Acceptance gate.

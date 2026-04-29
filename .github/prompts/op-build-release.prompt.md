@@ -1,42 +1,41 @@
 ---
-description: "Build a release binary."
+description: "Run or repair the release build and packaging flow for one target artifact."
+agent: "Build-Engineer"
+tools: [tools/dev/parallel_cargo.py, tools/dist/dist.ps1]
 ---
-
 # Op Build Release
 
 ## Goal
-- Build a release binary for Lurek2D for a target platform. Use when creating a distributable build. Produces a stripped release binary in...
+- Produce or repair one release build flow with clear artifact proof.
 
 ## Inputs
-- TARGET_TRIPLE Rust target triple (e.g., x86_64-pc-windows-msvc, x86_64-unknown-linux-gnu). Leave blank for native host.
-- VERSION version string to verify (optional; will check Cargo.toml)
+- Target platform.
+- Profile or packaging path.
+- Artifact expectation.
+- Observed failure or goal.
 
 ## Steps
-- Load cross-platform, rust-coding before changing any files.
-- Verify Cargo.toml version matches VERSION (if provided)
-- Run all quality gates first:
-- Build release:
-- Verify output:
-- Native: target/release/lurek2d.exe (Windows) or target/release/lurek2d (Linux)
-- Cross: target/<TARGET_TRIPLE>/release/lurek2d[.exe]
-- Smoke test the binary:
-- Check binary size:
-- Typical release binary: 5 10 MB (software rendering stack)
-- Warning if > 50 MB likely debug symbols leaked into release build
+1. Load [skill: build-system](../skills/build-system/SKILL.md), [skill: cross-platform](../skills/cross-platform/SKILL.md), and [skill: quality-pipeline](../skills/quality-pipeline/SKILL.md) before acting.
+2. Read the owning build task, Cargo profile, and packaging script before changing anything.
+3. Align the local build path, release packaging path, and any install or dist assumptions so the same artifact story is consistent end to end.
+4. Run the narrowest failing build or package step first, fix only that layer, then rerun the same step before moving to the broader release gate.
+5. Return artifact location, command proof, and any platform-specific caveat instead of implying the release is universally green.
 
 ## Success Criteria
-- [ ] Release binary at target/release/lurek2d[.exe]
-- [ ] Smoke test result (window opened, no panic)
-- [ ] Binary size reported
+- [ ] The workflow outcome is complete: Produce or repair one release build flow with clear artifact proof.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Let the workflow widen with no clear owner or gate.
+- Skip the first focused check and rely on narrative confidence.
+- Close the task while blockers, warnings, or failed gates are still open.
 
 ## Example Invocation
-- /op-build-release <TARGET_TRIPLE>
+- /op-build-release platform=windows profile=dist
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: cross-platform, rust-coding
-- **Inputs required**: TARGET_TRIPLE
+Mode: agent
+Loads skills: build-system, cross-platform, quality-pipeline
+Inputs required: Target platform., Profile or packaging path., Artifact expectation., Observed failure or goal.

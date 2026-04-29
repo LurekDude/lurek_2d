@@ -1,46 +1,39 @@
 ---
-description: "Create a new audio feature."
+description: "Create one bounded audio feature in the engine and sync the exposed contract."
+agent: "Audio-Eng"
 ---
-
 # Create Audio Feature
 
 ## Goal
-- Add a new audio feature to the Lurek2D engine. Use when implementing new audio API functions, new format support, or mixer improvements....
+- Add one audio feature without leaking into unrelated engine systems.
 
 ## Inputs
-- FEATURE describe the audio capability (e.g., "loop a source", "fade volume over time", "query whether playing")
-- API_NAME proposed lurek.audio.* function name (e.g., lurek.audio.setLooping)
-- RODIO_APPROACH any known rodio 0.17 API to use (optional; agent will research if blank)
+- Feature goal.
+- Target audio path.
+- Lua-facing impact.
+- Expected validation path.
 
 ## Steps
-- Load lua-api-design before changing any files.
-- Load skill audio-integration/SKILL.md
-- Load skill lua-api-design/SKILL.md
-- Design the lurek.audio.* function signature following existing patterns:
-- First arg: source_id: usize returned by newSource()
-- Subsequent args: feature-specific parameters
-- Implement in src/audio/mixer.rs:
-- Use rodio 0.17 API check rodio::Sink methods for looping, volume, pause, etc.
-- Handle missing audio hardware gracefully (the Mixer may have stream_handle: None)
-- Register the binding in src/lua_api/audio_api.rs:
-- Follow the state.clone() move closure pattern
-- Return LuaResult<()> or appropriate type
+1. Load [skill: lua-api-design](../skills/lua-api-design/SKILL.md), [skill: rust-coding](../skills/rust-coding/SKILL.md), [skill: asset-pipeline](../skills/asset-pipeline/SKILL.md), and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Read src/audio/, any matching src/lua_api/audio_api.rs code, docs/specs/audio.md, and nearby tests or examples before editing.
+3. Keep loading, mixer, and playback responsibilities clear, surface errors cleanly, and sync the Lua-facing contract only where the feature actually changes it.
+4. Run the narrowest audio-focused test or build check first, then regenerate docs or run broader gates only if the public contract changed.
 
 ## Success Criteria
-- [ ] Updated src/audio/mixer.rs with new method
-- [ ] Updated src/lua_api/audio_api.rs with new Lua binding
-- [ ] New test in tests/rust/unit/audio_tests.rs
-- [ ] Updated docs/api/lurek.md
-- [ ] Verified: cargo build clean, cargo test passes
+- [ ] The prompt goal was completed: Add one audio feature without leaking into unrelated engine systems.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-audio-feature <function>
+- /create-audio-feature feature=loop_region
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-api-design
-- **Inputs required**: function
+Mode: agent
+Loads skills: lua-api-design, rust-coding, asset-pipeline, error-handling
+Inputs required: Feature goal., Target audio path., Lua-facing impact., Expected validation path.

@@ -1,50 +1,38 @@
 ---
-description: "Audit test placement rules in src/, src/lua_api/, and mod.rs files."
-agent: Tester
-loads_tools:
- - tools/audit/inline_test_audit.py
- - tools/audit/thin_wrapper_audit.py
- - tools/audit/thin_modrs_audit.py
- - tools/audit/test_coverage.py
+description: "Audit whether tests live in the correct Rust or Lua layer for the behavior they cover."
+agent: "Tester"
 ---
 # Audit Test Placement
 
 ## Goal
-- Audit TST-01 to TST-04 placement rules and produce a read-only report.
+- Identify misplaced tests and the smallest correct home for them.
 
 ## Inputs
-- target_scope: src/, src/<module>/, or one src/<module>/<file>.rs path. Default is src/.
+- Target module or test file set.
+- Behavior area.
+- Any current placement concern.
 
 ## Steps
-- Load testing-rust, lua-rust-bridge, and module-architecture.
-- Resolve target_scope.
-- Run inline_test_audit.py for TST-02.
-- Run thin_wrapper_audit.py for TST-03.
-- Run thin_modrs_audit.py for TST-04.
-- Run test_coverage.py for the TST-01 cross-check.
-- Group findings by TST rule and file.
-- Add one remediation hint per finding.
-- Write the report to work/<session>/reports/test-placement-audit.md.
-- Append one JSONL log entry to work/<session>/logs/agent_log.jsonl.
-- Do not modify src/, tests/, or Cargo.toml in this prompt.
+1. Load [skill: testing-rust](../skills/testing-rust/SKILL.md), [skill: lua-rust-bridge](../skills/lua-rust-bridge/SKILL.md), and [skill: module-architecture](../skills/module-architecture/SKILL.md) before acting.
+2. Read tests/, src/lua_api/, docs/specs/, and the touched module paths.
+3. Check whether Lua-visible behavior lives under tests/lua/, Rust-only internals live under tests/rust/unit/, and support files sit in the right harness layer.
+4. Report misplaced tests, missing tests, and the exact target path each issue should move to.
 
 ## Success Criteria
-- [ ] All needed audit scripts ran for target_scope, or the report states which script is missing.
-- [ ] work/<session>/reports/test-placement-audit.md lists each violation with file, line, rule, and remediation hint.
-- [ ] The report summary includes counts per TST rule.
-- [ ] python tools/validate/cag_validate.py reports no new errors.
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Auto-fix violations during the audit.
-- Skip the tests/lua/ @covers cross-check.
-- Ignore a narrower target_scope.
-- Use git add .
-- Declare done before checking Success Criteria.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /audit-test-placement src/tween/
+- /audit-test-placement module=lua_api/audio
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: testing-rust, lua-rust-bridge, module-architecture
-- **Inputs required**: target_scope
+Mode: agent
+Loads skills: testing-rust, lua-rust-bridge, module-architecture
+Inputs required: Target module or test file set., Behavior area., Any current placement concern.

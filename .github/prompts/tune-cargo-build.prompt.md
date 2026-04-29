@@ -1,36 +1,41 @@
 ---
-description: "Tune Cargo profiles and build output."
+description: "Tune Cargo build or profile settings for a concrete build goal."
+agent: "Build-Engineer"
+tools: [tools/dev/parallel_cargo.py]
 ---
-
 # Tune Cargo Build
 
 ## Goal
-- Adjust Cargo profiles, feature flags, or the build/ output directory so a Lurek2D build target meets a stated size or speed objective without regressing cargo test.
+- Improve one build path without breaking correctness or release expectations.
 
 ## Inputs
-- target
-- objective
+- Target build goal.
+- Profile or command.
+- Observed cost or failure.
+- Platform.
 
 ## Steps
-- Load build-system before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Developer agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: build-system](../skills/build-system/SKILL.md), [skill: cross-platform](../skills/cross-platform/SKILL.md), and [skill: quality-pipeline](../skills/quality-pipeline/SKILL.md) before acting.
+2. Read the current Cargo profiles, build tasks, and the command that exhibits the problem before changing knobs.
+3. Change only the settings tied to the named goal, such as debug speed, release size, or CI stability, and keep platform behavior explicit.
+4. Measure or validate the targeted build path after the first change instead of stacking many speculative tweaks.
+5. Close with the before or after effect, any tradeoff introduced, and the commands that now represent the tuned path.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The workflow outcome is complete: Improve one build path without breaking correctness or release expectations.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Let the workflow widen with no clear owner or gate.
+- Skip the first focused check and rely on narrative confidence.
+- Close the task while blockers, warnings, or failed gates are still open.
 
 ## Example Invocation
-- /tune-cargo-build <target> <objective>
+- /tune-cargo-build goal=debug_iteration profile=dev
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: build-system
-- **Inputs required**: target, objective
+Mode: agent
+Loads skills: build-system, cross-platform, quality-pipeline
+Inputs required: Target build goal., Profile or command., Observed cost or failure., Platform.

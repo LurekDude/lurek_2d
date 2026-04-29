@@ -1,36 +1,39 @@
 ---
-description: "Tune Lua runtime behavior and hot paths."
+description: "Tune one Lua runtime behavior or performance-sensitive path in the engine."
+agent: "Developer"
 ---
-
 # Tune Lua Runtime
 
 ## Goal
-- Reduce Lua-side per-frame cost in a named hot path by tuning LuaJIT GC, FFI, or upvalue patterns and confirming the change with a measurement.
+- Adjust one Lua runtime path without widening scope.
 
 ## Inputs
-- script_path
-- objective
+- Runtime concern.
+- Target path.
+- Repro or measurement.
+- Acceptance gate.
 
 ## Steps
-- Load lua-runtime before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Optimizer agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: lua-runtime](../skills/lua-runtime/SKILL.md) and [skill: rust-coding](../skills/rust-coding/SKILL.md) before acting.
+2. Read the smallest repro, the owning runtime or bridge code, and any current measurement or test evidence before editing.
+3. Keep the change inside the controlling runtime path, preserve LuaJIT-first constraints, and document any behavior difference instead of hiding it.
+4. Rerun the same repro or narrow runtime test first, then widen validation only if the focused path improved or was fixed.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Adjust one Lua runtime path without widening scope.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /tune-lua-runtime <script_path> <objective>
+- /tune-lua-runtime path=src/runtime concern=callback_overhead
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-runtime
-- **Inputs required**: script_path, objective
+Mode: agent
+Loads skills: lua-runtime, rust-coding
+Inputs required: Runtime concern., Target path., Repro or measurement., Acceptance gate.

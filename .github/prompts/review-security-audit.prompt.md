@@ -1,42 +1,38 @@
 ---
-description: "Run a security audit."
+description: "Review a target surface for security risks, unsafe assumptions, and missing hardening."
+agent: "Security"
 ---
-
 # Review Security Audit
 
 ## Goal
-- Security audit for Lurek2D Lua sandboxing, filesystem access, and input validation. Use when adding filesystem features, untrusted script...
+- Produce a practical security review for one bounded attack surface.
 
 ## Inputs
-- CHANGED_FILES list of Rust files that changed or are new
-- THREAT_CONCERN specific concern to prioritize (e.g., "path traversal in lurek.filesystem.read", "arbitrary Lua module loading")
+- Target surface.
+- Threat focus.
+- Any known incident or repro.
 
 ## Steps
-- Load asset-pipeline, dev-debugging, error-handling before changing any files.
-- Load skill dev-debugging/SKILL.md
-- Check **Lua sandbox**:
-- os, io, require, load, dofile, loadfile must be nil'd or absent
-- GameFS must be the only I/O surface accessible to Lua
-- luaL_openlibs must NOT be called; confirm only allow-listed libraries are opened
-- Check **path validation** in src/filesystem/vfs.rs:
-- canonicalize() or equivalent path normalization applied before any file open
-- Paths must not resolve outside the game directory (no ../../../etc/passwd)
-- Symlink traversal: resolved path must remain under base_dir
-- Check **argument validation** in src/lua_api/filesystem_api.rs:
-- Reject null bytes in path strings
+1. Load [skill: error-handling](../skills/error-handling/SKILL.md), [skill: asset-pipeline](../skills/asset-pipeline/SKILL.md), and [skill: dev-debugging](../skills/dev-debugging/SKILL.md) before acting.
+2. Read the named files, data entry points, relevant asset or script loading paths, and any current validation logic.
+3. Prioritize trust boundaries, file or script ingestion, panic paths, unchecked assumptions, and exploitability.
+4. State severity, realistic exploit path, and the most important missing validation or hardening step.
 
 ## Success Criteria
-- [ ] Threat model summary (attack surface, trust boundary diagram in prose)
-- [ ] Numbered finding list with SEVERITY, location, description, fix recommendation
-- [ ] PASS/FAIL verdict for the audit scope
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-security-audit
+- /review-security-audit surface=filesystem threat=untrusted_paths
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: asset-pipeline, dev-debugging, error-handling
+Mode: agent
+Loads skills: error-handling, asset-pipeline, dev-debugging
+Inputs required: Target surface., Threat focus., Any known incident or repro.

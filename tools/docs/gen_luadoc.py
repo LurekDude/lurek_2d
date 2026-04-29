@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-gen_luadoc.py — Generate LuaCATS type-annotation stubs for the Lurek2D VS Code extension.
+gen_luadoc.py â€” Generate LuaCATS type-annotation stubs for the Lurek2D VS Code extension.
 
-Reads logs/data/lua_api_data.json and emits docs/api/lurek.lua — a LuaCATS
+Reads logs/data/lua_api_data.json and emits docs/api/lurek.lua â€” a LuaCATS
 stub file that gives the VS Code Lua language server full type information
 for the lurek.* API. Consumed by the vscode-extension IntelliSense provider.
 
@@ -15,7 +15,7 @@ import re
 
 from gen_extension_api import BUILTIN_ENUMS, CALLBACKS
 
-# Lua reserved keywords — cannot be used as parameter names in stub declarations.
+# Lua reserved keywords â€” cannot be used as parameter names in stub declarations.
 LUA_KEYWORDS = {
     "and", "break", "do", "else", "elseif", "end", "false", "for",
     "function", "goto", "if", "in", "local", "nil", "not", "or",
@@ -125,7 +125,7 @@ def extract_return_from_full_doc(full_doc):
         return ""
     if len(types) == 1:
         return types[0]
-    # Multiple @return lines → join as comma-separated so parse_returns can split them.
+    # Multiple @return lines â†’ join as comma-separated so parse_returns can split them.
     return ", ".join(types)
 
 
@@ -499,7 +499,7 @@ def parse_params(fn):
     params_doc = fn.get("params_doc", "")
     for line in params_doc.splitlines():
         # Match lines like `- \`name\`` or `- \`n1\`, \`n2\`` followed by weird characters or typical separators
-        m = re.match(r'^-\s+`([^`]+)`(?:,\s*`([^`]+)`)?\s*(?:[-:—\u2014]+|Ă.Ă.Ă.|\xef\xbf\xbd.+)?\s*(.*)$', line.strip())
+        m = re.match(r'^-\s+`([^`]+)`(?:,\s*`([^`]+)`)?\s*(?:[-:â€”\u2014]+|Ä‚.Ä‚.Ä‚.|\xef\xbf\xbd.+)?\s*(.*)$', line.strip())
         if not m:
             m = re.match(r'^-\s+`([^`]+)`(.*?)$', line.strip())
 
@@ -514,7 +514,7 @@ def parse_params(fn):
             else:
                 n1, rest = m.groups()
                 names.append(n1)
-                desc = re.sub(r'^(?:[-:—\u2014]+|Ă.Ă.Ă.|\xef\xbf\xbd.+)?\s*', '', rest)
+                desc = re.sub(r'^(?:[-:â€”\u2014]+|Ä‚.Ä‚.Ä‚.|\xef\xbf\xbd.+)?\s*', '', rest)
 
             for n in names:
                 n_clean = n if n == "..." else re.sub(r'[^a-zA-Z0-9_]', '', n.replace(' ', '_'))
@@ -561,8 +561,8 @@ def parse_returns(fn):
         if ret_doc and ret_doc[0].isupper():
             return normalize_type(ret_doc)
         # Extract just the type token (before 2+ spaces / inline description).
-        # e.g. "table  {x, y, width, height}" → "table" to avoid heuristic
-        # false-matches on description words (e.g. "width, height" → "number, number").
+        # e.g. "table  {x, y, width, height}" â†’ "table" to avoid heuristic
+        # false-matches on description words (e.g. "width, height" â†’ "number, number").
         type_token = re.split(r'\s{2,}', ret_doc)[0].strip()
         # Handle comma-separated primitive type lists, e.g. "@return number, number, number".
         # Without this, guess_type collapses "number, number" to just "number".
@@ -609,7 +609,8 @@ def write_function_doc(out, fn, name):
             safe_k = (k + "_") if k in LUA_KEYWORDS else k
             if is_optional:
                 # LuaCATS optional syntax: name? type (NOT name type|nil)
-                clean_t = re.sub(r"\|nil$", "", t) or DYNAMIC_LUA_TYPE
+                clean_parts = [part.strip() for part in t.split('|') if part.strip() and part.strip() != 'nil']
+                clean_t = '|'.join(clean_parts) or DYNAMIC_LUA_TYPE
                 if pd and pd != "(optional)":
                     out.append(f"---@param {safe_k}? {clean_t} {pd}".strip())
                 else:
@@ -675,7 +676,7 @@ def main():
 
     lua_api = data.get("lua_api", {}).get("modules", {})
 
-    # Maps internal json key → actual Lua namespace (for modules that register under a different name)
+    # Maps internal json key â†’ actual Lua namespace (for modules that register under a different name)
     _LUA_NAMESPACE = {}
 
     source_enums = data.get("lua_api", {}).get("enums") or BUILTIN_ENUMS
@@ -697,7 +698,7 @@ def main():
 
     # Dynamic mlua carrier types normalize to `LuaValue`, a real project alias for
     # unconstrained Lua runtime values.
-    # Old-name → L-prefix aliases: if a referenced type "Foo" has a declared counterpart "LFoo",
+    # Old-name â†’ L-prefix aliases: if a referenced type "Foo" has a declared counterpart "LFoo",
     # emit an alias instead of a duplicate stub class.  This happens when docstring @return tags
     # still use the pre-L-prefix name.
     #
@@ -706,18 +707,18 @@ def main():
     _OPAQUE_ALIASES: dict[str, str] = {
         "MultiValue":   DYNAMIC_LUA_TYPE,   # mlua multi-return carrier
         "Environment":  DYNAMIC_LUA_TYPE,   # OS/Lua environment table
-        "GID":          "integer",  # tilemap global tile ID — integer alias
-        "ID":           "integer",  # generic ID — integer alias
-        "Radius":       "number",   # plain numeric radius — not a userdata type
-        "TextureKey":   DYNAMIC_LUA_TYPE,   # internal render key — not exposed as userdata
-        "Tint":         DYNAMIC_LUA_TYPE,   # plain color tint — not a userdata type
-        # Struct-name → L-prefix where casing or suffix differs
+        "GID":          "integer",  # tilemap global tile ID â€” integer alias
+        "ID":           "integer",  # generic ID â€” integer alias
+        "Radius":       "number",   # plain numeric radius â€” not a userdata type
+        "TextureKey":   DYNAMIC_LUA_TYPE,   # internal render key â€” not exposed as userdata
+        "Tint":         DYNAMIC_LUA_TYPE,   # plain color tint â€” not a userdata type
+        # Struct-name â†’ L-prefix where casing or suffix differs
         "AiFlowField":    "LAIFlowField",    # LuaAiFlowField struct but type() returns LAIFlowField
         "Camera2D":       "LCamera",         # LuaCamera2D struct but type() returns LCamera
-        "Edge":           "LGraphEdge",      # LuaEdge shorthand → full graph type
-        "Node":           "LGraphNode",      # LuaNode shorthand → full graph type
-        "Step":           "LPipelineStep",   # LuaStep shorthand → full pipeline type
-        "ThreadHandle":   "LThread",         # LuaThreadHandle → LThread
+        "Edge":           "LGraphEdge",      # LuaEdge shorthand â†’ full graph type
+        "Node":           "LGraphNode",      # LuaNode shorthand â†’ full graph type
+        "Step":           "LPipelineStep",   # LuaStep shorthand â†’ full pipeline type
+        "ThreadHandle":   "LThread",         # LuaThreadHandle â†’ LThread
     }
     # Auto-derive: if a referenced type "Foo" has a declared counterpart "LFoo" (exact match),
     # alias it.  Case-insensitive fallback for minor capitalisation differences.
@@ -733,7 +734,7 @@ def main():
             if candidate in _l_declared_lower:
                 _OPAQUE_ALIASES[type_name] = _l_declared_lower[candidate]
 
-    # Types defined as @class in docs/api/library.lua — skip generating aliases for them
+    # Types defined as @class in docs/api/library.lua â€” skip generating aliases for them
     # to avoid 'duplicate-doc-alias' warnings from the Lua language server.
     _SKIP_ALIAS = {"EventBus", "Scheduler", "Stack"}
 
@@ -781,9 +782,9 @@ def main():
         ],
         "globe": [
             ("MAX_PROVINCES", "integer", "Maximum number of provinces the globe supports."),
-            ("LOD_FAR",       "string",  'LOD tier constant "far" — zoomed-out view (zoom < 1.5).'),
-            ("LOD_MID",       "string",  'LOD tier constant "mid" — medium zoom (1.5 \u2264 zoom < 4.0).'),
-            ("LOD_NEAR",      "string",  'LOD tier constant "near" — close-zoom view (zoom \u2265 4.0).'),
+            ("LOD_FAR",       "string",  'LOD tier constant "far" â€” zoomed-out view (zoom < 1.5).'),
+            ("LOD_MID",       "string",  'LOD tier constant "mid" â€” medium zoom (1.5 \u2264 zoom < 4.0).'),
+            ("LOD_NEAR",      "string",  'LOD tier constant "near" â€” close-zoom view (zoom \u2265 4.0).'),
         ],
 
     }
@@ -793,6 +794,16 @@ def main():
     # the Lua language server can resolve lurek.input.keyboard.isDown etc.
     _NESTED_NAMESPACES: dict[str, list[str]] = {
         "input": ["keyboard", "mouse", "gamepad", "touch"],
+    }
+
+    _UI_NON_WIDGET_CLASSES = {
+        "LTheme",
+        "LLineChart",
+        "LBarChart",
+        "LScatterPlot",
+        "LPieChart",
+        "LAreaChart",
+        "LUiWidget",
     }
 
     for mod_name in sorted(lua_api.keys()):
@@ -816,7 +827,10 @@ def main():
             if desc:
                 for line in desc.splitlines():
                     out.append(f"--- {line}")
-            out.append(f"---@class {class_name}")
+            class_decl = class_name
+            if mod_name == "ui" and class_name not in _UI_NON_WIDGET_CLASSES:
+                class_decl = f"{class_name} : LUiWidget"
+            out.append(f"---@class {class_decl}")
             # Hardcoded field annotations for types whose fields are Rust struct members
             # not visible to the Rust parser (registered via add_field_method_get).
             if class_name == "LVec2":
@@ -849,13 +863,13 @@ def main():
             if ":" in name:
                 continue
             # Remap stored lua_name only when the module folder name differs from
-            # the Lua namespace (e.g. timer→time, event→signal).  When mod_name==lua_ns
-            # the lua_name is already correct — preserve nested paths (keyboard.isDown etc.).
+            # the Lua namespace (e.g. timerâ†’time, eventâ†’signal).  When mod_name==lua_ns
+            # the lua_name is already correct â€” preserve nested paths (keyboard.isDown etc.).
             if mod_name != lua_ns and name.startswith(f"lurek.{mod_name}."):
                 name = f"lurek.{lua_ns}." + name[len(f"lurek.{mod_name}."):]
             write_function_doc(out, func, name)
 
-        # ── Particle flat-forwarding wrappers ─────────────────────────────────────────
+        # â”€â”€ Particle flat-forwarding wrappers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         # particle_api.rs registers every LParticleSystem method *also* as a module-level
         # function  lurek.particle.METHOD(ps, ...)  via its flat_methods list.  These have
         # no Rust docstrings so they don't appear in the JSON.  Emit type assignments here

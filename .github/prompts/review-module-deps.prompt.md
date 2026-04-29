@@ -1,36 +1,38 @@
 ---
-description: "Review module dependency rules."
+description: "Review module dependencies for direction, ownership, and unnecessary coupling."
+agent: "Architect"
 ---
-
 # Review Module Deps
 
 ## Goal
-- Audit module dependency graph for violations.
+- Assess whether module dependencies are still aligned with the intended architecture.
 
 ## Inputs
-- None.
+- Target module set.
+- Dependency concern.
+- Any desired boundary outcome.
 
 ## Steps
-- Load module-architecture before changing any files.
-- For each domain module (graphics, physics, audio, input, timer, filesystem, window):
-- Check imports should only use crate::math::* from other domain modules
-- No imports from other domain modules
-- Check engine may import from all modules
-- Check lua_api may import from engine + all domain modules
-- Report any violations with file path and import line
+1. Load [skill: module-architecture](../skills/module-architecture/SKILL.md) before acting.
+2. Read the named modules, their public edges, docs/specs, and any recent dependency changes.
+3. Look for dependency inversion failures, utility creep, hidden cycles, and domain logic leaking through thin wrappers.
+4. Return the clearest dependency risks, the clean boundary direction, and the smallest safe refactor path.
 
 ## Success Criteria
-- [ ] No cross-domain module dependencies (except through math)
-- [ ] engine dependency direction correct
-- [ ] lua_api dependency direction correct
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-module-deps
+- /review-module-deps modules=render,lua_api
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: module-architecture
+Mode: agent
+Loads skills: module-architecture
+Inputs required: Target module set., Dependency concern., Any desired boundary outcome.

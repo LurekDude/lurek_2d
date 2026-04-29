@@ -1,35 +1,39 @@
 ---
-description: "Create or edit a TOML UI layout in content/layouts/."
+description: "Author or update a TOML UI layout under content/layouts/."
+agent: "Content-Maker"
 ---
-
-# Author Ui Layout
+# Author UI Layout
 
 ## Goal
-- Author or edit a TOML UI layout under content/layouts/ for a named screen grid-snapped coordinates, valid widget types, renderable via tools/ui/render_layout.py.
+- Produce one usable layout file for a concrete UI surface.
 
 ## Inputs
-- screen_name
+- Target screen or HUD.
+- Layout file path.
+- Required widgets or regions.
+- Any runtime consumer.
 
 ## Steps
-- Load ui-layout before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Lua-Designer agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: ui-layout](../skills/ui-layout/SKILL.md) and [skill: lua-scripting](../skills/lua-scripting/SKILL.md) before acting.
+2. Read the target layout file, neighboring layouts, the Lua consumer, and any supporting content assets before editing.
+3. Keep the layout readable, consistent with the existing content format, and aligned with the consuming Lua side instead of inventing new schema fields.
+4. Run the narrowest content or runtime check that loads the layout and confirm the touched screen still resolves correctly.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Produce one usable layout file for a concrete UI surface.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /author-ui-layout <screen_name>
+- /author-ui-layout file=content/layouts/inventory.toml screen=inventory
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: ui-layout
-- **Inputs required**: screen_name
+Mode: agent
+Loads skills: ui-layout, lua-scripting
+Inputs required: Target screen or HUD., Layout file path., Required widgets or regions., Any runtime consumer.

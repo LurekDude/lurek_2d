@@ -1,40 +1,38 @@
 ---
-description: "Review lurek.* API consistency."
+description: "Review a lurek.* API slice for naming, parameter, and contract consistency."
+agent: "Lua-Designer"
 ---
-
-# Review Api Consistency
+# Review API Consistency
 
 ## Goal
-- Audit the lurek.* API surface for naming and convention consistency.
+- Find inconsistencies in the Lua-facing API contract.
 
 ## Inputs
-- module
-- verb
+- Target module or API slice.
+- Compared APIs or prior art.
+- Any reported inconsistency.
 
 ## Steps
-- Load lua-api-design before changing any files.
-- Read all src/lua_api/*_api.rs files
-- Check function naming: lurek.<module>.<verb>() pattern
-- Check parameter conventions: dt, x, y, key, btn
-- Check return types: all return LuaResult<T>
-- Check key name conventions: lowercase strings
-- Compare against docs/api/lurek.md for accuracy
-- Report inconsistencies
+1. Load [skill: lua-api-design](../skills/lua-api-design/SKILL.md) and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Read src/lua_api/, docs/specs/, docs/api/, and nearby examples or tests for the same surface.
+3. Focus on naming, return shape, callback style, defaults, and whether the API feels coherent with the rest of lurek.*.
+4. State the highest-value consistency fixes and any case where the inconsistency is intentional and documented.
 
 ## Success Criteria
-- [ ] All functions follow naming pattern
-- [ ] Parameters consistent across modules
-- [ ] API reference matches code
-- [ ] Key names are lowercase
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-api-consistency <module> <verb>
+- /review-api-consistency module=graphics
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-api-design
-- **Inputs required**: module, verb
+Mode: agent
+Loads skills: lua-api-design, documentation
+Inputs required: Target module or API slice., Compared APIs or prior art., Any reported inconsistency.

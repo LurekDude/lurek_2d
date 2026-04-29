@@ -18,19 +18,20 @@ description: "Load this skill when planning module boundaries, dependency direct
 - API naming.
 
 ## Domain Knowledge
-- Keep dependencies acyclic.
-- Keep responsibilities narrow.
-- Put business logic in the owning module.
-- Keep thin wrappers thin.
-- Keep public surface small and clear.
-- Use docs/specs/<module>.md as the contract.
-- Route large multi-module work through Manager and Planner.
-- Prefer one clear owner per module area.
-
+- Each src module should map to docs/specs/<module>.md and keep mod.rs as a thin manifest.
+- Domain code must not import the binding layer; src/lua_api remains a thin wrapper boundary.
+- Prefer one clear owner for state, side effects, and public data types.
+- New modules must fit current export shape in src/lib.rs and current dependency direction.
+- Large restructures need migration steps and contract impact, not only target diagrams.
+- Use validate_module_coverage.py and thin module audits when ownership changes.
+- Module shape should match docs/specs, thin wrapper rules, and the current export graph in src/lib.rs rather than a theoretical ideal.
+- Ownership decisions here need to preserve test placement, Lua binding boundaries, and docs sync work.
+- This skill owns structure and dependency direction, not implementation details or generated docs.
 ## Companion File Index
 - None.
 
 ## References
 - docs/specs/
 - src/lib.rs
-- Cargo.toml
+- tools/validate/validate_module_coverage.py
+- tools/audit/thin_modrs_audit.py

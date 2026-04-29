@@ -3314,7 +3314,7 @@ impl LuaUserData for LuaBandit {
         });
 
         // -- reset --
-        /// Resets the bandit state.
+        /// Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.
         /// @return | nil | No value is returned.
         methods.add_method_mut("reset", |_, this, ()| {
             this.inner.borrow_mut().reset();

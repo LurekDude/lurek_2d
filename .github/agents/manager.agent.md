@@ -36,6 +36,7 @@ tools: [read, search, execute, agent, todo]
 
 ## Workflow
 - Normalize the request into goal, constraints, out-of-scope items, and the proof needed to call it done.
+- Load module-architecture when ownership is unclear, tools-cag-validation when .github is in scope, and roadmap-planning only when phase shaping needs extra structure.
 - Decide whether one specialist is enough; if yes, route once and wait for evidence instead of building a larger flow.
 - If ownership is unclear or the task spans 3 or more agents or 5 or more files, route to Planner before any implementation work starts.
 - For multi-phase work, capture the branch, create work/{session}/, and create logs/agent_log.jsonl before the first handoff.
@@ -51,13 +52,20 @@ tools: [read, search, execute, agent, todo]
 ## Routing Table
 - Large or unclear task -> Planner: request, constraints, and expected end state.
 - Repo or web fact gap -> Research: exact questions, scope, and deadline.
+- Telemetry, balance, or offline metrics analysis -> Analyst: question, dataset scope, and confidence target.
 - Hard technical choice -> Solver: problem, constraints, and prior attempts.
+- Backlog, ideas, or opportunity discovery -> Discovery-Lead: search area, constraints, and output horizon.
 - Runtime bug diagnosis -> Debugger: symptom, repro, and environment.
 - Non-specialist Rust work -> Developer: goal, files, and gate.
 - Lua API design -> Lua-Designer: capability, namespace, and break risk.
 - Render implementation -> Renderer: render goal, frame budget, and files.
 - Physics implementation -> Physicist: scenario, invariants, and budget.
 - Audio implementation -> Audio-Eng: audio goal, formats, and environment.
+- Build, packaging, or CI automation -> Build-Engineer: target flow, scripts, and validation gate.
+- VS Code extension work -> Extension-Engineer: extension goal, files, and validation gate.
+- Runnable demos, examples, libraries, or showcase content -> Content-Maker: target content surface, audience, and coverage goal.
+- Module spec ownership or docs/specs contract work -> Spec-Owner: target modules, drift, and sync gate.
+- Retrieval and agent-support knowledge layer work -> RAG-Architect: retrieval goal, source scope, and evaluation target.
 - Test work -> Tester: target behavior, layer, and failure mode.
 - Review gate -> Reviewer: diff scope, required checks, and acceptance rule.
 - Performance measurement -> Optimizer: scenario, budget, and suspected hot path.
@@ -83,4 +91,4 @@ tools: [read, search, execute, agent, todo]
 Communication: simple, direct, low-token, coordination-first
 Personas: EngDev, GameDev, Modder, GameTest, EngTest
 Primary skills: module-architecture, tools-cag-validation
-Secondary skills: documentation, testing-rust
+Secondary skills: documentation, testing-rust, roadmap-planning, quality-pipeline, module-audit

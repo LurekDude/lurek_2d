@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-gen_lua_api.py — Lurek2D Lua API parser library.
+gen_lua_api.py â€” Lurek2D Lua API parser library.
 
 Parses src/lua_api/*.rs files and extracts all registered Lua functions and
 userdata methods by scanning for .set() and add_method() patterns, associating
@@ -61,11 +61,12 @@ def _collect_docstring_above(lines: List[str], line_idx: int) -> str:
             doc_parts.insert(0, text[1:] if text.startswith(" ") else text)
         elif stripped.startswith("#[") or stripped == "":
             pass
-        elif re.match(r"^let\s+\w+\s*=\s*\w+\.clone\(\)\s*;$", stripped):
-            # Skip the `let s = state.clone();` bridge lines common in lurek2d API files
+        elif re.match(r"^let\s+\w+\s*=\s*.+;\s*$", stripped):
+            # Skip simple local bridge lines between a doc block and the final set() call,
+            # e.g. `let s = state.clone();`, `let rt = real_timers;`, `let cap = history_cap;`.
             pass
         elif stripped.startswith("//") and not stripped.startswith("///"):
-            # Skip plain // comments (e.g. // lurek.renders.X(…) inline signature notes)
+            # Skip plain // comments (e.g. // lurek.renders.X(â€¦) inline signature notes)
             pass
         else:
             break
@@ -129,7 +130,7 @@ def _extract_params_returns(docstring: str) -> tuple:
         stripped = line.strip()
 
         param_match = re.match(
-            r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*([^|]+?)\s*\|\s*(.+)",
+            r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*(.+)\s*\|\s*(.+)",
             stripped,
         )
         if param_match:
@@ -137,10 +138,10 @@ def _extract_params_returns(docstring: str) -> tuple:
             display_name = raw_name[:-1] if raw_name.endswith("?") and raw_name != "..." else raw_name
             lua_type = param_match.group(2).strip().rstrip(",.")
             desc = param_match.group(3).strip()
-            tagged_params.append(f"- `{display_name}` — `{lua_type}`: {desc}")
+            tagged_params.append(f"- `{display_name}` â€” `{lua_type}`: {desc}")
             continue
 
-        return_match = re.match(r"@return\s*\|\s*([^|]+?)\s*\|\s*(.+)", stripped)
+        return_match = re.match(r"@return\s*\|\s*(.+)\s*\|\s*(.+)", stripped)
         if return_match and not tagged_return:
             # Keep only the type token here. The detailed prose is already stored in
             # `return_description`, and a plain type string is the safest form for
@@ -155,7 +156,7 @@ def _extract_params_returns(docstring: str) -> tuple:
     return params, returns
 
 
-# ── Signature inference ──────────────────────────────────────────────────────
+# â”€â”€ Signature inference â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 # Rust -> Lua type map
 _RUST_TO_LUA: Dict[str, str] = {
@@ -203,7 +204,7 @@ def _parse_tagged_params(docstring: str) -> list:
         stripped = line.strip()
 
         pipe_match = re.match(
-            r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*([^|]+?)\s*\|\s*(.+)",
+            r"@param\s*\|\s*(\w+\??|\.\.\.)\s*\|\s*(.+)\s*\|\s*(.+)",
             stripped,
         )
         if pipe_match:
@@ -229,7 +230,7 @@ def _parse_tagged_return(docstring: str) -> tuple:
     for line in docstring.splitlines():
         stripped = line.strip()
 
-        pipe_match = re.match(r"@return\s*\|\s*([^|]+?)\s*\|\s*(.+)", stripped)
+        pipe_match = re.match(r"@return\s*\|\s*(.+)\s*\|\s*(.+)", stripped)
         if pipe_match:
             return (pipe_match.group(1).strip().rstrip(",."), pipe_match.group(2).strip())
     return ("", "")
@@ -309,7 +310,7 @@ def _merge_typed_params_with_inferred(typed_params: list, inferred_sig: str) -> 
 def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
     """Return {display_class_name: first_doc_line} for all pub struct LuaXxx and impl LuaUserData for LuaXxx types.
 
-    The display name strips the leading ``Lua`` prefix: ``LuaCard`` → ``Card``.
+    The display name strips the leading ``Lua`` prefix: ``LuaCard`` â†’ ``Card``.
     Checks ``pub struct LuaXxx`` first; then falls back to ``impl LuaUserData for LuaXxx``
     so that UserData types defined elsewhere (e.g. src/ai/) get descriptions too.
     """
@@ -329,10 +330,21 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
                 doc_parts.insert(0, text)
             elif stripped.startswith("#[") or stripped == "":
                 pass
+            elif stripped.startswith("//") and not stripped.startswith("///"):
+                pass
             else:
                 break
             j -= 1
         return doc_parts[0].strip() if doc_parts else ""
+
+    def _class_from_return(return_type: str, known_classes: set[str]) -> str:
+        candidate = return_type.strip().split("|", 1)[0].strip().strip("`")
+        if not candidate:
+            return ""
+        if candidate.startswith("L"):
+            return candidate
+        prefixed = "L" + candidate
+        return prefixed if prefixed in known_classes else ""
 
     result: Dict[str, str] = {}
 
@@ -370,7 +382,7 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
             return "L" + struct_name[3:]
         return "L" + struct_name  # non-Lua-prefixed userdata gets L prefix
 
-    # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority — struct-level docs)
+    # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority â€” struct-level docs)
     for i, line in enumerate(lines):
         m = re.match(r"\s*(?:pub(?:\([^)]*\))?\s+)?struct (Lua\w+)", line)
         if not m:
@@ -394,7 +406,19 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         if desc:
             result[class_name] = desc
 
-    # Pass 3: fn add_X_methods( — GUI-style widget factory functions
+    known_class_names: set[str] = set(result) | set(type_returns.values())
+
+    # Pass 3: create_widget_table( â€” shared UI base-widget table helpers
+    for i, line in enumerate(lines):
+        if not re.search(r"fn\s+create_widget_table\s*[<(]", line):
+            continue
+        desc = _collect_doc_above(lines, i)
+        if desc:
+            result.setdefault("LUiWidget", desc)
+            known_class_names.add("LUiWidget")
+        break
+
+    # Pass 4: fn add_X_methods( â€” GUI-style widget factory functions
     for i, line in enumerate(lines):
         m = re.search(r"fn\s+add_(\w+)_methods\(", line)
         if not m:
@@ -407,6 +431,39 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
         desc = _collect_doc_above(lines, i)
         if desc:
             result[class_name] = desc
+            known_class_names.add(class_name)
+
+    # Pass 5: constructor-style `set("newX", lua.create_function(...))` bindings
+    set_multiline_re = re.compile(r'\.set\(\s*$')
+    set_inline_re = re.compile(r'\.set\(\s*"(\w+)"\s*,\s*lua\.create_function')
+    name_next_re = re.compile(r'^\s*"(\w+)"\s*,')
+    for i, line in enumerate(lines):
+        func_name: Optional[str] = None
+        inline_m = set_inline_re.search(line)
+        if inline_m:
+            func_name = inline_m.group(1)
+        elif set_multiline_re.search(line):
+            for lookahead in range(1, 6):
+                if i + lookahead >= len(lines):
+                    break
+                candidate_line = lines[i + lookahead].strip()
+                if candidate_line == "" or candidate_line.startswith("//"):
+                    continue
+                name_m = name_next_re.match(candidate_line)
+                if name_m:
+                    func_name = name_m.group(1)
+                break
+
+        if not func_name:
+            continue
+
+        docstring = _collect_docstring_above(lines, i)
+        desc = _first_desc_line(docstring)
+        return_type, _ = _parse_tagged_return(docstring)
+        class_name = _class_from_return(return_type, known_class_names)
+        if desc and class_name and class_name not in result:
+            result[class_name] = desc
+            known_class_names.add(class_name)
 
     return result
 
@@ -474,7 +531,7 @@ def _infer_signature(lines: List[str], decl_line: int) -> str:
             return f"([{name}])"
         return f"({name})"
 
-    # (name,): (Type,) — single param in tuple form
+    # (name,): (Type,) â€” single param in tuple form
     single_tuple_m = re.search(
         r"\|[^|]*?,\s*\(([a-z_][a-z0-9_]*)\s*,?\):\s*\(([^)]+)\)",
         search_text,
@@ -497,7 +554,7 @@ def _infer_signature(lines: List[str], decl_line: int) -> str:
     return ""
 
 
-# ── Module-level doc extraction ────────────────────────────────────────────────
+# â”€â”€ Module-level doc extraction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 
 def _collect_module_doc(api_file: Path) -> str:
@@ -521,7 +578,7 @@ def _collect_module_doc(api_file: Path) -> str:
 # namespace key actually registered via lurek.set("<key>", ...).
 # Only entries that DIFFER from the Rust module name are listed here.
 _LUA_NAMESPACE_OVERRIDE: Dict[str, str] = {
-    # system_api.rs registers as lurek.set("runtime", ...) — not "system"
+    # system_api.rs registers as lurek.set("runtime", ...) â€” not "system"
     "system": "runtime",
 }
 
@@ -643,22 +700,24 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
 
     set_multiline_re = re.compile(r'(\w+)\.set\(\s*$')
     set_inline_re = re.compile(r'(\w+)\.set\(\s*"(\w+)"\s*,\s*lua\.create_function')
-    # NEW: named fn reference pattern — .set("luaName", lua.create_function(fn_name)?)
+    # NEW: named fn reference pattern â€” .set("luaName", lua.create_function(fn_name)?)
     set_named_fn_re = re.compile(
         r'\.set\(\s*"(\w+)"\s*,\s*lua\.create_function\(\s*(\w+)\s*\??\)'
     )
     name_next_re = re.compile(r'^\s*"(\w+)"\s*,')
     method_re = re.compile(r'methods\.add_method(?:_mut)?\(\s*"(\w+)"')
     method_function_re = re.compile(r'methods\.add_function\(\s*"(\w+)"')
-    # NEW: Self:: reference pattern — methods.add_method("luaName", Self::fn_name)
+    # NEW: Self:: reference pattern â€” methods.add_method("luaName", Self::fn_name)
     method_self_re = re.compile(
         r'methods\.add_method(?:_mut)?\(\s*"(\w+)"\s*,\s*Self::(\w+)'
     )
-    # NEW: multi-line add_method — method name on next line
+    dispatch_arith_inline_re = re.compile(r'dispatch_arith!\(\s*methods\s*,\s*"(\w+)"')
+    # NEW: multi-line add_method â€” method name on next line
     # methods.add_method_mut(
-    #     "methodName",  ← matched by name_next_re
+    #     "methodName",  â† matched by name_next_re
     method_multiline_re = re.compile(r'methods\.add_method(?:_mut)?\(\s*$')
     method_function_multiline_re = re.compile(r'methods\.add_function\(\s*$')
+    dispatch_arith_multiline_re = re.compile(r'dispatch_arith!\(\s*$')
     impl_re = re.compile(
         r'^\s*impl(?:<[^>]*>)?\s+(?:(?:(?:\w+::)*(?:LuaUserData|UserData))\s+for\s+)?(\w+)'
     )
@@ -785,7 +844,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 return_description=_parse_tagged_return(docstring)[1],
             ))
 
-        # Userdata methods — existing pattern (docstring directly above the add_method line)
+        # Userdata methods â€” existing pattern (docstring directly above the add_method line)
         method_m = method_re.search(stripped)
         if method_m and not method_self_re.search(stripped):
             func_name = method_m.group(1)
@@ -829,6 +888,29 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 inferred_sig=inferred,
                 typed_params=_merge_typed_params_with_inferred(
                     _parse_tagged_params(docstring), inferred
+                ),
+                inferred_return=_parse_tagged_return(docstring)[0],
+                return_description=_parse_tagged_return(docstring)[1],
+            ))
+
+        dispatch_arith_m = dispatch_arith_inline_re.search(stripped)
+        if dispatch_arith_m:
+            func_name = dispatch_arith_m.group(1)
+            owner = current_impl_type or "Unknown"
+            display_owner = _display_name(owner)
+            docstring = _collect_docstring_above(lines, i)
+            desc = _first_desc_line(docstring)
+            params, returns = _extract_params_returns(docstring)
+            functions.append(LuaFunction(
+                module=module, name=func_name,
+                lua_name=f"{display_owner}:{func_name}",
+                owner_type=display_owner, description=desc,
+                full_doc=docstring, params=params,
+                returns=returns, line=i + 1,
+                file=rel_path, kind="method",
+                inferred_sig="",
+                typed_params=_merge_typed_params_with_inferred(
+                    _parse_tagged_params(docstring), ""
                 ),
                 inferred_return=_parse_tagged_return(docstring)[0],
                 return_description=_parse_tagged_return(docstring)[1],
@@ -887,7 +969,40 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                     return_description=_parse_tagged_return(docstring)[1],
                 ))
 
-        # NEW: methods.add_method("luaName", Self::fn_name) — named fn pattern
+        if dispatch_arith_multiline_re.search(stripped):
+            name_m = None
+            for _la in range(1, 6):
+                if i + _la >= len(lines):
+                    break
+                next_stripped = lines[i + _la].strip()
+                if not next_stripped or next_stripped.startswith("//"):
+                    continue
+                name_m = name_next_re.match(next_stripped)
+                if name_m:
+                    break
+            if name_m:
+                func_name = name_m.group(1)
+                owner = current_impl_type or "Unknown"
+                display_owner = _display_name(owner)
+                docstring = _collect_docstring_above(lines, i)
+                desc = _first_desc_line(docstring)
+                params, returns = _extract_params_returns(docstring)
+                functions.append(LuaFunction(
+                    module=module, name=func_name,
+                    lua_name=f"{display_owner}:{func_name}",
+                    owner_type=display_owner, description=desc,
+                    full_doc=docstring, params=params,
+                    returns=returns, line=i + 1,
+                    file=rel_path, kind="method",
+                    inferred_sig="",
+                    typed_params=_merge_typed_params_with_inferred(
+                        _parse_tagged_params(docstring), ""
+                    ),
+                    inferred_return=_parse_tagged_return(docstring)[0],
+                    return_description=_parse_tagged_return(docstring)[1],
+                ))
+
+        # NEW: methods.add_method("luaName", Self::fn_name) â€” named fn pattern
         method_self_m = method_self_re.search(stripped)
         if method_self_m:
             func_name = method_self_m.group(1)   # Lua name (string key)
@@ -914,7 +1029,7 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
                 return_description=_parse_tagged_return(docstring)[1],
             ))
 
-        # NEW: .set("luaName", lua.create_function(named_fn)?) — named fn reference
+        # NEW: .set("luaName", lua.create_function(named_fn)?) â€” named fn reference
         set_named_m = set_named_fn_re.search(stripped)
         if set_named_m:
             func_name = set_named_m.group(1)    # Lua name (string key)

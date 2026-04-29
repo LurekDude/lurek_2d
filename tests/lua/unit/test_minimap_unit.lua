@@ -37,7 +37,7 @@ describe("lurek.minimap.newMinimap", function()
     end)
 end)
 
--- â”€â”€ Grid dimensions â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Grid dimensions Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: grid dimensions.
 describe("grid dimensions", function()
@@ -52,7 +52,7 @@ describe("grid dimensions", function()
     end)
 end)
 
--- â”€â”€ Display size â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Display size Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: display size.
 describe("display size", function()
@@ -73,7 +73,7 @@ describe("display size", function()
     end)
 end)
 
--- â”€â”€ Terrain â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Terrain Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: terrain.
 describe("terrain", function()
@@ -122,7 +122,7 @@ describe("terrain", function()
     end)
 end)
 
--- â”€â”€ Fog of war â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Fog of war Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: fog of war.
 describe("fog of war", function()
@@ -197,7 +197,7 @@ describe("fog of war", function()
     end)
 end)
 
--- â”€â”€ Object types â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Object types Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: object types.
 describe("object types", function()
@@ -236,7 +236,7 @@ describe("object types", function()
     end)
 end)
 
--- â”€â”€ Objects â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Objects Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: objects.
 describe("objects", function()
@@ -282,7 +282,7 @@ describe("objects", function()
     end)
 end)
 
--- â”€â”€ Owner colors â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Owner colors Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: owner colors.
 describe("owner colors", function()
@@ -301,7 +301,7 @@ describe("owner colors", function()
     end)
 end)
 
--- â”€â”€ Color mode â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Color mode Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: color mode.
 describe("color mode", function()
@@ -332,7 +332,7 @@ describe("color mode", function()
     end)
 end)
 
--- â”€â”€ Zoom and pan â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Zoom and pan Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: zoom and pan.
 describe("zoom and pan", function()
@@ -367,7 +367,7 @@ describe("zoom and pan", function()
     end)
 end)
 
--- â”€â”€ Viewport â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Viewport Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: viewport.
 describe("viewport", function()
@@ -386,12 +386,12 @@ describe("viewport", function()
     xit("can set and get viewport rect", function()
         local m = lurek.minimap.newMinimap(100, 100)
         m:setViewportRect(10, 20, 30, 40)
-        local vp = m:getViewportRect()
-        expect_not_nil(vp)
-        expect_equal(10, vp.x)
-        expect_equal(20, vp.y)
-        expect_equal(30, vp.w)
-        expect_equal(40, vp.h)
+        local x, y, w, h = m:getViewportRect()
+        expect_not_nil(x)
+        expect_equal(10, x)
+        expect_equal(20, y)
+        expect_equal(30, w)
+        expect_equal(40, h)
     end)
 
     -- @tests lurek.minimap.newMinimap
@@ -432,7 +432,7 @@ describe("viewport", function()
     end)
 end)
 
--- â”€â”€ Pings â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Pings Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: pings.
 describe("pings", function()
@@ -472,7 +472,7 @@ describe("pings", function()
     end)
 end)
 
--- â”€â”€ Markers â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Markers Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: markers.
 describe("markers", function()
@@ -535,7 +535,7 @@ describe("markers", function()
     end)
 end)
 
--- â”€â”€ Anti-alias â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Anti-alias Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: anti-alias.
 describe("anti-alias", function()
@@ -558,7 +558,7 @@ describe("anti-alias", function()
     end)
 end)
 
--- â”€â”€ Coordinate conversion â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Coordinate conversion Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: coordinate conversion.
 describe("coordinate conversion", function()
@@ -577,7 +577,7 @@ describe("coordinate conversion", function()
     end)
 end)
 
--- â”€â”€ Update â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Update Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: update.
 describe("update", function()
@@ -591,7 +591,7 @@ describe("update", function()
     end)
 end)
 
--- â”€â”€ Full workflow â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Full workflow Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: full workflow.
 describe("full workflow", function()
@@ -653,7 +653,7 @@ describe("full workflow", function()
     end)
 end)
 
--- â”€â”€ setTerrainData â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ setTerrainData Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: terrain data bulk set.
 describe("terrain data bulk set", function()
@@ -685,7 +685,7 @@ describe("terrain data bulk set", function()
     end)
 end)
 
--- â”€â”€ Tile descriptions â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Tile descriptions Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: tile descriptions.
 describe("tile descriptions", function()
@@ -735,7 +735,7 @@ describe("tile descriptions", function()
     end)
 end)
 
--- â”€â”€ getHoverInfo â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ getHoverInfo Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: getHoverInfo.
 describe("getHoverInfo", function()
@@ -774,7 +774,7 @@ describe("getHoverInfo", function()
     end)
 end)
 
--- â”€â”€ setClickable / isClickable â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ setClickable / isClickable Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: clickable.
 describe("clickable", function()
@@ -808,7 +808,7 @@ describe("clickable", function()
     end)
 end)
 
--- â”€â”€ getCenterX / getCenterY â”€â”€
+-- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ getCenterX / getCenterY Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
 
 -- @description Covers suite: center individual getters.
 describe("center individual getters", function()
@@ -847,7 +847,7 @@ describe("center individual getters", function()
     end)
 end)
 
--- ── Minimap Layers (merged from test_minimap_layers.lua) ──
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Layers (merged from test_minimap_layers.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Covers suite: minimap layers.
 describe("minimap layers", function()
@@ -960,7 +960,7 @@ describe("minimap marker animation", function()
     end)
 end)
 
--- ── Minimap Overlay (merged from test_minimap_ui.lua) ──
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Overlay (merged from test_minimap_ui.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Covers suite: minimap geometry overlay.
 describe("minimap geometry overlay", function()
@@ -1012,7 +1012,7 @@ describe("minimap geometry overlay", function()
     end)
 end)
 
--- ── Minimap Path (merged from test_minimap_path.lua) ──
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Path (merged from test_minimap_path.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Covers suite: minimap path visualization.
 describe("minimap path visualization", function()

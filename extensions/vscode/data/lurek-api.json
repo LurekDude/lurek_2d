@@ -1,6 +1,6 @@
 {
   "version": "auto-generated",
-  "generated": "2026-04-28",
+  "generated": "2026-04-29",
   "modules": [
     {
       "name": "ai",
@@ -3830,8 +3830,8 @@
           "parameters": [
             {
               "name": "value",
-              "type": "integer",
-              "description": "number | string source data, or buffer size in bytes.",
+              "type": "integer|number",
+              "description": "string source data, or buffer size in bytes.",
               "optional": false
             }
           ],
@@ -6228,11 +6228,11 @@
           "name": "push",
           "fullPath": "lurek.event.push",
           "signature": "(...)",
-          "description": "",
+          "description": "Pushes a custom named event onto the main engine event queue with optional payload arguments.",
           "parameters": [
             {
               "name": "...",
-              "type": "any",
+              "type": "string",
               "description": "",
               "optional": false
             }
@@ -7807,7 +7807,7 @@
           "parameters": [
             {
               "name": "...",
-              "type": "integer|integer",
+              "type": "integer|string|integer",
               "description": "",
               "optional": false
             }
@@ -8990,23 +8990,23 @@
           "name": "wasActionPressedWithin",
           "fullPath": "lurek.input.wasActionPressedWithin",
           "signature": "(action, frames)",
-          "description": "",
+          "description": "Returns true if the action was pressed within the last frame window.",
           "parameters": [
             {
               "name": "action",
-              "type": "any",
-              "description": "",
+              "type": "string",
+              "description": "Action name to test.",
               "optional": false
             },
             {
               "name": "frames",
-              "type": "any",
-              "description": "",
+              "type": "integer",
+              "description": "Maximum frame distance.",
               "optional": false
             }
           ],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": false,
           "objectType": null
         },
@@ -18708,7 +18708,7 @@
           "name": "fade",
           "fullPath": "lurek.scene.fade",
           "signature": "([duration])",
-          "description": "Returns a fade cross-dissolve transition config table.",
+          "description": "Pre-built named transition factory functions.  Each function accepts optional",
           "parameters": [
             {
               "name": "duration",
@@ -19387,10 +19387,10 @@
           "name": "getDebugOverlay",
           "fullPath": "lurek.runtime.getDebugOverlay",
           "signature": "()",
-          "description": "",
+          "description": "Returns whether the debug overlay is currently visible.",
           "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": false,
           "objectType": null
         },
@@ -21422,10 +21422,10 @@
           "name": "tickRealTimers",
           "fullPath": "lurek.timer.tickRealTimers",
           "signature": "()",
-          "description": "",
+          "description": "Checks all registered real-time timers and fires any whose wall-clock deadline has passed.",
           "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": false,
           "objectType": null
         },
@@ -21498,10 +21498,10 @@
           "name": "tickWaits",
           "fullPath": "lurek.timer.tickWaits",
           "signature": "()",
-          "description": "",
+          "description": "Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or frame target has been reached.",
           "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": false,
           "objectType": null
         }
@@ -23598,10 +23598,10 @@
           "name": "pollDpiChange",
           "fullPath": "lurek.window.pollDpiChange",
           "signature": "()",
-          "description": "",
+          "description": "Checks whether the DPI scale has changed since the last call and fires the onDpiChange callback if so.",
           "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "returns": "number",
+          "returnType": "number",
           "isMethod": false,
           "objectType": null
         },
@@ -24685,7 +24685,7 @@
     },
     {
       "name": "LAccordion",
-      "description": "",
+      "description": "Creates a collapsible accordion widget.",
       "methods": [
         {
           "name": "addSection",
@@ -25050,8 +25050,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -25068,8 +25068,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -27377,6 +27377,78 @@
           "objectType": "LArray"
         },
         {
+          "name": "add",
+          "fullPath": "LArray:add",
+          "signature": "LArray:add(other)",
+          "description": "Element-wise addition with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "sub",
+          "fullPath": "LArray:sub",
+          "signature": "LArray:sub(other)",
+          "description": "Element-wise subtraction with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "mul",
+          "fullPath": "LArray:mul",
+          "signature": "LArray:mul(other)",
+          "description": "Element-wise multiplication with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "div",
+          "fullPath": "LArray:div",
+          "signature": "LArray:div(other)",
+          "description": "Element-wise division with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
           "name": "pow",
           "fullPath": "LArray:pow",
           "signature": "(exp)",
@@ -27443,6 +27515,114 @@
               "name": "max",
               "type": "number",
               "description": "Upper bound.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "eq",
+          "fullPath": "LArray:eq",
+          "signature": "LArray:eq(other)",
+          "description": "Element-wise equality with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "neq",
+          "fullPath": "LArray:neq",
+          "signature": "LArray:neq(other)",
+          "description": "Element-wise not-equal with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "gt",
+          "fullPath": "LArray:gt",
+          "signature": "LArray:gt(other)",
+          "description": "Element-wise greater-than with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "lt",
+          "fullPath": "LArray:lt",
+          "signature": "LArray:lt(other)",
+          "description": "Element-wise less-than with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "gte",
+          "fullPath": "LArray:gte",
+          "signature": "LArray:gte(other)",
+          "description": "Element-wise greater-or-equal with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
+              "optional": false
+            }
+          ],
+          "returns": "Array",
+          "returnType": "Array",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "lte",
+          "fullPath": "LArray:lte",
+          "signature": "LArray:lte(other)",
+          "description": "Element-wise less-or-equal with an Array or scalar.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "any",
+              "description": "Array or scalar operand.",
               "optional": false
             }
           ],
@@ -28669,7 +28849,7 @@
     },
     {
       "name": "LBadge",
-      "description": "",
+      "description": "Creates a badge widget displaying a numeric count.",
       "methods": [
         {
           "name": "setCount",
@@ -28956,8 +29136,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -28974,8 +29154,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -29643,7 +29823,7 @@
           "name": "reset",
           "fullPath": "LBandit:reset",
           "signature": "()",
-          "description": "Resets the bandit state.",
+          "description": "Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.",
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
@@ -31437,7 +31617,7 @@
     },
     {
       "name": "LButton",
-      "description": "",
+      "description": "Creates and returns a new interactive button widget as a child of this widget.",
       "methods": [
         {
           "name": "setText",
@@ -31713,8 +31893,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -31731,8 +31911,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -33142,7 +33322,7 @@
           "name": "attach",
           "fullPath": "LCamera:attach",
           "signature": "()",
-          "description": "Alias for `apply()`.",
+          "description": "Alias for `apply()` that queues this camera's transform onto the render command stack.",
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
@@ -33153,7 +33333,7 @@
           "name": "detach",
           "fullPath": "LCamera:detach",
           "signature": "()",
-          "description": "Alias for `reset()`.",
+          "description": "Alias for `reset()` that removes this camera's transform from the render command stack.",
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
@@ -34044,7 +34224,7 @@
     },
     {
       "name": "LCheckbox",
-      "description": "",
+      "description": "Creates a checkbox widget.",
       "methods": [
         {
           "name": "setChecked",
@@ -34349,8 +34529,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -34367,8 +34547,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -35424,7 +35604,7 @@
     },
     {
       "name": "LColorPicker",
-      "description": "",
+      "description": "Creates a color picker widget.",
       "methods": [
         {
           "name": "getColor",
@@ -35794,8 +35974,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -35812,8 +35992,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -36544,7 +36724,7 @@
     },
     {
       "name": "LComboBox",
-      "description": "",
+      "description": "Creates a dropdown combo box widget.",
       "methods": [
         {
           "name": "addItem",
@@ -36907,8 +37087,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -36925,8 +37105,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -38431,8 +38611,8 @@
             },
             {
               "name": "default",
-              "type": "nil",
-              "description": "boolean|number|string | Default value for new rows in the column.",
+              "type": "nil|boolean|number|string",
+              "description": "Default value for new rows in the column.",
               "optional": true
             }
           ],
@@ -38449,8 +38629,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38467,8 +38647,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
@@ -38491,8 +38671,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38569,8 +38749,8 @@
             },
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38593,14 +38773,14 @@
             },
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
               "name": "val",
-              "type": "nil",
-              "description": "boolean|number|string | New cell value.",
+              "type": "nil|boolean|number|string",
+              "description": "New cell value.",
               "optional": false
             }
           ],
@@ -38617,8 +38797,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
@@ -38629,8 +38809,8 @@
             },
             {
               "name": "val",
-              "type": "nil",
-              "description": "boolean|number|string | Value to compare against.",
+              "type": "nil|boolean|number|string",
+              "description": "Value to compare against.",
               "optional": false
             }
           ],
@@ -38647,8 +38827,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
@@ -38731,7 +38911,7 @@
           "parameters": [
             {
               "name": "...",
-              "type": "string",
+              "type": "string|integer",
               "description": "",
               "optional": false
             }
@@ -38749,8 +38929,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38767,8 +38947,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38785,8 +38965,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38809,14 +38989,14 @@
             },
             {
               "name": "this_col",
-              "type": "string",
-              "description": "integer | Join column in this dataframe.",
+              "type": "string|integer",
+              "description": "Join column in this dataframe.",
               "optional": false
             },
             {
               "name": "other_col",
-              "type": "string",
-              "description": "integer | Join column in the other dataframe.",
+              "type": "string|integer",
+              "description": "Join column in the other dataframe.",
               "optional": false
             },
             {
@@ -38857,8 +39037,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38875,8 +39055,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38928,8 +39108,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38946,8 +39126,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38964,8 +39144,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -38982,8 +39162,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -39000,8 +39180,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -39018,8 +39198,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -39036,8 +39216,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             }
           ],
@@ -39054,14 +39234,14 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
               "name": "val",
-              "type": "nil",
-              "description": "boolean|number|string | Replacement value for nil cells.",
+              "type": "nil|boolean|number|string",
+              "description": "Replacement value for nil cells.",
               "optional": false
             }
           ],
@@ -39078,8 +39258,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39186,8 +39366,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Source column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Source column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39216,8 +39396,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Source column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Source column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39246,8 +39426,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Source column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Source column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39276,8 +39456,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Source column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Source column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39306,8 +39486,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Source column name or 1-based column index.",
+              "type": "string|integer",
+              "description": "Source column name or 1-based column index.",
               "optional": false
             },
             {
@@ -39336,8 +39516,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39360,8 +39540,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39384,14 +39564,14 @@
           "parameters": [
             {
               "name": "group_col",
-              "type": "string",
-              "description": "integer | Group column name or index.",
+              "type": "string|integer",
+              "description": "Group column name or index.",
               "optional": false
             },
             {
               "name": "agg_col",
-              "type": "string",
-              "description": "integer | Aggregate column name or index.",
+              "type": "string|integer",
+              "description": "Aggregate column name or index.",
               "optional": false
             },
             {
@@ -39414,20 +39594,20 @@
           "parameters": [
             {
               "name": "row_col",
-              "type": "string",
-              "description": "integer | Column whose values become row keys.",
+              "type": "string|integer",
+              "description": "Column whose values become row keys.",
               "optional": false
             },
             {
               "name": "col_col",
-              "type": "string",
-              "description": "integer | Column whose distinct values become headers.",
+              "type": "string|integer",
+              "description": "Column whose distinct values become headers.",
               "optional": false
             },
             {
               "name": "val_col",
-              "type": "string",
-              "description": "integer | Column to place in the pivot cells.",
+              "type": "string|integer",
+              "description": "Column to place in the pivot cells.",
               "optional": false
             }
           ],
@@ -39444,14 +39624,14 @@
           "parameters": [
             {
               "name": "col_a",
-              "type": "string",
-              "description": "integer | Left column name or index.",
+              "type": "string|integer",
+              "description": "Left column name or index.",
               "optional": false
             },
             {
               "name": "col_b",
-              "type": "string",
-              "description": "integer | Right column name or index.",
+              "type": "string|integer",
+              "description": "Right column name or index.",
               "optional": false
             }
           ],
@@ -39479,8 +39659,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39503,8 +39683,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39539,8 +39719,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39563,8 +39743,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             }
           ],
@@ -39581,8 +39761,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             }
           ],
@@ -39617,8 +39797,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             }
           ],
@@ -39635,8 +39815,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39712,20 +39892,20 @@
           "parameters": [
             {
               "name": "row_key",
-              "type": "string",
-              "description": "integer | Row key column.",
+              "type": "string|integer",
+              "description": "Row key column.",
               "optional": false
             },
             {
               "name": "col_key",
-              "type": "string",
-              "description": "integer | Column key column.",
+              "type": "string|integer",
+              "description": "Column key column.",
               "optional": false
             },
             {
               "name": "value_key",
-              "type": "string",
-              "description": "integer | Value column.",
+              "type": "string|integer",
+              "description": "Value column.",
               "optional": false
             },
             {
@@ -39748,8 +39928,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39778,8 +39958,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -39808,8 +39988,8 @@
           "parameters": [
             {
               "name": "col",
-              "type": "string",
-              "description": "integer | Column name or index.",
+              "type": "string|integer",
+              "description": "Column name or index.",
               "optional": false
             },
             {
@@ -40889,7 +41069,7 @@
     },
     {
       "name": "LDialog",
-      "description": "",
+      "description": "Creates a modal dialog widget.",
       "methods": [
         {
           "name": "getTitle",
@@ -41298,8 +41478,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -41316,8 +41496,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -42133,7 +42313,7 @@
     },
     {
       "name": "LDockPanel",
-      "description": "",
+      "description": "Creates and returns a new docking panel that arranges children along its edges.",
       "methods": [
         {
           "name": "dock",
@@ -42475,8 +42655,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -42493,8 +42673,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -46086,7 +46266,7 @@
     },
     {
       "name": "LGraph",
-      "description": "",
+      "description": "Lua wrapper around a directed `Graph` with event callback registry.",
       "methods": [
         {
           "name": "addNode",
@@ -46748,7 +46928,7 @@
     },
     {
       "name": "LGraphEdge",
-      "description": "",
+      "description": "Lua handle for an edge inside a `Graph`.",
       "methods": [
         {
           "name": "getType",
@@ -47153,7 +47333,7 @@
     },
     {
       "name": "LGraphItem",
-      "description": "",
+      "description": "Lua handle for a graph item (typed item) inside a `Graph`.",
       "methods": [
         {
           "name": "getType",
@@ -47319,7 +47499,7 @@
     },
     {
       "name": "LGraphNode",
-      "description": "",
+      "description": "Lua handle for a node inside a `Graph`.",
       "methods": [
         {
           "name": "getType",
@@ -48105,7 +48285,7 @@
     },
     {
       "name": "LGuiTable",
-      "description": "",
+      "description": "Creates a data table widget.",
       "methods": [
         {
           "name": "addColumn",
@@ -48546,8 +48726,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -48564,8 +48744,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -49181,7 +49361,7 @@
     },
     {
       "name": "LGuiWindow",
-      "description": "",
+      "description": "Creates a draggable window widget.",
       "methods": [
         {
           "name": "getTitle",
@@ -49562,8 +49742,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -49580,8 +49760,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -53123,7 +53303,7 @@
     },
     {
       "name": "LImageWidget",
-      "description": "",
+      "description": "Creates an image display widget.",
       "methods": [
         {
           "name": "getScaleMode",
@@ -53446,8 +53626,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -53464,8 +53644,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -55069,7 +55249,7 @@
     },
     {
       "name": "LLabel",
-      "description": "",
+      "description": "Creates a text label widget.",
       "methods": [
         {
           "name": "setText",
@@ -55345,8 +55525,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -55363,8 +55543,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -56675,7 +56855,7 @@
     },
     {
       "name": "LLayout",
-      "description": "",
+      "description": "Creates a flexbox layout container.",
       "methods": [
         {
           "name": "setDirection",
@@ -57085,8 +57265,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -57103,8 +57283,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -58915,7 +59095,7 @@
     },
     {
       "name": "LListBox",
-      "description": "",
+      "description": "Creates a selectable list widget.",
       "methods": [
         {
           "name": "addItem",
@@ -59285,8 +59465,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -59303,8 +59483,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -60686,7 +60866,7 @@
     },
     {
       "name": "LMenuBar",
-      "description": "",
+      "description": "Creates a menu bar widget.",
       "methods": [
         {
           "name": "addMenu",
@@ -60991,8 +61171,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -61009,8 +61189,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -61626,7 +61806,7 @@
     },
     {
       "name": "LMenuItem",
-      "description": "",
+      "description": "Creates a menu item widget.",
       "methods": [
         {
           "name": "getText",
@@ -62007,8 +62187,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -62025,8 +62205,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -67233,7 +67413,7 @@
     },
     {
       "name": "LNinePatch",
-      "description": "",
+      "description": "Creates a 9-patch slicer widget.",
       "methods": [
         {
           "name": "setInsets",
@@ -67573,8 +67753,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -67591,8 +67771,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -69096,7 +69276,7 @@
           "name": "get",
           "fullPath": "LObserver:get",
           "signature": "(key)",
-          "description": "Gets a property value.",
+          "description": "Returns the current stored property value for the given observer key, or nil if it has not been set.",
           "parameters": [
             {
               "name": "key",
@@ -70774,7 +70954,7 @@
     },
     {
       "name": "LPanel",
-      "description": "",
+      "description": "Creates a container panel widget.",
       "methods": [
         {
           "name": "setTitle",
@@ -71068,8 +71248,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -71086,8 +71266,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -73338,8 +73518,8 @@
           "parameters": [
             {
               "name": "dist",
-              "type": "string",
-              "description": "\"none\"|\"uniform\"|\"normal\"|\"ellipse\"|\"borderellipse\"|\"borderrectangle\".",
+              "type": "string|\"none\"|\"uniform\"|\"normal\"|\"ellipse\"|\"borderellipse\"",
+              "description": "\"borderrectangle\".",
               "optional": false
             },
             {
@@ -73391,8 +73571,8 @@
           "parameters": [
             {
               "name": "shape",
-              "type": "string",
-              "description": "\"square\"|\"circle\"|\"triangle\"|\"spark\"|\"diamond\"|\"shrapnel\"|\"ray\"|\"puff\"|\"ring\"|\"capsule\".",
+              "type": "string|\"square\"|\"circle\"|\"triangle\"|\"spark\"|\"diamond\"|\"shrapnel\"|\"ray\"|\"puff\"|\"ring\"",
+              "description": "\"capsule\".",
               "optional": false
             }
           ],
@@ -74287,7 +74467,7 @@
     },
     {
       "name": "LPipeline",
-      "description": "",
+      "description": "Lua-side wrapper around a [`Pipeline`] DAG.",
       "methods": [
         {
           "name": "addStep",
@@ -74645,7 +74825,7 @@
           "name": "setName",
           "fullPath": "LPipeline:setName",
           "signature": "(name)",
-          "description": "Sets the pipeline name.",
+          "description": "Renames the pipeline without changing its steps, dependencies, or current runtime state.",
           "parameters": [
             {
               "name": "name",
@@ -74798,7 +74978,7 @@
     },
     {
       "name": "LPipelineStep",
-      "description": "",
+      "description": "Lua-side wrapper around a single [`PipelineStep`].",
       "methods": [
         {
           "name": "getName",
@@ -76164,7 +76344,7 @@
     },
     {
       "name": "LProgressBar",
-      "description": "",
+      "description": "Creates a progress bar widget.",
       "methods": [
         {
           "name": "setValue",
@@ -76497,8 +76677,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -76515,8 +76695,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -77995,7 +78175,7 @@
     },
     {
       "name": "LRadioButton",
-      "description": "",
+      "description": "Creates a grouped radio button widget.",
       "methods": [
         {
           "name": "getText",
@@ -78347,8 +78527,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -78365,8 +78545,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -79880,20 +80060,20 @@
             },
             {
               "name": "lights",
-              "type": "table",
-              "description": "nil | - array of { x, y, radius, r, g, b, intensity }.",
+              "type": "table|nil",
+              "description": "- array of { x, y, radius, r, g, b, intensity }.",
               "optional": false
             },
             {
               "name": "sprites",
-              "type": "table",
-              "description": "nil | - array of { x, y, texture, size }.",
+              "type": "table|nil",
+              "description": "- array of { x, y, texture, size }.",
               "optional": false
             },
             {
               "name": "wall_textures",
-              "type": "table",
-              "description": "nil | - { [cell_value] = TextureKey }.",
+              "type": "table|nil",
+              "description": "- { [cell_value] = TextureKey }.",
               "optional": false
             }
           ],
@@ -81918,7 +82098,7 @@
     },
     {
       "name": "LScrollBar",
-      "description": "",
+      "description": "Creates a scroll bar widget.",
       "methods": [
         {
           "name": "getScrollPosition",
@@ -82281,8 +82461,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -82299,8 +82479,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -82898,7 +83078,7 @@
     },
     {
       "name": "LScrollPanel",
-      "description": "",
+      "description": "Creates a scrollable panel widget.",
       "methods": [
         {
           "name": "setContentSize",
@@ -83255,8 +83435,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -83273,8 +83453,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -83890,7 +84070,7 @@
     },
     {
       "name": "LSeparator",
-      "description": "",
+      "description": "Creates a separator line.",
       "methods": [
         {
           "name": "setVertical",
@@ -84195,8 +84375,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -84213,8 +84393,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -86686,7 +86866,7 @@
     },
     {
       "name": "LSlider",
-      "description": "",
+      "description": "Creates a value slider widget.",
       "methods": [
         {
           "name": "setValue",
@@ -87026,8 +87206,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -87044,8 +87224,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -88580,8 +88760,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -88598,8 +88778,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -89487,7 +89667,7 @@
     },
     {
       "name": "LSpinBox",
-      "description": "",
+      "description": "Creates a numeric spin box widget with increment and decrement buttons.",
       "methods": [
         {
           "name": "setValue",
@@ -89827,8 +90007,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -89845,8 +90025,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -90462,7 +90642,7 @@
     },
     {
       "name": "LSplitPanel",
-      "description": "",
+      "description": "Creates a resizable split panel.",
       "methods": [
         {
           "name": "getOrientation",
@@ -90854,8 +91034,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -90872,8 +91052,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -91589,7 +91769,7 @@
           "name": "cancel",
           "fullPath": "LSpring:cancel",
           "signature": "()",
-          "description": "Stops the spring.",
+          "description": "Stops the spring immediately, clears its settle callback, and leaves the current values at their last simulated positions.",
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
@@ -92759,7 +92939,7 @@
     },
     {
       "name": "LStatusBar",
-      "description": "",
+      "description": "Creates a status bar widget.",
       "methods": [
         {
           "name": "addSection",
@@ -92870,8 +93050,8 @@
             },
             {
               "name": "widget",
-              "type": "table",
-              "description": "integer | Widget table or widget index accepted by this compatibility shim.",
+              "type": "table|integer",
+              "description": "Widget table or widget index accepted by this compatibility shim.",
               "optional": false
             }
           ],
@@ -93125,8 +93305,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -93143,8 +93323,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -94683,7 +94863,7 @@
     },
     {
       "name": "LSwitch",
-      "description": "",
+      "description": "Creates a toggle switch widget.",
       "methods": [
         {
           "name": "setOn",
@@ -94970,8 +95150,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -94988,8 +95168,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -95605,7 +95785,7 @@
     },
     {
       "name": "LTabBar",
-      "description": "",
+      "description": "Creates a tab bar widget.",
       "methods": [
         {
           "name": "addTab",
@@ -95946,8 +96126,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -95964,8 +96144,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -97268,7 +97448,7 @@
     },
     {
       "name": "LTextInput",
-      "description": "",
+      "description": "Creates a text input widget.",
       "methods": [
         {
           "name": "setText",
@@ -97613,8 +97793,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -97631,8 +97811,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -100112,7 +100292,7 @@
     },
     {
       "name": "LToast",
-      "description": "",
+      "description": "Creates a toast notification widget.",
       "methods": [
         {
           "name": "setMessage",
@@ -100439,8 +100619,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -100457,8 +100637,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -101074,7 +101254,7 @@
     },
     {
       "name": "LToolbar",
-      "description": "",
+      "description": "Creates a toolbar widget.",
       "methods": [
         {
           "name": "getOrientation",
@@ -101487,8 +101667,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -101505,8 +101685,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -102122,7 +102302,7 @@
     },
     {
       "name": "LTooltipPanel",
-      "description": "",
+      "description": "Creates a tooltip panel widget.",
       "methods": [
         {
           "name": "getText",
@@ -102456,8 +102636,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -102474,8 +102654,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -103869,7 +104049,7 @@
     },
     {
       "name": "LTreeView",
-      "description": "",
+      "description": "Creates a collapsible tree view widget.",
       "methods": [
         {
           "name": "addNode",
@@ -104441,8 +104621,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -104459,8 +104639,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],
@@ -105964,7 +106144,7 @@
     },
     {
       "name": "LUiWidget",
-      "description": "",
+      "description": "Builds a Lua table with common base-widget methods bound to `idx`.",
       "methods": [
         {
           "name": "type",
@@ -106211,8 +106391,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to attach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to attach.",
               "optional": false
             }
           ],
@@ -106229,8 +106409,8 @@
           "parameters": [
             {
               "name": "child",
-              "type": "table",
-              "description": "integer | Child widget table or widget index to detach.",
+              "type": "table|integer",
+              "description": "Child widget table or widget index to detach.",
               "optional": false
             }
           ],

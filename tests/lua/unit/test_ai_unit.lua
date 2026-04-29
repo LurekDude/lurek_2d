@@ -4445,7 +4445,7 @@ end)
 describe("lurek.ai extensibility factories", function()
     -- @tests lurek.ai.newGuard
     xit("has newGuard factory", function()
-        assert.is_function(lurek.ai.newGuard, "newGuard should be a function")
+        expect_type("function", lurek.ai.newGuard, "newGuard should be a function")
     end)
 end)
 
@@ -4462,7 +4462,7 @@ describe("custom decision model", function()
             called = true
         end)
         world:update(0.016)
-        assert.is_true(called, "custom model callback should be called on update")
+        expect_true(called, "custom model callback should be called on update")
     end)
 
     -- @description Verifies getDecisionModel returns "custom" after setCustomModel.
@@ -4470,7 +4470,7 @@ describe("custom decision model", function()
         local world = lurek.ai.newWorld()
         local agent = world:addAgent("model_check_agent")
         agent:setCustomModel(function(ag, bb, dt) end)
-        assert.equal("custom", agent:getDecisionModel(),
+        expect_equal("custom", agent:getDecisionModel(),
             "decision model name should be 'custom'")
     end)
 end)
@@ -4482,15 +4482,15 @@ describe("BT Guard decorator", function()
     xit("creates guard node via newGuard", function()
         local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
         local guard = lurek.ai.newGuard(function(ag, bb) return true end, action)
-        assert.is_not_nil(guard, "Guard node should be created")
-        assert.equal("guard", guard:getNodeType(), "node type should be 'guard'")
+        expect_not_nil(guard, "Guard node should be created")
+        expect_equal("guard", guard:getNodeType(), "node type should be 'guard'")
     end)
 
     -- @description Verifies a guard node reports exactly one child.
     xit("guard has child count 1", function()
         local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
         local guard = lurek.ai.newGuard(function(ag, bb) return false end, action)
-        assert.equal(1, guard:getChildCount(), "Guard should have 1 child")
+        expect_equal(1, guard:getChildCount(), "Guard should have 1 child")
     end)
 end)
 
@@ -4509,7 +4509,7 @@ describe("custom utility response curve", function()
                 function(x) return x * x end  -- custom curve fn
             )
         end)
-        assert.is_true(ok, "addConsideration with function curve should succeed")
+        expect_true(ok, "addConsideration with function curve should succeed")
     end)
 
     -- @description addConsideration with a string curve should still work.
@@ -4525,7 +4525,7 @@ describe("custom utility response curve", function()
                 1.0, 0.0, 0.0
             )
         end)
-        assert.is_true(ok, "addConsideration with string curve should succeed")
+        expect_true(ok, "addConsideration with string curve should succeed")
     end)
 end)
 
@@ -4536,20 +4536,19 @@ describe("custom steering behavior", function()
         local sm = lurek.ai.newSteeringManager()
         local before = sm:getBehaviorCount()
         sm:addCustomBehavior(function(ag, dt) return 10, 0 end, 1.0)
-        assert.equal(before + 1, sm:getBehaviorCount(),
+        expect_equal(before + 1, sm:getBehaviorCount(),
             "behavior count should increase by 1")
     end)
 
     -- @tests SteeringManager:applyCustomSteering
     xit("applyCustomSteering returns a force pair without error", function()
         local sm = lurek.ai.newSteeringManager()
-        -- applyCustomSteering needs an agent userdata â€” without a world it must
-        -- still not panic; pass nil as a smoke test.
+        local world = lurek.ai.newWorld()
+        local agent = world:addAgent("steering_fixture")
         local ok = pcall(function()
-            sm:applyCustomSteering(nil, 0.016)
+            sm:applyCustomSteering(agent, 0.016)
         end)
-        -- Even with nil agent (no custom behaviors) it should not crash.
-        assert.is_true(ok, "applyCustomSteering with no custom behaviors should not error")
+        expect_true(ok, "applyCustomSteering with no custom behaviors should not error")
     end)
 end)
 
@@ -4567,7 +4566,7 @@ describe("Agent:setCustomModel extensibility hook", function()
         local world = lurek.ai.newWorld()
         local agent = world:addAgent("test_agent")
         agent:setCustomModel(function(ag, bb, dt) end)
-        assert.equal("custom", agent:getDecisionModel(),
+        expect_equal("custom", agent:getDecisionModel(),
             "getDecisionModel should return 'custom' after setCustomModel")
     end)
 
@@ -4579,7 +4578,7 @@ describe("Agent:setCustomModel extensibility hook", function()
             called = true
         end)
         world:update(0.016)
-        assert.is_true(called, "custom model callback should be called by world:update")
+        expect_true(called, "custom model callback should be called by world:update")
     end)
 end)
 

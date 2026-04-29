@@ -38,6 +38,9 @@ EXTENSION_API_PATH = ROOT / "extensions" / "vscode" / "data" / "lurek-api.json"
 
 METHOD_CALL_START = re.compile(r"\bmethods\.add_(?:method|method_mut|function|function_mut)\s*\(")
 SET_CALL_START = re.compile(r"\b\w+\s*\.\s*set\s*\(")
+DISPATCH_ARITH_START = re.compile(r"\bdispatch_arith!\s*\(")
+DISPATCH_ARITH_INLINE_NAME = re.compile(r'dispatch_arith!\(\s*methods\s*,\s*"([^"]+)"')
+DISPATCH_ARITH_NAME_IN_WINDOW = re.compile(r'^\s*"([^"]+)"\s*,?', re.MULTILINE)
 NAME_IN_WINDOW = re.compile(r'\(\s*"([^"]+)"')
 
 LUREK_TOP_FUNCTION_RE = re.compile(
@@ -107,6 +110,14 @@ def _collect_lua_api_source_entries() -> list[tuple[str, int, str]]:
                 match = NAME_IN_WINDOW.search(window)
                 if match and "create_function" in window:
                     name = match.group(1)
+            elif DISPATCH_ARITH_START.search(line):
+                inline_match = DISPATCH_ARITH_INLINE_NAME.search(window)
+                if inline_match:
+                    name = inline_match.group(1)
+                else:
+                    multiline_match = DISPATCH_ARITH_NAME_IN_WINDOW.search(window)
+                    if multiline_match:
+                        name = multiline_match.group(1)
 
             if not name or name.startswith("__"):
                 continue

@@ -63,4 +63,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, test-first
 Personas: EngDev, GameTest, EngTest
 Primary skills: testing-rust
-Secondary skills: rust-coding, error-handling
+Secondary skills: rust-coding, error-handling, lua-rust-bridge, module-architecture

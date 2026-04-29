@@ -2,7 +2,7 @@
 
 **Generated**: 2026-04-28
 **Mode**: hybrid
-**Total API functions**: 4378
+**Total API functions**: 4388
 
 ## Summary
 
@@ -11,13 +11,13 @@
 | Marker-covered | 229 |
 | Heuristic-covered | 4003 |
 | Total covered | 4256 |
-| Coverage | 97.2% |
+| Coverage | 97.0% |
 
 ## Per-Module Coverage
 
 | Module | Total | Marker | Heuristic | Covered | Coverage |
 |--------|-------|--------|-----------|---------|----------|
-| compute | 77 | 5 | 59 | 64 | 83.1% |
+| compute | 87 | 5 | 59 | 64 | 73.6% |
 | patterns | 170 | 1 | 141 | 142 | 83.5% |
 | html | 59 | 1 | 51 | 52 | 88.1% |
 | raycaster | 61 | 3 | 51 | 54 | 88.5% |
@@ -70,21 +70,29 @@
 
 ## Uncovered Functions (lowest coverage first)
 
-### compute (83.1%)
+### compute (73.6%)
 
 - `LArray:get` (method)
 - `LArray:set` (method)
+- `LArray:add` (method)
+- `LArray:sub` (method)
+- `LArray:mul` (method)
+- `LArray:div` (method)
 - `LArray:pow` (method)
 - `LArray:abs` (method)
 - `LArray:neg` (method)
+- `LArray:eq` (method)
+- `LArray:neq` (method)
+- `LArray:gt` (method)
+- `LArray:lt` (method)
+- `LArray:gte` (method)
+- `LArray:lte` (method)
 - `LArray:any` (method)
 - `LArray:all` (method)
 - `LArray:sum` (method)
 - `LArray:min` (method)
 - `LArray:max` (method)
-- `LArray:dot` (method)
-- `LArray:eigenPower` (method)
-- `LArray:map` (method)
+- ... and 3 more
 
 ### patterns (83.5%)
 

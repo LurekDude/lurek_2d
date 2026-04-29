@@ -1,39 +1,39 @@
 ---
-description: "Create a new test suite for a module."
+description: "Create a bounded test suite for one module or behavior area in the correct layer."
+agent: "Tester"
 ---
-
 # Create Test Suite
 
 ## Goal
-- Write tests for a Lurek2D module following proper test conventions.
+- Add a coherent test suite for one behavior slice.
 
 ## Inputs
-- **Module**: Which module to test
-- **Coverage goal**: What scenarios to cover (happy path, edge cases, errors)
+- Behavior area.
+- Target layer.
+- Required fixtures or harness.
+- Expected validation command.
 
 ## Steps
-- Load testing-rust before changing any files.
-- Read the module's public API
-- Identify test scenarios: happy path, edge cases, error conditions
-- Write integration tests in tests/<module>_tests.rs
-- Use descriptive names: test_<subject>_<scenario>_<expected>
-- Float comparisons with tolerance: (val - expected).abs() < 1e-5
-- Run cargo test
+1. Load [skill: testing-rust](../skills/testing-rust/SKILL.md) before acting.
+2. Read existing tests in the same layer, the owning module, harness files, and the repo test placement rules before editing.
+3. Keep the suite organized around one capability, reuse the existing harness patterns, and avoid mixing Rust-only internals with Lua-visible behavior in the same layer.
+4. Run the narrowest suite or target that covers the new tests and confirm the suite proves real behavior rather than scaffolding.
 
 ## Success Criteria
-- [ ] Tests cover happy path and edge cases
-- [ ] Float comparisons use tolerance
-- [ ] Test names describe scenarios
-- [ ] All tests pass deterministically
+- [ ] The prompt goal was completed: Add a coherent test suite for one behavior slice.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-test-suite <expected> <module> <scenario> <subject>
+- /create-test-suite area=pathfind layer=tests/rust/unit
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: testing-rust
-- **Inputs required**: expected, module, scenario, subject
+Mode: agent
+Loads skills: testing-rust
+Inputs required: Behavior area., Target layer., Required fixtures or harness., Expected validation command.

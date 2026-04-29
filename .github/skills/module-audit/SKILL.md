@@ -22,24 +22,21 @@ Own the 12-phase module audit process: structure, documentation, testing, archit
 - Pure Lua work -> use lua-scripting skill
 
 ## Domain Knowledge
-
-**Audit tool:** tools/audit/audit_module.py NAME runs a 12-phase audit. Use --all for all modules, --json for machine-readable output. Each phase produces PASS, WARN, or ERROR.
-
-**12-phase checks:** (1) Structure: mod.rs exists and is valid, (2) Mod.rs size: max 30 lines normal, max 100 absolute (ERROR if >100), (3) File size: max 2000 LOC (ERROR), max 1500 (WARNING), (4) Docstrings: /// on all pub items, (5) AGENT.md sync: module has a docs/specs/<module>.md, (6) Test coverage: tests exist for pub functions, (7) Architecture: tier hierarchy respected, no upward imports, (8) Code quality: no println!/eprintln!, unsafe needs // SAFETY:, .unwrap() = WARNING, (9) Lua API: if lua_api/<module>_api.rs exists, docstrings complete, (10) Wiki: wiki/<module>.md exists and is current, (11) Examples: content/examples/<module>.lua exists, (12) Performance: no known hot-path violations.
-
-**mod.rs rules:** must contain ONLY pub mod, pub use, attributes, and doc comments. No function definitions, no struct definitions, no impl blocks.
-
-**Architecture tier enforcement:** no use crate::lua_api in domain modules. Domain (src/<module>/) must not import the binding layer. Higher tiers may import lower tiers but never the reverse.
-
-**Forbidden patterns:** no #[cfg(test)] in src/ (tests go in tests/rust/unit/), no println!/eprintln! (use log::* macros), no bare .unwrap() without justification comment.
-
+- tools/audit/audit_module.py is the entry point for whole-module quality sweeps.
+- The audit checks thin mod.rs rules, file size, docs/specs presence, test coverage, wiki/example coverage, architecture direction, and wrapper leakage.
+- It also flags println/eprintln, tests in src/, unsafe without SAFETY, and bare unwrap hotspots.
+- Use audit output to route work: Architect for structure, Spec-Owner or Doc-Writer for contracts, Tester for coverage, Developer for code defects.
+- Pair audits with doc_coverage.py, test_coverage.py, and validate_module_coverage.py when findings affect contracts.
+- Treat module audit as a release/readiness gate, not a feature workflow.
+- The audit layer is valuable because it crosses structure, docs, tests, examples, wiki, and code quality in one sweep instead of treating them as isolated checks.
+- Findings should route to the right owner quickly: structure to Architect, contract drift to Spec-Owner, docs to Doc-Writer, and code fixes to Developer or specialists.
+- The skill owns whole-module readiness checks, not feature development.
 ## Companion File Index
 
 None - all guidance is inline.
 
 ## References
-
-- tools/audit/audit_module.py - 12-phase module audit tool
-- tools/audit/doc_coverage.py - docstring coverage metrics
-- tools/audit/test_coverage.py - test coverage metrics
-
+- tools/audit/audit_module.py
+- tools/audit/doc_coverage.py
+- tools/audit/test_coverage.py
+- tools/validate/validate_module_coverage.py

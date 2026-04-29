@@ -1,14 +1,14 @@
 {
   "meta": {
-    "generated": "2026-04-28T16:35:32.746619+00:00",
+    "generated": "2026-04-28T22:02:00.462756+00:00",
     "generator": "tools/audit/lua_api_test_coverage.py",
     "mode": "hybrid",
     "module_filter": null,
-    "total_api_functions": 4378,
+    "total_api_functions": 4388,
     "marker_covered": 229,
     "heuristic_covered": 4003,
     "total_covered": 4256,
-    "coverage_pct": 97.2
+    "coverage_pct": 97.0
   },
   "modules": {
     "ai": {
@@ -149,11 +149,11 @@
       ]
     },
     "compute": {
-      "total": 77,
+      "total": 87,
       "marker_covered": 5,
       "heuristic_covered": 59,
       "covered": 64,
-      "coverage_pct": 83.1,
+      "coverage_pct": 73.6,
       "uncovered": [
         {
           "lua_name": "LArray:get",
@@ -166,6 +166,30 @@
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
           "line": 154
+        },
+        {
+          "lua_name": "LArray:add",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 228
+        },
+        {
+          "lua_name": "LArray:sub",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 240
+        },
+        {
+          "lua_name": "LArray:mul",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 252
+        },
+        {
+          "lua_name": "LArray:div",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 264
         },
         {
           "lua_name": "LArray:pow",
@@ -184,6 +208,42 @@
           "kind": "method",
           "file": "src/lua_api/compute_api.rs",
           "line": 300
+        },
+        {
+          "lua_name": "LArray:eq",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 319
+        },
+        {
+          "lua_name": "LArray:neq",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 325
+        },
+        {
+          "lua_name": "LArray:gt",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 337
+        },
+        {
+          "lua_name": "LArray:lt",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 343
+        },
+        {
+          "lua_name": "LArray:gte",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 349
+        },
+        {
+          "lua_name": "LArray:lte",
+          "kind": "method",
+          "file": "src/lua_api/compute_api.rs",
+          "line": 361
         },
         {
           "lua_name": "LArray:any",
@@ -517,13 +577,13 @@
           "lua_name": "LGraph:mst",
           "kind": "method",
           "file": "src/lua_api/graph_api.rs",
-          "line": 1580
+          "line": 1586
         },
         {
           "lua_name": "LGraph:on",
           "kind": "method",
           "file": "src/lua_api/graph_api.rs",
-          "line": 1678
+          "line": 1684
         }
       ],
       "test_files": [

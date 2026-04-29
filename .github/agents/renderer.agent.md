@@ -33,7 +33,7 @@ tools: [read, search, execute, edit]
 
 ## Workflow
 - Read docs/specs/render.md, the target RenderCommand flow, and the nearest existing command or shader pattern before editing.
-- Load gpu-programming and visual-effects only when the touched slice needs them.
+- Load gpu-programming first, bring in rust-coding for the owning render module patterns, and add visual-effects only when the touched slice needs effect-specific shader behavior.
 - Keep GPU work out of Lua closures and keep command payloads data-only.
 - Validate WGSL at creation time and fail early on shader or pipeline mismatch.
 - Reuse buffers, textures, and temporary vectors where possible; call out unavoidable frame-budget cost explicitly.
@@ -61,4 +61,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, render-first
 Personas: EngDev, GameDev
 Primary skills: gpu-programming, rust-coding
-Secondary skills: performance-profiling, visual-effects, lua-rust-bridge
+Secondary skills: performance-profiling, visual-effects, lua-rust-bridge, testing-rust

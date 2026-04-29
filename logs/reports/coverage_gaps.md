@@ -28,99 +28,12 @@ These appear as `// (undocumented)` in `docs/api/rust.md`.
 
 ---
 
-## 3. Lua Docstring Issues (53 items)
+## 3. Lua Docstring Issues (0 items)
 
 Lua API items with missing or very short descriptions (< 25 chars).
 These appear without documentation in `docs/api/lurek.md` and IntelliSense.
 
-### `ai`
-
-- `method` **`LBandit:reset`** — *"Resets the bandit state."* (too short)
-
-### `camera`
-
-- `method` **`LCamera:attach`** — *"Alias for `apply()`."* (too short)
-- `method` **`LCamera:detach`** — *"Alias for `reset()`."* (too short)
-
-### `event`
-
-- `function` **`lurek.event.push`** — *(no description)*
-
-### `graph`
-
-- `class` **`lurek.graph.LGraph`** — *(no description)*
-- `class` **`lurek.graph.LGraphEdge`** — *(no description)*
-- `class` **`lurek.graph.LGraphItem`** — *(no description)*
-- `class` **`lurek.graph.LGraphNode`** — *(no description)*
-
-### `input`
-
-- `function` **`lurek.input.wasActionPressedWithin`** — *(no description)*
-
-### `patterns`
-
-- `method` **`LObserver:get`** — *"Gets a property value."* (too short)
-
-### `pipeline`
-
-- `class` **`lurek.pipeline.LPipeline`** — *(no description)*
-- `class` **`lurek.pipeline.LPipelineStep`** — *(no description)*
-- `method` **`LPipeline:setName`** — *"Sets the pipeline name."* (too short)
-
-### `system`
-
-- `function` **`lurek.runtime.getDebugOverlay`** — *(no description)*
-
-### `timer`
-
-- `function` **`lurek.timer.tickRealTimers`** — *(no description)*
-- `function` **`lurek.timer.tickWaits`** — *(no description)*
-
-### `tween`
-
-- `method` **`LSpring:cancel`** — *"Stops the spring."* (too short)
-
-### `ui`
-
-- `class` **`lurek.ui.LAccordion`** — *(no description)*
-- `class` **`lurek.ui.LBadge`** — *(no description)*
-- `class` **`lurek.ui.LButton`** — *(no description)*
-- `class` **`lurek.ui.LCheckbox`** — *(no description)*
-- `class` **`lurek.ui.LColorPicker`** — *(no description)*
-- `class` **`lurek.ui.LComboBox`** — *(no description)*
-- `class` **`lurek.ui.LDialog`** — *(no description)*
-- `class` **`lurek.ui.LDockPanel`** — *(no description)*
-- `class` **`lurek.ui.LGuiTable`** — *(no description)*
-- `class` **`lurek.ui.LGuiWindow`** — *(no description)*
-- `class` **`lurek.ui.LImageWidget`** — *(no description)*
-- `class` **`lurek.ui.LLabel`** — *(no description)*
-- `class` **`lurek.ui.LLayout`** — *(no description)*
-- `class` **`lurek.ui.LListBox`** — *(no description)*
-- `class` **`lurek.ui.LMenuBar`** — *(no description)*
-- `class` **`lurek.ui.LMenuItem`** — *(no description)*
-- `class` **`lurek.ui.LNinePatch`** — *(no description)*
-- `class` **`lurek.ui.LPanel`** — *(no description)*
-- `class` **`lurek.ui.LProgressBar`** — *(no description)*
-- `class` **`lurek.ui.LRadioButton`** — *(no description)*
-- `class` **`lurek.ui.LScrollBar`** — *(no description)*
-- `class` **`lurek.ui.LScrollPanel`** — *(no description)*
-- `class` **`lurek.ui.LSeparator`** — *(no description)*
-- `class` **`lurek.ui.LSlider`** — *(no description)*
-- `class` **`lurek.ui.LSpinBox`** — *(no description)*
-- `class` **`lurek.ui.LSplitPanel`** — *(no description)*
-- `class` **`lurek.ui.LStatusBar`** — *(no description)*
-- `class` **`lurek.ui.LSwitch`** — *(no description)*
-- `class` **`lurek.ui.LTabBar`** — *(no description)*
-- `class` **`lurek.ui.LTextInput`** — *(no description)*
-- `class` **`lurek.ui.LToast`** — *(no description)*
-- `class` **`lurek.ui.LToolbar`** — *(no description)*
-- `class` **`lurek.ui.LTooltipPanel`** — *(no description)*
-- `class` **`lurek.ui.LTreeView`** — *(no description)*
-- `class` **`lurek.ui.LUiWidget`** — *(no description)*
-
-### `window`
-
-- `function` **`lurek.window.pollDpiChange`** — *(no description)*
+*All Lua API items have adequate descriptions.*
 
 ---
 

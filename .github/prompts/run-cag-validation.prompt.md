@@ -1,34 +1,40 @@
 ---
-description: "Run CAG validation."
+description: "Run the full CAG validation flow and report the owning files for any violations."
+agent: "CAG-Architect"
+tools: [tools/validate/cag_validate.py, tools/audit/cag_link_check.py, tools/audit/cag_coverage.py, tools/audit/cag_persona_matrix.py]
 ---
-# Run Cag Validation
+# Run CAG Validation
 
 ## Goal
-- Validate the CAG layer with tools/validate/cag_validate.py.
+- Return a clear validation result for the current CAG layer.
 
 ## Inputs
-- None.
+- Scope: file, type, or full layer.
+- Need for strict or baseline mode.
+- Any recent shared-doc or routing changes.
 
 ## Steps
-- Load tools-cag-validation.
-- Run python tools/validate/cag_validate.py.
-- Read the errors and warnings.
-- If this prompt is part of a fix task, fix the files and run the command again.
-- Stop only when the final report is clean or the blocking issue is explicit.
+1. Load [skill: tools-cag-validation](../skills/tools-cag-validation/SKILL.md) before acting.
+2. Choose the narrowest validator scope that can answer the question, then widen to a full pass if the change crossed files or shared contracts.
+3. Run supporting audits such as link, coverage, or persona checks when the touched scope makes them relevant.
+4. Group any failures by file and rule so the owning fix is obvious, and keep warnings visible instead of smoothing them over.
+5. Close with the exact commands run and whether the layer is strict-green or still blocked.
 
 ## Success Criteria
-- [ ] Validation output is available.
-- [ ] Problem files are listed when the run fails.
-- [ ] Final run is clean when fixes are part of the task.
+- [ ] The workflow outcome is complete: Return a clear validation result for the current CAG layer.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Skip the final validation run.
-- Declare done after one failing run.
-- Use git add .
+- Let the workflow widen with no clear owner or gate.
+- Skip the first focused check and rely on narrative confidence.
+- Close the task while blockers, warnings, or failed gates are still open.
 
 ## Example Invocation
-- /run-cag-validation
+- /run-cag-validation scope=prompt
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: tools-cag-validation
+Mode: agent
+Loads skills: tools-cag-validation
+Inputs required: Scope: file, type, or full layer., Need for strict or baseline mode., Any recent shared-doc or routing changes.

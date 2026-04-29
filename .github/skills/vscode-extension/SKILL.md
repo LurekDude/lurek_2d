@@ -19,17 +19,20 @@ description: "Load this skill when building, debugging, or extending the VS Code
 - Docs outside the extension scope.
 
 ## Domain Knowledge
-- Keep extension logic inside extensions/vscode/.
-- Match extension data formats to the generated engine-side docs or API data.
-- Keep commands and contributions consistent with package.json.
-- Prefer small, explicit extension features over broad hidden behavior.
-- Regenerate extension API data when extension features depend on generated engine data.
-- Validate the extension flow with the repo tooling already in place.
-
+- The extension lives under extensions/vscode with commands/, providers/, editors/, services/, generated/, and mcp/ slices.
+- package.json is the contract for commands, views, editors, activation, and contributions; code and manifest must move together.
+- Generated extension data depends on engine-side generators like gen_extension_api.py and related API artifacts.
+- Webview and panel work should respect the current editor and sidebar inventory already declared in package.json.
+- Validate build and packaging against tsconfig.json, esbuild.config.mjs, and current extension scripts.
+- Do not move engine logic into TypeScript just because the UI lives there.
+- The extension already has a large command and panel surface declared in package.json, so feature work should reuse those patterns instead of inventing hidden editor behavior.
+- generated/ and mcp/ integration means extension features must stay in sync with engine-side API generation and agent-support tooling.
+- This skill owns extension-side TypeScript, manifests, and editor UX, not engine Rust or generic docs.
 ## Companion File Index
 - None.
 
 ## References
-- extensions/vscode/
+- extensions/vscode/src/
 - extensions/vscode/package.json
+- extensions/vscode/esbuild.config.mjs
 - tools/docs/gen_extension_api.py

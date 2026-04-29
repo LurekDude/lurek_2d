@@ -9,20 +9,20 @@ describe("stress: signal emit to many listeners", function()
     -- @stress Connects 100 listeners and emits the same signal 1000 times.
     -- @description Stresses listener fanout throughput by repeatedly broadcasting one signal to a fixed subscriber set and counting every dispatch.
     xit("1 signal       1000 listeners       100 emits: <5s", function()
-        local sig      = lurek.event.new()
+        local sig      = lurek.event.newSignal()
         local LISTENERS = 100
         local EMITS     = 1000
         local count     = 0
 
         for _ = 1, LISTENERS do
-            sig:connect(function()
+            sig:connect("stress", function()
                 count = count + 1
             end)
         end
 
         local start = os.clock()
         for _ = 1, EMITS do
-            sig:emit()
+            sig:emit("stress")
         end
         local elapsed = os.clock() - start
         local dispatches = LISTENERS * EMITS
@@ -39,12 +39,12 @@ describe("stress: signal emit to many listeners", function()
     -- @stress Performs 5000 connect-then-disconnect cycles on one signal object.
     -- @description Stresses connection lifecycle churn by creating and tearing down short-lived listeners in a measured loop.
     xit("signal connect/disconnect 5000 times in <5s", function()
-        local sig   = lurek.event.new()
+        local sig   = lurek.event.newSignal()
         local COUNT = 5000
 
         local elapsed = measure("signal connect+disconnect x" .. COUNT, COUNT, function()
-            local conn = sig:connect(function() end)
-            conn:disconnect()
+            local conn = sig:connect("stress", function() end)
+            sig:remove(conn)
         end)
 
         expect_true(elapsed < 5.0, "connect/disconnect budget: " .. elapsed .. "s")
@@ -63,16 +63,16 @@ describe("stress: signal emit to many listeners", function()
         local sigs      = {}
 
         for _ = 1, N_SIGS do
-            local s = lurek.event.new()
+            local s = lurek.event.newSignal()
             for _ = 1, N_LISTEN do
-                s:connect(function() total = total + 1 end)
+                s:connect("stress", function() total = total + 1 end)
             end
             sigs[#sigs + 1] = s
         end
 
         local start = os.clock()
         for _, s in ipairs(sigs) do
-            for _ = 1, N_EMITS do s:emit() end
+            for _ = 1, N_EMITS do s:emit("stress") end
         end
         local elapsed = os.clock() - start
         print(string.format("[STRESS] 10 sigs       100     1000: elapsed=%.4fs", elapsed))

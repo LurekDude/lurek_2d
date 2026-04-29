@@ -33,7 +33,7 @@ tools: [read, search, execute, edit]
 
 ## Workflow
 - Read src/runtime/config.rs and the nearest existing config templates before editing.
-- Load lua-scripting and documentation only to the extent needed to map runtime fields to user-facing keys.
+- Load lua-scripting and documentation first, then add build-system or cross-platform when feature flags, packaging, or platform defaults are part of the config task.
 - Map every relevant runtime field to conf.lua and conf.toml with stable defaults and safe comments.
 - Write the smallest template that solves the request, then add a larger example only if it clarifies a real deployment case.
 - Run tools/validate/validate_game.py and tools/validate/validate_lua_api.py when those validators apply.
@@ -60,4 +60,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, config-first
 Personas: GameDev, Modder
 Primary skills: lua-scripting, documentation
-Secondary skills: asset-pipeline
+Secondary skills: asset-pipeline, build-system, cross-platform

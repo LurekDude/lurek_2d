@@ -1,36 +1,40 @@
 ---
-description: "Update an existing roadmap phase file."
+description: "Update one roadmap phase from new evidence without turning it into a fresh brainstorm."
+agent: "Discovery-Lead"
 ---
-
 # Workflow Update Roadmap Phase
 
 ## Goal
-- Update the status, tasks, or acceptance gates of an existing Lurek2D roadmap phase file.
+- Refresh one roadmap phase so it reflects the latest evidence and dependencies.
 
 ## Inputs
-- STATUS_UPDATE per-task status: which tasks are done, in-progress, or blocked
-- SCOPE_CHANGE new files added / removed from task list (if any)
-- NEW_DEPS any new Depends On or Blocks that emerged
+- Phase path.
+- New evidence.
+- Reason for update.
+- Target decision horizon.
 
 ## Steps
-- Load roadmap-planning before changing any files.
-- Read this prompt's Inputs and confirm every required argument is present.
-- Load any skill listed in loads_skills of this prompt's frontmatter.
-- Execute the work as the Architect agent.
-- Run the relevant quality gates from the quality-pipeline before declaring done.
+1. Load [skill: opportunity-discovery](../skills/opportunity-discovery/SKILL.md) and [skill: roadmap-planning](../skills/roadmap-planning/SKILL.md) before acting.
+2. Read the current phase first, then the new evidence, and identify exactly which assumptions or gates changed.
+3. Update only the sections affected by the new signal, keeping problem framing, why-now, dependencies, and acceptance gate explicit.
+4. Separate confirmed changes from still-speculative ideas instead of smoothing uncertainty away.
+5. Close with the updated phase state, the evidence that changed it, and any next planning question still open.
 
 ## Success Criteria
-- [ ] Updated phase file with ## Status section reflecting current reality
-- [ ] Updated dependency files (if Blocks: lines changed)
-- [ ] Optional ## Retrospective section for completed phases
+- [ ] The workflow outcome is complete: Refresh one roadmap phase so it reflects the latest evidence and dependencies.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Creating a new phase from scratch use create-roadmap-phase
-- Making code changes that fulfil a phase route to the appropriate specialist agent
+- Let the workflow widen with no clear owner or gate.
+- Skip the first focused check and rely on narrative confidence.
+- Close the task while blockers, warnings, or failed gates are still open.
 
 ## Example Invocation
-- /workflow-update-roadmap-phase
+- /workflow-update-roadmap-phase path=ideas/phase_render.md evidence=latest_perf_audit
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: roadmap-planning
+Mode: agent
+Loads skills: opportunity-discovery, roadmap-planning
+Inputs required: Phase path., New evidence., Reason for update., Target decision horizon.

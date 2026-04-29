@@ -1,36 +1,39 @@
 ---
-description: "Design a new lurek.* API surface."
+description: "Design one lurek.* API slice before implementation."
+agent: "Lua-Designer"
 ---
-# Design Api Surface
+# Design API Surface
 
 ## Goal
-- Design a clear new lurek.* API surface.
+- Produce a bounded Lua API design that is ready for implementation.
 
 ## Inputs
-- api_goal: the user-facing capability to add.
+- Target module.
+- Capability goal.
+- User-facing use case.
+- Known constraints or compatibility concerns.
 
 ## Steps
-- Load lua-api-design, lua-scripting, and documentation.
-- Read the nearest existing API patterns first.
-- Draft examples early.
-- Define names, params, returns, defaults, and callbacks.
-- Note migration impact for breaking changes.
-- Hand off implementation details to the next owner.
+1. Load [skill: lua-api-design](../skills/lua-api-design/SKILL.md), [skill: lua-scripting](../skills/lua-scripting/SKILL.md), and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Read the current lurek.* surface, docs/specs/, nearby examples, and any accepted architecture notes before editing.
+3. Focus on naming, parameters, returns, callbacks, and consistency; stop before implementation and record any tradeoff that affects later bindings.
+4. Check the design against nearby APIs and usage patterns, then call out open compatibility risk or missing source truth instead of inventing certainty.
 
 ## Success Criteria
-- [ ] The API shape is clear.
-- [ ] Examples exist.
-- [ ] Breaking-change impact is stated when relevant.
+- [ ] The prompt goal was completed: Produce a bounded Lua API design that is ready for implementation.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Copy another engine without checking repo patterns.
-- Design the API with no example.
-- Hide breaking changes.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /design-api-surface api_goal
+- /design-api-surface module=window capability=modal_dialog
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-api-design, lua-scripting, documentation
-- **Inputs required**: api_goal
+Mode: agent
+Loads skills: lua-api-design, lua-scripting, documentation
+Inputs required: Target module., Capability goal., User-facing use case., Known constraints or compatibility concerns.

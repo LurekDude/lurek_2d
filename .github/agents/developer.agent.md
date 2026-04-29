@@ -34,7 +34,7 @@ tools: [read, search, execute, edit]
 
 ## Workflow
 - Read the accepted contract, target files, and the nearest existing test or call site before editing.
-- Load rust-coding and only the narrow secondary skill needed for the touched slice.
+- Load rust-coding first, then bring in error-handling for failure paths, module-architecture for ownership questions, and only the narrow secondary skill needed for the touched slice.
 - Confirm the task really belongs in non-specialist Rust and return to Manager if it drifted into render, physics, audio, or API design.
 - Make the smallest grounded edit that satisfies the current gate instead of reopening nearby surfaces.
 - Use SharedState, Rc<RefCell>, SlotMap, and callback boundaries correctly; never hold borrow_mut() across a Lua callback.
@@ -64,4 +64,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, implementation-first
 Personas: EngDev
 Primary skills: rust-coding, error-handling, module-architecture
-Secondary skills: lua-rust-bridge, logging
+Secondary skills: lua-rust-bridge, testing-rust, dev-debugging, lua-api-design, quality-pipeline, lua-runtime

@@ -1,40 +1,40 @@
 ---
-description: "Write or update lurek.* API reference docs."
+description: "Refresh API reference content from source docstrings and current contracts."
+agent: "Doc-Writer"
+tools: [tools/docs/gen_lua_api_data.py, tools/docs/gen_luadoc.py]
 ---
-
-# Doc Api Reference
+# Doc API Reference
 
 ## Goal
-- Write or update API reference documentation for lurek.* functions. Use when new Lua bindings are added or existing ones change. Produces...
+- Bring API reference content back in sync with the source.
 
 ## Inputs
-- FUNCTIONS list of lurek.* functions to document (e.g., lurek.render.setColor, lurek.audio.setLooping)
-- SOURCE_FILES corresponding Rust source files in src/lua_api/ to read for accurate signatures
+- Target module or API slice.
+- Doc issue or gap.
+- Source of truth.
+- Required generation scope.
 
 ## Steps
-- Load documentation, lua-api-design before changing any files.
-- Load skill documentation/SKILL.md
-- For each function to document:
-- Open docs/api/lurek.md
-- Find the correct sub-section (e.g., ## lurek.render)
-- Write the entry following this format:
-- param type, range or valid values
-- Returns: what Lua gets back (or nothing)
-- Verify all key names are lowercase: "space" not "Space"
-- Verify color parameters are documented as [0.0, 1.0] float range
+1. Load [skill: documentation](../skills/documentation/SKILL.md) and [skill: lua-api-design](../skills/lua-api-design/SKILL.md) before acting.
+2. Read the owning Rust docstrings, docs/specs/, linked examples, and the generator inputs before editing.
+3. Fix the source text that drives the generated docs, keep the wording concrete for Lua users, and avoid manual edits to generated artifacts.
+4. Run the relevant doc generators and verify the resulting reference matches the intended contract.
 
 ## Success Criteria
-- [ ] Updated docs/api/lurek.md with accurate, complete entries for all specified functions
-- [ ] No entries for functions that don't exist in src/lua_api/
+- [ ] The prompt goal was completed: Bring API reference content back in sync with the source.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Hand-edit generated docs/api files instead of changing their source inputs.
+- Document planned behavior as if it already ships.
+- Mix contributor notes and user-facing reference text in the same section.
 
 ## Example Invocation
-- /doc-api-reference <function> <module>
+- /doc-api-reference module=audio issue=stale_params
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: documentation, lua-api-design
-- **Inputs required**: function, module
+Mode: agent
+Loads skills: documentation, lua-api-design
+Inputs required: Target module or API slice., Doc issue or gap., Source of truth., Required generation scope.

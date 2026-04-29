@@ -1,42 +1,38 @@
 ---
-description: "Review entity lifecycle patterns."
+description: "Review entity lifecycle handling for leaks, stale handles, or invalid state transitions."
+agent: "Reviewer"
 ---
-
 # Review Entity Lifecycle
 
 ## Goal
-- Review entity lifecycle patterns for correctness: spawn, alive check, kill, ID recycling, blueprint usage, and layer organization. Use wh...
+- Find lifecycle bugs or contract drift in an entity-related slice.
 
 ## Inputs
-- None.
+- Target entity system or module.
+- Lifecycle concern.
+- Any repro or failing test.
 
 ## Steps
-- **Check ID management**
-- IDs are sequential on first spawn (1, 2, 3, ...)
-- Killed IDs recycle in LIFO order (last killed = first reused)
-- Verify is_alive() check before entity access
-- Confirm no stale ID references after kill
-- **Check lifecycle ordering**
-- Entities spawned during lurek.update() only never during lurek.draw()
-- Entities killed during lurek.update() only never during lurek.draw()
-- Blueprint application happens at spawn time
-- **Check tag/layer usage**
-- Bitmap tags for fast group membership queries
-- Layers for spatial/functional entity grouping
+1. Load [skill: rust-coding](../skills/rust-coding/SKILL.md), [skill: module-architecture](../skills/module-architecture/SKILL.md), and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Read the owning module, creation or teardown paths, related tests, and any lifecycle spec notes.
+3. Look for stale references, invalid transition order, missed cleanup, and ownership that crosses module boundaries.
+4. Tie each finding to the exact lifecycle stage and the proof or missing proof behind it.
 
 ## Success Criteria
-- [ ] No stale ID references in game logic
-- [ ] All mutations happen in lurek.update(), not lurek.draw()
-- [ ] ID recycling follows LIFO order
-- [ ] Blueprint patterns are copy-on-spawn
-- [ ] Tests cover the full lifecycle
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-entity-lifecycle
+- /review-entity-lifecycle module=ecs issue=despawn_cleanup
 
 ## CAG Metadata
-- **Mode**: agent
+Mode: agent
+Loads skills: rust-coding, module-architecture, error-handling
+Inputs required: Target entity system or module., Lifecycle concern., Any repro or failing test.

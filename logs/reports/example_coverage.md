@@ -7,7 +7,7 @@
 | `audio` | `lurek.audio` | `audio.lua` | 219 | 0 | 219 | 2492 | 716 | 219 |
 | `automation` | `lurek.automation` | `automation.lua` | 28 | 0 | 28 | 332 | 118 | 28 |
 | `camera` | `lurek.camera` | `camera.lua` | 49 | 0 | 49 | 932 | 330 | 49 |
-| `compute` | `lurek.compute` | `compute.lua` | 77 | 0 | 77 | 749 | 243 | 77 |
+| `compute` | `lurek.compute` | `compute.lua` | 77 | 0 | 87 | 749 | 243 | 77 |
 | `data` | `lurek.data` | `data.lua` | 68 | 0 | 68 | 777 | 278 | 68 |
 | `dataframe` | `lurek.dataframe` | `dataframe.lua` | 118 | 0 | 118 | 1229 | 388 | 118 |
 | `debugbridge` | `lurek.debugbridge` | `debugbridge.lua` | 14 | 0 | 14 | 198 | 75 | 14 |
@@ -16,14 +16,14 @@
 | `ecs` | `lurek.ecs` | `ecs.lua` | 63 | 0 | 63 | 713 | 226 | 63 |
 | `effect` | `lurek.effect` | `effect.lua` | 158 | 0 | 158 | 1701 | 542 | 158 |
 | `engine` | `lurek.engine` | `engine.lua` | 10 | 0 | 10 | 150 | 63 | 10 |
-| `event` | `lurek.event` | `event.lua` | 26 | 0 | 26 | 304 | 89 | 25 |
+| `event` | `lurek.event` | `event.lua` | 26 | 0 | 26 | 304 | 89 | 26 |
 | `filesystem` | `lurek.filesystem` | `filesystem.lua` | 60 | 0 | 60 | 675 | 226 | 60 |
 | `globe` | `lurek.globe` | `globe.lua` | 57 | 0 | 57 | 651 | 212 | 57 |
 | `graph` | `lurek.graph` | `graph.lua` | 126 | 0 | 126 | 2139 | 632 | 126 |
 | `html` | `lurek.html` | `html.lua` | 59 | 0 | 59 | 397 | 178 | 59 |
 | `i18n` | `lurek.i18n` | `i18n.lua` | 31 | 0 | 31 | 319 | 102 | 31 |
 | `image` | `lurek.image` | `image.lua` | 90 | 0 | 90 | 1585 | 512 | 90 |
-| `input` | `lurek.input` | `input.lua` | 87 | 0 | 87 | 949 | 302 | 86 |
+| `input` | `lurek.input` | `input.lua` | 87 | 0 | 87 | 949 | 302 | 87 |
 | `light` | `lurek.light` | `light.lua` | 90 | 0 | 90 | 1351 | 483 | 90 |
 | `log` | `lurek.log` | `log.lua` | 18 | 0 | 18 | 223 | 88 | 18 |
 | `math` | `lurek.math` | `math.lua` | 246 | 0 | 246 | 2282 | 809 | 246 |
@@ -48,10 +48,10 @@
 | `terminal` | `lurek.terminal` | `terminal.lua` | 87 | 0 | 87 | 872 | 287 | 87 |
 | `thread` | `lurek.thread` | `thread.lua` | 37 | 0 | 37 | 485 | 157 | 37 |
 | `tilemap` | `lurek.tilemap` | `tilemap.lua` | 188 | 0 | 188 | 2069 | 665 | 188 |
-| `timer` | `lurek.timer` | `timer.lua` | 49 | 0 | 49 | 568 | 185 | 47 |
+| `timer` | `lurek.timer` | `timer.lua` | 49 | 0 | 49 | 568 | 185 | 49 |
 | `tween` | `lurek.tween` | `tween.lua` | 58 | 0 | 58 | 612 | 196 | 58 |
 | `ui` | `lurek.ui` | `ui.lua` | 28 | 0 | 380 | 3415 | 1242 | 28 |
-| `window` | `lurek.window` | `window.lua` | 50 | 0 | 50 | 492 | 160 | 49 |
-| **TOTAL** | | | **4000** | **0** | **4378** | **48129** | **15982** | **3995** |
+| `window` | `lurek.window` | `window.lua` | 50 | 0 | 50 | 492 | 160 | 50 |
+| **TOTAL** | | | **4000** | **0** | **4388** | **48129** | **15982** | **4000** |
 
-**Overall Coverage (including stubs):** 91.4%
+**Overall Coverage (including stubs):** 91.2%

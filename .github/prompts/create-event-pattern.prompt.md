@@ -1,41 +1,39 @@
 ---
-description: "Create a new engine event pattern."
+description: "Create or extend one event pattern in the engine without breaking ownership boundaries."
+agent: "Developer"
 ---
-
 # Create Event Pattern
 
 ## Goal
-- ---.
+- Add one bounded event flow in the correct owner layer.
 
 ## Inputs
-- None.
+- Event goal.
+- Owning module.
+- Publishers and consumers.
+- Expected validation path.
 
 ## Steps
-- **Choose the pattern**
-- EventQueue: FIFO polling for deferred processing in lurek.update()
-- Signal: Pub-sub for immediate multi-listener broadcast
-- **Define event schema**
-- Event name: lowercase descriptive string (e.g., "player_died")
-- Arguments: EventArg types (Str, Num, Bool, Nil)
-- Document the event contract (what args, when fired)
-- **Implement integration**
-- For engine events: push to EventQueue from engine/app.rs
-- For game events: push from Lua via lurek.event.push(name, ...args)
-- For signals: emit from Lua via lurek.event.emit(name, ...args)
-- **Write tests**
+1. Load [skill: module-architecture](../skills/module-architecture/SKILL.md), [skill: rust-coding](../skills/rust-coding/SKILL.md), and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Read src/event/, the owning module, nearby event producers or consumers, and any matching spec text before editing.
+3. Keep event shape and ownership explicit, avoid ad hoc global signaling, and surface failures where the producing or consuming side can actually act on them.
+4. Run the narrowest test or build path that proves the new event flow and confirm no unrelated event surface drifted.
 
 ## Success Criteria
-- [ ] Event fires with correct name and arguments
-- [ ] EventQueue maintains FIFO order
-- [ ] Signal handles are unique and monotonic
-- [ ] All EventArg types preserved through round-trip
+- [ ] The prompt goal was completed: Add one bounded event flow in the correct owner layer.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-event-pattern
+- /create-event-pattern module=runtime goal=scene_transition_notifications
 
 ## CAG Metadata
-- **Mode**: agent
+Mode: agent
+Loads skills: module-architecture, rust-coding, error-handling
+Inputs required: Event goal., Owning module., Publishers and consumers., Expected validation path.

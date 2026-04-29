@@ -1,39 +1,39 @@
 ---
-description: "Create a new Lua game example in content/examples/."
+description: "Create one focused game example that teaches a concrete lurek.* capability."
+agent: "Content-Maker"
 ---
-
 # Create Game Example
 
 ## Goal
-- Create a new Lua game example that demonstrates specific Lurek2D features.
+- Add one focused game example with clear teaching value.
 
 ## Inputs
-- **Example name**: directory name (lowercase, underscore-separated)
-- **Features demonstrated**: which lurek.* APIs to showcase
-- **Complexity level**: minimal / intermediate / advanced
+- Example name.
+- Concept to teach.
+- Target APIs.
+- Audience level.
 
 ## Steps
-- Load documentation, lua-scripting before changing any files.
-- Create directory content/examples/<name>/
-- Write content/examples/<name>/main.lua with lurek.load(), lurek.update(dt), lurek.draw()
-- Use only lurek.* API functions (never external engine prefixes)
-- Use local for all variables (no globals except lurek callbacks)
-- Multiply movement by dt for frame-rate independence
-- Add comments explaining key concepts
-- Test with cargo run -- content/examples/<name>
+1. Load [skill: examples-management](../skills/examples-management/SKILL.md), [skill: lua-scripting](../skills/lua-scripting/SKILL.md), and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Read content/examples/, nearby examples, docs/specs/, and any matching content assets before editing.
+3. Keep the example self-contained, show real lurek.* usage, and add only the README text needed to explain how to run and understand it.
+4. Run the narrowest example load path available and confirm any required registration or docs updates stay in sync.
 
 ## Success Criteria
-- [ ] content/examples/<name>/main.lua working game script
-- [ ] Optional asset files (images, sounds) in the example directory
+- [ ] The prompt goal was completed: Add one focused game example with clear teaching value.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Modifying an existing example
-- Writing documentation without code
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-game-example <name>
+- /create-game-example name=camera_follow concept=smooth_tracking
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: documentation, lua-scripting
-- **Inputs required**: name
+Mode: agent
+Loads skills: examples-management, lua-scripting, documentation
+Inputs required: Example name., Concept to teach., Target APIs., Audience level.

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-28T16:35:29.307848+00:00",
+  "generated_at": "2026-04-28T22:01:55.282465+00:00",
   "summary": {
     "rust": {
       "total": 5412,
@@ -24264,7 +24264,7 @@
       "source": "rust",
       "module": "lua_api",
       "file": "src/lua_api/graph_api.rs",
-      "line": 1897,
+      "line": 1903,
       "kind": "fn",
       "name": "register",
       "has_doc": true

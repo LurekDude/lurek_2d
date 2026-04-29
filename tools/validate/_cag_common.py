@@ -394,6 +394,7 @@ def known_prompt_names() -> set[str]:
 # ─── CAG Metadata body-section parser ────────────────────────────────────────
 
 _CAG_META_LABEL_MAP: dict[str, str] = {
+    "communication": "communication",
     "personas": "personas",
     "primary skills": "primary_skills",
     "secondary skills": "secondary_skills",
@@ -405,9 +406,10 @@ _CAG_META_LABEL_MAP: dict[str, str] = {
 }
 
 _CAG_META_BULLET_RE = re.compile(r"^\s*-\s+\*\*([^*]+)\*\*:\s*(.+)$")
+_CAG_META_PLAIN_RE = re.compile(r"^\s*([^:#]+):\s*(.+)$")
 
 # Keys whose value is always returned as a plain string (not split)
-_CAG_META_SCALAR_KEYS = {"mode"}
+_CAG_META_SCALAR_KEYS = {"mode", "communication"}
 
 
 def parse_cag_metadata_section(text: str) -> dict[str, "str | list[str]"]:
@@ -417,11 +419,14 @@ def parse_cag_metadata_section(text: str) -> dict[str, "str | list[str]"]:
     (for *mode*) or a list of strings (for all other keys). Returns an empty
     dict when the section is absent.
 
-    Supported bullet format::
+    Supported metadata formats::
 
         - **Personas**: EngDev, GameDev
         - **Primary skills**: rust-coding, error-handling
         - **Routes to**: Lua-Designer, Renderer
+        Communication: simple, direct, low-token
+        Personas: EngDev, GameDev
+        Primary skills: rust-coding, error-handling
         - **Mode**: agent
         - **Loads skills**: visual-effects
         - **Inputs required**: effect_name, target_module
@@ -442,17 +447,26 @@ def parse_cag_metadata_section(text: str) -> dict[str, "str | list[str]"]:
             continue
         if not in_cag:
             continue
+        label = ""
+        values_str = ""
         bm = _CAG_META_BULLET_RE.match(line)
         if bm:
             label = bm.group(1).strip().lower()
             values_str = bm.group(2).strip()
-            key = _CAG_META_LABEL_MAP.get(label)
-            if key is None:
+        else:
+            pm = _CAG_META_PLAIN_RE.match(line)
+            if not pm:
                 continue
-            if key in _CAG_META_SCALAR_KEYS:
-                result[key] = values_str
-            else:
-                result[key] = [v.strip() for v in values_str.split(",") if v.strip()]
+            label = pm.group(1).strip().lower()
+            values_str = pm.group(2).strip()
+
+        key = _CAG_META_LABEL_MAP.get(label)
+        if key is None:
+            continue
+        if key in _CAG_META_SCALAR_KEYS:
+            result[key] = values_str
+        else:
+            result[key] = [v.strip() for v in values_str.split(",") if v.strip()]
     return result
 
 

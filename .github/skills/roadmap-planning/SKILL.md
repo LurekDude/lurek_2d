@@ -1,6 +1,6 @@
 ---
 name: roadmap-planning
-description: "Load this skill when creating or updating roadmap phase docs, gates, dependencies, or consistency checks. Skip it for code work or API design."
+description: "Load this skill when shaping roadmap or backlog artifacts, defining acceptance gates, or checking dependency consistency for future work. Skip it for code work or API design."
 ---
 # roadmap-planning
 
@@ -22,24 +22,21 @@ Own the phase file format, dependency graph rules, acceptance gate authoring, st
 - Writing tests -> use testing-rust skill
 
 ## Domain Knowledge
-
-**Phase file location:** docs/roadmap/phase-{NN}-{slug}.md where NN is 01-99 (two digits, zero-padded).
-
-**Required frontmatter fields:** Priority (P1-P4), Estimated Scope (S/M/L/XL), Depends On (list of phase slugs or "none"), Blocks (list of phase slugs or "none").
-
-**Required sections:** Goal (one paragraph), Current State Analysis (what exists today), Implementation Tasks (numbered list), Acceptance Gates (binary pass/fail checks).
-
-**Dependency graph rules:** must be a DAG (directed acyclic graph). No circular dependencies allowed. If phase A depends on phase B, B must have a lower NN number. Validate by checking that Depends On references only phases with lower NN values.
-
-**Acceptance gate rules:** each gate must be binary (pass or fail). Express as a command that exits 0 on success (e.g., "cargo test passes", "python tools/validate/X.py exits 0"). Never use subjective criteria like "looks good" or "seems fast enough".
-
-**Status tracking for in-progress phases:** add a Status section with current progress percentage and As-Built callouts for any deviations from the original plan. Keep the original Implementation Tasks intact; add strikethrough for dropped items with justification.
-
+- The repo currently has no formal docs/roadmap/ tree, so discovery starts from ideas/, docs, and review notes.
+- If roadmap phase files are introduced, they should point to real repo commands and validation gates, not vague outcomes.
+- Dependencies should mirror module or rollout order and stay acyclic.
+- Acceptance gates must be binary and use the same commands developers already run locally.
+- Preserve original intent with status or as-built notes instead of rewriting history when a phase evolves.
+- This skill is for planning artifacts and gates, not execution or API design.
+- Because formal roadmap phase files do not yet exist, planning work should start from ideas/, docs, and current validation gates rather than fake a mature process.
+- If a roadmap artifact is introduced, it should stay concise, binary-gated, and traceable to real repo work and real owners.
+- This skill owns future phase and backlog structure, not execution or discovery ranking itself.
 ## Companion File Index
 
 None - all guidance is inline.
 
 ## References
-
-- docs/roadmap/ - all phase files
-
+- ideas/
+- docs/architecture/
+- docs/handbook.md
+- work/

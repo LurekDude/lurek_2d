@@ -1,38 +1,40 @@
 ---
-description: "Fix Rust compile, clippy, or format issues."
+description: "Fix current compilation errors in the narrowest owner slice."
+agent: "Developer"
+tools: [tools/dev/parallel_cargo.py]
 ---
-
 # Fix Compilation Errors
 
 ## Goal
-- Resolve Rust compilation errors, clippy warnings, or formatting failures.
+- Take one failing compile path back to green.
 
 ## Inputs
-- **Error output**: Compiler or clippy error messages
-- **Affected files**: Which files have errors
+- Failing command or target.
+- Relevant files.
+- Error output.
+- Acceptance gate.
 
 ## Steps
-- Load error-handling, rust-coding before changing any files.
-- Read the full error message (file, line, error code)
-- Read the affected code in context
-- Identify the fix (type mismatch, missing import, lifetime issue, etc.)
-- Apply the fix
-- Run cargo build, cargo clippy, cargo fmt --check
-- Run cargo test to verify no regressions
+1. Load [skill: rust-coding](../skills/rust-coding/SKILL.md), [skill: error-handling](../skills/error-handling/SKILL.md), and [skill: quality-pipeline](../skills/quality-pipeline/SKILL.md) before acting.
+2. Reproduce the failure from the failing cargo output, the named files, and the smallest owning module or bridge slice.
+3. Address the compile error in the owner layer, prefer a real type or contract fix over temporary workarounds, and avoid unrelated cleanup.
+4. Rerun the same failing compile target first, then run the broader named gate if the narrow fix passed.
 
 ## Success Criteria
-- [ ] cargo build succeeds
-- [ ] cargo clippy 0 warnings
-- [ ] cargo fmt --check passes
-- [ ] cargo test passes
+- [ ] The failure was reproduced or tightly localized.
+- [ ] The owner slice was fixed at the source.
+- [ ] The failing check now passes.
+- [ ] No unrelated drift was introduced.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Patch symptoms in a different layer from the one that owns the failure.
+- Skip the smallest reproducer and guess at the fix.
+- Keep editing after the first change instead of rerunning the failing check.
 
 ## Example Invocation
-- /fix-compilation-errors
+- /fix-compilation-errors target=graphics error=E0308
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: error-handling, rust-coding
+Mode: agent
+Loads skills: rust-coding, error-handling, quality-pipeline
+Inputs required: Failing command or target., Relevant files., Error output., Acceptance gate.

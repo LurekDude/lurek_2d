@@ -1,38 +1,39 @@
 ---
-description: "Create a new roadmap phase file."
+description: "Create one roadmap phase draft with clear problem, gate, and dependency framing."
+agent: "Discovery-Lead"
 ---
-
 # Create Roadmap Phase
 
 ## Goal
-- Create a new Lurek2D roadmap phase file with all required metadata, tasks, and acceptance gates.
+- Write one roadmap phase draft that is ready for planning review.
 
 ## Inputs
-- PHASE_TITLE descriptive title (e.g., "Gamepad Input Deep Parity")
-- GOAL_DESC one paragraph: what changes, why it matters
-- PRIORITY Critical | High | Medium | Low
-- DEPENDS_ON list of phase numbers this phase requires (or "Nothing")
-- SCOPE_ESTIMATE rough file count or "Large requires discovery"
+- Target artifact path.
+- Problem statement.
+- Scope horizon.
+- Known dependencies or blockers.
 
 ## Steps
-- Load roadmap-planning before changing any files.
-- Assign the next sequential number (e.g., current max is 18 new phase is 19)
-- Choose a slug: lowercase hyphenated, 4 words, describes the feature
-- For each phase listed in DEPENDS_ON, open that phase file
-- Verify it exists and its Blocks: field either already lists the new phase or needs updating
-- If the new phase is truly independent: Depends On: Nothing
+1. Load [skill: opportunity-discovery](../skills/opportunity-discovery/SKILL.md) and [skill: roadmap-planning](../skills/roadmap-planning/SKILL.md) before acting.
+2. Read the target roadmap or ideas artifact, adjacent phase notes, and any supporting gap or evidence files before editing.
+3. Keep the phase grounded in one clear problem, why-now, dependencies, and acceptance gate instead of turning it into a loose brainstorm.
+4. Re-read the phase for clarity, dependency ordering, and evidence strength, then flag any missing proof instead of smoothing it over.
 
 ## Success Criteria
-- [ ] The Architect agent has produced the artifacts named in Goal.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
+- [ ] The prompt goal was completed: Write one roadmap phase draft that is ready for planning review.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- The change is a single file fix or a small addition just make the change
-- The phase already exists and needs updating use workflow-update-roadmap-phase
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-roadmap-phase
+- /create-roadmap-phase path=ideas/phase_lighting.md problem=2d_light_pipeline
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: roadmap-planning
+Mode: agent
+Loads skills: opportunity-discovery, roadmap-planning
+Inputs required: Target artifact path., Problem statement., Scope horizon., Known dependencies or blockers.

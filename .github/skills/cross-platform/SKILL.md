@@ -18,17 +18,21 @@ description: "Load this skill when handling platform-specific code, cfg gates, o
 - Lua script work.
 
 ## Domain Knowledge
-- Prefer shared code paths before adding cfg splits.
-- Use Path and PathBuf, not hardcoded separators.
-- Let winit, wgpu, and rodio absorb platform differences when possible.
-- Keep platform-specific code small and isolated.
-- Do not add raw platform APIs unless the repo already needs them.
-- Test the narrowest affected platform surface first.
-
+- Lurek2D targets desktop only: Windows, Linux, and macOS on x86_64 and ARM.
+- Windows is a strong local path here, so PowerShell 5.1 compatibility matters for user-facing scripts.
+- Prefer shared winit, wgpu, and rodio behavior before adding cfg-specific branches.
+- Use Path and PathBuf plus GameFS rules; never hardcode separators or shell-specific paths in engine code.
+- Window startup, file paths, and install scripts are the most likely cross-platform drift points in this repo.
+- Keep platform-specific code isolated and prove only the narrow affected surface.
+- Desktop-only means Windows, Linux, and macOS behavior should stay aligned for startup, filesystem access, and packaging, but mobile and WASM branches are out of scope.
+- Install, dist, and editor tooling often surface platform drift faster than pure engine code in this repo.
+- Prefer repo-level helpers and library abstractions before introducing new OS-specific shell or API behavior.
 ## Companion File Index
 - None.
 
 ## References
 - src/window/
-- src/filesystem/vfs.rs
+- src/app/
+- src/filesystem/
+- tools/dist/
 - Cargo.toml

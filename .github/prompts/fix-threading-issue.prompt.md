@@ -1,43 +1,39 @@
 ---
-description: "Fix a threading or Channel issue."
+description: "Fix one threading or worker-communication issue in the owning layer."
+agent: "Developer"
 ---
-
 # Fix Threading Issue
 
 ## Goal
-- Diagnose and fix threading issues in Lurek2D: Channel deadlocks, Worker lifecycle bugs, message delivery failures, or background Lua VM e...
+- Fix one threading issue without widening into unrelated runtime work.
 
 ## Inputs
-- SharedState
+- Symptom.
+- Repro path.
+- Target thread or worker path.
+- Acceptance gate.
 
 ## Steps
-- **Reproduce the issue**
-- Identify the symptom: deadlock, crash, missing messages, or unexpected behavior
-- Create a minimal Lua reproduction script
-- Check if the issue is consistent or timing-dependent
-- **Check Channel usage**
-- Channels are FIFO message queues order must be preserved
-- Verify sender/receiver are not using the same channel in both directions
-- Check for missing pop() calls that could cause unbounded queue growth
-- Messages are cloned across thread boundaries no sharing by reference
-- **Check Worker lifecycle**
-- Workers have **separate Lua VMs** no SharedState sharing with main thread
-- Workers communicate only through Channels
+1. Load [skill: dev-debugging](../skills/dev-debugging/SKILL.md) and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Reproduce the failure from the smallest reproducer, thread or channel code, related tests, and any worker-VM contract notes.
+3. Correct the synchronization, ownership, or error path in the controlling code, and keep cross-VM or channel boundaries explicit.
+4. Rerun the same reproducer first, then the narrowest threading-focused test or build check before broadening scope.
 
 ## Success Criteria
-- [ ] Bug is reproducible with a test case
-- [ ] Root cause identified and documented
-- [ ] Fix applied with 0 clippy warnings
-- [ ] Regression test passes
-- [ ] No thread safety violations introduced
+- [ ] The failure was reproduced or tightly localized.
+- [ ] The owner slice was fixed at the source.
+- [ ] The failing check now passes.
+- [ ] No unrelated drift was introduced.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Patch symptoms in a different layer from the one that owns the failure.
+- Skip the smallest reproducer and guess at the fix.
+- Keep editing after the first change instead of rerunning the failing check.
 
 ## Example Invocation
-- /fix-threading-issue <SharedState>
+- /fix-threading-issue path=src/thread symptom=deadlock_on_shutdown
 
 ## CAG Metadata
-- **Mode**: agent
-- **Inputs required**: SharedState
+Mode: agent
+Loads skills: dev-debugging, error-handling
+Inputs required: Symptom., Repro path., Target thread or worker path., Acceptance gate.

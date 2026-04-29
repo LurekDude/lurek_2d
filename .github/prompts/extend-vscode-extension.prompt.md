@@ -1,36 +1,39 @@
 ---
-description: "Extend the VS Code extension."
+description: "Extend the VS Code extension with one bounded command, panel, or language feature."
+agent: "Extension-Engineer"
 ---
-
-# Extend Vscode Extension
+# Extend VS Code Extension
 
 ## Goal
-- Add a new command, completion provider, or webview panel to the first-party Lurek2D VS Code extension under extensions/vscode/ and rebuild the bundle.
+- Add one extension feature without leaking engine logic into the IDE layer.
 
 ## Inputs
-- feature_kind
-- feature_name
+- Feature goal.
+- Target extension area.
+- Expected user action.
+- Validation path.
 
 ## Steps
-- Load vscode-extension before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Developer agent, following the workflow in the loaded skill.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: vscode-extension](../skills/vscode-extension/SKILL.md) and [skill: html-css](../skills/html-css/SKILL.md) before acting.
+2. Read extensions/vscode/, package.json contributions, nearby extension patterns, and any generated data dependency before editing.
+3. Keep implementation inside the extension, make contributions explicit, and sync generated data or command wiring when the feature depends on them.
+4. Run the narrowest extension build or test path first and verify the changed command, panel, or provider still resolves correctly.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Add one extension feature without leaking engine logic into the IDE layer.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /extend-vscode-extension <feature_kind> <feature_name>
+- /extend-vscode-extension feature=scene_outline_panel
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: vscode-extension
-- **Inputs required**: feature_kind, feature_name
+Mode: agent
+Loads skills: vscode-extension, html-css
+Inputs required: Feature goal., Target extension area., Expected user action., Validation path.

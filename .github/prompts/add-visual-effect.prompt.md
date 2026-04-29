@@ -1,36 +1,39 @@
 ---
-description: "Add a new visual effect."
+description: "Add one visual effect to the 2D renderer or post-process stack."
+agent: "Renderer"
 ---
-
 # Add Visual Effect
 
 ## Goal
-- Implement a named full-screen post-processing effect using the canvas render-to-texture pipeline plus a custom WGSL fragment shader, with one lurek.* toggle and a Lua evidence test.
+- Add one bounded visual effect without breaking the existing render model.
 
 ## Inputs
-- effect_name
+- Effect goal.
+- Target render stage.
+- Input data or parameters.
+- Expected validation or demo path.
 
 ## Steps
-- Load visual-effects before changing any files.
-- Confirm every input listed in this prompt's frontmatter is present in the user invocation.
-- Carry out the work as the Renderer agent, following the workflow in the loaded skill.
-- Consult the actual lurek.* API surface via docs/api/lurek.md, content/examples/, and docs/specs/. Do NOT invent APIs.
-- Run python tools/validate/cag_validate.py and the quality gates listed in quality-pipeline before declaring the prompt done.
-- Add a docs/CHANGELOG.md entry under the current version.
+1. Load [skill: visual-effects](../skills/visual-effects/SKILL.md), [skill: gpu-programming](../skills/gpu-programming/SKILL.md), and [skill: testing-rust](../skills/testing-rust/SKILL.md) before acting.
+2. Read the owning render or effect files, nearby tests, docs/architecture/render-command-architecture.md, and any existing effect path before editing.
+3. Keep the change inside the current 2D or pseudo-3D pipeline, wire only the required parameters, and update the nearest test or demo proof.
+4. Run the narrowest render test, build check, or demo path that exercises the effect before broadening validation.
 
 ## Success Criteria
-- [ ] All artifacts named in Goal exist on disk.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
-- [ ] docs/CHANGELOG.md has a new entry under the current version.
+- [ ] The prompt goal was completed: Add one bounded visual effect without breaking the existing render model.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the skill-load step listed above.
-- Running git add . instead of staging only files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /add-visual-effect <effect_name>
+- /add-visual-effect effect=crt stage=post_process
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: visual-effects
-- **Inputs required**: effect_name
+Mode: agent
+Loads skills: visual-effects, gpu-programming, testing-rust
+Inputs required: Effect goal., Target render stage., Input data or parameters., Expected validation or demo path.

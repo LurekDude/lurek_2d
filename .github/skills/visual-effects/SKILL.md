@@ -21,33 +21,20 @@ Own the canvas render-to-texture post-processing pipeline, WGSL shader patterns,
 - 3D rendering -> out of scope for Lurek2D
 
 ## Domain Knowledge
-
-**Single-pass pipeline:** setCanvas(c) -> render scene -> setCanvas(nil) -> setShader(s) -> draw(c, 0, 0) -> setShader(nil). This renders the scene to a canvas texture, then draws that canvas through a shader as a full-screen quad.
-
-**Auto-uniforms available in WGSL shaders:** luna_Time (f32, seconds since start), luna_ScreenSize (vec2 of f32, viewport width and height in pixels). These are set automatically by the engine before each shader draw call.
-
-**Common effect recipes:**
-
-Greyscale: luminance = 0.299 * R + 0.587 * G + 0.114 * B. Apply to each texel in the fragment shader.
-
-CRT scanlines: darken every Nth row (e.g., row % 3 == 0) by multiplying RGB by 0.7-0.8. Add slight barrel distortion by offsetting UV coordinates based on distance from center.
-
-Wave distortion: offset UV.x by sin(UV.y * frequency + luna_Time * speed) * amplitude. Keep amplitude small (0.005-0.02) to avoid nausea.
-
-Pixelation: floor UV coordinates to nearest grid cell: floor(uv * resolution) / resolution. Lower resolution = more pixelated.
-
-Colour correction: multiply final RGB by a correction vector, or apply gamma curve (pow(color, vec3(gamma))).
-
-**Multi-pass chaining:** render scene to canvas1, apply shader1 drawing canvas1 to canvas2, apply shader2 drawing canvas2 to screen. Each pass adds GPU overhead.
-
-**Performance budget:** max 2ms total for all FX per frame on Intel UHD at 1080p. For expensive effects like blur or bloom, use a half-resolution canvas (540p) to halve pixel shader cost.
-
+- Lurek2D postfx is still a 2D canvas -> shader -> draw pipeline, not a separate 3D renderer.
+- Expensive blur or bloom should usually start with half-resolution canvases on integrated GPUs.
+- Multi-pass chains multiply GPU cost fast, so budget passes explicitly.
+- Effect assumptions must stay aligned with docs/specs/render.md and src/render/ resource lifetime rules.
+- Existing showcase content such as postfx_demo is a better anchor than generic shader recipes.
+- Pair this skill with gpu-programming when the work touches pipelines, textures, or command flow.
+- postfx_demo and related showcase content are practical anchors for what screen-space effects should look like in this repo.
+- Effect work must respect current canvas, shader, and render-command lifetime rules because post-processing is layered on the same 2D pipeline.
+- This skill owns effect composition and shader-side visual tradeoffs, not general render backend structure.
 ## Companion File Index
 
 None - all guidance is inline.
 
 ## References
-
-- src/render/ - render pipeline and shader integration
-- docs/specs/render.md - render module specification
-
+- src/render/
+- docs/specs/render.md
+- content/games/showcase/postfx_demo/

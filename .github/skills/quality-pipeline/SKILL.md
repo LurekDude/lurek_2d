@@ -19,19 +19,15 @@ description: "Load this skill when running quality checks, audits, coverage tool
 - Writing docs.
 
 ## Domain Knowledge
-- Generators build JSON and docs from source.
-- Validators check rules and fail with exit code 1.
-- Auditors measure quality and gaps.
-- Fixers change files. Use --dry-run first when possible.
-- Quick gate is cargo test and cargo clippy -- -D warnings.
-- After API changes, run python tools/gen_all_docs.py first.
-- Then run validate_generated_lua_stubs.py and doc_coverage.py as needed.
-- Use audit_module.py for one module.
-- Use quality_report.py for a combined report.
-- Use cag_validate.py after .github changes.
-- Use validate_library.py after library/ changes.
-- Run generators before validators and auditors.
-
+- tools/README.md plus workspace tasks are the real map of quality commands in this repo.
+- Generators run before validators when artifacts are derived from source.
+- After Rust or Lua API changes, docs generation and generated-stub validation come before broader audits.
+- quality_report.py aggregates; targeted validators are better for fast failure diagnosis.
+- .github, library/, docs, module, and content changes each have different validators or audits.
+- Prefer narrow gates while working and the full pipeline only at the end.
+- This repo already separates generators, validators, auditors, and fixers; choosing the right class of tool matters as much as running it.
+- For API or docs changes, generator order is critical because later validators assume fresh derived artifacts.
+- The skill owns run order and result interpretation, not the code, docs, or tests being corrected.
 ## Companion File Index
 - None.
 
@@ -39,3 +35,4 @@ description: "Load this skill when running quality checks, audits, coverage tool
 - tools/README.md
 - tools/gen_all_docs.py
 - tools/audit/quality_report.py
+- tools/validate/

@@ -18,17 +18,20 @@ description: "Load this skill when designing Result flows, EngineError variants,
 - Test writing.
 
 ## Domain Knowledge
-- Prefer Result and explicit propagation over panic paths.
-- Keep Lua-visible errors clear and safe.
-- Do not leak internal paths or implementation detail in user-facing errors.
-- Keep recoverable runtime failures recoverable.
-- Use EngineError as the common engine-side error shape.
-- Treat callback and boundary errors carefully so the engine stays stable.
-
+- src/runtime/error.rs is the engine-side error hub; Lua boundaries should convert into clear, safe user-facing failures.
+- src/lua_api/ and app startup paths are common sites for recoverable errors that must not panic.
+- Avoid leaking absolute paths, raw Rust type names, or internal state details in Lua-visible errors.
+- Callback failures, file IO, asset decode, registry-key lookup, and config parsing should prefer Result over panic.
+- Recoverable content errors should keep the engine running when possible; reserve fatal paths for unrecoverable boot failures.
+- Error wording should match Lua-facing behavior, not only Rust internals.
+- Boundary-heavy modules like filesystem, config, asset loading, and lua_api are frequent places where user-visible error quality matters more than internal stack detail.
+- Good error paths in this repo distinguish invalid content, missing assets, unsupported runtime state, and engine defects.
+- This skill owns failure semantics and safe propagation, not generic logging or metrics analysis.
 ## Companion File Index
 - None.
 
 ## References
 - src/runtime/error.rs
-- src/lua_api/mod.rs
+- src/lua_api/
 - src/app/app.rs
+- docs/specs/lua-api-file-standard.md

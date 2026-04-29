@@ -1,43 +1,39 @@
 ---
-description: "Analyze engine memory use and allocation hot spots."
+description: "Analyze memory growth, allocation churn, or resource lifetime issues in the engine."
+agent: "Optimizer"
 ---
-
 # Analyze Memory Usage
 
 ## Goal
-- Analyze and reduce memory usage in the Lurek2D engine. Use when frame memory allocations are excessive, the buffer grows unboundedly, or...
+- Identify where memory cost is coming from and which owner should act next.
 
 ## Inputs
-- SYMPTOM describe the memory issue: frame spikes, growing RSS, Lua GC pauses, etc.
-- PROFILE_DATA optional: output from cargo flamegraph or heaptrack, if available
+- Repro scenario or command.
+- Target subsystem.
+- Observed memory symptom.
+- Any profiler or log output.
 
 ## Steps
-- Load gpu-programming, performance-profiling before changing any files.
-- Load skill performance-profiling/SKILL.md
-- Identify allocation hot-paths in the game loop:
-- render_commands: Vec<RenderCommand> is it cleared or recreated each frame?
-- Renderer::execute_commands() is a new Vec allocated per call?
-- Lua string arguments are String::from() calls avoidable?
-- Check SharedState.draw_commands:
-- Must use .clear() (retains capacity), never = Vec::new() (drops and reallocates)
-- Check renderer.to_u32_buffer() must return &[u32] or reuse an owned buffer, not allocate a fresh Vec<u32> each frame
-- Check Lua API closures for unnecessary String allocations:
-- Prefer lua.create_function with &str args that convert only when needed
-- If Lua GC is suspected: call lua.gc_collect()? at a controlled point (not every frame)
+1. Load [skill: performance-profiling](../skills/performance-profiling/SKILL.md) and [skill: gpu-programming](../skills/gpu-programming/SKILL.md) before acting.
+2. Gather only the relevant source material from profiler output, logs, resource lifetime code, cache paths, texture paths, and the narrow code slice for the symptom.
+3. Quantify memory growth, long-lived allocations, or churn sources and distinguish CPU ownership from GPU ownership.
+4. Explain the most likely controlling path, the confidence level, and the narrowest next validation or implementation step.
 
 ## Success Criteria
-- [ ] List of allocation sites found with severity (per-frame vs. one-time)
-- [ ] Recommended changes with before/after allocation counts
-- [ ] Optionally: patch implementing the highest-impact fixes
+- [ ] The data or source scope is explicit.
+- [ ] Findings are evidence-backed and quantified where possible.
+- [ ] Assumptions and open questions are separated from facts.
+- [ ] A next owner or next validation step is clear.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Give generic advice with no repo evidence or measured signal.
+- Mix facts, guesses, and recommendations into one vague paragraph.
+- Jump to implementation before identifying the owner and the evidence strength.
 
 ## Example Invocation
-- /analyze-memory-usage <RenderCommand> <u32>
+- /analyze-memory-usage subsystem=render symptom=steady_growth scenario=demo_smoke
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: gpu-programming, performance-profiling
-- **Inputs required**: RenderCommand, u32
+Mode: agent
+Loads skills: performance-profiling, gpu-programming
+Inputs required: Repro scenario or command., Target subsystem., Observed memory symptom., Any profiler or log output.

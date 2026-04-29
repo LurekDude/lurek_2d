@@ -1072,7 +1072,7 @@ impl LuaUserData for LuaObserver {
         });
 
         // -- get -------------------------------------------------
-        /// Gets a property value.
+        /// Returns the current stored property value for the given observer key, or nil if it has not been set.
         /// @param | key | string | Property key to read.
         /// @return | any | Stored property value, or nil if the key is unset.
         methods.add_method("get", |lua, this, key: String| {

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """cag_validate.py — Lurek2D CAG layer validator.
 
-Validates the four CAG file types against the templates defined in
-``work/cag-system-overhaul-20260418/reports/standards/``:
+Validates the four CAG file types against the current CAG schema described in
+``docs/architecture/cag-system.md`` and ``docs/architecture/templates/``:
 
 * ``.github/copilot-instructions.md`` (system prompt)         — rules E001-E004, W005
 * ``.github/agents/*.agent.md``                               — rules E101-E107, W108
@@ -219,7 +219,7 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
             out.append(Violation(rel, "E104", "error",
                                  f"routes_to references unknown agent: '{a}'"))
 
-    # tools (formerly loads_tools) stays in frontmatter.
+    # tools stays in frontmatter.
     # Values without a path separator are VS Code built-in tool names (e.g.
     # "vscode", "execute", "read") — skip the file-existence check for those.
     for t in fm.get_list("tools"):
@@ -300,7 +300,7 @@ def check_prompt(
     body = body_after_frontmatter(text, fm)
     meta = parse_cag_metadata_section(body)
 
-    # loads_skills now in ## CAG Metadata body section
+    # loads_skills lives in the ## CAG Metadata body section
     loads_skills = meta.get("loads_skills") or []
     if isinstance(loads_skills, str):
         loads_skills = [loads_skills]
@@ -309,13 +309,13 @@ def check_prompt(
             out.append(Violation(rel, "E302", "error",
                                  f"loads_skills references unknown skill: '{s}'"))
 
-    # tools (formerly loads_tools) stays in frontmatter
+    # tools stays in frontmatter
     for t in fm.get_list("tools"):
         if not (WORKSPACE_ROOT / t).exists():
             out.append(Violation(rel, "E303", "error",
                                  f"tools references missing path: '{t}'"))
 
-    # agent (formerly expected_agent) stays in frontmatter
+    # agent stays in frontmatter
     expected = fm.get_str("agent").strip()
     if expected:
         norm = expected.lower().replace(" ", "-")

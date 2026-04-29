@@ -63,4 +63,4 @@ tools: [read, search, execute]
 Communication: simple, direct, low-token, numbers-first
 Personas: EngDev, GameDev
 Primary skills: performance-profiling
-Secondary skills: rust-coding, gpu-programming
+Secondary skills: rust-coding, gpu-programming, module-architecture

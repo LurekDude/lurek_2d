@@ -18,17 +18,20 @@ description: "Load this skill when working on asset loading, GameFS, image decod
 - Audio playback logic.
 
 ## Domain Knowledge
-- All game-facing file access should go through GameFS.
-- Block path traversal and unsafe absolute-path behavior.
-- Resolve asset paths relative to the game root.
-- Prefer load-once and cache-by-path behavior for reused assets.
-- Return clear Lua-visible errors instead of panicking on missing assets.
-- Keep loading and decoding separate from playback and rendering concerns.
-
+- Game-facing asset access should resolve through GameFS and stay relative to the game root.
+- src/filesystem/ owns sandboxing and path rules; src/image/ and audio source loaders own decode, not playback.
+- Normalize paths before caching so repeated loads hit one cache key instead of per-call duplicates.
+- Missing assets, bad decode, and blocked paths should surface as clear Lua-visible errors, not panics.
+- Keep script loading, image decode, and raw bytes access separate from render and playback decisions.
+- save/ is runtime state, not a content root for examples or shipping assets.
+- content/, library/, mods, and game folders are content roots; asset rules should preserve those boundaries instead of leaking host filesystem assumptions into Lua-facing APIs.
+- Cache invalidation should follow stable path and decode assumptions, not transient caller state.
+- Filesystem safety here overlaps with security review, but this skill owns the loading contract rather than the exploit analysis.
 ## Companion File Index
 - None.
 
 ## References
-- src/filesystem/vfs.rs
+- src/filesystem/
 - src/image/
 - src/audio/source.rs
+- docs/specs/filesystem.md

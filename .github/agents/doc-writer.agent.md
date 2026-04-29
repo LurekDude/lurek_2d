@@ -61,4 +61,4 @@ tools: [read, search, execute, edit]
 Communication: simple, direct, low-token, audience-aware
 Personas: EngDev, GameDev, Modder
 Primary skills: documentation
-Secondary skills: lua-scripting, examples-management
+Secondary skills: lua-scripting, examples-management, lua-api-design

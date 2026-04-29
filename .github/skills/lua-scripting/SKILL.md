@@ -18,17 +18,20 @@ description: "Load this skill when writing or reviewing Lua game scripts and lur
 - Public API design.
 
 ## Domain Knowledge
-- Use lurek.* only for engine-facing APIs.
-- Keep game state in locals, not accidental globals.
-- Multiply movement and time-based updates by dt.
-- Keep rendering in render callbacks and logic in process callbacks.
-- Keep scripts readable enough for game authors first.
-- Use docs/api/lurek.md and content examples as the source of current script patterns.
-
+- Game scripts and tests should use lurek.* only, with locals as state and no accidental globals.
+- content/examples/ shows small API slices; content/games/ shows larger patterns; tests/lua/ shows proof-oriented usage.
+- Keep init, process, render, and input callback responsibilities separate.
+- Multiply movement, timers, tween input, and decay by dt when behavior is time-based.
+- Prefer readability for game authors over clever abstraction.
+- Generated docs and working examples are the current source for valid Lua usage.
+- content/games/, content/examples/, and tests/lua/ each model a different Lua writing style here: playable content, minimal examples, and proof-oriented tests.
+- Good scripts keep callback roles obvious, state local, and dt-driven behavior explicit.
+- The skill owns author-facing Lua structure and API use, not engine implementation or public API design.
 ## Companion File Index
 - None.
 
 ## References
 - content/games/
 - content/examples/
+- tests/lua/
 - docs/api/lurek.md

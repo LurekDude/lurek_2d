@@ -1,44 +1,39 @@
 ---
-description: "Fix a Lua script error."
+description: "Fix one Lua-side error in content or examples using the current API surface."
+agent: "Content-Maker"
 ---
-
 # Fix Lua Error
 
 ## Goal
-- Debug and fix Lua script errors in Lurek2D. Use when a Lua game script exits with an error, panics the engine, or produces unexpected mlu...
+- Fix one Lua-side content error at the source.
 
 ## Inputs
-- ERROR_MSG the full error message (including Lua traceback if available)
-- SCRIPT_PATH path to the main.lua file or example directory
-- REPRODUCTION minimal steps to reproduce (e.g., cargo run -- content/examples/my_game)
+- Lua error message.
+- Target file.
+- Repro path.
+- Expected behavior.
 
 ## Steps
-- Load dev-debugging, lua-api-design before changing any files.
-- Load skill dev-debugging/SKILL.md
-- Parse the error message:
-- attempt to index a nil value (global 'lurek') lurek table not constructed; check create_lua_vm()
-- bad argument #N to '<func>' argument type mismatch; check Lua call vs Rust binding signature
-- attempt to call a nil value function not registered; check register() in lua_api/mod.rs
-- Stack overflow recursive update/draw callback calling itself
-- Find the Rust binding for the failing function in src/lua_api/<module>_api.rs
-- Compare the Lua call signature against the Rust create_function argument types
-- Check that the function is registered:
-- src/lua_api/mod.rs <module>_api::register(&lua, &lurek, state.clone())?
-- lurek.set("<name>", ...) in the corresponding register() function
+1. Load [skill: dev-debugging](../skills/dev-debugging/SKILL.md) and [skill: lua-scripting](../skills/lua-scripting/SKILL.md) before acting.
+2. Reproduce the failure from the failing Lua file, the smallest repro path, nearby examples, and the current API docs for the calls involved.
+3. Correct the Lua content, usage pattern, or local wiring that caused the error, and only escalate to engine owners if the API itself is broken.
+4. Rerun the same content path or failing Lua test first, then widen validation only if the local fix passed.
 
 ## Success Criteria
-- [ ] Root-cause explanation (Lua script bug, binding mismatch, or missing registration)
-- [ ] Fix applied (Rust or Lua side, with reasoning)
-- [ ] Verified: cargo run -- <SCRIPT_PATH> succeeds
+- [ ] The failure was reproduced or tightly localized.
+- [ ] The owner slice was fixed at the source.
+- [ ] The failing check now passes.
+- [ ] No unrelated drift was introduced.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Patch symptoms in a different layer from the one that owns the failure.
+- Skip the smallest reproducer and guess at the fix.
+- Keep editing after the first change instead of rerunning the failing check.
 
 ## Example Invocation
-- /fix-lua-error <SCRIPT_PATH> <func> <module> <name>
+- /fix-lua-error file=content/examples/ui.lua error='attempt to call nil value'
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: dev-debugging, lua-api-design
-- **Inputs required**: SCRIPT_PATH, func, module, name
+Mode: agent
+Loads skills: dev-debugging, lua-scripting
+Inputs required: Lua error message., Target file., Repro path., Expected behavior.

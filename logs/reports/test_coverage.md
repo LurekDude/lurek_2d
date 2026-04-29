@@ -5,7 +5,7 @@
 | Category | Covered | Total | Coverage |
 |----------|---------|-------|----------|
 | Rust public functions | 3253 | 4229 | 76.9% |
-| Lua API functions | 4354 | 4378 | 99.5% |
+| Lua API functions | 4364 | 4388 | 99.5% |
 
 ## Rust Coverage by Module
 
@@ -73,7 +73,7 @@
 | audio | 218 | 219 | 99.5% |
 | automation | 28 | 28 | 100.0% |
 | camera | 49 | 49 | 100.0% |
-| compute | 76 | 77 | 98.7% |
+| compute | 86 | 87 | 98.9% |
 | data | 68 | 68 | 100.0% |
 | dataframe | 116 | 118 | 98.3% |
 | debugbridge | 14 | 14 | 100.0% |

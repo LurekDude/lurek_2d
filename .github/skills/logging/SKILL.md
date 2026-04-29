@@ -18,16 +18,20 @@ description: "Load this skill when adding or tuning log output, log levels, RUST
 - Analytics from saved logs.
 
 ## Domain Knowledge
-- Use the log crate flow, not println or eprintln in engine paths.
-- Match log level to impact and frequency.
-- Avoid noisy per-frame info or warn logs.
-- Include enough context to make grep and diagnosis useful.
-- Keep hot-path logging behind debug or trace where appropriate.
-- Make tests and repro runs explicit about RUST_LOG and nocapture when needed.
-
+- The repo uses the log crate; src/log/ and startup paths determine sinks and default filter behavior.
+- Avoid noisy info or warn logs in hot paths such as render, physics, timer, or per-frame AI loops.
+- Include enough identifiers for grep and parse_test_log.py without leaking absolute paths or private implementation detail.
+- Trace/debug is for transient state; info/warn/error should map to operational impact a user or tester can understand.
+- For tests, pair RUST_LOG with --nocapture before adding temporary output.
+- Logging should help diagnosis without becoming a hidden performance bug.
+- RUST_LOG filters, log level choice, and parseable context are especially important because repo tooling already expects structured diagnosis from captured output.
+- Logging in hot loops should be rare and deliberate; trace or debug should guard high-frequency details.
+- This skill owns runtime observability wording and filter strategy, not root-cause reasoning or offline trend analysis.
 ## Companion File Index
 - None.
 
 ## References
-- src/main.rs
 - src/log/
+- src/main.rs
+- logs/
+- tools/audit/parse_test_log.py

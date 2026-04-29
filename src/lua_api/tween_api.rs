@@ -869,7 +869,7 @@ impl LuaUserData for LuaSpring {
         });
 
         // -- cancel -------------------------------------------------
-        /// Stops the spring.
+        /// Stops the spring immediately, clears its settle callback, and leaves the current values at their last simulated positions.
         /// @return | nil | No value is returned.
         methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;

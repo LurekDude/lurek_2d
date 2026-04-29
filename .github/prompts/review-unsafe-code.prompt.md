@@ -1,35 +1,38 @@
 ---
-description: "Review unsafe blocks and SAFETY comments."
+description: "Review unsafe Rust blocks for soundness, documented invariants, and containment."
+agent: "Security"
 ---
-
 # Review Unsafe Code
 
 ## Goal
-- Audit all unsafe blocks for proper justification and safety.
+- Assess whether unsafe code is justified, documented, and sound.
 
 ## Inputs
-- None.
+- Target file or module.
+- Unsafe block scope.
+- Any suspected invariant issue.
 
 ## Steps
-- Load rust-coding before changing any files.
-- Search for all unsafe blocks in src/
-- For each: verify // SAFETY: comment exists immediately above
-- Evaluate if unsafe is truly necessary (safe alternative available?)
-- Check that safety invariants are correctly maintained
-- Report unjustified or unnecessary unsafe usage
+1. Load [skill: rust-coding](../skills/rust-coding/SKILL.md) and [skill: error-handling](../skills/error-handling/SKILL.md) before acting.
+2. Read the unsafe blocks, surrounding ownership code, and any comments or tests that state the invariants.
+3. Report missing SAFETY reasoning, invariant leaks, aliasing or lifetime risks, and cases where safe Rust should replace unsafe.
+4. Summarize the highest-severity unsafe finding and the proof still missing if the block remains.
 
 ## Success Criteria
-- [ ] All unsafe blocks have // SAFETY: comments
-- [ ] Each use of unsafe is genuinely necessary
-- [ ] Safety invariants documented and upheld
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /review-unsafe-code
+- /review-unsafe-code path=src/runtime
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: rust-coding
+Mode: agent
+Loads skills: rust-coding, error-handling
+Inputs required: Target file or module., Unsafe block scope., Any suspected invariant issue.

@@ -18,22 +18,21 @@ description: "Load this skill when validating, debugging, or maintaining CAG fil
 - CI/CD workflow setup.
 
 ## Domain Knowledge
-- Validate after every .github change.
-- Aim for 0 errors and 0 warnings.
-- Use python tools/validate/cag_validate.py --type agent|skill|prompt|system_prompt.
-- Use --file for one file.
-- Full run checks the whole CAG layer.
-- Validators should be read-only.
-- Tools should support --help.
-- Use exit code 0 on success and 1 on failure.
-- Prefer relative paths in output.
-- Do not hardcode repo paths.
-- Target Python 3.10+ and standard library only unless tools/README.md says otherwise.
-- Do not ignore parse errors silently.
-
+- cag_validate.py already checks frontmatter, required sections, line caps, known agents/skills, and prompt wiring.
+- Use --type skill for fast skill-only passes and a full run after cross-file or cross-layer changes.
+- cag_link_check.py, cag_coverage.py, and cag_persona_matrix.py complement validation for links, section coverage, and roster health.
+- In this repo, SKILL.md files should stay code-block free and example-free.
+- Validator output should stay relative, deterministic, and tied to real repo contracts rather than hypothetical policy.
+- When agent or skill wiring changes, update shared docs as part of the same validation pass.
+- Validation in this repo is broader than cag_validate.py alone; link, coverage, and persona audits matter whenever the graph or docs move.
+- The skill should keep validators deterministic, read-only, and aligned with actual repo rules rather than one-off style opinions.
+- It owns the validation surface for CAG files, not generic project quality tooling.
 ## Companion File Index
 - None.
 
 ## References
 - tools/validate/cag_validate.py
+- tools/audit/cag_link_check.py
+- tools/audit/cag_coverage.py
+- tools/audit/cag_persona_matrix.py
 - tools/README.md

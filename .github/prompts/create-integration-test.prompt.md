@@ -1,41 +1,39 @@
 ---
-description: "Create a new integration test suite."
+description: "Create one integration test in the correct repo layer for a concrete behavior."
+agent: "Tester"
 ---
-
 # Create Integration Test
 
 ## Goal
-- Write a new integration test suite for a Lurek2D module. Use when a module lacks test coverage or new public API needs validation. Produc...
+- Add one integration test in the right place with a clear purpose.
 
 ## Inputs
-- MODULE the module to test (e.g., math, physics, graphics, input, audio)
-- FUNCTIONS list of public functions/types to cover
-- REGRESSION optional: a specific bug scenario to add as a regression test
+- Behavior to cover.
+- Target module or API.
+- Correct test layer.
+- Expected validation command.
 
 ## Steps
-- Load rust-coding, testing-rust before changing any files.
-- Load skill testing-rust/SKILL.md
-- Read the module's src/<module>/mod.rs to understand what's public
-- Open (or create) tests/<module>_tests.rs
-- For each public type and function:
-- Float comparison rules:
-- NEVER assert_eq!(3.14_f32, some_float) use assert!((val - expected).abs() < 1e-5)
-- No I/O, no window, no network in integration tests
-- If testing audio::Mixer, the test must still pass when no audio hardware is present
-- Run: cargo test <module>_tests to verify
+1. Load [skill: testing-rust](../skills/testing-rust/SKILL.md) and [skill: rust-coding](../skills/rust-coding/SKILL.md) before acting.
+2. Read the owning module, existing tests in the same layer, the test placement rules, and the current failing or missing behavior before editing.
+3. Choose the right home first, keep the test focused on externally visible behavior, and avoid hiding product bugs behind test-only scaffolding.
+4. Run the narrowest test target that includes the new test and confirm the test proves the intended behavior.
 
 ## Success Criteria
-- [ ] tests/<module>_tests.rs with tests covering all specified public functions
-- [ ] Verified: cargo test passes
+- [ ] The prompt goal was completed: Add one integration test in the right place with a clear purpose.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-integration-test <description> <module> <module_name>
+- /create-integration-test behavior=save_roundtrip layer=tests/rust
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: rust-coding, testing-rust
-- **Inputs required**: description, module, module_name
+Mode: agent
+Loads skills: testing-rust, rust-coding
+Inputs required: Behavior to cover., Target module or API., Correct test layer., Expected validation command.

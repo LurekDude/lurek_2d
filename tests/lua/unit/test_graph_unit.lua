@@ -1027,7 +1027,7 @@ describe("Algorithms", function()
         local g = lurek.graph.newGraph()
         local a = g:addNode()
         local b = g:addNode()
-        -- No edges â€” 2 disconnected nodes
+        -- No edges Ă„â€šĂ˘â‚¬ĹľÄ‚ËĂ˘â€šÂ¬ÄąË‡Ă„â€šĂ˘â‚¬Ä…Ä‚â€šĂ‚ÂÄ‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă‹â€ˇĂ„â€šĂ˘â‚¬ĹˇÄ‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ„â€¦Ä‚â€žĂ˘â‚¬Ĺľ 2 disconnected nodes
         local comps = g:getComponents()
         expect_equal(2, #comps)
     end)
@@ -1215,7 +1215,7 @@ describe("Callbacks", function()
         if not fired then
             g:step()
         end
-        -- Accept either â€” event fires at some point
+        -- Accept either Ă„â€šĂ˘â‚¬ĹľÄ‚ËĂ˘â€šÂ¬ÄąË‡Ă„â€šĂ˘â‚¬Ä…Ä‚â€šĂ‚ÂÄ‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă‹â€ˇĂ„â€šĂ˘â‚¬ĹˇÄ‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ„â€¦Ä‚â€žĂ˘â‚¬Ĺľ event fires at some point
         -- If still not fired, sendItem may have triggered it directly
     end)
 
@@ -1507,119 +1507,19 @@ end)
 
 -- @description Verifies edge validation and node removal parity cases, including invalid endpoints and edge cleanup on node removal.
 describe("graph edge validity errors (RS parity)", function()
-    -- @description Confirms addEdge raises an error when the source node handle is invalid.
-    it("addEdge with invalid source returns error", function()
-        local g = lurek.graph.newGraph()
-        local b = g:addNode("B")
-        expect_error(function() g:addEdge(9999, b) end)
-    end)
-
-    -- @description Confirms addEdge raises an error when the destination node handle is invalid.
-    it("addEdge with invalid destination returns error", function()
-        local g = lurek.graph.newGraph()
-        local a = g:addNode("A")
-        expect_error(function() g:addEdge(a, 9999) end)
-    end)
-
-    -- @description Confirms removing a node also removes its connected edges, leaving one node and zero edges.
-    it("removeNode cleans connected edges", function()
-        local g = lurek.graph.newGraph()
-        local a = g:addNode("A")
-        local b = g:addNode("B")
-        g:addEdge(a, b)
-        g:removeNode(a)
-        expect_equal(1, g:getNodeCount())
-        expect_equal(0, g:getEdgeCount())
-    end)
-
-    -- @description Confirms removing a nonexistent node handle raises an error.
-    it("removeNode on nonexistent id raises error", function()
-        local g = lurek.graph.newGraph()
-        expect_error(function() g:removeNode(9999) end)
-    end)
-
-    -- @description Confirms getNodes returns the same count as getNodeCount after adding two nodes.
-    it("getNodes count matches getNodeCount", function()
-        local g = lurek.graph.newGraph()
-        g:addNode("X")
-        g:addNode("Y")
-        local nodes = g:getNodes()
-        expect_equal(g:getNodeCount(), #nodes)
-    end)
+    it("addEdge with invalid source returns error", function() local g=lurek.graph.newGraph(); local b=g:addNode("B"); expect_error(function() local invalid=g:addNode("invalid"); g:removeNode(invalid); g:addEdge(invalid,b) end) end)
+    it("addEdge with invalid destination returns error", function() local g=lurek.graph.newGraph(); local a=g:addNode("A"); expect_error(function() local invalid=g:addNode("invalid"); g:removeNode(invalid); g:addEdge(a,invalid) end) end)
+    it("removeNode cleans connected edges", function() local g=lurek.graph.newGraph(); local a=g:addNode("A"); local b=g:addNode("B"); g:addEdge(a,b); g:removeNode(a); expect_equal(1,g:getNodeCount()); expect_equal(0,g:getEdgeCount()) end)
+    it("removeNode on nonexistent id raises error", function() local g=lurek.graph.newGraph(); expect_error(function() local invalid=g:addNode("invalid"); g:removeNode(invalid); g:removeNode(invalid) end) end)
+    it("getNodes count matches getNodeCount", function() local g=lurek.graph.newGraph(); g:addNode("X"); g:addNode("Y"); local nodes=g:getNodes(); expect_equal(g:getNodeCount(),#nodes) end)
 end)
-
--- ── Graph parallel tick (merged from test_graph_parallel_tick.lua) ──
-
 describe("lurek.graph tickParallel", function()
-    describe("factory", function()
-        -- @tests lurek.graph.newSimulation
-        -- @description Verifies newSimulation is a function.
-        xit("exposes newSimulation", function()
-            expect_type("function", lurek.graph.newSimulation)
-        end)
-
-        -- @tests lurek.graph:tickParallel
-        -- @description Verifies tickParallel is callable on a simulation.
-        xit("tickParallel is callable", function()
-            local sim = lurek.graph.newSimulation()
-            expect_type("function", sim.tickParallel)
-        end)
-    end)
-
-    describe("tickParallel()", function()
-        -- @tests lurek.graph:tickParallel
-        -- @description Returns a table (event list) for an empty simulation.
-        xit("returns a table for an empty simulation", function()
-            local sim = lurek.graph.newSimulation()
-            local events = sim:tickParallel(0.016)
-            expect_type("table", events)
-        end)
-
-        -- @tests lurek.graph:tickParallel
-        -- @description Returns an empty table when there are no nodes.
-        xit("returns zero events for an empty graph", function()
-            local sim = lurek.graph.newSimulation()
-            local events = sim:tickParallel(0.016)
-            expect_equal(0, #events)
-        end)
-
-        -- @tests lurek.graph:tickParallel
-        -- @description dt = 0 produces no decay events.
-        xit("does not decay items when dt is zero", function()
-            local sim = lurek.graph.newSimulation()
-            local n = sim:addNode("source")
-            sim:setNodeItems(n, 10)
-            local events = sim:tickParallel(0.0)
-            expect_type("table", events)
-        end)
-
-        -- @tests lurek.graph:tickParallel
-        -- @description Calling tickParallel multiple times does not error.
-        xit("is idempotently callable", function()
-            local sim = lurek.graph.newSimulation()
-            local n = sim:addNode("reservoir")
-            sim:setNodeItems(n, 5)
-            sim:tickParallel(0.016)
-            local events = sim:tickParallel(0.016)
-            expect_type("table", events)
-        end)
-
-        -- @tests lurek.graph:tick
-        -- @tests lurek.graph:tickParallel
-        -- @description tickParallel and tick both return tables (same signature).
-        xit("has the same return signature as tick", function()
-            local sim = lurek.graph.newSimulation()
-            local n = sim:addNode("test")
-            sim:setNodeItems(n, 3)
-            local sequential_events = sim:tick(0.016)
-            local parallel_events   = sim:tickParallel(0.016)
-            expect_type("table", sequential_events)
-            expect_type("table", parallel_events)
-        end)
-    end)
+    xit("tickParallel is callable", function() local sim=lurek.graph.newGraph(); expect_type("function", sim.tickParallel) end)
+    xit("tickParallel returns a table", function() local sim=lurek.graph.newGraph(); local events=sim:tickParallel(0.016); expect_type("table", events) end)
+    xit("tickParallel stays callable with items", function() local sim=lurek.graph.newGraph(); local n=sim:addNode("n"); local item=sim:createItem(); sim:addItem(item,n); local a=sim:tickParallel(0.016); local b=sim:tickParallel(0.016); expect_type("table", a); expect_type("table", b) end)
 end)
-
 test_summary()
+
 
 -- =========================================================================
 -- Missing API Coverage Stubs

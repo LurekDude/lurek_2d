@@ -603,7 +603,7 @@ function LBandit:armCount() end
 ---@return integer Best arm index.
 function LBandit:bestArm() end
 
---- Resets the bandit state.
+--- Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.
 ---@return nil No value is returned.
 function LBandit:reset() end
 
@@ -3615,7 +3615,7 @@ LCamera = {}
 ---@return nil No return value.
 function LCamera:apply() end
 
---- Alias for `apply()`.
+--- Alias for `apply()` that queues this camera's transform onto the render command stack.
 ---@return nil No return value.
 function LCamera:attach() end
 
@@ -3627,7 +3627,7 @@ function LCamera:clearParallaxFactors() end
 ---@return nil No return value.
 function LCamera:clearTarget() end
 
---- Alias for `reset()`.
+--- Alias for `reset()` that removes this camera's transform from the render command stack.
 ---@return nil No return value.
 function LCamera:detach() end
 
@@ -3879,6 +3879,11 @@ LArray = {}
 ---@return Array Absolute-value array.
 function LArray:abs() end
 
+--- Element-wise addition with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Sum array.
+function LArray:add(other) end
+
 --- Returns true if all elements are nonzero.
 ---@return boolean True if all elements are nonzero.
 function LArray:all() end
@@ -3977,6 +3982,11 @@ function LArray:diff(order) end
 ---@return Array Dilated array.
 function LArray:dilate(radius) end
 
+--- Element-wise division with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Quotient array.
+function LArray:div(other) end
+
 --- Dot product of two 1D arrays.
 ---@param other Array Right-hand operand array.
 ---@return number Dot product value.
@@ -3987,6 +3997,11 @@ function LArray:dot(other) end
 ---@param tol? number (default 1e-10).
 ---@return table Table with the dominant eigenvalue and eigenvector.
 function LArray:eigenPower(max_iter, tol) end
+
+--- Element-wise equality with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise equality result array.
+function LArray:eq(other) end
 
 --- Morphological erosion with a diamond structuring element.
 ---@param radius integer Structuring element radius.
@@ -4039,6 +4054,16 @@ function LArray:getShape() end
 ---@return integer Total element count.
 function LArray:getSize() end
 
+--- Element-wise greater-than with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise greater-than result array.
+function LArray:gt(other) end
+
+--- Element-wise greater-or-equal with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise greater-or-equal result array.
+function LArray:gte(other) end
+
 --- Compute a histogram. Returns a table of {lo, hi, count} tables.
 ---@param bins integer Number of histogram bins.
 ---@param lo? number Optional lower bound.
@@ -4054,6 +4079,16 @@ function LArray:isOnGPU() end
 ---@param b Array Blue component.
 ---@return Array New array.
 function LArray:linsolve(b) end
+
+--- Element-wise less-than with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise less-than result array.
+function LArray:lt(other) end
+
+--- Element-wise less-or-equal with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise less-or-equal result array.
+function LArray:lte(other) end
 
 --- Decomposes this square matrix into L and U factors with partial pivoting.
 ---@return table LU decomposition data with permutation and matrix buffers.
@@ -4084,9 +4119,19 @@ function LArray:mean(axis) end
 ---@return Array Reduced array, or scalar number when axis is omitted.
 function LArray:min(axis) end
 
+--- Element-wise multiplication with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Product array.
+function LArray:mul(other) end
+
 --- Returns a new Array with every element negated (multiplied by -1).
 ---@return Array Negated array.
 function LArray:neg() end
+
+--- Element-wise not-equal with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Element-wise inequality result array.
+function LArray:neq(other) end
 
 --- Linearly rescale values to [out_min, out_max].
 ---@param out_min number Output minimum.
@@ -4154,6 +4199,11 @@ function LArray:sobel() end
 --- Element-wise square root.
 ---@return Array Square-rooted array.
 function LArray:sqrt() end
+
+--- Element-wise subtraction with an Array or scalar.
+---@param other LuaValue Array or scalar operand.
+---@return Array Difference array.
+function LArray:sub(other) end
 
 --- Sum of all elements, or along an axis (1-based).
 ---@param axis? integer Optional one-based axis.
@@ -4564,7 +4614,7 @@ lurek.data.getPackedSize = function(format, ...) end
 lurek.data.hash = function(algorithm, data) end
 
 --- Instantiates a raw byte data container object.
----@param value integer number | string source data, or buffer size in bytes.
+---@param value integer|number string source data, or buffer size in bytes.
 ---@return ByteData New byte buffer instance.
 lurek.data.newByteData = function(value) end
 
@@ -4635,7 +4685,7 @@ LDataFrame = {}
 
 --- Adds a new column with an optional default value.
 ---@param name string New column name.
----@param default? nil boolean|number|string | Default value for new rows in the column.
+---@param default? boolean|number|string Default value for new rows in the column.
 ---@return nil No value is returned.
 function LDataFrame:addColumn(name, default) end
 
@@ -4650,7 +4700,7 @@ function LDataFrame:addRow(row_tbl) end
 function LDataFrame:addRowBatch(rows) end
 
 --- Applies a function to each value in a column, replacing cells with results.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@param func function Callback applied to each cell value.
 ---@return nil No value is returned.
 function LDataFrame:apply(col, func) end
@@ -4664,8 +4714,8 @@ function LDataFrame:clone() end
 function LDataFrame:columns() end
 
 --- Pearson correlation coefficient between two numeric columns.
----@param col_a string integer | Left column name or index.
----@param col_b string integer | Right column name or index.
+---@param col_a string|integer Left column name or index.
+---@param col_b string|integer Right column name or index.
 ---@return number Pearson correlation coefficient.
 function LDataFrame:corr(col_a, col_b) end
 
@@ -4678,7 +4728,7 @@ function LDataFrame:correlationMatrix() end
 function LDataFrame:count() end
 
 --- Counts distinct values in a column, returns a DataFrame with value and count columns.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return LDataFrame Dataframe with value and count columns.
 function LDataFrame:countBy(col) end
 
@@ -4687,35 +4737,35 @@ function LDataFrame:countBy(col) end
 function LDataFrame:describe() end
 
 --- Removes rows where the given column is nil, returns a new DataFrame.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return LDataFrame Dataframe without nil values in that column.
 function LDataFrame:dropNil(col) end
 
 --- Shannon entropy (bits) of the value distribution in a column.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@return number Shannon entropy of the column value distribution.
 function LDataFrame:entropy(col) end
 
 --- Replaces nil values in a column with the given value.
----@param col string integer | Column name or 1-based column index.
----@param val nil boolean|number|string | Replacement value for nil cells.
+---@param col string|integer Column name or 1-based column index.
+---@param val nil|boolean|number|string Replacement value for nil cells.
 ---@return nil No value is returned.
 function LDataFrame:fillNil(col, val) end
 
 --- Filters rows where column matches a condition, returns a new DataFrame.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@param op string Comparison operator.
----@param val nil boolean|number|string | Value to compare against.
+---@param val nil|boolean|number|string Value to compare against.
 ---@return LDataFrame Filtered dataframe copy.
 function LDataFrame:filter(col, op, val) end
 
 --- Returns all values in a column as a table.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return table Column values.
 function LDataFrame:getColumn(col) end
 
 --- Return a numeric column as a Lua array of numbers (nils -> 0/nan).
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@return table Numeric column values as numbers.
 function LDataFrame:getColumnAsF64(col) end
 
@@ -4726,24 +4776,24 @@ function LDataFrame:getRow(row) end
 
 --- Returns a single cell value.
 ---@param row integer 1-based row index.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return table Cell value table, or nil when unavailable.
 function LDataFrame:getValue(row, col) end
 
 --- Aggregate agg_col grouped by group_col using the named function.
----@param group_col string integer | Group column name or index.
----@param agg_col string integer | Aggregate column name or index.
+---@param group_col string|integer Group column name or index.
+---@param agg_col string|integer Aggregate column name or index.
 ---@param fn_name string Function name.
 ---@return LDataFrame DataFrame result.
 function LDataFrame:groupAgg(group_col, agg_col, fn_name) end
 
 --- Groups rows by column value, returns a table of DataFrames keyed by value.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return table DataFrames keyed by grouped column values.
 function LDataFrame:groupBy(col) end
 
 --- Groups rows by column value, returns a GroupedFrame object supporting aggregate().
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return LGroupedFrame Grouped frame for chained aggregation.
 function LDataFrame:groupByObj(col) end
 
@@ -4754,24 +4804,24 @@ function LDataFrame:head(n) end
 
 --- Joins with another DataFrame on matching columns.
 ---@param other LDataFrame Dataframe to join with.
----@param this_col string integer | Join column in this dataframe.
----@param other_col string integer | Join column in the other dataframe.
+---@param this_col string|integer Join column in this dataframe.
+---@param other_col string|integer Join column in the other dataframe.
 ---@param join_type? string Join mode such as inner, left, right, or outer.
 ---@return LDataFrame Joined dataframe result.
 function LDataFrame:join(other, this_col, other_col, join_type) end
 
 --- Returns the maximum numeric value in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Maximum numeric value in the column.
 function LDataFrame:max(col) end
 
 --- Returns the mean of numeric values in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Mean of numeric values in the column.
 function LDataFrame:mean(col) end
 
 --- Returns the median of numeric values in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Median of numeric values in the column.
 function LDataFrame:median(col) end
 
@@ -4781,12 +4831,12 @@ function LDataFrame:median(col) end
 function LDataFrame:merge(other) end
 
 --- Returns the minimum numeric value in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Minimum numeric value in the column.
 function LDataFrame:min(col) end
 
 --- Return the most frequent value in a column (nil if empty).
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@return table Most frequent value in the column.
 function LDataFrame:modeVal(col) end
 
@@ -4795,7 +4845,7 @@ function LDataFrame:modeVal(col) end
 function LDataFrame:ncols() end
 
 --- Add a min-max normalized column scaled to [out_min, out_max].
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param out_min number Output min.
 ---@param out_max number Output max.
 ---@param name string Name string.
@@ -4807,22 +4857,22 @@ function LDataFrame:normalizeCol(col, out_min, out_max, name) end
 function LDataFrame:nrows() end
 
 --- Return a new DataFrame with only outlier rows (|z-score| > threshold).
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param threshold? number Threshold value.
 ---@return LDataFrame DataFrame result.
 function LDataFrame:outliers(col, threshold) end
 
 --- Creates a wide pivot table by reshaping rows into columns.
----@param row_col string integer | Column whose values become row keys.
----@param col_col string integer | Column whose distinct values become headers.
----@param val_col string integer | Column to place in the pivot cells.
+---@param row_col string|integer Column whose values become row keys.
+---@param col_col string|integer Column whose distinct values become headers.
+---@param val_col string|integer Column to place in the pivot cells.
 ---@return LDataFrame New wide pivot table by reshaping rows into columns.
 function LDataFrame:pivot(row_col, col_col, val_col) end
 
 --- Reshapes a long-format DataFrame into wide format.
----@param row_key string integer | Row key column.
----@param col_key string integer | Column key column.
----@param value_key string integer | Value column.
+---@param row_key string|integer Row key column.
+---@param col_key string|integer Column key column.
+---@param value_key string|integer Value column.
 ---@param agg? string Aggregation name.
 ---@return LDataFrame DataFrame result.
 function LDataFrame:pivotTable(row_key, col_key, value_key, agg) end
@@ -4833,14 +4883,14 @@ function LDataFrame:pivotTable(row_key, col_key, value_key, agg) end
 function LDataFrame:query(sql_str) end
 
 --- Returns a new DataFrame with a dense-rank column appended.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param order? string Sort order.
 ---@param result_col? string Result column name.
 ---@return LDataFrame New DataFrame with a dense-rank column appended.
 function LDataFrame:rank(col, order, result_col) end
 
 --- Removes a column by name or index.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return nil No value is returned.
 function LDataFrame:removeColumn(col) end
 
@@ -4850,20 +4900,20 @@ function LDataFrame:removeColumn(col) end
 function LDataFrame:removeRow(row) end
 
 --- Renames the column `old_name` to `new_name` in this DataFrame.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@param new_name string Replacement column name.
 ---@return nil No value is returned.
 function LDataFrame:rename(col, new_name) end
 
 --- Returns a new DataFrame with a rolling mean column appended.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param window integer Window size.
 ---@param result_col? string Result column name.
 ---@return LDataFrame New DataFrame with a rolling mean column appended.
 function LDataFrame:rollingMean(col, window, result_col) end
 
 --- Returns a new DataFrame with a rolling sum column appended.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param window integer Window size.
 ---@param result_col? string Result column name.
 ---@return LDataFrame New DataFrame with a rolling sum column appended.
@@ -4876,20 +4926,20 @@ function LDataFrame:rollingSum(col, window, result_col) end
 function LDataFrame:sample(n, seed) end
 
 --- Selects a subset of columns, returns a new DataFrame.
----@param ... string
+---@param ... string|integer
 ---@return LDataFrame Dataframe with only the selected columns.
 function LDataFrame:select(...) end
 
 --- Set a numeric column from a Lua array of numbers.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param values table Value list.
 ---@return nil No value is returned.
 function LDataFrame:setColumnFromF64(col, values) end
 
 --- Sets a single cell value.
 ---@param row integer 1-based row index.
----@param col string integer | Column name or 1-based column index.
----@param val nil boolean|number|string | New cell value.
+---@param col string|integer Column name or 1-based column index.
+---@param val nil|boolean|number|string New cell value.
 ---@return nil No value is returned.
 function LDataFrame:setValue(row, col, val) end
 
@@ -4900,18 +4950,18 @@ function LDataFrame:setValue(row, col, val) end
 function LDataFrame:slice(start, end_idx) end
 
 --- Sorts by column, returns a new DataFrame.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@param ascending? boolean True for ascending order, false for descending.
 ---@return LDataFrame Sorted dataframe copy.
 function LDataFrame:sort(col, ascending) end
 
 --- Returns the population standard deviation of numeric values in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Population standard deviation of the column.
 function LDataFrame:stddev(col) end
 
 --- Returns the sum of numeric values in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Sum of numeric values in the column.
 function LDataFrame:sum(col) end
 
@@ -4950,17 +5000,17 @@ function LDataFrame:type() end
 function LDataFrame:typeOf(name) end
 
 --- Returns unique values in a column as a table.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return table Unique values from the column.
 function LDataFrame:unique(col) end
 
 --- Returns the population variance of numeric values in a column.
----@param col string integer | Column name or 1-based column index.
+---@param col string|integer Column name or 1-based column index.
 ---@return number Population variance of the column.
 function LDataFrame:variance(col) end
 
 --- Add a cumulative-sum column.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param name string Name string.
 ---@return nil No value is returned.
 function LDataFrame:withCumsum(col, name) end
@@ -4972,48 +5022,48 @@ function LDataFrame:withCumsum(col, name) end
 function LDataFrame:withEval(col_name, expr) end
 
 --- Add a percent-change-from-previous-row column.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param name string Name string.
 ---@return nil No value is returned.
 function LDataFrame:withPctChange(col, name) end
 
 --- Add a rank column (1-based, ties averaged).
----@param col string integer | Source column name or 1-based column index.
+---@param col string|integer Source column name or 1-based column index.
 ---@param ascending? boolean True for ascending rank, false for descending.
 ---@param name string Name of the output column.
 ---@return nil No value is returned.
 function LDataFrame:withRank(col, ascending, name) end
 
 --- Add a rolling maximum column.
----@param col string integer | Source column name or 1-based column index.
+---@param col string|integer Source column name or 1-based column index.
 ---@param window integer Window size in rows.
 ---@param name string Name of the output column.
 ---@return nil No value is returned.
 function LDataFrame:withRollingMax(col, window, name) end
 
 --- Add a rolling mean column. Rows with insufficient history get nil.
----@param col string integer | Source column name or 1-based column index.
+---@param col string|integer Source column name or 1-based column index.
 ---@param window integer Window size in rows.
 ---@param name string Name of the output column.
 ---@return nil No value is returned.
 function LDataFrame:withRollingMean(col, window, name) end
 
 --- Add a rolling minimum column.
----@param col string integer | Source column name or 1-based column index.
+---@param col string|integer Source column name or 1-based column index.
 ---@param window integer Window size in rows.
 ---@param name string Name of the output column.
 ---@return nil No value is returned.
 function LDataFrame:withRollingMin(col, window, name) end
 
 --- Add a rolling sum column.
----@param col string integer | Source column name or 1-based column index.
+---@param col string|integer Source column name or 1-based column index.
 ---@param window integer Window size in rows.
 ---@param name string Name of the output column.
 ---@return nil No value is returned.
 function LDataFrame:withRollingSum(col, window, name) end
 
 --- Add a z-score column for the given numeric column.
----@param col string integer | Column name or index.
+---@param col string|integer Column name or index.
 ---@param name string Name string.
 ---@return nil No value is returned.
 function LDataFrame:zscoreCol(col, name) end
@@ -7328,7 +7378,9 @@ lurek.event.poll = function() end
 ---@return nil No return value.
 lurek.event.pump = function() end
 
----@param ... LuaValue
+--- Pushes a custom named event onto the main engine event queue with optional payload arguments.
+---@param ... string
+---@return nil No return value.
 lurek.event.push = function(...) end
 
 --- Pushes a named event into the deferred buffer instead of the main queue.
@@ -7655,9 +7707,9 @@ lurek.filesystem.write = function(path, data) end
 
 ---@class lurek.globe
 ---@field MAX_PROVINCES integer  Maximum number of provinces the globe supports.
----@field LOD_FAR string  LOD tier constant "far" — zoomed-out view (zoom < 1.5).
----@field LOD_MID string  LOD tier constant "mid" — medium zoom (1.5 ≤ zoom < 4.0).
----@field LOD_NEAR string  LOD tier constant "near" — close-zoom view (zoom ≥ 4.0).
+---@field LOD_FAR string  LOD tier constant "far" â€” zoomed-out view (zoom < 1.5).
+---@field LOD_MID string  LOD tier constant "mid" â€” medium zoom (1.5 ≤ zoom < 4.0).
+---@field LOD_NEAR string  LOD tier constant "near" â€” close-zoom view (zoom ≥ 4.0).
 lurek.globe = {}
 
 --- Lua-accessible handle to a `Globe` inside a `GlobeRegistry`.
@@ -8002,6 +8054,7 @@ lurek.globe.new = function(name, spec) end
 ---@class lurek.graph
 lurek.graph = {}
 
+--- Lua wrapper around a directed `Graph` with event callback registry.
 ---@class LGraph
 LGraph = {}
 
@@ -8193,6 +8246,7 @@ function LGraph:typeOf(name) end
 ---@return nil No value is returned.
 function LGraph:update(dt) end
 
+--- Lua handle for an edge inside a `Graph`.
 ---@class LGraphEdge
 LGraphEdge = {}
 
@@ -8321,6 +8375,7 @@ function LGraphEdge:type() end
 ---@return boolean True when the type name matches GraphEdge or Object.
 function LGraphEdge:typeOf(name) end
 
+--- Lua handle for a graph item (typed item) inside a `Graph`.
 ---@class LGraphItem
 LGraphItem = {}
 
@@ -8376,6 +8431,7 @@ function LGraphItem:type() end
 ---@return boolean True if the type name matches GraphItem or Object.
 function LGraphItem:typeOf(name) end
 
+--- Lua handle for a node inside a `Graph`.
 ---@class LGraphNode
 LGraphNode = {}
 
@@ -9542,7 +9598,7 @@ lurek.image.loadLayered = function(path) end
 lurek.image.newCompressedData = function(filename) end
 
 --- Creates a new blank ImageData or loads one from a file.
----@param ... integer|integer
+---@param ... integer|string|integer
 ---@return ImageData New or loaded image data.
 lurek.image.newImageData = function(...) end
 
@@ -10003,8 +10059,10 @@ lurek.input.gamepad.vibrate = function(id, low_freq, high_freq, duration_ms) end
 ---@return boolean True if the action was pressed this frame.
 lurek.input.wasActionPressed = function(action) end
 
----@param action LuaValue
----@param frames LuaValue
+--- Returns true if the action was pressed within the last frame window.
+---@param action string Action name to test.
+---@param frames integer Maximum frame distance.
+---@return boolean True if the action was pressed within the window.
 lurek.input.wasActionPressedWithin = function(action, frames) end
 
 --- Returns true if any key bound to the action was released this frame.
@@ -13534,7 +13592,7 @@ function LParticleSystem:setCustomEmissionShape(fn) end
 function LParticleSystem:setDirection(dir) end
 
 --- Sets emission area distribution and size.
----@param dist string "none"|"uniform"|"normal"|"ellipse"|"borderellipse"|"borderrectangle".
+---@param dist string|"none"|"uniform"|"normal"|"ellipse"|"borderellipse" "borderrectangle".
 ---@param w number Width value.
 ---@param h number Height value.
 ---@param angle? number Angle in radians.
@@ -13625,7 +13683,7 @@ function LParticleSystem:setRelativeRotation(v) end
 function LParticleSystem:setRotation(min, max) end
 
 --- Sets the particle draw shape.
----@param shape string "square"|"circle"|"triangle"|"spark"|"diamond"|"shrapnel"|"ray"|"puff"|"ring"|"capsule".
+---@param shape string|"square"|"circle"|"triangle"|"spark"|"diamond"|"shrapnel"|"ray"|"puff"|"ring" "capsule".
 ---@return nil No value is returned.
 function LParticleSystem:setShape(shape) end
 
@@ -14838,7 +14896,7 @@ function LObjectPool:release(value) end
 ---@class LObserver
 LObserver = {}
 
---- Gets a property value.
+--- Returns the current stored property value for the given observer key, or nil if it has not been set.
 ---@param key string Property key to read.
 ---@return LuaValue Stored property value, or nil if the key is unset.
 function LObserver:get(key) end
@@ -16568,6 +16626,7 @@ lurek.physics.testPoint = function(px, py, ax, ay, aw, ah) end
 ---@class lurek.pipeline
 lurek.pipeline = {}
 
+--- Lua-side wrapper around a [`Pipeline`] DAG.
 ---@class LPipeline
 LPipeline = {}
 
@@ -16680,7 +16739,7 @@ function LPipeline:runAsync(context) end
 ---@return nil No value is returned.
 function LPipeline:setErrorMode(mode) end
 
---- Sets the pipeline name.
+--- Renames the pipeline without changing its steps, dependencies, or current runtime state.
 ---@param name string New pipeline name.
 ---@return nil No value is returned.
 function LPipeline:setName(name) end
@@ -16727,6 +16786,7 @@ function LPipeline:update(dt) end
 ---@return table Array of validation error strings.
 function LPipeline:validate() end
 
+--- Lua-side wrapper around a single [`PipelineStep`].
 ---@class LPipelineStep
 LPipelineStep = {}
 
@@ -17135,9 +17195,9 @@ LRaycaster = {}
 
 --- Builds a raycaster scene and stores it in SharedState for GPU rendering.
 ---@param params table - { px, py, angle, fov, rays, max_dist, screen_w, screen_h, ambient?, shade_dist?, floor_color?, ceiling_color? }.
----@param lights table nil | - array of { x, y, radius, r, g, b, intensity }.
----@param sprites table nil | - array of { x, y, texture, size }.
----@param wall_textures table nil | - { [cell_value] = TextureKey }.
+---@param lights table|nil - array of { x, y, radius, r, g, b, intensity }.
+---@param sprites table|nil - array of { x, y, texture, size }.
+---@param wall_textures table|nil - { [cell_value] = TextureKey }.
 ---@return nil No value is returned.
 function LRaycaster:buildScene(params, lights, sprites, wall_textures) end
 
@@ -18844,7 +18904,7 @@ lurek.scene.deserializeScene = function(snapshot) end
 ---@return nil No value is returned.
 lurek.scene.draw = function() end
 
---- Returns a fade cross-dissolve transition config table.
+--- Pre-built named transition factory functions.  Each function accepts optional
 ---@param duration? number Duration in seconds. Defaults to 0.5.
 ---@return table Transition config table.
 lurek.scene.fade = function(duration) end
@@ -19470,6 +19530,8 @@ lurek.runtime.getBatchResults = function(results) end
 ---@return string Returns the current clipboard text or an empty string on failure.
 lurek.runtime.getClipboardText = function() end
 
+--- Returns whether the debug overlay is currently visible.
+---@return boolean Returns whether the debug overlay is visible.
 lurek.runtime.getDebugOverlay = function() end
 
 --- Returns the value of an environment variable, or nil if not set.
@@ -21581,8 +21643,12 @@ lurek.timer.sleep = function(seconds) end
 ---@return number The delta time for the stepped frame
 lurek.timer.step = function() end
 
+--- Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
+---@return integer The number of real-time callbacks that fired
 lurek.timer.tickRealTimers = function() end
 
+--- Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or frame target has been reached.
+---@return integer Number of coroutines resumed in this tick
 lurek.timer.tickWaits = function() end
 
 --- Yields the current Lua coroutine until at least `frames` engine frames have elapsed.
@@ -21602,7 +21668,7 @@ lurek.tween = {}
 ---@class LSpring
 LSpring = {}
 
---- Stops the spring.
+--- Stops the spring immediately, clears its settle callback, and leaves the current values at their last simulated positions.
 ---@return nil No value is returned.
 function LSpring:cancel() end
 
@@ -21917,7 +21983,8 @@ lurek.tween.update = function(dt) end
 ---@class lurek.ui
 lurek.ui = {}
 
----@class LAccordion
+--- Creates a collapsible accordion widget.
+---@class LAccordion : LUiWidget
 LAccordion = {}
 
 --- Adds a section entry to this Accordion widget.
@@ -21986,7 +22053,8 @@ function LAreaChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LAreaChart:typeOf(name) end
 
----@class LBadge
+--- Creates a badge widget displaying a numeric count.
+---@class LBadge : LUiWidget
 LBadge = {}
 
 --- Returns the raw count of this Badge widget.
@@ -22034,7 +22102,8 @@ function LBarChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LBarChart:typeOf(name) end
 
----@class LButton
+--- Creates and returns a new interactive button widget as a child of this widget.
+---@class LButton : LUiWidget
 LButton = {}
 
 --- Returns the text of this Button widget.
@@ -22046,7 +22115,8 @@ LButton.getText = function() end
 ---@return nil No value is returned.
 LButton.setText = function(text) end
 
----@class LCheckbox
+--- Creates a checkbox widget.
+---@class LCheckbox : LUiWidget
 LCheckbox = {}
 
 --- Returns the text of this Checkbox widget.
@@ -22067,7 +22137,8 @@ LCheckbox.setChecked = function(checked) end
 ---@return nil No value is returned.
 LCheckbox.setText = function(text) end
 
----@class LColorPicker
+--- Creates a color picker widget.
+---@class LColorPicker : LUiWidget
 LColorPicker = {}
 
 --- Returns the color of this Color_Picker widget.
@@ -22108,7 +22179,8 @@ LColorPicker.setOnChange = function(fn) end
 ---@return nil No value is returned.
 LColorPicker.setShowAlpha = function(v) end
 
----@class LComboBox
+--- Creates a dropdown combo box widget.
+---@class LComboBox : LUiWidget
 LComboBox = {}
 
 --- Adds a item entry to this Combo_Box widget.
@@ -22147,7 +22219,8 @@ LComboBox.removeItem = function(index) end
 ---@return nil No value is returned.
 LComboBox.setSelectedIndex = function(index) end
 
----@class LDialog
+--- Creates a modal dialog widget.
+---@class LDialog : LUiWidget
 LDialog = {}
 
 --- Adds a button entry to this Dialog widget.
@@ -22200,7 +22273,8 @@ LDialog.setOnClose = function(fn) end
 ---@return nil No value is returned.
 LDialog.setTitle = function(title) end
 
----@class LDockPanel
+--- Creates and returns a new docking panel that arranges children along its edges.
+---@class LDockPanel : LUiWidget
 LDockPanel = {}
 
 --- Performs the dock operation on this Dock_Panel widget.
@@ -22229,7 +22303,8 @@ LDockPanel.setSplitSize = function(side, size) end
 ---@return nil No value is returned.
 LDockPanel.undock = function(child_idx) end
 
----@class LGuiTable
+--- Creates a data table widget.
+---@class LGuiTable : LUiWidget
 LGuiTable = {}
 
 --- Adds a column entry to this Gui_Table widget.
@@ -22287,7 +22362,8 @@ LGuiTable.setSelectedRow = function(row) end
 ---@return nil No value is returned.
 LGuiTable.setSortable = function(v) end
 
----@class LGuiWindow
+--- Creates a draggable window widget.
+---@class LGuiWindow : LUiWidget
 LGuiWindow = {}
 
 --- Returns the title of this Gui_Window widget.
@@ -22331,7 +22407,8 @@ LGuiWindow.setResizable = function(v) end
 ---@return nil No value is returned.
 LGuiWindow.setTitle = function(title) end
 
----@class LImageWidget
+--- Creates an image display widget.
+---@class LImageWidget : LUiWidget
 LImageWidget = {}
 
 --- Returns the scale mode of this Image_Widget widget.
@@ -22358,7 +22435,8 @@ LImageWidget.setScaleMode = function(mode) end
 ---@return nil No value is returned.
 LImageWidget.setTint = function(r, green, b, a) end
 
----@class LLabel
+--- Creates a text label widget.
+---@class LLabel : LUiWidget
 LLabel = {}
 
 --- Returns the text of this Label widget.
@@ -22370,7 +22448,8 @@ LLabel.getText = function() end
 ---@return nil No value is returned.
 LLabel.setText = function(text) end
 
----@class LLayout
+--- Creates a flexbox layout container.
+---@class LLayout : LUiWidget
 LLayout = {}
 
 --- Returns the align of this Layout widget.
@@ -22460,7 +22539,8 @@ function LLineChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LLineChart:typeOf(name) end
 
----@class LListBox
+--- Creates a selectable list widget.
+---@class LListBox : LUiWidget
 LListBox = {}
 
 --- Adds a item entry to this List_Box widget.
@@ -22500,7 +22580,8 @@ LListBox.setItemHeight = function(h) end
 ---@return nil No value is returned.
 LListBox.setSelectedIndex = function(index) end
 
----@class LMenuBar
+--- Creates a menu bar widget.
+---@class LMenuBar : LUiWidget
 LMenuBar = {}
 
 --- Adds a menu entry to this Menu_Bar widget.
@@ -22521,7 +22602,8 @@ LMenuBar.getMenus = function() end
 ---@return boolean True when a menu was removed.
 LMenuBar.removeMenu = function(menu_idx) end
 
----@class LMenuItem
+--- Creates a menu item widget.
+---@class LMenuItem : LUiWidget
 LMenuItem = {}
 
 --- Adds a sub item entry to this Menu_Item widget.
@@ -22565,7 +22647,8 @@ LMenuItem.setShortcut = function(shortcut) end
 ---@return nil No value is returned.
 LMenuItem.setText = function(text) end
 
----@class LNinePatch
+--- Creates a 9-patch slicer widget.
+---@class LNinePatch : LUiWidget
 LNinePatch = {}
 
 --- Returns the image dimensions of this Nine_Patch widget.
@@ -22598,7 +22681,8 @@ LNinePatch.setImageDimensions = function(w, h) end
 ---@return nil No value is returned.
 LNinePatch.setInsets = function(left, top, right, bottom) end
 
----@class LPanel
+--- Creates a container panel widget.
+---@class LPanel : LUiWidget
 LPanel = {}
 
 --- Returns the title of this Panel widget.
@@ -22642,7 +22726,8 @@ function LPieChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LPieChart:typeOf(name) end
 
----@class LProgressBar
+--- Creates a progress bar widget.
+---@class LProgressBar : LUiWidget
 LProgressBar = {}
 
 --- Returns the max of this Progress_Bar widget.
@@ -22672,7 +22757,8 @@ LProgressBar.setRange = function(min, max) end
 ---@return nil No value is returned.
 LProgressBar.setValue = function(v) end
 
----@class LRadioButton
+--- Creates a grouped radio button widget.
+---@class LRadioButton : LUiWidget
 LRadioButton = {}
 
 --- Returns the group of this Radio_Button widget.
@@ -22746,7 +22832,8 @@ function LScatterPlot:type() end
 ---@return boolean True if this object matches the requested type.
 function LScatterPlot:typeOf(name) end
 
----@class LScrollBar
+--- Creates a scroll bar widget.
+---@class LScrollBar : LUiWidget
 LScrollBar = {}
 
 --- Returns the content size of this Scroll_Bar widget.
@@ -22785,7 +22872,8 @@ LScrollBar.setScrollPosition = function(v) end
 ---@return nil No value is returned.
 LScrollBar.setViewSize = function(v) end
 
----@class LScrollPanel
+--- Creates a scrollable panel widget.
+---@class LScrollPanel : LUiWidget
 LScrollPanel = {}
 
 --- Returns the content size of this Scroll_Panel widget.
@@ -22824,7 +22912,8 @@ LScrollPanel.setScrollPosition = function(x, y) end
 ---@return nil No value is returned.
 LScrollPanel.setScrollSpeed = function(speed) end
 
----@class LSeparator
+--- Creates a separator line.
+---@class LSeparator : LUiWidget
 LSeparator = {}
 
 --- Returns the thickness of this Separator widget.
@@ -22845,7 +22934,8 @@ LSeparator.setThickness = function(thickness) end
 ---@return nil No value is returned.
 LSeparator.setVertical = function(v) end
 
----@class LSlider
+--- Creates a value slider widget.
+---@class LSlider : LUiWidget
 LSlider = {}
 
 --- Returns the max of this Slider widget.
@@ -22876,7 +22966,8 @@ LSlider.setStep = function(step) end
 ---@return nil No value is returned.
 LSlider.setValue = function(v) end
 
----@class LSpinBox
+--- Creates a numeric spin box widget with increment and decrement buttons.
+---@class LSpinBox : LUiWidget
 LSpinBox = {}
 
 --- Decrements the value by one step.
@@ -22907,7 +22998,8 @@ LSpinBox.setStep = function(step) end
 ---@return nil No value is returned.
 LSpinBox.setValue = function(v) end
 
----@class LSplitPanel
+--- Creates a resizable split panel.
+---@class LSplitPanel : LUiWidget
 LSplitPanel = {}
 
 --- Returns the first child of this Split_Panel widget.
@@ -22955,7 +23047,8 @@ LSplitPanel.setSecondChild = function(child_idx) end
 ---@return nil No value is returned.
 LSplitPanel.setSplitPosition = function(v) end
 
----@class LStatusBar
+--- Creates a status bar widget.
+---@class LStatusBar : LUiWidget
 LStatusBar = {}
 
 --- Adds a section entry to this Status_Bar widget.
@@ -22986,11 +23079,12 @@ LStatusBar.setSectionText = function(section_idx, text) end
 
 --- Compatibility shim for assigning a widget to a section.
 ---@param section_idx integer 1-based section index to target.
----@param widget table integer | Widget table or widget index accepted by this compatibility shim.
+---@param widget table|integer Widget table or widget index accepted by this compatibility shim.
 ---@return nil No value is returned.
 LStatusBar.setSectionWidget = function(section_idx, widget) end
 
----@class LSwitch
+--- Creates a toggle switch widget.
+---@class LSwitch : LUiWidget
 LSwitch = {}
 
 --- Returns the on/off state of this Switch widget.
@@ -23006,7 +23100,8 @@ LSwitch.setOn = function(on) end
 ---@return nil No value is returned.
 LSwitch.toggle = function() end
 
----@class LTabBar
+--- Creates a tab bar widget.
+---@class LTabBar : LUiWidget
 LTabBar = {}
 
 --- Adds a tab entry to this Tab_Bar widget.
@@ -23037,7 +23132,8 @@ LTabBar.removeTab = function(index) end
 ---@return nil No value is returned.
 LTabBar.setActiveTab = function(index) end
 
----@class LTextInput
+--- Creates a text input widget.
+---@class LTextInput : LUiWidget
 LTextInput = {}
 
 --- Returns the cursor position of this Text_Input widget.
@@ -23091,7 +23187,8 @@ function LTheme:type() end
 ---@return boolean True if this object matches the requested type.
 function LTheme:typeOf(name) end
 
----@class LToast
+--- Creates a toast notification widget.
+---@class LToast : LUiWidget
 LToast = {}
 
 --- Returns the duration of this Toast widget.
@@ -23120,7 +23217,8 @@ LToast.setDuration = function(d) end
 ---@return nil No value is returned.
 LToast.setMessage = function(msg) end
 
----@class LToolbar
+--- Creates a toolbar widget.
+---@class LToolbar : LUiWidget
 LToolbar = {}
 
 --- Adds a button entry to this Toolbar widget.
@@ -23169,7 +23267,8 @@ LToolbar.setButtonToggled = function(id, toggled) end
 ---@return nil No value is returned.
 LToolbar.setOrientation = function(v) end
 
----@class LTooltipPanel
+--- Creates a tooltip panel widget.
+---@class LTooltipPanel : LUiWidget
 LTooltipPanel = {}
 
 --- Returns the delay of this Tooltip_Panel widget.
@@ -23199,7 +23298,8 @@ LTooltipPanel.setTarget = function(target) end
 ---@return nil No value is returned.
 LTooltipPanel.setText = function(text) end
 
----@class LTreeView
+--- Creates a collapsible tree view widget.
+---@class LTreeView : LUiWidget
 LTreeView = {}
 
 --- Adds a node entry to this Tree_View widget.
@@ -23295,11 +23395,12 @@ LTreeView.setSelectedNode = function(index) end
 ---@return boolean True when the node ends in the expanded state.
 LTreeView.toggleNode = function(index) end
 
+--- Builds a Lua table with common base-widget methods bound to `idx`.
 ---@class LUiWidget
 LUiWidget = {}
 
 --- Adds a child widget to this container.
----@param child table integer | Child widget table or widget index to attach.
+---@param child table|integer Child widget table or widget index to attach.
 ---@return nil No value is returned.
 LUiWidget.addChild = function(child) end
 
@@ -23426,7 +23527,7 @@ LUiWidget.isEnabled = function() end
 LUiWidget.isVisible = function() end
 
 --- Removes a child widget from this container.
----@param child table integer | Child widget table or widget index to detach.
+---@param child table|integer Child widget table or widget index to detach.
 ---@return nil No value is returned.
 LUiWidget.removeChild = function(child) end
 
@@ -24073,6 +24174,8 @@ lurek.window.onDpiChange = function(callback) end
 ---@return table Array of selected file paths.
 lurek.window.openFileDialog = function(opts) end
 
+--- Checks whether the DPI scale has changed since the last call and fires the onDpiChange callback if so.
+---@return number Current DPI scale factor after polling for changes.
 lurek.window.pollDpiChange = function() end
 
 --- Flashes the window icon in the operating system taskbar or dock to attract the user's attention.

@@ -1,47 +1,39 @@
 ---
-description: "Generate a roadmap phase file from a natural-language description."
+description: "Turn a rough feature description into one roadmap phase draft."
+agent: "Discovery-Lead"
 ---
-
 # Generate Roadmap Phase From Description
 
 ## Goal
-- Generate a complete Lurek2D roadmap phase file from a natural language description of scope and goals.
+- Transform a loose idea into one structured roadmap phase draft.
 
 ## Inputs
-- Noun
-- StructName
-- domain
-- module
-- name
-- slug
-- verb
+- Raw description.
+- Target artifact path.
+- Audience or persona.
+- Any constraints.
 
 ## Steps
-- Load documentation, roadmap-planning before changing any files.
-- **Feature domain** which Lurek2D module(s) does this touch? (graphics, physics, audio, input, filesystem, math, timer, window, data, image, sound, event, thread, system, or a new module)
-- **Core capability** one sentence: what can the game developer do after this phase that they cannot do today?
-- **Scope signal** is this a small addition (1 3 new functions), a medium module extension (new sub-system), or a large new module (brand-new src/<name>/ + lua_api/<name>_api.rs)?
-- **Lua API surface sketch** list the lurek.* function names implied by the description. If none are named, invent canonical names following the lurek.<module>.<verb><Noun> pattern.
-- **Rust implementation surface sketch** list the struct/trait/module names the implementation will likely need.
-- docs/api/lurek.md what the current generated reference says
-- Assign the next number (zero-padded, e.g. 19, 20).
-- Choose a slug: lowercase-hyphenated, max 4 words, describes the feature not the status.
-- Determine dependencies:
-- Does this phase need SlotMap keys? Depends On Phase 1
-- Does it need OO Lua objects (UserData)? Depends On Phase 13
+1. Load [skill: opportunity-discovery](../skills/opportunity-discovery/SKILL.md), [skill: roadmap-planning](../skills/roadmap-planning/SKILL.md), and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Read the supplied description, nearby roadmap or ideas files, and any supporting repo evidence before editing.
+3. Extract the real problem, why-now, dependencies, and acceptance gate, then write the smallest useful phase instead of a broad vision document.
+4. Re-read the draft for evidence strength and planning clarity, and mark open questions explicitly when the input is underspecified.
 
 ## Success Criteria
-- [ ] The Architect agent has produced the artifacts named in Goal.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
+- [ ] The prompt goal was completed: Transform a loose idea into one structured roadmap phase draft.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /generate-roadmap-phase-from-description <Noun> <StructName> <domain> <module> <name> <slug> <verb>
+- /generate-roadmap-phase-from-description path=ideas/phase_editor.md description='scene workflow and editor panels'
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: documentation, roadmap-planning
-- **Inputs required**: Noun, StructName, domain, module, name, slug, verb
+Mode: agent
+Loads skills: opportunity-discovery, roadmap-planning, documentation
+Inputs required: Raw description., Target artifact path., Audience or persona., Any constraints.

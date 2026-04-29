@@ -18,17 +18,20 @@ description: "Load this skill when writing or reviewing Rust engine code. It own
 - Docs-only work.
 
 ## Domain Knowledge
-- Prefer clear ownership and small public surfaces.
-- Keep unsafe small and justified.
-- Keep domain logic out of thin wrapper layers.
-- Follow existing module style.
-- Use narrow validation first, then wider gates.
-- Keep fixes at the root cause.
-
+- mod.rs files stay thin; public logic belongs in sibling files, not module roots.
+- No #[cfg(test)] blocks in src/ and no product logic pushed into src/lua_api for convenience.
+- Thin Wrapper Rule and docs/specs sync rules are part of normal Rust work here.
+- Prefer root-cause fixes, explicit error propagation, narrow validation first, and no warning suppression hacks.
+- Keep unsafe tiny, justified, and surrounded by stable invariants.
+- Stage explicit files only and keep one logical change per commit.
+- Safe, idiomatic Rust here includes thin mod.rs, explicit error flow, source-of-truth specs, and no test hacks inside src/.
+- The repo values narrow validation first, root-cause fixes, and minimal unrelated churn over broad cleanup passes.
+- This skill owns core implementation behavior and style, not CAG files or Lua authoring.
 ## Companion File Index
 - None.
 
 ## References
 - src/
 - docs/specs/
-- Cargo.toml
+- tests/rust/unit/
+- tests/lua/

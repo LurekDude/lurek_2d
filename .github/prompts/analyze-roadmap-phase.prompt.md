@@ -1,37 +1,39 @@
 ---
-description: "Audit a roadmap phase and report completion status."
+description: "Analyze one roadmap phase for readiness, gaps, and evidence strength."
+agent: "Discovery-Lead"
 ---
-
 # Analyze Roadmap Phase
 
 ## Goal
-- The **Manager** owns this workflow from start to finish.
-- It runs audit findings fix plan implementation tests documentation re-audit review phase closure.
-- Nothing is skipped. Nothing is assumed done.
+- Return a short phase audit that separates ready work from weakly supported work.
 
 ## Inputs
-- DRY_RUN optional true to stop after producing the Gap Report without implementing anything (default: false)
-- --
+- Phase file or note path.
+- Target persona or audience.
+- Decision horizon.
+- Known blockers or open questions.
 
 ## Steps
-- Load asset-pipeline, documentation, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust before changing any files.
-- Read this prompt's Inputs and confirm every required argument is present.
-- Load any skill listed in loads_skills of this prompt's frontmatter.
-- Execute the work as the Architect agent.
-- Run the relevant quality gates from the quality-pipeline before declaring done.
+1. Load [skill: opportunity-discovery](../skills/opportunity-discovery/SKILL.md), [skill: roadmap-planning](../skills/roadmap-planning/SKILL.md), and [skill: documentation](../skills/documentation/SKILL.md) before acting.
+2. Gather only the relevant source material from the named roadmap or ideas artifact, linked docs, related gaps, and any supporting notes in ideas/ or docs/.
+3. Check whether the phase has a clear problem, why-now, dependencies, acceptance gate, and evidence strong enough to justify planning.
+4. State what is ready, what is speculative, and the smallest next action to improve the phase.
 
 ## Success Criteria
-- [ ] The Architect agent has produced the artifacts named in Goal.
-- [ ] python tools/validate/cag_validate.py returns no new errors.
+- [ ] The data or source scope is explicit.
+- [ ] Findings are evidence-backed and quantified where possible.
+- [ ] Assumptions and open questions are separated from facts.
+- [ ] A next owner or next validation step is clear.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Give generic advice with no repo evidence or measured signal.
+- Mix facts, guesses, and recommendations into one vague paragraph.
+- Jump to implementation before identifying the owner and the evidence strength.
 
 ## Example Invocation
-- /analyze-roadmap-phase <module>
+- /analyze-roadmap-phase path=ideas/render-phase.md
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: asset-pipeline, documentation, gpu-programming, lua-api-design, roadmap-planning, rust-coding, testing-rust
-- **Inputs required**: module
+Mode: agent
+Loads skills: opportunity-discovery, roadmap-planning, documentation
+Inputs required: Phase file or note path., Target persona or audience., Decision horizon., Known blockers or open questions.

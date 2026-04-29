@@ -1086,7 +1086,7 @@ describe("lurek.compute.Array analytics", function()
 
     -- @description Cumulative sum of [1,2,3,4] should be [1,3,6,10].
     xit("cumsum produces running total", function()
-        local a = lurek.compute.fromTable({1, 2, 3, 4}, "float32")
+        local a = lurek.compute.fromTable({1, 2, 3, 4}, nil, "float32")
         local c = a:cumsum()
         expect_near(1,  c:get(1), 0.001)
         expect_near(3,  c:get(2), 0.001)
@@ -1095,25 +1095,25 @@ describe("lurek.compute.Array analytics", function()
 
     -- @description First-order diff of [1,4,9,16] should give [3,5,7].
     xit("diff order 1 yields first differences", function()
-        local a = lurek.compute.fromTable({1, 4, 9, 16}, "float32")
+        local a = lurek.compute.fromTable({1, 4, 9, 16}, nil, "float32")
         local d = a:diff(1)
-        expect_equal(3, d:size())
+        expect_equal(3, d:getSize())
         expect_near(3, d:get(1), 0.01)
         expect_near(7, d:get(3), 0.01)
     end)
 
     -- @description Second-order diff of a quadratic is constant.
     xit("diff order 2 of quadratic is constant", function()
-        local a = lurek.compute.fromTable({0, 1, 4, 9, 16}, "float32")
+        local a = lurek.compute.fromTable({0, 1, 4, 9, 16}, nil, "float32")
         local d = a:diff(2)
-        expect_equal(3, d:size())
+        expect_equal(3, d:getSize())
         expect_near(2, d:get(1), 0.01)
         expect_near(2, d:get(3), 0.01)
     end)
 
     -- @description histogram with 2 bins over [0.5,1.5,2.5,3.5] and range [0,4] gives 2 bins each holding 2 items.
     xit("histogram returns correct bin counts", function()
-        local a = lurek.compute.fromTable({0.5, 1.5, 2.5, 3.5}, "float32")
+        local a = lurek.compute.fromTable({0.5, 1.5, 2.5, 3.5}, nil, "float32")
         local h = a:histogram(2, 0, 4)
         expect_equal(2, #h)
         expect_equal(2, h[1].count)
@@ -1122,33 +1122,33 @@ describe("lurek.compute.Array analytics", function()
 
     -- @description Median (50th percentile) of [1,2,3,4,5] is 3.
     xit("percentile 50 is median", function()
-        local a = lurek.compute.fromTable({1, 2, 3, 4, 5}, "float32")
+        local a = lurek.compute.fromTable({1, 2, 3, 4, 5}, nil, "float32")
         expect_near(3.0, a:percentile(50), 0.001)
     end)
 
     -- @description 100th percentile equals maximum value.
     xit("percentile 100 equals max", function()
-        local a = lurek.compute.fromTable({3, 1, 4, 1, 5}, "float32")
+        local a = lurek.compute.fromTable({3, 1, 4, 1, 5}, nil, "float32")
         expect_near(5.0, a:percentile(100), 0.001)
     end)
 
     -- @description Covariance of an array with itself equals its population variance.
     xit("covariance of array with itself is its variance", function()
-        local a = lurek.compute.fromTable({1, 2, 3}, "float32")
+        local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         -- pop variance of [1,2,3] = 2/3
         expect_near(0.6667, a:covariance(a), 0.01)
     end)
 
     -- @description Pearson correlation of a with 2*a is 1.
     xit("pearsonCorr of linearly related arrays is 1", function()
-        local a = lurek.compute.fromTable({1, 2, 3}, "float32")
-        local b = lurek.compute.fromTable({2, 4, 6}, "float32")
+        local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
+        local b = lurek.compute.fromTable({2, 4, 6}, nil, "float32")
         expect_near(1.0, a:pearsonCorr(b), 0.001)
     end)
 
     -- @description normalizeRange scales [0,5,10] to [0,0.5,1].
     xit("normalizeRange scales to [0, 1]", function()
-        local a = lurek.compute.fromTable({0, 5, 10}, "float32")
+        local a = lurek.compute.fromTable({0, 5, 10}, nil, "float32")
         local n = a:normalizeRange(0, 1)
         expect_near(0.0, n:get(1), 0.001)
         expect_near(0.5, n:get(2), 0.001)
@@ -1157,35 +1157,35 @@ describe("lurek.compute.Array analytics", function()
 
     -- @description zscore of a constant array should error because std dev is 0.
     xit("zscore of constant array returns error", function()
-        local a = lurek.compute.fromTable({5, 5, 5}, "float32")
+        local a = lurek.compute.fromTable({5, 5, 5}, nil, "float32")
         expect_error(function() a:zscore() end)
     end)
 
     -- @description zscore of non-constant array has mean ~0 and std ~1.
     xit("zscore normalises mean to zero", function()
-        local a = lurek.compute.fromTable({2, 4, 4, 4, 5, 5, 7, 9}, "float32")
+        local a = lurek.compute.fromTable({2, 4, 4, 4, 5, 5, 7, 9}, nil, "float32")
         local z = a:zscore()
         local sum = 0
-        for i = 1, z:size() do sum = sum + z:get(i) end
-        expect_near(0.0, sum / z:size(), 0.001)
+        for i = 1, z:getSize() do sum = sum + z:get(i) end
+        expect_near(0.0, sum / z:getSize(), 0.001)
     end)
 
     -- @description Convolving [1,2,3] with identity kernel [1] returns the same array.
     xit("convolve1d with identity kernel returns input", function()
-        local sig = lurek.compute.fromTable({1, 2, 3}, "float32")
-        local ker = lurek.compute.fromTable({1}, "float32")
+        local sig = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
+        local ker = lurek.compute.fromTable({1}, nil, "float32")
         local out = sig:convolve1d(ker)
-        expect_equal(3, out:size())
+        expect_equal(3, out:getSize())
         expect_near(1, out:get(1), 0.001)
         expect_near(3, out:get(3), 0.001)
     end)
 
     -- @description Cross-correlation of signal=[0,1,2,1,0] with template=[1,2,1] peaks at centre.
     xit("correlate1d peaks at template location", function()
-        local sig = lurek.compute.fromTable({0, 1, 2, 1, 0}, "float32")
-        local tpl = lurek.compute.fromTable({1, 2, 1}, "float32")
+        local sig = lurek.compute.fromTable({0, 1, 2, 1, 0}, nil, "float32")
+        local tpl = lurek.compute.fromTable({1, 2, 1}, nil, "float32")
         local out = sig:correlate1d(tpl)
-        expect_equal(3, out:size())
+        expect_equal(3, out:getSize())
         -- position 2 (window [1,2,1]): 1+4+1 = 6
         expect_near(6, out:get(2), 0.001)
     end)
@@ -1198,7 +1198,7 @@ describe("lurek.compute linear algebra", function()
 
     -- @description normalizeVec of [3,4] produces a unit vector [0.6, 0.8].
     xit("normalizeVec makes unit vector", function()
-        local v = lurek.compute.fromTable({3, 4}, "float64")
+        local v = lurek.compute.fromTable({3, 4}, nil, "float64")
         local n = v:normalizeVec()
         expect_near(0.6, n:get(1), 0.001)
         expect_near(0.8, n:get(2), 0.001)
@@ -1206,15 +1206,15 @@ describe("lurek.compute linear algebra", function()
 
     -- @description cross2d of [1,0] and [0,1] is 1.
     xit("cross2d of standard basis vectors is 1", function()
-        local a = lurek.compute.fromTable({1, 0}, "float64")
-        local b = lurek.compute.fromTable({0, 1}, "float64")
+        local a = lurek.compute.fromTable({1, 0}, nil, "float64")
+        local b = lurek.compute.fromTable({0, 1}, nil, "float64")
         expect_near(1.0, a:cross2d(b), 0.001)
     end)
 
     -- @description outer product of [1,2] with [3,4,5] gives a 2Ă—3 matrix.
     xit("outer product has correct shape and values", function()
-        local a = lurek.compute.fromTable({1, 2}, "float64")
-        local b = lurek.compute.fromTable({3, 4, 5}, "float64")
+        local a = lurek.compute.fromTable({1, 2}, nil, "float64")
+        local b = lurek.compute.fromTable({3, 4, 5}, nil, "float64")
         local o = a:outer(b)
         local shape = o:getShape()
         expect_equal(2, shape[1])
@@ -1225,14 +1225,14 @@ describe("lurek.compute linear algebra", function()
     xit("gaussianKernel sums to one", function()
         local k = lurek.compute.gaussianKernel(3, 1.0)
         local s = 0
-        for i = 1, k:size() do s = s + k:get(i) end
+        for i = 1, k:getSize() do s = s + k:get(i) end
         expect_near(1.0, s, 0.0001)
     end)
 
     -- @description rotate2dMatrix and transformPoints rotates [1,0] by 90Â°.
     xit("rotate2dMatrix rotates point by 90 degrees", function()
         local m = lurek.compute.rotate2dMatrix(math.pi / 2)
-        local pts = lurek.compute.fromTable({1, 0}, "float64"):reshape({1, 2})
+        local pts = lurek.compute.fromTable({1, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
         expect_near(0.0, out:get(1), 0.001)
         expect_near(1.0, out:get(2), 0.001)
@@ -1241,7 +1241,7 @@ describe("lurek.compute linear algebra", function()
     -- @description affine2d with identity-scale and zero rotation gives a translation-only matrix.
     xit("affine2d translates points correctly", function()
         local m = lurek.compute.affine2d(5, 3, 0, 1, 1)
-        local pts = lurek.compute.fromTable({0, 0}, "float64"):reshape({1, 2})
+        local pts = lurek.compute.fromTable({0, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
         expect_near(5.0, out:get(1), 0.001)
         expect_near(3.0, out:get(2), 0.001)
@@ -1249,8 +1249,8 @@ describe("lurek.compute linear algebra", function()
 
     -- @description linsolve solves 2x+y=5, x+3y=10 â†’ x=1, y=3.
     xit("linsolve gives correct 2x2 solution", function()
-        local a = lurek.compute.fromTable({2, 1, 1, 3}, "float64"):reshape({2, 2})
-        local b = lurek.compute.fromTable({5, 10}, "float64")
+        local a = lurek.compute.fromTable({2, 1, 1, 3}, nil, "float64"):reshape({2, 2})
+        local b = lurek.compute.fromTable({5, 10}, nil, "float64")
         local x = a:linsolve(b)
         expect_near(1.0, x:get(1), 0.001)
         expect_near(3.0, x:get(2), 0.001)

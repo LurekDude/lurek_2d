@@ -1,40 +1,40 @@
 ---
-description: "Fix a broken lurek.* API function."
+description: "Fix one existing lurek.* API function at the source and resync the public contract."
+agent: "Developer"
+tools: [tools/docs/gen_lua_api_data.py, tools/docs/gen_luadoc.py]
 ---
-
-# Fix Api Function
+# Fix API Function
 
 ## Goal
-- Fix a broken lurek.* API function.
+- Fix one Lua API function at the owner layer.
 
 ## Inputs
-- **Function**: Which lurek.* function is broken
-- **Expected behavior**: What it should do
-- **Actual behavior**: What it currently does
+- Module and function.
+- Observed failure.
+- Expected behavior.
+- Failing test or repro.
 
 ## Steps
-- Load lua-api-design before changing any files.
-- Read the binding in src/lua_api/<module>_api.rs
-- Read the underlying engine code
-- Identify the discrepancy
-- Fix the binding or engine code
-- Update docs/api/lurek.md if signature changed
-- Verify with test
-- Consult the actual lurek.* API surface via docs/api/lurek.md, content/examples/, and docs/specs/. Do NOT invent APIs.
+1. Load [skill: dev-debugging](../skills/dev-debugging/SKILL.md), [skill: lua-api-design](../skills/lua-api-design/SKILL.md), [skill: rust-coding](../skills/rust-coding/SKILL.md), and [skill: lua-rust-bridge](../skills/lua-rust-bridge/SKILL.md) before acting.
+2. Reproduce the failure from the smallest failing test, src/lua_api/<module>_api.rs, the matching domain code, and the accepted spec or docs.
+3. Correct the owning Rust or bridge slice, keep the Lua surface consistent with the accepted contract, and update source docstrings only if the public behavior changed.
+4. Rerun the same failing test first, regenerate Lua API docs from source if needed, and only then widen validation.
 
 ## Success Criteria
-- [ ] Function behaves as documented
-- [ ] API reference accurate
-- [ ] Tests pass
+- [ ] The failure was reproduced or tightly localized.
+- [ ] The owner slice was fixed at the source.
+- [ ] The failing check now passes.
+- [ ] No unrelated drift was introduced.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Patch the symptom in an example, doc, or generated file while leaving the real binding bug in place.
+- Change the API shape casually while trying to fix a localized defect.
+- Skip the original failing test before running broader checks.
 
 ## Example Invocation
-- /fix-api-function <module>
+- /fix-api-function module=audio function=playOnce failure=wrong_return_value
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-api-design
-- **Inputs required**: module
+Mode: agent
+Loads skills: dev-debugging, lua-api-design, rust-coding, lua-rust-bridge
+Inputs required: Module and function., Observed failure., Expected behavior., Failing test or repro.

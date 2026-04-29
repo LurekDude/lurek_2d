@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generated": "2026-04-28T16:35:27.412176+00:00",
+    "generated": "2026-04-28T22:01:52.389169+00:00",
     "generator": "tools/gen_rust_api_data.py",
     "version": "1.0.0",
     "stats": {
@@ -17580,7 +17580,7 @@
         "file": "tests/lua/unit/test_dataframe_unit.lua",
         "module": "test_dataframe_unit",
         "name": "test_dataframe_unit",
-        "description": "Tests for lurek.dataframe tabular data API",
+        "description": "Lurek2D DataFrame Tests",
         "kind": "lua"
       },
       {

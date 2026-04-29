@@ -19,17 +19,20 @@ description: "Load this skill when working on LuaJIT vs Lua 5.4 behavior, GC, lu
 - API naming.
 
 ## Domain Knowledge
-- LuaJIT is the main runtime and shipping path.
-- lua54 is a fallback and compatibility path, not the shipping target.
-- Keep runtime assumptions explicit when behavior differs by backend.
-- Treat GC and allocation pressure as runtime concerns, not API-shape concerns.
-- Keep worker VM limits and multi-VM rules in mind for threaded Lua work.
-- Verify feature-flag behavior against Cargo.toml when backend selection matters.
-
+- Cargo feature selection controls LuaJIT versus lua54; LuaJIT is the shipping path and lua54 is fallback only.
+- Worker VMs under threading are isolated states; no shared Lua VM assumptions survive across threads.
+- Runtime concerns here are GC pressure, allocation churn, backend differences, and VM behavior, not API naming.
+- Measure runtime differences in release mode and state backend-sensitive behavior explicitly.
+- If a backend change affects visible script behavior, reflect it in tests or docs/specs.
+- Keep runtime tuning distinct from binding and game-script work.
+- Backend-sensitive behavior should be checked against Cargo features, worker VM rules, and release-mode runtime expectations before any compatibility claim is made.
+- Runtime tuning here includes GC pressure, LuaJIT vs lua54 behavior, and multi-VM constraints, not boundary conversion or API naming.
+- This skill owns scripting runtime characteristics, not gameplay script style.
 ## Companion File Index
 - None.
 
 ## References
 - Cargo.toml
 - src/runtime/
+- src/thread/
 - docs/specs/thread.md

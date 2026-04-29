@@ -1,58 +1,40 @@
 ---
-description: "Run the full feature-development workflow."
+description: "Run a full feature-development workflow with explicit owners, gates, and sync steps."
+agent: "Manager"
 ---
 # Workflow Feature Development
 
 ## Goal
-- Run a full feature workflow from design to verified code.
+- Drive one feature from scoped request to validated completion.
 
 ## Inputs
-- FEATURE_DESC: one short feature summary and user value.
-- AFFECTED_MODULES: src/ modules that will change.
-- PRIORITY: p1, p2, or p3.
+- Feature goal.
+- Accepted source of truth.
+- Constraints.
+- Required final gate.
 
 ## Steps
-- Load documentation, lua-api-design, lua-rust-bridge, module-architecture, rust-coding, and testing-rust.
-- Read docs/architecture/philosophy.md, docs/architecture/engine-architecture.md, and docs/architecture/test-framework.md.
-- Read docs/specs/<module>.md for each affected module.
-- Stop if the feature breaks binding constraints.
-- Route Lua API design to Lua-Designer when lurek.* changes.
-- Route structure changes to Architect when modules or boundaries change.
-- Keep domain logic in src/<module>/.
-- Keep src/lua_api/<module>_api.rs thin. Only validate, convert, and delegate there.
-- Keep tests out of src/.
-- Keep mod.rs files as declarations only.
-- Write Lua tests for lurek.* behavior and Rust unit tests only for Rust-only internals.
-- Update docs/specs/<module>.md, content/examples/<module>.lua, and docs/CHANGELOG.md.
-- Run python tools/gen_all_docs.py after API changes.
-- Finish with cargo check --tests.
+1. Load [skill: module-architecture](../skills/module-architecture/SKILL.md), [skill: documentation](../skills/documentation/SKILL.md), [skill: testing-rust](../skills/testing-rust/SKILL.md), and [skill: roadmap-planning](../skills/roadmap-planning/SKILL.md) before acting.
+2. Normalize the feature into goal, constraints, out-of-scope items, and the proof needed to call it done.
+3. Split the work into the smallest valid owner slices and keep docs, tests, and changelog sync attached to the slices that actually move.
+4. Require a focused validation after the first meaningful edit in each slice before allowing more reading or more patching.
+5. Close only when the final gate is green and all required sync artifacts for the touched scope are current.
 
 ## Success Criteria
-- [ ] Domain logic is in src/<module>/ only.
-- [ ] Lua wrapper files stay thin.
-- [ ] No tests were added under src/.
-- [ ] mod.rs stays declarations-only.
-- [ ] Needed Lua tests and Rust unit tests exist in the right place.
-- [ ] Public item docstrings are updated.
-- [ ] docs/specs/<module>.md is updated.
-- [ ] Generated API docs are refreshed after API changes.
-- [ ] content/examples/<module>.lua shows the new API.
-- [ ] docs/CHANGELOG.md is updated.
-- [ ] cargo check --tests passes.
+- [ ] The workflow outcome is complete: Drive one feature from scoped request to validated completion.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Skip the success check.
-- Use git add .
-- Add tests under src/.
-- Add structs, enums, impls, or functions to mod.rs.
-- Put business logic in lua_api closures.
-- Skip gen_all_docs.py after API changes.
-- Add a Lua test and forget harness registration.
+- Let the workflow widen with no clear owner or gate.
+- Skip the first focused check and rely on narrative confidence.
+- Close the task while blockers, warnings, or failed gates are still open.
 
 ## Example Invocation
-- /workflow-feature-development FEATURE_DESC AFFECTED_MODULES PRIORITY
+- /workflow-feature-development feature=save_slots source=docs/specs/save.md
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: documentation, lua-api-design, lua-rust-bridge, module-architecture, rust-coding, testing-rust
-- **Inputs required**: FEATURE_DESC, AFFECTED_MODULES, PRIORITY
+Mode: agent
+Loads skills: module-architecture, documentation, testing-rust, roadmap-planning
+Inputs required: Feature goal., Accepted source of truth., Constraints., Required final gate.

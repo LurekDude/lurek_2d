@@ -376,7 +376,7 @@ impl LuaUserData for LuaCamera2D {
         });
 
         // -- attach --
-        /// Alias for `apply()`.
+        /// Alias for `apply()` that queues this camera's transform onto the render command stack.
         /// @return | nil | No return value.
         methods.add_method("attach", |_, this, ()| {
             let cmds = this.inner.borrow().begin_render_commands();
@@ -385,7 +385,7 @@ impl LuaUserData for LuaCamera2D {
         });
 
         // -- detach --
-        /// Alias for `reset()`.
+        /// Alias for `reset()` that removes this camera's transform from the render command stack.
         /// @return | nil | No return value.
         methods.add_method("detach", |_, this, ()| {
             this.state

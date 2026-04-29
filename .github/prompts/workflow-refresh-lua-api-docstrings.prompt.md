@@ -1,54 +1,40 @@
 ---
-description: "Refresh Lua API docstrings to the standard format."
-agent: developer
-loads_tools:
- - tools/validate/validate_lua_api.py
- - tools/validate/cag_validate.py
- - tools/docs/gen_lua_api_data.py
- - tools/docs/gen_extension_api.py
- - tools/docs/gen_luadoc.py
- - tools/docs/gen_docs_lua.py
+description: "Refresh Lua API docstrings at the source and regenerate the derived reference artifacts."
+agent: "Doc-Writer"
+tools: [tools/docs/gen_lua_api_data.py, tools/docs/gen_luadoc.py]
 ---
-# Workflow Refresh Lua Api Docstrings
+# Workflow Refresh Lua API Docstrings
 
 ## Goal
-- Refresh Lua API docstrings to the current standard without changing Rust logic.
+- Bring Lua API docstrings and generated reference outputs back in sync.
 
 ## Inputs
-- target_modules: module names or src/lua_api/*_api.rs paths.
+- Target module or API slice.
+- Doc drift or wording issue.
+- Required generation scope.
 
 ## Steps
-- Load lua-api-design, documentation, and cag-workflow.
-- Read src/lua_api/mod.rs, src/lua_api/register.rs, src/lua_api/lua_types.rs, and docs/specs/lua-api-file-standard.md.
-- If the standard drifted, update the standard docs and related skills first.
-- Rewrite docstrings only in each target file.
-- Keep logic, signatures, return behavior, tests, and control flow unchanged.
-- Use one short description line, then @param lines, then @return lines.
-- Use Lua-visible type names only.
-- Use fixed return types only.
-- Run validate_lua_api.py on touched files.
-- Regenerate lua_api_data.json, lurek-api.json, docs/api/lurek.lua, and docs/api/lurek.md.
-- Run cag_validate.py only if .github changed.
-- Do not run cargo test or runtime checks unless Rust logic changed.
+1. Load [skill: documentation](../skills/documentation/SKILL.md) and [skill: lua-api-design](../skills/lua-api-design/SKILL.md) before acting.
+2. Read the owning src/lua_api/*_api.rs file, the matching spec, and the current generated output before editing text.
+3. Fix the source doc comments only, keeping Lua-facing wording concrete and consistent with the shipped API.
+4. Regenerate the Lua API data and generated docs after the source edit, and copy extension-facing artifacts only if that flow is part of the current contract.
+5. Close with the regenerated output proof and any remaining wording gap that still needs an API decision rather than a doc fix.
 
 ## Success Criteria
-- [ ] Every touched src/lua_api/*_api.rs file uses the fixed docstring format.
-- [ ] No touched Lua API file has Rust logic changes.
-- [ ] validate_lua_api.py passes for touched files.
-- [ ] lua_api_data.json, lurek-api.json, docs/api/lurek.lua, and docs/api/lurek.md are regenerated.
-- [ ] cag_validate.py passes if .github changed.
+- [ ] The workflow outcome is complete: Bring Lua API docstrings and generated reference outputs back in sync.
+- [ ] The controlling files, checks, or owners were identified.
+- [ ] Required validation or gate output is attached.
+- [ ] Remaining blockers or risks are explicit.
 
 ## Anti-patterns
-- Change Rust logic in a docs-only task.
-- Keep legacy docstring formats.
-- Use Rust wrapper names instead of Lua-visible names.
-- Invent behavior that the code does not have.
-- Run runtime checks for doc-only edits.
+- Edit generated docs/api files directly while leaving stale source docstrings in place.
+- Describe planned API behavior as if it already ships.
+- Skip regeneration and assume the rendered docs match the edited source.
 
 ## Example Invocation
-- /workflow-refresh-lua-api-docstrings event,timer,camera,window,log
+- /workflow-refresh-lua-api-docstrings module=audio
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: lua-api-design, documentation, cag-workflow
-- **Inputs required**: target_modules
+Mode: agent
+Loads skills: documentation, lua-api-design
+Inputs required: Target module or API slice., Doc drift or wording issue., Required generation scope.

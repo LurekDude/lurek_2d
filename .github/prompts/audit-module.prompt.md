@@ -1,36 +1,39 @@
 ---
-description: "Run an end-to-end audit for one or more src/ modules."
+description: "Audit one module for architecture, docs, tests, and contract drift."
+agent: "Reviewer"
 ---
 # Audit Module
 
 ## Goal
-- Run a full audit for one or more src/ modules.
+- Produce a module audit focused on correctness, drift, and missing coverage.
 
 ## Inputs
-- module_names: target module list.
+- Target module.
+- Review depth.
+- Known risk area.
+- Any source of truth to honor.
 
 ## Steps
-- Load module-audit, documentation, testing-rust, and module-architecture.
-- Read the target module specs first.
-- Run the audit tools that match module docs, tests, and structure.
-- Group findings by module and issue type.
-- Add remediation guidance.
-- Keep the audit read-only.
+1. Load [skill: module-audit](../skills/module-audit/SKILL.md), [skill: module-architecture](../skills/module-architecture/SKILL.md), [skill: documentation](../skills/documentation/SKILL.md), and [skill: testing-rust](../skills/testing-rust/SKILL.md) before acting.
+2. Read src/<module>/, docs/specs/<module>.md, related tests, and any linked docs or examples.
+3. List findings first in severity order, with emphasis on behavior regressions, ownership leaks, stale docs, and missing tests.
+4. Call out the highest-risk drift, the missing validation, and whether the module is ready for more feature work.
 
 ## Success Criteria
-- [ ] Each target module was audited.
-- [ ] Findings are grouped clearly.
-- [ ] Remediation guidance is listed.
+- [ ] Findings were listed first, or the prompt states clearly that no findings were found.
+- [ ] Each finding is tied to a file, behavior, or missing proof.
+- [ ] Missing validation or test coverage is called out.
+- [ ] Residual risk or next owner is explicit.
 
 ## Anti-patterns
-- Fix code during the audit.
-- Skip the module specs.
-- Mix unrelated modules into one report.
+- Lead with summary instead of findings.
+- Treat style nits as more important than behavior, safety, or contract drift.
+- Declare the area clean without checking tests, validation, or missing proof.
 
 ## Example Invocation
-- /audit-module module_names
+- /audit-module module=audio depth=full
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: module-audit, documentation, testing-rust, module-architecture
-- **Inputs required**: module_names
+Mode: agent
+Loads skills: module-audit, module-architecture, documentation, testing-rust
+Inputs required: Target module., Review depth., Known risk area., Any source of truth to honor.

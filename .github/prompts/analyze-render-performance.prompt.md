@@ -1,36 +1,39 @@
 ---
-description: "Analyze rendering performance and hot spots."
+description: "Analyze frame time, draw cost, or render-pipeline hotspots in one scenario."
+agent: "Optimizer"
 ---
-
 # Analyze Render Performance
 
 ## Goal
-- Profile and analyze the rendering pipeline performance.
+- Locate the dominant render cost for one frame-time problem.
 
 ## Inputs
-- None.
+- Render scenario.
+- Observed frame-time issue.
+- Target backend path or effect.
+- Any profiling output.
 
 ## Steps
-- Load gpu-programming, performance-profiling before changing any files.
-- Identify the rendering hot path in src/render/renderer.rs
-- Count draw commands processed per frame
-- Check for per-frame allocations in render loop
-- Analyze texture memory usage (loaded textures, format conversions)
-- Check camera transform overhead
-- Report bottlenecks with recommended optimizations
+1. Load [skill: performance-profiling](../skills/performance-profiling/SKILL.md) and [skill: gpu-programming](../skills/gpu-programming/SKILL.md) before acting.
+2. Gather only the relevant source material from render traces, frame captures, GPU validation output, render code, and the scenario that reproduces the issue.
+3. Break the cost down into passes, draw submission, resource updates, or synchronization so the main bottleneck is explicit.
+4. Return the most likely controlling render path, any missing measurement, and the next narrow validation step.
 
 ## Success Criteria
-- [ ] Frame time measured per rendering phase
-- [ ] Per-frame allocations identified
-- [ ] Recommendations ordered by impact
+- [ ] The data or source scope is explicit.
+- [ ] Findings are evidence-backed and quantified where possible.
+- [ ] Assumptions and open questions are separated from facts.
+- [ ] A next owner or next validation step is clear.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Give generic advice with no repo evidence or measured signal.
+- Mix facts, guesses, and recommendations into one vague paragraph.
+- Jump to implementation before identifying the owner and the evidence strength.
 
 ## Example Invocation
-- /analyze-render-performance
+- /analyze-render-performance scenario=particle_test symptom=frame_spike
 
 ## CAG Metadata
-- **Mode**: agent
-- **Loads skills**: gpu-programming, performance-profiling
+Mode: agent
+Loads skills: performance-profiling, gpu-programming
+Inputs required: Render scenario., Observed frame-time issue., Target backend path or effect., Any profiling output.

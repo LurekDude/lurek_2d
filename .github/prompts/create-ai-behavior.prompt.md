@@ -1,42 +1,39 @@
 ---
-description: "Create a new lurek.ai behavior."
+description: "Create one Lua-side AI behavior using the current lurek.ai surface."
+agent: "Content-Maker"
 ---
-
-# Create Ai Behavior
+# Create AI Behavior
 
 ## Goal
-- Create a new AI behavior for Lurek2D game entities. Use when implementing FSM states, behavior tree nodes, steering behaviors, or GOAP ac...
+- Add one bounded gameplay AI behavior in Lua content.
 
 ## Inputs
-- SharedState
+- Behavior goal.
+- Target content file or library.
+- Relevant AI module or API.
+- Expected demo or test path.
 
 ## Steps
-- **Choose the AI model**
-- FSM: Simple state-based behavior (idle patrol chase)
-- BehaviorTree: Complex decision logic with fallbacks
-- Steering: Smooth movement (seek, flee, wander, flocking)
-- GOAP: Multi-step planning with preconditions/effects
-- QLearner: Learning from experience (small state spaces only)
-- UtilityAI: Weighted action scoring
-- **Implement the Rust type**
-- Add to appropriate file in src/ai/
-- Follow existing patterns (DecisionModel enum, Agent struct)
-- All computation must be pure CPU math no GPU or window access
-- Add /// doc comments on all public items
+1. Load [skill: game-ai](../skills/game-ai/SKILL.md) and [skill: lua-scripting](../skills/lua-scripting/SKILL.md) before acting.
+2. Read the target content file, nearby lurek.ai usage, matching examples, and the accepted API surface before editing.
+3. Use current lurek.ai behavior primitives, keep the behavior runnable in content, and avoid inventing new engine-side APIs from the prompt layer.
+4. Run the narrowest content check or test that exercises the new behavior and confirm any required registration stays in sync.
 
 ## Success Criteria
-- [ ] New AI type compiles and passes tests
-- [ ] Lua bindings work under lurek.ai.*
-- [ ] Doc comments on all public items
-- [ ] No GPU, audio, or window dependencies in src/ai/
+- [ ] The prompt goal was completed: Add one bounded gameplay AI behavior in Lua content.
+- [ ] Required sync files were updated for the touched slice.
+- [ ] The narrowest relevant validation passed.
+- [ ] The change stayed inside the intended scope.
 
 ## Anti-patterns
-- Skipping the Success Criteria check before declaring the prompt done.
-- Running git add . instead of staging only the files this prompt produced.
+- Widen the change into adjacent layers with no new decision.
+- Edit generated artifacts by hand when the source should change instead.
+- Skip the first narrow validation and jump straight to a broad sweep.
 
 ## Example Invocation
-- /create-ai-behavior <SharedState>
+- /create-ai-behavior file=content/examples/guard.lua goal=patrol_and_chase
 
 ## CAG Metadata
-- **Mode**: agent
-- **Inputs required**: SharedState
+Mode: agent
+Loads skills: game-ai, lua-scripting
+Inputs required: Behavior goal., Target content file or library., Relevant AI module or API., Expected demo or test path.

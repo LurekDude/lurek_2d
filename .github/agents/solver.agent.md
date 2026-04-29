@@ -34,7 +34,7 @@ tools: [read, search, execute]
 
 ## Workflow
 - Rewrite the ask as a decision that can be accepted or rejected.
-- Load rust-coding and module-architecture only when they sharpen the comparison.
+- Load rust-coding and module-architecture when they sharpen the comparison, and bring in error-handling whenever the decision changes failure semantics or recovery behavior.
 - Confirm the symptom is already understood; if not, return that gap to Manager instead of guessing.
 - Read the smallest code slice that controls the decision, not every related module.
 - State the root cause or design pressure in one sentence before listing options.
