@@ -215,7 +215,7 @@ mod frame_tests {
         assert!(db.get_table("t").is_some());
         let tables = db.list_tables();
         assert_eq!(tables, vec!["t"]);
-        db.remove_table("t");
+        let _ = db.remove_table("t");
         assert!(!db.has_table("t"));
     }
 

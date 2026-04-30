@@ -65,6 +65,17 @@ describe("lurek.procgen", function()
             local data = lurek.procgen.cellularAutomata(6, 6, { fill = 0.5, iterations = 2 })
             expect_equal(36, #data)
         end)
+
+        -- @tests lurek.procgen.cellularAutomata
+        -- @description Verifies the same seed reproduces the same grid.
+        it("is deterministic for the same seed", function()
+            local a = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
+            local b = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
+            expect_equal(#a, #b)
+            for i = 1, #a do
+                expect_equal(a[i], b[i])
+            end
+        end)
     end)
 
     -- @description Covers suite: floodFill(data, w, h, sx, sy, threshold, above).
@@ -90,6 +101,21 @@ describe("lurek.procgen", function()
                 if v > 0 then filled = filled + 1 end
             end
             expect_true(filled > 0, "expected at least one filled cell")
+        end)
+
+        -- @tests lurek.procgen.floodFill
+        -- @description Verifies floodFill respects threshold filtering when above=true.
+        it("fills only cells that meet the threshold rule", function()
+            local data = {1, 1, 0, 0,
+                          1, 1, 0, 0,
+                          0, 0, 0, 0,
+                          0, 0, 0, 1}
+            local result = lurek.procgen.floodFill(data, 4, 4, 0, 0, 1, true)
+            expect_equal(1, result[1])
+            expect_equal(1, result[2])
+            expect_equal(1, result[5])
+            expect_equal(1, result[6])
+            expect_equal(0, result[3])
         end)
     end)
 
@@ -148,6 +174,22 @@ describe("lurek.procgen", function()
             for _, p in ipairs(pts) do
                 expect_true(p.x >= 0 and p.x < w, "point x=" .. p.x .. " out of bounds")
                 expect_true(p.y >= 0 and p.y < h, "point y=" .. p.y .. " out of bounds")
+            end
+        end)
+
+        -- @tests lurek.procgen.poissonDisk
+        -- @description Verifies returned points respect the requested minimum spacing.
+        it("keeps points at least min_dist apart", function()
+            local min_dist = 10
+            local pts = lurek.procgen.poissonDisk(80, 80, min_dist, 30, 42)
+            for i = 1, #pts do
+                for j = i + 1, #pts do
+                    local dx = pts[i].x - pts[j].x
+                    local dy = pts[i].y - pts[j].y
+                    local dist_sq = dx * dx + dy * dy
+                    expect_true(dist_sq >= (min_dist * min_dist) - 1e-4,
+                        "points too close: " .. tostring(math.sqrt(dist_sq)))
+                end
             end
         end)
     end)
@@ -446,177 +488,46 @@ describe("procgen.noiseMap / noiseMapParallel", function()
     end)
 end)
 
-test_summary()
+-- @description Replaces the old placeholder tail with direct assertions for the remaining uncovered procedural APIs: WFC generation and simplex noise helpers.
+describe("lurek.procgen regression coverage", function()
+    -- @tests lurek.procgen.wfcGenerate
+    -- @description Generates a trivial one-tile WFC map and verifies the output dimensions and every collapsed cell value.
+    it("wfcGenerate returns a fully collapsed grid for a single-tile ruleset", function()
+        local grid = lurek.procgen.wfcGenerate({
+            width = 4,
+            height = 3,
+            seed = 7,
+            max_attempts = 2,
+            tiles = {
+                { id = 1, weight = 1.0 },
+            },
+            adjacencies = {
+                [1] = { 1 },
+            },
+        })
 
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
+        expect_equal(4, grid.width)
+        expect_equal(3, grid.height)
+        expect_equal(12, #grid.cells)
+        for _, cell in ipairs(grid.cells) do
+            expect_equal(1, cell)
+        end
+    end)
 
-describe("Missing API Coverage", function()
+    -- @tests lurek.procgen.simplex2d
     -- @tests lurek.procgen.simplex3d
-    it("covers lurek.procgen.simplex3d", function()
-        -- TODO: Implement test for lurek.procgen.simplex3d
-    end)
+    -- @description Samples identical simplex coordinates twice in both dimensions and verifies the helpers are numeric and deterministic.
+    it("simplex2d and simplex3d return deterministic numeric samples", function()
+        local s2_a = lurek.procgen.simplex2d(0.25, 0.5)
+        local s2_b = lurek.procgen.simplex2d(0.25, 0.5)
+        local s3_a = lurek.procgen.simplex3d(0.25, 0.5, 0.75)
+        local s3_b = lurek.procgen.simplex3d(0.25, 0.5, 0.75)
 
-end)
-
-describe("Missing explicit test for lurek.procgen.bspDungeon", function()
-    it("lurek.procgen.bspDungeon works", function()
-        -- @tests lurek.procgen.bspDungeon
-        -- TODO: add assertion for lurek.procgen.bspDungeon
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.roomsDungeon", function()
-    it("lurek.procgen.roomsDungeon works", function()
-        -- @tests lurek.procgen.roomsDungeon
-        -- TODO: add assertion for lurek.procgen.roomsDungeon
+        expect_type("number", s2_a)
+        expect_type("number", s3_a)
+        expect_near(s2_a, s2_b, 0.000001)
+        expect_near(s3_a, s3_b, 0.000001)
     end)
 end)
 
-describe("Missing explicit test for lurek.procgen.heightmap", function()
-    it("lurek.procgen.heightmap works", function()
-        -- @tests lurek.procgen.heightmap
-        -- TODO: add assertion for lurek.procgen.heightmap
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.wfcGenerate", function()
-    it("lurek.procgen.wfcGenerate works", function()
-        -- @tests lurek.procgen.wfcGenerate
-        -- TODO: add assertion for lurek.procgen.wfcGenerate
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.lsystem", function()
-    it("lurek.procgen.lsystem works", function()
-        -- @tests lurek.procgen.lsystem
-        -- TODO: add assertion for lurek.procgen.lsystem
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.lsystemSegments", function()
-    it("lurek.procgen.lsystemSegments works", function()
-        -- @tests lurek.procgen.lsystemSegments
-        -- TODO: add assertion for lurek.procgen.lsystemSegments
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.generateName", function()
-    it("lurek.procgen.generateName works", function()
-        -- @tests lurek.procgen.generateName
-        -- TODO: add assertion for lurek.procgen.generateName
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.generateNames", function()
-    it("lurek.procgen.generateNames works", function()
-        -- @tests lurek.procgen.generateNames
-        -- TODO: add assertion for lurek.procgen.generateNames
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.worldGraph", function()
-    it("lurek.procgen.worldGraph works", function()
-        -- @tests lurek.procgen.worldGraph
-        -- TODO: add assertion for lurek.procgen.worldGraph
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.noiseMap", function()
-    it("lurek.procgen.noiseMap works", function()
-        -- @tests lurek.procgen.noiseMap
-        -- TODO: add assertion for lurek.procgen.noiseMap
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.noiseMapParallel", function()
-    it("lurek.procgen.noiseMapParallel works", function()
-        -- @tests lurek.procgen.noiseMapParallel
-        -- TODO: add assertion for lurek.procgen.noiseMapParallel
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.bspDungeon", function()
-    it("lurek.procgen.bspDungeon works", function()
-        -- @tests lurek.procgen.bspDungeon
-        -- TODO: add assertion for lurek.procgen.bspDungeon
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.roomsDungeon", function()
-    it("lurek.procgen.roomsDungeon works", function()
-        -- @tests lurek.procgen.roomsDungeon
-        -- TODO: add assertion for lurek.procgen.roomsDungeon
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.heightmap", function()
-    it("lurek.procgen.heightmap works", function()
-        -- @tests lurek.procgen.heightmap
-        -- TODO: add assertion for lurek.procgen.heightmap
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.wfcGenerate", function()
-    it("lurek.procgen.wfcGenerate works", function()
-        -- @tests lurek.procgen.wfcGenerate
-        -- TODO: add assertion for lurek.procgen.wfcGenerate
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.lsystem", function()
-    it("lurek.procgen.lsystem works", function()
-        -- @tests lurek.procgen.lsystem
-        -- TODO: add assertion for lurek.procgen.lsystem
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.lsystemSegments", function()
-    it("lurek.procgen.lsystemSegments works", function()
-        -- @tests lurek.procgen.lsystemSegments
-        -- TODO: add assertion for lurek.procgen.lsystemSegments
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.generateName", function()
-    it("lurek.procgen.generateName works", function()
-        -- @tests lurek.procgen.generateName
-        -- TODO: add assertion for lurek.procgen.generateName
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.generateNames", function()
-    it("lurek.procgen.generateNames works", function()
-        -- @tests lurek.procgen.generateNames
-        -- TODO: add assertion for lurek.procgen.generateNames
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.worldGraph", function()
-    it("lurek.procgen.worldGraph works", function()
-        -- @tests lurek.procgen.worldGraph
-        -- TODO: add assertion for lurek.procgen.worldGraph
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.noiseMap", function()
-    it("lurek.procgen.noiseMap works", function()
-        -- @tests lurek.procgen.noiseMap
-        -- TODO: add assertion for lurek.procgen.noiseMap
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.noiseMapParallel", function()
-    it("lurek.procgen.noiseMapParallel works", function()
-        -- @tests lurek.procgen.noiseMapParallel
-        -- TODO: add assertion for lurek.procgen.noiseMapParallel
-    end)
-end)
-
-describe("Missing explicit test for lurek.procgen.simplex2d", function()
-    it("lurek.procgen.simplex2d works", function()
-        -- @tests lurek.procgen.simplex2d
-        -- TODO: add assertion for lurek.procgen.simplex2d
-    end)
-end)
+test_summary()

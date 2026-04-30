@@ -87,7 +87,9 @@ impl LuaUserData for LuaCamera2D {
         /// @param | w | number | Width of the viewport in screen pixels
         /// @param | h | number | Height of the viewport in screen pixels
         /// @return | nil | No return value.
-        methods.add_method("setViewport", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
+        methods.add_method(
+            "setViewport",
+            |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
                 this.inner.borrow_mut().set_viewport(x, y, w, h);
                 Ok(())
             },
@@ -110,7 +112,9 @@ impl LuaUserData for LuaCamera2D {
         /// @param | w | number | Width of the bounding rectangle in world units
         /// @param | h | number | Height of the bounding rectangle in world units
         /// @return | nil | No return value.
-        methods.add_method("setBounds", |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
+        methods.add_method(
+            "setBounds",
+            |_, this, (x, y, w, h): (f32, f32, f32, f32)| {
                 this.inner.borrow_mut().set_bounds(x, y, w, h);
                 Ok(())
             },
@@ -244,7 +248,9 @@ impl LuaUserData for LuaCamera2D {
         /// @param | points | table | Point array.
         /// @param | duration | number | Duration in seconds.
         /// @return | nil | No return value.
-        methods.add_method("followPath", |_, this, (points, duration): (LuaTable, f32)| {
+        methods.add_method(
+            "followPath",
+            |_, this, (points, duration): (LuaTable, f32)| {
                 let mut waypoints: Vec<[f32; 2]> = Vec::new();
                 for pair in points.sequence_values::<LuaTable>() {
                     let pair = pair?;
@@ -268,7 +274,7 @@ impl LuaUserData for LuaCamera2D {
         // -- updatePath --
         /// Advances the path animation by `dt` seconds and applies the resulting position to the camera.
         /// @param | dt | number | Delta time in seconds.
-            /// @return | boolean | True if the path updated and produced a new position.
+        /// @return | boolean | True if the path updated and produced a new position.
         methods.add_method("updatePath", |_, this, dt: f32| {
             let pos = this.path.borrow_mut().as_mut().and_then(|p| p.update(dt));
             if let Some((x, y)) = pos {
@@ -281,7 +287,7 @@ impl LuaUserData for LuaCamera2D {
 
         // -- pathProgress --
         /// Returns the fractional progress `[0, 1]` of the active path, or `1` if no path is running.
-            /// @return | number | Current path progress from 0 to 1.
+        /// @return | number | Current path progress from 0 to 1.
         methods.add_method("pathProgress", |_, this, ()| {
             Ok(this
                 .path
@@ -313,7 +319,7 @@ impl LuaUserData for LuaCamera2D {
         // -- updateZoom --
         /// Advances the zoom tween by `dt` seconds and applies the resulting zoom level to the camera.
         /// @param | dt | number | Delta time in seconds.
-            /// @return | boolean | True if the zoom tween updated and produced a zoom value.
+        /// @return | boolean | True if the zoom tween updated and produced a zoom value.
         methods.add_method("updateZoom", |_, this, dt: f32| {
             let zoom = this
                 .zoom_tween
@@ -333,7 +339,9 @@ impl LuaUserData for LuaCamera2D {
         /// @param | layer | string | Layer index.
         /// @param | factor | number | Factor value.
         /// @return | nil | No return value.
-        methods.add_method("setParallaxFactor", |_, this, (layer, factor): (String, f32)| {
+        methods.add_method(
+            "setParallaxFactor",
+            |_, this, (layer, factor): (String, f32)| {
                 this.parallax.borrow_mut().insert(layer, factor);
                 Ok(())
             },
@@ -447,7 +455,9 @@ impl LuaUserData for LuaCamera2D {
         /// @param | amplitude | number? | Peak zoom offset from base (default 0.005)
         /// @param | rate | number? | Oscillation rate in cycles per second (default 0.2)
         /// @return | nil | No return value.
-        methods.add_method("startBreathing", |_, this, (amplitude, rate): (Option<f32>, Option<f32>)| {
+        methods.add_method(
+            "startBreathing",
+            |_, this, (amplitude, rate): (Option<f32>, Option<f32>)| {
                 let amplitude = amplitude.unwrap_or(0.005);
                 let rate = rate.unwrap_or(0.2);
                 this.inner.borrow_mut().breathing.start(amplitude, rate);
@@ -514,7 +524,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | viewport_h | number? | Viewport height in pixels (default 600)
     /// @return | LCamera | New Camera2D with the given viewport dimensions.
     let s = state.clone();
-    tbl.set("new", lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
+    tbl.set(
+        "new",
+        lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
             let vh = vh.unwrap_or(600.0);
             lua.create_userdata(LuaCamera2D {
@@ -533,7 +545,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | viewport_h | number? | Viewport height in pixels (default 600)
     /// @return | LCamera | New 2D camera with the given viewport dimensions.
     let s = state.clone();
-    tbl.set("newCamera", lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
+    tbl.set(
+        "newCamera",
+        lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
             let vh = vh.unwrap_or(600.0);
             lua.create_userdata(LuaCamera2D {

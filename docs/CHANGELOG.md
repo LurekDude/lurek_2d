@@ -2,7 +2,63 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.14] - 2026-04-30
+
+### test(lua): migrate 50 more public API tests from Rust to Lua-first coverage
+
+- Replaced remaining TODO and placeholder coverage in `tests/lua/unit/test_math_unit.lua` with real assertions for the migrated math easing, geometry, and tween behavior, and moved `test_summary()` back to the real end of file.
+- Strengthened `tests/lua/unit/test_raycaster_unit.lua` and `tests/lua/unit/test_procgen_unit.lua` with the public-API cases needed to cover the migrated raycaster and procgen contracts through Lua.
+- Removed 50 duplicate Rust tests from `tests/rust/unit/math_tests.rs`, `procgen_tests.rs`, and `raycaster_tests.rs` now that the same user-facing behavior is exercised through the Lua surface.
+
+## [1.0.9-fix.13] - 2026-04-30
+
+### test(lua): migrate another Lua-first unit batch and remove duplicate Rust smoke coverage
+
+- Replaced placeholder-only tails in `tests/lua/unit/test_patterns_unit.lua`, `test_image_unit.lua`, `test_docs_unit.lua`, and `test_network_unit.lua` with real Lua coverage for the remaining public `lurek.*` behavior that was still stubbed.
+- Moved stray mid-file `test_summary()` calls back to end-of-file in the touched Lua suites and tightened the affected assertions so the Problems panel is clean for the migrated cases.
+- Removed duplicate Rust-only smoke tests from `tests/rust/unit/patterns_tests.rs`, `image_tests.rs`, and `docs_tests.rs` now that the same contracts are exercised through the Lua API surface.
+- Cleaned the touched warning sites in `src/ai/orca.rs` and the affected Rust test files so scoped validation for this batch runs without fresh Problems entries.
+
+## [1.0.9-fix.12] - 2026-04-29
+
+### docs(architecture): start the TOGAF-to-Lurek mapping set
+
+- Added `docs/architecture/togaf-mapping.md` as the current-state crosswalk from TOGAF concepts onto Lurek2D principles, domains, repository artifacts, governance surfaces, and ADM-like workflow equivalents.
+- Added `docs/architecture/togaf-gap-analysis.md` as the follow-on fit assessment describing strong matches, weak spots, risks, and the smallest safe migration path for future TOGAF-aware architecture work.
+- Updated `docs/architecture/README.md` and `docs/architecture/togaf-research.md` so the TOGAF research brief now points to the live mapping and gap-analysis documents instead of an open-ended future placeholder.
+
+### chore(cag): add TOGAF and enterprise-architecture skills for architecture comparison work
+
+- Added `.github/skills/enterprise-architecture/SKILL.md` for repo-level architecture doctrine, artifact mapping, and governance work that sits above module-boundary design.
+- Added `.github/skills/togaf/SKILL.md` for TOGAF terminology, source handling, and repo-to-TOGAF comparison work anchored on `docs/architecture/togaf-research.md`.
+- Updated `Architect` and `CAG-Architect` so both agents explicitly load the new skills when TOGAF or higher-level architecture-governance work is in scope.
+- Updated `.github/copilot-instructions.md` and `docs/architecture/cag-system.md` so TOGAF comparative work is discoverable through the normal CAG discovery flow.
+
+### docs(architecture): add an evidence-first TOGAF research brief for later comparison work
+
+- Added `docs/architecture/togaf-research.md` as a source-limited background brief on TOGAF terminology, ADM, architecture domains, repository/governance concepts, contradiction notes, and next questions for future `Architect` / `CAG Architect` work.
+- Updated `docs/architecture/README.md` so the new TOGAF brief is discoverable from the architecture index and explicitly positioned as optional comparative background rather than current project doctrine.
+
+### chore(cag): clarify agent artifact output, git consent, and ownership boundaries
+
+- Clarified the CAG contract so no agent is treated as read-only: all agents may write plans, briefs, repros, reports, scripts, and logs under `work/{session}/` while product-source ownership stays role-specific.
+- Split `Content-Maker` and `Doc-Writer` by artifact class: `Content-Maker` now owns runnable Lua/content files and support assets, while `Doc-Writer` owns markdown docs and generated reference refresh.
+- Repositioned `Manager` as a pure orchestrator that routes subagents and closes phases from specialist outputs instead of doing specialist work itself.
+- Updated the system git policy so state-changing git work requires session-level user opt-in and still stages only touched files.
+
+### chore(cag): centralize agent routing in one skill and drop per-agent routing tables
+
+- Added `.github/skills/agent-routing/SKILL.md` as the single maintained source for ownership heuristics, phase-routing thresholds, and Manager handoff rules.
+- Removed the `Routing Table` section from agent schema and from all agent definitions so specialists no longer carry duplicated pseudo-routing boilerplate.
+- Updated `Manager` so it must load the routing skill through a markdown link in its `Workflow`, and updated the validator plus docs to enforce that contract.
+
 ## [1.0.9-fix.11] - 2026-04-28
+
+### test(lua): migrate the next Lua-first unit-test batch and drop duplicate placeholder tails
+
+- Replaced placeholder-only tail sections in `tests/lua/unit/test_tilemap_unit.lua`, `test_camera_unit.lua`, `test_animation_unit.lua`, `test_pipeline_unit.lua`, and `test_graph_unit.lua` with real regression coverage for the remaining public helpers that were still only stubbed.
+- Removed duplicate placeholder tails that were already covered earlier in the same suite for `tests/lua/unit/test_minimap_unit.lua`, `test_input_unit.lua`, `test_audio_unit.lua`, `test_data_unit.lua`, and `test_effect_unit.lua`, and moved each affected `test_summary()` call back to the real file end.
+- Cleaned the touched Lua test files so the Problems panel is clear for this batch and validated the updated suites with focused exact `cargo test --test lua_tests ... -- --exact` runs per module.
 
 ### fix(lua-api): restore missing class docs and UI widget inheritance in generated Lua docs
 

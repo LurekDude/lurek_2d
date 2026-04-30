@@ -267,8 +267,6 @@ impl ORCASolver {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     #[ignore = "ORCASolver::new() requires time_horizon arg; ORCANeighbour removed; compute API changed"]
     fn no_neighbours_preferred_velocity() {

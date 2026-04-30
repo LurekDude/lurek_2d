@@ -18,15 +18,16 @@ description: "Load this skill when planning module boundaries, dependency direct
 - API naming.
 
 ## Domain Knowledge
-- Each src module should map to docs/specs/<module>.md and keep mod.rs as a thin manifest.
-- Domain code must not import the binding layer; src/lua_api remains a thin wrapper boundary.
-- Prefer one clear owner for state, side effects, and public data types.
-- New modules must fit current export shape in src/lib.rs and current dependency direction.
-- Large restructures need migration steps and contract impact, not only target diagrams.
-- Use validate_module_coverage.py and thin module audits when ownership changes.
-- Module shape should match docs/specs, thin wrapper rules, and the current export graph in src/lib.rs rather than a theoretical ideal.
-- Ownership decisions here need to preserve test placement, Lua binding boundaries, and docs sync work.
-- This skill owns structure and dependency direction, not implementation details or generated docs.
+- Each src module should map to docs/specs/<module>.md and keep mod.rs as a thin manifest, so structure decisions remain visible to both code readers and spec readers.
+- Domain code must not import the binding layer; src/lua_api remains a thin wrapper boundary, not a shared utility layer or architectural shortcut.
+- Prefer one clear owner for state, side effects, public data types, and lifecycle transitions; split modules only when ownership becomes clearer, not because a file feels large in isolation.
+- New modules must fit the current export shape in src/lib.rs and the documented dependency direction across foundations, core runtime, platform services, feature systems, and edge or integration layers.
+- Avoid dependency cycles by keeping cross-layer traffic one-directional; when a module wants data from a higher layer, that is usually a sign the boundary is wrong.
+- Large restructures need migration steps, contract impact, and downstream sync plans, not only target diagrams or aspirational folder trees.
+- Ownership changes should preserve test placement rules, Lua binding boundaries, examples, and docs/specs sync instead of treating architecture as a src/-only concern.
+- Public types should live with the module that owns their invariants; forwarding them through unrelated modules weakens dependency clarity and reviewability.
+- Use validate_module_coverage.py and thin module audits when ownership changes so the structural story remains consistent across code and docs.
+- Module shape should match repo conventions and the current export graph rather than a theoretical ideal.
 ## Companion File Index
 - None.
 

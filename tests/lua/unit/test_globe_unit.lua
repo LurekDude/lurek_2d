@@ -465,34 +465,60 @@ describe("Path finding", function()
     local function make_path_globe()
         local g = lurek.globe.new("path_globe")
         g:addProvince({ id = 10, centroid = {0.0, 0.0}, vertices = {{-1,0},{0,1},{1,0}}, neighbors = {11} })
-        g:addProvince({ id = 11, centroid = {5.0, 5.0}, vertices = {{4,5},{5,6},{6,5}}, neighbors = {10, 12} })
-        g:addProvince({ id = 12, centroid = {10.0, 10.0}, vertices = {{9,10},{10,11},{11,10}}, neighbors = {11} })
+        g:addProvince({ id = 11, centroid = {1.0, 0.0}, vertices = {{0,0},{1,1},{2,0}}, neighbors = {10, 12} })
+        g:addProvince({ id = 12, centroid = {2.0, 0.0}, vertices = {{1,0},{2,1},{3,0}}, neighbors = {11} })
         return g
     end
 
-    -- @description Asserts that findPath returns a table when a path exists or nil otherwise.
-    it("findPath returns a table or nil", function()
+    -- @description Asserts that findPath returns the exact province chain on a connected three-province line.
+    it("findPath returns the exact province chain", function()
         local g = make_path_globe()
         local path = g:findPath(10, 12)
-        if path ~= nil then
-            expect_type("table", path)
-        end
-        expect_equal(true, true) -- acceptable either way
+        expect_not_nil(path)
+        expect_equal(3, #path)
+        expect_equal(10, path[1])
+        expect_equal(11, path[2])
+        expect_equal(12, path[3])
     end)
 
-    -- @description Asserts that findPath with the same start and end is accepted without error.
+    -- @description Asserts that findPath with the same start and end returns the trivial one-province path.
     it("findPath same-province returns trivial path", function()
         local g = make_path_globe()
         local path = g:findPath(10, 10)
-        -- trivial path: just the start node, or nil if cost function rejects
-        expect_equal(true, true)
+        expect_not_nil(path)
+        expect_equal(1, #path)
+        expect_equal(10, path[1])
     end)
 
-    -- @description Asserts that reachable returns a table mapping province IDs to costs.
-    it("reachable returns a table", function()
-        local g = make_path_globe()
+    -- @description Asserts that reachable includes the start province with zero cost even when there are no neighbors.
+    it("reachable with no neighbors only includes the start province", function()
+        local g = lurek.globe.new("solo_path_globe")
+        g:addProvince({ id = 10, centroid = {0.0, 0.0}, vertices = {{-1,0},{0,1},{1,0}}, neighbors = {} })
+
         local reached = g:reachable(10, 5.0)
         expect_type("table", reached)
+        expect_equal(0, reached[10])
+        expect_nil(reached[11])
+    end)
+
+    -- @description Asserts that reachable includes both downstream provinces when the budget covers the full chain.
+    it("reachable includes downstream provinces within budget", function()
+        local g = make_path_globe()
+        local reached = g:reachable(10, 3.0)
+        expect_type("table", reached)
+        expect_equal(0, reached[10])
+        expect_true(reached[11] ~= nil)
+        expect_true(reached[12] ~= nil)
+    end)
+
+    -- @description Asserts that zero traversal budget keeps the reachable set at the starting province only.
+    it("reachable with zero budget only includes the start province", function()
+        local g = make_path_globe()
+        local reached = g:reachable(10, 0.0)
+        expect_type("table", reached)
+        expect_equal(0, reached[10])
+        expect_nil(reached[11])
+        expect_nil(reached[12])
     end)
 end)
 
@@ -689,8 +715,7 @@ describe("globe_demo: lurek.init()", function()
     it("at least 15 capital markers were added", function()
         local earth = lurek.globe.get("earth")
         if earth == nil then pending("globe not created") return end
-        local count = earth:markerCount()
-        expect_true(count >= 15, string.format("expected >= 15 markers, got %d", count))
+        expect_equal("capital", earth:getMarkerAttr(15, "type"))
     end)
 
     it("camera was set (getCamera returns numeric lat/lon/zoom)", function()
@@ -762,330 +787,46 @@ end)
 describe("Missing API Coverage", function()
     -- @tests lurek.globe.get
     it("covers lurek.globe.get", function()
-        -- TODO: Implement test for lurek.globe.get
+        local missing = lurek.globe.get("missing_globe_name")
+        expect_nil(missing)
     end)
 
     -- @tests Globe:pan
     it("covers Globe:pan", function()
-        -- TODO: Implement test for Globe:pan
-    end)
-
-    -- @tests GlobeRegistry:get
-    it("covers GlobeRegistry:get", function()
-        -- TODO: Implement test for GlobeRegistry:get
+        local g = lurek.globe.new("pan_cover_globe")
+        g:setCamera(10.0, 20.0, 1.5)
+        local before_lat, before_lon = g:getCamera()
+        g:pan(5.0, -7.0)
+        local after_lat, after_lon = g:getCamera()
+        expect_not_equal(before_lat, after_lat)
+        expect_not_equal(before_lon, after_lon)
     end)
 
 end)
 
-describe("Missing explicit test for lurek.globe.loadFromTOML", function()
-    it("lurek.globe.loadFromTOML works", function()
+describe("lurek.globe.loadFromTOML", function()
+    it("loads provinces and attrs from TOML", function()
         -- @tests lurek.globe.loadFromTOML
-        -- TODO: add assertion for lurek.globe.loadFromTOML
-    end)
-end)
+        local toml = [=[
+[[province]]
+id = 1
+centroid = [10.0, 20.0]
+vertices = [[9.0, 19.0], [9.0, 21.0], [11.0, 21.0], [11.0, 19.0]]
+neighbors = [2]
 
-describe("Missing explicit test for Globe:addProvince", function()
-    it("Globe:addProvince works", function()
-        -- @tests Globe:addProvince
-        -- TODO: add assertion for Globe:addProvince
-    end)
-end)
+[province.attrs]
+owner = "player"
 
-describe("Missing explicit test for Globe:removeProvince", function()
-    it("Globe:removeProvince works", function()
-        -- @tests Globe:removeProvince
-        -- TODO: add assertion for Globe:removeProvince
-    end)
-end)
-
-describe("Missing explicit test for Globe:provinceCount", function()
-    it("Globe:provinceCount works", function()
-        -- @tests Globe:provinceCount
-        -- TODO: add assertion for Globe:provinceCount
-    end)
-end)
-
-describe("Missing explicit test for Globe:getNeighbors", function()
-    it("Globe:getNeighbors works", function()
-        -- @tests Globe:getNeighbors
-        -- TODO: add assertion for Globe:getNeighbors
-    end)
-end)
-
-describe("Missing explicit test for Globe:getProvinceAttr", function()
-    it("Globe:getProvinceAttr works", function()
-        -- @tests Globe:getProvinceAttr
-        -- TODO: add assertion for Globe:getProvinceAttr
-    end)
-end)
-
-describe("Missing explicit test for Globe:zoom", function()
-    it("Globe:zoom works", function()
-        -- @tests Globe:zoom
-        -- TODO: add assertion for Globe:zoom
-    end)
-end)
-
-describe("Missing explicit test for Globe:setCamera", function()
-    it("Globe:setCamera works", function()
-        -- @tests Globe:setCamera
-        -- TODO: add assertion for Globe:setCamera
-    end)
-end)
-
-describe("Missing explicit test for Globe:getCamera", function()
-    it("Globe:getCamera works", function()
-        -- @tests Globe:getCamera
-        -- TODO: add assertion for Globe:getCamera
-    end)
-end)
-
-describe("Missing explicit test for Globe:getLod", function()
-    it("Globe:getLod works", function()
-        -- @tests Globe:getLod
-        -- TODO: add assertion for Globe:getLod
-    end)
-end)
-
-describe("Missing explicit test for Globe:pick", function()
-    it("Globe:pick works", function()
-        -- @tests Globe:pick
-        -- TODO: add assertion for Globe:pick
-    end)
-end)
-
-describe("Missing explicit test for Globe:pickLatLon", function()
-    it("Globe:pickLatLon works", function()
-        -- @tests Globe:pickLatLon
-        -- TODO: add assertion for Globe:pickLatLon
-    end)
-end)
-
-describe("Missing explicit test for Globe:setActiveViewer", function()
-    it("Globe:setActiveViewer works", function()
-        -- @tests Globe:setActiveViewer
-        -- TODO: add assertion for Globe:setActiveViewer
-    end)
-end)
-
-describe("Missing explicit test for Globe:revealProvince", function()
-    it("Globe:revealProvince works", function()
-        -- @tests Globe:revealProvince
-        -- TODO: add assertion for Globe:revealProvince
-    end)
-end)
-
-describe("Missing explicit test for Globe:hideProvince", function()
-    it("Globe:hideProvince works", function()
-        -- @tests Globe:hideProvince
-        -- TODO: add assertion for Globe:hideProvince
-    end)
-end)
-
-describe("Missing explicit test for Globe:isVisible", function()
-    it("Globe:isVisible works", function()
-        -- @tests Globe:isVisible
-        -- TODO: add assertion for Globe:isVisible
-    end)
-end)
-
-describe("Missing explicit test for Globe:revealAll", function()
-    it("Globe:revealAll works", function()
-        -- @tests Globe:revealAll
-        -- TODO: add assertion for Globe:revealAll
-    end)
-end)
-
-describe("Missing explicit test for Globe:removeMarker", function()
-    it("Globe:removeMarker works", function()
-        -- @tests Globe:removeMarker
-        -- TODO: add assertion for Globe:removeMarker
-    end)
-end)
-
-describe("Missing explicit test for Globe:moveMarker", function()
-    it("Globe:moveMarker works", function()
-        -- @tests Globe:moveMarker
-        -- TODO: add assertion for Globe:moveMarker
-    end)
-end)
-
-describe("Missing explicit test for Globe:setMarkerVisible", function()
-    it("Globe:setMarkerVisible works", function()
-        -- @tests Globe:setMarkerVisible
-        -- TODO: add assertion for Globe:setMarkerVisible
-    end)
-end)
-
-describe("Missing explicit test for Globe:getMarkerAttr", function()
-    it("Globe:getMarkerAttr works", function()
-        -- @tests Globe:getMarkerAttr
-        -- TODO: add assertion for Globe:getMarkerAttr
-    end)
-end)
-
-describe("Missing explicit test for Globe:setLabelText", function()
-    it("Globe:setLabelText works", function()
-        -- @tests Globe:setLabelText
-        -- TODO: add assertion for Globe:setLabelText
-    end)
-end)
-
-describe("Missing explicit test for Globe:setLabelVisible", function()
-    it("Globe:setLabelVisible works", function()
-        -- @tests Globe:setLabelVisible
-        -- TODO: add assertion for Globe:setLabelVisible
-    end)
-end)
-
-describe("Missing explicit test for Globe:removeLabel", function()
-    it("Globe:removeLabel works", function()
-        -- @tests Globe:removeLabel
-        -- TODO: add assertion for Globe:removeLabel
-    end)
-end)
-
-describe("Missing explicit test for Globe:removeLayer", function()
-    it("Globe:removeLayer works", function()
-        -- @tests Globe:removeLayer
-        -- TODO: add assertion for Globe:removeLayer
-    end)
-end)
-
-describe("Missing explicit test for Globe:setLayerVisible", function()
-    it("Globe:setLayerVisible works", function()
-        -- @tests Globe:setLayerVisible
-        -- TODO: add assertion for Globe:setLayerVisible
-    end)
-end)
-
-describe("Missing explicit test for Globe:setLayerAlpha", function()
-    it("Globe:setLayerAlpha works", function()
-        -- @tests Globe:setLayerAlpha
-        -- TODO: add assertion for Globe:setLayerAlpha
-    end)
-end)
-
-describe("Missing explicit test for Globe:setTimeOfDay", function()
-    it("Globe:setTimeOfDay works", function()
-        -- @tests Globe:setTimeOfDay
-        -- TODO: add assertion for Globe:setTimeOfDay
-    end)
-end)
-
-describe("Missing explicit test for Globe:getTimeOfDay", function()
-    it("Globe:getTimeOfDay works", function()
-        -- @tests Globe:getTimeOfDay
-        -- TODO: add assertion for Globe:getTimeOfDay
-    end)
-end)
-
-describe("Missing explicit test for Globe:setRotation", function()
-    it("Globe:setRotation works", function()
-        -- @tests Globe:setRotation
-        -- TODO: add assertion for Globe:setRotation
-    end)
-end)
-
-describe("Missing explicit test for Globe:update", function()
-    it("Globe:update works", function()
-        -- @tests Globe:update
-        -- TODO: add assertion for Globe:update
-    end)
-end)
-
-describe("Missing explicit test for Globe:setBorders", function()
-    it("Globe:setBorders works", function()
-        -- @tests Globe:setBorders
-        -- TODO: add assertion for Globe:setBorders
-    end)
-end)
-
-describe("Missing explicit test for Globe:findPath", function()
-    it("Globe:findPath works", function()
-        -- @tests Globe:findPath
-        -- TODO: add assertion for Globe:findPath
-    end)
-end)
-
-describe("Missing explicit test for Globe:removeArc", function()
-    it("Globe:removeArc works", function()
-        -- @tests Globe:removeArc
-        -- TODO: add assertion for Globe:removeArc
-    end)
-end)
-
-describe("Missing explicit test for Globe:getName", function()
-    it("Globe:getName works", function()
-        -- @tests Globe:getName
-        -- TODO: add assertion for Globe:getName
-    end)
-end)
-
-describe("Missing explicit test for GlobeRegistry:remove", function()
-    it("GlobeRegistry:remove works", function()
-        -- @tests GlobeRegistry:remove
-        -- TODO: add assertion for GlobeRegistry:remove
-    end)
-end)
-
-describe("Missing explicit test for GlobeRegistry:names", function()
-    it("GlobeRegistry:names works", function()
-        -- @tests GlobeRegistry:names
-        -- TODO: add assertion for GlobeRegistry:names
-    end)
-end)
-
-describe("lurek.globe.new and lurek.globe.get (@covers)", function()
-    it("lurek.globe.new returns a userdata handle", function()
-        -- @covers lurek.globe.new
-        local g = lurek.globe.new("cov_globe_new")
-        expect_not_nil(g)
+[[province]]
+id = 2
+centroid = [12.0, 22.0]
+vertices = [[11.0, 21.0], [11.0, 23.0], [13.0, 23.0], [13.0, 21.0]]
+neighbors = [1]
+]=]
+        local g = lurek.globe.loadFromTOML("toml_globe", toml)
         expect_type("userdata", g)
-    end)
-
-    it("lurek.globe.get retrieves a previously created globe", function()
-        -- @covers lurek.globe.get
-        local _ = lurek.globe.new("cov_globe_get")
-        local g = lurek.globe.get("cov_globe_get")
-        expect_not_nil(g)
-    end)
-end)
-
-describe("Globe:pan (@covers)", function()
-    it("pan does not crash", function()
-        -- @covers Globe:pan
-        local g = lurek.globe.new("cov_pan_globe")
-        local ok, _ = pcall(function() g:pan(0.1, 0.0) end)
-        expect_type("boolean", ok)
-    end)
-end)
-
-describe("GlobeRegistry:new and GlobeRegistry:get (@covers)", function()
-    it("GlobeRegistry:new creates a globe via registry", function()
-        -- @covers GlobeRegistry:new
-        local ok, reg = pcall(function() return lurek.globe.newRegistry() end)
-        if not ok then
-            -- factory may be named differently; fall back to module-level
-            ok, reg = pcall(function() return lurek.globe.getRegistry() end)
-        end
-        if ok and reg ~= nil then
-            local ok2, _ = pcall(function() reg:new("reg_test_globe") end)
-            expect_type("boolean", ok2)
-        end
-    end)
-
-    it("GlobeRegistry:get retrieves by name", function()
-        -- @covers GlobeRegistry:get
-        local ok, reg = pcall(function() return lurek.globe.newRegistry() end)
-        if not ok then
-            ok, reg = pcall(function() return lurek.globe.getRegistry() end)
-        end
-        if ok and reg ~= nil then
-            pcall(function() reg:new("reg_get_globe") end)
-            local ok2, _ = pcall(function() return reg:get("reg_get_globe") end)
-            expect_type("boolean", ok2)
-        end
+        expect_equal(2, g:provinceCount())
+        expect_equal("player", g:getProvinceAttr(1, "owner"))
     end)
 end)
 

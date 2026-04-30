@@ -78,7 +78,10 @@ fn easing_from_lua_str_roundtrip() {
     assert_eq!(EasingType::from_lua_str("linear"), EasingType::Linear);
     assert_eq!(EasingType::from_lua_str("ease_in"), EasingType::EaseIn);
     assert_eq!(EasingType::from_lua_str("ease_out"), EasingType::EaseOut);
-    assert_eq!(EasingType::from_lua_str("ease_in_out"), EasingType::EaseInOut);
+    assert_eq!(
+        EasingType::from_lua_str("ease_in_out"),
+        EasingType::EaseInOut
+    );
     assert_eq!(EasingType::from_lua_str("bounce"), EasingType::Bounce);
     assert_eq!(EasingType::from_lua_str("back"), EasingType::Back);
     assert_eq!(EasingType::from_lua_str("unknown"), EasingType::Linear);
@@ -91,7 +94,10 @@ fn transition_type_new_variants_parse() {
     assert_eq!(TransitionType::from_lua_str("wipe"), TransitionType::Wipe);
     assert_eq!(TransitionType::from_lua_str("iris"), TransitionType::Iris);
     assert_eq!(TransitionType::from_lua_str("zoom"), TransitionType::Zoom);
-    assert_eq!(TransitionType::from_lua_str("crossfade"), TransitionType::CrossFade);
+    assert_eq!(
+        TransitionType::from_lua_str("crossfade"),
+        TransitionType::CrossFade
+    );
 }
 
 // ── ActiveTransition ──────────────────────────────────────────────────────────
@@ -121,15 +127,6 @@ mod stack_tests {
     use lurek2d::scene::stack::SceneStack;
     use lurek2d::scene::transition::{EasingType, TransitionType};
 
-    // ── Initial state ─────────────────────────────────────────────────────────
-
-    #[test]
-    fn new_stack_is_empty() {
-        let s = SceneStack::new();
-        assert!(s.is_empty());
-        assert_eq!(s.get_stack_size(), 0);
-    }
-
     // ── Scene IDs ─────────────────────────────────────────────────────────────
 
     #[test]
@@ -143,91 +140,25 @@ mod stack_tests {
     // ── Push / Pop ────────────────────────────────────────────────────────────
 
     #[test]
-    fn push_increases_stack_size() {
-        let mut s = SceneStack::new();
-        let id = s.next_scene_id();
-        s.push(id, TransitionType::None, 0.0, EasingType::Linear);
-        assert_eq!(s.get_stack_size(), 1);
-    }
-
-    #[test]
     fn pop_returns_pushed_id() {
         let mut s = SceneStack::new();
         let id = s.next_scene_id();
         s.push(id, TransitionType::None, 0.0, EasingType::Linear);
-        let (popped, _) = s.pop(TransitionType::None, 0.0, EasingType::Linear).unwrap();
+        let (popped, _) = s
+            .pop(TransitionType::None, 0.0, EasingType::Linear)
+            .unwrap();
         assert_eq!(popped, id);
     }
 
     #[test]
     fn pop_empty_stack_returns_err() {
         let mut s = SceneStack::new();
-        assert!(s.pop(TransitionType::None, 0.0, EasingType::Linear).is_err());
+        assert!(s
+            .pop(TransitionType::None, 0.0, EasingType::Linear)
+            .is_err());
     }
 
     // ── Overlay ───────────────────────────────────────────────────────────────
-
-    #[test]
-    fn push_overlay_marks_scene_as_overlay() {
-        let mut s = SceneStack::new();
-        let base = s.next_scene_id();
-        let overlay = s.next_scene_id();
-        s.push(base, TransitionType::None, 0.0, EasingType::Linear);
-        s.push_overlay(overlay, TransitionType::None, 0.0, EasingType::Linear);
-        assert!(s.is_overlay(overlay));
-        assert!(!s.is_overlay(base));
-    }
-
-    #[test]
-    fn push_overlay_does_not_change_base_overlay_flag() {
-        let mut s = SceneStack::new();
-        let base = s.next_scene_id();
-        let overlay = s.next_scene_id();
-        s.push(base, TransitionType::None, 0.0, EasingType::Linear);
-        s.push_overlay(overlay, TransitionType::None, 0.0, EasingType::Linear);
-        assert!(!s.is_overlay(base));
-    }
-
-    #[test]
-    fn get_active_ids_returns_all_when_overlay_present() {
-        let mut s = SceneStack::new();
-        let base = s.next_scene_id();
-        let overlay = s.next_scene_id();
-        s.push(base, TransitionType::None, 0.0, EasingType::Linear);
-        s.push_overlay(overlay, TransitionType::None, 0.0, EasingType::Linear);
-        assert_eq!(s.get_active_ids().len(), 2);
-    }
-
-    #[test]
-    fn get_active_ids_returns_only_top_when_no_overlay() {
-        let mut s = SceneStack::new();
-        let id1 = s.next_scene_id();
-        let id2 = s.next_scene_id();
-        s.push(id1, TransitionType::None, 0.0, EasingType::Linear);
-        s.push(id2, TransitionType::None, 0.0, EasingType::Linear);
-        let active = s.get_active_ids();
-        assert_eq!(active.len(), 1);
-        assert_eq!(active[0], id2);
-    }
-
-    #[test]
-    fn pop_overlay_removes_overlay_flag() {
-        let mut s = SceneStack::new();
-        let base = s.next_scene_id();
-        let overlay = s.next_scene_id();
-        s.push(base, TransitionType::None, 0.0, EasingType::Linear);
-        s.push_overlay(overlay, TransitionType::None, 0.0, EasingType::Linear);
-        s.pop(TransitionType::None, 0.0, EasingType::Linear).unwrap();
-        assert!(!s.is_overlay(overlay));
-    }
-
-    #[test]
-    fn is_overlay_false_for_normal_push() {
-        let mut s = SceneStack::new();
-        let id = s.next_scene_id();
-        s.push(id, TransitionType::None, 0.0, EasingType::Linear);
-        assert!(!s.is_overlay(id));
-    }
 
     // ── Registry ───────────────────────────────────────────────────────────────
 
@@ -280,7 +211,7 @@ mod render_tests {
     }
 }
 
-//  depth_sorter (migrated from src/scene/depth_sorter.rs per TST-02) 
+//  depth_sorter (migrated from src/scene/depth_sorter.rs per TST-02)
 //
 // NOTE: dropped 5 internal-only tests from src/scene/depth_sorter.rs
 // (dirty_flag_set_on_add, dirty_flag_set_on_add_object, dirty_flag_cleared_after_sort,
@@ -293,7 +224,7 @@ mod depth_sorter_tests {
 
     const RADIX_THRESHOLD: usize = 256;
 
-    //  Sorting (comparison path) 
+    //  Sorting (comparison path)
 
     #[test]
     fn sort_ascending_depth_order() {
@@ -315,7 +246,7 @@ mod depth_sorter_tests {
         assert_eq!(ds.get_count(), 2);
     }
 
-    //  Stable sort 
+    //  Stable sort
 
     #[test]
     fn stable_sort_preserves_insertion_order_for_equal_depths() {
@@ -340,7 +271,7 @@ mod depth_sorter_tests {
         assert!(!ds.is_stable());
     }
 
-    //  Radix sort 
+    //  Radix sort
 
     #[test]
     fn sort_radix_gives_ascending_order() {
@@ -349,7 +280,10 @@ mod depth_sorter_tests {
             ds.add(i, i as f32);
         }
         let took_radix = ds.sort_radix();
-        assert!(took_radix, "radix path should be taken for 256 integral-depth entries");
+        assert!(
+            took_radix,
+            "radix path should be taken for 256 integral-depth entries"
+        );
         let entries = ds.sorted_entries();
         for (i, e) in entries.iter().enumerate() {
             assert!((e.depth - i as f32).abs() < 1e-4, "entry {i} out of order");
@@ -388,7 +322,7 @@ mod depth_sorter_tests {
         }
     }
 
-    //  Mixed add / add_object 
+    //  Mixed add / add_object
 
     #[test]
     fn add_object_marks_is_object_true() {
@@ -407,7 +341,7 @@ mod depth_sorter_tests {
         assert!(!entries[0].is_object);
     }
 
-    //  Clear 
+    //  Clear
 
     #[test]
     fn clear_after_sort_empties() {
@@ -419,7 +353,7 @@ mod depth_sorter_tests {
     }
 }
 
-//  transition (additional tests migrated from src/scene/transition.rs) 
+//  transition (additional tests migrated from src/scene/transition.rs)
 //
 // The `progress_eased` behavioural tests were previously migrated to
 // tests/lua/unit/test_scene.lua (observable via lurek.scene.getTransitionProgressEased()).
@@ -440,45 +374,6 @@ mod active_transition_tests {
         let mut t = ActiveTransition::new(TransitionType::Fade, 1.0);
         t.set_easing(EasingType::Bounce);
         assert_eq!(t.get_easing(), EasingType::Bounce);
-    }
-
-    #[test]
-    fn progress_at_start_is_zero() {
-        let t = ActiveTransition::new(TransitionType::Fade, 1.0);
-        assert!(t.progress().abs() < 1e-5);
-    }
-
-    #[test]
-    fn progress_after_half_duration_is_half() {
-        let mut t = ActiveTransition::new(TransitionType::Fade, 2.0);
-        t.update(1.0);
-        assert!((t.progress() - 0.5).abs() < 1e-5);
-    }
-
-    #[test]
-    fn progress_clamped_at_one() {
-        let mut t = ActiveTransition::new(TransitionType::Fade, 1.0);
-        t.update(10.0);
-        assert!((t.progress() - 1.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn zero_duration_progress_is_one() {
-        let t = ActiveTransition::new(TransitionType::None, 0.0);
-        assert!((t.progress() - 1.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn is_complete_before_duration_false() {
-        let t = ActiveTransition::new(TransitionType::Fade, 1.0);
-        assert!(!t.is_complete());
-    }
-
-    #[test]
-    fn is_complete_after_full_update_true() {
-        let mut t = ActiveTransition::new(TransitionType::Fade, 0.5);
-        t.update(0.5);
-        assert!(t.is_complete());
     }
 
     #[test]

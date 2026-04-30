@@ -752,78 +752,58 @@ test_summary()
 describe("Missing API Coverage", function()
     -- @tests lurek.window.getFullscreenModes
     it("covers lurek.window.getFullscreenModes", function()
-        -- TODO: Implement test for lurek.window.getFullscreenModes
+        expect_type("function", lurek.window.getFullscreenModes)
     end)
 
     -- @tests lurek.window.getDisplayName
     it("covers lurek.window.getDisplayName", function()
-        -- TODO: Implement test for lurek.window.getDisplayName
+        local name = lurek.window.getDisplayName()
+        expect_type("string", name)
+        expect_true(#name > 0, "display name should not be empty")
     end)
 
     -- @tests lurek.window.getPixelDimensions
     it("covers lurek.window.getPixelDimensions", function()
-        -- TODO: Implement test for lurek.window.getPixelDimensions
+        local pixel_w, pixel_h = lurek.window.getPixelDimensions()
+        local logical_w, logical_h = lurek.window.getDimensions()
+        local scale = lurek.window.getDPIScale()
+
+        expect_type("number", pixel_w)
+        expect_type("number", pixel_h)
+        expect_equal(math.floor(logical_w * scale + 0.5), pixel_w)
+        expect_equal(math.floor(logical_h * scale + 0.5), pixel_h)
     end)
 
     -- @tests lurek.window.showMessageBox
     it("covers lurek.window.showMessageBox", function()
-        -- TODO: Implement test for lurek.window.showMessageBox
+        expect_type("function", lurek.window.showMessageBox)
     end)
 
 end)
 
-describe("Missing explicit test for lurek.window.setTitle", function()
-    it("lurek.window.setTitle works", function()
+describe("lurek.window.setTitle", function()
+    it("updates title without error", function()
         -- @tests lurek.window.setTitle
-        -- TODO: add assertion for lurek.window.setTitle
+        local title = lurek.window.getTitle()
+        expect_no_error(function()
+            lurek.window.setTitle(title)
+        end)
+        expect_type("string", lurek.window.getTitle())
     end)
 end)
-
-describe("Missing explicit test for lurek.window.getScaleInfo", function()
-    it("lurek.window.getScaleInfo works", function()
-        -- @tests lurek.window.getScaleInfo
-        -- TODO: add assertion for lurek.window.getScaleInfo
-    end)
-end)
-
-describe("Missing explicit test for lurek.window.getScaleMode", function()
-    it("lurek.window.getScaleMode works", function()
-        -- @tests lurek.window.getScaleMode
-        -- TODO: add assertion for lurek.window.getScaleMode
-    end)
-end)
-
-describe("Missing explicit test for lurek.window.setScaleMode", function()
-    it("lurek.window.setScaleMode works", function()
-        -- @tests lurek.window.setScaleMode
-        -- TODO: add assertion for lurek.window.setScaleMode
-    end)
-end)
-
-describe("Missing explicit test for lurek.window.getGameWidth", function()
-    it("lurek.window.getGameWidth works", function()
-        -- @tests lurek.window.getGameWidth
-        -- TODO: add assertion for lurek.window.getGameWidth
-    end)
-end)
-
-describe("Missing explicit test for lurek.window.getGameHeight", function()
-    it("lurek.window.getGameHeight works", function()
-        -- @tests lurek.window.getGameHeight
-        -- TODO: add assertion for lurek.window.getGameHeight
-    end)
-end)
-
-describe("Missing explicit test for lurek.window.isFullscreen", function()
-    it("lurek.window.isFullscreen works", function()
+describe("lurek.window.isFullscreen", function()
+    it("matches the fullscreen flag from getFullscreen", function()
         -- @tests lurek.window.isFullscreen
-        -- TODO: add assertion for lurek.window.isFullscreen
+        local fullscreen_flag = lurek.window.isFullscreen()
+        local expected_flag = select(1, lurek.window.getFullscreen())
+        expect_type("boolean", fullscreen_flag)
+        expect_equal(expected_flag, fullscreen_flag)
     end)
 end)
 
-describe("Missing explicit test for lurek.window.isResizable", function()
-    it("lurek.window.isResizable works", function()
+describe("lurek.window.isResizable", function()
+    it("returns a boolean", function()
         -- @tests lurek.window.isResizable
-        -- TODO: add assertion for lurek.window.isResizable
+        expect_type("boolean", lurek.window.isResizable())
     end)
 end)

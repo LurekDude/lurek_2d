@@ -16,6 +16,12 @@ For a new contributor, read top-down:
 6. [cag-system.md](cag-system.md) — CAG layer doctrine, validator rules, end-of-session sweep contract.
 7. [plugins.md](plugins.md) — plugin architecture (Proposed): core-vs-plugin boundary, load tiers, candidate matrix, migration plan.
 
+Optional comparative background:
+
+8. [togaf-research.md](togaf-research.md) — evidence-first brief on TOGAF terminology, structure, source limits, and future comparison questions for `Architect` / `CAG Architect`.
+9. [togaf-mapping.md](togaf-mapping.md) — current-state crosswalk from TOGAF concepts onto real Lurek2D docs, repository artifacts, and governance surfaces.
+10. [togaf-gap-analysis.md](togaf-gap-analysis.md) — where the current repo already aligns with TOGAF-style concerns, where it does not, and the smallest safe next steps.
+
 For contributor onboarding (clone → build → first game → first engine change), see [docs/handbook.md](../handbook.md).
 
 ---
@@ -31,6 +37,9 @@ For contributor onboarding (clone → build → first game → first engine chan
 | [vscode-architecture.md](vscode-architecture.md)                 | Shipping `extensions/vscode/` design: activation, commands, debug bridge, MCP server, webview editors.                                                       | EngDev · GameDev                               | ~535 lines |
 | [cag-system.md](cag-system.md)                                   | CAG layer (`.github/`) file-type catalog, discovery flow, persona matrix, validator & tooling, sweep contract.                                               | All six personas                               | ~295 lines |
 | [plugins.md](plugins.md)                                         | Plugin architecture (Proposed): core-vs-plugin boundary, Tier A/B/C load mechanism, candidate matrix, migration plan, comparison to other engines.           | EngDev · Modder                                | ~370 lines |
+| [togaf-research.md](togaf-research.md)                           | Evidence-first TOGAF brief: core concepts, public-source limits, contradiction note, and future comparison questions for later architecture work.             | Architect · CAG Architect · EngDev             | ~210 lines |
+| [togaf-mapping.md](togaf-mapping.md)                             | TOGAF concept-to-artifact crosswalk: domains, ADM areas, repository, and governance mapped onto current Lurek2D architecture surfaces.                        | Architect · CAG Architect · EngDev             | ~180 lines |
+| [togaf-gap-analysis.md](togaf-gap-analysis.md)                   | TOGAF-aware fit assessment: strong matches, weak spots, risks, and the smallest safe next steps for future architecture work.                                 | Architect · CAG Architect · EngDev             | ~180 lines |
 
 ---
 
@@ -51,5 +60,8 @@ The system prompt at [.github/copilot-instructions.md](../../.github/copilot-ins
 | VS Code extension commands, MCP server, providers, debug bridge                                   | [vscode-architecture.md](vscode-architecture.md)                                                           |
 | `.github/` layer (agent, skill, prompt, validator, persona matrix)                                | [cag-system.md](cag-system.md) and the system prompt                                                       |
 | Plugin boundary, feature flag, plugin ABI                                                         | [plugins.md](plugins.md)                                                                                   |
+| External architecture framework research used as a comparison lens                                 | [togaf-research.md](togaf-research.md)                                                                     |
+| Current-state TOGAF concept mapping                                                                | [togaf-mapping.md](togaf-mapping.md)                                                                       |
+| TOGAF fit / gap / next-step analysis                                                               | [togaf-gap-analysis.md](togaf-gap-analysis.md)                                                             |
 
 Always also add a bullet under the current version in [docs/CHANGELOG.md](../CHANGELOG.md).

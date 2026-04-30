@@ -539,32 +539,49 @@ describe("lurek.serial.decodeXml", function()
   end)
 end)
 
+describe("lurek.serial regression coverage", function()
+  it("encodeMsgPack round-trips a nested table", function()
+    -- @tests lurek.serial.encodeMsgPack
+    local source = {
+      name = "hero",
+      stats = { hp = 10, mp = 3 },
+      tags = { "warrior", "starter" },
+    }
+    local bytes = lurek.serial.encodeMsgPack(source)
+    expect_equal("string", type(bytes))
+    local decoded = lurek.serial.decodeMsgPack(bytes)
+    expect_equal("hero", decoded.name)
+    expect_equal(10, decoded.stats.hp)
+    expect_equal("warrior", decoded.tags[1])
+  end)
+
+  it("decodeMsgPack preserves sequential arrays", function()
+    -- @tests lurek.serial.decodeMsgPack
+    local decoded = lurek.serial.decodeMsgPack(lurek.serial.encodeMsgPack({ 10, 20, 30 }))
+    expect_equal(3, #decoded)
+    expect_equal(20, decoded[2])
+  end)
+
+  it("decodeXml returns root tag text and attributes", function()
+    -- @tests lurek.serial.decodeXml
+    local decoded = lurek.serial.decodeXml("<root version=\"1\">hello</root>")
+    expect_equal("root", decoded.tag)
+    expect_equal("1", decoded.attrs.version)
+    expect_equal("hello", decoded.text)
+  end)
+
+  it("validate rejects a missing required field", function()
+    -- @tests lurek.serial.validate
+    local ok, err = lurek.serial.validate({ name = "hero" }, {
+      type = "table",
+      fields = {
+        name = { type = "string", required = true },
+        level = { type = "number", required = true },
+      },
+    })
+    expect_equal(false, ok)
+    expect_not_nil(err)
+  end)
+end)
+
 test_summary()
-
-describe("Missing explicit test for lurek.serial.encodeMsgPack", function()
-    it("lurek.serial.encodeMsgPack works", function()
-        -- @tests lurek.serial.encodeMsgPack
-        -- TODO: add assertion for lurek.serial.encodeMsgPack
-    end)
-end)
-
-describe("Missing explicit test for lurek.serial.decodeMsgPack", function()
-    it("lurek.serial.decodeMsgPack works", function()
-        -- @tests lurek.serial.decodeMsgPack
-        -- TODO: add assertion for lurek.serial.decodeMsgPack
-    end)
-end)
-
-describe("Missing explicit test for lurek.serial.decodeXml", function()
-    it("lurek.serial.decodeXml works", function()
-        -- @tests lurek.serial.decodeXml
-        -- TODO: add assertion for lurek.serial.decodeXml
-    end)
-end)
-
-describe("Missing explicit test for lurek.serial.validate", function()
-    it("lurek.serial.validate works", function()
-        -- @tests lurek.serial.validate
-        -- TODO: add assertion for lurek.serial.validate
-    end)
-end)

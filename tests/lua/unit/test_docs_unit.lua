@@ -333,8 +333,6 @@ describe("lurek.docs", function()
 
 end)
 
-test_summary()
-
 -- =========================================================================
 -- Missing API Coverage Stubs
 -- =========================================================================
@@ -406,28 +404,26 @@ describe("Missing API Coverage", function()
     end)
 
     -- @tests DocEntry:getQualifiedName
-    it("covers DocEntry:getQualifiedName", function()
-        -- TODO: Implement test for DocEntry:getQualifiedName
-    end)
-
+    -- @tests DocEntry:getModule
     -- @tests DocEntry:getKind
-    it("covers DocEntry:getKind", function()
-        -- TODO: Implement test for DocEntry:getKind
-    end)
-
     -- @tests DocEntry:getExample
-    it("covers DocEntry:getExample", function()
-        -- TODO: Implement test for DocEntry:getExample
-    end)
-
     -- @tests DocEntry:getSince
-    it("covers DocEntry:getSince", function()
-        -- TODO: Implement test for DocEntry:getSince
-    end)
-
     -- @tests DocEntry:getDeprecated
-    it("covers DocEntry:getDeprecated", function()
-        -- TODO: Implement test for DocEntry:getDeprecated
+    -- @description Verifies DocEntry exposes qualified name, default kind, and nil optional metadata for a described entry without example/since/deprecated fields.
+    it("DocEntry exposes qualified name kind and optional metadata", function()
+        lurek.docs.resetCatalog()
+        lurek.docs.describe("lurek.test.meta", "Meta entry")
+        local entry = lurek.docs.getCatalog():getEntry("lurek.test.meta")
+
+        expect_not_nil(entry)
+        expect_equal("lurek.test.meta", entry:getQualifiedName())
+        expect_equal("lurek.test", entry:getModule())
+        expect_equal("function", entry:getKind())
+        expect_nil(entry:getExample())
+        expect_nil(entry:getSince())
+        expect_nil(entry:getDeprecated())
+
+        lurek.docs.resetCatalog()
     end)
 
     -- @tests ApiCatalog:getTypeMethods
@@ -436,28 +432,23 @@ describe("Missing API Coverage", function()
     end)
 
     -- @tests ValidationReport:getMissing
-    it("covers ValidationReport:getMissing", function()
-        -- TODO: Implement test for ValidationReport:getMissing
-    end)
-
     -- @tests ValidationReport:getPhantom
-    it("covers ValidationReport:getPhantom", function()
-        -- TODO: Implement test for ValidationReport:getPhantom
-    end)
-
     -- @tests ValidationReport:getIncomplete
-    it("covers ValidationReport:getIncomplete", function()
-        -- TODO: Implement test for ValidationReport:getIncomplete
-    end)
-
     -- @tests ValidationReport:phantomCount
-    it("covers ValidationReport:phantomCount", function()
-        -- TODO: Implement test for ValidationReport:phantomCount
-    end)
-
     -- @tests ValidationReport:incompleteCount
-    it("covers ValidationReport:incompleteCount", function()
-        -- TODO: Implement test for ValidationReport:incompleteCount
+    -- @description Verifies validation reports expose missing, phantom, and incomplete lists whose lengths match the corresponding count helpers.
+    it("ValidationReport exposes issue lists and count helpers", function()
+        local report = lurek.docs.validate()
+        local missing = report:getMissing()
+        local phantom = report:getPhantom()
+        local incomplete = report:getIncomplete()
+
+        expect_type("table", missing)
+        expect_type("table", phantom)
+        expect_type("table", incomplete)
+        expect_true(#missing > 0)
+        expect_equal(#phantom, report:phantomCount())
+        expect_equal(#incomplete, report:incompleteCount())
     end)
 
 end)
@@ -734,3 +725,5 @@ describe("Missing explicit test for QualityReport:toJSON", function()
         -- TODO: add assertion for QualityReport:toJSON
     end)
 end)
+
+test_summary()

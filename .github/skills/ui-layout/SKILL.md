@@ -21,15 +21,17 @@ Own the TOML UI layout format: grid system, widget types, naming conventions, hi
 - Lua game-logic scripting -> use lua-scripting skill
 
 ## Domain Knowledge
-- content/layouts/ currently splits into apps/ and games/ layout trees.
-- Use tools/ui/render_layout.py, snap_to_grid.py, and fix_layouts.py before hand-tuning screenshots.
-- The project grid baseline is 8px, with 4px for fine offsets and larger multiples for grouping.
-- Choose widget patterns already supported by src/ui/ loaders and renderers.
-- Keep layout hierarchy shallow, IDs snake_case, and screen purpose obvious.
-- This skill is for TOML layout authoring, not HTML UI or Rust widget internals.
-- content/layouts/apps and content/layouts/games are the concrete layout roots, and tools/ui already provides render, snap, and fix helpers for this format.
-- TOML layouts here should follow supported widget and hierarchy rules from the existing UI loaders instead of importing generic web or game UI schemas.
-- The skill owns declarative TOML layout authoring, not HTML screens or Rust widget logic.
+- content/layouts/ currently splits into apps/ and games/ layout trees, so layout authoring should keep those content roles distinct instead of merging every screen into one folder style.
+- Use tools/ui/render_layout.py, snap_to_grid.py, and fix_layouts.py before hand-tuning screenshots or pixel offsets by eye; the tooling is the intended feedback loop for this format.
+- The project grid baseline is 8px, with 4px for fine offsets and larger multiples for grouping, so spacing choices should feel systematic rather than ad hoc.
+- Choose widget patterns already supported by src/ui/ loaders and renderers; unsupported schema ideas belong in engine work, not in speculative TOML files.
+- Keep layout hierarchy shallow, IDs snake_case, and screen purpose obvious so scripts and tools can refer to elements without brittle naming.
+- TOML layouts here should follow the supported widget, hierarchy, and data rules from the current layout system instead of importing HTML or generic UI-builder conventions.
+- Prefer a small number of well-grouped containers over deeply nested structures that make alignment and maintenance harder.
+- IDs should be stable and semantic because layout files often become the anchor for script wiring, screenshots, and bug reports.
+- This skill is for declarative TOML layout authoring and its tooling loop, not HTML screens, CSS styling, or Rust widget implementation.
+- Good layout work here produces screens that snap cleanly to the grid, render predictably with the repo tools, and remain easy to read as plain text.
+- If a screen needs dynamic document behavior, reconsider whether it belongs in the HTML path rather than stretching the TOML format beyond its intended use.
 ## Companion File Index
 
 None - all guidance is inline.

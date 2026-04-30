@@ -2231,296 +2231,169 @@ describe("IsoMap regression: zero index", function()
     end)
 end)
 
-test_summary()
+-- @description Replaces the old placeholder tail with direct regression coverage for the remaining public chunk, isometric, map-block, image-render, autotile, and large-renderer helpers.
+describe("tilemap regression coverage", function()
+    local function has_chunk(chunks, cx, cy)
+        for _, chunk in ipairs(chunks) do
+            if chunk[1] == cx and chunk[2] == cy then
+                return true
+            end
+        end
 
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
+        return false
+    end
 
-describe("Missing API Coverage", function()
     -- @tests ChunkMap:loadChunk
-    it("covers ChunkMap:loadChunk", function()
-        -- TODO: Implement test for ChunkMap:loadChunk
-    end)
-
     -- @tests ChunkMap:unloadChunk
-    it("covers ChunkMap:unloadChunk", function()
-        -- TODO: Implement test for ChunkMap:unloadChunk
-    end)
-
     -- @tests ChunkMap:getLoadedChunks
-    it("covers ChunkMap:getLoadedChunks", function()
-        -- TODO: Implement test for ChunkMap:getLoadedChunks
-    end)
-
     -- @tests ChunkMap:chunkTileRange
-    it("covers ChunkMap:chunkTileRange", function()
-        -- TODO: Implement test for ChunkMap:chunkTileRange
+    -- @description Loads and unloads chunks explicitly, verifies the loaded-chunk set, and checks the inclusive tile range for a non-origin chunk.
+    it("ChunkMap tracks loaded chunks and reports chunk tile ranges", function()
+        local cm = lurek.tilemap.newChunkMap(8)
+        expect_equal(0, #cm:getLoadedChunks())
+
+        cm:loadChunk(0, 0)
+        cm:loadChunk(1, 0)
+
+        local loaded = cm:getLoadedChunks()
+        expect_equal(2, #loaded)
+        expect_true(has_chunk(loaded, 0, 0))
+        expect_true(has_chunk(loaded, 1, 0))
+
+        local x0, y0, x1, y1 = cm:chunkTileRange(1, 0)
+        expect_equal(8, x0)
+        expect_equal(0, y0)
+        expect_equal(16, x1)
+        expect_equal(8, y1)
+
+        cm:unloadChunk(0, 0)
+        loaded = cm:getLoadedChunks()
+        expect_equal(1, #loaded)
+        expect_false(has_chunk(loaded, 0, 0))
+        expect_true(has_chunk(loaded, 1, 0))
     end)
 
     -- @tests IsoMap:isLevelVisible
-    it("covers IsoMap:isLevelVisible", function()
-        -- TODO: Implement test for IsoMap:isLevelVisible
-    end)
-
+    -- @tests IsoMap:setLevelVisible
     -- @tests IsoMap:fillLevel
-    it("covers IsoMap:fillLevel", function()
-        -- TODO: Implement test for IsoMap:fillLevel
-    end)
-
     -- @tests IsoMap:getLevelHeight
-    it("covers IsoMap:getLevelHeight", function()
-        -- TODO: Implement test for IsoMap:getLevelHeight
-    end)
-
+    -- @tests IsoMap:setOrigin
+    -- @tests IsoMap:getTileWidth
+    -- @tests IsoMap:getTileHeight
     -- @tests IsoMap:tileToScreen
-    it("covers IsoMap:tileToScreen", function()
-        -- TODO: Implement test for IsoMap:tileToScreen
-    end)
-
     -- @tests IsoMap:screenToTile
-    it("covers IsoMap:screenToTile", function()
-        -- TODO: Implement test for IsoMap:screenToTile
-    end)
+    -- @description Fills one isometric level, toggles its visibility, and verifies the screen-projection helpers round-trip under a custom origin.
+    it("IsoMap applies fill, visibility, and projection helpers consistently", function()
+        local iso = lurek.tilemap.newIsoMap(4, 3, 64, 32, 12)
+        iso:addLevel()
 
-    -- @tests MapBlock:setSide
-    -- @tests MapBlock:getSide
-    it("setSide stores a connection id retrievable via getSide", function()
-        local block = lurek.tilemap.newMapBlock(4, 4, 1, 4)
-        block:setSide("north", 1, 7)
-        expect_equal(7, block:getSide("north", 1))
-        block:setSide("east", 2, 3)
-        expect_equal(3, block:getSide("east", 2))
-    end)
+        expect_true(iso:isLevelVisible(1))
+        iso:setLevelVisible(1, false)
+        expect_false(iso:isLevelVisible(1))
+        iso:setLevelVisible(1, true)
 
-    -- @tests MapBlock:getSide
-    it("getSide returns 0 for a segment that was never set", function()
-        local block = lurek.tilemap.newMapBlock(4, 4, 1, 4)
-        expect_equal(0, block:getSide("south", 1))
+        iso:fillLevel(1, 0, 9)
+        expect_equal(9, iso:getTilePart(1, 1, 1, 0))
+        expect_equal(12, iso:getLevelHeight())
+        expect_equal(64, iso:getTileWidth())
+        expect_equal(32, iso:getTileHeight())
+
+        iso:setOrigin(100, 50)
+        local sx, sy = iso:tileToScreen(2, 3, 0)
+        local tx, ty = iso:screenToTile(sx, sy)
+        expect_near(2, tx, 0.001)
+        expect_near(3, ty, 0.001)
     end)
 
     -- @tests MapBlock:getSegmentSize
-    it("covers MapBlock:getSegmentSize", function()
-        -- TODO: Implement test for MapBlock:getSegmentSize
-    end)
-
     -- @tests MapBlock:getWidthInSegments
-    it("covers MapBlock:getWidthInSegments", function()
-        -- TODO: Implement test for MapBlock:getWidthInSegments
-    end)
-
     -- @tests MapBlock:getHeightInSegments
-    it("covers MapBlock:getHeightInSegments", function()
-        -- TODO: Implement test for MapBlock:getHeightInSegments
+    -- @tests MapBlock:getDimensions
+    -- @tests MapBlock:setName
+    -- @tests MapBlock:getName
+    -- @tests MapBlock:setWeight
+    -- @tests MapBlock:getWeight
+    -- @description Verifies segment geometry and metadata round-trip on a map block with explicit segment sizing.
+    it("MapBlock reports segment geometry and metadata", function()
+        local block = lurek.tilemap.newMapBlock(8, 6, 2, 2)
+        expect_equal(2, block:getSegmentSize())
+        expect_equal(4, block:getWidthInSegments())
+        expect_equal(3, block:getHeightInSegments())
+
+        local width, height = block:getDimensions()
+        expect_equal(8, width)
+        expect_equal(6, height)
+
+        block:setName("room")
+        expect_equal("room", block:getName())
+
+        block:setWeight(2.5)
+        expect_near(2.5, block:getWeight(), 0.001)
     end)
 
     -- @tests MapGroup:removeBlock
-    it("covers MapGroup:removeBlock", function()
-        -- TODO: Implement test for MapGroup:removeBlock
+    -- @description Adds two blocks to a group, removes the first one, and checks the group count shrinks accordingly.
+    it("MapGroup removes blocks by 1-based index", function()
+        local group = lurek.tilemap.newMapGroup("world")
+        group:addBlock(lurek.tilemap.newMapBlock(4, 4, 1, 2))
+        group:addBlock(lurek.tilemap.newMapBlock(4, 4, 1, 2))
+
+        expect_equal(2, group:getBlockCount())
+        group:removeBlock(1)
+        expect_equal(1, group:getBlockCount())
     end)
 
-end)
+    -- @tests TileMap:drawToImage
+    -- @description Draws a tiny tilemap to CPU image data and verifies the output dimensions and a non-empty pixel alpha channel.
+    it("TileMap:drawToImage returns sized image data", function()
+        local tm = lurek.tilemap.newTileMap(16, 16)
+        tm:addLayer("base", 2, 2)
+        tm:setTile(1, 1, 1, 1)
 
-describe("Missing explicit test for lurek.tilemap.fromLDtk", function()
-    it("lurek.tilemap.fromLDtk works", function()
-        -- @tests lurek.tilemap.fromLDtk
-        -- TODO: add assertion for lurek.tilemap.fromLDtk
+        local img = tm:drawToImage(4)
+        expect_equal(8, img:getWidth())
+        expect_equal(8, img:getHeight())
+
+        local _, _, _, a = img:getPixel(1, 1)
+        expect_equal(255, a)
     end)
-end)
 
-describe("Missing explicit test for lurek.tilemap.newLargeMapRenderer", function()
-    it("lurek.tilemap.newLargeMapRenderer works", function()
-        -- @tests lurek.tilemap.newLargeMapRenderer
-        -- TODO: add assertion for lurek.tilemap.newLargeMapRenderer
+    -- @tests AutoTileSheet:getQuad
+    -- @description Confirms autotile atlas quads follow the expected grid layout for a minimal16 sheet.
+    it("AutoTileSheet:getQuad returns the expected atlas rectangle", function()
+        local sheet = lurek.tilemap.newAutoTileSheet(16, 16, "minimal16")
+        local x, y, w, h = sheet:getQuad(2)
+
+        expect_equal(16, x)
+        expect_equal(0, y)
+        expect_equal(16, w)
+        expect_equal(16, h)
     end)
-end)
 
-describe("Missing explicit test for TileMap:drawToImage", function()
-    it("TileMap:drawToImage works", function()
-        -- @tests TileMap:drawToImage
-        -- TODO: add assertion for TileMap:drawToImage
-    end)
-end)
+    -- @tests LargeMapRenderer:setTile
+    -- @tests LargeMapRenderer:getTile
+    -- @tests LargeMapRenderer:invalidateChunk
+    -- @tests LargeMapRenderer:invalidateAll
+    -- @tests LargeMapRenderer:setCamera
+    -- @tests LargeMapRenderer:setViewport
+    -- @tests LargeMapRenderer:setLodThresholds
+    -- @description Applies direct tile edits and culling-state updates to the large map renderer and checks the edited tile survives the lifecycle calls.
+    it("LargeMapRenderer keeps tile data stable across visibility state updates", function()
+        local lmr = lurek.tilemap.newLargeMapRenderer(16, 16)
+        lmr:setMapData({0, 0, 0, 0}, 2, 2)
+        lmr:setTile(1, 1, 7)
 
-describe("Missing explicit test for AutoTileSheet:getQuad", function()
-    it("AutoTileSheet:getQuad works", function()
-        -- @tests AutoTileSheet:getQuad
-        -- TODO: add assertion for AutoTileSheet:getQuad
-    end)
-end)
+        expect_equal(7, lmr:getTile(1, 1))
 
-describe("Missing explicit test for LargeMapRenderer:setTile", function()
-    it("LargeMapRenderer:setTile works", function()
-        -- @tests LargeMapRenderer:setTile
-        -- TODO: add assertion for LargeMapRenderer:setTile
-    end)
-end)
+        lmr:setCamera(8, 8, 1.25)
+        lmr:setViewport(64, 48)
+        lmr:setLodThresholds({8, 16, 32})
+        lmr:invalidateChunk(0, 0)
+        lmr:invalidateAll()
 
-describe("Missing explicit test for LargeMapRenderer:getTile", function()
-    it("LargeMapRenderer:getTile works", function()
-        -- @tests LargeMapRenderer:getTile
-        -- TODO: add assertion for LargeMapRenderer:getTile
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:getMapSize", function()
-    it("LargeMapRenderer:getMapSize works", function()
-        -- @tests LargeMapRenderer:getMapSize
-        -- TODO: add assertion for LargeMapRenderer:getMapSize
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setChunkSize", function()
-    it("LargeMapRenderer:setChunkSize works", function()
-        -- @tests LargeMapRenderer:setChunkSize
-        -- TODO: add assertion for LargeMapRenderer:setChunkSize
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:getChunkSize", function()
-    it("LargeMapRenderer:getChunkSize works", function()
-        -- @tests LargeMapRenderer:getChunkSize
-        -- TODO: add assertion for LargeMapRenderer:getChunkSize
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:invalidateChunk", function()
-    it("LargeMapRenderer:invalidateChunk works", function()
-        -- @tests LargeMapRenderer:invalidateChunk
-        -- TODO: add assertion for LargeMapRenderer:invalidateChunk
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:invalidateAll", function()
-    it("LargeMapRenderer:invalidateAll works", function()
-        -- @tests LargeMapRenderer:invalidateAll
-        -- TODO: add assertion for LargeMapRenderer:invalidateAll
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:getVisibleChunks", function()
-    it("LargeMapRenderer:getVisibleChunks works", function()
-        -- @tests LargeMapRenderer:getVisibleChunks
-        -- TODO: add assertion for LargeMapRenderer:getVisibleChunks
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:getTotalChunks", function()
-    it("LargeMapRenderer:getTotalChunks works", function()
-        -- @tests LargeMapRenderer:getTotalChunks
-        -- TODO: add assertion for LargeMapRenderer:getTotalChunks
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setCamera", function()
-    it("LargeMapRenderer:setCamera works", function()
-        -- @tests LargeMapRenderer:setCamera
-        -- TODO: add assertion for LargeMapRenderer:setCamera
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setViewport", function()
-    it("LargeMapRenderer:setViewport works", function()
-        -- @tests LargeMapRenderer:setViewport
-        -- TODO: add assertion for LargeMapRenderer:setViewport
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setLodEnabled", function()
-    it("LargeMapRenderer:setLodEnabled works", function()
-        -- @tests LargeMapRenderer:setLodEnabled
-        -- TODO: add assertion for LargeMapRenderer:setLodEnabled
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:isLodEnabled", function()
-    it("LargeMapRenderer:isLodEnabled works", function()
-        -- @tests LargeMapRenderer:isLodEnabled
-        -- TODO: add assertion for LargeMapRenderer:isLodEnabled
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setLodThresholds", function()
-    it("LargeMapRenderer:setLodThresholds works", function()
-        -- @tests LargeMapRenderer:setLodThresholds
-        -- TODO: add assertion for LargeMapRenderer:setLodThresholds
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:setTilesetColumns", function()
-    it("LargeMapRenderer:setTilesetColumns works", function()
-        -- @tests LargeMapRenderer:setTilesetColumns
-        -- TODO: add assertion for LargeMapRenderer:setTilesetColumns
-    end)
-end)
-
-describe("Missing explicit test for LargeMapRenderer:getTilesetColumns", function()
-    it("LargeMapRenderer:getTilesetColumns works", function()
-        -- @tests LargeMapRenderer:getTilesetColumns
-        -- TODO: add assertion for LargeMapRenderer:getTilesetColumns
-    end)
-end)
-
-describe("Missing explicit test for IsoMap:setLevelVisible", function()
-    it("IsoMap:setLevelVisible works", function()
-        -- @tests IsoMap:setLevelVisible
-        -- TODO: add assertion for IsoMap:setLevelVisible
-    end)
-end)
-
-describe("Missing explicit test for IsoMap:setOrigin", function()
-    it("IsoMap:setOrigin works", function()
-        -- @tests IsoMap:setOrigin
-        -- TODO: add assertion for IsoMap:setOrigin
-    end)
-end)
-
-describe("Missing explicit test for IsoMap:getTileWidth", function()
-    it("IsoMap:getTileWidth works", function()
-        -- @tests IsoMap:getTileWidth
-        -- TODO: add assertion for IsoMap:getTileWidth
-    end)
-end)
-
-describe("Missing explicit test for IsoMap:getTileHeight", function()
-    it("IsoMap:getTileHeight works", function()
-        -- @tests IsoMap:getTileHeight
-        -- TODO: add assertion for IsoMap:getTileHeight
-    end)
-end)
-
-describe("Missing explicit test for MapBlock:getDimensions", function()
-    it("MapBlock:getDimensions works", function()
-        -- @tests MapBlock:getDimensions
-        -- TODO: add assertion for MapBlock:getDimensions
-    end)
-end)
-
-describe("Missing explicit test for MapBlock:setName", function()
-    it("MapBlock:setName works", function()
-        -- @tests MapBlock:setName
-        -- TODO: add assertion for MapBlock:setName
-    end)
-end)
-
-describe("Missing explicit test for MapBlock:getName", function()
-    it("MapBlock:getName works", function()
-        -- @tests MapBlock:getName
-        -- TODO: add assertion for MapBlock:getName
-    end)
-end)
-
-describe("Missing explicit test for MapBlock:setWeight", function()
-    it("MapBlock:setWeight works", function()
-        -- @tests MapBlock:setWeight
-        -- TODO: add assertion for MapBlock:setWeight
-    end)
-end)
-
-describe("Missing explicit test for MapBlock:getWeight", function()
-    it("MapBlock:getWeight works", function()
-        -- @tests MapBlock:getWeight
-        -- TODO: add assertion for MapBlock:getWeight
+        expect_equal(7, lmr:getTile(1, 1))
+        expect_true(lmr:getVisibleChunks() >= 0)
+        expect_true(lmr:getTotalChunks() >= 1)
     end)
 end)
 
@@ -2602,3 +2475,5 @@ describe("tilemap tile step/exit callbacks", function()
         end
     end)
 end)
+
+test_summary()

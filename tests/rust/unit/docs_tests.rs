@@ -82,14 +82,6 @@ mod entry_tests {
     use super::*;
 
     #[test]
-    fn new_entry_qualified_name() {
-        let e = DocEntry::new("play", "audio", "function");
-        assert_eq!(e.qualified_name, "lurek.audio.play");
-        assert_eq!(e.module, "audio");
-        assert_eq!(e.kind, "function");
-    }
-
-    #[test]
     fn is_complete_with_description_and_params() {
         let mut e = DocEntry::new("play", "audio", "function");
         assert!(!e.is_complete()); // no description

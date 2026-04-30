@@ -32,10 +32,11 @@ tools: [read, search, execute, edit]
 - Validate the narrowest relevant check before closing.
 - Return proof, touched files, and residual risk.
 
-## Routing Table
-- Work is complete -> Manager: changed files, validation, and residual risk.
-- Scope drifted -> Manager: affected area and why ownership changed.
-- Work is blocked -> Manager: blocker and the missing decision or artifact.
+## Success Metrics
+Score the finished work from 1 to 10 stars against these checks.
+- The output stays inside the role's owned surface.
+- The role's main gate is proven with concrete evidence.
+- Residual risk or blockers are explicit and actionable.
 
 ## Anti-patterns
 - Duplicate another agent's ownership.

@@ -18,15 +18,16 @@ description: "Load this skill when working on asset loading, GameFS, image decod
 - Audio playback logic.
 
 ## Domain Knowledge
-- Game-facing asset access should resolve through GameFS and stay relative to the game root.
-- src/filesystem/ owns sandboxing and path rules; src/image/ and audio source loaders own decode, not playback.
-- Normalize paths before caching so repeated loads hit one cache key instead of per-call duplicates.
-- Missing assets, bad decode, and blocked paths should surface as clear Lua-visible errors, not panics.
-- Keep script loading, image decode, and raw bytes access separate from render and playback decisions.
-- save/ is runtime state, not a content root for examples or shipping assets.
-- content/, library/, mods, and game folders are content roots; asset rules should preserve those boundaries instead of leaking host filesystem assumptions into Lua-facing APIs.
-- Cache invalidation should follow stable path and decode assumptions, not transient caller state.
-- Filesystem safety here overlaps with security review, but this skill owns the loading contract rather than the exploit analysis.
+- Game-facing asset access should resolve through GameFS and stay relative to the game root or mounted content root; direct host-path assumptions break the sandbox contract quickly.
+- src/filesystem/ owns sandboxing and path rules, while src/image/ and audio source loaders own decode only; render and playback are downstream consumers, not asset-pipeline concerns.
+- Normalize or canonicalize paths before caching so repeated loads hit one stable cache key instead of duplicating entries for equivalent caller strings.
+- Missing assets, bad decode, blocked paths, and unsupported formats should surface as clear Lua-visible errors, not panics or silent fallback.
+- Keep script loading, image decode, raw bytes access, and audio source loading separate from render, mixer, or scene decisions so failures stay attributable to the right layer.
+- save/ is runtime state, not a content root for shipping assets, demos, or examples; loader rules should keep that boundary obvious.
+- content/, library/, mods/, and game folders are content roots in this repo, and asset rules should preserve those boundaries instead of leaking workstation-specific filesystem layout into Lua APIs.
+- Cache invalidation should follow stable path and decode assumptions, not transient caller state such as the current scene or a one-off access pattern.
+- If an asset path comes from Lua, validate it at the boundary and preserve the same sandbox semantics across images, scripts, bytes, and audio sources.
+- Good asset behavior here makes the loaded root, normalized path, and failure class obvious enough that a game author can correct content quickly.
 ## Companion File Index
 - None.
 

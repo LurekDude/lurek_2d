@@ -1337,8 +1337,8 @@ describe("lurek.light ambient bridge", function()
 
         -- @tests lurek.light.getGodRayHints
         -- @description Returns empty table when no directional lights exist.
-        xit("returns empty table with no directional lights", function()
-            lurek.light.clearAll()
+        it("returns empty table with no directional lights", function()
+            lurek.light.clear()
             local hints = lurek.light.getGodRayHints()
             expect_equal(0, #hints)
         end)
@@ -1346,25 +1346,27 @@ describe("lurek.light ambient bridge", function()
         -- @tests lurek.light.newLight
         -- @tests lurek.light.getGodRayHints
         -- @description Each hint entry has x, y, and angle fields.
-        xit("each hint has x, y, angle fields", function()
-            lurek.light.clearAll()
-            local light = lurek.light.newLight("directional", 100, 200)
-            light:setDirection(1.57)  -- ~pi/2
+        it("each hint has x, y, angle fields", function()
+            lurek.light.clear()
+            local light = lurek.light.newLight(100, 200, 50, { type = "directional" })
+            light:setDirection(1.57)  -- near pi/2
             light:setEnabled(true)
             local hints = lurek.light.getGodRayHints()
-            if #hints > 0 then
-                local h = hints[1]
-                expect_type("number", h.x)
-                expect_type("number", h.y)
-                expect_type("number", h.angle)
-            end
+            expect_equal(1, #hints)
+            local h = hints[1]
+            expect_type("number", h.x)
+            expect_type("number", h.y)
+            expect_type("number", h.angle)
+            expect_near(100, h.x, 0.001)
+            expect_near(200, h.y, 0.001)
+            expect_near(1.57, h.angle, 0.001)
         end)
 
         -- @tests lurek.light.getGodRayHints
         -- @description Disabled directional lights are not included.
-        xit("disabled lights are excluded", function()
-            lurek.light.clearAll()
-            local light = lurek.light.newLight("directional", 0, 0)
+        it("disabled lights are excluded", function()
+            lurek.light.clear()
+            local light = lurek.light.newLight(0, 0, 50, { type = "directional" })
             light:setEnabled(false)
             local hints = lurek.light.getGodRayHints()
             expect_equal(0, #hints)

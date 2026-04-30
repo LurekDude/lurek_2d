@@ -434,102 +434,80 @@ describe("sprite.atlas.getFlipped", function()
 
 end)
 
+-- @description Replaces the old placeholder tail with direct assertions across Aseprite parsing, sheet geometry helpers, group lookup, image generation, and atlas enumeration.
+describe("lurek.sprite regression coverage", function()
+    -- @tests lurek.sprite.parseAsepriteAtlas
+    -- @tests SpriteAtlas:getEntry
+    -- @tests SpriteAtlas:getByIndex
+    -- @tests SpriteAtlas:entryCount
+    -- @tests SpriteAtlas:entryNames
+    -- @description Parses an Aseprite atlas and verifies direct lookup, indexed lookup, entry counting, and name enumeration all agree on the same content.
+    it("parseAsepriteAtlas exposes atlas entries through every lookup helper", function()
+        local atlas = lurek.sprite.parseAsepriteAtlas(ASEPRITE_ARRAY_JSON)
+        local entry = atlas:getEntry("hero/run_0.png")
+        local indexed = atlas:getByIndex(2)
+        local names = atlas:entryNames()
+
+        expect_equal(3, atlas:entryCount())
+        expect_type("table", entry)
+        expect_equal(64, entry.x)
+        expect_equal(32, entry.w)
+        expect_type("table", indexed)
+        expect_equal("hero/idle_1.png", indexed.name)
+        expect_equal(3, #names)
+
+        local seen = {}
+        for _, name in ipairs(names) do
+            seen[name] = true
+        end
+        expect_true(seen["hero/idle_0.png"] ~= nil, "expected hero/idle_0.png in names")
+        expect_true(seen["hero/run_0.png"] ~= nil, "expected hero/run_0.png in names")
+    end)
+
+    -- @tests SpriteSheet:getFrame
+    -- @tests SpriteSheet:getFrameCount
+    -- @tests SpriteSheet:getRow
+    -- @tests SpriteSheet:getColumn
+    -- @tests SpriteSheet:getFrameSize
+    -- @tests SpriteSheet:getGridSize
+    -- @description Builds a 3x2 sheet and verifies its frame indexing, count, row/column extraction, and reported geometry stay internally consistent.
+    it("SpriteSheet geometry helpers stay consistent", function()
+        local sheet = lurek.sprite.newSheet(96, 64, 32, 32)
+        local frame = sheet:getFrame(4)
+        local row = sheet:getRow(1)
+        local column = sheet:getColumn(1)
+        local frame_w, frame_h = sheet:getFrameSize()
+        local cols, rows = sheet:getGridSize()
+
+        expect_equal(6, sheet:getFrameCount())
+        expect_equal(32, frame.x)
+        expect_equal(32, frame.y)
+        expect_equal(3, #row)
+        expect_equal(2, #column)
+        expect_equal(32, frame_w)
+        expect_equal(32, frame_h)
+        expect_equal(3, cols)
+        expect_equal(2, rows)
+    end)
+
+    -- @tests SpriteSheet:getGroupFrames
+    -- @tests SpriteSheet:getGroupNames
+    -- @tests SpriteSheet:drawToImage
+    -- @description Registers named frame groups and verifies both group discovery and debug rendering work on the same sheet object.
+    it("SpriteSheet group helpers and drawToImage return usable results", function()
+        local sheet = lurek.sprite.newSheet(64, 64, 16, 16)
+        sheet:nameGroup("idle", 0, 2)
+        sheet:nameGroup("run", 2, 4)
+
+        local idle = sheet:getGroupFrames("idle")
+        local names = sheet:getGroupNames()
+        local image = sheet:drawToImage(64, 64)
+
+        expect_type("table", idle)
+        expect_equal(2, #idle)
+        expect_equal(2, #names)
+        expect_type("userdata", image)
+    end)
+end)
+
 test_summary()
-
-describe("Missing explicit test for lurek.sprite.parseAsepriteAtlas", function()
-    it("lurek.sprite.parseAsepriteAtlas works", function()
-        -- @tests lurek.sprite.parseAsepriteAtlas
-        -- TODO: add assertion for lurek.sprite.parseAsepriteAtlas
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getFrame", function()
-    it("SpriteSheet:getFrame works", function()
-        -- @tests SpriteSheet:getFrame
-        -- TODO: add assertion for SpriteSheet:getFrame
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getFrameCount", function()
-    it("SpriteSheet:getFrameCount works", function()
-        -- @tests SpriteSheet:getFrameCount
-        -- TODO: add assertion for SpriteSheet:getFrameCount
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getRow", function()
-    it("SpriteSheet:getRow works", function()
-        -- @tests SpriteSheet:getRow
-        -- TODO: add assertion for SpriteSheet:getRow
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getColumn", function()
-    it("SpriteSheet:getColumn works", function()
-        -- @tests SpriteSheet:getColumn
-        -- TODO: add assertion for SpriteSheet:getColumn
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getGroupFrames", function()
-    it("SpriteSheet:getGroupFrames works", function()
-        -- @tests SpriteSheet:getGroupFrames
-        -- TODO: add assertion for SpriteSheet:getGroupFrames
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getGroupNames", function()
-    it("SpriteSheet:getGroupNames works", function()
-        -- @tests SpriteSheet:getGroupNames
-        -- TODO: add assertion for SpriteSheet:getGroupNames
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getFrameSize", function()
-    it("SpriteSheet:getFrameSize works", function()
-        -- @tests SpriteSheet:getFrameSize
-        -- TODO: add assertion for SpriteSheet:getFrameSize
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:getGridSize", function()
-    it("SpriteSheet:getGridSize works", function()
-        -- @tests SpriteSheet:getGridSize
-        -- TODO: add assertion for SpriteSheet:getGridSize
-    end)
-end)
-
-describe("Missing explicit test for SpriteSheet:drawToImage", function()
-    it("SpriteSheet:drawToImage works", function()
-        -- @tests SpriteSheet:drawToImage
-        -- TODO: add assertion for SpriteSheet:drawToImage
-    end)
-end)
-
-describe("Missing explicit test for SpriteAtlas:getEntry", function()
-    it("SpriteAtlas:getEntry works", function()
-        -- @tests SpriteAtlas:getEntry
-        -- TODO: add assertion for SpriteAtlas:getEntry
-    end)
-end)
-
-describe("Missing explicit test for SpriteAtlas:getByIndex", function()
-    it("SpriteAtlas:getByIndex works", function()
-        -- @tests SpriteAtlas:getByIndex
-        -- TODO: add assertion for SpriteAtlas:getByIndex
-    end)
-end)
-
-describe("Missing explicit test for SpriteAtlas:entryCount", function()
-    it("SpriteAtlas:entryCount works", function()
-        -- @tests SpriteAtlas:entryCount
-        -- TODO: add assertion for SpriteAtlas:entryCount
-    end)
-end)
-
-describe("Missing explicit test for SpriteAtlas:entryNames", function()
-    it("SpriteAtlas:entryNames works", function()
-        -- @tests SpriteAtlas:entryNames
-        -- TODO: add assertion for SpriteAtlas:entryNames
-    end)
-end)

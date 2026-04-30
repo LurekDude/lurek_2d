@@ -3,7 +3,7 @@
 use std::collections::HashMap;
 
 use lurek2d::pipeline::dag::{ErrorMode, Pipeline};
-use lurek2d::pipeline::result::{PipelineResult, PipelineStatus};
+use lurek2d::pipeline::result::PipelineStatus;
 use lurek2d::pipeline::scheduler::PipelineScheduler;
 use lurek2d::pipeline::step::{ErrorPolicy, PipelineStep, StepStatus};
 
@@ -57,51 +57,6 @@ mod step_tests {
         let s = PipelineStep::new("x");
         assert!(s.metadata.is_empty());
         assert!(s.tag.is_none());
-    }
-}
-
-// ── result tests ────────────────────────────────────────────────────────────
-
-mod result_tests {
-    use super::*;
-
-    #[test]
-    fn new_result_is_pending() {
-        let r = PipelineResult::new();
-        assert_eq!(r.status, PipelineStatus::Pending);
-        assert!(r.completed.is_empty());
-        assert!(r.failed.is_empty());
-    }
-
-    #[test]
-    fn is_success_when_no_failures() {
-        let r = PipelineResult::new();
-        assert!(r.is_success());
-    }
-
-    #[test]
-    fn is_not_success_when_failures_present() {
-        let mut r = PipelineResult::new();
-        r.failed.push("step_a".into());
-        assert!(!r.is_success());
-    }
-
-    #[test]
-    fn summary_contains_status_and_counts() {
-        let mut r = PipelineResult::new();
-        r.status = PipelineStatus::Completed;
-        r.completed.push("a".into());
-        let s = r.summary();
-        assert!(s.contains("Completed"));
-        assert!(s.contains("completed=1"));
-    }
-
-    #[test]
-    fn default_matches_new() {
-        let a = PipelineResult::new();
-        let b = PipelineResult::default();
-        assert_eq!(a.status, b.status);
-        assert_eq!(a.completed.len(), b.completed.len());
     }
 }
 

@@ -1,4 +1,4 @@
--- Lurek2D minimap API tests.
+﻿-- Lurek2D minimap API tests.
 -- Covers minimap construction, terrain/object/fog state, view controls, and helper queries exposed through lurek.minimap.
 
 -- @description Covers suite: lurek.minimap.newMinimap.
@@ -37,7 +37,7 @@ describe("lurek.minimap.newMinimap", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Grid dimensions Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Grid dimensions ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: grid dimensions.
 describe("grid dimensions", function()
@@ -52,7 +52,7 @@ describe("grid dimensions", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Display size Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Display size ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: display size.
 describe("display size", function()
@@ -73,7 +73,7 @@ describe("display size", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Terrain Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Terrain ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: terrain.
 describe("terrain", function()
@@ -122,7 +122,7 @@ describe("terrain", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Fog of war Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Fog of war ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: fog of war.
 describe("fog of war", function()
@@ -197,7 +197,7 @@ describe("fog of war", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Object types Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Object types ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: object types.
 describe("object types", function()
@@ -236,7 +236,7 @@ describe("object types", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Objects Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Objects ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: objects.
 describe("objects", function()
@@ -282,7 +282,7 @@ describe("objects", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Owner colors Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Owner colors ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: owner colors.
 describe("owner colors", function()
@@ -301,7 +301,7 @@ describe("owner colors", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Color mode Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Color mode ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: color mode.
 describe("color mode", function()
@@ -332,7 +332,7 @@ describe("color mode", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Zoom and pan Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Zoom and pan ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: zoom and pan.
 describe("zoom and pan", function()
@@ -367,7 +367,7 @@ describe("zoom and pan", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Viewport Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Viewport ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: viewport.
 describe("viewport", function()
@@ -432,7 +432,7 @@ describe("viewport", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Pings Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Pings ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: pings.
 describe("pings", function()
@@ -472,7 +472,7 @@ describe("pings", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Markers Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Markers ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: markers.
 describe("markers", function()
@@ -535,7 +535,7 @@ describe("markers", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Anti-alias Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Anti-alias ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: anti-alias.
 describe("anti-alias", function()
@@ -558,7 +558,7 @@ describe("anti-alias", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Coordinate conversion Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Coordinate conversion ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: coordinate conversion.
 describe("coordinate conversion", function()
@@ -577,7 +577,7 @@ describe("coordinate conversion", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Update Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Update ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: update.
 describe("update", function()
@@ -591,7 +591,7 @@ describe("update", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Full workflow Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Full workflow ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: full workflow.
 describe("full workflow", function()
@@ -653,7 +653,7 @@ describe("full workflow", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ setTerrainData Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č setTerrainData ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: terrain data bulk set.
 describe("terrain data bulk set", function()
@@ -685,7 +685,7 @@ describe("terrain data bulk set", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Tile descriptions Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č Tile descriptions ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: tile descriptions.
 describe("tile descriptions", function()
@@ -735,7 +735,7 @@ describe("tile descriptions", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ getHoverInfo Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č getHoverInfo ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: getHoverInfo.
 describe("getHoverInfo", function()
@@ -774,7 +774,7 @@ describe("getHoverInfo", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ setClickable / isClickable Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č setClickable / isClickable ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: clickable.
 describe("clickable", function()
@@ -808,7 +808,7 @@ describe("clickable", function()
     end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ getCenterX / getCenterY Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č getCenterX / getCenterY ├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č├äÔÇÜ├ő┬ś─é╦ś├óÔÇÜ┬Č─╣─ä─é╦ś├óÔéČ┼í├é┬Č
 
 -- @description Covers suite: center individual getters.
 describe("center individual getters", function()
@@ -847,7 +847,7 @@ describe("center individual getters", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Layers (merged from test_minimap_layers.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č Minimap Layers (merged from test_minimap_layers.lua) ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č
 
 -- @description Covers suite: minimap layers.
 describe("minimap layers", function()
@@ -960,7 +960,7 @@ describe("minimap marker animation", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Overlay (merged from test_minimap_ui.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č Minimap Overlay (merged from test_minimap_ui.lua) ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č
 
 -- @description Covers suite: minimap geometry overlay.
 describe("minimap geometry overlay", function()
@@ -1012,7 +1012,7 @@ describe("minimap geometry overlay", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Minimap Path (merged from test_minimap_path.lua) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č Minimap Path (merged from test_minimap_path.lua) ─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č─é╦ś├óÔéČ┼ą├óÔÇÜ┬Č
 
 -- @description Covers suite: minimap path visualization.
 describe("minimap path visualization", function()
@@ -1071,381 +1071,3 @@ describe("minimap path visualization", function()
 end)
 
 test_summary()
-
-describe("Missing explicit test for Minimap:getGridWidth", function()
-    it("Minimap:getGridWidth works", function()
-        -- @tests Minimap:getGridWidth
-        -- TODO: add assertion for Minimap:getGridWidth
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getGridHeight", function()
-    it("Minimap:getGridHeight works", function()
-        -- @tests Minimap:getGridHeight
-        -- TODO: add assertion for Minimap:getGridHeight
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getGridSize", function()
-    it("Minimap:getGridSize works", function()
-        -- @tests Minimap:getGridSize
-        -- TODO: add assertion for Minimap:getGridSize
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getDisplayWidth", function()
-    it("Minimap:getDisplayWidth works", function()
-        -- @tests Minimap:getDisplayWidth
-        -- TODO: add assertion for Minimap:getDisplayWidth
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getDisplayHeight", function()
-    it("Minimap:getDisplayHeight works", function()
-        -- @tests Minimap:getDisplayHeight
-        -- TODO: add assertion for Minimap:getDisplayHeight
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getDisplaySize", function()
-    it("Minimap:getDisplaySize works", function()
-        -- @tests Minimap:getDisplaySize
-        -- TODO: add assertion for Minimap:getDisplaySize
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setDisplaySize", function()
-    it("Minimap:setDisplaySize works", function()
-        -- @tests Minimap:setDisplaySize
-        -- TODO: add assertion for Minimap:setDisplaySize
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getTerrain", function()
-    it("Minimap:getTerrain works", function()
-        -- @tests Minimap:getTerrain
-        -- TODO: add assertion for Minimap:getTerrain
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setTerrainData", function()
-    it("Minimap:setTerrainData works", function()
-        -- @tests Minimap:setTerrainData
-        -- TODO: add assertion for Minimap:setTerrainData
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getTerrainColor", function()
-    it("Minimap:getTerrainColor works", function()
-        -- @tests Minimap:getTerrainColor
-        -- TODO: add assertion for Minimap:getTerrainColor
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getTileDescription", function()
-    it("Minimap:getTileDescription works", function()
-        -- @tests Minimap:getTileDescription
-        -- TODO: add assertion for Minimap:getTileDescription
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setFogEnabled", function()
-    it("Minimap:setFogEnabled works", function()
-        -- @tests Minimap:setFogEnabled
-        -- TODO: add assertion for Minimap:setFogEnabled
-    end)
-end)
-
-describe("Missing explicit test for Minimap:isFogEnabled", function()
-    it("Minimap:isFogEnabled works", function()
-        -- @tests Minimap:isFogEnabled
-        -- TODO: add assertion for Minimap:isFogEnabled
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setFogLevel", function()
-    it("Minimap:setFogLevel works", function()
-        -- @tests Minimap:setFogLevel
-        -- TODO: add assertion for Minimap:setFogLevel
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getFogLevel", function()
-    it("Minimap:getFogLevel works", function()
-        -- @tests Minimap:getFogLevel
-        -- TODO: add assertion for Minimap:getFogLevel
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getFogColor", function()
-    it("Minimap:getFogColor works", function()
-        -- @tests Minimap:getFogColor
-        -- TODO: add assertion for Minimap:getFogColor
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setFogData", function()
-    it("Minimap:setFogData works", function()
-        -- @tests Minimap:setFogData
-        -- TODO: add assertion for Minimap:setFogData
-    end)
-end)
-
-describe("Missing explicit test for Minimap:isObjectTypeVisible", function()
-    it("Minimap:isObjectTypeVisible works", function()
-        -- @tests Minimap:isObjectTypeVisible
-        -- TODO: add assertion for Minimap:isObjectTypeVisible
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getObjectTypeCount", function()
-    it("Minimap:getObjectTypeCount works", function()
-        -- @tests Minimap:getObjectTypeCount
-        -- TODO: add assertion for Minimap:getObjectTypeCount
-    end)
-end)
-
-describe("Missing explicit test for Minimap:removeObject", function()
-    it("Minimap:removeObject works", function()
-        -- @tests Minimap:removeObject
-        -- TODO: add assertion for Minimap:removeObject
-    end)
-end)
-
-describe("Missing explicit test for Minimap:clearObjects", function()
-    it("Minimap:clearObjects works", function()
-        -- @tests Minimap:clearObjects
-        -- TODO: add assertion for Minimap:clearObjects
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getObjectCount", function()
-    it("Minimap:getObjectCount works", function()
-        -- @tests Minimap:getObjectCount
-        -- TODO: add assertion for Minimap:getObjectCount
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getOwnerColor", function()
-    it("Minimap:getOwnerColor works", function()
-        -- @tests Minimap:getOwnerColor
-        -- TODO: add assertion for Minimap:getOwnerColor
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setColorMode", function()
-    it("Minimap:setColorMode works", function()
-        -- @tests Minimap:setColorMode
-        -- TODO: add assertion for Minimap:setColorMode
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getColorMode", function()
-    it("Minimap:getColorMode works", function()
-        -- @tests Minimap:getColorMode
-        -- TODO: add assertion for Minimap:getColorMode
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setZoom", function()
-    it("Minimap:setZoom works", function()
-        -- @tests Minimap:setZoom
-        -- TODO: add assertion for Minimap:setZoom
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getZoom", function()
-    it("Minimap:getZoom works", function()
-        -- @tests Minimap:getZoom
-        -- TODO: add assertion for Minimap:getZoom
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setCenter", function()
-    it("Minimap:setCenter works", function()
-        -- @tests Minimap:setCenter
-        -- TODO: add assertion for Minimap:setCenter
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getCenter", function()
-    it("Minimap:getCenter works", function()
-        -- @tests Minimap:getCenter
-        -- TODO: add assertion for Minimap:getCenter
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getCenterX", function()
-    it("Minimap:getCenterX works", function()
-        -- @tests Minimap:getCenterX
-        -- TODO: add assertion for Minimap:getCenterX
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getCenterY", function()
-    it("Minimap:getCenterY works", function()
-        -- @tests Minimap:getCenterY
-        -- TODO: add assertion for Minimap:getCenterY
-    end)
-end)
-
-describe("Missing explicit test for Minimap:clearViewportRect", function()
-    it("Minimap:clearViewportRect works", function()
-        -- @tests Minimap:clearViewportRect
-        -- TODO: add assertion for Minimap:clearViewportRect
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getViewportRect", function()
-    it("Minimap:getViewportRect works", function()
-        -- @tests Minimap:getViewportRect
-        -- TODO: add assertion for Minimap:getViewportRect
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setViewportVisible", function()
-    it("Minimap:setViewportVisible works", function()
-        -- @tests Minimap:setViewportVisible
-        -- TODO: add assertion for Minimap:setViewportVisible
-    end)
-end)
-
-describe("Missing explicit test for Minimap:isViewportVisible", function()
-    it("Minimap:isViewportVisible works", function()
-        -- @tests Minimap:isViewportVisible
-        -- TODO: add assertion for Minimap:isViewportVisible
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getViewportColor", function()
-    it("Minimap:getViewportColor works", function()
-        -- @tests Minimap:getViewportColor
-        -- TODO: add assertion for Minimap:getViewportColor
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getPingCount", function()
-    it("Minimap:getPingCount works", function()
-        -- @tests Minimap:getPingCount
-        -- TODO: add assertion for Minimap:getPingCount
-    end)
-end)
-
-describe("Missing explicit test for Minimap:removeMarker", function()
-    it("Minimap:removeMarker works", function()
-        -- @tests Minimap:removeMarker
-        -- TODO: add assertion for Minimap:removeMarker
-    end)
-end)
-
-describe("Missing explicit test for Minimap:hasMarker", function()
-    it("Minimap:hasMarker works", function()
-        -- @tests Minimap:hasMarker
-        -- TODO: add assertion for Minimap:hasMarker
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getMarkerDescription", function()
-    it("Minimap:getMarkerDescription works", function()
-        -- @tests Minimap:getMarkerDescription
-        -- TODO: add assertion for Minimap:getMarkerDescription
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getMarkerCount", function()
-    it("Minimap:getMarkerCount works", function()
-        -- @tests Minimap:getMarkerCount
-        -- TODO: add assertion for Minimap:getMarkerCount
-    end)
-end)
-
-describe("Missing explicit test for Minimap:clearMarkerAnimation", function()
-    it("Minimap:clearMarkerAnimation works", function()
-        -- @tests Minimap:clearMarkerAnimation
-        -- TODO: add assertion for Minimap:clearMarkerAnimation
-    end)
-end)
-
-describe("Missing explicit test for Minimap:clearOverlay", function()
-    it("Minimap:clearOverlay works", function()
-        -- @tests Minimap:clearOverlay
-        -- TODO: add assertion for Minimap:clearOverlay
-    end)
-end)
-
-describe("Missing explicit test for Minimap:clearPath", function()
-    it("Minimap:clearPath works", function()
-        -- @tests Minimap:clearPath
-        -- TODO: add assertion for Minimap:clearPath
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setLayer", function()
-    it("Minimap:setLayer works", function()
-        -- @tests Minimap:setLayer
-        -- TODO: add assertion for Minimap:setLayer
-    end)
-end)
-
-describe("Missing explicit test for Minimap:getLayer", function()
-    it("Minimap:getLayer works", function()
-        -- @tests Minimap:getLayer
-        -- TODO: add assertion for Minimap:getLayer
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setAntiAlias", function()
-    it("Minimap:setAntiAlias works", function()
-        -- @tests Minimap:setAntiAlias
-        -- TODO: add assertion for Minimap:setAntiAlias
-    end)
-end)
-
-describe("Missing explicit test for Minimap:isAntiAlias", function()
-    it("Minimap:isAntiAlias works", function()
-        -- @tests Minimap:isAntiAlias
-        -- TODO: add assertion for Minimap:isAntiAlias
-    end)
-end)
-
-describe("Missing explicit test for Minimap:setClickable", function()
-    it("Minimap:setClickable works", function()
-        -- @tests Minimap:setClickable
-        -- TODO: add assertion for Minimap:setClickable
-    end)
-end)
-
-describe("Missing explicit test for Minimap:isClickable", function()
-    it("Minimap:isClickable works", function()
-        -- @tests Minimap:isClickable
-        -- TODO: add assertion for Minimap:isClickable
-    end)
-end)
-
-describe("Missing explicit test for Minimap:update", function()
-    it("Minimap:update works", function()
-        -- @tests Minimap:update
-        -- TODO: add assertion for Minimap:update
-    end)
-end)
-
-describe("Missing explicit test for Minimap:type", function()
-    it("Minimap:type works", function()
-        -- @tests Minimap:type
-        -- TODO: add assertion for Minimap:type
-    end)
-end)
-
-describe("Missing explicit test for Minimap:typeOf", function()
-    it("Minimap:typeOf works", function()
-        -- @tests Minimap:typeOf
-        -- TODO: add assertion for Minimap:typeOf
-    end)
-end)
-
-describe("Missing explicit test for Minimap:drawToImage", function()
-    it("Minimap:drawToImage works", function()
-        -- @tests Minimap:drawToImage
-        -- TODO: add assertion for Minimap:drawToImage
-    end)
-end)

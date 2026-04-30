@@ -7,7 +7,7 @@ structural rules. Each script exits 1 on failure and prints a report.
 
 | Script | Purpose | Key args |
 |---|---|---|
-| `cag_validate.py` | Validate all `.github/` CAG files (system prompt, agents, skills, prompts) against the templates in `work/cag-system-overhaul-20260418/reports/standards/`. Implements rules `E001-E004/W005`, `E101-E107/W108`, `E201-E205/W206`, `E301-E305/W306`. | `--type system_prompt\|agent\|skill\|prompt`, `--file <path>`, `--baseline`, `--write-baseline`, `--report <path>`, `--format text\|json` |
+| `cag_validate.py` | Validate all `.github/` CAG files (system prompt, agents, skills, prompts) against the live schema in `docs/architecture/cag-system.md`. Implements rules `E001-E004/W005`, `E101-E113/W108`, `E201-E205/W206`, `E301-E305/W306`. Agent files must not define `Autonomy`; that rule lives in the system prompt. | `--type system_prompt\|agent\|skill\|prompt`, `--file <path>`, `--baseline`, `--write-baseline`, `--report <path>`, `--format text\|json` |
 | `check_callbacks.py` | Verify `gen_docs_lua._callbacks()` output has no embedded newlines | â€” |
 | `validate_game.py` | Validate a game/demo directory structure | `--all-examples`, `--all-demos` |
 | `validate_generated_lua_stubs.py` | Validate committed Lua API generated artifacts against fresh generator output | `--format text\|json` |

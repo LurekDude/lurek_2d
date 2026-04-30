@@ -22,15 +22,16 @@ Own the phase file format, dependency graph rules, acceptance gate authoring, st
 - Writing tests -> use testing-rust skill
 
 ## Domain Knowledge
-- The repo currently has no formal docs/roadmap/ tree, so discovery starts from ideas/, docs, and review notes.
-- If roadmap phase files are introduced, they should point to real repo commands and validation gates, not vague outcomes.
-- Dependencies should mirror module or rollout order and stay acyclic.
-- Acceptance gates must be binary and use the same commands developers already run locally.
-- Preserve original intent with status or as-built notes instead of rewriting history when a phase evolves.
-- This skill is for planning artifacts and gates, not execution or API design.
-- Because formal roadmap phase files do not yet exist, planning work should start from ideas/, docs, and current validation gates rather than fake a mature process.
-- If a roadmap artifact is introduced, it should stay concise, binary-gated, and traceable to real repo work and real owners.
-- This skill owns future phase and backlog structure, not execution or discovery ranking itself.
+- The repo currently has no formal docs/roadmap/ tree, so planning should start from ideas/, docs, architecture notes, and existing review evidence rather than pretending a full phase system already exists.
+- If roadmap phase files are introduced, they should point to real repo commands, real validation gates, and concrete artifacts, not vague aspirations or untestable outcomes.
+- Dependencies should mirror module, rollout, or migration order and remain acyclic; if a plan needs circular prerequisites, the slices are probably wrong.
+- Acceptance gates must be binary and use the same commands developers already run locally, otherwise status becomes subjective and unreviewable.
+- Preserve original intent with status notes, superseded steps, or as-built comments instead of rewriting history when a phase evolves; planning documents should show change, not erase it.
+- Good roadmap slices here are small enough to ship, validate, and hand off; oversized phases that bundle architecture, docs, tooling, and content into one block quickly lose decision value.
+- Every phase or milestone should name the owning area, key dependency, expected validation evidence, and the artifact that proves completion.
+- Because formal roadmap files do not yet exist, planning should remain lightweight and traceable to current repo structure, not import heavyweight process vocabulary for its own sake.
+- Use implementation-neutral language where possible; roadmap artifacts should define outcomes and gates, not precommit the exact internal design before discovery is complete.
+- If a proposed phase changes contributor workflow, cite the docs or quality gates that must move with it.
 ## Companion File Index
 
 None - all guidance is inline.

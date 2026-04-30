@@ -18,15 +18,16 @@ description: "Load this skill when designing Result flows, EngineError variants,
 - Test writing.
 
 ## Domain Knowledge
-- src/runtime/error.rs is the engine-side error hub; Lua boundaries should convert into clear, safe user-facing failures.
-- src/lua_api/ and app startup paths are common sites for recoverable errors that must not panic.
-- Avoid leaking absolute paths, raw Rust type names, or internal state details in Lua-visible errors.
-- Callback failures, file IO, asset decode, registry-key lookup, and config parsing should prefer Result over panic.
-- Recoverable content errors should keep the engine running when possible; reserve fatal paths for unrecoverable boot failures.
-- Error wording should match Lua-facing behavior, not only Rust internals.
-- Boundary-heavy modules like filesystem, config, asset loading, and lua_api are frequent places where user-visible error quality matters more than internal stack detail.
-- Good error paths in this repo distinguish invalid content, missing assets, unsupported runtime state, and engine defects.
-- This skill owns failure semantics and safe propagation, not generic logging or metrics analysis.
+- src/runtime/error.rs is the engine-side error hub, and Lua boundaries should translate failures into clear, safe user-facing messages that preserve meaning without leaking internals.
+- src/lua_api/ and app startup paths are common sites for recoverable errors that must not panic; these are the places where boundary quality matters more than raw stack detail.
+- Avoid leaking absolute paths, raw Rust type names, private handles, or internal state details in Lua-visible errors unless that detail is truly required for the user to fix content.
+- Callback failures, file IO, asset decode, registry-key lookup, channel handoff, and config parsing should prefer Result-based flow over panic or silent ignore behavior.
+- Recoverable content errors should keep the engine running when possible, while fatal exits should be reserved for unrecoverable boot, renderer, or configuration failures that prevent safe continuation.
+- Good error wording here matches Lua-facing behavior and next action, not just Rust internals; say what failed and what kind of input or state caused it.
+- Distinguish invalid content, missing assets, unsupported runtime state, unavailable resource, and engine defect as separate failure classes because they imply different fixes and different severity.
+- Preserve internal context in Rust where useful, but sanitize the outward message so content authors see a stable error contract instead of implementation trivia.
+- When an error crosses async or threaded boundaries, preserve enough category information that the receiver can still decide whether to retry, abort, or surface a fatal message.
+- Do not log and rewrap the same failure at every layer; one well-placed error with clear propagation is better than duplicate noise.
 ## Companion File Index
 - None.
 

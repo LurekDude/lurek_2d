@@ -18,15 +18,16 @@ description: "Load this skill when validating, debugging, or maintaining CAG fil
 - CI/CD workflow setup.
 
 ## Domain Knowledge
-- cag_validate.py already checks frontmatter, required sections, line caps, known agents/skills, and prompt wiring.
-- Use --type skill for fast skill-only passes and a full run after cross-file or cross-layer changes.
-- cag_link_check.py, cag_coverage.py, and cag_persona_matrix.py complement validation for links, section coverage, and roster health.
-- In this repo, SKILL.md files should stay code-block free and example-free.
-- Validator output should stay relative, deterministic, and tied to real repo contracts rather than hypothetical policy.
-- When agent or skill wiring changes, update shared docs as part of the same validation pass.
-- Validation in this repo is broader than cag_validate.py alone; link, coverage, and persona audits matter whenever the graph or docs move.
-- The skill should keep validators deterministic, read-only, and aligned with actual repo rules rather than one-off style opinions.
-- It owns the validation surface for CAG files, not generic project quality tooling.
+- cag_validate.py already checks frontmatter, required sections, line caps, known agents and skills, prompt wiring, and discovery phrasing, so use its rules as the first explanation for a CAG failure before guessing.
+- Use --type skill, --type agent, or a single-file run for fast local isolation, and reserve the full validator pass for cross-file or cross-layer changes that can affect the whole graph.
+- cag_link_check.py, cag_coverage.py, and cag_persona_matrix.py complement validation for links, section coverage, and roster health; together they define the broader CAG quality surface.
+- In this repo, SKILL.md files should stay code-block free and example-free, so validator work should reinforce that constraint rather than allow special-case exceptions.
+- Validator output should stay relative, deterministic, and tied to real repo contracts rather than hypothetical style opinions or environment-specific paths.
+- When agent or skill wiring changes, update shared docs and any discovery indexes in the same pass so validators and human guidance remain aligned.
+- Distinguish content defects from validator defects: a bad file should be fixed in the file, while a bad rule should be changed only when the repo contract itself has truly changed.
+- Validation in this repo is broader than cag_validate.py alone; link, coverage, and persona audits matter whenever relationships, docs, or role boundaries move.
+- Prefer read-only validation tools for diagnosis and use fixers separately; mixing correction and checking too early makes rule debugging harder.
+- Type-filtered runs are the fastest loop for iterative authoring, but a full pass is still required before closing a multi-file CAG task.
 ## Companion File Index
 - None.
 

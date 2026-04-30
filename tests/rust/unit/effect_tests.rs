@@ -4,12 +4,10 @@ use lurek2d::effect::ambient::AmbientState;
 use lurek2d::effect::atmosphere::{
     CloudState, FilmGrainState, FogState, HeatHazeState, LightningState, VignetteState,
 };
-use lurek2d::effect::draw;
 use lurek2d::effect::effect::PostFxEffect;
 use lurek2d::effect::effect_type::PostFxEffectType;
 use lurek2d::effect::overlay::Overlay;
 use lurek2d::effect::presets::{build_preset, preset_names};
-use lurek2d::effect::render;
 use lurek2d::effect::screen_effects::{FadeState, FlashState, ShakeState};
 use lurek2d::effect::stack::PostFxStack;
 use lurek2d::effect::transition::{ScreenTransition, TransitionKind};

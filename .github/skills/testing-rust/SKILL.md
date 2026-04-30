@@ -21,15 +21,16 @@ Own the testing strategy, file layout, assertion patterns, and coverage tooling 
 - Lua scripting unrelated to tests -> use lua-scripting skill
 
 ## Domain Knowledge
-- TST-01 is the main split: lurek.*-reachable behavior goes to tests/lua/, Rust-only internals go to tests/rust/unit/.
-- No tests live in src/ and Lua files end with test_summary() plus @covers markers for coverage tools.
-- Prefer headless state readback, then pixel readback, then smoke-only evidence when stronger proof is impossible.
-- Use expect_near or float epsilon checks, never direct float equality.
-- Harness registration and Cargo test-target registration move with new suites.
-- Coverage tools already exist: test_coverage.py and lua_api_test_coverage.py.
-- The repo already has strong Lua-first rules, headless coverage boundaries, and coverage tooling, so test work should follow those rules instead of inventing ad hoc placement.
-- Harness registration, @covers markers, and evidence strength are part of the contract, not optional polish.
-- This skill owns test-layer choice, assertions, and coverage practice, not production fixes.
+- TST-01 is the main split in this repo: behavior reachable through lurek.* belongs in tests/lua/, while Rust-only internals belong in tests/rust/unit/.
+- No tests live in src/, and Lua test files should end with test_summary() plus accurate @covers markers so the existing coverage tools can attribute behavior correctly.
+- File placement is part of the contract: Rust unit tests live under tests/rust/unit/<module>_tests.rs, Lua tests follow the test_<module>_<layer>.lua pattern, and demos have their own dedicated locations.
+- Prefer headless state readback first, then pixel readback when rendering output matters, and use smoke-only evidence only when stronger assertions are not technically possible.
+- Harness registration and Cargo target wiring move with new suites; a good test file is incomplete until the repo can actually discover and run it in the standard flows.
+- Use expect_near or explicit epsilon checks for floats; direct float equality should be treated as a bug unless the value is intentionally exact and stable.
+- Determinism matters more than clever setup: stable seeds, fixed dt, controlled fixtures, and narrow asset inputs beat large scenario scripts with hidden moving parts.
+- Reuse existing fixtures, helpers, and harness patterns before inventing ad hoc scaffolding; consistency keeps failures interpretable across many modules.
+- Coverage tools already exist, including test_coverage.py and lua_api_test_coverage.py, so missing coverage should be reported and closed using the repo's current metrics rather than informal guesses.
+- Evidence strength should be stated implicitly in the test shape: direct state assertions are stronger than visual inference.
 ## Companion File Index
 
 None - all guidance is inline.

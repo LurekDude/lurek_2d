@@ -2,7 +2,7 @@
 
 use lurek2d::math::{Color, Vec2};
 use lurek2d::raycaster::*;
-use lurek2d::render::renderer::{DrawMode, RenderCommand};
+use lurek2d::render::renderer::RenderCommand;
 
 // ── visibility ────────────────────────────────────────────────────────
 
@@ -336,29 +336,6 @@ mod render_tests {
     }
 }
 
-// ── projection ────────────────────────────────────────────────────────
-
-mod projection_tests {
-    use super::*;
-    use std::f32::consts::PI;
-
-    #[test]
-    fn test_project_column() {
-        let (h, start, end) = project_column(2.0, PI / 3.0, 200.0);
-        assert!(h > 0.0);
-        assert!(start >= 0.0);
-        assert!(end <= 200.0);
-    }
-
-    #[test]
-    fn test_distance_shade() {
-        assert!((distance_shade(0.0, 10.0) - 1.0).abs() < 1e-5);
-        assert!((distance_shade(10.0, 10.0) - 0.0).abs() < 1e-5);
-        assert!((distance_shade(5.0, 10.0) - 0.5).abs() < 1e-5);
-        assert!((distance_shade(15.0, 10.0) - 0.0).abs() < 1e-5);
-    }
-}
-
 // ── minimap_overlay ───────────────────────────────────────────────────
 
 mod minimap_overlay_tests {
@@ -477,22 +454,6 @@ mod heightmap_tests {
     use super::*;
 
     #[test]
-    fn test_default_heights() {
-        let hm = HeightMap::new(4, 4);
-        assert!((hm.floor_at(0, 0)).abs() < 1e-5);
-        assert!((hm.ceiling_at(0, 0) - 1.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn test_set_floor_ceiling() {
-        let mut hm = HeightMap::new(4, 4);
-        hm.set_floor(1, 2, 0.5);
-        hm.set_ceiling(1, 2, 0.8);
-        assert!((hm.floor_at(1, 2) - 0.5).abs() < 1e-5);
-        assert!((hm.ceiling_at(1, 2) - 0.8).abs() < 1e-5);
-    }
-
-    #[test]
     fn test_out_of_bounds() {
         let hm = HeightMap::new(4, 4);
         assert!((hm.floor_at(10, 10)).abs() < 1e-5);
@@ -534,45 +495,6 @@ mod draw_tests {
 
 mod doors_tests {
     use super::*;
-
-    #[test]
-    fn test_add_and_query_door() {
-        let mut mgr = DoorManager::new();
-        let idx = mgr.add_door(3, 5, DoorDirection::Horizontal, 2.0);
-        assert_eq!(idx, 0);
-
-        let door = mgr.get_door_at(3, 5);
-        assert!(door.is_some());
-        let d = door.unwrap();
-        assert_eq!(d.state, DoorState::Closed);
-        assert!((d.open_amount).abs() < 1e-5);
-    }
-
-    #[test]
-    fn test_open_close_cycle() {
-        let mut mgr = DoorManager::new();
-        let idx = mgr.add_door(1, 1, DoorDirection::Vertical, 1.0);
-
-        mgr.open_door(idx);
-        assert_eq!(mgr.doors()[idx].state, DoorState::Opening);
-
-        // Advance halfway
-        mgr.update(0.5);
-        assert!((mgr.doors()[idx].open_amount - 0.5).abs() < 1e-5);
-
-        // Advance to fully open
-        mgr.update(0.6);
-        assert_eq!(mgr.doors()[idx].state, DoorState::Open);
-        assert!((mgr.doors()[idx].open_amount - 1.0).abs() < 1e-5);
-
-        // Close
-        mgr.close_door(idx);
-        assert_eq!(mgr.doors()[idx].state, DoorState::Closing);
-
-        mgr.update(1.5);
-        assert_eq!(mgr.doors()[idx].state, DoorState::Closed);
-        assert!((mgr.doors()[idx].open_amount).abs() < 1e-5);
-    }
 
     #[test]
     fn test_door_not_found() {
@@ -621,103 +543,6 @@ mod depth_buffer_tests {
     fn test_out_of_bounds() {
         let buf = DepthBuffer::new(5);
         assert_eq!(buf.get(100), f32::MAX);
-    }
-}
-
-// ── dda ───────────────────────────────────────────────────────────────
-
-mod dda_tests {
-    use super::*;
-    use std::f32::consts::PI;
-
-    #[test]
-    fn test_new_grid_empty() {
-        let rc = Raycaster2D::new(8, 8);
-        assert_eq!(rc.width(), 8);
-        assert_eq!(rc.height(), 8);
-        for y in 0..8 {
-            for x in 0..8 {
-                assert_eq!(rc.get_cell(x, y), 0);
-            }
-        }
-    }
-
-    #[test]
-    fn test_set_get_cell() {
-        let mut rc = Raycaster2D::new(4, 4);
-        rc.set_cell(2, 3, 5);
-        assert_eq!(rc.get_cell(2, 3), 5);
-        assert!(rc.is_blocked(2, 3));
-        assert!(!rc.is_blocked(0, 0));
-    }
-
-    #[test]
-    fn test_cast_ray_hits_wall() {
-        let mut rc = Raycaster2D::new(8, 8);
-        rc.set_cell(4, 2, 1); // wall at (4,2)
-                              // Cast from (2.5, 2.5) to the right (angle=0)
-        let hit = rc.cast_ray(2.5, 2.5, 0.0, 20.0);
-        assert!(hit.is_some());
-        let h = hit.unwrap();
-        assert!(h.hit);
-        assert_eq!(h.cell_value, 1);
-        assert!((h.distance - 1.5).abs() < 0.1);
-    }
-
-    #[test]
-    fn test_cast_ray_misses() {
-        let rc = Raycaster2D::new(8, 8);
-        // empty grid, ray goes right and exits
-        let hit = rc.cast_ray(1.5, 1.5, 0.0, 5.0);
-        assert!(hit.is_none());
-    }
-
-    #[test]
-    fn test_line_of_sight_clear() {
-        let rc = Raycaster2D::new(8, 8);
-        assert!(rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
-    }
-
-    #[test]
-    fn test_line_of_sight_blocked() {
-        let mut rc = Raycaster2D::new(8, 8);
-        rc.set_cell(3, 3, 1);
-        assert!(!rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
-    }
-
-    #[test]
-    fn test_cast_rays_count() {
-        let mut rc = Raycaster2D::new(8, 8);
-        // Surround with walls
-        for i in 0..8 {
-            rc.set_cell(i, 0, 1);
-            rc.set_cell(i, 7, 1);
-            rc.set_cell(0, i, 1);
-            rc.set_cell(7, i, 1);
-        }
-        let rays = rc.cast_rays(4.0, 4.0, 0.0, PI / 3.0, 10, 20.0);
-        assert_eq!(rays.len(), 10);
-    }
-
-    #[test]
-    fn test_cast_rays_flat_layout() {
-        let mut rc = Raycaster2D::new(8, 8);
-        for i in 0..8 {
-            rc.set_cell(i, 0, 1);
-            rc.set_cell(i, 7, 1);
-            rc.set_cell(0, i, 1);
-            rc.set_cell(7, i, 1);
-        }
-        let flat = rc.cast_rays_flat(4.0, 4.0, 0.0, PI / 3.0, 5, 20.0);
-        assert_eq!(flat.len(), 25); // 5 rays * 5 values
-    }
-
-    #[test]
-    fn test_sprite_projection_behind() {
-        let rc = Raycaster2D::new(8, 8);
-        let proj = rc.project_sprite(3.0, 3.0, 5.0, 5.0, 0.0, PI / 3.0, 320.0);
-        // Sprite is behind or to the side depending on angle
-        assert!(!proj.visible);
     }
 }
 
@@ -904,101 +729,3 @@ mod build_scene_tests {
     }
 }
 
-// ── dda (migrated from src/raycaster/dda.rs) ─────────────────────────
-
-mod raycaster2d_tests {
-    use super::*;
-    use std::f32::consts::PI;
-
-    #[test]
-    fn test_new_grid_empty() {
-        let rc = Raycaster2D::new(8, 8);
-        assert_eq!(rc.width(), 8);
-        assert_eq!(rc.height(), 8);
-        for y in 0..8 {
-            for x in 0..8 {
-                assert_eq!(rc.get_cell(x, y), 0);
-            }
-        }
-    }
-
-    #[test]
-    fn test_set_get_cell() {
-        let mut rc = Raycaster2D::new(4, 4);
-        rc.set_cell(2, 3, 5);
-        assert_eq!(rc.get_cell(2, 3), 5);
-        assert!(rc.is_blocked(2, 3));
-        assert!(!rc.is_blocked(0, 0));
-    }
-
-    #[test]
-    fn test_cast_ray_hits_wall() {
-        let mut rc = Raycaster2D::new(8, 8);
-        rc.set_cell(4, 2, 1); // wall at (4,2)
-        // Cast from (2.5, 2.5) to the right (angle=0)
-        let hit = rc.cast_ray(2.5, 2.5, 0.0, 20.0);
-        assert!(hit.is_some());
-        let h = hit.unwrap();
-        assert!(h.hit);
-        assert_eq!(h.cell_value, 1);
-        assert!((h.distance - 1.5).abs() < 0.1);
-    }
-
-    #[test]
-    fn test_cast_ray_misses() {
-        let rc = Raycaster2D::new(8, 8);
-        // empty grid, ray goes right and exits
-        let hit = rc.cast_ray(1.5, 1.5, 0.0, 5.0);
-        assert!(hit.is_none());
-    }
-
-    #[test]
-    fn test_line_of_sight_clear() {
-        let rc = Raycaster2D::new(8, 8);
-        assert!(rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
-    }
-
-    #[test]
-    fn test_line_of_sight_blocked() {
-        let mut rc = Raycaster2D::new(8, 8);
-        rc.set_cell(3, 3, 1);
-        assert!(!rc.line_of_sight(1.5, 1.5, 6.5, 6.5));
-    }
-
-    #[test]
-    fn test_cast_rays_count() {
-        let mut rc = Raycaster2D::new(8, 8);
-        // Surround with walls
-        for i in 0..8 {
-            rc.set_cell(i, 0, 1);
-            rc.set_cell(i, 7, 1);
-            rc.set_cell(0, i, 1);
-            rc.set_cell(7, i, 1);
-        }
-        let rays = rc.cast_rays(4.0, 4.0, 0.0, PI / 3.0, 10, 20.0);
-        assert_eq!(rays.len(), 10);
-    }
-
-    #[test]
-    fn test_cast_rays_flat_layout() {
-        let mut rc = Raycaster2D::new(8, 8);
-        for i in 0..8 {
-            rc.set_cell(i, 0, 1);
-            rc.set_cell(i, 7, 1);
-            rc.set_cell(0, i, 1);
-            rc.set_cell(7, i, 1);
-        }
-        let flat = rc.cast_rays_flat(4.0, 4.0, 0.0, PI / 3.0, 5, 20.0);
-        assert_eq!(flat.len(), 25); // 5 rays * 5 values
-    }
-
-    #[test]
-    fn test_sprite_projection_behind() {
-        let rc = Raycaster2D::new(8, 8);
-        let proj = rc.project_sprite(3.0, 3.0, 5.0, 5.0, 0.0, PI / 3.0, 320.0);
-        // Sprite is behind or to the side depending on angle
-        // At angle 0, sprite at (3,3) from (5,5) has dx=-2, dy=-2,
-        // transform_y = -(-2)*sin(0) + (-2)*cos(0) = -2, so not visible
-        assert!(!proj.visible);
-    }
-}

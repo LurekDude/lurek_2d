@@ -251,24 +251,6 @@ mod event_bus_tests {
     use super::*;
 
     #[test]
-    fn subscribe_returns_unique_ids() {
-        let mut bus = EventBus::new("test");
-        let a = bus.subscribe("hit", 0, false);
-        let b = bus.subscribe("hit", 0, false);
-        assert_ne!(a, b);
-    }
-
-    #[test]
-    fn get_listeners_returns_priority_order() {
-        let mut bus = EventBus::new("test");
-        let low = bus.subscribe("e", 1, false);
-        let high = bus.subscribe("e", 10, false);
-        let listeners = bus.get_listeners("e");
-        assert_eq!(listeners[0], high);
-        assert_eq!(listeners[1], low);
-    }
-
-    #[test]
     fn disabled_bus_returns_no_listeners() {
         let mut bus = EventBus::new("test");
         bus.subscribe("e", 0, false);

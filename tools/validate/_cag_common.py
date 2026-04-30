@@ -55,7 +55,7 @@ AGENT_REQUIRED_SECTIONS = (
     "Inputs",
     "Outputs",
     "Workflow",
-    "Routing Table",
+    "Success Metrics",
     "Anti-patterns",
 )
 

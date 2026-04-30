@@ -1,4 +1,4 @@
--- tests/lua/unit/test_data.lua
+﻿-- tests/lua/unit/test_data.lua
 -- BDD tests for the lurek.data module
 
 -- @description Verifies binary packing and unpacking across floats, signed and unsigned integers, strings, endianness, padding, and offset-based reads.
@@ -231,7 +231,7 @@ describe("data.newDataView", function()
   end)
 end)
 
--- â”€â”€ compress / decompress â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ compress / decompress Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies lossless compression and decompression for deflate, gzip, and lz4, including empty input and a size reduction check for repetitive deflate data.
 describe("data.compress + data.decompress", function()
@@ -276,7 +276,7 @@ describe("data.compress + data.decompress", function()
   end)
 end)
 
--- â”€â”€ encode / decode â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ encode / decode Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies deterministic base64 and hex encodings, correct decode round-trips, and edge cases for empty and single-byte inputs.
 describe("data.encode + data.decode", function()
@@ -313,7 +313,7 @@ describe("data.encode + data.decode", function()
   end)
 end)
 
--- â”€â”€ hash â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ hash Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies known digests for md5, sha1, sha256, and sha512, plus determinism for identical input and divergence for different input.
 describe("data.hash", function()
@@ -356,7 +356,7 @@ describe("data.hash", function()
 end)
 
 
--- â”€â”€ newByteData â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ newByteData Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies ByteData creation from sizes and strings, byte mutation and retrieval, and cloning behavior.
 describe("data.newByteData", function()
@@ -370,7 +370,9 @@ describe("data.newByteData", function()
 
   -- @description Creates ByteData from the string "hello" and confirms it reports length 5 and reproduces the same string content.
   it("creates buffer from string", function()
-    local bd = lurek.data.newByteData("hello")
+    local new_byte_data = lurek.data.newByteData
+    ---@cast new_byte_data fun(data: string): LByteData
+    local bd = new_byte_data("hello")
     expect_equal(bd:getSize(), 5)
     expect_equal(bd:getString(), "hello")
   end)
@@ -386,14 +388,16 @@ describe("data.newByteData", function()
 
   -- @description Clones ByteData created from "test" and confirms the clone preserves both the string content and the size of 4 bytes.
   it("clone produces independent copy", function()
-    local original = lurek.data.newByteData("test")
+    local new_byte_data = lurek.data.newByteData
+    ---@cast new_byte_data fun(data: string): LByteData
+    local original = new_byte_data("test")
     local cloned = original:clone()
     expect_equal(cloned:getString(), "test")
     expect_equal(cloned:getSize(), 4)
   end)
 end)
 
--- â”€â”€ parseToml / encodeToml â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ parseToml / encodeToml Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies TOML parsing for scalar values, nested tables, and arrays, TOML encoding of Lua tables, round-trip behavior, and invalid-input errors.
 describe("data.parseToml + data.encodeToml", function()
@@ -448,7 +452,7 @@ describe("data.parseToml + data.encodeToml", function()
   end)
 end)
 
--- â”€â”€ write / read (Binary Pack Format) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ write / read (Binary Pack Format) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies binary write/read helpers for numeric, string, boolean, and endian-sensitive formats, plus exact size calculations for composite schemas.
 describe("data.write + data.read (Binary Pack Format)", function()
@@ -506,7 +510,7 @@ describe("data.write + data.read (Binary Pack Format)", function()
   end)
 end)
 
--- ── ByteData bit operations ──────────────────────────────────────────────────
+-- â”€â”€ ByteData bit operations â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Verifies individual bit set/get round-trips, bit clearing, single-byte and cross-byte readBits, and out-of-range error handling.
 describe("data.newByteData bit operations", function()
@@ -538,7 +542,7 @@ describe("data.newByteData bit operations", function()
   end)
 
   -- @tests lurek.data.newByteData
-  -- @description Writes 0xFF into byte 0 and 0x01 into byte 1; readBits(0, 4, 8) reads 4 high bits from byte 0 (0xF) then 4 low bits from byte 1 (0x1) → 0x1F = 31.
+  -- @description Writes 0xFF into byte 0 and 0x01 into byte 1; readBits(0, 4, 8) reads 4 high bits from byte 0 (0xF) then 4 low bits from byte 1 (0x1) â†’ 0x1F = 31.
   it("bytedata_readBits_spanning_bytes", function()
     local bd = lurek.data.newByteData(2)
     bd:setByte(0, 0xFF)
@@ -557,7 +561,7 @@ describe("data.newByteData bit operations", function()
   end)
 end)
 
--- ── msgpack (merged from test_data_msgpack.lua) ─────────────────────────────
+-- â”€â”€ msgpack (merged from test_data_msgpack.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("data.msgpack", function()
 
@@ -596,6 +600,8 @@ describe("data.msgpack", function()
         local tbl = { x = 1, y = 2, name = "test" }
         local bytes = lurek.data.toMsgPack(tbl)
         local val = lurek.data.fromMsgPack(bytes)
+      expect_type("table", val)
+      ---@cast val table
         expect_equal(val.x, 1)
         expect_equal(val.y, 2)
         expect_equal(val.name, "test")
@@ -605,6 +611,8 @@ describe("data.msgpack", function()
         local arr = { 10, 20, 30 }
         local bytes = lurek.data.toMsgPack(arr)
         local val = lurek.data.fromMsgPack(bytes)
+      expect_type("table", val)
+      ---@cast val table
         expect_equal(val[1], 10)
         expect_equal(val[2], 20)
         expect_equal(val[3], 30)
@@ -614,6 +622,8 @@ describe("data.msgpack", function()
         local data = { player = { name = "hero", hp = 100 }, level = 5 }
         local bytes = lurek.data.toMsgPack(data)
         local val = lurek.data.fromMsgPack(bytes)
+      expect_type("table", val)
+      ---@cast val table
         expect_equal(val.level, 5)
         expect_equal(val.player.name, "hero")
         expect_equal(val.player.hp, 100)
@@ -637,7 +647,7 @@ describe("data.msgpack", function()
 
 end)
 
--- ── ring buffer (merged from test_data_ring_buffer.lua) ─────────────────────
+-- â”€â”€ ring buffer (merged from test_data_ring_buffer.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Factory and type checks.
 describe("lurek.data.newRingBuffer factory", function()
@@ -889,11 +899,12 @@ describe("RingBuffer mixed value types", function()
     expect_equal(b, true)
     local tbl = rb:pop()
     expect_type("table", tbl)
+    ---@cast tbl table
     expect_equal(tbl.key, "value")
   end)
 end)
 
--- ── DataWriter ────────────────────────────────────────────────────────────────
+-- â”€â”€ DataWriter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 -- @description Tests for the lurek.data.newWriter / DataWriter binary buffer API.
 describe("lurek.data.newWriter DataWriter", function()
   -- @tests lurek.data.newWriter
@@ -1058,275 +1069,6 @@ describe("lurek.data crc32 checksum", function()
   end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
-    -- @tests RingBuffer:pop
-    it("covers RingBuffer:pop", function()
-        -- TODO: Implement test for RingBuffer:pop
-    end)
-
-    -- @tests RingBuffer:len
-    it("covers RingBuffer:len", function()
-        -- TODO: Implement test for RingBuffer:len
-    end)
-
-    -- @tests DataView:getInt8
-    it("covers DataView:getInt8", function()
-        -- TODO: Implement test for DataView:getInt8
-    end)
-
-    -- @tests DataView:getInt16
-    it("covers DataView:getInt16", function()
-        -- TODO: Implement test for DataView:getInt16
-    end)
-
-    -- @tests DataView:getInt32
-    it("covers DataView:getInt32", function()
-        -- TODO: Implement test for DataView:getInt32
-    end)
-
-    -- @tests DataWriter:writeI8
-    it("covers DataWriter:writeI8", function()
-        -- TODO: Implement test for DataWriter:writeI8
-    end)
-
-    -- @tests DataWriter:writeU16LE
-    it("covers DataWriter:writeU16LE", function()
-        -- TODO: Implement test for DataWriter:writeU16LE
-    end)
-
-    -- @tests DataWriter:writeU16BE
-    it("covers DataWriter:writeU16BE", function()
-        -- TODO: Implement test for DataWriter:writeU16BE
-    end)
-
-    -- @tests DataWriter:writeI16LE
-    it("covers DataWriter:writeI16LE", function()
-        -- TODO: Implement test for DataWriter:writeI16LE
-    end)
-
-    -- @tests DataWriter:writeI32LE
-    it("covers DataWriter:writeI32LE", function()
-        -- TODO: Implement test for DataWriter:writeI32LE
-    end)
-
-    -- @tests DataWriter:writeF32LE
-    it("covers DataWriter:writeF32LE", function()
-        -- TODO: Implement test for DataWriter:writeF32LE
-    end)
-
-    -- @tests DataWriter:writeF64LE
-    it("covers DataWriter:writeF64LE", function()
-        -- TODO: Implement test for DataWriter:writeF64LE
-    end)
-
-    -- @tests DataWriter:writeBytes
-    it("covers DataWriter:writeBytes", function()
-        -- TODO: Implement test for DataWriter:writeBytes
-    end)
-
-    -- @tests DataWriter:len
-    it("covers DataWriter:len", function()
-        -- TODO: Implement test for DataWriter:len
-    end)
-
-end)
-
-describe("Missing explicit test for lurek.data.crc32", function()
-    it("lurek.data.crc32 works", function()
-        -- @tests lurek.data.crc32
-        -- TODO: add assertion for lurek.data.crc32
-    end)
-end)
-
-describe("Missing explicit test for lurek.data.toMsgPack", function()
-    it("lurek.data.toMsgPack works", function()
-        -- @tests lurek.data.toMsgPack
-        -- TODO: add assertion for lurek.data.toMsgPack
-    end)
-end)
-
-describe("Missing explicit test for lurek.data.fromMsgPack", function()
-    it("lurek.data.fromMsgPack works", function()
-        -- @tests lurek.data.fromMsgPack
-        -- TODO: add assertion for lurek.data.fromMsgPack
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:push", function()
-    it("RingBuffer:push works", function()
-        -- @tests RingBuffer:push
-        -- TODO: add assertion for RingBuffer:push
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:peek", function()
-    it("RingBuffer:peek works", function()
-        -- @tests RingBuffer:peek
-        -- TODO: add assertion for RingBuffer:peek
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:peekNewest", function()
-    it("RingBuffer:peekNewest works", function()
-        -- @tests RingBuffer:peekNewest
-        -- TODO: add assertion for RingBuffer:peekNewest
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:capacity", function()
-    it("RingBuffer:capacity works", function()
-        -- @tests RingBuffer:capacity
-        -- TODO: add assertion for RingBuffer:capacity
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:isEmpty", function()
-    it("RingBuffer:isEmpty works", function()
-        -- @tests RingBuffer:isEmpty
-        -- TODO: add assertion for RingBuffer:isEmpty
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:clear", function()
-    it("RingBuffer:clear works", function()
-        -- @tests RingBuffer:clear
-        -- TODO: add assertion for RingBuffer:clear
-    end)
-end)
-
-describe("Missing explicit test for RingBuffer:toTable", function()
-    it("RingBuffer:toTable works", function()
-        -- @tests RingBuffer:toTable
-        -- TODO: add assertion for RingBuffer:toTable
-    end)
-end)
-
-describe("Missing explicit test for DataView:getUInt8", function()
-    it("DataView:getUInt8 works", function()
-        -- @tests DataView:getUInt8
-        -- TODO: add assertion for DataView:getUInt8
-    end)
-end)
-
-describe("Missing explicit test for DataView:getUInt16", function()
-    it("DataView:getUInt16 works", function()
-        -- @tests DataView:getUInt16
-        -- TODO: add assertion for DataView:getUInt16
-    end)
-end)
-
-describe("Missing explicit test for DataView:getUInt32", function()
-    it("DataView:getUInt32 works", function()
-        -- @tests DataView:getUInt32
-        -- TODO: add assertion for DataView:getUInt32
-    end)
-end)
-
-describe("Missing explicit test for DataView:getFloat", function()
-    it("DataView:getFloat works", function()
-        -- @tests DataView:getFloat
-        -- TODO: add assertion for DataView:getFloat
-    end)
-end)
-
-describe("Missing explicit test for DataView:getDouble", function()
-    it("DataView:getDouble works", function()
-        -- @tests DataView:getDouble
-        -- TODO: add assertion for DataView:getDouble
-    end)
-end)
-
-describe("Missing explicit test for DataView:getSize", function()
-    it("DataView:getSize works", function()
-        -- @tests DataView:getSize
-        -- TODO: add assertion for DataView:getSize
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:writeU8", function()
-    it("DataWriter:writeU8 works", function()
-        -- @tests DataWriter:writeU8
-        -- TODO: add assertion for DataWriter:writeU8
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:writeU32LE", function()
-    it("DataWriter:writeU32LE works", function()
-        -- @tests DataWriter:writeU32LE
-        -- TODO: add assertion for DataWriter:writeU32LE
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:writeString", function()
-    it("DataWriter:writeString works", function()
-        -- @tests DataWriter:writeString
-        -- TODO: add assertion for DataWriter:writeString
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:seek", function()
-    it("DataWriter:seek works", function()
-        -- @tests DataWriter:seek
-        -- TODO: add assertion for DataWriter:seek
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:tell", function()
-    it("DataWriter:tell works", function()
-        -- @tests DataWriter:tell
-        -- TODO: add assertion for DataWriter:tell
-    end)
-end)
-
-describe("Missing explicit test for DataWriter:toBytes", function()
-    it("DataWriter:toBytes works", function()
-        -- @tests DataWriter:toBytes
-        -- TODO: add assertion for DataWriter:toBytes
-    end)
-end)
-
-describe("Missing explicit test for mlua:getSize", function()
-    it("mlua:getSize works", function()
-        -- @tests mlua:getSize
-        -- TODO: add assertion for mlua:getSize
-    end)
-end)
-
-describe("Missing explicit test for mlua:getString", function()
-    it("mlua:getString works", function()
-        -- @tests mlua:getString
-        -- TODO: add assertion for mlua:getString
-    end)
-end)
-
-describe("Missing explicit test for mlua:getByte", function()
-    it("mlua:getByte works", function()
-        -- @tests mlua:getByte
-        -- TODO: add assertion for mlua:getByte
-    end)
-end)
-
-describe("Missing explicit test for mlua:setByte", function()
-    it("mlua:setByte works", function()
-        -- @tests mlua:setByte
-        -- TODO: add assertion for mlua:setByte
-    end)
-end)
-
-describe("Missing explicit test for mlua:clone", function()
-    it("mlua:clone works", function()
-        -- @tests mlua:clone
-        -- TODO: add assertion for mlua:clone
-    end)
-end)
-
--- =========================================================================
 -- @covers additions for data module
 -- =========================================================================
 
@@ -1362,3 +1104,5 @@ describe("DataWriter:len (@covers)", function()
         expect_true(n >= 2)
     end)
 end)
+
+test_summary()

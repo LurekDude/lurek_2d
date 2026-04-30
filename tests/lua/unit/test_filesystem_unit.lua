@@ -676,113 +676,84 @@ describe("lurek.filesystem.createTempFile temporary file creation", function()
   end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Covers the remaining filesystem helpers that only had placeholder stubs at the end of the file.
+describe("lurek.filesystem remaining coverage", function()
     -- @tests lurek.filesystem.removeDir
-    it("covers lurek.filesystem.removeDir", function()
-        -- TODO: Implement test for lurek.filesystem.removeDir
+    -- @description Creates a nested save directory with a file, removes the top directory recursively, and verifies the directory no longer exists.
+    it("removeDir removes nested directories recursively", function()
+        local dir = TMP .. "remove_dir_case/"
+        local nested = dir .. "deep/nested/"
+        lurek.filesystem.createDirectory(nested)
+        lurek.filesystem.write(nested .. "file.txt", "x")
+
+        lurek.filesystem.removeDir(dir)
+
+        expect_false(lurek.filesystem.isDirectory(dir))
+        expect_false(lurek.filesystem.exists(nested .. "file.txt"))
     end)
 
-    -- @tests ZipMount:readFile
-    it("covers ZipMount:readFile", function()
-        -- TODO: Implement test for ZipMount:readFile
+    -- @tests lurek.filesystem.copy
+    -- @description Writes a source file, copies it to a second save path, and verifies the destination content matches while the source remains present.
+    it("copy duplicates file contents into destination", function()
+        local src = TMP .. "copy_src.txt"
+        local dst = TMP .. "copy_dst.txt"
+        lurek.filesystem.write(src, "copy me")
+
+        lurek.filesystem.copy(src, dst)
+
+        expect_true(lurek.filesystem.exists(src))
+        expect_true(lurek.filesystem.exists(dst))
+        expect_equal("copy me", lurek.filesystem.read(dst))
     end)
 
-    -- @tests ZipMount:listFiles
-    it("covers ZipMount:listFiles", function()
-        -- TODO: Implement test for ZipMount:listFiles
+    -- @tests lurek.filesystem.move
+    -- @description Writes a source file, moves it to a new save path, and verifies the source disappears while the destination keeps the original content.
+    it("move relocates file within save sandbox", function()
+        local src = TMP .. "move_src.txt"
+        local dst = TMP .. "move_dst.txt"
+        lurek.filesystem.write(src, "move me")
+
+        lurek.filesystem.move(src, dst)
+
+        expect_false(lurek.filesystem.exists(src))
+        expect_true(lurek.filesystem.exists(dst))
+        expect_equal("move me", lurek.filesystem.read(dst))
     end)
 
-end)
+    -- @tests lurek.filesystem.glob
+    -- @description Creates two Lua files and one text file in the same directory, then verifies glob('*.lua') returns exactly the sorted Lua matches.
+    it("glob returns sorted wildcard matches", function()
+        local dir = TMP .. "glob_case/"
+        lurek.filesystem.createDirectory(dir)
+        lurek.filesystem.write(dir .. "a.lua", "")
+        lurek.filesystem.write(dir .. "b.lua", "")
+        lurek.filesystem.write(dir .. "c.txt", "")
 
-describe("Missing explicit test for lurek.filesystem.mountZip", function()
-    it("lurek.filesystem.mountZip works", function()
-        -- @tests lurek.filesystem.mountZip
-        -- TODO: add assertion for lurek.filesystem.mountZip
+        local matches = lurek.filesystem.glob(dir .. "*.lua")
+
+        expect_equal(2, #matches)
+        expect_equal(dir .. "a.lua", matches[1])
+        expect_equal(dir .. "b.lua", matches[2])
     end)
-end)
 
-describe("Missing explicit test for lurek.filesystem.watchPath", function()
-    it("lurek.filesystem.watchPath works", function()
-        -- @tests lurek.filesystem.watchPath
-        -- TODO: add assertion for lurek.filesystem.watchPath
+    -- @tests lurek.filesystem.mkdir
+    -- @description mkdir creates nested directories relative to the game root and leaves a path recognized as a directory.
+    it("mkdir creates nested directories", function()
+        local dir = TMP .. "mkdir_case/deep/nested/"
+        lurek.filesystem.mkdir(dir)
+        expect_true(lurek.filesystem.isDirectory(dir))
     end)
-end)
 
-describe("Missing explicit test for lurek.filesystem.unwatchPath", function()
-    it("lurek.filesystem.unwatchPath works", function()
-        -- @tests lurek.filesystem.unwatchPath
-        -- TODO: add assertion for lurek.filesystem.unwatchPath
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.pollWatchers", function()
-    it("lurek.filesystem.pollWatchers works", function()
-        -- @tests lurek.filesystem.pollWatchers
-        -- TODO: add assertion for lurek.filesystem.pollWatchers
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.copy", function()
-    it("lurek.filesystem.copy works", function()
-        -- @tests lurek.filesystem.copy
-        -- TODO: add assertion for lurek.filesystem.copy
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.move", function()
-    it("lurek.filesystem.move works", function()
-        -- @tests lurek.filesystem.move
-        -- TODO: add assertion for lurek.filesystem.move
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.glob", function()
-    it("lurek.filesystem.glob works", function()
-        -- @tests lurek.filesystem.glob
-        -- TODO: add assertion for lurek.filesystem.glob
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.mkdir", function()
-    it("lurek.filesystem.mkdir works", function()
-        -- @tests lurek.filesystem.mkdir
-        -- TODO: add assertion for lurek.filesystem.mkdir
-    end)
-end)
-
-describe("Missing explicit test for lurek.filesystem.toAbsolutePath", function()
-    it("lurek.filesystem.toAbsolutePath works", function()
-        -- @tests lurek.filesystem.toAbsolutePath
-        -- TODO: add assertion for lurek.filesystem.toAbsolutePath
+    -- @tests lurek.filesystem.toAbsolutePath
+    -- @description Resolves a relative sandbox path to an absolute OS path string containing the save test folder segment.
+    it("toAbsolutePath returns an absolute path string", function()
+        local abs = lurek.filesystem.toAbsolutePath(TMP .. "absolute_case.txt")
+        expect_type("string", abs)
+        expect_true(string.find(abs, "_fs_tests", 1, true) ~= nil)
     end)
 end)
 
-describe("Missing explicit test for FileData:getSize", function()
-    it("FileData:getSize works", function()
-        -- @tests FileData:getSize
-        -- TODO: add assertion for FileData:getSize
-    end)
-end)
-
-describe("Missing explicit test for FileData:getString", function()
-    it("FileData:getString works", function()
-        -- @tests FileData:getString
-        -- TODO: add assertion for FileData:getString
-    end)
-end)
-
-describe("Missing explicit test for FileData:getFilename", function()
-    it("FileData:getFilename works", function()
-        -- @tests FileData:getFilename
-        -- TODO: add assertion for FileData:getFilename
-    end)
-end)
+test_summary()
 
 describe("Missing explicit test for FileHandle:read", function()
     it("FileHandle:read works", function()

@@ -238,24 +238,38 @@ describe("lurek.spine extended", function()
         -- @description Confirms getAnimationTime advances after update when playing.
         it("animation time advances after updateAnimation", function()
             local sk = lurek.spine.newSkeleton("test")
-            sk:playAnimation("walk", true)
+            sk:addBone("root")
+            local anim = lurek.spine.newSkeletonAnimation("walk", 1.0)
+            anim:addKeyframe(0, "x", 0.0, 0.0)
+            anim:addKeyframe(0, "x", 1.0, 10.0)
+            sk:addAnimation(anim)
+            expect_true(sk:playAnimation("walk", true))
             sk:updateAnimation(0.1)
             local t = sk:getAnimationTime()
             expect_type("number", t)
-            expect_true(t >= 0.0, "time should be non-negative")
+            expect_true(t > 0.0, "time should advance once playback starts")
         end)
 
         -- @tests lurek.spine.newSkeleton
         -- @tests lurek.spine.playAnimation
         -- @tests lurek.spine.stopAnimation
         -- @tests lurek.spine.getAnimationTime
-        -- @description Confirms stopAnimation resets animation time to zero.
-        it("stopAnimation sets time back to zero", function()
+        -- @tests lurek.spine.updateAnimation
+        -- @description Confirms stopAnimation stops playback without advancing time further.
+        it("stopAnimation freezes animation time", function()
             local sk = lurek.spine.newSkeleton("test")
-            sk:playAnimation("walk", true)
+            sk:addBone("root")
+            local anim = lurek.spine.newSkeletonAnimation("walk", 1.0)
+            anim:addKeyframe(0, "x", 0.0, 0.0)
+            anim:addKeyframe(0, "x", 1.0, 10.0)
+            sk:addAnimation(anim)
+            expect_true(sk:playAnimation("walk", true))
             sk:updateAnimation(0.5)
             sk:stopAnimation()
-            expect_near(0.0, sk:getAnimationTime(), 0.001)
+            local stopped_at = sk:getAnimationTime()
+            sk:updateAnimation(0.25)
+            expect_near(0.5, stopped_at, 0.001)
+            expect_near(stopped_at, sk:getAnimationTime(), 0.001)
         end)
 
         -- @tests lurek.spine.newSkeleton
@@ -414,131 +428,91 @@ describe("lurek.spine extended", function()
     end)
 end)
 
-test_summary()
+-- @description Replaces the old placeholder tail with concrete assertions across skeleton topology, animation metadata, playback, and skin activation.
+describe("lurek.spine regression coverage", function()
+    -- @tests Skeleton:findBone
+    -- @tests Skeleton:findSlot
+    -- @tests Skeleton:updateWorldTransforms
+    -- @tests Skeleton:getBoneWorld
+    -- @tests Skeleton:setPosition
+    -- @tests Skeleton:boneCount
+    -- @tests Skeleton:slotCount
+    -- @tests Skeleton:drawToImage
+    -- @description Builds a small skeleton hierarchy, moves it, updates transforms, and verifies topology queries, world transform access, and debug rendering.
+    it("skeleton topology and world transform helpers stay consistent", function()
+        local sk = lurek.spine.newSkeleton("rig")
+        local root = sk:addBone("root", { x = 5, y = 10 })
+        local arm = sk:addChildBone("arm", root, { x = 3, y = 4 })
+        local slot = sk:addSlot("hand_slot", arm, "hand")
 
-describe("Missing explicit test for Skeleton:findBone", function()
-    it("Skeleton:findBone works", function()
-        -- @tests Skeleton:findBone
-        -- TODO: add assertion for Skeleton:findBone
+        sk:setPosition(20, 30)
+        sk:updateWorldTransforms()
+
+        local world = sk:getBoneWorld(arm)
+        local image = sk:drawToImage(32, 32)
+
+        expect_equal(root, sk:findBone("root"))
+        expect_equal(arm, sk:findBone("arm"))
+        expect_equal(slot, sk:findSlot("hand_slot"))
+        expect_equal(2, sk:boneCount())
+        expect_equal(1, sk:slotCount())
+        expect_type("table", world)
+        expect_type("number", world.x)
+        expect_type("number", world.y)
+        expect_type("userdata", image)
     end)
-end)
 
-describe("Missing explicit test for Skeleton:findSlot", function()
-    it("Skeleton:findSlot works", function()
-        -- @tests Skeleton:findSlot
-        -- TODO: add assertion for Skeleton:findSlot
+    -- @tests SkeletonAnimation:getDuration
+    -- @tests SkeletonAnimation:getEvents
+    -- @tests SkeletonAnimation:getTimelineCount
+    -- @description Adds keyframes and event keys to a single animation and verifies duration, timeline count, and event collection all expose the authored data.
+    it("SkeletonAnimation exposes duration timelines and event windows", function()
+        local anim = lurek.spine.newSkeletonAnimation("wave", 1.5)
+        anim:addKeyframe(0, "x", 0.0, 0.0)
+        anim:addKeyframe(0, "x", 1.0, 10.0)
+        anim:addEventKey(0.25, "start", 1.0)
+        anim:addEventKey(0.75, "peak", 2.0)
+
+        local events = anim:getEvents(0.0, 0.5)
+
+        expect_near(1.5, anim:getDuration(), 0.001)
+        expect_equal(1, anim:getTimelineCount())
+        expect_equal(1, #events)
+        expect_equal("start", events[1].name)
+        expect_near(1.0, events[1].value, 0.001)
     end)
-end)
 
-describe("Missing explicit test for Skeleton:updateWorldTransforms", function()
-    it("Skeleton:updateWorldTransforms works", function()
-        -- @tests Skeleton:updateWorldTransforms
-        -- TODO: add assertion for Skeleton:updateWorldTransforms
-    end)
-end)
+    -- @tests Skeleton:addAnimation
+    -- @tests Skeleton:stopAnimation
+    -- @tests Skeleton:updateAnimation
+    -- @tests Skeleton:getAnimationTime
+    -- @tests Skeleton:addSkin
+    -- @tests Skeleton:setSkin
+    -- @tests Skeleton:getSkin
+    -- @description Attaches a real animation to a skeleton, advances playback, stops it, and verifies skin registration and activation on the same object.
+    it("skeleton playback and skin helpers work with a real animation", function()
+        local sk = lurek.spine.newSkeleton("hero")
+        sk:addBone("root")
+        sk:addSkin("hero_skin")
 
-describe("Missing explicit test for Skeleton:getBoneWorld", function()
-    it("Skeleton:getBoneWorld works", function()
-        -- @tests Skeleton:getBoneWorld
-        -- TODO: add assertion for Skeleton:getBoneWorld
-    end)
-end)
+        expect_true(sk:setSkin("hero_skin"))
+        expect_equal("hero_skin", sk:getSkin())
 
-describe("Missing explicit test for Skeleton:setPosition", function()
-    it("Skeleton:setPosition works", function()
-        -- @tests Skeleton:setPosition
-        -- TODO: add assertion for Skeleton:setPosition
-    end)
-end)
+        local anim = lurek.spine.newSkeletonAnimation("walk", 1.0)
+        anim:addKeyframe(0, "x", 0.0, 0.0)
+        anim:addKeyframe(0, "x", 1.0, 12.0)
+        sk:addAnimation(anim)
 
-describe("Missing explicit test for Skeleton:boneCount", function()
-    it("Skeleton:boneCount works", function()
-        -- @tests Skeleton:boneCount
-        -- TODO: add assertion for Skeleton:boneCount
-    end)
-end)
+        expect_true(sk:playAnimation("walk", false))
 
-describe("Missing explicit test for Skeleton:slotCount", function()
-    it("Skeleton:slotCount works", function()
-        -- @tests Skeleton:slotCount
-        -- TODO: add assertion for Skeleton:slotCount
-    end)
-end)
+        sk:updateAnimation(0.5)
+        expect_true(sk:getAnimationTime() > 0.0, "expected animation time to advance")
 
-describe("Missing explicit test for Skeleton:drawToImage", function()
-    it("Skeleton:drawToImage works", function()
-        -- @tests Skeleton:drawToImage
-        -- TODO: add assertion for Skeleton:drawToImage
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:stopAnimation", function()
-    it("Skeleton:stopAnimation works", function()
-        -- @tests Skeleton:stopAnimation
-        -- TODO: add assertion for Skeleton:stopAnimation
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:updateAnimation", function()
-    it("Skeleton:updateAnimation works", function()
-        -- @tests Skeleton:updateAnimation
-        -- TODO: add assertion for Skeleton:updateAnimation
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:getAnimationTime", function()
-    it("Skeleton:getAnimationTime works", function()
-        -- @tests Skeleton:getAnimationTime
-        -- TODO: add assertion for Skeleton:getAnimationTime
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:addAnimation", function()
-    it("Skeleton:addAnimation works", function()
-        -- @tests Skeleton:addAnimation
-        -- TODO: add assertion for Skeleton:addAnimation
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:addSkin", function()
-    it("Skeleton:addSkin works", function()
-        -- @tests Skeleton:addSkin
-        -- TODO: add assertion for Skeleton:addSkin
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:setSkin", function()
-    it("Skeleton:setSkin works", function()
-        -- @tests Skeleton:setSkin
-        -- TODO: add assertion for Skeleton:setSkin
-    end)
-end)
-
-describe("Missing explicit test for Skeleton:getSkin", function()
-    it("Skeleton:getSkin works", function()
-        -- @tests Skeleton:getSkin
-        -- TODO: add assertion for Skeleton:getSkin
-    end)
-end)
-
-describe("Missing explicit test for SkeletonAnimation:getDuration", function()
-    it("SkeletonAnimation:getDuration works", function()
-        -- @tests SkeletonAnimation:getDuration
-        -- TODO: add assertion for SkeletonAnimation:getDuration
-    end)
-end)
-
-describe("Missing explicit test for SkeletonAnimation:getEvents", function()
-    it("SkeletonAnimation:getEvents works", function()
-        -- @tests SkeletonAnimation:getEvents
-        -- TODO: add assertion for SkeletonAnimation:getEvents
-    end)
-end)
-
-describe("Missing explicit test for SkeletonAnimation:getTimelineCount", function()
-    it("SkeletonAnimation:getTimelineCount works", function()
-        -- @tests SkeletonAnimation:getTimelineCount
-        -- TODO: add assertion for SkeletonAnimation:getTimelineCount
+        sk:stopAnimation()
+        local stopped_at = sk:getAnimationTime()
+        sk:updateAnimation(0.25)
+        expect_near(0.5, stopped_at, 0.001)
+        expect_near(stopped_at, sk:getAnimationTime(), 0.001)
     end)
 end)
 
@@ -550,8 +524,9 @@ describe("Skeleton:blendAnimation (@covers)", function()
     it("blendAnimation does not crash on a fresh skeleton", function()
         -- @covers Skeleton:blendAnimation
         local skel = lurek.spine.newSkeleton("cov_blend_skel")
+        local anim = lurek.spine.newSkeletonAnimation("idle", 1.0)
         local ok, _ = pcall(function()
-            skel:blendAnimation("idle", 1.0, 0.0)
+            skel:blendAnimation(anim, 1.0, 0.0)
         end)
         expect_type("boolean", ok)
     end)
@@ -567,3 +542,5 @@ describe("SkeletonAnimation:addEventKey (@covers)", function()
         expect_type("boolean", ok)
     end)
 end)
+
+test_summary()

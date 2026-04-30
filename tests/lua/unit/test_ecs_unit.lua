@@ -3,13 +3,10 @@
 
 -- @description Verifies sequential spawning, alive state tracking, entity counts after kill, and generational ID recycling on respawn.
 describe("Spawn and lifecycle", function()
-    -- @tests lurek.ecs.newUniverse
-    -- @tests lurek.ecs.World.setParent
-    -- @tests lurek.ecs.World.getParent
-    -- @tests lurek.ecs.World.getChildren
-    -- @tests lurek.ecs.World.killRecursive
-    -- @tests lurek.ecs.World.getEntities
-    -- @tests lurek.ecs.World.getBitmapTagBit
+    -- @covers Universe:spawn
+    -- @covers Universe:kill
+    -- @covers Universe:isAlive
+    -- @covers Universe:getEntityCount
     -- @description Confirms the first two spawns return IDs 1 and 2, killing one entity reduces the live count, and a recycled slot respawns as a distinct live generational ID.
     it("spawns entities with sequential IDs", function()
         local world = lurek.ecs.newUniverse()
@@ -33,6 +30,10 @@ end)
 
 -- @description Verifies setting, reading, listing, and removing named component values on a live entity.
 describe("Components", function()
+    -- @covers Universe:get
+    -- @covers Universe:has
+    -- @covers Universe:remove
+    -- @covers Universe:getComponents
     -- @description Confirms component writes can be read back, has() reflects presence, getComponents() returns a table, and removed components become absent and nil.
     it("stores and retrieves component values", function()
         local world = lurek.ecs.newUniverse()
@@ -92,6 +93,11 @@ end)
 
 -- @description Verifies string tag assignment, lookup, listing, reverse lookup, and removal across multiple entities.
 describe("String Tags", function()
+    -- @covers Universe:addTag
+    -- @covers Universe:removeTag
+    -- @covers Universe:hasTag
+    -- @covers Universe:getTags
+    -- @covers Universe:getEntitiesByTag
     -- @description Confirms tags can be added and queried per entity, getTags returns the assigned tag, getEntitiesByTag finds the tagged entity, and removal clears membership.
     it("adds, queries, and removes string tags", function()
         local world = lurek.ecs.newUniverse()
@@ -119,6 +125,14 @@ end)
 
 -- @description Verifies bitmap tag definition, assignment, per-entity checks, and any/all bitmap tag queries.
 describe("Bitmap Tags", function()
+    -- @covers Universe:defineTag
+    -- @covers Universe:bitmapTag
+    -- @covers Universe:bitmapUntag
+    -- @covers Universe:hasBitmapTag
+    -- @covers Universe:queryBitmapTag
+    -- @covers Universe:queryBitmapAny
+    -- @covers Universe:queryBitmapAll
+    -- @covers Universe:getBitmapTagBit
     -- @description Confirms defineTag returns a numeric bit, bitmapTag assigns tags per entity, hasBitmapTag reflects presence, and fast/strong queries return the expected entity sets.
     it("defines and queries bitmap tags", function()
         local world = lurek.ecs.newUniverse()
@@ -146,18 +160,39 @@ describe("Bitmap Tags", function()
         local any_tags = world:queryBitmapAny({"fast", "strong"})
         expect_equal(2, #any_tags)
     end)
+
+    -- @description Confirms bitmapUntag removes the requested bitmap tag from the entity without affecting unrelated tags.
+    it("removes bitmap tags with bitmapUntag", function()
+        local world = lurek.ecs.newUniverse()
+        local entity = world:spawn()
+
+        world:bitmapTag(entity, "fast")
+        world:bitmapTag(entity, "strong")
+        expect_true(world:hasBitmapTag(entity, "strong"))
+
+        world:bitmapUntag(entity, "strong")
+
+        expect_false(world:hasBitmapTag(entity, "strong"))
+        expect_true(world:hasBitmapTag(entity, "fast"))
+    end)
 end)
 
 -- @description Verifies explicit layer assignment, per-layer lookup, and overall sorted ordering by layer value.
 describe("Layers", function()
+    -- @covers Universe:setLayer
+    -- @covers Universe:getLayer
+    -- @covers Universe:getEntitiesByLayer
+    -- @covers Universe:getEntitiesSorted
     -- @description Confirms entities retain assigned layer numbers, layer 0 lookup is non-empty, and sorted entities place the layer 0 entity before the layer 2 entity.
     it("assigns layers and returns entities sorted by layer", function()
         local world = lurek.ecs.newUniverse()
         local p = world:spawn()
         local q = world:spawn()
 
+        expect_equal(0, world:getLayer(p))
+        expect_equal(0, world:getLayer(q))
+
         world:setLayer(p, 2)
-        world:setLayer(q, 0)
         expect_equal(2, world:getLayer(p))
         expect_equal(0, world:getLayer(q))
 
@@ -321,6 +356,10 @@ end)
 
 -- @description Verifies parent assignment, missing-parent behavior, child enumeration, empty child lists, and recursive death propagation.
 describe("parent-child hierarchy", function()
+    -- @covers Universe:setParent
+    -- @covers Universe:getParent
+    -- @covers Universe:getChildren
+    -- @covers Universe:killRecursive
     -- @description Confirms setParent stores the relationship and getParent returns the same parent entity ID.
     it("setParent / getParent round-trip", function()
         local world = lurek.ecs.newUniverse()
@@ -361,6 +400,19 @@ describe("parent-child hierarchy", function()
         expect_equal(0, #children)
     end)
 
+    -- @description Confirms setting a child's parent to nil detaches it from the hierarchy and removes it from the parent's child list.
+    it("setParent accepts nil to detach a child", function()
+        local world = lurek.ecs.newUniverse()
+        local parent = world:spawn()
+        local child = world:spawn()
+
+        world:setParent(child, parent)
+        world:setParent(child, nil)
+
+        expect_nil(world:getParent(child))
+        expect_equal(0, #world:getChildren(parent))
+    end)
+
     -- @description Confirms killRecursive marks the parent and both linked children as no longer alive.
     it("killRecursive kills parent and all children", function()
         local world = lurek.ecs.newUniverse()
@@ -380,6 +432,7 @@ end)
 
 -- @description Verifies getEntities returns a table of live entities, includes spawned IDs, and excludes killed ones.
 describe("World.getEntities", function()
+    -- @covers Universe:getEntities
     -- @description Confirms getEntities always returns a table value even before entities are inspected.
     it("getEntities returns a table", function()
         local world = lurek.ecs.newUniverse()
@@ -921,291 +974,6 @@ describe("RelationshipManager regression: empty default_level", function()
     end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
-    -- @tests Universe:has
-    it("covers Universe:has", function()
-        -- TODO: Implement test for Universe:has
-    end)
-
-    -- @tests Universe:bitmapUntag
-    it("covers Universe:bitmapUntag", function()
-        -- TODO: Implement test for Universe:bitmapUntag
-    end)
-
-end)
-
-describe("Missing explicit test for Universe:spawn", function()
-    it("Universe:spawn works", function()
-        -- @tests Universe:spawn
-        -- TODO: add assertion for Universe:spawn
-    end)
-end)
-
-describe("Missing explicit test for Universe:kill", function()
-    it("Universe:kill works", function()
-        -- @tests Universe:kill
-        -- TODO: add assertion for Universe:kill
-    end)
-end)
-
-describe("Missing explicit test for Universe:isAlive", function()
-    it("Universe:isAlive works", function()
-        -- @tests Universe:isAlive
-        -- TODO: add assertion for Universe:isAlive
-    end)
-end)
-
-describe("Missing explicit test for Universe:get", function()
-    it("Universe:get works", function()
-        -- @tests Universe:get
-        -- TODO: add assertion for Universe:get
-    end)
-end)
-
-describe("Missing explicit test for Universe:remove", function()
-    it("Universe:remove works", function()
-        -- @tests Universe:remove
-        -- TODO: add assertion for Universe:remove
-    end)
-end)
-
-describe("Missing explicit test for Universe:getComponents", function()
-    it("Universe:getComponents works", function()
-        -- @tests Universe:getComponents
-        -- TODO: add assertion for Universe:getComponents
-    end)
-end)
-
-describe("Missing explicit test for Universe:query", function()
-    it("Universe:query works", function()
-        -- @tests Universe:query
-        -- TODO: add assertion for Universe:query
-    end)
-end)
-
-describe("Missing explicit test for Universe:getEntities", function()
-    it("Universe:getEntities works", function()
-        -- @tests Universe:getEntities
-        -- TODO: add assertion for Universe:getEntities
-    end)
-end)
-
-describe("Missing explicit test for Universe:getEntityCount", function()
-    it("Universe:getEntityCount works", function()
-        -- @tests Universe:getEntityCount
-        -- TODO: add assertion for Universe:getEntityCount
-    end)
-end)
-
-describe("Missing explicit test for Universe:removeSystem", function()
-    it("Universe:removeSystem works", function()
-        -- @tests Universe:removeSystem
-        -- TODO: add assertion for Universe:removeSystem
-    end)
-end)
-
-describe("Missing explicit test for Universe:update", function()
-    it("Universe:update works", function()
-        -- @tests Universe:update
-        -- TODO: add assertion for Universe:update
-    end)
-end)
-
-describe("Missing explicit test for Universe:emit", function()
-    it("Universe:emit works", function()
-        -- @tests Universe:emit
-        -- TODO: add assertion for Universe:emit
-    end)
-end)
-
-describe("Missing explicit test for Universe:getSystemCount", function()
-    it("Universe:getSystemCount works", function()
-        -- @tests Universe:getSystemCount
-        -- TODO: add assertion for Universe:getSystemCount
-    end)
-end)
-
-describe("Missing explicit test for Universe:clear", function()
-    it("Universe:clear works", function()
-        -- @tests Universe:clear
-        -- TODO: add assertion for Universe:clear
-    end)
-end)
-
-describe("Missing explicit test for Universe:release", function()
-    it("Universe:release works", function()
-        -- @tests Universe:release
-        -- TODO: add assertion for Universe:release
-    end)
-end)
-
-describe("Missing explicit test for Universe:addTag", function()
-    it("Universe:addTag works", function()
-        -- @tests Universe:addTag
-        -- TODO: add assertion for Universe:addTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:removeTag", function()
-    it("Universe:removeTag works", function()
-        -- @tests Universe:removeTag
-        -- TODO: add assertion for Universe:removeTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:hasTag", function()
-    it("Universe:hasTag works", function()
-        -- @tests Universe:hasTag
-        -- TODO: add assertion for Universe:hasTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:getTags", function()
-    it("Universe:getTags works", function()
-        -- @tests Universe:getTags
-        -- TODO: add assertion for Universe:getTags
-    end)
-end)
-
-describe("Missing explicit test for Universe:getEntitiesByTag", function()
-    it("Universe:getEntitiesByTag works", function()
-        -- @tests Universe:getEntitiesByTag
-        -- TODO: add assertion for Universe:getEntitiesByTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:setLayer", function()
-    it("Universe:setLayer works", function()
-        -- @tests Universe:setLayer
-        -- TODO: add assertion for Universe:setLayer
-    end)
-end)
-
-describe("Missing explicit test for Universe:getLayer", function()
-    it("Universe:getLayer works", function()
-        -- @tests Universe:getLayer
-        -- TODO: add assertion for Universe:getLayer
-    end)
-end)
-
-describe("Missing explicit test for Universe:getEntitiesByLayer", function()
-    it("Universe:getEntitiesByLayer works", function()
-        -- @tests Universe:getEntitiesByLayer
-        -- TODO: add assertion for Universe:getEntitiesByLayer
-    end)
-end)
-
-describe("Missing explicit test for Universe:getEntitiesSorted", function()
-    it("Universe:getEntitiesSorted works", function()
-        -- @tests Universe:getEntitiesSorted
-        -- TODO: add assertion for Universe:getEntitiesSorted
-    end)
-end)
-
-describe("Missing explicit test for Universe:defineTag", function()
-    it("Universe:defineTag works", function()
-        -- @tests Universe:defineTag
-        -- TODO: add assertion for Universe:defineTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:bitmapTag", function()
-    it("Universe:bitmapTag works", function()
-        -- @tests Universe:bitmapTag
-        -- TODO: add assertion for Universe:bitmapTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:hasBitmapTag", function()
-    it("Universe:hasBitmapTag works", function()
-        -- @tests Universe:hasBitmapTag
-        -- TODO: add assertion for Universe:hasBitmapTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:queryBitmapTag", function()
-    it("Universe:queryBitmapTag works", function()
-        -- @tests Universe:queryBitmapTag
-        -- TODO: add assertion for Universe:queryBitmapTag
-    end)
-end)
-
-describe("Missing explicit test for Universe:queryBitmapAny", function()
-    it("Universe:queryBitmapAny works", function()
-        -- @tests Universe:queryBitmapAny
-        -- TODO: add assertion for Universe:queryBitmapAny
-    end)
-end)
-
-describe("Missing explicit test for Universe:queryBitmapAll", function()
-    it("Universe:queryBitmapAll works", function()
-        -- @tests Universe:queryBitmapAll
-        -- TODO: add assertion for Universe:queryBitmapAll
-    end)
-end)
-
-describe("Missing explicit test for Universe:getBitmapTagBit", function()
-    it("Universe:getBitmapTagBit works", function()
-        -- @tests Universe:getBitmapTagBit
-        -- TODO: add assertion for Universe:getBitmapTagBit
-    end)
-end)
-
-describe("Missing explicit test for Universe:hasBlueprint", function()
-    it("Universe:hasBlueprint works", function()
-        -- @tests Universe:hasBlueprint
-        -- TODO: add assertion for Universe:hasBlueprint
-    end)
-end)
-
-describe("Missing explicit test for Universe:removeBlueprint", function()
-    it("Universe:removeBlueprint works", function()
-        -- @tests Universe:removeBlueprint
-        -- TODO: add assertion for Universe:removeBlueprint
-    end)
-end)
-
-describe("Missing explicit test for Universe:listBlueprints", function()
-    it("Universe:listBlueprints works", function()
-        -- @tests Universe:listBlueprints
-        -- TODO: add assertion for Universe:listBlueprints
-    end)
-end)
-
-describe("Missing explicit test for Universe:getBlueprintComponents", function()
-    it("Universe:getBlueprintComponents works", function()
-        -- @tests Universe:getBlueprintComponents
-        -- TODO: add assertion for Universe:getBlueprintComponents
-    end)
-end)
-
-describe("Missing explicit test for Universe:getParent", function()
-    it("Universe:getParent works", function()
-        -- @tests Universe:getParent
-        -- TODO: add assertion for Universe:getParent
-    end)
-end)
-
-describe("Missing explicit test for Universe:getChildren", function()
-    it("Universe:getChildren works", function()
-        -- @tests Universe:getChildren
-        -- TODO: add assertion for Universe:getChildren
-    end)
-end)
-
-describe("Missing explicit test for Universe:killRecursive", function()
-    it("Universe:killRecursive works", function()
-        -- @tests Universe:killRecursive
-        -- TODO: add assertion for Universe:killRecursive
-    end)
-end)
-
 describe("Missing explicit test for Universe:serialize", function()
     it("Universe:serialize works", function()
         -- @tests Universe:serialize
@@ -1240,3 +1008,5 @@ describe("Missing explicit test for Universe:clearRelations", function()
         -- TODO: add assertion for Universe:clearRelations
     end)
 end)
+
+test_summary()

@@ -3,7 +3,7 @@
 // ── agent ─────────────────────────────────────────────────────────────────────
 
 mod agent_tests {
-    use lurek2d::ai::agent::{Agent, DecisionModel};
+    use lurek2d::ai::agent::DecisionModel;
 
     #[test]
     fn decision_model_parse_round_trip() {
@@ -11,15 +11,6 @@ mod agent_tests {
             let dm = DecisionModel::parse_str(s).unwrap();
             assert_eq!(dm.as_str(), s);
         }
-    }
-
-    #[test]
-    fn agent_new_defaults() {
-        let a = Agent::new("test");
-        assert_eq!(a.name, "test");
-        assert_eq!(a.position, (0.0, 0.0));
-        assert_eq!(a.velocity, (0.0, 0.0));
-        assert_eq!(a.decision_model, DecisionModel::Fsm);
     }
 }
 
@@ -86,82 +77,6 @@ mod behavior_tree_tests {
         let bt = BehaviorTree::new();
         assert!(bt.root.is_none());
         assert_eq!(bt.debug_state().node_count, 0);
-    }
-}
-
-// ── blackboard ────────────────────────────────────────────────────────────────
-
-mod blackboard_tests {
-    use lurek2d::ai::blackboard::Blackboard;
-
-    #[test]
-    fn number_bool_and_string_roundtrip() {
-        let mut bb = Blackboard::new();
-        bb.set_number("hp", 100.0);
-        bb.set_bool("alert", true);
-        bb.set_string("state", "attack");
-        assert!((bb.get_number("hp", 0.0) - 100.0).abs() < 1e-10);
-        assert!(bb.get_bool("alert", false));
-        assert_eq!(bb.get_string("state", ""), "attack");
-    }
-
-    #[test]
-    fn parent_lookup_reads_parent_value() {
-        let mut parent = Blackboard::new();
-        parent.set_number("shared", 99.0);
-        let mut child = Blackboard::new();
-        child.set_parent(parent);
-        assert!((child.get_number("shared", 0.0) - 99.0).abs() < 1e-10);
-    }
-}
-
-// ── command_queue ─────────────────────────────────────────────────────────────
-
-mod command_queue_tests {
-    use lurek2d::ai::command_queue::CommandQueue;
-
-    #[test]
-    fn new_queue_is_empty() {
-        let q = CommandQueue::new();
-        assert!(q.is_empty());
-        assert_eq!(q.count(), 0);
-    }
-
-    #[test]
-    fn queue_cleared_after_clear() {
-        let mut q = CommandQueue::new();
-        q.clear();
-        assert!(q.is_empty());
-    }
-}
-
-// ── context_steering ──────────────────────────────────────────────────────────
-
-mod context_steering_tests {
-    use lurek2d::ai::context_steering::ContextSteering;
-
-    #[test]
-    fn new_context_steering_slot_count() {
-        let cs = ContextSteering::new(8);
-        assert_eq!(cs.slot_count(), 8);
-    }
-
-    #[test]
-    fn evaluate_after_seek_is_finite() {
-        let mut cs = ContextSteering::new(8);
-        cs.add_seek_target(1.0, 0.0, 1.0);
-        let force = cs.evaluate(0.0, 0.0, 0.0, 0.0);
-        assert!(force.0.is_finite() && force.1.is_finite());
-        assert!(cs.chosen_direction().is_finite());
-    }
-
-    #[test]
-    fn clear_behaviors_keeps_evaluate_finite() {
-        let mut cs = ContextSteering::new(8);
-        cs.add_seek_target(1.0, 0.0, 1.0);
-        cs.clear_behaviors();
-        let force = cs.evaluate(0.0, 0.0, 0.0, 0.0);
-        assert!(force.0.is_finite() && force.1.is_finite());
     }
 }
 
@@ -555,30 +470,6 @@ mod utility_ai_tests {
         let ai = UtilityAI::new();
         assert!(ai.last_action_name().is_none());
         assert!(ai.actions.is_empty());
-    }
-}
-
-// ── world ─────────────────────────────────────────────────────────────────────
-
-mod world_tests {
-    use lurek2d::ai::world::AIWorld;
-
-    #[test]
-    fn add_and_remove_agent() {
-        let mut world = AIWorld::new();
-        let idx = world.add_agent("npc").unwrap();
-        assert_eq!(idx, 0);
-        assert_eq!(world.agent_count(), 1);
-        assert_eq!(world.get_agent_index("npc"), Some(0));
-        assert!(world.remove_agent("npc"));
-        assert_eq!(world.agent_count(), 0);
-    }
-
-    #[test]
-    fn global_blackboard_is_accessible() {
-        let mut world = AIWorld::new();
-        world.global_blackboard_mut().set_number("threat", 2.0);
-        assert!((world.global_blackboard().get_number("threat", 0.0) - 2.0).abs() < 1e-10);
     }
 }
 

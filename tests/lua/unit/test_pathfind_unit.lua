@@ -983,17 +983,46 @@ describe("Missing explicit test for lurek.pathfind.newHexGrid", function()
     end)
 end)
 
-describe("Missing explicit test for lurek.pathfind.newJpsGrid", function()
-    it("lurek.pathfind.newJpsGrid works", function()
-        -- @tests lurek.pathfind.newJpsGrid
-        -- TODO: add assertion for lurek.pathfind.newJpsGrid
+describe("lurek.pathfind.newJpsGrid", function()
+    -- @tests lurek.pathfind.newJpsGrid
+    -- @tests LJpsGrid:findPath
+    -- @description Verifies newJpsGrid returns a path on an open grid and that the path reaches the requested goal cell.
+    it("findPath reaches the requested goal on an open grid", function()
+        local grid = lurek.pathfind.newJpsGrid(5, 5)
+        local path = grid:findPath(1, 1, 5, 5)
+
+        expect_not_nil(path)
+        expect_true(#path > 0, "expected a non-empty JPS path")
+        expect_equal(5, path[#path].x)
+        expect_equal(5, path[#path].y)
     end)
 end)
 
-describe("Missing explicit test for lurek.pathfind.rangeMap", function()
-    it("lurek.pathfind.rangeMap works", function()
-        -- @tests lurek.pathfind.rangeMap
-        -- TODO: add assertion for lurek.pathfind.rangeMap
+describe("lurek.pathfind.rangeMap", function()
+    -- @tests lurek.pathfind.rangeMap
+    -- @description Verifies rangeMap includes the origin cell with zero cost and returns at least one reachable cell.
+    it("includes the origin cell in reachable results", function()
+        local result = lurek.pathfind.rangeMap({
+            width = 5,
+            height = 5,
+            origin_x = 3,
+            origin_y = 3,
+            budget = 3.0,
+        })
+
+        expect_equal(5, result.width)
+        expect_equal(5, result.height)
+        expect_true(#result.cells > 0, "expected at least one reachable cell")
+
+        local found_origin = false
+        for _, cell in ipairs(result.cells) do
+            if cell.x == 3 and cell.y == 3 then
+                found_origin = true
+                expect_equal(0, cell.cost)
+            end
+        end
+
+        expect_true(found_origin, "expected the origin cell to be reachable")
     end)
 end)
 

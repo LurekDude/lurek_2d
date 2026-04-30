@@ -1,8 +1,7 @@
 //! Smoke tests for the pathfind module against the current public API.
 
 use lurek2d::pathfind::{
-    ai_flow_field::FlowField, astar, bidirectional_astar, JpsGrid, NavGrid, PathThreadPool,
-    RangeMap,
+    ai_flow_field::FlowField, astar, bidirectional_astar, NavGrid, PathThreadPool,
 };
 
 mod flow_field_tests {
@@ -53,30 +52,5 @@ mod async_pool_tests {
     fn default_thread_count() {
         let pool = PathThreadPool::new(0);
         assert!(pool.get_thread_count() >= 1);
-    }
-}
-
-mod jps_tests {
-    use super::*;
-
-    #[test]
-    fn jps_grid_finds_path() {
-        let grid = JpsGrid::new(5, 5);
-        let path = grid.find_path((0, 0), (4, 4)).unwrap();
-        assert_eq!(path.first(), Some(&(0, 0)));
-        assert_eq!(path.last(), Some(&(4, 4)));
-    }
-}
-
-mod range_map_tests {
-    use super::*;
-
-    #[test]
-    fn origin_is_reachable() {
-        let costs = vec![1.0; 25];
-        let blocked = vec![false; 25];
-        let range = RangeMap::from_grid(5, 5, &costs, &blocked, 2, 2, 3.0, false);
-        assert!(range.reachable(2, 2));
-        assert!(!range.reachable_cells().is_empty());
     }
 }

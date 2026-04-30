@@ -949,75 +949,84 @@ describe("lurek.tween.spring — auto-tick via lurek.tween.update", function()
     end)
 end)
 
-test_summary()
-
-describe("Missing explicit test for lurek.tween.spring", function()
-    it("lurek.tween.spring works", function()
-        -- @tests lurek.tween.spring
-        -- TODO: add assertion for lurek.tween.spring
-    end)
-end)
-
-describe("Missing explicit test for Tween:resume", function()
-    it("Tween:resume works", function()
+describe("Tween:resume", function()
+    it("continues interpolation after a pause", function()
         -- @tests Tween:resume
-        -- TODO: add assertion for Tween:resume
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        local t = lurek.tween.tween(2.0, obj, { x = 100 }, "linear")
+        lurek.tween.update(0.5)
+        local paused_at = obj.x
+        t:pause()
+        lurek.tween.update(0.5)
+        expect_near(paused_at, obj.x, 0.5)
+        t:resume()
+        lurek.tween.update(0.5)
+        expect_true(obj.x > paused_at)
     end)
 end)
 
-describe("Missing explicit test for Spring:update", function()
-    it("Spring:update works", function()
-        -- @tests Spring:update
-        -- TODO: add assertion for Spring:update
-    end)
-end)
-
-describe("Missing explicit test for Spring:isSettled", function()
-    it("Spring:isSettled works", function()
-        -- @tests Spring:isSettled
-        -- TODO: add assertion for Spring:isSettled
-    end)
-end)
-
-describe("Missing explicit test for Spring:isActive", function()
-    it("Spring:isActive works", function()
+describe("lurek.tween.spring regression coverage", function()
+    it("creates an active spring handle", function()
+        -- @tests lurek.tween.spring
         -- @tests Spring:isActive
-        -- TODO: add assertion for Spring:isActive
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 })
+        expect_not_nil(sp)
+        expect_equal(true, sp:isActive())
     end)
-end)
 
-describe("Missing explicit test for Spring:setTarget", function()
-    it("Spring:setTarget works", function()
-        -- @tests Spring:setTarget
-        -- TODO: add assertion for Spring:setTarget
-    end)
-end)
-
-describe("Missing explicit test for Spring:setStiffness", function()
-    it("Spring:setStiffness works", function()
-        -- @tests Spring:setStiffness
-        -- TODO: add assertion for Spring:setStiffness
-    end)
-end)
-
-describe("Missing explicit test for Spring:setDamping", function()
-    it("Spring:setDamping works", function()
-        -- @tests Spring:setDamping
-        -- TODO: add assertion for Spring:setDamping
-    end)
-end)
-
-describe("Missing explicit test for Spring:cancel", function()
-    it("Spring:cancel works", function()
-        -- @tests Spring:cancel
-        -- TODO: add assertion for Spring:cancel
-    end)
-end)
-
-describe("Missing explicit test for Spring:getPosition", function()
-    it("Spring:getPosition works", function()
+    it("update advances the simulation and getPosition exposes it", function()
+        -- @tests Spring:update
         -- @tests Spring:getPosition
-        -- TODO: add assertion for Spring:getPosition
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 120, damping = 18 })
+        local result = sp:update(1 / 60)
+        expect_type("boolean", result)
+        expect_true(sp:getPosition("x") > 0)
+    end)
+
+    it("isSettled becomes true after enough updates", function()
+        -- @tests Spring:isSettled
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 150, damping = 25 })
+        for _ = 1, 240 do
+            sp:update(1 / 60)
+        end
+        expect_equal(true, sp:isSettled())
+    end)
+
+    it("setTarget restarts motion toward a new target", function()
+        -- @tests Spring:setTarget
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 150, damping = 25 })
+        for _ = 1, 240 do
+            sp:update(1 / 60)
+        end
+        sp:setTarget({ x = 200 })
+        sp:update(1 / 60)
+        expect_equal(false, sp:isSettled())
+        expect_true(sp:getPosition("x") > 100)
+    end)
+
+    it("setStiffness and setDamping keep the spring usable", function()
+        -- @tests Spring:setStiffness
+        -- @tests Spring:setDamping
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 50, damping = 8 })
+        sp:setStiffness(200)
+        sp:setDamping(30)
+        sp:update(1 / 60)
+        expect_equal(true, sp:isActive())
+        expect_true(sp:getPosition("x") > 0)
+    end)
+
+    it("cancel deactivates the spring immediately", function()
+        -- @tests Spring:cancel
+        local target = { x = 0 }
+        local sp = lurek.tween.spring(target, { x = 100 })
+        sp:cancel()
+        expect_equal(false, sp:isActive())
     end)
 end)
 
@@ -1075,3 +1084,5 @@ describe("LTweenParallel.add (@covers)", function()
         expect_not_nil(par)
     end)
 end)
+
+test_summary()

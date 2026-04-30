@@ -613,123 +613,113 @@ describe("lurek.pipeline toAscii", function()
     end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Replaces the pipeline placeholder tail with direct retry, async, and error-hook coverage for the remaining step and pipeline helpers.
+describe("pipeline regression coverage", function()
     -- @tests Step:setCallback
-    it("covers Step:setCallback", function()
-        -- TODO: Implement test for Step:setCallback
-    end)
-
     -- @tests Step:getTimeout
-    it("covers Step:getTimeout", function()
-        -- TODO: Implement test for Step:getTimeout
-    end)
-
     -- @tests Step:setRetryDelay
-    it("covers Step:setRetryDelay", function()
-        -- TODO: Implement test for Step:setRetryDelay
-    end)
-
     -- @tests Step:setOnError
-    it("covers Step:setOnError", function()
-        -- TODO: Implement test for Step:setOnError
-    end)
-
     -- @tests Step:getAttempt
-    it("covers Step:getAttempt", function()
-        -- TODO: Implement test for Step:getAttempt
-    end)
+    -- @description Replaces the step callback, stores timeout metadata, retries once after a deliberate failure, and verifies the attempt counter reflects the successful second try.
+    it("step retry metadata and callback replacement work together", function()
+        local attempts = 0
+        local step = lurek.pipeline.newStep("retry", function(ctx) return -1 end)
+        step:setTimeout(2.5)
+        step:setRetryCount(1)
+        step:setRetryDelay(0.25)
+        step:setCallback(function(ctx)
+            attempts = attempts + 1
+            if attempts == 1 then
+                error("retry once")
+            end
+            return 42
+        end)
 
-    -- @tests Pipeline:run
-    it("covers Pipeline:run", function()
-        -- TODO: Implement test for Pipeline:run
+        local pipeline = lurek.pipeline.newPipeline("retry_meta")
+        pipeline:addStep(step)
+        local result = pipeline:run()
+
+        expect_true(result.success)
+        expect_near(2.5, step:getTimeout(), 0.001)
+        expect_equal(2, step:getAttempt())
     end)
 
     -- @tests Pipeline:runAsync
-    it("covers Pipeline:runAsync", function()
-        -- TODO: Implement test for Pipeline:runAsync
+    -- @tests Pipeline:getContext
+    -- @description Starts an async pipeline, verifies the stored context survives the launch, and checks update returns a boolean tick result.
+    it("runAsync stores context and exposes async state", function()
+        local step = lurek.pipeline.newStep("async_step", function(ctx)
+            return ctx.seed * 2
+        end)
+        local pipeline = lurek.pipeline.newPipeline("async_case")
+        pipeline:addStep(step)
+
+        pipeline:runAsync({seed = 21})
+        expect_true(pipeline:isRunning())
+        expect_equal(21, pipeline:getContext().seed)
+        expect_type("boolean", pipeline:update(0.01))
     end)
 
     -- @tests Pipeline:getResult
-    it("covers Pipeline:getResult", function()
-        -- TODO: Implement test for Pipeline:getResult
-    end)
-
-    -- @tests Pipeline:getContext
-    it("covers Pipeline:getContext", function()
-        -- TODO: Implement test for Pipeline:getContext
-    end)
-
     -- @tests Pipeline:setOnComplete
-    it("covers Pipeline:setOnComplete", function()
-        -- TODO: Implement test for Pipeline:setOnComplete
-    end)
-
     -- @tests Pipeline:setOnStepComplete
-    it("covers Pipeline:setOnStepComplete", function()
-        -- TODO: Implement test for Pipeline:setOnStepComplete
+    -- @tests Pipeline:getResult
+    -- @description Runs a synchronous one-step pipeline and verifies both completion hooks observe the successful step while getResult mirrors the final success state.
+    it("run fires completion hooks and stores the final result", function()
+        local complete_result = { success = false }
+        local completed_step = nil
+        local step = lurek.pipeline.newStep("sync_step", function(ctx)
+            return ctx.seed * 2
+        end)
+        local pipeline = lurek.pipeline.newPipeline("sync_case")
+        pipeline:addStep(step)
+        pipeline:setOnComplete(function(result)
+            complete_result = result
+        end)
+        pipeline:setOnStepComplete(function(name, ctx)
+            completed_step = name
+        end)
+
+        local ctx = {seed = 21}
+        local result = pipeline:run(ctx)
+        expect_true(result.success)
+        expect_equal("sync_step", completed_step)
+        expect_true(complete_result.success)
+        expect_true(pipeline:getResult().success)
+        expect_equal(42, ctx.results.sync_step)
     end)
 
     -- @tests Pipeline:setOnStepError
-    it("covers Pipeline:setOnStepError", function()
-        -- TODO: Implement test for Pipeline:setOnStepError
-    end)
+    -- @tests Step:setOnError
+    -- @tests Pipeline:run
+    -- @description Runs a failing step in continue mode and verifies both the step-local error hook and the pipeline-level step-error hook receive the failure.
+    it("step and pipeline error hooks fire on failure", function()
+        local step_error_name = nil
+        local pipeline_error_name = nil
+        local step = lurek.pipeline.newStep("boom", function(ctx)
+            error("explode")
+        end)
+        step:setOnError(function(name, msg)
+            step_error_name = name
+        end)
 
-end)
+        local pipeline = lurek.pipeline.newPipeline("error_case")
+        pipeline:setErrorMode("continue")
+        pipeline:setOnStepError(function(name, msg)
+            pipeline_error_name = name
+        end)
+        pipeline:addStep(step)
 
-describe("Missing explicit test for Step:getName", function()
-    it("Step:getName works", function()
-        -- @tests Step:getName
-        -- TODO: add assertion for Step:getName
-    end)
-end)
-
-describe("Missing explicit test for Step:setCondition", function()
-    it("Step:setCondition works", function()
-        -- @tests Step:setCondition
-        -- TODO: add assertion for Step:setCondition
-    end)
-end)
-
-describe("Missing explicit test for Step:setDelay", function()
-    it("Step:setDelay works", function()
-        -- @tests Step:setDelay
-        -- TODO: add assertion for Step:setDelay
-    end)
-end)
-
-describe("Missing explicit test for Step:getDelay", function()
-    it("Step:getDelay works", function()
-        -- @tests Step:getDelay
-        -- TODO: add assertion for Step:getDelay
+        local result = pipeline:run()
+        expect_false(result.success)
+        expect_equal("boom", step_error_name)
+        expect_equal("boom", pipeline_error_name)
+        expect_equal(1, step:getAttempt())
+        expect_false(pipeline:getResult().success)
     end)
 end)
 
-describe("Missing explicit test for Step:setTimeout", function()
-    it("Step:setTimeout works", function()
-        -- @tests Step:setTimeout
-        -- TODO: add assertion for Step:setTimeout
-    end)
-end)
-
-describe("Missing explicit test for Step:setRetryCount", function()
-    it("Step:setRetryCount works", function()
-        -- @tests Step:setRetryCount
-        -- TODO: add assertion for Step:setRetryCount
-    end)
-end)
-
-describe("Missing explicit test for Step:getRetryCount", function()
-    it("Step:getRetryCount works", function()
-        -- @tests Step:getRetryCount
-        -- TODO: add assertion for Step:getRetryCount
-    end)
-end)
+test_summary()
 
 describe("Missing explicit test for Step:setOptional", function()
     it("Step:setOptional works", function()

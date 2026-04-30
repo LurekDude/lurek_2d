@@ -1,7 +1,7 @@
 ---
 name: Renderer
 description: Own render code and lurek.render.* bindings: commands, textures, sprites, canvases, shaders, and fonts. Do not change non-render code.
-tools: [read, search, execute, edit]
+tools: [vscode/memory, vscode/runCommand, vscode/askQuestions, vscode/toolSearch, execute/getTerminalOutput, execute/killTerminal, execute/sendToTerminal, execute/runTask, execute/createAndRunTask, execute/runInTerminal, read/problems, read/readFile, read/viewImage, read/skill, read/terminalSelection, read/terminalLastCommand, read/getTaskOutput, edit/createDirectory, edit/createFile, edit/editFiles, edit/rename, search/changes, search/codebase, search/fileSearch, search/listDirectory, search/textSearch, search/usages, todo]
 ---
 # Renderer
 
@@ -17,6 +17,7 @@ tools: [read, search, execute, edit]
 - HUD versus world-space render separation.
 - Render-side performance hygiene such as buffer reuse and allocation control.
 - Graphics-test proof for the touched slice.
+- Render-pass ordering, blend-state, and resource-lifetime invariants for the touched render path.
 
 ## Inputs
 - Render feature or bug.
@@ -43,10 +44,13 @@ tools: [read, search, execute, edit]
 - Return changed files, validation proof, and any render-budget caveat to Manager.
 - Save work/{session} artifacts and one log entry when used.
 
-## Routing Table
-- Render work is complete -> Manager: changed files, validation, and budget note.
-- Work drifted outside render ownership -> Manager: affected subsystem and why it needs rerouting.
-- Render task is blocked -> Manager: missing API decision, asset, or hardware assumption.
+## Success Metrics
+Score the work from 1 to 10 stars against these checks.
+- Command flow, pass order, and GPU lifetime stay correct.
+- WGSL, pipelines, and reuse are validated.
+- World, UI, and debug separation stays intact.
+- Frame-budget caveats are explicit.
+
 
 ## Anti-patterns
 - Do GPU draw work inside a Lua callback.
@@ -55,6 +59,7 @@ tools: [read, search, execute, edit]
 - Block on device.poll wait on the main thread.
 - Allocate a new RenderCommand Vec every frame.
 - Skip WGSL validation.
+- Disable validation or swallow GPU errors to make a symptom disappear.
 - Hide render-budget regressions inside correctness-only changes.
 
 ## CAG Metadata

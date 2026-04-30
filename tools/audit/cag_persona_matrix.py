@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """cag_persona_matrix.py — persona ↔ agent value matrix.
 
-Reads the ``personas`` field from every agent file's YAML frontmatter and
-builds a 6 × N matrix (closed persona vocabulary × agents). Each cell is
+Reads the ``Personas`` value from every agent file's ``## CAG Metadata``
+section and builds a 6 × N matrix (closed persona vocabulary × agents). Each cell is
 ``true`` when the agent declares that persona, ``false`` otherwise.
 
 Reports per-persona coverage (warns on <3 agents, errors on 0 agents) and

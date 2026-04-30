@@ -5,7 +5,7 @@ Validates the four CAG file types against the current CAG schema described in
 ``docs/architecture/cag-system.md`` and ``docs/architecture/templates/``:
 
 * ``.github/copilot-instructions.md`` (system prompt)         — rules E001-E004, W005
-* ``.github/agents/*.agent.md``                               — rules E101-E107, W108
+* ``.github/agents/*.agent.md``                               — rules E101-E113, W108
 * ``.github/skills/*/SKILL.md``                               — rules E201-E205, W206
 * ``.github/prompts/*.prompt.md``                             — rules E301-E305, W306
 
@@ -84,6 +84,9 @@ def check_system_prompt(path: Path) -> list[Violation]:
     if SYSTEM_PROMPT_POINTER not in text:
         out.append(Violation(rel, "E001", "error",
                              f"Missing pointer to '{SYSTEM_PROMPT_POINTER}'"))
+    if not _SYSTEM_AUTONOMY_RE.search(" ".join(text.split())):
+        out.append(Violation(rel, "E001", "error",
+                             "Missing generic agent autonomy statement in the system prompt"))
 
     line_count = text.count("\n") + (0 if text.endswith("\n") else 1)
     if line_count > 120:
@@ -110,7 +113,15 @@ _ROSTER_HEADINGS = (
     "agent roster", "skill catalog", "available agents",
     "available skills", "prompt list", "available prompts",
 )
-_ROSTER_LINE_RE = re.compile(r"^[\-\*\|]\s*[A-Za-z][a-z\-]+(?:\s|\||$)")
+_ROSTER_LINE_RE = re.compile(r"^[\-\*]\s*`?[A-Za-z][\w-]*`?\s*(?::|\||$)")
+_SYSTEM_AUTONOMY_RE = re.compile(
+    r"agents are autonomous.*?(work|keep working).*?until.*?(done|complete).*?(block|blocked|blocker).*?(out of scope|scope mismatch).*?manager",
+    re.IGNORECASE,
+)
+
+_BUILTIN_TOOL_PREFIXES = {"vscode", "edit", "search"}
+_BUILTIN_TOOL_NAMES = {"execute", "read", "agent", "todo", "search"}
+_MANAGER_ROUTING_SKILL = (GITHUB_DIR / "skills" / "agent-routing" / "SKILL.md").resolve()
 
 
 def _detect_inline_rosters(rel: str, text: str) -> list[Violation]:
@@ -142,6 +153,16 @@ def _detect_inline_rosters(rel: str, text: str) -> list[Violation]:
     return out
 
 
+def _is_builtin_tool_ref(tool_ref: str) -> bool:
+    norm = tool_ref.strip()
+    if not norm:
+        return False
+    if norm in _BUILTIN_TOOL_NAMES:
+        return True
+    head = re.split(r"[\\/]", norm, maxsplit=1)[0]
+    return head in _BUILTIN_TOOL_PREFIXES
+
+
 # ─── Section ordering helper ─────────────────────────────────────────────────
 
 
@@ -167,11 +188,200 @@ def _check_required_sections(
     return out
 
 
+def _section_window(body: str, title: str) -> tuple[int | None, list[str]]:
+    lines = body.splitlines()
+    sections = find_sections(body)
+    needle = title.lower()
+    for idx, (line, _, heading) in enumerate(sections):
+        if needle not in heading.lower():
+            continue
+        next_line = sections[idx + 1][0] if idx + 1 < len(sections) else len(lines) + 1
+        return line, lines[line:next_line - 1]
+    return None, []
+
+
+def _section_bullets(
+    body: str, title: str, *, body_offset_lines: int = 0
+) -> list[tuple[int, str]]:
+    start_line, section_lines = _section_window(body, title)
+    if start_line is None:
+        return []
+    out: list[tuple[int, str]] = []
+    for offset, line in enumerate(section_lines, start=1):
+        stripped = line.lstrip()
+        if stripped.startswith("- ") or stripped.startswith("* "):
+            out.append((body_offset_lines + start_line + offset, stripped[2:].strip()))
+    return out
+
+
+def _normalise_agent_bullet(text: str) -> str:
+    norm = re.sub(r"[^a-z0-9]+", " ", text.lower())
+    return re.sub(r"\s+", " ", norm).strip()
+
+
+def _check_agent_autonomy(rel: str, body: str, *, body_offset_lines: int) -> list[Violation]:
+    start_line = first_section_line(body, "Autonomy")
+    if start_line is None:
+        return []
+    return [
+        Violation(
+            rel,
+            "E109",
+            "error",
+            "Autonomy is a generic system-prompt rule and must not appear as an agent section",
+            body_offset_lines + start_line,
+        )
+    ]
+
+
+def _check_agent_success_metrics(
+    rel: str, body: str, *, body_offset_lines: int
+) -> list[Violation]:
+    start_line, section_lines = _section_window(body, "Success Metrics")
+    if start_line is None:
+        return []
+    section_text = " ".join(line.strip().lower() for line in section_lines if line.strip())
+    bullets = [line for line in section_lines if line.lstrip().startswith(("- ", "* "))]
+    out: list[Violation] = []
+    if "1 to 10 stars" not in section_text and "1-10 stars" not in section_text:
+        out.append(Violation(
+            rel,
+            "E110",
+            "error",
+            "Success Metrics must describe the 1 to 10 stars self-evaluation scale",
+            body_offset_lines + start_line,
+        ))
+    if not 3 <= len(bullets) <= 6:
+        out.append(Violation(
+            rel,
+            "E110",
+            "error",
+            f"Success Metrics must contain 3 to 6 bullet items (found {len(bullets)})",
+            body_offset_lines + start_line,
+        ))
+    return out
+
+
+def _check_agent_routing_contract(
+    path: Path,
+    rel: str,
+    body: str,
+    meta: dict[str, object],
+    *,
+    body_offset_lines: int,
+) -> list[Violation]:
+    out: list[Violation] = []
+
+    routing_line = first_section_line(body, "Routing Table")
+    if routing_line is not None:
+        out.append(Violation(
+            rel,
+            "E107",
+            "error",
+            "Routing Table is deprecated; keep routing rules in shared docs or .github/skills/agent-routing/SKILL.md",
+            body_offset_lines + routing_line,
+        ))
+
+    routes_to = meta.get("routes_to") or []
+    if isinstance(routes_to, str):
+        routes_to = [routes_to]
+    if routes_to:
+        cag_meta_line = first_section_line(body, "CAG Metadata") or 1
+        out.append(Violation(
+            rel,
+            "E104",
+            "error",
+            "routes_to is deprecated; move routing rules to .github/skills/agent-routing/SKILL.md",
+            body_offset_lines + cag_meta_line,
+        ))
+
+    if path.name != "manager.agent.md":
+        return out
+
+    workflow_line, workflow_lines = _section_window(body, "Workflow")
+    if workflow_line is None:
+        return out
+    refs = extract_links(path, "\n".join(workflow_lines))
+    if not any(ref.kind == "md-link" and ref.resolved() == _MANAGER_ROUTING_SKILL for ref in refs):
+        out.append(Violation(
+            rel,
+            "E104",
+            "error",
+            "Manager Workflow must include a markdown link to '../skills/agent-routing/SKILL.md' for mandatory routing guidance",
+            body_offset_lines + workflow_line,
+        ))
+    return out
+
+
+def _check_agent_list_density(
+    rel: str,
+    body: str,
+    *,
+    title: str,
+    rule: str,
+    minimum_bullets: int,
+    body_offset_lines: int,
+) -> list[Violation]:
+    start_line, _ = _section_window(body, title)
+    if start_line is None:
+        return []
+    bullets = _section_bullets(body, title, body_offset_lines=body_offset_lines)
+    if len(bullets) >= minimum_bullets:
+        return []
+    return [
+        Violation(
+            rel,
+            rule,
+            "error",
+            f"{title} must contain at least {minimum_bullets} bullet items (found {len(bullets)})",
+            body_offset_lines + start_line,
+        )
+    ]
+
+
+def _check_agent_duplicate_bullets(paths: list[Path]) -> list[Violation]:
+    seen: dict[str, dict[str, list[tuple[str, int, str]]]] = {
+        "Scope": {},
+        "Anti-patterns": {},
+        "Success Metrics": {},
+    }
+    for path in paths:
+        text = safe_read(path)
+        fm = parse_frontmatter(text)
+        body = body_after_frontmatter(text, fm)
+        body_offset_lines = text[: fm.body_offset].count("\n")
+        for section in ("Scope", "Anti-patterns", "Success Metrics"):
+            for line, bullet in _section_bullets(
+                body, section, body_offset_lines=body_offset_lines
+            ):
+                norm = _normalise_agent_bullet(bullet)
+                if len(norm.split()) < 4:
+                    continue
+                seen[section].setdefault(norm, []).append((relpath(path), line, bullet))
+
+    out: list[Violation] = []
+    for section, buckets in seen.items():
+        for locations in buckets.values():
+            files = {file for file, _, _ in locations}
+            if len(files) < 2:
+                continue
+            for file, line, bullet in locations:
+                others = ", ".join(sorted(other for other in files if other != file))
+                out.append(Violation(
+                    file,
+                    "E113",
+                    "error",
+                    f"{section} bullet duplicates another agent: '{bullet}' also appears in {others}",
+                    line,
+                ))
+    return out
+
+
 # ─── Agent rules ──────────────────────────────────────────────────────────────
 
 
 def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Violation]:
-    """Apply E101–E107 and W108 to an agent file."""
+    """Apply E101–E113 and W108 to an agent file."""
     rel = relpath(path)
     text = safe_read(path)
     out: list[Violation] = []
@@ -183,6 +393,7 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
         return out
 
     body = body_after_frontmatter(text, fm)
+    body_offset_lines = text[: fm.body_offset].count("\n")
     meta = parse_cag_metadata_section(body)
 
     # Personas now live in the ## CAG Metadata body section
@@ -208,23 +419,12 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
                 out.append(Violation(rel, "E103", "error",
                                      f"{key} references unknown skill: '{s}'"))
 
-    # routes_to now in body section
-    known_lower = {x.lower() for x in agents}
-    routes_to = meta.get("routes_to") or []
-    if isinstance(routes_to, str):
-        routes_to = [routes_to]
-    for a in routes_to:
-        norm = a.lower().replace(" ", "-")
-        if norm not in known_lower:
-            out.append(Violation(rel, "E104", "error",
-                                 f"routes_to references unknown agent: '{a}'"))
-
     # tools stays in frontmatter.
     # Values without a path separator are VS Code built-in tool names (e.g.
     # "vscode", "execute", "read") — skip the file-existence check for those.
     for t in fm.get_list("tools"):
-        if "/" not in t and "\\" not in t:
-            continue  # VS Code built-in tool name, not a repo path
+        if _is_builtin_tool_ref(t):
+            continue
         if not (WORKSPACE_ROOT / t).exists():
             out.append(Violation(rel, "E105", "error",
                                  f"tools references missing path: '{t}'"))
@@ -234,7 +434,32 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
         out.append(Violation(rel, "E106", "error",
                              f"File has {line_count} lines (cap 200)"))
 
+    out.extend(_check_agent_routing_contract(
+        path,
+        rel,
+        body,
+        meta,
+        body_offset_lines=body_offset_lines,
+    ))
     out.extend(_check_required_sections(rel, body, AGENT_REQUIRED_SECTIONS, "E107"))
+    out.extend(_check_agent_autonomy(rel, body, body_offset_lines=body_offset_lines))
+    out.extend(_check_agent_success_metrics(rel, body, body_offset_lines=body_offset_lines))
+    out.extend(_check_agent_list_density(
+        rel,
+        body,
+        title="Scope",
+        rule="E111",
+        minimum_bullets=7,
+        body_offset_lines=body_offset_lines,
+    ))
+    out.extend(_check_agent_list_density(
+        rel,
+        body,
+        title="Anti-patterns",
+        rule="E112",
+        minimum_bullets=7,
+        body_offset_lines=body_offset_lines,
+    ))
     return out
 
 
@@ -311,6 +536,8 @@ def check_prompt(
 
     # tools stays in frontmatter
     for t in fm.get_list("tools"):
+        if _is_builtin_tool_ref(t):
+            continue
         if not (WORKSPACE_ROOT / t).exists():
             out.append(Violation(rel, "E303", "error",
                                  f"tools references missing path: '{t}'"))
@@ -359,6 +586,8 @@ def run_validation(
             scanned["system_prompt"] = 1
         elif single_file.name.endswith(".agent.md"):
             violations.extend(check_agent(single_file, skills=skills, agents=agents))
+            duplicates = _check_agent_duplicate_bullets(discover_agents())
+            violations.extend(v for v in duplicates if v.file == relpath(single_file))
             scanned["agent"] = 1
         elif single_file.name == "SKILL.md":
             violations.extend(check_skill(single_file, skills=skills))
@@ -373,9 +602,11 @@ def run_validation(
             violations.extend(check_system_prompt(SYSTEM_PROMPT))
             scanned["system_prompt"] = 1
     if type_filter in (None, "agent"):
-        for a in discover_agents():
+        agent_paths = discover_agents()
+        for a in agent_paths:
             violations.extend(check_agent(a, skills=skills, agents=agents))
             scanned["agent"] += 1
+        violations.extend(_check_agent_duplicate_bullets(agent_paths))
     if type_filter in (None, "skill"):
         for s in discover_skills():
             violations.extend(check_skill(s, skills=skills))

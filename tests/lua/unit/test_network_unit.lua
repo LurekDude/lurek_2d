@@ -10,11 +10,12 @@ describe("lurek.network", function()
   -- @tests lurek.network.newHost
   -- @tests lurek.network.Host.service
   -- @tests lurek.network.Host.getAddress
-  -- @tests lurek.network.Host.getPeerCount
+  -- @tests lurek.network.Host.getPeerLimit
   -- @tests lurek.network.Host.flush
   -- @tests lurek.network.Host.destroy
   -- @tests lurek.network.Host.setBandwidthLimit
-  -- @tests lurek.network.Host.getPeers
+  -- @tests lurek.network.Host.getConnectedPeerIds
+  -- @tests lurek.network.Host.getBandwidthLimit
   -- @tests lurek.network.Host.connect
   -- @tests lurek.network.Host.broadcast
   -- @description Verifies the high-level network namespace is available as a table.
@@ -33,31 +34,29 @@ end)
 describe("lurek.network.newHost", function()
   -- @tests lurek.network.newHost
   -- @description Verifies newHost can create a client host with default options.
-    xit("creates a client host with no arguments", function()
+  it("creates a client host with no arguments", function()
     local host = lurek.network.newHost({})
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
   -- @tests lurek.network.newHost
-  -- @description Verifies newHost accepts a port option table.
-  it("creates a host with port option", function()
-    local host = lurek.network.newHost({ port = 0 })
+  -- @description Verifies newHost accepts an explicit bind address string.
+  it("creates a host with addr option", function()
+    local host = lurek.network.newHost({ addr = "0.0.0.0:0" })
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
   -- @tests lurek.network.newHost
-  -- @description Verifies newHost accepts the full option table surface.
-    xit("creates a host with all options", function()
+  -- @description Verifies newHost accepts the legacy peers alias alongside an explicit bind address.
+  it("creates a host with legacy peers alias", function()
     local host = lurek.network.newHost({
-      port = 0,
-      maxPeers = 4,
-      channels = 2,
-      inBandwidth = 0,
-      outBandwidth = 0,
+      addr = "0.0.0.0:0",
+      peers = 4,
     })
     expect_equal(type(host), "userdata")
+    expect_equal(4, host:getPeerLimit())
     host:destroy()
   end)
 
@@ -75,7 +74,7 @@ end)
 describe("lurek.network host methods", function()
   -- @tests lurek.network.Host.service
   -- @description Verifies service returns nil when no events are pending.
-    xit("service returns nil when no events", function()
+  it("service returns nil when no events", function()
     local host = lurek.network.newHost({})
     local event = host:service()
     expect_equal(event, nil)
@@ -83,54 +82,60 @@ describe("lurek.network host methods", function()
   end)
 
   -- @tests lurek.network.Host.getAddress
-  -- @description Verifies getAddress returns string host information and a numeric port.
-    xit("getAddress returns address and port", function()
+  -- @description Verifies getAddress returns the bound host information as a string.
+  it("getAddress returns a socket string", function()
     local host = lurek.network.newHost({})
-    local addr, port = host:getAddress()
+    local addr = host:getAddress()
     expect_equal(type(addr), "string")
-    expect_equal(type(port), "number")
+    expect_true(string.find(addr, ":", 1, true) ~= nil)
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getPeerCount
-  -- @description Verifies getPeerCount reports the default peer limit.
-    xit("getPeerCount returns peer limit", function()
-    local host = lurek.network.newHost({})
+  -- @tests lurek.network.Host.getPeerLimit
+  -- @description Verifies getPeerLimit reports the configured peer limit.
+  it("getPeerLimit returns configured limit", function()
+    local host = lurek.network.newHost({ maxPeers = 6 })
     local count = host:getPeerLimit()
-    expect_equal(4, count)
+    expect_equal(6, count)
     host:destroy()
   end)
 
   -- @tests lurek.network.Host.flush
   -- @description Verifies flush is safe when there is no pending data.
-    xit("flush succeeds with no pending data", function()
+  it("flush succeeds with no pending data", function()
     local host = lurek.network.newHost({})
-    local ok, err = pcall(function() host:flush() end)
+    local ok = pcall(function() host:flush() end)
     expect_equal(ok, true)
     host:destroy()
   end)
 
   -- @tests lurek.network.Host.destroy
   -- @description Verifies destroy invalidates the host for later method calls.
-    xit("destroy makes host unusable", function()
+  it("destroy makes host unusable", function()
     local host = lurek.network.newHost({})
     host:destroy()
-    local ok, err = pcall(function() host:service() end)
+    expect_equal(true, host:isDestroyed())
+    local ok = pcall(function() host:service() end)
     expect_equal(ok, false)
   end)
 
   -- @tests lurek.network.Host.setBandwidthLimit
-  -- @description Verifies setBandwidthLimit accepts numeric limits without error.
-    xit("setBandwidthLimit does not error", function()
+  -- @tests lurek.network.Host.getBandwidthLimit
+  -- @description Verifies setBandwidthLimit accepts numeric limits and getBandwidthLimit returns a table with incoming and outgoing fields.
+  it("setBandwidthLimit updates bandwidth table", function()
     local host = lurek.network.newHost({})
-    local ok, err = pcall(function() host:setBandwidthLimit(100000, 50000) end)
+    local ok = pcall(function() host:setBandwidthLimit(100000, 50000) end)
     expect_equal(ok, true)
+    local limits = host:getBandwidthLimit()
+    expect_equal(type(limits), "table")
+    expect_equal(type(limits.incoming), "number")
+    expect_equal(type(limits.outgoing), "number")
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getPeers
-  -- @description Verifies getPeers returns an empty table when there are no connections.
-    xit("getPeers returns empty table when no connections", function()
+  -- @tests lurek.network.Host.getConnectedPeerIds
+  -- @description Verifies getConnectedPeerIds returns an empty table when there are no connections.
+  it("getConnectedPeerIds returns empty table when no connections", function()
     local host = lurek.network.newHost({})
     local peers = host:getConnectedPeerIds()
     expect_equal(type(peers), "table")
@@ -140,9 +145,9 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getStats
-  -- @description Verifies getStats returns a table payload.
-    xit("getStats returns a table", function()
+  -- @tests lurek.network.Host.getBandwidthLimit
+  -- @description Verifies getBandwidthLimit returns a table payload.
+  it("getBandwidthLimit returns a table", function()
     local host = lurek.network.newHost({})
     local stats = host:getBandwidthLimit()
     expect_equal(type(stats), "table")
@@ -615,33 +620,35 @@ describe("lurek.network.pack / unpack", function()
         local input = { 1, 2, 3, "four", true }
         local packed = lurek.network.pack(input)
         local unpacked = lurek.network.unpack(packed)
-        expect_equal(type(unpacked), "table")
-        expect_equal(unpacked[1], 1)
-        expect_equal(unpacked[2], 2)
-        expect_equal(unpacked[3], 3)
-        expect_equal(unpacked[4], "four")
-        expect_equal(unpacked[5], true)
+      expect_equal("table", type(unpacked))
+      expect_equal(1, unpacked and unpacked[1] or nil)
+      expect_equal(2, unpacked and unpacked[2] or nil)
+      expect_equal(3, unpacked and unpacked[3] or nil)
+      expect_equal("four", unpacked and unpacked[4] or nil)
+      expect_equal(true, unpacked and unpacked[5] or nil)
     end)
 
     it("should round-trip maps (string-keyed tables)", function()
         local input = { name = "Alice", score = 100 }
         local packed = lurek.network.pack(input)
         local unpacked = lurek.network.unpack(packed)
-        expect_equal(type(unpacked), "table")
-        expect_equal(unpacked.name, "Alice")
-        expect_equal(unpacked.score, 100)
+      expect_equal("table", type(unpacked))
+      expect_equal("Alice", unpacked and unpacked.name or nil)
+      expect_equal(100, unpacked and unpacked.score or nil)
     end)
 
     it("should round-trip nested tables", function()
         local input = { pos = { x = 10, y = 20 }, tags = { "a", "b" } }
         local packed = lurek.network.pack(input)
         local unpacked = lurek.network.unpack(packed)
-        expect_equal(type(unpacked), "table")
-        expect_equal(type(unpacked.pos), "table")
-        expect_equal(unpacked.pos.x, 10)
-        expect_equal(unpacked.pos.y, 20)
-        expect_equal(unpacked.tags[1], "a")
-        expect_equal(unpacked.tags[2], "b")
+      local pos = unpacked and unpacked.pos or nil
+      local tags = unpacked and unpacked.tags or nil
+      expect_equal("table", type(unpacked))
+      expect_equal("table", type(pos))
+      expect_equal(10, pos and pos.x or nil)
+      expect_equal(20, pos and pos.y or nil)
+      expect_equal("a", tags and tags[1] or nil)
+      expect_equal("b", tags and tags[2] or nil)
     end)
 
     it("should produce compact binary (smaller than JSON)", function()

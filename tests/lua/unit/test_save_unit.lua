@@ -289,152 +289,87 @@ describe("SaveManager.disableAutoSave / update", function()
     end)
 end)
 
-test_summary()
+-- @description Replaces the old placeholder tail with real assertions for unregister behavior, compression toggling, save/load hooks, and autosave triggering.
+describe("SaveManager regression coverage", function()
+    -- @tests SaveManager:unregister
+    -- @description Registers a collector, unregisters it, and verifies collect() no longer includes that module key.
+    it("unregister removes collector output from collect", function()
+        local sm = lurek.save.newSaveManager()
+        sm:register("temp_sys", function() return { hp = 100 } end, function() end)
+        sm:unregister("temp_sys")
 
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
+        local snapshot = sm:collect()
+        expect_equal(nil, snapshot.temp_sys)
+    end)
 
-describe("Missing API Coverage", function()
     -- @tests SaveManager:setCompress
-    it("covers SaveManager:setCompress", function()
-        -- TODO: Implement test for SaveManager:setCompress
+    -- @tests SaveManager:isCompressed
+    -- @description Toggles compression on and off and verifies isCompressed mirrors the configured flag.
+    it("setCompress toggles isCompressed", function()
+        local sm = lurek.save.newSaveManager()
+
+        sm:setCompress(true)
+        expect_true(sm:isCompressed())
+
+        sm:setCompress(false)
+        expect_false(sm:isCompressed())
     end)
 
     -- @tests SaveManager:onBeforeSave
-    it("covers SaveManager:onBeforeSave", function()
-        -- TODO: Implement test for SaveManager:onBeforeSave
+    -- @description Registers a before-save hook, saves a slot, and verifies the callback receives that exact slot name.
+    it("onBeforeSave fires with the slot name", function()
+        local sm = lurek.save.newSaveManager()
+        local slot = "unit_test_before_save_hook"
+        local seen_slot = nil
+
+        sm:register("hook_data", function() return { x = 1 } end, function() end)
+        sm:onBeforeSave(function(name)
+            seen_slot = name
+        end)
+
+        sm:save(slot)
+
+        expect_equal(slot, seen_slot)
+        sm:delete(slot)
     end)
 
     -- @tests SaveManager:onAfterLoad
-    it("covers SaveManager:onAfterLoad", function()
-        -- TODO: Implement test for SaveManager:onAfterLoad
-    end)
+    -- @tests SaveManager:disableAutoSave
+    -- @tests SaveManager:update
+    -- @description Saves and loads a slot to verify onAfterLoad sees the slot name, then checks autosave only triggers while enabled and dirty.
+    it("onAfterLoad fires after a successful load and autosave returns the configured slot", function()
+        local sm = lurek.save.newSaveManager()
+        local slot = "unit_test_after_load_hook"
+        local restored_value = nil
+        local loaded_slot = nil
 
-end)
+        sm:register(
+            "round_trip",
+            function() return { value = 42 } end,
+            function(data) restored_value = data.value end
+        )
+        sm:onAfterLoad(function(name)
+            loaded_slot = name
+        end)
 
-describe("Missing explicit test for SaveManager:unregister", function()
-    it("SaveManager:unregister works", function()
-        -- @tests SaveManager:unregister
-        -- TODO: add assertion for SaveManager:unregister
-    end)
-end)
+        sm:save(slot)
+        local ok, err = sm:load(slot)
 
-describe("Missing explicit test for SaveManager:setSchemaVersion", function()
-    it("SaveManager:setSchemaVersion works", function()
-        -- @tests SaveManager:setSchemaVersion
-        -- TODO: add assertion for SaveManager:setSchemaVersion
-    end)
-end)
+        expect_true(ok, err or "expected load to succeed")
+        expect_equal(42, restored_value)
+        expect_equal(slot, loaded_slot)
 
-describe("Missing explicit test for SaveManager:getSchemaVersion", function()
-    it("SaveManager:getSchemaVersion works", function()
-        -- @tests SaveManager:getSchemaVersion
-        -- TODO: add assertion for SaveManager:getSchemaVersion
-    end)
-end)
+        sm:enableAutoSave(0.5, "autosave_slot")
+        sm:markDirty()
+        expect_equal(nil, sm:update(0.49))
+        expect_equal("autosave_slot", sm:update(0.01))
 
-describe("Missing explicit test for SaveManager:collect", function()
-    it("SaveManager:collect works", function()
-        -- @tests SaveManager:collect
-        -- TODO: add assertion for SaveManager:collect
-    end)
-end)
+        sm:disableAutoSave()
+        sm:markDirty()
+        expect_equal(nil, sm:update(1.0))
 
-describe("Missing explicit test for SaveManager:restore", function()
-    it("SaveManager:restore works", function()
-        -- @tests SaveManager:restore
-        -- TODO: add assertion for SaveManager:restore
+        sm:delete(slot)
     end)
 end)
 
-describe("Missing explicit test for SaveManager:markDirty", function()
-    it("SaveManager:markDirty works", function()
-        -- @tests SaveManager:markDirty
-        -- TODO: add assertion for SaveManager:markDirty
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:isDirty", function()
-    it("SaveManager:isDirty works", function()
-        -- @tests SaveManager:isDirty
-        -- TODO: add assertion for SaveManager:isDirty
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:disableAutoSave", function()
-    it("SaveManager:disableAutoSave works", function()
-        -- @tests SaveManager:disableAutoSave
-        -- TODO: add assertion for SaveManager:disableAutoSave
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:update", function()
-    it("SaveManager:update works", function()
-        -- @tests SaveManager:update
-        -- TODO: add assertion for SaveManager:update
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:setSummary", function()
-    it("SaveManager:setSummary works", function()
-        -- @tests SaveManager:setSummary
-        -- TODO: add assertion for SaveManager:setSummary
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:getSummary", function()
-    it("SaveManager:getSummary works", function()
-        -- @tests SaveManager:getSummary
-        -- TODO: add assertion for SaveManager:getSummary
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:reset", function()
-    it("SaveManager:reset works", function()
-        -- @tests SaveManager:reset
-        -- TODO: add assertion for SaveManager:reset
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:isCompressed", function()
-    it("SaveManager:isCompressed works", function()
-        -- @tests SaveManager:isCompressed
-        -- TODO: add assertion for SaveManager:isCompressed
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:save", function()
-    it("SaveManager:save works", function()
-        -- @tests SaveManager:save
-        -- TODO: add assertion for SaveManager:save
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:load", function()
-    it("SaveManager:load works", function()
-        -- @tests SaveManager:load
-        -- TODO: add assertion for SaveManager:load
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:delete", function()
-    it("SaveManager:delete works", function()
-        -- @tests SaveManager:delete
-        -- TODO: add assertion for SaveManager:delete
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:getSlots", function()
-    it("SaveManager:getSlots works", function()
-        -- @tests SaveManager:getSlots
-        -- TODO: add assertion for SaveManager:getSlots
-    end)
-end)
-
-describe("Missing explicit test for SaveManager:getSlotInfo", function()
-    it("SaveManager:getSlotInfo works", function()
-        -- @tests SaveManager:getSlotInfo
-        -- TODO: add assertion for SaveManager:getSlotInfo
-    end)
-end)
+test_summary()

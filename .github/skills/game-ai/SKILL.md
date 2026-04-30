@@ -17,15 +17,17 @@ description: "Load this skill when designing or implementing lurek.ai.* game beh
 - Pathfinding algorithm work.
 
 ## Domain Knowledge
-- game-facing AI lives in lurek.ai.* and the best current behavior reference is tests/lua/unit/test_ai_unit.lua.
-- Pick FSM, BT, GOAP, utility AI, steering, or squad logic based on authoring clarity, not engine novelty.
-- Keep blackboards, goals, tags, influence, and director pacing visible enough to debug from Lua.
-- AI examples should prove edge states like idle, chase, reset, empty world, and conflicting goals.
-- Pathfinding algorithms and grid search belong to pathfind, not this skill.
-- Favor readable game-author behavior wiring over low-level engine internals.
-- docs/specs/ai.md and tests/lua/unit/test_ai_unit.lua are the best current anchors for what the public AI surface already promises.
-- Many AI systems here are Lua-facing and headless-testable, so author-facing behavior clarity matters as much as engine internals.
-- The skill owns game behavior composition and public AI usage, not low-level pathfinding math or Rust-only internals.
+- Game-facing AI lives in lurek.ai.* and the best current behavior reference is tests/lua/unit/test_ai_unit.lua, so public behavior should stay grounded in what authors can already exercise headlessly.
+- Pick FSM, behavior tree, GOAP, utility AI, steering, or squad logic based on authoring clarity and behavior shape, not on engine novelty or theoretical completeness.
+- Keep blackboards, goals, tags, influence values, and pacing controls visible enough that a Lua author can inspect or reason about behavior when something feels wrong.
+- AI examples and tests should prove edge states such as idle, chase, lose-target, reset, empty world, conflicting goals, and no-valid-action cases.
+- Pathfinding algorithms, grid search, and route math belong to pathfind; this skill focuses on decision making and behavior composition above that layer.
+- Favor readable game-author wiring over low-level engine cleverness; if a behavior graph is hard to read, it will be harder to tune than to implement.
+- docs/specs/ai.md and the Lua AI tests are the best current anchors for what the public AI surface already promises, so design should stay consistent with those expectations.
+- Many AI systems here are Lua-facing and headless-testable, which means clarity of state names, transitions, and goal evaluation matters as much as internal efficiency.
+- Avoid mixing several paradigms into one behavior just because the engine supports them; choose the simplest model that captures the behavior cleanly.
+- Good AI content in this repo should make intent obvious: what the agent wants, what state it is in, and why it changed state now.
+- This skill owns game behavior composition, author-facing AI patterns, and public lurek.ai.* usage, not low-level pathfinding math or Rust-only internals.
 ## Companion File Index
 - None.
 

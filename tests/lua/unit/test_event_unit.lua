@@ -658,67 +658,73 @@ describe("Signal wildcard subscriptions", function()
     end)
 end)
 
-test_summary()
-
-describe("Missing explicit test for lurek.event.exit", function()
-    it("lurek.event.exit works", function()
-        -- @tests lurek.event.exit
-        -- TODO: add assertion for lurek.event.exit
+  describe("lurek.event.exit", function()
+    it("is exposed as a function", function()
+      -- @tests lurek.event.exit
+      expect_equal("function", type(lurek.event.exit))
     end)
-end)
+  end)
 
-describe("Missing explicit test for Signal:emit", function()
-    it("Signal:emit works", function()
-        -- @tests Signal:emit
-        -- TODO: add assertion for Signal:emit
+  describe("Signal regression coverage", function()
+    it("emit forwards arguments to matching listeners", function()
+      -- @tests Signal:emit
+      local sig = lurek.event.newSignal()
+      local number_arg = nil
+      local string_arg = nil
+      sig:connect("ping", function(a, b)
+        number_arg = a
+        string_arg = b
+      end)
+      sig:emit("ping", 4, "ok")
+      expect_equal(4, number_arg)
+      expect_equal("ok", string_arg)
     end)
-end)
 
-describe("Missing explicit test for Signal:remove", function()
-    it("Signal:remove works", function()
-        -- @tests Signal:remove
-        -- TODO: add assertion for Signal:remove
+    it("remove unregisters a specific listener handle", function()
+      -- @tests Signal:remove
+      -- @tests Signal:getCount
+      local sig = lurek.event.newSignal()
+      local fired = false
+      local handle = sig:connect("tick", function() fired = true end)
+      expect_equal(1, sig:getCount("tick"))
+      expect_true(sig:remove(handle))
+      sig:emit("tick")
+      expect_false(fired)
+      expect_equal(0, sig:getCount("tick"))
     end)
-end)
 
-describe("Missing explicit test for Signal:clear", function()
-    it("Signal:clear works", function()
-        -- @tests Signal:clear
-        -- TODO: add assertion for Signal:clear
+    it("clear removes listeners only for one event name", function()
+      -- @tests Signal:clear
+      -- @tests Signal:getCount
+      local sig = lurek.event.newSignal()
+      sig:connect("click", function() end)
+      sig:connect("click", function() end)
+      sig:connect("hover", function() end)
+      expect_equal(2, sig:clear("click"))
+      expect_equal(0, sig:getCount("click"))
+      expect_equal(1, sig:getCount("hover"))
     end)
-end)
 
-describe("Missing explicit test for Signal:clearAll", function()
-    it("Signal:clearAll works", function()
-        -- @tests Signal:clearAll
-        -- TODO: add assertion for Signal:clearAll
+    it("clearAll empties all listener buckets", function()
+      -- @tests Signal:clearAll
+      -- @tests Signal:getTotalCount
+      local sig = lurek.event.newSignal()
+      sig:connect("a", function() end)
+      sig:connect("b", function() end)
+      expect_equal(2, sig:getTotalCount())
+      expect_equal(2, sig:clearAll())
+      expect_equal(0, sig:getTotalCount())
     end)
-end)
 
-describe("Missing explicit test for Signal:getCount", function()
-    it("Signal:getCount works", function()
-        -- @tests Signal:getCount
-        -- TODO: add assertion for Signal:getCount
+    it("type and typeOf report the signal userdata identity", function()
+      -- @tests Signal:type
+      -- @tests Signal:typeOf
+      local sig = lurek.event.newSignal()
+      expect_equal("LSignal", sig:type())
+      expect_true(sig:typeOf("LSignal"))
+      expect_true(sig:typeOf("Object"))
+      expect_false(sig:typeOf("Entity"))
     end)
-end)
+  end)
 
-describe("Missing explicit test for Signal:getTotalCount", function()
-    it("Signal:getTotalCount works", function()
-        -- @tests Signal:getTotalCount
-        -- TODO: add assertion for Signal:getTotalCount
-    end)
-end)
-
-describe("Missing explicit test for Signal:type", function()
-    it("Signal:type works", function()
-        -- @tests Signal:type
-        -- TODO: add assertion for Signal:type
-    end)
-end)
-
-describe("Missing explicit test for Signal:typeOf", function()
-    it("Signal:typeOf works", function()
-        -- @tests Signal:typeOf
-        -- TODO: add assertion for Signal:typeOf
-    end)
-end)
+  test_summary()

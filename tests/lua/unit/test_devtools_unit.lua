@@ -576,7 +576,7 @@ describe("Missing API Coverage", function()
 
 end)
 
-describe("Missing explicit test for lurek.devtools.scan", function()
+describe("lurek.devtools.scan", function()
     it("lurek.devtools.scan works", function()
         -- @tests lurek.devtools.scan
         local changed = lurek.devtools.scan()
@@ -584,7 +584,7 @@ describe("Missing explicit test for lurek.devtools.scan", function()
     end)
 end)
 
-describe("Missing explicit test for lurek.devtools.snapshot", function()
+describe("lurek.devtools.snapshot", function()
     it("lurek.devtools.snapshot works", function()
         -- @tests lurek.devtools.snapshot
         local snap = lurek.devtools.snapshot()
@@ -593,7 +593,7 @@ describe("Missing explicit test for lurek.devtools.snapshot", function()
     end)
 end)
 
-describe("Missing explicit test for FileWatcher:onChanged", function()
+describe("FileWatcher:onChanged", function()
     it("FileWatcher:onChanged works", function()
         -- @tests FileWatcher:onChanged
         local watcher = lurek.devtools.newFileWatcher(".")
@@ -603,7 +603,7 @@ describe("Missing explicit test for FileWatcher:onChanged", function()
     end)
 end)
 
-describe("Missing explicit test for FileWatcher:check", function()
+describe("FileWatcher:check", function()
     it("FileWatcher:check works", function()
         -- @tests FileWatcher:check
         local watcher = lurek.devtools.newFileWatcher(".")
@@ -612,7 +612,7 @@ describe("Missing explicit test for FileWatcher:check", function()
     end)
 end)
 
-describe("Missing explicit test for FileWatcher:getPath", function()
+describe("FileWatcher:getPath", function()
     it("FileWatcher:getPath works", function()
         -- @tests FileWatcher:getPath
         local watcher = lurek.devtools.newFileWatcher("content")
@@ -620,7 +620,7 @@ describe("Missing explicit test for FileWatcher:getPath", function()
     end)
 end)
 
-describe("Missing explicit test for FileWatcher:cancel", function()
+describe("FileWatcher:cancel", function()
     it("FileWatcher:cancel works", function()
         -- @tests FileWatcher:cancel
         local watcher = lurek.devtools.newFileWatcher(".")
@@ -630,7 +630,7 @@ describe("Missing explicit test for FileWatcher:cancel", function()
     end)
 end)
 
-describe("Missing explicit test for ReplConsole:eval", function()
+describe("ReplConsole:eval", function()
     it("ReplConsole:eval works", function()
         -- @tests ReplConsole:eval
         local console = lurek.devtools.newRepl()
@@ -639,7 +639,7 @@ describe("Missing explicit test for ReplConsole:eval", function()
     end)
 end)
 
-describe("Missing explicit test for ReplConsole:history", function()
+describe("ReplConsole:history", function()
     it("ReplConsole:history works", function()
         -- @tests ReplConsole:history
         local console = lurek.devtools.newRepl()
@@ -650,7 +650,7 @@ describe("Missing explicit test for ReplConsole:history", function()
     end)
 end)
 
-describe("Missing explicit test for ReplConsole:clear", function()
+describe("ReplConsole:clear", function()
     it("ReplConsole:clear works", function()
         -- @tests ReplConsole:clear
         local console = lurek.devtools.newRepl()
@@ -692,3 +692,5 @@ describe("ReplConsole:len (@covers)", function()
         expect_type("function", lurek.devtools.openConsole)
     end)
 end)
+
+test_summary()

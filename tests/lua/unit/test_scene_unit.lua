@@ -1484,54 +1484,79 @@ describe("lurek.scene", function()
     end)
 end)
 
-test_summary()
-
-describe("Missing explicit test for lurek.scene.newScene", function()
-    it("lurek.scene.newScene works", function()
+describe("lurek.scene.newScene", function()
+    it("creates a scene table that inherits methods from the definition", function()
         -- @tests lurek.scene.newScene
-        -- TODO: add assertion for lurek.scene.newScene
+        local scene = lurek.scene.newScene({
+            enter = function(self)
+                self.entered = true
+                return "ok"
+            end,
+        })
+        expect_equal("table", type(scene))
+        expect_equal("function", type(scene.enter))
+        expect_equal("ok", scene:enter())
+        expect_equal(true, scene.entered)
     end)
 end)
 
-describe("Missing explicit test for lurek.scene.fade", function()
-    it("lurek.scene.fade works", function()
+describe("lurek.scene transition helper aliases", function()
+    local function get_helper(name)
+        local direct = lurek.scene[name]
+        if type(direct) == "function" then
+            return direct
+        end
+        local transitions = lurek.scene["transitions"]
+        return transitions[name]
+    end
+
+    it("fade returns a fade transition table", function()
         -- @tests lurek.scene.fade
-        -- TODO: add assertion for lurek.scene.fade
+        local fade = get_helper("fade")
+        expect_equal("function", type(fade))
+        local t = fade(1.0)
+        expect_equal("fade", t.type)
+        expect_near(1.0, t.duration, 0.001)
     end)
-end)
 
-describe("Missing explicit test for lurek.scene.slide", function()
-    it("lurek.scene.slide works", function()
+    it("slide returns a directional slide transition table", function()
         -- @tests lurek.scene.slide
-        -- TODO: add assertion for lurek.scene.slide
+        local slide = get_helper("slide")
+        expect_equal("function", type(slide))
+        local t = slide("right", 0.75)
+        expect_equal("right", t.type)
+        expect_near(0.75, t.duration, 0.001)
     end)
-end)
 
-describe("Missing explicit test for lurek.scene.wipe", function()
-    it("lurek.scene.wipe works", function()
+    it("wipe returns a wipe transition table", function()
         -- @tests lurek.scene.wipe
-        -- TODO: add assertion for lurek.scene.wipe
+        local wipe = get_helper("wipe")
+        expect_equal("function", type(wipe))
+        local t = wipe(0.25)
+        expect_equal("wipe", t.type)
+        expect_near(0.25, t.duration, 0.001)
     end)
-end)
 
-describe("Missing explicit test for lurek.scene.iris", function()
-    it("lurek.scene.iris works", function()
+    it("iris returns an iris transition table", function()
         -- @tests lurek.scene.iris
-        -- TODO: add assertion for lurek.scene.iris
+        local iris = get_helper("iris")
+        expect_equal("function", type(iris))
+        local t = iris(0.9)
+        expect_equal("iris", t.type)
+        expect_near(0.9, t.duration, 0.001)
     end)
 end)
 
-describe("Missing explicit test for DepthSorter:setStable", function()
-    it("DepthSorter:setStable works", function()
+describe("DepthSorter stable mode", function()
+    it("setStable toggles the stable-sorting flag", function()
         -- @tests DepthSorter:setStable
-        -- TODO: add assertion for DepthSorter:setStable
-    end)
-end)
-
-describe("Missing explicit test for DepthSorter:isStable", function()
-    it("DepthSorter:isStable works", function()
         -- @tests DepthSorter:isStable
-        -- TODO: add assertion for DepthSorter:isStable
+        local ds = lurek.scene.newDepthSorter()
+        expect_equal(false, ds:isStable())
+        ds:setStable(true)
+        expect_equal(true, ds:isStable())
+        ds:setStable(false)
+        expect_equal(false, ds:isStable())
     end)
 end)
 
@@ -1567,3 +1592,5 @@ describe("DepthSorter:add (@covers)", function()
         expect_true(ds:getCount() >= 2)
     end)
 end)
+
+test_summary()

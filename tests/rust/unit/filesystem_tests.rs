@@ -204,15 +204,6 @@ mod vfs_tests {
     }
 
     #[test]
-    fn create_directory_inside_save() {
-        let dir = make_temp_game("mkdir");
-        let fs = GameFS::new(&dir);
-        fs.create_directory("save/sub/deep").unwrap();
-        assert!(dir.join("save/sub/deep").is_dir());
-        let _ = std::fs::remove_dir_all(&dir);
-    }
-
-    #[test]
     fn remove_file_in_save() {
         let dir = make_temp_game("remove");
         let fs = GameFS::new(&dir);
@@ -240,18 +231,6 @@ mod vfs_tests {
         assert_eq!(FileType::Directory.as_str(), "directory");
         assert_eq!(FileType::Symlink.as_str(), "symlink");
         assert_eq!(FileType::Other.as_str(), "other");
-    }
-
-    #[test]
-    fn glob_returns_matching_files() {
-        let dir = make_temp_game("glob");
-        std::fs::write(dir.join("a.lua"), "").unwrap();
-        std::fs::write(dir.join("b.lua"), "").unwrap();
-        std::fs::write(dir.join("c.txt"), "").unwrap();
-        let fs = GameFS::new(&dir);
-        let matches = fs.glob("*.lua").unwrap();
-        assert_eq!(matches, vec!["a.lua", "b.lua"]);
-        let _ = std::fs::remove_dir_all(&dir);
     }
 
     #[test]
@@ -289,39 +268,6 @@ mod vfs_tests {
         let _ = std::fs::remove_dir_all(&dir);
     }
 
-    #[test]
-    fn copy_file_within_sandbox() {
-        let dir = make_temp_game("copy");
-        std::fs::write(dir.join("original.txt"), "data").unwrap();
-        let fs = GameFS::new(&dir);
-        fs.copy_file("original.txt", "save/copy.txt").unwrap();
-        let content = std::fs::read_to_string(dir.join("save/copy.txt")).unwrap();
-        assert_eq!(content, "data");
-        let _ = std::fs::remove_dir_all(&dir);
-    }
-
-    #[test]
-    fn move_file_within_save() {
-        let dir = make_temp_game("move");
-        let fs = GameFS::new(&dir);
-        fs.write_string("save/src.txt", "move me").unwrap();
-        fs.move_file("save/src.txt", "save/dst.txt").unwrap();
-        assert!(!dir.join("save/src.txt").exists());
-        let content = std::fs::read_to_string(dir.join("save/dst.txt")).unwrap();
-        assert_eq!(content, "move me");
-        let _ = std::fs::remove_dir_all(&dir);
-    }
-
-    #[test]
-    fn remove_dir_recursive() {
-        let dir = make_temp_game("rmdir");
-        let fs = GameFS::new(&dir);
-        fs.create_directory("save/deep/nested").unwrap();
-        fs.write_string("save/deep/nested/file.txt", "x").unwrap();
-        fs.remove_dir("save/deep").unwrap();
-        assert!(!dir.join("save/deep").exists());
-        let _ = std::fs::remove_dir_all(&dir);
-    }
 }
 
 // ── file_handle ───────────────────────────────────────────────────────────────

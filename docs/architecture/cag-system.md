@@ -43,7 +43,7 @@ The CAG layer is built from five artifact types. Each has a fixed location, requ
 | Type               | Location                                                                 | Purpose                                                                                                               | Required Frontmatter                                                                                      | Required Sections                                                                                                      | Line Cap            | Validator Rules               |
 | ------------------ | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------- | ----------------------------- |
 | **System prompt**  | [.github/copilot-instructions.md](../../.github/copilot-instructions.md) | High-level discovery index, always loaded into every chat session.                                                    | (top-level config — no frontmatter)                                                                       | Engine Identity / Binding Constraints / Cross-Artifact Sync / Discovery Directives / Quality Gates / Repository Layout | ≤ 120 lines, ≤ 8 KB | E001–E004, W005               |
-| **Agent**          | `.github/agents/<name>.agent.md`                                         | Defines a workflow specialist (mission, scope, IO, routing).                                                          | `name`, `description`, optional `tools[]`                                                                  | Mission / Scope / Inputs / Outputs / Workflow / Routing Table / Anti-patterns                                          | ≤ 200 lines         | E101–E107, W108               |
+| **Agent**          | `.github/agents/<name>.agent.md`                                         | Defines a workflow specialist (mission, scope, IO, workflow).                                                         | `name`, `description`, optional `tools[]`                                                                  | Mission / Scope / Inputs / Outputs / Workflow / Success Metrics / Anti-patterns                                          | ≤ 200 lines         | E101–E113, W108               |
 | **Skill**          | `.github/skills/<name>/SKILL.md`                                         | Deep domain knowledge pulled in only when the task matches. **No fenced code blocks** — extracted to companion files. | `name`, `description` (load-when + skip-for)                                                               | Mission / When To Load / When To Skip / Domain Knowledge / Companion File Index / References                           | ≤ 120 lines         | E201–E205, W206               |
 | **Prompt**         | `.github/prompts/<verb>-<noun>.prompt.md`                                | Concrete user-invocable task, typically run via `/<name>`.                                                            | `description`, `agent`, optional `tools[]`                                                                 | Goal / Inputs / Steps / Success Criteria / Anti-patterns / Example Invocation                                          | none                | E301–E305, W306               |
 | **Companion file** | `.github/skills/<name>/{examples,templates,snippets}/...`                | Code, templates, or extended notes referenced from a `SKILL.md`.                                                      | n/a                                                                                                       | n/a                                                                                                                    | none                | E203 (referenced-but-missing) |
@@ -88,8 +88,8 @@ User request
      │       ▼                                                          │
      │  match task type to .github/agents/<name>.agent.md `mission`     │
      │       │                                                          │
-     │       └── `routes_to` documents valid handoff targets; only      │
-     │           `Manager` dispatches work to another agent             │
+     │       └── `Manager` loads `agent-routing` for exact ownership    │
+     │           and handoff rules before dispatching work              │
      │                                                                  │
      │  task came from a slash command / user button                    │
      │       │                                                          │
@@ -104,6 +104,7 @@ Three properties hold:
 
 - **The system prompt is the only file always loaded.** Everything else is pulled in by intent matching, not by inclusion.
 - **Skills are knowledge, not procedures.** They are additive — a single task may load several (e.g. `lua-api-design` + `lua-rust-bridge` + `testing-rust` for a new `lurek.*` API).
+- Comparative architecture work follows the same rule: a TOGAF-aware review may load `enterprise-architecture` + `togaf` without changing who owns the final architecture decision.
 - **Agents are roles, not menus.** When work spans ≥ 3 agents or ≥ 5 files, the user (or a calling agent) routes to `Manager` first; Manager engages `Planner` before any implementation begins.
 
 **Worked example** — "fix a crash in `src/physics/`":
@@ -193,7 +194,7 @@ Exit code is non-zero on any error. `--baseline` compares against the recorded b
 | Range                | Type          | Meaning                                                                                                                                                                                                                                                                                                         |
 | -------------------- | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **E001–E004 / W005** | System prompt | E001 missing required section · E002 oversize (lines or bytes) · E003 invalid YAML/structure · E004 missing canonical reference · W005 broken markdown link target                                                                                                                                              |
-| **E101–E107 / W108** | Agent         | E101 missing or malformed YAML frontmatter · E102 invalid persona name in `## CAG Metadata` · E103 unknown skill in `Primary skills` or `Secondary skills` · E104 unknown agent in `Routes to` · E105 unknown tool path in frontmatter `tools` · E106 file exceeds the line cap · E107 missing or misordered required sections · W108 no personas declared |
+| **E101–E113 / W108** | Agent         | E101 missing or malformed YAML frontmatter · E102 invalid persona name in `## CAG Metadata` · E103 unknown skill in `Primary skills` or `Secondary skills` · E104 deprecated routing metadata or missing mandatory Manager link to `agent-routing` · E105 unknown tool path in frontmatter `tools` · E106 file exceeds the line cap · E107 missing or misordered required sections, or legacy `Routing Table` section still present · E109 `Autonomy` wrongly appears in an agent file · E110 `Success Metrics` misses the 1-10 stars contract or bullet count · E111 `Scope` is too thin · E112 `Anti-patterns` is too thin · E113 duplicated `Scope`, `Anti-patterns`, or `Success Metrics` bullets across agents · W108 no personas declared |
 | **E201–E205 / W206** | Skill         | E201 forbidden fenced code block · E202 missing or malformed YAML frontmatter · E204 unknown skill in `Related skills` · E205 missing or misordered required sections · W206 `description` missing the load-when and skip-for clauses                                                                       |
 | **E301–E305 / W306** | Prompt        | E301 missing or malformed YAML frontmatter · E302 unknown skill in `Loads skills` · E303 unknown tool path in frontmatter `tools` · E304 unknown agent in frontmatter `agent` · E305 missing or misordered required sections · W306 Success Criteria missing checklist items                                          |
 
@@ -242,11 +243,13 @@ python tools/audit/cag_persona_matrix.py --format json
 
 1. Decide the role; pick a lowercase kebab-case `<name>` (e.g. `profiler` or `spec-owner`).
 2. Copy [templates/AGENT_TEMPLATE.md](templates/AGENT_TEMPLATE.md) to `.github/agents/<name>.agent.md`.
-3. Fill the YAML frontmatter: `name`, `description`, and optional `tools`. Put personas, skills, and routing in `## CAG Metadata`, not in frontmatter. Every referenced skill, agent, and tool must already exist.
-4. Write the seven required body sections in order: **Mission · Scope · Inputs · Outputs · Workflow · Routing Table · Anti-patterns**. Add `## CAG Metadata` after them. Keep total length ≤ 200 lines.
-5. Add a row to the agent directory table in [.github/agents/README.md](../../.github/agents/README.md).
-6. Validate: `python tools/validate/cag_validate.py --type agent`.
-7. Commit: `chore(cag): add <name> agent`.
+3. Fill the YAML frontmatter: `name`, `description`, and optional `tools`. Put personas and skills in `## CAG Metadata`, not in frontmatter. Keep routing in shared docs or `.github/skills/agent-routing/SKILL.md`. Every referenced skill, agent, and tool must already exist.
+4. Write the seven required body sections in order: **Mission · Scope · Inputs · Outputs · Workflow · Success Metrics · Anti-patterns**. Add `## CAG Metadata` after them. Keep total length ≤ 200 lines.
+5. Put routing specifics in shared docs or `.github/skills/agent-routing/SKILL.md`, not in a per-agent `Routing Table`.
+6. The autonomy rule is generic and belongs in the system prompt, not in agent files. `Success Metrics` must explain the 1 to 10 star self-evaluation scale and use 3 to 6 role-specific bullets.
+7. Add a row to the agent directory table in [.github/agents/README.md](../../.github/agents/README.md).
+8. Validate: `python tools/validate/cag_validate.py --type agent`.
+9. Commit: `chore(cag): add <name> agent`.
 
 ### 6.2 Adding a new skill
 

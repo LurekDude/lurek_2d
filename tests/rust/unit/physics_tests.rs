@@ -2,8 +2,6 @@
 
 use lurek2d::physics::*;
 use lurek2d::physics::zone::ZoneTracker;
-use lurek2d::physics::collision_helpers::*;
-use lurek2d::math::Vec2;
 use std::collections::HashSet;
 
 // ── cellular ──────────────────────────────────────────────────────────────────
@@ -120,106 +118,17 @@ mod cellular_tests {
 
 // ── body ──────────────────────────────────────────────────────────────────────
 
-mod body_tests {
-    use super::*;
-
-    #[test]
-    fn new_body_defaults() {
-        let b = Body::new(10.0, 20.0, BodyType::Dynamic);
-        assert_eq!(b.position.x, 10.0);
-        assert_eq!(b.position.y, 20.0);
-        assert_eq!(b.body_type, BodyType::Dynamic);
-        assert_eq!(b.mass, 1.0);
-        assert!((b.restitution - 0.3).abs() < 1e-6);
-    }
-
-    #[test]
-    fn new_circle_body() {
-        let b = Body::new_circle(5.0, 5.0, 16.0, BodyType::Static);
-        assert!(matches!(b.shape, BodyShape::Circle { radius } if (radius - 16.0).abs() < 1e-6));
-        assert_eq!(b.width, 32.0);
-        assert_eq!(b.height, 32.0);
-    }
-
-    #[test]
-    fn bounding_box_rect() {
-        let b = Body::new(100.0, 200.0, BodyType::Dynamic);
-        let bb = b.bounding_box();
-        assert!((bb.x - 84.0).abs() < 1e-6);
-        assert!((bb.y - 184.0).abs() < 1e-6);
-        assert!((bb.width - 32.0).abs() < 1e-6);
-    }
-
-    #[test]
-    fn bounding_box_circle() {
-        let b = Body::new_circle(0.0, 0.0, 10.0, BodyType::Dynamic);
-        let bb = b.bounding_box();
-        assert!((bb.x - (-10.0)).abs() < 1e-6);
-        assert!((bb.width - 20.0).abs() < 1e-6);
-    }
-
-    #[test]
-    fn collides_with_layer_filtering() {
-        let mut a = Body::new(0.0, 0.0, BodyType::Dynamic);
-        let mut b = Body::new(0.0, 0.0, BodyType::Dynamic);
-        a.layer = 1;
-        a.mask = 2;
-        b.layer = 2;
-        b.mask = 1;
-        assert!(a.collides_with_layer(&b));
-        b.mask = 0;
-        assert!(!a.collides_with_layer(&b));
-    }
-
-    #[test]
-    fn get_type_strings() {
-        assert_eq!(Body::new(0.0, 0.0, BodyType::Static).get_type(), "static");
-        assert_eq!(Body::new(0.0, 0.0, BodyType::Dynamic).get_type(), "dynamic");
-        assert_eq!(Body::new(0.0, 0.0, BodyType::Kinematic).get_type(), "kinematic");
-        assert_eq!(Body::new(0.0, 0.0, BodyType::Sensor).get_type(), "sensor");
-    }
-
-    #[test]
-    fn world_local_point_roundtrip() {
-        let mut b = Body::new(100.0, 200.0, BodyType::Dynamic);
-        b.angle = std::f32::consts::FRAC_PI_4;
-        let (wx, wy) = b.get_world_point(10.0, 0.0);
-        let (lx, ly) = b.get_local_point(wx, wy);
-        assert!((lx - 10.0).abs() < 1e-3);
-        assert!(ly.abs() < 1e-3);
-    }
-
-    #[test]
-    fn new_polygon_computes_bounding_size() {
-        let verts = vec![
-            Vec2::new(-5.0, -5.0),
-            Vec2::new(5.0, -5.0),
-            Vec2::new(5.0, 5.0),
-            Vec2::new(-5.0, 5.0),
-        ];
-        let b = Body::new_polygon(0.0, 0.0, verts, BodyType::Dynamic);
-        assert!((b.width - 10.0).abs() < 1e-6);
-        assert!((b.height - 10.0).abs() < 1e-6);
-        assert!(b.shape_ext.is_some());
-    }
-
-    #[test]
-    fn new_edge_body() {
-        let b = Body::new_edge(
-            0.0, 0.0,
-            Vec2::new(0.0, 0.0),
-            Vec2::new(10.0, 0.0),
-            BodyType::Static,
-        );
-        assert!((b.width - 10.0).abs() < 1e-6);
-        assert!(matches!(&b.shape_ext, Some(Shape::Edge { .. })));
-    }
-}
+// Public body behavior is covered in `tests/lua/unit/test_physics_unit.lua`.
 
 // ── collision_helpers ─────────────────────────────────────────────────────────
 
 mod collision_helpers_tests {
-    use super::*;
+    use lurek2d::physics::collision_helpers::{
+        test_aabb,
+        test_circle_aabb,
+        test_circles,
+        test_point_aabb,
+    };
 
     #[test]
     fn aabb_overlap() {
@@ -493,95 +402,7 @@ mod terrain_tests {
 
 // ── shape ─────────────────────────────────────────────────────────────────────
 
-mod shape_tests {
-    use super::*;
-
-    #[test]
-    fn from_parts_rectangle() {
-        let s = Shape::from_parts("rectangle", &[10.0, 20.0], false).unwrap();
-        assert!(matches!(s, Shape::Rect { width, height } if (width - 10.0).abs() < 1e-6 && (height - 20.0).abs() < 1e-6));
-    }
-
-    #[test]
-    fn from_parts_circle() {
-        let s = Shape::from_parts("circle", &[5.0], false).unwrap();
-        assert!(matches!(s, Shape::Circle { radius } if (radius - 5.0).abs() < 1e-6));
-    }
-
-    #[test]
-    fn from_parts_polygon() {
-        let s = Shape::from_parts("polygon", &[0.0, 0.0, 10.0, 0.0, 5.0, 10.0], false).unwrap();
-        assert!(matches!(s, Shape::Polygon { ref vertices } if vertices.len() == 3));
-    }
-
-    #[test]
-    fn from_parts_edge() {
-        let s = Shape::from_parts("edge", &[0.0, 0.0, 10.0, 5.0], false).unwrap();
-        assert!(matches!(s, Shape::Edge { .. }));
-    }
-
-    #[test]
-    fn from_parts_chain_open() {
-        let s = Shape::from_parts("chain", &[0.0, 0.0, 10.0, 0.0, 10.0, 10.0], false).unwrap();
-        assert!(matches!(s, Shape::Chain { closed, .. } if !closed));
-    }
-
-    #[test]
-    fn from_parts_chain_closed() {
-        let s = Shape::from_parts("chain", &[0.0, 0.0, 10.0, 0.0, 10.0, 10.0], true).unwrap();
-        assert!(matches!(s, Shape::Chain { closed, .. } if closed));
-    }
-
-    #[test]
-    fn from_parts_invalid_type() {
-        assert!(Shape::from_parts("hexagon", &[1.0], false).is_err());
-    }
-
-    #[test]
-    fn from_parts_insufficient_args() {
-        assert!(Shape::from_parts("rectangle", &[10.0], false).is_err());
-        assert!(Shape::from_parts("polygon", &[0.0, 0.0, 1.0, 1.0], false).is_err());
-    }
-
-    #[test]
-    fn regular_polygon_clamps_sides() {
-        let s = Shape::regular_polygon(10.0, 2);
-        assert!(matches!(s, Shape::Polygon { ref vertices } if vertices.len() == 3));
-        let s = Shape::regular_polygon(10.0, 20);
-        assert!(matches!(s, Shape::Polygon { ref vertices } if vertices.len() == 8));
-    }
-
-    #[test]
-    fn standalone_shape_defaults() {
-        let ss = StandaloneShape::new(Shape::Circle { radius: 5.0 });
-        assert_eq!(ss.get_type(), "circle");
-        assert!((ss.get_radius().unwrap() - 5.0).abs() < 1e-6);
-        assert!((ss.density - 1.0).abs() < 1e-6);
-        assert!(!ss.sensor);
-    }
-
-    #[test]
-    fn standalone_bounding_box() {
-        let ss = StandaloneShape::new(Shape::Rect { width: 10.0, height: 6.0 });
-        let (min_x, min_y, max_x, max_y) = ss.get_bounding_box();
-        assert!((min_x - (-5.0)).abs() < 1e-6);
-        assert!((min_y - (-3.0)).abs() < 1e-6);
-        assert!((max_x - 5.0).abs() < 1e-6);
-        assert!((max_y - 3.0).abs() < 1e-6);
-    }
-
-    #[test]
-    #[ignore = "to_rapier_collider is pub(crate)"]
-    fn to_rapier_collider_rect() {
-        let _s = Shape::Rect { width: 10.0, height: 8.0 };
-    }
-
-    #[test]
-    #[ignore = "to_rapier_collider is pub(crate)"]
-    fn to_rapier_collider_degenerate_polygon() {
-        let _s = Shape::Polygon { vertices: vec![Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0)] };
-    }
-}
+// Public shape construction behavior is covered in `tests/lua/unit/test_physics_unit.lua`.
 
 // ── world ─────────────────────────────────────────────────────────────────────
 

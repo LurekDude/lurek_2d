@@ -19,15 +19,17 @@ description: "Load this skill when building lurek.html screens, HUDs, menus, dia
 - Pure game logic.
 
 ## Domain Knowledge
-- HTML UI in this repo spans src/html/ domain code, src/ui/ integration, and src/lua_api/html_api.rs bindings.
-- Use docs/specs/html.md and docs/specs/ui.md as the behavior contract for supported HTML/CSS features.
-- Keep markup and styling together; do not spread layout decisions across Lua callbacks unless state really changes them.
-- Relayout only when DOM size or structure changes justify it.
-- Showcase HTML screens already exist in content/games/showcase/ and are better anchors than generic web patterns.
-- This skill covers HTML/CSS UI, not TOML layouts under content/layouts/.
-- HTML-driven UI work should respect the current engine-side html/ui split and the showcase content already living under content/games/showcase/.
-- Lua callback wiring should remain explicit so UI behavior stays inspectable and testable from game scripts.
-- This skill owns HTML/CSS documents and flow, not TOML layout grids or Rust widget internals.
+- HTML UI in this repo spans src/html/ domain code, src/ui/ integration, and src/lua_api/html_api.rs bindings, so authoring decisions should respect the full path from markup to Lua callbacks.
+- Use docs/specs/html.md and docs/specs/ui.md as the behavior contract for the supported HTML and CSS feature set instead of assuming browser-complete behavior.
+- Keep markup and styling together; do not spread layout decisions across Lua callbacks unless state actually changes them at runtime.
+- Relayout only when DOM size, hierarchy, or content changes justify it; unnecessary rebuilds make UI behavior harder to reason about and can cost frame time.
+- Showcase HTML screens already exist in content/games/showcase/ and are better anchors than generic web tutorials because they reflect the engine-supported subset.
+- Keep IDs, classes, and callback wiring explicit so UI behavior stays inspectable, grep-friendly, and testable from scripts.
+- Prefer HTML and CSS for document structure and visual rules, with Lua responsible for state transitions, user actions, and data flow.
+- Avoid importing web assumptions that the engine does not promise, especially around layout edge cases, browser APIs, or unsupported styling behavior.
+- This skill covers HTML and CSS UI documents and flow, not TOML layouts under content/layouts/ and not Rust widget internals in src/ui/.
+- Good html-css work in this repo produces screens that are readable in source, predictable in runtime behavior, and clearly connected to the Lua logic that drives them.
+- When UI behavior depends on game state, keep that contract visible in the script rather than burying logic in CSS or implicit DOM conventions.
 ## Companion File Index
 - None.
 

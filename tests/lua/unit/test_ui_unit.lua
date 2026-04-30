@@ -203,6 +203,7 @@ describe("UI custom widget", function()
     -- @tests widget:setOnDraw
     -- @description setOnDraw method exists on the returned widget handle
     it("setOnDraw method exists on widget", function()
+        ---@type any
         local w = lurek.ui.newCustomWidget({ width = 100, height = 100 })
         expect_not_nil(w)
         expect_type("function", w.setOnDraw)
@@ -212,6 +213,7 @@ describe("UI custom widget", function()
     -- @tests widget:setOnDraw
     -- @description setOnDraw does not throw when called with a function
     it("setOnDraw accepts a callback without error", function()
+        ---@type any
         local w = lurek.ui.newCustomWidget({ x = 0, y = 0, width = 100, height = 50 })
         local ok = pcall(function()
             w:setOnDraw(function(rect)
@@ -237,6 +239,7 @@ describe("UI custom widget", function()
     -- @description draw invokes registered on_draw callbacks
     it("draw invokes on_draw callback", function()
         local called = false
+        ---@type any
         local w = lurek.ui.newCustomWidget({ x = 5, y = 5, width = 40, height = 30 })
         w:setOnDraw(function(rect)
             called = true
@@ -471,87 +474,157 @@ describe("Missing API Coverage", function()
 
 end)
 
+local function make_basic_widget(opts)
+    ---@type any
+    local widget = lurek.ui.newCustomWidget(opts or {
+        x = 1,
+        y = 2,
+        width = 3,
+        height = 4,
+    })
+
+    return widget
+end
+
 describe("Missing explicit test for lurek.ui.setPosition", function()
     it("lurek.ui.setPosition works", function()
         -- @tests lurek.ui.setPosition
-        -- TODO: add assertion for lurek.ui.setPosition
+        local widget = make_basic_widget()
+        widget["setPosition"](12, 34)
+
+        local x, y = widget["getPosition"]()
+        expect_equal(12, x)
+        expect_equal(34, y)
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.getPosition", function()
     it("lurek.ui.getPosition works", function()
         -- @tests lurek.ui.getPosition
-        -- TODO: add assertion for lurek.ui.getPosition
+        local widget = make_basic_widget({
+            x = 9,
+            y = 11,
+            width = 30,
+            height = 40,
+        })
+
+        local x, y = widget["getPosition"]()
+        expect_equal(9, x)
+        expect_equal(11, y)
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.setSize", function()
     it("lurek.ui.setSize works", function()
         -- @tests lurek.ui.setSize
-        -- TODO: add assertion for lurek.ui.setSize
+        local widget = make_basic_widget()
+        widget["setSize"](56, 78)
+
+        local w, h = widget["getSize"]()
+        expect_equal(56, w)
+        expect_equal(78, h)
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.getSize", function()
     it("lurek.ui.getSize works", function()
         -- @tests lurek.ui.getSize
-        -- TODO: add assertion for lurek.ui.getSize
+        local widget = make_basic_widget({
+            x = 0,
+            y = 0,
+            width = 21,
+            height = 34,
+        })
+
+        local w, h = widget["getSize"]()
+        expect_equal(21, w)
+        expect_equal(34, h)
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.setVisible", function()
     it("lurek.ui.setVisible works", function()
         -- @tests lurek.ui.setVisible
-        -- TODO: add assertion for lurek.ui.setVisible
+        local widget = make_basic_widget()
+        widget["setVisible"](false)
+        expect_false(widget["isVisible"]())
+
+        widget["setVisible"](true)
+        expect_true(widget["isVisible"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.isVisible", function()
     it("lurek.ui.isVisible works", function()
         -- @tests lurek.ui.isVisible
-        -- TODO: add assertion for lurek.ui.isVisible
+        local widget = make_basic_widget()
+        expect_false(widget["isVisible"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.setEnabled", function()
     it("lurek.ui.setEnabled works", function()
         -- @tests lurek.ui.setEnabled
-        -- TODO: add assertion for lurek.ui.setEnabled
+        local widget = make_basic_widget()
+        widget["setEnabled"](false)
+        expect_false(widget["isEnabled"]())
+
+        widget["setEnabled"](true)
+        expect_true(widget["isEnabled"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.isEnabled", function()
     it("lurek.ui.isEnabled works", function()
         -- @tests lurek.ui.isEnabled
-        -- TODO: add assertion for lurek.ui.isEnabled
+        local widget = make_basic_widget()
+        expect_false(widget["isEnabled"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.setId", function()
     it("lurek.ui.setId works", function()
         -- @tests lurek.ui.setId
-        -- TODO: add assertion for lurek.ui.setId
+        local widget = make_basic_widget()
+        widget["setId"]("hud_button")
+
+        expect_equal("hud_button", widget["getId"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.getId", function()
     it("lurek.ui.getId works", function()
         -- @tests lurek.ui.getId
-        -- TODO: add assertion for lurek.ui.getId
+        local widget = make_basic_widget({
+            x = 0,
+            y = 0,
+            width = 10,
+            height = 10,
+            id = "score_label",
+        })
+
+        expect_equal("score_label", widget["getId"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.setTooltip", function()
     it("lurek.ui.setTooltip works", function()
         -- @tests lurek.ui.setTooltip
-        -- TODO: add assertion for lurek.ui.setTooltip
+        local widget = make_basic_widget()
+        widget["setTooltip"]("Click to continue")
+
+        expect_equal("Click to continue", widget["getTooltip"]())
     end)
 end)
 
 describe("Missing explicit test for lurek.ui.getTooltip", function()
     it("lurek.ui.getTooltip works", function()
         -- @tests lurek.ui.getTooltip
-        -- TODO: add assertion for lurek.ui.getTooltip
+        local widget = make_basic_widget()
+        expect_equal("", widget["getTooltip"]())
+
+        widget["setTooltip"]("Opens the inventory")
+        expect_equal("Opens the inventory", widget["getTooltip"]())
     end)
 end)
 

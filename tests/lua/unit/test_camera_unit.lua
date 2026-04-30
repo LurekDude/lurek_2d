@@ -529,241 +529,60 @@ describe("camera effects — breathing", function()
     end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Replaces the Camera2D placeholder tail with direct lifecycle coverage for path-following, smooth zoom, and parallax state helpers.
+describe("Camera2D regression coverage", function()
     -- @tests Camera2D:stopPath
-    it("covers Camera2D:stopPath", function()
-        -- TODO: Implement test for Camera2D:stopPath
-    end)
-
     -- @tests Camera2D:updatePath
-    it("covers Camera2D:updatePath", function()
-        -- TODO: Implement test for Camera2D:updatePath
-    end)
-
     -- @tests Camera2D:pathProgress
-    it("covers Camera2D:pathProgress", function()
-        -- TODO: Implement test for Camera2D:pathProgress
+    -- @description Starts a two-point path, advances it once, and verifies stopPath returns the path helper to the idle state.
+    it("path helpers update progress and stop cleanly", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setPosition(0, 0)
+        cam:followPath({{0, 0}, {100, 0}}, 1.0)
+
+        expect_near(0.0, cam:pathProgress(), 0.001)
+        expect_true(cam:updatePath(0.5))
+
+        local x, y = cam:getPosition()
+        expect_true(x > 0, "path update should advance x")
+        expect_near(0.0, y, 0.001)
+        expect_near(0.5, cam:pathProgress(), 0.001)
+
+        cam:stopPath()
+        expect_false(cam:updatePath(0.1))
+        expect_near(1.0, cam:pathProgress(), 0.001)
     end)
 
     -- @tests Camera2D:zoomTo
-    it("covers Camera2D:zoomTo", function()
-        -- TODO: Implement test for Camera2D:zoomTo
-    end)
-
     -- @tests Camera2D:stopZoom
-    it("covers Camera2D:stopZoom", function()
-        -- TODO: Implement test for Camera2D:stopZoom
-    end)
-
     -- @tests Camera2D:updateZoom
-    it("covers Camera2D:updateZoom", function()
-        -- TODO: Implement test for Camera2D:updateZoom
+    -- @description Starts a zoom tween, checks it updates the base zoom toward the target, and verifies stopZoom freezes the tween state.
+    it("zoom tween updates and stops without resetting zoom", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setZoom(1.0)
+        cam:zoomTo(2.0, 1.0)
+
+        expect_true(cam:updateZoom(0.5))
+        local mid_zoom = cam:getZoom()
+        expect_true(mid_zoom > 1.0 and mid_zoom < 2.0, "zoom should move toward the target")
+
+        cam:stopZoom()
+        expect_false(cam:updateZoom(0.1))
+        expect_near(mid_zoom, cam:getZoom(), 0.001)
     end)
 
     -- @tests Camera2D:getParallaxFactor
-    it("covers Camera2D:getParallaxFactor", function()
-        -- TODO: Implement test for Camera2D:getParallaxFactor
-    end)
-
     -- @tests Camera2D:clearParallaxFactors
-    it("covers Camera2D:clearParallaxFactors", function()
-        -- TODO: Implement test for Camera2D:clearParallaxFactors
-    end)
+    -- @description Verifies unset parallax factors default to 1.0, explicit factors round-trip, and clearParallaxFactors restores the default.
+    it("parallax factors round-trip and clear back to defaults", function()
+        local cam = lurek.camera.new(320, 240)
+        expect_near(1.0, cam:getParallaxFactor("bg"), 0.001)
 
-end)
+        cam:setParallaxFactor("bg", 0.25)
+        expect_near(0.25, cam:getParallaxFactor("bg"), 0.001)
 
-describe("Missing explicit test for Camera2D:setPosition", function()
-    it("Camera2D:setPosition works", function()
-        -- @tests Camera2D:setPosition
-        -- TODO: add assertion for Camera2D:setPosition
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getPosition", function()
-    it("Camera2D:getPosition works", function()
-        -- @tests Camera2D:getPosition
-        -- TODO: add assertion for Camera2D:getPosition
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setZoom", function()
-    it("Camera2D:setZoom works", function()
-        -- @tests Camera2D:setZoom
-        -- TODO: add assertion for Camera2D:setZoom
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getZoom", function()
-    it("Camera2D:getZoom works", function()
-        -- @tests Camera2D:getZoom
-        -- TODO: add assertion for Camera2D:getZoom
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setRotation", function()
-    it("Camera2D:setRotation works", function()
-        -- @tests Camera2D:setRotation
-        -- TODO: add assertion for Camera2D:setRotation
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getRotation", function()
-    it("Camera2D:getRotation works", function()
-        -- @tests Camera2D:getRotation
-        -- TODO: add assertion for Camera2D:getRotation
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getViewport", function()
-    it("Camera2D:getViewport works", function()
-        -- @tests Camera2D:getViewport
-        -- TODO: add assertion for Camera2D:getViewport
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:removeBounds", function()
-    it("Camera2D:removeBounds works", function()
-        -- @tests Camera2D:removeBounds
-        -- TODO: add assertion for Camera2D:removeBounds
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setTarget", function()
-    it("Camera2D:setTarget works", function()
-        -- @tests Camera2D:setTarget
-        -- TODO: add assertion for Camera2D:setTarget
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:clearTarget", function()
-    it("Camera2D:clearTarget works", function()
-        -- @tests Camera2D:clearTarget
-        -- TODO: add assertion for Camera2D:clearTarget
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setFollowSmooth", function()
-    it("Camera2D:setFollowSmooth works", function()
-        -- @tests Camera2D:setFollowSmooth
-        -- TODO: add assertion for Camera2D:setFollowSmooth
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setDeadZone", function()
-    it("Camera2D:setDeadZone works", function()
-        -- @tests Camera2D:setDeadZone
-        -- TODO: add assertion for Camera2D:setDeadZone
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:setLookAhead", function()
-    it("Camera2D:setLookAhead works", function()
-        -- @tests Camera2D:setLookAhead
-        -- TODO: add assertion for Camera2D:setLookAhead
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:shake", function()
-    it("Camera2D:shake works", function()
-        -- @tests Camera2D:shake
-        -- TODO: add assertion for Camera2D:shake
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:update", function()
-    it("Camera2D:update works", function()
-        -- @tests Camera2D:update
-        -- TODO: add assertion for Camera2D:update
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:toWorld", function()
-    it("Camera2D:toWorld works", function()
-        -- @tests Camera2D:toWorld
-        -- TODO: add assertion for Camera2D:toWorld
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:toScreen", function()
-    it("Camera2D:toScreen works", function()
-        -- @tests Camera2D:toScreen
-        -- TODO: add assertion for Camera2D:toScreen
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getVisibleArea", function()
-    it("Camera2D:getVisibleArea works", function()
-        -- @tests Camera2D:getVisibleArea
-        -- TODO: add assertion for Camera2D:getVisibleArea
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:lookAt", function()
-    it("Camera2D:lookAt works", function()
-        -- @tests Camera2D:lookAt
-        -- TODO: add assertion for Camera2D:lookAt
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:move", function()
-    it("Camera2D:move works", function()
-        -- @tests Camera2D:move
-        -- TODO: add assertion for Camera2D:move
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:zoomPulse", function()
-    it("Camera2D:zoomPulse works", function()
-        -- @tests Camera2D:zoomPulse
-        -- TODO: add assertion for Camera2D:zoomPulse
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:stopSway", function()
-    it("Camera2D:stopSway works", function()
-        -- @tests Camera2D:stopSway
-        -- TODO: add assertion for Camera2D:stopSway
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:isSway", function()
-    it("Camera2D:isSway works", function()
-        -- @tests Camera2D:isSway
-        -- TODO: add assertion for Camera2D:isSway
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:stopBreathing", function()
-    it("Camera2D:stopBreathing works", function()
-        -- @tests Camera2D:stopBreathing
-        -- TODO: add assertion for Camera2D:stopBreathing
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:isBreathing", function()
-    it("Camera2D:isBreathing works", function()
-        -- @tests Camera2D:isBreathing
-        -- TODO: add assertion for Camera2D:isBreathing
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getEffectiveZoom", function()
-    it("Camera2D:getEffectiveZoom works", function()
-        -- @tests Camera2D:getEffectiveZoom
-        -- TODO: add assertion for Camera2D:getEffectiveZoom
-    end)
-end)
-
-describe("Missing explicit test for Camera2D:getEffectOffset", function()
-    it("Camera2D:getEffectOffset works", function()
-        -- @tests Camera2D:getEffectOffset
-        -- TODO: add assertion for Camera2D:getEffectOffset
+        cam:clearParallaxFactors()
+        expect_near(1.0, cam:getParallaxFactor("bg"), 0.001)
     end)
 end)
 
@@ -788,8 +607,10 @@ describe("Camera2D:setParallaxFactor (@covers)", function()
         -- @covers Camera2D:setParallaxFactor
         local cam = lurek.camera.new(320, 240)
         local ok, _ = pcall(function()
-            cam:setParallaxFactor(0.5, 0.5)
+            cam:setParallaxFactor("bg", 0.5)
         end)
         expect_type("boolean", ok)
     end)
 end)
+
+test_summary()

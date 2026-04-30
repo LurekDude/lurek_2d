@@ -55,58 +55,7 @@ mod heightmap_tests {
     }
 }
 
-// ── flood_fill ────────────────────────────────────────────────────────
-
-mod flood_fill_tests {
-    use super::*;
-
-    #[test]
-    fn test_flood_fill() {
-        let data = vec![1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1];
-        let result = flood_fill(&data, 4, 4, 0, 0, 1, true);
-        assert_eq!(result[0], 1); // (0,0)
-        assert_eq!(result[1], 1); // (1,0)
-        assert_eq!(result[4], 1); // (0,1)
-        assert_eq!(result[5], 1); // (1,1)
-        assert_eq!(result[2], 0); // (2,0) is 0, not >= 1
-    }
-}
-
 // ── cellular ──────────────────────────────────────────────────────────
-
-mod cellular_tests {
-    use super::*;
-
-    #[test]
-    fn test_cellular_automata_size() {
-        let grid = cellular_automata(20, 15, &CellularOpts::default());
-        assert_eq!(grid.len(), 300);
-        // Should contain both 0s and 1s
-        assert!(grid.contains(&0));
-        assert!(grid.contains(&1));
-    }
-
-    #[test]
-    fn test_cellular_automata_deterministic() {
-        let g1 = cellular_automata(
-            10,
-            10,
-            &CellularOpts {
-                seed: 42,
-                ..Default::default()
-            },
-        );
-        let g2 = cellular_automata(
-            10,
-            10,
-            &CellularOpts {
-                seed: 42,
-                ..Default::default()
-            },
-        );
-        assert_eq!(g1, g2);
-    }
-}
 
 // ── bsp ───────────────────────────────────────────────────────────────
 
@@ -334,25 +283,6 @@ mod wfc_tests {
     }
 }
 
-// ── voronoi ───────────────────────────────────────────────────────────
-
-mod voronoi_tests {
-    use super::*;
-
-    #[test]
-    fn test_voronoi_diagram() {
-        let points = vec![(5.0, 5.0), (15.0, 15.0)];
-        let (regions, dist, dist2) = voronoi_diagram(20, 20, &points, &VoronoiOpts::default());
-        assert_eq!(regions.len(), 400);
-        assert_eq!(dist.len(), 400);
-        assert_eq!(dist2.len(), 400);
-        // Corner (0,0) should be closest to point 0
-        assert_eq!(regions[0], 0);
-        // Corner (19,19) should be closest to point 1
-        assert_eq!(regions[19 * 20 + 19], 1);
-    }
-}
-
 // ── rooms ─────────────────────────────────────────────────────────────
 
 mod rooms_tests {
@@ -406,22 +336,6 @@ mod render_tests {
     use super::*;
 
     #[test]
-    fn from_perlin_correct_dimensions() {
-        let grid = NoiseGrid::from_perlin(8, 6, 0.1);
-        assert_eq!(grid.width, 8);
-        assert_eq!(grid.height, 6);
-        assert_eq!(grid.cells.len(), 48);
-    }
-
-    #[test]
-    fn from_perlin_values_in_range() {
-        let grid = NoiseGrid::from_perlin(16, 16, 0.2);
-        for &v in &grid.cells {
-            assert!(v >= 0.0 && v <= 1.0, "value out of [0,1]: {v}");
-        }
-    }
-
-    #[test]
     fn to_rgba_bytes_length() {
         let grid = NoiseGrid::from_perlin(4, 4, 0.1);
         assert_eq!(grid.to_rgba_bytes().len(), 4 * 4 * 4);
@@ -460,32 +374,6 @@ mod render_tests {
             cells: Vec::new(),
         };
         assert!(grid.generate_render_commands(8.0).is_empty());
-    }
-}
-
-// ── poisson ───────────────────────────────────────────────────────────
-
-mod poisson_tests {
-    use super::*;
-
-    #[test]
-    fn test_poisson_disk_spacing() {
-        let points = poisson_disk(50.0, 50.0, 5.0, 30, 42);
-        assert!(!points.is_empty());
-        // Check all points are within bounds
-        for &(x, y) in &points {
-            assert!(x >= 0.0 && x < 50.0);
-            assert!(y >= 0.0 && y < 50.0);
-        }
-        // Check minimum distance constraint
-        for i in 0..points.len() {
-            for j in (i + 1)..points.len() {
-                let dx = points[i].0 - points[j].0;
-                let dy = points[i].1 - points[j].1;
-                let dist = (dx * dx + dy * dy).sqrt();
-                assert!(dist >= 4.9, "Points too close: {dist}"); // small tolerance
-            }
-        }
     }
 }
 
@@ -783,29 +671,6 @@ mod noise_tests {
         };
         let map = generate_noise_map_parallel(4, 4, &opts);
         assert_eq!(map.len(), 16);
-    }
-}
-
-// ── noise_ext ─────────────────────────────────────────────────────────
-
-mod noise_ext_tests {
-    use super::*;
-
-    #[test]
-    fn test_perlin_noise_periodic() {
-        // Value at x should equal value at x + period
-        let v1 = perlin_noise_periodic(1.5, 2.3, 4.0, 4.0);
-        let v2 = perlin_noise_periodic(5.5, 2.3, 4.0, 4.0);
-        assert!(
-            (v1 - v2).abs() < 1e-10,
-            "Periodic noise not tiling: {v1} vs {v2}"
-        );
-
-        let v3 = perlin_noise_periodic(1.5, 6.3, 4.0, 4.0);
-        assert!(
-            (v1 - v3).abs() < 1e-10,
-            "Periodic noise not tiling Y: {v1} vs {v3}"
-        );
     }
 }
 

@@ -22,15 +22,16 @@ Own the 12-phase module audit process: structure, documentation, testing, archit
 - Pure Lua work -> use lua-scripting skill
 
 ## Domain Knowledge
-- tools/audit/audit_module.py is the entry point for whole-module quality sweeps.
-- The audit checks thin mod.rs rules, file size, docs/specs presence, test coverage, wiki/example coverage, architecture direction, and wrapper leakage.
-- It also flags println/eprintln, tests in src/, unsafe without SAFETY, and bare unwrap hotspots.
-- Use audit output to route work: Architect for structure, Spec-Owner or Doc-Writer for contracts, Tester for coverage, Developer for code defects.
-- Pair audits with doc_coverage.py, test_coverage.py, and validate_module_coverage.py when findings affect contracts.
-- Treat module audit as a release/readiness gate, not a feature workflow.
-- The audit layer is valuable because it crosses structure, docs, tests, examples, wiki, and code quality in one sweep instead of treating them as isolated checks.
-- Findings should route to the right owner quickly: structure to Architect, contract drift to Spec-Owner, docs to Doc-Writer, and code fixes to Developer or specialists.
-- The skill owns whole-module readiness checks, not feature development.
+- tools/audit/audit_module.py is the entry point for whole-module quality sweeps, and its value comes from combining structural, documentation, testing, and code-quality checks in one repeatable pass.
+- The audit checks thin mod.rs rules, file size, docs/specs presence, test coverage, wiki and example coverage, architecture direction, and wrapper leakage across the whole module surface.
+- It also flags println/eprintln, tests in src/, unsafe without SAFETY, and bare unwrap hotspots, which makes it useful for release readiness even before a human deep review starts.
+- Treat module audit as a readiness or review gate, not as a feature workflow; it should tell you whether a module is coherent enough to ship or hand off, not how to implement a new behavior.
+- Use audit output to route work quickly: architecture findings to structure owners, contract drift to doc or spec owners, coverage gaps to test owners, and local code defects to the relevant implementation specialist.
+- Pair audits with doc_coverage.py, test_coverage.py, wiki coverage, and validate_module_coverage.py when findings affect contracts or module inventory.
+- A good audit read distinguishes blocking defects from informational drift; not every warning should force the same urgency or same owner.
+- Audit findings should remain file-specific and evidence-based so follow-up work can stay narrow instead of turning one report into a repo-wide cleanup campaign.
+- Because the audit crosses docs, tests, examples, and source rules, it is often the fastest way to see whether a module is internally consistent, not just compiling.
+- If several findings point to the same structural mistake, report the shared root cause first instead of listing symptoms separately.
 ## Companion File Index
 
 None - all guidance is inline.

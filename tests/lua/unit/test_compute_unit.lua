@@ -1085,7 +1085,8 @@ end)
 describe("lurek.compute.Array analytics", function()
 
     -- @description Cumulative sum of [1,2,3,4] should be [1,3,6,10].
-    xit("cumsum produces running total", function()
+    it("cumsum produces running total", function()
+        -- @tests Array:cumsum
         local a = lurek.compute.fromTable({1, 2, 3, 4}, nil, "float32")
         local c = a:cumsum()
         expect_near(1,  c:get(1), 0.001)
@@ -1094,7 +1095,8 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description First-order diff of [1,4,9,16] should give [3,5,7].
-    xit("diff order 1 yields first differences", function()
+    it("diff order 1 yields first differences", function()
+        -- @tests Array:diff
         local a = lurek.compute.fromTable({1, 4, 9, 16}, nil, "float32")
         local d = a:diff(1)
         expect_equal(3, d:getSize())
@@ -1103,7 +1105,8 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description Second-order diff of a quadratic is constant.
-    xit("diff order 2 of quadratic is constant", function()
+    it("diff order 2 of quadratic is constant", function()
+        -- @tests Array:diff
         local a = lurek.compute.fromTable({0, 1, 4, 9, 16}, nil, "float32")
         local d = a:diff(2)
         expect_equal(3, d:getSize())
@@ -1112,7 +1115,8 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description histogram with 2 bins over [0.5,1.5,2.5,3.5] and range [0,4] gives 2 bins each holding 2 items.
-    xit("histogram returns correct bin counts", function()
+    it("histogram returns correct bin counts", function()
+        -- @tests Array:histogram
         local a = lurek.compute.fromTable({0.5, 1.5, 2.5, 3.5}, nil, "float32")
         local h = a:histogram(2, 0, 4)
         expect_equal(2, #h)
@@ -1121,33 +1125,38 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description Median (50th percentile) of [1,2,3,4,5] is 3.
-    xit("percentile 50 is median", function()
+    it("percentile 50 is median", function()
+        -- @tests Array:percentile
         local a = lurek.compute.fromTable({1, 2, 3, 4, 5}, nil, "float32")
         expect_near(3.0, a:percentile(50), 0.001)
     end)
 
     -- @description 100th percentile equals maximum value.
-    xit("percentile 100 equals max", function()
+    it("percentile 100 equals max", function()
+        -- @tests Array:percentile
         local a = lurek.compute.fromTable({3, 1, 4, 1, 5}, nil, "float32")
         expect_near(5.0, a:percentile(100), 0.001)
     end)
 
     -- @description Covariance of an array with itself equals its population variance.
-    xit("covariance of array with itself is its variance", function()
+    it("covariance of array with itself is its variance", function()
+        -- @tests Array:covariance
         local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         -- pop variance of [1,2,3] = 2/3
         expect_near(0.6667, a:covariance(a), 0.01)
     end)
 
     -- @description Pearson correlation of a with 2*a is 1.
-    xit("pearsonCorr of linearly related arrays is 1", function()
+    it("pearsonCorr of linearly related arrays is 1", function()
+        -- @tests Array:pearsonCorr
         local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         local b = lurek.compute.fromTable({2, 4, 6}, nil, "float32")
         expect_near(1.0, a:pearsonCorr(b), 0.001)
     end)
 
     -- @description normalizeRange scales [0,5,10] to [0,0.5,1].
-    xit("normalizeRange scales to [0, 1]", function()
+    it("normalizeRange scales to [0, 1]", function()
+        -- @tests Array:normalizeRange
         local a = lurek.compute.fromTable({0, 5, 10}, nil, "float32")
         local n = a:normalizeRange(0, 1)
         expect_near(0.0, n:get(1), 0.001)
@@ -1156,13 +1165,15 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description zscore of a constant array should error because std dev is 0.
-    xit("zscore of constant array returns error", function()
+    it("zscore of constant array returns error", function()
+        -- @tests Array:zscore
         local a = lurek.compute.fromTable({5, 5, 5}, nil, "float32")
         expect_error(function() a:zscore() end)
     end)
 
     -- @description zscore of non-constant array has mean ~0 and std ~1.
-    xit("zscore normalises mean to zero", function()
+    it("zscore normalises mean to zero", function()
+        -- @tests Array:zscore
         local a = lurek.compute.fromTable({2, 4, 4, 4, 5, 5, 7, 9}, nil, "float32")
         local z = a:zscore()
         local sum = 0
@@ -1171,7 +1182,8 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description Convolving [1,2,3] with identity kernel [1] returns the same array.
-    xit("convolve1d with identity kernel returns input", function()
+    it("convolve1d with identity kernel returns input", function()
+        -- @tests Array:convolve1d
         local sig = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         local ker = lurek.compute.fromTable({1}, nil, "float32")
         local out = sig:convolve1d(ker)
@@ -1181,7 +1193,8 @@ describe("lurek.compute.Array analytics", function()
     end)
 
     -- @description Cross-correlation of signal=[0,1,2,1,0] with template=[1,2,1] peaks at centre.
-    xit("correlate1d peaks at template location", function()
+    it("correlate1d peaks at template location", function()
+        -- @tests Array:correlate1d
         local sig = lurek.compute.fromTable({0, 1, 2, 1, 0}, nil, "float32")
         local tpl = lurek.compute.fromTable({1, 2, 1}, nil, "float32")
         local out = sig:correlate1d(tpl)
@@ -1197,7 +1210,8 @@ end)
 describe("lurek.compute linear algebra", function()
 
     -- @description normalizeVec of [3,4] produces a unit vector [0.6, 0.8].
-    xit("normalizeVec makes unit vector", function()
+    it("normalizeVec makes unit vector", function()
+        -- @tests Array:normalizeVec
         local v = lurek.compute.fromTable({3, 4}, nil, "float64")
         local n = v:normalizeVec()
         expect_near(0.6, n:get(1), 0.001)
@@ -1205,14 +1219,16 @@ describe("lurek.compute linear algebra", function()
     end)
 
     -- @description cross2d of [1,0] and [0,1] is 1.
-    xit("cross2d of standard basis vectors is 1", function()
+    it("cross2d of standard basis vectors is 1", function()
+        -- @tests Array:cross2d
         local a = lurek.compute.fromTable({1, 0}, nil, "float64")
         local b = lurek.compute.fromTable({0, 1}, nil, "float64")
         expect_near(1.0, a:cross2d(b), 0.001)
     end)
 
     -- @description outer product of [1,2] with [3,4,5] gives a 2Ă—3 matrix.
-    xit("outer product has correct shape and values", function()
+    it("outer product has correct shape and values", function()
+        -- @tests Array:outer
         local a = lurek.compute.fromTable({1, 2}, nil, "float64")
         local b = lurek.compute.fromTable({3, 4, 5}, nil, "float64")
         local o = a:outer(b)
@@ -1222,33 +1238,43 @@ describe("lurek.compute linear algebra", function()
     end)
 
     -- @description gaussianKernel(3, 1.0) sums to 1.0.
-    xit("gaussianKernel sums to one", function()
+    it("gaussianKernel sums to one", function()
+        -- @tests lurek.compute.gaussianKernel
         local k = lurek.compute.gaussianKernel(3, 1.0)
         local s = 0
-        for i = 1, k:getSize() do s = s + k:get(i) end
+        for row = 1, 3 do
+            for col = 1, 3 do
+                s = s + k:get(row, col)
+            end
+        end
         expect_near(1.0, s, 0.0001)
     end)
 
     -- @description rotate2dMatrix and transformPoints rotates [1,0] by 90Â°.
-    xit("rotate2dMatrix rotates point by 90 degrees", function()
+    it("rotate2dMatrix rotates point by 90 degrees", function()
+        -- @tests lurek.compute.rotate2dMatrix
+        -- @tests Array:transformPoints
         local m = lurek.compute.rotate2dMatrix(math.pi / 2)
         local pts = lurek.compute.fromTable({1, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
-        expect_near(0.0, out:get(1), 0.001)
-        expect_near(1.0, out:get(2), 0.001)
+        expect_near(0.0, out:get(1, 1), 0.001)
+        expect_near(1.0, out:get(1, 2), 0.001)
     end)
 
     -- @description affine2d with identity-scale and zero rotation gives a translation-only matrix.
-    xit("affine2d translates points correctly", function()
+    it("affine2d translates points correctly", function()
+        -- @tests lurek.compute.affine2d
+        -- @tests Array:transformPoints
         local m = lurek.compute.affine2d(5, 3, 0, 1, 1)
         local pts = lurek.compute.fromTable({0, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
-        expect_near(5.0, out:get(1), 0.001)
-        expect_near(3.0, out:get(2), 0.001)
+        expect_near(5.0, out:get(1, 1), 0.001)
+        expect_near(3.0, out:get(1, 2), 0.001)
     end)
 
     -- @description linsolve solves 2x+y=5, x+3y=10 â†’ x=1, y=3.
-    xit("linsolve gives correct 2x2 solution", function()
+    it("linsolve gives correct 2x2 solution", function()
+        -- @tests Array:linsolve
         local a = lurek.compute.fromTable({2, 1, 1, 3}, nil, "float64"):reshape({2, 2})
         local b = lurek.compute.fromTable({5, 10}, nil, "float64")
         local x = a:linsolve(b)
@@ -1257,11 +1283,12 @@ describe("lurek.compute linear algebra", function()
     end)
 
     -- @description sobel on a flat image returns zero gradients at centre.
-    xit("sobel on flat image gives zero gradient", function()
+    it("sobel on flat image gives zero gradient", function()
+        -- @tests Array:sobel
         local flat = lurek.compute.zeros({5, 5})
         local result = flat:sobel()
-        expect_near(0.0, result.gx:get(13), 0.001) -- centre index
-        expect_near(0.0, result.gy:get(13), 0.001)
+        expect_near(0.0, result.gx:get(3, 3), 0.001)
+        expect_near(0.0, result.gy:get(3, 3), 0.001)
     end)
 
 end)
@@ -1346,27 +1373,6 @@ describe("Missing API Coverage", function()
         -- TODO: Implement test for Array:luDecompose
     end)
 
-end)
-
-describe("Missing explicit test for lurek.compute.gaussianKernel", function()
-    it("lurek.compute.gaussianKernel works", function()
-        -- @tests lurek.compute.gaussianKernel
-        -- TODO: add assertion for lurek.compute.gaussianKernel
-    end)
-end)
-
-describe("Missing explicit test for lurek.compute.rotate2dMatrix", function()
-    it("lurek.compute.rotate2dMatrix works", function()
-        -- @tests lurek.compute.rotate2dMatrix
-        -- TODO: add assertion for lurek.compute.rotate2dMatrix
-    end)
-end)
-
-describe("Missing explicit test for lurek.compute.affine2d", function()
-    it("lurek.compute.affine2d works", function()
-        -- @tests lurek.compute.affine2d
-        -- TODO: add assertion for lurek.compute.affine2d
-    end)
 end)
 
 describe("Missing explicit test for Array:getShape", function()
@@ -1558,108 +1564,10 @@ describe("Missing explicit test for Array:erode", function()
     end)
 end)
 
-describe("Missing explicit test for Array:cumsum", function()
-    it("Array:cumsum works", function()
-        -- @tests Array:cumsum
-        -- TODO: add assertion for Array:cumsum
-    end)
-end)
-
-describe("Missing explicit test for Array:diff", function()
-    it("Array:diff works", function()
-        -- @tests Array:diff
-        -- TODO: add assertion for Array:diff
-    end)
-end)
-
-describe("Missing explicit test for Array:percentile", function()
-    it("Array:percentile works", function()
-        -- @tests Array:percentile
-        -- TODO: add assertion for Array:percentile
-    end)
-end)
-
-describe("Missing explicit test for Array:covariance", function()
-    it("Array:covariance works", function()
-        -- @tests Array:covariance
-        -- TODO: add assertion for Array:covariance
-    end)
-end)
-
-describe("Missing explicit test for Array:pearsonCorr", function()
-    it("Array:pearsonCorr works", function()
-        -- @tests Array:pearsonCorr
-        -- TODO: add assertion for Array:pearsonCorr
-    end)
-end)
-
-describe("Missing explicit test for Array:normalizeRange", function()
-    it("Array:normalizeRange works", function()
-        -- @tests Array:normalizeRange
-        -- TODO: add assertion for Array:normalizeRange
-    end)
-end)
-
-describe("Missing explicit test for Array:zscore", function()
-    it("Array:zscore works", function()
-        -- @tests Array:zscore
-        -- TODO: add assertion for Array:zscore
-    end)
-end)
-
-describe("Missing explicit test for Array:convolve1d", function()
-    it("Array:convolve1d works", function()
-        -- @tests Array:convolve1d
-        -- TODO: add assertion for Array:convolve1d
-    end)
-end)
-
-describe("Missing explicit test for Array:correlate1d", function()
-    it("Array:correlate1d works", function()
-        -- @tests Array:correlate1d
-        -- TODO: add assertion for Array:correlate1d
-    end)
-end)
-
-describe("Missing explicit test for Array:normalizeVec", function()
-    it("Array:normalizeVec works", function()
-        -- @tests Array:normalizeVec
-        -- TODO: add assertion for Array:normalizeVec
-    end)
-end)
-
-describe("Missing explicit test for Array:outer", function()
-    it("Array:outer works", function()
-        -- @tests Array:outer
-        -- TODO: add assertion for Array:outer
-    end)
-end)
-
-describe("Missing explicit test for Array:cross2d", function()
-    it("Array:cross2d works", function()
-        -- @tests Array:cross2d
-        -- TODO: add assertion for Array:cross2d
-    end)
-end)
-
 describe("Missing explicit test for Array:transformPoints", function()
     it("Array:transformPoints works", function()
         -- @tests Array:transformPoints
         -- TODO: add assertion for Array:transformPoints
-    end)
-end)
-
-describe("Missing explicit test for Array:sobel", function()
-    it("Array:sobel works", function()
-        -- @tests Array:sobel
-        -- TODO: add assertion for Array:sobel
-    end)
-end)
-
-describe("Missing explicit test for Array:linsolve", function()
-    it("Array:linsolve works", function()
-        -- @tests Array:linsolve
-        -- TODO: add assertion for Array:linsolve
     end)
 end)
 

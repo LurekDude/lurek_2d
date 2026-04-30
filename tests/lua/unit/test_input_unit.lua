@@ -1,4 +1,4 @@
--- Lurek2D Input API Tests
+﻿-- Lurek2D Input API Tests
 
 -- @description Verifies that the keyboard namespace is exposed on lurek as a table.
 describe("lurek.input.keyboard module exists", function()
@@ -351,7 +351,7 @@ describe("lurek.input.gamepad mapping persistence", function()
     end)
 end)
 
--- â”€â”€ mouse visibility / grab / relative â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ mouse visibility / grab / relative Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Verifies mouse visibility toggles reflect the value last set and restores visibility after the false case.
 describe("mouse.setVisible / isVisible", function()
@@ -424,7 +424,7 @@ describe("mouse.setPosition", function()
     end)
 end)
 
--- â”€â”€ Cursor extended methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Cursor extended methods Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
 
 -- @description Checks Cursor userdata helper methods by creating system cursors, reading the type string, and releasing without error.
 describe("Cursor.getType / Cursor.release", function()
@@ -507,9 +507,9 @@ describe("lurek.input action mapping", function()
   end)
 end)
 
--- ── Input Combo (merged from test_input_combo.lua) ──────────────────────────
+-- â”€â”€ Input Combo (merged from test_input_combo.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-describe("lurek.input.newCombo — basic construction", function()
+describe("lurek.input.newCombo â€” basic construction", function()
 
     it("creates a combo with the correct total step count (string steps)", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -557,7 +557,7 @@ describe("lurek.input.newCombo — basic construction", function()
 
 end)
 
-describe("lurek.input.newCombo — feed() advancement", function()
+describe("lurek.input.newCombo â€” feed() advancement", function()
 
     it("returns 'idle' when wrong first key is fed", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -623,7 +623,7 @@ describe("lurek.input.newCombo — feed() advancement", function()
 
 end)
 
-describe("lurek.input.newCombo — tick() timeout", function()
+describe("lurek.input.newCombo â€” tick() timeout", function()
 
     it("tick returns 'idle' when no combo is in progress", function()
         local combo = lurek.input.newCombo({"a", "b"}, {total_gap=2000})
@@ -634,7 +634,7 @@ describe("lurek.input.newCombo — tick() timeout", function()
     it("tick returns 'in_progress' while within time budget", function()
         local combo = lurek.input.newCombo({{key="a", gap=1000}, {key="b", gap=1000}}, {total_gap=2000})
         combo:feed("a")
-        -- 0.3 s elapsed — well within 1000 ms gap
+        -- 0.3 s elapsed â€” well within 1000 ms gap
         local r = combo:tick(0.3)
         expect_equal(r, "in_progress")
     end)
@@ -669,7 +669,7 @@ describe("lurek.input.newCombo — tick() timeout", function()
 
 end)
 
-describe("lurek.input.newCombo — reset()", function()
+describe("lurek.input.newCombo â€” reset()", function()
 
     it("reset cancels an in-progress combo", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -691,7 +691,7 @@ describe("lurek.input.newCombo — reset()", function()
 
 end)
 
-describe("lurek.input.newCombo — opts.total_gap", function()
+describe("lurek.input.newCombo â€” opts.total_gap", function()
 
     it("custom total_gap is respected", function()
         local combo = lurek.input.newCombo(
@@ -706,7 +706,7 @@ describe("lurek.input.newCombo — opts.total_gap", function()
 
 end)
 
-describe("lurek.input.newCombo — error cases", function()
+describe("lurek.input.newCombo â€” error cases", function()
 
     it("raises error for empty steps table", function()
         expect_error(function()
@@ -722,7 +722,7 @@ describe("lurek.input.newCombo — error cases", function()
 
 end)
 
--- ── Input Recording (merged from test_input_recording.lua) ──────────────────
+-- â”€â”€ Input Recording (merged from test_input_recording.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 describe("input.recording", function()
 
@@ -767,7 +767,7 @@ describe("input.recording", function()
         lurek.input.startRecording()
         local rec = lurek.input.stopRecording()
         local json = rec:toJson()
-        -- load it back — should not raise
+        -- load it back â€” should not raise
         lurek.input.loadRecording(json)
     end)
 
@@ -816,7 +816,7 @@ describe("input.recording", function()
 
 end)
 
--- ── Input Vibrate (merged from test_input_vibrate.lua) ──────────────────────
+-- â”€â”€ Input Vibrate (merged from test_input_vibrate.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Verifies the gamepad vibration stub API.
 
@@ -873,7 +873,7 @@ describe("lurek.input.gamepad.vibrate", function()
   end)
 end)
 
--- ── Joystick Background Events (merged from test_joystick_ext.lua) ──────────
+-- â”€â”€ Joystick Background Events (merged from test_joystick_ext.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 -- @description Covers suite: lurek.input.gamepad.getBackgroundEvents.
 describe("lurek.input.gamepad.getBackgroundEvents", function()
@@ -906,507 +906,3 @@ describe("lurek.input.gamepad.setBackgroundEvents", function()
 end)
 
 test_summary()
-
-describe("Missing explicit test for lurek.input.isDown", function()
-    it("lurek.input.isDown works", function()
-        -- @tests lurek.input.isDown
-        -- TODO: add assertion for lurek.input.isDown
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isScancodeDown", function()
-    it("lurek.input.isScancodeDown works", function()
-        -- @tests lurek.input.isScancodeDown
-        -- TODO: add assertion for lurek.input.isScancodeDown
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setKeyRepeat", function()
-    it("lurek.input.setKeyRepeat works", function()
-        -- @tests lurek.input.setKeyRepeat
-        -- TODO: add assertion for lurek.input.setKeyRepeat
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.hasKeyRepeat", function()
-    it("lurek.input.hasKeyRepeat works", function()
-        -- @tests lurek.input.hasKeyRepeat
-        -- TODO: add assertion for lurek.input.hasKeyRepeat
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setTextInput", function()
-    it("lurek.input.setTextInput works", function()
-        -- @tests lurek.input.setTextInput
-        -- TODO: add assertion for lurek.input.setTextInput
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.hasTextInput", function()
-    it("lurek.input.hasTextInput works", function()
-        -- @tests lurek.input.hasTextInput
-        -- TODO: add assertion for lurek.input.hasTextInput
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getScancodeFromKey", function()
-    it("lurek.input.getScancodeFromKey works", function()
-        -- @tests lurek.input.getScancodeFromKey
-        -- TODO: add assertion for lurek.input.getScancodeFromKey
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getKeyFromScancode", function()
-    it("lurek.input.getKeyFromScancode works", function()
-        -- @tests lurek.input.getKeyFromScancode
-        -- TODO: add assertion for lurek.input.getKeyFromScancode
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isModifierActive", function()
-    it("lurek.input.isModifierActive works", function()
-        -- @tests lurek.input.isModifierActive
-        -- TODO: add assertion for lurek.input.isModifierActive
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getPosition", function()
-    it("lurek.input.getPosition works", function()
-        -- @tests lurek.input.getPosition
-        -- TODO: add assertion for lurek.input.getPosition
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getX", function()
-    it("lurek.input.getX works", function()
-        -- @tests lurek.input.getX
-        -- TODO: add assertion for lurek.input.getX
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getY", function()
-    it("lurek.input.getY works", function()
-        -- @tests lurek.input.getY
-        -- TODO: add assertion for lurek.input.getY
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isDown", function()
-    it("lurek.input.isDown works", function()
-        -- @tests lurek.input.isDown
-        -- TODO: add assertion for lurek.input.isDown
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setVisible", function()
-    it("lurek.input.setVisible works", function()
-        -- @tests lurek.input.setVisible
-        -- TODO: add assertion for lurek.input.setVisible
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isVisible", function()
-    it("lurek.input.isVisible works", function()
-        -- @tests lurek.input.isVisible
-        -- TODO: add assertion for lurek.input.isVisible
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setGrabbed", function()
-    it("lurek.input.setGrabbed works", function()
-        -- @tests lurek.input.setGrabbed
-        -- TODO: add assertion for lurek.input.setGrabbed
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isGrabbed", function()
-    it("lurek.input.isGrabbed works", function()
-        -- @tests lurek.input.isGrabbed
-        -- TODO: add assertion for lurek.input.isGrabbed
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setRelativeMode", function()
-    it("lurek.input.setRelativeMode works", function()
-        -- @tests lurek.input.setRelativeMode
-        -- TODO: add assertion for lurek.input.setRelativeMode
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getRelativeMode", function()
-    it("lurek.input.getRelativeMode works", function()
-        -- @tests lurek.input.getRelativeMode
-        -- TODO: add assertion for lurek.input.getRelativeMode
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setPosition", function()
-    it("lurek.input.setPosition works", function()
-        -- @tests lurek.input.setPosition
-        -- TODO: add assertion for lurek.input.setPosition
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setCursor", function()
-    it("lurek.input.setCursor works", function()
-        -- @tests lurek.input.setCursor
-        -- TODO: add assertion for lurek.input.setCursor
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.newCursor", function()
-    it("lurek.input.newCursor works", function()
-        -- @tests lurek.input.newCursor
-        -- TODO: add assertion for lurek.input.newCursor
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getSystemCursor", function()
-    it("lurek.input.getSystemCursor works", function()
-        -- @tests lurek.input.getSystemCursor
-        -- TODO: add assertion for lurek.input.getSystemCursor
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isCursorSupported", function()
-    it("lurek.input.isCursorSupported works", function()
-        -- @tests lurek.input.isCursorSupported
-        -- TODO: add assertion for lurek.input.isCursorSupported
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getCursor", function()
-    it("lurek.input.getCursor works", function()
-        -- @tests lurek.input.getCursor
-        -- TODO: add assertion for lurek.input.getCursor
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getWheelDelta", function()
-    it("lurek.input.getWheelDelta works", function()
-        -- @tests lurek.input.getWheelDelta
-        -- TODO: add assertion for lurek.input.getWheelDelta
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getCount", function()
-    it("lurek.input.getCount works", function()
-        -- @tests lurek.input.getCount
-        -- TODO: add assertion for lurek.input.getCount
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getJoystickCount", function()
-    it("lurek.input.getJoystickCount works", function()
-        -- @tests lurek.input.getJoystickCount
-        -- TODO: add assertion for lurek.input.getJoystickCount
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getJoysticks", function()
-    it("lurek.input.getJoysticks works", function()
-        -- @tests lurek.input.getJoysticks
-        -- TODO: add assertion for lurek.input.getJoysticks
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isConnected", function()
-    it("lurek.input.isConnected works", function()
-        -- @tests lurek.input.isConnected
-        -- TODO: add assertion for lurek.input.isConnected
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getName", function()
-    it("lurek.input.getName works", function()
-        -- @tests lurek.input.getName
-        -- TODO: add assertion for lurek.input.getName
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isGamepad", function()
-    it("lurek.input.isGamepad works", function()
-        -- @tests lurek.input.isGamepad
-        -- TODO: add assertion for lurek.input.isGamepad
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getButtonCount", function()
-    it("lurek.input.getButtonCount works", function()
-        -- @tests lurek.input.getButtonCount
-        -- TODO: add assertion for lurek.input.getButtonCount
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getAxisCount", function()
-    it("lurek.input.getAxisCount works", function()
-        -- @tests lurek.input.getAxisCount
-        -- TODO: add assertion for lurek.input.getAxisCount
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isDown", function()
-    it("lurek.input.isDown works", function()
-        -- @tests lurek.input.isDown
-        -- TODO: add assertion for lurek.input.isDown
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getAxis", function()
-    it("lurek.input.getAxis works", function()
-        -- @tests lurek.input.getAxis
-        -- TODO: add assertion for lurek.input.getAxis
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isVibrationSupported", function()
-    it("lurek.input.isVibrationSupported works", function()
-        -- @tests lurek.input.isVibrationSupported
-        -- TODO: add assertion for lurek.input.isVibrationSupported
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.vibrate", function()
-    it("lurek.input.vibrate works", function()
-        -- @tests lurek.input.vibrate
-        -- TODO: add assertion for lurek.input.vibrate
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getGUID", function()
-    it("lurek.input.getGUID works", function()
-        -- @tests lurek.input.getGUID
-        -- TODO: add assertion for lurek.input.getGUID
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getHat", function()
-    it("lurek.input.getHat works", function()
-        -- @tests lurek.input.getHat
-        -- TODO: add assertion for lurek.input.getHat
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setVibration", function()
-    it("lurek.input.setVibration works", function()
-        -- @tests lurek.input.setVibration
-        -- TODO: add assertion for lurek.input.setVibration
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setBackgroundEvents", function()
-    it("lurek.input.setBackgroundEvents works", function()
-        -- @tests lurek.input.setBackgroundEvents
-        -- TODO: add assertion for lurek.input.setBackgroundEvents
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getBackgroundEvents", function()
-    it("lurek.input.getBackgroundEvents works", function()
-        -- @tests lurek.input.getBackgroundEvents
-        -- TODO: add assertion for lurek.input.getBackgroundEvents
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.setGamepadMapping", function()
-    it("lurek.input.setGamepadMapping works", function()
-        -- @tests lurek.input.setGamepadMapping
-        -- TODO: add assertion for lurek.input.setGamepadMapping
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getGamepadMappingString", function()
-    it("lurek.input.getGamepadMappingString works", function()
-        -- @tests lurek.input.getGamepadMappingString
-        -- TODO: add assertion for lurek.input.getGamepadMappingString
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.loadGamepadMappings", function()
-    it("lurek.input.loadGamepadMappings works", function()
-        -- @tests lurek.input.loadGamepadMappings
-        -- TODO: add assertion for lurek.input.loadGamepadMappings
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.saveGamepadMappings", function()
-    it("lurek.input.saveGamepadMappings works", function()
-        -- @tests lurek.input.saveGamepadMappings
-        -- TODO: add assertion for lurek.input.saveGamepadMappings
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getTouches", function()
-    it("lurek.input.getTouches works", function()
-        -- @tests lurek.input.getTouches
-        -- TODO: add assertion for lurek.input.getTouches
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getPosition", function()
-    it("lurek.input.getPosition works", function()
-        -- @tests lurek.input.getPosition
-        -- TODO: add assertion for lurek.input.getPosition
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getPressure", function()
-    it("lurek.input.getPressure works", function()
-        -- @tests lurek.input.getPressure
-        -- TODO: add assertion for lurek.input.getPressure
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getTouchCount", function()
-    it("lurek.input.getTouchCount works", function()
-        -- @tests lurek.input.getTouchCount
-        -- TODO: add assertion for lurek.input.getTouchCount
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.newCombo", function()
-    it("lurek.input.newCombo works", function()
-        -- @tests lurek.input.newCombo
-        -- TODO: add assertion for lurek.input.newCombo
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.startRecording", function()
-    it("lurek.input.startRecording works", function()
-        -- @tests lurek.input.startRecording
-        -- TODO: add assertion for lurek.input.startRecording
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.stopRecording", function()
-    it("lurek.input.stopRecording works", function()
-        -- @tests lurek.input.stopRecording
-        -- TODO: add assertion for lurek.input.stopRecording
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.loadRecording", function()
-    it("lurek.input.loadRecording works", function()
-        -- @tests lurek.input.loadRecording
-        -- TODO: add assertion for lurek.input.loadRecording
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.startPlayback", function()
-    it("lurek.input.startPlayback works", function()
-        -- @tests lurek.input.startPlayback
-        -- TODO: add assertion for lurek.input.startPlayback
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.stopPlayback", function()
-    it("lurek.input.stopPlayback works", function()
-        -- @tests lurek.input.stopPlayback
-        -- TODO: add assertion for lurek.input.stopPlayback
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isRecording", function()
-    it("lurek.input.isRecording works", function()
-        -- @tests lurek.input.isRecording
-        -- TODO: add assertion for lurek.input.isRecording
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.isPlayingBack", function()
-    it("lurek.input.isPlayingBack works", function()
-        -- @tests lurek.input.isPlayingBack
-        -- TODO: add assertion for lurek.input.isPlayingBack
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.getPlaybackFrame", function()
-    it("lurek.input.getPlaybackFrame works", function()
-        -- @tests lurek.input.getPlaybackFrame
-        -- TODO: add assertion for lurek.input.getPlaybackFrame
-    end)
-end)
-
-describe("Missing explicit test for lurek.input.advancePlayback", function()
-    it("lurek.input.advancePlayback works", function()
-        -- @tests lurek.input.advancePlayback
-        -- TODO: add assertion for lurek.input.advancePlayback
-    end)
-end)
-
-describe("Missing explicit test for Cursor:release", function()
-    it("Cursor:release works", function()
-        -- @tests Cursor:release
-        -- TODO: add assertion for Cursor:release
-    end)
-end)
-
-describe("Missing explicit test for Cursor:getType", function()
-    it("Cursor:getType works", function()
-        -- @tests Cursor:getType
-        -- TODO: add assertion for Cursor:getType
-    end)
-end)
-
-describe("Missing explicit test for Combo:feed", function()
-    it("Combo:feed works", function()
-        -- @tests Combo:feed
-        -- TODO: add assertion for Combo:feed
-    end)
-end)
-
-describe("Missing explicit test for Combo:tick", function()
-    it("Combo:tick works", function()
-        -- @tests Combo:tick
-        -- TODO: add assertion for Combo:tick
-    end)
-end)
-
-describe("Missing explicit test for Combo:reset", function()
-    it("Combo:reset works", function()
-        -- @tests Combo:reset
-        -- TODO: add assertion for Combo:reset
-    end)
-end)
-
-describe("Missing explicit test for Combo:totalSteps", function()
-    it("Combo:totalSteps works", function()
-        -- @tests Combo:totalSteps
-        -- TODO: add assertion for Combo:totalSteps
-    end)
-end)
-
-describe("Missing explicit test for Combo:isInProgress", function()
-    it("Combo:isInProgress works", function()
-        -- @tests Combo:isInProgress
-        -- TODO: add assertion for Combo:isInProgress
-    end)
-end)
-
-describe("Missing explicit test for Combo:getStep", function()
-    it("Combo:getStep works", function()
-        -- @tests Combo:getStep
-        -- TODO: add assertion for Combo:getStep
-    end)
-end)
-
-describe("Missing explicit test for InputRecording:toJson", function()
-    it("InputRecording:toJson works", function()
-        -- @tests InputRecording:toJson
-        -- TODO: add assertion for InputRecording:toJson
-    end)
-end)
-
-describe("Missing explicit test for InputRecording:totalFrames", function()
-    it("InputRecording:totalFrames works", function()
-        -- @tests InputRecording:totalFrames
-        -- TODO: add assertion for InputRecording:totalFrames
-    end)
-end)
-
-describe("Missing explicit test for InputRecording:frameCount", function()
-    it("InputRecording:frameCount works", function()
-        -- @tests InputRecording:frameCount
-        -- TODO: add assertion for InputRecording:frameCount
-    end)
-end)

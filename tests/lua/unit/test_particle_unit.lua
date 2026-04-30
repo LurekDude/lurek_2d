@@ -1561,11 +1561,19 @@ describe("ParticleSystem:setOnDeathBatch extensibility", function()
     end)
 end)
 
--- @description Verifies lurek.particle.fromTOML is available as a function.
+-- @description Verifies lurek.particle.fromTOML loads a TOML-backed particle config file into a usable particle-system handle.
 describe("lurek.particle.fromTOML extensibility", function()
     -- @tests lurek.particle.fromTOML
-    it("fromTOML is a function", function()
+    it("fromTOML loads config from file", function()
         expect_type("function", lurek.particle.fromTOML)
+
+        local ps = lurek.particle.fromTOML("save/particle_test.toml")
+        expect_type("userdata", ps)
+        expect_near(30.0, lurek.particle.getEmissionRate(ps), 0.001)
+
+        local min_life, max_life = lurek.particle.getParticleLifetime(ps)
+        expect_near(0.5, min_life, 0.001)
+        expect_near(2.0, max_life, 0.001)
     end)
 end)
 

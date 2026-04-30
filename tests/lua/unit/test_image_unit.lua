@@ -1763,79 +1763,95 @@ describe("ImageData:mapPixels", function()
     end)
 end)
 
-test_summary()
-
 -- =========================================================================
 -- Missing API Coverage Stubs
 -- =========================================================================
 
-describe("Missing API Coverage", function()
+describe("image palette and province coverage", function()
     -- @tests lurek.image.newPaletteLut
-    it("covers lurek.image.newPaletteLut", function()
-        -- TODO: Implement test for lurek.image.newPaletteLut
-    end)
-
-    -- @tests lurek.image.newProvinceGrid
-    it("covers lurek.image.newProvinceGrid", function()
-        -- TODO: Implement test for lurek.image.newProvinceGrid
-    end)
-
-    -- @tests CompressedImageData:getMipmapCount
-    it("covers CompressedImageData:getMipmapCount", function()
-        -- TODO: Implement test for CompressedImageData:getMipmapCount
+    -- @tests PaletteLUT:getColorCount
+    -- @description Verifies a new palette LUT starts empty and tracks appended mappings.
+    it("newPaletteLut starts empty and counts entries", function()
+        local lut = lurek.image.newPaletteLut()
+        expect_equal(0, lut:getColorCount())
+        lut:setColor(255, 0, 0, 255, 0, 255, 0, 255)
+        expect_equal(1, lut:getColorCount())
+        lut:setColor(0, 0, 255, 255, 255, 255, 0, 255)
+        expect_equal(2, lut:getColorCount())
     end)
 
     -- @tests mlua:applyPaletteLut
-    it("covers mlua:applyPaletteLut", function()
-        -- TODO: Implement test for mlua:applyPaletteLut
+    -- @description Verifies applyPaletteLut remaps only exact colour matches and leaves unrelated pixels unchanged.
+    it("applyPaletteLut replaces matching pixels", function()
+        local img = lurek.image.newImageData(2, 1)
+        local lut = lurek.image.newPaletteLut()
+        img:setPixel(0, 0, 255, 0, 0, 255)
+        img:setPixel(1, 0, 0, 0, 255, 255)
+        lut:setColor(255, 0, 0, 255, 0, 255, 0, 255)
+
+        img:applyPaletteLut(lut)
+
+        local r1, g1, b1, a1 = img:getPixel(0, 0)
+        local r2, g2, b2, a2 = img:getPixel(1, 0)
+        expect_equal(0, r1)
+        expect_equal(255, g1)
+        expect_equal(0, b1)
+        expect_equal(255, a1)
+        expect_equal(0, r2)
+        expect_equal(0, g2)
+        expect_equal(255, b2)
+        expect_equal(255, a2)
     end)
 
-    -- @tests PaletteLUT:getColorCount
-    it("covers PaletteLUT:getColorCount", function()
-        -- TODO: Implement test for PaletteLUT:getColorCount
-    end)
+    -- @tests lurek.image.savePNG
+    -- @tests lurek.image.newProvinceGrid
+    -- @tests ProvinceGrid:getWidth
+    -- @tests ProvinceGrid:getHeight
+    -- @tests ProvinceGrid:getAt
+    -- @tests ProvinceGrid:provinceCount
+    -- @tests ProvinceGrid:adjacencies
+    -- @description Builds a tiny RGB province map, saves it as PNG, reloads it as a ProvinceGrid, and verifies dimensions, IDs, background handling, and adjacency output.
+    it("savePNG and newProvinceGrid build a usable province map", function()
+        local img = lurek.image.newImageData(4, 4)
+        local path = "save/_province_grid_test.png"
 
-end)
+        for y = 0, 1 do
+            for x = 0, 1 do
+                img:setPixel(x, y, 255, 0, 0, 255)
+            end
+        end
+        for y = 0, 1 do
+            for x = 2, 3 do
+                img:setPixel(x, y, 0, 255, 0, 255)
+            end
+        end
+        for x = 0, 3 do
+            img:setPixel(x, 2, 0, 0, 255, 255)
+        end
 
-describe("Missing explicit test for lurek.image.savePNG", function()
-    it("lurek.image.savePNG works", function()
-        -- @tests lurek.image.savePNG
-        -- TODO: add assertion for lurek.image.savePNG
-    end)
-end)
+        lurek.image.savePNG(img, path)
+        local grid = lurek.image.newProvinceGrid(path)
+        local adj = grid:adjacencies()
+        local red = grid:getAt(0, 0)
+        local green = grid:getAt(2, 0)
+        local blue = grid:getAt(0, 2)
 
-describe("Missing explicit test for ProvinceGrid:getWidth", function()
-    it("ProvinceGrid:getWidth works", function()
-        -- @tests ProvinceGrid:getWidth
-        -- TODO: add assertion for ProvinceGrid:getWidth
-    end)
-end)
-
-describe("Missing explicit test for ProvinceGrid:getHeight", function()
-    it("ProvinceGrid:getHeight works", function()
-        -- @tests ProvinceGrid:getHeight
-        -- TODO: add assertion for ProvinceGrid:getHeight
-    end)
-end)
-
-describe("Missing explicit test for ProvinceGrid:getAt", function()
-    it("ProvinceGrid:getAt works", function()
-        -- @tests ProvinceGrid:getAt
-        -- TODO: add assertion for ProvinceGrid:getAt
-    end)
-end)
-
-describe("Missing explicit test for ProvinceGrid:provinceCount", function()
-    it("ProvinceGrid:provinceCount works", function()
-        -- @tests ProvinceGrid:provinceCount
-        -- TODO: add assertion for ProvinceGrid:provinceCount
-    end)
-end)
-
-describe("Missing explicit test for ProvinceGrid:adjacencies", function()
-    it("ProvinceGrid:adjacencies works", function()
-        -- @tests ProvinceGrid:adjacencies
-        -- TODO: add assertion for ProvinceGrid:adjacencies
+        expect_equal(4, grid:getWidth())
+        expect_equal(4, grid:getHeight())
+        expect_equal(3, grid:provinceCount())
+        expect_equal(red, grid:getAt(1, 1))
+        expect_true(red > 0)
+        expect_true(green > 0)
+        expect_true(blue > 0)
+        expect_true(red ~= green)
+        expect_true(red ~= blue)
+        expect_true(green ~= blue)
+        expect_equal(0, grid:getAt(0, 3))
+        expect_type("table", adj)
+        expect_true(#adj >= 3)
+        expect_type("number", adj[1].province_a)
+        expect_type("number", adj[1].province_b)
+        expect_type("number", adj[1].border_pixels)
     end)
 end)
 
@@ -2188,3 +2204,5 @@ describe("Missing explicit test for PaletteLUT:clear", function()
         -- TODO: add assertion for PaletteLUT:clear
     end)
 end)
+
+test_summary()

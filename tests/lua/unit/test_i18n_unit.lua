@@ -426,36 +426,85 @@ describe("localization format helpers (RS parity)", function()
     end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Covers helper APIs that were previously left as placeholders by asserting callback payloads, locale-aware formatting, gender fallback, and loaded locale enumeration.
+describe("lurek.i18n helper coverage", function()
     -- @tests lurek.i18n.onLanguageChange
-    it("covers lurek.i18n.onLanguageChange", function()
-        -- TODO: Implement test for lurek.i18n.onLanguageChange
+    -- @description Registers an onLanguageChange callback, switches from en to fr, and verifies the callback receives both the new and old locale codes.
+    it("onLanguageChange receives new and old locale codes", function()
+        setup_en_fr()
+        lurek.i18n.offChange()
+
+        local new_locale = nil
+        local old_locale = nil
+
+        lurek.i18n.onLanguageChange(function(next_locale, previous_locale)
+            new_locale = next_locale
+            old_locale = previous_locale
+        end)
+
+        lurek.i18n.setLanguage("fr")
+
+        expect_equal("fr", new_locale)
+        expect_equal("en", old_locale)
+
+        lurek.i18n.offChange()
     end)
 
     -- @tests lurek.i18n.formatNumber
-    it("covers lurek.i18n.formatNumber", function()
-        -- TODO: Implement test for lurek.i18n.formatNumber
+    -- @description Sets a French locale and verifies formatNumber applies comma decimals and dot thousands separators with rounding.
+    it("formatNumber applies locale separators and decimals", function()
+        setup_en_fr()
+        lurek.i18n.setLanguage("fr")
+
+        local formatted = lurek.i18n.formatNumber(12345.678, { decimals = 2 })
+
+        expect_equal("12.345,68", formatted)
     end)
 
     -- @tests lurek.i18n.formatDate
-    it("covers lurek.i18n.formatDate", function()
-        -- TODO: Implement test for lurek.i18n.formatDate
+    -- @description Formats the Unix epoch using both iso and short variants and verifies the returned strings are deterministic for English.
+    it("formatDate supports iso and short formats", function()
+        setup_en_fr()
+        lurek.i18n.setLanguage("en")
+
+        expect_equal("1970-01-01", lurek.i18n.formatDate(0, "iso"))
+        expect_equal("Jan 1, 1970", lurek.i18n.formatDate(0, "short"))
     end)
 
     -- @tests lurek.i18n.tGender
-    it("covers lurek.i18n.tGender", function()
-        -- TODO: Implement test for lurek.i18n.tGender
+    -- @description Resolves a masculine variant when present and falls back to the base key when the requested gender-specific key does not exist.
+    it("tGender resolves gendered keys and falls back to base key", function()
+        setup_en_fr()
+        lurek.i18n.setKey("en", "title", "Captain {name}")
+        lurek.i18n.setKey("en", "title.masculine", "Sir {name}")
+
+        local masculine = lurek.i18n.tGender("title", "masculine", { name = "Alex" })
+        local fallback = lurek.i18n.tGender("title", "neutral", { name = "Alex" })
+
+        expect_equal("Sir Alex", masculine)
+        expect_equal("Captain Alex", fallback)
     end)
 
     -- @tests lurek.i18n.getLoadedLocales
-    it("covers lurek.i18n.getLoadedLocales", function()
-        -- TODO: Implement test for lurek.i18n.getLoadedLocales
-    end)
+    -- @description Loads a temporary locale and verifies getLoadedLocales returns a table containing all expected locale names without depending on iteration order.
+    it("getLoadedLocales returns every loaded locale", function()
+        setup_en_fr()
+        lurek.i18n.loadTable("zz_loaded", { hello = "Ciao" })
 
+        local locales = lurek.i18n.getLoadedLocales()
+        local seen = {}
+
+        expect_type("table", locales)
+        for _, locale in ipairs(locales) do
+            seen[locale] = true
+        end
+
+        expect_true(seen["en"] ~= nil, "expected en to be listed")
+        expect_true(seen["fr"] ~= nil, "expected fr to be listed")
+        expect_true(seen["zz_loaded"] ~= nil, "expected zz_loaded to be listed")
+
+        lurek.i18n.unloadTable("zz_loaded")
+    end)
 end)
+
+test_summary()

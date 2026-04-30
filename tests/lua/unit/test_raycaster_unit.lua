@@ -170,6 +170,20 @@ describe("lurek.raycaster", function()
                 expect_type("number", v)
             end
         end)
+
+        -- @tests lurek.raycaster.new
+        -- @description Verifies castRaysFlat returns exactly five floats per ray.
+        it("returns count * 5 flat values", function()
+            local rc = lurek.raycaster.new(8, 8)
+            for i = 0, 7 do
+                rc:setCell(i, 0, 1)
+                rc:setCell(i, 7, 1)
+                rc:setCell(0, i, 1)
+                rc:setCell(7, i, 1)
+            end
+            local flat = rc:castRaysFlat(4.0, 4.0, 0.0, math.pi / 3, 5, 20.0)
+            expect_equal(25, #flat)
+        end)
     end)
 
     -- @description Covers suite: lineOfSight(x1, y1, x2, y2).
@@ -212,6 +226,14 @@ describe("lurek.raycaster", function()
             expect_type("number", sp.scale)
             expect_type("number", sp.distance)
             expect_type("boolean", sp.visible)
+        end)
+
+        -- @tests lurek.raycaster.new
+        -- @description Verifies a sprite behind the camera is reported as not visible.
+        it("reports sprites behind the camera as invisible", function()
+            local rc = lurek.raycaster.new(8, 8)
+            local sp = rc:projectSprite(3.0, 3.0, 5.0, 5.0, 0.0, math.pi / 3, 320.0)
+            expect_false(sp.visible)
         end)
     end)
 end)
@@ -540,149 +562,86 @@ describe("raycaster transparent walls", function()
   end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Covers the constructor and core userdata methods that previously existed only as placeholder stubs.
+describe("raycaster constructor and userdata coverage", function()
     -- @tests lurek.raycaster.newDoorManager
-    it("covers lurek.raycaster.newDoorManager", function()
-        -- TODO: Implement test for lurek.raycaster.newDoorManager
-    end)
-
-    -- @tests lurek.raycaster.newHeightMap
-    it("covers lurek.raycaster.newHeightMap", function()
-        -- TODO: Implement test for lurek.raycaster.newHeightMap
-    end)
-
-    -- @tests lurek.raycaster.newPointLight
-    it("covers lurek.raycaster.newPointLight", function()
-        -- TODO: Implement test for lurek.raycaster.newPointLight
+    -- @tests DoorManager:count
+    -- @tests DoorManager:type
+    -- @tests DoorManager:typeOf
+    -- @description Creates a door manager and verifies it starts empty with the expected userdata type information.
+    it("newDoorManager creates an empty LDoorManager", function()
+        local dm = lurek.raycaster.newDoorManager()
+        expect_equal(0, dm:count())
+        expect_equal("LDoorManager", dm:type())
+        expect_true(dm:typeOf("DoorManager"))
     end)
 
     -- @tests DoorManager:openDoor
-    it("covers DoorManager:openDoor", function()
-        -- TODO: Implement test for DoorManager:openDoor
-    end)
-
     -- @tests DoorManager:closeDoor
-    it("covers DoorManager:closeDoor", function()
-        -- TODO: Implement test for DoorManager:closeDoor
-    end)
-
     -- @tests DoorManager:getDoor
-    it("covers DoorManager:getDoor", function()
-        -- TODO: Implement test for DoorManager:getDoor
+    -- @tests DoorManager:update
+    -- @description Adds a door, opens it, advances halfway, closes it again, and verifies the reported door state table updates across the full cycle.
+    it("DoorManager updates openAmount and state across open/close cycle", function()
+        local dm = lurek.raycaster.newDoorManager()
+        local idx = dm:addDoor(1, 1, "vertical", 1.0)
+
+        local closed = dm:getDoor(idx)
+        expect_equal("closed", closed.state)
+        expect_near(0.0, closed.openAmount, 1e-5)
+
+        dm:openDoor(idx)
+        dm:update(0.5)
+        local opening = dm:getDoor(idx)
+        expect_equal("opening", opening.state)
+        expect_near(0.5, opening.openAmount, 1e-5)
+
+        dm:update(0.6)
+        local open = dm:getDoor(idx)
+        expect_equal("open", open.state)
+        expect_near(1.0, open.openAmount, 1e-5)
+
+        dm:closeDoor(idx)
+        dm:update(1.1)
+        local closed_again = dm:getDoor(idx)
+        expect_equal("closed", closed_again.state)
+        expect_near(0.0, closed_again.openAmount, 1e-5)
     end)
 
+    -- @tests lurek.raycaster.newHeightMap
     -- @tests HeightMap:setFloor
-    it("covers HeightMap:setFloor", function()
-        -- TODO: Implement test for HeightMap:setFloor
-    end)
-
     -- @tests HeightMap:setCeiling
-    it("covers HeightMap:setCeiling", function()
-        -- TODO: Implement test for HeightMap:setCeiling
-    end)
-
     -- @tests HeightMap:floorAt
-    it("covers HeightMap:floorAt", function()
-        -- TODO: Implement test for HeightMap:floorAt
-    end)
-
     -- @tests HeightMap:ceilingAt
-    it("covers HeightMap:ceilingAt", function()
-        -- TODO: Implement test for HeightMap:ceilingAt
+    -- @tests HeightMap:type
+    -- @tests HeightMap:typeOf
+    -- @description Creates a height map, verifies default floor and ceiling values, then applies setters and checks the updated values and userdata type helpers.
+    it("newHeightMap defaults and setters round-trip", function()
+        local hm = lurek.raycaster.newHeightMap(4, 4)
+        expect_equal("LHeightMap", hm:type())
+        expect_true(hm:typeOf("HeightMap"))
+        expect_near(0.0, hm:floorAt(0, 0), 1e-5)
+        expect_near(1.0, hm:ceilingAt(0, 0), 1e-5)
+
+        hm:setFloor(1, 2, 0.25)
+        hm:setCeiling(1, 2, 0.75)
+
+        expect_near(0.25, hm:floorAt(1, 2), 1e-5)
+        expect_near(0.75, hm:ceilingAt(1, 2), 1e-5)
     end)
 
-    -- @tests PointLight:x
-    it("covers PointLight:x", function()
-        -- TODO: Implement test for PointLight:x
-    end)
-
-    -- @tests PointLight:y
-    it("covers PointLight:y", function()
-        -- TODO: Implement test for PointLight:y
-    end)
-
-end)
-
-describe("Missing explicit test for lurek.raycaster.newMap", function()
-    it("lurek.raycaster.newMap works", function()
-        -- @tests lurek.raycaster.newMap
-        -- TODO: add assertion for lurek.raycaster.newMap
-    end)
-end)
-
-describe("Missing explicit test for lurek.raycaster.newSpriteManager", function()
-    it("lurek.raycaster.newSpriteManager works", function()
-        -- @tests lurek.raycaster.newSpriteManager
-        -- TODO: add assertion for lurek.raycaster.newSpriteManager
-    end)
-end)
-
-describe("Missing explicit test for DoorManager:update", function()
-    it("DoorManager:update works", function()
-        -- @tests DoorManager:update
-        -- TODO: add assertion for DoorManager:update
-    end)
-end)
-
-describe("Missing explicit test for DoorManager:count", function()
-    it("DoorManager:count works", function()
-        -- @tests DoorManager:count
-        -- TODO: add assertion for DoorManager:count
-    end)
-end)
-
-describe("Missing explicit test for DoorManager:type", function()
-    it("DoorManager:type works", function()
-        -- @tests DoorManager:type
-        -- TODO: add assertion for DoorManager:type
-    end)
-end)
-
-describe("Missing explicit test for DoorManager:typeOf", function()
-    it("DoorManager:typeOf works", function()
-        -- @tests DoorManager:typeOf
-        -- TODO: add assertion for DoorManager:typeOf
-    end)
-end)
-
-describe("Missing explicit test for HeightMap:type", function()
-    it("HeightMap:type works", function()
-        -- @tests HeightMap:type
-        -- TODO: add assertion for HeightMap:type
-    end)
-end)
-
-describe("Missing explicit test for HeightMap:typeOf", function()
-    it("HeightMap:typeOf works", function()
-        -- @tests HeightMap:typeOf
-        -- TODO: add assertion for HeightMap:typeOf
-    end)
-end)
-
-describe("Missing explicit test for PointLight:radius", function()
-    it("PointLight:radius works", function()
-        -- @tests PointLight:radius
-        -- TODO: add assertion for PointLight:radius
-    end)
-end)
-
-describe("Missing explicit test for PointLight:intensity", function()
-    it("PointLight:intensity works", function()
-        -- @tests PointLight:intensity
-        -- TODO: add assertion for PointLight:intensity
-    end)
-end)
-
-describe("Missing explicit test for PointLight:color", function()
-    it("PointLight:color works", function()
-        -- @tests PointLight:color
-        -- TODO: add assertion for PointLight:color
+    -- @tests lurek.raycaster.newPointLight
+    -- @tests PointLight:radius
+    -- @tests PointLight:intensity
+    -- @tests PointLight:color
+    -- @description Creates a point light and verifies its radius, intensity, and RGB color accessors expose the constructor values.
+    it("newPointLight exposes configured radius intensity and color", function()
+        local pl = lurek.raycaster.newPointLight(10.0, 20.0, 0.2, 0.4, 0.6, 5.0, 0.8)
+        local r, g, b = pl:color()
+        expect_near(5.0, pl:radius(), 1e-5)
+        expect_near(0.8, pl:intensity(), 1e-5)
+        expect_near(0.2, r, 1e-5)
+        expect_near(0.4, g, 1e-5)
+        expect_near(0.6, b, 1e-5)
     end)
 end)
 

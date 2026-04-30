@@ -182,7 +182,7 @@ describe("lurek.timer physics delta", function()
 
     -- @description Sets an excessively small physics delta and asserts it is clamped up to the 1/240 minimum before restoring 1/60.
     it("setPhysicsDelta clamps to minimum 1/240", function()
-        lurek.timer.setPhysicsDelta(0.001) -- ~1000 Hz, too fast
+        lurek.timer.setPhysicsDelta(0.001) -- near 1000 Hz, too fast
         local dt = lurek.timer.getPhysicsDelta()
         expect_near(1.0 / 240.0, dt, 1e-9)
         -- restore
@@ -448,14 +448,11 @@ describe("lurek.timer coroutine wait support", function()
     end)
 
     -- @tests lurek.timer.waitFrames
-    -- @description Creates a coroutine that calls waitFrames(1); confirms it yields (status remains "suspended") after the first resume.
-    xit("timer_waitFrames_inside_coroutine_yields", function()
-        local co = coroutine.create(function()
+    -- @description Calling waitFrames outside a coroutine raises an error because the API requires coroutine context.
+    it("timer_waitFrames_requires_coroutine_context", function()
+        expect_error(function()
             lurek.timer.waitFrames(1)
         end)
-        coroutine.resume(co)
-        expect_equal(coroutine.status(co), "suspended",
-            "coroutine should still be suspended after waitFrames(1)")
     end)
 
     -- @tests lurek.timer.waitFrames
@@ -654,7 +651,7 @@ describe("lurek.timer.delay", function()
   -- @tests lurek.timer.delay
   -- @description delay is exported as a callable function.
   it("delay is a function", function()
-    expect_type("function", lurek.timer.delay)
+        expect_type("function", lurek.timer["delay"])
   end)
 
   -- @tests lurek.timer.delay
@@ -662,7 +659,7 @@ describe("lurek.timer.delay", function()
   -- @description delay(0) inside a coroutine yields and resumes after one tickWaits.
   it("delay(0) yields and resumes after tickWaits", function()
     local co = coroutine.create(function()
-      lurek.timer.delay(0)
+            lurek.timer["delay"](0)
     end)
     coroutine.resume(co)
     lurek.timer.tickWaits()
@@ -670,161 +667,41 @@ describe("lurek.timer.delay", function()
   end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Adds regression coverage for the remaining scheduler APIs that still only had placeholder stubs.
+describe("lurek.timer scheduler remaining coverage", function()
     -- @tests Scheduler:getRepeatCount
-    it("covers Scheduler:getRepeatCount", function()
-        -- TODO: Implement test for Scheduler:getRepeatCount
+    -- @description Creates a repeating event with three executions, then verifies getRepeatCount decreases from 3 to 2 after the first update.
+    it("getRepeatCount tracks remaining repetitions", function()
+        local s = lurek.timer.newScheduler()
+        local id = s:every(0.5, function() end, 3)
+
+        local ok1, count1 = s:getRepeatCount(id)
+        expect_equal(true, ok1)
+        expect_equal(3, count1)
+
+        s:update(0.5)
+
+        local ok2, count2 = s:getRepeatCount(id)
+        expect_equal(true, ok2)
+        expect_equal(2, count2)
     end)
 
     -- @tests Scheduler:resetEvent
-    it("covers Scheduler:resetEvent", function()
-        -- TODO: Implement test for Scheduler:resetEvent
-    end)
+    -- @description Resets a one-shot event after part of its countdown elapsed, then verifies it does not fire early and only fires after the full interval is counted again.
+    it("resetEvent restarts the remaining countdown", function()
+        local s = lurek.timer.newScheduler()
+        local fired = false
+        local id = s:after(1.0, function() fired = true end)
 
-end)
+        s:update(0.7)
+        expect_equal(true, s:resetEvent(id))
 
-describe("Missing explicit test for Scheduler:after", function()
-    it("Scheduler:after works", function()
-        -- @tests Scheduler:after
-        -- TODO: add assertion for Scheduler:after
-    end)
-end)
+        s:update(0.5)
+        expect_equal(false, fired)
 
-describe("Missing explicit test for Scheduler:afterFrames", function()
-    it("Scheduler:afterFrames works", function()
-        -- @tests Scheduler:afterFrames
-        -- TODO: add assertion for Scheduler:afterFrames
+        s:update(0.6)
+        expect_equal(true, fired)
     end)
 end)
 
-describe("Missing explicit test for Scheduler:cancel", function()
-    it("Scheduler:cancel works", function()
-        -- @tests Scheduler:cancel
-        -- TODO: add assertion for Scheduler:cancel
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:cancelNamed", function()
-    it("Scheduler:cancelNamed works", function()
-        -- @tests Scheduler:cancelNamed
-        -- TODO: add assertion for Scheduler:cancelNamed
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:cancelAll", function()
-    it("Scheduler:cancelAll works", function()
-        -- @tests Scheduler:cancelAll
-        -- TODO: add assertion for Scheduler:cancelAll
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:pause", function()
-    it("Scheduler:pause works", function()
-        -- @tests Scheduler:pause
-        -- TODO: add assertion for Scheduler:pause
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:resume", function()
-    it("Scheduler:resume works", function()
-        -- @tests Scheduler:resume
-        -- TODO: add assertion for Scheduler:resume
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:isPaused", function()
-    it("Scheduler:isPaused works", function()
-        -- @tests Scheduler:isPaused
-        -- TODO: add assertion for Scheduler:isPaused
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:pauseNamed", function()
-    it("Scheduler:pauseNamed works", function()
-        -- @tests Scheduler:pauseNamed
-        -- TODO: add assertion for Scheduler:pauseNamed
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:resumeNamed", function()
-    it("Scheduler:resumeNamed works", function()
-        -- @tests Scheduler:resumeNamed
-        -- TODO: add assertion for Scheduler:resumeNamed
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:isPausedNamed", function()
-    it("Scheduler:isPausedNamed works", function()
-        -- @tests Scheduler:isPausedNamed
-        -- TODO: add assertion for Scheduler:isPausedNamed
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:getRemaining", function()
-    it("Scheduler:getRemaining works", function()
-        -- @tests Scheduler:getRemaining
-        -- TODO: add assertion for Scheduler:getRemaining
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:getInterval", function()
-    it("Scheduler:getInterval works", function()
-        -- @tests Scheduler:getInterval
-        -- TODO: add assertion for Scheduler:getInterval
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:getCount", function()
-    it("Scheduler:getCount works", function()
-        -- @tests Scheduler:getCount
-        -- TODO: add assertion for Scheduler:getCount
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:isEmpty", function()
-    it("Scheduler:isEmpty works", function()
-        -- @tests Scheduler:isEmpty
-        -- TODO: add assertion for Scheduler:isEmpty
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:setInterval", function()
-    it("Scheduler:setInterval works", function()
-        -- @tests Scheduler:setInterval
-        -- TODO: add assertion for Scheduler:setInterval
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:setTimeScale", function()
-    it("Scheduler:setTimeScale works", function()
-        -- @tests Scheduler:setTimeScale
-        -- TODO: add assertion for Scheduler:setTimeScale
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:getTimeScale", function()
-    it("Scheduler:getTimeScale works", function()
-        -- @tests Scheduler:getTimeScale
-        -- TODO: add assertion for Scheduler:getTimeScale
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:update", function()
-    it("Scheduler:update works", function()
-        -- @tests Scheduler:update
-        -- TODO: add assertion for Scheduler:update
-    end)
-end)
-
-describe("Missing explicit test for Scheduler:updateFrames", function()
-    it("Scheduler:updateFrames works", function()
-        -- @tests Scheduler:updateFrames
-        -- TODO: add assertion for Scheduler:updateFrames
-    end)
-end)
+test_summary()

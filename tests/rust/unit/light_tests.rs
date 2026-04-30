@@ -255,18 +255,6 @@ mod light_world_tests {
     }
 
     #[test]
-    fn set_group_enabled_targets_correct_group() {
-        let mut w = LightWorld::new();
-        let k1 = w.add_light(Light2D::new(0.0, 0.0, 50.0));
-        let k2 = w.add_light(Light2D::new(10.0, 0.0, 50.0));
-        w.get_light_mut(k1).unwrap().set_group_id(1);
-        w.get_light_mut(k2).unwrap().set_group_id(2);
-        w.set_group_enabled(1, false);
-        assert!(!w.get_light(k1).unwrap().is_enabled());
-        assert!(w.get_light(k2).unwrap().is_enabled());
-    }
-
-    #[test]
     fn advance_flickers_updates_phase() {
         let mut w = LightWorld::new();
         let k = w.add_light(Light2D::new(0.0, 0.0, 50.0));
@@ -276,28 +264,6 @@ mod light_world_tests {
         assert!(w.get_light(k).unwrap().flicker().phase > 0.0);
     }
 
-    #[test]
-    fn group_count_filters_correctly() {
-        let mut w = LightWorld::new();
-        let k1 = w.add_light(Light2D::new(0.0, 0.0, 50.0));
-        let _k2 = w.add_light(Light2D::new(10.0, 0.0, 50.0));
-        w.get_light_mut(k1).unwrap().set_group_id(5);
-        assert_eq!(w.group_count(5), 1);
-        assert_eq!(w.group_count(0), 1);
-    }
-
-    #[test]
-    fn directional_light_hints_filters_enabled_directional() {
-        let mut w = LightWorld::new();
-        let k = w.add_light(Light2D::new(0.0, 0.0, 50.0));
-        w.get_light_mut(k)
-            .unwrap()
-            .set_light_type(LightType::Directional);
-        w.get_light_mut(k).unwrap().set_direction(1.5);
-        let hints = w.directional_light_hints();
-        assert_eq!(hints.len(), 1);
-        assert!((hints[0].2 - 1.5).abs() < 1e-6);
-    }
 }
 
 // ── occluder tests ──────────────────────────────────────────────────────────

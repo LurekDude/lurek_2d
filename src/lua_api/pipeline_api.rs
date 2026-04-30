@@ -1042,7 +1042,9 @@ impl LuaUserData for LuaPipeline {
         /// @param | fn | function | Step callback.
         /// @param | when_fn | function | Callback that returns whether the step should run.
         /// @return | LPipeline | This pipeline for chaining.
-        methods.add_method("addConditional", |lua,
+        methods.add_method(
+            "addConditional",
+            |lua,
              this,
              (name, deps_tbl, cb, cond): (String, LuaTable, LuaFunction, LuaFunction)| {
                 let dep_names: Vec<String> = deps_tbl
@@ -1125,7 +1127,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Step name.
     /// @param | fn | function? | Optional step callback.
     /// @return | LPipelineStep | New pipeline step wrapper.
-    tbl.set("newStep", lua.create_function(|lua, (name, callback): (String, Option<LuaFunction>)| {
+    tbl.set(
+        "newStep",
+        lua.create_function(|lua, (name, callback): (String, Option<LuaFunction>)| {
             let step = PipelineStep::new(name);
             let wrapper = LuaStep::new(step);
             if let Some(cb) = callback {
@@ -1139,7 +1143,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a new empty pipeline.
     /// @param | name | string? | Optional pipeline name.
     /// @return | LPipeline | New pipeline wrapper.
-    tbl.set("newPipeline", lua.create_function(|_, name: Option<String>| {
+    tbl.set(
+        "newPipeline",
+        lua.create_function(|_, name: Option<String>| {
             let pipeline = Pipeline::new(name.unwrap_or_else(|| "pipeline".to_string()));
             Ok(LuaPipeline::new(pipeline))
         })?,
@@ -1149,7 +1155,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Deserialises a pipeline from a definition table.
     /// @param | def | table | Pipeline definition table.
     /// @return | LPipeline | New pipeline wrapper built from the table.
-    tbl.set("fromTable", lua.create_function(|lua, def: LuaTable| {
+    tbl.set(
+        "fromTable",
+        lua.create_function(|lua, def: LuaTable| {
             let name: Option<String> = def.get("name")?;
             let error_mode_str: Option<String> = def.get("errorMode")?;
 

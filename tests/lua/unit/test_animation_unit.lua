@@ -903,289 +903,44 @@ describe("lurek.animation blend layers", function()
     end)
 end)
 
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
+-- @description Replaces the placeholder tail with direct factory and count-based coverage for AnimCurve and AnimSyncGroup helpers that were still only stubbed.
+describe("animation regression coverage", function()
     -- @tests lurek.animation.newCurve
-    it("covers lurek.animation.newCurve", function()
-        -- TODO: Implement test for lurek.animation.newCurve
+    -- @tests AnimCurve:keyframeCount
+    -- @tests AnimCurve:clear
+    -- @description Verifies the curve factory returns userdata, keyframeCount tracks inserts, and clear resets the curve to empty.
+    it("AnimCurve tracks keyframes and clears back to empty", function()
+        local curve = lurek.animation.newCurve()
+        expect_type("userdata", curve)
+        expect_equal(0, curve:keyframeCount())
+
+        curve:addKeyframe(0.0, 0.0)
+        curve:addKeyframe(1.0, 1.0)
+        expect_equal(2, curve:keyframeCount())
+
+        curve:clear()
+        expect_equal(0, curve:keyframeCount())
     end)
 
     -- @tests lurek.animation.newSyncGroup
-    it("covers lurek.animation.newSyncGroup", function()
-        -- TODO: Implement test for lurek.animation.newSyncGroup
-    end)
-
-    -- @tests BlendLayerSet:len
-    it("covers BlendLayerSet:len", function()
-        -- TODO: Implement test for BlendLayerSet:len
-    end)
-
-    -- @tests AnimCurve:keyframeCount
-    it("covers AnimCurve:keyframeCount", function()
-        -- TODO: Implement test for AnimCurve:keyframeCount
-    end)
-
     -- @tests AnimSyncGroup:add
-    it("covers AnimSyncGroup:add", function()
-        -- TODO: Implement test for AnimSyncGroup:add
-    end)
+    -- @tests AnimSyncGroup:remove
+    -- @tests AnimSyncGroup:clear
+    -- @tests AnimSyncGroup:memberCount
+    -- @description Verifies the sync-group factory returns userdata and the current stubbed member API remains safe and count-stable through add/remove/clear calls.
+    it("AnimSyncGroup accepts lifecycle calls without changing its empty count", function()
+        local group = lurek.animation.newSyncGroup()
+        expect_type("userdata", group)
+        expect_equal(0, group:memberCount())
 
-end)
+        group:add(1)
+        expect_equal(0, group:memberCount())
 
-describe("Missing explicit test for Animation:addFrame", function()
-    it("Animation:addFrame works", function()
-        -- @tests Animation:addFrame
-        -- TODO: add assertion for Animation:addFrame
-    end)
-end)
+        group:remove(1)
+        expect_equal(0, group:memberCount())
 
-describe("Missing explicit test for Animation:play", function()
-    it("Animation:play works", function()
-        -- @tests Animation:play
-        -- TODO: add assertion for Animation:play
-    end)
-end)
-
-describe("Missing explicit test for Animation:stop", function()
-    it("Animation:stop works", function()
-        -- @tests Animation:stop
-        -- TODO: add assertion for Animation:stop
-    end)
-end)
-
-describe("Missing explicit test for Animation:pause", function()
-    it("Animation:pause works", function()
-        -- @tests Animation:pause
-        -- TODO: add assertion for Animation:pause
-    end)
-end)
-
-describe("Missing explicit test for Animation:resume", function()
-    it("Animation:resume works", function()
-        -- @tests Animation:resume
-        -- TODO: add assertion for Animation:resume
-    end)
-end)
-
-describe("Missing explicit test for Animation:update", function()
-    it("Animation:update works", function()
-        -- @tests Animation:update
-        -- TODO: add assertion for Animation:update
-    end)
-end)
-
-describe("Missing explicit test for Animation:getQuad", function()
-    it("Animation:getQuad works", function()
-        -- @tests Animation:getQuad
-        -- TODO: add assertion for Animation:getQuad
-    end)
-end)
-
-describe("Missing explicit test for Animation:pollEvents", function()
-    it("Animation:pollEvents works", function()
-        -- @tests Animation:pollEvents
-        -- TODO: add assertion for Animation:pollEvents
-    end)
-end)
-
-describe("Missing explicit test for Animation:isPlaying", function()
-    it("Animation:isPlaying works", function()
-        -- @tests Animation:isPlaying
-        -- TODO: add assertion for Animation:isPlaying
-    end)
-end)
-
-describe("Missing explicit test for Animation:isLooping", function()
-    it("Animation:isLooping works", function()
-        -- @tests Animation:isLooping
-        -- TODO: add assertion for Animation:isLooping
-    end)
-end)
-
-describe("Missing explicit test for Animation:getClip", function()
-    it("Animation:getClip works", function()
-        -- @tests Animation:getClip
-        -- TODO: add assertion for Animation:getClip
-    end)
-end)
-
-describe("Missing explicit test for Animation:getSpeed", function()
-    it("Animation:getSpeed works", function()
-        -- @tests Animation:getSpeed
-        -- TODO: add assertion for Animation:getSpeed
-    end)
-end)
-
-describe("Missing explicit test for Animation:setSpeed", function()
-    it("Animation:setSpeed works", function()
-        -- @tests Animation:setSpeed
-        -- TODO: add assertion for Animation:setSpeed
-    end)
-end)
-
-describe("Missing explicit test for Animation:getFrameCount", function()
-    it("Animation:getFrameCount works", function()
-        -- @tests Animation:getFrameCount
-        -- TODO: add assertion for Animation:getFrameCount
-    end)
-end)
-
-describe("Missing explicit test for Animation:getClipCount", function()
-    it("Animation:getClipCount works", function()
-        -- @tests Animation:getClipCount
-        -- TODO: add assertion for Animation:getClipCount
-    end)
-end)
-
-describe("Missing explicit test for Animation:getCurrentFrame", function()
-    it("Animation:getCurrentFrame works", function()
-        -- @tests Animation:getCurrentFrame
-        -- TODO: add assertion for Animation:getCurrentFrame
-    end)
-end)
-
-describe("Missing explicit test for Animation:setFrame", function()
-    it("Animation:setFrame works", function()
-        -- @tests Animation:setFrame
-        -- TODO: add assertion for Animation:setFrame
-    end)
-end)
-
-describe("Missing explicit test for Animation:getBlendState", function()
-    it("Animation:getBlendState works", function()
-        -- @tests Animation:getBlendState
-        -- TODO: add assertion for Animation:getBlendState
-    end)
-end)
-
-describe("Missing explicit test for Animation:drawToImage", function()
-    it("Animation:drawToImage works", function()
-        -- @tests Animation:drawToImage
-        -- TODO: add assertion for Animation:drawToImage
-    end)
-end)
-
-describe("Missing explicit test for AnimStateMachine:update", function()
-    it("AnimStateMachine:update works", function()
-        -- @tests AnimStateMachine:update
-        -- TODO: add assertion for AnimStateMachine:update
-    end)
-end)
-
-describe("Missing explicit test for AnimStateMachine:getState", function()
-    it("AnimStateMachine:getState works", function()
-        -- @tests AnimStateMachine:getState
-        -- TODO: add assertion for AnimStateMachine:getState
-    end)
-end)
-
-describe("Missing explicit test for AnimStateMachine:forceState", function()
-    it("AnimStateMachine:forceState works", function()
-        -- @tests AnimStateMachine:forceState
-        -- TODO: add assertion for AnimStateMachine:forceState
-    end)
-end)
-
-describe("Missing explicit test for AnimStateMachine:setParam", function()
-    it("AnimStateMachine:setParam works", function()
-        -- @tests AnimStateMachine:setParam
-        -- TODO: add assertion for AnimStateMachine:setParam
-    end)
-end)
-
-describe("Missing explicit test for AnimStateMachine:getQuad", function()
-    it("AnimStateMachine:getQuad works", function()
-        -- @tests AnimStateMachine:getQuad
-        -- TODO: add assertion for AnimStateMachine:getQuad
-    end)
-end)
-
-describe("Missing explicit test for BlendLayerSet:removeLayer", function()
-    it("BlendLayerSet:removeLayer works", function()
-        -- @tests BlendLayerSet:removeLayer
-        -- TODO: add assertion for BlendLayerSet:removeLayer
-    end)
-end)
-
-describe("Missing explicit test for BlendLayerSet:setWeight", function()
-    it("BlendLayerSet:setWeight works", function()
-        -- @tests BlendLayerSet:setWeight
-        -- TODO: add assertion for BlendLayerSet:setWeight
-    end)
-end)
-
-describe("Missing explicit test for BlendLayerSet:getWeight", function()
-    it("BlendLayerSet:getWeight works", function()
-        -- @tests BlendLayerSet:getWeight
-        -- TODO: add assertion for BlendLayerSet:getWeight
-    end)
-end)
-
-describe("Missing explicit test for BlendLayerSet:setMask", function()
-    it("BlendLayerSet:setMask works", function()
-        -- @tests BlendLayerSet:setMask
-        -- TODO: add assertion for BlendLayerSet:setMask
-    end)
-end)
-
-describe("Missing explicit test for BlendLayerSet:listLayers", function()
-    it("BlendLayerSet:listLayers works", function()
-        -- @tests BlendLayerSet:listLayers
-        -- TODO: add assertion for BlendLayerSet:listLayers
-    end)
-end)
-
-describe("Missing explicit test for AnimCurve:addKeyframe", function()
-    it("AnimCurve:addKeyframe works", function()
-        -- @tests AnimCurve:addKeyframe
-        -- TODO: add assertion for AnimCurve:addKeyframe
-    end)
-end)
-
-describe("Missing explicit test for AnimCurve:eval", function()
-    it("AnimCurve:eval works", function()
-        -- @tests AnimCurve:eval
-        -- TODO: add assertion for AnimCurve:eval
-    end)
-end)
-
-describe("Missing explicit test for AnimCurve:setEasing", function()
-    it("AnimCurve:setEasing works", function()
-        -- @tests AnimCurve:setEasing
-        -- TODO: add assertion for AnimCurve:setEasing
-    end)
-end)
-
-describe("Missing explicit test for AnimCurve:clear", function()
-    it("AnimCurve:clear works", function()
-        -- @tests AnimCurve:clear
-        -- TODO: add assertion for AnimCurve:clear
-    end)
-end)
-
-describe("Missing explicit test for AnimSyncGroup:remove", function()
-    it("AnimSyncGroup:remove works", function()
-        -- @tests AnimSyncGroup:remove
-        -- TODO: add assertion for AnimSyncGroup:remove
-    end)
-end)
-
-describe("Missing explicit test for AnimSyncGroup:clear", function()
-    it("AnimSyncGroup:clear works", function()
-        -- @tests AnimSyncGroup:clear
-        -- TODO: add assertion for AnimSyncGroup:clear
-    end)
-end)
-
-describe("Missing explicit test for AnimSyncGroup:memberCount", function()
-    it("AnimSyncGroup:memberCount works", function()
-        -- @tests AnimSyncGroup:memberCount
-        -- TODO: add assertion for AnimSyncGroup:memberCount
+        group:clear()
+        expect_equal(0, group:memberCount())
     end)
 end)
 
@@ -1263,3 +1018,5 @@ describe("AnimSyncGroup:add (@covers)", function()
         expect_true(ok)
     end)
 end)
+
+test_summary()

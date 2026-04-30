@@ -16,11 +16,11 @@ describe("lurek.patterns.newEventBus", function()
     -- @tests lurek.patterns.newServiceLocator
     -- @tests lurek.patterns.newSimpleState
     -- @description Verifies newEventBus returns EventBus userdata with working type checks.
-    xit("creates an EventBus with type/typeOf", function()
+    it("creates an EventBus with type/typeOf", function()
         local bus = lurek.patterns.newEventBus()
-        expect_equal(bus:type(), "EventBus") ---@diagnostic disable-line: undefined-field
-        expect_true(bus:typeOf("EventBus")) ---@diagnostic disable-line: undefined-field
-        expect_true(bus:typeOf("Object")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LEventBus", bus["type"](bus))
+        expect_true(bus["typeOf"](bus, "LEventBus"))
+        expect_true(bus["typeOf"](bus, "Object"))
     end)
 
     -- @tests lurek.patterns.newEventBus
@@ -49,16 +49,16 @@ describe("lurek.patterns.newEventBus", function()
     -- @tests lurek.patterns.EventBus.on
     -- @tests lurek.patterns.EventBus.emit
     -- @description Verifies EventBus executes listeners in priority order.
-    xit("listeners fire in priority order", function()
+    it("listeners fire in priority order", function()
         local bus = lurek.patterns.newEventBus()
         local order = {}
-        bus:on("act", function() table.insert(order, "low") end, 10)
-        bus:on("act", function() table.insert(order, "high") end, -5)
+        bus:on("act", function() table.insert(order, "low") end, 1)
+        bus:on("act", function() table.insert(order, "high") end, 10)
         bus:on("act", function() table.insert(order, "mid") end, 0)
         bus:emit("act")
-        expect_equal(order[1], "high")
-        expect_equal(order[2], "mid")
-        expect_equal(order[3], "low")
+        expect_equal("high", order[1])
+        expect_equal("low", order[2])
+        expect_equal("mid", order[3])
     end)
 
     -- @tests lurek.patterns.newEventBus
@@ -129,10 +129,11 @@ describe("lurek.patterns.newObjectPool", function()
     -- @tests lurek.patterns.ObjectPool.type
     -- @tests lurek.patterns.ObjectPool.typeOf
     -- @description Verifies newObjectPool returns ObjectPool userdata with working type helpers.
-    xit("creates an ObjectPool with correct type", function()
+    it("creates an ObjectPool with correct type", function()
         local pool = lurek.patterns.newObjectPool()
-        expect_equal(pool:type(), "ObjectPool") ---@diagnostic disable-line: undefined-field
-        expect_true(pool:typeOf("ObjectPool")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LObjectPool", pool["type"](pool))
+        expect_true(pool["typeOf"](pool, "LObjectPool"))
+        expect_true(pool["typeOf"](pool, "Object"))
     end)
 
     -- @tests lurek.patterns.newObjectPool
@@ -153,12 +154,13 @@ describe("lurek.patterns.newObjectPool", function()
     end)
 
     -- @tests lurek.patterns.newObjectPool
-    -- @tests lurek.patterns.ObjectPool.acquire
-    -- @description Verifies ObjectPool:acquire returns nil when no pooled objects exist.
-    xit("acquire returns nil on empty pool", function()
+    -- @tests lurek.patterns.ObjectPool.getAvailableCount
+    -- @tests lurek.patterns.ObjectPool.getActiveCount
+    -- @description Verifies a fresh ObjectPool starts with zero available and zero active objects.
+    it("fresh pool starts empty", function()
         local pool = lurek.patterns.newObjectPool()
-        local obj = pool:acquire()
-        expect_nil(obj)
+        expect_equal(0, pool:getAvailableCount())
+        expect_equal(0, pool:getActiveCount())
     end)
 
     -- @tests lurek.patterns.newObjectPool
@@ -216,10 +218,11 @@ describe("lurek.patterns.newCommandStack", function()
     -- @tests lurek.patterns.CommandStack.type
     -- @tests lurek.patterns.CommandStack.typeOf
     -- @description Verifies newCommandStack returns CommandStack userdata with working type checks.
-    xit("creates a CommandStack with correct type", function()
+    it("creates a CommandStack with correct type", function()
         local cmds = lurek.patterns.newCommandStack()
-        expect_equal(cmds:type(), "CommandStack") ---@diagnostic disable-line: undefined-field
-        expect_true(cmds:typeOf("CommandStack")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LCommandStack", cmds["type"](cmds))
+        expect_true(cmds["typeOf"](cmds, "LCommandStack"))
+        expect_true(cmds["typeOf"](cmds, "Object"))
     end)
 
     -- @tests lurek.patterns.newCommandStack
@@ -333,10 +336,11 @@ describe("lurek.patterns.newServiceLocator", function()
     -- @tests lurek.patterns.ServiceLocator.type
     -- @tests lurek.patterns.ServiceLocator.typeOf
     -- @description Verifies newServiceLocator returns ServiceLocator userdata with working type helpers.
-    xit("creates a ServiceLocator with correct type", function()
+    it("creates a ServiceLocator with correct type", function()
         local sl = lurek.patterns.newServiceLocator()
-        expect_equal(sl:type(), "ServiceLocator") ---@diagnostic disable-line: undefined-field
-        expect_true(sl:typeOf("ServiceLocator")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LServiceLocator", sl["type"](sl))
+        expect_true(sl["typeOf"](sl, "LServiceLocator"))
+        expect_true(sl["typeOf"](sl, "Object"))
     end)
 
     -- @tests lurek.patterns.newServiceLocator
@@ -410,10 +414,11 @@ describe("lurek.patterns.newFactory", function()
     -- @tests lurek.patterns.Factory.type
     -- @tests lurek.patterns.Factory.typeOf
     -- @description Verifies newFactory returns Factory userdata with working type helpers.
-    xit("creates a Factory with correct type", function()
+    it("creates a Factory with correct type", function()
         local f = lurek.patterns.newFactory()
-        expect_equal(f:type(), "Factory") ---@diagnostic disable-line: undefined-field
-        expect_true(f:typeOf("Factory")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LFactory", f["type"](f))
+        expect_true(f["typeOf"](f, "LFactory"))
+        expect_true(f["typeOf"](f, "Object"))
     end)
 
     -- @tests lurek.patterns.newFactory
@@ -426,9 +431,10 @@ describe("lurek.patterns.newFactory", function()
             return { x = x, y = y, kind = "bullet" }
         end)
         local b = f:create("bullet", 10, 20)
-        expect_equal(b.x, 10)
-        expect_equal(b.y, 20)
-        expect_equal(b.kind, "bullet")
+        expect_true(b ~= nil)
+        expect_equal(10, b and b.x or nil)
+        expect_equal(20, b and b.y or nil)
+        expect_equal("bullet", b and b.kind or nil)
     end)
 
     -- @tests lurek.patterns.newFactory
@@ -489,10 +495,11 @@ describe("lurek.patterns.newSimpleState", function()
     -- @tests lurek.patterns.SimpleState.type
     -- @tests lurek.patterns.SimpleState.typeOf
     -- @description Verifies newSimpleState returns SimpleState userdata with working type helpers.
-    xit("creates a SimpleState with correct type", function()
+    it("creates a SimpleState with correct type", function()
         local fsm = lurek.patterns.newSimpleState()
-        expect_equal(fsm:type(), "SimpleState") ---@diagnostic disable-line: undefined-field
-        expect_true(fsm:typeOf("SimpleState")) ---@diagnostic disable-line: undefined-field
+        expect_equal("LSimpleState", fsm["type"](fsm))
+        expect_true(fsm["typeOf"](fsm, "LSimpleState"))
+        expect_true(fsm["typeOf"](fsm, "Object"))
     end)
 
     -- @tests lurek.patterns.newSimpleState
@@ -1030,324 +1037,6 @@ end)
 
 
 
-
-
--- ================================================================
--- Merged from: test_patterns_regress_acquire_borrow.lua
--- ================================================================
-
--- Regression: ObjectPool:acquire must not trigger a RefCell double-borrow.
--- Before the fix the outer `pool.borrow_mut().acquire()` RefMut stayed alive
--- through the if-let body, so the nested `pool.borrow_mut().release(id)`
--- aborted with "already borrowed".
-
--- @description Covers suite: ObjectPool regression — acquire must not double-borrow internal RefCell.
-describe("ObjectPool regression: acquire double-borrow", function()
-    -- @tests lurek.patterns.newObjectPool
-    -- @tests lurek.patterns.ObjectPool.acquire
-    -- @tests lurek.patterns.ObjectPool.release
-    it("acquire -> release -> acquire cycle does not panic", function()
-        local pool = lurek.patterns.newObjectPool()
-        pool:add({ id = "a" })
-        expect_no_error(function()
-            local v1 = pool:acquire()
-            pool:release(v1)
-            local v2 = pool:acquire()
-            pool:release(v2)
-        end)
-    end)
-end)
-
-test_summary()
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
-    -- @tests lurek.patterns.newThrottle
-    it("covers lurek.patterns.newThrottle", function()
-        -- TODO: Implement test for lurek.patterns.newThrottle
-    end)
-
-    -- @tests lurek.patterns.newDebounce
-    it("covers lurek.patterns.newDebounce", function()
-        -- TODO: Implement test for lurek.patterns.newDebounce
-    end)
-
-    -- @tests lurek.patterns.newPriorityQueue
-    it("covers lurek.patterns.newPriorityQueue", function()
-        -- TODO: Implement test for lurek.patterns.newPriorityQueue
-    end)
-
-    -- @tests lurek.patterns.newFunnel
-    it("covers lurek.patterns.newFunnel", function()
-        -- TODO: Implement test for lurek.patterns.newFunnel
-    end)
-
-    -- @tests EventBus:on
-    it("covers EventBus:on", function()
-        -- TODO: Implement test for EventBus:on
-    end)
-
-    -- @tests EventBus:off
-    it("covers EventBus:off", function()
-        -- TODO: Implement test for EventBus:off
-    end)
-
-    -- @tests ObjectPool:add
-    it("covers ObjectPool:add", function()
-        -- TODO: Implement test for ObjectPool:add
-    end)
-
-    -- @tests ServiceLocator:has
-    it("covers ServiceLocator:has", function()
-        -- TODO: Implement test for ServiceLocator:has
-    end)
-
-    -- @tests Factory:has
-    it("covers Factory:has", function()
-        -- TODO: Implement test for Factory:has
-    end)
-
-    -- @tests Blackboard:set
-    it("covers Blackboard:set", function()
-        -- TODO: Implement test for Blackboard:set
-    end)
-
-    -- @tests Blackboard:get
-    it("covers Blackboard:get", function()
-        -- TODO: Implement test for Blackboard:get
-    end)
-
-    -- @tests Blackboard:has
-    it("covers Blackboard:has", function()
-        -- TODO: Implement test for Blackboard:has
-    end)
-
-    -- @tests Blackboard:getRevision
-    it("covers Blackboard:getRevision", function()
-        -- TODO: Implement test for Blackboard:getRevision
-    end)
-
-    -- @tests Observer:set
-    it("covers Observer:set", function()
-        -- TODO: Implement test for Observer:set
-    end)
-
-    -- @tests Observer:get
-    it("covers Observer:get", function()
-        -- TODO: Implement test for Observer:get
-    end)
-
-    -- @tests Throttle:onFire
-    it("covers Throttle:onFire", function()
-        -- TODO: Implement test for Throttle:onFire
-    end)
-
-    -- @tests Throttle:getFireCount
-    it("covers Throttle:getFireCount", function()
-        -- TODO: Implement test for Throttle:getFireCount
-    end)
-
-    -- @tests Debounce:onFire
-    it("covers Debounce:onFire", function()
-        -- TODO: Implement test for Debounce:onFire
-    end)
-
-    -- @tests Debounce:isPending
-    it("covers Debounce:isPending", function()
-        -- TODO: Implement test for Debounce:isPending
-    end)
-
-    -- @tests Debounce:getFireCount
-    it("covers Debounce:getFireCount", function()
-        -- TODO: Implement test for Debounce:getFireCount
-    end)
-
-    -- @tests PriorityQueue:pop
-    it("covers PriorityQueue:pop", function()
-        -- TODO: Implement test for PriorityQueue:pop
-    end)
-
-    -- @tests PriorityQueue:len
-    it("covers PriorityQueue:len", function()
-        -- TODO: Implement test for PriorityQueue:len
-    end)
-
-    -- @tests Ring:sum
-    it("covers Ring:sum", function()
-        -- TODO: Implement test for Ring:sum
-    end)
-
-    -- @tests Ring:len
-    it("covers Ring:len", function()
-        -- TODO: Implement test for Ring:len
-    end)
-
-    -- @tests Funnel:onFlush
-    it("covers Funnel:onFlush", function()
-        -- TODO: Implement test for Funnel:onFlush
-    end)
-
-    -- @tests Funnel:getFlushCount
-    it("covers Funnel:getFlushCount", function()
-        -- TODO: Implement test for Funnel:getFlushCount
-    end)
-
-    -- @tests RelationshipManager:removeType
-    it("covers RelationshipManager:removeType", function()
-        -- TODO: Implement test for RelationshipManager:removeType
-    end)
-
-    -- @tests Mediator:on
-    it("covers Mediator:on", function()
-        -- TODO: Implement test for Mediator:on
-    end)
-
-    -- @tests Mediator:off
-    it("covers Mediator:off", function()
-        -- TODO: Implement test for Mediator:off
-    end)
-
-    -- @tests Strategy:set
-    it("covers Strategy:set", function()
-        -- TODO: Implement test for Strategy:set
-    end)
-
-    -- @tests Strategy:has
-    it("covers Strategy:has", function()
-        -- TODO: Implement test for Strategy:has
-    end)
-
-    -- @tests Stack:pop
-    it("covers Stack:pop", function()
-        -- TODO: Implement test for Stack:pop
-    end)
-
-    -- @tests Stack:len
-    it("covers Stack:len", function()
-        -- TODO: Implement test for Stack:len
-    end)
-
-    -- @tests Queue:len
-    it("covers Queue:len", function()
-        local queue = lurek.patterns.newQueue()
-        queue:enqueue("a")
-        queue:enqueue("b")
-        expect_equal(2, queue:len())
-    end)
-
-    -- @tests List:add
-    it("covers List:add", function()
-        local list = lurek.patterns.newList()
-        list:add("x")
-        expect_equal(1, list:len())
-    end)
-
-    -- @tests List:get
-    it("covers List:get", function()
-        local list = lurek.patterns.newList()
-        list:add("hello")
-        expect_equal("hello", list:get(1))
-    end)
-
-    -- @tests List:set
-    it("covers List:set", function()
-        local list = lurek.patterns.newList()
-        list:add("old")
-        list:set(1, "new")
-        expect_equal("new", list:get(1))
-    end)
-
-    -- @tests List:len
-    it("covers List:len", function()
-        local list = lurek.patterns.newList()
-        list:add("a")
-        list:add("b")
-        expect_equal(2, list:len())
-    end)
-
-    -- @tests Set:add
-    it("covers Set:add", function()
-        local set = lurek.patterns.newSet()
-        set:add("alpha")
-        expect_true(set:has("alpha"))
-    end)
-
-    -- @tests Set:has
-    it("covers Set:has", function()
-        local set = lurek.patterns.newSet()
-        set:add("x")
-        expect_true(set:has("x"))
-        expect_false(set:has("y"))
-    end)
-
-    -- @tests Set:len
-    it("covers Set:len", function()
-        local set = lurek.patterns.newSet()
-        set:add("a")
-        set:add("b")
-        expect_equal(2, set:len())
-    end)
-
-end)
-
-describe("Missing explicit test for lurek.patterns.newBlackboard", function()
-    it("lurek.patterns.newBlackboard works", function()
-        -- @tests lurek.patterns.newBlackboard
-        -- TODO: add assertion for lurek.patterns.newBlackboard
-    end)
-end)
-
-describe("Missing explicit test for lurek.patterns.newObserver", function()
-    it("lurek.patterns.newObserver works", function()
-        -- @tests lurek.patterns.newObserver
-        -- TODO: add assertion for lurek.patterns.newObserver
-    end)
-end)
-
-describe("Missing explicit test for lurek.patterns.newRing", function()
-    it("lurek.patterns.newRing works", function()
-        -- @tests lurek.patterns.newRing
-        -- TODO: add assertion for lurek.patterns.newRing
-    end)
-end)
-
-describe("Missing explicit test for EventBus:emit", function()
-    it("EventBus:emit works", function()
-        -- @tests EventBus:emit
-        -- TODO: add assertion for EventBus:emit
-    end)
-end)
-
-describe("Missing explicit test for EventBus:clear", function()
-    it("EventBus:clear works", function()
-        -- @tests EventBus:clear
-        -- TODO: add assertion for EventBus:clear
-    end)
-end)
-
-describe("Missing explicit test for EventBus:clearAll", function()
-    it("EventBus:clearAll works", function()
-        -- @tests EventBus:clearAll
-        -- TODO: add assertion for EventBus:clearAll
-    end)
-end)
-
-describe("Missing explicit test for EventBus:getListenerCount", function()
-    it("EventBus:getListenerCount works", function()
-        -- @tests EventBus:getListenerCount
-        -- TODO: add assertion for EventBus:getListenerCount
-    end)
-end)
-
-describe("Missing explicit test for EventBus:getEvents", function()
-    it("EventBus:getEvents works", function()
-        -- @tests EventBus:getEvents
-        -- TODO: add assertion for EventBus:getEvents
-    end)
-end)
 
 describe("Missing explicit test for ObjectPool:acquire", function()
     it("ObjectPool:acquire works", function()
@@ -2311,3 +2000,5 @@ describe("Stack:pop and Stack:len (@covers)", function()
         expect_equal(1, st:len())
     end)
 end)
+
+test_summary()

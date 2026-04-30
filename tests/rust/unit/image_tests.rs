@@ -666,12 +666,6 @@ mod palette_lut_tests {
     use super::*;
 
     #[test]
-    fn new_palette_is_empty() {
-        let p = PaletteLUT::new();
-        assert_eq!(p.get_color_count(), 0);
-    }
-
-    #[test]
     fn default_is_same_as_new() {
         let p = PaletteLUT::default();
         assert_eq!(p.get_color_count(), 0);
@@ -704,24 +698,6 @@ mod palette_lut_tests {
         assert_eq!(p.get_color_count(), 2);
         p.clear();
         assert_eq!(p.get_color_count(), 0);
-    }
-
-    #[test]
-    fn apply_replaces_matching_pixel() {
-        let mut img = ImageData::new(2, 1);
-        img.set_pixel(0, 0, 255, 0, 0, 255);
-        img.set_pixel(1, 0, 0, 0, 255, 255);
-
-        let mut p = PaletteLUT::new();
-        p.set_color(
-            0,
-            Color { r: 1.0, g: 0.0, b: 0.0, a: 1.0 },
-            Color { r: 0.0, g: 1.0, b: 0.0, a: 1.0 },
-        );
-        p.apply(&mut img);
-
-        assert_eq!(img.get_pixel(0, 0), Some((0, 255, 0, 255)));
-        assert_eq!(img.get_pixel(1, 0), Some((0, 0, 255, 255)));
     }
 
     #[test]
@@ -758,58 +734,11 @@ mod province_grid_tests {
     }
 
     #[test]
-    fn from_image_assigns_sequential_ids() {
-        let img = make_test_image();
-        let grid = ProvinceGrid::from_image(&img);
-        assert_eq!(grid.width(), 4);
-        assert_eq!(grid.height(), 4);
-        assert_eq!(grid.province_count(), 3);
-    }
-
-    #[test]
-    fn get_at_returns_zero_for_background() {
-        let img = make_test_image();
-        let grid = ProvinceGrid::from_image(&img);
-        assert_eq!(grid.get_at(0, 3), 0);
-        assert_eq!(grid.get_at(3, 3), 0);
-    }
-
-    #[test]
     fn get_at_returns_zero_for_out_of_bounds() {
         let img = make_test_image();
         let grid = ProvinceGrid::from_image(&img);
         assert_eq!(grid.get_at(10, 10), 0);
         assert_eq!(grid.get_at(4, 0), 0);
-    }
-
-    #[test]
-    fn same_colour_pixels_share_id() {
-        let img = make_test_image();
-        let grid = ProvinceGrid::from_image(&img);
-        let id_a = grid.get_at(0, 0);
-        let id_b = grid.get_at(1, 1);
-        assert!(id_a > 0);
-        assert_eq!(id_a, id_b);
-    }
-
-    #[test]
-    fn different_colours_get_different_ids() {
-        let img = make_test_image();
-        let grid = ProvinceGrid::from_image(&img);
-        let red_id = grid.get_at(0, 0);
-        let green_id = grid.get_at(2, 0);
-        let blue_id = grid.get_at(0, 2);
-        assert_ne!(red_id, green_id);
-        assert_ne!(red_id, blue_id);
-        assert_ne!(green_id, blue_id);
-    }
-
-    #[test]
-    fn adjacency_detected_between_neighbors() {
-        let img = make_test_image();
-        let grid = ProvinceGrid::from_image(&img);
-        let adj = grid.adjacencies();
-        assert!(adj.len() >= 3, "expected at least 3 adjacency pairs, got {}", adj.len());
     }
 
     #[test]

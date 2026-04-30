@@ -4,157 +4,15 @@ use lurek2d::tilemap::*;
 use lurek2d::tilemap::tilemap::TileMap;
 use lurek2d::tilemap::tileset::TileSet;
 use lurek2d::tilemap::polygon_map::PolygonMap;
-use lurek2d::tilemap::tmx::*;
 use lurek2d::tilemap::ldtk::load_ldtk;
 use lurek2d::tilemap::tile_walker::{TileWalker, Facing};
-use lurek2d::tilemap::large_map_renderer::LargeMapRenderer;
-use lurek2d::tilemap::coords::*;
 use lurek2d::render::renderer::{DrawMode, RenderCommand};
 use lurek2d::math::Color;
 use lurek2d::math::rect::Rect;
 
 // ── tmx ───────────────────────────────────────────────────────────────────────
 
-mod tmx_tests {
-    use super::*;
-
-    const SIMPLE_TMX: &str = r#"<?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.0" orientation="orthogonal"
-     renderorder="right-down" width="4" height="3" tilewidth="32" tileheight="32">
-  <tileset firstgid="1" name="Ground" tilewidth="32" tileheight="32" tilecount="16" columns="4">
-    <image source="ground.png" width="128" height="128"/>
-  </tileset>
-  <layer id="1" name="Tiles" width="4" height="3">
-    <data encoding="csv">
-1,2,1,0,
-3,1,2,1,
-0,1,0,2
-    </data>
-  </layer>
-</map>
-"#;
-
-    #[test]
-    fn parse_simple_map() {
-        let map = load_tmx(SIMPLE_TMX).expect("parse failed");
-        assert_eq!(map.width, 4);
-        assert_eq!(map.height, 3);
-        assert_eq!(map.tile_width, 32);
-        assert_eq!(map.tile_height, 32);
-        assert_eq!(map.orientation, TmxOrientation::Orthogonal);
-    }
-
-    #[test]
-    fn parse_tileset() {
-        let map = load_tmx(SIMPLE_TMX).expect("valid TMX parses");
-        assert_eq!(map.tilesets.len(), 1);
-        let ts = &map.tilesets[0];
-        assert_eq!(ts.first_gid, 1);
-        assert_eq!(ts.name, "Ground");
-        assert_eq!(ts.tile_width, 32);
-        assert_eq!(ts.image_source.as_deref(), Some("ground.png"));
-    }
-
-    #[test]
-    fn parse_csv_tile_layer() {
-        let map = load_tmx(SIMPLE_TMX).expect("valid TMX parses");
-        let layers: Vec<_> = map.tile_layers().collect();
-        assert_eq!(layers.len(), 1);
-        let layer = &layers[0];
-        assert_eq!(layer.name, "Tiles");
-        assert_eq!(layer.width, 4);
-        assert_eq!(layer.height, 3);
-        assert_eq!(layer.tiles.len(), 12);
-        assert_eq!(layer.tiles[0], 1);
-        assert_eq!(layer.tiles[3], 0);
-    }
-
-    #[test]
-    fn parse_visibility_and_opacity() {
-        let xml = r#"<?xml version="1.0"?>
-<map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="16" tileheight="16">
-  <layer id="1" name="Bg" width="2" height="2" visible="0" opacity="0.5">
-    <data encoding="csv">0,0,0,0</data>
-  </layer>
-</map>"#;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        let layer = map.tile_layers().next().expect("at least one tile layer");
-        assert!(!layer.visible);
-        assert!((layer.opacity - 0.5).abs() < 1e-5);
-    }
-
-    #[test]
-    fn parse_object_layer() {
-        let xml = r#"<?xml version="1.0"?>
-<map version="1.9" orientation="orthogonal" width="4" height="4" tilewidth="32" tileheight="32">
-  <objectgroup id="2" name="Entities">
-    <object id="1" name="Player" x="64" y="96" width="32" height="32"/>
-    <object id="2" name="Enemy" type="hostile" x="128" y="64" width="16" height="16"/>
-  </objectgroup>
-</map>"#;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        assert_eq!(map.tile_layers().count(), 0);
-        let objs: Vec<_> = map.object_layers().collect();
-        assert_eq!(objs.len(), 1);
-        assert_eq!(objs[0].objects.len(), 2);
-        let player = &objs[0].objects[0];
-        assert_eq!(player.name, "Player");
-        assert!((player.x - 64.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn parse_isometric_map() {
-        let xml = r#"<?xml version="1.0"?>
-<map version="1.9" orientation="isometric" width="4" height="4" tilewidth="64" tileheight="32">
-</map>"#;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        assert_eq!(map.orientation, TmxOrientation::Isometric);
-    }
-
-    #[test]
-    fn external_tileset_reference() {
-        let xml = r#"<?xml version="1.0"?>
-<map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="32" tileheight="32">
-  <tileset firstgid="1" source="tiles.tsx"/>
-</map>"#;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        assert_eq!(map.tilesets.len(), 1);
-        assert_eq!(map.tilesets[0].source.as_deref(), Some("tiles.tsx"));
-        assert_eq!(map.tilesets[0].first_gid, 1);
-    }
-
-    #[test]
-    fn parse_background_color() {
-        let xml = r##"<?xml version="1.0"?>
-<map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="16" tileheight="16"
-     backgroundcolor="#ff3366">
-</map>"##;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        let [a, r, g, b] = map.background_color.expect("background color is set in this TMX");
-        assert_eq!(a, 255);
-        assert_eq!(r, 0xff);
-        assert_eq!(g, 0x33);
-        assert_eq!(b, 0x66);
-    }
-
-    #[test]
-    fn parse_xml_encoding() {
-        let xml = r#"<?xml version="1.0"?>
-<map version="1.9" orientation="orthogonal" width="2" height="2" tilewidth="16" tileheight="16">
-  <layer id="1" name="Base" width="2" height="2">
-    <data encoding="xml">
-      <tile gid="5"/>
-      <tile gid="3"/>
-      <tile gid="0"/>
-      <tile gid="2"/>
-    </data>
-  </layer>
-</map>"#;
-        let map = load_tmx(xml).expect("valid TMX string parses");
-        let layer = map.tile_layers().next().expect("at least one tile layer");
-        assert_eq!(layer.tiles, vec![5, 3, 0, 2]);
-    }
-}
+// Public TMX loader behavior is covered in `tests/lua/unit/test_tilemap_unit.lua`.
 
 // ── tile_walker ───────────────────────────────────────────────────────────────
 

@@ -1914,8 +1914,6 @@ describe("lurek.math AabbTree querySegment", function()
   end)
 end)
 
-test_summary()
-
 -- =========================================================================
 -- Missing API Coverage Stubs
 -- =========================================================================
@@ -1928,32 +1926,44 @@ describe("Missing API Coverage", function()
 
     -- @tests lurek.math.inQuart
     it("covers lurek.math.inQuart", function()
-        -- TODO: Implement test for lurek.math.inQuart
+        expect_near(0.0, lurek.math.inQuart(0), 1e-5)
+        expect_near(1.0, lurek.math.inQuart(1), 1e-5)
     end)
 
     -- @tests lurek.math.outQuart
     it("covers lurek.math.outQuart", function()
-        -- TODO: Implement test for lurek.math.outQuart
+        expect_near(0.0, lurek.math.outQuart(0), 1e-5)
+        expect_near(1.0, lurek.math.outQuart(1), 1e-5)
     end)
 
     -- @tests lurek.math.inOutQuart
     it("covers lurek.math.inOutQuart", function()
-        -- TODO: Implement test for lurek.math.inOutQuart
+        expect_near(0.0, lurek.math.inOutQuart(0), 1e-5)
+        expect_near(0.5, lurek.math.inOutQuart(0.5), 1e-5)
+        expect_near(1.0, lurek.math.inOutQuart(1), 1e-5)
     end)
 
     -- @tests lurek.math.inOutExpo
     it("covers lurek.math.inOutExpo", function()
-        -- TODO: Implement test for lurek.math.inOutExpo
+        expect_near(0.0, lurek.math.inOutExpo(0), 1e-5)
+        expect_near(0.5, lurek.math.inOutExpo(0.5), 1e-5)
+        expect_near(1.0, lurek.math.inOutExpo(1), 1e-5)
     end)
 
     -- @tests lurek.math.inBounce
     it("covers lurek.math.inBounce", function()
-        -- TODO: Implement test for lurek.math.inBounce
+        expect_near(0.0, lurek.math.inBounce(0), 1e-5)
+        expect_near(1.0, lurek.math.inBounce(1), 1e-5)
     end)
 
     -- @tests lurek.math.circleIntersectsLine
     it("covers lurek.math.circleIntersectsLine", function()
-        -- TODO: Implement test for lurek.math.circleIntersectsLine
+        local hit, x1, y1, x2, y2 = lurek.math.circleIntersectsLine(0, 0, 1, -2, 0, 2, 0)
+        expect_true(hit)
+        expect_near(1.0, math.abs(x1), 1e-5)
+        expect_near(0.0, y1, 1e-5)
+        expect_near(1.0, math.abs(x2), 1e-5)
+        expect_near(0.0, y2, 1e-5)
     end)
 
     -- @tests lurek.math.circleIntersectsSegment
@@ -1963,12 +1973,15 @@ describe("Missing API Coverage", function()
 
     -- @tests lurek.math.closestPointOnSegment
     it("covers lurek.math.closestPointOnSegment", function()
-        -- TODO: Implement test for lurek.math.closestPointOnSegment
+        local x, y = lurek.math.closestPointOnSegment(1, 2, 0, 0, 2, 0)
+        expect_near(1.0, x, 1e-5)
+        expect_near(0.0, y, 1e-5)
     end)
 
     -- @tests lurek.math.convexHull
     it("covers lurek.math.convexHull", function()
-        -- TODO: Implement test for lurek.math.convexHull
+        local hull = lurek.math.convexHull({0, 0, 4, 0, 4, 4, 0, 4, 2, 2})
+        expect_equal(8, #hull)
     end)
 
     -- @tests lurek.math.delaunayTriangulate
@@ -1978,17 +1991,22 @@ describe("Missing API Coverage", function()
 
     -- @tests lurek.math.lineIntersect
     it("covers lurek.math.lineIntersect", function()
-        -- TODO: Implement test for lurek.math.lineIntersect
+        local x, y = lurek.math.lineIntersect(0, 0, 1, 1, 0, 1, 1, 0)
+        expect_near(0.5, x, 1e-5)
+        expect_near(0.5, y, 1e-5)
     end)
 
     -- @tests lurek.math.pointInPolygon
     it("covers lurek.math.pointInPolygon", function()
-        -- TODO: Implement test for lurek.math.pointInPolygon
+        local square = {0, 0, 4, 0, 4, 4, 0, 4}
+        expect_true(lurek.math.pointInPolygon(square, 2, 2))
+        expect_false(lurek.math.pointInPolygon(square, 5, 5))
     end)
 
     -- @tests lurek.math.polygonArea
     it("covers lurek.math.polygonArea", function()
-        -- TODO: Implement test for lurek.math.polygonArea
+        local area = lurek.math.polygonArea({0, 0, 1, 0, 1, 1, 0, 1})
+        expect_near(1.0, math.abs(area), 1e-5)
     end)
 
     -- @tests lurek.math.polygonCentroid
@@ -1998,7 +2016,10 @@ describe("Missing API Coverage", function()
 
     -- @tests lurek.math.segmentIntersectsSegment
     it("covers lurek.math.segmentIntersectsSegment", function()
-        -- TODO: Implement test for lurek.math.segmentIntersectsSegment
+        local hit, x, y = lurek.math.segmentIntersectsSegment(0, 0, 2, 2, 0, 2, 2, 0)
+        expect_true(hit)
+        expect_near(1.0, x, 1e-5)
+        expect_near(1.0, y, 1e-5)
     end)
 
     -- @tests lurek.math.rad
@@ -2093,27 +2114,44 @@ describe("Missing API Coverage", function()
 
     -- @tests Tween:getAllValues
     it("covers Tween:getAllValues", function()
-        -- TODO: Implement test for Tween:getAllValues
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 10.0)
+        tw:addValue(100.0, 200.0)
+        tw:setTime(1.0)
+        local vals = tw:getAllValues()
+        expect_equal(2, #vals)
+        expect_near(10.0, vals[1], 1e-3)
+        expect_near(200.0, vals[2], 1e-3)
     end)
 
     -- @tests Tween:getValueCount
     it("covers Tween:getValueCount", function()
-        -- TODO: Implement test for Tween:getValueCount
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 10.0)
+        tw:addValue(10.0, 20.0)
+        expect_equal(2, tw:getValueCount())
     end)
 
     -- @tests Tween:getClock
     it("covers Tween:getClock", function()
-        -- TODO: Implement test for Tween:getClock
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:setTime(0.25)
+        expect_near(0.25, tw:getClock(), 1e-5)
     end)
 
     -- @tests Tween:set
     it("covers Tween:set", function()
-        -- TODO: Implement test for Tween:set
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 100.0)
+        tw:set(0.5)
+        expect_near(50.0, tw:getValue(1), 1e-3)
     end)
 
     -- @tests Tween:addValue
     it("covers Tween:addValue", function()
-        -- TODO: Implement test for Tween:addValue
+        local tw = lurek.math.newTween(1.0, "linear")
+        expect_equal(1, tw:addValue(0.0, 100.0))
+        expect_equal(2, tw:addValue(50.0, 150.0))
     end)
 
     -- @tests NoiseGenerator:perlin1d
@@ -2182,7 +2220,11 @@ end)
 describe("Missing explicit test for lurek.math.newTween", function()
     it("lurek.math.newTween works", function()
         -- @tests lurek.math.newTween
-        -- TODO: add assertion for lurek.math.newTween
+        local tw = lurek.math.newTween(1.0, "nonexistent")
+        expect_equal("LTween", tw:type())
+        tw:addValue(0.0, 100.0)
+        tw:setTime(0.5)
+        expect_near(50.0, tw:getValue(1), 1e-3)
     end)
 end)
 
@@ -2224,7 +2266,10 @@ end)
 describe("Missing explicit test for lurek.math.applyEasing", function()
     it("lurek.math.applyEasing works", function()
         -- @tests lurek.math.applyEasing
-        -- TODO: add assertion for lurek.math.applyEasing
+        local ok = pcall(function()
+            return lurek.math.applyEasing("nonexistent", 0.5)
+        end)
+        expect_false(ok)
     end)
 end)
 
@@ -2238,21 +2283,26 @@ end)
 describe("Missing explicit test for lurek.math.inQuad", function()
     it("lurek.math.inQuad works", function()
         -- @tests lurek.math.inQuad
-        -- TODO: add assertion for lurek.math.inQuad
+        expect_near(0.0, lurek.math.inQuad(0), 1e-5)
+        expect_near(0.25, lurek.math.inQuad(0.5), 1e-5)
+        expect_near(1.0, lurek.math.inQuad(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.outQuad", function()
     it("lurek.math.outQuad works", function()
         -- @tests lurek.math.outQuad
-        -- TODO: add assertion for lurek.math.outQuad
+        expect_near(0.0, lurek.math.outQuad(0), 1e-5)
+        expect_near(1.0, lurek.math.outQuad(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.inOutQuad", function()
     it("lurek.math.inOutQuad works", function()
         -- @tests lurek.math.inOutQuad
-        -- TODO: add assertion for lurek.math.inOutQuad
+        expect_near(0.0, lurek.math.inOutQuad(0), 1e-5)
+        expect_near(0.5, lurek.math.inOutQuad(0.5), 1e-5)
+        expect_near(1.0, lurek.math.inOutQuad(1), 1e-5)
     end)
 end)
 
@@ -2273,7 +2323,7 @@ end)
 describe("Missing explicit test for lurek.math.inOutCubic", function()
     it("lurek.math.inOutCubic works", function()
         -- @tests lurek.math.inOutCubic
-        -- TODO: add assertion for lurek.math.inOutCubic
+        expect_near(0.5, lurek.math.inOutCubic(0.5), 1e-5)
     end)
 end)
 
@@ -2294,56 +2344,63 @@ end)
 describe("Missing explicit test for lurek.math.inOutSine", function()
     it("lurek.math.inOutSine works", function()
         -- @tests lurek.math.inOutSine
-        -- TODO: add assertion for lurek.math.inOutSine
+        expect_near(0.5, lurek.math.inOutSine(0.5), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.inExpo", function()
     it("lurek.math.inExpo works", function()
         -- @tests lurek.math.inExpo
-        -- TODO: add assertion for lurek.math.inExpo
+        expect_near(0.0, lurek.math.inExpo(0), 1e-5)
+        expect_near(1.0, lurek.math.inExpo(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.outExpo", function()
     it("lurek.math.outExpo works", function()
         -- @tests lurek.math.outExpo
-        -- TODO: add assertion for lurek.math.outExpo
+        expect_near(0.0, lurek.math.outExpo(0), 1e-5)
+        expect_near(1.0, lurek.math.outExpo(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.inElastic", function()
     it("lurek.math.inElastic works", function()
         -- @tests lurek.math.inElastic
-        -- TODO: add assertion for lurek.math.inElastic
+        expect_near(0.0, lurek.math.inElastic(0), 1e-5)
+        expect_near(1.0, lurek.math.inElastic(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.outElastic", function()
     it("lurek.math.outElastic works", function()
         -- @tests lurek.math.outElastic
-        -- TODO: add assertion for lurek.math.outElastic
+        expect_near(0.0, lurek.math.outElastic(0), 1e-5)
+        expect_near(1.0, lurek.math.outElastic(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.outBounce", function()
     it("lurek.math.outBounce works", function()
         -- @tests lurek.math.outBounce
-        -- TODO: add assertion for lurek.math.outBounce
+        expect_near(0.0, lurek.math.outBounce(0), 1e-5)
+        expect_near(1.0, lurek.math.outBounce(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.inBack", function()
     it("lurek.math.inBack works", function()
         -- @tests lurek.math.inBack
-        -- TODO: add assertion for lurek.math.inBack
+        expect_near(0.0, lurek.math.inBack(0), 1e-5)
+        expect_near(1.0, lurek.math.inBack(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.outBack", function()
     it("lurek.math.outBack works", function()
         -- @tests lurek.math.outBack
-        -- TODO: add assertion for lurek.math.outBack
+        expect_near(0.0, lurek.math.outBack(0), 1e-5)
+        expect_near(1.0, lurek.math.outBack(1), 1e-5)
     end)
 end)
 
@@ -2378,28 +2435,36 @@ end)
 describe("Missing explicit test for lurek.math.angleBetween", function()
     it("lurek.math.angleBetween works", function()
         -- @tests lurek.math.angleBetween
-        -- TODO: add assertion for lurek.math.angleBetween
+        expect_near(0.0, lurek.math.angleBetween(0, 0, 1, 0), 1e-5)
+        expect_near(math.pi / 2, lurek.math.angleBetween(0, 0, 0, 1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for lurek.math.circleContainsPoint", function()
     it("lurek.math.circleContainsPoint works", function()
         -- @tests lurek.math.circleContainsPoint
-        -- TODO: add assertion for lurek.math.circleContainsPoint
+        expect_true(lurek.math.circleContainsPoint(0, 0, 5, 3, 4))
+        expect_false(lurek.math.circleContainsPoint(0, 0, 5, 4, 4))
     end)
 end)
 
 describe("Missing explicit test for lurek.math.circleIntersectsCircle", function()
     it("lurek.math.circleIntersectsCircle works", function()
         -- @tests lurek.math.circleIntersectsCircle
-        -- TODO: add assertion for lurek.math.circleIntersectsCircle
+        expect_true(lurek.math.circleIntersectsCircle(0, 0, 3, 4, 0, 3))
+        expect_false(lurek.math.circleIntersectsCircle(0, 0, 1, 10, 0, 1))
     end)
 end)
 
 describe("Missing explicit test for lurek.math.bresenham", function()
     it("lurek.math.bresenham works", function()
         -- @tests lurek.math.bresenham
-        -- TODO: add assertion for lurek.math.bresenham
+        local pts = lurek.math.bresenham(0, 0, 3, 0)
+        expect_equal(4, #pts)
+        expect_equal(0, pts[1][1])
+        expect_equal(0, pts[1][2])
+        expect_equal(3, pts[4][1])
+        expect_equal(0, pts[4][2])
     end)
 end)
 
@@ -2938,28 +3003,44 @@ end)
 describe("Missing explicit test for Tween:update", function()
     it("Tween:update works", function()
         -- @tests Tween:update
-        -- TODO: add assertion for Tween:update
+        local tw = lurek.math.newTween(2.0, "linear")
+        tw:addValue(0.0, 10.0)
+        expect_false(tw:isComplete())
+        tw:update(1.0)
+        expect_false(tw:isComplete())
     end)
 end)
 
 describe("Missing explicit test for Tween:reset", function()
     it("Tween:reset works", function()
         -- @tests Tween:reset
-        -- TODO: add assertion for Tween:reset
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 100.0)
+        tw:update(1.0)
+        expect_true(tw:isComplete())
+        tw:reset()
+        expect_false(tw:isComplete())
+        expect_near(0.0, tw:getValue(1), 1e-5)
     end)
 end)
 
 describe("Missing explicit test for Tween:getValue", function()
     it("Tween:getValue works", function()
         -- @tests Tween:getValue
-        -- TODO: add assertion for Tween:getValue
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 100.0)
+        tw:setTime(0.5)
+        expect_near(50.0, tw:getValue(1), 1e-3)
     end)
 end)
 
 describe("Missing explicit test for Tween:isComplete", function()
     it("Tween:isComplete works", function()
         -- @tests Tween:isComplete
-        -- TODO: add assertion for Tween:isComplete
+        local tw = lurek.math.newTween(1.0, "linear")
+        tw:addValue(0.0, 10.0)
+        tw:update(1.5)
+        expect_true(tw:isComplete())
     end)
 end)
 
@@ -2987,7 +3068,12 @@ end)
 describe("Missing explicit test for Tween:setTime", function()
     it("Tween:setTime works", function()
         -- @tests Tween:setTime
-        -- TODO: add assertion for Tween:setTime
+        local tw = lurek.math.newTween(1.0, "inQuad")
+        local a = tw:addValue(0.0, 100.0)
+        local b = tw:addValue(50.0, 150.0)
+        tw:setTime(0.5)
+        expect_near(25.0, tw:getValue(a), 1e-3)
+        expect_near(75.0, tw:getValue(b), 1e-3)
     end)
 end)
 
@@ -3321,3 +3407,5 @@ describe("AabbTree:len (@covers)", function()
         expect_equal(1, tree:len())
     end)
 end)
+
+test_summary()

@@ -19,15 +19,16 @@ description: "Load this skill when working on LuaJIT vs Lua 5.4 behavior, GC, lu
 - API naming.
 
 ## Domain Knowledge
-- Cargo feature selection controls LuaJIT versus lua54; LuaJIT is the shipping path and lua54 is fallback only.
-- Worker VMs under threading are isolated states; no shared Lua VM assumptions survive across threads.
-- Runtime concerns here are GC pressure, allocation churn, backend differences, and VM behavior, not API naming.
-- Measure runtime differences in release mode and state backend-sensitive behavior explicitly.
-- If a backend change affects visible script behavior, reflect it in tests or docs/specs.
-- Keep runtime tuning distinct from binding and game-script work.
-- Backend-sensitive behavior should be checked against Cargo features, worker VM rules, and release-mode runtime expectations before any compatibility claim is made.
-- Runtime tuning here includes GC pressure, LuaJIT vs lua54 behavior, and multi-VM constraints, not boundary conversion or API naming.
-- This skill owns scripting runtime characteristics, not gameplay script style.
+- Cargo feature selection controls LuaJIT versus lua54, and LuaJIT is the shipping path while lua54 remains a fallback, so runtime assumptions should start from LuaJIT unless compatibility work says otherwise.
+- Worker VMs under threading are isolated states, which means no shared Lua VM assumptions survive across threads even if the Rust side coordinates them.
+- Runtime concerns here are GC pressure, allocation churn, backend differences, JIT-sensitive behavior, and VM execution characteristics, not API naming or boundary conversion.
+- Measure runtime differences in release mode and state backend-sensitive behavior explicitly; dev-mode impressions are not reliable evidence for Lua runtime tuning.
+- If a backend change affects visible script behavior, performance, or supported idioms, reflect it in tests or docs/specs so compatibility expectations stay explicit.
+- Keep runtime tuning distinct from binding work and general Lua script style; a GC or backend issue is not the same problem as a poor API or messy main.lua.
+- Backend-sensitive behavior should always be checked against Cargo features, worker VM rules, and real runtime mode before any compatibility claim is made.
+- Avoid designing around one accidental backend quirk unless the repo explicitly chooses that tradeoff and documents it; fallback behavior still matters even when LuaJIT is primary.
+- When tuning hot Lua paths, look for allocation churn, transient table creation, and unnecessary cross-VM work before assuming the JIT alone will save the path.
+- Runtime work here includes GC pressure, LuaJIT vs lua54 behavior, and multi-VM constraints, not binding-layer translation.
 ## Companion File Index
 - None.
 

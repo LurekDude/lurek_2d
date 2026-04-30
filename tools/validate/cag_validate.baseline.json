@@ -1,10 +1,10 @@
 {
-  "captured_at": "2026-04-19T20:27:18.194437+00:00",
+  "captured_at": "2026-04-29T18:13:43.143878+00:00",
   "keys": [],
   "scanned": {
-    "agent": 20,
-    "prompt": 56,
-    "skill": 33,
+    "agent": 27,
+    "prompt": 58,
+    "skill": 36,
     "system_prompt": 1
   },
   "summary": {

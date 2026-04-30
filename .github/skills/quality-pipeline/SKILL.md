@@ -19,15 +19,16 @@ description: "Load this skill when running quality checks, audits, coverage tool
 - Writing docs.
 
 ## Domain Knowledge
-- tools/README.md plus workspace tasks are the real map of quality commands in this repo.
-- Generators run before validators when artifacts are derived from source.
-- After Rust or Lua API changes, docs generation and generated-stub validation come before broader audits.
-- quality_report.py aggregates; targeted validators are better for fast failure diagnosis.
-- .github, library/, docs, module, and content changes each have different validators or audits.
-- Prefer narrow gates while working and the full pipeline only at the end.
-- This repo already separates generators, validators, auditors, and fixers; choosing the right class of tool matters as much as running it.
-- For API or docs changes, generator order is critical because later validators assume fresh derived artifacts.
-- The skill owns run order and result interpretation, not the code, docs, or tests being corrected.
+- tools/README.md plus the workspace tasks are the real map of quality commands in this repo, so start from checked-in entry points before inventing raw command sequences.
+- This codebase separates generators, validators, auditors, and fixers on purpose; choosing the right class of tool is often more important than picking the loudest full-pipeline command.
+- Generators run before validators when artifacts are derived from source, and validators run before broad audits when you need the fastest possible root cause.
+- After Rust or Lua API changes, docs generation and generated-stub validation come before broader audits because later checks assume fresh derived outputs.
+- .github, library/, docs, module, and content changes each have different quality surfaces, so the first question is which artifact moved, not which command looks comprehensive.
+- Prefer narrow gates while working: one validator, one target test, or one focused audit usually gives a faster and more actionable failure than the entire quality stack.
+- quality_report.py is useful as an aggregator, but targeted validators are better when the goal is to understand the first concrete failure instead of reading a wide summary.
+- Use repo wrappers and tasks such as parallel_cargo.py, task definitions, and checked-in scripts to preserve the same expectations developers already rely on locally.
+- Run order matters: formatter checks, generated-doc steps, clippy, unit or Lua suites, and packaging checks each answer different questions and should not be shuffled casually.
+- When a change touches CAG files, generated docs, or library outputs, include the artifact-specific validators in the loop.
 ## Companion File Index
 - None.
 

@@ -18,15 +18,17 @@ description: "Load this skill when working with GitHub issues, PRs, labels, mile
 - Code review work.
 
 ## Domain Knowledge
-- Repo process expects explicit staging, one logical change per commit, and docs/CHANGELOG.md updated in the same logical change.
-- Commit format is type(scope): description and branch should be checked before staging or release work.
-- Keep GitHub labels, milestones, and roadmap links aligned with actual local quality gates, not a parallel process.
-- Avoid interactive git flows in agent work; use non-interactive commands and explicit file lists.
-- CONTRIBUTING.md and current CAG rules are the contract for process, not ad hoc PR conventions.
-- Use tools/github/ only when a checked-in repo helper already exists there.
-- This repo already enforces explicit staging, branch checks, and changelog discipline, so issue or PR process should reinforce those habits instead of bypassing them.
-- GitHub workflow here is a planning and tracking layer on top of local quality gates, not a substitute for them.
-- The skill owns labels, milestones, and change hygiene, not CI YAML or code review logic.
+- Repo process expects explicit staging, one logical change per commit, and docs/CHANGELOG.md updated in the same logical change, so GitHub workflow should reinforce that structure rather than hide it behind broad PRs.
+- Commit format is type(scope): description, and the current branch should be checked before staging, release work, or milestone updates so history stays attributable.
+- Keep GitHub labels, milestones, issue status, and roadmap links aligned with real module ownership and actual local quality gates, not a parallel planning vocabulary.
+- Avoid interactive git flows in agent work; use non-interactive commands, explicit file lists, and concrete status output that another contributor can reproduce.
+- CONTRIBUTING.md and the current CAG rules are the contract for process, not ad hoc PR folklore or personal branch habits.
+- Use tools/github/ only when a checked-in helper actually exists there; do not assume missing automation and invent process requirements that the repo does not support.
+- Good issue triage here includes evidence, affected module or layer, reproduction signal, and the likely validation command, not just a feature request title.
+- Good PR hygiene here includes a narrow scope, visible validation, synced docs or changelog updates when required, and labels that help route follow-up work.
+- GitHub workflow in this repo is a planning and tracking layer on top of local engineering rules, not a substitute for tests, docs sync, or packaging checks.
+- Milestones should represent deliverable slices with real gates and owners; vague buckets that do not map to repo work quickly become stale.
+- This skill owns labels, milestones, issue and PR structure, and change hygiene, not CI YAML, implementation details, or code review findings themselves.
 ## Companion File Index
 - None.
 

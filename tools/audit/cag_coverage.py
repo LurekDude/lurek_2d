@@ -2,8 +2,8 @@
 """cag_coverage.py — required-section coverage analytics for CAG files.
 
 For each CAG file type, computes the share of files that contain each
-required section / frontmatter field defined by the templates in
-``work/cag-system-overhaul-20260418/reports/standards/``.
+required section or live-schema metadata field described in
+``docs/architecture/cag-system.md``.
 
 Useful as a contributor-facing "what's still missing" view while CAG files
 are being migrated to the new templates.
@@ -36,20 +36,17 @@ from _cag_common import (  # noqa: E402
     discover_prompts,
     discover_skills,
     has_section,
+    parse_cag_metadata_section,
     parse_frontmatter,
     relpath,
     safe_read,
 )
 
-AGENT_REQUIRED_FIELDS = (
-    "name", "mission", "personas", "primary_skills",
-    "secondary_skills", "routes_to", "loads_tools",
-)
-SKILL_REQUIRED_FIELDS = ("name", "description", "companion_files", "related_skills")
-PROMPT_REQUIRED_FIELDS = (
-    "description", "mode", "loads_skills", "loads_tools",
-    "expected_agent", "inputs_required",
-)
+AGENT_FRONTMATTER_FIELDS = ("name", "description")
+AGENT_METADATA_FIELDS = ("communication", "personas", "primary_skills", "secondary_skills")
+SKILL_FRONTMATTER_FIELDS = ("name", "description")
+PROMPT_FRONTMATTER_FIELDS = ("description", "agent")
+PROMPT_METADATA_FIELDS = ("mode", "loads_skills", "inputs_required")
 
 
 def _row(name: str, fields: list[tuple[str, bool]]) -> dict[str, object]:
@@ -81,9 +78,13 @@ def scan_agents() -> dict[str, object]:
         text = safe_read(p)
         fm = parse_frontmatter(text)
         body = body_after_frontmatter(text, fm)
+        meta = parse_cag_metadata_section(body)
         fields: list[tuple[str, bool]] = []
-        for field in AGENT_REQUIRED_FIELDS:
+        for field in AGENT_FRONTMATTER_FIELDS:
             fields.append((f"fm:{field}", field in fm.data and bool(fm.data.get(field))))
+        for field in AGENT_METADATA_FIELDS:
+            value = meta.get(field)
+            fields.append((f"meta:{field}", bool(value)))
         for sec in AGENT_REQUIRED_SECTIONS:
             fields.append((f"sec:{sec}", has_section(body, sec)))
         rows.append(_row(relpath(p), fields))
@@ -97,7 +98,7 @@ def scan_skills() -> dict[str, object]:
         fm = parse_frontmatter(text)
         body = body_after_frontmatter(text, fm)
         fields: list[tuple[str, bool]] = []
-        for field in SKILL_REQUIRED_FIELDS:
+        for field in SKILL_FRONTMATTER_FIELDS:
             fields.append((f"fm:{field}", field in fm.data and bool(fm.data.get(field))))
         for sec in SKILL_REQUIRED_SECTIONS:
             fields.append((f"sec:{sec}", has_section(body, sec)))
@@ -111,9 +112,13 @@ def scan_prompts() -> dict[str, object]:
         text = safe_read(p)
         fm = parse_frontmatter(text)
         body = body_after_frontmatter(text, fm)
+        meta = parse_cag_metadata_section(body)
         fields: list[tuple[str, bool]] = []
-        for field in PROMPT_REQUIRED_FIELDS:
+        for field in PROMPT_FRONTMATTER_FIELDS:
             fields.append((f"fm:{field}", field in fm.data and bool(fm.data.get(field))))
+        for field in PROMPT_METADATA_FIELDS:
+            value = meta.get(field)
+            fields.append((f"meta:{field}", bool(value)))
         for sec in PROMPT_REQUIRED_SECTIONS:
             fields.append((f"sec:{sec}", has_section(body, sec)))
         rows.append(_row(relpath(p), fields))
