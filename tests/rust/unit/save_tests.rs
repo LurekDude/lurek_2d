@@ -1,4 +1,12 @@
-//! Tests for the save module.
+//! INTERNAL ONLY: public `lurek.save.SaveManager` behavior is covered by the Lua-first suites in
+//! `tests/lua/unit/test_save_unit.lua` and `tests/lua/security/test_save.lua`.
+//!
+//! The Rust-only coverage that remains here is limited to helpers and internal
+//! state that are not directly observable through the Lua API:
+//! - migration bookkeeping helpers such as `applicable_migrations`
+//! - serializer/parser helpers like `serialize_table`, `serialize_value`, and
+//!   `parse_save_string`
+//! - private metadata defaults and path formatting helpers
 
 use lurek2d::save::*;
 use std::collections::HashMap;
@@ -7,50 +15,6 @@ use std::collections::HashMap;
 
 mod save_manager_tests {
     use super::*;
-
-    #[test]
-    fn save_manager_defaults() {
-        let sm = SaveManager::new();
-        assert_eq!(sm.schema_version(), 0);
-        assert!(!sm.is_dirty());
-        assert!(sm.registered_names().is_empty());
-    }
-
-    #[test]
-    fn register_unregister() {
-        let mut sm = SaveManager::new();
-        sm.register("player");
-        sm.register("inventory");
-        assert_eq!(sm.registered_names().len(), 2);
-        sm.unregister("player");
-        assert_eq!(sm.registered_names(), &["inventory"]);
-    }
-
-    #[test]
-    fn dirty_tracking() {
-        let mut sm = SaveManager::new();
-        assert!(!sm.is_dirty());
-        sm.mark_dirty();
-        assert!(sm.is_dirty());
-        sm.clear_dirty();
-        assert!(!sm.is_dirty());
-    }
-
-    #[test]
-    fn auto_save_triggers() {
-        let mut sm = SaveManager::new();
-        sm.enable_auto_save(5.0, "quick");
-        sm.mark_dirty();
-        assert!(sm.update(4.0).is_none());
-        assert_eq!(sm.update(1.5).unwrap(), "quick");
-    }
-
-    #[test]
-    fn auto_save_not_when_clean() {
-        let mut sm = SaveManager::new();
-        sm.enable_auto_save(1.0, "slot");
-        assert!(sm.update(2.0).is_none()); // not dirty
-    }
 
     #[test]
     fn migrations() {
@@ -91,30 +55,9 @@ mod save_manager_tests {
     }
 
     #[test]
-    fn reset_clears_all() {
-        let mut sm = SaveManager::new();
-        sm.register("a");
-        sm.set_schema_version(3);
-        sm.mark_dirty();
-        sm.enable_auto_save(1.0, "slot");
-        sm.reset();
-        assert!(!sm.is_dirty());
-        assert_eq!(sm.schema_version(), 0);
-        assert!(sm.registered_names().is_empty());
-    }
-
-    #[test]
     fn slot_path_format() {
         assert_eq!(SaveManager::slot_path("quick"), "save/slot_quick.sav");
         assert_eq!(SaveManager::slot_path("1"), "save/slot_1.sav");
-    }
-
-    #[test]
-    fn summary_set_and_get() {
-        let mut sm = SaveManager::new();
-        assert_eq!(sm.summary(), "");
-        sm.set_summary("Chapter 3 — Forest".to_string());
-        assert_eq!(sm.summary(), "Chapter 3 — Forest");
     }
 
     #[test]
@@ -156,23 +99,6 @@ mod save_manager_tests {
         let s = serialize_table(&outer, 0).unwrap();
         assert!(s.contains("pos = {"));
         assert!(s.contains("x = 1"));
-    }
-
-    #[test]
-    fn register_duplicate_is_noop() {
-        let mut sm = SaveManager::new();
-        sm.register("player");
-        sm.register("player");
-        assert_eq!(sm.registered_names().len(), 1);
-    }
-
-    #[test]
-    fn disable_auto_save_stops_timer() {
-        let mut sm = SaveManager::new();
-        sm.enable_auto_save(1.0, "slot");
-        sm.mark_dirty();
-        sm.disable_auto_save();
-        assert!(sm.update(5.0).is_none());
     }
 
     #[test]

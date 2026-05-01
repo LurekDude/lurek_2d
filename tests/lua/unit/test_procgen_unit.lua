@@ -1,57 +1,47 @@
 -- Lurek2D Lua BDD tests for lurek.procgen
 -- Headless: no GPU, no audio, no window.
 
--- @description Covers suite: lurek.procgen.
 describe("lurek.procgen", function()
-    -- @description Covers suite: module interface.
     describe("module interface", function()
-        -- @tests lurek.procgen.cellularAutomata
-        -- @tests lurek.procgen.floodFill
-        -- @tests lurek.procgen.perlinNoise
-        -- @tests lurek.procgen.poissonDisk
-        -- @tests lurek.procgen.voronoi
-        -- @description Verifies cellularAutomata is exposed.
+        -- @covers lurek.procgen.cellularAutomata
+        -- @covers lurek.procgen.floodFill
+        -- @covers lurek.procgen.perlinNoise
+        -- @covers lurek.procgen.poissonDisk
+        -- @covers lurek.procgen.voronoi
         it("exposes cellularAutomata", function()
             expect_type("function", lurek.procgen.cellularAutomata)
         end)
 
-        -- @tests lurek.procgen.floodFill
-        -- @description Verifies floodFill is exposed.
+        -- @covers lurek.procgen.floodFill
         it("exposes floodFill", function()
             expect_type("function", lurek.procgen.floodFill)
         end)
 
-        -- @tests lurek.procgen.perlinNoise
-        -- @description Verifies perlinNoise is exposed.
+        -- @covers lurek.procgen.perlinNoise
         it("exposes perlinNoise", function()
             expect_type("function", lurek.procgen.perlinNoise)
         end)
 
-        -- @tests lurek.procgen.poissonDisk
-        -- @description Verifies poissonDisk is exposed.
+        -- @covers lurek.procgen.poissonDisk
         it("exposes poissonDisk", function()
             expect_type("function", lurek.procgen.poissonDisk)
         end)
 
-        -- @tests lurek.procgen.voronoi
-        -- @description Verifies voronoi is exposed.
+        -- @covers lurek.procgen.voronoi
         it("exposes voronoi", function()
             expect_type("function", lurek.procgen.voronoi)
         end)
     end)
 
-    -- @description Covers suite: cellularAutomata(w, h, opts).
     describe("cellularAutomata(w, h, opts)", function()
-        -- @tests lurek.procgen.cellularAutomata
-        -- @description Verifies cellularAutomata returns width*height binary cells.
+        -- @covers lurek.procgen.cellularAutomata
         it("returns a flat table of 0/1 values", function()
             local data = lurek.procgen.cellularAutomata(8, 6)
             expect_type("table", data)
             expect_equal(48, #data)
         end)
 
-        -- @tests lurek.procgen.cellularAutomata
-        -- @description Verifies cellularAutomata outputs only 0 or 1 values.
+        -- @covers lurek.procgen.cellularAutomata
         it("all values are 0 or 1", function()
             local data = lurek.procgen.cellularAutomata(10, 10)
             for _, v in ipairs(data) do
@@ -59,15 +49,13 @@ describe("lurek.procgen", function()
             end
         end)
 
-        -- @tests lurek.procgen.cellularAutomata
-        -- @description Verifies cellularAutomata accepts option tables with fill and iteration fields.
+        -- @covers lurek.procgen.cellularAutomata
         it("accepts opts table with fill parameter", function()
             local data = lurek.procgen.cellularAutomata(6, 6, { fill = 0.5, iterations = 2 })
             expect_equal(36, #data)
         end)
 
-        -- @tests lurek.procgen.cellularAutomata
-        -- @description Verifies the same seed reproduces the same grid.
+        -- @covers lurek.procgen.cellularAutomata
         it("is deterministic for the same seed", function()
             local a = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
             local b = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
@@ -78,10 +66,8 @@ describe("lurek.procgen", function()
         end)
     end)
 
-    -- @description Covers suite: floodFill(data, w, h, sx, sy, threshold, above).
     describe("floodFill(data, w, h, sx, sy, threshold, above)", function()
-        -- @tests lurek.procgen.floodFill
-        -- @description Verifies floodFill returns the same number of cells as the source grid.
+        -- @covers lurek.procgen.floodFill
         it("returns a table of the same size as input", function()
             local data = {}
             for i = 1, 25 do data[i] = 0 end
@@ -89,8 +75,7 @@ describe("lurek.procgen", function()
             expect_equal(25, #result)
         end)
 
-        -- @tests lurek.procgen.floodFill
-        -- @description Verifies floodFill marks cells connected to the seed.
+        -- @covers lurek.procgen.floodFill
         it("fills connected region starting from seed", function()
             local data = {}
             for i = 1, 25 do data[i] = 0 end
@@ -103,8 +88,7 @@ describe("lurek.procgen", function()
             expect_true(filled > 0, "expected at least one filled cell")
         end)
 
-        -- @tests lurek.procgen.floodFill
-        -- @description Verifies floodFill respects threshold filtering when above=true.
+        -- @covers lurek.procgen.floodFill
         it("fills only cells that meet the threshold rule", function()
             local data = {1, 1, 0, 0,
                           1, 1, 0, 0,
@@ -119,24 +103,20 @@ describe("lurek.procgen", function()
         end)
     end)
 
-    -- @description Covers suite: perlinNoise(x, y, px, py).
     describe("perlinNoise(x, y, px, py)", function()
-        -- @tests lurek.procgen.perlinNoise
-        -- @description Verifies perlinNoise returns a numeric sample.
+        -- @covers lurek.procgen.perlinNoise
         it("returns a number", function()
             local v = lurek.procgen.perlinNoise(0.5, 0.5, 8.0, 8.0)
             expect_type("number", v)
         end)
 
-        -- @tests lurek.procgen.perlinNoise
-        -- @description Verifies perlinNoise output stays within [-1, 1].
+        -- @covers lurek.procgen.perlinNoise
         it("value is in [-1, 1]", function()
             local v = lurek.procgen.perlinNoise(1.0, 2.0, 10.0, 10.0)
             expect_in_range(v, -1.0, 1.0, "out of range: " .. tostring(v))
         end)
 
-        -- @tests lurek.procgen.perlinNoise
-        -- @description Verifies perlinNoise wraps at the provided period boundary.
+        -- @covers lurek.procgen.perlinNoise
         it("wraps at period boundaries", function()
             local px, py = 8.0, 8.0
             local v1 = lurek.procgen.perlinNoise(0.0, 3.0, px, py)
@@ -146,17 +126,14 @@ describe("lurek.procgen", function()
         end)
     end)
 
-    -- @description Covers suite: poissonDisk(w, h, min_dist, max_attempts, seed).
     describe("poissonDisk(w, h, min_dist, max_attempts, seed)", function()
-        -- @tests lurek.procgen.poissonDisk
-        -- @description Verifies poissonDisk returns a table of points.
+        -- @covers lurek.procgen.poissonDisk
         it("returns a table of point objects", function()
             local pts = lurek.procgen.poissonDisk(80, 80, 10)
             expect_type("table", pts)
         end)
 
-        -- @tests lurek.procgen.poissonDisk
-        -- @description Verifies each sampled point exposes numeric x and y fields.
+        -- @covers lurek.procgen.poissonDisk
         it("each point has x and y fields", function()
             local pts = lurek.procgen.poissonDisk(80, 80, 10, 30, 42)
             expect_true(#pts > 0, "expected at least one point")
@@ -166,8 +143,7 @@ describe("lurek.procgen", function()
             end
         end)
 
-        -- @tests lurek.procgen.poissonDisk
-        -- @description Verifies sampled points stay inside the requested rectangle.
+        -- @covers lurek.procgen.poissonDisk
         it("points lie within the specified bounds", function()
             local w, h = 100, 60
             local pts = lurek.procgen.poissonDisk(w, h, 8, 30, 7)
@@ -177,8 +153,7 @@ describe("lurek.procgen", function()
             end
         end)
 
-        -- @tests lurek.procgen.poissonDisk
-        -- @description Verifies returned points respect the requested minimum spacing.
+        -- @covers lurek.procgen.poissonDisk
         it("keeps points at least min_dist apart", function()
             local min_dist = 10
             local pts = lurek.procgen.poissonDisk(80, 80, min_dist, 30, 42)
@@ -194,10 +169,8 @@ describe("lurek.procgen", function()
         end)
     end)
 
-    -- @description Covers suite: voronoi(w, h, seeds).
     describe("voronoi(w, h, seeds)", function()
-        -- @tests lurek.procgen.voronoi
-        -- @description Verifies voronoi returns region and distance tables.
+        -- @covers lurek.procgen.voronoi
         it("returns three tables: regions, dist, dist2", function()
             local pts = { { x = 10, y = 10 }, { x = 30, y = 30 } }
             local regions, dist, dist2 = lurek.procgen.voronoi(8, 8, pts)
@@ -206,16 +179,14 @@ describe("lurek.procgen", function()
             expect_type("table", dist2)
         end)
 
-        -- @tests lurek.procgen.voronoi
-        -- @description Verifies the regions output contains one entry per output cell.
+        -- @covers lurek.procgen.voronoi
         it("regions table has w*h entries", function()
             local pts = { { x = 5, y = 5 }, { x = 15, y = 5 }, { x = 10, y = 15 } }
             local regions, _, _ = lurek.procgen.voronoi(20, 10, pts)
             expect_equal(200, #regions)
         end)
 
-        -- @tests lurek.procgen.voronoi
-        -- @description Verifies Voronoi region ids stay within the seed count.
+        -- @covers lurek.procgen.voronoi
         it("region indices are within seed count range", function()
             local pts = { { x = 5, y = 5 }, { x = 15, y = 10 } }
             local n = #pts
@@ -227,18 +198,15 @@ describe("lurek.procgen", function()
     end)
 end)
 
--- @description Covers suite: procgen determinism.
 describe("procgen determinism", function()
-    -- @tests lurek.procgen.poissonDisk
-    -- @description Verifies identical seeds reproduce the same sample count.
+    -- @covers lurek.procgen.poissonDisk
     it("poissonDisk with same seed returns same point count", function()
         local pts1 = lurek.procgen.poissonDisk(100, 80, 12, 30, 42)
         local pts2 = lurek.procgen.poissonDisk(100, 80, 12, 30, 42)
         expect_equal(#pts1, #pts2)
     end)
 
-    -- @tests lurek.procgen.poissonDisk
-    -- @description Verifies different seeds still produce valid non-empty samples.
+    -- @covers lurek.procgen.poissonDisk
     it("poissonDisk with different seeds may differ", function()
         local pts1 = lurek.procgen.poissonDisk(100, 80, 8, 30, 1)
         local pts2 = lurek.procgen.poissonDisk(100, 80, 8, 30, 9999)
@@ -247,8 +215,7 @@ describe("procgen determinism", function()
         expect_true(#pts2 > 0, "seed 9999 result non-empty")
     end)
 
-    -- @tests lurek.procgen.perlinNoise
-    -- @description Verifies repeated identical perlinNoise calls are deterministic.
+    -- @covers lurek.procgen.perlinNoise
     it("perlinNoise same coords same period returns identical value", function()
         local v1 = lurek.procgen.perlinNoise(1.5, 2.5, 8.0, 8.0)
         local v2 = lurek.procgen.perlinNoise(1.5, 2.5, 8.0, 8.0)
@@ -256,10 +223,8 @@ describe("procgen determinism", function()
     end)
 end)
 
--- @description Covers suite: procgen edge cases.
 describe("procgen edge cases", function()
-    -- @tests lurek.procgen.cellularAutomata
-    -- @description Verifies zero fill produces no filled cells when iterations are skipped.
+    -- @covers lurek.procgen.cellularAutomata
     it("cellularAutomata with fill=0 produces mostly zeros", function()
         local data = lurek.procgen.cellularAutomata(20, 20, { fill = 0.0, iterations = 0 })
         local ones = 0
@@ -269,8 +234,7 @@ describe("procgen edge cases", function()
         expect_equal(0, ones, "fill=0 should produce all zeros")
     end)
 
-    -- @tests lurek.procgen.cellularAutomata
-    -- @description Verifies fill=1 produces no zero cells when iterations are skipped.
+    -- @covers lurek.procgen.cellularAutomata
     it("cellularAutomata with fill=1 produces mostly ones", function()
         local data = lurek.procgen.cellularAutomata(20, 20, { fill = 1.0, iterations = 0 })
         local zeros = 0
@@ -280,8 +244,7 @@ describe("procgen edge cases", function()
         expect_equal(0, zeros, "fill=1 should produce all ones")
     end)
 
-    -- @tests lurek.procgen.voronoi
-    -- @description Verifies a single-seed Voronoi map assigns every cell to region 1.
+    -- @covers lurek.procgen.voronoi
     it("voronoi with single seed assigns all cells to region 1", function()
         local pts = { { x = 4, y = 4 } }
         local regions, _, _ = lurek.procgen.voronoi(8, 8, pts)
@@ -291,9 +254,9 @@ describe("procgen edge cases", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- BSP Dungeon
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.bspDungeon", function()
     it("returns rooms and corridors", function()
         local d = lurek.procgen.bspDungeon({ width = 40, height = 30, seed = 1 })
@@ -319,9 +282,9 @@ describe("procgen.bspDungeon", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- Rooms Dungeon
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.roomsDungeon", function()
     it("grid length equals width * height", function()
         local d = lurek.procgen.roomsDungeon({ width = 20, height = 15, seed = 7 })
@@ -340,9 +303,9 @@ describe("procgen.roomsDungeon", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- Heightmap
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.heightmap", function()
     it("returns correct cell count", function()
         local hm = lurek.procgen.heightmap({ width = 16, height = 16, seed = 1 })
@@ -365,9 +328,9 @@ describe("procgen.heightmap", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- L-System
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.lsystem", function()
     it("F doubled each iteration", function()
         local s = lurek.procgen.lsystem({ axiom = "F", rules = { F = "FF" }, iterations = 3 })
@@ -393,9 +356,9 @@ describe("procgen.lsystem", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- Name Generator
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.generateName", function()
     local training = { "Aria", "Lyra", "Mira", "Elara", "Kira", "Tara", "Nara", "Zara", "Vera", "Lara" }
 
@@ -420,9 +383,9 @@ describe("procgen.generateName", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- World Graph
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.worldGraph", function()
     it("returns correct region count", function()
         local wg = lurek.procgen.worldGraph(200, 150, 8, 1)
@@ -457,9 +420,9 @@ describe("procgen.worldGraph", function()
     end)
 end)
 
--- ─────────────────────────────────────────────
+-- ============================================================
 -- Noise Map & Parallel
--- ─────────────────────────────────────────────
+-- ============================================================
 describe("procgen.noiseMap / noiseMapParallel", function()
     it("noiseMap returns correct count", function()
         local m = lurek.procgen.noiseMap(16, 16)
@@ -488,10 +451,8 @@ describe("procgen.noiseMap / noiseMapParallel", function()
     end)
 end)
 
--- @description Replaces the old placeholder tail with direct assertions for the remaining uncovered procedural APIs: WFC generation and simplex noise helpers.
 describe("lurek.procgen regression coverage", function()
-    -- @tests lurek.procgen.wfcGenerate
-    -- @description Generates a trivial one-tile WFC map and verifies the output dimensions and every collapsed cell value.
+    -- @covers lurek.procgen.wfcGenerate
     it("wfcGenerate returns a fully collapsed grid for a single-tile ruleset", function()
         local grid = lurek.procgen.wfcGenerate({
             width = 4,
@@ -514,9 +475,8 @@ describe("lurek.procgen regression coverage", function()
         end
     end)
 
-    -- @tests lurek.procgen.simplex2d
-    -- @tests lurek.procgen.simplex3d
-    -- @description Samples identical simplex coordinates twice in both dimensions and verifies the helpers are numeric and deterministic.
+    -- @covers lurek.procgen.simplex2d
+    -- @covers lurek.procgen.simplex3d
     it("simplex2d and simplex3d return deterministic numeric samples", function()
         local s2_a = lurek.procgen.simplex2d(0.25, 0.5)
         local s2_b = lurek.procgen.simplex2d(0.25, 0.5)

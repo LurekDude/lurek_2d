@@ -1,31 +1,28 @@
 -- Lurek2D lurek.light.* API Tests
 
--- â”€â”€ Module-level functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Module-level functions
 
--- @description Verifies the module table, constructors, counters, ambient state, enable state, and max-light controls all round-trip through the public API.
 describe("lurek.light module functions", function()
-    -- @tests lurek.light.advanceFlickers
-    -- @tests lurek.light.clear
-    -- @tests lurek.light.getAmbient
-    -- @tests lurek.light.getGroupCount
-    -- @tests lurek.light.getLightCount
-    -- @tests lurek.light.getMaxLights
-    -- @tests lurek.light.getOccluderCount
-    -- @tests lurek.light.isEnabled
-    -- @tests lurek.light.newLight
-    -- @tests lurek.light.newOccluder
-    -- @tests lurek.light.setAmbient
-    -- @tests lurek.light.setEnabled
-    -- @tests lurek.light.setGroupColor
-    -- @tests lurek.light.setGroupEnabled
-    -- @tests lurek.light.setGroupIntensity
-    -- @tests lurek.light.setMaxLights
-    -- @description Asserts that lurek.light is exposed to Lua as a table.
+    -- @covers lurek.light.advanceFlickers
+    -- @covers lurek.light.clear
+    -- @covers lurek.light.getAmbient
+    -- @covers lurek.light.getGroupCount
+    -- @covers lurek.light.getLightCount
+    -- @covers lurek.light.getMaxLights
+    -- @covers lurek.light.getOccluderCount
+    -- @covers lurek.light.isEnabled
+    -- @covers lurek.light.newLight
+    -- @covers lurek.light.newOccluder
+    -- @covers lurek.light.setAmbient
+    -- @covers lurek.light.setEnabled
+    -- @covers lurek.light.setGroupColor
+    -- @covers lurek.light.setGroupEnabled
+    -- @covers lurek.light.setGroupIntensity
+    -- @covers lurek.light.setMaxLights
     it("lurek.light is a table", function()
         expect_type("table", lurek.light)
     end)
 
-    -- @description Clears state, creates one light at 100,200 with radius 50, checks that the handle is userdata, and removes it.
     it("newLight returns userdata", function()
         lurek.light.clear()
         local l = lurek.light.newLight(100, 200, 50)
@@ -33,7 +30,6 @@ describe("lurek.light module functions", function()
         l:remove()
     end)
 
-    -- @description Creates a light with every options field set and verifies position, radius, color, intensity, energy, blend, falloff, shadow settings, masks, and enabled state.
     it("newLight with opts applies settings", function()
         lurek.light.clear()
         local l = lurek.light.newLight(10, 20, 30, {
@@ -78,7 +74,6 @@ describe("lurek.light module functions", function()
         l:remove()
     end)
 
-    -- @description Clears state, creates a triangle occluder from six coordinates, verifies the returned handle is userdata, and removes it.
     it("newOccluder returns userdata for valid polygon", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 100, 0, 50, 80})
@@ -86,7 +81,6 @@ describe("lurek.light module functions", function()
         o:remove()
     end)
 
-    -- @description Creates an occluder with opacity, light mask, and disabled state options, then checks each configured value.
     it("newOccluder with opts applies settings", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 100, 0, 50, 80}, {
@@ -100,21 +94,18 @@ describe("lurek.light module functions", function()
         o:remove()
     end)
 
-    -- @description Confirms that creating an occluder with only four numbers raises an error because there are too few vertices.
     it("newOccluder errors on fewer than 6 numbers", function()
         expect_error(function()
             lurek.light.newOccluder({0, 0, 100, 0})
         end)
     end)
 
-    -- @description Confirms that creating an occluder with an odd number of coordinates raises an error.
     it("newOccluder errors on odd number count", function()
         expect_error(function()
             lurek.light.newOccluder({0, 0, 100, 0, 50})
         end)
     end)
 
-    -- @description Sets ambient light with RGB only and verifies the stored RGB values plus the default alpha of 1.0.
     it("setAmbient / getAmbient round-trip (rgb)", function()
         lurek.light.clear()
         lurek.light.setAmbient(0.3, 0.4, 0.5)
@@ -125,7 +116,6 @@ describe("lurek.light module functions", function()
         expect_near(a, 1.0, 0.001)
     end)
 
-    -- @description Sets ambient light with RGBA and verifies that all four channels are returned unchanged.
     it("setAmbient / getAmbient round-trip (rgba)", function()
         lurek.light.clear()
         lurek.light.setAmbient(0.2, 0.3, 0.4, 0.8)
@@ -136,7 +126,6 @@ describe("lurek.light module functions", function()
         expect_near(a, 0.8, 0.001)
     end)
 
-    -- @description Toggles the module enabled flag off and on again and checks that isEnabled reports each state.
     it("setEnabled / isEnabled round-trip", function()
         lurek.light.clear()
         lurek.light.setEnabled(false)
@@ -145,7 +134,6 @@ describe("lurek.light module functions", function()
         expect_true(lurek.light.isEnabled())
     end)
 
-    -- @description Starts with lighting disabled, creates one light, and verifies that the first light creation automatically re-enables lighting.
     it("auto-enables after first newLight", function()
         lurek.light.clear()
         lurek.light.setEnabled(false)
@@ -155,7 +143,6 @@ describe("lurek.light module functions", function()
         l:remove()
     end)
 
-    -- @description Verifies that the light count increments for two created lights and decrements back to zero as each light is removed.
     it("getLightCount tracks add/remove", function()
         lurek.light.clear()
         expect_equal(lurek.light.getLightCount(), 0)
@@ -169,7 +156,6 @@ describe("lurek.light module functions", function()
         expect_equal(lurek.light.getLightCount(), 0)
     end)
 
-    -- @description Verifies that the occluder count increments for two created occluders and decrements back to zero as each one is removed.
     it("getOccluderCount tracks add/remove", function()
         lurek.light.clear()
         expect_equal(lurek.light.getOccluderCount(), 0)
@@ -183,14 +169,12 @@ describe("lurek.light module functions", function()
         expect_equal(lurek.light.getOccluderCount(), 0)
     end)
 
-    -- @description Sets the module max-light limit to 128 and verifies that the getter returns the same value.
     it("getMaxLights / setMaxLights round-trip", function()
         lurek.light.clear()
         lurek.light.setMaxLights(128)
         expect_equal(lurek.light.getMaxLights(), 128)
     end)
 
-    -- @description Verifies that max lights clamps low values up to 1 and high values down to 256.
     it("setMaxLights clamps to 1..256", function()
         lurek.light.setMaxLights(0)
         expect_equal(lurek.light.getMaxLights(), 1)
@@ -198,7 +182,6 @@ describe("lurek.light module functions", function()
         expect_equal(lurek.light.getMaxLights(), 256)
     end)
 
-    -- @description Creates one light and one occluder, changes ambient to white, clears the system, and checks that counts reset and ambient returns to the default 0.1,0.1,0.1,1.0.
     it("clear resets counts and ambient", function()
         local l = lurek.light.newLight(0, 0, 10)
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -214,11 +197,9 @@ describe("lurek.light module functions", function()
     end)
 end)
 
--- â”€â”€ Light handle methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light handle methods
 
--- @description Verifies per-light handle setters, getters, validity checks, and enum-like field updates on an individual light instance.
 describe("Light handle methods", function()
-    -- @description Moves a light to 42,99 and verifies the reported position matches those coordinates.
     it("setPosition / getPosition", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -229,7 +210,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Changes a light radius to 77.5 and verifies getRadius returns the updated value.
     it("setRadius / getRadius", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -238,7 +218,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets RGB color only on a light and verifies the RGB channels plus the default alpha of 1.0.
     it("setColor / getColor (rgb)", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -251,7 +230,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets RGBA color on a light and verifies all four returned channels match.
     it("setColor / getColor (rgba)", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -264,7 +242,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets light intensity to 3.5 and verifies the getter returns that exact value within tolerance.
     it("setIntensity / getIntensity", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -273,7 +250,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets light energy to 2.0 and verifies the getter returns the same value.
     it("setEnergy / getEnergy", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -282,7 +258,15 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the blend mode to add and verifies getBlendMode returns add.
+    it("new light defaults for blend, falloff, and shadow filter", function()
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 10)
+        expect_equal(l:getBlendMode(), "add")
+        expect_equal(l:getFalloff(), "linear")
+        expect_equal(l:getShadowFilter(), "none")
+        l:remove()
+    end)
+
     it("setBlendMode / getBlendMode - add", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -291,7 +275,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the blend mode to sub and verifies getBlendMode returns sub.
     it("setBlendMode / getBlendMode - sub", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -300,7 +283,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the blend mode to mix and verifies getBlendMode returns mix.
     it("setBlendMode / getBlendMode - mix", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -309,7 +291,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the falloff mode to smooth and verifies the getter returns smooth.
     it("setFalloff / getFalloff - smooth", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -318,7 +299,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the falloff mode to constant and verifies the getter returns constant.
     it("setFalloff / getFalloff - constant", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -327,7 +307,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the falloff mode to linear and verifies the getter returns linear.
     it("setFalloff / getFalloff - linear", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -336,7 +315,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Verifies shadowing starts disabled, can be enabled, and can then be disabled again on the same light.
     it("setShadowEnabled / isShadowEnabled", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -348,7 +326,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the shadow RGBA color and verifies each returned shadow color channel matches.
     it("setShadowColor / getShadowColor", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -361,7 +338,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the shadow filter to pcf5 and verifies the getter returns pcf5.
     it("setShadowFilter / getShadowFilter - pcf5", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -370,7 +346,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the shadow filter to pcf13 and verifies the getter returns pcf13.
     it("setShadowFilter / getShadowFilter - pcf13", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -379,7 +354,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the shadow filter to none and verifies the getter returns none.
     it("setShadowFilter / getShadowFilter - none", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -388,7 +362,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets shadow smoothing to 2.0 and verifies the getter returns 2.0.
     it("setShadowSmooth / getShadowSmooth", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -397,7 +370,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the light mask to 255 and verifies the getter returns 255.
     it("setLightMask / getLightMask", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -406,7 +378,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Sets the shadow mask to 127 and verifies the getter returns 127.
     it("setShadowMask / getShadowMask", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -415,7 +386,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Verifies a light handle starts enabled, can be disabled, and can be re-enabled.
     it("setEnabled / isEnabled on light handle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -427,7 +397,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Checks that a newly created light reports itself as valid before removal.
     it("isValid returns true before remove", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -435,7 +404,6 @@ describe("Light handle methods", function()
         l:remove()
     end)
 
-    -- @description Removes a light and verifies the handle reports invalid afterward.
     it("isValid returns false after remove", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -444,11 +412,9 @@ describe("Light handle methods", function()
     end)
 end)
 
--- â”€â”€ Occluder handle methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Occluder handle methods
 
--- @description Verifies occluder handle movement, opacity, masks, enabled state, validity, and vertex read/write behavior.
 describe("Occluder handle methods", function()
-    -- @description Moves an occluder to 15,25 and verifies the returned position matches those coordinates.
     it("setPosition / getPosition", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -459,7 +425,6 @@ describe("Occluder handle methods", function()
         o:remove()
     end)
 
-    -- @description Sets occluder opacity to 0.5 and verifies the getter returns that value.
     it("setOpacity / getOpacity", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -468,7 +433,13 @@ describe("Occluder handle methods", function()
         o:remove()
     end)
 
-    -- @description Sets the occluder light mask to 0 and then 255, verifying both values round-trip.
+    it("default light mask is all bits set", function()
+        lurek.light.clear()
+        local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
+        expect_equal(o:getLightMask(), 65535)
+        o:remove()
+    end)
+
     it("setLightMask / getLightMask", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -479,7 +450,6 @@ describe("Occluder handle methods", function()
         o:remove()
     end)
 
-    -- @description Verifies an occluder starts enabled, can be disabled, and can be enabled again.
     it("setEnabled / isEnabled", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -491,7 +461,6 @@ describe("Occluder handle methods", function()
         o:remove()
     end)
 
-    -- @description Confirms an occluder is valid before removal and invalid after remove is called.
     it("isValid returns false after remove", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -500,7 +469,6 @@ describe("Occluder handle methods", function()
         expect_false(o:isValid())
     end)
 
-    -- @description Reads occluder vertices back as a flat table and verifies both the table length and each coordinate value.
     it("getVertices returns flat table", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({10, 20, 30, 40, 50, 60})
@@ -516,7 +484,6 @@ describe("Occluder handle methods", function()
         o:remove()
     end)
 
-    -- @description Replaces an occluder vertex list and verifies all six stored coordinates were updated.
     it("setVertices replaces vertices", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -532,11 +499,9 @@ describe("Occluder handle methods", function()
     end)
 end)
 
--- â”€â”€ Edge cases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Edge cases
 
--- @description Verifies that invalid enum strings and operations on removed handles all raise errors instead of silently succeeding.
 describe("lurek.light edge cases", function()
-    -- @description Confirms that setting an unsupported blend mode string on a light raises an error.
     it("invalid blend mode string errors", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -544,7 +509,6 @@ describe("lurek.light edge cases", function()
         l:remove()
     end)
 
-    -- @description Confirms that setting an unsupported falloff string on a light raises an error.
     it("invalid falloff string errors", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -552,7 +516,6 @@ describe("lurek.light edge cases", function()
         l:remove()
     end)
 
-    -- @description Confirms that setting an unsupported shadow filter string on a light raises an error.
     it("invalid shadow filter string errors", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -560,7 +523,6 @@ describe("lurek.light edge cases", function()
         l:remove()
     end)
 
-    -- @description Removes a light and verifies that reading or writing position, radius, color, and intensity all error on the stale handle.
     it("operations on removed light error", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 10)
@@ -575,7 +537,6 @@ describe("lurek.light edge cases", function()
         expect_error(function() l:setIntensity(1) end)
     end)
 
-    -- @description Removes an occluder and verifies that position, opacity, and vertex operations all error on the stale handle.
     it("operations on removed occluder error", function()
         lurek.light.clear()
         local o = lurek.light.newOccluder({0, 0, 10, 0, 5, 10})
@@ -589,11 +550,9 @@ describe("lurek.light edge cases", function()
     end)
 end)
 
--- â”€â”€ New effects: Light Type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- New effects: Light Type
 
--- @description Verifies the light type API defaults to point, accepts valid type transitions, and rejects invalid type strings.
 describe("Light type", function()
-    -- @description Creates a light and verifies its default light type is point.
     it("default is point", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -601,7 +560,6 @@ describe("Light type", function()
         l:remove()
     end)
 
-    -- @description Switches a light from point to spot to directional and back to point, verifying each reported type.
     it("setLightType to spot and back", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -614,7 +572,6 @@ describe("Light type", function()
         l:remove()
     end)
 
-    -- @description Confirms that setting an unsupported light type string raises an error.
     it("invalid light type errors", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -623,11 +580,9 @@ describe("Light type", function()
     end)
 end)
 
--- â”€â”€ Light Direction and Angles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Direction and Angles
 
--- @description Verifies directional and cone angle defaults and setter/getter round-trips for directional light parameters.
 describe("Light direction and angles", function()
-    -- @description Creates a light and verifies its default direction is 0 radians.
     it("default direction is 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -635,7 +590,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets light direction to 1.57 radians and verifies the getter returns that value.
     it("setDirection / getDirection", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -644,7 +598,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets the inner cone angle to 0.3 radians and verifies the getter returns 0.3.
     it("setInnerAngle / getInnerAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -653,7 +606,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets the outer cone angle to 0.6 radians and verifies the getter returns 0.6.
     it("setOuterAngle / getOuterAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -662,7 +614,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Verifies the default inner and outer cone angles are pi/6 and pi/4 respectively.
     it("default angles are pi/6 and pi/4", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -672,11 +623,9 @@ describe("Light direction and angles", function()
     end)
 end)
 
--- â”€â”€ Light Attenuation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Attenuation
 
--- @description Verifies attenuation defaults and round-trips constant, linear, and quadratic attenuation coefficients.
 describe("Light attenuation", function()
-    -- @description Creates a light and verifies the default attenuation coefficients are 1.0, 0.0, and 0.0.
     it("default attenuation is 1 0 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -687,7 +636,6 @@ describe("Light attenuation", function()
         l:remove()
     end)
 
-    -- @description Sets attenuation coefficients to 1.0, 0.09, and 0.032 and verifies each returned coefficient.
     it("setAttenuation / getAttenuation", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -700,11 +648,9 @@ describe("Light attenuation", function()
     end)
 end)
 
--- â”€â”€ Light Flicker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Flicker
 
--- @description Verifies flicker defaults, configured speed and strength, and explicit enable toggling for flickering lights.
 describe("Light flicker", function()
-    -- @description Creates a light and verifies flicker is disabled by default.
     it("default flicker disabled", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -712,7 +658,6 @@ describe("Light flicker", function()
         l:remove()
     end)
 
-    -- @description Sets flicker speed to 10.0 and strength to 0.25, then verifies both values and that flicker becomes enabled.
     it("setFlicker enables and sets values", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -724,7 +669,6 @@ describe("Light flicker", function()
         l:remove()
     end)
 
-    -- @description Configures flicker, disables it, re-enables it, and verifies the enabled flag after each toggle.
     it("setFlickerEnabled toggles", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -735,13 +679,22 @@ describe("Light flicker", function()
         expect_equal(l:isFlickerEnabled(), true)
         l:remove()
     end)
+
+    it("addFlicker derives speed and strength from range", function()
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:addFlicker(0.8, 1.2, 2.0)
+        local speed, strength = l:getFlicker()
+        expect_near(speed, math.pi * 4.0, 0.001)
+        expect_near(strength, 0.2, 0.001)
+        expect_equal(l:isFlickerEnabled(), true)
+        l:remove()
+    end)
 end)
 
--- â”€â”€ Light Groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Groups
 
--- @description Verifies group IDs, per-group counts, group-wide enable changes, group intensity updates, and group color updates.
 describe("Light groups", function()
-    -- @description Creates a light and verifies its default group ID is 0.
     it("default group is 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -749,7 +702,6 @@ describe("Light groups", function()
         l:remove()
     end)
 
-    -- @description Assigns a light to group 5 and verifies getGroupId returns 5.
     it("setGroupId / getGroupId", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -758,7 +710,6 @@ describe("Light groups", function()
         l:remove()
     end)
 
-    -- @description Places two lights into group 1 and verifies that group 1 reports a count of 2 while group 0 reports 0.
     it("getGroupCount returns count", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -770,7 +721,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Disables group 2 and verifies that two lights in group 2 are disabled while a light left in group 0 remains enabled.
     it("setGroupEnabled disables a group", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -786,7 +736,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Assigns a light to group 3, sets group intensity to 0.5, and verifies the light intensity updates to 0.5.
     it("setGroupIntensity changes group intensity", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -796,7 +745,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Assigns a light to group 4, sets the group color to solid red, and verifies the light color channels match 1,0,0,1.
     it("setGroupColor changes group color", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -811,11 +759,9 @@ describe("Light groups", function()
     end)
 end)
 
--- â”€â”€ Light Volumetric â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Volumetric
 
--- @description Verifies volumetric lighting defaults to false and can be toggled on and back off per light.
 describe("Light volumetric", function()
-    -- @description Creates a light and verifies volumetric lighting is disabled by default.
     it("default not volumetric", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -823,7 +769,6 @@ describe("Light volumetric", function()
         l:remove()
     end)
 
-    -- @description Enables volumetric lighting, verifies true, disables it again, and verifies false.
     it("setVolumetric / isVolumetric", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -835,11 +780,9 @@ describe("Light volumetric", function()
     end)
 end)
 
--- â”€â”€ advanceFlickers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- advanceFlickers
 
--- @description Verifies the module-level flicker advancement function can run on a flickering light without raising an error.
 describe("advanceFlickers", function()
-    -- @description Creates a flickering light, advances flickers by 0.1 seconds, and treats the absence of an error as success.
     it("advanceFlickers does not error", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -850,11 +793,9 @@ describe("advanceFlickers", function()
     end)
 end)
 
--- â”€â”€ newLight opts with new fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- newLight opts with new fields
 
--- @description Verifies that the new extended newLight options table initializes newer fields such as type, direction, angles, groups, volumetric state, flicker, and attenuation.
 describe("newLight opts with new effects", function()
-    -- @description Creates a light with opts.type set to spot and verifies getLightType returns spot.
     it("opts type sets light type", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { type = "spot" })
@@ -862,7 +803,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.direction set to 1.57 and verifies the stored direction matches.
     it("opts direction sets direction", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { direction = 1.57 })
@@ -870,7 +810,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with innerAngle 0.3 and outerAngle 0.6 in opts and verifies both stored cone angles.
     it("opts innerAngle and outerAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { innerAngle = 0.3, outerAngle = 0.6 })
@@ -879,7 +818,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.groupId set to 7 and verifies the light reports group 7.
     it("opts groupId sets group", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { groupId = 7 })
@@ -887,7 +825,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.volumetric enabled and verifies the light reports volumetric true.
     it("opts volumetric sets flag", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { volumetric = true })
@@ -895,7 +832,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with flickerSpeed 12.0 and flickerStrength 0.3 in opts, verifies flicker is enabled, and checks both values.
     it("opts flickerSpeed and flickerStrength enable flicker", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, {
@@ -909,7 +845,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with attenuation coefficients in opts and verifies constant, linear, and quadratic values round-trip.
     it("opts attenuation coefficients", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, {
@@ -925,11 +860,9 @@ describe("newLight opts with new effects", function()
     end)
 end)
 
--- â”€â”€ New effects: Light Type â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- New effects: Light Type
 
--- @description Verifies the light type API defaults to point, accepts valid type transitions, and rejects invalid type strings.
 describe("Light type", function()
-    -- @description Creates a light and verifies its default light type is point.
     it("default is point", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -937,7 +870,6 @@ describe("Light type", function()
         l:remove()
     end)
 
-    -- @description Switches a light from point to spot to directional and back to point, verifying each reported type.
     it("setLightType to spot and back", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -950,7 +882,6 @@ describe("Light type", function()
         l:remove()
     end)
 
-    -- @description Confirms that setting an unsupported light type string raises an error.
     it("invalid light type errors", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -959,11 +890,9 @@ describe("Light type", function()
     end)
 end)
 
--- â”€â”€ Light Direction and Angles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Direction and Angles
 
--- @description Verifies directional and cone angle defaults and setter/getter round-trips for directional light parameters.
 describe("Light direction and angles", function()
-    -- @description Creates a light and verifies its default direction is 0 radians.
     it("default direction is 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -971,7 +900,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets light direction to 1.57 radians and verifies the getter returns that value.
     it("setDirection / getDirection", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -980,7 +908,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets the inner cone angle to 0.3 radians and verifies the getter returns 0.3.
     it("setInnerAngle / getInnerAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -989,7 +916,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Sets the outer cone angle to 0.6 radians and verifies the getter returns 0.6.
     it("setOuterAngle / getOuterAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -998,7 +924,6 @@ describe("Light direction and angles", function()
         l:remove()
     end)
 
-    -- @description Verifies the default inner and outer cone angles are pi/6 and pi/4 respectively.
     it("default angles are pi/6 and pi/4", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1008,11 +933,9 @@ describe("Light direction and angles", function()
     end)
 end)
 
--- â”€â”€ Light Attenuation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Attenuation
 
--- @description Verifies attenuation defaults and round-trips constant, linear, and quadratic attenuation coefficients.
 describe("Light attenuation", function()
-    -- @description Creates a light and verifies the default attenuation coefficients are 1.0, 0.0, and 0.0.
     it("default attenuation is 1 0 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1023,7 +946,6 @@ describe("Light attenuation", function()
         l:remove()
     end)
 
-    -- @description Sets attenuation coefficients to 1.0, 0.09, and 0.032 and verifies each returned coefficient.
     it("setAttenuation / getAttenuation", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1036,11 +958,9 @@ describe("Light attenuation", function()
     end)
 end)
 
--- â”€â”€ Light Flicker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Flicker
 
--- @description Verifies flicker defaults, configured speed and strength, and explicit enable toggling for flickering lights.
 describe("Light flicker", function()
-    -- @description Creates a light and verifies flicker is disabled by default.
     it("default flicker disabled", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1048,7 +968,6 @@ describe("Light flicker", function()
         l:remove()
     end)
 
-    -- @description Sets flicker speed to 10.0 and strength to 0.25, then verifies both values and that flicker becomes enabled.
     it("setFlicker enables and sets values", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1060,7 +979,6 @@ describe("Light flicker", function()
         l:remove()
     end)
 
-    -- @description Configures flicker, disables it, re-enables it, and verifies the enabled flag after each toggle.
     it("setFlickerEnabled toggles", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1073,11 +991,9 @@ describe("Light flicker", function()
     end)
 end)
 
--- â”€â”€ Light Groups â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Groups
 
--- @description Verifies group IDs, per-group counts, group-wide enable changes, group intensity updates, and group color updates.
 describe("Light groups", function()
-    -- @description Creates a light and verifies its default group ID is 0.
     it("default group is 0", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1085,7 +1001,6 @@ describe("Light groups", function()
         l:remove()
     end)
 
-    -- @description Assigns a light to group 5 and verifies getGroupId returns 5.
     it("setGroupId / getGroupId", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1094,7 +1009,6 @@ describe("Light groups", function()
         l:remove()
     end)
 
-    -- @description Places two lights into group 1 and verifies that group 1 reports a count of 2 while group 0 reports 0.
     it("getGroupCount returns count", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -1106,7 +1020,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Disables group 2 and verifies that two lights in group 2 are disabled while a light left in group 0 remains enabled.
     it("setGroupEnabled disables a group", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -1122,7 +1035,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Assigns a light to group 3, sets group intensity to 0.5, and verifies the light intensity updates to 0.5.
     it("setGroupIntensity changes group intensity", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -1132,7 +1044,6 @@ describe("Light groups", function()
         lurek.light.clear()
     end)
 
-    -- @description Assigns a light to group 4, sets the group color to solid red, and verifies the light color channels match 1,0,0,1.
     it("setGroupColor changes group color", function()
         lurek.light.clear()
         local l1 = lurek.light.newLight(0, 0, 50)
@@ -1147,11 +1058,9 @@ describe("Light groups", function()
     end)
 end)
 
--- â”€â”€ Light Volumetric â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Light Volumetric
 
--- @description Verifies volumetric lighting defaults to false and can be toggled on and back off per light.
 describe("Light volumetric", function()
-    -- @description Creates a light and verifies volumetric lighting is disabled by default.
     it("default not volumetric", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1159,7 +1068,6 @@ describe("Light volumetric", function()
         l:remove()
     end)
 
-    -- @description Enables volumetric lighting, verifies true, disables it again, and verifies false.
     it("setVolumetric / isVolumetric", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1171,11 +1079,9 @@ describe("Light volumetric", function()
     end)
 end)
 
--- â”€â”€ advanceFlickers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- advanceFlickers
 
--- @description Verifies the module-level flicker advancement function can run on a flickering light without raising an error.
 describe("advanceFlickers", function()
-    -- @description Creates a flickering light, advances flickers by 0.1 seconds, and treats the absence of an error as success.
     it("advanceFlickers does not error", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1186,11 +1092,9 @@ describe("advanceFlickers", function()
     end)
 end)
 
--- â”€â”€ newLight opts with new fields â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- newLight opts with new fields
 
--- @description Verifies that the new extended newLight options table initializes newer fields such as type, direction, angles, groups, volumetric state, flicker, and attenuation.
 describe("newLight opts with new effects", function()
-    -- @description Creates a light with opts.type set to spot and verifies getLightType returns spot.
     it("opts type sets light type", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { type = "spot" })
@@ -1198,7 +1102,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.direction set to 1.57 and verifies the stored direction matches.
     it("opts direction sets direction", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { direction = 1.57 })
@@ -1206,7 +1109,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with innerAngle 0.3 and outerAngle 0.6 in opts and verifies both stored cone angles.
     it("opts innerAngle and outerAngle", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { innerAngle = 0.3, outerAngle = 0.6 })
@@ -1215,7 +1117,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.groupId set to 7 and verifies the light reports group 7.
     it("opts groupId sets group", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { groupId = 7 })
@@ -1223,7 +1124,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with opts.volumetric enabled and verifies the light reports volumetric true.
     it("opts volumetric sets flag", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, { volumetric = true })
@@ -1231,7 +1131,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with flickerSpeed 12.0 and flickerStrength 0.3 in opts, verifies flicker is enabled, and checks both values.
     it("opts flickerSpeed and flickerStrength enable flicker", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, {
@@ -1245,7 +1144,6 @@ describe("newLight opts with new effects", function()
         l:remove()
     end)
 
-    -- @description Creates a light with attenuation coefficients in opts and verifies constant, linear, and quadratic values round-trip.
     it("opts attenuation coefficients", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50, {
@@ -1261,29 +1159,23 @@ describe("newLight opts with new effects", function()
     end)
 end)
 
--- ── Ambient Bridge & God-Ray Hints (merged from test_light_godrays.lua) ─────
+--  Ambient Bridge & God-Ray Hints (merged from test_light_godrays.lua) 
 
--- @description Covers suite: lurek.light ambient bridge and god-ray hints.
 describe("lurek.light ambient bridge", function()
-    -- @description Covers suite: API exposure.
     describe("API exposure", function()
-        -- @tests lurek.light.syncAmbient
-        -- @description syncAmbient is exposed as a function.
+        -- @covers lurek.light.syncAmbient
         it("exposes syncAmbient", function()
             expect_type("function", lurek.light.syncAmbient)
         end)
 
-        -- @tests lurek.light.getGodRayHints
-        -- @description getGodRayHints is exposed as a function.
+        -- @covers lurek.light.getGodRayHints
         it("exposes getGodRayHints", function()
             expect_type("function", lurek.light.getGodRayHints)
         end)
     end)
 
-    -- @description Covers suite: syncAmbient().
     describe("syncAmbient()", function()
-        -- @tests lurek.light.syncAmbient
-        -- @description Returns four numbers.
+        -- @covers lurek.light.syncAmbient
         it("returns four numeric values", function()
             local r, g, b, a = lurek.light.syncAmbient()
             expect_type("number", r)
@@ -1292,17 +1184,15 @@ describe("lurek.light ambient bridge", function()
             expect_type("number", a)
         end)
 
-        -- @tests lurek.light.syncAmbient
-        -- @description Alpha is in [0, 1].
+        -- @covers lurek.light.syncAmbient
         it("alpha component is in [0, 1]", function()
             local _, _, _, a = lurek.light.syncAmbient()
             assert(a >= 0.0 and a <= 1.0,
                 "alpha out of [0,1]: " .. tostring(a))
         end)
 
-        -- @tests lurek.light.setAmbient
-        -- @tests lurek.light.syncAmbient
-        -- @description After setAmbient, syncAmbient reflects the new colour.
+        -- @covers lurek.light.setAmbient
+        -- @covers lurek.light.syncAmbient
         it("reflects setAmbient changes", function()
             lurek.light.setAmbient(0.2, 0.4, 0.6, 0.8)
             local r, g, b, a = lurek.light.syncAmbient()
@@ -1312,9 +1202,8 @@ describe("lurek.light ambient bridge", function()
             expect_near(0.8, a, 0.001)
         end)
 
-        -- @tests lurek.light.setAmbient
-        -- @tests lurek.light.syncAmbient
-        -- @description syncAmbient matches getAmbient.
+        -- @covers lurek.light.setAmbient
+        -- @covers lurek.light.syncAmbient
         it("matches getAmbient values", function()
             lurek.light.setAmbient(0.1, 0.3, 0.5, 1.0)
             local r1, g1, b1, a1 = lurek.light.getAmbient()
@@ -1326,26 +1215,22 @@ describe("lurek.light ambient bridge", function()
         end)
     end)
 
-    -- @description Covers suite: getGodRayHints().
     describe("getGodRayHints()", function()
-        -- @tests lurek.light.getGodRayHints
-        -- @description Returns a table.
+        -- @covers lurek.light.getGodRayHints
         it("returns a table", function()
             local hints = lurek.light.getGodRayHints()
             expect_type("table", hints)
         end)
 
-        -- @tests lurek.light.getGodRayHints
-        -- @description Returns empty table when no directional lights exist.
+        -- @covers lurek.light.getGodRayHints
         it("returns empty table with no directional lights", function()
             lurek.light.clear()
             local hints = lurek.light.getGodRayHints()
             expect_equal(0, #hints)
         end)
 
-        -- @tests lurek.light.newLight
-        -- @tests lurek.light.getGodRayHints
-        -- @description Each hint entry has x, y, and angle fields.
+        -- @covers lurek.light.newLight
+        -- @covers lurek.light.getGodRayHints
         it("each hint has x, y, angle fields", function()
             lurek.light.clear()
             local light = lurek.light.newLight(100, 200, 50, { type = "directional" })
@@ -1362,8 +1247,7 @@ describe("lurek.light ambient bridge", function()
             expect_near(1.57, h.angle, 0.001)
         end)
 
-        -- @tests lurek.light.getGodRayHints
-        -- @description Disabled directional lights are not included.
+        -- @covers lurek.light.getGodRayHints
         it("disabled lights are excluded", function()
             lurek.light.clear()
             local light = lurek.light.newLight(0, 0, 50, { type = "directional" })
@@ -1374,454 +1258,91 @@ describe("lurek.light ambient bridge", function()
     end)
 end)
 
-test_summary()
-
 -- =========================================================================
--- Missing API Coverage Stubs
+-- Additional Light coverage
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @tests Light:addFlicker
+    -- @covers Light:addFlicker
     it("covers Light:addFlicker", function()
-        -- TODO: Implement test for Light:addFlicker
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:addFlicker(0.9, 1.1, 3.0)
+        local speed, strength = l:getFlicker()
+        expect_near(speed, math.pi * 6.0, 0.001)
+        expect_near(strength, 0.1, 0.001)
+        l:remove()
     end)
 
-    -- @tests Light:updateTransition
+    -- @covers Light:updateTransition
     it("covers Light:updateTransition", function()
-        -- TODO: Implement test for Light:updateTransition
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 100)
+        l:transitionTo({ color = {0.0, 0.0, 0.0, 1.0}, intensity = 0.0, radius = 50.0 }, 2.0)
+        expect_near(l:transitionProgress(), 0.0, 0.001)
+        expect_equal(l:updateTransition(1.0), true)
+
+        local r, g, b, a = l:getColor()
+        expect_near(r, 0.5, 0.001)
+        expect_near(g, 0.5, 0.001)
+        expect_near(b, 0.5, 0.001)
+        expect_near(a, 1.0, 0.001)
+        expect_near(l:getIntensity(), 0.5, 0.001)
+        expect_near(l:getRadius(), 75.0, 0.001)
+        expect_near(l:transitionProgress(), 0.5, 0.001)
+
+        expect_equal(l:updateTransition(1.0), true)
+        local r2, g2, b2, a2 = l:getColor()
+        expect_near(r2, 0.0, 0.001)
+        expect_near(g2, 0.0, 0.001)
+        expect_near(b2, 0.0, 0.001)
+        expect_near(a2, 1.0, 0.001)
+        expect_near(l:getIntensity(), 0.0, 0.001)
+        expect_near(l:getRadius(), 50.0, 0.001)
+        expect_near(l:transitionProgress(), 1.0, 0.001)
+        expect_equal(l:updateTransition(0.1), false)
+        l:remove()
     end)
 
-    -- @tests Light:stopTransition
+    -- @covers Light:stopTransition
     it("covers Light:stopTransition", function()
-        -- TODO: Implement test for Light:stopTransition
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 20)
+        l:transitionTo({ radius = 10.0 }, 1.0)
+        l:stopTransition()
+        expect_equal(l:updateTransition(0.1), false)
+        l:remove()
     end)
 
-    -- @tests Light:setCookie
+    -- @covers Light:setCookie
     it("covers Light:setCookie", function()
-        -- TODO: Implement test for Light:setCookie
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:setCookie("assets/lights/cookie.png")
+        expect_equal(l:getCookie(), "assets/lights/cookie.png")
+        l:remove()
     end)
 
-    -- @tests Light:getCookie
+    -- @covers Light:getCookie
     it("covers Light:getCookie", function()
-        -- TODO: Implement test for Light:getCookie
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        expect_equal(l:getCookie(), nil)
+        l:setCookie("assets/lights/window.png")
+        expect_equal(l:getCookie(), "assets/lights/window.png")
+        l:remove()
     end)
 
-    -- @tests Light:clearCookie
+    -- @covers Light:clearCookie
     it("covers Light:clearCookie", function()
-        -- TODO: Implement test for Light:clearCookie
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:setCookie("assets/lights/cookie.png")
+        l:clearCookie()
+        expect_equal(l:getCookie(), nil)
+        l:remove()
     end)
 
 end)
 
-describe("Missing explicit test for Light:setPosition", function()
-    it("Light:setPosition works", function()
-        -- @tests Light:setPosition
-        -- TODO: add assertion for Light:setPosition
-    end)
-end)
-
-describe("Missing explicit test for Light:getPosition", function()
-    it("Light:getPosition works", function()
-        -- @tests Light:getPosition
-        -- TODO: add assertion for Light:getPosition
-    end)
-end)
-
-describe("Missing explicit test for Light:setRadius", function()
-    it("Light:setRadius works", function()
-        -- @tests Light:setRadius
-        -- TODO: add assertion for Light:setRadius
-    end)
-end)
-
-describe("Missing explicit test for Light:getRadius", function()
-    it("Light:getRadius works", function()
-        -- @tests Light:getRadius
-        -- TODO: add assertion for Light:getRadius
-    end)
-end)
-
-describe("Missing explicit test for Light:getColor", function()
-    it("Light:getColor works", function()
-        -- @tests Light:getColor
-        -- TODO: add assertion for Light:getColor
-    end)
-end)
-
-describe("Missing explicit test for Light:setIntensity", function()
-    it("Light:setIntensity works", function()
-        -- @tests Light:setIntensity
-        -- TODO: add assertion for Light:setIntensity
-    end)
-end)
-
-describe("Missing explicit test for Light:getIntensity", function()
-    it("Light:getIntensity works", function()
-        -- @tests Light:getIntensity
-        -- TODO: add assertion for Light:getIntensity
-    end)
-end)
-
-describe("Missing explicit test for Light:setEnergy", function()
-    it("Light:setEnergy works", function()
-        -- @tests Light:setEnergy
-        -- TODO: add assertion for Light:setEnergy
-    end)
-end)
-
-describe("Missing explicit test for Light:getEnergy", function()
-    it("Light:getEnergy works", function()
-        -- @tests Light:getEnergy
-        -- TODO: add assertion for Light:getEnergy
-    end)
-end)
-
-describe("Missing explicit test for Light:setBlendMode", function()
-    it("Light:setBlendMode works", function()
-        -- @tests Light:setBlendMode
-        -- TODO: add assertion for Light:setBlendMode
-    end)
-end)
-
-describe("Missing explicit test for Light:getBlendMode", function()
-    it("Light:getBlendMode works", function()
-        -- @tests Light:getBlendMode
-        -- TODO: add assertion for Light:getBlendMode
-    end)
-end)
-
-describe("Missing explicit test for Light:setFalloff", function()
-    it("Light:setFalloff works", function()
-        -- @tests Light:setFalloff
-        -- TODO: add assertion for Light:setFalloff
-    end)
-end)
-
-describe("Missing explicit test for Light:getFalloff", function()
-    it("Light:getFalloff works", function()
-        -- @tests Light:getFalloff
-        -- TODO: add assertion for Light:getFalloff
-    end)
-end)
-
-describe("Missing explicit test for Light:setShadowEnabled", function()
-    it("Light:setShadowEnabled works", function()
-        -- @tests Light:setShadowEnabled
-        -- TODO: add assertion for Light:setShadowEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:isShadowEnabled", function()
-    it("Light:isShadowEnabled works", function()
-        -- @tests Light:isShadowEnabled
-        -- TODO: add assertion for Light:isShadowEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:getShadowColor", function()
-    it("Light:getShadowColor works", function()
-        -- @tests Light:getShadowColor
-        -- TODO: add assertion for Light:getShadowColor
-    end)
-end)
-
-describe("Missing explicit test for Light:setShadowFilter", function()
-    it("Light:setShadowFilter works", function()
-        -- @tests Light:setShadowFilter
-        -- TODO: add assertion for Light:setShadowFilter
-    end)
-end)
-
-describe("Missing explicit test for Light:getShadowFilter", function()
-    it("Light:getShadowFilter works", function()
-        -- @tests Light:getShadowFilter
-        -- TODO: add assertion for Light:getShadowFilter
-    end)
-end)
-
-describe("Missing explicit test for Light:setShadowSmooth", function()
-    it("Light:setShadowSmooth works", function()
-        -- @tests Light:setShadowSmooth
-        -- TODO: add assertion for Light:setShadowSmooth
-    end)
-end)
-
-describe("Missing explicit test for Light:getShadowSmooth", function()
-    it("Light:getShadowSmooth works", function()
-        -- @tests Light:getShadowSmooth
-        -- TODO: add assertion for Light:getShadowSmooth
-    end)
-end)
-
-describe("Missing explicit test for Light:setLightMask", function()
-    it("Light:setLightMask works", function()
-        -- @tests Light:setLightMask
-        -- TODO: add assertion for Light:setLightMask
-    end)
-end)
-
-describe("Missing explicit test for Light:getLightMask", function()
-    it("Light:getLightMask works", function()
-        -- @tests Light:getLightMask
-        -- TODO: add assertion for Light:getLightMask
-    end)
-end)
-
-describe("Missing explicit test for Light:setShadowMask", function()
-    it("Light:setShadowMask works", function()
-        -- @tests Light:setShadowMask
-        -- TODO: add assertion for Light:setShadowMask
-    end)
-end)
-
-describe("Missing explicit test for Light:getShadowMask", function()
-    it("Light:getShadowMask works", function()
-        -- @tests Light:getShadowMask
-        -- TODO: add assertion for Light:getShadowMask
-    end)
-end)
-
-describe("Missing explicit test for Light:setEnabled", function()
-    it("Light:setEnabled works", function()
-        -- @tests Light:setEnabled
-        -- TODO: add assertion for Light:setEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:isEnabled", function()
-    it("Light:isEnabled works", function()
-        -- @tests Light:isEnabled
-        -- TODO: add assertion for Light:isEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:setLightType", function()
-    it("Light:setLightType works", function()
-        -- @tests Light:setLightType
-        -- TODO: add assertion for Light:setLightType
-    end)
-end)
-
-describe("Missing explicit test for Light:getLightType", function()
-    it("Light:getLightType works", function()
-        -- @tests Light:getLightType
-        -- TODO: add assertion for Light:getLightType
-    end)
-end)
-
-describe("Missing explicit test for Light:setDirection", function()
-    it("Light:setDirection works", function()
-        -- @tests Light:setDirection
-        -- TODO: add assertion for Light:setDirection
-    end)
-end)
-
-describe("Missing explicit test for Light:getDirection", function()
-    it("Light:getDirection works", function()
-        -- @tests Light:getDirection
-        -- TODO: add assertion for Light:getDirection
-    end)
-end)
-
-describe("Missing explicit test for Light:setInnerAngle", function()
-    it("Light:setInnerAngle works", function()
-        -- @tests Light:setInnerAngle
-        -- TODO: add assertion for Light:setInnerAngle
-    end)
-end)
-
-describe("Missing explicit test for Light:getInnerAngle", function()
-    it("Light:getInnerAngle works", function()
-        -- @tests Light:getInnerAngle
-        -- TODO: add assertion for Light:getInnerAngle
-    end)
-end)
-
-describe("Missing explicit test for Light:setOuterAngle", function()
-    it("Light:setOuterAngle works", function()
-        -- @tests Light:setOuterAngle
-        -- TODO: add assertion for Light:setOuterAngle
-    end)
-end)
-
-describe("Missing explicit test for Light:getOuterAngle", function()
-    it("Light:getOuterAngle works", function()
-        -- @tests Light:getOuterAngle
-        -- TODO: add assertion for Light:getOuterAngle
-    end)
-end)
-
-describe("Missing explicit test for Light:setAttenuation", function()
-    it("Light:setAttenuation works", function()
-        -- @tests Light:setAttenuation
-        -- TODO: add assertion for Light:setAttenuation
-    end)
-end)
-
-describe("Missing explicit test for Light:getAttenuation", function()
-    it("Light:getAttenuation works", function()
-        -- @tests Light:getAttenuation
-        -- TODO: add assertion for Light:getAttenuation
-    end)
-end)
-
-describe("Missing explicit test for Light:setFlicker", function()
-    it("Light:setFlicker works", function()
-        -- @tests Light:setFlicker
-        -- TODO: add assertion for Light:setFlicker
-    end)
-end)
-
-describe("Missing explicit test for Light:getFlicker", function()
-    it("Light:getFlicker works", function()
-        -- @tests Light:getFlicker
-        -- TODO: add assertion for Light:getFlicker
-    end)
-end)
-
-describe("Missing explicit test for Light:setFlickerEnabled", function()
-    it("Light:setFlickerEnabled works", function()
-        -- @tests Light:setFlickerEnabled
-        -- TODO: add assertion for Light:setFlickerEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:isFlickerEnabled", function()
-    it("Light:isFlickerEnabled works", function()
-        -- @tests Light:isFlickerEnabled
-        -- TODO: add assertion for Light:isFlickerEnabled
-    end)
-end)
-
-describe("Missing explicit test for Light:setGroupId", function()
-    it("Light:setGroupId works", function()
-        -- @tests Light:setGroupId
-        -- TODO: add assertion for Light:setGroupId
-    end)
-end)
-
-describe("Missing explicit test for Light:getGroupId", function()
-    it("Light:getGroupId works", function()
-        -- @tests Light:getGroupId
-        -- TODO: add assertion for Light:getGroupId
-    end)
-end)
-
-describe("Missing explicit test for Light:setVolumetric", function()
-    it("Light:setVolumetric works", function()
-        -- @tests Light:setVolumetric
-        -- TODO: add assertion for Light:setVolumetric
-    end)
-end)
-
-describe("Missing explicit test for Light:isVolumetric", function()
-    it("Light:isVolumetric works", function()
-        -- @tests Light:isVolumetric
-        -- TODO: add assertion for Light:isVolumetric
-    end)
-end)
-
-describe("Missing explicit test for Light:remove", function()
-    it("Light:remove works", function()
-        -- @tests Light:remove
-        -- TODO: add assertion for Light:remove
-    end)
-end)
-
-describe("Missing explicit test for Light:isValid", function()
-    it("Light:isValid works", function()
-        -- @tests Light:isValid
-        -- TODO: add assertion for Light:isValid
-    end)
-end)
-
-describe("Missing explicit test for Light:transitionProgress", function()
-    it("Light:transitionProgress works", function()
-        -- @tests Light:transitionProgress
-        -- TODO: add assertion for Light:transitionProgress
-    end)
-end)
-
-describe("Missing explicit test for Occluder:setVertices", function()
-    it("Occluder:setVertices works", function()
-        -- @tests Occluder:setVertices
-        -- TODO: add assertion for Occluder:setVertices
-    end)
-end)
-
-describe("Missing explicit test for Occluder:getVertices", function()
-    it("Occluder:getVertices works", function()
-        -- @tests Occluder:getVertices
-        -- TODO: add assertion for Occluder:getVertices
-    end)
-end)
-
-describe("Missing explicit test for Occluder:setPosition", function()
-    it("Occluder:setPosition works", function()
-        -- @tests Occluder:setPosition
-        -- TODO: add assertion for Occluder:setPosition
-    end)
-end)
-
-describe("Missing explicit test for Occluder:getPosition", function()
-    it("Occluder:getPosition works", function()
-        -- @tests Occluder:getPosition
-        -- TODO: add assertion for Occluder:getPosition
-    end)
-end)
-
-describe("Missing explicit test for Occluder:setOpacity", function()
-    it("Occluder:setOpacity works", function()
-        -- @tests Occluder:setOpacity
-        -- TODO: add assertion for Occluder:setOpacity
-    end)
-end)
-
-describe("Missing explicit test for Occluder:getOpacity", function()
-    it("Occluder:getOpacity works", function()
-        -- @tests Occluder:getOpacity
-        -- TODO: add assertion for Occluder:getOpacity
-    end)
-end)
-
-describe("Missing explicit test for Occluder:setLightMask", function()
-    it("Occluder:setLightMask works", function()
-        -- @tests Occluder:setLightMask
-        -- TODO: add assertion for Occluder:setLightMask
-    end)
-end)
-
-describe("Missing explicit test for Occluder:getLightMask", function()
-    it("Occluder:getLightMask works", function()
-        -- @tests Occluder:getLightMask
-        -- TODO: add assertion for Occluder:getLightMask
-    end)
-end)
-
-describe("Missing explicit test for Occluder:setEnabled", function()
-    it("Occluder:setEnabled works", function()
-        -- @tests Occluder:setEnabled
-        -- TODO: add assertion for Occluder:setEnabled
-    end)
-end)
-
-describe("Missing explicit test for Occluder:isEnabled", function()
-    it("Occluder:isEnabled works", function()
-        -- @tests Occluder:isEnabled
-        -- TODO: add assertion for Occluder:isEnabled
-    end)
-end)
-
-describe("Missing explicit test for Occluder:remove", function()
-    it("Occluder:remove works", function()
-        -- @tests Occluder:remove
-        -- TODO: add assertion for Occluder:remove
-    end)
-end)
-
-describe("Missing explicit test for Occluder:isValid", function()
-    it("Occluder:isValid works", function()
-        -- @tests Occluder:isValid
-        -- TODO: add assertion for Occluder:isValid
-    end)
-end)
+test_summary()

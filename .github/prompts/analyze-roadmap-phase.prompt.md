@@ -1,6 +1,6 @@
 ---
 description: "Analyze one roadmap phase for readiness, gaps, and evidence strength."
-agent: "Discovery-Lead"
+agent: "Planner"
 ---
 # Analyze Roadmap Phase
 

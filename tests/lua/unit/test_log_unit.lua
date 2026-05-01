@@ -4,27 +4,24 @@
 -- addSink, removeSink, clearSinks, listSinks, readMemory, flushFile.
 
 -- Module presence
--- @description Verifies that the lurek.log namespace exists and exposes each documented logging and sink-management function.
 describe("lurek.log module", function()
-    -- @tests lurek.log.debug
-    -- @tests lurek.log.info
-    -- @tests lurek.log.warn
-    -- @tests lurek.log.error
-    -- @tests lurek.log.print
-    -- @tests lurek.log.setLevel
-    -- @tests lurek.log.getLevel
-    -- @tests lurek.log.addSink
-    -- @tests lurek.log.removeSink
-    -- @tests lurek.log.clearSinks
-    -- @tests lurek.log.listSinks
-    -- @tests lurek.log.readMemory
-    -- @tests lurek.log.flushFile
-    -- @description Confirms the global lurek.log value is a table before any function access is attempted.
+    -- @covers lurek.log.debug
+    -- @covers lurek.log.info
+    -- @covers lurek.log.warn
+    -- @covers lurek.log.error
+    -- @covers lurek.log.print
+    -- @covers lurek.log.setLevel
+    -- @covers lurek.log.getLevel
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.removeSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.listSinks
+    -- @covers lurek.log.readMemory
+    -- @covers lurek.log.flushFile
     it("lurek.log is a table", function()
         expect_type("table", lurek.log)
     end)
 
-    -- @description Checks that every expected API entry on lurek.log exists and is callable as a function.
     it("all expected functions are present", function()
         local fns = {
             "debug", "info", "warn", "error", "print",
@@ -39,32 +36,26 @@ describe("lurek.log module", function()
 end)
 
 -- Level control
--- @description Verifies that getLevel returns text and that setLevel updates the active level for each supported severity.
 describe("lurek.log.setLevel / getLevel", function()
-    -- @description Asserts that getLevel reports the current log level as a string value.
     it("getLevel returns a string", function()
         expect_type("string", lurek.log.getLevel())
     end)
 
-    -- @description Sets the log level to debug and checks that getLevel immediately returns "debug".
     it("setLevel to debug is reflected by getLevel", function()
         lurek.log.setLevel("debug")
         expect_equal("debug", lurek.log.getLevel())
     end)
 
-    -- @description Sets the log level to warn and checks that getLevel immediately returns "warn".
     it("setLevel to warn is reflected by getLevel", function()
         lurek.log.setLevel("warn")
         expect_equal("warn", lurek.log.getLevel())
     end)
 
-    -- @description Sets the log level to info and checks that getLevel immediately returns "info".
     it("setLevel to info is reflected by getLevel", function()
         lurek.log.setLevel("info")
         expect_equal("info", lurek.log.getLevel())
     end)
 
-    -- @description Sets the log level to error and checks that getLevel immediately returns "error".
     it("setLevel to error is reflected by getLevel", function()
         lurek.log.setLevel("error")
         expect_equal("error", lurek.log.getLevel())
@@ -72,39 +63,31 @@ describe("lurek.log.setLevel / getLevel", function()
 end)
 
 -- Basic log calls
--- @description Verifies that each direct logging entry point can be invoked without raising a Lua-side error under the tested level conditions.
 describe("lurek.log message functions", function()
-    -- @description Calls lurek.log.info with a sample message and expects the invocation to complete without error.
     it("info does not error", function()
         expect_no_error(function() lurek.log.info("unit test info message") end)
     end)
 
-    -- @description Calls lurek.log.warn with a sample message and expects the invocation to complete without error.
     it("warn does not error", function()
         expect_no_error(function() lurek.log.warn("unit test warn message") end)
     end)
 
-    -- @description Calls lurek.log.error with a sample message and expects the invocation to complete without error.
     it("error call does not error", function()
         expect_no_error(function() lurek.log.error("unit test error message") end)
     end)
 
-    -- @description Switches to debug level, then verifies that lurek.log.debug accepts a message without throwing.
     it("debug does not error at debug level", function()
         lurek.log.setLevel("debug")
         expect_no_error(function() lurek.log.debug("unit test debug message") end)
     end)
 
-    -- @description Invokes the generic print entry point with the info level and expects no Lua-side error.
     it("print does not error", function()
         expect_no_error(function() lurek.log.print("info", "unit test print message") end)
     end)
 end)
 
 -- Memory sink
--- @description Verifies memory sink creation, retrieval, buffering, draining, and multi-sink capture behavior through readMemory.
 describe("lurek.log.addSink memory sink", function()
-    -- @description Clears existing sinks, creates a memory sink, and checks that addSink returns a numeric sink id.
     it("addSink with type=memory returns a sink id number", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory" })
@@ -112,7 +95,6 @@ describe("lurek.log.addSink memory sink", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Creates a memory sink and verifies that reading from its id returns a table of entries.
     it("readMemory returns a table for a valid memory sink id", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory" })
@@ -121,7 +103,6 @@ describe("lurek.log.addSink memory sink", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Logs a message after attaching a memory sink and checks that readMemory captures at least one entry.
     it("messages logged after addSink appear in readMemory", function()
         lurek.log.clearSinks()
         lurek.log.setLevel("debug")
@@ -132,7 +113,6 @@ describe("lurek.log.addSink memory sink", function()
         expect_true(#entries >= 1, "at least one entry captured")
     end)
 
-    -- @description Logs one message, reads the memory sink, and asserts the first captured entry exposes a string message field.
     it("readMemory entries have a message field", function()
         lurek.log.clearSinks()
         lurek.log.setLevel("debug")
@@ -144,7 +124,6 @@ describe("lurek.log.addSink memory sink", function()
         expect_type("string", entries[1].message)
     end)
 
-    -- @description Reads a memory sink with drain=true and verifies the first read has entries while the second read is empty.
     it("readMemory with drain=true clears the buffer", function()
         lurek.log.clearSinks()
         lurek.log.setLevel("debug")
@@ -157,7 +136,6 @@ describe("lurek.log.addSink memory sink", function()
         expect_equal(0, #second, "buffer should be empty after drain")
     end)
 
-    -- @description Reads the same memory sink twice with drain=false and checks that both reads still contain entries.
     it("readMemory with drain=false does not clear the buffer", function()
         lurek.log.clearSinks()
         lurek.log.setLevel("debug")
@@ -170,7 +148,31 @@ describe("lurek.log.addSink memory sink", function()
         expect_true(#second >= 1, "second read should still have entries")
     end)
 
-    -- @description Attaches two memory sinks, logs one message, and confirms that each sink independently captures an entry.
+    it("memory sink level='warning' drops info and keeps warn", function()
+        lurek.log.clearSinks()
+        lurek.log.setLevel("debug")
+        local id = lurek.log.addSink({ type = "memory", level = "warning" })
+        lurek.log.info("warning_alias_drop_info")
+        lurek.log.warn("warning_alias_keep_warn")
+        local entries = lurek.log.readMemory(id)
+        lurek.log.removeSink(id)
+
+        expect_equal(#entries, 1)
+        expect_true(entries[1].message:find("warning_alias_keep_warn") ~= nil)
+    end)
+
+    it("memory sink unknown level falls back to debug", function()
+        lurek.log.clearSinks()
+        lurek.log.setLevel("debug")
+        local id = lurek.log.addSink({ type = "memory", level = "mystery" })
+        lurek.log.debug("unknown_level_defaults_to_debug")
+        local entries = lurek.log.readMemory(id)
+        lurek.log.removeSink(id)
+
+        expect_true(#entries >= 1)
+        expect_true(entries[#entries].message:find("unknown_level_defaults_to_debug") ~= nil)
+    end)
+
     it("multiple memory sinks capture messages independently", function()
         lurek.log.clearSinks()
         lurek.log.setLevel("debug")
@@ -187,16 +189,13 @@ describe("lurek.log.addSink memory sink", function()
 end)
 
 -- removeSink / clearSinks / listSinks
--- @description Verifies sink registry inspection and mutation through listSinks, removeSink, and clearSinks.
 describe("lurek.log.removeSink / clearSinks / listSinks", function()
-    -- @description Clears the registry and confirms that listSinks still returns a table result.
     it("listSinks returns a table", function()
         lurek.log.clearSinks()
         local sinks = lurek.log.listSinks()
         expect_type("table", sinks)
     end)
 
-    -- @description Adds one memory sink and checks that listSinks reports at least one registered sink.
     it("listSinks reflects newly added sinks", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory" })
@@ -205,7 +204,6 @@ describe("lurek.log.removeSink / clearSinks / listSinks", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Compares sink counts before and after removeSink and expects the count to decrease.
     it("removeSink decreases listSinks count", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory" })
@@ -215,7 +213,6 @@ describe("lurek.log.removeSink / clearSinks / listSinks", function()
         expect_true(after < before, "count decreased after removeSink")
     end)
 
-    -- @description Adds two sinks, clears them all, and verifies that listSinks reports an empty registry.
     it("clearSinks leaves listSinks empty", function()
         lurek.log.addSink({ type = "memory" })
         lurek.log.addSink({ type = "memory" })
@@ -225,9 +222,7 @@ describe("lurek.log.removeSink / clearSinks / listSinks", function()
 end)
 
 -- File sink
--- @description Verifies file sink creation and explicit flushing for a valid file-backed sink id.
 describe("lurek.log.addSink file sink", function()
-    -- @description Creates a file sink at a test path and checks that addSink returns a numeric sink id.
     it("addSink with type=file returns a sink id", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "file", path = "save/_log_test_sink.log" })
@@ -235,7 +230,6 @@ describe("lurek.log.addSink file sink", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Writes one message to a file sink and verifies that flushFile on that sink id does not error.
     it("flushFile does not error for a valid file sink id", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "file", path = "save/_log_flush_test.log" })
@@ -245,9 +239,7 @@ describe("lurek.log.addSink file sink", function()
     end)
 end)
 
--- @description Exercises registry behaviors that mirror the Rust-side sink tests, including id validity, remove semantics, retrieval, capacity, and clearing.
 describe("log sink registry (RS parity)", function()
-    -- @description Starts from an empty registry, adds one memory sink with capacity 10, and asserts the returned id is numeric and positive.
     it("clearSinks starts empty then addSink increments count", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory", capacity = 10 })
@@ -256,7 +248,6 @@ describe("log sink registry (RS parity)", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Removes the same sink twice and expects the first call to succeed and the second to report false.
     it("removeSink returns true on first call, false on second", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory", capacity = 10 })
@@ -264,7 +255,6 @@ describe("log sink registry (RS parity)", function()
         expect_false(lurek.log.removeSink(id))
     end)
 
-    -- @description Writes one info message into a memory sink and checks that readMemory returns a table with at least one entry.
     it("messages written to memory sink are retrievable", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory", capacity = 20 })
@@ -277,7 +267,6 @@ describe("log sink registry (RS parity)", function()
         lurek.log.setLevel("info")
     end)
 
-    -- @description Creates a capacity-3 memory sink, logs five debug messages, and asserts the retained entry count does not exceed the configured capacity.
     it("memory sink respects capacity and drops oldest on overflow", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({ type = "memory", capacity = 3 })
@@ -289,7 +278,6 @@ describe("log sink registry (RS parity)", function()
         lurek.log.setLevel("info")
     end)
 
-    -- @description Adds one sink, clears the registry, and verifies that the old sink id can no longer be removed.
     it("clearSinks removes all sinks", function()
         local id = lurek.log.addSink({ type = "memory", capacity = 5 })
         lurek.log.clearSinks()
@@ -301,49 +289,41 @@ end)
 lurek.log.setLevel("info")
 lurek.log.clearSinks()
 
--- ── Log API validation (merged from test_log_api.lua) ───────────────────────
+-- Log API validation (merged from test_log_api.lua)
 
--- @description Validates the core lurek.log.* function contract: presence,
 --              type safety, level validation, and rotating sink support.
 
 describe("lurek.log namespace", function()
-    -- @description Confirms the global lurek.log value is a table.
     it("has info function", function()
         expect_equal(type(lurek.log.info), "function")
     end)
 
-    -- @description Checks that warn is a callable function.
     it("has warn function", function()
         expect_equal(type(lurek.log.warn), "function")
     end)
 
-    -- @description Checks that error is a callable function.
     it("has error function", function()
         expect_equal(type(lurek.log.error), "function")
     end)
 
-    -- @description Checks that debug is a callable function.
     it("has debug function", function()
         expect_equal(type(lurek.log.debug), "function")
     end)
 
-    -- @description Checks that setLevel is a callable function.
     it("has setLevel function", function()
         expect_equal(type(lurek.log.setLevel), "function")
     end)
 
-    -- @description Calls info with a valid string and expects no error.
     it("logs without error", function()
         lurek.log.info("test message from Lua")
         expect_equal(true, true)
     end)
 
-    -- @description Passes nil to info and expects a Lua type error.
     it("errors on non-string message", function()
-        expect_error(function() lurek.log.info(nil) end)
+        local bad_message = lurek.__missing_log_message
+        expect_error(function() lurek.log.info(bad_message) end)
     end)
 
-    -- @description Passes an unrecognised level string and expects an error.
     it("errors on invalid level string", function()
         expect_error(function() lurek.log.setLevel("verbose") end)
     end)
@@ -351,7 +331,6 @@ end)
 
 -- Level round-trip
 describe("lurek.log.setLevel validation", function()
-    -- @description Each accepted level name should be accepted without error.
     it("accepts error level", function()
         expect_no_error(function() lurek.log.setLevel("error") end)
     end)
@@ -372,7 +351,6 @@ describe("lurek.log.setLevel validation", function()
         expect_no_error(function() lurek.log.setLevel("off") end)
     end)
 
-    -- @description Rejects a completely unknown string.
     it("rejects unknown level 'verbose'", function()
         expect_error(function() lurek.log.setLevel("verbose") end)
     end)
@@ -384,7 +362,6 @@ end)
 
 -- Rotating sink
 describe("lurek.log rotating sink", function()
-    -- @description Creates a rotating sink at a temp path and expects a numeric id.
     it("addSink type=rotating returns a number id", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({
@@ -399,7 +376,6 @@ describe("lurek.log rotating sink", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description Writes to a rotating sink and verifies no error occurs.
     it("writing to rotating sink does not error", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({
@@ -412,7 +388,6 @@ describe("lurek.log rotating sink", function()
         lurek.log.removeSink(id)
     end)
 
-    -- @description listSinks reports type="rotating" for a rotating sink.
     it("listSinks reflects rotating type correctly", function()
         lurek.log.clearSinks()
         local id = lurek.log.addSink({
@@ -430,7 +405,6 @@ describe("lurek.log rotating sink", function()
         expect_true(found, "expected rotating type in listSinks")
     end)
 
-    -- @description Rejects addSink type=rotating when path is missing.
     it("addSink type=rotating errors when path is missing", function()
         lurek.log.clearSinks()
         expect_error(function()
@@ -443,9 +417,9 @@ end)
 lurek.log.setLevel("info")
 lurek.log.clearSinks()
 
--- ── Structured Logging (merged from test_log_structured.lua) ────────────────
+--  Structured Logging (merged from test_log_structured.lua) 
 
-describe("lurek.log.struct — basic API", function()
+describe("lurek.log.struct  basic API", function()
     it("does not error when called with a non-empty fields table", function()
         lurek.log.struct("info", "hello structured", {key = "value", count = 42})
     end)
@@ -492,7 +466,7 @@ describe("lurek.log.*_fields shorthands", function()
     end)
 end)
 
-describe("lurek.log memory sink — structured entries", function()
+describe("lurek.log memory sink  structured entries", function()
     it("memory sink captures structured entry with fields", function()
         local sid = lurek.log.addSink({type = "memory", capacity = 50, level = "debug"})
 
@@ -511,9 +485,12 @@ describe("lurek.log memory sink — structured entries", function()
             end
         end
         expect_equal(found ~= nil, true)
-        expect_equal(found.fields ~= nil, true)
-        expect_equal(found.fields.player, "Alice")
-        expect_equal(found.fields.score, "100")
+        local fields = found and found["fields"] or nil
+        expect_equal(fields ~= nil, true)
+        if fields ~= nil then
+            expect_equal(fields["player"], "Alice")
+            expect_equal(fields["score"], "100")
+        end
 
         lurek.log.removeSink(sid)
     end)
@@ -535,7 +512,7 @@ describe("lurek.log memory sink — structured entries", function()
             end
         end
         expect_equal(found ~= nil, true)
-        expect_equal(found.fields, nil)
+        expect_equal(found and found["fields"] or nil, nil)
 
         lurek.log.removeSink(sid)
     end)
@@ -554,8 +531,11 @@ describe("lurek.log memory sink — structured entries", function()
             end
         end
         expect_equal(found ~= nil, true)
-        expect_equal(found.fields ~= nil, true)
-        expect_equal(found.fields.module, "tween")
+        local fields = found and found["fields"] or nil
+        expect_equal(fields ~= nil, true)
+        if fields ~= nil then
+            expect_equal(fields["module"], "tween")
+        end
 
         lurek.log.removeSink(sid)
     end)
@@ -599,15 +579,18 @@ describe("lurek.log memory sink — structured entries", function()
             end
         end
         expect_equal(found ~= nil, true)
-        expect_equal(found.fields ~= nil, true)
+        local fields = found and found["fields"] or nil
+        expect_equal(fields ~= nil, true)
         -- values are stored as strings
-        expect_equal(type(found.fields.fps), "string")
+        if fields ~= nil then
+            expect_equal(type(fields["fps"]), "string")
+        end
 
         lurek.log.removeSink(sid)
     end)
 end)
 
-describe("lurek.log memory sink — plain + structured mixed", function()
+describe("lurek.log memory sink  plain + structured mixed", function()
     it("mixed plain and structured entries coexist in memory sink", function()
         local sid = lurek.log.addSink({type = "memory", capacity = 50, level = "debug"})
 
@@ -623,38 +606,3 @@ describe("lurek.log memory sink — plain + structured mixed", function()
 end)
 
 test_summary()
-
-describe("Missing explicit test for lurek.log.struct", function()
-    it("lurek.log.struct works", function()
-        -- @tests lurek.log.struct
-        -- TODO: add assertion for lurek.log.struct
-    end)
-end)
-
-describe("Missing explicit test for lurek.log.debug_fields", function()
-    it("lurek.log.debug_fields works", function()
-        -- @tests lurek.log.debug_fields
-        -- TODO: add assertion for lurek.log.debug_fields
-    end)
-end)
-
-describe("Missing explicit test for lurek.log.info_fields", function()
-    it("lurek.log.info_fields works", function()
-        -- @tests lurek.log.info_fields
-        -- TODO: add assertion for lurek.log.info_fields
-    end)
-end)
-
-describe("Missing explicit test for lurek.log.warn_fields", function()
-    it("lurek.log.warn_fields works", function()
-        -- @tests lurek.log.warn_fields
-        -- TODO: add assertion for lurek.log.warn_fields
-    end)
-end)
-
-describe("Missing explicit test for lurek.log.error_fields", function()
-    it("lurek.log.error_fields works", function()
-        -- @tests lurek.log.error_fields
-        -- TODO: add assertion for lurek.log.error_fields
-    end)
-end)

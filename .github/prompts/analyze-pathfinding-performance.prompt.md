@@ -1,6 +1,6 @@
 ---
 description: "Analyze pathfinding cost, search hotspots, or route-quality regressions."
-agent: "Optimizer"
+agent: "Verifier"
 ---
 # Analyze Pathfinding Performance
 

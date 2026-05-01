@@ -4,97 +4,82 @@
 -- Headless: no GPU, no audio, no window.
 -- Tests property tweening: table field animation, sequences, parallels, callbacks.
 
--- @description Covers suite: lurek.tween.
 describe("lurek.tween", function()
-    -- @description Covers suite: module interface.
     describe("module interface", function()
-        -- @tests lurek.tween.tween
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.delay
-        -- @tests lurek.tween.getActiveCount
-        -- @tests lurek.tween.getEasingNames
-        -- @tests lurek.tween.parallel
-        -- @tests lurek.tween.newState
-        -- @tests lurek.tween.registerEasing
-        -- @tests lurek.tween.sequence
-        -- @tests lurek.tween.update
-        -- @description Verifies the tween factory function is exposed on the lurek.tween module.
+        -- @covers lurek.tween.tween
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.delay
+        -- @covers lurek.tween.getActiveCount
+        -- @covers lurek.tween.getEasingNames
+        -- @covers lurek.tween.parallel
+        -- @covers lurek.tween.newState
+        -- @covers lurek.tween.registerEasing
+        -- @covers lurek.tween.sequence
+        -- @covers lurek.tween.update
         it("exposes tween factory", function()
             expect_type("function", lurek.tween.tween)
         end)
 
-        -- @tests lurek.tween.sequence
-        -- @description Verifies the sequence factory function is exposed on the lurek.tween module.
+        -- @covers lurek.tween.sequence
         it("exposes sequence factory", function()
             expect_type("function", lurek.tween.sequence)
         end)
 
-        -- @tests lurek.tween.parallel
-        -- @description Verifies the parallel factory function is exposed on the lurek.tween module.
+        -- @covers lurek.tween.parallel
         it("exposes parallel factory", function()
             expect_type("function", lurek.tween.parallel)
         end)
 
-        -- @tests lurek.tween.delay
-        -- @description Verifies the delay helper is exposed on the lurek.tween module.
+        -- @covers lurek.tween.delay
         it("exposes delay factory", function()
             expect_type("function", lurek.tween.delay)
         end)
 
-        -- @tests lurek.tween.update
-        -- @description Verifies the global tween update entry point is exposed.
+        -- @covers lurek.tween.update
         it("exposes update", function()
             expect_type("function", lurek.tween.update)
         end)
 
-        -- @tests lurek.tween.cancelAll
-        -- @description Verifies the global tween cancellation entry point is exposed.
+        -- @covers lurek.tween.cancelAll
         it("exposes cancelAll", function()
             expect_type("function", lurek.tween.cancelAll)
         end)
 
-        -- @tests lurek.tween.getActiveCount
-        -- @description Verifies the active tween counter helper is exposed.
+        -- @covers lurek.tween.getActiveCount
         it("exposes getActiveCount", function()
             expect_type("function", lurek.tween.getActiveCount)
         end)
 
-        -- @tests lurek.tween.registerEasing
-        -- @description Verifies the custom easing registration function is exposed.
+        -- @covers lurek.tween.registerEasing
         it("exposes registerEasing", function()
             expect_type("function", lurek.tween.registerEasing)
         end)
 
-        -- @tests lurek.tween.getEasingNames
-        -- @description Verifies the easing-name enumeration helper is exposed.
+        -- @covers lurek.tween.getEasingNames
         it("exposes getEasingNames", function()
             expect_type("function", lurek.tween.getEasingNames)
         end)
     end)
 
-    -- @description Covers suite: tween().
     describe("tween()", function()
-        -- @tests lurek.tween.tween
-        -- @description Verifies tween() returns a userdata handle for the created tween.
+        -- @covers lurek.tween.tween
         it("returns a userdata handle", function()
             local obj = { x = 0 }
             local t = lurek.tween.tween(1.0, obj, { x = 100 })
             expect_type("userdata", t)
         end)
 
-        -- @tests lurek.tween.tween
-        -- @tests Tween:isActive
-        -- @description Verifies a newly created tween reports itself as active before any updates.
+        -- @covers lurek.tween.tween
+        -- @covers Tween:isActive
         it("isActive returns true after creation", function()
             local obj = { x = 0 }
             local t = lurek.tween.tween(1.0, obj, { x = 100 })
             expect_equal(true, t:isActive())
         end)
 
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.tween
-        -- @tests lurek.tween.update
-        -- @description Verifies a linear tween interpolates a single numeric field to its midpoint after half its duration.
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.tween
+        -- @covers lurek.tween.update
         it("interpolates single field to midpoint", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -103,10 +88,9 @@ describe("lurek.tween", function()
             expect_near(50.0, obj.x, 1.0)
         end)
 
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.tween
-        -- @tests lurek.tween.update
-        -- @description Verifies a tween updates multiple numeric target fields together over the same duration.
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.tween
+        -- @covers lurek.tween.update
         it("interpolates multiple fields simultaneously", function()
             lurek.tween.cancelAll()
             local obj = { x = 0, y = 0 }
@@ -116,11 +100,10 @@ describe("lurek.tween", function()
             expect_near(200.0, obj.y, 0.5)
         end)
 
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.tween
-        -- @tests lurek.tween.update
-        -- @tests Tween:isActive
-        -- @description Verifies a tween becomes inactive after enough update time has elapsed to complete it.
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.tween
+        -- @covers lurek.tween.update
+        -- @covers Tween:isActive
         it("isActive returns false after completion", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -129,10 +112,9 @@ describe("lurek.tween", function()
             expect_equal(false, t:isActive())
         end)
 
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.tween
-        -- @tests lurek.tween.update
-        -- @description Verifies tween start values are sampled lazily from the target table on the first update tick.
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.tween
+        -- @covers lurek.tween.update
         it("captures start values lazily from table at first tick", function()
             lurek.tween.cancelAll()
             local obj = { x = 50 }
@@ -141,9 +123,8 @@ describe("lurek.tween", function()
             expect_near(100.0, obj.x, 1.0)
         end)
 
-        -- @tests lurek.tween.tween
-        -- @tests Tween:getProgress
-        -- @description Verifies getProgress() starts at zero before the tween receives any update ticks.
+        -- @covers lurek.tween.tween
+        -- @covers Tween:getProgress
         it("getProgress returns 0 before first update", function()
             local obj = { x = 0 }
             local t = lurek.tween.tween(2.0, obj, { x = 100 })
@@ -151,35 +132,30 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: newState().
     describe("newState()", function()
-        -- @tests lurek.tween.newState
-        -- @description Verifies newState() returns a userdata tween-state handle.
+        -- @covers lurek.tween.newState
         it("returns a userdata handle", function()
             local state = lurek.tween.newState(1.0, "linear")
             expect_type("userdata", state)
         end)
 
-        -- @tests lurek.tween.newState
-        -- @tests TweenState:t
-        -- @description Verifies a fresh TweenState reports normalized progress t() of zero.
+        -- @covers lurek.tween.newState
+        -- @covers TweenState:t
         it("t() starts at zero", function()
             local state = lurek.tween.newState(2.0, "linear")
             expect_near(0.0, state:t(), 0.0001)
         end)
 
-        -- @tests TweenState:tick
-        -- @tests TweenState:t
-        -- @description Verifies tick(dt) advances TweenState progress proportionally and reports incomplete status mid-way.
+        -- @covers TweenState:tick
+        -- @covers TweenState:t
         it("tick advances progress", function()
             local state = lurek.tween.newState(2.0, "linear")
             expect_equal(false, state:tick(1.0))
             expect_near(0.5, state:t(), 0.0001)
         end)
 
-        -- @tests TweenState:tick
-        -- @tests TweenState:isComplete
-        -- @description Verifies tick(dt) returns true and marks the state complete once elapsed time reaches the duration.
+        -- @covers TweenState:tick
+        -- @covers TweenState:isComplete
         it("tick returns true at completion", function()
             local state = lurek.tween.newState(1.0, "linear")
             expect_equal(true, state:tick(1.0))
@@ -187,9 +163,8 @@ describe("lurek.tween", function()
         end)
 
         -- @tests TweenState.paused
-        -- @tests TweenState:tick
-        -- @tests TweenState:t
-        -- @description Verifies the paused field freezes TweenState progress even when tick() is called.
+        -- @covers TweenState:tick
+        -- @covers TweenState:t
         it("paused field freezes elapsed progress", function()
             local state = lurek.tween.newState(2.0, "linear")
             state:tick(0.5)
@@ -199,10 +174,9 @@ describe("lurek.tween", function()
             expect_near(before, state:t(), 0.0001)
         end)
 
-        -- @tests TweenState:reset
-        -- @tests TweenState:isComplete
-        -- @tests TweenState:t
-        -- @description Verifies reset() clears TweenState completion and restores progress back to zero.
+        -- @covers TweenState:reset
+        -- @covers TweenState:isComplete
+        -- @covers TweenState:t
         it("reset restores progress to zero", function()
             local state = lurek.tween.newState(1.0, "linear")
             state:tick(1.0)
@@ -212,29 +186,26 @@ describe("lurek.tween", function()
             expect_near(0.0, state:t(), 0.0001)
         end)
 
-        -- @tests TweenState:tick
-        -- @tests TweenState:lerp
-        -- @description Verifies lerp() uses the current TweenState progress when interpolating between numeric endpoints.
+        -- @covers TweenState:tick
+        -- @covers TweenState:lerp
         it("lerp uses the current tween progress", function()
             local state = lurek.tween.newState(2.0, "linear")
             state:tick(1.0)
             expect_near(50.0, state:lerp(0.0, 100.0), 0.0001)
         end)
 
-        -- @tests lurek.tween.newState
-        -- @tests TweenState:tick
-        -- @tests TweenState:isComplete
-        -- @description Verifies zero-duration TweenState handles clamp and complete on the first small tick.
+        -- @covers lurek.tween.newState
+        -- @covers TweenState:tick
+        -- @covers TweenState:isComplete
         it("zero duration clamps and completes on a small tick", function()
             local state = lurek.tween.newState(0.0, "linear")
             expect_equal(true, state:tick(0.001))
             expect_equal(true, state:isComplete())
         end)
 
-        -- @tests lurek.tween.newState
-        -- @tests TweenState:tick
-        -- @tests TweenState:lerp
-        -- @description Verifies TweenState accepts named non-linear easing curves and applies them during interpolation.
+        -- @covers lurek.tween.newState
+        -- @covers TweenState:tick
+        -- @covers TweenState:lerp
         it("accepts non-linear easing names", function()
             local state = lurek.tween.newState(1.0, "cubicOut")
             state:tick(0.5)
@@ -242,11 +213,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: pause and resume.
     describe("pause and resume", function()
-        -- @tests Tween:pause
-        -- @tests lurek.tween.update
-        -- @description Verifies pausing a tween freezes property interpolation across subsequent update ticks.
+        -- @covers Tween:pause
+        -- @covers lurek.tween.update
         it("pause stops interpolation", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -259,11 +228,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: cancel.
     describe("cancel", function()
-        -- @tests Tween:cancel
-        -- @tests Tween:isActive
-        -- @description Verifies cancel() immediately deactivates a tween handle.
+        -- @covers Tween:cancel
+        -- @covers Tween:isActive
         it("cancel makes tween inactive", function()
             local obj = { x = 0 }
             local t = lurek.tween.tween(2.0, obj, { x = 100 })
@@ -271,9 +238,8 @@ describe("lurek.tween", function()
             expect_equal(false, t:isActive())
         end)
 
-        -- @tests Tween:onCancel
-        -- @tests Tween:cancel
-        -- @description Verifies onCancel() callbacks fire when a tween is explicitly cancelled.
+        -- @covers Tween:onCancel
+        -- @covers Tween:cancel
         it("onCancel fires when cancelled", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -285,11 +251,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: callbacks.
     describe("callbacks", function()
-        -- @tests Tween:onComplete
-        -- @tests lurek.tween.update
-        -- @description Verifies onComplete() callbacks fire when update() advances a tween to completion.
+        -- @covers Tween:onComplete
+        -- @covers lurek.tween.update
         it("onComplete fires when tween finishes", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -300,9 +264,8 @@ describe("lurek.tween", function()
             expect_equal(true, finished)
         end)
 
-        -- @tests Tween:onUpdate
-        -- @tests lurek.tween.update
-        -- @description Verifies onUpdate() callbacks receive progress notifications on each tween update tick.
+        -- @covers Tween:onUpdate
+        -- @covers lurek.tween.update
         it("onUpdate fires each tick", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -314,8 +277,7 @@ describe("lurek.tween", function()
                 "onUpdate t out of expected range: " .. tostring(last_t))
         end)
 
-        -- @tests Tween:onComplete
-        -- @description Verifies onComplete() returns the tween handle so callback registration can be chained.
+        -- @covers Tween:onComplete
         it("onComplete returns tween for chaining", function()
             local obj = { x = 0 }
             local t = lurek.tween.tween(1.0, obj, { x = 100 })
@@ -324,12 +286,10 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: repeat and yoyo.
     describe("repeat and yoyo", function()
-        -- @tests Tween:setRepeat
-        -- @tests Tween:onComplete
-        -- @tests lurek.tween.update
-        -- @description Verifies setRepeat(1) replays the tween once and still fires completion exactly once after the full run.
+        -- @covers Tween:setRepeat
+        -- @covers Tween:onComplete
+        -- @covers lurek.tween.update
         it("setRepeat(1) plays tween twice", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -341,10 +301,9 @@ describe("lurek.tween", function()
             expect_equal(1, complete_count)
         end)
 
-        -- @tests Tween:setRepeat
-        -- @tests Tween:setYoyo
-        -- @tests lurek.tween.update
-        -- @description Verifies yoyo mode can be enabled on a repeating tween without producing update errors.
+        -- @covers Tween:setRepeat
+        -- @covers Tween:setYoyo
+        -- @covers lurek.tween.update
         it("setYoyo does not error", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -355,11 +314,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: cancelAll().
     describe("cancelAll()", function()
-        -- @tests lurek.tween.cancelAll
-        -- @tests lurek.tween.getActiveCount
-        -- @description Verifies cancelAll() clears all tracked tweens from the engine.
+        -- @covers lurek.tween.cancelAll
+        -- @covers lurek.tween.getActiveCount
         it("removes all active objects from tracking", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -370,11 +327,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: getActiveCount().
     describe("getActiveCount()", function()
-        -- @tests lurek.tween.getActiveCount
-        -- @tests lurek.tween.tween
-        -- @description Verifies getActiveCount() reflects that created tweens are being tracked by the engine.
+        -- @covers lurek.tween.getActiveCount
+        -- @covers lurek.tween.tween
         it("counts tracked tweens", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -384,35 +339,30 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: sequence().
     describe("sequence()", function()
-        -- @tests lurek.tween.sequence
-        -- @description Verifies sequence() returns a userdata sequence handle.
+        -- @covers lurek.tween.sequence
         it("returns a userdata", function()
             local seq = lurek.tween.sequence()
             expect_type("userdata", seq)
         end)
 
-        -- @tests TweenSequence:isActive
-        -- @description Verifies a new TweenSequence is inactive until start() is called.
+        -- @covers TweenSequence:isActive
         it("isActive returns false before start()", function()
             local seq = lurek.tween.sequence()
             expect_equal(false, seq:isActive())
         end)
 
-        -- @tests TweenSequence:start
-        -- @tests TweenSequence:isActive
-        -- @description Verifies start() activates a TweenSequence.
+        -- @covers TweenSequence:start
+        -- @covers TweenSequence:isActive
         it("start() activates sequence", function()
             local seq = lurek.tween.sequence()
             seq:start()
             expect_equal(true, seq:isActive())
         end)
 
-        -- @tests TweenSequence:tween
-        -- @tests TweenSequence:start
-        -- @tests lurek.tween.update
-        -- @description Verifies a tween step in a sequence animates its target once the sequence is started.
+        -- @covers TweenSequence:tween
+        -- @covers TweenSequence:start
+        -- @covers lurek.tween.update
         it("tween step animates target table", function()
             lurek.tween.cancelAll()
             local obj = { x = 0 }
@@ -423,10 +373,9 @@ describe("lurek.tween", function()
             expect_near(100.0, obj.x, 0.5)
         end)
 
-        -- @tests TweenSequence:callback
-        -- @tests TweenSequence:start
-        -- @tests lurek.tween.update
-        -- @description Verifies callback steps in a sequence execute in the order they were appended.
+        -- @covers TweenSequence:callback
+        -- @covers TweenSequence:start
+        -- @covers lurek.tween.update
         it("callback steps run in order", function()
             lurek.tween.cancelAll()
             local order = {}
@@ -441,11 +390,10 @@ describe("lurek.tween", function()
             expect_equal(3, order[3])
         end)
 
-        -- @tests TweenSequence:delay
-        -- @tests TweenSequence:onComplete
-        -- @tests TweenSequence:start
-        -- @tests lurek.tween.update
-        -- @description Verifies a sequence onComplete callback fires after the final delayed step finishes.
+        -- @covers TweenSequence:delay
+        -- @covers TweenSequence:onComplete
+        -- @covers TweenSequence:start
+        -- @covers lurek.tween.update
         it("onComplete fires when all steps done", function()
             lurek.tween.cancelAll()
             local done = false
@@ -457,11 +405,10 @@ describe("lurek.tween", function()
             expect_equal(true, done)
         end)
 
-        -- @tests TweenSequence:delay
-        -- @tests TweenSequence:callback
-        -- @tests TweenSequence:start
-        -- @tests lurek.tween.update
-        -- @description Verifies a delay step blocks later callbacks until enough time has elapsed.
+        -- @covers TweenSequence:delay
+        -- @covers TweenSequence:callback
+        -- @covers TweenSequence:start
+        -- @covers lurek.tween.update
         it("delay step pauses execution", function()
             lurek.tween.cancelAll()
             local fired = false
@@ -475,9 +422,8 @@ describe("lurek.tween", function()
             expect_equal(true, fired)
         end)
 
-        -- @tests TweenSequence:cancel
-        -- @tests TweenSequence:isActive
-        -- @description Verifies cancel() stops a running TweenSequence and marks it inactive.
+        -- @covers TweenSequence:cancel
+        -- @covers TweenSequence:isActive
         it("cancel() stops sequence", function()
             local seq = lurek.tween.sequence()
                 :delay(10.0)
@@ -487,19 +433,16 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: parallel().
     describe("parallel()", function()
-        -- @tests lurek.tween.parallel
-        -- @description Verifies parallel() returns a userdata parallel-group handle.
+        -- @covers lurek.tween.parallel
         it("returns a userdata", function()
             local par = lurek.tween.parallel()
             expect_type("userdata", par)
         end)
 
-        -- @tests TweenParallel:tween
-        -- @tests TweenParallel:start
-        -- @tests lurek.tween.update
-        -- @description Verifies a parallel group advances all child tween entries simultaneously.
+        -- @covers TweenParallel:tween
+        -- @covers TweenParallel:start
+        -- @covers lurek.tween.update
         it("animates children simultaneously", function()
             lurek.tween.cancelAll()
             local obj1 = { x = 0 }
@@ -513,11 +456,10 @@ describe("lurek.tween", function()
             expect_near(100.0, obj2.y, 2.0)
         end)
 
-        -- @tests TweenParallel:onComplete
-        -- @tests TweenParallel:tween
-        -- @tests TweenParallel:start
-        -- @tests lurek.tween.update
-        -- @description Verifies a parallel group's onComplete callback fires after every child tween finishes.
+        -- @covers TweenParallel:onComplete
+        -- @covers TweenParallel:tween
+        -- @covers TweenParallel:start
+        -- @covers lurek.tween.update
         it("onComplete fires when all entries done", function()
             lurek.tween.cancelAll()
             local done = false
@@ -530,9 +472,8 @@ describe("lurek.tween", function()
             expect_equal(true, done)
         end)
 
-        -- @tests TweenParallel:cancel
-        -- @tests TweenParallel:isActive
-        -- @description Verifies cancel() stops a parallel group and marks it inactive.
+        -- @covers TweenParallel:cancel
+        -- @covers TweenParallel:isActive
         it("cancel() stops parallel", function()
             local par = lurek.tween.parallel()
             par:cancel()
@@ -540,11 +481,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: delay().
     describe("delay()", function()
-        -- @tests lurek.tween.delay
-        -- @tests lurek.tween.update
-        -- @description Verifies delay() runs its callback only after the requested duration has fully elapsed.
+        -- @covers lurek.tween.delay
+        -- @covers lurek.tween.update
         it("fires callback after duration", function()
             lurek.tween.cancelAll()
             local fired = false
@@ -555,9 +494,8 @@ describe("lurek.tween", function()
             expect_equal(true, fired)
         end)
 
-        -- @tests lurek.tween.delay
-        -- @tests lurek.tween.update
-        -- @description Verifies delay() can be scheduled without a callback and still updates without error.
+        -- @covers lurek.tween.delay
+        -- @covers lurek.tween.update
         it("works without callback", function()
             lurek.tween.cancelAll()
             lurek.tween.delay(0.5)
@@ -565,18 +503,15 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: getEasingNames().
     describe("getEasingNames()", function()
-        -- @tests lurek.tween.getEasingNames
-        -- @description Verifies getEasingNames() returns a non-empty table of registered easing names.
+        -- @covers lurek.tween.getEasingNames
         it("returns a table with entries", function()
             local names = lurek.tween.getEasingNames()
             expect_type("table", names)
             expect_true(#names > 0, "easing names should not be empty")
         end)
 
-        -- @tests lurek.tween.getEasingNames
-        -- @description Verifies the built-in linear easing appears in the registered easing-name list.
+        -- @covers lurek.tween.getEasingNames
         it("includes linear", function()
             local names = lurek.tween.getEasingNames()
             local found = false
@@ -587,11 +522,9 @@ describe("lurek.tween", function()
         end)
     end)
 
-    -- @description Covers suite: registerEasing().
     describe("registerEasing()", function()
-        -- @tests lurek.tween.registerEasing
-        -- @tests lurek.tween.getEasingNames
-        -- @description Verifies registering a custom easing name adds it to the easing-name list.
+        -- @covers lurek.tween.registerEasing
+        -- @covers lurek.tween.getEasingNames
         it("custom easing appears in getEasingNames()", function()
             lurek.tween.registerEasing("myCustomEasing", function(t) return t * t end)
             local names = lurek.tween.getEasingNames()
@@ -604,13 +537,11 @@ describe("lurek.tween", function()
     end)
 end)
 
--- â”€â”€ edge cases from Rust test migration â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- edge cases from Rust test migration
 
--- @description Covers suite: tween edge cases.
 describe("tween edge cases", function()
-    -- @tests lurek.tween.tween
-    -- @tests lurek.tween.update
-    -- @description Verifies easing-name lookup is case-insensitive for built-in names like LINEAR.
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
     it("easing name is case-insensitive", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -619,10 +550,9 @@ describe("tween edge cases", function()
         expect_near(obj.x, 50, 2)
     end)
 
-    -- @tests Tween:onComplete
-    -- @tests lurek.tween.tween
-    -- @tests lurek.tween.update
-    -- @description Verifies a zero-duration tween completes immediately on the first non-zero update and fires onComplete.
+    -- @covers Tween:onComplete
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
     it("zero-duration tween completes immediately", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -633,10 +563,9 @@ describe("tween edge cases", function()
         expect_equal(completed, true)
     end)
 
-    -- @tests Tween:onUpdate
-    -- @tests Tween:pause
-    -- @tests lurek.tween.update
-    -- @description Verifies paused tweens suppress onUpdate callbacks while the tween remains paused.
+    -- @covers Tween:onUpdate
+    -- @covers Tween:pause
+    -- @covers lurek.tween.update
     it("paused tween does not fire onUpdate", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -648,9 +577,8 @@ describe("tween edge cases", function()
         expect_equal(updated, false)
     end)
 
-    -- @tests Tween:onComplete
-    -- @tests lurek.tween.update
-    -- @description Verifies onComplete callbacks fire exactly once even if update() is called again after completion.
+    -- @covers Tween:onComplete
+    -- @covers lurek.tween.update
     it("onComplete fires exactly once", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -666,18 +594,15 @@ describe("tween edge cases", function()
     end)
 end)
 
--- @description Covers suite: easing resolution (RS parity).
 describe("easing resolution (RS parity)", function()
-    -- @tests lurek.tween.getEasingNames
-    -- @description Verifies getEasingNames() returns a non-empty Lua table in parity with the Rust-side expectations.
+    -- @covers lurek.tween.getEasingNames
     it("getEasingNames returns a non-empty table", function()
         local names = lurek.tween.getEasingNames()
         expect_equal("table", type(names))
         expect_true(#names > 0)
     end)
 
-    -- @tests lurek.tween.getEasingNames
-    -- @description Verifies the easing-name list contains expected built-in entries such as linear and a quad variant.
+    -- @covers lurek.tween.getEasingNames
     it("getEasingNames contains expected built-in entries", function()
         local names = lurek.tween.getEasingNames()
         local set = {}
@@ -686,9 +611,8 @@ describe("easing resolution (RS parity)", function()
         expect_true(set["quadIn"] == true or set["quad_in"] == true or set["easeInQuad"] == true)
     end)
 
-    -- @tests lurek.tween.tween
-    -- @tests lurek.tween.update
-    -- @description Verifies a tween using linear easing advances proportionally with elapsed time.
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
     it("tween with 'linear' easing progresses proportionally", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -698,9 +622,8 @@ describe("easing resolution (RS parity)", function()
         lurek.tween.cancelAll()
     end)
 
-    -- @tests lurek.tween.tween
-    -- @tests lurek.tween.update
-    -- @description Verifies tween creation stays robust when given an easing string that resolves without crashing.
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
     it("tween with unknown easing string does not crash", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -711,9 +634,8 @@ describe("easing resolution (RS parity)", function()
         lurek.tween.cancelAll()
     end)
 
-    -- @tests lurek.tween.tween
-    -- @tests lurek.tween.update
-    -- @description Verifies a near-zero-duration tween reaches its target value on the first meaningful update tick.
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
     it("zero-duration tween completes on first non-zero update", function()
         lurek.tween.cancelAll()
         local obj = { x = 0 }
@@ -724,10 +646,8 @@ describe("easing resolution (RS parity)", function()
     end)
 end)
 
--- @description Tests for lurek.tween.to() sugar function.
 describe("lurek.tween.to sugar", function()
-  -- @tests lurek.tween.to
-  -- @description tween.to(target, fields, duration) should animate target to the desired values by the end of the duration.
+  -- @covers lurek.tween.to
   it("tween.to animates properties forward", function()
     local obj = { x = 0.0, y = 0.0 }
     lurek.tween.to(obj, { x = 100.0, y = 50.0 }, 1.0)
@@ -737,8 +657,7 @@ describe("lurek.tween.to sugar", function()
     lurek.tween.cancelAll()
   end)
 
-  -- @tests lurek.tween.to
-  -- @description tween.to should accept an optional easing name without error.
+  -- @covers lurek.tween.to
   it("tween.to accepts optional easing parameter without error", function()
     local obj = { alpha = 1.0 }
     expect_no_error(function()
@@ -748,11 +667,11 @@ describe("lurek.tween.to sugar", function()
   end)
 end)
 
--- ═══════════════════════════════════════════════════════════════════════
+-- ============================================================
 -- Merged from test_tween_spring.lua
--- ═══════════════════════════════════════════════════════════════════════
+-- ============================================================
 
-describe("lurek.tween.spring — creation", function()
+describe("lurek.tween.spring  creation", function()
     it("creates a spring from a table and fields", function()
         local target = {x = 0, y = 0}
         local sp = lurek.tween.spring(target, {x = 100, y = 50})
@@ -785,7 +704,7 @@ describe("lurek.tween.spring — creation", function()
     end)
 end)
 
-describe("lurek.tween.spring — getPosition", function()
+describe("lurek.tween.spring  getPosition", function()
     it("returns starting position before any update", function()
         local target = {x = 42.0}
         local sp = lurek.tween.spring(target, {x = 100})
@@ -799,7 +718,7 @@ describe("lurek.tween.spring — getPosition", function()
     end)
 end)
 
-describe("lurek.tween.spring — update convergence", function()
+describe("lurek.tween.spring  update convergence", function()
     xit("position moves toward target after updates", function()
         local target = {x = 0}
         local sp = lurek.tween.spring(target, {x = 100}, {stiffness = 100, damping = 10})
@@ -852,7 +771,7 @@ describe("lurek.tween.spring — update convergence", function()
     end)
 end)
 
-describe("lurek.tween.spring — multi-axis", function()
+describe("lurek.tween.spring  multi-axis", function()
     it("animates multiple fields simultaneously", function()
         local target = {x = 0, y = 0, alpha = 0}
         local sp = lurek.tween.spring(target, {x = 100, y = 200, alpha = 1},
@@ -877,7 +796,7 @@ describe("lurek.tween.spring — multi-axis", function()
     end)
 end)
 
-describe("lurek.tween.spring — setTarget", function()
+describe("lurek.tween.spring  setTarget", function()
     it("changes target without resetting velocity", function()
         local target = {x = 0}
         local sp = lurek.tween.spring(target, {x = 100}, {stiffness = 100, damping = 10})
@@ -896,7 +815,7 @@ describe("lurek.tween.spring — setTarget", function()
     end)
 end)
 
-describe("lurek.tween.spring — setStiffness / setDamping", function()
+describe("lurek.tween.spring  setStiffness / setDamping", function()
     it("setStiffness updates the simulation", function()
         local target = {x = 0}
         local sp = lurek.tween.spring(target, {x = 100}, {stiffness = 50})
@@ -914,7 +833,7 @@ describe("lurek.tween.spring — setStiffness / setDamping", function()
     end)
 end)
 
-describe("lurek.tween.spring — cancel", function()
+describe("lurek.tween.spring  cancel", function()
     it("cancel makes isActive false", function()
         local target = {x = 0}
         local sp = lurek.tween.spring(target, {x = 100})
@@ -931,7 +850,7 @@ describe("lurek.tween.spring — cancel", function()
     end)
 end)
 
-describe("lurek.tween.spring — auto-tick via lurek.tween.update", function()
+describe("lurek.tween.spring  auto-tick via lurek.tween.update", function()
     it("spring is ticked by lurek.tween.update", function()
         local target = {x = 0}
         local sp = lurek.tween.spring(target, {x = 100}, {stiffness = 100, damping = 10})
@@ -951,7 +870,7 @@ end)
 
 describe("Tween:resume", function()
     it("continues interpolation after a pause", function()
-        -- @tests Tween:resume
+        -- @covers Tween:resume
         lurek.tween.cancelAll()
         local obj = { x = 0 }
         local t = lurek.tween.tween(2.0, obj, { x = 100 }, "linear")
@@ -968,8 +887,8 @@ end)
 
 describe("lurek.tween.spring regression coverage", function()
     it("creates an active spring handle", function()
-        -- @tests lurek.tween.spring
-        -- @tests Spring:isActive
+        -- @covers lurek.tween.spring
+        -- @covers Spring:isActive
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 })
         expect_not_nil(sp)
@@ -977,8 +896,8 @@ describe("lurek.tween.spring regression coverage", function()
     end)
 
     it("update advances the simulation and getPosition exposes it", function()
-        -- @tests Spring:update
-        -- @tests Spring:getPosition
+        -- @covers Spring:update
+        -- @covers Spring:getPosition
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 120, damping = 18 })
         local result = sp:update(1 / 60)
@@ -987,7 +906,7 @@ describe("lurek.tween.spring regression coverage", function()
     end)
 
     it("isSettled becomes true after enough updates", function()
-        -- @tests Spring:isSettled
+        -- @covers Spring:isSettled
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 150, damping = 25 })
         for _ = 1, 240 do
@@ -997,7 +916,7 @@ describe("lurek.tween.spring regression coverage", function()
     end)
 
     it("setTarget restarts motion toward a new target", function()
-        -- @tests Spring:setTarget
+        -- @covers Spring:setTarget
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 150, damping = 25 })
         for _ = 1, 240 do
@@ -1010,8 +929,8 @@ describe("lurek.tween.spring regression coverage", function()
     end)
 
     it("setStiffness and setDamping keep the spring usable", function()
-        -- @tests Spring:setStiffness
-        -- @tests Spring:setDamping
+        -- @covers Spring:setStiffness
+        -- @covers Spring:setDamping
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 }, { stiffness = 50, damping = 8 })
         sp:setStiffness(200)
@@ -1022,7 +941,7 @@ describe("lurek.tween.spring regression coverage", function()
     end)
 
     it("cancel deactivates the spring immediately", function()
-        -- @tests Spring:cancel
+        -- @covers Spring:cancel
         local target = { x = 0 }
         local sp = lurek.tween.spring(target, { x = 100 })
         sp:cancel()

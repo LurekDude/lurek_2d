@@ -1,4 +1,4 @@
-//! Public tween behavior is covered by the Lua-first suite in
+//! INTERNAL ONLY: public tween behavior is covered by the Lua-first suite in
 //! `tests/lua/unit/test_tween_unit.lua`.
 //!
 //! This target previously duplicated `lurek.tween`-reachable behavior for

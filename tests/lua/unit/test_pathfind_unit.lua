@@ -5,72 +5,66 @@
 -- NavGrid creation and basic ops
 -- ============================================================
 
--- @description Covers suite: NavGrid creation.
 describe("NavGrid creation", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.getThreadCount
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.newNavGridFromTileMap
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.tilemap.newTileMap
-    -- @tests lurek.pathfind.NavGrid.getDimensions
-    -- @tests lurek.pathfind.NavGrid.fill
-    -- @tests lurek.pathfind.NavGrid.saveToString
-    -- @tests lurek.pathfind.NavGrid.loadFromString
-    -- @tests lurek.pathfind.NavGrid.setChunkSize
-    -- @tests lurek.pathfind.NavGrid.getChunkSize
-    -- @tests lurek.pathfind.NavGrid.type
-    -- @tests lurek.pathfind.NavGrid.typeOf
-    -- @tests lurek.pathfind.UnitPathfinder.findPathSmooth
-    -- @tests lurek.pathfind.UnitPathfinder.getPathLength
-    -- @tests lurek.pathfind.UnitPathfinder.getPathCost
-    -- @tests lurek.pathfind.UnitPathfinder.findPartialPath
-    -- @tests lurek.pathfind.UnitPathfinder.findNearestWalkable
-    -- @tests lurek.pathfind.UnitPathfinder.isReachable
-    -- @tests lurek.pathfind.UnitPathfinder.lineOfSight
-    -- @tests lurek.pathfind.UnitPathfinder.setCacheEnabled
-    -- @tests lurek.pathfind.UnitPathfinder.isCacheEnabled
-    -- @tests lurek.pathfind.UnitPathfinder.clearCache
-    -- @tests lurek.pathfind.UnitPathfinder.getCacheSize
-    -- @tests lurek.pathfind.UnitPathfinder.setCacheMaxSize
-    -- @description Verifies newNavGrid returns NavGrid userdata for valid dimensions.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.getThreadCount
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.newNavGridFromTileMap
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers lurek.pathfind.NavGrid.getDimensions
+    -- @covers lurek.pathfind.NavGrid.fill
+    -- @covers lurek.pathfind.NavGrid.saveToString
+    -- @covers lurek.pathfind.NavGrid.loadFromString
+    -- @covers lurek.pathfind.NavGrid.setChunkSize
+    -- @covers lurek.pathfind.NavGrid.getChunkSize
+    -- @covers lurek.pathfind.NavGrid.type
+    -- @covers lurek.pathfind.NavGrid.typeOf
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
+    -- @covers lurek.pathfind.UnitPathfinder.getPathLength
+    -- @covers lurek.pathfind.UnitPathfinder.getPathCost
+    -- @covers lurek.pathfind.UnitPathfinder.findPartialPath
+    -- @covers lurek.pathfind.UnitPathfinder.findNearestWalkable
+    -- @covers lurek.pathfind.UnitPathfinder.isReachable
+    -- @covers lurek.pathfind.UnitPathfinder.lineOfSight
+    -- @covers lurek.pathfind.UnitPathfinder.setCacheEnabled
+    -- @covers lurek.pathfind.UnitPathfinder.isCacheEnabled
+    -- @covers lurek.pathfind.UnitPathfinder.clearCache
+    -- @covers lurek.pathfind.UnitPathfinder.getCacheSize
+    -- @covers lurek.pathfind.UnitPathfinder.setCacheMaxSize
     it("newNavGrid returns an object", function()
         local grid = lurek.pathfind.newNavGrid(20, 20)
         expect_type("userdata", grid)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.getWidth
-    -- @tests lurek.pathfind.NavGrid.getHeight
-    -- @description Verifies a new NavGrid reports the configured width and height.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.getWidth
+    -- @covers lurek.pathfind.NavGrid.getHeight
     it("width and height are correct", function()
         local grid = lurek.pathfind.newNavGrid(20, 20)
         expect_equal(20, grid:getWidth())
         expect_equal(20, grid:getHeight())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.getCost
-    -- @description Verifies new NavGrid cells default to traversal cost 1.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.getCost
     it("default cost is 1", function()
         local grid = lurek.pathfind.newNavGrid(5, 5)
         expect_equal(1, grid:getCost(1, 1))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setCost
-    -- @tests lurek.pathfind.NavGrid.getCost
-    -- @description Verifies setCost updates the stored cost for a grid cell.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setCost
+    -- @covers lurek.pathfind.NavGrid.getCost
     it("setCost changes cost", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         grid:setCost(5, 5, 10)
         expect_equal(10, grid:getCost(5, 5))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.NavGrid.isBlocked
-    -- @description Verifies setBlocked marks a cell blocked and leaves other cells unblocked.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.NavGrid.isBlocked
     it("setBlocked / isBlocked", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         grid:setBlocked(3, 3, true)
@@ -78,10 +72,9 @@ describe("NavGrid creation", function()
         expect_false(grid:isBlocked(1, 1))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.NavGrid.isWalkable
-    -- @description Verifies isWalkable tracks the blocked state of a grid cell.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.NavGrid.isWalkable
     it("isWalkable reflects blocked state", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         expect_true(grid:isWalkable(1, 1))
@@ -89,10 +82,9 @@ describe("NavGrid creation", function()
         expect_false(grid:isWalkable(1, 1))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.fillRect
-    -- @tests lurek.pathfind.NavGrid.isBlocked
-    -- @description Verifies fillRect applies blocked cells inside the target rectangle only.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.fillRect
+    -- @covers lurek.pathfind.NavGrid.isBlocked
     it("fillRect blocks region", function()
         local grid = lurek.pathfind.newNavGrid(20, 20)
         grid:fillRect(10, 10, 3, 3, 0)
@@ -101,10 +93,9 @@ describe("NavGrid creation", function()
         expect_false(grid:isBlocked(9, 9))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setDiagonalMode
-    -- @tests lurek.pathfind.NavGrid.getDiagonalMode
-    -- @description Verifies diagonal movement mode can be switched and queried on NavGrid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setDiagonalMode
+    -- @covers lurek.pathfind.NavGrid.getDiagonalMode
     it("diagonal mode get/set", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         grid:setDiagonalMode("always")
@@ -117,21 +108,18 @@ end)
 -- ============================================================
 -- Pathfinder
 -- ============================================================
--- @description Covers suite: Pathfinder.
 describe("Pathfinder", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @description Verifies newPathfinder returns pathfinder userdata for a NavGrid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
     it("newPathfinder returns an object", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
         expect_type("userdata", pf)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
-    -- @description Verifies findPath returns a waypoint list spanning start and goal on an open grid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
     it("findPath on open grid returns path", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -144,11 +132,10 @@ describe("Pathfinder", function()
         expect_equal(10, path[#path].y)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
-    -- @description Verifies findPath can route through a single-cell opening in a blocked wall.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
     it("findPath through narrow gap", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         for y = 1, 10 do grid:setBlocked(5, y, true) end
@@ -158,10 +145,9 @@ describe("Pathfinder", function()
         expect_true(path ~= nil, "should find path through narrow gap")
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.heuristicDistance
-    -- @description Verifies heuristicDistance returns a positive numeric estimate between two cells.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.heuristicDistance
     it("heuristicDistance returns positive number", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -170,12 +156,11 @@ describe("Pathfinder", function()
         expect_true(d > 0, "distance should be positive")
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.isCacheEnabled
-    -- @tests lurek.pathfind.UnitPathfinder.clearCache
-    -- @tests lurek.pathfind.UnitPathfinder.getCacheSize
-    -- @description Verifies cache helpers report enabled state and clear cached entries.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.isCacheEnabled
+    -- @covers lurek.pathfind.UnitPathfinder.clearCache
+    -- @covers lurek.pathfind.UnitPathfinder.getCacheSize
     it("cache operations", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -188,32 +173,28 @@ end)
 -- ============================================================
 -- FlowField
 -- ============================================================
--- @description Covers suite: FlowField.
 describe("FlowField", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @description Verifies newFlowField returns FlowField userdata for a NavGrid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
     it("newFlowField returns an object", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
         expect_type("userdata", ff)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.isCalculated
-    -- @description Verifies a new FlowField starts in an uncalculated state.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.isCalculated
     it("isCalculated returns false initially", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
         expect_false(ff:isCalculated())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.isCalculated
-    -- @description Verifies calculate marks the FlowField as ready after a target is set.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.isCalculated
     it("calculate makes isCalculated true", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
@@ -221,11 +202,10 @@ describe("FlowField", function()
         expect_true(ff:isCalculated())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.getDirection
-    -- @description Verifies getDirection returns numeric steering components after FlowField calculation.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.getDirection
     it("getDirection returns numbers", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
@@ -235,11 +215,10 @@ describe("FlowField", function()
         expect_type("number", dy)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.getCostToTarget
-    -- @description Verifies getCostToTarget reports a positive cost for a reachable non-target cell.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.getCostToTarget
     it("getCostToTarget positive for reachable cell", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
@@ -248,11 +227,10 @@ describe("FlowField", function()
         expect_true(cost > 0, "cost should be positive")
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.steer
-    -- @description Verifies steer returns numeric velocity components for a calculated FlowField.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.steer
     it("steer returns numbers", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(grid)
@@ -266,10 +244,8 @@ end)
 -- ============================================================
 -- Thread count
 -- ============================================================
--- @description Covers suite: pathfinding threadCount.
 describe("pathfinding threadCount", function()
-    -- @tests lurek.pathfind.getThreadCount
-    -- @description Verifies getThreadCount returns a numeric worker-thread count.
+    -- @covers lurek.pathfind.getThreadCount
     it("getThreadCount returns a number", function()
         local tc = lurek.pathfind.getThreadCount()
         expect_type("number", tc)
@@ -279,21 +255,18 @@ end)
 -- ============================================================
 -- newNavGridFromTileMap
 -- ============================================================
--- @description Covers suite: newNavGridFromTileMap.
 describe("newNavGridFromTileMap", function()
-    -- @tests lurek.pathfind.newNavGridFromTileMap
-    -- @description Verifies newNavGridFromTileMap is exposed as a callable function.
+    -- @covers lurek.pathfind.newNavGridFromTileMap
     it("is a function", function()
         expect_type("function", lurek.pathfind.newNavGridFromTileMap)
     end)
 
-    -- @tests lurek.tilemap.newTileMap
-    -- @tests lurek.tilemap.TileMap.addLayer
-    -- @tests lurek.tilemap.TileMap.setTile
-    -- @tests lurek.pathfind.newNavGridFromTileMap
-    -- @tests lurek.pathfind.NavGrid.getWidth
-    -- @tests lurek.pathfind.NavGrid.getHeight
-    -- @description Verifies newNavGridFromTileMap preserves tilemap layer dimensions in the generated NavGrid.
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers lurek.tilemap.TileMap.addLayer
+    -- @covers lurek.tilemap.TileMap.setTile
+    -- @covers lurek.pathfind.newNavGridFromTileMap
+    -- @covers lurek.pathfind.NavGrid.getWidth
+    -- @covers lurek.pathfind.NavGrid.getHeight
     it("creates grid from tilemap with correct dimensions", function()
         local tm = lurek.tilemap.newTileMap(16, 16, 8)
         tm:addLayer("ground", 4, 4)
@@ -307,12 +280,11 @@ describe("newNavGridFromTileMap", function()
         expect_equal(4, nav:getHeight())
     end)
 
-    -- @tests lurek.tilemap.newTileMap
-    -- @tests lurek.tilemap.TileMap.addLayer
-    -- @tests lurek.tilemap.TileMap.setTile
-    -- @tests lurek.pathfind.newNavGridFromTileMap
-    -- @tests lurek.pathfind.NavGrid.getCost
-    -- @description Verifies blocked tile GIDs become zero-cost blocked cells in the generated NavGrid.
+    -- @covers lurek.tilemap.newTileMap
+    -- @covers lurek.tilemap.TileMap.addLayer
+    -- @covers lurek.tilemap.TileMap.setTile
+    -- @covers lurek.pathfind.newNavGridFromTileMap
+    -- @covers lurek.pathfind.NavGrid.getCost
     it("blocked GIDs produce cost 0", function()
         local tm = lurek.tilemap.newTileMap(16, 16, 8)
         tm:addLayer("ground", 4, 4)
@@ -330,13 +302,11 @@ describe("newNavGridFromTileMap", function()
     end)
 end)
 
--- Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬ NavGrid extended Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬
+-- NavGrid extended
 
--- @description Covers suite: NavGrid.getDimensions.
 describe("NavGrid.getDimensions", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.getDimensions
-    -- @description Verifies getDimensions returns the NavGrid width and height tuple.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.getDimensions
     it("getDimensions returns width and height", function()
         local g = lurek.pathfind.newNavGrid(12, 8)
         local w, h = g:getDimensions()
@@ -345,12 +315,10 @@ describe("NavGrid.getDimensions", function()
     end)
 end)
 
--- @description Covers suite: NavGrid.fill.
 describe("NavGrid.fill", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.fill
-    -- @tests lurek.pathfind.NavGrid.getCost
-    -- @description Verifies fill assigns the same traversal cost to every cell in the grid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.fill
+    -- @covers lurek.pathfind.NavGrid.getCost
     it("fill sets all cells to the same cost", function()
         local g = lurek.pathfind.newNavGrid(5, 5)
         g:fill(3)
@@ -361,10 +329,9 @@ describe("NavGrid.fill", function()
         end
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.fill
-    -- @tests lurek.pathfind.NavGrid.isWalkable
-    -- @description Verifies fill with zero cost marks every cell as non-walkable.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.fill
+    -- @covers lurek.pathfind.NavGrid.isWalkable
     it("fill with 0 marks entire grid blocked", function()
         local g = lurek.pathfind.newNavGrid(4, 4)
         g:fill(0)
@@ -376,11 +343,9 @@ describe("NavGrid.fill", function()
     end)
 end)
 
--- @description Covers suite: NavGrid.saveToString / loadFromString.
 describe("NavGrid.saveToString / loadFromString", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.saveToString
-    -- @description Verifies saveToString returns non-empty serialized NavGrid data.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.saveToString
     it("saveToString returns a non-empty string", function()
         local g = lurek.pathfind.newNavGrid(6, 6)
         local s = g:saveToString()
@@ -388,12 +353,11 @@ describe("NavGrid.saveToString / loadFromString", function()
         expect_true(#s > 0, "serialised string must not be empty")
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.NavGrid.saveToString
-    -- @tests lurek.pathfind.NavGrid.loadFromString
-    -- @tests lurek.pathfind.NavGrid.isBlocked
-    -- @description Verifies blocked cells survive a saveToString and loadFromString round trip.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.NavGrid.saveToString
+    -- @covers lurek.pathfind.NavGrid.loadFromString
+    -- @covers lurek.pathfind.NavGrid.isBlocked
     it("loadFromString round-trips blocked state", function()
         local g = lurek.pathfind.newNavGrid(6, 6)
         g:setBlocked(3, 3, true)
@@ -406,12 +370,11 @@ describe("NavGrid.saveToString / loadFromString", function()
         expect_false(g2:isBlocked(1, 1))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setCost
-    -- @tests lurek.pathfind.NavGrid.saveToString
-    -- @tests lurek.pathfind.NavGrid.loadFromString
-    -- @tests lurek.pathfind.NavGrid.getCost
-    -- @description Verifies custom cell costs survive a NavGrid serialization round trip.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setCost
+    -- @covers lurek.pathfind.NavGrid.saveToString
+    -- @covers lurek.pathfind.NavGrid.loadFromString
+    -- @covers lurek.pathfind.NavGrid.getCost
     it("loadFromString round-trips cost values", function()
         local g = lurek.pathfind.newNavGrid(4, 4)
         g:setCost(2, 2, 7)
@@ -421,12 +384,10 @@ describe("NavGrid.saveToString / loadFromString", function()
     end)
 end)
 
--- @description Covers suite: NavGrid.setChunkSize / getChunkSize.
 describe("NavGrid.setChunkSize / getChunkSize", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setChunkSize
-    -- @tests lurek.pathfind.NavGrid.getChunkSize
-    -- @description Verifies chunk size configuration round-trips on NavGrid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setChunkSize
+    -- @covers lurek.pathfind.NavGrid.getChunkSize
     it("setChunkSize / getChunkSize round-trip", function()
         local g = lurek.pathfind.newNavGrid(32, 32)
         g:setChunkSize(8)
@@ -434,19 +395,16 @@ describe("NavGrid.setChunkSize / getChunkSize", function()
     end)
 end)
 
--- @description Covers suite: NavGrid.type / typeOf.
 describe("NavGrid.type / typeOf", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.type
-    -- @description Verifies NavGrid:type returns a type name string.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.type
     it("type() returns a string", function()
         local g = lurek.pathfind.newNavGrid(4, 4)
         expect_type("string", g:type())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.typeOf
-    -- @description Verifies NavGrid:typeOf matches NavGrid and rejects unrelated userdata types.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.typeOf
     it("typeOf() checks identity against a type name", function()
         local g = lurek.pathfind.newNavGrid(4, 4)
         expect_true(g:typeOf("LNavGrid"))
@@ -454,14 +412,12 @@ describe("NavGrid.type / typeOf", function()
     end)
 end)
 
--- Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬ UnitPathfinder extended Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬Ä‚â€žĂ˘â‚¬ĹˇÄ‚â€ąĂ‚ÂĂ„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„Ä…Ă„â€žĂ„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąË‡Ä‚â€šĂ‚Â¬
+-- UnitPathfinder extended
 
--- @description Covers suite: UnitPathfinder.findPathSmooth.
 describe("UnitPathfinder.findPathSmooth", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPathSmooth
-    -- @description Verifies findPathSmooth returns either a waypoint table or nil.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
     it("findPathSmooth returns a table or nil", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -469,10 +425,9 @@ describe("UnitPathfinder.findPathSmooth", function()
         expect_true(path == nil or type(path) == "table", "findPathSmooth must return table or nil")
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPathSmooth
-    -- @description Verifies findPathSmooth finds a route across an open grid.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
     it("findPathSmooth with open grid returns a path", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -481,13 +436,11 @@ describe("UnitPathfinder.findPathSmooth", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder.getPathLength / getPathCost.
 describe("UnitPathfinder.getPathLength / getPathCost", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
-    -- @tests lurek.pathfind.UnitPathfinder.getPathLength
-    -- @description Verifies getPathLength returns a numeric length for a computed path.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
+    -- @covers lurek.pathfind.UnitPathfinder.getPathLength
     it("getPathLength returns a number for a valid path", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -501,11 +454,10 @@ describe("UnitPathfinder.getPathLength / getPathCost", function()
         end
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
-    -- @tests lurek.pathfind.UnitPathfinder.getPathCost
-    -- @description Verifies getPathCost returns a numeric traversal cost for a computed path.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
+    -- @covers lurek.pathfind.UnitPathfinder.getPathCost
     it("getPathCost returns a number for a valid path", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -520,12 +472,10 @@ describe("UnitPathfinder.getPathLength / getPathCost", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder.findPartialPath.
 describe("UnitPathfinder.findPartialPath", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPartialPath
-    -- @description Verifies findPartialPath returns a path result plus a boolean completion flag.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPartialPath
     it("findPartialPath returns a path and boolean", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -534,10 +484,9 @@ describe("UnitPathfinder.findPartialPath", function()
         expect_type("boolean", complete)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findPartialPath
-    -- @description Verifies findPartialPath reports completion on an unobstructed grid with ample search budget.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findPartialPath
     it("findPartialPath in open grid returns complete=true", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -546,13 +495,11 @@ describe("UnitPathfinder.findPartialPath", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder.findNearestWalkable.
 describe("UnitPathfinder.findNearestWalkable", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findNearestWalkable
-    -- @description Verifies findNearestWalkable returns numeric coordinates for a blocked source cell.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findNearestWalkable
     it("findNearestWalkable returns two numbers", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         g:setBlocked(5, 5, true)
@@ -562,10 +509,9 @@ describe("UnitPathfinder.findNearestWalkable", function()
         expect_type("number", ny)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.findNearestWalkable
-    -- @description Verifies findNearestWalkable returns the original coordinates when the cell is already walkable.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.findNearestWalkable
     it("findNearestWalkable returns same coords for already walkable cell", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -575,23 +521,20 @@ describe("UnitPathfinder.findNearestWalkable", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder.isReachable.
 describe("UnitPathfinder.isReachable", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.isReachable
-    -- @description Verifies isReachable reports true between open-grid start and goal cells.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.isReachable
     it("isReachable returns true for reachable goal in open grid", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
         expect_true(pf:isReachable(1, 1, 10, 10))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.isReachable
-    -- @description Verifies isReachable returns a boolean result when the goal cell is boxed in by blocked neighbors.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.isReachable
     it("isReachable returns false when goal is fully blocked", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         -- Wall off all border cells adjacent to 10,10
@@ -606,23 +549,20 @@ describe("UnitPathfinder.isReachable", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder.lineOfSight.
 describe("UnitPathfinder.lineOfSight", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.lineOfSight
-    -- @description Verifies lineOfSight returns true across an unobstructed segment.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.lineOfSight
     it("lineOfSight returns true for unobstructed path", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
         expect_true(pf:lineOfSight(1, 1, 5, 5))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.lineOfSight
-    -- @description Verifies lineOfSight returns a boolean when a blocked wall crosses the segment.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.lineOfSight
     it("lineOfSight returns false when wall blocks", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         -- Block a column between start and end
@@ -633,13 +573,11 @@ describe("UnitPathfinder.lineOfSight", function()
     end)
 end)
 
--- @description Covers suite: UnitPathfinder cache control.
 describe("UnitPathfinder cache control", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.setCacheEnabled
-    -- @tests lurek.pathfind.UnitPathfinder.isCacheEnabled
-    -- @description Verifies cache enablement can be toggled and queried.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.setCacheEnabled
+    -- @covers lurek.pathfind.UnitPathfinder.isCacheEnabled
     it("setCacheEnabled / isCacheEnabled round-trip", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -649,30 +587,27 @@ describe("UnitPathfinder cache control", function()
         expect_true(pf:isCacheEnabled())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.clearCache
-    -- @description Verifies clearCache can be called safely on a pathfinder instance.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.clearCache
     it("clearCache does not error", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
         expect_no_error(function() pf:clearCache() end)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.getCacheSize
-    -- @description Verifies getCacheSize returns a numeric cache entry count.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.getCacheSize
     it("getCacheSize returns a number", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
         expect_type("number", pf:getCacheSize())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.setCacheMaxSize
-    -- @description Verifies setCacheMaxSize accepts a numeric cache capacity without error.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.setCacheMaxSize
     it("setCacheMaxSize does not error", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
@@ -680,31 +615,27 @@ describe("UnitPathfinder cache control", function()
     end)
 end)
 
--- @description Covers suite: flow field (RS parity).
 describe("flow field (RS parity)", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @description Verifies newFlowField returns userdata in the RS parity suite.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
     it("newFlowField returns userdata", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(g)
         expect_equal("userdata", type(ff))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.isCalculated
-    -- @description Verifies a parity-suite FlowField starts uncalculated.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.isCalculated
     it("isCalculated is false before calculate", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(g)
         expect_false(ff:isCalculated())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.getTargets
-    -- @description Verifies getTargets is empty before any FlowField calculation.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.getTargets
     it("getTargets returns empty before calculate", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local ff = lurek.pathfind.newFlowField(g)
@@ -713,11 +644,10 @@ describe("flow field (RS parity)", function()
         expect_equal(0, #targets)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.isCalculated
-    -- @description Verifies calculate marks the FlowField calculated in the parity suite.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.isCalculated
     it("calculate with single target sets isCalculated = true", function()
         local g = lurek.pathfind.newNavGrid(5, 5)
         local ff = lurek.pathfind.newFlowField(g)
@@ -725,11 +655,10 @@ describe("flow field (RS parity)", function()
         expect_true(ff:isCalculated())
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.getTargets
-    -- @description Verifies getTargets returns the target cell after calculation.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.getTargets
     it("getTargets after calculate returns the specified cells", function()
         local g = lurek.pathfind.newNavGrid(5, 5)
         local ff = lurek.pathfind.newFlowField(g)
@@ -738,11 +667,10 @@ describe("flow field (RS parity)", function()
         expect_equal(1, #targets)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.getCostToTarget
-    -- @description Verifies getCostToTarget returns zero at the target cell.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.getCostToTarget
     it("costToTarget returns 0 at the target cell", function()
         local g = lurek.pathfind.newNavGrid(5, 5)
         local ff = lurek.pathfind.newFlowField(g)
@@ -751,11 +679,10 @@ describe("flow field (RS parity)", function()
         expect_near(0.0, cost, 0.01)
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.steer
-    -- @description Verifies steer returns numeric components after parity-suite FlowField calculation.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.steer
     it("steer returns numbers for vx and vy", function()
         local g = lurek.pathfind.newNavGrid(5, 5)
         local ff = lurek.pathfind.newFlowField(g)
@@ -765,11 +692,10 @@ describe("flow field (RS parity)", function()
         expect_equal("number", type(vy))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newFlowField
-    -- @tests lurek.pathfind.FlowField.calculate
-    -- @tests lurek.pathfind.FlowField.isCalculated
-    -- @description Verifies calculate accepts target input and leaves the FlowField calculated for parity coverage.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newFlowField
+    -- @covers lurek.pathfind.FlowField.calculate
+    -- @covers lurek.pathfind.FlowField.isCalculated
     it("multi-target calculate accepts multiple cells", function()
         local g = lurek.pathfind.newNavGrid(8, 8)
         local ff = lurek.pathfind.newFlowField(g)
@@ -778,23 +704,20 @@ describe("flow field (RS parity)", function()
     end)
 end)
 
--- @description Covers suite: pathfinder line of sight and diagonal mode (RS parity).
 describe("pathfinder line of sight and diagonal mode (RS parity)", function()
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.lineOfSight
-    -- @description Verifies lineOfSight succeeds on an unobstructed grid in the parity suite.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.lineOfSight
     it("lineOfSight returns true on open grid", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(g)
         expect_true(pf:lineOfSight(1, 1, 5, 5))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setBlocked
-    -- @tests lurek.pathfind.newPathfinder
-    -- @tests lurek.pathfind.UnitPathfinder.lineOfSight
-    -- @description Verifies lineOfSight fails when a blocked wall cuts across the tested path.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setBlocked
+    -- @covers lurek.pathfind.newPathfinder
+    -- @covers lurek.pathfind.UnitPathfinder.lineOfSight
     it("lineOfSight returns false when wall blocks path", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         -- block a row of cells at column 5
@@ -803,10 +726,9 @@ describe("pathfinder line of sight and diagonal mode (RS parity)", function()
         expect_false(pf:lineOfSight(1, 5, 9, 5))
     end)
 
-    -- @tests lurek.pathfind.newNavGrid
-    -- @tests lurek.pathfind.NavGrid.setDiagonalMode
-    -- @tests lurek.pathfind.NavGrid.getDiagonalMode
-    -- @description Verifies diagonal mode changes round-trip correctly in the parity suite.
+    -- @covers lurek.pathfind.newNavGrid
+    -- @covers lurek.pathfind.NavGrid.setDiagonalMode
+    -- @covers lurek.pathfind.NavGrid.getDiagonalMode
     it("setDiagonalMode and getDiagonalMode round-trip", function()
         local g = lurek.pathfind.newNavGrid(10, 10)
         g:setDiagonalMode("none")
@@ -816,12 +738,11 @@ describe("pathfinder line of sight and diagonal mode (RS parity)", function()
     end)
 end)
 
--- Ă„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąÄ„Ä‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąÄ„Ä‚ËĂ˘â‚¬ĹˇĂ‚Â¬ Pathfind Bidirectional (merged from test_pathfind_bidirectional.lua) Ă„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąÄ„Ä‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ă„â€šĂ‹ÂÄ‚ËĂ˘â€šÂ¬ÄąÄ„Ä‚ËĂ˘â‚¬ĹˇĂ‚Â¬
+-- Pathfind Bidirectional (merged from test_pathfind_bidirectional.lua)
 
--- @description Covers suite: NavGrid bidirectional A* path finding.
 describe("Bidirectional A*: path finding", function()
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathBidirectional
+    -- @covers lurek.pathfind.UnitPathfinder.findPathBidirectional
     xit("finds path on open 5x5 grid from (1,1) to (5,5)", function()
         local grid = lurek.pathfind.newNavGrid(5, 5)
         local pathfinder = lurek.pathfind.newPathfinder(grid)
@@ -837,7 +758,7 @@ describe("Bidirectional A*: path finding", function()
         expect_equal(5, last.y)
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathBidirectional
+    -- @covers lurek.pathfind.UnitPathfinder.findPathBidirectional
     xit("start equals goal returns single-node path", function()
         local grid = lurek.pathfind.newNavGrid(5, 5)
         local pathfinder = lurek.pathfind.newPathfinder(grid)
@@ -849,7 +770,7 @@ describe("Bidirectional A*: path finding", function()
         expect_equal(3, path[1].y)
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathBidirectional
+    -- @covers lurek.pathfind.UnitPathfinder.findPathBidirectional
     xit("blocked start returns nil path and complete false", function()
         local grid = lurek.pathfind.newNavGrid(5, 5)
         local pathfinder = lurek.pathfind.newPathfinder(grid)
@@ -859,7 +780,7 @@ describe("Bidirectional A*: path finding", function()
         expect_false(complete, "complete must be false when start is blocked")
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathBidirectional
+    -- @covers lurek.pathfind.UnitPathfinder.findPathBidirectional
     xit("findPathBidirectional finds path on 10x10 grid", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pathfinder = lurek.pathfind.newPathfinder(grid)
@@ -872,7 +793,7 @@ describe("Bidirectional A*: path finding", function()
         expect_equal(10, last.y)
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathBidirectional
+    -- @covers lurek.pathfind.UnitPathfinder.findPathBidirectional
     xit("tiny max_nodes budget returns incomplete path", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pathfinder = lurek.pathfind.newPathfinder(grid)
@@ -888,9 +809,8 @@ end)
 -- caller passes a 0 (invalid 1-based) coordinate. Before the fix, the u32
 -- subtraction underflowed and aborted the process.
 
--- @description Covers suite: UnitPathfinder regression Ă„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ä‚ËĂ˘â€šÂ¬ÄąÄ„ 0-index must return Lua error not panic.
 describe("UnitPathfinder regression: zero index", function()
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
     it("findPath with x1=0 returns a Lua error (no panic)", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -899,7 +819,7 @@ describe("UnitPathfinder regression: zero index", function()
         end)
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathSmooth
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
     it("findPathSmooth with y2=0 returns a Lua error (no panic)", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -921,9 +841,8 @@ end)
 -- caller passes a 0 (invalid 1-based) coordinate. Before the fix, the u32
 -- subtraction underflowed and aborted the process.
 
--- @description Covers suite: UnitPathfinder regression Ă„â€šĂ‹ÂÄ‚ËĂ˘â‚¬ĹˇĂ‚Â¬Ä‚ËĂ˘â€šÂ¬ÄąÄ„ 0-index must return Lua error not panic.
 describe("UnitPathfinder regression: zero index", function()
-    -- @tests lurek.pathfind.UnitPathfinder.findPath
+    -- @covers lurek.pathfind.UnitPathfinder.findPath
     it("findPath with x1=0 returns a Lua error (no panic)", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -932,7 +851,7 @@ describe("UnitPathfinder regression: zero index", function()
         end)
     end)
 
-    -- @tests lurek.pathfind.UnitPathfinder.findPathSmooth
+    -- @covers lurek.pathfind.UnitPathfinder.findPathSmooth
     it("findPathSmooth with y2=0 returns a Lua error (no panic)", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -944,434 +863,3 @@ end)
 
 test_summary()
 
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
-    -- @tests lurek.pathfind.setThreadCount
-    it("covers lurek.pathfind.setThreadCount", function()
-        -- TODO: Implement test for lurek.pathfind.setThreadCount
-    end)
-
-    -- @tests NavGrid:rebuildAbstract
-    it("covers NavGrid:rebuildAbstract", function()
-        -- TODO: Implement test for NavGrid:rebuildAbstract
-    end)
-
-    -- @tests NavGrid:setDirty
-    it("covers NavGrid:setDirty", function()
-        -- TODO: Implement test for NavGrid:setDirty
-    end)
-
-    -- @tests NavGrid:clearDirty
-    it("covers NavGrid:clearDirty", function()
-        -- TODO: Implement test for NavGrid:clearDirty
-    end)
-
-    -- @tests FlowField:getDirectionAngle
-    it("covers FlowField:getDirectionAngle", function()
-        -- TODO: Implement test for FlowField:getDirectionAngle
-    end)
-
-end)
-
-describe("Missing explicit test for lurek.pathfind.newHexGrid", function()
-    it("lurek.pathfind.newHexGrid works", function()
-        -- @tests lurek.pathfind.newHexGrid
-        -- TODO: add assertion for lurek.pathfind.newHexGrid
-    end)
-end)
-
-describe("lurek.pathfind.newJpsGrid", function()
-    -- @tests lurek.pathfind.newJpsGrid
-    -- @tests LJpsGrid:findPath
-    -- @description Verifies newJpsGrid returns a path on an open grid and that the path reaches the requested goal cell.
-    it("findPath reaches the requested goal on an open grid", function()
-        local grid = lurek.pathfind.newJpsGrid(5, 5)
-        local path = grid:findPath(1, 1, 5, 5)
-
-        expect_not_nil(path)
-        expect_true(#path > 0, "expected a non-empty JPS path")
-        expect_equal(5, path[#path].x)
-        expect_equal(5, path[#path].y)
-    end)
-end)
-
-describe("lurek.pathfind.rangeMap", function()
-    -- @tests lurek.pathfind.rangeMap
-    -- @description Verifies rangeMap includes the origin cell with zero cost and returns at least one reachable cell.
-    it("includes the origin cell in reachable results", function()
-        local result = lurek.pathfind.rangeMap({
-            width = 5,
-            height = 5,
-            origin_x = 3,
-            origin_y = 3,
-            budget = 3.0,
-        })
-
-        expect_equal(5, result.width)
-        expect_equal(5, result.height)
-        expect_true(#result.cells > 0, "expected at least one reachable cell")
-
-        local found_origin = false
-        for _, cell in ipairs(result.cells) do
-            if cell.x == 3 and cell.y == 3 then
-                found_origin = true
-                expect_equal(0, cell.cost)
-            end
-        end
-
-        expect_true(found_origin, "expected the origin cell to be reachable")
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getWidth", function()
-    it("NavGrid:getWidth works", function()
-        -- @tests NavGrid:getWidth
-        -- TODO: add assertion for NavGrid:getWidth
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getHeight", function()
-    it("NavGrid:getHeight works", function()
-        -- @tests NavGrid:getHeight
-        -- TODO: add assertion for NavGrid:getHeight
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getDimensions", function()
-    it("NavGrid:getDimensions works", function()
-        -- @tests NavGrid:getDimensions
-        -- TODO: add assertion for NavGrid:getDimensions
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:setCost", function()
-    it("NavGrid:setCost works", function()
-        -- @tests NavGrid:setCost
-        -- TODO: add assertion for NavGrid:setCost
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getCost", function()
-    it("NavGrid:getCost works", function()
-        -- @tests NavGrid:getCost
-        -- TODO: add assertion for NavGrid:getCost
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:isBlocked", function()
-    it("NavGrid:isBlocked works", function()
-        -- @tests NavGrid:isBlocked
-        -- TODO: add assertion for NavGrid:isBlocked
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:fill", function()
-    it("NavGrid:fill works", function()
-        -- @tests NavGrid:fill
-        -- TODO: add assertion for NavGrid:fill
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:loadFromString", function()
-    it("NavGrid:loadFromString works", function()
-        -- @tests NavGrid:loadFromString
-        -- TODO: add assertion for NavGrid:loadFromString
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:saveToString", function()
-    it("NavGrid:saveToString works", function()
-        -- @tests NavGrid:saveToString
-        -- TODO: add assertion for NavGrid:saveToString
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:setChunkSize", function()
-    it("NavGrid:setChunkSize works", function()
-        -- @tests NavGrid:setChunkSize
-        -- TODO: add assertion for NavGrid:setChunkSize
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getChunkSize", function()
-    it("NavGrid:getChunkSize works", function()
-        -- @tests NavGrid:getChunkSize
-        -- TODO: add assertion for NavGrid:getChunkSize
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:setDiagonalMode", function()
-    it("NavGrid:setDiagonalMode works", function()
-        -- @tests NavGrid:setDiagonalMode
-        -- TODO: add assertion for NavGrid:setDiagonalMode
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:getDiagonalMode", function()
-    it("NavGrid:getDiagonalMode works", function()
-        -- @tests NavGrid:getDiagonalMode
-        -- TODO: add assertion for NavGrid:getDiagonalMode
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:type", function()
-    it("NavGrid:type works", function()
-        -- @tests NavGrid:type
-        -- TODO: add assertion for NavGrid:type
-    end)
-end)
-
-describe("Missing explicit test for NavGrid:typeOf", function()
-    it("NavGrid:typeOf works", function()
-        -- @tests NavGrid:typeOf
-        -- TODO: add assertion for NavGrid:typeOf
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:getPathLength", function()
-    it("UnitPathfinder:getPathLength works", function()
-        -- @tests UnitPathfinder:getPathLength
-        -- TODO: add assertion for UnitPathfinder:getPathLength
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:getPathCost", function()
-    it("UnitPathfinder:getPathCost works", function()
-        -- @tests UnitPathfinder:getPathCost
-        -- TODO: add assertion for UnitPathfinder:getPathCost
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:setCacheEnabled", function()
-    it("UnitPathfinder:setCacheEnabled works", function()
-        -- @tests UnitPathfinder:setCacheEnabled
-        -- TODO: add assertion for UnitPathfinder:setCacheEnabled
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:isCacheEnabled", function()
-    it("UnitPathfinder:isCacheEnabled works", function()
-        -- @tests UnitPathfinder:isCacheEnabled
-        -- TODO: add assertion for UnitPathfinder:isCacheEnabled
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:clearCache", function()
-    it("UnitPathfinder:clearCache works", function()
-        -- @tests UnitPathfinder:clearCache
-        -- TODO: add assertion for UnitPathfinder:clearCache
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:getCacheSize", function()
-    it("UnitPathfinder:getCacheSize works", function()
-        -- @tests UnitPathfinder:getCacheSize
-        -- TODO: add assertion for UnitPathfinder:getCacheSize
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:setCacheMaxSize", function()
-    it("UnitPathfinder:setCacheMaxSize works", function()
-        -- @tests UnitPathfinder:setCacheMaxSize
-        -- TODO: add assertion for UnitPathfinder:setCacheMaxSize
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:type", function()
-    it("UnitPathfinder:type works", function()
-        -- @tests UnitPathfinder:type
-        -- TODO: add assertion for UnitPathfinder:type
-    end)
-end)
-
-describe("Missing explicit test for UnitPathfinder:typeOf", function()
-    it("UnitPathfinder:typeOf works", function()
-        -- @tests UnitPathfinder:typeOf
-        -- TODO: add assertion for UnitPathfinder:typeOf
-    end)
-end)
-
-describe("Missing explicit test for FlowField:getDirection", function()
-    it("FlowField:getDirection works", function()
-        -- @tests FlowField:getDirection
-        -- TODO: add assertion for FlowField:getDirection
-    end)
-end)
-
-describe("Missing explicit test for FlowField:getCostToTarget", function()
-    it("FlowField:getCostToTarget works", function()
-        -- @tests FlowField:getCostToTarget
-        -- TODO: add assertion for FlowField:getCostToTarget
-    end)
-end)
-
-describe("Missing explicit test for FlowField:isCalculated", function()
-    it("FlowField:isCalculated works", function()
-        -- @tests FlowField:isCalculated
-        -- TODO: add assertion for FlowField:isCalculated
-    end)
-end)
-
-describe("Missing explicit test for FlowField:getTargets", function()
-    it("FlowField:getTargets works", function()
-        -- @tests FlowField:getTargets
-        -- TODO: add assertion for FlowField:getTargets
-    end)
-end)
-
-describe("Missing explicit test for FlowField:type", function()
-    it("FlowField:type works", function()
-        -- @tests FlowField:type
-        -- TODO: add assertion for FlowField:type
-    end)
-end)
-
-describe("Missing explicit test for FlowField:typeOf", function()
-    it("FlowField:typeOf works", function()
-        -- @tests FlowField:typeOf
-        -- TODO: add assertion for FlowField:typeOf
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:getWidth", function()
-    it("PathGrid:getWidth works", function()
-        -- @tests PathGrid:getWidth
-        -- TODO: add assertion for PathGrid:getWidth
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:getHeight", function()
-    it("PathGrid:getHeight works", function()
-        -- @tests PathGrid:getHeight
-        -- TODO: add assertion for PathGrid:getHeight
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:getCellSize", function()
-    it("PathGrid:getCellSize works", function()
-        -- @tests PathGrid:getCellSize
-        -- TODO: add assertion for PathGrid:getCellSize
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:setWalkable", function()
-    it("PathGrid:setWalkable works", function()
-        -- @tests PathGrid:setWalkable
-        -- TODO: add assertion for PathGrid:setWalkable
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:isWalkable", function()
-    it("PathGrid:isWalkable works", function()
-        -- @tests PathGrid:isWalkable
-        -- TODO: add assertion for PathGrid:isWalkable
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:setCost", function()
-    it("PathGrid:setCost works", function()
-        -- @tests PathGrid:setCost
-        -- TODO: add assertion for PathGrid:setCost
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:getCost", function()
-    it("PathGrid:getCost works", function()
-        -- @tests PathGrid:getCost
-        -- TODO: add assertion for PathGrid:getCost
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:type", function()
-    it("PathGrid:type works", function()
-        -- @tests PathGrid:type
-        -- TODO: add assertion for PathGrid:type
-    end)
-end)
-
-describe("Missing explicit test for PathGrid:typeOf", function()
-    it("PathGrid:typeOf works", function()
-        -- @tests PathGrid:typeOf
-        -- TODO: add assertion for PathGrid:typeOf
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:getWidth", function()
-    it("AiFlowField:getWidth works", function()
-        -- @tests AiFlowField:getWidth
-        -- TODO: add assertion for AiFlowField:getWidth
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:getHeight", function()
-    it("AiFlowField:getHeight works", function()
-        -- @tests AiFlowField:getHeight
-        -- TODO: add assertion for AiFlowField:getHeight
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:hasGoal", function()
-    it("AiFlowField:hasGoal works", function()
-        -- @tests AiFlowField:hasGoal
-        -- TODO: add assertion for AiFlowField:hasGoal
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:setGoal", function()
-    it("AiFlowField:setGoal works", function()
-        -- @tests AiFlowField:setGoal
-        -- TODO: add assertion for AiFlowField:setGoal
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:getDirection", function()
-    it("AiFlowField:getDirection works", function()
-        -- @tests AiFlowField:getDirection
-        -- TODO: add assertion for AiFlowField:getDirection
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:getDistance", function()
-    it("AiFlowField:getDistance works", function()
-        -- @tests AiFlowField:getDistance
-        -- TODO: add assertion for AiFlowField:getDistance
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:type", function()
-    it("AiFlowField:type works", function()
-        -- @tests AiFlowField:type
-        -- TODO: add assertion for AiFlowField:type
-    end)
-end)
-
-describe("Missing explicit test for AiFlowField:typeOf", function()
-    it("AiFlowField:typeOf works", function()
-        -- @tests AiFlowField:typeOf
-        -- TODO: add assertion for AiFlowField:typeOf
-    end)
-end)
-
-describe("Missing explicit test for HexGrid:setCost", function()
-    it("HexGrid:setCost works", function()
-        -- @tests HexGrid:setCost
-        -- TODO: add assertion for HexGrid:setCost
-    end)
-end)
-
-describe("Missing explicit test for HexGrid:isBlocked", function()
-    it("HexGrid:isBlocked works", function()
-        -- @tests HexGrid:isBlocked
-        -- TODO: add assertion for HexGrid:isBlocked
-    end)
-end)
-
-describe("Missing explicit test for JpsGrid:isBlocked", function()
-    it("JpsGrid:isBlocked works", function()
-        -- @tests JpsGrid:isBlocked
-        -- TODO: add assertion for JpsGrid:isBlocked
-    end)
-end)

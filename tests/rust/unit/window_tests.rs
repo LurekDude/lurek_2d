@@ -1,4 +1,8 @@
-//! Tests for the window module.
+//! INTERNAL ONLY: public `lurek.window.*` behavior is covered by the Lua-first suite in
+//! `tests/lua/unit/test_window_unit.lua`.
+//!
+//! This Rust file keeps state-helper coverage that is either more precise at
+//! the `WindowState` layer or still internal to the runtime plumbing.
 
 use lurek2d::runtime::{FullscreenType, WindowState};
 use lurek2d::window::*;
@@ -20,29 +24,6 @@ mod viewport_tests {
     }
 
     #[test]
-    fn get_dimensions() {
-        let ws = make_ws();
-        assert_eq!(get_width(&ws), 800.0);
-        assert_eq!(get_height(&ws), 600.0);
-    }
-
-    #[test]
-    fn to_pixels_applies_scale_and_offset() {
-        let ws = make_ws();
-        let (px, py) = to_pixels(&ws, 100.0, 50.0);
-        assert_eq!(px, 100.0 * 2.0 + 10.0);
-        assert_eq!(py, 50.0 * 2.0 + 20.0);
-    }
-
-    #[test]
-    fn from_pixels_inverts_to_pixels() {
-        let ws = make_ws();
-        let (gx, gy) = from_pixels(&ws, 210.0, 120.0);
-        assert!((gx - 100.0).abs() < 0.001);
-        assert!((gy - 50.0).abs() < 0.001);
-    }
-
-    #[test]
     fn from_pixels_zero_scale_returns_zero() {
         let mut ws = make_ws();
         ws.viewport_scale_x = 0.0;
@@ -50,15 +31,6 @@ mod viewport_tests {
         let (gx, gy) = from_pixels(&ws, 100.0, 100.0);
         assert_eq!(gx, 0.0);
         assert_eq!(gy, 0.0);
-    }
-
-    #[test]
-    fn scale_info_fields() {
-        let ws = make_ws();
-        let info = get_scale_info(&ws);
-        assert_eq!(info.scale_x, 2.0);
-        assert_eq!(info.offset_x, 10.0);
-        assert_eq!(info.game_width, 800.0);
     }
 
     #[test]
@@ -80,32 +52,6 @@ mod viewport_tests {
         let mut ws = WindowState::default();
         set_scale_mode(&mut ws, "stretch");
         assert_eq!(ws.pending_scale_mode.as_deref(), Some("stretch"));
-    }
-
-    #[test]
-    fn get_scale_mode_reads_current() {
-        let mut ws = WindowState::default();
-        ws.scale_mode_str = "pixel".to_string();
-        assert_eq!(get_scale_mode(&ws), "pixel");
-    }
-
-    #[test]
-    fn set_scale_mode_validated_case_insensitive() {
-        let mut ws = WindowState::default();
-        assert!(set_scale_mode_validated(&mut ws, "LETTERBOX"));
-        assert_eq!(ws.pending_scale_mode.as_deref(), Some("letterbox"));
-    }
-
-    #[test]
-    fn to_pixels_identity_when_scale_is_one_offset_zero() {
-        let mut ws = WindowState::default();
-        ws.viewport_scale_x = 1.0;
-        ws.viewport_scale_y = 1.0;
-        ws.viewport_offset_x = 0.0;
-        ws.viewport_offset_y = 0.0;
-        let (px, py) = to_pixels(&ws, 42.0, 99.0);
-        assert_eq!(px, 42.0);
-        assert_eq!(py, 99.0);
     }
 
     #[test]

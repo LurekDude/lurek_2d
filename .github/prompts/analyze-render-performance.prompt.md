@@ -1,6 +1,6 @@
 ---
 description: "Analyze frame time, draw cost, or render-pipeline hotspots in one scenario."
-agent: "Optimizer"
+agent: "Verifier"
 ---
 # Analyze Render Performance
 

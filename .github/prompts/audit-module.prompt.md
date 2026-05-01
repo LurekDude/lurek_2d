@@ -1,6 +1,6 @@
 ---
 description: "Audit one module for architecture, docs, tests, and contract drift."
-agent: "Reviewer"
+agent: "Verifier"
 ---
 # Audit Module
 

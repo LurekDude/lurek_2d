@@ -1,4 +1,8 @@
-//! Tests for the timer module.
+//! INTERNAL ONLY: public `lurek.timer.*` behavior is covered by the Lua-first suite in
+//! `tests/lua/unit/test_timer_unit.lua` plus integration/stress coverage.
+//!
+//! The Rust-only coverage that remains here targets the internal `Clock`
+//! helper, which is not exposed one-to-one through the Lua API.
 
 // ── clock ─────────────────────────────────────────────────────────────────────
 

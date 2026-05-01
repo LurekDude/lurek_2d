@@ -1,6 +1,6 @@
 ---
 description: "Review a target surface for security risks, unsafe assumptions, and missing hardening."
-agent: "Security"
+agent: "Verifier"
 ---
 # Review Security Audit
 

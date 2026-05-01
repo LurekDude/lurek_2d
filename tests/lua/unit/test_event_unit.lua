@@ -2,39 +2,33 @@
 -- BDD tests for the lurek.event event subsystem.
 -- Headless-safe (no GPU/window needed).
 
--- @description Covers suite: lurek.event.pump.
 describe("lurek.event.pump", function()
-  -- @tests lurek.event.pump
-  -- @tests lurek.event.clear
-  -- @tests lurek.event.push
-  -- @tests lurek.event.restart
-  -- @tests lurek.event.wait
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.poll
-  -- @tests lurek.event.quit
-  -- @description Checks that the lurek.event namespace exports pump as a callable function before queue behavior is exercised.
+  -- @covers lurek.event.pump
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.push
+  -- @covers lurek.event.restart
+  -- @covers lurek.event.wait
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.poll
+  -- @covers lurek.event.quit
   it("exists as a function", function()
     expect_equal(type(lurek.event.pump), "function")
   end)
 
-  -- @tests lurek.event.pump
-  -- @description Calls pump inside pcall with no queued work to verify the event-queue sync hook returns without raising an error.
+  -- @covers lurek.event.pump
   it("returns without error", function()
     local ok, err = pcall(function() lurek.event.pump() end)
     expect_equal(ok, true)
   end)
 end)
 
--- @description Covers suite: lurek.event.wait.
 describe("lurek.event.wait", function()
-  -- @tests lurek.event.wait
-  -- @description Confirms wait is exposed as a callable function on the signal module before timeout cases are tested.
+  -- @covers lurek.event.wait
   it("exists as a function", function()
     expect_equal(type(lurek.event.wait), "function")
   end)
 
-  -- @tests lurek.event.wait
-  -- @description Waits for 10 ms against an empty queue and verifies the API returns a fixed false, empty-name, empty-args tuple.
+  -- @covers lurek.event.wait
   it("returns fixed empty result on timeout with no events", function()
     -- 10 ms timeout, queue is empty
     local ok, name, args = lurek.event.wait(0.01)
@@ -44,9 +38,8 @@ describe("lurek.event.wait", function()
     expect_equal(#args, 0)
   end)
 
-  -- @tests lurek.event.push
-  -- @tests lurek.event.wait
-  -- @description Pushes a named event and immediately waits with zero timeout to confirm wait returns a fixed tuple.
+  -- @covers lurek.event.push
+  -- @covers lurek.event.wait
   it("returns fixed event tuple immediately if event is available", function()
     lurek.event.push("testev")
     local ok, name, args = lurek.event.wait(0)
@@ -55,9 +48,8 @@ describe("lurek.event.wait", function()
     expect_equal(type(args), "table")
   end)
 
-  -- @tests lurek.event.clear
-  -- @tests lurek.event.wait
-  -- @description Clears pending events first, then verifies a zero-timeout wait reports an empty queue with a fixed tuple.
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.wait
   it("returns fixed empty result with zero timeout and empty queue", function()
     lurek.event.clear()
     local ok, name, args = lurek.event.wait(0)
@@ -68,16 +60,13 @@ describe("lurek.event.wait", function()
   end)
 end)
 
--- @description Covers suite: lurek.event.restart.
 describe("lurek.event.restart", function()
-  -- @tests lurek.event.restart
-  -- @description Verifies the restart hook is exported as a callable function on the signal namespace.
+  -- @covers lurek.event.restart
   it("exists as a function", function()
     expect_equal(type(lurek.event.restart), "function")
   end)
 
-  -- @tests lurek.event.restart
-  -- @description Invokes restart inside pcall to confirm the restart request flag can be set without throwing inside the test VM.
+  -- @covers lurek.event.restart
   it("does not throw an error when called", function()
     -- NOTE: calling restart sets a flag; it does not actually reboot the VM here.
     local ok, err = pcall(function() lurek.event.restart() end)
@@ -85,21 +74,18 @@ describe("lurek.event.restart", function()
   end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ Signal UserData Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- Signal UserData
 
--- @description Covers suite: lurek.event.newSignal.
 describe("lurek.event.newSignal", function()
-  -- @tests lurek.event.newSignal
-  -- @description Creates a fresh Signal userdata and checks the constructor returns a non-nil object.
+  -- @covers lurek.event.newSignal
   it("creates a Signal object", function()
     local sig = lurek.event.newSignal()
     expect_not_nil(sig)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.getCount
-  -- @description Registers one click listener and verifies register returns a handle while getCount reflects the new subscription.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.getCount
   it("register adds a listener", function()
     local sig = lurek.event.newSignal()
     local handle = sig:register("click", function() end)
@@ -107,10 +93,9 @@ describe("lurek.event.newSignal", function()
     expect_equal(sig:getCount("click"), 1)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.emit
-  -- @description Registers an action listener, emits that event name, and checks the callback flips a captured boolean.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.emit
   it("emit fires registered callback", function()
     local sig = lurek.event.newSignal()
     local fired = false
@@ -119,10 +104,9 @@ describe("lurek.event.newSignal", function()
     expect_equal(fired, true)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.emit
-  -- @description Emits a data event with three payload values and verifies the registered listener receives the exact argument sequence.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.emit
   it("emit passes arguments to callback", function()
     local sig = lurek.event.newSignal()
     local received = {}
@@ -135,10 +119,9 @@ describe("lurek.event.newSignal", function()
     expect_equal(received[3], true)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.emit
-  -- @description Registers two listeners for the same tick event and confirms one emit dispatches to both callbacks.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.emit
   it("multiple listeners all fire", function()
     local sig = lurek.event.newSignal()
     local count = 0
@@ -148,10 +131,9 @@ describe("lurek.event.newSignal", function()
     expect_equal(count, 2)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.getCount
-  -- @description Adds listeners under two event names and checks getCount reports per-name totals rather than a global count.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.getCount
   it("getCount returns listener count for name", function()
     local sig = lurek.event.newSignal()
     sig:register("a", function() end)
@@ -161,10 +143,9 @@ describe("lurek.event.newSignal", function()
     expect_equal(sig:getCount("b"), 1)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.getTotalCount
-  -- @description Registers listeners across three distinct event names and verifies getTotalCount sums them into one total.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.getTotalCount
   it("getTotalCount returns all listeners", function()
     local sig = lurek.event.newSignal()
     sig:register("a", function() end)
@@ -173,11 +154,10 @@ describe("lurek.event.newSignal", function()
     expect_equal(sig:getTotalCount(), 3)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.remove
-  -- @tests lurek.event.Signal.emit
-  -- @description Removes a registered handle before emitting its event and verifies the detached listener no longer fires.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.remove
+  -- @covers lurek.event.Signal.emit
   it("remove unsubscribes a listener", function()
     local sig = lurek.event.newSignal()
     local fired = false
@@ -188,20 +168,18 @@ describe("lurek.event.newSignal", function()
     expect_equal(fired, false)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.remove
-  -- @description Calls remove with a nonexistent handle ID and verifies the API reports failure with false.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.remove
   it("remove returns false for unknown handle", function()
     local sig = lurek.event.newSignal()
     local ok = sig:remove(9999)
     expect_equal(ok, false)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.clear
-  -- @tests lurek.event.Signal.getCount
-  -- @description Clears only the click subscriptions and verifies hover listeners remain while click counts drop to zero.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.clear
+  -- @covers lurek.event.Signal.getCount
   it("clear removes all listeners for a name", function()
     local sig = lurek.event.newSignal()
     sig:register("click", function() end)
@@ -213,11 +191,10 @@ describe("lurek.event.newSignal", function()
     expect_equal(sig:getCount("hover"), 1)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.register
-  -- @tests lurek.event.Signal.clearAll
-  -- @tests lurek.event.Signal.getTotalCount
-  -- @description Registers listeners under multiple names, clears the dispatcher globally, and checks no subscriptions remain.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.register
+  -- @covers lurek.event.Signal.clearAll
+  -- @covers lurek.event.Signal.getTotalCount
   it("clearAll removes everything", function()
     local sig = lurek.event.newSignal()
     sig:register("a", function() end)
@@ -227,47 +204,41 @@ describe("lurek.event.newSignal", function()
     expect_equal(sig:getTotalCount(), 0)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.type
-  -- @description Constructs a Signal userdata and verifies its runtime type string reports Signal.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.type
   it("type returns LSignal", function()
     local sig = lurek.event.newSignal()
     expect_equal(sig:type(), "LSignal")
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.typeOf
-  -- @description Verifies typeOf recognizes the concrete Signal type name on a newly created dispatcher.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.typeOf
   it("typeOf returns true for LSignal type", function()
     local sig = lurek.event.newSignal()
     expect_true(sig:typeOf("LSignal"))
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.typeOf
-  -- @description Verifies typeOf also reports true for the shared Object base type implemented by Signal userdata.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.typeOf
   it("typeOf returns true for Object base type", function()
     local sig = lurek.event.newSignal()
     expect_true(sig:typeOf("Object"))
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @tests lurek.event.Signal.typeOf
-  -- @description Passes an unrelated type name to typeOf and confirms the Signal userdata rejects the mismatch.
+  -- @covers lurek.event.newSignal
+  -- @covers lurek.event.Signal.typeOf
   it("typeOf returns false for unrelated type name", function()
     local sig = lurek.event.newSignal()
     expect_equal(sig:typeOf("unknown"), false)
   end)
 end)
 
--- Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬ poll iterator Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬Ä‚ËĂ˘â‚¬ĹĄĂ˘â€šÂ¬
+-- poll iterator
 
--- @description Covers suite: lurek.event.poll.
 describe("lurek.event.poll", function()
-  -- @tests lurek.event.clear
-  -- @tests lurek.event.push
-  -- @tests lurek.event.poll
-  -- @description Clears the queue, pushes two named events, then iterates poll() to verify FIFO delivery order through the Lua iterator.
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.push
+  -- @covers lurek.event.poll
   it("iterates queued events", function()
     lurek.event.clear()
     lurek.event.push("ev1")
@@ -281,9 +252,8 @@ describe("lurek.event.poll", function()
     expect_equal(names[2], "ev2")
   end)
 
-  -- @tests lurek.event.clear
-  -- @tests lurek.event.poll
-  -- @description Empties the queue before iterating poll() and verifies the iterator produces no values when nothing is pending.
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.poll
   it("returns nothing when queue is empty", function()
     lurek.event.clear()
     local count = 0
@@ -294,10 +264,8 @@ describe("lurek.event.poll", function()
   end)
 end)
 
--- @description New-feature tests: once, registerWithFilter, pushDeferred/flushDeferred, history.
 describe("lurek.event once and filter", function()
-  -- @tests lurek.event.newSignal
-  -- @description Creates a signal and registers a once-listener; after emitting once the listener must not fire again.
+  -- @covers lurek.event.newSignal
   it("once callback fires exactly one time", function()
     local sig = lurek.event.newSignal()
     local count = 0
@@ -307,8 +275,7 @@ describe("lurek.event once and filter", function()
     expect_equal(count, 1)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @description Registers a once and a permanent listener on the same event; confirms once fires once and permanent fires twice.
+  -- @covers lurek.event.newSignal
   it("once and permanent listener coexist correctly", function()
     local sig = lurek.event.newSignal()
     local once_count  = 0
@@ -321,8 +288,7 @@ describe("lurek.event once and filter", function()
     expect_equal(perm_count, 2)
   end)
 
-  -- @tests lurek.event.newSignal
-  -- @description Registers registerWithFilter with a predicate that passes only numbers > 5; confirms callback fires selectively.
+  -- @covers lurek.event.newSignal
   it("registerWithFilter respects the predicate", function()
     local sig = lurek.event.newSignal()
     local fired = 0
@@ -334,9 +300,8 @@ describe("lurek.event once and filter", function()
 end)
 
 describe("lurek.event pushDeferred and history", function()
-  -- @tests lurek.event.pushDeferred
-  -- @tests lurek.event.flushDeferred
-  -- @description Pushes two deferred events, confirms flushDeferred reports count and events appear in the queue.
+  -- @covers lurek.event.pushDeferred
+  -- @covers lurek.event.flushDeferred
   it("pushDeferred/flushDeferred works", function()
     lurek.event.pushDeferred("deferA")
     lurek.event.pushDeferred("deferB")
@@ -344,10 +309,9 @@ describe("lurek.event pushDeferred and history", function()
     expect_equal(count, 2)
   end)
 
-  -- @tests lurek.event.enableHistory
-  -- @tests lurek.event.getHistory
-  -- @tests lurek.event.clearHistory
-  -- @description Enables history, pushes two events, verifies getHistory returns both, then clearHistory empties it.
+  -- @covers lurek.event.enableHistory
+  -- @covers lurek.event.getHistory
+  -- @covers lurek.event.clearHistory
   it("history records pushed events", function()
     lurek.event.enableHistory(10)
     lurek.event.push("histA")
@@ -373,24 +337,20 @@ end)
 -- ============================================================
 -- Signal creation
 -- ============================================================
--- @description Covers suite: lurek.event.newSignal.
 describe("lurek.event.newSignal", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies newSignal constructs a non-nil userdata handle.
+    -- @covers lurek.event.newSignal
     it("should create a Signal userdata", function()
         local sig = lurek.event.newSignal()
         expect_not_nil(sig, "newSignal should return a value")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies Signal:type reports the userdata class name.
+    -- @covers lurek.event.newSignal
     it("should have type 'LSignal'", function()
         local sig = lurek.event.newSignal()
       expect_equal("LSignal", sig:type(), "type should be LSignal")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies Signal:typeOf recognizes Signal and Object while rejecting unrelated types.
+    -- @covers lurek.event.newSignal
     it("should support typeOf check", function()
         local sig = lurek.event.newSignal()
         expect_true(sig:typeOf("LSignal"), "typeOf('LSignal') should be true")
@@ -402,10 +362,8 @@ end)
 -- ============================================================
 -- register / emit
 -- ============================================================
--- @description Covers suite: Signal:register and Signal:emit.
 describe("Signal:register and Signal:emit", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies registering a callback returns a positive numeric subscription handle.
+    -- @covers lurek.event.newSignal
     it("should register a callback and return a handle", function()
         local sig = lurek.event.newSignal()
         local handle = sig:register("test", function() end)
@@ -413,8 +371,7 @@ describe("Signal:register and Signal:emit", function()
         expect_true(handle > 0, "handle should be positive")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies registration handles are monotonically increasing across events.
+    -- @covers lurek.event.newSignal
     it("should return monotonically increasing handles", function()
         local sig = lurek.event.newSignal()
         local h1 = sig:register("test", function() end)
@@ -424,8 +381,7 @@ describe("Signal:register and Signal:emit", function()
         expect_true(h3 > h2, "h3 > h2")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies emit dispatches to listeners registered for the matching event name.
+    -- @covers lurek.event.newSignal
     it("should emit to registered callbacks", function()
         local sig = lurek.event.newSignal()
         local called = false
@@ -436,8 +392,7 @@ describe("Signal:register and Signal:emit", function()
         expect_true(called, "callback should have been called")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies emit forwards variadic payload arguments to registered callbacks.
+    -- @covers lurek.event.newSignal
     it("should pass extra arguments to callbacks", function()
         local sig = lurek.event.newSignal()
         local received_a, received_b
@@ -450,8 +405,7 @@ describe("Signal:register and Signal:emit", function()
         expect_equal("hello", received_b, "second arg")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies listeners fire in registration order for the same event name.
+    -- @covers lurek.event.newSignal
     it("should call multiple callbacks in registration order", function()
         local sig = lurek.event.newSignal()
         local order = {}
@@ -465,8 +419,7 @@ describe("Signal:register and Signal:emit", function()
         expect_equal("third", order[3])
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies emit does not dispatch listeners registered under other event names.
+    -- @covers lurek.event.newSignal
     it("should not fire callbacks for other event names", function()
         local sig = lurek.event.newSignal()
         local called = false
@@ -475,8 +428,7 @@ describe("Signal:register and Signal:emit", function()
         expect_false(called, "callback should not fire for different event")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies emitting an event with no listeners is a safe no-op.
+    -- @covers lurek.event.newSignal
     it("should handle emit with no registered listeners", function()
         local sig = lurek.event.newSignal()
         -- Should not error
@@ -487,10 +439,8 @@ end)
 -- ============================================================
 -- remove
 -- ============================================================
--- @description Covers suite: Signal:remove.
 describe("Signal:remove", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies remove detaches a callback by handle so later emits do not invoke it.
+    -- @covers lurek.event.newSignal
     it("should remove a callback by handle", function()
         local sig = lurek.event.newSignal()
         local count = 0
@@ -503,15 +453,13 @@ describe("Signal:remove", function()
         expect_equal(1, count, "callback should not fire after removal")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies remove returns false when the requested handle is unknown.
+    -- @covers lurek.event.newSignal
     it("should return false for nonexistent handle", function()
         local sig = lurek.event.newSignal()
         expect_false(sig:remove(999), "remove of unknown handle")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies removing one listener leaves other listeners on the same event intact.
+    -- @covers lurek.event.newSignal
     it("should not affect other callbacks", function()
         local sig = lurek.event.newSignal()
         local a_count, b_count = 0, 0
@@ -527,10 +475,8 @@ end)
 -- ============================================================
 -- clear / clearAll
 -- ============================================================
--- @description Covers suite: Signal:clear and Signal:clearAll.
 describe("Signal:clear and Signal:clearAll", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies clear removes all listeners for a single event name and reports the removal count.
+    -- @covers lurek.event.newSignal
     it("should clear all callbacks for one event name", function()
         local sig = lurek.event.newSignal()
         sig:register("click", function() end)
@@ -542,15 +488,13 @@ describe("Signal:clear and Signal:clearAll", function()
         expect_equal(1, sig:getCount("hover"), "hover count unchanged")
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies clear returns zero when asked to remove a missing event bucket.
+    -- @covers lurek.event.newSignal
     it("should return 0 for clearing nonexistent event", function()
         local sig = lurek.event.newSignal()
         expect_equal(0, sig:clear("nope"))
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies clearAll removes every registered listener across all events.
+    -- @covers lurek.event.newSignal
     it("should clearAll subscriptions", function()
         local sig = lurek.event.newSignal()
         sig:register("a", function() end)
@@ -565,10 +509,8 @@ end)
 -- ============================================================
 -- getCount / getTotalCount
 -- ============================================================
--- @description Covers suite: Signal:getCount and Signal:getTotalCount.
 describe("Signal:getCount and Signal:getTotalCount", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies getCount reports per-event listener totals and zero for unknown events.
+    -- @covers lurek.event.newSignal
     it("should return counts per event name", function()
         local sig = lurek.event.newSignal()
         sig:register("click", function() end)
@@ -579,8 +521,7 @@ describe("Signal:getCount and Signal:getTotalCount", function()
         expect_equal(0, sig:getCount("nonexistent"))
     end)
 
-    -- @tests lurek.event.newSignal
-    -- @description Verifies getTotalCount reports the aggregate number of registered listeners.
+    -- @covers lurek.event.newSignal
     it("should return total count", function()
         local sig = lurek.event.newSignal()
         expect_equal(0, sig:getTotalCount())
@@ -593,10 +534,8 @@ end)
 -- ============================================================
 -- Multiple independent signals
 -- ============================================================
--- @description Covers suite: Multiple Signal instances.
 describe("Multiple Signal instances", function()
-    -- @tests lurek.event.newSignal
-    -- @description Verifies separate Signal instances keep isolated listener registries.
+    -- @covers lurek.event.newSignal
     it("should be independent", function()
         local sig1 = lurek.event.newSignal()
         local sig2 = lurek.event.newSignal()
@@ -612,11 +551,9 @@ end)
 -- ============================================================
 -- Wildcard subscriptions
 -- ============================================================
--- @description Covers suite: Signal wildcard connect/disconnect via lurek.event.new().
 describe("Signal wildcard subscriptions", function()
-    -- @tests lurek.event.new
-    -- @description Connects with pattern "player.*", emits "player.move"; verifies callback fires.
-    xit("wildcard_star_matches_prefix", function()
+    -- @covers lurek.event.new
+  it("wildcard_star_matches_prefix", function()
         local sig = lurek.event.newSignal()
         local fired = false
         sig:connect("player.*", function() fired = true end)
@@ -624,9 +561,8 @@ describe("Signal wildcard subscriptions", function()
         expect_true(fired, "callback should fire when name matches 'player.*'")
     end)
 
-    -- @tests lurek.event.new
-    -- @description Connects with pattern "player.*", emits "enemy.move"; verifies callback does NOT fire.
-    xit("wildcard_no_match_does_not_fire", function()
+    -- @covers lurek.event.new
+  it("wildcard_no_match_does_not_fire", function()
         local sig = lurek.event.newSignal()
         local fired = false
         sig:connect("player.*", function() fired = true end)
@@ -634,9 +570,8 @@ describe("Signal wildcard subscriptions", function()
         expect_false(fired, "callback must not fire when name does not match the pattern")
     end)
 
-    -- @tests lurek.event.new
-    -- @description Connects with pattern "item_?"; emits "item_A" (fires) and "item_AB" (does NOT fire).
-    xit("wildcard_question_mark_matches_single_char", function()
+    -- @covers lurek.event.new
+  it("wildcard_question_mark_matches_single_char", function()
         local sig = lurek.event.newSignal()
         local count = 0
         sig:connect("item_?", function() count = count + 1 end)
@@ -646,9 +581,8 @@ describe("Signal wildcard subscriptions", function()
         expect_equal(1, count, "two-char suffix must not match '?' wildcard")
     end)
 
-    -- @tests lurek.event.new
-    -- @description Connects as wildcard, disconnects the returned handle, emits; verifies callback is NOT called.
-    xit("wildcard_disconnect_stops_firing", function()
+    -- @covers lurek.event.new
+  it("wildcard_disconnect_stops_firing", function()
         local sig = lurek.event.newSignal()
         local fired = false
         local handle = sig:connect("player.*", function() fired = true end)
@@ -660,14 +594,14 @@ end)
 
   describe("lurek.event.exit", function()
     it("is exposed as a function", function()
-      -- @tests lurek.event.exit
+      -- @covers lurek.event.exit
       expect_equal("function", type(lurek.event.exit))
     end)
   end)
 
   describe("Signal regression coverage", function()
     it("emit forwards arguments to matching listeners", function()
-      -- @tests Signal:emit
+      -- @covers Signal:emit
       local sig = lurek.event.newSignal()
       local number_arg = nil
       local string_arg = nil
@@ -681,8 +615,8 @@ end)
     end)
 
     it("remove unregisters a specific listener handle", function()
-      -- @tests Signal:remove
-      -- @tests Signal:getCount
+      -- @covers Signal:remove
+      -- @covers Signal:getCount
       local sig = lurek.event.newSignal()
       local fired = false
       local handle = sig:connect("tick", function() fired = true end)
@@ -694,8 +628,8 @@ end)
     end)
 
     it("clear removes listeners only for one event name", function()
-      -- @tests Signal:clear
-      -- @tests Signal:getCount
+      -- @covers Signal:clear
+      -- @covers Signal:getCount
       local sig = lurek.event.newSignal()
       sig:connect("click", function() end)
       sig:connect("click", function() end)
@@ -706,8 +640,8 @@ end)
     end)
 
     it("clearAll empties all listener buckets", function()
-      -- @tests Signal:clearAll
-      -- @tests Signal:getTotalCount
+      -- @covers Signal:clearAll
+      -- @covers Signal:getTotalCount
       local sig = lurek.event.newSignal()
       sig:connect("a", function() end)
       sig:connect("b", function() end)
@@ -717,8 +651,8 @@ end)
     end)
 
     it("type and typeOf report the signal userdata identity", function()
-      -- @tests Signal:type
-      -- @tests Signal:typeOf
+      -- @covers Signal:type
+      -- @covers Signal:typeOf
       local sig = lurek.event.newSignal()
       expect_equal("LSignal", sig:type())
       expect_true(sig:typeOf("LSignal"))

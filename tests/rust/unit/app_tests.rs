@@ -1,4 +1,9 @@
-//! Tests for the app module.
+//! INTERNAL ONLY: Rust-only tests for app-side helpers that are not exercised through the
+//! Lua-facing engine API.
+//!
+//! Public engine/application behaviour is covered in the Lua-first suite. The
+//! remaining Rust coverage here focuses on low-level error-screen formatting
+//! and debug-overlay command generation.
 
 use lurek2d::app::error_screen::{wrap_text, format_traceback, ErrorScreen};
 use lurek2d::app::debug_overlay::DebugOverlay;

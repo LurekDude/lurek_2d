@@ -1,6 +1,6 @@
 ---
 description: "Review a bounded code slice for defects, risks, and missing validation."
-agent: "Reviewer"
+agent: "Verifier"
 ---
 # Review Code Quality
 

@@ -1,6 +1,6 @@
 ---
 description: "Review entity lifecycle handling for leaks, stale handles, or invalid state transitions."
-agent: "Reviewer"
+agent: "Verifier"
 ---
 # Review Entity Lifecycle
 

@@ -1,52 +1,44 @@
 -- Lurek2D font tests for lurek.render font functions.
 
--- @description Covers suite: lurek.render font functions.
 describe("lurek.render font functions", function()
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.getFont
-  -- @tests lurek.render.getFontHeight
-  -- @tests lurek.render.getFontWidth
-  -- @tests lurek.render.setFont
-  -- @description Verifies the font constructor is exposed on the graphics namespace.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.getFont
+  -- @covers lurek.render.getFontHeight
+  -- @covers lurek.render.getFontWidth
+  -- @covers lurek.render.setFont
   it("newFont is a function", function()
     expect_type("function", lurek.render.newFont)
   end)
 
-  -- @tests lurek.render.setFont
-  -- @description Verifies the active-font setter is exposed for text rendering state.
+  -- @covers lurek.render.setFont
   it("setFont is a function", function()
     expect_type("function", lurek.render.setFont)
   end)
 
-  -- @tests lurek.render.getFont
-  -- @description Verifies the current-font getter is exposed.
+  -- @covers lurek.render.getFont
   it("getFont is a function", function()
     expect_type("function", lurek.render.getFont)
   end)
 
-  -- @tests lurek.render.getFontWidth
-  -- @description Verifies the string-width helper is exposed.
+  -- @covers lurek.render.getFontWidth
   it("getFontWidth is a function", function()
     expect_type("function", lurek.render.getFontWidth)
   end)
 
-  -- @tests lurek.render.getFontHeight
-  -- @description Verifies the font-height helper is exposed.
+  -- @covers lurek.render.getFontHeight
   it("getFontHeight is a function", function()
     expect_type("function", lurek.render.getFontHeight)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @description Verifies requesting a built-in bitmap font size returns a font userdata instead of requiring a file path.
+  -- @covers lurek.render.newFont
   it("loads a built-in bitmap font by size", function()
     local font = lurek.render.newFont(14)
     expect_type("userdata", font)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.setFont
-  -- @tests lurek.render.getFont
-  -- @description Verifies a created font can be installed as the active font and retrieved again.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.setFont
+  -- @covers lurek.render.getFont
   it("setFont and getFont round-trip to a non-nil font", function()
     local font = lurek.render.newFont(14)
     lurek.render.setFont(font)
@@ -54,18 +46,16 @@ describe("lurek.render font functions", function()
     expect_type("userdata", current)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.getFontWidth
-  -- @tests lurek.render.getFontHeight
-  -- @description Verifies loaded fonts report positive text metrics for width and line height.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.getFontWidth
+  -- @covers lurek.render.getFontHeight
   it("reports positive width and height for a loaded font", function()
     local font = lurek.render.newFont(14)
     expect_true(lurek.render.getFontWidth(font, "Hello") > 0)
     expect_true(lurek.render.getFontHeight(font) > 0)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @description Verifies the constructor rejects nonexistent font asset paths instead of silently creating an invalid font.
+  -- @covers lurek.render.newFont
   it("newFont errors when file does not exist", function()
     expect_error(function()
       lurek.render.newFont("nonexistent_font.png")
@@ -81,53 +71,45 @@ end)
 
 -- Lurek2D font tests for lurek.render font functions.
 
--- @description Covers suite: lurek.render font functions.
 describe("lurek.render font functions", function()
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.getFont
-  -- @tests lurek.render.getFontHeight
-  -- @tests lurek.render.getFontWidth
-  -- @tests lurek.render.setFont
-  -- @description Verifies the font constructor is exposed on the graphics namespace.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.getFont
+  -- @covers lurek.render.getFontHeight
+  -- @covers lurek.render.getFontWidth
+  -- @covers lurek.render.setFont
   it("newFont is a function", function()
     expect_type("function", lurek.render.newFont)
   end)
 
-  -- @tests lurek.render.setFont
-  -- @description Verifies the active-font setter is exposed for text rendering state.
+  -- @covers lurek.render.setFont
   it("setFont is a function", function()
     expect_type("function", lurek.render.setFont)
   end)
 
-  -- @tests lurek.render.getFont
-  -- @description Verifies the current-font getter is exposed.
+  -- @covers lurek.render.getFont
   it("getFont is a function", function()
     expect_type("function", lurek.render.getFont)
   end)
 
-  -- @tests lurek.render.getFontWidth
-  -- @description Verifies the string-width helper is exposed.
+  -- @covers lurek.render.getFontWidth
   it("getFontWidth is a function", function()
     expect_type("function", lurek.render.getFontWidth)
   end)
 
-  -- @tests lurek.render.getFontHeight
-  -- @description Verifies the font-height helper is exposed.
+  -- @covers lurek.render.getFontHeight
   it("getFontHeight is a function", function()
     expect_type("function", lurek.render.getFontHeight)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @description Verifies requesting a built-in bitmap font size returns a font userdata instead of requiring a file path.
+  -- @covers lurek.render.newFont
   it("loads a built-in bitmap font by size", function()
     local font = lurek.render.newFont(14)
     expect_type("userdata", font)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.setFont
-  -- @tests lurek.render.getFont
-  -- @description Verifies a created font can be installed as the active font and retrieved again.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.setFont
+  -- @covers lurek.render.getFont
   it("setFont and getFont round-trip to a non-nil font", function()
     local font = lurek.render.newFont(14)
     lurek.render.setFont(font)
@@ -135,18 +117,16 @@ describe("lurek.render font functions", function()
     expect_type("userdata", current)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @tests lurek.render.getFontWidth
-  -- @tests lurek.render.getFontHeight
-  -- @description Verifies loaded fonts report positive text metrics for width and line height.
+  -- @covers lurek.render.newFont
+  -- @covers lurek.render.getFontWidth
+  -- @covers lurek.render.getFontHeight
   it("reports positive width and height for a loaded font", function()
     local font = lurek.render.newFont(14)
     expect_true(lurek.render.getFontWidth(font, "Hello") > 0)
     expect_true(lurek.render.getFontHeight(font) > 0)
   end)
 
-  -- @tests lurek.render.newFont
-  -- @description Verifies the constructor rejects nonexistent font asset paths instead of silently creating an invalid font.
+  -- @covers lurek.render.newFont
   it("newFont errors when file does not exist", function()
     expect_error(function()
       lurek.render.newFont("nonexistent_font.png")

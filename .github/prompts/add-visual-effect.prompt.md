@@ -1,6 +1,6 @@
 ---
 description: "Add one visual effect to the 2D renderer or post-process stack."
-agent: "Renderer"
+agent: "Developer"
 ---
 # Add Visual Effect
 

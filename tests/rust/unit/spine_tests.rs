@@ -1,4 +1,9 @@
-//! Tests for the spine module.
+//! INTERNAL ONLY: public `lurek.spine.*` behavior is covered by the Lua-first suites in
+//! `tests/lua/unit/test_spine_unit.lua` and `tests/lua/evidence/test_spine_evidence.lua`.
+//!
+//! The remaining Rust coverage here exercises low-level skeleton data types,
+//! IK solving, and timeline interpolation helpers that are more direct and more
+//! precise to assert at the Rust layer.
 
 use lurek2d::spine::*;
 
@@ -41,7 +46,7 @@ mod bone_tests {
 // ── slot ──────────────────────────────────────────────────────────────
 
 mod slot_tests {
-    
+
     use lurek2d::spine::slot::Slot;
 
     #[test]
@@ -103,10 +108,7 @@ mod ik_tests {
 
     #[test]
     fn solve_writes_rotations() {
-        let mut bones = vec![
-            Bone::new("root"),
-            Bone::with_parent("elbow", 0, 10.0, 0.0),
-        ];
+        let mut bones = vec![Bone::new("root"), Bone::with_parent("elbow", 0, 10.0, 0.0)];
         // Place elbow in world space for the solver
         bones[1].world_x = 10.0;
         bones[1].world_y = 0.0;
@@ -123,8 +125,10 @@ mod ik_tests {
 // ── timeline ──────────────────────────────────────────────────────────
 
 mod timeline_tests {
-    
-    use lurek2d::spine::timeline::{BoneProperty, BoneTimeline, EasingType, EventKeyframe, SkeletonAnimation};
+
+    use lurek2d::spine::timeline::{
+        BoneProperty, BoneTimeline, EasingType, EventKeyframe, SkeletonAnimation,
+    };
 
     // ── EasingType ────────────────────────────────────────────────────
 
@@ -150,7 +154,10 @@ mod timeline_tests {
     #[test]
     fn ease_in_out_symmetric() {
         let v = EasingType::EaseInOut.apply(0.5);
-        assert!((v - 0.5).abs() < 0.01, "EaseInOut(0.5) = {v}, expected ~0.5");
+        assert!(
+            (v - 0.5).abs() < 0.01,
+            "EaseInOut(0.5) = {v}, expected ~0.5"
+        );
     }
 
     #[test]
@@ -505,7 +512,10 @@ mod skeleton_tests {
         let mut skel = Skeleton::new("test");
         skel.add_bone(Bone::new("root"));
         let idx = skel.add_slot_full("hat", 0, Some("wizard_hat".to_string()));
-        assert_eq!(skel.slots[idx].attachment_name.as_deref(), Some("wizard_hat"));
+        assert_eq!(
+            skel.slots[idx].attachment_name.as_deref(),
+            Some("wizard_hat")
+        );
     }
 
     #[test]

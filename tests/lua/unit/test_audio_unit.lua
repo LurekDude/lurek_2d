@@ -1,113 +1,102 @@
-﻿-- Lurek2D Audio API Tests
+-- Lurek2D Audio API Tests
 
--- @description Verifies the top-level audio namespace is present before exercising any factories or listener controls.
 describe("lurek.audio module exists", function()
-    -- @tests lurek.audio.getDistanceModel
-    -- @tests lurek.audio.getDopplerScale
-    -- @tests lurek.audio.getFreeBufferCount
-    -- @tests lurek.audio.getListener
-    -- @tests lurek.audio.getListener2D
-    -- @tests lurek.audio.getMasterVolume
-    -- @tests lurek.audio.getPlaybackDevice
-    -- @tests lurek.audio.getPlaybackDevices
-    -- @tests lurek.audio.newDecoder
-    -- @tests lurek.audio.newQueueableSource
-    -- @tests lurek.audio.newSoundData
-    -- @tests lurek.audio.newSource
-    -- @tests lurek.audio.playQueueable
-    -- @tests lurek.audio.queueSource
-    -- @tests lurek.audio.setDistanceModel
-    -- @tests lurek.audio.setDopplerScale
-    -- @tests lurek.audio.setListener
-    -- @tests lurek.audio.setListener2D
-    -- @tests lurek.audio.setMasterVolume
-    -- @tests lurek.audio.setPlaybackDevice
-    -- @tests lurek.audio.stopQueueable
-    -- @tests lurek.audio.newBus
-    -- @tests lurek.audio.Source.play
-    -- @tests lurek.audio.Source.stop
-    -- @tests lurek.audio.Source.pause
-    -- @tests lurek.audio.Source.resume
-    -- @tests lurek.audio.Source.setVolume
-    -- @tests lurek.audio.Source.getVolume
-    -- @tests lurek.audio.Source.setPitch
-    -- @tests lurek.audio.Source.getPitch
-    -- @tests lurek.audio.Source.setLooping
-    -- @tests lurek.audio.Source.isLooping
-    -- @tests lurek.audio.Source.isPlaying
-    -- @tests lurek.audio.Source.isPaused
-    -- @tests lurek.audio.Source.isStopped
-    -- @tests lurek.audio.Source.setPan
-    -- @tests lurek.audio.Source.getPan
-    -- @tests lurek.audio.Source.clone
-    -- @tests lurek.audio.Source.getType
-    -- @tests lurek.audio.Source.getDuration
-    -- @tests lurek.audio.Source.tell
-    -- @tests lurek.audio.Source.seek
-    -- @tests lurek.audio.Source.setLowpass
-    -- @tests lurek.audio.Source.getLowpass
-    -- @tests lurek.audio.Source.setHighpass
-    -- @tests lurek.audio.Source.getHighpass
-    -- @tests lurek.audio.Source.clearFilter
-    -- @tests lurek.audio.Source.fadeIn
-    -- @tests lurek.audio.Source.getFadeIn
-    -- @tests lurek.audio.Bus.getName
-    -- @tests lurek.audio.Bus.setVolume
-    -- @tests lurek.audio.Bus.getVolume
-    -- @tests lurek.audio.Bus.setPitch
-    -- @tests lurek.audio.Bus.getPitch
-    -- @tests lurek.audio.Bus.pause
-    -- @tests lurek.audio.Bus.resume
-    -- @tests lurek.audio.Bus.isPaused
-    -- @tests lurek.audio.Bus.type
-    -- @tests lurek.audio.Bus.typeOf
-    -- @description Checks that the Lua bridge exposes lurek.audio as a table namespace.
+    -- @covers lurek.audio.getDistanceModel
+    -- @covers lurek.audio.getDopplerScale
+    -- @covers lurek.audio.getFreeBufferCount
+    -- @covers lurek.audio.getListener
+    -- @covers lurek.audio.getListener2D
+    -- @covers lurek.audio.getMasterVolume
+    -- @covers lurek.audio.getPlaybackDevice
+    -- @covers lurek.audio.getPlaybackDevices
+    -- @covers lurek.audio.newDecoder
+    -- @covers lurek.audio.newQueueableSource
+    -- @covers lurek.audio.newSoundData
+    -- @covers lurek.audio.newSource
+    -- @covers lurek.audio.playQueueable
+    -- @covers lurek.audio.queueSource
+    -- @covers lurek.audio.setDistanceModel
+    -- @covers lurek.audio.setDopplerScale
+    -- @covers lurek.audio.setListener
+    -- @covers lurek.audio.setListener2D
+    -- @covers lurek.audio.setMasterVolume
+    -- @covers lurek.audio.setPlaybackDevice
+    -- @covers lurek.audio.stopQueueable
+    -- @covers lurek.audio.newBus
+    -- @covers lurek.audio.Source.play
+    -- @covers lurek.audio.Source.stop
+    -- @covers lurek.audio.Source.pause
+    -- @covers lurek.audio.Source.resume
+    -- @covers lurek.audio.Source.setVolume
+    -- @covers lurek.audio.Source.getVolume
+    -- @covers lurek.audio.Source.setPitch
+    -- @covers lurek.audio.Source.getPitch
+    -- @covers lurek.audio.Source.setLooping
+    -- @covers lurek.audio.Source.isLooping
+    -- @covers lurek.audio.Source.isPlaying
+    -- @covers lurek.audio.Source.isPaused
+    -- @covers lurek.audio.Source.isStopped
+    -- @covers lurek.audio.Source.setPan
+    -- @covers lurek.audio.Source.getPan
+    -- @covers lurek.audio.Source.clone
+    -- @covers lurek.audio.Source.getType
+    -- @covers lurek.audio.Source.getDuration
+    -- @covers lurek.audio.Source.tell
+    -- @covers lurek.audio.Source.seek
+    -- @covers lurek.audio.Source.setLowpass
+    -- @covers lurek.audio.Source.getLowpass
+    -- @covers lurek.audio.Source.setHighpass
+    -- @covers lurek.audio.Source.getHighpass
+    -- @covers lurek.audio.Source.clearFilter
+    -- @covers lurek.audio.Source.fadeIn
+    -- @covers lurek.audio.Source.getFadeIn
+    -- @covers lurek.audio.Bus.getName
+    -- @covers lurek.audio.Bus.setVolume
+    -- @covers lurek.audio.Bus.getVolume
+    -- @covers lurek.audio.Bus.setPitch
+    -- @covers lurek.audio.Bus.getPitch
+    -- @covers lurek.audio.Bus.pause
+    -- @covers lurek.audio.Bus.resume
+    -- @covers lurek.audio.Bus.isPaused
+    -- @covers lurek.audio.Bus.type
+    -- @covers lurek.audio.Bus.typeOf
     it("lurek.audio is a table", function()
         expect_type("table", lurek.audio)
     end)
 end)
 
--- @description Confirms the core master-volume and source-construction entry points are registered on the audio namespace.
 describe("lurek.audio functions exist", function()
-    -- @description Verifies the master-volume setter is exported as a callable function.
     it("setMasterVolume is a function", function()
         expect_type("function", lurek.audio.setMasterVolume)
     end)
 
-    -- @description Verifies the master-volume getter is exported as a callable function.
     it("getMasterVolume is a function", function()
         expect_type("function", lurek.audio.getMasterVolume)
     end)
 
-    -- @description Verifies the audio source factory is exported as a callable function.
     it("newSource is a function", function()
         expect_type("function", lurek.audio.newSource)
     end)
 end)
 
--- @description Exercises master-volume writes, reads, and range behavior on the global audio mixer state.
 describe("lurek.audio volume", function()
-    -- @description Ensures the master-volume setter accepts an in-range value without raising an error.
     it("setMasterVolume accepts 0..1 range", function()
         expect_no_error(function()
             lurek.audio.setMasterVolume(0.5)
         end)
     end)
 
-    -- @description Verifies the master-volume getter returns a numeric value.
     it("getMasterVolume returns a number", function()
         local vol = lurek.audio.getMasterVolume()
         expect_type("number", vol)
     end)
 
-    -- @description Writes a master-volume value, reads it back, and checks the round-trip within tolerance before resetting to full volume.
     it("setMasterVolume/getMasterVolume roundtrip", function()
         lurek.audio.setMasterVolume(0.75)
         expect_near(0.75, lurek.audio.getMasterVolume(), 0.01)
         lurek.audio.setMasterVolume(1.0) -- reset
     end)
 
-    -- @description Verifies boundary values at both ends of the valid master-volume range can be stored and read back accurately.
     it("setMasterVolume clamps to valid range", function()
         lurek.audio.setMasterVolume(0.0)
         expect_near(0.0, lurek.audio.getMasterVolume(), 0.01)
@@ -116,33 +105,27 @@ describe("lurek.audio volume", function()
     end)
 end)
 
-    -- @description Covers Doppler scaling, distance-model selection, and 2D or 3D listener position helpers for spatial audio state.
 describe("audio spatial", function()
-    -- @description Verifies the Doppler scale starts at the documented default value of 1.0.
     it("getDopplerScale returns 1 by default", function()
         expect_near(1.0, lurek.audio.getDopplerScale(), 0.0001)
     end)
 
-    -- @description Sets a custom Doppler scale, confirms it round-trips, then restores the default value.
     it("setDopplerScale round-trips", function()
         lurek.audio.setDopplerScale(2.0)
         expect_near(2.0, lurek.audio.getDopplerScale(), 0.0001)
         lurek.audio.setDopplerScale(1.0)  -- reset
     end)
 
-    -- @description Checks that the current distance-model query returns a string identifier.
     it("getDistanceModel returns a string", function()
         expect_type("string", lurek.audio.getDistanceModel())
     end)
 
-    -- @description Switches to the linear distance model, verifies the change, then restores the previous default mode.
     it("setDistanceModel round-trips", function()
         lurek.audio.setDistanceModel("linear")
         expect_equal("linear", lurek.audio.getDistanceModel())
         lurek.audio.setDistanceModel("inverse_clamped")  -- reset
     end)
 
-    -- @description Writes a 3D listener position and verifies all three coordinates are returned unchanged.
     it("setListener / getListener round-trips", function()
         lurek.audio.setListener(100, 50, 0)
         local x, y, z = lurek.audio.getListener()
@@ -152,7 +135,6 @@ describe("audio spatial", function()
         lurek.audio.setListener(0, 0, 0)  -- reset
     end)
 
-    -- @description Uses the compatibility 2D listener helpers and verifies the stored X and Y coordinates round-trip correctly.
     it("setListener2D / getListener2D backward compat", function()
         lurek.audio.setListener2D(30, 40)
         local x, y = lurek.audio.getListener2D()
@@ -162,14 +144,11 @@ describe("audio spatial", function()
     end)
 end)
 
--- @description Validates the decoder factory is exported and rejects nonexistent file paths.
 describe("audio.newDecoder", function()
-  -- @description Confirms the decoder constructor itself is available as a function.
   it("is a function", function()
     expect_type("function", lurek.audio.newDecoder)
   end)
 
-  -- @description Verifies decoder construction fails with an error when the source file path does not exist.
   it("errors on missing file", function()
     expect_error(function()
       lurek.audio.newDecoder("nonexistent_file.wav")
@@ -177,21 +156,17 @@ describe("audio.newDecoder", function()
   end)
 end)
 
--- @description Exercises decoder metadata access, seeking, decoding, EOF handling, and rewind behavior using the mono WAV fixture.
 describe("Decoder userdata methods", function()
-  -- @description Confirms decoder channel-count queries return numeric data.
   it("getChannelCount returns a number", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     expect_type("number", d:getChannelCount())
   end)
 
-  -- @description Verifies the mono fixture reports exactly one channel.
   it("getChannelCount is 1 for mono fixture", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     expect_equal(1, d:getChannelCount())
   end)
 
-  -- @description Checks the decoder reports a positive numeric sample rate for the fixture audio.
   it("getSampleRate returns a positive number", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     local rate = d:getSampleRate()
@@ -199,7 +174,6 @@ describe("Decoder userdata methods", function()
     expect_greater(rate, 0, "sample rate must be positive")
   end)
 
-  -- @description Checks the decoder reports a positive numeric bit depth for the fixture audio.
   it("getBitDepth returns a positive number", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     local depth = d:getBitDepth()
@@ -207,7 +181,6 @@ describe("Decoder userdata methods", function()
     expect_greater(depth, 0, "bit depth must be positive")
   end)
 
-  -- @description Checks the decoder reports a positive duration for the fixture audio stream.
   it("getDuration returns a positive number", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     local dur = d:getDuration()
@@ -215,26 +188,22 @@ describe("Decoder userdata methods", function()
     expect_greater(dur, 0, "duration must be positive")
   end)
 
-  -- @description Verifies the WAV decoder reports itself as seekable.
   it("isSeekable returns true", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     expect_equal(true, d:isSeekable())
   end)
 
-  -- @description Confirms a fresh decoder starts at playback position 0.
   it("tell starts at 0", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     expect_near(0.0, d:tell(), 0.000001)
   end)
 
-  -- @description Seeks to a small offset and verifies tell returns approximately the same position.
   it("seek and tell round-trip", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav")
     d:seek(0.01)
     expect_near(0.01, d:tell(), 0.001)
   end)
 
-  -- @description Decodes a large chunk to exhaust the fixture and verifies subsequent decode calls return nil at EOF.
   it("decode returns userdata then nil at EOF", function()
     -- Use a large buffer so we hit EOF in one call
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav", 1000000)
@@ -246,7 +215,6 @@ describe("Decoder userdata methods", function()
     expect_nil(eof, "decode at EOF must return nil")
   end)
 
-  -- @description Consumes decoded data, rewinds the decoder, and verifies playback position resets to zero.
   it("rewind resets position to 0", function()
     local d = lurek.audio.newDecoder("tests/fixtures/sine_mono_44100.wav", 1000000)
     d:decode()  -- consume
@@ -255,28 +223,23 @@ describe("Decoder userdata methods", function()
   end)
 end)
 
--- Phase 15 Ă˘â‚¬â€ť Queueable Sources
--- @description Covers queueable-source creation, free-buffer accounting, playback start, and stop-based buffer reset behavior.
+-- Phase 15  Queueable Sources
 describe("audio.newQueueableSource", function()
-  -- @description Verifies queueable-source construction returns a numeric handle.
   it("creates a queueable source and returns a number id", function()
     local q = lurek.audio.newQueueableSource(44100, 16, 1, 4)
     expect_equal(type(q), "number")
   end)
 
-  -- @description Checks that a newly created queueable source starts with all configured buffers free.
   it("getFreeBufferCount returns buffer_count initially", function()
     local q = lurek.audio.newQueueableSource(44100, 16, 1, 4)
     expect_equal(lurek.audio.getFreeBufferCount(q), 4)
   end)
 
-  -- @description Verifies omitted buffer-count arguments fall back to the documented default of four buffers.
   it("getFreeBufferCount defaults to 4 buffers when omitted", function()
     local q = lurek.audio.newQueueableSource(44100, 16, 1)
     expect_equal(lurek.audio.getFreeBufferCount(q), 4)
   end)
 
-  -- @description Ensures a queueable source can be started without errors even before buffers are exhausted.
   it("playQueueable does not error", function()
     local q = lurek.audio.newQueueableSource(44100, 16, 1, 4)
     expect_no_error(function()
@@ -284,7 +247,6 @@ describe("audio.newQueueableSource", function()
     end)
   end)
 
-  -- @description Queues a buffer, verifies the free count drops, then stops playback and confirms the free count resets to the initial capacity.
   it("stopQueueable resets free buffer count", function()
     local q = lurek.audio.newQueueableSource(44100, 16, 1, 4)
     -- queue a SoundData buffer, then stop
@@ -299,27 +261,22 @@ describe("audio.newQueueableSource", function()
   end)
 end)
 
--- Phase 18 Ă˘â‚¬â€ť Playback Device Selection
--- @description Exercises playback-device enumeration and validates both successful and failing device-selection paths.
+-- Phase 18  Playback Device Selection
 describe("audio device selection", function()
-  -- @description Verifies audio device enumeration returns a Lua table.
   it("getPlaybackDevices returns a table", function()
     local devs = lurek.audio.getPlaybackDevices()
     expect_equal(type(devs), "table")
   end)
 
-  -- @description Verifies at least one playback device is visible to the runtime.
   it("getPlaybackDevices has at least one entry", function()
     local devs = lurek.audio.getPlaybackDevices()
     expect_true(#devs >= 1, "must have at least one device")
   end)
 
-  -- @description Verifies the active playback-device query returns a string name.
   it("getPlaybackDevice returns a string", function()
     expect_equal(type(lurek.audio.getPlaybackDevice()), "string")
   end)
 
-  -- @description Selects the first reported playback device and verifies the call succeeds without error.
   it("setPlaybackDevice with valid name does not error", function()
     local devs = lurek.audio.getPlaybackDevices()
     expect_no_error(function()
@@ -327,7 +284,6 @@ describe("audio device selection", function()
     end)
   end)
 
-  -- @description Verifies selecting an unknown playback device raises the expected error.
   it("setPlaybackDevice with unknown name errors", function()
     expect_error(function()
       lurek.audio.setPlaybackDevice("NonExistentDevice___XYZ")
@@ -335,25 +291,21 @@ describe("audio device selection", function()
   end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Source UserData (static source from fixture) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- Source UserData (static source from fixture)
 
 local FIXTURE = "tests/fixtures/sine_mono_44100.wav"
 
--- @description Covers Source playback state transitions from creation through play, pause, resume, and stop.
 describe("Source UserData - play/stop/pause/resume lifecycle", function()
-    -- @description Creates a static source from the WAV fixture and verifies the constructor returns a non-nil userdata object.
     it("newSource returns a non-nil Source from fixture", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_true(src ~= nil, "source is not nil")
     end)
 
-    -- @description Verifies newly created sources begin in the stopped state.
     it("isStopped is true before play", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_true(src:isStopped())
     end)
 
-    -- @description Starts playback and verifies the source reports a playing state before cleanup.
     it("play / isPlaying round-trip", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:play()
@@ -361,7 +313,6 @@ describe("Source UserData - play/stop/pause/resume lifecycle", function()
         src:stop()
     end)
 
-    -- @description Pauses an actively playing source and verifies the paused-state flag is set.
     it("pause / isPaused round-trip", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:play()
@@ -370,7 +321,6 @@ describe("Source UserData - play/stop/pause/resume lifecycle", function()
         src:stop()
     end)
 
-    -- @description Resumes a paused source and verifies it transitions back to the playing state.
     it("resume after pause returns to playing", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:play()
@@ -380,7 +330,6 @@ describe("Source UserData - play/stop/pause/resume lifecycle", function()
         src:stop()
     end)
 
-    -- @description Stops an active source and verifies it reports the stopped state again.
     it("stop transitions to isStopped", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:play()
@@ -389,23 +338,19 @@ describe("Source UserData - play/stop/pause/resume lifecycle", function()
     end)
 end)
 
-    -- @description Verifies per-source mixer properties for volume, pitch, and stereo pan.
 describe("Source UserData - volume / pitch / pan", function()
-    -- @description Sets the source volume and verifies the value round-trips through the getter.
     it("setVolume / getVolume round-trip", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setVolume(0.5)
         expect_near(0.5, src:getVolume(), 0.001)
     end)
 
-    -- @description Sets the source pitch and verifies the value round-trips through the getter.
     it("setPitch / getPitch round-trip", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setPitch(1.5)
         expect_near(1.5, src:getPitch(), 0.001)
     end)
 
-    -- @description Sets the source pan and verifies the value round-trips through the getter.
     it("setPan / getPan round-trip", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setPan(-0.5)
@@ -413,29 +358,24 @@ describe("Source UserData - volume / pitch / pan", function()
     end)
 end)
 
-    -- @description Covers looping toggles, source-type reporting, and duration metadata queries.
 describe("Source UserData - looping / type / duration", function()
-    -- @description Enables looping and verifies the looping-state query reports true.
     it("setLooping true / isLooping true", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setLooping(true)
         expect_true(src:isLooping())
     end)
 
-    -- @description Disables looping and verifies the looping-state query reports false.
     it("setLooping false / isLooping false", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setLooping(false)
         expect_false(src:isLooping())
     end)
 
-    -- @description Verifies source-type introspection returns a string identifier.
     it("getType returns a string", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_type("string", src:getType())
     end)
 
-    -- @description Verifies duration queries either return a positive number or nil in accepted headless environments.
     it("getDuration returns a positive number or nil in headless", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         local dur = src:getDuration()
@@ -448,15 +388,12 @@ describe("Source UserData - looping / type / duration", function()
     end)
 end)
 
-    -- @description Exercises source playback-position queries before and after an explicit seek operation.
 describe("Source UserData - tell / seek", function()
-    -- @description Verifies a fresh source reports playback position zero before any playback or seeking occurs.
     it("tell returns 0 before playback starts", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_equal(0, src:tell())
     end)
 
-    -- @description Seeks the source slightly forward and verifies tell reports a nonnegative updated position.
     it("seek moves position and tell reflects it", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:seek(0.01)
@@ -464,9 +401,7 @@ describe("Source UserData - tell / seek", function()
     end)
 end)
 
-    -- @description Verifies low-pass, high-pass, and filter-clearing source APIs execute and expose numeric filter state.
 describe("Source UserData - filter methods", function()
-    -- @description Sets a low-pass filter and verifies the getter returns a numeric value without errors.
     it("setLowpass / getLowpass does not error", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_no_error(function()
@@ -476,7 +411,6 @@ describe("Source UserData - filter methods", function()
         end)
     end)
 
-    -- @description Sets a high-pass filter and verifies the getter returns a numeric value without errors.
     it("setHighpass / getHighpass does not error", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_no_error(function()
@@ -486,7 +420,6 @@ describe("Source UserData - filter methods", function()
         end)
     end)
 
-    -- @description Applies a low-pass filter and verifies clearing filters afterwards does not raise an error.
     it("clearFilter does not error", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:setLowpass(0.5)
@@ -494,22 +427,18 @@ describe("Source UserData - filter methods", function()
     end)
 end)
 
-      -- @description Covers source fade-in state and cloning behavior on static audio sources.
 describe("Source UserData - fadeIn / clone", function()
-    -- @description Verifies invoking fadeIn is accepted by the source without errors.
     it("fadeIn does not error", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         expect_no_error(function() src:fadeIn(1.0) end)
     end)
 
-    -- @description Verifies getFadeIn returns a numeric fade duration after fadeIn has been configured.
     it("getFadeIn returns a number", function()
         local src = lurek.audio.newSource(FIXTURE, "static")
         src:fadeIn(1.0)
         expect_type("number", src:getFadeIn())
     end)
 
-    -- @description Clones an existing source and verifies the duplicate object is returned.
     it("clone returns a new Source", function()
         local src  = lurek.audio.newSource(FIXTURE, "static")
         local copy = src:clone()
@@ -517,37 +446,31 @@ describe("Source UserData - fadeIn / clone", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Bus UserData Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- Bus UserData
 
--- @description Verifies bus construction, mix-property controls, pause state, and runtime type introspection for audio buses.
 describe("Bus UserData", function()
-    -- @description Creates an audio bus and verifies the factory returns a non-nil object.
     it("newBus returns a non-nil object", function()
         local bus = lurek.audio.newBus("test_bus")
         expect_true(bus ~= nil, "bus is not nil")
     end)
 
-    -- @description Verifies a bus remembers the name it was created with.
     it("Bus:getName returns the registered name", function()
         local bus = lurek.audio.newBus("named_bus")
         expect_equal("named_bus", bus:getName())
     end)
 
-    -- @description Sets bus volume and verifies the value round-trips through the getter.
     it("Bus setVolume / getVolume round-trip", function()
         local bus = lurek.audio.newBus("vol_bus")
         bus:setVolume(0.6)
         expect_near(0.6, bus:getVolume(), 0.001)
     end)
 
-    -- @description Sets bus pitch and verifies the value round-trips through the getter.
     it("Bus setPitch / getPitch round-trip", function()
         local bus = lurek.audio.newBus("pitch_bus")
         bus:setPitch(1.2)
         expect_near(1.2, bus:getPitch(), 0.001)
     end)
 
-    -- @description Pauses and resumes a bus, verifying the paused-state query tracks both transitions correctly.
     it("Bus pause / isPaused / resume", function()
         local bus = lurek.audio.newBus("pause_bus")
         bus:pause()
@@ -556,13 +479,11 @@ describe("Bus UserData", function()
         expect_false(bus:isPaused())
     end)
 
-    -- @description Verifies bus type introspection returns a string identifier.
     it("Bus:type returns a string", function()
         local bus = lurek.audio.newBus("type_bus")
         expect_type("string", bus:type())
     end)
 
-    -- @description Verifies typeOf recognizes Bus userdata correctly and rejects unrelated Source type checks.
     it("Bus:typeOf checks identity against a type name", function()
         local bus = lurek.audio.newBus("typeof_bus")
         expect_true(bus:typeOf("Bus"))
@@ -574,26 +495,22 @@ end)
 -- newSoundData guard (PR-4)
 -- =========================================================================
 
--- @description Covers suite: lurek.audio newSoundData input validation guard.
 describe("lurek.audio newSoundData guard", function()
-    -- @tests lurek.audio.newSoundData
-    -- @description Passing a string literal for sample rate must now return an error instead of silently defaulting to 44100.
+    -- @covers lurek.audio.newSoundData
     it("newSoundData_invalid_sample_rate_string_errors", function()
         expect_error(function()
             lurek.audio.newSoundData(64, "invalid")
         end)
     end)
 
-    -- @tests lurek.audio.newSoundData
-    -- @description Passing a boolean for sample rate must also trigger the validation error.
+    -- @covers lurek.audio.newSoundData
     it("newSoundData_boolean_sample_rate_errors", function()
         expect_error(function()
             lurek.audio.newSoundData(64, true)
         end)
     end)
 
-    -- @tests lurek.audio.newSoundData
-    -- @description A valid integer count and numeric sample rate must succeed without error.
+    -- @covers lurek.audio.newSoundData
     it("newSoundData_valid_args_succeeds", function()
         expect_no_error(function()
             lurek.audio.newSoundData(64, 44100, 1)
@@ -601,88 +518,177 @@ describe("lurek.audio newSoundData guard", function()
     end)
 end)
 
+describe("lurek.audio SoundData", function()
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:getSampleCount
+    -- @covers SoundData:getSampleRate
+    -- @covers SoundData:getChannelCount
+    -- @covers SoundData:getSample
+    it("newSoundData creates a silent buffer with requested shape", function()
+        local sd = lurek.audio.newSoundData(100, 44100, 1)
+        expect_equal(100, sd:getSampleCount())
+        expect_equal(44100, sd:getSampleRate())
+        expect_equal(1, sd:getChannelCount())
+        expect_near(0.0, sd:getSample(0), 0.0001)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:setSample
+    -- @covers SoundData:getSample
+    it("setSample and getSample round-trip", function()
+        local sd = lurek.audio.newSoundData(10, 44100, 1)
+        sd:setSample(0, 0.5)
+        expect_near(0.5, sd:getSample(0), 0.0001)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:setSample
+    -- @covers SoundData:getSample
+    it("setSample clamps values to audio range", function()
+        local sd = lurek.audio.newSoundData(10, 44100, 1)
+        sd:setSample(0, 5.0)
+        expect_near(1.0, sd:getSample(0), 0.0001)
+        sd:setSample(1, -5.0)
+        expect_near(-1.0, sd:getSample(1), 0.0001)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:setSample
+    it("setSample errors when index is out of range", function()
+        local sd = lurek.audio.newSoundData(10, 44100, 1)
+        expect_error(function()
+            sd:setSample(100, 0.5)
+        end)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:getDuration
+    it("getDuration reports one second for 44100 mono samples", function()
+        local sd = lurek.audio.newSoundData(44100, 44100, 1)
+        expect_near(1.0, sd:getDuration(), 0.0001)
+    end)
+
+    -- @covers lurek.audio.newSineWave
+    -- @covers SoundData:getSampleCount
+    -- @covers SoundData:getChannelCount
+    -- @covers SoundData:getSample
+    it("newSineWave creates the requested mono buffer", function()
+        local sd = lurek.audio.newSineWave(440.0, 1.0, 44100, 0.5)
+        expect_equal(44100, sd:getSampleCount())
+        expect_equal(1, sd:getChannelCount())
+        expect_true(math.abs(sd:getSample(0)) < 0.01)
+    end)
+
+    -- @covers lurek.audio.newSquareWave
+    -- @covers SoundData:getSample
+    it("newSquareWave alternates positive and negative phases", function()
+        local sd = lurek.audio.newSquareWave(1.0, 1.0, 100, 1.0)
+        expect_true(sd:getSample(0) > 0.0)
+        expect_true(sd:getSample(75) < 0.0)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:setSample
+    -- @covers SoundData:getSample
+    -- @covers lurek.audio.applyGain
+    it("applyGain scales samples in-place", function()
+        local sd = lurek.audio.newSoundData(2, 44100, 1)
+        sd:setSample(0, 0.5)
+        sd:setSample(1, -0.5)
+        lurek.audio.applyGain(sd, 0.5)
+        expect_near(0.25, sd:getSample(0), 0.0001)
+        expect_near(-0.25, sd:getSample(1), 0.0001)
+    end)
+
+    -- @covers lurek.audio.newSoundData
+    -- @covers SoundData:setSample
+    -- @covers SoundData:getSample
+    -- @covers lurek.audio.mixInto
+    it("mixInto additively blends source samples", function()
+        local dest = lurek.audio.newSoundData(2, 44100, 1)
+        local src = lurek.audio.newSoundData(2, 44100, 1)
+        dest:setSample(0, 0.3)
+        dest:setSample(1, 0.3)
+        src:setSample(0, 0.2)
+        src:setSample(1, -0.1)
+        lurek.audio.mixInto(dest, src)
+        expect_near(0.5, dest:getSample(0), 0.0001)
+        expect_near(0.2, dest:getSample(1), 0.0001)
+    end)
+end)
+
 -- =========================================================================
 -- MidiPlayer sample rate and channels (PR-5)
 -- =========================================================================
 
--- @description Covers suite: lurek.audio MidiPlayer rate and channels configurability.
 describe("lurek.audio MidiPlayer rate and channels", function()
-    -- @tests lurek.audio.newMidiPlayer
-    -- @description Confirms the MidiPlayer factory is exported as a callable function.
+    -- @covers lurek.audio.newMidiPlayer
     it("newMidiPlayer is a function", function()
         expect_type("function", lurek.audio.newMidiPlayer)
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:getSampleRate
-    -- @description Verifies the default output sample rate of a freshly-created MidiPlayer is 44100 Hz.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:getSampleRate
     it("midi_getSampleRate_default_is_44100", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(44100, midi:getSampleRate())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setSampleRate
-    -- @tests MidiPlayer:getSampleRate
-    -- @description Sets a sample rate within the valid range and reads it back to confirm round-trip fidelity.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
     it("midi_setSampleRate_roundtrips_value", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setSampleRate(48000)
         expect_equal(48000, midi:getSampleRate())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setSampleRate
-    -- @tests MidiPlayer:getSampleRate
-    -- @description Passes a value below 8000; the engine must clamp it to 8000.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
     it("midi_setSampleRate_clamps_below_8000_to_8000", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setSampleRate(100)
         expect_equal(8000, midi:getSampleRate())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setSampleRate
-    -- @tests MidiPlayer:getSampleRate
-    -- @description Passes a value above 192000; the engine must clamp it to 192000.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setSampleRate
+    -- @covers MidiPlayer:getSampleRate
     it("midi_setSampleRate_clamps_above_192000_to_192000", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setSampleRate(999999)
         expect_equal(192000, midi:getSampleRate())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:getChannels
-    -- @description Confirms the default output channel count of a freshly-created MidiPlayer is 2 (stereo).
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:getChannels
     it("midi_getChannels_default_is_2", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(2, midi:getChannels())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setChannels
-    -- @tests MidiPlayer:getChannels
-    -- @description Sets the channel count to 1 (mono) and verifies it is stored correctly.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
     it("midi_setChannels_accepts_1_mono", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setChannels(1)
         expect_equal(1, midi:getChannels())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setChannels
-    -- @tests MidiPlayer:getChannels
-    -- @description Sets the channel count to 2 (stereo) and verifies it is stored correctly.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
     it("midi_setChannels_accepts_2_stereo", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setChannels(2)
         expect_equal(2, midi:getChannels())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests MidiPlayer:setChannels
-    -- @tests MidiPlayer:getChannels
-    -- @description Passes 5 (above the maximum of 2); the engine must clamp it to 2.
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers MidiPlayer:setChannels
+    -- @covers MidiPlayer:getChannels
     it("midi_setChannels_clamps_above_2_to_2", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setChannels(5)
@@ -694,52 +700,45 @@ end)
 -- Merged from test_audio_bus.lua
 -- =========================================================================
 
--- @description Covers suite: lurek.audio.newBus.
 describe("lurek.audio.newBus", function()
-    -- @tests lurek.audio.newBus
+    -- @covers lurek.audio.newBus
     -- @tests Bus.getName
-    -- @tests lurek.audio.getListener2D
-    -- @tests lurek.audio.getMaxSources
-    -- @tests lurek.audio.getMeter
-    -- @tests lurek.audio.newMidiPlayer
-    -- @tests lurek.audio.setListener2D
-    -- @tests lurek.audio.setMeter
-    -- @description Verifies bus construction preserves the provided bus name.
+    -- @covers lurek.audio.getListener2D
+    -- @covers lurek.audio.getMaxSources
+    -- @covers lurek.audio.getMeter
+    -- @covers lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.setListener2D
+    -- @covers lurek.audio.setMeter
     it("creates a bus with the given name", function()
         local bus = lurek.audio.newBus("music")
         expect_equal(bus:getName(), "music")
     end)
 
-    -- @tests lurek.audio.newBus
+    -- @covers lurek.audio.newBus
     -- @tests Bus.getVolume
-    -- @description Verifies newly created buses start at unity volume.
     it("has default volume 1.0", function()
         local bus = lurek.audio.newBus("test")
         expect_near(bus:getVolume(), 1.0, 1e-5)
     end)
 
-    -- @tests lurek.audio.newBus
+    -- @covers lurek.audio.newBus
     -- @tests Bus.getPitch
-    -- @description Verifies newly created buses start at neutral pitch.
     it("has default pitch 1.0", function()
         local bus = lurek.audio.newBus("test")
         expect_near(bus:getPitch(), 1.0, 1e-5)
     end)
 
-    -- @tests lurek.audio.newBus
+    -- @covers lurek.audio.newBus
     -- @tests Bus.isPaused
-    -- @description Verifies new buses begin unpaused.
     it("is not paused by default", function()
         local bus = lurek.audio.newBus("test")
         expect_false(bus:isPaused())
     end)
 end)
 
--- @description Covers suite: Bus:setVolume / getVolume.
 describe("Bus:setVolume / getVolume", function()
     -- @tests Bus.setVolume
     -- @tests Bus.getVolume
-    -- @description Verifies bus volume changes round-trip for an in-range scalar.
     it("sets and gets volume", function()
         local bus = lurek.audio.newBus("test")
         bus:setVolume(0.7)
@@ -748,7 +747,6 @@ describe("Bus:setVolume / getVolume", function()
 
     -- @tests Bus.setVolume
     -- @tests Bus.getVolume
-    -- @description Verifies negative bus volume inputs clamp to silence instead of going below zero.
     it("clamps negative volume to 0", function()
         local bus = lurek.audio.newBus("test")
         bus:setVolume(-1.0)
@@ -756,11 +754,9 @@ describe("Bus:setVolume / getVolume", function()
     end)
 end)
 
--- @description Covers suite: Bus:setPitch / getPitch.
 describe("Bus:setPitch / getPitch", function()
     -- @tests Bus.setPitch
     -- @tests Bus.getPitch
-    -- @description Verifies bus pitch changes round-trip for a positive factor.
     it("sets and gets pitch", function()
         local bus = lurek.audio.newBus("test")
         bus:setPitch(1.5)
@@ -769,7 +765,6 @@ describe("Bus:setPitch / getPitch", function()
 
     -- @tests Bus.setPitch
     -- @tests Bus.getPitch
-    -- @description Verifies negative pitch values clamp to zero rather than producing invalid playback factors.
     it("clamps negative pitch to 0", function()
         local bus = lurek.audio.newBus("test")
         bus:setPitch(-0.5)
@@ -777,12 +772,10 @@ describe("Bus:setPitch / getPitch", function()
     end)
 end)
 
--- @description Covers suite: Bus:pause / resume / isPaused.
 describe("Bus:pause / resume / isPaused", function()
     -- @tests Bus.pause
     -- @tests Bus.resume
     -- @tests Bus.isPaused
-    -- @description Verifies pause state flips on and off through the lifecycle methods.
     it("pauses and resumes", function()
         local bus = lurek.audio.newBus("test")
         bus:pause()
@@ -792,17 +785,14 @@ describe("Bus:pause / resume / isPaused", function()
     end)
 end)
 
--- @description Covers suite: Bus type system.
 describe("Bus type system", function()
     -- @tests Bus.type
-    -- @description Verifies bus userdata reports its concrete runtime type string.
     it("reports type as LBus", function()
         local bus = lurek.audio.newBus("test")
         expect_equal(bus:type(), "LBus")
     end)
 
     -- @tests Bus.typeOf
-    -- @description Verifies bus userdata advertises both its concrete type and Object base type.
     it("typeOf returns true for Bus and Object", function()
         local bus = lurek.audio.newBus("test")
         expect_true(bus:typeOf("Bus"))
@@ -810,26 +800,21 @@ describe("Bus type system", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.getMaxSources.
 describe("lurek.audio.getMaxSources", function()
-    -- @tests lurek.audio.getMaxSources
-    -- @description Verifies the engine reports the expected global static max-source limit.
+    -- @covers lurek.audio.getMaxSources
     it("returns 64", function()
         expect_equal(lurek.audio.getMaxSources(), 64)
     end)
 end)
 
--- @description Covers suite: lurek.audio.setListener2D / getListener2D stubs.
 describe("lurek.audio.setListener2D / getListener2D stubs", function()
-    -- @tests lurek.audio.setListener2D
-    -- @description Verifies the 2D listener setter accepts valid coordinates without error.
+    -- @covers lurek.audio.setListener2D
     it("setListener2D does not error", function()
         lurek.audio.setListener2D(1.0, 2.0)
     end)
 
-    -- @tests lurek.audio.setListener2D
-    -- @tests lurek.audio.getListener2D
-    -- @description Verifies the 2D listener compatibility helpers round-trip the last set position.
+    -- @covers lurek.audio.setListener2D
+    -- @covers lurek.audio.getListener2D
     it("getListener2D returns the position set by setListener2D", function()
         lurek.audio.setListener2D(1.0, 2.0)
         local x, y = lurek.audio.getListener2D()
@@ -840,77 +825,65 @@ describe("lurek.audio.setListener2D / getListener2D stubs", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.setMeter / getMeter stubs.
 describe("lurek.audio.setMeter / getMeter stubs", function()
-    -- @tests lurek.audio.setMeter
-    -- @description Verifies the meter setter accepts a numeric value without error even in stubbed form.
+    -- @covers lurek.audio.setMeter
     it("setMeter does not error", function()
         lurek.audio.setMeter(2.0)
     end)
 
-    -- @tests lurek.audio.getMeter
-    -- @description Verifies the stub meter getter returns the fixed default meter scalar.
+    -- @covers lurek.audio.getMeter
     it("getMeter returns 1.0", function()
         expect_near(lurek.audio.getMeter(), 1.0, 1e-5)
     end)
 end)
 
--- @description Covers suite: lurek.audio.newMidiPlayer.
 describe("lurek.audio.newMidiPlayer", function()
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.isLoaded
-    -- @description Verifies creating a MIDI player yields an unloaded player object.
     it("creates a MidiPlayer", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_false(midi:isLoaded())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.isPlaying
-    -- @description Verifies unloaded MIDI players start stopped.
     it("is not playing by default", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_false(midi:isPlaying())
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.getVolume
-    -- @description Verifies new MIDI players default to full volume.
     it("has default volume 1.0", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_near(midi:getVolume(), 1.0, 1e-5)
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.getTempoScale
-    -- @description Verifies tempo scaling starts at neutral speed.
     it("has default tempo scale 1.0", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_near(midi:getTempoScale(), 1.0, 1e-5)
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.getTrackCount
-    -- @description Verifies unloaded MIDI players report zero tracks.
     it("has 0 tracks when unloaded", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(midi:getTrackCount(), 0)
     end)
 
-    -- @tests lurek.audio.newMidiPlayer
+    -- @covers lurek.audio.newMidiPlayer
     -- @tests MidiPlayer.getNoteCount
-    -- @description Verifies unloaded MIDI players report zero note events.
     it("has 0 note count when unloaded", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(midi:getNoteCount(), 0)
     end)
 end)
 
--- @description Covers suite: MidiPlayer volume.
 describe("MidiPlayer volume", function()
     -- @tests MidiPlayer.setVolume
     -- @tests MidiPlayer.getVolume
-    -- @description Verifies MIDI player volume round-trips through its accessor pair.
     it("sets and gets volume", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setVolume(0.5)
@@ -918,11 +891,9 @@ describe("MidiPlayer volume", function()
     end)
 end)
 
--- @description Covers suite: MidiPlayer tempo.
 describe("MidiPlayer tempo", function()
     -- @tests MidiPlayer.setTempoScale
     -- @tests MidiPlayer.getTempoScale
-    -- @description Verifies MIDI tempo scaling round-trips through the setter/getter pair.
     it("sets and gets tempo scale", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setTempoScale(2.0)
@@ -930,18 +901,15 @@ describe("MidiPlayer tempo", function()
     end)
 
     -- @tests MidiPlayer.getOriginalTempo
-    -- @description Verifies unloaded MIDI players expose the default original tempo metadata.
     it("getOriginalTempo returns 120 when unloaded", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_near(midi:getOriginalTempo(), 120.0, 1e-5)
     end)
 end)
 
--- @description Covers suite: MidiPlayer looping.
 describe("MidiPlayer looping", function()
     -- @tests MidiPlayer.setLooping
     -- @tests MidiPlayer.isLooping
-    -- @description Verifies looping can be toggled on and off and reflected immediately.
     it("toggles looping", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_false(midi:isLooping())
@@ -952,11 +920,9 @@ describe("MidiPlayer looping", function()
     end)
 end)
 
--- @description Covers suite: MidiPlayer channel control.
 describe("MidiPlayer channel control", function()
     -- @tests MidiPlayer.setChannelVolume
     -- @tests MidiPlayer.getChannelVolume
-    -- @description Verifies per-channel volume uses 1-based indexing and round-trips the stored value.
     it("sets and gets channel volume (1-indexed)", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setChannelVolume(1, 0.5)
@@ -965,7 +931,6 @@ describe("MidiPlayer channel control", function()
 
     -- @tests MidiPlayer.setChannelMuted
     -- @tests MidiPlayer.isChannelMuted
-    -- @description Verifies per-channel mute state can be toggled on and off.
     it("mutes and unmutes channel", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_false(midi:isChannelMuted(1))
@@ -977,7 +942,6 @@ describe("MidiPlayer channel control", function()
 
     -- @tests MidiPlayer.setChannelInstrument
     -- @tests MidiPlayer.getChannelInstrument
-    -- @description Verifies channel instrument program numbers round-trip.
     it("sets and gets channel instrument", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setChannelInstrument(1, 42)
@@ -986,7 +950,6 @@ describe("MidiPlayer channel control", function()
 
     -- @tests MidiPlayer.soloChannel
     -- @tests MidiPlayer.isChannelMuted
-    -- @description Verifies soloChannel leaves the target channel audible while muting the others.
     it("soloChannel mutes all others", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:soloChannel(5)
@@ -998,7 +961,6 @@ describe("MidiPlayer channel control", function()
     -- @tests MidiPlayer.unsoloAll
     -- @tests MidiPlayer.soloChannel
     -- @tests MidiPlayer.isChannelMuted
-    -- @description Verifies unsoloAll clears solo-side muting across every channel.
     it("unsoloAll unmutes all", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:soloChannel(5)
@@ -1009,54 +971,44 @@ describe("MidiPlayer channel control", function()
     end)
 end)
 
--- @description Covers suite: MidiPlayer stubs.
 describe("MidiPlayer stubs", function()
-    -- @description Verifies case: setSoundFont does not error.
     it("setSoundFont does not error", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setSoundFont("path/to/sf2")
     end)
 
-    -- @description Verifies case: useDefaultSoundFont does not error.
     it("useDefaultSoundFont does not error", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:useDefaultSoundFont()
     end)
 
-    -- @description Verifies case: getSoundFontPath returns nil.
     it("getSoundFontPath returns nil", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(midi:getSoundFontPath(), nil)
     end)
 
-    -- @description Verifies case: setOnNoteOn does not error.
     it("setOnNoteOn does not error", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setOnNoteOn(function() end)
     end)
 
-    -- @description Verifies case: setOnNoteOff does not error.
     it("setOnNoteOff does not error", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setOnNoteOff(function() end)
     end)
 
-    -- @description Verifies case: setOnEnd does not error.
     it("setOnEnd does not error", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:setOnEnd(function() end)
     end)
 end)
 
--- @description Covers suite: MidiPlayer type system.
 describe("MidiPlayer type system", function()
-    -- @description Verifies case: reports type as MidiPlayer.
     it("reports type as LMidiPlayer", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_equal(midi:type(), "LMidiPlayer")
     end)
 
-    -- @description Verifies case: typeOf returns true for MidiPlayer and Object.
     it("typeOf returns true for MidiPlayer and Object", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_true(midi:typeOf("MidiPlayer"))
@@ -1064,16 +1016,13 @@ describe("MidiPlayer type system", function()
     end)
 end)
 
--- @description Covers suite: MidiPlayer seek/tell.
 describe("MidiPlayer seek/tell", function()
-    -- @description Verifies case: seek and tell work.
     it("seek and tell work", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:seek(5.0)
         expect_near(midi:tell(), 5.0, 1e-5)
     end)
 
-    -- @description Verifies case: seek clamps negative to 0.
     it("seek clamps negative to 0", function()
         local midi = lurek.audio.newMidiPlayer()
         midi:seek(-1.0)
@@ -1081,9 +1030,7 @@ describe("MidiPlayer seek/tell", function()
     end)
 end)
 
--- @description Covers suite: MidiPlayer getDuration.
 describe("MidiPlayer getDuration", function()
-    -- @description Verifies case: returns 0 when unloaded.
     it("returns 0 when unloaded", function()
         local midi = lurek.audio.newMidiPlayer()
         expect_near(midi:getDuration(), 0.0, 1e-5)
@@ -1094,23 +1041,20 @@ end)
 -- Merged from test_audio_dsp.lua
 -- =========================================================================
 
--- @description Covers suite: lurek.audio.create_bus.
 describe("lurek.audio.create_bus", function()
-    -- @tests lurek.audio.create_bus
-    -- @tests lurek.audio.add_effect
-    -- @tests lurek.audio.newSource
-    -- @tests lurek.audio.play
-    -- @tests lurek.audio.remove_effect
-    -- @tests lurek.audio.set_bus_volume
-    -- @tests lurek.audio.set_effect_param
-    -- @description Verifies bus creation is side-effect only and returns no handle.
+    -- @covers lurek.audio.create_bus
+    -- @covers lurek.audio.add_effect
+    -- @covers lurek.audio.newSource
+    -- @covers lurek.audio.play
+    -- @covers lurek.audio.remove_effect
+    -- @covers lurek.audio.set_bus_volume
+    -- @covers lurek.audio.set_effect_param
     it("creates a bus without returning an object", function()
         local result = lurek.audio.create_bus("sfx")
         expect_equal(nil, result)
     end)
 
-    -- @tests lurek.audio.create_bus
-    -- @description Verifies create_bus rejects empty bus names.
+    -- @covers lurek.audio.create_bus
     it("errors if empty string is provided", function()
         expect_error(function()
             lurek.audio.create_bus("")
@@ -1118,19 +1062,16 @@ describe("lurek.audio.create_bus", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.set_bus_volume.
 describe("lurek.audio.set_bus_volume", function()
-    -- @tests lurek.audio.set_bus_volume
-    -- @tests lurek.audio.create_bus
-    -- @description Verifies bus volume can be changed after creating the named bus.
+    -- @covers lurek.audio.set_bus_volume
+    -- @covers lurek.audio.create_bus
     it("sets the volume of an existing bus", function()
         lurek.audio.create_bus("music")
         -- Should not error
         lurek.audio.set_bus_volume("music", 0.75)
     end)
 
-    -- @tests lurek.audio.set_bus_volume
-    -- @description Verifies set_bus_volume errors when the requested bus name is unknown.
+    -- @covers lurek.audio.set_bus_volume
     it("errors if bus does not exist", function()
         expect_error(function()
             lurek.audio.set_bus_volume("nonexistent_bus", 0.5)
@@ -1138,12 +1079,10 @@ describe("lurek.audio.set_bus_volume", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.play with bus.
 describe("lurek.audio.play with bus", function()
-    -- @tests lurek.audio.play
-    -- @tests lurek.audio.newSource
-    -- @tests lurek.audio.create_bus
-    -- @description Verifies play accepts an explicit bus option and returns a numeric playback id.
+    -- @covers lurek.audio.play
+    -- @covers lurek.audio.newSource
+    -- @covers lurek.audio.create_bus
     it("accepts a bus parameter in options", function()
         lurek.audio.create_bus("ambient")
         local src = lurek.audio.newSource("tests/fixtures/sine_mono_44100.wav", "static")
@@ -1151,17 +1090,15 @@ describe("lurek.audio.play with bus", function()
         expect_type("number", id)
     end)
 
-    -- @tests lurek.audio.play
-    -- @tests lurek.audio.newSource
-    -- @description Verifies play falls back to the master bus when no bus is supplied.
+    -- @covers lurek.audio.play
+    -- @covers lurek.audio.newSource
     it("defaults to master bus if none provided", function()
         local src = lurek.audio.newSource("tests/fixtures/sine_mono_44100.wav", "static")
         local id = lurek.audio.play(src, {})
         expect_type("number", id)
     end)
 
-    -- @tests lurek.audio.play
-    -- @description Verifies play rejects requests targeting a nonexistent bus name.
+    -- @covers lurek.audio.play
     it("errors if bus does not exist", function()
         local src = lurek.audio.newSource("tests/fixtures/sine_mono_44100.wav", "static")
         expect_error(function()
@@ -1170,27 +1107,23 @@ describe("lurek.audio.play with bus", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.add_effect.
 describe("lurek.audio.add_effect", function()
-    -- @tests lurek.audio.add_effect
-    -- @tests lurek.audio.create_bus
-    -- @description Verifies adding an effect to a bus returns a numeric effect id.
+    -- @covers lurek.audio.add_effect
+    -- @covers lurek.audio.create_bus
     it("adds an effect and returns an integer ID", function()
         lurek.audio.create_bus("sfx2")
         local effect_id = lurek.audio.add_effect("sfx2", "lowpass")
         expect_type("number", effect_id)
     end)
 
-    -- @tests lurek.audio.add_effect
-    -- @description Verifies add_effect accepts an initial parameter table during construction.
+    -- @covers lurek.audio.add_effect
     it("accepts initial parameters", function()
         lurek.audio.create_bus("sfx3")
         local effect_id = lurek.audio.add_effect("sfx3", "reverb", { room_size = 0.8, mix = 0.4 })
         expect_type("number", effect_id)
     end)
 
-    -- @tests lurek.audio.add_effect
-    -- @description Verifies unknown effect type names are rejected.
+    -- @covers lurek.audio.add_effect
     it("errors on invalid effect type", function()
         lurek.audio.create_bus("sfx4")
         expect_error(function()
@@ -1198,8 +1131,7 @@ describe("lurek.audio.add_effect", function()
         end, "invalid effect")
     end)
 
-    -- @tests lurek.audio.add_effect
-    -- @description Verifies add_effect fails when the target bus does not exist.
+    -- @covers lurek.audio.add_effect
     it("errors if bus does not exist for effect", function()
         expect_error(function()
             lurek.audio.add_effect("nope_bus", "lowpass")
@@ -1207,11 +1139,9 @@ describe("lurek.audio.add_effect", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.set_effect_param.
 describe("lurek.audio.set_effect_param", function()
-    -- @tests lurek.audio.set_effect_param
-    -- @tests lurek.audio.add_effect
-    -- @description Verifies effect parameters can be mutated after creating an effect instance.
+    -- @covers lurek.audio.set_effect_param
+    -- @covers lurek.audio.add_effect
     it("mutates an effect parameter without errors", function()
         lurek.audio.create_bus("music2")
         local efx = lurek.audio.add_effect("music2", "lowpass")
@@ -1219,8 +1149,7 @@ describe("lurek.audio.set_effect_param", function()
         lurek.audio.set_effect_param("music2", efx, "cutoff", 500.0)
     end)
 
-    -- @tests lurek.audio.set_effect_param
-    -- @description Verifies set_effect_param rejects unknown effect ids.
+    -- @covers lurek.audio.set_effect_param
     it("errors if effect ID does not exist", function()
         lurek.audio.create_bus("music3")
         expect_error(function()
@@ -1228,8 +1157,7 @@ describe("lurek.audio.set_effect_param", function()
         end, "effect not found")
     end)
 
-    -- @tests lurek.audio.set_effect_param
-    -- @description Verifies parameter validation is effect-type specific.
+    -- @covers lurek.audio.set_effect_param
     it("errors if parameter name is invalid for effect type", function()
         lurek.audio.create_bus("music4")
         local efx = lurek.audio.add_effect("music4", "lowpass")
@@ -1239,11 +1167,9 @@ describe("lurek.audio.set_effect_param", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.remove_effect.
 describe("lurek.audio.remove_effect", function()
-    -- @tests lurek.audio.remove_effect
-    -- @tests lurek.audio.set_effect_param
-    -- @description Verifies removing an effect invalidates later parameter writes to that effect id.
+    -- @covers lurek.audio.remove_effect
+    -- @covers lurek.audio.set_effect_param
     it("removes an existing effect", function()
         lurek.audio.create_bus("sfx5")
         local efx = lurek.audio.add_effect("sfx5", "bandpass")
@@ -1255,8 +1181,7 @@ describe("lurek.audio.remove_effect", function()
         end, "effect not found")
     end)
 
-    -- @tests lurek.audio.remove_effect
-    -- @description Verifies remove_effect rejects unknown effect ids on an otherwise valid bus.
+    -- @covers lurek.audio.remove_effect
     it("errors if effect not found", function()
         lurek.audio.create_bus("sfx6")
         expect_error(function()
@@ -1269,16 +1194,15 @@ end)
 -- Merged from test_audio_effects.lua
 -- =========================================================================
 
--- @description Covers suite: new DSP effect type: notch.
-describe("lurek.audio.add_effect â€“ notch", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - notch", function()
+    -- @covers lurek.audio.add_effect
     it("creates a notch filter effect and returns an id", function()
         lurek.audio.create_bus("test_notch")
         local eid = lurek.audio.add_effect("test_notch", "notch")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts cutoff and bandwidth parameters", function()
         lurek.audio.create_bus("test_notch2")
         local eid = lurek.audio.add_effect("test_notch2", "notch", { cutoff = 1000.0, bandwidth = 100.0 })
@@ -1288,16 +1212,15 @@ describe("lurek.audio.add_effect â€“ notch", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: lowshelf.
-describe("lurek.audio.add_effect â€“ lowshelf", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - lowshelf", function()
+    -- @covers lurek.audio.add_effect
     it("creates a low-shelf EQ effect", function()
         lurek.audio.create_bus("test_lowshelf")
         local eid = lurek.audio.add_effect("test_lowshelf", "lowshelf")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts cutoff and gain_db parameters", function()
         lurek.audio.create_bus("test_lowshelf2")
         local eid = lurek.audio.add_effect("test_lowshelf2", "lowshelf", { cutoff = 200.0, gain_db = -6.0 })
@@ -1306,16 +1229,15 @@ describe("lurek.audio.add_effect â€“ lowshelf", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: highshelf.
-describe("lurek.audio.add_effect â€“ highshelf", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - highshelf", function()
+    -- @covers lurek.audio.add_effect
     it("creates a high-shelf EQ effect", function()
         lurek.audio.create_bus("test_highshelf")
         local eid = lurek.audio.add_effect("test_highshelf", "highshelf")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts cutoff and gain_db parameters", function()
         lurek.audio.create_bus("test_highshelf2")
         local eid = lurek.audio.add_effect("test_highshelf2", "highshelf", { cutoff = 8000.0, gain_db = 4.0 })
@@ -1323,16 +1245,15 @@ describe("lurek.audio.add_effect â€“ highshelf", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: flanger.
-describe("lurek.audio.add_effect â€“ flanger", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - flanger", function()
+    -- @covers lurek.audio.add_effect
     it("creates a flanger effect", function()
         lurek.audio.create_bus("test_flanger")
         local eid = lurek.audio.add_effect("test_flanger", "flanger")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts rate and depth parameters", function()
         lurek.audio.create_bus("test_flanger2")
         local eid = lurek.audio.add_effect("test_flanger2", "flanger", { rate = 0.5, depth = 0.3, mix = 0.6 })
@@ -1342,16 +1263,15 @@ describe("lurek.audio.add_effect â€“ flanger", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: phaser.
-describe("lurek.audio.add_effect â€“ phaser", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - phaser", function()
+    -- @covers lurek.audio.add_effect
     it("creates a phaser effect", function()
         lurek.audio.create_bus("test_phaser")
         local eid = lurek.audio.add_effect("test_phaser", "phaser")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts rate, depth and mix parameters", function()
         lurek.audio.create_bus("test_phaser2")
         local eid = lurek.audio.add_effect("test_phaser2", "phaser", { rate = 0.3, depth = 0.7, mix = 0.5 })
@@ -1359,16 +1279,15 @@ describe("lurek.audio.add_effect â€“ phaser", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: distortion.
-describe("lurek.audio.add_effect â€“ distortion", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - distortion", function()
+    -- @covers lurek.audio.add_effect
     it("creates a distortion (waveshaper) effect", function()
         lurek.audio.create_bus("test_dist")
         local eid = lurek.audio.add_effect("test_dist", "distortion")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts drive and mix parameters", function()
         lurek.audio.create_bus("test_dist2")
         local eid = lurek.audio.add_effect("test_dist2", "distortion", { drive = 10.0, mix = 0.5 })
@@ -1377,16 +1296,15 @@ describe("lurek.audio.add_effect â€“ distortion", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: limiter.
-describe("lurek.audio.add_effect â€“ limiter", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - limiter", function()
+    -- @covers lurek.audio.add_effect
     it("creates a brick-wall limiter effect", function()
         lurek.audio.create_bus("test_limiter")
         local eid = lurek.audio.add_effect("test_limiter", "limiter")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts threshold and release parameters", function()
         lurek.audio.create_bus("test_limiter2")
         local eid = lurek.audio.add_effect("test_limiter2", "limiter", { threshold = 0.9, release = 0.1 })
@@ -1394,16 +1312,15 @@ describe("lurek.audio.add_effect â€“ limiter", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: compressor.
-describe("lurek.audio.add_effect â€“ compressor", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - compressor", function()
+    -- @covers lurek.audio.add_effect
     it("creates a dynamic range compressor", function()
         lurek.audio.create_bus("test_comp")
         local eid = lurek.audio.add_effect("test_comp", "compressor")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts threshold, ratio and makeup_gain parameters", function()
         lurek.audio.create_bus("test_comp2")
         local eid = lurek.audio.add_effect("test_comp2", "compressor",
@@ -1414,16 +1331,15 @@ describe("lurek.audio.add_effect â€“ compressor", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: bell_eq.
-describe("lurek.audio.add_effect â€“ bell_eq", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - bell_eq", function()
+    -- @covers lurek.audio.add_effect
     it("creates a bell equalizer effect", function()
         lurek.audio.create_bus("test_bell")
         local eid = lurek.audio.add_effect("test_bell", "bell_eq")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts cutoff, gain_db and q parameters", function()
         lurek.audio.create_bus("test_bell2")
         local eid = lurek.audio.add_effect("test_bell2", "bell_eq",
@@ -1433,16 +1349,15 @@ describe("lurek.audio.add_effect â€“ bell_eq", function()
     end)
 end)
 
--- @description Covers suite: new DSP effect type: reverb2.
-describe("lurek.audio.add_effect â€“ reverb2", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - reverb2", function()
+    -- @covers lurek.audio.add_effect
     it("creates an improved reverb (reverb2) effect", function()
         lurek.audio.create_bus("test_rev2")
         local eid = lurek.audio.add_effect("test_rev2", "reverb2")
         expect_type("number", eid)
     end)
 
-    -- @tests lurek.audio.set_effect_param
+    -- @covers lurek.audio.set_effect_param
     it("accepts room_size, damping, pre_delay and mix parameters", function()
         lurek.audio.create_bus("test_rev3")
         local eid = lurek.audio.add_effect("test_rev3", "reverb2",
@@ -1452,9 +1367,8 @@ describe("lurek.audio.add_effect â€“ reverb2", function()
     end)
 end)
 
--- @description Covers suite: invalid effect types still rejected.
-describe("lurek.audio.add_effect â€“ validation", function()
-    -- @tests lurek.audio.add_effect
+describe("lurek.audio.add_effect  - validation", function()
+    -- @covers lurek.audio.add_effect
     it("rejects unknown effect type names", function()
         lurek.audio.create_bus("test_inv_e")
         expect_error(function()
@@ -1470,9 +1384,8 @@ end)
 local WAVE = "tests/fixtures/sine_mono_44100.wav"
 local OUT_DIR = evidence_output_dir("audio")
 
--- @description Covers suite: lurek.audio.processOffline.
 describe("lurek.audio.processOffline", function()
-    -- @tests lurek.audio.processOffline
+    -- @covers lurek.audio.processOffline
     it("processes a WAV file with a lowpass effect and writes output", function()
         local effects = {
             { type = "lowpass", cutoff = 1000.0 }
@@ -1481,7 +1394,7 @@ describe("lurek.audio.processOffline", function()
         lurek.audio.processOffline(WAVE, out, effects)
     end)
 
-    -- @tests lurek.audio.processOffline
+    -- @covers lurek.audio.processOffline
     it("processes with multiple chained effects", function()
         local effects = {
             { type = "highpass", cutoff = 200.0 },
@@ -1491,20 +1404,20 @@ describe("lurek.audio.processOffline", function()
         lurek.audio.processOffline(WAVE, out, effects)
     end)
 
-    -- @tests lurek.audio.processOffline
+    -- @covers lurek.audio.processOffline
     it("processes with empty effect list (passthrough)", function()
         local out = OUT_DIR .. "offline_passthrough_out.wav"
         lurek.audio.processOffline(WAVE, out, {})
     end)
 
-    -- @tests lurek.audio.processOffline
+    -- @covers lurek.audio.processOffline
     it("errors if source file does not exist", function()
         expect_error(function()
             lurek.audio.processOffline("no_such_file.wav", OUT_DIR .. "out.wav", {})
         end, "not found")
     end)
 
-    -- @tests lurek.audio.processOffline
+    -- @covers lurek.audio.processOffline
     it("errors on path traversal in output path", function()
         expect_error(function()
             lurek.audio.processOffline(WAVE, "../../etc/output.wav", {})
@@ -1512,15 +1425,14 @@ describe("lurek.audio.processOffline", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.normalizeFile.
 describe("lurek.audio.normalizeFile", function()
-    -- @tests lurek.audio.normalizeFile
+    -- @covers lurek.audio.normalizeFile
     it("normalizes a WAV file without error", function()
         local out = OUT_DIR .. "normalized_out.wav"
         lurek.audio.normalizeFile(WAVE, out, 0.9)
     end)
 
-    -- @tests lurek.audio.normalizeFile
+    -- @covers lurek.audio.normalizeFile
     it("errors if target level is outside (0.0, 1.0]", function()
         expect_error(function()
             lurek.audio.normalizeFile(WAVE, OUT_DIR .. "out.wav", 0.0)
@@ -1530,7 +1442,7 @@ describe("lurek.audio.normalizeFile", function()
         end, "target level")
     end)
 
-    -- @tests lurek.audio.normalizeFile
+    -- @covers lurek.audio.normalizeFile
     it("errors if source file does not exist", function()
         expect_error(function()
             lurek.audio.normalizeFile("no_such.wav", OUT_DIR .. "out.wav", 0.9)
@@ -1542,22 +1454,21 @@ end)
 -- Merged from test_audio_pool.lua
 -- =========================================================================
 
--- @description Covers suite: lurek.audio.newPool.
 describe("lurek.audio.newPool", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("creates a sound pool and returns a Pool object", function()
         local pool = lurek.audio.newPool(WAVE, 4)
         expect_not_nil(pool)
     end)
 
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     xit("errors on empty path", function()
         expect_error(function()
             lurek.audio.newPool("", 4)
         end, "invalid path")
     end)
 
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("errors on zero voice count", function()
         expect_error(function()
             lurek.audio.newPool(WAVE, 0)
@@ -1565,16 +1476,15 @@ describe("lurek.audio.newPool", function()
     end)
 end)
 
--- @description Covers suite: Pool:play.
 describe("Pool:play", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("play returns a numeric source id", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         local id = pool:play()
         expect_type("number", id)
     end)
 
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("play can be called multiple times up to voice count", function()
         local pool = lurek.audio.newPool(WAVE, 3)
         local id1 = pool:play()
@@ -1584,11 +1494,23 @@ describe("Pool:play", function()
         expect_type("number", id2)
         expect_type("number", id3)
     end)
+
+    -- @covers lurek.audio.newPool
+    -- @covers Pool:play
+    it("play wraps around to the first voice after the pool is exhausted", function()
+        local pool = lurek.audio.newPool(WAVE, 3)
+        local id1 = pool:play()
+        local id2 = pool:play()
+        local id3 = pool:play()
+        local id4 = pool:play()
+        expect_true(id1 ~= id2)
+        expect_true(id2 ~= id3)
+        expect_equal(id1, id4)
+    end)
 end)
 
--- @description Covers suite: Pool:stopAll.
 describe("Pool:stopAll", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("stopAll does not error when pool has playing sources", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         pool:play()
@@ -1596,32 +1518,30 @@ describe("Pool:stopAll", function()
         pool:stopAll()  -- should not raise
     end)
 
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("stopAll does not error on an idle pool", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         pool:stopAll()
     end)
 end)
 
--- @description Covers suite: Pool:setVolume.
 describe("Pool:setVolume", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("setVolume sets volume for all pool sources", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         pool:setVolume(0.5)  -- should not raise
     end)
 end)
 
--- @description Covers suite: Pool:setBus.
 describe("Pool:setBus", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("setBus routes all pool sources to a named bus", function()
         lurek.audio.create_bus("pool_test_bus")
         local pool = lurek.audio.newPool(WAVE, 2)
         pool:setBus("pool_test_bus")  -- should not raise
     end)
 
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     xit("setBus errors if bus does not exist", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         expect_error(function()
@@ -1630,9 +1550,8 @@ describe("Pool:setBus", function()
     end)
 end)
 
--- @description Covers suite: Pool:release.
 describe("Pool:release", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("release frees all sources without error", function()
         local pool = lurek.audio.newPool(WAVE, 2)
         pool:play()
@@ -1640,9 +1559,8 @@ describe("Pool:release", function()
     end)
 end)
 
--- @description Covers suite: Pool:getVoiceCount.
 describe("Pool:getVoiceCount", function()
-    -- @tests lurek.audio.newPool
+    -- @covers lurek.audio.newPool
     it("returns the configured voice count", function()
         local pool = lurek.audio.newPool(WAVE, 6)
         expect_equal(6, pool:getVoiceCount())
@@ -1653,22 +1571,21 @@ end)
 -- Merged from test_audio_stereo.lua
 -- =========================================================================
 
--- @description Covers suite: lurek.audio.setStereoWidth.
 describe("lurek.audio.setStereoWidth", function()
-    -- @tests lurek.audio.setStereoWidth
+    -- @covers lurek.audio.setStereoWidth
     it("sets stereo width on a valid source without error", function()
         local src = lurek.audio.newSource(WAVE, "static")
         lurek.audio.setStereoWidth(src, 1.5)  -- 1.5 = slight widening
     end)
 
-    -- @tests lurek.audio.setStereoWidth
+    -- @covers lurek.audio.setStereoWidth
     it("clamps stereo width to [0.0, 2.0] silently", function()
         local src = lurek.audio.newSource(WAVE, "static")
         lurek.audio.setStereoWidth(src, -1.0)  -- should clamp, not error
         lurek.audio.setStereoWidth(src, 5.0)   -- should clamp, not error
     end)
 
-    -- @tests lurek.audio.getStereoWidth
+    -- @covers lurek.audio.getStereoWidth
     it("getStereoWidth returns the last set value (clamped)", function()
         local src = lurek.audio.newSource(WAVE, "static")
         lurek.audio.setStereoWidth(src, 0.5)
@@ -1676,7 +1593,7 @@ describe("lurek.audio.setStereoWidth", function()
         expect_near(0.5, w, 0.001)
     end)
 
-    -- @tests lurek.audio.setStereoWidth
+    -- @covers lurek.audio.setStereoWidth
     it("errors on invalid source handle", function()
         expect_error(function()
             lurek.audio.setStereoWidth(99999999, 1.0) ---@diagnostic disable-line: param-type-mismatch
@@ -1684,15 +1601,14 @@ describe("lurek.audio.setStereoWidth", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.setRandomPitch.
 describe("lurek.audio.setRandomPitch", function()
-    -- @tests lurek.audio.setRandomPitch
+    -- @covers lurek.audio.setRandomPitch
     it("sets a random pitch range on a source", function()
         local src = lurek.audio.newSource(WAVE, "static")
         lurek.audio.setRandomPitch(src, 0.9, 1.1)
     end)
 
-    -- @tests lurek.audio.setRandomPitch
+    -- @covers lurek.audio.setRandomPitch
     it("errors if min > max", function()
         local src = lurek.audio.newSource(WAVE, "static")
         expect_error(function()
@@ -1700,14 +1616,14 @@ describe("lurek.audio.setRandomPitch", function()
         end, "min must be")
     end)
 
-    -- @tests lurek.audio.setRandomPitch
+    -- @covers lurek.audio.setRandomPitch
     it("errors on invalid source", function()
         expect_error(function()
             lurek.audio.setRandomPitch(12345678, 0.9, 1.1) ---@diagnostic disable-line: param-type-mismatch
         end, "invalid")
     end)
 
-    -- @tests lurek.audio.clearRandomPitch
+    -- @covers lurek.audio.clearRandomPitch
     it("clearRandomPitch removes the random pitch range", function()
         local src = lurek.audio.newSource(WAVE, "static")
         lurek.audio.setRandomPitch(src, 0.9, 1.1)
@@ -1715,16 +1631,15 @@ describe("lurek.audio.setRandomPitch", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.crossfade.
 describe("lurek.audio.crossfade", function()
-    -- @tests lurek.audio.crossfade
+    -- @covers lurek.audio.crossfade
     it("crossfade between two sources does not error", function()
         local src_a = lurek.audio.newSource(WAVE, "static")
         local src_b = lurek.audio.newSource(WAVE, "static")
         lurek.audio.crossfade(src_a, src_b, 0.5)
     end)
 
-    -- @tests lurek.audio.crossfade
+    -- @covers lurek.audio.crossfade
     xit("errors if duration is negative", function()
         local src_a = lurek.audio.newSource(WAVE, "static")
         local src_b = lurek.audio.newSource(WAVE, "static")
@@ -1733,7 +1648,7 @@ describe("lurek.audio.crossfade", function()
         end, "duration")
     end)
 
-    -- @tests lurek.audio.crossfade
+    -- @covers lurek.audio.crossfade
     it("errors if first source is invalid", function()
         local src_b = lurek.audio.newSource(WAVE, "static")
         expect_error(function()
@@ -1742,23 +1657,22 @@ describe("lurek.audio.crossfade", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.getBusPeak.
 describe("lurek.audio.getBusPeak", function()
-    -- @tests lurek.audio.getBusPeak
+    -- @covers lurek.audio.getBusPeak
     it("returns a number for a known bus", function()
         lurek.audio.create_bus("peak_test_bus")
         local peak = lurek.audio.getBusPeak("peak_test_bus")
         expect_type("number", peak)
     end)
 
-    -- @tests lurek.audio.getBusPeak
+    -- @covers lurek.audio.getBusPeak
     it("returns 0.0 when bus is idle", function()
         lurek.audio.create_bus("peak_idle_bus")
         local peak = lurek.audio.getBusPeak("peak_idle_bus")
         expect_near(0.0, peak, 0.001)
     end)
 
-    -- @tests lurek.audio.getBusPeak
+    -- @covers lurek.audio.getBusPeak
     it("errors for unknown bus", function()
         expect_error(function()
             lurek.audio.getBusPeak("nope_bus")
@@ -1766,20 +1680,41 @@ describe("lurek.audio.getBusPeak", function()
     end)
 end)
 
--- @description Covers suite: lurek.audio.getBusRms.
 describe("lurek.audio.getBusRms", function()
-    -- @tests lurek.audio.getBusRms
+    -- @covers lurek.audio.getBusRms
     it("returns a number for a known bus", function()
         lurek.audio.create_bus("rms_test_bus")
         local rms = lurek.audio.getBusRms("rms_test_bus")
         expect_type("number", rms)
     end)
 
-    -- @tests lurek.audio.getBusRms
+    -- @covers lurek.audio.getBusRms
     it("returns 0.0 when bus is idle", function()
         lurek.audio.create_bus("rms_idle_bus")
         local rms = lurek.audio.getBusRms("rms_idle_bus")
         expect_near(0.0, rms, 0.001)
+    end)
+end)
+
+describe("lurek.audio waveform and spectrogram export errors", function()
+    -- @covers lurek.audio.waveformToPng
+    it("waveformToPng errors for a missing input file", function()
+        local ok, err = pcall(function()
+            lurek.audio.waveformToPng("tests/fixtures/does_not_exist.wav", "tests/output/missing_waveform.png", 100, 50)
+        end)
+
+        expect_false(ok)
+        expect_false(err == nil)
+    end)
+
+    -- @covers lurek.audio.spectrogramToPng
+    it("spectrogramToPng errors for a missing input file", function()
+        local ok, err = pcall(function()
+            lurek.audio.spectrogramToPng("tests/fixtures/does_not_exist.wav", "tests/output/missing_spectrogram.png", 100, 50)
+        end)
+
+        expect_false(ok)
+        expect_false(err == nil)
     end)
 end)
 

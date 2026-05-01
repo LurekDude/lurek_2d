@@ -2,7 +2,32 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.15] - 2026-05-01
+
+### chore(cag): prototype a reduced agents2 roster and strengthen CAG validation
+
+- Added `.github/agents2/` with a 12-agent prototype roster that merges the current specialist set into `Manager`, `Planner`, `Architect`, `Developer`, `Lua-Designer`, `Content-Maker`, `Extension-Engineer`, `Build-Engineer`, `Tester`, `Verifier`, `Doc-Writer`, and `CAG-Architect` without changing the live `.github/agents/` discovery surface.
+- Added `.github/skills/solution-options/SKILL.md` so high-level problem solving and option comparison have an explicit reusable workflow for the reduced roster.
+- Updated `tools/validate/cag_validate.py` to recognize built-in tool references correctly and raised the agent file cap from 200 to 300 lines, then synced the contract wording in `docs/architecture/cag-system.md`.
+
 ## [1.0.9-fix.14] - 2026-04-30
+
+### test(lua): finish Rust unit audit through window batch
+
+- Marked the remaining Rust unit suites from `runtime` through `window` as `INTERNAL ONLY`, leaving only Rust-only helpers, enum/state internals, and render-command assertions in those files.
+- Removed generated TODO-only Lua coverage blocks from the `terminal`, `thread`, `ui`, and `window` unit suites, moved premature `test_summary()` calls to the true end of the touched files, and cleaned stale placeholder wording in the Lua test docstrings.
+- Tightened `test_terminal_unit.lua` LuaLS typing for dynamic terminal userdata and ANSI parser result checks so the Problems panel stays clean for the final audit batch.
+
+### test(lua): continue Rust unit audit through render batch
+
+- Marked the next Rust unit suites from `input` through `render` as `INTERNAL ONLY` after reviewing their Lua-facing coverage boundaries.
+- Migrated `Trail` coverage from `tests/rust/unit/particle_tests.rs` into `tests/lua/unit/test_particle_unit.lua` and removed the duplicate Rust trail assertions.
+- Removed duplicate TODO-only tails from the `log`, `light`, `math`, `network`, `parallax`, `particle`, `pathfind`, `patterns`, `physics`, `pipeline`, `raycaster`, and `render` Lua unit suites, added real cookie assertions for `Light:setCookie`, `Light:getCookie`, and `Light:clearCookie`, and kept each touched suite at a single final `test_summary()`.
+
+### test(lua): audit first Rust unit batch for Lua-first placement
+
+- Marked the first 15 alphabetic Rust unit suites as INTERNAL ONLY after checking their remaining coverage is limited to private helpers, render-command generation, or Rust-only invariants.
+- Replaced the placeholder-only tail in `tests/lua/unit/test_image_unit.lua` with real assertions for compressed image metadata, raw pixel replacement, and palette LUT clearing, while dropping duplicate LayeredImage/ImageData stubs already covered earlier in the same file.
 
 ### test(lua): migrate 50 more public API tests from Rust to Lua-first coverage
 

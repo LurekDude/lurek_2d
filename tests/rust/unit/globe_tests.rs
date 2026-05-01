@@ -1,4 +1,4 @@
-//! Unit tests for the `globe` module.
+//! INTERNAL ONLY: Rust-only tests for the `globe` module.
 //!
 //! Covers: fog, lighting, projection, topology.
 //! Tests for draw/label/layer/marker/registry/loader are integration-level and

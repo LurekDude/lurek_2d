@@ -1,5 +1,5 @@
 -- Dialog API integration tests
--- @tests lurek.dialog.newSequencer
+-- @covers lurek.dialog.newSequencer
 
 -- Guard: skip all tests if lurek.dialog is not registered
 if type(lurek) ~= "table" or type(lurek.dialog) ~= "table" then
@@ -21,10 +21,10 @@ local function it(name, fn)
     local ok, err = pcall(fn)
     if ok then
         passed = passed + 1
-        print("    âś“ " .. name)
+        print("     " .. name)
     else
         failed = failed + 1
-        print("    âś— " .. name .. ": " .. tostring(err))
+        print("     " .. name .. ": " .. tostring(err))
     end
 end
 
@@ -48,21 +48,17 @@ end
 print("Dialog API Tests")
 print("================")
 
--- @description Verifies that a new sequencer instance is created as userdata, reports its concrete type as Sequencer, and matches Object and Sequencer in typeOf while rejecting Image.
 describe("newSequencer", function()
-    -- @description Creates a sequencer with lurek.dialog.newSequencer() and asserts that the returned value is userdata.
     it("creates a sequencer", function()
         local seq = lurek.dialog.newSequencer()
         expect_type(seq, "userdata", "sequencer")
     end)
 
-    -- @description Calls type() on a fresh sequencer and asserts that it returns the exact string "Sequencer".
     it("has type Sequencer", function()
         local seq = lurek.dialog.newSequencer()
         expect_eq(seq:type(), "Sequencer")
     end)
 
-    -- @description Checks typeOf on a fresh sequencer and asserts true for Object and Sequencer, and false for Image.
     it("typeOf Object", function()
         local seq = lurek.dialog.newSequencer()
         expect_eq(seq:typeOf("Object"), true)
@@ -71,30 +67,24 @@ describe("newSequencer", function()
     end)
 end)
 
--- @description Confirms a newly created sequencer starts in the idle state, reports inactive status, and uses the default typing speed of 30.
 describe("initial state", function()
-    -- @description Asserts that getState() on a fresh sequencer returns "idle" before any script is loaded or started.
     it("starts idle", function()
         local seq = lurek.dialog.newSequencer()
         expect_eq(seq:getState(), "idle")
     end)
 
-    -- @description Asserts that isActive() is false on a fresh sequencer before playback begins.
     it("is not active", function()
         local seq = lurek.dialog.newSequencer()
         expect_eq(seq:isActive(), false)
     end)
 
-    -- @description Asserts that getSpeed() returns the default typing speed value of 30 on a new sequencer.
     it("default speed is 30", function()
         local seq = lurek.dialog.newSequencer()
         expect_eq(seq:getSpeed(), 30)
     end)
 end)
 
--- @description Verifies loading and starting behavior for both a say node and an empty script, including state transitions, speaker/text exposure, and active status.
 describe("load and start", function()
-    -- @description Loads one say node, starts the sequencer, and asserts typing state, speaker "Alice", text "Hello world", and active status.
     it("loads a say node and starts typing", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -107,7 +97,6 @@ describe("load and start", function()
         expect_eq(seq:isActive(), true)
     end)
 
-    -- @description Loads an empty script, starts the sequencer, and asserts that it immediately enters the done state and is not active.
     it("handles empty script gracefully", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({})
@@ -117,16 +106,13 @@ describe("load and start", function()
     end)
 end)
 
--- @description Checks that setSpeed updates the configured typing speed and that a speed of 0 reveals say-node text instantly and skips straight to waiting.
 describe("setSpeed / getSpeed", function()
-    -- @description Sets the speed to 60 and asserts that getSpeed() returns the updated value.
     it("changes typing speed", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(60)
         expect_eq(seq:getSpeed(), 60)
     end)
 
-    -- @description Sets speed to 0, starts a say node, and asserts immediate waiting state with the full revealed text "Instant".
     it("speed 0 means instant reveal", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -139,9 +125,7 @@ describe("setSpeed / getSpeed", function()
     end)
 end)
 
--- @description Verifies skip and advance behavior across typing, waiting, next-node progression, and completion after the final node.
 describe("advance and skip", function()
-    -- @description Starts a typing say node, calls skip(), and asserts a transition to waiting with the full text "Hello" revealed.
     it("skip goes from typing to waiting", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -154,7 +138,6 @@ describe("advance and skip", function()
         expect_eq(seq:revealedText(), "Hello")
     end)
 
-    -- @description Starts a typing say node, calls advance() during typing, and asserts that it behaves like a skip by moving to waiting.
     it("advance from typing skips to waiting", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -165,7 +148,6 @@ describe("advance and skip", function()
         expect_eq(seq:getState(), "waiting")
     end)
 
-    -- @description Uses instant speed across two say nodes, advances from the first waiting node, and asserts that speaker control moves from A to B while staying in waiting.
     it("advance from waiting goes to next node", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -180,7 +162,6 @@ describe("advance and skip", function()
         expect_eq(seq:getState(), "waiting")
     end)
 
-    -- @description Uses instant speed on a single say node, advances past it, and asserts that the sequencer reaches done and becomes inactive.
     it("advance past last node goes to done", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -194,9 +175,7 @@ describe("advance and skip", function()
     end)
 end)
 
--- @description Verifies choice-node entry state, choice label extraction, and branch selection that swaps the current text to the chosen branch's say node.
 describe("choice nodes", function()
-    -- @description Starts a choice node and asserts choice state, waiting-for-choice status, and the prompt text "Pick one".
     it("enters choice state", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -211,7 +190,6 @@ describe("choice nodes", function()
         expect_eq(seq:getChoiceText(), "Pick one")
     end)
 
-    -- @description Starts a three-option choice node, reads the choice labels, and asserts the exact ordered labels Yes, No, and Maybe.
     it("getChoiceLabels returns labels", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -229,7 +207,6 @@ describe("choice nodes", function()
         expect_eq(labels[3], "Maybe")
     end)
 
-    -- @description Starts a two-branch choice, selects option 2, and asserts that the current text becomes the B-branch line "You chose B".
     it("choose selects a branch", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -249,9 +226,7 @@ describe("choice nodes", function()
     end)
 end)
 
--- @description Verifies that starting a wait node moves the sequencer into the paused state.
 describe("wait nodes", function()
-    -- @description Loads a wait node with time 2.0, starts it, and asserts that the sequencer state is "paused".
     it("enters paused state with timer", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -262,9 +237,7 @@ describe("wait nodes", function()
     end)
 end)
 
--- @description Verifies that call nodes execute their callback immediately when the sequencer starts.
 describe("call nodes", function()
-    -- @description Loads a call node whose function flips a local flag and asserts that the flag is true after start().
     it("invokes callback on start", function()
         local called = false
         local seq = lurek.dialog.newSequencer()
@@ -276,9 +249,7 @@ describe("call nodes", function()
     end)
 end)
 
--- @description Verifies line, choice, and finished event emission, and confirms that off("line") prevents later line callbacks from firing.
 describe("events", function()
-    -- @description Registers a line handler, starts a say node for Bob saying "Hi there", and asserts that the event receives that exact speaker and text.
     it("fires line event on say node", function()
         local event_speaker, event_text = nil, nil
         local seq = lurek.dialog.newSequencer()
@@ -294,7 +265,6 @@ describe("events", function()
         expect_eq(event_text, "Hi there")
     end)
 
-    -- @description Registers a choice handler, starts a choice node, and asserts that the choice event fires by setting the flag to true.
     it("fires choice event", function()
         local choice_fired = false
         local seq = lurek.dialog.newSequencer()
@@ -308,7 +278,6 @@ describe("events", function()
         expect_eq(choice_fired, true)
     end)
 
-    -- @description Registers a finished handler, completes an instant one-line sequence, and asserts that the finished event flag becomes true.
     it("fires finished event", function()
         local finished = false
         local seq = lurek.dialog.newSequencer()
@@ -322,7 +291,6 @@ describe("events", function()
         expect_eq(finished, true, "finished event should fire")
     end)
 
-    -- @description Registers a line handler across two say nodes, asserts the first line increments the count once, removes the handler with off("line"), and asserts the second line does not increment it again.
     it("off removes event handler", function()
         local count = 0
         local seq = lurek.dialog.newSequencer()
@@ -341,9 +309,7 @@ describe("events", function()
     end)
 end)
 
--- @description Verifies time-based text reveal during typing and the automatic transition to waiting once the entire line has been revealed.
 describe("update with dt", function()
-    -- @description Sets speed to 10 chars per second, updates for 0.3 seconds on "Hello", and asserts that revealedText has more than 0 but fewer than 5 characters.
     it("reveals characters over time", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10) -- 10 chars per second
@@ -360,7 +326,6 @@ describe("update with dt", function()
         expect_eq(#revealed < 5, true, "should not reveal all chars yet")
     end)
 
-    -- @description Sets speed to 10 chars per second, updates a two-character line for 1.0 second, and asserts that the state becomes waiting with full text "Hi" revealed.
     it("transitions to waiting when fully revealed", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10)
@@ -374,9 +339,7 @@ describe("update with dt", function()
     end)
 end)
 
--- @description Verifies an end-to-end sequence with line, choice, branch selection, and finished events, asserting the recorded event order and final done state.
 describe("full workflow", function()
-    -- @description Runs an instant say-plus-choice sequence, asserts the first event is line:NPC, the next event is choice, choosing option 1 yields "Nice to meet you!", and the sequence ends in done with finished as the last event.
     it("complete dialog sequence", function()
         local events = {}
         local seq = lurek.dialog.newSequencer()

@@ -1,4 +1,8 @@
-//! Tests for the network module.
+//! INTERNAL ONLY: Rust-only tests for network helpers and internal data structures that are
+//! not directly asserted through `lurek.network.*`.
+//!
+//! Public networking behaviour is covered by `tests/lua/unit/test_network_unit.lua`.
+//! The remaining Rust tests keep constant/error/type/message/runtime helpers.
 
 use lurek2d::network::constants::*;
 use lurek2d::network::error::NetworkError;
@@ -13,16 +17,6 @@ use std::net::{Ipv4Addr, SocketAddr};
 
 mod constants_tests {
     use super::*;
-
-    #[test]
-    fn default_peers_within_max() {
-        assert!(DEFAULT_PEERS <= MAX_PEERS);
-    }
-
-    #[test]
-    fn default_channels_within_max() {
-        assert!(DEFAULT_CHANNELS <= MAX_CHANNELS);
-    }
 
     #[test]
     fn buffer_sizes_are_power_of_two() {

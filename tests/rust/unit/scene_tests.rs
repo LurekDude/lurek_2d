@@ -1,4 +1,4 @@
-//! Rust unit tests for the `scene` module — private internals not reachable
+//! INTERNAL ONLY: Rust unit tests for the `scene` module — private internals not reachable
 //! from the `lurek.*` Lua API.
 //!
 //! Only tests that cannot be expressed via `lurek.*` live here:
@@ -9,7 +9,7 @@
 //!
 //! Tests observable via `lurek.scene.getTransitionProgress()` and
 //! `lurek.scene.getTransitionProgressEased()` live in
-//! `tests/lua/unit/test_scene.lua`.
+//! `tests/lua/unit/test_scene_unit.lua`.
 //!
 //! Naming: `<subject>_<scenario>_<expected>` — no `test_` prefix.
 
@@ -118,7 +118,7 @@ fn active_transition_new_with_easing_stores_curve() {
 // active_transition_progress_eased_linear_matches_progress,
 // active_transition_progress_eased_ease_in_less_before_midpoint, and
 // scene_stack_get_transition_progress_eased_linear_matches were migrated to
-// tests/lua/unit/test_scene.lua — they are observable via
+// tests/lua/unit/test_scene_unit.lua — they are observable via
 // lurek.scene.getTransitionProgress() and lurek.scene.getTransitionProgressEased().
 
 // ── stack (migrated from src/scene/stack.rs) ──────────────────────────────────

@@ -1,6 +1,6 @@
 ---
 description: "Update one roadmap phase from new evidence without turning it into a fresh brainstorm."
-agent: "Discovery-Lead"
+agent: "Planner"
 ---
 # Workflow Update Roadmap Phase
 

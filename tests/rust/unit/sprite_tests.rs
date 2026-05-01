@@ -1,10 +1,14 @@
-//! Tests for the sprite module.
+//! INTERNAL ONLY: public `lurek.sprite.*` behavior is covered primarily by the Lua-first suite
+//! in `tests/lua/unit/test_sprite_unit.lua`.
+//!
+//! This Rust file keeps only helper-level coverage that is either not asserted
+//! through the Lua surface or is still more precise to check directly here.
 
 use lurek2d::math::{Color, Vec2};
 use lurek2d::runtime::resource_keys::TextureKey;
-use lurek2d::sprite::*;
 use lurek2d::sprite::sprite_batch::BatchEntry;
 use lurek2d::sprite::sprite_sheet::DirectionLayout;
+use lurek2d::sprite::*;
 use slotmap::KeyData;
 
 fn dummy_key() -> TextureKey {
@@ -68,8 +72,17 @@ mod sprite_batch_tests {
 
     fn make_entry(x: f32, y: f32) -> BatchEntry {
         BatchEntry {
-            x, y, quad_x: 0.0, quad_y: 0.0, quad_w: 32.0, quad_h: 32.0,
-            rotation: 0.0, sx: 1.0, sy: 1.0, ox: 0.0, oy: 0.0,
+            x,
+            y,
+            quad_x: 0.0,
+            quad_y: 0.0,
+            quad_w: 32.0,
+            quad_h: 32.0,
+            rotation: 0.0,
+            sx: 1.0,
+            sy: 1.0,
+            ox: 0.0,
+            oy: 0.0,
         }
     }
 
@@ -127,53 +140,9 @@ mod sprite_sheet_tests {
     use super::*;
 
     #[test]
-    fn new_computes_grid_dimensions() {
-        let sheet = SpriteSheet::new(128, 64, 32, 32);
-        assert_eq!(sheet.columns, 4);
-        assert_eq!(sheet.rows, 2);
-        assert_eq!(sheet.get_frame_count(), 8);
-    }
-
-    #[test]
-    fn get_frame_returns_correct_quad() {
-        let sheet = SpriteSheet::new(64, 64, 32, 32);
-        let f = sheet.get_frame(0).unwrap();
-        assert!((f.x).abs() < 1e-5);
-        assert!((f.y).abs() < 1e-5);
-        assert!((f.width - 32.0).abs() < 1e-5);
-        // Second frame (col=1, row=0)
-        let f1 = sheet.get_frame(1).unwrap();
-        assert!((f1.x - 32.0).abs() < 1e-5);
-    }
-
-    #[test]
     fn get_frame_out_of_range_returns_none() {
         let sheet = SpriteSheet::new(32, 32, 32, 32);
         assert!(sheet.get_frame(5).is_none());
-    }
-
-    #[test]
-    fn named_group_round_trip() {
-        let mut sheet = SpriteSheet::new(128, 32, 32, 32);
-        sheet.name_group("walk", 0, 3);
-        let frames = sheet.get_group("walk").unwrap();
-        assert_eq!(frames.len(), 3);
-        assert!(sheet.get_group("missing").is_none());
-    }
-
-    #[test]
-    fn get_row_returns_correct_count() {
-        let sheet = SpriteSheet::new(96, 64, 32, 32);
-        let row = sheet.get_row(0);
-        assert_eq!(row.len(), 3);
-        assert!(sheet.get_row(99).is_empty());
-    }
-
-    #[test]
-    fn get_column_returns_correct_count() {
-        let sheet = SpriteSheet::new(64, 96, 32, 32);
-        let col = sheet.get_column(0);
-        assert_eq!(col.len(), 3);
     }
 
     #[test]
@@ -181,17 +150,6 @@ mod sprite_sheet_tests {
         let sheet = SpriteSheet::new(64, 32, 32, 32);
         let range = sheet.get_range(1, 100);
         assert_eq!(range.len(), 1); // only frame index 1 exists
-    }
-
-    #[test]
-    fn from_rpgmaker_creates_four_groups() {
-        let sheet = SpriteSheet::from_rpgmaker(96, 128);
-        assert_eq!(sheet.columns, 3);
-        assert_eq!(sheet.rows, 4);
-        assert!(sheet.get_group("down").is_some());
-        assert!(sheet.get_group("up").is_some());
-        assert!(sheet.get_group("left").is_some());
-        assert!(sheet.get_group("right").is_some());
     }
 
     #[test]
@@ -252,7 +210,8 @@ mod atlas_tests {
 
     #[test]
     fn atlas_hash_format_parses_correctly() {
-        let json = r#"{"frames":{"hero.png":{"frame":{"x":0,"y":0,"w":32,"h":32},"rotated":false}}}"#;
+        let json =
+            r#"{"frames":{"hero.png":{"frame":{"x":0,"y":0,"w":32,"h":32},"rotated":false}}}"#;
         let atlas = parse_texturepacker_json(json).unwrap();
         assert_eq!(atlas.entry_count(), 1);
         let entry = atlas.get_entry("hero.png").unwrap();

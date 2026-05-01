@@ -1,59 +1,49 @@
 -- Lurek2D Lua BDD tests for lurek.sprite
 -- Headless: no GPU, no audio, no window.
 
--- @description Covers suite: lurek.sprite.
 describe("lurek.sprite", function()
-    -- ── module interface ──────────────────────────────────────────────────
+-- module interface
 
-    -- @description Covers suite: module interface.
     describe("module interface", function()
-        -- @tests lurek.sprite.newSheet
-        -- @description Verifies the sprite namespace exposes the newSheet factory.
+        -- @covers lurek.sprite.newSheet
         it("exposes newSheet factory", function()
             expect_type("function", lurek.sprite.newSheet)
         end)
 
-        -- @tests lurek.sprite.newRPGMakerSheet
-        -- @description Verifies the sprite namespace exposes the newRPGMakerSheet factory.
+        -- @covers lurek.sprite.newRPGMakerSheet
         it("exposes newRPGMakerSheet factory", function()
             expect_type("function", lurek.sprite.newRPGMakerSheet)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @description Verifies the sprite namespace exposes the parseAtlas factory.
+        -- @covers lurek.sprite.parseAtlas
         it("exposes parseAtlas factory", function()
             expect_type("function", lurek.sprite.parseAtlas)
         end)
 
-        -- @tests lurek.sprite.newAtlasSheet
-        -- @description Verifies the sprite namespace exposes the newAtlasSheet factory.
+        -- @covers lurek.sprite.newAtlasSheet
         it("exposes newAtlasSheet factory", function()
             expect_type("function", lurek.sprite.newAtlasSheet)
         end)
     end)
 
-    -- ── newSheet ──────────────────────────────────────────────────────────
+-- newSheet
 
-    -- @description Covers suite: newSheet().
     describe("newSheet()", function()
-        -- @tests lurek.sprite.newSheet
-        -- @description Confirms newSheet returns userdata for a valid grid description.
+        -- @covers lurek.sprite.newSheet
         it("returns a userdata", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             expect_type("userdata", s)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getFrameCount
-        -- @description Confirms a 4×4 grid sheet has 16 frames.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getFrameCount
         it("getFrameCount returns 16 for a 4x4 grid", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             expect_equal(16, s:getFrameCount())
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getGridSize
-        -- @description Checks grid dimensions are reported accurately.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getGridSize
         it("getGridSize returns correct columns and rows", function()
             local s = lurek.sprite.newSheet(128, 64, 32, 32)
             local cols, rows = s:getGridSize()
@@ -61,9 +51,8 @@ describe("lurek.sprite", function()
             expect_equal(2, rows)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getFrameSize
-        -- @description Confirms getFrameSize returns the tile dimensions given at construction.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getFrameSize
         it("getFrameSize returns tile dimensions", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 32)
             local fw, fh = s:getFrameSize()
@@ -71,9 +60,8 @@ describe("lurek.sprite", function()
             expect_equal(32, fh)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getFrame
-        -- @description Verifies frame 0 returns a table with x/y/w/h fields.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getFrame
         it("getFrame(0) returns a quad table", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local q = s:getFrame(0)
@@ -84,9 +72,8 @@ describe("lurek.sprite", function()
             expect_type("number", q.h)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getFrame
-        -- @description Verifies the first frame starts at pixel (0, 0).
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getFrame
         it("frame 0 starts at (0,0)", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local q = s:getFrame(0)
@@ -94,9 +81,8 @@ describe("lurek.sprite", function()
             expect_equal(0, q.y)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getFrame
-        -- @description Verifies frame 1 starts at x = tile width.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getFrame
         it("frame 1 starts at x = tile_w", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local q = s:getFrame(1)
@@ -104,9 +90,8 @@ describe("lurek.sprite", function()
             expect_equal(0, q.y)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getRow
-        -- @description Verifies getRow returns all frames in the first row.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getRow
         it("getRow(0) returns all frames in first row", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local row = s:getRow(0)
@@ -114,9 +99,8 @@ describe("lurek.sprite", function()
             expect_equal(4, #row)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getColumn
-        -- @description Verifies getColumn returns all frames in the first column.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getColumn
         it("getColumn(0) returns all frames in first column", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local col = s:getColumn(0)
@@ -124,10 +108,9 @@ describe("lurek.sprite", function()
             expect_equal(4, #col)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.nameGroup
-        -- @tests lurek.sprite.getGroupFrames
-        -- @description Verifies a named group can be retrieved after registration.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.nameGroup
+        -- @covers lurek.sprite.getGroupFrames
         it("nameGroup registers retrievable group", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             s:nameGroup("run", 0, 4)
@@ -136,10 +119,9 @@ describe("lurek.sprite", function()
             expect_equal(4, #g)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.nameGroup
-        -- @tests lurek.sprite.getGroupNames
-        -- @description Verifies getGroupNames returns the names of all registered groups.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.nameGroup
+        -- @covers lurek.sprite.getGroupNames
         it("getGroupNames returns registered group names", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             s:nameGroup("idle", 0, 2)
@@ -149,18 +131,16 @@ describe("lurek.sprite", function()
             expect_equal(2, #names)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.getGroupFrames
-        -- @description Verifies getGroupFrames returns nil for an unregistered name.
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.getGroupFrames
         it("getGroupFrames nil for unknown group", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local g = s:getGroupFrames("ghost")
             expect_equal(nil, g)
         end)
 
-        -- @tests lurek.sprite.newSheet
-        -- @tests lurek.sprite.drawToImage
-        -- @description Verifies drawToImage returns userdata (an ImageData object).
+        -- @covers lurek.sprite.newSheet
+        -- @covers lurek.sprite.drawToImage
         it("drawToImage returns userdata", function()
             local s = lurek.sprite.newSheet(64, 64, 16, 16)
             local img = s:drawToImage(64, 64)
@@ -168,28 +148,24 @@ describe("lurek.sprite", function()
         end)
     end)
 
-    -- ── newRPGMakerSheet ──────────────────────────────────────────────────
+-- newRPGMakerSheet
 
-    -- @description Covers suite: newRPGMakerSheet().
     describe("newRPGMakerSheet()", function()
-        -- @tests lurek.sprite.newRPGMakerSheet
-        -- @description Confirms the RPGMaker factory returns a valid SpriteSheet.
+        -- @covers lurek.sprite.newRPGMakerSheet
         it("returns a userdata", function()
             local s = lurek.sprite.newRPGMakerSheet(144, 192)
             expect_type("userdata", s)
         end)
 
-        -- @tests lurek.sprite.newRPGMakerSheet
-        -- @tests lurek.sprite.getFrameCount
-        -- @description Confirms a standard RPGMaker sheet (3×4 grid) has 12 frames.
+        -- @covers lurek.sprite.newRPGMakerSheet
+        -- @covers lurek.sprite.getFrameCount
         it("getFrameCount returns 12 for standard RPGMaker sheet", function()
             local s = lurek.sprite.newRPGMakerSheet(144, 192)
             expect_equal(12, s:getFrameCount())
         end)
 
-        -- @tests lurek.sprite.newRPGMakerSheet
-        -- @tests lurek.sprite.getGroupNames
-        -- @description Confirms RPGMaker direction groups are present.
+        -- @covers lurek.sprite.newRPGMakerSheet
+        -- @covers lurek.sprite.getGroupNames
         it("has down/left/right/up groups", function()
             local s = lurek.sprite.newRPGMakerSheet(144, 192)
             local names = s:getGroupNames()
@@ -202,9 +178,8 @@ describe("lurek.sprite", function()
         end)
     end)
 
-    -- ── parseAtlas ────────────────────────────────────────────────────────
+-- parseAtlas
 
-    -- @description Covers suite: parseAtlas().
     describe("parseAtlas()", function()
         local HASH_JSON = [[{
             "frames": {
@@ -213,24 +188,21 @@ describe("lurek.sprite", function()
             }
         }]]
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @description Confirms parseAtlas returns a SpriteAtlas userdata on valid JSON.
+        -- @covers lurek.sprite.parseAtlas
         it("returns a userdata for valid hash JSON", function()
             local a = lurek.sprite.parseAtlas(HASH_JSON)
             expect_type("userdata", a)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @tests lurek.sprite.entryCount
-        -- @description Confirms entryCount equals the number of frame entries in the JSON.
+        -- @covers lurek.sprite.parseAtlas
+        -- @covers lurek.sprite.entryCount
         it("entryCount matches frame count", function()
             local a = lurek.sprite.parseAtlas(HASH_JSON)
             expect_equal(2, a:entryCount())
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @tests lurek.sprite.getEntry
-        -- @description Verifies getEntry returns a table with x/y/w/h fields for a known entry.
+        -- @covers lurek.sprite.parseAtlas
+        -- @covers lurek.sprite.getEntry
         it("getEntry returns correct quad for known name", function()
             local a = lurek.sprite.parseAtlas(HASH_JSON)
             local e = a:getEntry("hero_idle")
@@ -241,18 +213,16 @@ describe("lurek.sprite", function()
             expect_equal(32, e.h)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @tests lurek.sprite.getEntry
-        -- @description Verifies getEntry returns nil for an unknown sprite name.
+        -- @covers lurek.sprite.parseAtlas
+        -- @covers lurek.sprite.getEntry
         it("getEntry returns nil for unknown name", function()
             local a = lurek.sprite.parseAtlas(HASH_JSON)
             local e = a:getEntry("ghost")
             expect_equal(nil, e)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @tests lurek.sprite.getByIndex
-        -- @description Verifies getByIndex(1) returns a valid entry table for a one-entry atlas.
+        -- @covers lurek.sprite.parseAtlas
+        -- @covers lurek.sprite.getByIndex
         it("getByIndex(1) returns a valid entry", function()
             local json = [[{"frames":{"hero":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false}}}]]
             local a = lurek.sprite.parseAtlas(json)
@@ -261,9 +231,8 @@ describe("lurek.sprite", function()
             expect_type("string", e.name)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @tests lurek.sprite.entryNames
-        -- @description Verifies entryNames returns a table of all sprite names in the atlas.
+        -- @covers lurek.sprite.parseAtlas
+        -- @covers lurek.sprite.entryNames
         it("entryNames returns all sprite names", function()
             local a = lurek.sprite.parseAtlas(HASH_JSON)
             local names = a:entryNames()
@@ -271,8 +240,7 @@ describe("lurek.sprite", function()
             expect_equal(2, #names)
         end)
 
-        -- @tests lurek.sprite.parseAtlas
-        -- @description Verifies parseAtlas surfaces an error on malformed JSON input.
+        -- @covers lurek.sprite.parseAtlas
         it("errors on invalid JSON", function()
             expect_error(function()
                 lurek.sprite.parseAtlas("not json at all")
@@ -280,12 +248,10 @@ describe("lurek.sprite", function()
         end)
     end)
 
-    -- ── newAtlasSheet ─────────────────────────────────────────────────────
+-- newAtlasSheet
 
-    -- @description Covers suite: newAtlasSheet().
     describe("newAtlasSheet()", function()
-        -- @tests lurek.sprite.newAtlasSheet
-        -- @description Confirms newAtlasSheet returns a SpriteSheet from a parsed atlas.
+        -- @covers lurek.sprite.newAtlasSheet
         it("returns a userdata", function()
             local json = [[{"frames":{"a":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false}}}]]
             local atlas = lurek.sprite.parseAtlas(json)
@@ -293,9 +259,8 @@ describe("lurek.sprite", function()
             expect_type("userdata", s)
         end)
 
-        -- @tests lurek.sprite.newAtlasSheet
-        -- @tests lurek.sprite.getFrameCount
-        -- @description Confirms atlas-derived sheet has the same number of frames as atlas entries.
+        -- @covers lurek.sprite.newAtlasSheet
+        -- @covers lurek.sprite.getFrameCount
         it("frame count equals atlas entry count", function()
             local json = [[{"frames":{
                 "a":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false},
@@ -308,9 +273,9 @@ describe("lurek.sprite", function()
     end)
 end)
 
--- ═══════════════════════════════════════════════════════════════════════
+-- ============================================================
 -- Merged from test_sprite_aseprite.lua
--- ═══════════════════════════════════════════════════════════════════════
+-- ============================================================
 
 local ASEPRITE_ARRAY_JSON = [[{
   "frames": [
@@ -434,14 +399,12 @@ describe("sprite.atlas.getFlipped", function()
 
 end)
 
--- @description Replaces the old placeholder tail with direct assertions across Aseprite parsing, sheet geometry helpers, group lookup, image generation, and atlas enumeration.
 describe("lurek.sprite regression coverage", function()
-    -- @tests lurek.sprite.parseAsepriteAtlas
-    -- @tests SpriteAtlas:getEntry
-    -- @tests SpriteAtlas:getByIndex
-    -- @tests SpriteAtlas:entryCount
-    -- @tests SpriteAtlas:entryNames
-    -- @description Parses an Aseprite atlas and verifies direct lookup, indexed lookup, entry counting, and name enumeration all agree on the same content.
+    -- @covers lurek.sprite.parseAsepriteAtlas
+    -- @covers SpriteAtlas:getEntry
+    -- @covers SpriteAtlas:getByIndex
+    -- @covers SpriteAtlas:entryCount
+    -- @covers SpriteAtlas:entryNames
     it("parseAsepriteAtlas exposes atlas entries through every lookup helper", function()
         local atlas = lurek.sprite.parseAsepriteAtlas(ASEPRITE_ARRAY_JSON)
         local entry = atlas:getEntry("hero/run_0.png")
@@ -464,13 +427,12 @@ describe("lurek.sprite regression coverage", function()
         expect_true(seen["hero/run_0.png"] ~= nil, "expected hero/run_0.png in names")
     end)
 
-    -- @tests SpriteSheet:getFrame
-    -- @tests SpriteSheet:getFrameCount
-    -- @tests SpriteSheet:getRow
-    -- @tests SpriteSheet:getColumn
-    -- @tests SpriteSheet:getFrameSize
-    -- @tests SpriteSheet:getGridSize
-    -- @description Builds a 3x2 sheet and verifies its frame indexing, count, row/column extraction, and reported geometry stay internally consistent.
+    -- @covers SpriteSheet:getFrame
+    -- @covers SpriteSheet:getFrameCount
+    -- @covers SpriteSheet:getRow
+    -- @covers SpriteSheet:getColumn
+    -- @covers SpriteSheet:getFrameSize
+    -- @covers SpriteSheet:getGridSize
     it("SpriteSheet geometry helpers stay consistent", function()
         local sheet = lurek.sprite.newSheet(96, 64, 32, 32)
         local frame = sheet:getFrame(4)
@@ -490,10 +452,9 @@ describe("lurek.sprite regression coverage", function()
         expect_equal(2, rows)
     end)
 
-    -- @tests SpriteSheet:getGroupFrames
-    -- @tests SpriteSheet:getGroupNames
-    -- @tests SpriteSheet:drawToImage
-    -- @description Registers named frame groups and verifies both group discovery and debug rendering work on the same sheet object.
+    -- @covers SpriteSheet:getGroupFrames
+    -- @covers SpriteSheet:getGroupNames
+    -- @covers SpriteSheet:drawToImage
     it("SpriteSheet group helpers and drawToImage return usable results", function()
         local sheet = lurek.sprite.newSheet(64, 64, 16, 16)
         sheet:nameGroup("idle", 0, 2)

@@ -2,38 +2,36 @@
 -- Headless-safe (no window/GPU/audio needed).
 -- lurek.scene is a module-level singleton; each describe calls lurek.scene.clear() first.
 
--- @description Covers suite: Stack operations.
 describe("Stack operations", function()
-    -- @tests lurek.scene.clear
-    -- @tests lurek.scene.isEmpty
-    -- @tests lurek.scene.getStackSize
-    -- @tests lurek.scene.getCurrent
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.pop
-    -- @tests lurek.scene.switchTo
-    -- @tests lurek.scene.draw
-    -- @tests lurek.scene.getData
-    -- @tests lurek.scene.getRegistered
-    -- @tests lurek.scene.getRegisteredNames
-    -- @tests lurek.scene.getTransitionProgress
-    -- @tests lurek.scene.hasData
-    -- @tests lurek.scene.hasRegistered
-    -- @tests lurek.scene.isTransitioning
-    -- @tests lurek.scene.newDepthSorter
-    -- @tests lurek.scene.process
-    -- @tests lurek.scene.processLate
-    -- @tests lurek.scene.processPhysics
-    -- @tests lurek.scene.registerScene
-    -- @tests lurek.scene.removeData
-    -- @tests lurek.scene.render
-    -- @tests lurek.scene.renderUi
-    -- @tests lurek.scene.setData
-    -- @tests lurek.scene.unregisterScene
-    -- @tests lurek.scene.update
-    -- @tests lurek.scene.popTo
-    -- @tests lurek.scene.new
-    -- @tests lurek.scene.define
-    -- @description Verifies the scene stack starts empty and updates size and current-scene state across push, pop, switchTo, and clear operations.
+    -- @covers lurek.scene.clear
+    -- @covers lurek.scene.isEmpty
+    -- @covers lurek.scene.getStackSize
+    -- @covers lurek.scene.getCurrent
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.pop
+    -- @covers lurek.scene.switchTo
+    -- @covers lurek.scene.draw
+    -- @covers lurek.scene.getData
+    -- @covers lurek.scene.getRegistered
+    -- @covers lurek.scene.getRegisteredNames
+    -- @covers lurek.scene.getTransitionProgress
+    -- @covers lurek.scene.hasData
+    -- @covers lurek.scene.hasRegistered
+    -- @covers lurek.scene.isTransitioning
+    -- @covers lurek.scene.newDepthSorter
+    -- @covers lurek.scene.process
+    -- @covers lurek.scene.processLate
+    -- @covers lurek.scene.processPhysics
+    -- @covers lurek.scene.registerScene
+    -- @covers lurek.scene.removeData
+    -- @covers lurek.scene.render
+    -- @covers lurek.scene.renderUi
+    -- @covers lurek.scene.setData
+    -- @covers lurek.scene.unregisterScene
+    -- @covers lurek.scene.update
+    -- @covers lurek.scene.popTo
+    -- @covers lurek.scene.new
+    -- @covers lurek.scene.define
     it("starts empty and tracks push/pop/switchTo/clear correctly", function()
         lurek.scene.clear()
         local scene_a = { name = "A" }
@@ -66,13 +64,11 @@ describe("Stack operations", function()
     end)
 end)
 
--- @description Covers suite: Transitions.
 describe("Transitions", function()
-    -- @tests lurek.scene.isTransitioning
-    -- @tests lurek.scene.getTransitionProgress
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.update
-    -- @description Verifies transition state toggles on push with transition parameters and reports progress within the normalized [0,1] range.
+    -- @covers lurek.scene.isTransitioning
+    -- @covers lurek.scene.getTransitionProgress
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.update
     it("reports transitioning state and progress in [0,1]", function()
         lurek.scene.clear()
         expect_false(lurek.scene.isTransitioning())
@@ -89,14 +85,12 @@ describe("Transitions", function()
     end)
 end)
 
--- @description Covers suite: Registry.
 describe("Registry", function()
-    -- @tests lurek.scene.registerScene
-    -- @tests lurek.scene.hasRegistered
-    -- @tests lurek.scene.getRegisteredNames
-    -- @tests lurek.scene.getRegistered
-    -- @tests lurek.scene.unregisterScene
-    -- @description Verifies named scene registration, lookup, listing, and unregistering through the registry helpers.
+    -- @covers lurek.scene.registerScene
+    -- @covers lurek.scene.hasRegistered
+    -- @covers lurek.scene.getRegisteredNames
+    -- @covers lurek.scene.getRegistered
+    -- @covers lurek.scene.unregisterScene
     it("registers, queries, and unregisters scenes by name", function()
         lurek.scene.clear()
         local menu = { name = "menu" }
@@ -120,13 +114,11 @@ describe("Registry", function()
     end)
 end)
 
--- @description Covers suite: Data store.
 describe("Data store", function()
-    -- @tests lurek.scene.setData
-    -- @tests lurek.scene.hasData
-    -- @tests lurek.scene.getData
-    -- @tests lurek.scene.removeData
-    -- @description Verifies the shared scene data store can save, read back, and remove arbitrary key-value pairs.
+    -- @covers lurek.scene.setData
+    -- @covers lurek.scene.hasData
+    -- @covers lurek.scene.getData
+    -- @covers lurek.scene.removeData
     it("stores, reads, and removes arbitrary key-value pairs", function()
         lurek.scene.setData("score", 42)
         expect_true(lurek.scene.hasData("score"))
@@ -141,13 +133,11 @@ describe("Data store", function()
     end)
 end)
 
--- @description Covers suite: DepthSorter.
 describe("DepthSorter", function()
-    -- @tests lurek.scene.newDepthSorter
-    -- @tests DepthSorter:getCount
-    -- @tests DepthSorter:add
-    -- @tests DepthSorter:flush
-    -- @description Verifies a new depth sorter queues callbacks with depths and flushes them in ascending order.
+    -- @covers lurek.scene.newDepthSorter
+    -- @covers DepthSorter:getCount
+    -- @covers DepthSorter:add
+    -- @covers DepthSorter:flush
     it("flushes callbacks in ascending depth order", function()
         local sorter = lurek.scene.newDepthSorter()
         expect_true(sorter ~= nil)
@@ -168,12 +158,10 @@ describe("DepthSorter", function()
     end)
 end)
 
--- @description Covers suite: Lifecycle callbacks.
 describe("Lifecycle callbacks", function()
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.pop
-    -- @tests lurek.scene.switchTo
-    -- @description Verifies stack transitions invoke scene enter, leave, pause, and resume callbacks in the expected order.
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.pop
+    -- @covers lurek.scene.switchTo
     it("calls enter/leave/pause/resume on push/pop/switchTo", function()
         lurek.scene.clear()
         local log = {}
@@ -206,8 +194,7 @@ describe("Lifecycle callbacks", function()
         expect_equal("s1:resume", log[5])
     end)
 
-    -- @tests lurek.scene.update
-    -- @description Verifies update(dt) dispatches to the top scene's update callback.
+    -- @covers lurek.scene.update
     it("update dispatches to the top scene", function()
         lurek.scene.clear()
         local log = {}
@@ -218,8 +205,7 @@ describe("Lifecycle callbacks", function()
         expect_equal("s1:update", log[1])
     end)
 
-    -- @tests lurek.scene.draw
-    -- @description Verifies draw() dispatches draw callbacks for scenes on the stack.
+    -- @covers lurek.scene.draw
     it("draw dispatches to all scenes", function()
         lurek.scene.clear()
         local log = {}
@@ -230,8 +216,7 @@ describe("Lifecycle callbacks", function()
         expect_equal("s1:draw", log[1])
     end)
 
-    -- @tests lurek.scene.switchTo
-    -- @description Verifies switchTo() leaves the old scene and enters the replacement scene.
+    -- @covers lurek.scene.switchTo
     it("switchTo calls leave on old and enter on new", function()
         lurek.scene.clear()
         local log = {}
@@ -245,21 +230,22 @@ describe("Lifecycle callbacks", function()
         expect_equal("s2:enter", log[2])
     end)
 
-    -- @tests lurek.scene.push
-    -- @description Verifies push() forwards an explicit params table into the scene enter callback.
+    -- @covers lurek.scene.push
     xit("push forwards params to enter callback", function()
         lurek.scene.clear()
+        ---@type any
         local received = nil
         local s = { enter = function(self, p) received = p end }
 
-        lurek.scene.push(s, nil, nil, { level = 3, mode = "hard" })
+        ---@type any
+        local params = { level = 3, mode = "hard" }
+        lurek.scene.push(s, nil, nil, params)
         expect_type("table", received)
         expect_equal(3, received.level)
         expect_equal("hard", received.mode)
     end)
 
-    -- @tests lurek.scene.push
-    -- @description Verifies push() calls enter(nil) when no params table is supplied.
+    -- @covers lurek.scene.push
     it("push with no params calls enter with nil", function()
         lurek.scene.clear()
         local called = false
@@ -271,55 +257,50 @@ describe("Lifecycle callbacks", function()
         expect_equal(nil, received)
     end)
 
-    -- @tests lurek.scene.switchTo
-    -- @description Verifies switchTo() forwards an explicit params table to the new scene's enter callback.
+    -- @covers lurek.scene.switchTo
     xit("switchTo forwards params to enter callback", function()
         lurek.scene.clear()
+        ---@type any
         local received = nil
         local s1 = {}
         local s2 = { enter = function(self, p) received = p end }
 
         lurek.scene.push(s1)
-        lurek.scene.switchTo(s2, nil, nil, { map = "village" })
+        ---@type any
+        local params = { map = "village" }
+        lurek.scene.switchTo(s2, nil, nil, params)
         expect_type("table", received)
         expect_equal("village", received.map)
     end)
 end)
 
--- @description Covers suite: lurek.scene new pipeline callbacks.
 describe("lurek.scene new pipeline callbacks", function()
-    -- @tests lurek.scene.processPhysics
-    -- @description Verifies the processPhysics pipeline entry point is exposed as a function.
+    -- @covers lurek.scene.processPhysics
     it("processPhysics is a function", function()
         expect_type("function", lurek.scene.processPhysics)
     end)
 
-    -- @tests lurek.scene.processLate
-    -- @description Verifies the processLate pipeline entry point is exposed as a function.
+    -- @covers lurek.scene.processLate
     it("processLate is a function", function()
         expect_type("function", lurek.scene.processLate)
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies the process pipeline entry point is exposed as a function.
+    -- @covers lurek.scene.process
     it("process is a function", function()
         expect_type("function", lurek.scene.process)
     end)
 
-    -- @tests lurek.scene.render
-    -- @description Verifies the render pipeline entry point is exposed as a function.
+    -- @covers lurek.scene.render
     it("render is a function", function()
         expect_type("function", lurek.scene.render)
     end)
 
-    -- @tests lurek.scene.renderUi
-    -- @description Verifies the renderUi pipeline entry point is exposed as a function.
+    -- @covers lurek.scene.renderUi
     it("renderUi is a function", function()
         expect_type("function", lurek.scene.renderUi)
     end)
 
-    -- @tests lurek.scene.processPhysics
-    -- @description Verifies processPhysics(dt) forwards dt to the top scene's process_physics callback.
+    -- @covers lurek.scene.processPhysics
     it("processPhysics calls scene:process_physics(dt)", function()
         local called_dt = nil
         local scene = {
@@ -331,8 +312,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.processLate
-    -- @description Verifies processLate(dt) forwards dt to the top scene's process_late callback.
+    -- @covers lurek.scene.processLate
     it("processLate calls scene:process_late(dt)", function()
         local called_dt = nil
         local scene = {
@@ -344,8 +324,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies process(dt) forwards dt to the top scene's process callback.
+    -- @covers lurek.scene.process
     it("process calls scene:process(dt)", function()
         local called_dt = nil
         local scene = {
@@ -357,8 +336,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.render
-    -- @description Verifies render() dispatches render callbacks for every scene on the stack in order.
+    -- @covers lurek.scene.render
     it("render calls scene:render() for all scenes", function()
         local calls = {}
         local s1 = { render = function(self) table.insert(calls, "s1") end }
@@ -373,8 +351,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.renderUi
-    -- @description Verifies renderUi() dispatches render_ui callbacks for every scene on the stack in order.
+    -- @covers lurek.scene.renderUi
     it("renderUi calls scene:render_ui() for all scenes", function()
         local calls = {}
         local s1 = { render_ui = function(self) table.insert(calls, "s1") end }
@@ -389,8 +366,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies process() fires a scene's ready callback once on the first tick and does not repeat it on later ticks.
+    -- @covers lurek.scene.process
     it("process fires scene:ready() once on first tick, then never again", function()
         local ready_count = 0
         local scene = {
@@ -404,8 +380,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies process() invokes ready() before process() on the first tick for a newly pushed scene.
+    -- @covers lurek.scene.process
     it("process calls scene:ready() before scene:process() on first tick", function()
         local order = {}
         local scene = {
@@ -420,9 +395,8 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.switchTo
-    -- @tests lurek.scene.process
-    -- @description Verifies switching scenes resets ready state so the replacement scene fires ready() on its first process tick.
+    -- @covers lurek.scene.switchTo
+    -- @covers lurek.scene.process
     it("ready fires for the new scene after switchTo", function()
         lurek.scene.clear()
         local a_ready = 0
@@ -438,25 +412,23 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.pop
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.process
-    -- @description Verifies popping and pushing the same scene instance causes ready() to fire again on the new activation.
+    -- @covers lurek.scene.pop
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.process
     it("ready fires again after pop and re-push of same scene", function()
         lurek.scene.clear()
         local count = 0
         local scene = { ready = function(self) count = count + 1 end }
         lurek.scene.push(scene)
-        lurek.scene.process(0.016)   -- first push â†’ ready fires (count = 1)
+        lurek.scene.process(0.016)   -- first push  ready fires (count = 1)
         lurek.scene.pop()
         lurek.scene.push(scene)
-        lurek.scene.process(0.016)   -- second push â†’ ready must fire again (count = 2)
+        lurek.scene.process(0.016)   -- second push  ready must fire again (count = 2)
         expect_equal(2, count)
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies process() is safe when the active scene does not implement a process callback.
+    -- @covers lurek.scene.process
     it("scene without process method does not crash", function()
         lurek.scene.clear()
         local scene = {}  -- no process method
@@ -465,8 +437,7 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.process
-    -- @description Verifies process() is safe when the active scene does not implement a ready callback.
+    -- @covers lurek.scene.process
     it("scene without ready method does not crash", function()
         lurek.scene.clear()
         local scene = {}  -- no ready method
@@ -475,9 +446,8 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.render
-    -- @tests lurek.scene.renderUi
-    -- @description Verifies render() and renderUi() are safe when the active scene implements neither render callback.
+    -- @covers lurek.scene.render
+    -- @covers lurek.scene.renderUi
     it("scene without render or render_ui methods does not crash", function()
         lurek.scene.clear()
         local scene = {}  -- no render / render_ui methods
@@ -487,36 +457,31 @@ describe("lurek.scene new pipeline callbacks", function()
         lurek.scene.pop()
     end)
 
-    -- @tests lurek.scene.renderUi
-    -- @description Verifies renderUi() is a no-op and does not error when the scene stack is empty.
+    -- @covers lurek.scene.renderUi
     it("renderUi with empty stack is safe", function()
         lurek.scene.clear()
         lurek.scene.renderUi()
     end)
 
-    -- @tests lurek.scene.render
-    -- @description Verifies render() is a no-op and does not error when the scene stack is empty.
+    -- @covers lurek.scene.render
     it("render with empty stack is safe", function()
         lurek.scene.clear()
         lurek.scene.render()
     end)
 
-    -- @tests lurek.scene.processPhysics
-    -- @description Verifies processPhysics() is a no-op and does not error when the scene stack is empty.
+    -- @covers lurek.scene.processPhysics
     it("processPhysics with empty stack is safe", function()
         lurek.scene.clear()
         lurek.scene.processPhysics(0.016)
     end)
 end)
 
--- â”€â”€ popTo â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- popTo
 
--- @description Covers suite: popTo.
 describe("popTo", function()
-    -- @tests lurek.scene.registerScene
-    -- @tests lurek.scene.popTo
-    -- @tests lurek.scene.getStackSize
-    -- @description Verifies popTo() finds a registered target name and removes scenes above it from the stack.
+    -- @covers lurek.scene.registerScene
+    -- @covers lurek.scene.popTo
+    -- @covers lurek.scene.getStackSize
     it("pops scenes above registered target (inclusive)", function()
         lurek.scene.clear()
         local menu = { name = "menu" }
@@ -534,9 +499,8 @@ describe("popTo", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.popTo
-    -- @tests lurek.scene.getStackSize
-    -- @description Verifies popTo() returns false and leaves the stack unchanged when the target name is unknown.
+    -- @covers lurek.scene.popTo
+    -- @covers lurek.scene.getStackSize
     it("returns false for non-existent registered name", function()
         lurek.scene.clear()
         local s = {}
@@ -548,15 +512,13 @@ describe("popTo", function()
     end)
 end)
 
--- â”€â”€ DepthSorter addObject â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- DepthSorter addObject
 
--- @description Covers suite: DepthSorter addObject.
 describe("DepthSorter addObject", function()
-    -- @tests lurek.scene.newDepthSorter
-    -- @tests DepthSorter:addObject
-    -- @tests DepthSorter:sort
-    -- @tests DepthSorter:flush
-    -- @description Verifies addObject() uses each object's depth field and flushes drawSorted callbacks in ascending depth order.
+    -- @covers lurek.scene.newDepthSorter
+    -- @covers DepthSorter:addObject
+    -- @covers DepthSorter:sort
+    -- @covers DepthSorter:flush
     it("addObject uses obj.depth and calls drawSorted", function()
         lurek.scene.clear()
         local sorter = lurek.scene.newDepthSorter()
@@ -579,9 +541,8 @@ describe("DepthSorter addObject", function()
         expect_equal("obj1", calls[2])
     end)
 
-    -- @tests DepthSorter:addObject
-    -- @tests DepthSorter:getCount
-    -- @description Verifies addObject() increases the depth sorter item count.
+    -- @covers DepthSorter:addObject
+    -- @covers DepthSorter:getCount
     it("getCount reflects addObject", function()
         local sorter = lurek.scene.newDepthSorter()
         expect_equal(0, sorter:getCount())
@@ -589,10 +550,9 @@ describe("DepthSorter addObject", function()
         expect_equal(1, sorter:getCount())
     end)
 
-    -- @tests DepthSorter:add
-    -- @tests DepthSorter:clear
-    -- @tests DepthSorter:getCount
-    -- @description Verifies clear() removes queued callbacks without invoking them and resets the count to zero.
+    -- @covers DepthSorter:add
+    -- @covers DepthSorter:clear
+    -- @covers DepthSorter:getCount
     it("clear removes all without calling callbacks", function()
         local sorter = lurek.scene.newDepthSorter()
         local called = false
@@ -603,14 +563,12 @@ describe("DepthSorter addObject", function()
     end)
 end)
 
--- â”€â”€ DepthSorter negative depths â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- DepthSorter negative depths
 
--- @description Covers suite: DepthSorter negative depths.
 describe("DepthSorter negative depths", function()
-    -- @tests DepthSorter:add
-    -- @tests DepthSorter:sort
-    -- @tests DepthSorter:flush
-    -- @description Verifies depth sorting treats negative depths as earlier than positive depths.
+    -- @covers DepthSorter:add
+    -- @covers DepthSorter:sort
+    -- @covers DepthSorter:flush
     it("sorts negative depths before positive", function()
         local sorter = lurek.scene.newDepthSorter()
         local calls = {}
@@ -623,21 +581,18 @@ describe("DepthSorter negative depths", function()
     end)
 end)
 
--- â”€â”€ scene.new factory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- scene.new factory
 
--- @description Covers suite: scene.new factory.
 describe("scene.new factory", function()
-    -- @tests lurek.scene.new
-    -- @description Verifies lurek.scene.new() returns a Lua table scene object.
+    -- @covers lurek.scene.new
     it("returns a table", function()
         local s = lurek.scene.new()
         expect_type("table", s)
     end)
 
-    -- @tests lurek.scene.new
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.getStackSize
-    -- @description Verifies a scene created by lurek.scene.new() can be pushed onto the scene stack.
+    -- @covers lurek.scene.new
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.getStackSize
     it("returned scene works with push", function()
         lurek.scene.clear()
         local s = lurek.scene.new()
@@ -646,9 +601,8 @@ describe("scene.new factory", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.new
-    -- @tests lurek.scene.push
-    -- @description Verifies lurek.scene.new(definition) applies callback definitions that run when the scene is pushed.
+    -- @covers lurek.scene.new
+    -- @covers lurek.scene.push
     it("accepts definition table with callbacks", function()
         local entered = false
         local s = lurek.scene.new({
@@ -661,29 +615,25 @@ describe("scene.new factory", function()
     end)
 end)
 
--- â”€â”€ scene.define factory â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- scene.define factory
 
--- @description Covers suite: scene.define factory.
 describe("scene.define factory", function()
-    -- @tests lurek.scene.define
-    -- @description Verifies lurek.scene.define() returns a constructor function.
+    -- @covers lurek.scene.define
     it("returns a constructor function", function()
         local ctor = lurek.scene.define()
         expect_type("function", ctor)
     end)
 
-    -- @tests lurek.scene.define
-    -- @description Verifies a constructor returned by lurek.scene.define() creates scene tables.
+    -- @covers lurek.scene.define
     it("constructor produces scene instances", function()
         local ctor = lurek.scene.define({ name = "test" })
         local s = ctor()
         expect_type("table", s)
     end)
 
-    -- @tests lurek.scene.define
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.getStackSize
-    -- @description Verifies scene instances built by define() can be pushed onto the scene stack.
+    -- @covers lurek.scene.define
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.getStackSize
     it("instances work with scene stack", function()
         lurek.scene.clear()
         local ctor = lurek.scene.define()
@@ -694,14 +644,12 @@ describe("scene.define factory", function()
     end)
 end)
 
--- â”€â”€ data store with complex types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- data store with complex types
 
--- @description Covers suite: Data store complex values.
 describe("Data store complex values", function()
-    -- @tests lurek.scene.setData
-    -- @tests lurek.scene.getData
-    -- @tests lurek.scene.removeData
-    -- @description Verifies the scene data store preserves nested table values and returns them intact.
+    -- @covers lurek.scene.setData
+    -- @covers lurek.scene.getData
+    -- @covers lurek.scene.removeData
     it("stores and retrieves tables", function()
         lurek.scene.clear()
         local data = { hp = 100, items = {"sword", "shield"} }
@@ -712,9 +660,8 @@ describe("Data store complex values", function()
         lurek.scene.removeData("player")
     end)
 
-    -- @tests lurek.scene.setData
-    -- @tests lurek.scene.getData
-    -- @description Verifies setting the same data key again replaces the previous stored value.
+    -- @covers lurek.scene.setData
+    -- @covers lurek.scene.getData
     it("overwrite replaces value", function()
         lurek.scene.clear()
         lurek.scene.setData("score", 10)
@@ -724,30 +671,31 @@ describe("Data store complex values", function()
     end)
 end)
 
--- â”€â”€ transition params â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- transition params
 
--- @description Covers suite: Transition params.
 describe("Transition params", function()
-    -- @tests lurek.scene.push
-    -- @description Verifies push() passes a params table through to the scene enter callback.
+    -- @covers lurek.scene.push
     xit("enter callback receives params from push", function()
         lurek.scene.clear()
+        ---@type any
         local got_params = nil
         local s = {
             enter = function(self, params)
                 got_params = params
             end
         }
-        lurek.scene.push(s, nil, nil, { level = 5 })
+        ---@type any
+        local params = { level = 5 }
+        lurek.scene.push(s, nil, nil, params)
         expect_not_nil(got_params)
         expect_equal(5, got_params.level)
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.switchTo
-    -- @description Verifies switchTo() passes a params table through to the replacement scene enter callback.
+    -- @covers lurek.scene.switchTo
     xit("switchTo passes params to new scene enter", function()
         lurek.scene.clear()
+        ---@type any
         local got_params = nil
         local s1 = {}
         local s2 = {
@@ -756,25 +704,24 @@ describe("Transition params", function()
             end
         }
         lurek.scene.push(s1)
-        lurek.scene.switchTo(s2, nil, nil, { from = "s1" })
+        ---@type any
+        local params = { from = "s1" }
+        lurek.scene.switchTo(s2, nil, nil, params)
         expect_not_nil(got_params)
         expect_equal("s1", got_params.from)
         lurek.scene.clear()
     end)
 end)
 
--- @description Covers suite: DepthSorter (RS parity).
 describe("DepthSorter (RS parity)", function()
-    -- @tests lurek.scene.newDepthSorter
-    -- @description Verifies newDepthSorter() returns a userdata handle.
+    -- @covers lurek.scene.newDepthSorter
     it("newDepthSorter returns userdata", function()
         local ds = lurek.scene.newDepthSorter()
         expect_equal("userdata", type(ds))
     end)
 
-    -- @tests DepthSorter:add
-    -- @tests DepthSorter:getCount
-    -- @description Verifies adding queued callbacks increments the depth sorter count.
+    -- @covers DepthSorter:add
+    -- @covers DepthSorter:getCount
     it("add increments count", function()
         local ds = lurek.scene.newDepthSorter()
         ds:add(function() end, 10)
@@ -782,9 +729,8 @@ describe("DepthSorter (RS parity)", function()
         expect_equal(2, ds:getCount())
     end)
 
-    -- @tests DepthSorter:sort
-    -- @tests DepthSorter:flush
-    -- @description Verifies sort() followed by flush() runs queued callbacks from lowest to highest depth.
+    -- @covers DepthSorter:sort
+    -- @covers DepthSorter:flush
     it("sort then flush executes items in ascending depth order", function()
         local ds = lurek.scene.newDepthSorter()
         local order = {}
@@ -799,9 +745,8 @@ describe("DepthSorter (RS parity)", function()
         expect_equal("back", order[3])
     end)
 
-    -- @tests DepthSorter:clear
-    -- @tests DepthSorter:getCount
-    -- @description Verifies clear() empties the depth sorter and resets its count.
+    -- @covers DepthSorter:clear
+    -- @covers DepthSorter:getCount
     it("clear resets count to zero", function()
         local ds = lurek.scene.newDepthSorter()
         ds:add(function() end, 1)
@@ -810,10 +755,8 @@ describe("DepthSorter (RS parity)", function()
     end)
 end)
 
--- @description Covers suite: scene popTo (RS parity).
 describe("scene popTo (RS parity)", function()
-    -- @tests lurek.scene.popTo
-    -- @description Verifies popTo() returns false when the requested scene name is not present in the stack.
+    -- @covers lurek.scene.popTo
     it("popTo returns falsy when name not found in stack", function()
         local s1 = {}
         lurek.scene.push(s1)
@@ -822,9 +765,8 @@ describe("scene popTo (RS parity)", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.getStackSize
-    -- @description Verifies getStackSize() reflects the current number of pushed scenes.
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.getStackSize
     it("scene.getStackSize returns stack height after push", function()
         lurek.scene.clear()
         local s1 = {}
@@ -836,13 +778,12 @@ describe("scene popTo (RS parity)", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Phase B: Easing transitions
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("scene easing transitions", function()
-    -- @tests lurek.scene.push
-    -- @tests lurek.scene.isTransitioning
-    -- @description Push with an easing string parameter does not raise an error.
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.isTransitioning
     it("push with easing param runs without error", function()
         lurek.scene.clear()
         local s1 = {}
@@ -853,8 +794,7 @@ describe("scene easing transitions", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.getTransitionProgressEased
-    -- @description Returns a number in [0,1] when no transition is active.
+    -- @covers lurek.scene.getTransitionProgressEased
     it("getTransitionProgressEased returns 0 when idle", function()
         lurek.scene.clear()
         local p = lurek.scene.getTransitionProgressEased()
@@ -862,9 +802,8 @@ describe("scene easing transitions", function()
         expect_true(p >= 0.0 and p <= 1.0)
     end)
 
-    -- @tests lurek.scene.getTransitionProgressEased
-    -- @tests lurek.scene.getTransitionProgress
-    -- @description With "linear" easing the eased progress matches raw progress mid-transition.
+    -- @covers lurek.scene.getTransitionProgressEased
+    -- @covers lurek.scene.getTransitionProgress
     -- Migrated from Rust active_transition_progress_eased_linear_matches_progress
     -- and scene_stack_get_transition_progress_eased_linear_matches.
     it("linear easing: eased progress matches raw progress", function()
@@ -880,10 +819,9 @@ describe("scene easing transitions", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.getTransitionProgressEased
-    -- @tests lurek.scene.getTransitionProgress
-    -- @description With "ease_in" easing the eased value is less than raw progress
-    -- before the midpoint (t² < t for 0 < t < 1).
+    -- @covers lurek.scene.getTransitionProgressEased
+    -- @covers lurek.scene.getTransitionProgress
+    -- before the midpoint (t < t for 0 < t < 1).
     -- Migrated from Rust active_transition_progress_eased_ease_in_less_before_midpoint.
     it("ease_in easing: eased progress is less than raw before midpoint", function()
         lurek.scene.clear()
@@ -892,14 +830,13 @@ describe("scene easing transitions", function()
         lurek.scene.update(0.5)  -- advance to t = 0.25 (raw progress)
         local raw   = lurek.scene.getTransitionProgress()
         local eased = lurek.scene.getTransitionProgressEased()
-        -- For ease_in: eased = t² < t when 0 < t < 1
+        -- For ease_in: eased = t < t when 0 < t < 1
         expect_true(raw > 0.0)
         expect_true(eased < raw)
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.pop
-    -- @description pop with an easing param runs without error.
+    -- @covers lurek.scene.pop
     it("pop with easing param runs without error", function()
         lurek.scene.clear()
         local s1 = {}
@@ -912,13 +849,12 @@ describe("scene easing transitions", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Phase C: Overlay mode
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("scene overlay", function()
-    -- @tests lurek.scene.pushOverlay
-    -- @tests lurek.scene.isOverlay
-    -- @description pushOverlay marks the top scene as an overlay.
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.isOverlay
     it("pushOverlay marks scene as overlay", function()
         lurek.scene.clear()
         local base = {}
@@ -929,10 +865,9 @@ describe("scene overlay", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.pushOverlay
-    -- @tests lurek.scene.pop
-    -- @tests lurek.scene.isOverlay
-    -- @description Popping the effect reveals normal mode; isOverlay is false.
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.pop
+    -- @covers lurek.scene.isOverlay
     it("popping overlay restores normal mode", function()
         lurek.scene.clear()
         local base = {}
@@ -944,8 +879,7 @@ describe("scene overlay", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.getActiveScenes
-    -- @description getActiveScenes returns all scenes when overlay is present.
+    -- @covers lurek.scene.getActiveScenes
     it("getActiveScenes returns all when overlay present", function()
         lurek.scene.clear()
         local base = {}
@@ -958,8 +892,7 @@ describe("scene overlay", function()
         lurek.scene.clear()
     end)
 
-    -- @tests lurek.scene.getActiveScenes
-    -- @description When no overlay, getActiveScenes returns only the top scene.
+    -- @covers lurek.scene.getActiveScenes
     it("getActiveScenes returns top only without overlay", function()
         lurek.scene.clear()
         local base = {}
@@ -973,14 +906,13 @@ describe("scene overlay", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Phase A: DepthSorter API via lurek.scene
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("DepthSorter Lua API", function()
-    -- @tests lurek.scene.newDepthSorter
+    -- @covers lurek.scene.newDepthSorter
     -- @tests lurek.scene.DepthSorter:add
     -- @tests lurek.scene.DepthSorter:sort
-    -- @description Creating a DepthSorter and adding items does not crash.
     it("newDepthSorter add and clear work", function()
         local ds = lurek.scene.newDepthSorter()
         ds:add(function() end, 2.0)
@@ -992,7 +924,6 @@ describe("DepthSorter Lua API", function()
 
     -- @tests lurek.scene.DepthSorter:setStable
     -- @tests lurek.scene.DepthSorter:isStable
-    -- @description setStable/isStable round-trip via Lua.
     it("setStable and isStable round-trip", function()
         local ds = lurek.scene.newDepthSorter()
         expect_false(ds:isStable())
@@ -1003,13 +934,12 @@ describe("DepthSorter Lua API", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Phase D: Preload
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("scene preload", function()
-    -- @tests lurek.scene.preload
-    -- @tests lurek.scene.isPreloaded
-    -- @description preload stores a loader; isPreloaded is false before push.
+    -- @covers lurek.scene.preload
+    -- @covers lurek.scene.isPreloaded
     it("preload registers loader; isPreloaded false before invoke", function()
         lurek.scene.clear()
         lurek.scene.preload("my_scene", function() end)
@@ -1017,9 +947,8 @@ describe("scene preload", function()
         expect_false(lurek.scene.isPreloaded("my_scene"))
     end)
 
-    -- @tests lurek.scene.pushPreloaded
-    -- @tests lurek.scene.isPreloaded
-    -- @description pushPreloaded calls loader and marks as preloaded.
+    -- @covers lurek.scene.pushPreloaded
+    -- @covers lurek.scene.isPreloaded
     it("pushPreloaded calls loader and marks isPreloaded true", function()
         lurek.scene.clear()
         local called = false
@@ -1033,14 +962,13 @@ describe("scene preload", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- DepthSorter flush correctness (migrated from Rust scene_tests.rs)
 -- These tests verify behavior observable via lurek.* that was previously in Rust.
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("DepthSorter flush sort order", function()
     -- @tests lurek.scene.DepthSorter:flush
     -- @tests lurek.scene.DepthSorter:add
-    -- @description flush invokes callbacks in ascending depth order.
     it("flush calls callbacks in ascending depth order", function()
         local ds = lurek.scene.newDepthSorter()
         local order = {}
@@ -1055,7 +983,6 @@ describe("DepthSorter flush sort order", function()
 
     -- @tests lurek.scene.DepthSorter:sort
     -- @tests lurek.scene.DepthSorter:flush
-    -- @description After sort(), a new add() must re-dirty so flush re-sorts.
     it("flush re-sorts after add() following sort()", function()
         local ds = lurek.scene.newDepthSorter()
         local order = {}
@@ -1074,7 +1001,6 @@ describe("DepthSorter flush sort order", function()
 
     -- @tests lurek.scene.DepthSorter:setStable
     -- @tests lurek.scene.DepthSorter:flush
-    -- @description Equal-depth callbacks fire in insertion order when stable=true.
     it("stable mode preserves insertion order for equal depths", function()
         local ds = lurek.scene.newDepthSorter()
         ds:setStable(true)
@@ -1089,7 +1015,6 @@ describe("DepthSorter flush sort order", function()
     end)
 
     -- @tests lurek.scene.DepthSorter:flush
-    -- @description 256 entries in reverse insertion order flush in ascending depth
     --              order (exercises the radix sort path internally).
     it("256 entries flush ascending (triggers radix sort path)", function()
         local ds = lurek.scene.newDepthSorter()
@@ -1108,7 +1033,6 @@ describe("DepthSorter flush sort order", function()
     end)
 
     -- @tests lurek.scene.DepthSorter:flush
-    -- @description Negative-depth entries are sorted before positive-depth entries.
     it("negative depths sort before positive depths", function()
         local ds = lurek.scene.newDepthSorter()
         local order = {}
@@ -1128,14 +1052,13 @@ describe("DepthSorter flush sort order", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Overlay clear state (migrated from Rust scene_tests.rs)
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 describe("scene overlay clear state", function()
-    -- @tests lurek.scene.clear
-    -- @tests lurek.scene.pushOverlay
-    -- @tests lurek.scene.isOverlay
-    -- @description clear after pushOverlay leaves an empty, non-overlay stack.
+    -- @covers lurek.scene.clear
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.isOverlay
     it("clear after pushOverlay resets overlay flag and empties stack", function()
         lurek.scene.clear()
         local base = {}
@@ -1148,23 +1071,20 @@ describe("scene overlay clear state", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Merged from test_scene_ui.lua
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 
--- @description Covers suite: Overlay mode (pushOverlay / isOverlay / depth).
 
 describe("lurek.scene overlay mode", function()
-    -- @tests lurek.scene.pushOverlay
-    -- @tests lurek.scene.isOverlay
-    -- @tests lurek.scene.depth
-    -- @tests lurek.scene.getActiveScenes
-    -- @description Verifies that pushOverlay is a registered function.
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.isOverlay
+    -- @covers lurek.scene.depth
+    -- @covers lurek.scene.getActiveScenes
     it("pushOverlay is a function", function()
         expect_equal(type(lurek.scene.pushOverlay), "function")
     end)
 
-    -- @description Verifies that pushOverlay accepts a scene table without error
     -- and that depth() correctly counts it on the stack.
     it("pushOverlay accepts a scene table and increments depth", function()
         lurek.scene.clear()
@@ -1175,7 +1095,6 @@ describe("lurek.scene overlay mode", function()
         expect_equal(lurek.scene.depth(), 0)
     end)
 
-    -- @description Verifies that isOverlay() returns true for a scene pushed via pushOverlay.
     it("isOverlay returns true after pushOverlay", function()
         lurek.scene.clear()
         local overlay = {}
@@ -1184,7 +1103,6 @@ describe("lurek.scene overlay mode", function()
         lurek.scene.pop()
     end)
 
-    -- @description Verifies that a normal push does NOT mark the scene as an overlay.
     it("isOverlay returns false after a normal push", function()
         lurek.scene.clear()
         local scene = {}
@@ -1193,7 +1111,6 @@ describe("lurek.scene overlay mode", function()
         lurek.scene.pop()
     end)
 
-    -- @description Verifies that a background scene and overlay are both active (getActiveScenes).
     it("both background and overlay are in getActiveScenes", function()
         lurek.scene.clear()
         local bg      = { name = "bg"      }
@@ -1205,7 +1122,6 @@ describe("lurek.scene overlay mode", function()
         lurek.scene.clear()
     end)
 
-    -- @description Verifies that depth() alias equals getStackSize().
     it("depth() equals getStackSize()", function()
         lurek.scene.clear()
         local s1 = {}
@@ -1217,32 +1133,27 @@ describe("lurek.scene overlay mode", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Merged from test_scene_preload.lua
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 
--- @description Covers suite: Scene preloading (preload / isPreloaded / pushPreloaded).
 
 describe("lurek.scene.preload", function()
-    -- @tests lurek.scene.preload
-    -- @tests lurek.scene.isPreloaded
-    -- @tests lurek.scene.pushPreloaded
-    -- @description Verifies that preload is a registered function.
+    -- @covers lurek.scene.preload
+    -- @covers lurek.scene.isPreloaded
+    -- @covers lurek.scene.pushPreloaded
     it("preload is a function", function()
         expect_equal(type(lurek.scene.preload), "function")
     end)
 
-    -- @description Verifies that isPreloaded is a registered function.
     it("isPreloaded is a function", function()
         expect_equal(type(lurek.scene.isPreloaded), "function")
     end)
 
-    -- @description Verifies that pushPreloaded is a registered function.
     it("pushPreloaded is a function", function()
         expect_equal(type(lurek.scene.pushPreloaded), "function")
     end)
 
-    -- @description Verifies that registering a preload function completes without error.
     it("can register a preload function without error", function()
         lurek.scene.preload("test_scene", function()
             -- heavy asset load would go here
@@ -1250,14 +1161,12 @@ describe("lurek.scene.preload", function()
         expect_equal(true, true)
     end)
 
-    -- @description Verifies that a scene is NOT marked as preloaded before it is pushed.
     it("scene is not preloaded before pushPreloaded is called", function()
         lurek.scene.clear()
         lurek.scene.preload("lazy_scene", function() end)
         expect_false(lurek.scene.isPreloaded("lazy_scene"))
     end)
 
-    -- @description Verifies that the loader is called at most once even when pushPreloaded
     -- is invoked multiple times for the same name.
     it("loader is invoked exactly once across multiple pushPreloaded calls", function()
         lurek.scene.clear()
@@ -1276,7 +1185,6 @@ describe("lurek.scene.preload", function()
         lurek.scene.clear()
     end)
 
-    -- @description Verifies that isPreloaded returns true after pushPreloaded runs the loader.
     it("isPreloaded returns true after pushPreloaded triggers the loader", function()
         lurek.scene.clear()
         local scene_tbl = {}
@@ -1290,18 +1198,15 @@ describe("lurek.scene.preload", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Merged from test_scene_serialization.lua
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 
--- @description Covers suite: lurek.scene.serializeScene and deserializeScene.
 describe("lurek.scene", function()
-    -- @description Covers suite: scene data serialization.
     describe("serializeScene and deserializeScene", function()
-        -- @tests lurek.scene.setData
-        -- @tests lurek.scene.getData
-        -- @tests lurek.scene.serializeScene
-        -- @description Verifies that serializeScene captures setData values.
+        -- @covers lurek.scene.setData
+        -- @covers lurek.scene.getData
+        -- @covers lurek.scene.serializeScene
         it("serializeScene captures setData values", function()
             lurek.scene.setData("level", 3)
             lurek.scene.setData("score", 9999)
@@ -1312,8 +1217,7 @@ describe("lurek.scene", function()
             expect_equal(9999, snap.data.score)
         end)
 
-        -- @tests lurek.scene.deserializeScene
-        -- @description Verifies that deserializeScene restores setData values.
+        -- @covers lurek.scene.deserializeScene
         it("deserializeScene restores setData values", function()
             local snap = { data = { gold = 150, hp = 80 }, stack = {} }
             lurek.scene.deserializeScene(snap)
@@ -1321,8 +1225,7 @@ describe("lurek.scene", function()
             expect_equal(80, lurek.scene.getData("hp"))
         end)
 
-        -- @tests lurek.scene.serializeScene
-        -- @description Verifies that serializeScene with no data returns empty data table.
+        -- @covers lurek.scene.serializeScene
         xit("serializeScene with no data returns empty data table", function()
             local snap = lurek.scene.serializeScene()
             local count = 0
@@ -1330,8 +1233,7 @@ describe("lurek.scene", function()
             expect_equal(0, count)
         end)
 
-        -- @tests lurek.scene.deserializeScene
-        -- @description Verifies that deserializeScene with empty data does not error.
+        -- @covers lurek.scene.deserializeScene
         it("deserializeScene with empty snapshot does not error", function()
             local ok, err = pcall(function()
                 lurek.scene.deserializeScene({ data = {}, stack = {} })
@@ -1341,114 +1243,98 @@ describe("lurek.scene", function()
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Merged from test_scene_transitions.lua
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 
--- @description Covers suite: Built-in transition library (lurek.scene.transitions).
+---@type any
+local scene_api = lurek.scene
+local scene_transitions = scene_api.transitions
 
 describe("lurek.scene.transitions", function()
-    -- @tests lurek.scene.transitions
-    -- @description Verifies that the transitions table is present on lurek.scene.
+    -- @covers lurek.scene.transitions
     it("transitions table exists", function()
-        expect_equal(type(lurek.scene.transitions), "table")
+        expect_equal(type(scene_transitions), "table")
     end)
 
-    -- @description Verifies that lurek.scene.transitions.fade is a function.
     it("fade transition exists as a function", function()
-        expect_equal(type(lurek.scene.transitions.fade), "function")
+        expect_equal(type(scene_transitions.fade), "function")
     end)
 
-    -- @description Verifies that lurek.scene.transitions.slide is a function.
     it("slide transition exists as a function", function()
-        expect_equal(type(lurek.scene.transitions.slide), "function")
+        expect_equal(type(scene_transitions.slide), "function")
     end)
 
-    -- @description Verifies that lurek.scene.transitions.wipe is a function.
     it("wipe transition exists as a function", function()
-        expect_equal(type(lurek.scene.transitions.wipe), "function")
+        expect_equal(type(scene_transitions.wipe), "function")
     end)
 
-    -- @description Verifies that lurek.scene.transitions.iris is a function.
     it("iris transition exists as a function", function()
-        expect_equal(type(lurek.scene.transitions.iris), "function")
+        expect_equal(type(scene_transitions.iris), "function")
     end)
 
-    -- @description Verifies that fade() with no args returns type="fade" and a default duration.
     it("fade() returns a table with type=fade", function()
-        local t = lurek.scene.transitions.fade()
+        local t = scene_transitions.fade()
         expect_equal(t.type, "fade")
     end)
 
-    -- @description Verifies that fade() default duration is 0.5.
     it("fade() returns default duration 0.5", function()
-        local t = lurek.scene.transitions.fade()
+        local t = scene_transitions.fade()
         expect_near(t.duration, 0.5, 0.001)
     end)
 
-    -- @description Verifies that fade(1.0) stores the supplied duration.
     it("fade(1.0) returns duration=1.0", function()
-        local t = lurek.scene.transitions.fade(1.0)
+        local t = scene_transitions.fade(1.0)
         expect_near(t.duration, 1.0, 0.001)
     end)
 
-    -- @description Verifies that slide() default type is "left".
     it("slide() returns type=left by default", function()
-        local t = lurek.scene.transitions.slide()
+        local t = scene_transitions.slide()
         expect_equal(t.type, "left")
     end)
 
-    -- @description Verifies that slide("right") stores the supplied direction.
     it("slide(\"right\") returns type=right", function()
-        local t = lurek.scene.transitions.slide("right")
+        local t = scene_transitions.slide("right")
         expect_equal(t.type, "right")
     end)
 
-    -- @description Verifies that slide() default duration is 0.4.
     it("slide() returns default duration 0.4", function()
-        local t = lurek.scene.transitions.slide()
+        local t = scene_transitions.slide()
         expect_near(t.duration, 0.4, 0.001)
     end)
 
-    -- @description Verifies that wipe() returns type="wipe" and default duration 0.5.
     it("wipe() returns type=wipe with default duration", function()
-        local t = lurek.scene.transitions.wipe()
+        local t = scene_transitions.wipe()
         expect_equal(t.type, "wipe")
         expect_near(t.duration, 0.5, 0.001)
     end)
 
-    -- @description Verifies that iris() returns type="iris" and default duration 0.6.
     it("iris() returns type=iris with default duration", function()
-        local t = lurek.scene.transitions.iris()
+        local t = scene_transitions.iris()
         expect_equal(t.type, "iris")
         expect_near(t.duration, 0.6, 0.001)
     end)
 
-    -- @description Verifies that factory functions return independent table instances.
     it("each factory call returns a fresh table", function()
-        local a = lurek.scene.transitions.fade()
-        local b = lurek.scene.transitions.fade()
+        local a = scene_transitions.fade()
+        local b = scene_transitions.fade()
         expect_false(a == b)
     end)
 end)
 
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 -- Merged from test_scene_transitions_extended.lua
--- ──────────────────────────────────────────────────────────────────────────────
+-- ============================================================
 
--- @description Covers suite: lurek.scene extended transition types.
 describe("lurek.scene", function()
-    -- @description Covers suite: getTransitionTypes.
     describe("getTransitionTypes", function()
-        -- @tests lurek.scene.getTransitionTypes
-        -- @description Verifies that getTransitionTypes returns exactly 10 entries.
+        -- @covers lurek.scene.getTransitionTypes
         it("returns exactly 10 transition type strings", function()
             local types = lurek.scene.getTransitionTypes()
             expect_equal(10, #types)
         end)
 
-        -- @tests lurek.scene.getTransitionTypes
-        -- @description Verifies that all expected basic types are present.
+        -- @covers lurek.scene.getTransitionTypes
         it("contains none, fade, left, right, up, down", function()
             local types = lurek.scene.getTransitionTypes()
             local lookup = {}
@@ -1461,8 +1347,7 @@ describe("lurek.scene", function()
             expect_equal(true, lookup["down"])
         end)
 
-        -- @tests lurek.scene.getTransitionTypes
-        -- @description Verifies that extended types wipe, iris, zoom, crossfade are present.
+        -- @covers lurek.scene.getTransitionTypes
         it("contains extended types wipe, iris, zoom, crossfade", function()
             local types = lurek.scene.getTransitionTypes()
             local lookup = {}
@@ -1473,8 +1358,7 @@ describe("lurek.scene", function()
             expect_equal(true, lookup["crossfade"])
         end)
 
-        -- @tests lurek.scene.getTransitionTypes
-        -- @description Verifies that all entries are strings.
+        -- @covers lurek.scene.getTransitionTypes
         it("all entries are strings", function()
             local types = lurek.scene.getTransitionTypes()
             for _, v in ipairs(types) do
@@ -1486,7 +1370,7 @@ end)
 
 describe("lurek.scene.newScene", function()
     it("creates a scene table that inherits methods from the definition", function()
-        -- @tests lurek.scene.newScene
+        -- @covers lurek.scene.newScene
         local scene = lurek.scene.newScene({
             enter = function(self)
                 self.entered = true
@@ -1511,7 +1395,7 @@ describe("lurek.scene transition helper aliases", function()
     end
 
     it("fade returns a fade transition table", function()
-        -- @tests lurek.scene.fade
+        -- @covers lurek.scene.fade
         local fade = get_helper("fade")
         expect_equal("function", type(fade))
         local t = fade(1.0)
@@ -1520,7 +1404,7 @@ describe("lurek.scene transition helper aliases", function()
     end)
 
     it("slide returns a directional slide transition table", function()
-        -- @tests lurek.scene.slide
+        -- @covers lurek.scene.slide
         local slide = get_helper("slide")
         expect_equal("function", type(slide))
         local t = slide("right", 0.75)
@@ -1529,7 +1413,7 @@ describe("lurek.scene transition helper aliases", function()
     end)
 
     it("wipe returns a wipe transition table", function()
-        -- @tests lurek.scene.wipe
+        -- @covers lurek.scene.wipe
         local wipe = get_helper("wipe")
         expect_equal("function", type(wipe))
         local t = wipe(0.25)
@@ -1538,7 +1422,7 @@ describe("lurek.scene transition helper aliases", function()
     end)
 
     it("iris returns an iris transition table", function()
-        -- @tests lurek.scene.iris
+        -- @covers lurek.scene.iris
         local iris = get_helper("iris")
         expect_equal("function", type(iris))
         local t = iris(0.9)
@@ -1549,8 +1433,8 @@ end)
 
 describe("DepthSorter stable mode", function()
     it("setStable toggles the stable-sorting flag", function()
-        -- @tests DepthSorter:setStable
-        -- @tests DepthSorter:isStable
+        -- @covers DepthSorter:setStable
+        -- @covers DepthSorter:isStable
         local ds = lurek.scene.newDepthSorter()
         expect_equal(false, ds:isStable())
         ds:setStable(true)

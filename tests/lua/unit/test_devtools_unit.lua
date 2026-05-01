@@ -5,89 +5,81 @@
 -- Logger
 -- ===================================================================
 
--- @description Covers suite: lurek.devtools logger.
 describe("lurek.devtools logger", function()
     -- @tests lurek.devtools
-    -- @tests lurek.devtools.clearLog
-    -- @tests lurek.devtools.clearWatches
-    -- @tests lurek.devtools.eval
-    -- @tests lurek.devtools.getCallStack
-    -- @tests lurek.devtools.getFrameHistory
-    -- @tests lurek.devtools.getFrameHistorySize
-    -- @tests lurek.devtools.getFrameStats
-    -- @tests lurek.devtools.getLogConsole
-    -- @tests lurek.devtools.getLogFile
-    -- @tests lurek.devtools.getLogHistory
-    -- @tests lurek.devtools.getLogLevel
-    -- @tests lurek.devtools.getProfileData
-    -- @tests lurek.devtools.getProfileFrameCount
-    -- @tests lurek.devtools.getWatchInterval
-    -- @tests lurek.devtools.getWatchedPaths
-    -- @tests lurek.devtools.info
-    -- @tests lurek.devtools.isConsoleOpen
-    -- @tests lurek.devtools.isProfilingEnabled
-    -- @tests lurek.devtools.openConsole
-    -- @tests lurek.devtools.profileFrame
-    -- @tests lurek.devtools.profilePop
-    -- @tests lurek.devtools.profilePush
-    -- @tests lurek.devtools.recordFrameTime
-    -- @tests lurek.devtools.resetProfile
-    -- @tests lurek.devtools.setFrameHistorySize
-    -- @tests lurek.devtools.setLogConsole
-    -- @tests lurek.devtools.setLogFile
-    -- @tests lurek.devtools.setLogLevel
-    -- @tests lurek.devtools.setProfilingEnabled
-    -- @tests lurek.devtools.setWatchInterval
-    -- @tests lurek.devtools.unwatch
-    -- @tests lurek.devtools.watch
-    -- @description Verifies the devtools namespace is registered.
+    -- @covers lurek.devtools.clearLog
+    -- @covers lurek.devtools.clearWatches
+    -- @covers lurek.devtools.eval
+    -- @covers lurek.devtools.getCallStack
+    -- @covers lurek.devtools.getFrameHistory
+    -- @covers lurek.devtools.getFrameHistorySize
+    -- @covers lurek.devtools.getFrameStats
+    -- @covers lurek.devtools.getLogConsole
+    -- @covers lurek.devtools.getLogFile
+    -- @covers lurek.devtools.getLogHistory
+    -- @covers lurek.devtools.getLogLevel
+    -- @covers lurek.devtools.getProfileData
+    -- @covers lurek.devtools.getProfileFrameCount
+    -- @covers lurek.devtools.getWatchInterval
+    -- @covers lurek.devtools.getWatchedPaths
+    -- @covers lurek.devtools.info
+    -- @covers lurek.devtools.isConsoleOpen
+    -- @covers lurek.devtools.isProfilingEnabled
+    -- @covers lurek.devtools.openConsole
+    -- @covers lurek.devtools.profileFrame
+    -- @covers lurek.devtools.profilePop
+    -- @covers lurek.devtools.profilePush
+    -- @covers lurek.devtools.recordFrameTime
+    -- @covers lurek.devtools.resetProfile
+    -- @covers lurek.devtools.setFrameHistorySize
+    -- @covers lurek.devtools.setLogConsole
+    -- @covers lurek.devtools.setLogFile
+    -- @covers lurek.devtools.setLogLevel
+    -- @covers lurek.devtools.setProfilingEnabled
+    -- @covers lurek.devtools.setWatchInterval
+    -- @covers lurek.devtools.unwatch
+    -- @covers lurek.devtools.watch
     it("exists as a table", function()
         expect_not_nil(lurek.devtools)
     end)
 
-    -- @tests lurek.devtools.getLogLevel
-    -- @description Verifies the default log threshold starts at info.
+    -- @covers lurek.devtools.getLogLevel
     it("defaults log level to info", function()
         expect_equal("info", lurek.devtools.getLogLevel())
     end)
 
-    -- @tests lurek.devtools.setLogLevel
-    -- @tests lurek.devtools.getLogLevel
-    -- @description Verifies log level changes round-trip through the setter/getter pair.
+    -- @covers lurek.devtools.setLogLevel
+    -- @covers lurek.devtools.getLogLevel
     it("can set and get log level", function()
         lurek.devtools.setLogLevel("warn")
         expect_equal("warn", lurek.devtools.getLogLevel())
         lurek.devtools.setLogLevel("info")
     end)
 
-    -- @tests lurek.devtools.getLogConsole
-    -- @description Verifies console logging is enabled by default.
+    -- @covers lurek.devtools.getLogConsole
     it("defaults log console to true", function()
         expect_equal(true, lurek.devtools.getLogConsole())
     end)
 
-    -- @tests lurek.devtools.setLogConsole
-    -- @tests lurek.devtools.getLogConsole
-    -- @description Verifies console logging can be toggled off and back on.
+    -- @covers lurek.devtools.setLogConsole
+    -- @covers lurek.devtools.getLogConsole
     it("can toggle console logging", function()
         lurek.devtools.setLogConsole(false)
         expect_equal(false, lurek.devtools.getLogConsole())
         lurek.devtools.setLogConsole(true)
     end)
 
-    -- @tests lurek.devtools.setLogFile
-    -- @tests lurek.devtools.getLogFile
-    -- @description Verifies the log file path round-trips through the devtools logger state.
+    -- @covers lurek.devtools.setLogFile
+    -- @covers lurek.devtools.getLogFile
     it("can set and get log file path", function()
         lurek.devtools.setLogFile("test.log")
         expect_equal("test.log", lurek.devtools.getLogFile())
         lurek.devtools.setLogFile("")
     end)
 
-    -- @tests lurek.devtools.clearLog
-    -- @tests lurek.devtools.info
-    -- @tests lurek.devtools.getLogHistory
-    -- @description Verifies info messages are recorded with level and message fields in the in-memory log history.
+    -- @covers lurek.devtools.clearLog
+    -- @covers lurek.devtools.info
+    -- @covers lurek.devtools.getLogHistory
     it("records log entries", function()
         lurek.devtools.clearLog()
         lurek.devtools.setLogConsole(false) -- suppress stderr noise
@@ -99,11 +91,10 @@ describe("lurek.devtools logger", function()
         lurek.devtools.setLogConsole(true)
     end)
 
-    -- @tests lurek.devtools.clearLog
-    -- @tests lurek.devtools.setLogLevel
-    -- @tests lurek.devtools.info
-    -- @tests lurek.devtools.getLogHistory
-    -- @description Verifies messages below the active log level are excluded from stored history.
+    -- @covers lurek.devtools.clearLog
+    -- @covers lurek.devtools.setLogLevel
+    -- @covers lurek.devtools.info
+    -- @covers lurek.devtools.getLogHistory
     it("filters below minimum level", function()
         lurek.devtools.clearLog()
         lurek.devtools.setLogConsole(false)
@@ -115,9 +106,8 @@ describe("lurek.devtools logger", function()
         lurek.devtools.setLogConsole(true)
     end)
 
-    -- @tests lurek.devtools.clearLog
-    -- @tests lurek.devtools.getLogHistory
-    -- @description Verifies clearLog empties the accumulated logger history.
+    -- @covers lurek.devtools.clearLog
+    -- @covers lurek.devtools.getLogHistory
     it("clearLog empties history", function()
         lurek.devtools.setLogConsole(false)
         lurek.devtools.info("will be cleared")
@@ -126,8 +116,7 @@ describe("lurek.devtools logger", function()
         lurek.devtools.setLogConsole(true)
     end)
 
-    -- @tests lurek.devtools.getLogHistory
-    -- @description Verifies getLogHistory(count) returns only the trailing entries.
+    -- @covers lurek.devtools.getLogHistory
     it("getLogHistory respects count", function()
         lurek.devtools.clearLog()
         lurek.devtools.setLogConsole(false)
@@ -145,17 +134,14 @@ end)
 -- ===================================================================
 -- Frame Statistics
 -- ===================================================================
--- @description Covers suite: lurek.devtools frame stats.
 describe("lurek.devtools frame stats", function()
-    -- @tests lurek.devtools.getFrameHistorySize
-    -- @description Verifies the frame history buffer starts at the default size.
+    -- @covers lurek.devtools.getFrameHistorySize
     it("defaults frame history size to 300", function()
         expect_equal(300, lurek.devtools.getFrameHistorySize())
     end)
 
-    -- @tests lurek.devtools.recordFrameTime
-    -- @tests lurek.devtools.getFrameHistory
-    -- @description Verifies recorded frame times are appended to the history buffer.
+    -- @covers lurek.devtools.recordFrameTime
+    -- @covers lurek.devtools.getFrameHistory
     it("can record and retrieve frame times", function()
         lurek.devtools.recordFrameTime(0.016)
         lurek.devtools.recordFrameTime(0.017)
@@ -163,9 +149,8 @@ describe("lurek.devtools frame stats", function()
         expect_true(#history >= 2)
     end)
 
-    -- @tests lurek.devtools.recordFrameTime
-    -- @tests lurek.devtools.getFrameStats
-    -- @description Verifies computed frame statistics include aggregate fields like fps and percentiles.
+    -- @covers lurek.devtools.recordFrameTime
+    -- @covers lurek.devtools.getFrameStats
     it("computes frame stats", function()
         -- Record some known values
         for i = 1, 10 do
@@ -181,18 +166,16 @@ describe("lurek.devtools frame stats", function()
         expect_not_nil(stats.p99)
     end)
 
-    -- @tests lurek.devtools.setFrameHistorySize
-    -- @tests lurek.devtools.getFrameHistorySize
-    -- @description Verifies the frame history capacity can be changed and retrieved.
+    -- @covers lurek.devtools.setFrameHistorySize
+    -- @covers lurek.devtools.getFrameHistorySize
     it("can change frame history size", function()
         lurek.devtools.setFrameHistorySize(50)
         expect_equal(50, lurek.devtools.getFrameHistorySize())
         lurek.devtools.setFrameHistorySize(300) -- restore
     end)
 
-    -- @tests lurek.devtools.setFrameHistorySize
-    -- @tests lurek.devtools.getFrameHistorySize
-    -- @description Verifies history size requests are clamped to the module minimum.
+    -- @covers lurek.devtools.setFrameHistorySize
+    -- @covers lurek.devtools.getFrameHistorySize
     it("clamps history size", function()
         lurek.devtools.setFrameHistorySize(1)
         expect_equal(10, lurek.devtools.getFrameHistorySize())
@@ -203,29 +186,25 @@ end)
 -- ===================================================================
 -- Profiler
 -- ===================================================================
--- @description Covers suite: lurek.devtools profiler.
 describe("lurek.devtools profiler", function()
-    -- @tests lurek.devtools.isProfilingEnabled
-    -- @description Verifies profiling starts disabled.
+    -- @covers lurek.devtools.isProfilingEnabled
     it("defaults profiling to disabled", function()
         expect_equal(false, lurek.devtools.isProfilingEnabled())
     end)
 
-    -- @tests lurek.devtools.setProfilingEnabled
-    -- @tests lurek.devtools.isProfilingEnabled
-    -- @description Verifies profiling can be toggled on and observed through the query API.
+    -- @covers lurek.devtools.setProfilingEnabled
+    -- @covers lurek.devtools.isProfilingEnabled
     it("can enable profiling", function()
         lurek.devtools.setProfilingEnabled(true)
         expect_equal(true, lurek.devtools.isProfilingEnabled())
         lurek.devtools.setProfilingEnabled(false)
     end)
 
-    -- @tests lurek.devtools.profilePush
-    -- @tests lurek.devtools.profilePop
-    -- @tests lurek.devtools.profileFrame
-    -- @tests lurek.devtools.getProfileFrameCount
-    -- @tests lurek.devtools.getProfileData
-    -- @description Verifies nested profile zones are recorded into a completed profile frame.
+    -- @covers lurek.devtools.profilePush
+    -- @covers lurek.devtools.profilePop
+    -- @covers lurek.devtools.profileFrame
+    -- @covers lurek.devtools.getProfileFrameCount
+    -- @covers lurek.devtools.getProfileData
     it("records and retrieves profile zones", function()
         lurek.devtools.setProfilingEnabled(true)
         lurek.devtools.profilePush("render")
@@ -241,9 +220,8 @@ describe("lurek.devtools profiler", function()
         lurek.devtools.setProfilingEnabled(false)
     end)
 
-    -- @tests lurek.devtools.resetProfile
-    -- @tests lurek.devtools.getProfileFrameCount
-    -- @description Verifies resetProfile clears accumulated profiler frames.
+    -- @covers lurek.devtools.resetProfile
+    -- @covers lurek.devtools.getProfileFrameCount
     it("resetProfile clears all data", function()
         lurek.devtools.setProfilingEnabled(true)
         lurek.devtools.profilePush("test")
@@ -258,36 +236,31 @@ end)
 -- ===================================================================
 -- File Watcher
 -- ===================================================================
--- @description Covers suite: lurek.devtools file watcher.
 describe("lurek.devtools file watcher", function()
-    -- @tests lurek.devtools.clearWatches
-    -- @tests lurek.devtools.getWatchedPaths
-    -- @description Verifies the watcher registry can be reset to an empty state.
+    -- @covers lurek.devtools.clearWatches
+    -- @covers lurek.devtools.getWatchedPaths
     it("starts with no watched paths", function()
         lurek.devtools.clearWatches()
         expect_equal(0, #lurek.devtools.getWatchedPaths())
     end)
 
-    -- @tests lurek.devtools.getWatchInterval
-    -- @description Verifies the watch polling interval starts at the default half-second value.
+    -- @covers lurek.devtools.getWatchInterval
     it("defaults watch interval to 0.5", function()
         local interval = lurek.devtools.getWatchInterval()
         expect_true(math.abs(interval - 0.5) < 0.01)
     end)
 
-    -- @tests lurek.devtools.setWatchInterval
-    -- @tests lurek.devtools.getWatchInterval
-    -- @description Verifies the watch polling interval can be updated and read back.
+    -- @covers lurek.devtools.setWatchInterval
+    -- @covers lurek.devtools.getWatchInterval
     it("can set watch interval", function()
         lurek.devtools.setWatchInterval(1.0)
         expect_true(math.abs(lurek.devtools.getWatchInterval() - 1.0) < 0.01)
         lurek.devtools.setWatchInterval(0.5)
     end)
 
-    -- @tests lurek.devtools.watch
-    -- @tests lurek.devtools.unwatch
-    -- @tests lurek.devtools.getWatchedPaths
-    -- @description Verifies watching and unwatching a path updates the watched-path registry.
+    -- @covers lurek.devtools.watch
+    -- @covers lurek.devtools.unwatch
+    -- @covers lurek.devtools.getWatchedPaths
     it("can watch and unwatch paths", function()
         lurek.devtools.clearWatches()
         local added = lurek.devtools.watch("nonexistent_test_file.txt")
@@ -298,8 +271,7 @@ describe("lurek.devtools file watcher", function()
         expect_equal(0, #lurek.devtools.getWatchedPaths())
     end)
 
-    -- @tests lurek.devtools.watch
-    -- @description Verifies duplicate watch registration requests are rejected.
+    -- @covers lurek.devtools.watch
     it("watch returns false if already watched", function()
         lurek.devtools.clearWatches()
         lurek.devtools.watch("test.txt")
@@ -312,25 +284,21 @@ end)
 -- ===================================================================
 -- Debug Bridge
 -- ===================================================================
--- @description Covers suite: lurek.devtools debug bridge.
 describe("lurek.devtools debug bridge", function()
-    -- @tests lurek.devtools.getCallStack
-    -- @description Verifies getCallStack returns a table-shaped stack snapshot.
+    -- @covers lurek.devtools.getCallStack
     it("getCallStack returns a table", function()
         local stack = lurek.devtools.getCallStack()
         expect_not_nil(stack)
     end)
 
-    -- @tests lurek.devtools.eval
-    -- @description Verifies eval executes valid Lua code and returns a success flag with the computed result.
+    -- @covers lurek.devtools.eval
     it("eval succeeds with valid code", function()
         local ok, result = lurek.devtools.eval("return 1 + 2")
         expect_true(ok)
         expect_equal(3, result)
     end)
 
-    -- @tests lurek.devtools.eval
-    -- @description Verifies eval reports syntax errors without throwing.
+    -- @covers lurek.devtools.eval
     it("eval fails with invalid code", function()
         local ok, err = lurek.devtools.eval("invalid code here %%%")
         expect_equal(false, ok)
@@ -341,34 +309,28 @@ end)
 -- ===================================================================
 -- Console
 -- ===================================================================
--- @description Covers suite: lurek.devtools console.
 describe("lurek.devtools console", function()
-    -- @tests lurek.devtools.isConsoleOpen
-    -- @description Verifies the debug console starts closed.
+    -- @covers lurek.devtools.isConsoleOpen
     it("defaults console to not open", function()
         expect_equal(false, lurek.devtools.isConsoleOpen())
     end)
 
-    -- @tests lurek.devtools.openConsole
-    -- @tests lurek.devtools.isConsoleOpen
-    -- @description Verifies opening the console flips the console-open query state.
+    -- @covers lurek.devtools.openConsole
+    -- @covers lurek.devtools.isConsoleOpen
     it("openConsole marks it as open", function()
         lurek.devtools.openConsole()
         expect_equal(true, lurek.devtools.isConsoleOpen())
     end)
 end)
 
--- @description Tests for new devtools features: profilerReport and newFileWatcher.
 describe("lurek.devtools new features", function()
-  -- @tests lurek.devtools.profilerReport
-  -- @description profilerReport returns a table (may be empty if no frames recorded).
+  -- @covers lurek.devtools.profilerReport
   it("profilerReport returns a table", function()
     local report = lurek.devtools.profilerReport()
     expect_equal(type(report), "table")
   end)
 
-  -- @tests lurek.devtools.newFileWatcher
-  -- @description newFileWatcher returns a userdata with check(), onChanged() and getPath() methods.
+  -- @covers lurek.devtools.newFileWatcher
   it("newFileWatcher returns a userdata with expected methods", function()
     local watcher = lurek.devtools.newFileWatcher(".")
     expect_true(watcher ~= nil, "watcher must not be nil")
@@ -378,22 +340,19 @@ describe("lurek.devtools new features", function()
     expect_equal(type(watcher.cancel), "function")
   end)
 
-  -- @tests lurek.devtools.newFileWatcher
-  -- @description getPath returns the path passed to newFileWatcher.
+  -- @covers lurek.devtools.newFileWatcher
   it("newFileWatcher getPath returns the watched path", function()
     local watcher = lurek.devtools.newFileWatcher("content")
     expect_equal(watcher:getPath(), "content")
   end)
 
-  -- @tests lurek.devtools.newFileWatcher
-  -- @description check() runs without error on a valid path.
+  -- @covers lurek.devtools.newFileWatcher
   it("newFileWatcher check does not error on valid path", function()
     local watcher = lurek.devtools.newFileWatcher(".")
     expect_no_error(function() watcher:check() end)
   end)
 
-  -- @tests lurek.devtools.newFileWatcher
-  -- @description cancel() removes the callback without error.
+  -- @covers lurek.devtools.newFileWatcher
   it("newFileWatcher cancel does not error", function()
     local watcher = lurek.devtools.newFileWatcher(".")
     watcher:onChanged(function() end)
@@ -401,25 +360,22 @@ describe("lurek.devtools new features", function()
   end)
 end)
 
--- ── Devtools REPL console (merged from test_devtools_repl.lua) ──
+--  Devtools REPL console (merged from test_devtools_repl.lua) 
 
 describe("lurek.devtools newRepl", function()
     describe("factory", function()
-        -- @tests lurek.devtools.newRepl
-        -- @description Verifies newRepl is exposed on the devtools namespace.
+        -- @covers lurek.devtools.newRepl
         it("exposes newRepl", function()
             expect_type("function", lurek.devtools.newRepl)
         end)
 
-        -- @tests lurek.devtools.newRepl
-        -- @description Factory returns a userdata.
+        -- @covers lurek.devtools.newRepl
         it("returns a userdata", function()
             local repl = lurek.devtools.newRepl()
             expect_type("userdata", repl)
         end)
 
-        -- @tests lurek.devtools.newRepl
-        -- @description Factory with explicit history limit does not error.
+        -- @covers lurek.devtools.newRepl
         it("accepts max_history argument", function()
             local repl = lurek.devtools.newRepl(25)
             expect_type("userdata", repl)
@@ -428,21 +384,18 @@ describe("lurek.devtools newRepl", function()
 
     describe("len() / history()", function()
         -- @tests lurek.devtools:len
-        -- @description Starts with zero entries.
         it("starts empty", function()
             local repl = lurek.devtools.newRepl()
             expect_equal(0, repl:len())
         end)
 
         -- @tests lurek.devtools:history
-        -- @description history() returns a table.
         it("history returns a table", function()
             local repl = lurek.devtools.newRepl()
             expect_type("table", repl:history())
         end)
 
         -- @tests lurek.devtools:history
-        -- @description Empty history has zero entries.
         it("empty history has length zero", function()
             local repl = lurek.devtools.newRepl()
             expect_equal(0, #repl:history())
@@ -451,7 +404,6 @@ describe("lurek.devtools newRepl", function()
 
     describe("eval()", function()
         -- @tests lurek.devtools:eval
-        -- @description eval returns a string.
         it("returns a string for a simple expression", function()
             local repl = lurek.devtools.newRepl()
             local result = repl:eval("1 + 1")
@@ -459,7 +411,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description eval of an arithmetic expression returns the correct value.
         it("evaluates arithmetic expressions", function()
             local repl = lurek.devtools.newRepl()
             local result = repl:eval("2 + 2")
@@ -467,7 +418,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description eval of a string literal returns the string.
         it("evaluates string literals", function()
             local repl = lurek.devtools.newRepl()
             local result = repl:eval("\"hello\"")
@@ -475,7 +425,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description eval of a nil expression returns "nil".
         it("evaluates nil as string nil", function()
             local repl = lurek.devtools.newRepl()
             local result = repl:eval("nil")
@@ -483,7 +432,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description Calling eval increments len.
         it("increments len after eval", function()
             local repl = lurek.devtools.newRepl()
             repl:eval("1 + 1")
@@ -491,7 +439,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description Each eval call adds one entry to history.
         it("history grows with each eval", function()
             local repl = lurek.devtools.newRepl()
             repl:eval("1")
@@ -500,7 +447,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:eval
-        -- @description Invalid Lua returns an error string without panicking.
         it("returns error string for invalid Lua", function()
             local repl = lurek.devtools.newRepl()
             local result = repl:eval("!!!not valid lua!!!")
@@ -510,7 +456,6 @@ describe("lurek.devtools newRepl", function()
 
     describe("clear()", function()
         -- @tests lurek.devtools:clear
-        -- @description clear resets len to zero.
         it("resets len to zero", function()
             local repl = lurek.devtools.newRepl()
             repl:eval("42")
@@ -520,7 +465,6 @@ describe("lurek.devtools newRepl", function()
         end)
 
         -- @tests lurek.devtools:clear
-        -- @description clear empties the history table.
         it("empties history", function()
             local repl = lurek.devtools.newRepl()
             repl:eval("1")
@@ -537,38 +481,38 @@ test_summary()
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @tests lurek.devtools.log
+    -- @covers lurek.devtools.log
     it("covers lurek.devtools.log", function()
         expect_type("function", lurek.devtools.log)
         lurek.devtools.log("info", "unit test log message")
     end)
 
-    -- @tests lurek.devtools.exposeWatch
+    -- @covers lurek.devtools.exposeWatch
     it("covers lurek.devtools.exposeWatch", function()
         local id = lurek.devtools.exposeWatch("unit_watch", function() return 42 end)
         expect_type("number", id)
     end)
 
-    -- @tests lurek.devtools.removeWatch
+    -- @covers lurek.devtools.removeWatch
     it("covers lurek.devtools.removeWatch", function()
         local id = lurek.devtools.exposeWatch("rem_watch", function() return 0 end)
         local ok = lurek.devtools.removeWatch(id)
         expect_true(ok)
     end)
 
-    -- @tests lurek.devtools.getWatches
+    -- @covers lurek.devtools.getWatches
     it("covers lurek.devtools.getWatches", function()
         local watches = lurek.devtools.getWatches()
         expect_type("table", watches)
     end)
 
-    -- @tests ReplConsole:len
+    -- @covers ReplConsole:len
     it("covers ReplConsole:len", function()
         local console = lurek.devtools.newRepl()
         expect_type("number", console:len())
     end)
 
-    -- @tests lurek.devtools.fatal
+    -- @covers lurek.devtools.fatal
     it("covers lurek.devtools.fatal", function()
         expect_type("function", lurek.devtools.fatal)
         lurek.devtools.fatal("unit test fatal message")
@@ -578,7 +522,7 @@ end)
 
 describe("lurek.devtools.scan", function()
     it("lurek.devtools.scan works", function()
-        -- @tests lurek.devtools.scan
+        -- @covers lurek.devtools.scan
         local changed = lurek.devtools.scan()
         expect_type("table", changed)
     end)
@@ -586,7 +530,7 @@ end)
 
 describe("lurek.devtools.snapshot", function()
     it("lurek.devtools.snapshot works", function()
-        -- @tests lurek.devtools.snapshot
+        -- @covers lurek.devtools.snapshot
         local snap = lurek.devtools.snapshot()
         expect_type("table", snap)
         expect_not_nil(snap.watchCount)
@@ -595,7 +539,7 @@ end)
 
 describe("FileWatcher:onChanged", function()
     it("FileWatcher:onChanged works", function()
-        -- @tests FileWatcher:onChanged
+        -- @covers FileWatcher:onChanged
         local watcher = lurek.devtools.newFileWatcher(".")
         local called = false
         watcher:onChanged(function() called = true end)
@@ -605,7 +549,7 @@ end)
 
 describe("FileWatcher:check", function()
     it("FileWatcher:check works", function()
-        -- @tests FileWatcher:check
+        -- @covers FileWatcher:check
         local watcher = lurek.devtools.newFileWatcher(".")
         local result = watcher:check()
         expect_type("boolean", result)
@@ -614,7 +558,7 @@ end)
 
 describe("FileWatcher:getPath", function()
     it("FileWatcher:getPath works", function()
-        -- @tests FileWatcher:getPath
+        -- @covers FileWatcher:getPath
         local watcher = lurek.devtools.newFileWatcher("content")
         expect_equal("content", watcher:getPath())
     end)
@@ -622,7 +566,7 @@ end)
 
 describe("FileWatcher:cancel", function()
     it("FileWatcher:cancel works", function()
-        -- @tests FileWatcher:cancel
+        -- @covers FileWatcher:cancel
         local watcher = lurek.devtools.newFileWatcher(".")
         watcher:onChanged(function() end)
         watcher:cancel()
@@ -632,7 +576,7 @@ end)
 
 describe("ReplConsole:eval", function()
     it("ReplConsole:eval works", function()
-        -- @tests ReplConsole:eval
+        -- @covers ReplConsole:eval
         local console = lurek.devtools.newRepl()
         local result = console:eval("1 + 1")
         expect_type("string", result)
@@ -641,7 +585,7 @@ end)
 
 describe("ReplConsole:history", function()
     it("ReplConsole:history works", function()
-        -- @tests ReplConsole:history
+        -- @covers ReplConsole:history
         local console = lurek.devtools.newRepl()
         console:eval("x = 1")
         local hist = console:history()
@@ -652,7 +596,7 @@ end)
 
 describe("ReplConsole:clear", function()
     it("ReplConsole:clear works", function()
-        -- @tests ReplConsole:clear
+        -- @covers ReplConsole:clear
         local console = lurek.devtools.newRepl()
         console:eval("a = 1")
         console:clear()

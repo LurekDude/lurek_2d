@@ -1,4 +1,10 @@
-//! Tests for the runtime module.
+//! INTERNAL ONLY: public `lurek.runtime.*` behavior is covered by the Lua-first suites in
+//! `tests/lua/unit/test_runtime_unit.lua`, `tests/lua/security/test_runtime.lua`,
+//! and `tests/lua/integration/test_runtime_system.lua`.
+//!
+//! The Rust-only coverage that remains here targets internal enums, config
+//! defaults, and error/log-message helpers that are not exposed as direct Lua
+//! values.
 
 use lurek2d::runtime::config::Config;
 use lurek2d::runtime::error::{EngineError, ErrorCategory};

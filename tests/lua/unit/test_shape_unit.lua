@@ -1,29 +1,25 @@
 -- tests/lua/unit/test_shape.lua
--- Lurek2D BDD tests for lurek.render.newShape() â€” CompoundShape builder
--- @tests lurek.render.newShape
+-- Lurek2D BDD tests for lurek.render.newShape()  - CompoundShape builder
+-- @covers lurek.render.newShape
 
 local function run_tests()
 
-    -- â”€â”€ Constructor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Constructor
 
-    -- @description Covers suite: newShape constructor.
     describe("newShape constructor", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies newShape returns a non-nil userdata handle.
+        -- @covers lurek.render.newShape
         it("returns a non-nil userdata", function()
             local shape = lurek.render.newShape()
             expect_not_nil(shape)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies fresh shapes start with zero queued commands.
+        -- @covers lurek.render.newShape
         it("starts with zero commands", function()
             local shape = lurek.render.newShape()
             expect_equal(0, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies separate shape instances keep independent command buffers.
+        -- @covers lurek.render.newShape
         it("can create multiple independent shapes", function()
             local s1 = lurek.render.newShape()
             local s2 = lurek.render.newShape()
@@ -33,108 +29,94 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ Primitive builder methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Primitive builder methods
 
-    -- @description Covers suite: primitive builder methods.
     describe("primitive builder methods", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies rectangle appends one draw command.
+        -- @covers lurek.render.newShape
         it("rectangle adds one command", function()
             local shape = lurek.render.newShape()
             shape:rectangle("fill", 0, 0, 100, 50)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies line-mode rectangle also appends one draw command.
+        -- @covers lurek.render.newShape
         it("rectangle line mode adds one command", function()
             local shape = lurek.render.newShape()
             shape:rectangle("line", 10, 10, 80, 40)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies roundedRectangle appends one draw command.
+        -- @covers lurek.render.newShape
         it("roundedRectangle adds one command", function()
             local shape = lurek.render.newShape()
             shape:roundedRectangle("fill", 0, 0, 100, 50, 10)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies roundedRectangle accepts explicit x and y radii.
+        -- @covers lurek.render.newShape
         it("roundedRectangle with explicit ry adds one command", function()
             local shape = lurek.render.newShape()
             shape:roundedRectangle("line", 0, 0, 100, 50, 12, 8)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies circle appends one draw command.
+        -- @covers lurek.render.newShape
         it("circle adds one command", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 30)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies ellipse appends one draw command.
+        -- @covers lurek.render.newShape
         it("ellipse adds one command", function()
             local shape = lurek.render.newShape()
             shape:ellipse("fill", 0, 0, 40, 25)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies triangle appends one draw command.
+        -- @covers lurek.render.newShape
         it("triangle adds one command", function()
             local shape = lurek.render.newShape()
             shape:triangle("fill", 0, 0, 50, 0, 25, 50)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polygon appends one draw command with valid vertices.
+        -- @covers lurek.render.newShape
         it("polygon adds one command", function()
             local shape = lurek.render.newShape()
             shape:polygon("fill", 0, 0, 50, 0, 50, 50)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies line appends one draw command.
+        -- @covers lurek.render.newShape
         it("line adds one command", function()
             local shape = lurek.render.newShape()
             shape:line(0, 0, 100, 100)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polyline appends one draw command.
+        -- @covers lurek.render.newShape
         it("polyline adds one command", function()
             local shape = lurek.render.newShape()
             shape:polyline(0, 0, 100, 100, 200, 0)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies arc appends one draw command.
+        -- @covers lurek.render.newShape
         it("arc adds one command", function()
             local shape = lurek.render.newShape()
             shape:arc("fill", 0, 0, 50, 0, math.pi)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies arc accepts an explicit segment count.
+        -- @covers lurek.render.newShape
         it("arc with explicit segments adds one command", function()
             local shape = lurek.render.newShape()
             shape:arc("line", 0, 0, 50, 0, math.pi, 64)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies multiple primitive builders accumulate commands in order.
+        -- @covers lurek.render.newShape
         it("multiple primitives accumulate", function()
             local shape = lurek.render.newShape()
             shape:rectangle("fill", 0, 0, 100, 50)
@@ -144,36 +126,31 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ State builder methods â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- State builder methods
 
-    -- @description Covers suite: state builder methods.
     describe("state builder methods", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies setColor appends a state command.
+        -- @covers lurek.render.newShape
         it("setColor adds a command", function()
             local shape = lurek.render.newShape()
             shape:setColor(1, 0, 0)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies setColor accepts alpha and still appends one state command.
+        -- @covers lurek.render.newShape
         it("setColor with alpha adds a command", function()
             local shape = lurek.render.newShape()
             shape:setColor(0, 1, 0, 0.5)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies setLineWidth appends a state command.
+        -- @covers lurek.render.newShape
         it("setLineWidth adds a command", function()
             local shape = lurek.render.newShape()
             shape:setLineWidth(3.0)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies state commands and primitives both count toward the command list.
+        -- @covers lurek.render.newShape
         it("setColor before primitive affects count", function()
             local shape = lurek.render.newShape()
             shape:setColor(1, 0, 0)
@@ -181,8 +158,7 @@ local function run_tests()
             expect_equal(2, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies repeated setColor calls append separate state commands.
+        -- @covers lurek.render.newShape
         it("multiple setColor calls all add commands", function()
             local shape = lurek.render.newShape()
             shape:setColor(1, 0, 0)
@@ -192,28 +168,24 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ polygon validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- polygon validation
 
-    -- @description Covers suite: polygon validation.
     describe("polygon validation", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies polygon accepts exactly three vertices.
+        -- @covers lurek.render.newShape
         it("polygon with 3 vertices succeeds", function()
             local shape = lurek.render.newShape()
             shape:polygon("fill", 0, 0, 50, 0, 25, 50)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polygon accepts more than three vertices.
+        -- @covers lurek.render.newShape
         it("polygon with more than 3 vertices succeeds", function()
             local shape = lurek.render.newShape()
             shape:polygon("fill", 0, 0,  100, 0,  100, 100,  0, 100)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polygon rejects fewer than three vertices.
+        -- @covers lurek.render.newShape
         it("polygon with fewer than 3 vertices raises error", function()
             local shape = lurek.render.newShape()
             expect_error(function()
@@ -221,8 +193,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies failed polygon validation does not append a command.
+        -- @covers lurek.render.newShape
         it("polygon error does not increment command count", function()
             local shape = lurek.render.newShape()
             pcall(function() shape:polygon("fill", 0, 0, 50, 0) end)
@@ -230,28 +201,24 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ polyline validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- polyline validation
 
-    -- @description Covers suite: polyline validation.
     describe("polyline validation", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies polyline accepts exactly two points.
+        -- @covers lurek.render.newShape
         it("polyline with 2 points succeeds", function()
             local shape = lurek.render.newShape()
             shape:polyline(0, 0, 100, 100)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polyline accepts more than two points.
+        -- @covers lurek.render.newShape
         it("polyline with 3 points succeeds", function()
             local shape = lurek.render.newShape()
             shape:polyline(0, 0, 100, 100, 200, 0)
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies polyline rejects fewer than two points.
+        -- @covers lurek.render.newShape
         it("polyline with fewer than 2 points raises error", function()
             local shape = lurek.render.newShape()
             expect_error(function()
@@ -259,8 +226,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies failed polyline validation does not append a command.
+        -- @covers lurek.render.newShape
         it("polyline error does not increment command count", function()
             local shape = lurek.render.newShape()
             pcall(function() shape:polyline(0, 0) end)
@@ -268,12 +234,10 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ draw dispatch â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- draw dispatch
 
-    -- @description Covers suite: draw dispatch.
     describe("draw dispatch", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies drawing an empty shape is a safe no-op.
+        -- @covers lurek.render.newShape
         it("draw on empty shape does not error", function()
             local shape = lurek.render.newShape()
             expect_no_error(function()
@@ -281,8 +245,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies draw accepts the full transform argument list.
+        -- @covers lurek.render.newShape
         it("draw with all transform args does not error", function()
             local shape = lurek.render.newShape()
             expect_no_error(function()
@@ -290,8 +253,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies draw accepts the minimal x and y arguments.
+        -- @covers lurek.render.newShape
         it("draw with minimal args does not error", function()
             local shape = lurek.render.newShape()
             expect_no_error(function()
@@ -299,8 +261,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies populated shapes can be drawn without error.
+        -- @covers lurek.render.newShape
         it("draw on populated shape does not error", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 30)
@@ -309,8 +270,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies draw does not mutate the stored command list.
+        -- @covers lurek.render.newShape
         it("draw does not change command count", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 30)
@@ -320,12 +280,10 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ clear â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- clear
 
-    -- @description Covers suite: clear.
     describe("clear", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies clear resets the command list to zero entries.
+        -- @covers lurek.render.newShape
         it("clear resets command count to 0", function()
             local shape = lurek.render.newShape()
             shape:rectangle("fill", 0, 0, 100, 50)
@@ -335,8 +293,7 @@ local function run_tests()
             expect_equal(0, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies builders still work after a clear.
+        -- @covers lurek.render.newShape
         it("builder calls after clear succeed", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 30)
@@ -345,8 +302,7 @@ local function run_tests()
             expect_equal(1, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies draw remains safe after a clear.
+        -- @covers lurek.render.newShape
         it("draw after clear does not error", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 30)
@@ -356,8 +312,7 @@ local function run_tests()
             end)
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies clearing an already empty shape is safe.
+        -- @covers lurek.render.newShape
         it("clear on already-empty shape does not error", function()
             local shape = lurek.render.newShape()
             expect_no_error(function()
@@ -367,12 +322,10 @@ local function run_tests()
         end)
     end)
 
-    -- â”€â”€ method sequencing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- method sequencing
 
-    -- @description Covers suite: method chaining.
     describe("method chaining", function()
-        -- @tests lurek.render.newShape
-        -- @description Verifies state and primitive builders can be sequenced without errors.
+        -- @covers lurek.render.newShape
         it("builder methods can be called in sequence without errors", function()
             local shape = lurek.render.newShape()
             expect_no_error(function()
@@ -384,16 +337,14 @@ local function run_tests()
             expect_equal(4, shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies getCommandCount returns a numeric type.
+        -- @covers lurek.render.newShape
         it("getCommandCount returns a number type", function()
             local shape = lurek.render.newShape()
             shape:circle("fill", 0, 0, 10)
             expect_type("number", shape:getCommandCount())
         end)
 
-        -- @tests lurek.render.newShape
-        -- @description Verifies interleaving state and primitive commands accumulates every entry.
+        -- @covers lurek.render.newShape
         it("interleaving state and primitives accumulates all commands", function()
             local shape = lurek.render.newShape()
             shape:setColor(1, 0, 0)

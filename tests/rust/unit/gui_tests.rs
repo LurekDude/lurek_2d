@@ -1,4 +1,4 @@
-//! Rust unit tests for private UI internals not reachable through the `lurek.*` Lua API.
+//! INTERNAL ONLY: Rust unit tests for private UI internals not reachable through the `lurek.*` Lua API.
 //!
 //! **Rule**: If behaviour can be observed via `lurek.ui.*` it MUST be tested in
 //! `tests/lua/unit/test_gui.lua` instead. Only struct-field defaults, non-public

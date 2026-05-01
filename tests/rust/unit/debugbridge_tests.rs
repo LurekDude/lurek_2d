@@ -1,4 +1,4 @@
-//! Public debugbridge behavior is covered by the Lua-first suite in
+//! INTERNAL ONLY: Public debugbridge behavior is covered by the Lua-first suite in
 //! `tests/lua/unit/test_debugbridge_unit.lua`.
 //!
 //! Rust-only coverage remains below for the low-level JSON-RPC message handler.

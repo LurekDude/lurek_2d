@@ -1,99 +1,89 @@
-﻿-- Lurek2D Input API Tests
+-- Lurek2D Input API Tests
 
--- @description Verifies that the keyboard namespace is exposed on lurek as a table.
 describe("lurek.input.keyboard module exists", function()
-    -- @tests lurek.input.gamepad.getAxis
-    -- @tests lurek.input.gamepad.getAxisCount
-    -- @tests lurek.input.gamepad.getButtonCount
-    -- @tests lurek.input.gamepad.getCount
-    -- @tests lurek.input.gamepad.getGUID
-    -- @tests lurek.input.gamepad.getGamepadMappingString
-    -- @tests lurek.input.gamepad.getHat
-    -- @tests lurek.input.gamepad.getJoystickCount
-    -- @tests lurek.input.gamepad.getJoysticks
-    -- @tests lurek.input.gamepad.getName
-    -- @tests lurek.input.gamepad.isConnected
-    -- @tests lurek.input.gamepad.isDown
-    -- @tests lurek.input.gamepad.isGamepad
-    -- @tests lurek.input.gamepad.isVibrationSupported
-    -- @tests lurek.input.gamepad.loadGamepadMappings
-    -- @tests lurek.input.gamepad.saveGamepadMappings
-    -- @tests lurek.input.gamepad.setGamepadMapping
-    -- @tests lurek.input.gamepad.setVibration
-    -- @tests lurek.input.keyboard.getKeyFromScancode
-    -- @tests lurek.input.keyboard.getScancodeFromKey
-    -- @tests lurek.input.keyboard.hasKeyRepeat
-    -- @tests lurek.input.keyboard.hasTextInput
-    -- @tests lurek.input.keyboard.isDown
-    -- @tests lurek.input.keyboard.isModifierActive
-    -- @tests lurek.input.keyboard.isScancodeDown
-    -- @tests lurek.input.keyboard.setKeyRepeat
-    -- @tests lurek.input.keyboard.setTextInput
-    -- @tests lurek.input.mouse.getCursor
-    -- @tests lurek.input.mouse.getPosition
-    -- @tests lurek.input.mouse.getSystemCursor
-    -- @tests lurek.input.mouse.getX
-    -- @tests lurek.input.mouse.getY
-    -- @tests lurek.input.mouse.isCursorSupported
-    -- @tests lurek.input.mouse.isDown
-    -- @tests lurek.input.mouse.setCursor
-    -- @tests lurek.input.touch.getPosition
-    -- @tests lurek.input.touch.getPressure
-    -- @tests lurek.input.touch.getTouchCount
-    -- @tests lurek.input.touch.getTouches
-    -- @tests lurek.input.mouse.setVisible
-    -- @tests lurek.input.mouse.isVisible
-    -- @tests lurek.input.mouse.setGrabbed
-    -- @tests lurek.input.mouse.isGrabbed
-    -- @tests lurek.input.mouse.setRelativeMode
-    -- @tests lurek.input.mouse.getRelativeMode
-    -- @tests lurek.input.mouse.setPosition
-    -- @tests lurek.input.mouse.getWheelDelta
-    -- @tests lurek.input.mouse.newCursor
-    -- @tests lurek.input.Cursor.release
-    -- @tests lurek.input.Cursor.getType
-    -- @description Confirms lurek.input.keyboard is present and typed as a table.
+    -- @covers lurek.input.gamepad.getAxis
+    -- @covers lurek.input.gamepad.getAxisCount
+    -- @covers lurek.input.gamepad.getButtonCount
+    -- @covers lurek.input.gamepad.getCount
+    -- @covers lurek.input.gamepad.getGUID
+    -- @covers lurek.input.gamepad.getGamepadMappingString
+    -- @covers lurek.input.gamepad.getHat
+    -- @covers lurek.input.gamepad.getJoystickCount
+    -- @covers lurek.input.gamepad.getJoysticks
+    -- @covers lurek.input.gamepad.getName
+    -- @covers lurek.input.gamepad.isConnected
+    -- @covers lurek.input.gamepad.isDown
+    -- @covers lurek.input.gamepad.isGamepad
+    -- @covers lurek.input.gamepad.isVibrationSupported
+    -- @covers lurek.input.gamepad.loadGamepadMappings
+    -- @covers lurek.input.gamepad.saveGamepadMappings
+    -- @covers lurek.input.gamepad.setGamepadMapping
+    -- @covers lurek.input.gamepad.setVibration
+    -- @covers lurek.input.keyboard.getKeyFromScancode
+    -- @covers lurek.input.keyboard.getScancodeFromKey
+    -- @covers lurek.input.keyboard.hasKeyRepeat
+    -- @covers lurek.input.keyboard.hasTextInput
+    -- @covers lurek.input.keyboard.isDown
+    -- @covers lurek.input.keyboard.isModifierActive
+    -- @covers lurek.input.keyboard.isScancodeDown
+    -- @covers lurek.input.keyboard.setKeyRepeat
+    -- @covers lurek.input.keyboard.setTextInput
+    -- @covers lurek.input.mouse.getCursor
+    -- @covers lurek.input.mouse.getPosition
+    -- @covers lurek.input.mouse.getSystemCursor
+    -- @covers lurek.input.mouse.getX
+    -- @covers lurek.input.mouse.getY
+    -- @covers lurek.input.mouse.isCursorSupported
+    -- @covers lurek.input.mouse.isDown
+    -- @covers lurek.input.mouse.setCursor
+    -- @covers lurek.input.touch.getPosition
+    -- @covers lurek.input.touch.getPressure
+    -- @covers lurek.input.touch.getTouchCount
+    -- @covers lurek.input.touch.getTouches
+    -- @covers lurek.input.mouse.setVisible
+    -- @covers lurek.input.mouse.isVisible
+    -- @covers lurek.input.mouse.setGrabbed
+    -- @covers lurek.input.mouse.isGrabbed
+    -- @covers lurek.input.mouse.setRelativeMode
+    -- @covers lurek.input.mouse.getRelativeMode
+    -- @covers lurek.input.mouse.setPosition
+    -- @covers lurek.input.mouse.getWheelDelta
+    -- @covers lurek.input.mouse.newCursor
+    -- @covers lurek.input.Cursor.release
+    -- @covers lurek.input.Cursor.getType
     it("lurek.input.keyboard is a table", function()
         expect_type("table", lurek.input.keyboard)
     end)
 end)
 
--- @description Checks keyboard query and toggle helpers for type shape, default false states, and round-trip behavior.
 describe("lurek.input.keyboard functions", function()
-    -- @description Confirms the keyboard down query is exported as a callable function.
     it("isDown is a function", function()
         expect_type("function", lurek.input.keyboard.isDown)
     end)
 
-    -- @description Calls isDown with "space" and asserts the result type is boolean.
     it("isDown returns a boolean", function()
         local val = lurek.input.keyboard.isDown("space")
         expect_type("boolean", val)
     end)
 
-    -- @description Verifies space, a, and escape all report false when no keys are pressed.
     it("isDown returns false for unpressed key", function()
         expect_false(lurek.input.keyboard.isDown("space"))
         expect_false(lurek.input.keyboard.isDown("a"))
         expect_false(lurek.input.keyboard.isDown("escape"))
     end)
 
-    -- @description Verifies the variadic key query returns false when space, a, and escape are all unpressed.
     it("isDown accepts multiple keys and returns false when none are pressed", function()
         expect_false(lurek.input.keyboard.isDown("space", "a", "escape"))
     end)
 
-    -- @description Confirms the scancode down query is exported as a callable function.
     it("isScancodeDown is a function", function()
         expect_type("function", lurek.input.keyboard.isScancodeDown)
     end)
 
-    -- @description Verifies the space scancode reports false before any input is pressed.
     it("isScancodeDown returns false for an unpressed scancode", function()
         expect_false(lurek.input.keyboard.isScancodeDown("space"))
     end)
 
-    -- @description Verifies key repeat starts false, becomes true after enabling, and returns to false after disabling.
     it("setKeyRepeat and hasKeyRepeat round-trip", function()
         expect_type("function", lurek.input.keyboard.setKeyRepeat)
         expect_type("function", lurek.input.keyboard.hasKeyRepeat)
@@ -104,7 +94,6 @@ describe("lurek.input.keyboard functions", function()
         expect_false(lurek.input.keyboard.hasKeyRepeat())
     end)
 
-    -- @description Verifies text input starts false, becomes true after enabling, and returns to false after disabling.
     it("setTextInput and hasTextInput round-trip", function()
         expect_type("function", lurek.input.keyboard.setTextInput)
         expect_type("function", lurek.input.keyboard.hasTextInput)
@@ -115,85 +104,80 @@ describe("lurek.input.keyboard functions", function()
         expect_false(lurek.input.keyboard.hasTextInput())
     end)
 
-    -- @description Confirms both key-to-scancode and scancode-to-key lookup helpers are exported as functions.
     it("phase 03 scancode lookup helpers exist", function()
         expect_type("function", lurek.input.keyboard.getScancodeFromKey)
         expect_type("function", lurek.input.keyboard.getKeyFromScancode)
     end)
 end)
 
--- @description Verifies that the mouse namespace is exposed on lurek as a table.
 describe("lurek.input.mouse module exists", function()
-    -- @description Confirms lurek.input.mouse is present and typed as a table.
     it("lurek.input.mouse is a table", function()
         expect_type("table", lurek.input.mouse)
     end)
 end)
 
--- @description Checks mouse position and button helpers for function shape, numeric coordinate results, and default unpressed buttons.
 describe("lurek.input.mouse functions", function()
-    -- @description Confirms the mouse position query is exported as a callable function.
     it("getPosition is a function", function()
         expect_type("function", lurek.input.mouse.getPosition)
     end)
 
-    -- @description Calls getPosition and asserts both returned coordinates are numbers.
     it("getPosition returns two numbers", function()
         local x, y = lurek.input.mouse.getPosition()
         expect_type("number", x)
         expect_type("number", y)
     end)
 
-    -- @description Confirms the X-coordinate accessor is exported as a callable function.
     it("getX is a function", function()
         expect_type("function", lurek.input.mouse.getX)
     end)
 
-    -- @description Calls getX and asserts the returned cursor X coordinate is numeric.
     it("getX returns a number", function()
         expect_type("number", lurek.input.mouse.getX())
     end)
 
-    -- @description Confirms the Y-coordinate accessor is exported as a callable function.
     it("getY is a function", function()
         expect_type("function", lurek.input.mouse.getY)
     end)
 
-    -- @description Calls getY and asserts the returned cursor Y coordinate is numeric.
     it("getY returns a number", function()
         expect_type("number", lurek.input.mouse.getY())
     end)
 
-    -- @description Confirms the mouse button query is exported as a callable function.
     it("isDown is a function", function()
         expect_type("function", lurek.input.mouse.isDown)
     end)
 
-    -- @description Calls isDown for button 1 and asserts the result type is boolean.
     it("isDown returns a boolean", function()
         local val = lurek.input.mouse.isDown(1)
         expect_type("boolean", val)
     end)
 
-    -- @description Verifies buttons 1, 2, and 3 all report false when no mouse buttons are pressed.
     it("isDown returns false for unpressed button", function()
         expect_false(lurek.input.mouse.isDown(1))
         expect_false(lurek.input.mouse.isDown(2))
         expect_false(lurek.input.mouse.isDown(3))
     end)
+
+    it("default mouse state is observable", function()
+        local x, y = lurek.input.mouse.getPosition()
+        local dx, dy = lurek.input.mouse.getWheelDelta()
+        expect_equal(0, x)
+        expect_equal(0, y)
+        expect_true(lurek.input.mouse.isVisible())
+        expect_false(lurek.input.mouse.isGrabbed())
+        expect_false(lurek.input.mouse.getRelativeMode())
+        expect_equal(0, dx)
+        expect_equal(0, dy)
+    end)
 end)
 
--- @description Verifies that the gamepad namespace is exposed on lurek as a table.
 describe("lurek.input.gamepad module exists", function()
-    -- @description Confirms lurek.input.gamepad is present and typed as a table.
     it("lurek.input.gamepad is a table", function()
         expect_type("table", lurek.input.gamepad)
     end)
 end)
 
--- @description Checks gamepad discovery helpers, empty-state defaults, and presence of advanced GUID, hat, and vibration hooks.
 describe("lurek.input.gamepad functions", function()
-    -- @description Confirms the core gamepad inventory and state query API is exported as functions.
     it("core query functions exist", function()
         expect_type("function", lurek.input.gamepad.getCount)
         expect_type("function", lurek.input.gamepad.getJoystickCount)
@@ -208,7 +192,6 @@ describe("lurek.input.gamepad functions", function()
         expect_type("function", lurek.input.gamepad.isVibrationSupported)
     end)
 
-    -- @description Verifies an empty gamepad inventory reports zero counts, an empty joystick table, and false for connection and gamepad checks on id 0.
     it("empty inventory returns stable defaults", function()
         expect_equal(0, lurek.input.gamepad.getCount())
         expect_equal(0, lurek.input.gamepad.getJoystickCount())
@@ -219,7 +202,6 @@ describe("lurek.input.gamepad functions", function()
         expect_false(lurek.input.gamepad.isGamepad(0))
     end)
 
-    -- @description Confirms GUID lookup, hat query, and vibration setter are all exported as functions.
     it("phase 03 advanced gamepad hooks exist", function()
         expect_type("function", lurek.input.gamepad.getGUID)
         expect_type("function", lurek.input.gamepad.getHat)
@@ -227,17 +209,13 @@ describe("lurek.input.gamepad functions", function()
     end)
 end)
 
--- @description Verifies that the touch namespace is exposed on lurek as a table.
 describe("lurek.input.touch module exists", function()
-    -- @description Confirms lurek.input.touch is present and typed as a table.
     it("lurek.input.touch is a table", function()
         expect_type("table", lurek.input.touch)
     end)
 end)
 
--- @description Checks touch query helpers for presence and verifies the default touch list is empty.
 describe("lurek.input.touch functions", function()
-    -- @description Confirms touch list, position, pressure, and count helpers are all exported as functions.
     it("phase 03 touch query functions exist", function()
         expect_type("function", lurek.input.touch.getTouches)
         expect_type("function", lurek.input.touch.getPosition)
@@ -245,17 +223,18 @@ describe("lurek.input.touch functions", function()
         expect_type("function", lurek.input.touch.getTouchCount)
     end)
 
-    -- @description Verifies getTouches returns a table whose length is zero before any touches are active.
     it("getTouches returns an empty table by default", function()
         local touches = lurek.input.touch.getTouches()
         expect_type("table", touches)
         expect_equal(0, #touches)
     end)
+
+    it("getTouchCount returns 0 by default", function()
+        expect_equal(0, lurek.input.touch.getTouchCount())
+    end)
 end)
 
--- @description Verifies modifier queries return booleans for supported names and false for unknown or inactive modifiers.
 describe("keyboard.isModifierActive", function()
-    -- @description Confirms shift, ctrl, alt, meta, and super each return a boolean result.
     it("returns a boolean for valid modifiers", function()
         expect_type("boolean", lurek.input.keyboard.isModifierActive("shift"))
         expect_type("boolean", lurek.input.keyboard.isModifierActive("ctrl"))
@@ -263,47 +242,38 @@ describe("keyboard.isModifierActive", function()
         expect_type("boolean", lurek.input.keyboard.isModifierActive("meta"))
         expect_type("boolean", lurek.input.keyboard.isModifierActive("super"))
     end)
-    -- @description Verifies an unsupported modifier name capslock returns false.
     it("returns false for unknown modifier", function()
         expect_equal(false, lurek.input.keyboard.isModifierActive("capslock"))
     end)
-    -- @description Verifies shift and ctrl both start inactive at test startup.
     it("no modifiers held at start", function()
         expect_equal(false, lurek.input.keyboard.isModifierActive("shift"))
         expect_equal(false, lurek.input.keyboard.isModifierActive("ctrl"))
     end)
 end)
 
--- @description Checks cursor userdata creation, support reporting, cursor switching with userdata and strings, and current cursor reporting.
 describe("mouse cursor userdata", function()
-    -- @description Verifies getSystemCursor("arrow") returns userdata.
     it("getSystemCursor returns a userdata", function()
         local c = lurek.input.mouse.getSystemCursor("arrow")
         expect_type("userdata", c)
     end)
-    -- @description Verifies cursor support reports a boolean and currently returns true.
     it("isCursorSupported returns a bool", function()
         expect_type("boolean", lurek.input.mouse.isCursorSupported())
         expect_equal(true, lurek.input.mouse.isCursorSupported())
     end)
-    -- @description Verifies requesting the hand system cursor returns userdata.
     it("getSystemCursor hand cursor returns non-nil", function()
         local c = lurek.input.mouse.getSystemCursor("hand")
         expect_type("userdata", c)
     end)
-    -- @description Verifies requesting the crosshair system cursor returns userdata.
     it("getSystemCursor crosshair cursor returns userdata", function()
         local c = lurek.input.mouse.getSystemCursor("crosshair")
         expect_type("userdata", c)
     end)
-    -- @description Sets the cursor from userdata, checks getCursor reports hand, then restores arrow.
     it("setCursor accepts userdata and updates cursor", function()
         local c = lurek.input.mouse.getSystemCursor("hand")
         lurek.input.mouse.setCursor(c)
         expect_equal("hand", lurek.input.mouse.getCursor())
         lurek.input.mouse.setCursor("arrow")
     end)
-    -- @description Sets the cursor from the string name crosshair, checks getCursor matches, then restores arrow for backward compatibility.
     it("setCursor still accepts string for backward compat", function()
         lurek.input.mouse.setCursor("crosshair")
         expect_equal("crosshair", lurek.input.mouse.getCursor())
@@ -312,9 +282,7 @@ describe("mouse cursor userdata", function()
 end)
 
 -- Phase 10: Gamepad Mapping Persistence
--- @description Checks mapping persistence helpers for presence, successful mapping insertion, string retrieval, and missing-file error handling.
 describe("lurek.input.gamepad mapping persistence", function()
-    -- @description Confirms set, get, load, and save mapping functions are all exported as callables.
     it("mapping API functions exist", function()
         expect_type("function", lurek.input.gamepad.setGamepadMapping)
         expect_type("function", lurek.input.gamepad.getGamepadMappingString)
@@ -322,7 +290,6 @@ describe("lurek.input.gamepad mapping persistence", function()
         expect_type("function", lurek.input.gamepad.saveGamepadMappings)
     end)
 
-    -- @description Verifies setGamepadMapping accepts a valid GUID and mapping string without raising an error.
     it("setGamepadMapping does not error for valid guid", function()
         lurek.input.gamepad.setGamepadMapping(
             "000000000000000000000000504944564d",
@@ -330,12 +297,10 @@ describe("lurek.input.gamepad mapping persistence", function()
         )
     end)
 
-    -- @description Verifies an unknown GUID returns nil from getGamepadMappingString.
     it("getGamepadMappingString returns nil for unknown guid", function()
         expect_equal(nil, lurek.input.gamepad.getGamepadMappingString("unknown_guid_xyz"))
     end)
 
-    -- @description Sets a mapping for a known GUID and verifies getGamepadMappingString returns a string.
     it("getGamepadMappingString returns a string after set", function()
         local guid = "030000005e0400008e02000014010000"
         lurek.input.gamepad.setGamepadMapping(guid, guid .. ",XInput,a:b0")
@@ -343,7 +308,6 @@ describe("lurek.input.gamepad mapping persistence", function()
         expect_type("string", s)
     end)
 
-    -- @description Verifies loading mappings from a nonexistent file raises an error.
     it("loadGamepadMappings errors on missing file", function()
         expect_error(function()
             lurek.input.gamepad.loadGamepadMappings("__nonexistent_mappings_file_.txt")
@@ -351,17 +315,14 @@ describe("lurek.input.gamepad mapping persistence", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ mouse visibility / grab / relative Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- mouse visibility / grab / relative
 
--- @description Verifies mouse visibility toggles reflect the value last set and restores visibility after the false case.
 describe("mouse.setVisible / isVisible", function()
-    -- @description Sets visibility to true and verifies isVisible returns true.
     it("setVisible true / isVisible round-trip", function()
         lurek.input.mouse.setVisible(true)
         expect_true(lurek.input.mouse.isVisible())
     end)
 
-    -- @description Sets visibility to false, verifies isVisible returns false, then restores visibility to true.
     it("setVisible false / isVisible round-trip", function()
         lurek.input.mouse.setVisible(false)
         expect_false(lurek.input.mouse.isVisible())
@@ -369,44 +330,35 @@ describe("mouse.setVisible / isVisible", function()
     end)
 end)
 
--- @description Verifies mouse grab state can be set false and that the grab query returns a boolean.
 describe("mouse.setGrabbed / isGrabbed", function()
-    -- @description Sets grabbed to false and verifies isGrabbed reports false.
     it("setGrabbed / isGrabbed round-trip false", function()
         lurek.input.mouse.setGrabbed(false)
         expect_false(lurek.input.mouse.isGrabbed())
     end)
 
-    -- @description Confirms isGrabbed returns a boolean result.
     it("isGrabbed returns a boolean", function()
         expect_type("boolean", lurek.input.mouse.isGrabbed())
     end)
 end)
 
--- @description Verifies relative mouse mode can be set false and that the relative mode query returns a boolean.
 describe("mouse.setRelativeMode / getRelativeMode", function()
-    -- @description Sets relative mode to false and verifies getRelativeMode reports false.
     it("setRelativeMode false / getRelativeMode round-trip", function()
         lurek.input.mouse.setRelativeMode(false)
         expect_false(lurek.input.mouse.getRelativeMode())
     end)
 
-    -- @description Confirms getRelativeMode returns a boolean result.
     it("getRelativeMode returns a boolean", function()
         expect_type("boolean", lurek.input.mouse.getRelativeMode())
     end)
 end)
 
--- @description Checks wheel delta return types and verifies the default delta is exactly 0,0 without scrolling.
 describe("mouse.getWheelDelta", function()
-    -- @description Calls getWheelDelta and asserts both returned deltas are numbers.
     it("getWheelDelta returns two numbers", function()
         local dx, dy = lurek.input.mouse.getWheelDelta()
         expect_type("number", dx)
         expect_type("number", dy)
     end)
 
-    -- @description Verifies getWheelDelta returns 0 for both axes when no scroll input has occurred.
     it("getWheelDelta is 0,0 when no scroll occurred", function()
         local dx, dy = lurek.input.mouse.getWheelDelta()
         expect_equal(0, dx)
@@ -414,9 +366,7 @@ describe("mouse.getWheelDelta", function()
     end)
 end)
 
--- @description Verifies setPosition can be called in headless mode without raising an error.
 describe("mouse.setPosition", function()
-    -- @description Wraps setPosition(0, 0) and asserts the call completes without error.
     it("setPosition does not error in headless mode", function()
         expect_no_error(function()
             lurek.input.mouse.setPosition(0, 0)
@@ -424,34 +374,28 @@ describe("mouse.setPosition", function()
     end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ Cursor extended methods Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- Cursor extended methods
 
--- @description Checks Cursor userdata helper methods by creating system cursors, reading the type string, and releasing without error.
 describe("Cursor.getType / Cursor.release", function()
-    -- @description Verifies getSystemCursor("default") returns a non-nil Cursor object.
     it("getSystemCursor returns a Cursor object", function()
         local cursor = lurek.input.mouse.getSystemCursor("default")
         expect_true(cursor ~= nil, "system cursor is not nil")
     end)
 
-    -- @description Verifies Cursor:getType returns a string for the default system cursor.
     it("Cursor:getType returns a string", function()
         local cursor = lurek.input.mouse.getSystemCursor("default")
         expect_type("string", cursor:getType())
     end)
 
-    -- @description Verifies calling Cursor:release on the arrow cursor completes without error.
     it("Cursor:release does not error", function()
         local cursor = lurek.input.mouse.getSystemCursor("arrow")
         expect_no_error(function() cursor:release() end)
     end)
 end)
 
--- @description Tests for the new lurek.input action-mapping namespace.
 describe("lurek.input action mapping", function()
-  -- @tests lurek.input.bind
-  -- @tests lurek.input.getBindings
-  -- @description Binds an action to keys and verifies getBindings returns a non-empty table.
+  -- @covers lurek.input.bind
+  -- @covers lurek.input.getBindings
   it("bind registers an action", function()
     lurek.input.bind("jump", {"space", "up"})
     local bindings = lurek.input.getBindings()
@@ -460,8 +404,7 @@ describe("lurek.input action mapping", function()
     expect_equal(#bindings["jump"], 2)
   end)
 
-  -- @tests lurek.input.unbind
-  -- @description After unbind, the action should no longer appear in getBindings.
+  -- @covers lurek.input.unbind
   it("unbind removes an action", function()
     lurek.input.bind("fire", "ctrl")
     local removed = lurek.input.unbind("fire")
@@ -470,8 +413,7 @@ describe("lurek.input action mapping", function()
     expect_equal(b["fire"], nil)
   end)
 
-  -- @tests lurek.input.clearBindings
-  -- @description clearBindings leaves getBindings returning an empty table.
+  -- @covers lurek.input.clearBindings
   it("clearBindings empties all mappings", function()
     lurek.input.bind("run", "shift")
     lurek.input.clearBindings()
@@ -481,35 +423,31 @@ describe("lurek.input action mapping", function()
     expect_equal(count, 0)
   end)
 
-  -- @tests lurek.input.isActionDown
-  -- @description isActionDown on an unbound action returns false.
+  -- @covers lurek.input.isActionDown
   it("isActionDown is false for an unmapped action", function()
     lurek.input.clearBindings()
     expect_equal(lurek.input.isActionDown("nosuchaction"), false)
   end)
 
-  -- @tests lurek.input.wasActionPressed
-  -- @description wasActionPressed on an unbound action returns false.
+  -- @covers lurek.input.wasActionPressed
   it("wasActionPressed is false for an unmapped action", function()
     expect_equal(lurek.input.wasActionPressed("nosuchaction"), false)
   end)
 
-  -- @tests lurek.input.wasActionReleased
-  -- @description wasActionReleased on an unbound action returns false.
+  -- @covers lurek.input.wasActionReleased
   it("wasActionReleased is false for an unmapped action", function()
     expect_equal(lurek.input.wasActionReleased("nosuchaction"), false)
   end)
 
-  -- @tests lurek.input.wasActionPressedWithin
-  -- @description wasActionPressedWithin returns false for an action that was never pressed.
+  -- @covers lurek.input.wasActionPressedWithin
   it("wasActionPressedWithin is false for an action never pressed", function()
     expect_equal(lurek.input.wasActionPressedWithin("nosuchaction", 10), false)
   end)
 end)
 
--- â”€â”€ Input Combo (merged from test_input_combo.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Input Combo (merged from test_input_combo.lua)
 
-describe("lurek.input.newCombo â€” basic construction", function()
+describe("lurek.input.newCombo  - basic construction", function()
 
     it("creates a combo with the correct total step count (string steps)", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -557,7 +495,7 @@ describe("lurek.input.newCombo â€” basic construction", function()
 
 end)
 
-describe("lurek.input.newCombo â€” feed() advancement", function()
+describe("lurek.input.newCombo  - feed() advancement", function()
 
     it("returns 'idle' when wrong first key is fed", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -623,7 +561,7 @@ describe("lurek.input.newCombo â€” feed() advancement", function()
 
 end)
 
-describe("lurek.input.newCombo â€” tick() timeout", function()
+describe("lurek.input.newCombo  - tick() timeout", function()
 
     it("tick returns 'idle' when no combo is in progress", function()
         local combo = lurek.input.newCombo({"a", "b"}, {total_gap=2000})
@@ -634,7 +572,7 @@ describe("lurek.input.newCombo â€” tick() timeout", function()
     it("tick returns 'in_progress' while within time budget", function()
         local combo = lurek.input.newCombo({{key="a", gap=1000}, {key="b", gap=1000}}, {total_gap=2000})
         combo:feed("a")
-        -- 0.3 s elapsed â€” well within 1000 ms gap
+        -- 0.3 s elapsed  - well within 1000 ms gap
         local r = combo:tick(0.3)
         expect_equal(r, "in_progress")
     end)
@@ -669,7 +607,7 @@ describe("lurek.input.newCombo â€” tick() timeout", function()
 
 end)
 
-describe("lurek.input.newCombo â€” reset()", function()
+describe("lurek.input.newCombo  - reset()", function()
 
     it("reset cancels an in-progress combo", function()
         local combo = lurek.input.newCombo({"a", "b", "c"})
@@ -691,7 +629,7 @@ describe("lurek.input.newCombo â€” reset()", function()
 
 end)
 
-describe("lurek.input.newCombo â€” opts.total_gap", function()
+describe("lurek.input.newCombo  - opts.total_gap", function()
 
     it("custom total_gap is respected", function()
         local combo = lurek.input.newCombo(
@@ -706,7 +644,7 @@ describe("lurek.input.newCombo â€” opts.total_gap", function()
 
 end)
 
-describe("lurek.input.newCombo â€” error cases", function()
+describe("lurek.input.newCombo  - error cases", function()
 
     it("raises error for empty steps table", function()
         expect_error(function()
@@ -722,7 +660,7 @@ describe("lurek.input.newCombo â€” error cases", function()
 
 end)
 
--- â”€â”€ Input Recording (merged from test_input_recording.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Input Recording (merged from test_input_recording.lua)
 
 describe("input.recording", function()
 
@@ -767,7 +705,7 @@ describe("input.recording", function()
         lurek.input.startRecording()
         local rec = lurek.input.stopRecording()
         local json = rec:toJson()
-        -- load it back â€” should not raise
+        -- load it back  - should not raise
         lurek.input.loadRecording(json)
     end)
 
@@ -806,6 +744,30 @@ describe("input.recording", function()
         lurek.input.stopPlayback()
     end)
 
+    it("advancePlayback emits recorded events and auto-stops at the end", function()
+        local json = [[{"frames":[{"frame":0,"key_events":[{"kind":"down","name":"a"}],"mouse_x":null,"mouse_y":null},{"frame":2,"key_events":[{"kind":"up","name":"a"}],"mouse_x":null,"mouse_y":null}],"total_frames":3}]]
+        lurek.input.loadRecording(json)
+        lurek.input.startPlayback()
+
+        local events0 = lurek.input.advancePlayback()
+        expect_equal(#events0, 1)
+        expect_equal(events0[1].kind, "down")
+        expect_equal(events0[1].name, "a")
+        expect_equal(lurek.input.getPlaybackFrame(), 1)
+        expect_equal(lurek.input.isPlayingBack(), true)
+
+        local events1 = lurek.input.advancePlayback()
+        expect_equal(#events1, 0)
+        expect_equal(lurek.input.getPlaybackFrame(), 2)
+        expect_equal(lurek.input.isPlayingBack(), true)
+
+        local events2 = lurek.input.advancePlayback()
+        expect_equal(#events2, 1)
+        expect_equal(events2[1].kind, "up")
+        expect_equal(events2[1].name, "a")
+        expect_equal(lurek.input.isPlayingBack(), false)
+    end)
+
     it("isRecording is false while not recording", function()
         expect_equal(lurek.input.isRecording(), false)
     end)
@@ -816,24 +778,23 @@ describe("input.recording", function()
 
 end)
 
--- â”€â”€ Input Vibrate (merged from test_input_vibrate.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Input Vibrate (merged from test_input_vibrate.lua)
 
--- @description Verifies the gamepad vibration stub API.
 
 describe("lurek.input.gamepad vibration API types", function()
-  -- @tests lurek.input.gamepad.vibrate
+  -- @covers lurek.input.gamepad.vibrate
   it("vibrate is a function", function()
     expect_type("function", lurek.input.gamepad.vibrate)
   end)
 
-  -- @tests lurek.input.gamepad.isVibrationSupported
+  -- @covers lurek.input.gamepad.isVibrationSupported
   it("isVibrationSupported is a function", function()
     expect_type("function", lurek.input.gamepad.isVibrationSupported)
   end)
 end)
 
 describe("lurek.input.gamepad.isVibrationSupported", function()
-  -- @tests lurek.input.gamepad.isVibrationSupported
+  -- @covers lurek.input.gamepad.isVibrationSupported
   it("returns a boolean", function()
     local result = lurek.input.gamepad.isVibrationSupported(0)
     expect_type("boolean", result)
@@ -846,7 +807,7 @@ describe("lurek.input.gamepad.isVibrationSupported", function()
 end)
 
 describe("lurek.input.gamepad.vibrate", function()
-  -- @tests lurek.input.gamepad.vibrate
+  -- @covers lurek.input.gamepad.vibrate
   it("returns a boolean", function()
     local result = lurek.input.gamepad.vibrate(0, 0.5, 0.5, 200)
     expect_type("boolean", result)
@@ -873,31 +834,26 @@ describe("lurek.input.gamepad.vibrate", function()
   end)
 end)
 
--- â”€â”€ Joystick Background Events (merged from test_joystick_ext.lua) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Joystick Background Events (merged from test_joystick_ext.lua)
 
--- @description Covers suite: lurek.input.gamepad.getBackgroundEvents.
 describe("lurek.input.gamepad.getBackgroundEvents", function()
-    -- @tests lurek.input.gamepad.getBackgroundEvents
-    -- @tests lurek.input.gamepad.setBackgroundEvents
-    -- @description Verifies background joystick events are disabled by default.
+    -- @covers lurek.input.gamepad.getBackgroundEvents
+    -- @covers lurek.input.gamepad.setBackgroundEvents
     it("defaults to false", function()
         expect_equal(false, lurek.input.gamepad.getBackgroundEvents())
     end)
 end)
 
--- @description Covers suite: lurek.input.gamepad.setBackgroundEvents.
 describe("lurek.input.gamepad.setBackgroundEvents", function()
-    -- @tests lurek.input.gamepad.setBackgroundEvents
-    -- @tests lurek.input.gamepad.getBackgroundEvents
-    -- @description Verifies enabling background events updates the stored gamepad setting.
+    -- @covers lurek.input.gamepad.setBackgroundEvents
+    -- @covers lurek.input.gamepad.getBackgroundEvents
     it("can enable background events", function()
         lurek.input.gamepad.setBackgroundEvents(true)
         expect_equal(true, lurek.input.gamepad.getBackgroundEvents())
     end)
 
-    -- @tests lurek.input.gamepad.setBackgroundEvents
-    -- @tests lurek.input.gamepad.getBackgroundEvents
-    -- @description Verifies the background-event flag can be turned back off after being enabled.
+    -- @covers lurek.input.gamepad.setBackgroundEvents
+    -- @covers lurek.input.gamepad.getBackgroundEvents
     it("can disable background events", function()
         lurek.input.gamepad.setBackgroundEvents(true)
         lurek.input.gamepad.setBackgroundEvents(false)

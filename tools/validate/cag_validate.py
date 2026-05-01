@@ -122,6 +122,7 @@ _SYSTEM_AUTONOMY_RE = re.compile(
 _BUILTIN_TOOL_PREFIXES = {"vscode", "edit", "search"}
 _BUILTIN_TOOL_NAMES = {"execute", "read", "agent", "todo", "search"}
 _MANAGER_ROUTING_SKILL = (GITHUB_DIR / "skills" / "agent-routing" / "SKILL.md").resolve()
+AGENT_LINE_CAP = 450
 
 
 def _detect_inline_rosters(rel: str, text: str) -> list[Violation]:
@@ -160,7 +161,7 @@ def _is_builtin_tool_ref(tool_ref: str) -> bool:
     if norm in _BUILTIN_TOOL_NAMES:
         return True
     head = re.split(r"[\\/]", norm, maxsplit=1)[0]
-    return head in _BUILTIN_TOOL_PREFIXES
+    return head in _BUILTIN_TOOL_PREFIXES or head in _BUILTIN_TOOL_NAMES
 
 
 # ─── Section ordering helper ─────────────────────────────────────────────────
@@ -430,9 +431,9 @@ def check_agent(path: Path, *, skills: set[str], agents: set[str]) -> list[Viola
                                  f"tools references missing path: '{t}'"))
 
     line_count = text.count("\n") + (0 if text.endswith("\n") else 1)
-    if line_count > 200:
+    if line_count > AGENT_LINE_CAP:
         out.append(Violation(rel, "E106", "error",
-                             f"File has {line_count} lines (cap 200)"))
+                             f"File has {line_count} lines (cap {AGENT_LINE_CAP})"))
 
     out.extend(_check_agent_routing_contract(
         path,

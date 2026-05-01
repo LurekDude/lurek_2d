@@ -8,39 +8,33 @@
 -- Compressed API (existing tests)
 -- =============================================================================
 
--- @description Verifies that the compressed-image namespace exposes its helper functions and treats a nonexistent DDS path as an error for loading and as uncompressed for probing.
 describe("lurek.image compressed API", function()
-    -- @tests lurek.image.isCompressed
-    -- @tests lurek.image.loadImage
-    -- @tests lurek.image.loadLayered
-    -- @tests lurek.image.newCompressedData
-    -- @tests lurek.image.newImageData
-    -- @tests lurek.image.newLayeredImage
-    -- @tests lurek.image.saveImage
-    -- @tests lurek.image.saveLayered
-    -- @description Confirms the image namespace is available on lurek.image as a table.
+    -- @covers lurek.image.isCompressed
+    -- @covers lurek.image.loadImage
+    -- @covers lurek.image.loadLayered
+    -- @covers lurek.image.newCompressedData
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.newLayeredImage
+    -- @covers lurek.image.saveImage
+    -- @covers lurek.image.saveLayered
     it("lurek.image is a table", function()
         expect_type("table", lurek.image)
     end)
 
-    -- @description Confirms the compressed-data constructor is exposed as a callable function.
     it("newCompressedData is a function", function()
         expect_type("function", lurek.image.newCompressedData)
     end)
 
-    -- @description Confirms the compression probe helper is exposed as a callable function.
     it("isCompressed is a function", function()
         expect_type("function", lurek.image.isCompressed)
     end)
 
-    -- @description Asserts that constructing compressed data from a missing file path raises an error instead of succeeding silently.
     it("newCompressedData errors on missing file", function()
         expect_error(function()
             lurek.image.newCompressedData("nonexistent_file.dds")
         end)
     end)
 
-    -- @description Checks that probing a missing file path reports false rather than raising or returning true.
     it("isCompressed returns false for a missing path", function()
         local result = lurek.image.isCompressed("nonexistent_file.dds")
         expect_equal(result, false)
@@ -51,14 +45,11 @@ end)
 -- Basic API (existing tests)
 -- =============================================================================
 
--- @description Verifies the legacy ImageData constructor still exists and produces userdata buffers after the newer image work landed.
 describe("lurek.image existing API still works", function()
-    -- @description Confirms lurek.image.newImageData remains exposed as a function.
     it("newImageData is a function", function()
         expect_type("function", lurek.image.newImageData)
     end)
 
-    -- @description Checks that newImageData(4, 4) returns a userdata buffer for a blank image.
     it("newImageData creates a blank buffer", function()
         local img = lurek.image.newImageData(4, 4)
         expect_type("userdata", img)
@@ -66,112 +57,91 @@ describe("lurek.image existing API still works", function()
 end)
 
 -- =============================================================================
--- Effect method existence â€” one it per effect
+-- Effect method existence  - one it per effect
 -- =============================================================================
 
--- @description Creates a fresh ImageData before each case and verifies that every documented effect method is attached as a callable function on the userdata.
 describe("ImageData effect method existence", function()
     local img
     before_each(function()
         img = lurek.image.newImageData(4, 4)
     end)
 
-    -- @description Checks that ImageData exposes brightness as a callable method.
     it("brightness is a function", function()
         expect_type("function", img.brightness)
     end)
 
-    -- @description Checks that ImageData exposes contrast as a callable method.
     it("contrast is a function", function()
         expect_type("function", img.contrast)
     end)
 
-    -- @description Checks that ImageData exposes saturation as a callable method.
     it("saturation is a function", function()
         expect_type("function", img.saturation)
     end)
 
-    -- @description Checks that ImageData exposes gamma as a callable method.
     it("gamma is a function", function()
         expect_type("function", img.gamma)
     end)
 
-    -- @description Checks that ImageData exposes tint as a callable method.
     it("tint is a function", function()
         expect_type("function", img.tint)
     end)
 
-    -- @description Checks that ImageData exposes grayscale as a callable method.
     it("grayscale is a function", function()
         expect_type("function", img.grayscale)
     end)
 
-    -- @description Checks that ImageData exposes sepia as a callable method.
     it("sepia is a function", function()
         expect_type("function", img.sepia)
     end)
 
-    -- @description Checks that ImageData exposes invert as a callable method.
     it("invert is a function", function()
         expect_type("function", img.invert)
     end)
 
-    -- @description Checks that ImageData exposes threshold as a callable method.
     it("threshold is a function", function()
         expect_type("function", img.threshold)
     end)
 
-    -- @description Checks that ImageData exposes posterize as a callable method.
     it("posterize is a function", function()
         expect_type("function", img.posterize)
     end)
 
-    -- @description Checks that ImageData exposes fill as a callable method.
     it("fill is a function", function()
         expect_type("function", img.fill)
     end)
 
-    -- @description Checks that ImageData exposes noise as a callable method.
     it("noise is a function", function()
         expect_type("function", img.noise)
     end)
 
-    -- @description Checks that ImageData exposes alphaMask as a callable method.
     it("alphaMask is a function", function()
         expect_type("function", img.alphaMask)
     end)
 
-    -- @description Checks that ImageData exposes flipHorizontal as a callable method.
     it("flipHorizontal is a function", function()
         expect_type("function", img.flipHorizontal)
     end)
 
-    -- @description Checks that ImageData exposes flipVertical as a callable method.
     it("flipVertical is a function", function()
         expect_type("function", img.flipVertical)
     end)
 
-    -- @description Checks that ImageData exposes rotate90cw as a callable method.
     it("rotate90cw is a function", function()
         expect_type("function", img.rotate90cw)
     end)
 
-    -- @description Checks that ImageData exposes crop as a callable method.
     it("crop is a function", function()
         expect_type("function", img.crop)
     end)
 
-    -- @description Checks that ImageData exposes resizeNearest as a callable method.
     it("resizeNearest is a function", function()
         expect_type("function", img.resizeNearest)
     end)
 
-    -- @description Checks that ImageData exposes blur as a callable method.
     it("blur is a function", function()
         expect_type("function", img.blur)
     end)
 
-    -- @description Checks that ImageData exposes sharpen as a callable method.
     it("sharpen is a function", function()
         expect_type("function", img.sharpen)
     end)
@@ -181,9 +151,7 @@ end)
 -- Color / Tone effects
 -- =============================================================================
 
--- @description Verifies brightness scaling by checking clamp-up behaviour on mid-grey, identity at factor 1, and nil return for in-place mutation.
 describe("ImageData color/tone effects: brightness", function()
-    -- @description Confirms brightness(2.0) pushes a mid-grey pixel up toward white while preserving full alpha.
     it("brightness factor=2 brightens a mid-grey pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 128, 128, 128, 255)
@@ -196,7 +164,6 @@ describe("ImageData color/tone effects: brightness", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms brightness(1.0) leaves all RGBA channels unchanged.
     it("brightness factor=1 leaves pixel unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -208,7 +175,6 @@ describe("ImageData color/tone effects: brightness", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Checks that brightness mutates in place and therefore returns nil.
     it("brightness returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:brightness(1.0)
@@ -216,9 +182,7 @@ describe("ImageData color/tone effects: brightness", function()
     end)
 end)
 
--- @description Verifies contrast by checking identity at factor 1, clamp-up when amplifying a bright value, and nil return for in-place mutation.
 describe("ImageData color/tone effects: contrast", function()
-    -- @description Confirms contrast(1.0) leaves channels unchanged because the mid-grey distance is multiplied by 1.
     it("contrast factor=1 leaves pixel unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 128, 200, 50, 255)
@@ -231,7 +195,6 @@ describe("ImageData color/tone effects: contrast", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms contrast(2.0) increases distance from mid-grey enough to clamp a bright channel to 255.
     it("contrast factor=2 increases distance from mid-grey", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 200, 200, 200, 255)
@@ -241,7 +204,6 @@ describe("ImageData color/tone effects: contrast", function()
         expect_equal(r, 255)
     end)
 
-    -- @description Checks that contrast mutates the source image and returns nil.
     it("contrast returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:contrast(1.0)
@@ -249,21 +211,18 @@ describe("ImageData color/tone effects: contrast", function()
     end)
 end)
 
--- @description Verifies saturation by checking full desaturation to grey, identity at factor 1, and nil return for in-place mutation.
 describe("ImageData color/tone effects: saturation", function()
-    -- @description Confirms saturation(0.0) collapses a pure red pixel to nearly equal grey channels while preserving alpha.
     it("saturation factor=0 desaturates a pure-red pixel to grey", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 255, 0, 0, 255)
         img:saturation(0.0)
         local r, g, b, a = img:getPixel(0, 0)
-        -- All channels interpolated to luma â‰ 54; must be equal within rounding
+        -- All channels interpolated to luma  54; must be equal within rounding
         expect_equal(math.abs(r - g) <= 2, true)
         expect_equal(math.abs(g - b) <= 2, true)
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms saturation(1.0) leaves the original colour untouched.
     it("saturation factor=1 leaves pixel unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -275,7 +234,6 @@ describe("ImageData color/tone effects: saturation", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Checks that saturation mutates in place and returns nil.
     it("saturation returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:saturation(1.0)
@@ -283,9 +241,7 @@ describe("ImageData color/tone effects: saturation", function()
     end)
 end)
 
--- @description Verifies gamma correction by checking identity at gamma 1, mid-tone brightening above 1, and nil return for in-place mutation.
 describe("ImageData color/tone effects: gamma", function()
-    -- @description Confirms gamma(1.0) preserves each channel within rounding tolerance and keeps alpha unchanged.
     it("gamma 1.0 leaves pixel unchanged (within rounding)", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -298,17 +254,15 @@ describe("ImageData color/tone effects: gamma", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms gamma(2.0) brightens a mid-tone grey channel above its original 128 value.
     it("gamma > 1 brightens mid-tones", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 128, 128, 128, 255)
         img:gamma(2.0)
         local r, _, _, _ = img:getPixel(0, 0)
-        -- (128/255)^0.5 * 255 â‰ 180; must be brighter than 128
+        -- (128/255)^0.5 * 255  180; must be brighter than 128
         expect_equal(r > 128, true)
     end)
 
-    -- @description Checks that gamma mutates the source image and returns nil.
     it("gamma returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:gamma(1.0)
@@ -316,9 +270,7 @@ describe("ImageData color/tone effects: gamma", function()
     end)
 end)
 
--- @description Verifies tint blending by checking full replacement at factor 1, identity at factor 0, and nil return for in-place mutation.
 describe("ImageData color/tone effects: tint", function()
-    -- @description Confirms tint with factor 1.0 replaces RGB with the supplied tint colour while leaving alpha at 200.
     it("tint factor=1.0 replaces RGB with tint colour, preserving alpha", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 128, 64, 32, 200)
@@ -331,7 +283,6 @@ describe("ImageData color/tone effects: tint", function()
         expect_equal(a, 200)
     end)
 
-    -- @description Confirms tint with factor 0.0 leaves the original pixel unchanged.
     it("tint factor=0 leaves pixel unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -343,7 +294,6 @@ describe("ImageData color/tone effects: tint", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Checks that tint mutates in place and returns nil rather than a new image.
     it("tint returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:tint(255, 0, 0, 0.5)
@@ -355,9 +305,7 @@ end)
 -- Filter effects
 -- =============================================================================
 
--- @description Verifies grayscale by checking that coloured pixels become equal-channel greys and that the method mutates in place.
 describe("ImageData filter effects: grayscale", function()
-    -- @description Confirms grayscale converts a pure red pixel into equal r, g, and b channels while preserving alpha.
     it("grayscale makes r==g==b for a pure-red pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 255, 0, 0, 255)
@@ -368,7 +316,6 @@ describe("ImageData filter effects: grayscale", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms grayscale also equalises the channels of a pure blue pixel.
     it("grayscale makes r==g==b for a pure-blue pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 0, 0, 255, 255)
@@ -378,7 +325,6 @@ describe("ImageData filter effects: grayscale", function()
         expect_equal(g, b)
     end)
 
-    -- @description Checks that grayscale is an in-place filter and therefore returns nil.
     it("grayscale returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:grayscale()
@@ -386,15 +332,13 @@ describe("ImageData filter effects: grayscale", function()
     end)
 end)
 
--- @description Verifies sepia by checking warm-toned channel ordering, alpha preservation, and nil return for in-place mutation.
 describe("ImageData filter effects: sepia", function()
-    -- @description Confirms sepia on a red pixel yields positive warm channels with r >= g >= b and unchanged alpha.
     it("sepia produces warm-toned output on a red pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 255, 0, 0, 255)
         img:sepia()
         local r, g, b, a = img:getPixel(0, 0)
-        -- sepia: râ‰100, gâ‰89, bâ‰69 â€” all positive, r >= g >= b
+        -- sepia: r100, g89, b69  - all positive, r >= g >= b
         expect_equal(r > 0, true)
         expect_equal(g > 0, true)
         expect_equal(b > 0, true)
@@ -403,7 +347,6 @@ describe("ImageData filter effects: sepia", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms sepia leaves the original alpha channel untouched.
     it("sepia leaves alpha unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 200, 100, 50, 128)
@@ -412,7 +355,6 @@ describe("ImageData filter effects: sepia", function()
         expect_equal(a, 128)
     end)
 
-    -- @description Checks that sepia mutates the source image and returns nil.
     it("sepia returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:sepia()
@@ -420,9 +362,7 @@ describe("ImageData filter effects: sepia", function()
     end)
 end)
 
--- @description Verifies invert by checking channel inversion, round-tripping after two applications, and nil return for in-place mutation.
 describe("ImageData filter effects: invert", function()
-    -- @description Confirms invert maps RGB to 255 minus the source channel values while leaving alpha unchanged.
     it("invert inverts RGB channels, leaving alpha unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -435,7 +375,6 @@ describe("ImageData filter effects: invert", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms applying invert twice restores the original RGBA values.
     it("invert applied twice returns to original", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 80, 120, 200, 200)
@@ -448,7 +387,6 @@ describe("ImageData filter effects: invert", function()
         expect_equal(a, 200)
     end)
 
-    -- @description Checks that invert mutates in place and returns nil.
     it("invert returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:invert()
@@ -456,9 +394,7 @@ describe("ImageData filter effects: invert", function()
     end)
 end)
 
--- @description Verifies thresholding by checking white output above the cutoff, black output below it, alpha preservation, and nil return for in-place mutation.
 describe("ImageData filter effects: threshold", function()
-    -- @description Confirms a white source pixel remains white when its luma is at or above the threshold value.
     it("threshold above value produces white pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 255, 255, 255, 255)  -- luma=255 >= 128
@@ -469,10 +405,9 @@ describe("ImageData filter effects: threshold", function()
         expect_equal(b, 255)
     end)
 
-    -- @description Confirms a dark source pixel becomes black when its luma is below the threshold value.
     it("threshold below value produces black pixel", function()
         local img = lurek.image.newImageData(1, 1)
-        img:setPixel(0, 0, 10, 10, 10, 255)  -- lumaâ‰10 < 128
+        img:setPixel(0, 0, 10, 10, 10, 255)  -- luma10 < 128
         img:threshold(128)
         local r, g, b, _ = img:getPixel(0, 0)
         expect_equal(r, 0)
@@ -480,7 +415,6 @@ describe("ImageData filter effects: threshold", function()
         expect_equal(b, 0)
     end)
 
-    -- @description Confirms threshold changes colour channels but keeps the alpha channel at 99.
     it("threshold leaves alpha unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 200, 200, 200, 99)
@@ -489,7 +423,6 @@ describe("ImageData filter effects: threshold", function()
         expect_equal(a, 99)
     end)
 
-    -- @description Checks that threshold mutates the source image and returns nil.
     it("threshold returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:threshold(128)
@@ -497,9 +430,7 @@ describe("ImageData filter effects: threshold", function()
     end)
 end)
 
--- @description Verifies posterize by checking two-level channel quantisation, alpha preservation, and nil return for in-place mutation.
 describe("ImageData filter effects: posterize", function()
-    -- @description Confirms posterize(2) constrains each RGB channel to either 0 or 255 while leaving alpha at 255.
     it("posterize levels=2 maps each channel to 0 or 255", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 200, 50, 128, 255)
@@ -511,7 +442,6 @@ describe("ImageData filter effects: posterize", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms posterize does not alter the alpha channel.
     it("posterize leaves alpha unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 100, 100, 77)
@@ -520,7 +450,6 @@ describe("ImageData filter effects: posterize", function()
         expect_equal(a, 77)
     end)
 
-    -- @description Checks that posterize mutates in place and returns nil.
     it("posterize returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:posterize(4)
@@ -528,9 +457,7 @@ describe("ImageData filter effects: posterize", function()
     end)
 end)
 
--- @description Verifies fill by checking that written RGBA values appear across the image, including a corner pixel, and that the method returns nil.
 describe("ImageData filter effects: fill", function()
-    -- @description Confirms fill writes the requested solid RGBA colour to pixel (0,0).
     it("fill sets all pixels to the given RGBA colour", function()
         local img = lurek.image.newImageData(4, 4)
         img:fill(255, 0, 0, 255)
@@ -541,7 +468,6 @@ describe("ImageData filter effects: fill", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms fill applies the same RGBA colour at the far corner pixel as well.
     it("fill sets a corner pixel too", function()
         local img = lurek.image.newImageData(4, 4)
         img:fill(0, 128, 255, 200)
@@ -552,7 +478,6 @@ describe("ImageData filter effects: fill", function()
         expect_equal(a, 200)
     end)
 
-    -- @description Checks that fill mutates the image in place and returns nil.
     it("fill returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:fill(0, 0, 0, 255)
@@ -560,9 +485,7 @@ describe("ImageData filter effects: fill", function()
     end)
 end)
 
--- @description Verifies noise by checking that amount 0 leaves both colour and alpha unchanged and that the method returns nil for in-place mutation.
 describe("ImageData filter effects: noise", function()
-    -- @description Confirms noise(0) leaves the RGB values and alpha exactly unchanged on an opaque pixel.
     it("noise(0) leaves pixels exactly unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 150, 200, 255)
@@ -574,7 +497,6 @@ describe("ImageData filter effects: noise", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms noise(0) leaves the alpha channel unchanged even on a semi-transparent pixel.
     it("noise(0) leaves alpha unchanged on a transparent pixel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 50, 50, 50, 128)
@@ -583,7 +505,6 @@ describe("ImageData filter effects: noise", function()
         expect_equal(a, 128)
     end)
 
-    -- @description Checks that noise mutates in place and returns nil.
     it("noise returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:noise(0)
@@ -591,9 +512,7 @@ describe("ImageData filter effects: noise", function()
     end)
 end)
 
--- @description Verifies alpha masking by checking halved alpha, identity at 1.0, full transparency at 0.0, preserved RGB values, and nil return.
 describe("ImageData filter effects: alphaMask", function()
-    -- @description Confirms alphaMask(0.5) reduces alpha from 200 to about 100 while leaving RGB unchanged.
     it("alphaMask(0.5) halves the alpha channel", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 128, 64, 255, 200)
@@ -606,7 +525,6 @@ describe("ImageData filter effects: alphaMask", function()
         expect_equal(b, 255)
     end)
 
-    -- @description Confirms alphaMask(1.0) leaves the existing alpha value unchanged.
     it("alphaMask(1.0) leaves alpha unchanged", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 100, 100, 100, 180)
@@ -615,7 +533,6 @@ describe("ImageData filter effects: alphaMask", function()
         expect_equal(a, 180)
     end)
 
-    -- @description Confirms alphaMask(0.0) drives the alpha channel all the way to zero.
     it("alphaMask(0.0) makes pixel fully transparent", function()
         local img = lurek.image.newImageData(1, 1)
         img:setPixel(0, 0, 255, 255, 255, 200)
@@ -624,7 +541,6 @@ describe("ImageData filter effects: alphaMask", function()
         expect_equal(a, 0)
     end)
 
-    -- @description Checks that alphaMask mutates the source image and returns nil.
     it("alphaMask returns nil (in-place)", function()
         local img = lurek.image.newImageData(1, 1)
         local ret = img:alphaMask(1.0)
@@ -636,21 +552,18 @@ end)
 -- Geometric in-place effects
 -- =============================================================================
 
--- @description Verifies horizontal flipping by checking mirrored edge pixels, preserved dimensions, round-tripping after two flips, and nil return for in-place mutation.
 describe("ImageData geometric in-place: flipHorizontal", function()
-    -- @description Confirms flipHorizontal swaps the left and right edge pixels in a 4-wide image.
     it("flipHorizontal mirrors pixel from column 0 to column 3 in a 4-wide image", function()
         local img = lurek.image.newImageData(4, 1)
         img:setPixel(0, 0, 255, 0, 0, 255)    -- red at left
         img:setPixel(3, 0, 0, 0, 255, 255)    -- blue at right
         img:flipHorizontal()
-        local r0, _, b0, _ = img:getPixel(0, 0)  -- was right edge â†’ now blue
-        local r3, _, b3, _ = img:getPixel(3, 0)  -- was left edge  â†’ now red
+        local r0, _, b0, _ = img:getPixel(0, 0)  -- was right edge  now blue
+        local r3, _, b3, _ = img:getPixel(3, 0)  -- was left edge   now red
         expect_equal(b0, 255)
         expect_equal(r3, 255)
     end)
 
-    -- @description Confirms flipHorizontal does not change the image width or height.
     it("flipHorizontal preserves image dimensions", function()
         local img = lurek.image.newImageData(4, 2)
         img:flipHorizontal()
@@ -658,7 +571,6 @@ describe("ImageData geometric in-place: flipHorizontal", function()
         expect_equal(img:getHeight(), 2)
     end)
 
-    -- @description Confirms applying flipHorizontal twice restores the original pixel values.
     it("flipHorizontal applied twice returns to original", function()
         local img = lurek.image.newImageData(4, 1)
         img:setPixel(0, 0, 200, 100, 50, 255)
@@ -671,7 +583,6 @@ describe("ImageData geometric in-place: flipHorizontal", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Checks that flipHorizontal mutates the source image and returns nil.
     it("flipHorizontal returns nil (in-place)", function()
         local img = lurek.image.newImageData(2, 2)
         local ret = img:flipHorizontal()
@@ -679,21 +590,18 @@ describe("ImageData geometric in-place: flipHorizontal", function()
     end)
 end)
 
--- @description Verifies vertical flipping by checking mirrored edge pixels, preserved dimensions, round-tripping after two flips, and nil return for in-place mutation.
 describe("ImageData geometric in-place: flipVertical", function()
-    -- @description Confirms flipVertical swaps the top and bottom edge pixels in a 4-tall image.
     it("flipVertical mirrors pixel from row 0 to row 3 in a 4-tall image", function()
         local img = lurek.image.newImageData(1, 4)
         img:setPixel(0, 0, 255, 0, 0, 255)    -- red at top
         img:setPixel(0, 3, 0, 0, 255, 255)    -- blue at bottom
         img:flipVertical()
-        local r0, _, b0, _ = img:getPixel(0, 0)  -- was bottom â†’ now blue
-        local r3, _, b3, _ = img:getPixel(0, 3)  -- was top    â†’ now red
+        local r0, _, b0, _ = img:getPixel(0, 0)  -- was bottom  now blue
+        local r3, _, b3, _ = img:getPixel(0, 3)  -- was top     now red
         expect_equal(b0, 255)
         expect_equal(r3, 255)
     end)
 
-    -- @description Confirms flipVertical does not change the image width or height.
     it("flipVertical preserves image dimensions", function()
         local img = lurek.image.newImageData(2, 4)
         img:flipVertical()
@@ -701,7 +609,6 @@ describe("ImageData geometric in-place: flipVertical", function()
         expect_equal(img:getHeight(), 4)
     end)
 
-    -- @description Confirms applying flipVertical twice restores the original pixel values.
     it("flipVertical applied twice returns to original", function()
         local img = lurek.image.newImageData(1, 4)
         img:setPixel(0, 0, 200, 100, 50, 255)
@@ -714,7 +621,6 @@ describe("ImageData geometric in-place: flipVertical", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Checks that flipVertical mutates the source image and returns nil.
     it("flipVertical returns nil (in-place)", function()
         local img = lurek.image.newImageData(2, 2)
         local ret = img:flipVertical()
@@ -726,24 +632,20 @@ end)
 -- Geometric new-image effects
 -- =============================================================================
 
--- @description Verifies clockwise rotation by checking the returned userdata type, swapped dimensions for non-square images, preserved square dimensions, and object independence from the source.
 describe("ImageData geometric new-image: rotate90cw", function()
-    -- @description Confirms rotate90cw returns a new userdata instead of mutating in place.
     it("rotate90cw returns a new userdata", function()
         local img = lurek.image.newImageData(4, 2)
         local out = img:rotate90cw()
         expect_type("userdata", out)
     end)
 
-    -- @description Confirms rotating a 4x2 image clockwise produces a 2x4 output image.
-    it("rotate90cw swaps dimensions (4x2 â†’ 2x4)", function()
+    it("rotate90cw swaps dimensions (4x2  2x4)", function()
         local img = lurek.image.newImageData(4, 2)
         local out = img:rotate90cw()
         expect_equal(out:getWidth(), 2)
         expect_equal(out:getHeight(), 4)
     end)
 
-    -- @description Confirms rotating a square image preserves its dimensions.
     it("rotate90cw on a square returns the same dimensions", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:rotate90cw()
@@ -751,7 +653,6 @@ describe("ImageData geometric new-image: rotate90cw", function()
         expect_equal(out:getHeight(), 4)
     end)
 
-    -- @description Confirms the rotated output is independent by mutating the source after rotation and checking the output stays blank.
     it("rotate90cw returns a distinct object from the source", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:rotate90cw()
@@ -762,16 +663,13 @@ describe("ImageData geometric new-image: rotate90cw", function()
     end)
 end)
 
--- @description Verifies cropping by checking the returned userdata type, output dimensions, copied source pixels, and error cases for invalid regions.
 describe("ImageData geometric new-image: crop", function()
-    -- @description Confirms crop returns a new userdata for a valid region.
     it("crop returns a new userdata", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:crop(0, 0, 2, 2)
         expect_type("userdata", out)
     end)
 
-    -- @description Confirms cropping a 2x2 region from the top-left of a 4x4 image yields a 2x2 output.
     it("crop(0,0,2,2) on a 4x4 image produces a 2x2 image", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:crop(0, 0, 2, 2)
@@ -779,19 +677,17 @@ describe("ImageData geometric new-image: crop", function()
         expect_equal(out:getHeight(), 2)
     end)
 
-    -- @description Confirms crop copies pixel data so source pixel (1,1) becomes output pixel (0,0).
     it("crop copies pixel values from the source region", function()
         local img = lurek.image.newImageData(4, 4)
         img:setPixel(1, 1, 200, 100, 50, 255)
         local out = img:crop(1, 1, 2, 2)  -- region starting at (1,1)
-        local r, g, b, a = out:getPixel(0, 0)  -- (1,1) in src â†’ (0,0) in crop
+        local r, g, b, a = out:getPixel(0, 0)  -- (1,1) in src  (0,0) in crop
         expect_equal(r, 200)
         expect_equal(g, 100)
         expect_equal(b, 50)
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms crop rejects a region whose x, y, width, and height extend beyond the source bounds.
     it("crop out-of-bounds raises an error", function()
         local img = lurek.image.newImageData(4, 4)
         expect_error(function()
@@ -799,7 +695,6 @@ describe("ImageData geometric new-image: crop", function()
         end)
     end)
 
-    -- @description Confirms crop rejects a zero-width region as invalid input.
     it("crop zero-width raises an error", function()
         local img = lurek.image.newImageData(4, 4)
         expect_error(function()
@@ -808,16 +703,13 @@ describe("ImageData geometric new-image: crop", function()
     end)
 end)
 
--- @description Verifies nearest-neighbour resizing by checking returned userdata, downscale and upscale dimensions, and preservation of the top-left source pixel.
 describe("ImageData geometric new-image: resizeNearest", function()
-    -- @description Confirms resizeNearest returns a new userdata rather than mutating the source.
     it("resizeNearest returns a new userdata", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:resizeNearest(2, 2)
         expect_type("userdata", out)
     end)
 
-    -- @description Confirms resizing from 4x4 to 2x2 produces the requested downscaled dimensions.
     it("resizeNearest(2,2) downscales a 4x4 to 2x2", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:resizeNearest(2, 2)
@@ -825,7 +717,6 @@ describe("ImageData geometric new-image: resizeNearest", function()
         expect_equal(out:getHeight(), 2)
     end)
 
-    -- @description Confirms resizing from 4x4 to 8x8 produces the requested upscaled dimensions.
     it("resizeNearest(8,8) upscales a 4x4 to 8x8", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:resizeNearest(8, 8)
@@ -833,7 +724,6 @@ describe("ImageData geometric new-image: resizeNearest", function()
         expect_equal(out:getHeight(), 8)
     end)
 
-    -- @description Confirms nearest-neighbour resizing keeps the top-left pixel colour at output coordinate (0,0).
     it("resizeNearest preserves top-left pixel colour", function()
         local img = lurek.image.newImageData(4, 4)
         img:setPixel(0, 0, 200, 100, 50, 255)
@@ -850,16 +740,13 @@ end)
 -- Convolution effects
 -- =============================================================================
 
--- @description Verifies blur by checking returned userdata, preserved dimensions for different radii, cloned pixels at radius 0, and colour stability on a solid image at radius 1.
 describe("ImageData convolution: blur", function()
-    -- @description Confirms blur(0) returns a new userdata.
     it("blur(0) returns a new userdata", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:blur(0)
         expect_type("userdata", out)
     end)
 
-    -- @description Confirms blur(0) keeps the output dimensions equal to the source dimensions.
     it("blur(0) returns an image with the same dimensions", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:blur(0)
@@ -867,7 +754,6 @@ describe("ImageData convolution: blur", function()
         expect_equal(out:getHeight(), 4)
     end)
 
-    -- @description Confirms blur(1) also keeps the output dimensions equal to the source dimensions.
     it("blur(1) returns an image with the same dimensions", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:blur(1)
@@ -875,7 +761,6 @@ describe("ImageData convolution: blur", function()
         expect_equal(out:getHeight(), 4)
     end)
 
-    -- @description Confirms blur(0) behaves like a clone by preserving the filled pixel values exactly.
     it("blur(0) preserves pixel values (returns a clone)", function()
         local img = lurek.image.newImageData(4, 4)
         img:fill(100, 150, 200, 255)
@@ -887,7 +772,6 @@ describe("ImageData convolution: blur", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms blur(1) leaves a solid-colour image unchanged because every sampled neighbour has the same value.
     it("blur(1) on a solid-colour image preserves colour", function()
         local img = lurek.image.newImageData(4, 4)
         img:fill(80, 120, 160, 255)
@@ -901,16 +785,13 @@ describe("ImageData convolution: blur", function()
     end)
 end)
 
--- @description Verifies sharpen by checking returned userdata, preserved dimensions, colour stability on a solid image, and independence from later source mutations.
 describe("ImageData convolution: sharpen", function()
-    -- @description Confirms sharpen returns a new userdata.
     it("sharpen returns a new userdata", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:sharpen()
         expect_type("userdata", out)
     end)
 
-    -- @description Confirms sharpen keeps the output width and height equal to the source image.
     it("sharpen returns an image with the same dimensions", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:sharpen()
@@ -918,7 +799,6 @@ describe("ImageData convolution: sharpen", function()
         expect_equal(out:getHeight(), 4)
     end)
 
-    -- @description Confirms sharpen leaves a uniform-colour image unchanged within rounding tolerance and preserves alpha.
     it("sharpen on a solid-colour image preserves pixel values", function()
         local img = lurek.image.newImageData(4, 4)
         img:fill(128, 64, 32, 255)
@@ -931,7 +811,6 @@ describe("ImageData convolution: sharpen", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms the sharpened output is independent by filling the source afterward and checking the output pixel stays blank.
     it("sharpen returns a distinct object from the source", function()
         local img = lurek.image.newImageData(4, 4)
         local out = img:sharpen()
@@ -946,38 +825,31 @@ end)
 -- LayeredImage tests
 -- -----------------------------------------------------------------------
 
--- @description Verifies layered-image construction by checking userdata type, stored canvas dimensions, and an initial layer count of zero.
 describe("lurek.image.newLayeredImage", function()
-    -- @description Confirms newLayeredImage returns userdata representing a LayeredImage stack.
     it("returns a LayeredImage userdata", function()
         local stack = lurek.image.newLayeredImage(64, 64)
         expect_equal(type(stack), "userdata")
     end)
 
-    -- @description Confirms getWidth and getHeight report the dimensions passed to newLayeredImage.
     it("getWidth and getHeight return canvas dimensions", function()
         local stack = lurek.image.newLayeredImage(32, 48)
         expect_equal(stack:getWidth(), 32)
         expect_equal(stack:getHeight(), 48)
     end)
 
-    -- @description Confirms a new LayeredImage starts with zero layers.
     it("layerCount starts at zero", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         expect_equal(stack:layerCount(), 0)
     end)
 end)
 
--- @description Verifies layer insertion by checking returned indices, incrementing layer counts, and autogenerated names when none are supplied.
 describe("LayeredImage:addLayer", function()
-    -- @description Confirms adding a named first layer returns index 1.
     it("addLayer with explicit name returns 1", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         local idx = stack:addLayer("background")
         expect_equal(idx, 1)
     end)
 
-    -- @description Confirms consecutive addLayer calls return indices 1 and 2 and increase the stack count to two.
     it("adding two layers increments index", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         local a = stack:addLayer("a")
@@ -987,7 +859,6 @@ describe("LayeredImage:addLayer", function()
         expect_equal(stack:layerCount(), 2)
     end)
 
-    -- @description Confirms addLayer without a name still assigns a non-empty generated layer name.
     it("addLayer without name generates a default name", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer()
@@ -997,9 +868,7 @@ describe("LayeredImage:addLayer", function()
     end)
 end)
 
--- @description Verifies layer removal by checking successful deletion of an existing layer and false for an out-of-range index.
 describe("LayeredImage:removeLayer", function()
-    -- @description Confirms removing the only layer returns true and drops the layer count to zero.
     it("removes existing layer and decrements count", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1007,16 +876,13 @@ describe("LayeredImage:removeLayer", function()
         expect_equal(stack:layerCount(), 0)
     end)
 
-    -- @description Confirms removeLayer returns false when asked to remove a nonexistent index.
     it("returns false for out-of-range index", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         expect_equal(stack:removeLayer(99), false)
     end)
 end)
 
--- @description Verifies per-layer opacity and visibility controls by checking round-trips, clamping above 1.0, visibility toggles, and error handling for invalid indices.
 describe("LayeredImage opacity and visibility", function()
-    -- @description Confirms setting opacity to 0.5 on layer 1 can be read back within a small tolerance.
     it("setOpacity and getOpacity round-trip", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1025,7 +891,6 @@ describe("LayeredImage opacity and visibility", function()
         expect_equal(math.abs(op - 0.5) < 0.01, true)
     end)
 
-    -- @description Confirms opacity values above 1.0 are clamped back to 1.0.
     it("setOpacity clamps above 1.0", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1033,7 +898,6 @@ describe("LayeredImage opacity and visibility", function()
         expect_equal(math.abs(stack:getOpacity(1) - 1.0) < 0.01, true)
     end)
 
-    -- @description Confirms setVisible(false) and setVisible(true) both round-trip through isVisible.
     it("setVisible and isVisible round-trip", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1043,23 +907,19 @@ describe("LayeredImage opacity and visibility", function()
         expect_equal(stack:isVisible(1), true)
     end)
 
-    -- @description Confirms getOpacity raises an error when the layer index is invalid.
     it("invalid index returns error from getOpacity", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         expect_error(function() stack:getOpacity(99) end)
     end)
 end)
 
--- @description Verifies layer naming by checking name retrieval and renaming on an existing layer.
 describe("LayeredImage name operations", function()
-    -- @description Confirms getName returns the explicit layer name that was added.
     it("getName returns the layer name", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("myName")
         expect_equal(stack:getName(1), "myName")
     end)
 
-    -- @description Confirms setName renames an existing layer and reports success.
     it("setName renames a layer", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("old")
@@ -1068,9 +928,7 @@ describe("LayeredImage name operations", function()
     end)
 end)
 
--- @description Verifies layer ordering by checking swaps, out-of-range failures, and moving a layer to a new position.
 describe("LayeredImage layer reordering", function()
-    -- @description Confirms swapLayers exchanges the names at positions 1 and 2 and returns true.
     it("swapLayers exchanges two layer positions", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("first")
@@ -1080,14 +938,12 @@ describe("LayeredImage layer reordering", function()
         expect_equal(stack:getName(2), "first")
     end)
 
-    -- @description Confirms swapLayers returns false when either requested index is out of range.
     it("swapLayers returns false for out-of-range", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
         expect_equal(stack:swapLayers(1, 99), false)
     end)
 
-    -- @description Confirms moveLayer(1, 3) reorders layers so that a moves behind b and c.
     it("moveLayer repositions a layer", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("a")
@@ -1100,9 +956,7 @@ describe("LayeredImage layer reordering", function()
     end)
 end)
 
--- @description Verifies direct layer pixel access by checking ImageData copies from getLayer, pixel replacement through setLayer, and error handling for invalid indices.
 describe("LayeredImage pixel editing via getLayer/setLayer", function()
-    -- @description Confirms getLayer returns a 4x4 ImageData userdata copy for an existing layer.
     it("getLayer returns an ImageData copy", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1112,7 +966,6 @@ describe("LayeredImage pixel editing via getLayer/setLayer", function()
         expect_equal(img:getHeight(), 4)
     end)
 
-    -- @description Confirms setLayer replaces the stored layer pixels with the red source image.
     it("setLayer replaces layer pixels", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("x")
@@ -1127,16 +980,13 @@ describe("LayeredImage pixel editing via getLayer/setLayer", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms getLayer raises an error for an invalid layer index.
     it("getLayer with invalid index throws", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         expect_error(function() stack:getLayer(99) end)
     end)
 end)
 
--- @description Verifies layer compositing by checking transparent empty output, exact output from one opaque layer, hidden-layer exclusion, opaque top-layer coverage, and preserved canvas dimensions.
 describe("LayeredImage:merge", function()
-    -- @description Confirms merging an empty stack yields a fully transparent pixel.
     it("empty stack merges to fully transparent image", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         local flat = stack:merge()
@@ -1144,7 +994,6 @@ describe("LayeredImage:merge", function()
         expect_equal(a, 0)
     end)
 
-    -- @description Confirms merging a single opaque filled layer reproduces that layer's RGBA values exactly.
     it("single opaque layer merges to that layer's pixels", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("bg")
@@ -1159,7 +1008,6 @@ describe("LayeredImage:merge", function()
         expect_equal(a, 255)
     end)
 
-    -- @description Confirms a hidden foreground layer does not contribute to the merged output, leaving the red background visible.
     it("hidden layer does not appear in merge", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("bg")
@@ -1176,7 +1024,6 @@ describe("LayeredImage:merge", function()
         expect_equal(r, 255)  -- red from bg; blue fg invisible
     end)
 
-    -- @description Confirms a visible opaque top layer fully covers the bottom layer in the merged output.
     it("opaque top layer fully covers bottom", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         stack:addLayer("bg")
@@ -1193,7 +1040,6 @@ describe("LayeredImage:merge", function()
         expect_equal(r, 0)
     end)
 
-    -- @description Confirms merge returns an ImageData with the same width and height as the layered canvas.
     it("merge returns an ImageData of the same dimensions", function()
         local stack = lurek.image.newLayeredImage(8, 6)
         local flat = stack:merge()
@@ -1206,33 +1052,27 @@ end)
 -- LIMG binary serialization tests
 -- -----------------------------------------------------------------------
 
--- @description Verifies that the flat-image serialization entry points are exposed on lurek.image.
 describe("lurek.image.saveImage / lurek.image.loadImage", function()
-    -- @description Confirms both saveImage and loadImage are present as functions on lurek.image.
     it("saveImage and loadImage functions exist", function()
         expect_equal(type(lurek.image.saveImage), "function")
         expect_equal(type(lurek.image.loadImage), "function")
     end)
 end)
 
--- @description Verifies that the layered-image loading entry point is exposed on lurek.image.
 describe("lurek.image.saveLayered / lurek.image.loadLayered", function()
-    -- @description Confirms loadLayered is present as a function on lurek.image.
     it("loadLayered function exists", function()
         expect_equal(type(lurek.image.loadLayered), "function")
     end)
 end)
 
--- @description Verifies that LayeredImage userdata exposes an instance save method.
 describe("LayeredImage:save", function()
-    -- @description Confirms the save method exists on a LayeredImage userdata instance.
     it("save method exists on LayeredImage userdata", function()
         local stack = lurek.image.newLayeredImage(4, 4)
         expect_equal(type(stack.save), "function")
     end)
 end)
 
--- ── ImageEffect chain API (merged from test_image_effect.lua) ──
+--  ImageEffect chain API (merged from test_image_effect.lua) 
 
 ---@param fx LImageEffect
 ---@param key integer|string
@@ -1256,8 +1096,7 @@ local function require_image_data(img, context)
 end
 
 describe("lurek.effect.newImageEffect construction (empty)", function()
-    -- @tests lurek.effect.newImageEffect
-    -- @description Confirms the constructor is exported as a callable function on lurek.effect.
+    -- @covers lurek.effect.newImageEffect
     it("newImageEffect is a function", function()
         expect_type("function", lurek.effect.newImageEffect)
     end)
@@ -1641,7 +1480,7 @@ describe("lurek.effect.newImageEffect invalid effect name", function()
     end)
 end)
 
--- ── Extended ImageData ops: resize, blit, getRegion, diff, mapPixels (merged from test_image_extended.lua) ──
+--  Extended ImageData ops: resize, blit, getRegion, diff, mapPixels (merged from test_image_extended.lua) 
 
 local function make_solid(w, h, r, g, b, a)
     local img = lurek.image.newImageData(w, h)
@@ -1764,13 +1603,12 @@ describe("ImageData:mapPixels", function()
 end)
 
 -- =========================================================================
--- Missing API Coverage Stubs
+-- Additional API coverage
 -- =========================================================================
 
 describe("image palette and province coverage", function()
-    -- @tests lurek.image.newPaletteLut
-    -- @tests PaletteLUT:getColorCount
-    -- @description Verifies a new palette LUT starts empty and tracks appended mappings.
+    -- @covers lurek.image.newPaletteLut
+    -- @covers PaletteLUT:getColorCount
     it("newPaletteLut starts empty and counts entries", function()
         local lut = lurek.image.newPaletteLut()
         expect_equal(0, lut:getColorCount())
@@ -1780,8 +1618,7 @@ describe("image palette and province coverage", function()
         expect_equal(2, lut:getColorCount())
     end)
 
-    -- @tests mlua:applyPaletteLut
-    -- @description Verifies applyPaletteLut remaps only exact colour matches and leaves unrelated pixels unchanged.
+    -- @covers mlua:applyPaletteLut
     it("applyPaletteLut replaces matching pixels", function()
         local img = lurek.image.newImageData(2, 1)
         local lut = lurek.image.newPaletteLut()
@@ -1803,14 +1640,13 @@ describe("image palette and province coverage", function()
         expect_equal(255, a2)
     end)
 
-    -- @tests lurek.image.savePNG
-    -- @tests lurek.image.newProvinceGrid
-    -- @tests ProvinceGrid:getWidth
-    -- @tests ProvinceGrid:getHeight
-    -- @tests ProvinceGrid:getAt
-    -- @tests ProvinceGrid:provinceCount
-    -- @tests ProvinceGrid:adjacencies
-    -- @description Builds a tiny RGB province map, saves it as PNG, reloads it as a ProvinceGrid, and verifies dimensions, IDs, background handling, and adjacency output.
+    -- @covers lurek.image.savePNG
+    -- @covers lurek.image.newProvinceGrid
+    -- @covers ProvinceGrid:getWidth
+    -- @covers ProvinceGrid:getHeight
+    -- @covers ProvinceGrid:getAt
+    -- @covers ProvinceGrid:provinceCount
+    -- @covers ProvinceGrid:adjacencies
     it("savePNG and newProvinceGrid build a usable province map", function()
         local img = lurek.image.newImageData(4, 4)
         local path = "save/_province_grid_test.png"
@@ -1855,353 +1691,45 @@ describe("image palette and province coverage", function()
     end)
 end)
 
-describe("Missing explicit test for LayeredImage:getWidth", function()
-    it("LayeredImage:getWidth works", function()
-        -- @tests LayeredImage:getWidth
-        -- TODO: add assertion for LayeredImage:getWidth
-    end)
-end)
+describe("image remaining explicit coverage", function()
+    -- @covers CompressedImageData:getWidth
+    -- @covers CompressedImageData:getHeight
+    -- @covers CompressedImageData:getDimensions
+    -- @covers CompressedImageData:getFormat
+    it("CompressedImageData metadata methods report fixture state", function()
+        local compressed = lurek.image.newCompressedData("tests/fixtures/test_dxt1.dds")
+        local width, height = compressed:getDimensions()
 
-describe("Missing explicit test for LayeredImage:getHeight", function()
-    it("LayeredImage:getHeight works", function()
-        -- @tests LayeredImage:getHeight
-        -- TODO: add assertion for LayeredImage:getHeight
+        expect_true(compressed:getWidth() > 0)
+        expect_true(compressed:getHeight() > 0)
+        expect_equal(width, compressed:getWidth())
+        expect_equal(height, compressed:getHeight())
+        expect_type("string", compressed:getFormat())
+        expect_true(#compressed:getFormat() > 0)
     end)
-end)
 
-describe("Missing explicit test for LayeredImage:layerCount", function()
-    it("LayeredImage:layerCount works", function()
-        -- @tests LayeredImage:layerCount
-        -- TODO: add assertion for LayeredImage:layerCount
+    -- @covers mlua:setRawData
+    it("ImageData:setRawData replaces pixel bytes", function()
+        local img = lurek.image.newImageData(1, 1)
+        img:setRawData(string.char(7, 8, 9, 255))
+        local r, g, b, a = img:getPixel(0, 0)
+
+        expect_equal(r, 7)
+        expect_equal(g, 8)
+        expect_equal(b, 9)
+        expect_equal(a, 255)
     end)
-end)
 
-describe("Missing explicit test for LayeredImage:addLayer", function()
-    it("LayeredImage:addLayer works", function()
-        -- @tests LayeredImage:addLayer
-        -- TODO: add assertion for LayeredImage:addLayer
-    end)
-end)
+    -- @covers PaletteLUT:clear
+    it("PaletteLUT:clear removes all mappings", function()
+        local lut = lurek.image.newPaletteLut()
+        lut:setColor(1, 2, 3, 255, 4, 5, 6, 255)
+        lut:setColor(10, 20, 30, 255, 40, 50, 60, 255)
+        expect_equal(2, lut:getColorCount())
 
-describe("Missing explicit test for LayeredImage:removeLayer", function()
-    it("LayeredImage:removeLayer works", function()
-        -- @tests LayeredImage:removeLayer
-        -- TODO: add assertion for LayeredImage:removeLayer
-    end)
-end)
+        lut:clear()
 
-describe("Missing explicit test for LayeredImage:getLayer", function()
-    it("LayeredImage:getLayer works", function()
-        -- @tests LayeredImage:getLayer
-        -- TODO: add assertion for LayeredImage:getLayer
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:getOpacity", function()
-    it("LayeredImage:getOpacity works", function()
-        -- @tests LayeredImage:getOpacity
-        -- TODO: add assertion for LayeredImage:getOpacity
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:setOpacity", function()
-    it("LayeredImage:setOpacity works", function()
-        -- @tests LayeredImage:setOpacity
-        -- TODO: add assertion for LayeredImage:setOpacity
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:isVisible", function()
-    it("LayeredImage:isVisible works", function()
-        -- @tests LayeredImage:isVisible
-        -- TODO: add assertion for LayeredImage:isVisible
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:setVisible", function()
-    it("LayeredImage:setVisible works", function()
-        -- @tests LayeredImage:setVisible
-        -- TODO: add assertion for LayeredImage:setVisible
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:getName", function()
-    it("LayeredImage:getName works", function()
-        -- @tests LayeredImage:getName
-        -- TODO: add assertion for LayeredImage:getName
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:setName", function()
-    it("LayeredImage:setName works", function()
-        -- @tests LayeredImage:setName
-        -- TODO: add assertion for LayeredImage:setName
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:swapLayers", function()
-    it("LayeredImage:swapLayers works", function()
-        -- @tests LayeredImage:swapLayers
-        -- TODO: add assertion for LayeredImage:swapLayers
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:merge", function()
-    it("LayeredImage:merge works", function()
-        -- @tests LayeredImage:merge
-        -- TODO: add assertion for LayeredImage:merge
-    end)
-end)
-
-describe("Missing explicit test for LayeredImage:save", function()
-    it("LayeredImage:save works", function()
-        -- @tests LayeredImage:save
-        -- TODO: add assertion for LayeredImage:save
-    end)
-end)
-
-describe("Missing explicit test for CompressedImageData:getWidth", function()
-    it("CompressedImageData:getWidth works", function()
-        -- @tests CompressedImageData:getWidth
-        -- TODO: add assertion for CompressedImageData:getWidth
-    end)
-end)
-
-describe("Missing explicit test for CompressedImageData:getHeight", function()
-    it("CompressedImageData:getHeight works", function()
-        -- @tests CompressedImageData:getHeight
-        -- TODO: add assertion for CompressedImageData:getHeight
-    end)
-end)
-
-describe("Missing explicit test for CompressedImageData:getDimensions", function()
-    it("CompressedImageData:getDimensions works", function()
-        -- @tests CompressedImageData:getDimensions
-        -- TODO: add assertion for CompressedImageData:getDimensions
-    end)
-end)
-
-describe("Missing explicit test for CompressedImageData:getFormat", function()
-    it("CompressedImageData:getFormat works", function()
-        -- @tests CompressedImageData:getFormat
-        -- TODO: add assertion for CompressedImageData:getFormat
-    end)
-end)
-
-describe("Missing explicit test for mlua:getWidth", function()
-    it("mlua:getWidth works", function()
-        -- @tests mlua:getWidth
-        -- TODO: add assertion for mlua:getWidth
-    end)
-end)
-
-describe("Missing explicit test for mlua:getHeight", function()
-    it("mlua:getHeight works", function()
-        -- @tests mlua:getHeight
-        -- TODO: add assertion for mlua:getHeight
-    end)
-end)
-
-describe("Missing explicit test for mlua:getDimensions", function()
-    it("mlua:getDimensions works", function()
-        -- @tests mlua:getDimensions
-        -- TODO: add assertion for mlua:getDimensions
-    end)
-end)
-
-describe("Missing explicit test for mlua:getPixel", function()
-    it("mlua:getPixel works", function()
-        -- @tests mlua:getPixel
-        -- TODO: add assertion for mlua:getPixel
-    end)
-end)
-
-describe("Missing explicit test for mlua:encode", function()
-    it("mlua:encode works", function()
-        -- @tests mlua:encode
-        -- TODO: add assertion for mlua:encode
-    end)
-end)
-
-describe("Missing explicit test for mlua:getString", function()
-    it("mlua:getString works", function()
-        -- @tests mlua:getString
-        -- TODO: add assertion for mlua:getString
-    end)
-end)
-
-describe("Missing explicit test for mlua:mapPixel", function()
-    it("mlua:mapPixel works", function()
-        -- @tests mlua:mapPixel
-        -- TODO: add assertion for mlua:mapPixel
-    end)
-end)
-
-describe("Missing explicit test for mlua:brightness", function()
-    it("mlua:brightness works", function()
-        -- @tests mlua:brightness
-        -- TODO: add assertion for mlua:brightness
-    end)
-end)
-
-describe("Missing explicit test for mlua:contrast", function()
-    it("mlua:contrast works", function()
-        -- @tests mlua:contrast
-        -- TODO: add assertion for mlua:contrast
-    end)
-end)
-
-describe("Missing explicit test for mlua:saturation", function()
-    it("mlua:saturation works", function()
-        -- @tests mlua:saturation
-        -- TODO: add assertion for mlua:saturation
-    end)
-end)
-
-describe("Missing explicit test for mlua:gamma", function()
-    it("mlua:gamma works", function()
-        -- @tests mlua:gamma
-        -- TODO: add assertion for mlua:gamma
-    end)
-end)
-
-describe("Missing explicit test for mlua:grayscale", function()
-    it("mlua:grayscale works", function()
-        -- @tests mlua:grayscale
-        -- TODO: add assertion for mlua:grayscale
-    end)
-end)
-
-describe("Missing explicit test for mlua:sepia", function()
-    it("mlua:sepia works", function()
-        -- @tests mlua:sepia
-        -- TODO: add assertion for mlua:sepia
-    end)
-end)
-
-describe("Missing explicit test for mlua:invert", function()
-    it("mlua:invert works", function()
-        -- @tests mlua:invert
-        -- TODO: add assertion for mlua:invert
-    end)
-end)
-
-describe("Missing explicit test for mlua:threshold", function()
-    it("mlua:threshold works", function()
-        -- @tests mlua:threshold
-        -- TODO: add assertion for mlua:threshold
-    end)
-end)
-
-describe("Missing explicit test for mlua:posterize", function()
-    it("mlua:posterize works", function()
-        -- @tests mlua:posterize
-        -- TODO: add assertion for mlua:posterize
-    end)
-end)
-
-describe("Missing explicit test for mlua:fill", function()
-    it("mlua:fill works", function()
-        -- @tests mlua:fill
-        -- TODO: add assertion for mlua:fill
-    end)
-end)
-
-describe("Missing explicit test for mlua:noise", function()
-    it("mlua:noise works", function()
-        -- @tests mlua:noise
-        -- TODO: add assertion for mlua:noise
-    end)
-end)
-
-describe("Missing explicit test for mlua:alphaMask", function()
-    it("mlua:alphaMask works", function()
-        -- @tests mlua:alphaMask
-        -- TODO: add assertion for mlua:alphaMask
-    end)
-end)
-
-describe("Missing explicit test for mlua:flipHorizontal", function()
-    it("mlua:flipHorizontal works", function()
-        -- @tests mlua:flipHorizontal
-        -- TODO: add assertion for mlua:flipHorizontal
-    end)
-end)
-
-describe("Missing explicit test for mlua:flipVertical", function()
-    it("mlua:flipVertical works", function()
-        -- @tests mlua:flipVertical
-        -- TODO: add assertion for mlua:flipVertical
-    end)
-end)
-
-describe("Missing explicit test for mlua:rotate90cw", function()
-    it("mlua:rotate90cw works", function()
-        -- @tests mlua:rotate90cw
-        -- TODO: add assertion for mlua:rotate90cw
-    end)
-end)
-
-describe("Missing explicit test for mlua:crop", function()
-    it("mlua:crop works", function()
-        -- @tests mlua:crop
-        -- TODO: add assertion for mlua:crop
-    end)
-end)
-
-describe("Missing explicit test for mlua:resizeNearest", function()
-    it("mlua:resizeNearest works", function()
-        -- @tests mlua:resizeNearest
-        -- TODO: add assertion for mlua:resizeNearest
-    end)
-end)
-
-describe("Missing explicit test for mlua:blur", function()
-    it("mlua:blur works", function()
-        -- @tests mlua:blur
-        -- TODO: add assertion for mlua:blur
-    end)
-end)
-
-describe("Missing explicit test for mlua:sharpen", function()
-    it("mlua:sharpen works", function()
-        -- @tests mlua:sharpen
-        -- TODO: add assertion for mlua:sharpen
-    end)
-end)
-
-describe("Missing explicit test for mlua:resize", function()
-    it("mlua:resize works", function()
-        -- @tests mlua:resize
-        -- TODO: add assertion for mlua:resize
-    end)
-end)
-
-describe("Missing explicit test for mlua:diff", function()
-    it("mlua:diff works", function()
-        -- @tests mlua:diff
-        -- TODO: add assertion for mlua:diff
-    end)
-end)
-
-describe("Missing explicit test for mlua:mapPixels", function()
-    it("mlua:mapPixels works", function()
-        -- @tests mlua:mapPixels
-        -- TODO: add assertion for mlua:mapPixels
-    end)
-end)
-
-describe("Missing explicit test for mlua:setRawData", function()
-    it("mlua:setRawData works", function()
-        -- @tests mlua:setRawData
-        -- TODO: add assertion for mlua:setRawData
-    end)
-end)
-
-describe("Missing explicit test for PaletteLUT:clear", function()
-    it("PaletteLUT:clear works", function()
-        -- @tests PaletteLUT:clear
-        -- TODO: add assertion for PaletteLUT:clear
+        expect_equal(0, lut:getColorCount())
     end)
 end)
 

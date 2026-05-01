@@ -1,4 +1,9 @@
-//! Tests for the terminal module.
+//! INTERNAL ONLY: public `lurek.terminal.*` behavior is covered by the Lua-first suite in
+//! `tests/lua/unit/test_terminal_unit.lua` plus targeted integration tests.
+//!
+//! The Rust coverage that remains here focuses on lower-level ANSI helpers,
+//! render-command generation, and widget internals that are more direct to
+//! assert outside the Lua binding layer.
 
 // ── cell ──────────────────────────────────────────────────────────────────────
 
@@ -95,52 +100,12 @@ mod widget_tests {
         assert_eq!(base.y, 6);
     }
 
-    #[test]
-    fn widget_new_label() {
-        let w = Widget::new_label(1, 1, "Hello");
-        assert!(matches!(
-            w.kind,
-            lurek2d::terminal::WidgetKind::Label { .. }
-        ));
-        assert_eq!(w.get_text().unwrap(), "Hello".to_string());
-    }
-
-    #[test]
-    fn widget_new_button() {
-        let w = Widget::new_button(1, 1, 4, 1, "OK");
-        assert!(w.is_button());
-    }
-
-    #[test]
-    fn widget_list_add_and_count() {
-        let mut w = Widget::new_list(1, 1, 10, 5);
-        w.add_item("alpha".to_string()).unwrap();
-        w.add_item("beta".to_string()).unwrap();
-        assert_eq!(w.get_item_count().unwrap(), 2);
-        assert_eq!(w.get_item_1based(1).unwrap(), "alpha".to_string());
-    }
-
-    #[test]
-    fn widget_is_type_checks() {
-        let btn = Widget::new_button(1, 1, 3, 1, "X");
-        assert!(btn.is_button());
-        assert!(!btn.is_textbox());
-        assert!(!btn.is_list());
-        assert!(!btn.is_panel());
-    }
 }
 
 // ── terminal_state ────────────────────────────────────────────────────────────
 
 mod terminal_state_tests {
     use lurek2d::terminal::Terminal;
-
-    #[test]
-    fn terminal_new_small_dimensions_preserved() {
-        let t = Terminal::new(10, 5);
-        assert_eq!(t.cols(), 10);
-        assert_eq!(t.rows(), 5);
-    }
 }
 
 // ── render ────────────────────────────────────────────────────────────────────

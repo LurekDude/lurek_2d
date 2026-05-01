@@ -1,4 +1,10 @@
-//! Tests for the render module.
+//! INTERNAL ONLY: Public `lurek.render.*` behavior is covered primarily by the Lua-first suites
+//! in `tests/lua/unit/test_render_unit.lua` and focused module suites such as
+//! `tests/lua/unit/test_drawlayer_unit.lua` and `tests/lua/unit/test_font_unit.lua`.
+//!
+//! This Rust file keeps internal helper coverage for pure data structures and
+//! renderer-side value types that are either not exposed one-to-one through Lua
+//! or still lack strong enough Lua assertions to replace these checks safely.
 
 use std::collections::HashMap;
 

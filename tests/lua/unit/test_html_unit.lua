@@ -1,4 +1,4 @@
-﻿-- tests/lua/unit/test_html_unit.lua
+-- tests/lua/unit/test_html_unit.lua
 -- Unit tests for lurek.html (standalone HTML/CSS layout engine).
 -- @covers lurek.html
 
@@ -17,7 +17,6 @@ local test_summary = test_summary or function() end
 
 describe("lurek.html module table exists", function()
     -- @tests lurek.html
-    -- @description the html sub-table is present and exposes the three top-level functions
     it("lurek.html is a table", function()
         expect_type(lurek.html, "table", "lurek.html must be a table")
     end)
@@ -36,8 +35,7 @@ describe("lurek.html module table exists", function()
 end)
 
 describe("lurek.html.newDocument constructor", function()
-    -- @tests lurek.html.newDocument
-    -- @description newDocument creates a valid HtmlDocument in all calling forms
+    -- @covers lurek.html.newDocument
     it("newDocument() returns a non-nil value", function()
         local doc = lurek.html.newDocument()
         expect_not_nil(doc, "newDocument() must return an HtmlDocument")
@@ -69,7 +67,6 @@ end)
 
 describe("HtmlDocument content API", function()
     -- @tests HtmlDocument.setHtml HtmlDocument.getHtml HtmlDocument.setCss HtmlDocument.addCss HtmlDocument.clearCss HtmlDocument.isDirty HtmlDocument.relayout HtmlDocument.update
-    -- @description set/get HTML and CSS content, dirty flag, layout pass
     local function make_doc()
         return lurek.html.newDocument()
     end
@@ -116,7 +113,6 @@ end)
 
 describe("HtmlDocument viewport API", function()
     -- @tests HtmlDocument.setViewport HtmlDocument.getViewport
-    -- @description viewport controls document layout dimensions
     it("setViewport / getViewport round-trip", function()
         local doc = lurek.html.newDocument()
         doc:setViewport(1280, 720)
@@ -134,7 +130,6 @@ end)
 
 describe("HtmlDocument element access API", function()
     -- @tests HtmlDocument.getRoot HtmlDocument.getElementById HtmlDocument.query HtmlDocument.queryAll
-    -- @description DOM traversal and element lookup
     local function make_doc_with_content()
         local doc = lurek.html.newDocument()
         doc:setHtml([[
@@ -192,7 +187,6 @@ end)
 
 describe("HtmlDocument event and input API", function()
     -- @tests HtmlDocument.on HtmlDocument.off HtmlDocument.mousepressed HtmlDocument.mousereleased HtmlDocument.mousemoved HtmlDocument.wheelmoved HtmlDocument.keypressed HtmlDocument.textinput
-    -- @description input forwarding and event subscription on the document
     local function make_doc()
         local doc = lurek.html.newDocument()
         doc:setHtml("<button id='btn'>Click</button>")
@@ -239,7 +233,6 @@ end)
 
 describe("HtmlElement DOM manipulation API", function()
     -- @tests HtmlElement.getDocument HtmlElement.getTagName HtmlElement.getId HtmlElement.setId HtmlElement.getText HtmlElement.setText HtmlElement.getHtml HtmlElement.setHtml HtmlElement.appendHtml HtmlElement.getAttribute HtmlElement.setAttribute HtmlElement.removeAttribute HtmlElement.hasClass HtmlElement.addClass HtmlElement.removeClass HtmlElement.toggleClass HtmlElement.getStyle HtmlElement.setStyle HtmlElement.getRect HtmlElement.focus HtmlElement.blur HtmlElement.query HtmlElement.queryAll HtmlElement.on HtmlElement.off HtmlElement.remove
-    -- @description complete HtmlElement DOM API coverage
     local function make_el()
         local doc = lurek.html.newDocument()
         doc:setHtml([[
@@ -383,8 +376,7 @@ describe("HtmlElement DOM manipulation API", function()
 end)
 
 describe("lurek.html.supports feature flags", function()
-    -- @tests lurek.html.supports
-    -- @description supports() returns true for known features and false for unknown ones
+    -- @covers lurek.html.supports
     it("supports('html') is true", function()
         expect_true(lurek.html.supports("html"),
             "supports('html') must be true")
@@ -408,8 +400,7 @@ describe("lurek.html.supports feature flags", function()
 end)
 
 describe("lurek.html.loadDocument error handling", function()
-    -- @tests lurek.html.loadDocument
-    -- @description loadDocument with a nonexistent path must raise a Lua error
+    -- @covers lurek.html.loadDocument
     it("loadDocument on missing file raises an error", function()
         local ok, err = pcall(function()
             lurek.html.loadDocument("nonexistent_file_xyzzy.rml")

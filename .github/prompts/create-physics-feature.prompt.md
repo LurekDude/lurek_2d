@@ -1,6 +1,6 @@
 ---
 description: "Create one bounded physics feature and keep the Lua-facing contract honest."
-agent: "Physicist"
+agent: "Developer"
 ---
 # Create Physics Feature
 

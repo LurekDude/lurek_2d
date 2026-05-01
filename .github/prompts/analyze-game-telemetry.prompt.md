@@ -1,6 +1,6 @@
 ---
 description: "Analyze game telemetry, SQL results, or DataFrame outputs for balance or KPI questions."
-agent: "Analyst"
+agent: "Planner"
 ---
 # Analyze Game Telemetry
 

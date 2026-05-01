@@ -245,10 +245,6 @@ name = "pathfind_tests"
 path = "tests/rust/unit/pathfind_tests.rs"
 
 [[test]]
-name = "ai_tests"
-path = "tests/rust/unit/ai_tests.rs"
-
-[[test]]
 name = "animation_tests"
 path = "tests/rust/unit/animation_tests.rs"
 
@@ -259,10 +255,6 @@ path = "tests/rust/unit/app_tests.rs"
 [[test]]
 name = "audio_tests"
 path = "tests/rust/unit/audio_tests.rs"
-
-[[test]]
-name = "automation_tests"
-path = "tests/rust/unit/automation_tests.rs"
 
 [[test]]
 name = "camera_tests"
@@ -277,20 +269,8 @@ name = "data_tests"
 path = "tests/rust/unit/data_tests.rs"
 
 [[test]]
-name = "dataframe_tests"
-path = "tests/rust/unit/dataframe_tests.rs"
-
-[[test]]
 name = "debugbridge_tests"
 path = "tests/rust/unit/debugbridge_tests.rs"
-
-[[test]]
-name = "devtools_tests"
-path = "tests/rust/unit/devtools_tests.rs"
-
-[[test]]
-name = "docs_tests"
-path = "tests/rust/unit/docs_tests.rs"
 
 [[test]]
 name = "ecs_tests"
@@ -299,10 +279,6 @@ path = "tests/rust/unit/ecs_tests.rs"
 [[test]]
 name = "effect_tests"
 path = "tests/rust/unit/effect_tests.rs"
-
-[[test]]
-name = "event_tests"
-path = "tests/rust/unit/event_tests.rs"
 
 [[test]]
 name = "filesystem_tests"
@@ -339,10 +315,6 @@ path = "tests/rust/unit/math_tests.rs"
 [[test]]
 name = "minimap_tests"
 path = "tests/rust/unit/minimap_tests.rs"
-
-[[test]]
-name = "mods_tests"
-path = "tests/rust/unit/mods_tests.rs"
 
 [[test]]
 name = "network_tests"

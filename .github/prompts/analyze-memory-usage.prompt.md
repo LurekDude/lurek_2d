@@ -1,6 +1,6 @@
 ---
 description: "Analyze memory growth, allocation churn, or resource lifetime issues in the engine."
-agent: "Optimizer"
+agent: "Verifier"
 ---
 # Analyze Memory Usage
 

@@ -1,6 +1,6 @@
 ---
 description: "Create one roadmap phase draft with clear problem, gate, and dependency framing."
-agent: "Discovery-Lead"
+agent: "Planner"
 ---
 # Create Roadmap Phase
 

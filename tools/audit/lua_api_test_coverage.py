@@ -35,7 +35,7 @@ OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "data" / "lua_api_test_coverage.json"
 
 # Regex for @covers markers: -- @covers lurek.math.sin  OR  -- @covers Vec2:length
 COVERS_RE = re.compile(
-    r"^--\s*@covers\s+((?:lurek\.\w+\.\w+)|(?:\w+:\w+))\s*$"
+    r"^--\s*@covers\s+((?:lurek\.\w+(?:\.\w+)+)|(?:\w+:\w+))\s*$"
 )
 
 # Regex for @evidence markers
@@ -150,11 +150,27 @@ def build_marker_coverage(
         covered_names: set of lua_name strings that have markers
         coverage_map: {lua_name: [test_files]}
         orphans: list of {"file", "line", "marker"} for unmatched markers
+
+    Handles two naming conventions:
+      - Canonical: LChannel:push, LThread:isRunning (internal L-prefix class names)
+      - Test-style: Channel:push, Thread:isRunning  (names without L-prefix)
+    Both are accepted. lurek.module.Class.method is resolved to LClass:method.
     """
-    # Build lookup sets
+    # Build canonical lookup and alias mappings
     canonical_names: Set[str] = set()
+    # Maps no-L alias -> canonical lua_name  (e.g. "Channel:push" -> "LChannel:push")
+    alias_map: Dict[str, str] = {}
+
     for fn in api_functions:
-        canonical_names.add(fn["lua_name"])
+        lua_name = fn["lua_name"]
+        canonical_names.add(lua_name)
+
+        # Build alias for class methods: LFoo:bar -> Foo:bar
+        if ":" in lua_name:
+            cls, sep, meth = lua_name.partition(":")
+            if cls.startswith("L") and len(cls) > 1:
+                alias = cls[1:] + sep + meth  # strip leading L
+                alias_map[alias] = lua_name
 
     covered_names: Set[str] = set()
     coverage_map: Dict[str, List[str]] = {}
@@ -163,9 +179,30 @@ def build_marker_coverage(
     for test_file, markers in marker_data.items():
         for entry in markers:
             marker = entry["marker"]
-            if marker in canonical_names:
-                covered_names.add(marker)
-                coverage_map.setdefault(marker, []).append(test_file)
+            resolved = marker
+
+            # Try direct match first
+            if marker not in canonical_names:
+                # Try alias (e.g. Channel:push -> LChannel:push)
+                if marker in alias_map:
+                    resolved = alias_map[marker]
+                # Try lurek.module.Class.method -> LClass:method
+                elif marker.startswith("lurek."):
+                    parts = marker.split(".")
+                    if len(parts) >= 4:
+                        # lurek.module.ClassName.methodName
+                        cls_name = parts[-2]
+                        meth_name = parts[-1]
+                        dotted_alias = cls_name + ":" + meth_name
+                        l_alias = "L" + cls_name + ":" + meth_name
+                        if dotted_alias in alias_map:
+                            resolved = alias_map[dotted_alias]
+                        elif l_alias in canonical_names:
+                            resolved = l_alias
+
+            if resolved in canonical_names:
+                covered_names.add(resolved)
+                coverage_map.setdefault(resolved, []).append(test_file)
             else:
                 orphans.append({
                     "file": test_file,

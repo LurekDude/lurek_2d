@@ -1,6 +1,6 @@
 ---
 description: "Turn a rough feature description into one roadmap phase draft."
-agent: "Discovery-Lead"
+agent: "Planner"
 ---
 # Generate Roadmap Phase From Description
 

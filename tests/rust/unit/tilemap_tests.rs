@@ -1,4 +1,10 @@
-//! Tests for the tilemap module.
+//! INTERNAL ONLY: public `lurek.tilemap.*` behavior is covered primarily by
+//! `tests/lua/unit/test_tilemap_unit.lua` plus matching evidence/golden and
+//! integration suites.
+//!
+//! The Rust coverage that remains here focuses on helper-level rendering,
+//! TileWalker internals, and tileset/mapgen behavior not yet asserted as
+//! strongly through Lua.
 
 use lurek2d::tilemap::*;
 use lurek2d::tilemap::tilemap::TileMap;
@@ -86,50 +92,6 @@ mod tileset_tests {
     use super::*;
 
     #[test]
-    fn quad_no_spacing_no_margin() {
-        let ts = TileSet::new(1, 16, 4, 32, 32, 0, 0);
-        let q = ts.get_quad(0);
-        assert!((q.x - 0.0).abs() < 1e-5);
-        assert!((q.y - 0.0).abs() < 1e-5);
-        assert!((q.width - 32.0).abs() < 1e-5);
-        assert!((q.height - 32.0).abs() < 1e-5);
-
-        let q5 = ts.get_quad(5);
-        assert!((q5.x - 32.0).abs() < 1e-5);
-        assert!((q5.y - 32.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn quad_with_spacing_and_margin() {
-        let ts = TileSet::new(1, 16, 4, 32, 32, 2, 4);
-        let q0 = ts.get_quad(0);
-        assert!((q0.x - 4.0).abs() < 1e-5);
-        assert!((q0.y - 4.0).abs() < 1e-5);
-
-        let q1 = ts.get_quad(1);
-        assert!((q1.x - 38.0).abs() < 1e-5);
-        assert!((q1.y - 4.0).abs() < 1e-5);
-
-        let q4 = ts.get_quad(4);
-        assert!((q4.x - 4.0).abs() < 1e-5);
-        assert!((q4.y - 38.0).abs() < 1e-5);
-    }
-
-    #[test]
-    fn solid_flag_get_set() {
-        let mut ts = TileSet::new(1, 16, 4, 32, 32, 0, 0);
-        assert!(!ts.is_solid(0));
-        assert!(!ts.is_solid(100));
-
-        ts.set_solid(5, true);
-        assert!(ts.is_solid(5));
-        assert!(!ts.is_solid(4));
-
-        ts.set_solid(5, false);
-        assert!(!ts.is_solid(5));
-    }
-
-    #[test]
     fn animation_get_set() {
         let mut ts = TileSet::new(1, 16, 4, 32, 32, 0, 0);
         assert!(ts.get_animation(0).is_none());
@@ -162,18 +124,6 @@ mod tileset_tests {
         assert_eq!(ts.get_auto_tile_id_8("wall", 0b00000000), None);
     }
 
-    #[test]
-    fn getters() {
-        let ts = TileSet::new(10, 64, 8, 16, 16, 1, 2);
-        assert_eq!(ts.get_first_gid(), 10);
-        assert_eq!(ts.get_tile_count(), 64);
-        assert_eq!(ts.get_columns(), 8);
-        assert_eq!(ts.get_tile_width(), 16);
-        assert_eq!(ts.get_tile_height(), 16);
-        assert_eq!(ts.get_tile_dimensions(), (16, 16));
-        assert_eq!(ts.get_spacing(), 1);
-        assert_eq!(ts.get_margin(), 2);
-    }
 }
 
 // ── render ────────────────────────────────────────────────────────────────────

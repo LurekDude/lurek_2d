@@ -1,26 +1,26 @@
-[2026-04-28T21:34:07.418Z] INFO  [L081] L081: C:\Users\tombl\Documents\luna2d\lurek.log
-[2026-04-28T21:34:07.430Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
-[2026-04-28T21:34:07.430Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\luna2d
-[2026-04-28T21:34:09.305Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
-[2026-04-28T21:34:09.308Z] WARN  GENERAL [Loader Message (0x0)]
+[2026-04-30T21:51:42.918Z] INFO  [L081] L081: C:\Users\tombl\Documents\luna2d\lurek.log
+[2026-04-30T21:51:42.920Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-04-30T21:51:42.920Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\luna2d
+[2026-04-30T21:51:43.036Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-04-30T21:51:43.037Z] WARN  GENERAL [Loader Message (0x0)]
 	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
-[2026-04-28T21:34:09.308Z] WARN  	objects: (type: INSTANCE, hndl: 0x23fbc772c50, name: ?)
-[2026-04-28T21:34:09.434Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
-[2026-04-28T21:34:09.435Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
-[2026-04-28T21:34:09.451Z] WARN  Unrecognized present mode 1000361000
-[2026-04-28T21:34:09.936Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
-[2026-04-28T21:34:10.000Z] WARN  Unrecognized present mode 1000361000
-[2026-04-28T21:34:10.001Z] INFO  [L034] GPU texture dimension limit: 2048
-[2026-04-28T21:34:10.003Z] WARN  Unrecognized present mode 1000361000
-[2026-04-28T21:34:10.448Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
-[2026-04-28T21:34:10.453Z] DEBUG Loaded 846 mappings.
-[2026-04-28T21:34:10.512Z] WARN  Unrecognized present mode 1000361000
-[2026-04-28T21:34:10.522Z] WARN  Unrecognized present mode 1000361000
-[2026-04-28T21:34:10.572Z] DEBUG [FS01] GameFS initialised
-[2026-04-28T21:34:11.088Z] DEBUG [AT01] Simulator created
-[2026-04-28T21:34:11.093Z] DEBUG [SC01] SC01
-[2026-04-28T21:34:11.097Z] DEBUG [GU01] GuiContext created
-[2026-04-28T21:34:11.101Z] WARN  [L007] No main.lua found in game directory: c:\Users\tombl\Documents\luna2d
-[2026-04-28T21:34:11.101Z] INFO  [L006] Splash screen — no game loaded
-[2026-04-28T21:34:17.737Z] INFO  [L039] Window close requested
-[2026-04-28T21:34:17.743Z] INFO  [L002] Lurek2D Engine stopped
+[2026-04-30T21:51:43.039Z] WARN  	objects: (type: INSTANCE, hndl: 0x24130d6eb80, name: ?)
+[2026-04-30T21:51:43.115Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-04-30T21:51:43.116Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-04-30T21:51:43.126Z] WARN  Unrecognized present mode 1000361000
+[2026-04-30T21:51:43.384Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-04-30T21:51:43.425Z] WARN  Unrecognized present mode 1000361000
+[2026-04-30T21:51:43.425Z] INFO  [L034] GPU texture dimension limit: 2048
+[2026-04-30T21:51:43.426Z] WARN  Unrecognized present mode 1000361000
+[2026-04-30T21:51:43.792Z] INFO  [L035] GPU initialised: 848ms (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-04-30T21:51:43.793Z] DEBUG Loaded 846 mappings.
+[2026-04-30T21:51:43.819Z] WARN  Unrecognized present mode 1000361000
+[2026-04-30T21:51:43.825Z] WARN  Unrecognized present mode 1000361000
+[2026-04-30T21:51:43.849Z] DEBUG [FS01] GameFS initialised
+[2026-04-30T21:51:44.462Z] DEBUG [AT01] Simulator created
+[2026-04-30T21:51:44.463Z] DEBUG [SC01] SC01
+[2026-04-30T21:51:44.463Z] DEBUG [GU01] GuiContext created
+[2026-04-30T21:51:44.464Z] WARN  [L007] No main.lua found in game directory: c:\Users\tombl\Documents\luna2d
+[2026-04-30T21:51:44.464Z] INFO  [L006] Splash screen — no game loaded
+[2026-04-30T21:51:47.249Z] INFO  [L039] Window close requested
+[2026-04-30T21:51:47.251Z] INFO  [L002] Lurek2D Engine stopped

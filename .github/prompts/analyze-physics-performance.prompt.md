@@ -1,6 +1,6 @@
 ---
 description: "Analyze physics step cost, collision pressure, or world-update slowdowns."
-agent: "Optimizer"
+agent: "Verifier"
 ---
 # Analyze Physics Performance
 

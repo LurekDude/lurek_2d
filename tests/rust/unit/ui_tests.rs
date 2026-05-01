@@ -1,4 +1,9 @@
-//! Tests for the ui module.
+//! INTERNAL ONLY: public `lurek.ui.*` behavior is covered primarily by
+//! `tests/lua/unit/test_ui_unit.lua` and related GUI/UI evidence suites.
+//!
+//! This Rust file keeps internal widget/theme/render helpers where Lua coverage
+//! is still partial or placeholder-only, so the stronger assertions remain at
+//! the Rust layer for now.
 
 // ── widget ────────────────────────────────────────────────────────────────────
 

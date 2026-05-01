@@ -1,4 +1,11 @@
-//! Tests for the raycaster module.
+//! INTERNAL ONLY: Public `lurek.raycaster.*` behavior is covered by the Lua-first suites in
+//! `tests/lua/unit/test_raycaster_unit.lua` and
+//! `tests/lua/evidence/test_raycaster_evidence.lua`.
+//!
+//! The Rust coverage that remains here focuses on lower-level helpers not
+//! exercised directly through the Lua object surface, such as polygon visibility
+//! math, free-function ray casting against segments, and internal scene/render
+//! command generation.
 
 use lurek2d::math::{Color, Vec2};
 use lurek2d::raycaster::*;
@@ -39,69 +46,6 @@ mod visibility_tests {
         ];
         let poly = field_of_view(0.0, 0.0, &segs, 20.0);
         assert!(poly.len() >= 8); // at least 4 points (8 floats)
-    }
-}
-
-// ── sprite_manager ────────────────────────────────────────────────────
-
-mod sprite_manager_tests {
-    use super::*;
-
-    #[test]
-    fn add_returns_unique_ids() {
-        let mut mgr = SpriteManager::new();
-        let a = mgr.add(0.0, 0.0, "tree", 1.0);
-        let b = mgr.add(1.0, 0.0, "rock", 1.0);
-        assert_ne!(a, b);
-    }
-
-    #[test]
-    fn remove_deletes_sprite() {
-        let mut mgr = SpriteManager::new();
-        let id = mgr.add(0.0, 0.0, "enemy", 1.0);
-        mgr.remove(id);
-        let sorted = mgr.sort_by_distance(0.0, 0.0);
-        assert!(sorted.is_empty());
-    }
-
-    #[test]
-    fn set_position_moves_sprite() {
-        let mut mgr = SpriteManager::new();
-        let id = mgr.add(0.0, 0.0, "npc", 1.0);
-        mgr.set_position(id, 5.0, 10.0);
-        let sorted = mgr.sort_by_distance(0.0, 0.0);
-        assert_eq!(sorted[0].x, 5.0);
-        assert_eq!(sorted[0].y, 10.0);
-    }
-
-    #[test]
-    fn invisible_sprite_excluded_from_sort() {
-        let mut mgr = SpriteManager::new();
-        let a = mgr.add(1.0, 0.0, "a", 1.0);
-        let _b = mgr.add(2.0, 0.0, "b", 1.0);
-        mgr.set_visible(a, false);
-        let sorted = mgr.sort_by_distance(0.0, 0.0);
-        assert_eq!(sorted.len(), 1);
-        assert_eq!(sorted[0].texture, "b");
-    }
-
-    #[test]
-    fn sort_by_distance_farthest_first() {
-        let mut mgr = SpriteManager::new();
-        mgr.add(1.0, 0.0, "near", 1.0);
-        mgr.add(10.0, 0.0, "far", 1.0);
-        let sorted = mgr.sort_by_distance(0.0, 0.0);
-        assert_eq!(sorted[0].texture, "far");
-        assert_eq!(sorted[1].texture, "near");
-    }
-
-    #[test]
-    fn clear_removes_all() {
-        let mut mgr = SpriteManager::new();
-        mgr.add(0.0, 0.0, "a", 1.0);
-        mgr.add(0.0, 0.0, "b", 1.0);
-        mgr.clear();
-        assert!(mgr.sort_by_distance(0.0, 0.0).is_empty());
     }
 }
 
@@ -157,7 +101,12 @@ mod scene_tests {
     }
 
     fn unit_uvs() -> [Vec2; 4] {
-        [Vec2::new(0.0, 0.0), Vec2::new(1.0, 0.0), Vec2::new(1.0, 1.0), Vec2::new(0.0, 1.0)]
+        [
+            Vec2::new(0.0, 0.0),
+            Vec2::new(1.0, 0.0),
+            Vec2::new(1.0, 1.0),
+            Vec2::new(0.0, 1.0),
+        ]
     }
 
     #[test]
@@ -597,8 +546,8 @@ mod column_batch_tests {
         let mut batch = ColumnBatch::new(2, 320.0, 200.0);
         // 5 floats per ray: distance, cellValue, side, texU, hit
         let rays = vec![
-            2.0, 1.0, 0.0, 0.25, 1.0,  // ray 0
-            4.0, 2.0, 1.0, 0.75, 1.0,  // ray 1
+            2.0, 1.0, 0.0, 0.25, 1.0, // ray 0
+            4.0, 2.0, 1.0, 0.75, 1.0, // ray 1
         ];
         batch.update_from_ray_data(&rays, 1.0, Some(10.0));
         let c0 = batch.get_column(0).unwrap();
@@ -721,11 +670,7 @@ mod build_scene_tests {
         let scene = RaycasterScene::build(&rc, &params, &lights, &[], &|_| None);
         if let Some(wall) = scene.walls.first() {
             // With an orange light nearby, red channel should be higher than blue
-            assert!(
-                wall.light[0] > 0.0,
-                "Wall should receive some light"
-            );
+            assert!(wall.light[0] > 0.0, "Wall should receive some light");
         }
     }
 }
-

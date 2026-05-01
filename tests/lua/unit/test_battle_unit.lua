@@ -8,25 +8,21 @@ if not lurek.turnbattle then
     return
 end
 
--- @description Covers suite: lurek.turnbattle module exists.
 describe("lurek.turnbattle module exists", function()
     -- @tests lurek.turnbattle
-    -- @tests lurek.turnbattle.newAction
-    -- @tests lurek.turnbattle.newBattle
-    -- @tests lurek.turnbattle.newCombatant
-    -- @description Verifies the turnbattle namespace is registered as a Lua table.
+    -- @covers lurek.turnbattle.newAction
+    -- @covers lurek.turnbattle.newBattle
+    -- @covers lurek.turnbattle.newCombatant
     it("is a table", function()
         expect_type("table", lurek.turnbattle)
     end)
 end)
 
--- @description Covers suite: lurek.turnbattle.newCombatant.
 describe("lurek.turnbattle.newCombatant", function()
-    -- @tests lurek.turnbattle.newCombatant
+    -- @covers lurek.turnbattle.newCombatant
     -- @tests Combatant.getName
     -- @tests Combatant.isAlive
     -- @tests Combatant.type
-    -- @description Verifies a new combatant exposes its assigned name, starts alive, and reports the Combatant userdata type.
     it("creates a combatant with basic accessors", function()
         local c = lurek.turnbattle.newCombatant("hero")
         expect_not_nil(c)
@@ -35,10 +31,9 @@ describe("lurek.turnbattle.newCombatant", function()
     end)
 end)
 
--- @description Covers suite: lurek.turnbattle.newBattle.
 describe("lurek.turnbattle.newBattle", function()
-    -- @tests lurek.turnbattle.newBattle
-    -- @tests lurek.turnbattle.newAction
+    -- @covers lurek.turnbattle.newBattle
+    -- @covers lurek.turnbattle.newAction
     -- @tests Combatant.setTeam
     -- @tests Combatant.setHp
     -- @tests Combatant.setMaxHp
@@ -47,7 +42,6 @@ describe("lurek.turnbattle.newBattle", function()
     -- @tests Action.setAccuracy
     -- @tests Battle.addCombatant
     -- @tests Battle.attack
-    -- @description Verifies a configured action resolves through the battle system and returns an attack result table with attacker, target, and damage fields.
     it("creates a battle and resolves a simple attack", function()
         local battle = lurek.turnbattle.newBattle("arena")
         local hero = lurek.turnbattle.newCombatant("hero")

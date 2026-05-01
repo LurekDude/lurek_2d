@@ -1,5 +1,5 @@
-//! Public serial behavior is covered by the Lua-first suite in
-//! `tests/lua/unit/test_serial_unit.lua`.
+//! INTERNAL ONLY: public serial behavior is covered by the Lua-first suites in
+//! `tests/lua/unit/test_serial_unit.lua` and `tests/lua/golden/test_serial_golden.lua`.
 //!
 //! The Rust-only coverage that remains here is the low-level `SerialValue` <->
 //! `LuaValue` bridge used by the binding layer itself.

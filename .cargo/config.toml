@@ -5,6 +5,17 @@
 [build]
 target-dir = "build"
 
+[alias]
+# Standard shortcuts
+r = "run --bin lurek2d --"
+c = "check"
+t = "test"
+
+# Project-specific shortcuts using the parallel runner
+pc = "!python tools/dev/parallel_cargo.py"
+test-all = "!python tools/dev/parallel_cargo.py test all"
+demo = "run --bin lurek2d -- content/games/showcase/hello_world"
+
 # Intentionally no Windows-specific debug linker override here.
 # The previous /DEBUG:FASTLINK setting caused unstable `lua_tests` links on
 # large debug builds under MSVC, so the repository now relies on Cargo's

@@ -1,55 +1,48 @@
-﻿-- tests/lua/unit/test_network.lua
+-- tests/lua/unit/test_network.lua
 -- BDD tests for lurek.network (high-level UDP API via ENet).
--- lurek.net and _G.enet tests are guarded Ă˘â‚¬â€ť they only run if those namespaces exist.
+-- lurek.net and _G.enet tests are guarded  they only run if those namespaces exist.
 -- Headless-safe (no GPU/window needed).
 require("tests/lua/init")
 
--- @description Covers suite: lurek.network.
 describe("lurek.network", function()
   -- @tests lurek.network
-  -- @tests lurek.network.newHost
-  -- @tests lurek.network.Host.service
-  -- @tests lurek.network.Host.getAddress
-  -- @tests lurek.network.Host.getPeerLimit
-  -- @tests lurek.network.Host.flush
-  -- @tests lurek.network.Host.destroy
-  -- @tests lurek.network.Host.setBandwidthLimit
-  -- @tests lurek.network.Host.getConnectedPeerIds
-  -- @tests lurek.network.Host.getBandwidthLimit
-  -- @tests lurek.network.Host.connect
-  -- @tests lurek.network.Host.broadcast
-  -- @description Verifies the high-level network namespace is available as a table.
+  -- @covers lurek.network.newHost
+  -- @covers lurek.network.Host.service
+  -- @covers lurek.network.Host.getAddress
+  -- @covers lurek.network.Host.getPeerLimit
+  -- @covers lurek.network.Host.flush
+  -- @covers lurek.network.Host.destroy
+  -- @covers lurek.network.Host.setBandwidthLimit
+  -- @covers lurek.network.Host.getConnectedPeerIds
+  -- @covers lurek.network.Host.getBandwidthLimit
+  -- @covers lurek.network.Host.connect
+  -- @covers lurek.network.Host.broadcast
   it("is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
 
-  -- @tests lurek.network.newHost
-  -- @description Verifies the high-level newHost constructor is exposed.
+  -- @covers lurek.network.newHost
   it("newHost is a function", function()
     expect_equal(type(lurek.network.newHost), "function")
   end)
 end)
 
--- @description Covers suite: lurek.network.newHost.
 describe("lurek.network.newHost", function()
-  -- @tests lurek.network.newHost
-  -- @description Verifies newHost can create a client host with default options.
+  -- @covers lurek.network.newHost
   it("creates a client host with no arguments", function()
     local host = lurek.network.newHost({})
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @tests lurek.network.newHost
-  -- @description Verifies newHost accepts an explicit bind address string.
+  -- @covers lurek.network.newHost
   it("creates a host with addr option", function()
     local host = lurek.network.newHost({ addr = "0.0.0.0:0" })
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @tests lurek.network.newHost
-  -- @description Verifies newHost accepts the legacy peers alias alongside an explicit bind address.
+  -- @covers lurek.network.newHost
   it("creates a host with legacy peers alias", function()
     local host = lurek.network.newHost({
       addr = "0.0.0.0:0",
@@ -60,8 +53,7 @@ describe("lurek.network.newHost", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.newHost
-  -- @description Verifies maxPeers is clamped instead of rejecting oversized requests.
+  -- @covers lurek.network.newHost
   it("clamps maxPeers to 8", function()
     -- Requesting more than MAX_PEERS should clamp, not error
     local host = lurek.network.newHost({ maxPeers = 100 })
@@ -70,10 +62,8 @@ describe("lurek.network.newHost", function()
   end)
 end)
 
--- @description Covers suite: lurek.network host methods.
 describe("lurek.network host methods", function()
-  -- @tests lurek.network.Host.service
-  -- @description Verifies service returns nil when no events are pending.
+  -- @covers lurek.network.Host.service
   it("service returns nil when no events", function()
     local host = lurek.network.newHost({})
     local event = host:service()
@@ -81,8 +71,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getAddress
-  -- @description Verifies getAddress returns the bound host information as a string.
+  -- @covers lurek.network.Host.getAddress
   it("getAddress returns a socket string", function()
     local host = lurek.network.newHost({})
     local addr = host:getAddress()
@@ -91,8 +80,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getPeerLimit
-  -- @description Verifies getPeerLimit reports the configured peer limit.
+  -- @covers lurek.network.Host.getPeerLimit
   it("getPeerLimit returns configured limit", function()
     local host = lurek.network.newHost({ maxPeers = 6 })
     local count = host:getPeerLimit()
@@ -100,8 +88,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.flush
-  -- @description Verifies flush is safe when there is no pending data.
+  -- @covers lurek.network.Host.flush
   it("flush succeeds with no pending data", function()
     local host = lurek.network.newHost({})
     local ok = pcall(function() host:flush() end)
@@ -109,8 +96,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.destroy
-  -- @description Verifies destroy invalidates the host for later method calls.
+  -- @covers lurek.network.Host.destroy
   it("destroy makes host unusable", function()
     local host = lurek.network.newHost({})
     host:destroy()
@@ -119,9 +105,8 @@ describe("lurek.network host methods", function()
     expect_equal(ok, false)
   end)
 
-  -- @tests lurek.network.Host.setBandwidthLimit
-  -- @tests lurek.network.Host.getBandwidthLimit
-  -- @description Verifies setBandwidthLimit accepts numeric limits and getBandwidthLimit returns a table with incoming and outgoing fields.
+  -- @covers lurek.network.Host.setBandwidthLimit
+  -- @covers lurek.network.Host.getBandwidthLimit
   it("setBandwidthLimit updates bandwidth table", function()
     local host = lurek.network.newHost({})
     local ok = pcall(function() host:setBandwidthLimit(100000, 50000) end)
@@ -133,8 +118,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getConnectedPeerIds
-  -- @description Verifies getConnectedPeerIds returns an empty table when there are no connections.
+  -- @covers lurek.network.Host.getConnectedPeerIds
   it("getConnectedPeerIds returns empty table when no connections", function()
     local host = lurek.network.newHost({})
     local peers = host:getConnectedPeerIds()
@@ -145,8 +129,7 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.network.Host.getBandwidthLimit
-  -- @description Verifies getBandwidthLimit returns a table payload.
+  -- @covers lurek.network.Host.getBandwidthLimit
   it("getBandwidthLimit returns a table", function()
     local host = lurek.network.newHost({})
     local stats = host:getBandwidthLimit()
@@ -155,70 +138,59 @@ describe("lurek.network host methods", function()
   end)
 end)
 
--- Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬ lurek.net (raw ENet API) Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬Ă˘â€ťâ‚¬
+-- lurek.net (raw ENet API)
 -- NOTE: lurek.net is a low-level ENet alias that may not be registered
 -- in all builds. Tests are guarded so the file does not crash when absent.
 
 if lurek.net then
-  -- @description Covers suite: lurek.net.
   describe("lurek.net", function()
     -- @tests lurek.net
-    -- @description Verifies the low-level ENet alias is exposed when registered.
     it("is a table", function()
       expect_equal(type(lurek.net), "table")
     end)
 
-    -- @tests lurek.net.host_create
-    -- @description Verifies the low-level host_create constructor is exposed.
+    -- @covers lurek.net.host_create
     it("host_create is a function", function()
       expect_equal(type(lurek.net.host_create), "function")
     end)
 
-    -- @tests lurek.net.linked_version
-    -- @description Verifies linked_version is exposed.
+    -- @covers lurek.net.linked_version
     it("linked_version is a function", function()
       expect_equal(type(lurek.net.linked_version), "function")
     end)
   end)
 
--- @description Covers suite: lurek.net.linked_version.
 describe("lurek.net.linked_version", function()
-  -- @tests lurek.net.linked_version
-  -- @description Verifies linked_version returns a string.
+  -- @covers lurek.net.linked_version
   it("returns a string", function()
     local ver = lurek.net.linked_version()
     expect_equal(type(ver), "string")
   end)
 end)
 
--- @description Covers suite: lurek.net.host_create.
 describe("lurek.net.host_create", function()
-  -- @tests lurek.net.host_create
-  -- @description Verifies host_create can build a client host with default arguments.
+  -- @covers lurek.net.host_create
   it("creates a client host with no arguments", function()
     local host = lurek.net.host_create()
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies host_create accepts a bind address string.
+  -- @covers lurek.net.host_create
   it("creates a server host with bind address", function()
     local host = lurek.net.host_create("*:0")
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies host_create accepts an explicit peer count.
+  -- @covers lurek.net.host_create
   it("creates a host with peer count", function()
     local host = lurek.net.host_create(nil, 6)
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies host_create accepts every low-level constructor parameter.
+  -- @covers lurek.net.host_create
   it("creates a host with all parameters", function()
     local host = lurek.net.host_create("*:0", 4, 2, 0, 0)
     expect_equal(type(host), "userdata")
@@ -226,10 +198,8 @@ describe("lurek.net.host_create", function()
   end)
 end)
 
--- @description Covers suite: lurek.net host methods.
 describe("lurek.net host methods", function()
-  -- @tests lurek.net.host_create
-  -- @description Verifies service returns nil when there are no ENet events.
+  -- @covers lurek.net.host_create
   it("service returns nil when no events", function()
     local host = lurek.net.host_create()
     local evt = host:service(0)
@@ -237,8 +207,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies get_socket_address returns a string.
+  -- @covers lurek.net.host_create
   it("get_socket_address returns address string", function()
     local host = lurek.net.host_create()
     local addr = host:get_socket_address()
@@ -246,8 +215,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies connected_peers starts at zero.
+  -- @covers lurek.net.host_create
   it("connected_peers returns zero initially", function()
     local host = lurek.net.host_create()
     local count = host:connected_peers()
@@ -255,8 +223,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies flush is safe without pending data.
+  -- @covers lurek.net.host_create
   it("flush succeeds with no pending data", function()
     local host = lurek.net.host_create()
     local ok, err = pcall(function() host:flush() end)
@@ -264,8 +231,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies destroy invalidates the low-level host.
+  -- @covers lurek.net.host_create
   it("destroy makes host unusable", function()
     local host = lurek.net.host_create()
     host:destroy()
@@ -273,8 +239,7 @@ describe("lurek.net host methods", function()
     expect_equal(ok, false)
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies bandwidth_limit returns numeric in and out limits.
+  -- @covers lurek.net.host_create
   it("bandwidth_limit returns in and out", function()
     local host = lurek.net.host_create()
     local in_bw, out_bw = host:bandwidth_limit()
@@ -284,8 +249,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies max_packet_size returns a number.
+  -- @covers lurek.net.host_create
   it("max_packet_size returns a number", function()
     local host = lurek.net.host_create()
     local sz = host:max_packet_size()
@@ -293,8 +257,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies max_waiting_data returns a number.
+  -- @covers lurek.net.host_create
   it("max_waiting_data returns a number", function()
     local host = lurek.net.host_create()
     local wd = host:max_waiting_data()
@@ -302,8 +265,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies duplicate_peers returns a number.
+  -- @covers lurek.net.host_create
   it("duplicate_peers returns a number", function()
     local host = lurek.net.host_create()
     local dp = host:duplicate_peers()
@@ -311,8 +273,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies enable_checksum accepts a boolean without error.
+  -- @covers lurek.net.host_create
   it("enable_checksum does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:enable_checksum(true) end)
@@ -320,8 +281,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies compress_with_range_coder is callable without error.
+  -- @covers lurek.net.host_create
   it("compress_with_range_coder does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:compress_with_range_coder() end)
@@ -329,8 +289,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies compress_disable is callable without error.
+  -- @covers lurek.net.host_create
   it("compress_disable does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:compress_disable() end)
@@ -338,8 +297,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies get_stats returns a table.
+  -- @covers lurek.net.host_create
   it("get_stats returns a table", function()
     local host = lurek.net.host_create()
     local stats = host:get_stats()
@@ -347,8 +305,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies reset_stats can be called without error.
+  -- @covers lurek.net.host_create
   it("reset_stats does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:reset_stats() end)
@@ -356,8 +313,7 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @tests lurek.net.host_create
-  -- @description Verifies received_address returns a string.
+  -- @covers lurek.net.host_create
   it("received_address returns a string", function()
     local host = lurek.net.host_create()
     local addr = host:received_address()
@@ -366,17 +322,14 @@ describe("lurek.net host methods", function()
   end)
 end)
 
--- @description Covers suite: lurek.net time.
 describe("lurek.net time", function()
-  -- @tests lurek.net.time_get
-  -- @description Verifies time_get returns a number.
+  -- @covers lurek.net.time_get
   it("time_get returns a number", function()
     local t = lurek.net.time_get()
     expect_equal(type(t), "number")
   end)
 
-  -- @tests lurek.net.time_get
-  -- @description Verifies time_get is monotonic across consecutive calls.
+  -- @covers lurek.net.time_get
   it("time_get increases monotonically", function()
     local t1 = lurek.net.time_get()
     local t2 = lurek.net.time_get()
@@ -390,22 +343,18 @@ end -- if lurek.net
 local global_env = _G
 
 if global_env.enet then
-  -- @description Covers suite: enet global alias.
   describe("enet global alias", function()
     -- @tests enet
-    -- @description Verifies the global enet alias is available when registered.
     it("enet is a table", function()
       expect_equal(type(global_env.enet), "table")
     end)
 
     -- @tests enet.host_create
-    -- @description Verifies the global enet alias exposes host_create.
     it("enet.host_create is a function", function()
       expect_equal(type(global_env.enet.host_create), "function")
     end)
 
     -- @tests enet.linked_version
-    -- @description Verifies the global enet alias exposes linked_version.
     it("enet.linked_version returns a string", function()
       expect_equal(type(global_env.enet.linked_version()), "string")
     end)
@@ -415,145 +364,122 @@ end -- if global_env.enet
   ---@type { MAX_PEERS: integer, DEFAULT_PEERS: integer, MAX_CHANNELS: integer, DEFAULT_CHANNELS: integer }
   local network_consts = lurek.network
 
--- @description Covers suite: lurek.network constants.
 describe("lurek.network constants", function()
-  -- @tests lurek.network.MAX_PEERS
-  -- @description Verifies MAX_PEERS is numeric in the high-level namespace.
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
-  -- @tests lurek.network.MAX_PEERS
-  -- @description Verifies MAX_PEERS equals 4096.
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 4096", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies DEFAULT_PEERS is numeric.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies DEFAULT_PEERS equals 166.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 166", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
-  -- @tests lurek.network.MAX_CHANNELS
-  -- @description Verifies MAX_CHANNELS is numeric.
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
-  -- @tests lurek.network.MAX_CHANNELS
-  -- @description Verifies MAX_CHANNELS equals 255.
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies DEFAULT_CHANNELS is numeric.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies DEFAULT_CHANNELS equals 1.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies DEFAULT_PEERS does not exceed MAX_PEERS.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is less than or equal to MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies DEFAULT_CHANNELS does not exceed MAX_CHANNELS.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is less than or equal to MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
 end)
 
--- â”€â”€ Merged from test_network_constants.lua â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Merged from test_network_constants.lua
 
--- @description Covers suite: lurek.network constants.
 describe("lurek.network constants", function()
   -- @tests lurek.network
-  -- @tests lurek.network.MAX_PEERS
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @tests lurek.network.MAX_CHANNELS
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies the network namespace is registered as a Lua table before constant lookups run.
+  -- @covers lurek.network.MAX_PEERS
+  -- @covers lurek.network.DEFAULT_PEERS
+  -- @covers lurek.network.MAX_CHANNELS
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("lurek.network is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
 
-  -- @tests lurek.network.MAX_PEERS
-  -- @description Verifies MAX_PEERS is exported as a numeric constant.
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
-  -- @tests lurek.network.MAX_PEERS
-  -- @description Verifies MAX_PEERS matches the documented hard limit of 8 peers.
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 8", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies DEFAULT_PEERS is exported as a numeric constant.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies DEFAULT_PEERS keeps the expected default peer count of 4.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 4", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
-  -- @tests lurek.network.MAX_CHANNELS
-  -- @description Verifies MAX_CHANNELS is exported as a numeric constant.
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
-  -- @tests lurek.network.MAX_CHANNELS
-  -- @description Verifies MAX_CHANNELS matches the documented ENet ceiling of 255.
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies DEFAULT_CHANNELS is exported as a numeric constant.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies DEFAULT_CHANNELS keeps the default single-channel configuration.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
-  -- @tests lurek.network.DEFAULT_PEERS
-  -- @description Verifies the default peer count never exceeds the advertised peer cap.
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS does not exceed MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
-  -- @tests lurek.network.DEFAULT_CHANNELS
-  -- @description Verifies the default channel count stays within the exported channel limit.
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS does not exceed MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
 end)
 
--- â”€â”€ Merged from test_network_pack_unpack.lua â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Merged from test_network_pack_unpack.lua
 
 describe("lurek.network.pack / unpack", function()
     it("should exist as functions", function()
@@ -654,7 +580,7 @@ describe("lurek.network.pack / unpack", function()
     it("should produce compact binary (smaller than JSON)", function()
         local msg = { type = "move", x = 100.5, y = 200.5, id = 42 }
         local packed = lurek.network.pack(msg)
-        -- MessagePack should be compact â€” well under 100 bytes for this
+        -- MessagePack should be compact  - well under 100 bytes for this
         expect_equal(#packed < 100, true)
     end)
 
@@ -665,7 +591,7 @@ describe("lurek.network.pack / unpack", function()
     end)
 end)
 
--- â”€â”€ Merged from test_network_roles.lua â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Merged from test_network_roles.lua
 
 describe("lurek.network server/client roles", function()
     it("should have newServer function", function()
@@ -707,7 +633,7 @@ describe("lurek.network server/client roles", function()
     end)
 end)
 
--- â”€â”€ Merged from test_network_runtimer.lua â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- Merged from test_network_runtimer.lua
 
 describe("lurek.network.newRuntime", function()
     it("should have newRuntime function", function()
@@ -770,244 +696,6 @@ describe("lurek.network.newRuntime", function()
         expect_equal(type(rt.wsSend), "function")
         expect_equal(type(rt.wsClose), "function")
         rt:shutdown()
-    end)
-end)
-
--- =========================================================================
--- Missing API Coverage Stubs
--- =========================================================================
-
-describe("Missing API Coverage", function()
-    -- @tests lurek.network.createLobby
-    it("covers lurek.network.createLobby", function()
-        -- TODO: Implement test for lurek.network.createLobby
-    end)
-
-    -- @tests lurek.network.discoverLobbies
-    it("covers lurek.network.discoverLobbies", function()
-        -- TODO: Implement test for lurek.network.discoverLobbies
-    end)
-
-    -- @tests lurek.network.syncEntity
-    it("covers lurek.network.syncEntity", function()
-        -- TODO: Implement test for lurek.network.syncEntity
-    end)
-
-    -- @tests NetworkHost:resetPeer
-    it("covers NetworkHost:resetPeer", function()
-        -- TODO: Implement test for NetworkHost:resetPeer
-    end)
-
-    -- @tests NetworkHost:getRoundTripTime
-    it("covers NetworkHost:getRoundTripTime", function()
-        -- TODO: Implement test for NetworkHost:getRoundTripTime
-    end)
-
-    -- @tests NetworkHost:getPeerState
-    it("covers NetworkHost:getPeerState", function()
-        -- TODO: Implement test for NetworkHost:getPeerState
-    end)
-
-    -- @tests NetworkHost:getPeerAddress
-    it("covers NetworkHost:getPeerAddress", function()
-        -- TODO: Implement test for NetworkHost:getPeerAddress
-    end)
-
-    -- @tests NetworkHost:getPeerLimit
-    it("covers NetworkHost:getPeerLimit", function()
-        -- TODO: Implement test for NetworkHost:getPeerLimit
-    end)
-
-    -- @tests NetworkHost:getChannelLimit
-    it("covers NetworkHost:getChannelLimit", function()
-        -- TODO: Implement test for NetworkHost:getChannelLimit
-    end)
-
-    -- @tests NetworkHost:setChannelLimit
-    it("covers NetworkHost:setChannelLimit", function()
-        -- TODO: Implement test for NetworkHost:setChannelLimit
-    end)
-
-    -- @tests NetworkHost:getBandwidthLimit
-    it("covers NetworkHost:getBandwidthLimit", function()
-        -- TODO: Implement test for NetworkHost:getBandwidthLimit
-    end)
-
-    -- @tests NetworkHost:getConnectedPeerCount
-    it("covers NetworkHost:getConnectedPeerCount", function()
-        -- TODO: Implement test for NetworkHost:getConnectedPeerCount
-    end)
-
-    -- @tests NetworkHost:getConnectedPeerIds
-    it("covers NetworkHost:getConnectedPeerIds", function()
-        -- TODO: Implement test for NetworkHost:getConnectedPeerIds
-    end)
-
-    -- @tests NetworkHost:getPeerStats
-    it("covers NetworkHost:getPeerStats", function()
-        -- TODO: Implement test for NetworkHost:getPeerStats
-    end)
-
-end)
-
-describe("Missing explicit test for lurek.network.newServer", function()
-    it("lurek.network.newServer works", function()
-        -- @tests lurek.network.newServer
-        -- TODO: add assertion for lurek.network.newServer
-    end)
-end)
-
-describe("Missing explicit test for lurek.network.newClient", function()
-    it("lurek.network.newClient works", function()
-        -- @tests lurek.network.newClient
-        -- TODO: add assertion for lurek.network.newClient
-    end)
-end)
-
-describe("Missing explicit test for lurek.network.newRuntime", function()
-    it("lurek.network.newRuntime works", function()
-        -- @tests lurek.network.newRuntime
-        -- TODO: add assertion for lurek.network.newRuntime
-    end)
-end)
-
-describe("Missing explicit test for lurek.network.pack", function()
-    it("lurek.network.pack works", function()
-        -- @tests lurek.network.pack
-        -- TODO: add assertion for lurek.network.pack
-    end)
-end)
-
-describe("Missing explicit test for lurek.network.unpack", function()
-    it("lurek.network.unpack works", function()
-        -- @tests lurek.network.unpack
-        -- TODO: add assertion for lurek.network.unpack
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:service", function()
-    it("NetworkHost:service works", function()
-        -- @tests NetworkHost:service
-        -- TODO: add assertion for NetworkHost:service
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:flush", function()
-    it("NetworkHost:flush works", function()
-        -- @tests NetworkHost:flush
-        -- TODO: add assertion for NetworkHost:flush
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:ping", function()
-    it("NetworkHost:ping works", function()
-        -- @tests NetworkHost:ping
-        -- TODO: add assertion for NetworkHost:ping
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:getAddress", function()
-    it("NetworkHost:getAddress works", function()
-        -- @tests NetworkHost:getAddress
-        -- TODO: add assertion for NetworkHost:getAddress
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:destroy", function()
-    it("NetworkHost:destroy works", function()
-        -- @tests NetworkHost:destroy
-        -- TODO: add assertion for NetworkHost:destroy
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:isDestroyed", function()
-    it("NetworkHost:isDestroyed works", function()
-        -- @tests NetworkHost:isDestroyed
-        -- TODO: add assertion for NetworkHost:isDestroyed
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:getRole", function()
-    it("NetworkHost:getRole works", function()
-        -- @tests NetworkHost:getRole
-        -- TODO: add assertion for NetworkHost:getRole
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:isServer", function()
-    it("NetworkHost:isServer works", function()
-        -- @tests NetworkHost:isServer
-        -- TODO: add assertion for NetworkHost:isServer
-    end)
-end)
-
-describe("Missing explicit test for NetworkHost:isClient", function()
-    it("NetworkHost:isClient works", function()
-        -- @tests NetworkHost:isClient
-        -- TODO: add assertion for NetworkHost:isClient
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:httpRequest", function()
-    it("NetworkRuntime:httpRequest works", function()
-        -- @tests NetworkRuntime:httpRequest
-        -- TODO: add assertion for NetworkRuntime:httpRequest
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:tcpConnect", function()
-    it("NetworkRuntime:tcpConnect works", function()
-        -- @tests NetworkRuntime:tcpConnect
-        -- TODO: add assertion for NetworkRuntime:tcpConnect
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:tcpSend", function()
-    it("NetworkRuntime:tcpSend works", function()
-        -- @tests NetworkRuntime:tcpSend
-        -- TODO: add assertion for NetworkRuntime:tcpSend
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:tcpClose", function()
-    it("NetworkRuntime:tcpClose works", function()
-        -- @tests NetworkRuntime:tcpClose
-        -- TODO: add assertion for NetworkRuntime:tcpClose
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:wsConnect", function()
-    it("NetworkRuntime:wsConnect works", function()
-        -- @tests NetworkRuntime:wsConnect
-        -- TODO: add assertion for NetworkRuntime:wsConnect
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:wsSend", function()
-    it("NetworkRuntime:wsSend works", function()
-        -- @tests NetworkRuntime:wsSend
-        -- TODO: add assertion for NetworkRuntime:wsSend
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:wsClose", function()
-    it("NetworkRuntime:wsClose works", function()
-        -- @tests NetworkRuntime:wsClose
-        -- TODO: add assertion for NetworkRuntime:wsClose
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:poll", function()
-    it("NetworkRuntime:poll works", function()
-        -- @tests NetworkRuntime:poll
-        -- TODO: add assertion for NetworkRuntime:poll
-    end)
-end)
-
-describe("Missing explicit test for NetworkRuntime:shutdown", function()
-    it("NetworkRuntime:shutdown works", function()
-        -- @tests NetworkRuntime:shutdown
-        -- TODO: add assertion for NetworkRuntime:shutdown
     end)
 end)
 

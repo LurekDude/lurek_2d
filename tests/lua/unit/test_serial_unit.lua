@@ -3,37 +3,31 @@
 
 -- Headless-safe (no window / GPU / audio required).
 
--- @description Covers suite: lurek.serial module exists.
 describe("lurek.serial module exists", function()
     -- @tests lurek.serial
-    -- @tests lurek.serial.fromCsv
-    -- @tests lurek.serial.fromJson
-    -- @tests lurek.serial.fromToml
-    -- @tests lurek.serial.toCsv
-    -- @tests lurek.serial.toJson
-    -- @tests lurek.serial.toToml
-    -- @description Verifies the codec namespace is available before format helpers are exercised.
+    -- @covers lurek.serial.fromCsv
+    -- @covers lurek.serial.fromJson
+    -- @covers lurek.serial.fromToml
+    -- @covers lurek.serial.toCsv
+    -- @covers lurek.serial.toJson
+    -- @covers lurek.serial.toToml
     it("lurek.serial is a table", function()
         expect_type("table", lurek.serial)
     end)
 end)
 
--- @description Covers suite: JSON round-trip.
 describe("JSON round-trip", function()
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies the JSON decoder is exposed as a callable function.
+    -- @covers lurek.serial.fromJson
     it("fromJson is a function", function()
         expect_type("function", lurek.serial.fromJson)
     end)
 
-    -- @tests lurek.serial.toJson
-    -- @description Verifies the JSON encoder is exposed as a callable function.
+    -- @covers lurek.serial.toJson
     it("toJson is a function", function()
         expect_type("function", lurek.serial.toJson)
     end)
 
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies fromJson decodes flat object members into named Lua table fields.
+    -- @covers lurek.serial.fromJson
     it("fromJson parses a simple object", function()
         local t = lurek.serial.fromJson('{"name":"luna","version":1}')
         expect_type("table", t)
@@ -41,8 +35,7 @@ describe("JSON round-trip", function()
         expect_equal(1, t.version)
     end)
 
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies fromJson decodes JSON arrays into numeric Lua sequence entries.
+    -- @covers lurek.serial.fromJson
     it("fromJson parses an array", function()
         local t = lurek.serial.fromJson('[1,2,3]')
         expect_type("table", t)
@@ -50,17 +43,15 @@ describe("JSON round-trip", function()
         expect_equal(3, t[3])
     end)
 
-    -- @tests lurek.serial.toJson
-    -- @description Verifies toJson serializes a Lua table into a non-empty JSON string.
+    -- @covers lurek.serial.toJson
     it("toJson serializes a table to a string", function()
         local s = lurek.serial.toJson({ x = 10, y = 20 })
         expect_type("string", s)
         expect_true(#s > 0, "json string is non-empty")
     end)
 
-    -- @tests lurek.serial.toJson
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies a JSON round-trip preserves string-valued object fields.
+    -- @covers lurek.serial.toJson
+    -- @covers lurek.serial.fromJson
     it("JSON round-trip preserves string values", function()
         local orig = { greeting = "hello" }
         local json = lurek.serial.toJson(orig)
@@ -68,9 +59,8 @@ describe("JSON round-trip", function()
         expect_equal("hello", back.greeting)
     end)
 
-    -- @tests lurek.serial.toJson
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies a JSON round-trip preserves numeric object fields.
+    -- @covers lurek.serial.toJson
+    -- @covers lurek.serial.fromJson
     it("JSON round-trip preserves numbers", function()
         local orig = { val = 42 }
         local json = lurek.serial.toJson(orig)
@@ -78,8 +68,7 @@ describe("JSON round-trip", function()
         expect_equal(42, back.val)
     end)
 
-    -- @tests lurek.serial.toJson
-    -- @description Verifies pretty-print mode produces output no shorter than the compact encoding.
+    -- @covers lurek.serial.toJson
     it("toJson with pretty=true produces longer output", function()
         local t = { a = 1, b = 2 }
         local compact = lurek.serial.toJson(t, false)
@@ -87,8 +76,7 @@ describe("JSON round-trip", function()
         expect_true(#pretty >= #compact, "pretty >= compact length")
     end)
 
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies malformed JSON input raises a Lua-side error instead of returning junk data.
+    -- @covers lurek.serial.fromJson
     it("fromJson returns error on invalid JSON", function()
         expect_error(function()
             lurek.serial.fromJson("not json {{{")
@@ -96,22 +84,18 @@ describe("JSON round-trip", function()
     end)
 end)
 
--- @description Covers suite: TOML round-trip.
 describe("TOML round-trip", function()
-    -- @tests lurek.serial.fromToml
-    -- @description Verifies the TOML decoder is exposed as a callable function.
+    -- @covers lurek.serial.fromToml
     it("fromToml is a function", function()
         expect_type("function", lurek.serial.fromToml)
     end)
 
-    -- @tests lurek.serial.toToml
-    -- @description Verifies the TOML encoder is exposed as a callable function.
+    -- @covers lurek.serial.toToml
     it("toToml is a function", function()
         expect_type("function", lurek.serial.toToml)
     end)
 
-    -- @tests lurek.serial.fromToml
-    -- @description Verifies fromToml parses nested table syntax into nested Lua tables.
+    -- @covers lurek.serial.fromToml
     it("fromToml parses a simple table", function()
         local t = lurek.serial.fromToml('[window]\ntitle = "Lurek2D"\nwidth = 800\n')
         expect_type("table", t)
@@ -120,17 +104,15 @@ describe("TOML round-trip", function()
         expect_equal(800, t.window.width)
     end)
 
-    -- @tests lurek.serial.toToml
-    -- @description Verifies toToml serializes Lua tables into non-empty TOML text.
+    -- @covers lurek.serial.toToml
     it("toToml serializes a table", function()
         local s = lurek.serial.toToml({ game = { fps = 60 } })
         expect_type("string", s)
         expect_true(#s > 0, "toml string is non-empty")
     end)
 
-    -- @tests lurek.serial.toToml
-    -- @tests lurek.serial.fromToml
-    -- @description Verifies a TOML round-trip preserves scalar values.
+    -- @covers lurek.serial.toToml
+    -- @covers lurek.serial.fromToml
     it("TOML round-trip preserves scalar values", function()
         local orig = { score = 100 }
         local toml = lurek.serial.toToml(orig)
@@ -138,8 +120,7 @@ describe("TOML round-trip", function()
         expect_equal(100, back.score)
     end)
 
-    -- @tests lurek.serial.fromToml
-    -- @description Verifies malformed TOML input raises an error.
+    -- @covers lurek.serial.fromToml
     it("fromToml returns error on invalid TOML", function()
         expect_error(function()
             lurek.serial.fromToml("[[broken = = ]]")
@@ -147,22 +128,18 @@ describe("TOML round-trip", function()
     end)
 end)
 
--- @description Covers suite: CSV round-trip.
 describe("CSV round-trip", function()
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies the CSV decoder is exposed as a callable function.
+    -- @covers lurek.serial.fromCsv
     it("fromCsv is a function", function()
         expect_type("function", lurek.serial.fromCsv)
     end)
 
-    -- @tests lurek.serial.toCsv
-    -- @description Verifies the CSV encoder is exposed as a callable function.
+    -- @covers lurek.serial.toCsv
     it("toCsv is a function", function()
         expect_type("function", lurek.serial.toCsv)
     end)
 
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies fromCsv parses delimited rows into a Lua table result.
+    -- @covers lurek.serial.fromCsv
     it("fromCsv parses rows", function()
         local csv = "name,score\nalice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv)
@@ -170,8 +147,7 @@ describe("CSV round-trip", function()
         expect_true(#rows >= 1, "has at least one row")
     end)
 
-    -- @tests lurek.serial.toCsv
-    -- @description Verifies toCsv serializes row tables into non-empty CSV text.
+    -- @covers lurek.serial.toCsv
     it("toCsv produces a non-empty string", function()
         local data = { { name = "a", score = "1" }, { name = "b", score = "2" } }
         local s = lurek.serial.toCsv(data)
@@ -180,12 +156,10 @@ describe("CSV round-trip", function()
     end)
 end)
 
--- â”€â”€ CSV options â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- CSV options
 
--- @description Covers suite: CSV advanced options.
 describe("CSV advanced options", function()
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies header-aware CSV parsing maps column names onto each returned row table.
+    -- @covers lurek.serial.fromCsv
     it("fromCsv with headers creates object-keyed rows", function()
         local csv = "name,score\nalice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv, nil, true)
@@ -194,8 +168,7 @@ describe("CSV advanced options", function()
         expect_equal("10", rows[1].score)
     end)
 
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies headerless CSV parsing preserves positional fields as numeric indexes.
+    -- @covers lurek.serial.fromCsv
     it("fromCsv without headers creates numeric keys", function()
         local csv = "alice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv, nil, false)
@@ -203,8 +176,7 @@ describe("CSV advanced options", function()
         expect_not_nil(rows[1][1])
     end)
 
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies fromCsv honors a caller-supplied delimiter instead of assuming commas.
+    -- @covers lurek.serial.fromCsv
     it("fromCsv with custom delimiter", function()
         local csv = "name\tscore\nalice\t10\nbob\t20\n"
         local rows = lurek.serial.fromCsv(csv, "\t", true)
@@ -212,9 +184,8 @@ describe("CSV advanced options", function()
         expect_equal("alice", rows[1].name)
     end)
 
-    -- @tests lurek.serial.toCsv
-    -- @tests lurek.serial.fromCsv
-    -- @description Verifies CSV serialization and parsing preserve field values across a round-trip.
+    -- @covers lurek.serial.toCsv
+    -- @covers lurek.serial.fromCsv
     it("CSV round-trip preserves data", function()
         local data = { { name = "test", value = "42" } }
         local csv = lurek.serial.toCsv(data)
@@ -224,28 +195,24 @@ describe("CSV advanced options", function()
     end)
 end)
 
--- â”€â”€ error handling â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- error handling
 
--- @description Covers suite: codec error handling.
 describe("codec error handling", function()
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies malformed JSON with invalid tokens raises an error.
+    -- @covers lurek.serial.fromJson
     it("fromJson error on malformed input", function()
         expect_error(function()
             lurek.serial.fromJson("{bad: json}")
         end)
     end)
 
-    -- @tests lurek.serial.fromToml
-    -- @description Verifies malformed TOML with an incomplete array raises an error.
+    -- @covers lurek.serial.fromToml
     it("fromToml error on malformed input", function()
         expect_error(function()
             lurek.serial.fromToml("invalid = [")
         end)
     end)
 
-    -- @tests lurek.serial.fromJson
-    -- @description Verifies empty JSON input is rejected instead of decoding to a default value.
+    -- @covers lurek.serial.fromJson
     it("fromJson on empty string errors", function()
         expect_error(function()
             lurek.serial.fromJson("")
@@ -255,7 +222,7 @@ end)
 
 -- YAML removed: design-assumption B-05 (TOML is the human-authored config format; serde_yml dependency dropped)
 
--- ── Serial MsgPack (merged from test_serial_msgpack.lua) ──
+--  Serial MsgPack (merged from test_serial_msgpack.lua) 
 
 describe("lurek.serial.encodeMsgPack", function()
   it("returns a non-empty string for a simple table", function()
@@ -265,15 +232,21 @@ describe("lurek.serial.encodeMsgPack", function()
   end)
 
   it("errors on nil input", function()
-    expect_error(function() lurek.serial.encodeMsgPack(nil) end)
+    ---@type any
+    local invalid = nil
+    expect_error(function() lurek.serial.encodeMsgPack(invalid) end)
   end)
 
   it("errors on string input", function()
-    expect_error(function() lurek.serial.encodeMsgPack("not a table") end)
+    ---@type any
+    local invalid = "not a table"
+    expect_error(function() lurek.serial.encodeMsgPack(invalid) end)
   end)
 
   it("errors on number input", function()
-    expect_error(function() lurek.serial.encodeMsgPack(42) end)
+    ---@type any
+    local invalid = 42
+    expect_error(function() lurek.serial.encodeMsgPack(invalid) end)
   end)
 end)
 
@@ -316,9 +289,9 @@ describe("lurek.serial.decodeMsgPack", function()
   end)
 end)
 
--- ── Serial Schema (merged from test_serial_schema.lua) ──
+--  Serial Schema (merged from test_serial_schema.lua) 
 
-describe("lurek.serial.validate – type checks", function()
+describe("lurek.serial.validate  type checks", function()
   it("passes when type matches string", function()
     local ok, err = lurek.serial.validate("hello", { type = "string" })
     expect_equal(ok, true)
@@ -349,7 +322,7 @@ describe("lurek.serial.validate – type checks", function()
   end)
 end)
 
-describe("lurek.serial.validate – required field", function()
+describe("lurek.serial.validate  required field", function()
   it("passes when non-nil value and required=true", function()
     local ok = lurek.serial.validate("value", { type = "string", required = true })
     expect_equal(ok, true)
@@ -367,7 +340,7 @@ describe("lurek.serial.validate – required field", function()
   end)
 end)
 
-describe("lurek.serial.validate – numeric range", function()
+describe("lurek.serial.validate  numeric range", function()
   it("passes when value is within min/max", function()
     local ok = lurek.serial.validate(50, { type = "number", min = 1, max = 100 })
     expect_equal(ok, true)
@@ -396,7 +369,7 @@ describe("lurek.serial.validate – numeric range", function()
   end)
 end)
 
-describe("lurek.serial.validate – string length", function()
+describe("lurek.serial.validate  string length", function()
   it("passes when string length is within minlen/maxlen", function()
     local ok = lurek.serial.validate("abc", { type = "string", minlen = 1, maxlen = 10 })
     expect_equal(ok, true)
@@ -415,7 +388,7 @@ describe("lurek.serial.validate – string length", function()
   end)
 end)
 
-describe("lurek.serial.validate – table fields", function()
+describe("lurek.serial.validate  table fields", function()
   local schema = {
     type = "table",
     fields = {
@@ -448,7 +421,7 @@ describe("lurek.serial.validate – table fields", function()
   end)
 end)
 
-describe("lurek.serial.validate – sequence items", function()
+describe("lurek.serial.validate  sequence items", function()
   local schema = {
     type  = "table",
     items = { type = "string" }
@@ -471,7 +444,7 @@ describe("lurek.serial.validate – sequence items", function()
   end)
 end)
 
--- ── Serial XML (merged from test_serial_xml.lua) ──
+--  Serial XML (merged from test_serial_xml.lua) 
 
 describe("lurek.serial.decodeXml", function()
   it("parses a simple element", function()
@@ -541,7 +514,7 @@ end)
 
 describe("lurek.serial regression coverage", function()
   it("encodeMsgPack round-trips a nested table", function()
-    -- @tests lurek.serial.encodeMsgPack
+    -- @covers lurek.serial.encodeMsgPack
     local source = {
       name = "hero",
       stats = { hp = 10, mp = 3 },
@@ -556,14 +529,14 @@ describe("lurek.serial regression coverage", function()
   end)
 
   it("decodeMsgPack preserves sequential arrays", function()
-    -- @tests lurek.serial.decodeMsgPack
+    -- @covers lurek.serial.decodeMsgPack
     local decoded = lurek.serial.decodeMsgPack(lurek.serial.encodeMsgPack({ 10, 20, 30 }))
     expect_equal(3, #decoded)
     expect_equal(20, decoded[2])
   end)
 
   it("decodeXml returns root tag text and attributes", function()
-    -- @tests lurek.serial.decodeXml
+    -- @covers lurek.serial.decodeXml
     local decoded = lurek.serial.decodeXml("<root version=\"1\">hello</root>")
     expect_equal("root", decoded.tag)
     expect_equal("1", decoded.attrs.version)
@@ -571,7 +544,7 @@ describe("lurek.serial regression coverage", function()
   end)
 
   it("validate rejects a missing required field", function()
-    -- @tests lurek.serial.validate
+    -- @covers lurek.serial.validate
     local ok, err = lurek.serial.validate({ name = "hero" }, {
       type = "table",
       fields = {

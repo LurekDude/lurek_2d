@@ -1,6 +1,6 @@
 ---
 description: "Create one bounded audio feature in the engine and sync the exposed contract."
-agent: "Audio-Eng"
+agent: "Developer"
 ---
 # Create Audio Feature
 

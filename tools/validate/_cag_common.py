@@ -23,7 +23,7 @@ from typing import Iterable, Iterator
 WORKSPACE_ROOT = Path(__file__).resolve().parents[2]
 GITHUB_DIR = WORKSPACE_ROOT / ".github"
 SYSTEM_PROMPT = GITHUB_DIR / "copilot-instructions.md"
-AGENTS_DIR = GITHUB_DIR / "agents"
+AGENTS_DIR = GITHUB_DIR / "agents2"
 SKILLS_DIR = GITHUB_DIR / "skills"
 PROMPTS_DIR = GITHUB_DIR / "prompts"
 TOOLS_DIR = WORKSPACE_ROOT / "tools"

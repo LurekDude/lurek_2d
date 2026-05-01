@@ -1,43 +1,78 @@
 -- tests/lua/test_docs.lua
 -- BDD tests for lurek.docs.* documentation management API
 
--- @description Verifies that the docs API can scan namespaces, mutate its internal catalog, expose catalog and entry helpers, and report validation, quality, and coverage metrics.
+local function unique_docs_id(stem)
+    return table.concat({
+        stem,
+        tostring(os.time()),
+        tostring(math.floor(os.clock() * 1000000)),
+    }, "_")
+end
+
+local function docs_temp_path(stem, ext)
+    return "save/_fs_tests/" .. unique_docs_id(stem) .. ext
+end
+
+local function write_text_file(path, content)
+    lurek.filesystem.write(path, content)
+end
+
+local function read_text_file(path)
+    return lurek.filesystem.read(path)
+end
+
+local function file_exists(path)
+    return lurek.filesystem.exists(path)
+end
+
+local function seed_catalog_entry(qualified_name, description)
+    lurek.docs.describe(qualified_name, description)
+    lurek.docs.setParamInfo(qualified_name, {
+        { name = "value", type = "number", description = "input value", optional = false },
+    })
+    lurek.docs.setReturnInfo(qualified_name, {
+        { type = "number", description = "result value" },
+    })
+end
+
+local function sample_docs_toml(entries)
+    return table.concat(entries, "\n")
+end
+
 describe("lurek.docs", function()
 
     -- ============= scan =============
 
-    -- @tests lurek.docs.coverage
-    -- @tests lurek.docs.coverageModule
-    -- @tests lurek.docs.describe
-    -- @tests lurek.docs.getCatalog
-    -- @tests lurek.docs.quality
-    -- @tests lurek.docs.resetCatalog
-    -- @tests lurek.docs.scan
-    -- @tests lurek.docs.scanModule
-    -- @tests lurek.docs.setParamInfo
-    -- @tests lurek.docs.setReturnInfo
-    -- @tests lurek.docs.validate
-    -- @tests lurek.docs.validateModule
-    -- @tests lurek.test.bar
-    -- @tests lurek.test.foo
-    -- @tests lurek.test.func
-    -- @tests lurek.test.func2
-    -- @tests lurek.test.g1
-    -- @tests lurek.test.json
-    -- @tests lurek.test.ms
-    -- @tests lurek.test.q1
-    -- @tests lurek.test.scored
-    -- @tests lurek.test.sum
-    -- @tests lurek.test.tt
-    -- @tests lurek.test.w1
-    -- @tests lurek.test.w2
-    -- @description Confirms scan() returns a non-nil ApiCatalog object for the full lurek namespace.
+    -- @covers lurek.docs.coverage
+    -- @covers lurek.docs.coverageModule
+    -- @covers lurek.docs.describe
+    -- @covers lurek.docs.getCatalog
+    -- @covers lurek.docs.quality
+    -- @covers lurek.docs.resetCatalog
+    -- @covers lurek.docs.scan
+    -- @covers lurek.docs.scanModule
+    -- @covers lurek.docs.setParamInfo
+    -- @covers lurek.docs.setReturnInfo
+    -- @covers lurek.docs.validate
+    -- @covers lurek.docs.validateModule
+    -- @covers lurek.test.bar
+    -- @covers lurek.test.foo
+    -- @covers lurek.test.func
+    -- @covers lurek.test.func2
+    -- @covers lurek.test.g1
+    -- @covers lurek.test.json
+    -- @covers lurek.test.ms
+    -- @covers lurek.test.q1
+    -- @covers lurek.test.scored
+    -- @covers lurek.test.sum
+    -- @covers lurek.test.tt
+    -- @covers lurek.test.w1
+    -- @covers lurek.test.w2
     it("should scan the lurek namespace", function()
         local catalog = lurek.docs.scan()
         expect_not_nil(catalog, "scan() should return an ApiCatalog")
     end)
 
-    -- @description Checks that a scanned catalog exposes getModules() and reports at least one discovered module.
     it("scan should return catalog with getModules", function()
         local catalog = lurek.docs.scan()
         local modules = catalog:getModules()
@@ -46,7 +81,6 @@ describe("lurek.docs", function()
         expect_true(#modules > 0, "should have found at least one module")
     end)
 
-    -- @description Ensures a full scan returns entries for the graphics module and that the module is not empty.
     it("scan should find lurek.render functions", function()
         local catalog = lurek.docs.scan()
         local entries = catalog:getEntries("render")
@@ -56,7 +90,6 @@ describe("lurek.docs", function()
 
     -- ============= scanModule =============
 
-    -- @description Verifies scanModule("render") returns a catalog whose entry count is greater than zero.
     it("should scan a single module", function()
         local catalog = lurek.docs.scanModule("render")
         expect_not_nil(catalog, "scanModule should return a catalog")
@@ -65,7 +98,6 @@ describe("lurek.docs", function()
     end)
     -- ============= describe / getCatalog / resetCatalog =============
 
-    -- @description Confirms describe() creates an entry that getCatalog() can retrieve with the exact stored description text.
     it("should describe and getCatalog", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.foo", "A test function")
@@ -75,7 +107,6 @@ describe("lurek.docs", function()
         expect_equal("A test function", entry:getDescription())
         lurek.docs.resetCatalog()
     end)
-    -- @description Ensures resetCatalog() clears previously described entries so the internal catalog count returns to zero.
     it("should reset the internal catalog", function()
         lurek.docs.describe("lurek.test.bar", "Another test")
         lurek.docs.resetCatalog()
@@ -85,7 +116,6 @@ describe("lurek.docs", function()
 
     -- ============= setParamInfo / setReturnInfo =============
 
-    -- @description Verifies setParamInfo() stores two parameters with the expected names, types, and optional flag values on the described entry.
     it("should set parameter info", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.func", "A function")
@@ -103,7 +133,6 @@ describe("lurek.docs", function()
         expect_equal(true, params[2].optional)
         lurek.docs.resetCatalog()
     end)
-    -- @description Confirms setReturnInfo() records a single return value whose type is exposed as number on the entry.
     it("should set return info", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.func2", "Another function")
@@ -121,7 +150,6 @@ describe("lurek.docs", function()
 
     -- ============= DocEntry methods =============
 
-    -- @description Checks that an entry with only a description scores about 0.4, reports a description, and reports no parameters, return type, or example.
     it("DocEntry should report score correctly", function()
         lurek.docs.resetCatalog()
         -- Entry with description only = 40%
@@ -138,13 +166,11 @@ describe("lurek.docs", function()
     end)
     -- ============= ApiCatalog methods =============
 
-    -- @description Verifies entryCount() returns a numeric count for a scanned module catalog.
     it("catalog should support entryCount", function()
         local catalog = lurek.docs.scanModule("math")
         local count = catalog:entryCount()
         expect_true(count >= 0, "entryCount should return a number")
     end)
-    -- @description Ensures catalog:search("render") returns a non-empty result list when scanning the full namespace.
     it("catalog should support search", function()
         local catalog = lurek.docs.scan()
         local results = catalog:search("render")
@@ -153,7 +179,6 @@ describe("lurek.docs", function()
         expect_true(#results > 0, "should find graphics entries")
     end)
 
-    -- @description Confirms toTable() serializes the catalog into a one-entry table with the expected qualifiedName.
     it("catalog should support toTable", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.tt", "Test toTable")
@@ -164,7 +189,6 @@ describe("lurek.docs", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @description Verifies toJSON() returns a non-empty JSON string for a catalog containing one described entry.
     it("catalog should support toJSON", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.json", "Test JSON")
@@ -175,7 +199,6 @@ describe("lurek.docs", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @description Ensures filter() returns a catalog and that every filtered entry has the exact name setColor.
     it("catalog should support filter", function()
         local catalog = lurek.docs.scan()
         local filtered = catalog:filter(function(entry)
@@ -189,7 +212,6 @@ describe("lurek.docs", function()
         end
     end)
 
-    -- @description Confirms merge() produces a catalog whose entry count is at least as large as the first source catalog.
     it("catalog should support merge", function()
         local cat1 = lurek.docs.scanModule("math")
         local cat2 = lurek.docs.scanModule("timer")
@@ -202,7 +224,6 @@ describe("lurek.docs", function()
 
     -- ============= validate =============
 
-    -- @description Verifies validate() returns a report that marks an empty internal catalog as invalid and missing documented entries.
     it("should validate completeness", function()
         -- Validating with no catalog should report many missing
         local report = lurek.docs.validate()
@@ -210,7 +231,6 @@ describe("lurek.docs", function()
         expect_true(report:missingCount() > 0, "should have missing entries with empty catalog")
         expect_true(not report:isValid(), "should not be valid with empty catalog")
     end)
-    -- @description Confirms validateModule("math") returns a report whose summary string can be retrieved.
     it("should validate a single module", function()
         local report = lurek.docs.validateModule("math")
         expect_not_nil(report, "validateModule should return a report")
@@ -218,7 +238,6 @@ describe("lurek.docs", function()
         expect_not_nil(summary, "getSummary should return a string")
     end)
 
-    -- @description Ensures ValidationReport:toTable() includes missing, phantom, and incomplete collections.
     it("validation report should support toTable", function()
         local report = lurek.docs.validate()
         local tbl = report:toTable()
@@ -227,7 +246,6 @@ describe("lurek.docs", function()
         expect_not_nil(tbl.incomplete, "toTable should have incomplete field")
     end)
 
-    -- @description Verifies ValidationReport:toJSON() returns a non-empty JSON string.
     it("validation report should support toJSON", function()
         local report = lurek.docs.validate()
         local json = report:toJSON()
@@ -237,7 +255,6 @@ describe("lurek.docs", function()
 
     -- ============= quality =============
 
-    -- @description Checks that a described entry with parameter and return metadata yields an overall score near 0.85 and a grade of B.
     it("should compute quality metrics", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.q1", "Good entry")
@@ -256,7 +273,6 @@ describe("lurek.docs", function()
         expect_equal("C", grade)
         lurek.docs.resetCatalog()
     end)
-    -- @description Verifies getModuleScores() returns a table for a catalog containing a described test entry.
     it("quality should support getModuleScores", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.ms", "Module score test")
@@ -267,7 +283,6 @@ describe("lurek.docs", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @description Confirms quality reports expose both worst and best entry lists after comparing a described entry and an empty-description entry.
     it("quality should support getWorst and getBest", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.w1", "Good")
@@ -281,7 +296,6 @@ describe("lurek.docs", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @description Ensures getByGrade("D") returns at least one entry when the catalog contains a description-only entry worth grade D.
     it("quality should support getByGrade", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.g1", "Has desc only")
@@ -294,7 +308,6 @@ describe("lurek.docs", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @description Verifies getSummary() returns a non-empty summary string for the computed quality report.
     it("quality should support getSummary", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.sum", "Summary test")
@@ -308,13 +321,11 @@ describe("lurek.docs", function()
 
     -- ============= coverage =============
 
-    -- @description Confirms coverage() reports a positive total and zero documented entries when no catalog is supplied.
     it("should compute coverage", function()
         local documented, total = lurek.docs.coverage()
         expect_true(total > 0, "total should be > 0")
         expect_equal(0, documented, "documented should be 0 with no catalog")
     end)
-    -- @description Verifies coverage(catalog) reports the full scan as completely documented by matching documented and total counts.
     it("should compute coverage with catalog", function()
         local catalog = lurek.docs.scan()
         local documented, total = lurek.docs.coverage(catalog)
@@ -325,7 +336,6 @@ describe("lurek.docs", function()
 
     -- ============= coverageModule =============
 
-    -- @description Ensures coverageModule("math") returns a total count that is numeric and non-negative.
     it("should compute module coverage", function()
         local documented, total = lurek.docs.coverageModule("math")
         expect_true(total >= 0, "total should be >= 0")
@@ -338,78 +348,246 @@ end)
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @tests lurek.docs.loadToml
+    -- @covers lurek.docs.loadToml
     it("covers lurek.docs.loadToml", function()
-        -- TODO: Implement test for lurek.docs.loadToml
+        local path = docs_temp_path("docs_load_toml", ".toml")
+        write_text_file(path, sample_docs_toml({
+            "[[entries]]",
+            'name = "play"',
+            'qualifiedName = "lurek.audio.play"',
+            'module = "audio"',
+            'kind = "function"',
+            'description = "Plays a sound"',
+        }))
+
+        local catalog = lurek.docs.loadToml(path)
+        local entry = catalog:getEntry("lurek.audio.play")
+
+        expect_not_nil(entry)
+        expect_equal(1, catalog:entryCount())
+        expect_equal("Plays a sound", entry:getDescription())
+
+        os.remove(path)
     end)
 
-    -- @tests lurek.docs.loadAll
+    -- @covers lurek.docs.loadAll
     it("covers lurek.docs.loadAll", function()
-        -- TODO: Implement test for lurek.docs.loadAll
+        local suffix = unique_docs_id("docs_load_all")
+        local path_a = "save/_fs_tests/" .. suffix .. "_a.toml"
+        local path_b = "save/_fs_tests/" .. suffix .. "_b.toml"
+
+        write_text_file(path_a, sample_docs_toml({
+            "[[entries]]",
+            'name = "one"',
+            'qualifiedName = "lurek.test.' .. suffix .. '.one"',
+            'module = "test"',
+            'kind = "function"',
+            'description = "First entry"',
+        }))
+        write_text_file(path_b, sample_docs_toml({
+            "[[entries]]",
+            'name = "two"',
+            'qualifiedName = "lurek.test.' .. suffix .. '.two"',
+            'module = "test"',
+            'kind = "function"',
+            'description = "Second entry"',
+        }))
+
+        local catalog = lurek.docs.loadAll("save/_fs_tests")
+        expect_not_nil(catalog:getEntry("lurek.test." .. suffix .. ".one"))
+        expect_not_nil(catalog:getEntry("lurek.test." .. suffix .. ".two"))
+
+        os.remove(path_a)
+        os.remove(path_b)
     end)
 
-    -- @tests lurek.docs.checkStaleness
+    -- @covers lurek.docs.checkStaleness
     it("covers lurek.docs.checkStaleness", function()
-        -- TODO: Implement test for lurek.docs.checkStaleness
+        local catalog = lurek.docs.scanModule("docs")
+        local report = lurek.docs.checkStaleness(catalog, "src/docs")
+
+        expect_type("table", report)
+        expect_type("table", report.stale)
+        expect_type("table", report.current)
+        expect_type("table", report.missing)
+        expect_true(#report.current > 0)
     end)
 
-    -- @tests lurek.docs.qualityModule
+    -- @covers lurek.docs.qualityModule
     it("covers lurek.docs.qualityModule", function()
-        -- TODO: Implement test for lurek.docs.qualityModule
+        local module_name = "lurek.docsbatch." .. unique_docs_id("quality_module")
+
+        lurek.docs.resetCatalog()
+        seed_catalog_entry(module_name .. ".alpha", "Alpha entry")
+        seed_catalog_entry(module_name .. ".beta", "Beta entry")
+
+        local cat = lurek.docs.getCatalog()
+        local quality = lurek.docs.qualityModule(module_name, cat)
+
+        expect_type("number", quality:getOverallScore())
+        expect_equal("C", quality:getGrade())
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportCompletions
+    -- @covers lurek.docs.exportCompletions
     it("covers lurek.docs.exportCompletions", function()
-        -- TODO: Implement test for lurek.docs.exportCompletions
+        local path = docs_temp_path("docs_export_completions", ".json")
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportCompletions", "Completion entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportCompletions(cat, path)
+
+        expect_true(file_exists(path))
+        expect_true(string.find(read_text_file(path), "exportCompletions", 1, true) ~= nil)
+
+        os.remove(path)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportHover
+    -- @covers lurek.docs.exportHover
     it("covers lurek.docs.exportHover", function()
-        -- TODO: Implement test for lurek.docs.exportHover
+        local path = docs_temp_path("docs_export_hover", ".json")
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportHover", "Hover entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportHover(cat, path)
+
+        expect_true(file_exists(path))
+        expect_true(string.find(read_text_file(path), "lurek.test.exportHover", 1, true) ~= nil)
+
+        os.remove(path)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportSignatures
+    -- @covers lurek.docs.exportSignatures
     it("covers lurek.docs.exportSignatures", function()
-        -- TODO: Implement test for lurek.docs.exportSignatures
+        local path = docs_temp_path("docs_export_signatures", ".json")
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportSignatures", "Signature entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportSignatures(cat, path)
+
+        expect_true(file_exists(path))
+        expect_true(string.find(read_text_file(path), "value", 1, true) ~= nil)
+
+        os.remove(path)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportAll
+    -- @covers lurek.docs.exportAll
     it("covers lurek.docs.exportAll", function()
-        -- TODO: Implement test for lurek.docs.exportAll
+        local dir = "save/_fs_tests/" .. unique_docs_id("docs_export_all")
+        local completions = dir .. "/completions.json"
+        local hover = dir .. "/hover.json"
+        local signatures = dir .. "/signatures.json"
+
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportAll", "Export all entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportAll(cat, dir)
+
+        expect_true(file_exists(completions))
+        expect_true(file_exists(hover))
+        expect_true(file_exists(signatures))
+
+        os.remove(completions)
+        os.remove(hover)
+        os.remove(signatures)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportMarkdown
+    -- @covers lurek.docs.exportMarkdown
     it("covers lurek.docs.exportMarkdown", function()
-        -- TODO: Implement test for lurek.docs.exportMarkdown
+        local path = docs_temp_path("docs_export_markdown", ".md")
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportMarkdown", "Markdown entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportMarkdown(cat, path)
+
+        local content = read_text_file(path)
+        expect_true(string.find(content, "# API Reference", 1, true) ~= nil)
+        expect_true(string.find(content, "lurek.test.exportMarkdown", 1, true) ~= nil)
+
+        os.remove(path)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.exportCheatsheet
+    -- @covers lurek.docs.exportCheatsheet
     it("covers lurek.docs.exportCheatsheet", function()
-        -- TODO: Implement test for lurek.docs.exportCheatsheet
+        local path = docs_temp_path("docs_export_cheatsheet", ".txt")
+        lurek.docs.resetCatalog()
+        seed_catalog_entry("lurek.test.exportCheatsheet", "Cheatsheet entry")
+
+        local cat = lurek.docs.getCatalog()
+        lurek.docs.exportCheatsheet(cat, path)
+
+        local content = read_text_file(path)
+        expect_true(string.find(content, "lurek.test.exportCheatsheet(value)", 1, true) ~= nil)
+        expect_true(string.find(content, "Cheatsheet entry", 1, true) ~= nil)
+
+        os.remove(path)
+        lurek.docs.resetCatalog()
     end)
 
-    -- @tests lurek.docs.reflectLive
+    -- @covers lurek.docs.reflectLive
     it("covers lurek.docs.reflectLive", function()
-        -- TODO: Implement test for lurek.docs.reflectLive
+        local reflected = lurek.docs.reflectLive("math")
+        expect_type("table", reflected)
+        expect_type("table", reflected.math)
+        expect_true(#reflected.math > 0)
+        expect_type("string", reflected.math[1].name)
+        expect_type("string", reflected.math[1].type)
     end)
 
-    -- @tests lurek.docs.reflectTable
+    -- @covers lurek.docs.reflectTable
     it("covers lurek.docs.reflectTable", function()
-        -- TODO: Implement test for lurek.docs.reflectTable
+        local reflected = lurek.docs.reflectTable({
+            alpha = 1,
+            beta = function() end,
+        }, "demo")
+
+        local seen_alpha = false
+        local seen_beta = false
+        for _, item in ipairs(reflected) do
+            if item.name == "alpha" then
+                seen_alpha = true
+                expect_equal("demo.alpha", item.qualifiedName)
+                expect_equal("integer", item.type)
+            elseif item.name == "beta" then
+                seen_beta = true
+                expect_equal("demo.beta", item.qualifiedName)
+                expect_equal("function", item.type)
+            end
+        end
+
+        expect_true(seen_alpha)
+        expect_true(seen_beta)
     end)
 
-    -- @tests Schema:getFields
+    -- @covers Schema:getFields
     it("covers Schema:getFields", function()
-        -- TODO: Implement test for Schema:getFields
+        local schema = lurek.docs.schema({
+            zeta = "string",
+            alpha = { type = "number", required = true },
+        }, "field_schema")
+
+        local fields = schema:getFields()
+        expect_equal(2, #fields)
+        expect_equal("alpha", fields[1])
+        expect_equal("zeta", fields[2])
     end)
 
-    -- @tests DocEntry:getQualifiedName
-    -- @tests DocEntry:getModule
-    -- @tests DocEntry:getKind
-    -- @tests DocEntry:getExample
-    -- @tests DocEntry:getSince
-    -- @tests DocEntry:getDeprecated
-    -- @description Verifies DocEntry exposes qualified name, default kind, and nil optional metadata for a described entry without example/since/deprecated fields.
+    -- @covers DocEntry:getQualifiedName
+    -- @covers DocEntry:getModule
+    -- @covers DocEntry:getKind
+    -- @covers DocEntry:getExample
+    -- @covers DocEntry:getSince
+    -- @covers DocEntry:getDeprecated
     it("DocEntry exposes qualified name kind and optional metadata", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.meta", "Meta entry")
@@ -426,17 +604,42 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @tests ApiCatalog:getTypeMethods
+    -- @covers ApiCatalog:getTypeMethods
     it("covers ApiCatalog:getTypeMethods", function()
-        -- TODO: Implement test for ApiCatalog:getTypeMethods
+        local path = docs_temp_path("docs_type_methods", ".toml")
+        write_text_file(path, sample_docs_toml({
+            "[[entries]]",
+            'name = "Vector"',
+            'qualifiedName = "lurek.test.Vector"',
+            'module = "test"',
+            'kind = "type"',
+            'description = "Vector type"',
+            "",
+            "[[entries]]",
+            'name = "len"',
+            'qualifiedName = "lurek.test.Vector:len"',
+            'module = "test"',
+            'kind = "method"',
+            'description = "Length method"',
+        }))
+
+        local catalog = lurek.docs.loadToml(path)
+        local type_names = catalog:getTypes("test")
+        local methods = catalog:getTypeMethods("lurek.test.Vector")
+
+        expect_equal(1, #type_names)
+        expect_equal("Vector", type_names[1])
+        expect_equal(1, #methods)
+        expect_equal("len", methods[1]:getName())
+
+        os.remove(path)
     end)
 
-    -- @tests ValidationReport:getMissing
-    -- @tests ValidationReport:getPhantom
-    -- @tests ValidationReport:getIncomplete
-    -- @tests ValidationReport:phantomCount
-    -- @tests ValidationReport:incompleteCount
-    -- @description Verifies validation reports expose missing, phantom, and incomplete lists whose lengths match the corresponding count helpers.
+    -- @covers ValidationReport:getMissing
+    -- @covers ValidationReport:getPhantom
+    -- @covers ValidationReport:getIncomplete
+    -- @covers ValidationReport:phantomCount
+    -- @covers ValidationReport:incompleteCount
     it("ValidationReport exposes issue lists and count helpers", function()
         local report = lurek.docs.validate()
         local missing = report:getMissing()
@@ -455,274 +658,61 @@ end)
 
 describe("Missing explicit test for lurek.docs.schema", function()
     it("lurek.docs.schema works", function()
-        -- @tests lurek.docs.schema
-        -- TODO: add assertion for lurek.docs.schema
+        -- @covers lurek.docs.schema
+        local schema = lurek.docs.schema({
+            name = "string",
+        }, "player")
+        expect_equal("player", schema:getName())
     end)
 end)
 
 describe("Missing explicit test for Schema:validate", function()
     it("Schema:validate works", function()
-        -- @tests Schema:validate
-        -- TODO: add assertion for Schema:validate
+        -- @covers Schema:validate
+        local schema = lurek.docs.schema({
+            name = { type = "string", required = true },
+        }, "validate_schema")
+        local ok, errors = schema:validate({})
+        expect_false(ok)
+        expect_equal(1, #errors)
+        expect_true(string.find(errors[1].message, "required", 1, true) ~= nil)
     end)
 end)
 
 describe("Missing explicit test for Schema:check", function()
     it("Schema:check works", function()
-        -- @tests Schema:check
-        -- TODO: add assertion for Schema:check
+        -- @covers Schema:check
+        local schema = lurek.docs.schema({
+            age = { type = "number", required = true, min = 1, max = 100 },
+            class = { type = "string", required = true, enum = { "warrior", "mage" } },
+        }, "check_schema")
+
+        expect_false(schema:check({ age = "old", class = "rogue" }))
+        expect_true(schema:check({ age = 50, class = "mage" }))
     end)
 end)
 
 describe("Missing explicit test for Schema:assert", function()
     it("Schema:assert works", function()
-        -- @tests Schema:assert
-        -- TODO: add assertion for Schema:assert
+        -- @covers Schema:assert
+        local schema = lurek.docs.schema({
+            __strict = true,
+            level = { type = "integer", required = true, max = 10 },
+        }, "assert_schema")
+
+        expect_error(function()
+            schema:assert({ level = 11, extra = true })
+        end)
+
+        schema:assert({ level = 5 })
     end)
 end)
 
 describe("Missing explicit test for Schema:getName", function()
     it("Schema:getName works", function()
-        -- @tests Schema:getName
-        -- TODO: add assertion for Schema:getName
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getName", function()
-    it("DocEntry:getName works", function()
-        -- @tests DocEntry:getName
-        -- TODO: add assertion for DocEntry:getName
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getModule", function()
-    it("DocEntry:getModule works", function()
-        -- @tests DocEntry:getModule
-        -- TODO: add assertion for DocEntry:getModule
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getDescription", function()
-    it("DocEntry:getDescription works", function()
-        -- @tests DocEntry:getDescription
-        -- TODO: add assertion for DocEntry:getDescription
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getParameters", function()
-    it("DocEntry:getParameters works", function()
-        -- @tests DocEntry:getParameters
-        -- TODO: add assertion for DocEntry:getParameters
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getReturns", function()
-    it("DocEntry:getReturns works", function()
-        -- @tests DocEntry:getReturns
-        -- TODO: add assertion for DocEntry:getReturns
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:getScore", function()
-    it("DocEntry:getScore works", function()
-        -- @tests DocEntry:getScore
-        -- TODO: add assertion for DocEntry:getScore
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:hasDescription", function()
-    it("DocEntry:hasDescription works", function()
-        -- @tests DocEntry:hasDescription
-        -- TODO: add assertion for DocEntry:hasDescription
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:hasParameters", function()
-    it("DocEntry:hasParameters works", function()
-        -- @tests DocEntry:hasParameters
-        -- TODO: add assertion for DocEntry:hasParameters
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:hasReturnType", function()
-    it("DocEntry:hasReturnType works", function()
-        -- @tests DocEntry:hasReturnType
-        -- TODO: add assertion for DocEntry:hasReturnType
-    end)
-end)
-
-describe("Missing explicit test for DocEntry:hasExample", function()
-    it("DocEntry:hasExample works", function()
-        -- @tests DocEntry:hasExample
-        -- TODO: add assertion for DocEntry:hasExample
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:getModules", function()
-    it("ApiCatalog:getModules works", function()
-        -- @tests ApiCatalog:getModules
-        -- TODO: add assertion for ApiCatalog:getModules
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:getEntries", function()
-    it("ApiCatalog:getEntries works", function()
-        -- @tests ApiCatalog:getEntries
-        -- TODO: add assertion for ApiCatalog:getEntries
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:getEntry", function()
-    it("ApiCatalog:getEntry works", function()
-        -- @tests ApiCatalog:getEntry
-        -- TODO: add assertion for ApiCatalog:getEntry
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:getTypes", function()
-    it("ApiCatalog:getTypes works", function()
-        -- @tests ApiCatalog:getTypes
-        -- TODO: add assertion for ApiCatalog:getTypes
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:entryCount", function()
-    it("ApiCatalog:entryCount works", function()
-        -- @tests ApiCatalog:entryCount
-        -- TODO: add assertion for ApiCatalog:entryCount
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:merge", function()
-    it("ApiCatalog:merge works", function()
-        -- @tests ApiCatalog:merge
-        -- TODO: add assertion for ApiCatalog:merge
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:filter", function()
-    it("ApiCatalog:filter works", function()
-        -- @tests ApiCatalog:filter
-        -- TODO: add assertion for ApiCatalog:filter
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:search", function()
-    it("ApiCatalog:search works", function()
-        -- @tests ApiCatalog:search
-        -- TODO: add assertion for ApiCatalog:search
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:toTable", function()
-    it("ApiCatalog:toTable works", function()
-        -- @tests ApiCatalog:toTable
-        -- TODO: add assertion for ApiCatalog:toTable
-    end)
-end)
-
-describe("Missing explicit test for ApiCatalog:toJSON", function()
-    it("ApiCatalog:toJSON works", function()
-        -- @tests ApiCatalog:toJSON
-        -- TODO: add assertion for ApiCatalog:toJSON
-    end)
-end)
-
-describe("Missing explicit test for ValidationReport:isValid", function()
-    it("ValidationReport:isValid works", function()
-        -- @tests ValidationReport:isValid
-        -- TODO: add assertion for ValidationReport:isValid
-    end)
-end)
-
-describe("Missing explicit test for ValidationReport:missingCount", function()
-    it("ValidationReport:missingCount works", function()
-        -- @tests ValidationReport:missingCount
-        -- TODO: add assertion for ValidationReport:missingCount
-    end)
-end)
-
-describe("Missing explicit test for ValidationReport:getSummary", function()
-    it("ValidationReport:getSummary works", function()
-        -- @tests ValidationReport:getSummary
-        -- TODO: add assertion for ValidationReport:getSummary
-    end)
-end)
-
-describe("Missing explicit test for ValidationReport:toTable", function()
-    it("ValidationReport:toTable works", function()
-        -- @tests ValidationReport:toTable
-        -- TODO: add assertion for ValidationReport:toTable
-    end)
-end)
-
-describe("Missing explicit test for ValidationReport:toJSON", function()
-    it("ValidationReport:toJSON works", function()
-        -- @tests ValidationReport:toJSON
-        -- TODO: add assertion for ValidationReport:toJSON
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getOverallScore", function()
-    it("QualityReport:getOverallScore works", function()
-        -- @tests QualityReport:getOverallScore
-        -- TODO: add assertion for QualityReport:getOverallScore
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getGrade", function()
-    it("QualityReport:getGrade works", function()
-        -- @tests QualityReport:getGrade
-        -- TODO: add assertion for QualityReport:getGrade
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getModuleScores", function()
-    it("QualityReport:getModuleScores works", function()
-        -- @tests QualityReport:getModuleScores
-        -- TODO: add assertion for QualityReport:getModuleScores
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getWorst", function()
-    it("QualityReport:getWorst works", function()
-        -- @tests QualityReport:getWorst
-        -- TODO: add assertion for QualityReport:getWorst
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getBest", function()
-    it("QualityReport:getBest works", function()
-        -- @tests QualityReport:getBest
-        -- TODO: add assertion for QualityReport:getBest
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getByGrade", function()
-    it("QualityReport:getByGrade works", function()
-        -- @tests QualityReport:getByGrade
-        -- TODO: add assertion for QualityReport:getByGrade
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:getSummary", function()
-    it("QualityReport:getSummary works", function()
-        -- @tests QualityReport:getSummary
-        -- TODO: add assertion for QualityReport:getSummary
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:toTable", function()
-    it("QualityReport:toTable works", function()
-        -- @tests QualityReport:toTable
-        -- TODO: add assertion for QualityReport:toTable
-    end)
-end)
-
-describe("Missing explicit test for QualityReport:toJSON", function()
-    it("QualityReport:toJSON works", function()
-        -- @tests QualityReport:toJSON
-        -- TODO: add assertion for QualityReport:toJSON
+        -- @covers Schema:getName
+        local schema = lurek.docs.schema({ hp = "number" }, "hero_schema")
+        expect_equal("hero_schema", schema:getName())
     end)
 end)
 

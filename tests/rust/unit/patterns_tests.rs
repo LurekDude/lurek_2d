@@ -1,7 +1,7 @@
-//! Tests for the patterns module.
+//! INTERNAL ONLY: Rust-only tests for pattern helper structures not directly asserted
+//! through `lurek.patterns.*`.
 //!
-//! All seventeen pattern types are Foundations-tier data structures.
-//! Tests cover public API only; no private internals are accessed.
+//! Lua-reachable pattern behavior belongs in `tests/lua/unit/test_patterns_unit.lua`.
 
 use lurek2d::patterns::*;
 
@@ -694,57 +694,6 @@ mod service_locator_tests {
         sl.register("x");
         sl.clear();
         assert!(sl.names().is_empty());
-    }
-}
-
-// ── SimpleState ──────────────────────────────────────────────────────────────
-
-mod simple_state_tests {
-    use super::*;
-
-    #[test]
-    fn new_has_no_current() {
-        let ss = SimpleState::new();
-        assert!(ss.current().is_none());
-    }
-
-    #[test]
-    fn register_and_set() {
-        let mut ss = SimpleState::new();
-        ss.add("idle");
-        assert!(ss.set_current("idle"));
-        assert_eq!(ss.current(), Some("idle"));
-    }
-
-    #[test]
-    fn set_unregistered_returns_false() {
-        let mut ss = SimpleState::new();
-        assert!(!ss.set_current("unknown"));
-    }
-
-    #[test]
-    fn clear_current_removes_active() {
-        let mut ss = SimpleState::new();
-        ss.add("run");
-        ss.set_current("run");
-        ss.clear_current();
-        assert!(ss.current().is_none());
-    }
-
-    #[test]
-    fn states_sorted() {
-        let mut ss = SimpleState::new();
-        ss.add("z");
-        ss.add("a");
-        assert_eq!(ss.states(), vec!["a", "z"]);
-    }
-
-    #[test]
-    fn state_count() {
-        let mut ss = SimpleState::new();
-        ss.add("x");
-        ss.add("y");
-        assert_eq!(ss.state_count(), 2);
     }
 }
 

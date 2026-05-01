@@ -11,16 +11,12 @@ mod math_ext_tests;
 mod terminal_demo_smoke_tests;
 
 // ── unit tests (one module per engine subsystem) ───────────────────────────────
-#[path = "rust/unit/ai_tests.rs"]
-mod ai_tests;
 #[path = "rust/unit/animation_tests.rs"]
 mod animation_tests;
 #[path = "rust/unit/app_tests.rs"]
 mod app_tests;
 #[path = "rust/unit/audio_tests.rs"]
 mod audio_tests;
-#[path = "rust/unit/automation_tests.rs"]
-mod automation_tests;
 #[path = "rust/unit/camera_tests.rs"]
 mod camera_tests;
 #[path = "rust/unit/compute_tests.rs"]
@@ -31,16 +27,10 @@ mod data_tests;
 mod dataframe_tests;
 #[path = "rust/unit/debugbridge_tests.rs"]
 mod debugbridge_tests;
-#[path = "rust/unit/devtools_tests.rs"]
-mod devtools_tests;
-#[path = "rust/unit/docs_tests.rs"]
-mod docs_tests;
 #[path = "rust/unit/ecs_tests.rs"]
 mod ecs_tests;
 #[path = "rust/unit/effect_tests.rs"]
 mod effect_tests;
-#[path = "rust/unit/event_tests.rs"]
-mod event_tests;
 #[path = "rust/unit/filesystem_tests.rs"]
 mod filesystem_tests;
 #[path = "rust/unit/globe_tests.rs"]

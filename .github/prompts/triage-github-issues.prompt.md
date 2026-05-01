@@ -1,6 +1,6 @@
 ---
 description: "Triage issue input into clusters, priorities, and next actions."
-agent: "Discovery-Lead"
+agent: "Planner"
 ---
 # Triage Github Issues
 

@@ -1,102 +1,89 @@
 -- Lurek2D Lua BDD tests for lurek.animation
 -- Headless: no GPU, no audio, no window.
 
--- @description Covers suite: lurek.animation.
 describe("lurek.animation", function()
-    -- @description Covers suite: module interface.
     describe("module interface", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addFramesFromGrid
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.addClipFromGrid
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.stop
-        -- @tests lurek.animation.pause
-        -- @tests lurek.animation.resume
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getQuad
-        -- @tests lurek.animation.pollEvents
-        -- @tests lurek.animation.isPlaying
-        -- @tests lurek.animation.isLooping
-        -- @tests lurek.animation.getClip
-        -- @tests lurek.animation.getSpeed
-        -- @tests lurek.animation.setSpeed
-        -- @tests lurek.animation.getFrameCount
-        -- @tests lurek.animation.getClipCount
-        -- @tests lurek.animation.getCurrentFrame
-        -- @tests lurek.animation.setFrame
-        -- @description Verifies the animation module exposes the new() factory used to create animation userdata.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addFramesFromGrid
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.addClipFromGrid
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.stop
+        -- @covers lurek.animation.pause
+        -- @covers lurek.animation.resume
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getQuad
+        -- @covers lurek.animation.pollEvents
+        -- @covers lurek.animation.isPlaying
+        -- @covers lurek.animation.isLooping
+        -- @covers lurek.animation.getClip
+        -- @covers lurek.animation.getSpeed
+        -- @covers lurek.animation.setSpeed
+        -- @covers lurek.animation.getFrameCount
+        -- @covers lurek.animation.getClipCount
+        -- @covers lurek.animation.getCurrentFrame
+        -- @covers lurek.animation.setFrame
         it("exposes new factory", function()
             expect_type("function", lurek.animation.new)
         end)
     end)
 
-    -- @description Covers suite: new().
     describe("new()", function()
-        -- @tests lurek.animation.new
-        -- @description Confirms lurek.animation.new returns animation userdata rather than a plain Lua table.
+        -- @covers lurek.animation.new
         it("returns a userdata object", function()
             local a = lurek.animation.new()
             expect_type("userdata", a)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.getFrameCount
-        -- @description Checks that a freshly created animation reports zero frames before any frame data is added.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.getFrameCount
         it("getFrameCount returns 0 on empty animation", function()
             local a = lurek.animation.new()
             expect_equal(0, a:getFrameCount())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.getClipCount
-        -- @description Checks that a new animation starts with no named clips registered.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.getClipCount
         it("getClipCount returns 0 with no clips", function()
             local a = lurek.animation.new()
             expect_equal(0, a:getClipCount())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.isPlaying
-        -- @description Verifies isPlaying() stays false until playback is explicitly started.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.isPlaying
         it("isPlaying returns false before play()", function()
             local a = lurek.animation.new()
             expect_equal(false, a:isPlaying())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.getClip
-        -- @description Verifies getClip() returns nil when no clip has been selected for playback.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.getClip
         it("getClip returns nil before play()", function()
             local a = lurek.animation.new()
             expect_equal(nil, a:getClip())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.getSpeed
-        -- @description Confirms newly created animations start with the default playback speed of 1.0.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.getSpeed
         it("getSpeed returns default 1.0", function()
             local a = lurek.animation.new()
             expect_near(1.0, a:getSpeed(), 0.001)
         end)
     end)
 
-    -- @description Covers suite: addFrame().
     describe("addFrame()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @description Verifies the first added frame is assigned index 0.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
         it("returns an index starting from 0", function()
             local a = lurek.animation.new()
             local idx = a:addFrame(0, 0, 32, 32)
             expect_equal(0, idx)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.getFrameCount
-        -- @description Confirms each addFrame() call increments the animation frame count.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.getFrameCount
         it("increments frame count", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -105,21 +92,18 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: addFramesFromGrid().
     describe("addFramesFromGrid()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFramesFromGrid
-        -- @description Verifies addFramesFromGrid() returns the number of frames it generated from the grid slice.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFramesFromGrid
         it("returns the number of frames added", function()
             local a = lurek.animation.new()
             local n = a:addFramesFromGrid(128, 128, 32, 32, 0, 4)
             expect_equal(4, n)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFramesFromGrid
-        -- @tests lurek.animation.getFrameCount
-        -- @description Confirms grid-imported frames become visible through getFrameCount().
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFramesFromGrid
+        -- @covers lurek.animation.getFrameCount
         it("increases frame count by the returned amount", function()
             local a = lurek.animation.new()
             local n = a:addFramesFromGrid(64, 64, 32, 32, 0, 2)
@@ -127,13 +111,11 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: addClip().
     describe("addClip()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.getClipCount
-        -- @description Verifies addClip() registers a named clip once the referenced frames exist.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.getClipCount
         it("increases clip count by one", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -142,14 +124,12 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: play() / stop().
     describe("play() / stop()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.isPlaying
-        -- @description Confirms play() succeeds for a valid clip and flips isPlaying() to true.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.isPlaying
         it("play transitions isPlaying to true", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -159,22 +139,20 @@ describe("lurek.animation", function()
             expect_equal(true, a:isPlaying())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.play
-        -- @description Verifies play() returns false instead of starting playback when the clip name is unknown.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.play
         it("play returns false for unknown clip", function()
             local a = lurek.animation.new()
             local ok = a:play("nonexistent")
             expect_equal(false, ok)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.stop
-        -- @tests lurek.animation.isPlaying
-        -- @description Confirms stop() halts an active clip and makes isPlaying() report false again.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.stop
+        -- @covers lurek.animation.isPlaying
         it("stop makes isPlaying false", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -185,12 +163,10 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: setSpeed() / getSpeed().
     describe("setSpeed() / getSpeed()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.setSpeed
-        -- @tests lurek.animation.getSpeed
-        -- @description Verifies setSpeed() persists the requested playback speed for later reads.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.setSpeed
+        -- @covers lurek.animation.getSpeed
         it("round-trips the speed value", function()
             local a = lurek.animation.new()
             a:setSpeed(2.5)
@@ -198,15 +174,13 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: update() + getQuad().
     describe("update() + getQuad()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getQuad
-        -- @description Confirms update() prepares the current frame quad once a valid clip is playing.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getQuad
         it("getQuad returns a table after play + update", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 32, 32)
@@ -221,9 +195,28 @@ describe("lurek.animation", function()
             expect_type("number", q.h)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.getQuad
-        -- @description Verifies getQuad() returns nil when no clip is currently playing.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getQuad
+        it("getQuad preserves the active frame rectangle", function()
+            local a = lurek.animation.new()
+            a:addFrame(64, 32, 16, 16)
+            a:addFrame(80, 32, 16, 16)
+            a:addClip("walk", {0, 1}, 10, true)
+            a:play("walk")
+            a:update(0.0)
+            local q = a:getQuad()
+            expect_equal(64, q.x)
+            expect_equal(32, q.y)
+            expect_equal(16, q.w)
+            expect_equal(16, q.h)
+        end)
+
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.getQuad
         it("getQuad returns nil when not playing", function()
             local a = lurek.animation.new()
             local q = a:getQuad()
@@ -231,20 +224,17 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- @description Covers suite: pollEvents().
     describe("pollEvents()", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.pollEvents
-        -- @description Confirms pollEvents() always returns a Lua table, even when no events are pending.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.pollEvents
         it("returns a table", function()
             local a = lurek.animation.new()
             local evs = a:pollEvents()
             expect_type("table", evs)
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.pollEvents
-        -- @description Verifies idle animations produce an empty event queue.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.pollEvents
         it("returns empty table when idle", function()
             local a = lurek.animation.new()
             local evs = a:pollEvents()
@@ -252,19 +242,17 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ pause / resume â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- pause / resume
 
-    -- @description Covers suite: pause and resume.
     describe("pause and resume", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.pause
-        -- @tests lurek.animation.isPlaying
-        -- @tests lurek.animation.getCurrentFrame
-        -- @tests lurek.animation.update
-        -- @description Verifies pause() freezes playback state so update() no longer advances the current frame.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.pause
+        -- @covers lurek.animation.isPlaying
+        -- @covers lurek.animation.getCurrentFrame
+        -- @covers lurek.animation.update
         it("pause stops advancement", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -278,15 +266,14 @@ describe("lurek.animation", function()
             expect_equal(f_before, a:getCurrentFrame())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.pause
-        -- @tests lurek.animation.resume
-        -- @tests lurek.animation.isPlaying
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Confirms resume() restarts playback without rewinding the paused frame index.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.pause
+        -- @covers lurek.animation.resume
+        -- @covers lurek.animation.isPlaying
+        -- @covers lurek.animation.getCurrentFrame
         it("resume continues from paused frame", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -301,17 +288,15 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ setFrame â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- setFrame
 
-    -- @description Covers suite: setFrame.
     describe("setFrame", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.setFrame
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Verifies setFrame() jumps playback to the requested frame index inside the active clip.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.setFrame
+        -- @covers lurek.animation.getCurrentFrame
         it("sets playback to a specific frame index", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -324,16 +309,14 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ getCurrentFrame â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- getCurrentFrame
 
-    -- @description Covers suite: getCurrentFrame.
     describe("getCurrentFrame", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Confirms a freshly started clip begins on frame 0.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.getCurrentFrame
         it("returns 0 at start of clip", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -344,16 +327,14 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ isLooping â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- isLooping
 
-    -- @description Covers suite: isLooping.
     describe("isLooping", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.isLooping
-        -- @description Verifies isLooping() reports true for a looping clip definition.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.isLooping
         it("returns true for looping clip", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -362,12 +343,11 @@ describe("lurek.animation", function()
             expect_true(a:isLooping())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.isLooping
-        -- @description Verifies isLooping() reports false for a non-looping clip definition.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.isLooping
         it("returns false for non-looping clip", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -377,17 +357,15 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ event lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- event lifecycle
 
-    -- @description Covers suite: event lifecycle.
     describe("event lifecycle", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.pollEvents
-        -- @description Confirms a non-looping clip emits a finished event after advancing past its final frame.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.pollEvents
         it("non-looping clip emits Finished event", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -402,13 +380,12 @@ describe("lurek.animation", function()
             expect_true(found, "expected Finished event")
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.pollEvents
-        -- @description Confirms a looping clip emits a looped event after playback wraps to the start.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.pollEvents
         it("looping clip emits Looped event", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -423,13 +400,36 @@ describe("lurek.animation", function()
             expect_true(found, "expected Looped event")
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.pollEvents
-        -- @description Verifies pollEvents() drains queued playback events so a second poll is empty.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.pollEvents
+        it("frame advancement emits frameChanged with frame index", function()
+            local a = lurek.animation.new()
+            a:addFrame(0, 0, 16, 16)
+            a:addFrame(16, 0, 16, 16)
+            a:addClip("walk", {0, 1}, 10, true)
+            a:play("walk")
+            a:update(0.15)
+            local evs = a:pollEvents()
+            local found = false
+            for _, e in ipairs(evs) do
+                if e.type == "frameChanged" then
+                    expect_equal(1, e.frame)
+                    found = true
+                end
+            end
+            expect_true(found, "expected frameChanged event")
+        end)
+
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.pollEvents
         it("pollEvents drains events", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -442,18 +442,16 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ speed edge cases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- speed edge cases
 
-    -- @description Covers suite: speed edge cases.
     describe("speed edge cases", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.setSpeed
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Confirms a playback speed of 0 freezes the current frame across update() calls.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.setSpeed
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getCurrentFrame
         it("speed 0 freezes playback", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -466,10 +464,9 @@ describe("lurek.animation", function()
             expect_equal(f0, a:getCurrentFrame())
         end)
 
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.setSpeed
-        -- @tests lurek.animation.getSpeed
-        -- @description Verifies negative speed inputs are clamped so the stored speed never goes below zero.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.setSpeed
+        -- @covers lurek.animation.getSpeed
         it("setSpeed clamps negative to 0", function()
             local a = lurek.animation.new()
             a:setSpeed(-5)
@@ -477,17 +474,15 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ clip switching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- clip switching
 
-    -- @description Covers suite: clip switching.
     describe("clip switching", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Confirms starting a different clip resets playback to the new clip's first frame.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getCurrentFrame
         it("switching clips resets frame to 0", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -501,15 +496,13 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ addClipFromGrid â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- addClipFromGrid
 
-    -- @description Covers suite: addClipFromGrid.
     describe("addClipFromGrid", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addClipFromGrid
-        -- @tests lurek.animation.getClipCount
-        -- @tests lurek.animation.getFrameCount
-        -- @description Verifies addClipFromGrid() creates both the clip entry and its backing frames in one call.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addClipFromGrid
+        -- @covers lurek.animation.getClipCount
+        -- @covers lurek.animation.getFrameCount
         it("creates clip from grid in one call", function()
             local a = lurek.animation.new()
             expect_no_error(function()
@@ -520,17 +513,15 @@ describe("lurek.animation", function()
         end)
     end)
 
-    -- â”€â”€ frame advancement precision â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+-- frame advancement precision
 
-    -- @description Covers suite: frame advancement.
     describe("frame advancement", function()
-        -- @tests lurek.animation.new
-        -- @tests lurek.animation.addFrame
-        -- @tests lurek.animation.addClip
-        -- @tests lurek.animation.play
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getCurrentFrame
-        -- @description Confirms update(0) leaves the current frame unchanged.
+        -- @covers lurek.animation.new
+        -- @covers lurek.animation.addFrame
+        -- @covers lurek.animation.addClip
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getCurrentFrame
         it("zero dt does not advance frame", function()
             local a = lurek.animation.new()
             a:addFrame(0, 0, 16, 16)
@@ -543,7 +534,7 @@ describe("lurek.animation", function()
     end)
 end)
 
--- ── Animation Extended (merged from test_animation_ext.lua) ──
+--  Animation Extended (merged from test_animation_ext.lua) 
 
 -- Helper: build a minimal animation with two named clips.
 local function make_anim()
@@ -555,31 +546,25 @@ local function make_anim()
     return a
 end
 
--- @description Covers suite: lurek.animation extended features.
 describe("lurek.animation extended", function()
-    -- ── module interface ──────────────────────────────────────────────────
+-- module interface
 
-    -- @description Covers suite: new API factories.
     describe("new API factories", function()
-        -- @tests lurek.animation.fromAseprite
-        -- @description Verifies the fromAseprite factory is exposed on the module.
+        -- @covers lurek.animation.fromAseprite
         it("exposes fromAseprite factory", function()
             expect_type("function", lurek.animation.fromAseprite)
         end)
 
-        -- @tests lurek.animation.newStateMachine
-        -- @description Verifies the newStateMachine factory is exposed on the module.
+        -- @covers lurek.animation.newStateMachine
         it("exposes newStateMachine factory", function()
             expect_type("function", lurek.animation.newStateMachine)
         end)
     end)
 
-    -- ── crossfade ─────────────────────────────────────────────────────────
+-- crossfade
 
-    -- @description Covers suite: crossfade().
     describe("crossfade()", function()
-        -- @tests lurek.animation.crossfade
-        -- @description Verifies crossfade returns true when switching to a valid clip.
+        -- @covers lurek.animation.crossfade
         it("returns true for an existing clip", function()
             local a = make_anim()
             a:play("idle")
@@ -587,8 +572,7 @@ describe("lurek.animation extended", function()
             expect_equal(true, ok)
         end)
 
-        -- @tests lurek.animation.crossfade
-        -- @description Verifies crossfade returns false when the target clip does not exist.
+        -- @covers lurek.animation.crossfade
         it("returns false for an unknown clip", function()
             local a = make_anim()
             a:play("idle")
@@ -596,9 +580,8 @@ describe("lurek.animation extended", function()
             expect_equal(false, ok)
         end)
 
-        -- @tests lurek.animation.crossfade
-        -- @tests lurek.animation.getBlendState
-        -- @description Verifies getBlendState returns a table immediately after starting a crossfade.
+        -- @covers lurek.animation.crossfade
+        -- @covers lurek.animation.getBlendState
         it("getBlendState returns blend table during crossfade", function()
             local a = make_anim()
             a:play("idle")
@@ -608,12 +591,10 @@ describe("lurek.animation extended", function()
         end)
     end)
 
-    -- ── getBlendState ─────────────────────────────────────────────────────
+-- getBlendState
 
-    -- @description Covers suite: getBlendState().
     describe("getBlendState()", function()
-        -- @tests lurek.animation.getBlendState
-        -- @description Verifies getBlendState returns nil when not crossfading.
+        -- @covers lurek.animation.getBlendState
         it("returns nil when not crossfading", function()
             local a = make_anim()
             a:play("idle")
@@ -621,9 +602,8 @@ describe("lurek.animation extended", function()
             expect_equal(nil, bs)
         end)
 
-        -- @tests lurek.animation.crossfade
-        -- @tests lurek.animation.getBlendState
-        -- @description Verifies blend state table has from, to, and blend fields.
+        -- @covers lurek.animation.crossfade
+        -- @covers lurek.animation.getBlendState
         it("blend table has from/to/blend fields", function()
             local a = make_anim()
             a:play("idle")
@@ -634,9 +614,8 @@ describe("lurek.animation extended", function()
             expect_type("number", bs.blend)
         end)
 
-        -- @tests lurek.animation.crossfade
-        -- @tests lurek.animation.getBlendState
-        -- @description Verifies blend value starts near 0 right after initiating a crossfade.
+        -- @covers lurek.animation.crossfade
+        -- @covers lurek.animation.getBlendState
         it("blend starts near 0 at crossfade start", function()
             local a = make_anim()
             a:play("idle")
@@ -646,12 +625,10 @@ describe("lurek.animation extended", function()
         end)
     end)
 
-    -- ── drawToImage ───────────────────────────────────────────────────────
+-- drawToImage
 
-    -- @description Covers suite: Animation:drawToImage().
     describe("Animation:drawToImage()", function()
-        -- @tests lurek.animation.drawToImage
-        -- @description Verifies drawToImage returns a userdata (ImageData).
+        -- @covers lurek.animation.drawToImage
         it("returns a userdata", function()
             local a = make_anim()
             local img = a:drawToImage(32, 32)
@@ -659,9 +636,8 @@ describe("lurek.animation extended", function()
         end)
     end)
 
-    -- ── fromAseprite ──────────────────────────────────────────────────────
+-- fromAseprite
 
-    -- @description Covers suite: fromAseprite().
     describe("fromAseprite()", function()
         -- Minimal two-frame Aseprite JSON export
         local ASEPRITE_JSON = [[{
@@ -670,48 +646,81 @@ describe("lurek.animation extended", function()
                 {"filename":"idle_1","frame":{"x":16,"y":0,"w":16,"h":16},"duration":100}
             ],
             "meta": {
+                "size":{"w":32,"h":16},
                 "frameTags":[{"name":"idle","from":0,"to":1,"direction":"forward"}]
             }
         }]]
 
-        -- @tests lurek.animation.fromAseprite
-        -- @description Confirms fromAseprite returns animation userdata for valid input.
-        xit("returns animation userdata for valid JSON", function()
+        local ASEPRITE_REVERSE_JSON = [[{
+            "frames": [
+                {"filename":"walk_0","frame":{"x":0,"y":0,"w":16,"h":16},"duration":100},
+                {"filename":"walk_1","frame":{"x":16,"y":0,"w":16,"h":16},"duration":100}
+            ],
+            "meta": {
+                "size":{"w":32,"h":16},
+                "frameTags":[{"name":"walk","from":0,"to":1,"direction":"reverse"}]
+            }
+        }]]
+
+        -- @covers lurek.animation.fromAseprite
+        it("returns animation userdata for valid JSON", function()
             local a = lurek.animation.fromAseprite(ASEPRITE_JSON)
             expect_type("userdata", a)
         end)
 
-        -- @tests lurek.animation.fromAseprite
-        -- @tests lurek.animation.getFrameCount
-        -- @description Confirms fromAseprite imports the correct number of frames.
-        xit("imports the correct frame count", function()
+        -- @covers lurek.animation.fromAseprite
+        -- @covers lurek.animation.getFrameCount
+        it("imports the correct frame count", function()
             local a = lurek.animation.fromAseprite(ASEPRITE_JSON)
             expect_equal(2, a:getFrameCount())
         end)
 
-        -- @tests lurek.animation.fromAseprite
-        -- @tests lurek.animation.getClipCount
-        -- @description Confirms fromAseprite registers clips from frameTags.
-        xit("registers named clips from frameTags", function()
+        -- @covers lurek.animation.fromAseprite
+        -- @covers lurek.animation.getClipCount
+        it("registers named clips from frameTags", function()
             local a = lurek.animation.fromAseprite(ASEPRITE_JSON)
             expect_true(a:getClipCount() >= 1, "expected at least one clip")
         end)
 
-        -- @tests lurek.animation.fromAseprite
-        -- @description Confirms fromAseprite raises an error for invalid JSON.
+        -- @covers lurek.animation.fromAseprite
+        -- @covers lurek.animation.play
+        -- @covers lurek.animation.getQuad
+        it("honors reverse frame tag direction", function()
+            local a = lurek.animation.fromAseprite(ASEPRITE_REVERSE_JSON)
+            expect_true(a:play("walk"))
+            local q = a:getQuad()
+            expect_equal(16, q.x)
+            expect_equal(0, q.y)
+            expect_equal(16, q.w)
+            expect_equal(16, q.h)
+        end)
+
+        -- @covers lurek.animation.fromAseprite
         it("errors on invalid JSON", function()
             expect_error(function()
                 lurek.animation.fromAseprite("not json")
             end)
         end)
+
+        -- @covers lurek.animation.fromAseprite
+        it("errors when frames key is missing", function()
+            expect_error(function()
+                lurek.animation.fromAseprite('{"meta":{"size":{"w":16,"h":16}}}')
+            end)
+        end)
+
+        -- @covers lurek.animation.fromAseprite
+        it("errors when meta key is missing", function()
+            expect_error(function()
+                lurek.animation.fromAseprite('{"frames":[]}')
+            end)
+        end)
     end)
 
-    -- ── newStateMachine ───────────────────────────────────────────────────
+-- newStateMachine
 
-    -- @description Covers suite: newStateMachine().
     describe("newStateMachine()", function()
-        -- @tests lurek.animation.newStateMachine
-        -- @description Confirms newStateMachine returns an FSM userdata.
+        -- @covers lurek.animation.newStateMachine
         it("returns a userdata", function()
             local a = make_anim()
             a:play("idle")
@@ -719,9 +728,8 @@ describe("lurek.animation extended", function()
             expect_type("userdata", fsm)
         end)
 
-        -- @tests lurek.animation.newStateMachine
-        -- @tests lurek.animation.getState
-        -- @description Confirms the initial state matches the provided initial state name.
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.getState
         it("getState returns initial state name", function()
             local a = make_anim()
             a:play("idle")
@@ -729,11 +737,10 @@ describe("lurek.animation extended", function()
             expect_equal("idle", fsm:getState())
         end)
 
-        -- @tests lurek.animation.newStateMachine
-        -- @tests lurek.animation.addState
-        -- @tests lurek.animation.forceState
-        -- @tests lurek.animation.getState
-        -- @description Confirms forceState immediately transitions to the target state.
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.addState
+        -- @covers lurek.animation.forceState
+        -- @covers lurek.animation.getState
         it("forceState switches the current state", function()
             local a = make_anim()
             local fsm = lurek.animation.newStateMachine(a, "idle")
@@ -742,25 +749,72 @@ describe("lurek.animation extended", function()
             expect_equal("run", fsm:getState())
         end)
 
-        -- @tests lurek.animation.newStateMachine
-        -- @tests lurek.animation.setParam
-        -- @tests lurek.animation.addTransition
-        -- @tests lurek.animation.update
-        -- @tests lurek.animation.getState
-        -- @description Confirms a boolean param triggers a registered transition on update.
-        xit("transition fires when boolean param is set", function()
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.setParam
+        -- @covers lurek.animation.addTransition
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getState
+        it("transition fires when boolean param is set", function()
             local a = make_anim()
             local fsm = lurek.animation.newStateMachine(a, "idle")
+            fsm:addState("idle", "idle", true)
             fsm:addState("run", "run", true)
-            fsm:addTransition("idle", "run", "moving")
+            fsm:addTransition("idle", "run", "moving == true")
             fsm:setParam("moving", true)
             fsm:update(0.016)
             expect_equal("run", fsm:getState())
         end)
 
-        -- @tests lurek.animation.newStateMachine
-        -- @tests lurek.animation.getQuad
-        -- @description Confirms getQuad returns a table when the FSM has an active animation state.
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.addTransition
+        -- @covers lurek.animation.setParam
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getState
+        it("transition fires when float param is greater than threshold", function()
+            local a = make_anim()
+            local fsm = lurek.animation.newStateMachine(a, "idle")
+            fsm:addState("idle", "idle", true)
+            fsm:addState("run", "run", true)
+            fsm:addTransition("idle", "run", "speed > 5.0")
+            fsm:setParam("speed", 6.0)
+            fsm:update(0.016)
+            expect_equal("run", fsm:getState())
+        end)
+
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.addTransition
+        -- @covers lurek.animation.setParam
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getState
+        it("transition fires when integer param is not equal", function()
+            local a = make_anim()
+            local fsm = lurek.animation.newStateMachine(a, "idle")
+            fsm:addState("idle", "idle", true)
+            fsm:addState("run", "run", true)
+            fsm:addTransition("idle", "run", "mode != 2")
+            fsm:setParam("mode", 1)
+            fsm:update(0.016)
+            expect_equal("run", fsm:getState())
+        end)
+
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.addTransition
+        -- @covers lurek.animation.setParam
+        -- @covers lurek.animation.update
+        -- @covers lurek.animation.getState
+        it("invalid transition conditions are ignored", function()
+            local a = make_anim()
+            local fsm = lurek.animation.newStateMachine(a, "idle")
+            fsm:addState("idle", "idle", true)
+            fsm:addState("run", "run", true)
+            fsm:addTransition("idle", "run", "noop")
+            fsm:setParam("noop", 999)
+            fsm:update(0.016)
+            expect_equal("idle", fsm:getState())
+        end)
+
+        -- @covers lurek.animation.newStateMachine
+        -- @covers lurek.animation.getQuad
         it("getQuad returns a table", function()
             local a = make_anim()
             a:play("idle")
@@ -770,37 +824,30 @@ describe("lurek.animation extended", function()
     end)
 end)
 
--- ── Animation Blend (merged from test_animation_blend.lua) ──
+--  Animation Blend (merged from test_animation_blend.lua) 
 
--- @description Covers suite: lurek.animation blend layers.
 describe("lurek.animation blend layers", function()
-    -- @description Covers suite: factory.
     describe("factory", function()
-        -- @tests lurek.animation.newBlendLayerSet
-        -- @description Verifies newBlendLayerSet is exposed on the module.
+        -- @covers lurek.animation.newBlendLayerSet
         it("exposes newBlendLayerSet", function()
             expect_type("function", lurek.animation.newBlendLayerSet)
         end)
 
-        -- @tests lurek.animation.newBlendLayerSet
-        -- @description Factory returns a userdata.
+        -- @covers lurek.animation.newBlendLayerSet
         it("returns a userdata", function()
             local bls = lurek.animation.newBlendLayerSet()
             expect_type("userdata", bls)
         end)
     end)
 
-    -- @description Covers suite: len() and addLayer().
     describe("len() / addLayer()", function()
         -- @tests lurek.animation:len
-        -- @description Empty set has length zero.
         it("starts empty", function()
             local bls = lurek.animation.newBlendLayerSet()
             expect_equal(0, bls:len())
         end)
 
         -- @tests lurek.animation:addLayer
-        -- @description Adding a layer increments length.
         it("addLayer increments len", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -808,7 +855,6 @@ describe("lurek.animation blend layers", function()
         end)
 
         -- @tests lurek.animation:addLayer
-        -- @description Two distinct layers can be added.
         it("accepts two distinct layers", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -817,7 +863,6 @@ describe("lurek.animation blend layers", function()
         end)
 
         -- @tests lurek.animation:addLayer
-        -- @description Layer with bone mask list does not error.
         it("accepts bone mask as fourth argument", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 0.8, {"spine", "shoulder_L", "shoulder_R"})
@@ -825,10 +870,8 @@ describe("lurek.animation blend layers", function()
         end)
     end)
 
-    -- @description Covers suite: weight accessors.
     describe("setWeight() / getWeight()", function()
         -- @tests lurek.animation:getWeight
-        -- @description getWeight returns the initial weight.
         it("getWeight returns initial weight", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 0.75)
@@ -837,7 +880,6 @@ describe("lurek.animation blend layers", function()
         end)
 
         -- @tests lurek.animation:setWeight
-        -- @description setWeight updates the weight.
         it("setWeight updates the weight", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("lower", "walk", 1.0)
@@ -847,10 +889,8 @@ describe("lurek.animation blend layers", function()
         end)
     end)
 
-    -- @description Covers suite: listLayers().
     describe("listLayers()", function()
         -- @tests lurek.animation:listLayers
-        -- @description listLayers returns a table of layer names.
         it("returns a table", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -859,7 +899,6 @@ describe("lurek.animation blend layers", function()
         end)
 
         -- @tests lurek.animation:listLayers
-        -- @description The table length matches the layer count.
         it("table length equals layer count", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -869,10 +908,8 @@ describe("lurek.animation blend layers", function()
         end)
     end)
 
-    -- @description Covers suite: removeLayer().
     describe("removeLayer()", function()
         -- @tests lurek.animation:removeLayer
-        -- @description Removing a layer decrements length.
         it("decrements len after removal", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -882,7 +919,6 @@ describe("lurek.animation blend layers", function()
         end)
 
         -- @tests lurek.animation:removeLayer
-        -- @description Removing a non-existent layer does not error.
         xit("removing unknown layer does not error", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:removeLayer("nonexistent")
@@ -890,10 +926,8 @@ describe("lurek.animation blend layers", function()
         end)
     end)
 
-    -- @description Covers suite: setMask().
     describe("setMask()", function()
         -- @tests lurek.animation:setMask
-        -- @description setMask on an existing layer does not error.
         it("accepts a bone list without error", function()
             local bls = lurek.animation.newBlendLayerSet()
             bls:addLayer("upper", "attack", 1.0)
@@ -903,12 +937,10 @@ describe("lurek.animation blend layers", function()
     end)
 end)
 
--- @description Replaces the placeholder tail with direct factory and count-based coverage for AnimCurve and AnimSyncGroup helpers that were still only stubbed.
 describe("animation regression coverage", function()
-    -- @tests lurek.animation.newCurve
-    -- @tests AnimCurve:keyframeCount
-    -- @tests AnimCurve:clear
-    -- @description Verifies the curve factory returns userdata, keyframeCount tracks inserts, and clear resets the curve to empty.
+    -- @covers lurek.animation.newCurve
+    -- @covers AnimCurve:keyframeCount
+    -- @covers AnimCurve:clear
     it("AnimCurve tracks keyframes and clears back to empty", function()
         local curve = lurek.animation.newCurve()
         expect_type("userdata", curve)
@@ -922,12 +954,37 @@ describe("animation regression coverage", function()
         expect_equal(0, curve:keyframeCount())
     end)
 
-    -- @tests lurek.animation.newSyncGroup
-    -- @tests AnimSyncGroup:add
-    -- @tests AnimSyncGroup:remove
-    -- @tests AnimSyncGroup:clear
-    -- @tests AnimSyncGroup:memberCount
-    -- @description Verifies the sync-group factory returns userdata and the current stubbed member API remains safe and count-stable through add/remove/clear calls.
+    -- @covers lurek.animation.newCurve
+    -- @covers AnimCurve:eval
+    it("AnimCurve eval handles empty and single-keyframe cases", function()
+        local curve = lurek.animation.newCurve()
+        expect_near(0.0, curve:eval(0.5), 0.001)
+
+        curve:addKeyframe(1.0, 42.0)
+        expect_near(42.0, curve:eval(0.0), 0.001)
+        expect_near(42.0, curve:eval(2.0), 0.001)
+    end)
+
+    -- @covers lurek.animation.newCurve
+    -- @covers AnimCurve:setEasing
+    -- @covers AnimCurve:eval
+    it("AnimCurve eval respects linear and step easing", function()
+        local curve = lurek.animation.newCurve()
+        curve:addKeyframe(0.0, 5.0)
+        curve:addKeyframe(1.0, 10.0)
+
+        curve:setEasing("linear")
+        expect_near(7.5, curve:eval(0.5), 0.001)
+
+        curve:setEasing("step")
+        expect_near(5.0, curve:eval(0.5), 0.001)
+    end)
+
+    -- @covers lurek.animation.newSyncGroup
+    -- @covers AnimSyncGroup:add
+    -- @covers AnimSyncGroup:remove
+    -- @covers AnimSyncGroup:clear
+    -- @covers AnimSyncGroup:memberCount
     it("AnimSyncGroup accepts lifecycle calls without changing its empty count", function()
         local group = lurek.animation.newSyncGroup()
         expect_type("userdata", group)
@@ -972,8 +1029,7 @@ describe("AnimCurve custom easing", function()
             c:addKeyframe(1, 1)
             c:setCustomEasing(function(t) return t * t end)
             local v = c:eval(0.5)
-            -- Custom easing returns t^2 = 0.25, not linear 0.5
-            expect_not_nil(v)
+            expect_near(0.25, v, 0.01)
         end
     end)
 
@@ -985,7 +1041,7 @@ describe("AnimCurve custom easing", function()
             c:setCustomEasing(function(t) return t * t end)
             c:setCustomEasing(nil)
             local v = c:eval(0.5)
-            expect_not_nil(v)
+            expect_near(0.5, v, 0.01)
         end
     end)
 end)

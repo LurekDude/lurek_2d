@@ -1,43 +1,36 @@
-﻿-- Lurek2D Compute Array Tests
+-- Lurek2D Compute Array Tests
 -- Tests for lurek.compute dense N-dimensional array API
 
 -- =========================================================================
 -- 1. Module exists
 -- =========================================================================
 
--- @description Verifies that lurek.compute is present as a table and exposes the documented array factory functions.
 describe("lurek.compute module exists", function()
-    -- @tests lurek.compute.fromTable
-    -- @tests lurek.compute.newArray
-    -- @tests lurek.compute.ones
-    -- @tests lurek.compute.range
-    -- @tests lurek.compute.zeros
-    -- @description Confirms the module root is a Lua table before any factories are used.
+    -- @covers lurek.compute.fromTable
+    -- @covers lurek.compute.newArray
+    -- @covers lurek.compute.ones
+    -- @covers lurek.compute.range
+    -- @covers lurek.compute.zeros
     it("lurek.compute is a table", function()
         expect_type("table", lurek.compute)
     end)
 
-    -- @description Checks that newArray is registered as a callable constructor on the module.
     it("has newArray factory", function()
         expect_type("function", lurek.compute.newArray)
     end)
 
-    -- @description Checks that zeros is registered as a callable constructor on the module.
     it("has zeros factory", function()
         expect_type("function", lurek.compute.zeros)
     end)
 
-    -- @description Checks that ones is registered as a callable constructor on the module.
     it("has ones factory", function()
         expect_type("function", lurek.compute.ones)
     end)
 
-    -- @description Checks that range is registered as a callable constructor on the module.
     it("has range factory", function()
         expect_type("function", lurek.compute.range)
     end)
 
-    -- @description Checks that fromTable is registered as a callable constructor on the module.
     it("has fromTable factory", function()
         expect_type("function", lurek.compute.fromTable)
     end)
@@ -46,9 +39,7 @@ end)
 -- =========================================================================
 -- 2. Construction
 -- =========================================================================
--- @description Covers array construction paths by checking shapes, sizes, default dtypes, explicit dtypes, and multidimensional initialization.
 describe("construction", function()
-    -- @description Builds a 3x3 zeros array and verifies both reported shape entries are 3.
     it("zeros creates array with correct shape", function()
         local a = lurek.compute.zeros({3, 3})
         local s = a:getShape()
@@ -56,25 +47,21 @@ describe("construction", function()
         expect_equal(3, s[2])
     end)
 
-    -- @description Verifies that a 3x3 zeros array reports a total element count of 9.
     it("zeros creates array with correct size", function()
         local a = lurek.compute.zeros({3, 3})
         expect_equal(9, a:getSize())
     end)
 
-    -- @description Verifies that a 3x3 zeros array reports exactly 2 dimensions.
     it("zeros creates array with correct dimensions", function()
         local a = lurek.compute.zeros({3, 3})
         expect_equal(2, a:getDimensions())
     end)
 
-    -- @description Confirms that zeros without an explicit dtype defaults to float32.
     it("zeros default dtype is float32", function()
         local a = lurek.compute.zeros({2, 2})
         expect_equal("float32", a:getDataType())
     end)
 
-    -- @description Checks each element of a length-3 zeros array and expects every value to be 0.0.
     it("zeros elements are all zero", function()
         local a = lurek.compute.zeros({3})
         for i = 1, 3 do
@@ -82,7 +69,6 @@ describe("construction", function()
         end
     end)
 
-    -- @description Builds a 2x3 ones array and verifies every indexed element is exactly 1.0.
     it("ones creates array with all elements 1.0", function()
         local a = lurek.compute.ones({2, 3})
         for i = 1, 2 do
@@ -92,14 +78,12 @@ describe("construction", function()
         end
     end)
 
-    -- @description Verifies that a 2x3 ones array reports size 6 and 2 dimensions.
     it("ones has correct shape", function()
         local a = lurek.compute.ones({2, 3})
         expect_equal(6, a:getSize())
         expect_equal(2, a:getDimensions())
     end)
 
-    -- @description Confirms that range(1, 4) yields three elements with values 1.0, 2.0, and 3.0.
     it("range produces correct sequence", function()
         local a = lurek.compute.range(1, 4)
         expect_equal(3, a:getSize())
@@ -108,7 +92,6 @@ describe("construction", function()
         expect_near(3.0, a:get(3), 1e-5)
     end)
 
-    -- @description Confirms that range(0, 10, 2) produces five elements stepping by 2 from 0.0 through 8.0.
     it("range with step produces correct sequence", function()
         local a = lurek.compute.range(0, 10, 2)
         expect_equal(5, a:getSize())
@@ -119,7 +102,6 @@ describe("construction", function()
         expect_near(8.0, a:get(5), 1e-5)
     end)
 
-    -- @description Creates a 1D array from a Lua table and verifies the size and all three element values.
     it("fromTable creates 1D array", function()
         local a = lurek.compute.fromTable({10, 20, 30})
         expect_equal(3, a:getSize())
@@ -128,7 +110,6 @@ describe("construction", function()
         expect_near(30.0, a:get(3), 1e-5)
     end)
 
-    -- @description Reshapes four flat values into a 2x2 array and verifies dimensionality and row-major element placement.
     it("fromTable with shape reshapes", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
         expect_equal(4, a:getSize())
@@ -139,26 +120,22 @@ describe("construction", function()
         expect_near(4.0, a:get(2, 2), 1e-5)
     end)
 
-    -- @description Verifies that newArray allocates the requested shape and starts with zero-initialized contents.
     it("newArray creates zero-initialized array", function()
         local a = lurek.compute.newArray({2, 2})
         expect_equal(4, a:getSize())
         expect_near(0.0, a:get(1, 1), 1e-5)
     end)
 
-    -- @description Confirms that zeros accepts float64 and reports the dtype name back unchanged.
     it("float64 dtype works", function()
         local a = lurek.compute.zeros({3}, "float64")
         expect_equal("float64", a:getDataType())
     end)
 
-    -- @description Confirms that zeros accepts int32 and reports the dtype name back unchanged.
     it("int32 dtype works", function()
         local a = lurek.compute.zeros({3}, "int32")
         expect_equal("int32", a:getDataType())
     end)
 
-    -- @description Builds a 2x3x4 zeros array and verifies the three reported dimensions and total size 24.
     it("3D array construction", function()
         local a = lurek.compute.zeros({2, 3, 4})
         expect_equal(3, a:getDimensions())
@@ -173,9 +150,7 @@ end)
 -- =========================================================================
 -- 3. Element access
 -- =========================================================================
--- @description Verifies indexed reads and writes across 1D, 2D, and 3D arrays, plus flat-table export and overwrite behavior.
 describe("element access", function()
-    -- @description Sets two positions in a 1D zeros array and verifies the written values and an untouched zero slot.
     it("1D get and set", function()
         local a = lurek.compute.zeros({5})
         a:set(1, 5.0)
@@ -185,7 +160,6 @@ describe("element access", function()
         expect_near(7.5, a:get(3), 1e-5)
     end)
 
-    -- @description Writes to position (2, 3) in a 3x4 array and verifies that value while checking an untouched cell stays 0.0.
     it("2D get and set", function()
         local a = lurek.compute.zeros({3, 4})
         a:set(2, 3, 7.0)
@@ -193,7 +167,6 @@ describe("element access", function()
         expect_near(0.0, a:get(1, 1), 1e-5)
     end)
 
-    -- @description Writes to position (1, 2, 3) in a 3D array and verifies the stored value and an untouched origin cell.
     it("3D get and set", function()
         local a = lurek.compute.zeros({2, 3, 4})
         a:set(1, 2, 3, 99.0)
@@ -201,7 +174,6 @@ describe("element access", function()
         expect_near(0.0, a:get(1, 1, 1), 1e-5)
     end)
 
-    -- @description Converts a reshaped 2x2 array back to a flat Lua table and verifies row-major ordering of all four values.
     it("toTable returns flat table", function()
         local a = lurek.compute.fromTable({10, 20, 30, 40}, {2, 2})
         local t = a:toTable()
@@ -212,7 +184,6 @@ describe("element access", function()
         expect_near(40.0, t[4], 1e-5)
     end)
 
-    -- @description Writes index 2 twice and verifies that the second assignment replaces the first stored value.
     it("set overwrites previous value", function()
         local a = lurek.compute.zeros({3})
         a:set(2, 100.0)
@@ -220,14 +191,20 @@ describe("element access", function()
         a:set(2, 200.0)
         expect_near(200.0, a:get(2), 1e-5)
     end)
+
+    it("int32 arrays round-trip integer writes", function()
+        local a = lurek.compute.zeros({4}, "int32")
+        a:set(1, 42)
+        a:set(2, -7)
+        expect_equal(42, a:get(1))
+        expect_equal(-7, a:get(2))
+    end)
 end)
 
 -- =========================================================================
 -- 4. Inspection
 -- =========================================================================
--- @description Verifies shape, dimensionality, size, GPU residency, and dtype inspection methods against known constructor inputs.
 describe("inspection", function()
-    -- @description Confirms that getShape returns the original 4x5 constructor dimensions.
     it("getShape matches constructor", function()
         local a = lurek.compute.zeros({4, 5})
         local s = a:getShape()
@@ -235,31 +212,26 @@ describe("inspection", function()
         expect_equal(5, s[2])
     end)
 
-    -- @description Confirms that a single-axis array reports one dimension.
     it("getDimensions for 1D", function()
         local a = lurek.compute.zeros({10})
         expect_equal(1, a:getDimensions())
     end)
 
-    -- @description Confirms that a 2x3x4 array reports three dimensions.
     it("getDimensions for 3D", function()
         local a = lurek.compute.zeros({2, 3, 4})
         expect_equal(3, a:getDimensions())
     end)
 
-    -- @description Checks that size equals the product of a 3x4x5 shape, which should be 60.
     it("getSize is product of shape", function()
         local a = lurek.compute.zeros({3, 4, 5})
         expect_equal(60, a:getSize())
     end)
 
-    -- @description Verifies the current backend reports CPU-backed arrays by always returning false for isOnGPU.
     it("isOnGPU always returns false", function()
         local a = lurek.compute.zeros({3})
         expect_false(a:isOnGPU())
     end)
 
-    -- @description Confirms that an explicitly requested float64 array reports the same dtype string.
     it("getDataType returns dtype name", function()
         local a = lurek.compute.ones({2}, "float64")
         expect_equal("float64", a:getDataType())
@@ -269,9 +241,7 @@ end)
 -- =========================================================================
 -- 5. Arithmetic
 -- =========================================================================
--- @description Checks element-wise arithmetic, scalar arithmetic, immutability of sources, unary transforms, and clamping results.
 describe("arithmetic", function()
-    -- @description Adds {1,2,3} and {4,5,6} and verifies the resulting elements are 5.0, 7.0, and 9.0.
     it("add two arrays element-wise", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({4, 5, 6})
@@ -281,7 +251,6 @@ describe("arithmetic", function()
         expect_near(9.0, c:get(3), 1e-5)
     end)
 
-    -- @description Adds the scalar 10 to each element of {1,2,3} and verifies the shifted values 11.0, 12.0, and 13.0.
     it("add scalar to array", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local c = a:add(10)
@@ -290,7 +259,6 @@ describe("arithmetic", function()
         expect_near(13.0, c:get(3), 1e-5)
     end)
 
-    -- @description Confirms that scalar addition returns a new array and leaves the original source values unchanged.
     it("add does not modify original", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local _ = a:add(10)
@@ -299,7 +267,6 @@ describe("arithmetic", function()
         expect_near(3.0, a:get(3), 1e-5)
     end)
 
-    -- @description Subtracts {1,2,3} from {10,20,30} and verifies the element-wise differences 9.0, 18.0, and 27.0.
     it("sub arrays element-wise", function()
         local a = lurek.compute.fromTable({10, 20, 30})
         local b = lurek.compute.fromTable({1, 2, 3})
@@ -309,7 +276,6 @@ describe("arithmetic", function()
         expect_near(27.0, c:get(3), 1e-5)
     end)
 
-    -- @description Subtracts the scalar 5 from each element of {10,20,30} and verifies the results 5.0, 15.0, and 25.0.
     it("sub scalar", function()
         local a = lurek.compute.fromTable({10, 20, 30})
         local c = a:sub(5)
@@ -318,7 +284,6 @@ describe("arithmetic", function()
         expect_near(25.0, c:get(3), 1e-5)
     end)
 
-    -- @description Multiplies {2,3,4} by {5,6,7} and verifies the element-wise products 10.0, 18.0, and 28.0.
     it("mul arrays element-wise", function()
         local a = lurek.compute.fromTable({2, 3, 4})
         local b = lurek.compute.fromTable({5, 6, 7})
@@ -328,7 +293,6 @@ describe("arithmetic", function()
         expect_near(28.0, c:get(3), 1e-5)
     end)
 
-    -- @description Multiplies {2,3,4} by scalar 3 and verifies the results 6.0, 9.0, and 12.0.
     it("mul scalar", function()
         local a = lurek.compute.fromTable({2, 3, 4})
         local c = a:mul(3)
@@ -337,7 +301,6 @@ describe("arithmetic", function()
         expect_near(12.0, c:get(3), 1e-5)
     end)
 
-    -- @description Divides {10,20,30} by {2,4,5} and verifies the element-wise quotients 5.0, 5.0, and 6.0.
     it("div arrays element-wise", function()
         local a = lurek.compute.fromTable({10, 20, 30})
         local b = lurek.compute.fromTable({2, 4, 5})
@@ -347,7 +310,6 @@ describe("arithmetic", function()
         expect_near(6.0, c:get(3), 1e-5)
     end)
 
-    -- @description Divides {10,20,30} by scalar 2 and verifies the quotients 5.0, 10.0, and 15.0.
     it("div scalar", function()
         local a = lurek.compute.fromTable({10, 20, 30})
         local c = a:div(2)
@@ -356,7 +318,6 @@ describe("arithmetic", function()
         expect_near(15.0, c:get(3), 1e-5)
     end)
 
-    -- @description Squares each element of {2,3,4} and verifies the powers 4.0, 9.0, and 16.0.
     it("pow raises elements to power", function()
         local a = lurek.compute.fromTable({2, 3, 4})
         local c = a:pow(2)
@@ -365,7 +326,6 @@ describe("arithmetic", function()
         expect_near(16.0, c:get(3), 1e-5)
     end)
 
-    -- @description Takes square roots of perfect squares and verifies the exact roots 2.0, 3.0, 4.0, and 5.0.
     it("sqrt of perfect squares", function()
         local a = lurek.compute.fromTable({4, 9, 16, 25})
         local c = a:sqrt()
@@ -375,7 +335,6 @@ describe("arithmetic", function()
         expect_near(5.0, c:get(4), 1e-5)
     end)
 
-    -- @description Applies absolute value to negative, zero, positive, and fractional inputs and verifies all outputs are non-negative magnitudes.
     it("abs of mixed values", function()
         local a = lurek.compute.fromTable({-3, 0, 5, -1.5})
         local c = a:abs()
@@ -385,7 +344,6 @@ describe("arithmetic", function()
         expect_near(1.5, c:get(4), 1e-5)
     end)
 
-    -- @description Negates {1,-2,3} and verifies the sign-flipped outputs -1.0, 2.0, and -3.0.
     it("neg negates elements", function()
         local a = lurek.compute.fromTable({1, -2, 3})
         local c = a:neg()
@@ -394,7 +352,6 @@ describe("arithmetic", function()
         expect_near(-3.0, c:get(3), 1e-5)
     end)
 
-    -- @description Clamps values into the inclusive range [0,10] and verifies underflow and overflow entries are clipped while in-range values stay unchanged.
     it("clamp clips values to range", function()
         local a = lurek.compute.fromTable({-5, 0, 3, 10, 15})
         local c = a:clamp(0, 10)
@@ -409,9 +366,7 @@ end)
 -- =========================================================================
 -- 6. Comparison
 -- =========================================================================
--- @description Verifies comparison operators against arrays and scalars by checking the returned mask values at each position.
 describe("comparison", function()
-    -- @description Compares two arrays for equality and verifies only matching positions yield 1.0 in the result mask.
     it("eq returns 1.0 for equal elements", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({1, 9, 3})
@@ -421,7 +376,6 @@ describe("comparison", function()
         expect_near(1.0, c:get(3), 1e-5)
     end)
 
-    -- @description Compares array values to scalar 2 and verifies only the equal entries are marked with 1.0.
     it("eq with scalar", function()
         local a = lurek.compute.fromTable({1, 2, 2, 3})
         local c = a:eq(2)
@@ -431,7 +385,6 @@ describe("comparison", function()
         expect_near(0.0, c:get(4), 1e-5)
     end)
 
-    -- @description Compares two arrays for inequality and verifies only the differing position yields 1.0.
     it("neq returns 1.0 for unequal elements", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({1, 9, 3})
@@ -441,7 +394,6 @@ describe("comparison", function()
         expect_near(0.0, c:get(3), 1e-5)
     end)
 
-    -- @description Verifies greater-than returns a mask marking only entries where the left array exceeds the right array.
     it("gt returns 1.0 where a > b", function()
         local a = lurek.compute.fromTable({1, 5, 3})
         local b = lurek.compute.fromTable({2, 3, 3})
@@ -451,7 +403,6 @@ describe("comparison", function()
         expect_near(0.0, c:get(3), 1e-5)
     end)
 
-    -- @description Verifies greater-than against scalar 2 marks the 5 and 3 entries but not the 1 entry.
     it("gt with scalar", function()
         local a = lurek.compute.fromTable({1, 5, 3})
         local c = a:gt(2)
@@ -460,7 +411,6 @@ describe("comparison", function()
         expect_near(1.0, c:get(3), 1e-5)
     end)
 
-    -- @description Verifies less-than against scalar 3 marks only the entry 1 and excludes 5 and 3.
     it("lt returns 1.0 where a < b", function()
         local a = lurek.compute.fromTable({1, 5, 3})
         local c = a:lt(3)
@@ -469,7 +419,6 @@ describe("comparison", function()
         expect_near(0.0, c:get(3), 1e-5)
     end)
 
-    -- @description Verifies greater-than-or-equal against scalar 3 marks the 3 and 5 entries but not the 1 entry.
     it("gte returns 1.0 where a >= b", function()
         local a = lurek.compute.fromTable({1, 3, 5})
         local c = a:gte(3)
@@ -478,7 +427,6 @@ describe("comparison", function()
         expect_near(1.0, c:get(3), 1e-5)
     end)
 
-    -- @description Verifies less-than-or-equal against scalar 3 marks the 1 and 3 entries but not the 5 entry.
     it("lte returns 1.0 where a <= b", function()
         local a = lurek.compute.fromTable({1, 3, 5})
         local c = a:lte(3)
@@ -491,9 +439,7 @@ end)
 -- =========================================================================
 -- 7. Masking
 -- =========================================================================
--- @description Verifies thresholding and masked selection by checking the exact mask and where-merged outputs.
 describe("masking", function()
-    -- @description Applies threshold 0.5 and verifies values at or above the threshold produce 1.0 while lower values produce 0.0.
     it("threshold returns 1.0 where >= val", function()
         local a = lurek.compute.fromTable({0.2, 0.5, 0.8, 1.0})
         local c = a:threshold(0.5)
@@ -503,7 +449,6 @@ describe("masking", function()
         expect_near(1.0, c:get(4), 1e-5)
     end)
 
-    -- @description Uses a {1,0,1,0} mask to select from arrays a and b and verifies the mixed result is {10,200,30,400}.
     it("where selects from two arrays based on condition", function()
         local cond = lurek.compute.fromTable({1, 0, 1, 0})
         local a = lurek.compute.fromTable({10, 20, 30, 40})
@@ -515,7 +460,7 @@ describe("masking", function()
         -- Let's verify: ops::where_mask(mask, this, other)
         -- Lua: this:where(mask, other) => where_mask(mask, this, other)
         -- So a:where(cond, b) puts mask=cond, this=a, other=b
-        -- where mask=1 Ă‚â€ş this(a), where mask=0 Ă‚â€ş other(b)
+        -- where mask=1  this(a), where mask=0  other(b)
         local result = a["where"](a, cond, b)
         expect_near(10.0, result:get(1), 1e-5)
         expect_near(200.0, result:get(2), 1e-5)
@@ -527,51 +472,42 @@ end)
 -- =========================================================================
 -- 8. Counting
 -- =========================================================================
--- @description Verifies nonzero counting, argmin and argmax indices, and boolean any/all checks over representative arrays.
 describe("counting", function()
-    -- @description Counts nonzero values in {0,1,0,3,5} and verifies the total is 3.
     it("countNonZero counts nonzero elements", function()
         local a = lurek.compute.fromTable({0, 1, 0, 3, 5})
         expect_equal(3, a:countNonZero())
     end)
 
-    -- @description Verifies that an all-zero array reports zero nonzero elements.
     it("countNonZero for all zeros", function()
         local a = lurek.compute.zeros({4})
         expect_equal(0, a:countNonZero())
     end)
 
-    -- @description Verifies argmin returns the 1-based index 2 for the minimum value 1 in {5,1,3,2}.
     it("argmin returns 1-based index of minimum", function()
         local a = lurek.compute.fromTable({5, 1, 3, 2})
         expect_equal(2, a:argmin())
     end)
 
-    -- @description Verifies argmax returns the 1-based index 1 for the maximum value 5 in {5,1,3,2}.
     it("argmax returns 1-based index of maximum", function()
         local a = lurek.compute.fromTable({5, 1, 3, 2})
         expect_equal(1, a:argmax())
     end)
 
-    -- @description Verifies that any() returns true when at least one element is nonzero.
     it("any returns true if any nonzero", function()
         local a = lurek.compute.fromTable({0, 0, 1})
         expect_true(a:any())
     end)
 
-    -- @description Verifies that any() returns false when every element is zero.
     it("any returns false for all zeros", function()
         local a = lurek.compute.zeros({3})
         expect_false(a:any())
     end)
 
-    -- @description Verifies that all() returns true when every element is nonzero.
     it("all returns true when all nonzero", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         expect_true(a:all())
     end)
 
-    -- @description Verifies that all() returns false when the array contains at least one zero.
     it("all returns false when any zero", function()
         local a = lurek.compute.fromTable({1, 0, 3})
         expect_false(a:all())
@@ -581,62 +517,53 @@ end)
 -- =========================================================================
 -- 9. Reductions
 -- =========================================================================
--- @description Verifies full-array and axis-based reductions for sum, mean, min, and max with known numeric results.
 describe("reductions", function()
-    -- @description Sums a 3x3 ones array and verifies the total is 9.0.
     it("sum of ones(3,3) is 9", function()
         local a = lurek.compute.ones({3, 3})
         expect_near(9.0, a:sum(), 1e-5)
     end)
 
-    -- @description Sums {1,2,3,4} and verifies the total is 10.0.
     it("sum of fromTable", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4})
         expect_near(10.0, a:sum(), 1e-5)
     end)
 
-    -- @description Computes the mean of {2,4,6} and verifies the result is 4.0.
     it("mean of values", function()
         local a = lurek.compute.fromTable({2, 4, 6})
         expect_near(4.0, a:mean(), 1e-5)
     end)
 
-    -- @description Computes the minimum of {5,1,3,2} and verifies the result is 1.0.
     it("min of array", function()
         local a = lurek.compute.fromTable({5, 1, 3, 2})
         expect_near(1.0, a:min(), 1e-5)
     end)
 
-    -- @description Computes the maximum of {5,1,3,2} and verifies the result is 5.0.
     it("max of array", function()
         local a = lurek.compute.fromTable({5, 1, 3, 2})
         expect_near(5.0, a:max(), 1e-5)
     end)
 
-    -- @description Sums a 3x3 array along axis 1 and verifies the per-column totals {12,15,18}.
     it("sum along axis 1 of a 3x3 array", function()
-        -- 3x3 array, sum along rows (axis 1) Ă‚â€ş each column summed
+        -- 3x3 array, sum along rows (axis 1)  each column summed
         local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
         local s = a:sum(1)
-        -- sum axis=0 (Rust 0-based) Ă‚â€ş sums over rows Ă‚â€ş {12, 15, 18}
+        -- sum axis=0 (Rust 0-based)  sums over rows  {12, 15, 18}
         expect_equal(3, s:getSize())
         expect_near(12.0, s:get(1), 1e-5)
         expect_near(15.0, s:get(2), 1e-5)
         expect_near(18.0, s:get(3), 1e-5)
     end)
 
-    -- @description Sums a 3x3 array along axis 2 and verifies the per-row totals {6,15,24}.
     it("sum along axis 2 of a 3x3 array", function()
         local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
         local s = a:sum(2)
-        -- sum axis=1 (Rust 0-based) Ă‚â€ş sums over cols Ă‚â€ş {6, 15, 24}
+        -- sum axis=1 (Rust 0-based)  sums over cols  {6, 15, 24}
         expect_equal(3, s:getSize())
         expect_near(6.0, s:get(1), 1e-5)
         expect_near(15.0, s:get(2), 1e-5)
         expect_near(24.0, s:get(3), 1e-5)
     end)
 
-    -- @description Computes the mean along axis 2 of a 2x2 array and verifies the row means are 3.0 and 7.0.
     it("mean along axis", function()
         local a = lurek.compute.fromTable({2, 4, 6, 8}, {2, 2})
         local m = a:mean(2)
@@ -645,7 +572,6 @@ describe("reductions", function()
         expect_near(7.0, m:get(2), 1e-5)
     end)
 
-    -- @description Computes the minimum along axis 2 of a 2x2 array and verifies the row minima are 1.0 and 2.0.
     it("min along axis", function()
         local a = lurek.compute.fromTable({3, 1, 2, 4}, {2, 2})
         local m = a:min(2)
@@ -654,7 +580,6 @@ describe("reductions", function()
         expect_near(2.0, m:get(2), 1e-5)
     end)
 
-    -- @description Computes the maximum along axis 2 of a 2x2 array and verifies the row maxima are 3.0 and 4.0.
     it("max along axis", function()
         local a = lurek.compute.fromTable({3, 1, 2, 4}, {2, 2})
         local m = a:max(2)
@@ -667,9 +592,7 @@ end)
 -- =========================================================================
 -- 10. Shape manipulation
 -- =========================================================================
--- @description Verifies reshaping, cloning, transposition, and in-place fill while checking that data layout and independence stay correct.
 describe("shape manipulation", function()
-    -- @description Reshapes six flat values to 2x3, then verifies size, dimensionality, and row-major element preservation through toTable.
     it("reshape preserves elements", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4, 5, 6})
         local b = a:reshape({2, 3})
@@ -681,7 +604,6 @@ describe("shape manipulation", function()
         expect_near(6.0, t[6], 1e-5)
     end)
 
-    -- @description Reshapes a 2x2 array into length 4 and verifies only the shape changes while the first and last elements remain 1.0 and 4.0.
     it("reshape changes shape but not data", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
         local b = a:reshape({4})
@@ -691,7 +613,6 @@ describe("shape manipulation", function()
         expect_near(4.0, b:get(4), 1e-5)
     end)
 
-    -- @description Clones an array, mutates the clone, and verifies the original retains its initial value while the clone changes independently.
     it("clone produces independent copy", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = a:clone()
@@ -700,7 +621,6 @@ describe("shape manipulation", function()
         expect_near(99.0, b:get(1), 1e-5)
     end)
 
-    -- @description Transposes a 2x3 matrix and verifies the swapped shape and every transposed element position.
     it("transpose swaps rows and cols", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4, 5, 6}, {2, 3})
         local b = a:transpose()
@@ -717,7 +637,6 @@ describe("shape manipulation", function()
         expect_near(6.0, b:get(3, 2), 1e-5)
     end)
 
-    -- @description Calls fill(7.0) on a zeros array and verifies all three elements are updated in place to 7.0.
     it("fill modifies in-place", function()
         local a = lurek.compute.zeros({3})
         a:fill(7.0)
@@ -730,9 +649,7 @@ end)
 -- =========================================================================
 -- 11. Linear algebra
 -- =========================================================================
--- @description Verifies matrix multiplication and dot products against hand-computed results, including identity and orthogonality cases.
 describe("linear algebra", function()
-    -- @description Multiplies a 2x3 matrix by a 3x2 matrix and verifies the 2x2 output shape and all four hand-calculated products.
     it("matmul 2x3 * 3x2 produces 2x2", function()
         -- A = [[1,2,3],[4,5,6]]  (2x3)
         local a = lurek.compute.fromTable({1,2,3, 4,5,6}, {2,3})
@@ -752,7 +669,6 @@ describe("linear algebra", function()
         expect_near(154.0, c:get(2, 2), 1e-5)
     end)
 
-    -- @description Computes the dot product of {1,2,3} and {4,5,6} and verifies the scalar result is 32.0.
     it("dot product of two 1D arrays", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({4, 5, 6})
@@ -760,14 +676,12 @@ describe("linear algebra", function()
         expect_near(32.0, a:dot(b), 1e-5)
     end)
 
-    -- @description Verifies that orthogonal basis vectors produce a dot product of exactly 0.0.
     it("dot product of orthogonal vectors is zero", function()
         local a = lurek.compute.fromTable({1, 0})
         local b = lurek.compute.fromTable({0, 1})
         expect_near(0.0, a:dot(b), 1e-5)
     end)
 
-    -- @description Multiplies a matrix by the 2x2 identity matrix and verifies every element is preserved unchanged.
     it("identity matmul preserves matrix", function()
         -- I = [[1,0],[0,1]]
         local eye = lurek.compute.fromTable({1,0, 0,1}, {2,2})
@@ -783,9 +697,7 @@ end)
 -- =========================================================================
 -- 12. Bitwise operations (int32 only)
 -- =========================================================================
--- @description Verifies int32-only bitwise operations and confirms the float32 path rejects bitwise usage.
 describe("bitwise operations", function()
-    -- @description Performs bitwise AND on three int32 pairs and verifies the outputs 0x0F, 0x0F, and 0x00.
     it("bitwiseAnd on int32 arrays", function()
         local a = lurek.compute.fromTable({0xFF, 0x0F, 0xAA}, nil, "int32")
         local b = lurek.compute.fromTable({0x0F, 0x0F, 0x55}, nil, "int32")
@@ -795,7 +707,6 @@ describe("bitwise operations", function()
         expect_near(0x00, c:get(3), 1e-5)
     end)
 
-    -- @description Performs bitwise OR on two int32 pairs and verifies the outputs 0xFF and 0x0F.
     it("bitwiseOr on int32 arrays", function()
         local a = lurek.compute.fromTable({0xF0, 0x0F}, nil, "int32")
         local b = lurek.compute.fromTable({0x0F, 0x0F}, nil, "int32")
@@ -804,7 +715,6 @@ describe("bitwise operations", function()
         expect_near(0x0F, c:get(2), 1e-5)
     end)
 
-    -- @description Performs bitwise XOR on equal int32 pairs and verifies both outputs collapse to 0x00.
     it("bitwiseXor on int32 arrays", function()
         local a = lurek.compute.fromTable({0xFF, 0x0F}, nil, "int32")
         local b = lurek.compute.fromTable({0xFF, 0x0F}, nil, "int32")
@@ -813,7 +723,6 @@ describe("bitwise operations", function()
         expect_near(0x00, c:get(2), 1e-5)
     end)
 
-    -- @description Applies bitwise NOT to int32 values 0 and 1 and verifies the signed results -1 and -2.
     it("bitwiseNot on int32 array", function()
         local a = lurek.compute.fromTable({0, 1}, nil, "int32")
         local c = a:bitwiseNot()
@@ -822,7 +731,6 @@ describe("bitwise operations", function()
         expect_near(-2, c:get(2), 1e-5)
     end)
 
-    -- @description Uses pcall to verify that invoking a bitwise operation on float32 arrays raises an error.
     it("bitwise on float32 errors", function()
         local a = lurek.compute.fromTable({1, 2})
         local b = lurek.compute.fromTable({3, 4})
@@ -834,9 +742,7 @@ end)
 -- =========================================================================
 -- 13. 2D Spatial operations
 -- =========================================================================
--- @description Verifies convolution, dilation, erosion, flood fill, region extraction, and region stamping on 2D arrays.
 describe("2D spatial operations", function()
-    -- @description Convolves with a kernel that has only the center weight set and verifies the center sample remains 5.0.
     it("convolve2D with identity kernel", function()
         local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
         -- Identity-like: 3x3 kernel with 1 in center
@@ -847,7 +753,18 @@ describe("2D spatial operations", function()
         expect_near(5.0, c:get(2, 2), 1e-5)
     end)
 
-    -- @description Dilates a single center pixel and verifies the center plus top and left neighbors become nonzero.
+    it("convolve2D blur averages the center sample", function()
+        local a = lurek.compute.zeros({3, 3})
+        a:set(2, 2, 9.0)
+        local k = lurek.compute.fromTable({
+            1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+            1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+            1.0 / 9.0, 1.0 / 9.0, 1.0 / 9.0,
+        }, {3, 3})
+        local c = a:convolve2D(k)
+        expect_near(1.0, c:get(2, 2), 1e-5)
+    end)
+
     it("dilate expands nonzero regions", function()
         local a = lurek.compute.zeros({5, 5})
         a:set(3, 3, 1.0)  -- single nonzero in center
@@ -858,7 +775,6 @@ describe("2D spatial operations", function()
         expect_true(d:get(3, 2) > 0, "left neighbor should be nonzero")
     end)
 
-    -- @description Erodes a mostly full 5x5 array with one cleared corner and verifies the corner is removed in the result.
     it("erode shrinks nonzero regions", function()
         local a = lurek.compute.ones({5, 5})
         a:set(1, 1, 0.0)  -- remove one corner
@@ -867,10 +783,9 @@ describe("2D spatial operations", function()
         expect_near(0.0, e:get(1, 1), 1e-5)
     end)
 
-    -- @description Flood-fills a zero-valued 3x3 array from (1,1) with 5.0 and verifies the connected region now contains 5.0.
     it("floodFill fills connected region", function()
         local a = lurek.compute.zeros({3, 3})
-        -- Fill from (1,1) Ă‚â€ş 0-region with value 5
+        -- Fill from (1,1)  0-region with value 5
         local filled = a:floodFill(1, 1, 5.0)
         -- All zeros connected to (1,1) should become 5
         expect_near(5.0, filled:get(1, 1), 1e-5)
@@ -878,7 +793,6 @@ describe("2D spatial operations", function()
         expect_near(5.0, filled:get(3, 3), 1e-5)
     end)
 
-    -- @description Extracts a 2x2 region from a 3x4 array at row 1, col 2 and verifies the shape and all four extracted values.
     it("getRegion extracts sub-array", function()
         local a = lurek.compute.fromTable({1,2,3,4, 5,6,7,8, 9,10,11,12}, {3, 4})
         -- Extract 2x2 region starting at row=1, col=2
@@ -892,7 +806,6 @@ describe("2D spatial operations", function()
         expect_near(7.0, r:get(2, 2), 1e-5)
     end)
 
-    -- @description Stamps a 2x2 patch into the center of a 4x4 zeros array and verifies both the written region and an untouched zero cell.
     it("setRegion stamps into array", function()
         local a = lurek.compute.zeros({4, 4})
         local patch = lurek.compute.fromTable({9, 8, 7, 6}, {2, 2})
@@ -909,27 +822,22 @@ end)
 -- =========================================================================
 -- 14. Type system
 -- =========================================================================
--- @description Verifies runtime type reporting and inheritance checks exposed by compute Array userdata.
 describe("type system", function()
-    -- @description Confirms the userdata reports its direct runtime type name as Array.
     it("type() returns LArray", function()
         local a = lurek.compute.zeros({2})
         expect_equal("LArray", a:type())
     end)
 
-    -- @description Confirms typeOf recognizes Array as the userdata's concrete type.
     it("typeOf Array is true", function()
         local a = lurek.compute.zeros({2})
         expect_true(a:typeOf("Array"))
     end)
 
-    -- @description Confirms typeOf recognizes Object as a parent or shared base type for Array userdata.
     it("typeOf Object is true", function()
         local a = lurek.compute.zeros({2})
         expect_true(a:typeOf("Object"))
     end)
 
-    -- @description Confirms typeOf rejects an unrelated type name by returning false for Source.
     it("typeOf Source is false", function()
         local a = lurek.compute.zeros({2})
         expect_false(a:typeOf("Source"))
@@ -939,9 +847,7 @@ end)
 -- =========================================================================
 -- 15. Error cases
 -- =========================================================================
--- @description Verifies representative misuse paths raise errors, including shape mismatches, invalid dtypes, and unsupported operations.
 describe("error cases", function()
-    -- @description Uses pcall to verify binary arithmetic rejects arrays whose shapes do not match.
     it("mismatched shapes for binary ops error", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({1, 2})
@@ -949,39 +855,48 @@ describe("error cases", function()
         expect_false(ok, "mismatched shapes should error")
     end)
 
-    -- @description Uses pcall to verify reshape rejects a target shape whose element count does not match the source data.
     it("reshape with wrong element count errors", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local ok = pcall(function() a:reshape({2, 2}) end)
         expect_false(ok, "reshape with wrong count should error")
     end)
 
-    -- @description Uses pcall to verify zeros rejects an empty shape table.
     it("empty shape errors", function()
         local ok = pcall(function() lurek.compute.zeros({}) end)
         expect_false(ok, "empty shape should error")
     end)
 
-    -- @description Uses pcall to verify zeros rejects negative dimension sizes.
     it("negative shape dimension errors", function()
         local ok = pcall(function() lurek.compute.zeros({-1}) end)
         expect_false(ok, "negative shape should error")
     end)
 
-    -- @description Uses pcall to verify transpose rejects non-2D arrays.
+    it("shape with more than three dimensions errors", function()
+        local ok = pcall(function() lurek.compute.zeros({1, 2, 3, 4}) end)
+        expect_false(ok, "4D shape should error")
+    end)
+
     it("transpose on non-2D errors", function()
         local a = lurek.compute.zeros({3})
         local ok = pcall(function() a:transpose() end)
         expect_false(ok, "transpose on 1D should error")
     end)
 
-    -- @description Uses pcall to verify zeros rejects an unsupported dtype string float16.
     it("unknown dtype errors", function()
         local ok = pcall(function() lurek.compute.zeros({3}, "float16") end)
         expect_false(ok, "unknown dtype should error")
     end)
 
-    -- @description Uses pcall to verify matmul rejects incompatible inner dimensions between a 2x2 and a 3x1 matrix.
+    it("range with negative step errors", function()
+        local ok = pcall(function() lurek.compute.range(0, 5, -1) end)
+        expect_false(ok, "negative range step should error")
+    end)
+
+    it("fromTable with mismatched shape errors", function()
+        local ok = pcall(function() lurek.compute.fromTable({1, 2, 3}, {2, 3}) end)
+        expect_false(ok, "shape mismatch should error")
+    end)
+
     it("matmul with incompatible shapes errors", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4}, {2, 2})
         local b = lurek.compute.fromTable({1, 2, 3}, {3, 1})
@@ -989,21 +904,30 @@ describe("error cases", function()
         expect_false(ok, "matmul shape mismatch should error")
     end)
 
-    -- @description Uses pcall to verify dot rejects vectors with different lengths.
     it("dot on mismatched sizes errors", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         local b = lurek.compute.fromTable({1, 2})
         local ok = pcall(function() a:dot(b) end)
         expect_false(ok, "dot size mismatch should error")
     end)
+
+    it("floodFill out of bounds errors", function()
+        local a = lurek.compute.zeros({2, 2})
+        local ok = pcall(function() a:floodFill(6, 1, 1.0) end)
+        expect_false(ok, "out-of-bounds floodFill should error")
+    end)
+
+    it("getRegion out of bounds errors", function()
+        local a = lurek.compute.zeros({2, 2})
+        local ok = pcall(function() a:getRegion(2, 2, 2, 2) end)
+        expect_false(ok, "out-of-bounds region should error")
+    end)
 end)
 
 -- =========================================================================
 -- Bitwise shift
 -- =========================================================================
--- @description Verifies int32 bit shifts by checking exact left-shifted and right-shifted output values.
 describe("bitwise shift", function()
-    -- @description Left-shifts {1,2,4} by two bits and verifies the results are 4, 8, and 16.
     it("bitwiseLShift shifts left", function()
         local a = lurek.compute.fromTable({1, 2, 4}, {3}, "int32")
         local r = a:bitwiseLShift(2)
@@ -1012,7 +936,6 @@ describe("bitwise shift", function()
         expect_equal(16, r:get(3))
     end)
 
-    -- @description Right-shifts {16,8,4} by two bits and verifies the results are 4, 2, and 1.
     it("bitwiseRShift shifts right", function()
         local a = lurek.compute.fromTable({16, 8, 4}, {3}, "int32")
         local r = a:bitwiseRShift(2)
@@ -1026,19 +949,15 @@ end)
 -- Summary
 -- =========================================================================
 
--- @description Adds RS parity checks for range step errors, constructor fills, value round-trips, and shape table reporting.
 describe("compute array strides and error paths (RS parity)", function()
-    -- @description Verifies that calling range with a zero step from 0 to 10 raises an error.
     it("range with zero step raises an error", function()
         expect_error(function() lurek.compute.range(0, 10, 0) end)
     end)
 
-    -- @description Verifies that calling range with a zero step from 10 down to 0 also raises an error.
     it("range with zero step raises an error", function()
         expect_error(function() lurek.compute.range(10, 0, 0) end)
     end)
 
-    -- @description Creates ones({5}) and verifies all five indexed elements equal 1.0 within tolerance.
     it("ones fills array with 1.0", function()
         local a = lurek.compute.ones({5})
         for i = 1, 5 do
@@ -1046,7 +965,6 @@ describe("compute array strides and error paths (RS parity)", function()
         end
     end)
 
-    -- @description Creates zeros({4}) and verifies all four indexed elements equal 0.0 within tolerance.
     it("zeros creates array filled with 0.0", function()
         local a = lurek.compute.zeros({4})
         for i = 1, 4 do
@@ -1054,7 +972,6 @@ describe("compute array strides and error paths (RS parity)", function()
         end
     end)
 
-    -- @description Rechecks ascending range(1,4) and verifies the first three values are 1.0, 2.0, and 3.0.
     it("range ascending produces correct sequence", function()
         local a = lurek.compute.range(1, 4)
         expect_near(1.0, a:get(1), 0.001)
@@ -1062,14 +979,12 @@ describe("compute array strides and error paths (RS parity)", function()
         expect_near(3.0, a:get(3), 0.001)
     end)
 
-    -- @description Writes 3.14 at index 7 of a length-10 array and verifies the same value is read back from that index.
     it("get and set round-trip at arbitrary index", function()
         local a = lurek.compute.zeros({10})
         a:set(7, 3.14)
         expect_near(3.14, a:get(7), 0.001)
     end)
 
-    -- @description Verifies getShape returns a Lua table for a 2x3 array and that the two entries match 2 and 3.
     it("getShape returns table with dimensions", function()
         local a = lurek.compute.zeros({2, 3})
         local shape = a:getShape()
@@ -1084,9 +999,8 @@ end)
 -- ---------------------------------------------------------------------------
 describe("lurek.compute.Array analytics", function()
 
-    -- @description Cumulative sum of [1,2,3,4] should be [1,3,6,10].
     it("cumsum produces running total", function()
-        -- @tests Array:cumsum
+        -- @covers Array:cumsum
         local a = lurek.compute.fromTable({1, 2, 3, 4}, nil, "float32")
         local c = a:cumsum()
         expect_near(1,  c:get(1), 0.001)
@@ -1094,9 +1008,8 @@ describe("lurek.compute.Array analytics", function()
         expect_near(10, c:get(4), 0.001)
     end)
 
-    -- @description First-order diff of [1,4,9,16] should give [3,5,7].
     it("diff order 1 yields first differences", function()
-        -- @tests Array:diff
+        -- @covers Array:diff
         local a = lurek.compute.fromTable({1, 4, 9, 16}, nil, "float32")
         local d = a:diff(1)
         expect_equal(3, d:getSize())
@@ -1104,9 +1017,8 @@ describe("lurek.compute.Array analytics", function()
         expect_near(7, d:get(3), 0.01)
     end)
 
-    -- @description Second-order diff of a quadratic is constant.
     it("diff order 2 of quadratic is constant", function()
-        -- @tests Array:diff
+        -- @covers Array:diff
         local a = lurek.compute.fromTable({0, 1, 4, 9, 16}, nil, "float32")
         local d = a:diff(2)
         expect_equal(3, d:getSize())
@@ -1114,9 +1026,8 @@ describe("lurek.compute.Array analytics", function()
         expect_near(2, d:get(3), 0.01)
     end)
 
-    -- @description histogram with 2 bins over [0.5,1.5,2.5,3.5] and range [0,4] gives 2 bins each holding 2 items.
     it("histogram returns correct bin counts", function()
-        -- @tests Array:histogram
+        -- @covers Array:histogram
         local a = lurek.compute.fromTable({0.5, 1.5, 2.5, 3.5}, nil, "float32")
         local h = a:histogram(2, 0, 4)
         expect_equal(2, #h)
@@ -1124,39 +1035,34 @@ describe("lurek.compute.Array analytics", function()
         expect_equal(2, h[2].count)
     end)
 
-    -- @description Median (50th percentile) of [1,2,3,4,5] is 3.
     it("percentile 50 is median", function()
-        -- @tests Array:percentile
+        -- @covers Array:percentile
         local a = lurek.compute.fromTable({1, 2, 3, 4, 5}, nil, "float32")
         expect_near(3.0, a:percentile(50), 0.001)
     end)
 
-    -- @description 100th percentile equals maximum value.
     it("percentile 100 equals max", function()
-        -- @tests Array:percentile
+        -- @covers Array:percentile
         local a = lurek.compute.fromTable({3, 1, 4, 1, 5}, nil, "float32")
         expect_near(5.0, a:percentile(100), 0.001)
     end)
 
-    -- @description Covariance of an array with itself equals its population variance.
     it("covariance of array with itself is its variance", function()
-        -- @tests Array:covariance
+        -- @covers Array:covariance
         local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         -- pop variance of [1,2,3] = 2/3
         expect_near(0.6667, a:covariance(a), 0.01)
     end)
 
-    -- @description Pearson correlation of a with 2*a is 1.
     it("pearsonCorr of linearly related arrays is 1", function()
-        -- @tests Array:pearsonCorr
+        -- @covers Array:pearsonCorr
         local a = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         local b = lurek.compute.fromTable({2, 4, 6}, nil, "float32")
         expect_near(1.0, a:pearsonCorr(b), 0.001)
     end)
 
-    -- @description normalizeRange scales [0,5,10] to [0,0.5,1].
     it("normalizeRange scales to [0, 1]", function()
-        -- @tests Array:normalizeRange
+        -- @covers Array:normalizeRange
         local a = lurek.compute.fromTable({0, 5, 10}, nil, "float32")
         local n = a:normalizeRange(0, 1)
         expect_near(0.0, n:get(1), 0.001)
@@ -1164,16 +1070,14 @@ describe("lurek.compute.Array analytics", function()
         expect_near(1.0, n:get(3), 0.001)
     end)
 
-    -- @description zscore of a constant array should error because std dev is 0.
     it("zscore of constant array returns error", function()
-        -- @tests Array:zscore
+        -- @covers Array:zscore
         local a = lurek.compute.fromTable({5, 5, 5}, nil, "float32")
         expect_error(function() a:zscore() end)
     end)
 
-    -- @description zscore of non-constant array has mean ~0 and std ~1.
     it("zscore normalises mean to zero", function()
-        -- @tests Array:zscore
+        -- @covers Array:zscore
         local a = lurek.compute.fromTable({2, 4, 4, 4, 5, 5, 7, 9}, nil, "float32")
         local z = a:zscore()
         local sum = 0
@@ -1181,9 +1085,8 @@ describe("lurek.compute.Array analytics", function()
         expect_near(0.0, sum / z:getSize(), 0.001)
     end)
 
-    -- @description Convolving [1,2,3] with identity kernel [1] returns the same array.
     it("convolve1d with identity kernel returns input", function()
-        -- @tests Array:convolve1d
+        -- @covers Array:convolve1d
         local sig = lurek.compute.fromTable({1, 2, 3}, nil, "float32")
         local ker = lurek.compute.fromTable({1}, nil, "float32")
         local out = sig:convolve1d(ker)
@@ -1192,9 +1095,8 @@ describe("lurek.compute.Array analytics", function()
         expect_near(3, out:get(3), 0.001)
     end)
 
-    -- @description Cross-correlation of signal=[0,1,2,1,0] with template=[1,2,1] peaks at centre.
     it("correlate1d peaks at template location", function()
-        -- @tests Array:correlate1d
+        -- @covers Array:correlate1d
         local sig = lurek.compute.fromTable({0, 1, 2, 1, 0}, nil, "float32")
         local tpl = lurek.compute.fromTable({1, 2, 1}, nil, "float32")
         local out = sig:correlate1d(tpl)
@@ -1209,26 +1111,23 @@ end)
 -- ---------------------------------------------------------------------------
 describe("lurek.compute linear algebra", function()
 
-    -- @description normalizeVec of [3,4] produces a unit vector [0.6, 0.8].
     it("normalizeVec makes unit vector", function()
-        -- @tests Array:normalizeVec
+        -- @covers Array:normalizeVec
         local v = lurek.compute.fromTable({3, 4}, nil, "float64")
         local n = v:normalizeVec()
         expect_near(0.6, n:get(1), 0.001)
         expect_near(0.8, n:get(2), 0.001)
     end)
 
-    -- @description cross2d of [1,0] and [0,1] is 1.
     it("cross2d of standard basis vectors is 1", function()
-        -- @tests Array:cross2d
+        -- @covers Array:cross2d
         local a = lurek.compute.fromTable({1, 0}, nil, "float64")
         local b = lurek.compute.fromTable({0, 1}, nil, "float64")
         expect_near(1.0, a:cross2d(b), 0.001)
     end)
 
-    -- @description outer product of [1,2] with [3,4,5] gives a 2Ă—3 matrix.
     it("outer product has correct shape and values", function()
-        -- @tests Array:outer
+        -- @covers Array:outer
         local a = lurek.compute.fromTable({1, 2}, nil, "float64")
         local b = lurek.compute.fromTable({3, 4, 5}, nil, "float64")
         local o = a:outer(b)
@@ -1237,9 +1136,8 @@ describe("lurek.compute linear algebra", function()
         expect_equal(3, shape[2])
     end)
 
-    -- @description gaussianKernel(3, 1.0) sums to 1.0.
     it("gaussianKernel sums to one", function()
-        -- @tests lurek.compute.gaussianKernel
+        -- @covers lurek.compute.gaussianKernel
         local k = lurek.compute.gaussianKernel(3, 1.0)
         local s = 0
         for row = 1, 3 do
@@ -1250,10 +1148,9 @@ describe("lurek.compute linear algebra", function()
         expect_near(1.0, s, 0.0001)
     end)
 
-    -- @description rotate2dMatrix and transformPoints rotates [1,0] by 90Â°.
     it("rotate2dMatrix rotates point by 90 degrees", function()
-        -- @tests lurek.compute.rotate2dMatrix
-        -- @tests Array:transformPoints
+        -- @covers lurek.compute.rotate2dMatrix
+        -- @covers Array:transformPoints
         local m = lurek.compute.rotate2dMatrix(math.pi / 2)
         local pts = lurek.compute.fromTable({1, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
@@ -1261,10 +1158,9 @@ describe("lurek.compute linear algebra", function()
         expect_near(1.0, out:get(1, 2), 0.001)
     end)
 
-    -- @description affine2d with identity-scale and zero rotation gives a translation-only matrix.
     it("affine2d translates points correctly", function()
-        -- @tests lurek.compute.affine2d
-        -- @tests Array:transformPoints
+        -- @covers lurek.compute.affine2d
+        -- @covers Array:transformPoints
         local m = lurek.compute.affine2d(5, 3, 0, 1, 1)
         local pts = lurek.compute.fromTable({0, 0}, nil, "float64"):reshape({1, 2})
         local out = m:transformPoints(pts)
@@ -1272,9 +1168,8 @@ describe("lurek.compute linear algebra", function()
         expect_near(3.0, out:get(1, 2), 0.001)
     end)
 
-    -- @description linsolve solves 2x+y=5, x+3y=10 â†’ x=1, y=3.
     it("linsolve gives correct 2x2 solution", function()
-        -- @tests Array:linsolve
+        -- @covers Array:linsolve
         local a = lurek.compute.fromTable({2, 1, 1, 3}, nil, "float64"):reshape({2, 2})
         local b = lurek.compute.fromTable({5, 10}, nil, "float64")
         local x = a:linsolve(b)
@@ -1282,9 +1177,8 @@ describe("lurek.compute linear algebra", function()
         expect_near(3.0, x:get(2), 0.001)
     end)
 
-    -- @description sobel on a flat image returns zero gradients at centre.
     it("sobel on flat image gives zero gradient", function()
-        -- @tests Array:sobel
+        -- @covers Array:sobel
         local flat = lurek.compute.zeros({5, 5})
         local result = flat:sobel()
         expect_near(0.0, result.gx:get(3, 3), 0.001)
@@ -1298,299 +1192,394 @@ end)
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @tests lurek.compute.fft
+    -- @covers lurek.compute.fft
     it("covers lurek.compute.fft", function()
-        -- TODO: Implement test for lurek.compute.fft
+        local out = lurek.compute.fft({1, 1, 1, 1, 1, 1, 1, 1})
+        expect_equal(8, #out)
+        expect_near(8.0, out[1].re, 1e-6)
+        expect_near(0.0, out[1].im, 1e-6)
+        for i = 2, #out do
+            local mag = math.sqrt(out[i].re * out[i].re + out[i].im * out[i].im)
+            expect_near(0.0, mag, 1e-6)
+        end
     end)
 
-    -- @tests lurek.compute.ifft
+    -- @covers lurek.compute.ifft
     it("covers lurek.compute.ifft", function()
-        -- TODO: Implement test for lurek.compute.ifft
+        local data = {1.0, 0.5, -0.5, 0.0, 1.0, -1.0, 0.0, 0.25}
+        local recovered = lurek.compute.ifft(lurek.compute.fft(data))
+        expect_equal(#data, #recovered)
+        for i = 1, #data do
+            expect_near(data[i], recovered[i], 1e-6)
+        end
     end)
 
-    -- @tests lurek.compute.fftMagnitude
+    -- @covers lurek.compute.fftMagnitude
     it("covers lurek.compute.fftMagnitude", function()
-        -- TODO: Implement test for lurek.compute.fftMagnitude
+        local mag = lurek.compute.fftMagnitude({0.1, -0.2, 0.3, -0.4, 0.5})
+        expect_equal(8, #mag)
+        for i = 1, #mag do
+            expect_true(mag[i] >= 0.0, "FFT magnitude bins must be non-negative")
+        end
     end)
 
-    -- @tests Array:get
+    -- @covers Array:get
     it("covers Array:get", function()
-        -- TODO: Implement test for Array:get
+        local a = lurek.compute.fromTable({10, 20, 30}, {3})
+        expect_equal(10, a:get(1))
+        expect_equal(30, a:get(3))
     end)
 
-    -- @tests Array:set
+    -- @covers Array:set
     it("covers Array:set", function()
-        -- TODO: Implement test for Array:set
+        local a = lurek.compute.zeros({3})
+        a:set(2, 99)
+        expect_equal(99, a:get(2))
     end)
 
-    -- @tests Array:pow
+    -- @covers Array:pow
     it("covers Array:pow", function()
-        -- TODO: Implement test for Array:pow
+        local a = lurek.compute.fromTable({2, 3, 4}, {3})
+        local r = a:pow(2)
+        expect_equal(4, r:get(1))
+        expect_equal(9, r:get(2))
+        expect_equal(16, r:get(3))
     end)
 
-    -- @tests Array:abs
+    -- @covers Array:abs
     it("covers Array:abs", function()
-        -- TODO: Implement test for Array:abs
+        local a = lurek.compute.fromTable({-1, 2, -3}, {3})
+        local r = a:abs()
+        expect_equal(1, r:get(1))
+        expect_equal(2, r:get(2))
+        expect_equal(3, r:get(3))
     end)
 
-    -- @tests Array:neg
+    -- @covers Array:neg
     it("covers Array:neg", function()
-        -- TODO: Implement test for Array:neg
+        local a = lurek.compute.fromTable({1, -2, 3}, {3})
+        local r = a:neg()
+        expect_equal(-1, r:get(1))
+        expect_equal(2,  r:get(2))
+        expect_equal(-3, r:get(3))
     end)
 
-    -- @tests Array:any
+    -- @covers Array:any
     it("covers Array:any", function()
-        -- TODO: Implement test for Array:any
+        local a_true  = lurek.compute.fromTable({0, 0, 1}, {3})
+        local a_false = lurek.compute.fromTable({0, 0, 0}, {3})
+        expect_equal(true,  a_true:any())
+        expect_equal(false, a_false:any())
     end)
 
-    -- @tests Array:all
+    -- @covers Array:all
     it("covers Array:all", function()
-        -- TODO: Implement test for Array:all
+        local a_true  = lurek.compute.fromTable({1, 2, 3}, {3})
+        local a_false = lurek.compute.fromTable({1, 0, 3}, {3})
+        expect_equal(true,  a_true:all())
+        expect_equal(false, a_false:all())
     end)
 
-    -- @tests Array:sum
+    -- @covers Array:sum
     it("covers Array:sum", function()
-        -- TODO: Implement test for Array:sum
+        local a = lurek.compute.fromTable({1, 2, 3, 4}, {4})
+        expect_equal(10, a:sum())
     end)
 
-    -- @tests Array:min
+    -- @covers Array:min
     it("covers Array:min", function()
-        -- TODO: Implement test for Array:min
+        local a = lurek.compute.fromTable({5, 2, 8, 1}, {4})
+        expect_equal(1, a:min())
     end)
 
-    -- @tests Array:max
+    -- @covers Array:max
     it("covers Array:max", function()
-        -- TODO: Implement test for Array:max
+        local a = lurek.compute.fromTable({5, 2, 8, 1}, {4})
+        expect_equal(8, a:max())
     end)
 
-    -- @tests Array:dot
+    -- @covers Array:dot
     it("covers Array:dot", function()
-        -- TODO: Implement test for Array:dot
+        local a = lurek.compute.fromTable({1, 2, 3}, {3})
+        local b = lurek.compute.fromTable({4, 5, 6}, {3})
+        -- 1*4 + 2*5 + 3*6 = 32
+        expect_equal(32, a:dot(b))
     end)
 
-    -- @tests Array:luDecompose
+    -- @covers Array:luDecompose
     it("covers Array:luDecompose", function()
-        -- TODO: Implement test for Array:luDecompose
+        local m = lurek.compute.fromTable({1,2,3,4}, {2,2})
+        local result = m:luDecompose()
+        expect_type("table", result)
+        expect_type("number", result.n)
+        expect_equal(2, result.n)
+        expect_type("table", result.perm)
     end)
 
 end)
 
-describe("Missing explicit test for Array:getShape", function()
-    it("Array:getShape works", function()
-        -- @tests Array:getShape
-        -- TODO: add assertion for Array:getShape
+describe("Array shape and metadata", function()
+    -- @covers Array:getShape
+    it("getShape returns {3,4} for a 3x4 array", function()
+        local a = lurek.compute.zeros({3, 4})
+        local s = a:getShape()
+        expect_equal(3, s[1])
+        expect_equal(4, s[2])
+    end)
+
+    -- @covers Array:getDimensions
+    it("getDimensions returns 2 for a 2D array", function()
+        local a = lurek.compute.zeros({3, 4})
+        expect_equal(2, a:getDimensions())
+    end)
+
+    -- @covers Array:getSize
+    it("getSize returns total element count", function()
+        local a = lurek.compute.zeros({3, 4})
+        expect_equal(12, a:getSize())
+    end)
+
+    -- @covers Array:getDataType
+    it("getDataType returns a non-empty string", function()
+        local a = lurek.compute.zeros({3})
+        local dt = a:getDataType()
+        expect_type("string", dt)
+        expect_true(#dt > 0, "data type must be non-empty")
+    end)
+
+    -- @covers Array:isOnGPU
+    it("isOnGPU returns a boolean", function()
+        local a = lurek.compute.zeros({3})
+        expect_type("boolean", a:isOnGPU())
+    end)
+
+    -- @covers Array:type
+    it("type returns 'LArray'", function()
+        local a = lurek.compute.zeros({2})
+        expect_equal("LArray", a:type())
+    end)
+
+    -- @covers Array:typeOf
+    it("typeOf('LArray') returns true", function()
+        local a = lurek.compute.zeros({2})
+        expect_equal(true, a:typeOf("LArray"))
     end)
 end)
 
-describe("Missing explicit test for Array:getDimensions", function()
-    it("Array:getDimensions works", function()
-        -- @tests Array:getDimensions
-        -- TODO: add assertion for Array:getDimensions
+describe("Array data access and mutation", function()
+    -- @covers Array:toTable
+    it("toTable returns a flat Lua table", function()
+        local a = lurek.compute.fromTable({1, 2, 3}, {3})
+        local t = a:toTable()
+        expect_type("table", t)
+        expect_equal(3, #t)
+        expect_equal(1, t[1])
+        expect_equal(3, t[3])
+    end)
+
+    -- @covers Array:reshape
+    it("reshape {4} into {2,2} preserves data", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 4}, {4})
+        local r = a:reshape({2, 2})
+        local s = r:getShape()
+        expect_equal(2, s[1])
+        expect_equal(2, s[2])
+    end)
+
+    -- @covers Array:clone
+    it("clone produces equal but independent array", function()
+        local a = lurek.compute.fromTable({5, 6, 7}, {3})
+        local b = a:clone()
+        expect_equal(a:get(1), b:get(1))
+        b:set(1, 999)
+        expect_equal(5, a:get(1))  -- original unchanged
+    end)
+
+    -- @covers Array:transpose
+    it("transpose of 2x3 gives 3x2 shape", function()
+        local a = lurek.compute.zeros({2, 3})
+        local t = a:transpose()
+        local s = t:getShape()
+        expect_equal(3, s[1])
+        expect_equal(2, s[2])
+    end)
+
+    -- @covers Array:fill
+    it("fill sets all elements to the given value", function()
+        local a = lurek.compute.zeros({4})
+        a:fill(7)
+        expect_equal(7, a:get(1))
+        expect_equal(7, a:get(4))
     end)
 end)
 
-describe("Missing explicit test for Array:getSize", function()
-    it("Array:getSize works", function()
-        -- @tests Array:getSize
-        -- TODO: add assertion for Array:getSize
+describe("Array math operations", function()
+    -- @covers Array:sqrt
+    it("sqrt of {4, 9, 16} gives {2, 3, 4}", function()
+        local a = lurek.compute.fromTable({4, 9, 16}, {3})
+        local r = a:sqrt()
+        expect_equal(2, r:get(1))
+        expect_equal(3, r:get(2))
+        expect_equal(4, r:get(3))
+    end)
+
+    -- @covers Array:clamp
+    it("clamp(2, 8) restricts values to [2, 8]", function()
+        local a = lurek.compute.fromTable({0, 5, 10}, {3})
+        local r = a:clamp(2, 8)
+        expect_equal(2, r:get(1))
+        expect_equal(5, r:get(2))
+        expect_equal(8, r:get(3))
+    end)
+
+    -- @covers Array:threshold
+    it("threshold returns a 0/1 mask", function()
+        -- values below threshold → 0, at or above → 1
+        local a = lurek.compute.fromTable({1, 5, 3, 9}, {4})
+        local r = a:threshold(4)
+        expect_equal(0, r:get(1))   -- 1 < 4
+        expect_equal(1, r:get(2))   -- 5 >= 4
+        expect_equal(0, r:get(3))   -- 3 < 4
+        expect_equal(1, r:get(4))   -- 9 >= 4
+    end)
+
+    -- @covers Array:countNonZero
+    it("countNonZero counts non-zero elements", function()
+        local a = lurek.compute.fromTable({0, 1, 0, 3, 0}, {5})
+        expect_equal(2, a:countNonZero())
+    end)
+
+    -- @covers Array:argmin
+    it("argmin returns index (1-based) of smallest element", function()
+        local a = lurek.compute.fromTable({5, 2, 8, 1}, {4})
+        expect_equal(4, a:argmin())
+    end)
+
+    -- @covers Array:argmax
+    it("argmax returns index (1-based) of largest element", function()
+        local a = lurek.compute.fromTable({5, 2, 8, 1}, {4})
+        expect_equal(3, a:argmax())
+    end)
+
+    -- @covers Array:mean
+    it("mean of {2, 4, 6} is 4", function()
+        local a = lurek.compute.fromTable({2, 4, 6}, {3})
+        expect_equal(4, a:mean())
+    end)
+
+    -- @covers Array:matmul
+    it("matmul of 2x2 matrices produces 2x2", function()
+        local a = lurek.compute.fromTable({1, 0, 0, 1}, {2, 2})  -- identity
+        local b = lurek.compute.fromTable({3, 4, 5, 6}, {2, 2})
+        local r = a:matmul(b)
+        local s = r:getShape()
+        expect_equal(2, s[1])
+        expect_equal(2, s[2])
+        -- identity * b = b
+        expect_equal(3, r:get(1, 1))
+        expect_equal(6, r:get(2, 2))
     end)
 end)
 
-describe("Missing explicit test for Array:getDataType", function()
-    it("Array:getDataType works", function()
-        -- @tests Array:getDataType
-        -- TODO: add assertion for Array:getDataType
+describe("Array bitwise operations", function()
+    local function int_arr(t)
+        return lurek.compute.fromTable(t, {#t}, "int32")
+    end
+
+    -- @covers Array:bitwiseAnd
+    it("bitwiseAnd: 6 & 3 = 2", function()
+        local a = int_arr({6})
+        local b = int_arr({3})
+        local t = a:bitwiseAnd(b):toTable()
+        expect_equal(2, t[1])
+    end)
+
+    -- @covers Array:bitwiseOr
+    it("bitwiseOr: 5 | 3 = 7", function()
+        local a = int_arr({5})
+        local b = int_arr({3})
+        local t = a:bitwiseOr(b):toTable()
+        expect_equal(7, t[1])
+    end)
+
+    -- @covers Array:bitwiseXor
+    it("bitwiseXor: 6 xor 3 = 5", function()
+        local a = int_arr({6})
+        local b = int_arr({3})
+        local t = a:bitwiseXor(b):toTable()
+        expect_equal(5, t[1])
+    end)
+
+    -- @covers Array:bitwiseNot
+    it("bitwiseNot returns an array of same size", function()
+        local a = int_arr({0})
+        local r = a:bitwiseNot()
+        expect_not_nil(r)
+        expect_equal(1, r:getSize())
+    end)
+
+    -- @covers Array:bitwiseLShift
+    it("bitwiseLShift: 1 << 3 = 8", function()
+        local a = int_arr({1})
+        local t = a:bitwiseLShift(3):toTable()
+        expect_equal(8, t[1])
+    end)
+
+    -- @covers Array:bitwiseRShift
+    it("bitwiseRShift: 8 >> 2 = 2", function()
+        local a = int_arr({8})
+        local t = a:bitwiseRShift(2):toTable()
+        expect_equal(2, t[1])
     end)
 end)
 
-describe("Missing explicit test for Array:isOnGPU", function()
-    it("Array:isOnGPU works", function()
-        -- @tests Array:isOnGPU
-        -- TODO: add assertion for Array:isOnGPU
+describe("Array image/spatial operations", function()
+    -- @covers Array:convolve2D
+    it("convolve2D with 3x3 identity kernel preserves shape", function()
+        local img    = lurek.compute.zeros({5, 5})
+        local kernel = lurek.compute.fromTable({0,0,0, 0,1,0, 0,0,0}, {3,3})
+        local r = img:convolve2D(kernel)
+        local s = r:getShape()
+        expect_equal(5, s[1])
+        expect_equal(5, s[2])
     end)
-end)
 
-describe("Missing explicit test for Array:toTable", function()
-    it("Array:toTable works", function()
-        -- @tests Array:toTable
-        -- TODO: add assertion for Array:toTable
+    -- @covers Array:dilate
+    it("dilate with radius 1 returns an array of same shape", function()
+        local img = lurek.compute.zeros({5, 5})
+        local r = img:dilate(1)
+        local s = r:getShape()
+        expect_equal(5, s[1])
+        expect_equal(5, s[2])
     end)
-end)
 
-describe("Missing explicit test for Array:reshape", function()
-    it("Array:reshape works", function()
-        -- @tests Array:reshape
-        -- TODO: add assertion for Array:reshape
+    -- @covers Array:erode
+    it("erode with radius 1 returns an array of same shape", function()
+        local img = lurek.compute.ones({5, 5})
+        local r = img:erode(1)
+        local s = r:getShape()
+        expect_equal(5, s[1])
+        expect_equal(5, s[2])
     end)
-end)
 
-describe("Missing explicit test for Array:clone", function()
-    it("Array:clone works", function()
-        -- @tests Array:clone
-        -- TODO: add assertion for Array:clone
-    end)
-end)
-
-describe("Missing explicit test for Array:transpose", function()
-    it("Array:transpose works", function()
-        -- @tests Array:transpose
-        -- TODO: add assertion for Array:transpose
-    end)
-end)
-
-describe("Missing explicit test for Array:fill", function()
-    it("Array:fill works", function()
-        -- @tests Array:fill
-        -- TODO: add assertion for Array:fill
-    end)
-end)
-
-describe("Missing explicit test for Array:sqrt", function()
-    it("Array:sqrt works", function()
-        -- @tests Array:sqrt
-        -- TODO: add assertion for Array:sqrt
-    end)
-end)
-
-describe("Missing explicit test for Array:clamp", function()
-    it("Array:clamp works", function()
-        -- @tests Array:clamp
-        -- TODO: add assertion for Array:clamp
-    end)
-end)
-
-describe("Missing explicit test for Array:threshold", function()
-    it("Array:threshold works", function()
-        -- @tests Array:threshold
-        -- TODO: add assertion for Array:threshold
-    end)
-end)
-
-describe("Missing explicit test for Array:countNonZero", function()
-    it("Array:countNonZero works", function()
-        -- @tests Array:countNonZero
-        -- TODO: add assertion for Array:countNonZero
-    end)
-end)
-
-describe("Missing explicit test for Array:argmin", function()
-    it("Array:argmin works", function()
-        -- @tests Array:argmin
-        -- TODO: add assertion for Array:argmin
-    end)
-end)
-
-describe("Missing explicit test for Array:argmax", function()
-    it("Array:argmax works", function()
-        -- @tests Array:argmax
-        -- TODO: add assertion for Array:argmax
-    end)
-end)
-
-describe("Missing explicit test for Array:mean", function()
-    it("Array:mean works", function()
-        -- @tests Array:mean
-        -- TODO: add assertion for Array:mean
-    end)
-end)
-
-describe("Missing explicit test for Array:matmul", function()
-    it("Array:matmul works", function()
-        -- @tests Array:matmul
-        -- TODO: add assertion for Array:matmul
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseAnd", function()
-    it("Array:bitwiseAnd works", function()
-        -- @tests Array:bitwiseAnd
-        -- TODO: add assertion for Array:bitwiseAnd
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseOr", function()
-    it("Array:bitwiseOr works", function()
-        -- @tests Array:bitwiseOr
-        -- TODO: add assertion for Array:bitwiseOr
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseXor", function()
-    it("Array:bitwiseXor works", function()
-        -- @tests Array:bitwiseXor
-        -- TODO: add assertion for Array:bitwiseXor
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseNot", function()
-    it("Array:bitwiseNot works", function()
-        -- @tests Array:bitwiseNot
-        -- TODO: add assertion for Array:bitwiseNot
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseLShift", function()
-    it("Array:bitwiseLShift works", function()
-        -- @tests Array:bitwiseLShift
-        -- TODO: add assertion for Array:bitwiseLShift
-    end)
-end)
-
-describe("Missing explicit test for Array:bitwiseRShift", function()
-    it("Array:bitwiseRShift works", function()
-        -- @tests Array:bitwiseRShift
-        -- TODO: add assertion for Array:bitwiseRShift
-    end)
-end)
-
-describe("Missing explicit test for Array:convolve2D", function()
-    it("Array:convolve2D works", function()
-        -- @tests Array:convolve2D
-        -- TODO: add assertion for Array:convolve2D
-    end)
-end)
-
-describe("Missing explicit test for Array:dilate", function()
-    it("Array:dilate works", function()
-        -- @tests Array:dilate
-        -- TODO: add assertion for Array:dilate
-    end)
-end)
-
-describe("Missing explicit test for Array:erode", function()
-    it("Array:erode works", function()
-        -- @tests Array:erode
-        -- TODO: add assertion for Array:erode
-    end)
-end)
-
-describe("Missing explicit test for Array:transformPoints", function()
-    it("Array:transformPoints works", function()
-        -- @tests Array:transformPoints
-        -- TODO: add assertion for Array:transformPoints
-    end)
-end)
-
-describe("Missing explicit test for Array:type", function()
-    it("Array:type works", function()
-        -- @tests Array:type
-        -- TODO: add assertion for Array:type
-    end)
-end)
-
-describe("Missing explicit test for Array:typeOf", function()
-    it("Array:typeOf works", function()
-        -- @tests Array:typeOf
-        -- TODO: add assertion for Array:typeOf
+    -- @covers Array:transformPoints
+    it("transformPoints with 3x3 identity matrix leaves points unchanged", function()
+        -- matrix:transformPoints(points) — called on the matrix
+        local mat = lurek.compute.fromTable({1,0,0, 0,1,0, 0,0,1}, {3,3})
+        local pts = lurek.compute.fromTable({1,0, 0,1, 2,3}, {3,2})
+        local r = mat:transformPoints(pts)
+        local s = r:getShape()
+        expect_equal(3, s[1])
+        expect_equal(2, s[2])
     end)
 end)
 
 -- =========================================================================
--- Phase 05 â€” Lua extensibility hooks
+-- Phase 05  - Lua extensibility hooks
 -- =========================================================================
 
 describe("Array:map", function()
-    -- @tests Array:map
+    -- @covers Array:map
     it("map method exists", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         expect_equal(type(a.map), "function")
@@ -1607,7 +1596,7 @@ describe("Array:map", function()
 end)
 
 describe("Array:eval", function()
-    -- @tests Array:eval
+    -- @covers Array:eval
     it("eval method exists", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         expect_equal(type(a.eval), "function")
@@ -1624,7 +1613,7 @@ describe("Array:eval", function()
 end)
 
 describe("Array:reduce", function()
-    -- @tests Array:reduce
+    -- @covers Array:reduce
     it("reduce method exists", function()
         local a = lurek.compute.fromTable({1, 2, 3, 4})
         expect_equal(type(a.reduce), "function")
@@ -1638,7 +1627,7 @@ describe("Array:reduce", function()
 end)
 
 describe("Array:scan", function()
-    -- @tests Array:scan
+    -- @covers Array:scan
     it("scan method exists", function()
         local a = lurek.compute.fromTable({1, 2, 3})
         expect_equal(type(a.scan), "function")

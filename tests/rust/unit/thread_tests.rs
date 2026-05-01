@@ -1,4 +1,8 @@
-//! Tests for the thread module.
+//! INTERNAL ONLY: public `lurek.thread.*` behavior is covered primarily by
+//! `tests/lua/unit/test_thread_unit.lua` plus stress/integration suites.
+//!
+//! This Rust file keeps worker-VM and pool internals that are awkward to prove
+//! through the Lua layer, while removing duplicated checks for channel basics.
 
 // ── channel ───────────────────────────────────────────────────────────────────
 
@@ -6,13 +10,6 @@ mod channel_tests {
     use lurek2d::thread::channel::{Channel, ChannelValue};
 
     // ── Channel basics ────────────────────────────────────────────────────
-
-    #[test]
-    fn new_channel_is_empty() {
-        let ch = Channel::new();
-        assert_eq!(ch.get_count(), 0);
-        assert!(ch.pop().is_none());
-    }
 
     #[test]
     fn named_channel_has_name() {
@@ -29,74 +26,11 @@ mod channel_tests {
     // ── Push / Pop ────────────────────────────────────────────────────────
 
     #[test]
-    fn push_pop_fifo() {
-        let ch = Channel::new();
-        ch.push(ChannelValue::Number(1.0));
-        ch.push(ChannelValue::Number(2.0));
-        match ch.pop() {
-            Some(ChannelValue::Number(n)) => assert!((n - 1.0).abs() < f64::EPSILON),
-            other => panic!("expected Number(1.0), got {:?}", other),
-        }
-        match ch.pop() {
-            Some(ChannelValue::Number(n)) => assert!((n - 2.0).abs() < f64::EPSILON),
-            other => panic!("expected Number(2.0), got {:?}", other),
-        }
-    }
-
-    #[test]
     fn push_returns_monotonic_ids() {
         let ch = Channel::new();
         let id1 = ch.push(ChannelValue::Nil);
         let id2 = ch.push(ChannelValue::Nil);
         assert!(id2 > id1);
-    }
-
-    // ── Peek ──────────────────────────────────────────────────────────────
-
-    #[test]
-    fn peek_does_not_consume() {
-        let ch = Channel::new();
-        ch.push(ChannelValue::Bool(true));
-        assert!(ch.peek().is_some());
-        assert_eq!(ch.get_count(), 1); // still there
-    }
-
-    // ── Supply ────────────────────────────────────────────────────────────
-
-    #[test]
-    fn supply_pushes_only_when_empty() {
-        let ch = Channel::new();
-        assert!(ch.supply(ChannelValue::Number(1.0)));
-        assert!(!ch.supply(ChannelValue::Number(2.0))); // already has value
-        assert_eq!(ch.get_count(), 1);
-    }
-
-    // ── Clear ─────────────────────────────────────────────────────────────
-
-    #[test]
-    fn clear_removes_all() {
-        let ch = Channel::new();
-        ch.push(ChannelValue::Nil);
-        ch.push(ChannelValue::Nil);
-        ch.clear();
-        assert_eq!(ch.get_count(), 0);
-    }
-
-    // ── Demand with timeout ───────────────────────────────────────────────
-
-    #[test]
-    fn demand_returns_immediately_when_available() {
-        let ch = Channel::new();
-        ch.push(ChannelValue::String("hello".into()));
-        let val = ch.demand(Some(0.001));
-        assert!(val.is_some());
-    }
-
-    #[test]
-    fn demand_times_out_when_empty() {
-        let ch = Channel::new();
-        let val = ch.demand(Some(0.001)); // 1ms timeout
-        assert!(val.is_none());
     }
 
     // ── ChannelValue clone ────────────────────────────────────────────────

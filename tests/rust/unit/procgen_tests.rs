@@ -1,4 +1,10 @@
-//! Tests for the procgen module.
+//! INTERNAL ONLY: Public `lurek.procgen.*` behavior is primarily covered by
+//! `tests/lua/unit/test_procgen_unit.lua` plus the matching evidence/golden
+//! suites.
+//!
+//! This Rust file keeps only the stricter internal invariants and helper-level
+//! coverage that are not directly asserted through the Lua surface, such as
+//! bounds checks, renderer helpers, and lower-level noise utilities.
 
 use lurek2d::procgen::*;
 
@@ -6,22 +12,6 @@ use lurek2d::procgen::*;
 
 mod heightmap_tests {
     use super::*;
-
-    #[test]
-    fn default_dimensions() {
-        let hm = Heightmap::generate(&HeightmapOpts::default());
-        assert_eq!(hm.width, 64);
-        assert_eq!(hm.height, 64);
-        assert_eq!(hm.cells.len(), 64 * 64);
-    }
-
-    #[test]
-    fn values_normalised_to_unit() {
-        let hm = Heightmap::generate(&HeightmapOpts::default());
-        for &v in &hm.cells {
-            assert!(v >= 0.0 && v <= 1.0, "elevation out of [0,1]: {v}");
-        }
-    }
 
     #[test]
     fn get_clamps_oob() {
@@ -63,20 +53,6 @@ mod bsp_tests {
     use super::*;
 
     #[test]
-    fn default_opts_produce_rooms() {
-        let d = bsp_dungeon(&BspOpts::default());
-        assert!(!d.rooms.is_empty(), "BSP should produce at least one room");
-    }
-
-    #[test]
-    fn deterministic_with_same_seed() {
-        let a = bsp_dungeon(&BspOpts::default());
-        let b = bsp_dungeon(&BspOpts::default());
-        assert_eq!(a.rooms.len(), b.rooms.len());
-        assert_eq!(a.corridors.len(), b.corridors.len());
-    }
-
-    #[test]
     fn rooms_within_bounds() {
         let opts = BspOpts {
             width: 32,
@@ -105,30 +81,9 @@ mod lsystem_tests {
     use super::*;
 
     #[test]
-    fn generate_applies_rules() {
-        let ls = LSystem::new("A", vec![('A', "AB"), ('B', "A")], 3);
-        // A -> AB -> ABA -> ABAAB
-        assert_eq!(ls.generate(), "ABAAB");
-    }
-
-    #[test]
-    fn generate_zero_iterations_returns_axiom() {
-        let ls = LSystem::new("ABC", vec![('A', "X")], 0);
-        assert_eq!(ls.generate(), "ABC");
-    }
-
-    #[test]
     fn unknown_symbols_pass_through() {
         let ls = LSystem::new("AXB", vec![('A', "C")], 1);
         assert_eq!(ls.generate(), "CXB");
-    }
-
-    #[test]
-    fn to_segments_produces_lines() {
-        // Simple: F -> FF, one iteration, straight line
-        let ls = LSystem::new("F", vec![('F', "FF")], 1);
-        let segs = ls.to_segments(90.0, 1.0);
-        assert_eq!(segs.len(), 2);
     }
 
     #[test]
@@ -203,13 +158,6 @@ mod world_graph_tests {
         let mst = g.mst();
         assert_eq!(mst.len(), 2); // N-1 edges for N=3 nodes
     }
-
-    #[test]
-    fn generate_world_graph_creates_regions() {
-        let g = generate_world_graph(100.0, 100.0, 10, 42);
-        assert_eq!(g.regions.len(), 10);
-        assert!(!g.edges.is_empty());
-    }
 }
 
 // ── wfc ───────────────────────────────────────────────────────────────
@@ -229,22 +177,6 @@ mod wfc_tests {
         };
         let grid = wfc_generate(&opts);
         assert!(grid.cells.iter().all(|c| c.is_none()));
-    }
-
-    #[test]
-    fn single_tile_fills_grid() {
-        let mut rules = WfcRules::default();
-        rules.adjacencies.insert(1, vec![1]);
-        let opts = WfcOpts {
-            width: 3,
-            height: 3,
-            tiles: vec![WfcTile { id: 1, weight: 1.0 }],
-            rules,
-            seed: 42,
-            max_attempts: 5,
-        };
-        let grid = wfc_generate(&opts);
-        assert!(grid.cells.iter().all(|c| *c == Some(1)));
     }
 
     #[test]
@@ -289,12 +221,6 @@ mod rooms_tests {
     use super::*;
 
     #[test]
-    fn default_opts_produce_rooms() {
-        let d = rooms_dungeon(&RoomsOpts::default());
-        assert!(!d.rooms.is_empty(), "should place at least one room");
-    }
-
-    #[test]
     fn grid_size_matches_opts() {
         let opts = RoomsOpts {
             width: 32,
@@ -313,14 +239,6 @@ mod rooms_tests {
             assert!(r.x + r.w <= opts.width);
             assert!(r.y + r.h <= opts.height);
         }
-    }
-
-    #[test]
-    fn deterministic_same_seed() {
-        let a = rooms_dungeon(&RoomsOpts::default());
-        let b = rooms_dungeon(&RoomsOpts::default());
-        assert_eq!(a.rooms.len(), b.rooms.len());
-        assert_eq!(a.grid, b.grid);
     }
 
     #[test]

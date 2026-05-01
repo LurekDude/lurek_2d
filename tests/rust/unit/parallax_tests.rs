@@ -1,4 +1,9 @@
-//! Tests for the parallax module.
+//! INTERNAL ONLY: Rust-only tests for parallax render helpers that are not directly asserted
+//! through `lurek.parallax.*`.
+//!
+//! Public parallax-layer behaviour is covered by `tests/lua/unit/test_parallax_unit.lua`.
+//! The remaining Rust tests keep draw-batch to render-command translation and
+//! image helper invariants.
 
 use lurek2d::parallax::layer::ParallaxDrawBatch;
 use lurek2d::parallax::render::batch_to_render_commands;
@@ -10,104 +15,6 @@ use slotmap::KeyData;
 
 fn dummy_key() -> TextureKey {
     TextureKey::from(KeyData::from_ffi(1))
-}
-
-// ── layer ─────────────────────────────────────────────────────────────────────
-
-mod layer_tests {
-    use super::*;
-
-    #[test]
-    fn parallax_layer_new_defaults() {
-        let layer = ParallaxLayer::new(dummy_key(), 512.0, 256.0);
-        assert!((layer.opacity - 1.0).abs() < 1e-5);
-        assert!(layer.visible);
-        assert!(layer.repeat_x);
-        assert!(!layer.repeat_y);
-        assert_eq!(layer.z, 0);
-    }
-
-    #[test]
-    fn parallax_layer_update_accumulates_autoscroll() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 512.0, 256.0);
-        layer.autoscroll = [100.0, 50.0];
-        layer.update(0.5);
-        assert!((layer.autoscroll_accum[0] - 50.0).abs() < 1e-4);
-        assert!((layer.autoscroll_accum[1] - 25.0).abs() < 1e-4);
-    }
-
-    #[test]
-    fn parallax_layer_autoscroll_wraps_within_tex_size() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 100.0, 100.0);
-        layer.autoscroll = [100.0, 0.0];
-        layer.update(1.5); // 150 px — should wrap to 50 within [0, 100)
-        assert!((layer.autoscroll_accum[0] - 50.0).abs() < 1e-4);
-    }
-
-    #[test]
-    fn parallax_layer_invisible_builds_no_calls() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 128.0, 128.0);
-        layer.visible = false;
-        let batch = layer.build_draw_calls(0.0, 0.0, 800.0, 600.0);
-        assert!(batch.is_none());
-    }
-
-    #[test]
-    fn parallax_layer_zero_opacity_builds_no_calls() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 128.0, 128.0);
-        layer.opacity = 0.0;
-        let batch = layer.build_draw_calls(0.0, 0.0, 800.0, 600.0);
-        assert!(batch.is_none());
-    }
-
-    #[test]
-    fn parallax_layer_non_repeat_single_tile() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 512.0, 512.0);
-        layer.repeat_x = false;
-        layer.repeat_y = false;
-        let batch = layer.build_draw_calls(0.0, 0.0, 800.0, 600.0).unwrap();
-        assert_eq!(batch.tiles.len(), 1);
-    }
-
-    #[test]
-    fn parallax_layer_repeat_x_fills_screen() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 200.0, 600.0);
-        layer.repeat_x = true;
-        layer.repeat_y = false;
-        // 800 / 200 = 4 tiles, starting at 0 offset → tiles at x=0,200,400,600
-        let batch = layer.build_draw_calls(0.0, 0.0, 800.0, 600.0).unwrap();
-        assert_eq!(batch.tiles.len(), 4);
-    }
-
-    #[test]
-    fn parallax_layer_scroll_factor_offsets_camera() {
-        let layer = ParallaxLayer::new(dummy_key(), 200.0, 200.0);
-        // scroll_factor [1,0], repeat_x true, cam_x = 100
-        // pixel offset = 100 * 1 = 100; start_x = -100 % 200 = -100
-        let batch = layer.build_draw_calls(100.0, 0.0, 400.0, 200.0).unwrap();
-        assert!((batch.tiles[0].0 - (-100.0)).abs() < 1e-4);
-    }
-
-    #[test]
-    fn parallax_layer_reset_autoscroll_clears_accum() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 100.0, 100.0);
-        layer.autoscroll = [50.0, 20.0];
-        layer.update(1.0);
-        layer.reset_autoscroll();
-        assert!((layer.autoscroll_accum[0]).abs() < 1e-5);
-        assert!((layer.autoscroll_accum[1]).abs() < 1e-5);
-    }
-
-    #[test]
-    fn parallax_layer_color_multiplies_tint_and_opacity() {
-        let mut layer = ParallaxLayer::new(dummy_key(), 100.0, 200.0);
-        layer.repeat_x = false;
-        layer.repeat_y = false;
-        layer.tint = [0.5, 0.8, 1.0, 1.0];
-        layer.opacity = 0.5;
-        let batch = layer.build_draw_calls(0.0, 0.0, 800.0, 600.0).unwrap();
-        assert!((batch.color[3] - 0.5).abs() < 1e-5); // 1.0 * 0.5 = 0.5
-    }
 }
 
 // ── render ────────────────────────────────────────────────────────────────────

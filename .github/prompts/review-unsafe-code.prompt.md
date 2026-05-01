@@ -1,6 +1,6 @@
 ---
 description: "Review unsafe Rust blocks for soundness, documented invariants, and containment."
-agent: "Security"
+agent: "Verifier"
 ---
 # Review Unsafe Code
 
