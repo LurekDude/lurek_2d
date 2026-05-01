@@ -603,7 +603,7 @@ function LBandit:armCount() end
 ---@return integer Best arm index.
 function LBandit:bestArm() end
 
---- Resets the bandit state.
+--- Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.
 ---@return nil No value is returned.
 function LBandit:reset() end
 
@@ -3615,7 +3615,7 @@ LCamera = {}
 ---@return nil No return value.
 function LCamera:apply() end
 
---- Alias for `apply()`.
+--- Alias for `apply()` that queues this camera's transform onto the render command stack.
 ---@return nil No return value.
 function LCamera:attach() end
 
@@ -3627,7 +3627,7 @@ function LCamera:clearParallaxFactors() end
 ---@return nil No return value.
 function LCamera:clearTarget() end
 
---- Alias for `reset()`.
+--- Alias for `reset()` that removes this camera's transform from the render command stack.
 ---@return nil No return value.
 function LCamera:detach() end
 
@@ -7378,7 +7378,9 @@ lurek.event.poll = function() end
 ---@return nil No return value.
 lurek.event.pump = function() end
 
----@param ... LuaValue
+--- Pushes a custom named event onto the main engine event queue with optional payload arguments.
+---@param ... string
+---@return nil No return value.
 lurek.event.push = function(...) end
 
 --- Pushes a named event into the deferred buffer instead of the main queue.
@@ -8052,6 +8054,7 @@ lurek.globe.new = function(name, spec) end
 ---@class lurek.graph
 lurek.graph = {}
 
+--- Lua wrapper around a directed `Graph` with event callback registry.
 ---@class LGraph
 LGraph = {}
 
@@ -8243,6 +8246,7 @@ function LGraph:typeOf(name) end
 ---@return nil No value is returned.
 function LGraph:update(dt) end
 
+--- Lua handle for an edge inside a `Graph`.
 ---@class LGraphEdge
 LGraphEdge = {}
 
@@ -8371,6 +8375,7 @@ function LGraphEdge:type() end
 ---@return boolean True when the type name matches GraphEdge or Object.
 function LGraphEdge:typeOf(name) end
 
+--- Lua handle for a graph item (typed item) inside a `Graph`.
 ---@class LGraphItem
 LGraphItem = {}
 
@@ -8426,6 +8431,7 @@ function LGraphItem:type() end
 ---@return boolean True if the type name matches GraphItem or Object.
 function LGraphItem:typeOf(name) end
 
+--- Lua handle for a node inside a `Graph`.
 ---@class LGraphNode
 LGraphNode = {}
 
@@ -10053,8 +10059,10 @@ lurek.input.gamepad.vibrate = function(id, low_freq, high_freq, duration_ms) end
 ---@return boolean True if the action was pressed this frame.
 lurek.input.wasActionPressed = function(action) end
 
----@param action LuaValue
----@param frames LuaValue
+--- Returns true if the action was pressed within the last frame window.
+---@param action string Action name to test.
+---@param frames integer Maximum frame distance.
+---@return boolean True if the action was pressed within the window.
 lurek.input.wasActionPressedWithin = function(action, frames) end
 
 --- Returns true if any key bound to the action was released this frame.
@@ -14888,7 +14896,7 @@ function LObjectPool:release(value) end
 ---@class LObserver
 LObserver = {}
 
---- Gets a property value.
+--- Returns the current stored property value for the given observer key, or nil if it has not been set.
 ---@param key string Property key to read.
 ---@return LuaValue Stored property value, or nil if the key is unset.
 function LObserver:get(key) end
@@ -16618,6 +16626,7 @@ lurek.physics.testPoint = function(px, py, ax, ay, aw, ah) end
 ---@class lurek.pipeline
 lurek.pipeline = {}
 
+--- Lua-side wrapper around a [`Pipeline`] DAG.
 ---@class LPipeline
 LPipeline = {}
 
@@ -16730,7 +16739,7 @@ function LPipeline:runAsync(context) end
 ---@return nil No value is returned.
 function LPipeline:setErrorMode(mode) end
 
---- Sets the pipeline name.
+--- Renames the pipeline without changing its steps, dependencies, or current runtime state.
 ---@param name string New pipeline name.
 ---@return nil No value is returned.
 function LPipeline:setName(name) end
@@ -16777,6 +16786,7 @@ function LPipeline:update(dt) end
 ---@return table Array of validation error strings.
 function LPipeline:validate() end
 
+--- Lua-side wrapper around a single [`PipelineStep`].
 ---@class LPipelineStep
 LPipelineStep = {}
 
@@ -18894,7 +18904,7 @@ lurek.scene.deserializeScene = function(snapshot) end
 ---@return nil No value is returned.
 lurek.scene.draw = function() end
 
---- Returns a fade cross-dissolve transition config table.
+--- Pre-built named transition factory functions.  Each function accepts optional
 ---@param duration? number Duration in seconds. Defaults to 0.5.
 ---@return table Transition config table.
 lurek.scene.fade = function(duration) end
@@ -19520,6 +19530,8 @@ lurek.runtime.getBatchResults = function(results) end
 ---@return string Returns the current clipboard text or an empty string on failure.
 lurek.runtime.getClipboardText = function() end
 
+--- Returns whether the debug overlay is currently visible.
+---@return boolean Returns whether the debug overlay is visible.
 lurek.runtime.getDebugOverlay = function() end
 
 --- Returns the value of an environment variable, or nil if not set.
@@ -21631,8 +21643,12 @@ lurek.timer.sleep = function(seconds) end
 ---@return number The delta time for the stepped frame
 lurek.timer.step = function() end
 
+--- Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
+---@return integer The number of real-time callbacks that fired
 lurek.timer.tickRealTimers = function() end
 
+--- Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or frame target has been reached.
+---@return integer Number of coroutines resumed in this tick
 lurek.timer.tickWaits = function() end
 
 --- Yields the current Lua coroutine until at least `frames` engine frames have elapsed.
@@ -21652,7 +21668,7 @@ lurek.tween = {}
 ---@class LSpring
 LSpring = {}
 
---- Stops the spring.
+--- Stops the spring immediately, clears its settle callback, and leaves the current values at their last simulated positions.
 ---@return nil No value is returned.
 function LSpring:cancel() end
 
@@ -21967,7 +21983,8 @@ lurek.tween.update = function(dt) end
 ---@class lurek.ui
 lurek.ui = {}
 
----@class LAccordion
+--- Creates a collapsible accordion widget.
+---@class LAccordion : LUiWidget
 LAccordion = {}
 
 --- Adds a section entry to this Accordion widget.
@@ -22036,7 +22053,8 @@ function LAreaChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LAreaChart:typeOf(name) end
 
----@class LBadge
+--- Creates a badge widget displaying a numeric count.
+---@class LBadge : LUiWidget
 LBadge = {}
 
 --- Returns the raw count of this Badge widget.
@@ -22084,7 +22102,8 @@ function LBarChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LBarChart:typeOf(name) end
 
----@class LButton
+--- Creates and returns a new interactive button widget as a child of this widget.
+---@class LButton : LUiWidget
 LButton = {}
 
 --- Returns the text of this Button widget.
@@ -22096,7 +22115,8 @@ LButton.getText = function() end
 ---@return nil No value is returned.
 LButton.setText = function(text) end
 
----@class LCheckbox
+--- Creates a checkbox widget.
+---@class LCheckbox : LUiWidget
 LCheckbox = {}
 
 --- Returns the text of this Checkbox widget.
@@ -22117,7 +22137,8 @@ LCheckbox.setChecked = function(checked) end
 ---@return nil No value is returned.
 LCheckbox.setText = function(text) end
 
----@class LColorPicker
+--- Creates a color picker widget.
+---@class LColorPicker : LUiWidget
 LColorPicker = {}
 
 --- Returns the color of this Color_Picker widget.
@@ -22158,7 +22179,8 @@ LColorPicker.setOnChange = function(fn) end
 ---@return nil No value is returned.
 LColorPicker.setShowAlpha = function(v) end
 
----@class LComboBox
+--- Creates a dropdown combo box widget.
+---@class LComboBox : LUiWidget
 LComboBox = {}
 
 --- Adds a item entry to this Combo_Box widget.
@@ -22197,7 +22219,8 @@ LComboBox.removeItem = function(index) end
 ---@return nil No value is returned.
 LComboBox.setSelectedIndex = function(index) end
 
----@class LDialog
+--- Creates a modal dialog widget.
+---@class LDialog : LUiWidget
 LDialog = {}
 
 --- Adds a button entry to this Dialog widget.
@@ -22250,7 +22273,8 @@ LDialog.setOnClose = function(fn) end
 ---@return nil No value is returned.
 LDialog.setTitle = function(title) end
 
----@class LDockPanel
+--- Creates and returns a new docking panel that arranges children along its edges.
+---@class LDockPanel : LUiWidget
 LDockPanel = {}
 
 --- Performs the dock operation on this Dock_Panel widget.
@@ -22279,7 +22303,8 @@ LDockPanel.setSplitSize = function(side, size) end
 ---@return nil No value is returned.
 LDockPanel.undock = function(child_idx) end
 
----@class LGuiTable
+--- Creates a data table widget.
+---@class LGuiTable : LUiWidget
 LGuiTable = {}
 
 --- Adds a column entry to this Gui_Table widget.
@@ -22337,7 +22362,8 @@ LGuiTable.setSelectedRow = function(row) end
 ---@return nil No value is returned.
 LGuiTable.setSortable = function(v) end
 
----@class LGuiWindow
+--- Creates a draggable window widget.
+---@class LGuiWindow : LUiWidget
 LGuiWindow = {}
 
 --- Returns the title of this Gui_Window widget.
@@ -22381,7 +22407,8 @@ LGuiWindow.setResizable = function(v) end
 ---@return nil No value is returned.
 LGuiWindow.setTitle = function(title) end
 
----@class LImageWidget
+--- Creates an image display widget.
+---@class LImageWidget : LUiWidget
 LImageWidget = {}
 
 --- Returns the scale mode of this Image_Widget widget.
@@ -22408,7 +22435,8 @@ LImageWidget.setScaleMode = function(mode) end
 ---@return nil No value is returned.
 LImageWidget.setTint = function(r, green, b, a) end
 
----@class LLabel
+--- Creates a text label widget.
+---@class LLabel : LUiWidget
 LLabel = {}
 
 --- Returns the text of this Label widget.
@@ -22420,7 +22448,8 @@ LLabel.getText = function() end
 ---@return nil No value is returned.
 LLabel.setText = function(text) end
 
----@class LLayout
+--- Creates a flexbox layout container.
+---@class LLayout : LUiWidget
 LLayout = {}
 
 --- Returns the align of this Layout widget.
@@ -22510,7 +22539,8 @@ function LLineChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LLineChart:typeOf(name) end
 
----@class LListBox
+--- Creates a selectable list widget.
+---@class LListBox : LUiWidget
 LListBox = {}
 
 --- Adds a item entry to this List_Box widget.
@@ -22550,7 +22580,8 @@ LListBox.setItemHeight = function(h) end
 ---@return nil No value is returned.
 LListBox.setSelectedIndex = function(index) end
 
----@class LMenuBar
+--- Creates a menu bar widget.
+---@class LMenuBar : LUiWidget
 LMenuBar = {}
 
 --- Adds a menu entry to this Menu_Bar widget.
@@ -22571,7 +22602,8 @@ LMenuBar.getMenus = function() end
 ---@return boolean True when a menu was removed.
 LMenuBar.removeMenu = function(menu_idx) end
 
----@class LMenuItem
+--- Creates a menu item widget.
+---@class LMenuItem : LUiWidget
 LMenuItem = {}
 
 --- Adds a sub item entry to this Menu_Item widget.
@@ -22615,7 +22647,8 @@ LMenuItem.setShortcut = function(shortcut) end
 ---@return nil No value is returned.
 LMenuItem.setText = function(text) end
 
----@class LNinePatch
+--- Creates a 9-patch slicer widget.
+---@class LNinePatch : LUiWidget
 LNinePatch = {}
 
 --- Returns the image dimensions of this Nine_Patch widget.
@@ -22648,7 +22681,8 @@ LNinePatch.setImageDimensions = function(w, h) end
 ---@return nil No value is returned.
 LNinePatch.setInsets = function(left, top, right, bottom) end
 
----@class LPanel
+--- Creates a container panel widget.
+---@class LPanel : LUiWidget
 LPanel = {}
 
 --- Returns the title of this Panel widget.
@@ -22692,7 +22726,8 @@ function LPieChart:type() end
 ---@return boolean True if this object matches the requested type.
 function LPieChart:typeOf(name) end
 
----@class LProgressBar
+--- Creates a progress bar widget.
+---@class LProgressBar : LUiWidget
 LProgressBar = {}
 
 --- Returns the max of this Progress_Bar widget.
@@ -22722,7 +22757,8 @@ LProgressBar.setRange = function(min, max) end
 ---@return nil No value is returned.
 LProgressBar.setValue = function(v) end
 
----@class LRadioButton
+--- Creates a grouped radio button widget.
+---@class LRadioButton : LUiWidget
 LRadioButton = {}
 
 --- Returns the group of this Radio_Button widget.
@@ -22796,7 +22832,8 @@ function LScatterPlot:type() end
 ---@return boolean True if this object matches the requested type.
 function LScatterPlot:typeOf(name) end
 
----@class LScrollBar
+--- Creates a scroll bar widget.
+---@class LScrollBar : LUiWidget
 LScrollBar = {}
 
 --- Returns the content size of this Scroll_Bar widget.
@@ -22835,7 +22872,8 @@ LScrollBar.setScrollPosition = function(v) end
 ---@return nil No value is returned.
 LScrollBar.setViewSize = function(v) end
 
----@class LScrollPanel
+--- Creates a scrollable panel widget.
+---@class LScrollPanel : LUiWidget
 LScrollPanel = {}
 
 --- Returns the content size of this Scroll_Panel widget.
@@ -22874,7 +22912,8 @@ LScrollPanel.setScrollPosition = function(x, y) end
 ---@return nil No value is returned.
 LScrollPanel.setScrollSpeed = function(speed) end
 
----@class LSeparator
+--- Creates a separator line.
+---@class LSeparator : LUiWidget
 LSeparator = {}
 
 --- Returns the thickness of this Separator widget.
@@ -22895,7 +22934,8 @@ LSeparator.setThickness = function(thickness) end
 ---@return nil No value is returned.
 LSeparator.setVertical = function(v) end
 
----@class LSlider
+--- Creates a value slider widget.
+---@class LSlider : LUiWidget
 LSlider = {}
 
 --- Returns the max of this Slider widget.
@@ -22926,7 +22966,8 @@ LSlider.setStep = function(step) end
 ---@return nil No value is returned.
 LSlider.setValue = function(v) end
 
----@class LSpinBox
+--- Creates a numeric spin box widget with increment and decrement buttons.
+---@class LSpinBox : LUiWidget
 LSpinBox = {}
 
 --- Decrements the value by one step.
@@ -22957,7 +22998,8 @@ LSpinBox.setStep = function(step) end
 ---@return nil No value is returned.
 LSpinBox.setValue = function(v) end
 
----@class LSplitPanel
+--- Creates a resizable split panel.
+---@class LSplitPanel : LUiWidget
 LSplitPanel = {}
 
 --- Returns the first child of this Split_Panel widget.
@@ -23005,7 +23047,8 @@ LSplitPanel.setSecondChild = function(child_idx) end
 ---@return nil No value is returned.
 LSplitPanel.setSplitPosition = function(v) end
 
----@class LStatusBar
+--- Creates a status bar widget.
+---@class LStatusBar : LUiWidget
 LStatusBar = {}
 
 --- Adds a section entry to this Status_Bar widget.
@@ -23040,7 +23083,8 @@ LStatusBar.setSectionText = function(section_idx, text) end
 ---@return nil No value is returned.
 LStatusBar.setSectionWidget = function(section_idx, widget) end
 
----@class LSwitch
+--- Creates a toggle switch widget.
+---@class LSwitch : LUiWidget
 LSwitch = {}
 
 --- Returns the on/off state of this Switch widget.
@@ -23056,7 +23100,8 @@ LSwitch.setOn = function(on) end
 ---@return nil No value is returned.
 LSwitch.toggle = function() end
 
----@class LTabBar
+--- Creates a tab bar widget.
+---@class LTabBar : LUiWidget
 LTabBar = {}
 
 --- Adds a tab entry to this Tab_Bar widget.
@@ -23087,7 +23132,8 @@ LTabBar.removeTab = function(index) end
 ---@return nil No value is returned.
 LTabBar.setActiveTab = function(index) end
 
----@class LTextInput
+--- Creates a text input widget.
+---@class LTextInput : LUiWidget
 LTextInput = {}
 
 --- Returns the cursor position of this Text_Input widget.
@@ -23141,7 +23187,8 @@ function LTheme:type() end
 ---@return boolean True if this object matches the requested type.
 function LTheme:typeOf(name) end
 
----@class LToast
+--- Creates a toast notification widget.
+---@class LToast : LUiWidget
 LToast = {}
 
 --- Returns the duration of this Toast widget.
@@ -23170,7 +23217,8 @@ LToast.setDuration = function(d) end
 ---@return nil No value is returned.
 LToast.setMessage = function(msg) end
 
----@class LToolbar
+--- Creates a toolbar widget.
+---@class LToolbar : LUiWidget
 LToolbar = {}
 
 --- Adds a button entry to this Toolbar widget.
@@ -23219,7 +23267,8 @@ LToolbar.setButtonToggled = function(id, toggled) end
 ---@return nil No value is returned.
 LToolbar.setOrientation = function(v) end
 
----@class LTooltipPanel
+--- Creates a tooltip panel widget.
+---@class LTooltipPanel : LUiWidget
 LTooltipPanel = {}
 
 --- Returns the delay of this Tooltip_Panel widget.
@@ -23249,7 +23298,8 @@ LTooltipPanel.setTarget = function(target) end
 ---@return nil No value is returned.
 LTooltipPanel.setText = function(text) end
 
----@class LTreeView
+--- Creates a collapsible tree view widget.
+---@class LTreeView : LUiWidget
 LTreeView = {}
 
 --- Adds a node entry to this Tree_View widget.
@@ -23345,6 +23395,7 @@ LTreeView.setSelectedNode = function(index) end
 ---@return boolean True when the node ends in the expanded state.
 LTreeView.toggleNode = function(index) end
 
+--- Builds a Lua table with common base-widget methods bound to `idx`.
 ---@class LUiWidget
 LUiWidget = {}
 
@@ -24123,6 +24174,8 @@ lurek.window.onDpiChange = function(callback) end
 ---@return table Array of selected file paths.
 lurek.window.openFileDialog = function(opts) end
 
+--- Checks whether the DPI scale has changed since the last call and fires the onDpiChange callback if so.
+---@return number Current DPI scale factor after polling for changes.
 lurek.window.pollDpiChange = function() end
 
 --- Flashes the window icon in the operating system taskbar or dock to attract the user's attention.

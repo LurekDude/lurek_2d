@@ -2,6 +2,66 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.20] - 2026-05-01
+
+### docs(architecture): cleanup and sync of docs/architecture + templates
+
+- Moved templates one level up: `docs/architecture/templates/` → `docs/` (`AGENT_TEMPLATE.md`, `SKILL_TEMPLATE.md`, `PROMPT_TEMPLATE.md`).
+- Added `docs/SYSTEM_PROMPT_TEMPLATE.md` — authoring guide and constraints for `.github/copilot-instructions.md`.
+- Updated `AGENT_TEMPLATE.md`: added `routes_to` field and expanded Workflow/Outputs sections.
+- Updated `PROMPT_TEMPLATE.md`: fixed skill link paths from deep-relative to `docs/`-relative.
+- `docs/architecture/cag-system.md`: added WHY/HOW/WHAT layer doctrine (§3a), added E307 (missing `agent` field in prompt frontmatter), added §6.5 (editing the system prompt), updated template path references.
+- `docs/architecture/test-framework.md`: replaced all stale `content/demos/` → `content/games/` and `tests/lua/content/demos/` → `tests/lua/demos/` path references.
+- `.github/copilot-instructions.md` TST-05: corrected path from `tests/lua/content/games/` to `tests/lua/demos/`.
+- Merged `togaf-research.md`, `togaf-gap-analysis.md`, `togaf-mapping.md` → single `docs/architecture/togaf.md` target-state document. Removed the three source files.
+- Updated all references to deleted TOGAF files in `docs/architecture/README.md`, `.github/skills/togaf/SKILL.md`, `.agents/rules/togaf.md`, `.agents/rules/systems.md`.
+- Expanded `gpu-programming` skill Domain Knowledge with render pipeline specifics, canvas/postfx patterns, and draw-layer ordering detail.
+- `cag_validate.py`: 0 errors, 0 warnings. `cag_link_check.py --strict`: 0 broken links.
+
+## [1.0.9-fix.19] - 2026-05-01
+
+### docs(cag): rewrite 9 unmodified skills to match standard format
+
+- Converted prose `## Domain Knowledge` walls to compact, actionable bullet points across all 9 skills.
+- Skills rewritten: `examples-management`, `game-ai`, `github-workflow`, `html-css`, `library-authoring`, `opportunity-discovery`, `togaf`, `ui-layout`, `visual-effects`.
+- Fixed `ui-layout` and `visual-effects`: `## Mission` was a prose paragraph — converted to bullets; `## Companion File Index` format standardised to `- None.`.
+- `togaf`: domain knowledge compacted; B/D/A/T labeling added to domain axes bullet.
+- Validator result: 0 errors, 0 warnings — 12 agents, 40 skills, 58 prompts.
+
+## [1.0.9-fix.18] - 2026-05-01
+
+### docs(cag): system prompt audit — trim agent-specific content, add universal sections
+
+- Rewrote `copilot-instructions.md` from 8016 → 7482 chars (100 lines).
+- **Removed** (agent/skill-specific, moved to owner): `First load: agent-customization/` (CAG-Architect); `gen_lua_api_data.py + gen_luadoc.py` exact commands replaced with `python tools/gen_all_docs.py`; specific test paths in library and demo sync rules; coverage audit commands (`doc_coverage.py`, `test_coverage.py`) replaced with pointer to each agent's Workflow section; `docs/architecture/togaf.md` key reference (TOGAF agent only); verbose "User frustration" explanation sentence; redundant "Agents must have distinct scope" bullet (now in agents/README.md).
+- **Compressed**: Communication from 8 bullets to 5 (merged "no slang" + "be direct"; merged "define jargon" + "respond in Polish"). TST-01 through TST-06 binding constraints compacted by ~30% without losing meaning. Cross-Artifact Sync rules simplified (same semantics, shorter paths).
+- **Added**: `Target personas: EngDev, GameDev, Modder, GameTest, EngTest` to Engine Identity. **Work Session** as its own `##` section with standard subfolder layout and rules (moved from end of Discovery). `/route-prompt` pointer in CAG layer discovery. Repository Layout expanded with `src/lua_api/` distinction and `docs/api/` generated-only note. `agent-routing` + `agent-specific audits` note in Quality Gates.
+- **Restructured**: Discovery Directives now has three clean subsections — Architecture & CAG source of truth, CAG layer how-to, Key references. "Session workflow" and "Commit hygiene" sub-blocks promoted to proper `##` sections (Work Session, Git Hygiene).
+
+## [1.0.9-fix.17] - 2026-05-01
+
+### docs(cag): prompt audit — doctrine, E307, merge, route-prompt
+
+- Added **Agents → WHY / Skills → HOW / Prompts → WHAT** doctrine to `docs/architecture/cag-system.md § 1 Philosophy` and `copilot-instructions.md` CAG Components. A prompt must not duplicate a skill or agent workflow — it adds only step sequence, output shape, and evaluation criteria.
+- Added **E307** to `tools/validate/cag_validate.py`: prompts without an `agent` frontmatter field are now a validator error. Updated the rule index in `cag-system.md § 5` and the validator docstring.
+- Fixed `add-cag-artifact.prompt.md`: added the missing `agent: "CAG-Architect"` field (was the only prompt lacking it).
+- Merged `create-lua-example.prompt.md` + `create-game-example.prompt.md` → `create-example.prompt.md`. Both had identical steps, criteria, and anti-patterns; difference in scope (API vs gameplay concept) is now a single `target=` vs `concept=` input parameter.
+- Created `route-prompt.prompt.md` (agent: Manager): finds the best existing prompt for a user's natural-language request and returns its name, agent, loaded skills, and a filled-in invocation line. Closes the missing meta-routing gap.
+- Updated `cag-system.md` file-type catalog: Prompt row now reads `agent (required)`, Purpose column states WHAT/steps/checklist, Validator Rules updated to `E301–E307`.
+- Validator result: 0 errors, 0 warnings — 12 agents, 40 skills, 58 prompts (+2 created, -2 deleted). 245 links, 0 broken.
+
+## [1.0.9-fix.16] - 2026-05-01
+
+### docs(cag): integrate skill bundles into cag-system.md and remove skill-map.md
+
+- Added `§ 4.1 Agent-Skill Bundles` to `docs/architecture/cag-system.md` as the single authoritative source for each agent's primary and secondary skill lists, derived from each agent's `## CAG Metadata` block.
+- Removed `.github/agents/skill-map.md`; all its content is now in cag-system.md § 4.1.
+- Updated `.github/agents/README.md` skill bundles section to a pointer to cag-system.md § 4.1; removed the stale duplicate table.
+- Updated `.github/copilot-instructions.md` Discovery Directives to reference cag-system.md § 4.1 instead of the deleted skill-map.md.
+- Updated `.github/skills/cag-workflow/SKILL.md` to reference cag-system.md § 4.1 instead of skill-map.md.
+- Added `logging, visual-effects` to `developer.agent.md` secondary skills to match the policy set in the previous session.
+- Fixed `tools/validate/_cag_common.py` `AGENTS_DIR` path from `agents2` to `agents` so the validator correctly scans the live agent roster; all 12 agents now validate.
+
 ## [1.0.9-fix.15] - 2026-05-01
 
 ### chore(cag): prototype a reduced agents2 roster and strengthen CAG validation
@@ -48,20 +108,20 @@ All notable changes to Lurek2D are recorded here.
 
 ### docs(architecture): start the TOGAF-to-Lurek mapping set
 
-- Added `docs/architecture/togaf-mapping.md` as the current-state crosswalk from TOGAF concepts onto Lurek2D principles, domains, repository artifacts, governance surfaces, and ADM-like workflow equivalents.
-- Added `docs/architecture/togaf-gap-analysis.md` as the follow-on fit assessment describing strong matches, weak spots, risks, and the smallest safe migration path for future TOGAF-aware architecture work.
-- Updated `docs/architecture/README.md` and `docs/architecture/togaf-research.md` so the TOGAF research brief now points to the live mapping and gap-analysis documents instead of an open-ended future placeholder.
+- Added `docs/architecture/togaf.md` as the current-state crosswalk from TOGAF concepts onto Lurek2D principles, domains, repository artifacts, governance surfaces, and ADM-like workflow equivalents.
+- Added `docs/architecture/togaf.md` as the follow-on fit assessment describing strong matches, weak spots, risks, and the smallest safe migration path for future TOGAF-aware architecture work.
+- Updated `docs/architecture/README.md` and `docs/architecture/togaf.md` so the TOGAF research brief now points to the live mapping and gap-analysis documents instead of an open-ended future placeholder.
 
 ### chore(cag): add TOGAF and enterprise-architecture skills for architecture comparison work
 
 - Added `.github/skills/enterprise-architecture/SKILL.md` for repo-level architecture doctrine, artifact mapping, and governance work that sits above module-boundary design.
-- Added `.github/skills/togaf/SKILL.md` for TOGAF terminology, source handling, and repo-to-TOGAF comparison work anchored on `docs/architecture/togaf-research.md`.
+- Added `.github/skills/togaf/SKILL.md` for TOGAF terminology, source handling, and repo-to-TOGAF comparison work anchored on `docs/architecture/togaf.md`.
 - Updated `Architect` and `CAG-Architect` so both agents explicitly load the new skills when TOGAF or higher-level architecture-governance work is in scope.
 - Updated `.github/copilot-instructions.md` and `docs/architecture/cag-system.md` so TOGAF comparative work is discoverable through the normal CAG discovery flow.
 
 ### docs(architecture): add an evidence-first TOGAF research brief for later comparison work
 
-- Added `docs/architecture/togaf-research.md` as a source-limited background brief on TOGAF terminology, ADM, architecture domains, repository/governance concepts, contradiction notes, and next questions for future `Architect` / `CAG Architect` work.
+- Added `docs/architecture/togaf.md` as a source-limited background brief on TOGAF terminology, ADM, architecture domains, repository/governance concepts, contradiction notes, and next questions for future `Architect` / `CAG Architect` work.
 - Updated `docs/architecture/README.md` so the new TOGAF brief is discoverable from the architecture index and explicitly positioned as optional comparative background rather than current project doctrine.
 
 ### chore(cag): clarify agent artifact output, git consent, and ownership boundaries

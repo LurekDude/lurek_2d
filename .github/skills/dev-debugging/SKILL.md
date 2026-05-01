@@ -18,16 +18,17 @@ description: "Load this skill when diagnosing runtime bugs, crashes, or wrong be
 - Test authoring.
 
 ## Domain Knowledge
-- logs/, tests/, content/, and save/ already contain many repro anchors, so start from an existing failing script, fixture, or save-state before reading large areas of src/.
-- Trace from the lurek.* symptom or user-visible failure to the controlling src/<module>/ or src/lua_api/ boundary, and stop as soon as one concrete control path explains the observed behavior.
-- The common failure surfaces in this repo are SharedState borrowing, RefCell lifetime leaks across callbacks, wrong callback order, stale registries, and state transitions that skip one edge case.
-- Build the smallest deterministic repro first; one narrowed Lua test, smoke case, or content script is worth more than broad speculative reading across unrelated modules.
-- Use tools/audit/parse_test_log.py for harness output instead of scrolling raw logs, especially when the same suite already prints structured pass or fail context.
-- Separate failure classes early: crash, wrong result, missing side effect, stale state, race or ordering issue, and backend-specific behavior each imply a different next hop.
-- When a bug crosses the Lua boundary, compare the public contract in docs/specs or generated docs with the binding behavior in src/lua_api/ before blaming engine internals.
-- Prefer one cheap discriminating check after each theory: a narrowed test, a single content repro, or a direct state readback that can falsify the current hypothesis quickly.
-- Existing harnesses and smoke tests can often be narrowed into a bug repro faster than writing fresh scripts, and they give you a stable path to validate the eventual fix.
-- If a save file or content asset triggers the problem, record the exact path and visible symptom so the repro stays portable.
+- Start from an existing failing script or fixture before reading src/. `tests/lua/`, `content/games/`, and `save/` already contain repro anchors. A narrowed Lua test or smoke case is faster to isolate than re-reading large module trees.
+- Common failure surfaces in this repo, in order of frequency: `RefCell::borrow_mut()` panic inside a Lua callback (always check SharedState borrow scope), stale registry key after a scene reload, wrong callback ordering between `process` and `render`, RunState transition skipping an init step, and channel drop causing silent loss of a thread result.
+- To trace a Lua-boundary crash: find the Lua call in logs (`RUST_LOG=lurek2d::lua_api=debug`), then find the corresponding `*_api.rs` binding, then trace from there into `src/<module>/`. Stop at the first concrete control path that explains the symptom.
+- To trace a render glitch: find which `RenderCommand` variant is wrong or missing in the command buffer log (`RUST_LOG=lurek2d::render=trace`). Then find where that command is pushed. Never start by reading the shader unless the command itself is correct.
+- Use `tools/audit/parse_test_log.py` for harness failures — it extracts structured pass/fail context from the Lua test harness output. Do not scroll raw cargo test output for Lua failures.
+- Separate failure classes before forming hypotheses: crash (panic or SIGSEGV), wrong result (logic error), missing side effect (event never fired), stale state (old value persisted), race (non-deterministic), and backend-specific (wgpu validation layer error). Each implies a different first check.
+- Build the smallest deterministic repro first: one Lua test, one content/games/ main.lua, or one Rust test that reliably reproduces. Write it under `work/{session}/scripts/` so it survives the session. A non-reproducible repro is not a repro.
+- When a bug crosses the Lua boundary, compare `docs/specs/<module>.md` Lua API section against the binding in `src/lua_api/<module>_api.rs` first. Spec drift — where the doc says one thing and the binding does another — is a common root cause.
+- For save-file or filesystem-triggered bugs, note the exact save path relative to the GameFS root, the triggering operation (`lurek.fs.read`, `lurek.save.load`, etc.), and the visible symptom before reading any src/ code.
+- Confidence marking rule: CONFIRMED = demonstrated by a single test that fails and passes in controlled conditions. LIKELY = two independent signals point to the same cause. SUSPECT = one signal that could have other explanations. Never report CONFIRMED without a passing fix or reproducer.
+- Check Clippy output (`cargo clippy --all-targets -- -D warnings`) after reproducing, because sometimes the root cause is a known pattern that Clippy would already flag.
 ## Companion File Index
 - None.
 

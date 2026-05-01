@@ -423,6 +423,191 @@
         "command": "lurek2d.scanAllGames",
         "title": "Scan Lua Workspace for Errors",
         "category": "Lurek2D"
+      },
+      {
+        "command": "lurek.build.debug",
+        "title": "Build: Debug",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "lurek.build.release",
+        "title": "Build: Release",
+        "icon": "$(tools)"
+      },
+      {
+        "command": "lurek.build.dist",
+        "title": "Build: Dist",
+        "icon": "$(package)"
+      },
+      {
+        "command": "lurek.build.check",
+        "title": "Build: Check (type-check only)",
+        "icon": "$(checklist)"
+      },
+      {
+        "command": "lurek.run.debugNoRebuild",
+        "title": "Run: Debug (no rebuild)",
+        "icon": "$(play)"
+      },
+      {
+        "command": "lurek.run.releaseNoRebuild",
+        "title": "Run: Release (no rebuild)",
+        "icon": "$(play)"
+      },
+      {
+        "command": "lurek.run.debugPickDemo",
+        "title": "Run: Debug — pick demo",
+        "icon": "$(list-selection)"
+      },
+      {
+        "command": "lurek.run.releasePickDemo",
+        "title": "Run: Release — pick demo",
+        "icon": "$(list-selection)"
+      },
+      {
+        "command": "lurek.test.rust.all",
+        "title": "Test: Run Rust Tests",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "lurek.test.target.math",
+        "title": "Test: Math",
+        "icon": "$(symbol-numeric)"
+      },
+      {
+        "command": "lurek.test.target.physics",
+        "title": "Test: Physics",
+        "icon": "$(settings-gear)"
+      },
+      {
+        "command": "lurek.test.target.graphics",
+        "title": "Test: Graphics",
+        "icon": "$(symbol-color)"
+      },
+      {
+        "command": "lurek.test.target.audio",
+        "title": "Test: Audio",
+        "icon": "$(unmute)"
+      },
+      {
+        "command": "lurek.test.target.input",
+        "title": "Test: Input",
+        "icon": "$(keyboard)"
+      },
+      {
+        "command": "lurek.quality.gate",
+        "title": "Quality: Gate (full pre-push)",
+        "icon": "$(pass)"
+      },
+      {
+        "command": "lurek.quality.clippy",
+        "title": "Quality: Clippy (strict)",
+        "icon": "$(search)"
+      },
+      {
+        "command": "lurek.quality.fmtApply",
+        "title": "Quality: Format Apply",
+        "icon": "$(symbol-ruler)"
+      },
+      {
+        "command": "lurek.quality.fmtCheck",
+        "title": "Quality: Format Check",
+        "icon": "$(symbol-ruler)"
+      },
+      {
+        "command": "lurek.docs.fullPipeline",
+        "title": "Docs: Full Pipeline",
+        "icon": "$(book)"
+      },
+      {
+        "command": "lurek.docs.rustBrowser",
+        "title": "Docs: Rust (browser)",
+        "icon": "$(browser)"
+      },
+      {
+        "command": "lurek.docs.libraryApi",
+        "title": "Docs: Library API",
+        "icon": "$(library)"
+      },
+      {
+        "command": "lurek.docs.validateLuaStubs",
+        "title": "Docs: Validate Lua Stubs",
+        "icon": "$(verified)"
+      },
+      {
+        "command": "lurek.dist.repackage",
+        "title": "Dist: Repackage (skip build)",
+        "icon": "$(file-zip)"
+      },
+      {
+        "command": "lurek.dist.installWindows",
+        "title": "Dist: Install Windows",
+        "icon": "$(desktop-download)"
+      },
+      {
+        "command": "lurek.audit.qualityReport",
+        "title": "Audit: Quality Report",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "lurek.audit.testCoverage",
+        "title": "Audit: Test Coverage",
+        "icon": "$(graph-line)"
+      },
+      {
+        "command": "lurek.audit.docCoverage",
+        "title": "Audit: Doc Coverage",
+        "icon": "$(book)"
+      },
+      {
+        "command": "lurek.audit.exampleCoverage",
+        "title": "Audit: Example Coverage",
+        "icon": "$(file-code)"
+      },
+      {
+        "command": "lurek.audit.luaTestCoverage",
+        "title": "Audit: Lua API Test Coverage",
+        "icon": "$(beaker)"
+      },
+      {
+        "command": "lurek.audit.luaSpecCoverage",
+        "title": "Audit: Lua Spec Coverage",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "lurek.audit.cagLinkCheck",
+        "title": "Audit: CAG Link Check (strict)",
+        "icon": "$(link)"
+      },
+      {
+        "command": "lurek.validate.luaApi",
+        "title": "Validate: Lua API",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "lurek.validate.library",
+        "title": "Validate: Library",
+        "icon": "$(library)"
+      },
+      {
+        "command": "lurek.validate.changelog",
+        "title": "Validate: Changelog",
+        "icon": "$(file-text)"
+      },
+      {
+        "command": "lurek.validate.moduleCoverage",
+        "title": "Validate: Module Coverage",
+        "icon": "$(graph)"
+      },
+      {
+        "command": "lurek.validate.callbacks",
+        "title": "Validate: Callbacks",
+        "icon": "$(symbol-event)"
+      },
+      {
+        "command": "lurek.validate.cag",
+        "title": "Validate: CAG Files",
+        "icon": "$(hubot)"
       }
     ],
     "keybindings": [

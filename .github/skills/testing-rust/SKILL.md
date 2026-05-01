@@ -21,16 +21,17 @@ Own the testing strategy, file layout, assertion patterns, and coverage tooling 
 - Lua scripting unrelated to tests -> use lua-scripting skill
 
 ## Domain Knowledge
-- TST-01 is the main split in this repo: behavior reachable through lurek.* belongs in tests/lua/, while Rust-only internals belong in tests/rust/unit/.
-- No tests live in src/, and Lua test files should end with test_summary() plus accurate @covers markers so the existing coverage tools can attribute behavior correctly.
-- File placement is part of the contract: Rust unit tests live under tests/rust/unit/<module>_tests.rs, Lua tests follow the test_<module>_<layer>.lua pattern, and demos have their own dedicated locations.
-- Prefer headless state readback first, then pixel readback when rendering output matters, and use smoke-only evidence only when stronger assertions are not technically possible.
-- Harness registration and Cargo target wiring move with new suites; a good test file is incomplete until the repo can actually discover and run it in the standard flows.
-- Use expect_near or explicit epsilon checks for floats; direct float equality should be treated as a bug unless the value is intentionally exact and stable.
-- Determinism matters more than clever setup: stable seeds, fixed dt, controlled fixtures, and narrow asset inputs beat large scenario scripts with hidden moving parts.
-- Reuse existing fixtures, helpers, and harness patterns before inventing ad hoc scaffolding; consistency keeps failures interpretable across many modules.
-- Coverage tools already exist, including test_coverage.py and lua_api_test_coverage.py, so missing coverage should be reported and closed using the repo's current metrics rather than informal guesses.
-- Evidence strength should be stated implicitly in the test shape: direct state assertions are stronger than visual inference.
+- Lua-first split (TST-01): behavior reachable through `lurek.*` belongs in `tests/lua/unit/test_<module>_<layer>.lua`, Rust-only private internals in `tests/rust/unit/<module>_tests.rs`. When in doubt, the Lua layer is preferred — if it can be tested via the public API, it must be.
+- Never put `#[cfg(test)]` in `src/`. Every test that uses `src/` code but is about private internals lives in `tests/rust/unit/<module>_tests.rs` as a separate binary target.
+- File naming is enforced: Rust test files are `<module>_tests.rs` (with the `s`), Lua unit test files are `test_<module>_<layer>.lua`. A file that does not follow the naming convention is not discoverable by `parallel_cargo.py` or the Lua harness.
+- Lua test file structure: each file ends with `test_summary()` and every test case uses `assert_equal`, `assert_true`, `assert_near`, or `assert_error` from the harness — not bare `assert()`. Missing `test_summary()` means the harness reports 0 tests, not a pass.
+- New Lua test files must be registered in `tests/lua/harness.rs` under the correct suite. New Rust test binaries must be added to `Cargo.toml` as `[[test]]` targets with the correct `name` and `path`.
+- Float comparison: use `assert_near(a, b, epsilon)` always. Direct `==` on floats in tests is a defect — CI will catch it intermittently on different build profiles or OS.
+- Determinism checklist: fixed random seed (pass seed to lurek.math.random if used), fixed `dt` value (headless tests use `dt = 1/60`), no filesystem reads outside `tests/fixtures/`, no wall-clock time, no window.
+- Test granularity: one failing reason per test. `test_body_position_after_one_step()` tests exactly that. `test_physics_all()` is not a valid test name — it makes regression attribution impossible.
+- Evidence strength: prefer state-readback assertions over side-effect checks. `assert_equal(body.position.x, 5.0)` is stronger than `assert_true(on_contact_called)`. Use screenshot evidence only when pixel output is the only available signal.
+- After adding tests, run `python tools/audit/test_coverage.py` and `python tools/audit/lua_api_test_coverage.py` to confirm that the new test registers as covering the target behavior. A test that covers behavior but has no `@covers` marker is invisible to coverage reports.
+- Demo tests go in `tests/lua/content/games/test_<name>.lua` and `tests/demo_smoke_tests.rs` — not in `tests/lua/unit/`. Mixing demo tests with unit tests defeats the purpose of both suites.
 ## Companion File Index
 
 None - all guidance is inline.

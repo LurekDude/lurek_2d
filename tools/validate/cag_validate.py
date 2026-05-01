@@ -7,7 +7,7 @@ Validates the four CAG file types against the current CAG schema described in
 * ``.github/copilot-instructions.md`` (system prompt)         — rules E001-E004, W005
 * ``.github/agents/*.agent.md``                               — rules E101-E113, W108
 * ``.github/skills/*/SKILL.md``                               — rules E201-E205, W206
-* ``.github/prompts/*.prompt.md``                             — rules E301-E305, W306
+* ``.github/prompts/*.prompt.md``                             — rules E301-E307, W306
 
 Usage::
 
@@ -551,6 +551,9 @@ def check_prompt(
         if norm not in known_lower and expected != "Manager":
             out.append(Violation(rel, "E304", "error",
                                  f"agent does not exist: '{expected}'"))
+    else:
+        out.append(Violation(rel, "E307", "error",
+                             "Prompt is missing required 'agent' frontmatter field"))
 
     out.extend(_check_required_sections(rel, body, PROMPT_REQUIRED_SECTIONS, "E305"))
 

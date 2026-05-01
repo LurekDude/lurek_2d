@@ -19,17 +19,16 @@ description: "Load this skill when writing Lua-Rust bindings, LuaUserData impls,
 - Pure Rust domain logic.
 
 ## Domain Knowledge
-- Thin Wrapper Rule applies: src/lua_api/*_api.rs owns bindings, conversions, and registration only, while business logic stays in src/<module>/.
-- Push mlua-heavy code to the boundary and keep engine decisions in domain modules; mixing them makes borrow bugs and review confusion much more likely.
-- Registry keys own long-lived callbacks and closures; borrowed Lua functions should not escape their immediate call unless the lifetime and ownership are made explicit.
-- RefCell and SharedState borrows cannot safely survive callback edges or long-lived closures, so boundary code should release borrows before invoking user-controlled Lua.
-- Keep table, tuple, userdata, and enum-like conversions explicit so Lua-visible shapes stay predictable and generated docs remain trustworthy.
-- Convert errors at the right layer: preserve internal context in Rust, but expose a clear Lua-facing failure that matches the public contract.
-- Registration code should stay declarative and easy to audit; hidden side effects during module registration make startup and doc generation harder to reason about.
-- After boundary changes, validate docstrings and conventions with validate_lua_api.py because the bridge layer also feeds generated docs and structural checks.
-- Binding quality in this repo depends on thin files, explicit conversions, safe callback ownership, and no business logic hidden in src/lua_api/*.
-- When a boundary function starts accumulating policy, that is usually a sign to move behavior back into the owning module and keep the bridge thin again.
-- This skill owns boundary mechanics, userdata and callback handling, and conversion discipline, not user-facing API semantics, runtime tuning, or general Rust architecture.
+- Thin Wrapper Rule is a hard constraint: `src/lua_api/*_api.rs` contains only `LuaUserData` impls, `add_methods`, module registration, and type conversions. When a binding file contains `if/match/for` logic beyond conversion, it is drifting and the logic must move to `src/<module>/`.
+- `UserData` types exposed to Lua must wrap a handle or an `Arc<>`-shared reference, not a raw struct. Raw structs bind Lua lifetimes to Rust lifetimes in ways that mlua cannot enforce safely.
+- Registry key pattern for callbacks: `lua.create_registry_value(callback)?` stores a `LuaFunction` for later use. Never let a borrowed `LuaFunction` escape the current call stack — it will dangle when the Lua state advances.
+- The borrow safety rule: extract all fields from `RefCell<>` or `Arc<Mutex<>>` before invoking any Lua-callable function. Pattern: `let x = { state.borrow().field.clone() }; lua.call(x)?`. The borrow must be fully dropped (scope closed) before the call.
+- Type conversion checklist for each boundary function: (1) validate integer ranges before casting `i64` to `u32` or `usize`, (2) validate string content when enum-like, (3) clamp f32/f64 values to meaningful game ranges at the boundary, not deep in the module.
+- `mlua::Error::RuntimeError(msg)` is the standard error type for Lua-visible failures. The message must include the `lurek.<module>.<function>` call site for content authors. Raw `mlua::Error::ExternalError` is for non-displayable engine faults.
+- Registration function naming: `pub fn register(lua: &Lua, state: &SharedState) -> mlua::Result<()>`. Each `*_api.rs` exports exactly one `register` function, called from `src/lua_api/register.rs`.
+- After modifying a binding, run `python tools/validate/validate_lua_api.py`. It checks that all registered functions have a docstring, that argument names match documented types, and that the generated stub stays in sync.
+- `LuaUserData::add_methods` must call only `add_method`, `add_method_mut`, `add_function`, or `add_meta_method`. No side effects, no lazy-init, no global state changes inside `add_methods`.
+- When a binding function exceeds ~20 lines, it is almost certainly doing too much. Split extraction, validation, domain call, and conversion into distinct steps and move the domain call to `src/<module>/`.
 ## Companion File Index
 - None.
 

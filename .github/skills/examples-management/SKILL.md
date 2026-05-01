@@ -20,17 +20,13 @@ description: "Load this skill when adding or reviewing content/examples/ or cont
 - CAG files.
 
 ## Domain Knowledge
-- content/examples/<module>.lua is the one-concept learning surface for public APIs, so each example should answer one clear question for a game author quickly.
-- Examples should exercise real lurek.* usage and help close coverage gaps reported by example_coverage.py or coverage reports, but they should still feel like believable usage instead of synthetic parameter stuffing.
-- Keep example setup tiny and README or conf notes short; this is not the place for long tutorial prose, branching content, or heavy asset management.
-- Examples and showcase games serve different jobs: an example teaches one concept fast, while a game or demo proves a broader playable slice.
-- Prefer stable APIs already reflected in docs/specs and generated docs so examples remain trustworthy onboarding material.
-- When an example changes materially, sync the supporting README text in the same pass so the entry point and the explanation continue to match.
-- content/examples/ should help a user understand a module quickly, and coverage-gap tooling is the right way to find under-served APIs without inventing arbitrary examples.
-- Stub-oriented cleanup should keep story flow, realistic arguments, and meaningful names rather than chasing line-by-line coverage with unnatural snippets.
-- Keep assets and setup local to the concept being shown; if the content starts needing broader game state, it probably wants to become a demo instead.
-- Good examples in this repo are short enough to scan, real enough to copy, and stable enough that docs can point to them as living evidence.
-- This skill owns compact learning artifacts and example coverage value, not full demos, reusable libraries, or tutorial-style documentation.
+- One example, one concept. `content/examples/<module>.lua` is a runnable `--@api-stub:` file that demonstrates exactly one API call or pattern in realistic game context. Look at `content/examples/ai.lua` or `content/examples/physics.lua` for the established format: each block opens with `do`, includes a comment explaining the usage, and closes with `end`.
+- The `--@api-stub: lurek.<namespace>.<function>` comment above each block is the signal that `tools/audit/example_coverage.py` uses to measure coverage. Keep that tag on the line immediately above the `do` block or coverage counting breaks.
+- How to find missing coverage: run `python tools/audit/example_coverage.py` and compare its output against `docs/api/lurek.lua`. The audit tool produces a list of API names with no matching `--@api-stub:` tag. Prioritise functions that game authors call in their first session (constructors, common callbacks, core configuration) over edge-case functions.
+- Minimal setup is a hard rule. If an example needs a physics world, create exactly one `lurek.physics.newWorld(0, 9.81)`. If it needs a sprite, load one asset. Never import a library module, never build helper utilities, never share state between `do` blocks in the same file. If the example is becoming too complex, it wants to be a demo in `content/games/`.
+- How to add a new example file: create `content/examples/<module>.lua`, run `cargo test --test examples_load_test`, and confirm the file is picked up and loads without error. If the module has a guard (e.g., `if not lurek.html then return end`), add it at the top of the file so headless CI does not fail.
+- Sync rules: if an example changes a function name or parameter order because the API changed, update the matching entry in `docs/api/lurek.lua` (after regenerating via `python tools/gen_all_docs.py`) and the affected `docs/specs/<module>.md` in the same commit. The example is living documentation; it must stay truthful.
+- Coverage gap workflow: audit → pick one uncovered function → write the `do` block → confirm the stub tag → run load test → commit with sync. Never inflate count by writing stub tags without runnable code.
 ## Companion File Index
 - None.
 

@@ -19,16 +19,16 @@ description: "Load this skill when building, debugging, or extending the VS Code
 - Docs outside the extension scope.
 
 ## Domain Knowledge
-- The extension lives under extensions/vscode with commands/, providers/, editors/, services/, generated/, mcp/, and related slices, so changes should land in the owning layer rather than one oversized utility module.
-- package.json is the contract for commands, views, editors, activation, and contributions; code and manifest must move together or the feature does not really exist for users.
-- Generated extension data depends on engine-side generators like gen_extension_api.py and related API artifacts, so extension work often has cross-repo sync requirements.
-- Webview and panel work should respect the current editor and sidebar inventory already declared in package.json instead of inventing hidden surfaces or duplicate entry points.
-- Validate build and packaging against tsconfig.json, esbuild.config.mjs, and the current extension scripts so changes remain compatible with the actual toolchain.
-- Do not move engine logic into TypeScript just because the UI lives there; the extension should orchestrate, present, and integrate, not reimplement engine behavior.
-- The extension already has a wide command and panel surface, so new features should reuse existing contribution and service patterns where possible.
-- generated/ and mcp/ integration means extension features must stay in sync with engine-side API generation, debugbridge assumptions, and agent-support tooling.
-- Activation paths and contribution points should stay explicit and minimal; unnecessary startup work in an extension hurts editor responsiveness quickly.
-- Good extension work here keeps TypeScript responsibilities narrow, UI behavior discoverable from package.json, and service wiring readable.
+- Layer ownership in extensions/vscode/src/: `commands/` handles VS Code command registration and entry points; `providers/` implements language providers (completion, hover, diagnostics); `editors/` implements custom editors and webviews; `services/` holds extension-side business logic and state; `generated/` holds files produced by engine-side generators; `mcp/` holds MCP server integration. Do not mix responsibilities across layers.
+- `package.json` is the contract between the extension and VS Code. Every command, view, editor type, activation event, and contribution point must be declared there. Code that registers a command not in `package.json` is invisible to users and discoverable only by accident.
+- Build and test commands: `npm run build` (esbuild bundle), `npm run watch` (incremental), `npm test` (extension test harness). Run these from `extensions/vscode/`. The root `tools/dev/parallel_cargo.py` does not manage the extension.
+- Generated data under `extensions/vscode/src/generated/` comes from `python tools/docs/gen_extension_api.py`. Never hand-edit generated files — fix the generator or its data source. If generated data seems stale, regenerate and commit both.
+- MCP integration in `mcp/` expects specific message shapes defined in `src/debugbridge/`. Changes to debugbridge message types require synchronized updates to the MCP handler. Check `docs/specs/debugbridge.md` for the wire format before changing either side.
+- Activation cost rule: extensions/vscode must activate lazily. Contribution points with `onCommand:` activation are preferred. `*` activation (activate on any VS Code start) is a performance defect. Check `activationEvents` in `package.json` after any activation change.
+- Webview content security policy: all webview HTML must include a CSP `<meta>` tag. No inline scripts. No external resource loads. Use `vscode-resource:` URIs for local assets. A webview without a CSP header is a security defect.
+- Extension-Rust boundary: the extension communicates with the engine exclusively through the debug bridge protocol over stdio or a local socket — never by importing Rust types directly into TypeScript or vice versa. If data needs to cross this boundary, define a message type in the protocol spec.
+- After any `package.json` contribution point change, run `vsce package` to validate the manifest schema and confirm the extension packages without errors before committing.
+- `A-01` applies here: the extension is a developer-experience layer, not part of the engine binary. Engine behavior must not depend on extension presence. Test engine functionality without the extension loaded.
 ## Companion File Index
 - None.
 

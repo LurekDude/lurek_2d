@@ -78,12 +78,22 @@ import {
 } from "./commands/cag.js";
 import { registerTestCommands } from "./commands/testGenerator.js";
 import { DebugBridge } from "./services/debugBridge.js";
-import { buildBuildCommand, buildCheckCommand } from "./services/parallelCargo.js";
 import { registerDebugBridgeCommands } from "./commands/debugBridge.js";
 import { registerGameJamCommands } from "./commands/gameJam.js";
 import { registerLibraryCommands } from "./commands/library.js";
 import { registerGameDevCagCommands } from "./commands/gameDevCag.js";
 import { register as registerDebugger } from "./debug/luaDebugAdapter.js";
+import {
+  buildBuildCommand,
+  buildBuildDistCommand,
+  buildCheckCommand,
+  buildClippyCommand,
+  buildDocCommand,
+  buildFmtCommand,
+  buildRunCommand,
+  buildRustFanoutCommand,
+  buildTestTargetCommand,
+} from "./services/parallelCargo.js";
 
 /** MCP server handle. */
 let mcpProcess: ReturnType<typeof startMcpServer> | undefined;
@@ -640,6 +650,241 @@ window.addEventListener('resize',draw);
 
   // ─── Game Dev CAG Commands ────────────────────────────────
   registerGameDevCagCommands(context);
+
+  // ─── Build Commands ───────────────────────────────────────
+  const getOrCreateBuildTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Build");
+    return existing ?? vscode.window.createTerminal("Lurek2D Build");
+  };
+
+  registerCommand(context, "lurek.build.debug", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildBuildCommand("debug"));
+  });
+  registerCommand(context, "lurek.build.release", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildBuildCommand("release"));
+  });
+  registerCommand(context, "lurek.build.dist", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildBuildDistCommand());
+  });
+  registerCommand(context, "lurek.build.check", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildCheckCommand());
+  });
+
+  // ─── Run Variant Commands ─────────────────────────────────
+  const SHOWCASE_GAMES = [
+    { label: "Hello World",       value: "content/games/showcase/hello_world" },
+    { label: "Sprites",           value: "content/games/showcase/sprites" },
+    { label: "Scene Demo",        value: "content/games/showcase/scene_demo" },
+    { label: "Particles Demo",    value: "content/games/showcase/particles_demo" },
+    { label: "Light Demo",        value: "content/games/showcase/light_demo" },
+    { label: "Globe Demo",        value: "content/games/showcase/globe_demo" },
+    { label: "Terminal Demo",     value: "content/games/showcase/terminal_demo" },
+    { label: "Hacking Game",      value: "content/games/showcase/hacking_game" },
+    { label: "Tween Demo",        value: "content/games/showcase/tween_demo" },
+    { label: "PostFX Demo",       value: "content/games/showcase/postfx_demo" },
+    { label: "Minimap Demo",      value: "content/games/showcase/minimap_demo" },
+    { label: "Demo Game",         value: "content/games/showcase/demo_game" },
+  ];
+
+  registerCommand(context, "lurek.run.debugPickDemo", async () => {
+    const picked = await vscode.window.showQuickPick(SHOWCASE_GAMES, { title: "Pick Demo (Debug)" });
+    if (!picked) return;
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildRunCommand("debug", [picked.value]));
+  });
+  registerCommand(context, "lurek.run.releasePickDemo", async () => {
+    const picked = await vscode.window.showQuickPick(SHOWCASE_GAMES, { title: "Pick Demo (Release)" });
+    if (!picked) return;
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(buildRunCommand("release", [picked.value]));
+  });
+  registerCommand(context, "lurek.run.debugNoRebuild", () => {
+    const wsRoot = getWorkspaceRoot() ?? ".";
+    const exe = path.join(wsRoot, "build", "debug", "lurek2d.exe");
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(`"${exe}"`);
+  });
+  registerCommand(context, "lurek.run.releaseNoRebuild", () => {
+    const wsRoot = getWorkspaceRoot() ?? ".";
+    const exe = path.join(wsRoot, "build", "release", "lurek2d.exe");
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText(`"${exe}"`);
+  });
+
+  // ─── Additional Test Module Commands ─────────────────────
+  const getOrCreateTestTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Tests");
+    return existing ?? vscode.window.createTerminal("Lurek2D Tests");
+  };
+
+  registerCommand(context, "lurek.test.rust.all", () => {
+    const t = getOrCreateTestTerminal();
+    t.show();
+    t.sendText(buildRustFanoutCommand());
+  });
+  for (const mod of ["math", "physics", "graphics", "audio", "input"] as const) {
+    registerCommand(context, `lurek.test.target.${mod}`, () => {
+      const t = getOrCreateTestTerminal();
+      t.show();
+      t.sendText(buildTestTargetCommand(mod));
+    });
+  }
+
+  // ─── Quality Commands ─────────────────────────────────────
+  const getOrCreateQualityTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Quality");
+    return existing ?? vscode.window.createTerminal("Lurek2D Quality");
+  };
+
+  registerCommand(context, "lurek.quality.gate", () => {
+    const t = getOrCreateQualityTerminal();
+    t.show();
+    t.sendText("python tools/dev/parallel_cargo.py fmt check && python tools/dev/parallel_cargo.py clippy --deny-warnings && python tools/dev/parallel_cargo.py test all");
+  });
+  registerCommand(context, "lurek.quality.clippy", () => {
+    const t = getOrCreateQualityTerminal();
+    t.show();
+    t.sendText(buildClippyCommand(true));
+  });
+  registerCommand(context, "lurek.quality.fmtApply", () => {
+    const t = getOrCreateQualityTerminal();
+    t.show();
+    t.sendText(buildFmtCommand("apply"));
+  });
+  registerCommand(context, "lurek.quality.fmtCheck", () => {
+    const t = getOrCreateQualityTerminal();
+    t.show();
+    t.sendText(buildFmtCommand("check"));
+  });
+
+  // ─── Docs Commands ────────────────────────────────────────
+  const getOrCreateDocsTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Docs");
+    return existing ?? vscode.window.createTerminal("Lurek2D Docs");
+  };
+  registerCommand(context, "lurek.docs.fullPipeline", () => {
+    const t = getOrCreateDocsTerminal();
+    t.show();
+    t.sendText("python tools/gen_all_docs.py");
+  });
+  registerCommand(context, "lurek.docs.rustBrowser", () => {
+    const t = getOrCreateDocsTerminal();
+    t.show();
+    t.sendText(buildDocCommand(true, true));
+  });
+  registerCommand(context, "lurek.docs.libraryApi", () => {
+    const t = getOrCreateDocsTerminal();
+    t.show();
+    t.sendText("python tools/docs/gen_lib_docs.py");
+  });
+  registerCommand(context, "lurek.docs.validateLuaStubs", () => {
+    const t = getOrCreateDocsTerminal();
+    t.show();
+    t.sendText("python tools/validate/validate_generated_lua_stubs.py");
+  });
+
+  // ─── Distribution Extra Commands ──────────────────────────
+  registerCommand(context, "lurek.dist.repackage", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText("powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild");
+  });
+  registerCommand(context, "lurek.dist.installWindows", () => {
+    const t = getOrCreateBuildTerminal();
+    t.show();
+    t.sendText("powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1");
+  });
+
+  // ─── Audit Commands ───────────────────────────────────────
+  const getOrCreateAuditTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Audit");
+    return existing ?? vscode.window.createTerminal("Lurek2D Audit");
+  };
+
+  registerCommand(context, "lurek.audit.qualityReport", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/quality_report.py");
+  });
+  registerCommand(context, "lurek.audit.testCoverage", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/test_coverage.py");
+  });
+  registerCommand(context, "lurek.audit.docCoverage", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/doc_coverage.py");
+  });
+  registerCommand(context, "lurek.audit.exampleCoverage", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/example_coverage.py");
+  });
+  registerCommand(context, "lurek.audit.luaTestCoverage", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/lua_api_test_coverage.py");
+  });
+  registerCommand(context, "lurek.audit.luaSpecCoverage", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/lua_spec_coverage.py");
+  });
+  registerCommand(context, "lurek.audit.cagLinkCheck", () => {
+    const t = getOrCreateAuditTerminal();
+    t.show();
+    t.sendText("python tools/audit/cag_link_check.py --strict");
+  });
+
+  // ─── Validate Commands ────────────────────────────────────
+  const getOrCreateValidateTerminal = (): vscode.Terminal => {
+    const existing = vscode.window.terminals.find((t) => t.name === "Lurek2D Validate");
+    return existing ?? vscode.window.createTerminal("Lurek2D Validate");
+  };
+
+  registerCommand(context, "lurek.validate.luaApi", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/validate_lua_api.py");
+  });
+  registerCommand(context, "lurek.validate.library", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/validate_library.py");
+  });
+  registerCommand(context, "lurek.validate.changelog", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/validate_changelog.py");
+  });
+  registerCommand(context, "lurek.validate.moduleCoverage", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/validate_module_coverage.py");
+  });
+  registerCommand(context, "lurek.validate.callbacks", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/check_callbacks.py");
+  });
+  registerCommand(context, "lurek.validate.cag", () => {
+    const t = getOrCreateValidateTerminal();
+    t.show();
+    t.sendText("python tools/validate/cag_validate.py");
+  });
 
   // ─── Legacy Backward Compat (lurek2d.* → lurek.*) ─────────
   registerCommand(context, "lurek2d.runExample", () => runExample(lurekProcess));

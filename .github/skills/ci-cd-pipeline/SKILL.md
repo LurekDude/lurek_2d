@@ -18,16 +18,16 @@ description: "Load this skill when setting up or maintaining CI/CD, GitHub Actio
 - Rust or Lua code changes.
 
 ## Domain Knowledge
-- The repo currently has no .github/workflows tree, so CI design should start from the local quality gates that already exist instead of inventing a second process from scratch.
-- Quality: Gate, tools/dev/parallel_cargo.py, rust-toolchain.toml, docs generators, and dist scripts are the current source of truth for what a future workflow should execute.
-- Mirror local fmt, clippy, test, docs, and packaging steps as directly as possible; the more CI diverges from checked-in scripts, the harder failures are to reproduce locally.
-- Keep jobs deterministic, pin tool versions, and prefer checked-in scripts over long inline shell blocks so maintenance stays in repo code rather than YAML trivia.
-- Split fast feedback from slow packaging or release work so failures stay attributable and developers do not wait on dist artifacts to discover a simple lint or test failure.
-- Release automation must follow tools/dist/ behavior, profile.dist, and generated-doc expectations rather than bypassing them with a CI-only packaging path.
-- Start with the smallest reliable matrix that reflects real support needs; desktop targets matter, but unnecessary platform fan-out increases maintenance before value is proven.
-- Caching should accelerate stable inputs like Cargo dependencies, not hide mutable generated artifacts whose freshness is part of the correctness contract.
-- Artifact naming and upload paths should align with build/ and dist/ structure so local and hosted outputs remain comparable.
-- CI workflows in this repo should remain non-interactive, explicit, and readably staged.
+- There is currently no GitHub Actions workflows directory in this repo. Any CI setup work must create it from scratch. Mirror existing local quality gates from `tools/dev/parallel_cargo.py` and `.vscode/tasks.json` — CI commands must match local developer experience exactly.
+- Required CI stages in this order: (1) `fmt check`, (2) `clippy --deny-warnings`, (3) `cargo test --all-targets` for Rust tests, (4) Lua harness test (`python tools/dev/parallel_cargo.py test lua`), (5) docs validation (`python tools/validate/validate_generated_lua_stubs.py`). Only after all 5 pass should an artifact build be attempted.
+- Platform matrix minimum: Windows x86_64 (mandatory), Linux x86_64 (mandatory). macOS ARM is a stretch goal. No mobile, no WASM. Over-expanding the matrix increases maintenance without proportional value.
+- LuaJIT CI note: LuaJIT requires a C compiler and a specific build step that can fail on some CI runners. The `lua54` fallback feature exists exactly for this reason. If a runner cannot build LuaJIT, run with `--no-default-features --features lua54` for that job and label the job clearly.
+- Pin all tool versions: Rust toolchain via `rust-toolchain.toml` (already in repo), Python version explicitly in CI config, UPX version for dist jobs. Never use `latest` for build tools.
+- Cargo dependency caching: cache `~/.cargo/registry`, `~/.cargo/git`, and `target/` by hashing `Cargo.lock`. Invalidate on any `Cargo.lock` change. Do not cache `build/` or `dist/` — these are derived outputs.
+- Artifact naming convention: `lurek2d-{os}-{arch}-{git-sha-short}.zip`. Artifacts produced during CI must match the layout that `tools/dist/dist.ps1` produces, so local and CI packaging outputs are structurally identical.
+- Release triggers: tag matching `v*.*.*` on the `main` branch. Pre-release triggers: tag matching `v*.*.*-rc.*`. Never trigger a release from a non-main branch automatically.
+- Docs generation in CI: run `python tools/gen_all_docs.py` and fail the job if generated files differ from committed files. This enforces that contributors do not commit stale generated docs.
+- CI YAML should remain readably staged — each logical step is a named step in the YAML, not a long inline shell block. Prefer checked-in scripts over inline YAML logic.
 ## Companion File Index
 - None.
 

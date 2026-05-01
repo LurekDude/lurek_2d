@@ -19,16 +19,16 @@ description: "Load this skill when changing Cargo profiles, debug or release bui
 - Rust code changes.
 
 ## Domain Knowledge
-- Local build and test loops are wrapped by tools/dev/parallel_cargo.py and workspace tasks, so those entry points are the first source of truth for how developers are expected to build, run, and validate changes.
-- build/ holds the user-facing outputs in this repo; release and dist flows should not assume target/ is the artifact users or packaging scripts consume directly.
-- Cargo profiles in Cargo.toml and the toolchain in rust-toolchain.toml are the baseline truth for build behavior, optimization level, and compatibility expectations.
-- dev is for fast iteration, release is for realistic runtime checks, and dist plus tools/dist/ is the shipping path; mixing their responsibilities usually produces misleading timing or packaging results.
-- LuaJIT is the shipping backend and lua54 is a fallback only, so local defaults, release commands, and packaging assumptions should continue to treat LuaJIT as the primary runtime.
-- Tune build size or speed only after confirming which profile, script, and output path the repo actually uses; otherwise you optimize a path that users never run.
-- The workspace already exposes build, run, test, docs, and quality tasks, including no-rebuild launch flows; reuse them before adding new wrapper scripts or alternate local commands.
-- tools/dist/install.ps1 and dist.ps1 define the Windows-facing install and packaging path and should stay aligned with profile.dist, UPX usage, and the build output layout.
-- Build changes often touch more than Cargo profiles: packaging scripts, install flows, docs, and task descriptions may all need sync when a build surface changes.
-- Prefer explicit feature and profile choices over hidden environment assumptions so local builds remain reproducible.
+- Three profiles: `dev` (fast compile, debug assertions, no optimization), `release` (opt-level 3, LTO=thin), `dist` (opt-level 3, LTO=fat, UPX compression, strip symbols). Never benchmark in `dev`. Never ship from `release` — use `dist`.
+- Commands: `python tools/dev/parallel_cargo.py build rust` (dev), `cargo build --release`, `cargo build --profile dist`. For packaging: `powershell -File tools/dist/dist.ps1`. For install: `powershell -File tools/dist/install.ps1`.
+- Output locations: `dev` → `target/debug/lurek2d.exe`, `release` → `target/release/lurek2d.exe`, final artifacts → `build/debug/` and `build/release/` (copied by build scripts). Packaging scripts read from `build/`, not `target/`.
+- LuaJIT is the default Cargo feature for all local and dist builds. Enabling `lua54` is done via `cargo build --no-default-features --features lua54`. CI uses lua54 on platforms where LuaJIT is unavailable. Never swap the default without explicit authorization.
+- `build.rs` handles asset embedding and generated code. If `build.rs` is changed, run `cargo clean` before the next build — incremental build cache does not always detect `build.rs` changes.
+- `rust-toolchain.toml` pins the Rust version. Never override it with `+nightly` or `+stable` locally to "fix" a build error — the toolchain file is part of the contract and overrides hide real problems.
+- UPX compression in `dist.ps1` reduces the binary from ~20 MB to ~5 MB. UPX must be on PATH. The script checks for it and aborts if missing — install via `scoop install upx` on Windows.
+- `tools/dev/parallel_cargo.py` wraps cargo for the workspace. Use it for clippy, fmt, test, and doc commands — it handles Cargo target threading and output formatting. Do not use raw `cargo` for repo-level commands.
+- The workspace `.vscode/tasks.json` exposes all standard build flows as tasks. When documenting a build step for a contributor, refer to the task label, not a raw command — task labels stay stable as command details change.
+- After modifying `Cargo.toml` (dependency bump, feature change, profile change), run the full Quality Gate task to confirm no test regressions from the change.
 ## Companion File Index
 - None.
 

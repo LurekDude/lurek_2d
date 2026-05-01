@@ -18,17 +18,13 @@ description: "Load this skill when working with GitHub issues, PRs, labels, mile
 - Code review work.
 
 ## Domain Knowledge
-- Repo process expects explicit staging, one logical change per commit, and docs/CHANGELOG.md updated in the same logical change, so GitHub workflow should reinforce that structure rather than hide it behind broad PRs.
-- Commit format is type(scope): description, and the current branch should be checked before staging, release work, or milestone updates so history stays attributable.
-- Keep GitHub labels, milestones, issue status, and roadmap links aligned with real module ownership and actual local quality gates, not a parallel planning vocabulary.
-- Avoid interactive git flows in agent work; use non-interactive commands, explicit file lists, and concrete status output that another contributor can reproduce.
-- CONTRIBUTING.md and the current CAG rules are the contract for process, not ad hoc PR folklore or personal branch habits.
-- Use tools/github/ only when a checked-in helper actually exists there; do not assume missing automation and invent process requirements that the repo does not support.
-- Good issue triage here includes evidence, affected module or layer, reproduction signal, and the likely validation command, not just a feature request title.
-- Good PR hygiene here includes a narrow scope, visible validation, synced docs or changelog updates when required, and labels that help route follow-up work.
-- GitHub workflow in this repo is a planning and tracking layer on top of local engineering rules, not a substitute for tests, docs sync, or packaging checks.
-- Milestones should represent deliverable slices with real gates and owners; vague buckets that do not map to repo work quickly become stale.
-- This skill owns labels, milestones, issue and PR structure, and change hygiene, not CI YAML, implementation details, or code review findings themselves.
+- Commit format is `type(scope): description`. Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`. Scope is the primary module or layer (e.g., `physics`, `lua-api`, `cag`, `ci`). Description is present tense, no period. Every commit that changes behavior must include a `docs/CHANGELOG.md` update in the same commit — never in a follow-up cleanup commit.
+- How to stage a commit correctly: `git status` to see dirty files, `git diff --stat HEAD` to confirm what changed, then `git add <each file explicitly>`. Never `git add .`. Confirm the branch with `git rev-parse --abbrev-ref HEAD` before staging anything. If the branch is `main`, ask the user before proceeding.
+- PR scoping rule: one PR, one logical change. Mixed PRs (feature + bug fix + refactor) are hard to review and hard to revert. If a PR touches more than 3 unrelated files or more than 2 module groups, split it. The exception is cross-artifact sync — a single API change that requires updating spec, example, and changelog is one logical change.
+- How to use milestones: a milestone represents a deliverable slice with an explicit acceptance gate. The gate must be a runnable check (e.g., `cargo test`, specific audit command, screenshot comparison). Milestones without a gate become backlogs. When creating a milestone, write the gate in its description field.
+- How to triage an issue: add a `module:` label to identify the affected subsystem. Add a `type:` label (bug, enhancement, task, question). Add a `persona:` label (EngDev, GameDev, Modder) to indicate who is affected. For bugs, add a `repro:` section in the issue body with the exact command and failing output. Issues without a repro command are hard to assign.
+- How to label a PR for routing: `needs-review` when ready for human review; `blocked` when waiting on another PR or external decision; `auto-merge` only when all quality gates pass. The `cag` label routes to the CAG-Architect agent; the `engine` label routes to the Developer agent.
+- `CONTRIBUTING.md` is the canonical process document. When a process question arises, check there first. If the answer is not there, add it after resolving the question — the answer belongs in `CONTRIBUTING.md`, not in a chat message.
 ## Companion File Index
 - None.
 

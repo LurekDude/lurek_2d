@@ -22,16 +22,16 @@ Own the 12-phase module audit process: structure, documentation, testing, archit
 - Pure Lua work -> use lua-scripting skill
 
 ## Domain Knowledge
-- tools/audit/audit_module.py is the entry point for whole-module quality sweeps, and its value comes from combining structural, documentation, testing, and code-quality checks in one repeatable pass.
-- The audit checks thin mod.rs rules, file size, docs/specs presence, test coverage, wiki and example coverage, architecture direction, and wrapper leakage across the whole module surface.
-- It also flags println/eprintln, tests in src/, unsafe without SAFETY, and bare unwrap hotspots, which makes it useful for release readiness even before a human deep review starts.
-- Treat module audit as a readiness or review gate, not as a feature workflow; it should tell you whether a module is coherent enough to ship or hand off, not how to implement a new behavior.
-- Use audit output to route work quickly: architecture findings to structure owners, contract drift to doc or spec owners, coverage gaps to test owners, and local code defects to the relevant implementation specialist.
-- Pair audits with doc_coverage.py, test_coverage.py, wiki coverage, and validate_module_coverage.py when findings affect contracts or module inventory.
-- A good audit read distinguishes blocking defects from informational drift; not every warning should force the same urgency or same owner.
-- Audit findings should remain file-specific and evidence-based so follow-up work can stay narrow instead of turning one report into a repo-wide cleanup campaign.
-- Because the audit crosses docs, tests, examples, and source rules, it is often the fastest way to see whether a module is internally consistent, not just compiling.
-- If several findings point to the same structural mistake, report the shared root cause first instead of listing symptoms separately.
+- `python tools/audit/audit_module.py <module>` is the entry point. It runs 12 phases: (1) mod.rs thinness, (2) file size limits, (3) docs/specs presence, (4) Lua API coverage, (5) test coverage, (6) wiki coverage, (7) example coverage, (8) dependency direction, (9) lua_api wrapper leakage, (10) println/eprintln hotspots, (11) unsafe without SAFETY comments, (12) bare unwrap in public paths. A module that passes all 12 is ready for release.
+- Phase 9 (wrapper leakage) checks that no `src/<module>/` file imports from `src/lua_api/`. If it does, that is a T-02 violation — not a style issue, a blocking defect.
+- Phase 3 (docs/specs presence) checks that `docs/specs/<module>.md` exists AND has non-empty Ownership and Invariants sections. A spec file with placeholder text fails this phase.
+- Phase 4 (Lua API coverage) compares functions registered in `src/lua_api/<module>_api.rs` against `@covers` markers in `tests/lua/unit/test_<module>_*.lua`. Every registered function must have at least one test covering it.
+- Phase 10 (println/eprintln) treats any `println!` in `src/<module>/` as a defect. Engine output must go through `src/log/` with proper level tagging. `eprintln!` in bin/ and tools/ is acceptable.
+- Audit output format: each finding includes phase number, file path, line number, finding type (BLOCKING/WARNING/INFO), and description. BLOCKING findings must be resolved before merge. WARNING findings should be resolved. INFO findings are informational.
+- Routing audit findings: BLOCKING dependency violations → Architect. BLOCKING coverage gaps → Tester. BLOCKING spec defects → Doc-Writer. Code-quality findings (unsafe, unwrap) → Developer. The Verifier decides accept/reject based on the full picture.
+- Run `python tools/audit/doc_coverage.py --module <name>` alongside the main audit to get the documentation completeness score separately. The main audit reports presence; doc_coverage reports density.
+- Use the audit as a pre-PR gate, not a post-merge cleanup job. A module that enters review with 12/12 phases passing costs half the reviewer time.
+- When several audit findings share a root cause (e.g., all phase-3 failures trace to a missing spec), report the shared root cause first rather than listing 8 individual findings.
 ## Companion File Index
 
 None - all guidance is inline.

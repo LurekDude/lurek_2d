@@ -63,6 +63,35 @@ export function buildCheckCommand(verbose = false): string {
   return buildParallelCargoCommand(args);
 }
 
+export function buildClippyCommand(denyWarnings = false, verbose = false): string {
+  const args = ["clippy"];
+  if (denyWarnings) {
+    args.push("--deny-warnings");
+  }
+  appendVerbose(args, verbose);
+  return buildParallelCargoCommand(args);
+}
+
+export function buildFmtCommand(mode: "apply" | "check", verbose = false): string {
+  const args = ["fmt", mode];
+  appendVerbose(args, verbose);
+  return buildParallelCargoCommand(args);
+}
+
+export function buildDocCommand(open = false, noDeps = false, verbose = false): string {
+  const args = ["doc"];
+  if (open) { args.push("--open"); }
+  if (noDeps) { args.push("--no-deps"); }
+  appendVerbose(args, verbose);
+  return buildParallelCargoCommand(args);
+}
+
+export function buildBuildDistCommand(verbose = false): string {
+  const args = ["build", "dist"];
+  appendVerbose(args, verbose);
+  return buildParallelCargoCommand(args);
+}
+
 export function buildRunCommand(
   profile: "debug" | "release",
   runArgs: readonly string[] = [],

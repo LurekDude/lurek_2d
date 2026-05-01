@@ -22,16 +22,15 @@ Own the phase file format, dependency graph rules, acceptance gate authoring, st
 - Writing tests -> use testing-rust skill
 
 ## Domain Knowledge
-- The repo currently has no formal docs/roadmap/ tree, so planning should start from ideas/, docs, architecture notes, and existing review evidence rather than pretending a full phase system already exists.
-- If roadmap phase files are introduced, they should point to real repo commands, real validation gates, and concrete artifacts, not vague aspirations or untestable outcomes.
-- Dependencies should mirror module, rollout, or migration order and remain acyclic; if a plan needs circular prerequisites, the slices are probably wrong.
-- Acceptance gates must be binary and use the same commands developers already run locally, otherwise status becomes subjective and unreviewable.
-- Preserve original intent with status notes, superseded steps, or as-built comments instead of rewriting history when a phase evolves; planning documents should show change, not erase it.
-- Good roadmap slices here are small enough to ship, validate, and hand off; oversized phases that bundle architecture, docs, tooling, and content into one block quickly lose decision value.
-- Every phase or milestone should name the owning area, key dependency, expected validation evidence, and the artifact that proves completion.
-- Because formal roadmap files do not yet exist, planning should remain lightweight and traceable to current repo structure, not import heavyweight process vocabulary for its own sake.
-- Use implementation-neutral language where possible; roadmap artifacts should define outcomes and gates, not precommit the exact internal design before discovery is complete.
-- If a proposed phase changes contributor workflow, cite the docs or quality gates that must move with it.
+- Current planning artifacts live in `ideas/` (raw ideas) and `work/` (active session plans). There is no formal roadmap directory yet. Do not create roadmap files that reference non-existent infrastructure or assume a process that is not yet in place.
+- A valid roadmap phase has exactly four fields: **Owner** (one agent or team), **Done When** (a binary, runnable test or validator command), **Inputs** (existing artifacts this phase depends on), **Produces** (concrete artifact this phase creates). Phases without Done When are wishlist items, not roadmap entries.
+- Dependency direction rule: phase B that requires phase A's output must list A's artifact as an Input. Circular phase dependencies mean the phases are wrong. Consolidate or split until the graph is a DAG.
+- Slice size rule: a phase that touches more than 5 files in `src/`, more than 2 spec files, or more than 1 test suite is too large. It will slip or merge badly. Split by artifact class (code, docs, tests) if size is the problem.
+- Scope-creep guard: every phase description must include a one-line statement of what is explicitly NOT in scope. This forces the planner to articulate the boundary and prevents adjacent work from silently accreting.
+- Quality gate alignment: the Done When criterion for any phase touching `src/` must include `cargo test` and `cargo clippy -- -D warnings`. Done When for any phase touching `docs/` must include `python tools/gen_all_docs.py` with clean diff. Don't invent new acceptance criteria — use what developers already run.
+- Ideas-to-phases pipeline: `ideas/` items are triaged to either WONTDO (add a rejection note), INVESTIGATE (goes to Planner or Architect for discovery), or PHASE (ready to add to roadmap). Do not move an idea directly to a phase without a brief investigation note.
+- When a phase changes a public API, it must include a sub-step for migration notes in `docs/specs/<module>.md` and an update to `docs/CHANGELOG.md`. These are not optional follow-up tasks — they are part of the phase.
+- Roadmap artifacts live in `work/{session}/plan.md` during planning and may be promoted to a docs location only when finalized and reviewed. Do not commit in-progress plans to `docs/`.
 ## Companion File Index
 
 None - all guidance is inline.

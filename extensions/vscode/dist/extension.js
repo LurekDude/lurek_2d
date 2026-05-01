@@ -1,561 +1,29 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
-};
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+"use strict";var Ho=Object.create;var Xt=Object.defineProperty;var Vo=Object.getOwnPropertyDescriptor;var Uo=Object.getOwnPropertyNames;var qo=Object.getPrototypeOf,$o=Object.prototype.hasOwnProperty;var kt=(n,e)=>()=>(n&&(e=n(n=0)),e);var $e=(n,e)=>()=>(e||n((e={exports:{}}).exports,e),e.exports),Zt=(n,e)=>{for(var t in e)Xt(n,t,{get:e[t],enumerable:!0})},Fa=(n,e,t,r)=>{if(e&&typeof e=="object"||typeof e=="function")for(let a of Uo(e))!$o.call(n,a)&&a!==t&&Xt(n,a,{get:()=>e[a],enumerable:!(r=Vo(e,a))||r.enumerable});return n};var C=(n,e,t)=>(t=n!=null?Ho(qo(n)):{},Fa(e||!n||!n.__esModule?Xt(t,"default",{value:n,enumerable:!0}):t,n)),Qt=n=>Fa(Xt({},"__esModule",{value:!0}),n);function Je(n){return[ut.join(n,"docs","api","lurek.lua"),ut.join(n,"docs","api","lurek.md"),ut.join(n,"docs","lurek.lua"),ut.join(n,"docs","lua-api.md")].find(t=>Oa.existsSync(t))}function za(n,e){return Pr(e)?Yo(n):Xo(n)}function xr(n,e,t){return Pr(e)?Zo(n,t):Qo(n,t)}function _a(n,e,t){return Pr(e)?Jo(n,t):Ko(n,t)}function Pr(n){return ut.basename(n).toLowerCase()==="lurek.lua"}function Yo(n){let e=n.split(`
+`),t=new Map;for(let r=0;r<e.length;r++){let a=e[r].trim(),i=a.match(/^---@class\s+(lurek\.[A-Za-z0-9_]+)\s*$/);if(i){let u=i[1];t.has(u)||t.set(u,{label:u,line:r,kind:"module"});continue}let o=a.match(/^---@class\s+([A-Z][A-Za-z0-9_]*)\s*$/);if(o){let u=o[1];t.has(u)||t.set(u,{label:u,line:r,kind:"class"});continue}let s=a.match(/^---@alias\s+([A-Za-z_][A-Za-z0-9_]*)\s+.+$/);if(s){let u=s[1];t.has(u)||t.set(u,{label:u,line:r,kind:"alias"});continue}let l=a.match(/^(?:function\s+)?(lurek(?:\.[A-Za-z0-9_]+)+)(?:\s*=\s*function)?\s*\(/);if(l){let u=l[1],c=u.split(".").length===2?"callback":"function";t.has(u)||t.set(u,{label:u,line:r,kind:c});continue}let p=a.match(/^function\s+([A-Za-z_][A-Za-z0-9_]*)[:.]([A-Za-z0-9_]+)\(/);if(p){let u=`${p[1]}:${p[2]}`;t.has(u)||t.set(u,{label:u,line:r,kind:"method"})}}return Array.from(t.values()).sort((r,a)=>r.label.localeCompare(a.label))}function Xo(n){return n.split(`
+`).map((e,t)=>({line:e,index:t})).filter(({line:e})=>e.startsWith("## ")||e.startsWith("### ")).map(({line:e,index:t})=>({label:e.replace(/^#+\s*/,""),line:t,kind:"section"}))}function Zo(n,e){let t=n.split(`
+`),r=[`function ${e}(`,`${e} = function(`,`---@class ${e}`,`---@alias ${e} `];for(let a=0;a<t.length;a++){let i=t[a].trim();if(r.some(o=>i.startsWith(o)))return a}return-1}function Qo(n,e){let t=e.replace(/^lurek\./,"");return n.split(`
+`).findIndex(r=>r.startsWith("##")&&(r.includes(e)||r.includes(t)))}function Jo(n,e){let t=e.toLowerCase(),a=es(n).filter(s=>s.text.toLowerCase().includes(t)).map(s=>s.text.trim()).filter(Boolean);if(a.length>0)return wr(a);let i=n.split(`
+`),o=[];for(let s=0;s<i.length;s++){if(!i[s].toLowerCase().includes(t))continue;let l=Math.max(0,s-3),p=Math.min(i.length,s+4);o.push(i.slice(l,p).join(`
+`).trim())}return wr(o.filter(Boolean))}function Ko(n,e){let t=n.split(`
+`),r=e.toLowerCase(),a=[],i=[],o=!1;for(let s of t){if(s.startsWith("##")){o&&i.length>0&&a.push(i.join(`
+`).trim()),i=[s],o=s.toLowerCase().includes(r);continue}i.push(s),s.toLowerCase().includes(r)&&(o=!0)}return o&&i.length>0&&a.push(i.join(`
+`).trim()),wr(a.filter(Boolean))}function es(n){let e=n.split(`
+`),t=[];for(let a=0;a<e.length;a++){let i=e[a].trim();if(!ts(i))continue;let o=a;for(;o>0&&e[o-1].trim().startsWith("---");)o--;t.push(o)}let r=Array.from(new Set(t)).sort((a,i)=>a-i);return r.map((a,i)=>{let o=i+1<r.length?r[i+1]:e.length;return{startLine:a,text:e.slice(a,o).join(`
+`)}})}function ts(n){return/^---@class\s+lurek\./.test(n)||/^---@class\s+[A-Z][A-Za-z0-9_]*\s*$/.test(n)||/^---@alias\s+[A-Za-z_][A-Za-z0-9_]*\s+/.test(n)||/^(?:function\s+)?lurek(?:\.[A-Za-z0-9_]+)+(?:\s*=\s*function)?\s*\(/.test(n)||/^function\s+[A-Za-z_][A-Za-z0-9_]*[:.][A-Za-z0-9_]+\(/.test(n)}function wr(n){return Array.from(new Set(n))}var Oa,ut,Jt=kt(()=>{"use strict";Oa=C(require("fs")),ut=C(require("path"))});function ns(n){return n.length===0?'""':/[\s"]/u.test(n)?`"${n.replace(/"/g,'\\"')}"`:n}function Mr(n,e=[]){return[n,...e].map(ns).join(" ")}function Oe(n){return Mr(Wa,[Ga,...n])}function Ke(n,e){e&&n.push("--verbose")}function Kt(n,e={}){Ke(n,e.verbose),e.nocapture&&n.push("--nocapture"),e.warmBuild&&n.push("--warm-build"),e.outerJobs!==void 0&&n.push("--outer-jobs",String(e.outerJobs)),e.testThreads!==void 0&&n.push("--test-threads",String(e.testThreads))}function en(n,e=!1){let t=["build",n];return Ke(t,e),Oe(t)}function Sr(n=!1){let e=["check"];return Ke(e,n),Oe(e)}function Ha(n=!1,e=!1){let t=["clippy"];return n&&t.push("--deny-warnings"),Ke(t,e),Oe(t)}function kr(n,e=!1){let t=["fmt",n];return Ke(t,e),Oe(t)}function Va(n=!1,e=!1,t=!1){let r=["doc"];return n&&r.push("--open"),e&&r.push("--no-deps"),Ke(r,t),Oe(r)}function Ua(n=!1){let e=["build","dist"];return Ke(e,n),Oe(e)}function jt(n,e=[],t=!1){let r=["run",n];return Ke(r,t),e.length>0&&r.push("--",...e),Oe(r)}function tn(n={}){let e=["test","all"];return Kt(e,n),Oe(e)}function Ct(n={}){let e=["test","lua"];return Kt(e,n),Oe(e)}function qa(n={}){let e=["test","rust"];return Kt(e,n),Oe(e)}function rs(n){return n.endsWith("_tests")?n:`${n}_tests`}function et(n,e={}){let t=["test","target",rs(n)];return Kt(t,e),Oe(t)}function nn(n,e,t=6e4){return new Promise(r=>{Na.execFile(Wa,[Ga,...e],{cwd:n,timeout:t,maxBuffer:1024*1024,encoding:"utf-8"},(a,i,o)=>{let s=`${i||""}${o||""}`;if(a){r(`${s}
+[exit code: ${a.code??"unknown"}]`);return}r(s||"(no output)")})})}var Na,Wa,Ga,Lt=kt(()=>{"use strict";Na=C(require("child_process")),Wa="python",Ga="tools/dev/parallel_cargo.py"});var jr={};Zt(jr,{getToolDefinitions:()=>as,handleCheckBuild:()=>ps,handleGetApiDoc:()=>os,handleGetLogs:()=>us,handleListExamples:()=>ss,handleRunExample:()=>is,handleRunLuaTest:()=>ls});function as(){return[{name:"lurek2d.runExample",description:"Build and run a named Lurek2D example, returning its output.",inputSchema:{type:"object",properties:{name:{type:"string",description:'Name of the example directory (e.g. "hello_world").'}},required:["name"]}},{name:"lurek2d.getApiDoc",description:"Search the Lurek2D Lua API documentation for a query string.",inputSchema:{type:"object",properties:{query:{type:"string",description:'Search query (e.g. "lurek.graphics.draw" or "physics").'}},required:["query"]}},{name:"lurek2d.listExamples",description:"List all available Lurek2D example directories.",inputSchema:{type:"object",properties:{}}},{name:"lurek2d.runLuaTest",description:"Run a Lua test file against a debug build of Lurek2D.",inputSchema:{type:"object",properties:{file:{type:"string",description:"Path to the Lua test file, relative to workspace root."}},required:["file"]}},{name:"lurek2d.checkBuild",description:"Run the wrapper-backed repo check flow and return compiler diagnostics.",inputSchema:{type:"object",properties:{}}},{name:"lurek2d.getLogs",description:"Return the last N lines of Lurek2D engine log output.",inputSchema:{type:"object",properties:{lines:{type:"number",description:"Number of log lines to return (default: 50)."}}}}]}function is(n){return async e=>{let t=e.name;if(!t)return"Error: 'name' parameter is required.";let r=ze.join(n,"content","games","showcase",t);if(!_e.existsSync(r)){let i=$a(n);return`Showcase game "${t}" not found. Available: ${i.join(", ")}`}let a=ze.posix.join("content","games","showcase",t);return nn(n,["run","debug","--",a],12e4)}}function os(n){return async e=>{let t=e.query;if(!t)return"Error: 'query' parameter is required.";let r=Je(n);if(!r||!_e.existsSync(r))return"API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md.";let a=_e.readFileSync(r,"utf-8"),i=_a(a,r,t);return i.length===0?`No documentation found for "${t}".`:r.endsWith(".lua")?i.map(o=>`\`\`\`lua
+${o}
+\`\`\``).join(`
 
-// src/services/apiDocs.ts
-function resolveWorkspaceApiDocPath(root) {
-  const candidates = [
-    path.join(root, "docs", "api", "lurek.lua"),
-    path.join(root, "docs", "api", "lurek.md"),
-    path.join(root, "docs", "lurek.lua"),
-    path.join(root, "docs", "lua-api.md")
-  ];
-  return candidates.find((candidate) => fs.existsSync(candidate));
-}
-function listApiEntries(content, filePath) {
-  return isLuaCatsApiFile(filePath) ? listLuaCatsEntries(content) : listMarkdownEntries(content);
-}
-function findApiSymbolLine(content, filePath, symbol) {
-  return isLuaCatsApiFile(filePath) ? findLuaCatsSymbolLine(content, symbol) : findMarkdownSymbolLine(content, symbol);
-}
-function searchApiDocumentation(content, filePath, query) {
-  return isLuaCatsApiFile(filePath) ? searchLuaCatsApi(content, query) : searchMarkdownApi(content, query);
-}
-function isLuaCatsApiFile(filePath) {
-  return path.basename(filePath).toLowerCase() === "lurek.lua";
-}
-function listLuaCatsEntries(content) {
-  const lines = content.split("\n");
-  const entries = /* @__PURE__ */ new Map();
-  for (let index = 0; index < lines.length; index++) {
-    const trimmed = lines[index].trim();
-    const moduleMatch = trimmed.match(/^---@class\s+(lurek\.[A-Za-z0-9_]+)\s*$/);
-    if (moduleMatch) {
-      const label = moduleMatch[1];
-      if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "module" });
-      }
-      continue;
-    }
-    const classMatch = trimmed.match(/^---@class\s+([A-Z][A-Za-z0-9_]*)\s*$/);
-    if (classMatch) {
-      const label = classMatch[1];
-      if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "class" });
-      }
-      continue;
-    }
-    const aliasMatch = trimmed.match(/^---@alias\s+([A-Za-z_][A-Za-z0-9_]*)\s+.+$/);
-    if (aliasMatch) {
-      const label = aliasMatch[1];
-      if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "alias" });
-      }
-      continue;
-    }
-    const lurekFunctionMatch = trimmed.match(/^(?:function\s+)?(lurek(?:\.[A-Za-z0-9_]+)+)(?:\s*=\s*function)?\s*\(/);
-    if (lurekFunctionMatch) {
-      const label = lurekFunctionMatch[1];
-      const kind = label.split(".").length === 2 ? "callback" : "function";
-      if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind });
-      }
-      continue;
-    }
-    const methodMatch = trimmed.match(/^function\s+([A-Za-z_][A-Za-z0-9_]*)[:.]([A-Za-z0-9_]+)\(/);
-    if (methodMatch) {
-      const label = `${methodMatch[1]}:${methodMatch[2]}`;
-      if (!entries.has(label)) {
-        entries.set(label, { label, line: index, kind: "method" });
-      }
-    }
-  }
-  return Array.from(entries.values()).sort((left, right) => left.label.localeCompare(right.label));
-}
-function listMarkdownEntries(content) {
-  return content.split("\n").map((line, index) => ({ line, index })).filter(({ line }) => line.startsWith("## ") || line.startsWith("### ")).map(({ line, index }) => ({
-    label: line.replace(/^#+\s*/, ""),
-    line: index,
-    kind: "section"
-  }));
-}
-function findLuaCatsSymbolLine(content, symbol) {
-  const lines = content.split("\n");
-  const targets = [
-    `function ${symbol}(`,
-    `${symbol} = function(`,
-    `---@class ${symbol}`,
-    `---@alias ${symbol} `
-  ];
-  for (let index = 0; index < lines.length; index++) {
-    const trimmed = lines[index].trim();
-    if (targets.some((target) => trimmed.startsWith(target))) {
-      return index;
-    }
-  }
-  return -1;
-}
-function findMarkdownSymbolLine(content, symbol) {
-  const bare = symbol.replace(/^lurek\./, "");
-  return content.split("\n").findIndex((line) => line.startsWith("##") && (line.includes(symbol) || line.includes(bare)));
-}
-function searchLuaCatsApi(content, query) {
-  const queryLower = query.toLowerCase();
-  const blocks = buildLuaCatsBlocks(content);
-  const matches = blocks.filter((block) => block.text.toLowerCase().includes(queryLower)).map((block) => block.text.trim()).filter(Boolean);
-  if (matches.length > 0) {
-    return dedupe(matches);
-  }
-  const lines = content.split("\n");
-  const windows = [];
-  for (let index = 0; index < lines.length; index++) {
-    if (!lines[index].toLowerCase().includes(queryLower)) {
-      continue;
-    }
-    const start = Math.max(0, index - 3);
-    const end = Math.min(lines.length, index + 4);
-    windows.push(lines.slice(start, end).join("\n").trim());
-  }
-  return dedupe(windows.filter(Boolean));
-}
-function searchMarkdownApi(content, query) {
-  const lines = content.split("\n");
-  const queryLower = query.toLowerCase();
-  const matches = [];
-  let currentSection = [];
-  let inMatch = false;
-  for (const line of lines) {
-    if (line.startsWith("##")) {
-      if (inMatch && currentSection.length > 0) {
-        matches.push(currentSection.join("\n").trim());
-      }
-      currentSection = [line];
-      inMatch = line.toLowerCase().includes(queryLower);
-      continue;
-    }
-    currentSection.push(line);
-    if (line.toLowerCase().includes(queryLower)) {
-      inMatch = true;
-    }
-  }
-  if (inMatch && currentSection.length > 0) {
-    matches.push(currentSection.join("\n").trim());
-  }
-  return dedupe(matches.filter(Boolean));
-}
-function buildLuaCatsBlocks(content) {
-  const lines = content.split("\n");
-  const starts = [];
-  for (let index = 0; index < lines.length; index++) {
-    const trimmed = lines[index].trim();
-    if (!isLuaCatsEntry(trimmed)) {
-      continue;
-    }
-    let start = index;
-    while (start > 0 && lines[start - 1].trim().startsWith("---")) {
-      start--;
-    }
-    starts.push(start);
-  }
-  const uniqueStarts = Array.from(new Set(starts)).sort((left, right) => left - right);
-  return uniqueStarts.map((startLine, index) => {
-    const endLine = index + 1 < uniqueStarts.length ? uniqueStarts[index + 1] : lines.length;
-    return {
-      startLine,
-      text: lines.slice(startLine, endLine).join("\n")
-    };
-  });
-}
-function isLuaCatsEntry(trimmed) {
-  return /^---@class\s+lurek\./.test(trimmed) || /^---@class\s+[A-Z][A-Za-z0-9_]*\s*$/.test(trimmed) || /^---@alias\s+[A-Za-z_][A-Za-z0-9_]*\s+/.test(trimmed) || /^(?:function\s+)?lurek(?:\.[A-Za-z0-9_]+)+(?:\s*=\s*function)?\s*\(/.test(trimmed) || /^function\s+[A-Za-z_][A-Za-z0-9_]*[:.][A-Za-z0-9_]+\(/.test(trimmed);
-}
-function dedupe(values) {
-  return Array.from(new Set(values));
-}
-var fs, path;
-var init_apiDocs = __esm({
-  "src/services/apiDocs.ts"() {
-    "use strict";
-    fs = __toESM(require("fs"));
-    path = __toESM(require("path"));
-  }
-});
+---
 
-// src/services/parallelCargo.ts
-function quoteTerminalArg(arg) {
-  if (arg.length === 0) {
-    return '""';
-  }
-  if (!/[\s"]/u.test(arg)) {
-    return arg;
-  }
-  return `"${arg.replace(/"/g, '\\"')}"`;
-}
-function buildTerminalCommand(program, args = []) {
-  return [program, ...args].map(quoteTerminalArg).join(" ");
-}
-function buildParallelCargoCommand(args) {
-  return buildTerminalCommand(PYTHON_EXECUTABLE, [WRAPPER_SCRIPT, ...args]);
-}
-function appendVerbose(args, verbose) {
-  if (verbose) {
-    args.push("--verbose");
-  }
-}
-function appendTestOptions(args, options = {}) {
-  appendVerbose(args, options.verbose);
-  if (options.nocapture) {
-    args.push("--nocapture");
-  }
-  if (options.warmBuild) {
-    args.push("--warm-build");
-  }
-  if (options.outerJobs !== void 0) {
-    args.push("--outer-jobs", String(options.outerJobs));
-  }
-  if (options.testThreads !== void 0) {
-    args.push("--test-threads", String(options.testThreads));
-  }
-}
-function buildBuildCommand(profile, verbose = false) {
-  const args = ["build", profile];
-  appendVerbose(args, verbose);
-  return buildParallelCargoCommand(args);
-}
-function buildCheckCommand(verbose = false) {
-  const args = ["check"];
-  appendVerbose(args, verbose);
-  return buildParallelCargoCommand(args);
-}
-function buildRunCommand(profile, runArgs = [], verbose = false) {
-  const args = ["run", profile];
-  appendVerbose(args, verbose);
-  if (runArgs.length > 0) {
-    args.push("--", ...runArgs);
-  }
-  return buildParallelCargoCommand(args);
-}
-function buildTestAllCommand(options = {}) {
-  const args = ["test", "all"];
-  appendTestOptions(args, options);
-  return buildParallelCargoCommand(args);
-}
-function buildLuaTestsCommand(options = {}) {
-  const args = ["test", "lua"];
-  appendTestOptions(args, options);
-  return buildParallelCargoCommand(args);
-}
-function normalizeRustTestTarget(target) {
-  return target.endsWith("_tests") ? target : `${target}_tests`;
-}
-function buildTestTargetCommand(target, options = {}) {
-  const args = ["test", "target", normalizeRustTestTarget(target)];
-  appendTestOptions(args, options);
-  return buildParallelCargoCommand(args);
-}
-function execParallelCargoCommand(workspaceRoot, args, timeoutMs = 6e4) {
-  return new Promise((resolve5) => {
-    child_process.execFile(
-      PYTHON_EXECUTABLE,
-      [WRAPPER_SCRIPT, ...args],
-      {
-        cwd: workspaceRoot,
-        timeout: timeoutMs,
-        maxBuffer: 1024 * 1024,
-        encoding: "utf-8"
-      },
-      (error, stdout, stderr) => {
-        const output = `${stdout || ""}${stderr || ""}`;
-        if (error) {
-          resolve5(`${output}
-[exit code: ${error.code ?? "unknown"}]`);
-          return;
-        }
-        resolve5(output || "(no output)");
-      }
-    );
-  });
-}
-var child_process, PYTHON_EXECUTABLE, WRAPPER_SCRIPT;
-var init_parallelCargo = __esm({
-  "src/services/parallelCargo.ts"() {
-    "use strict";
-    child_process = __toESM(require("child_process"));
-    PYTHON_EXECUTABLE = "python";
-    WRAPPER_SCRIPT = "tools/dev/parallel_cargo.py";
-  }
-});
+`):i.join(`
 
-// src/mcp/tools.ts
-var tools_exports = {};
-__export(tools_exports, {
-  getToolDefinitions: () => getToolDefinitions,
-  handleCheckBuild: () => handleCheckBuild,
-  handleGetApiDoc: () => handleGetApiDoc,
-  handleGetLogs: () => handleGetLogs,
-  handleListExamples: () => handleListExamples,
-  handleRunExample: () => handleRunExample,
-  handleRunLuaTest: () => handleRunLuaTest
-});
-function getToolDefinitions() {
-  return [
-    {
-      name: "lurek2d.runExample",
-      description: "Build and run a named Lurek2D example, returning its output.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            description: 'Name of the example directory (e.g. "hello_world").'
-          }
-        },
-        required: ["name"]
-      }
-    },
-    {
-      name: "lurek2d.getApiDoc",
-      description: "Search the Lurek2D Lua API documentation for a query string.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          query: {
-            type: "string",
-            description: 'Search query (e.g. "lurek.graphics.draw" or "physics").'
-          }
-        },
-        required: ["query"]
-      }
-    },
-    {
-      name: "lurek2d.listExamples",
-      description: "List all available Lurek2D example directories.",
-      inputSchema: {
-        type: "object",
-        properties: {}
-      }
-    },
-    {
-      name: "lurek2d.runLuaTest",
-      description: "Run a Lua test file against a debug build of Lurek2D.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          file: {
-            type: "string",
-            description: "Path to the Lua test file, relative to workspace root."
-          }
-        },
-        required: ["file"]
-      }
-    },
-    {
-      name: "lurek2d.checkBuild",
-      description: "Run the wrapper-backed repo check flow and return compiler diagnostics.",
-      inputSchema: {
-        type: "object",
-        properties: {}
-      }
-    },
-    {
-      name: "lurek2d.getLogs",
-      description: "Return the last N lines of Lurek2D engine log output.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          lines: {
-            type: "number",
-            description: "Number of log lines to return (default: 50)."
-          }
-        }
-      }
-    }
-  ];
-}
-function handleRunExample(workspaceRoot) {
-  return async (args) => {
-    const name = args.name;
-    if (!name) {
-      return "Error: 'name' parameter is required.";
-    }
-    const exampleDir = path2.join(workspaceRoot, "content", "games", "showcase", name);
-    if (!fs2.existsSync(exampleDir)) {
-      const available = listExampleDirs(workspaceRoot);
-      return `Showcase game "${name}" not found. Available: ${available.join(", ")}`;
-    }
-    const relativeGamePath = path2.posix.join("content", "games", "showcase", name);
-    return execParallelCargoCommand(workspaceRoot, ["run", "debug", "--", relativeGamePath], 12e4);
-  };
-}
-function handleGetApiDoc(workspaceRoot) {
-  return async (args) => {
-    const query = args.query;
-    if (!query) {
-      return "Error: 'query' parameter is required.";
-    }
-    const apiDocPath = resolveWorkspaceApiDocPath(workspaceRoot);
-    if (!apiDocPath || !fs2.existsSync(apiDocPath)) {
-      return "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md.";
-    }
-    const content = fs2.readFileSync(apiDocPath, "utf-8");
-    const matches = searchApiDocumentation(content, apiDocPath, query);
-    if (matches.length === 0) {
-      return `No documentation found for "${query}".`;
-    }
-    if (apiDocPath.endsWith(".lua")) {
-      return matches.map((match) => `\`\`\`lua
-${match}
-\`\`\``).join("\n\n---\n\n");
-    }
-    return matches.join("\n\n---\n\n");
-  };
-}
-function handleListExamples(workspaceRoot) {
-  return async () => {
-    const examples = listExampleDirs(workspaceRoot);
-    if (examples.length === 0) {
-      return "No showcase games found in content/games/showcase/.";
-    }
-    return examples.join("\n");
-  };
-}
-function handleRunLuaTest(workspaceRoot) {
-  return async (args) => {
-    const file = args.file;
-    if (!file) {
-      return "Error: 'file' parameter is required.";
-    }
-    const resolved = path2.resolve(workspaceRoot, file);
-    if (!resolved.startsWith(workspaceRoot)) {
-      return "Error: file path must be within the workspace.";
-    }
-    if (!fs2.existsSync(resolved)) {
-      return `Test file not found: ${file}`;
-    }
-    const relativeFile = path2.relative(workspaceRoot, resolved).replace(/\\/g, "/");
-    return execParallelCargoCommand(workspaceRoot, ["run", "debug", "--", relativeFile], 12e4);
-  };
-}
-function handleCheckBuild(workspaceRoot) {
-  return async () => {
-    return execParallelCargoCommand(workspaceRoot, ["check"], 12e4);
-  };
-}
-function handleGetLogs(workspaceRoot) {
-  return async (args) => {
-    const lines = args.lines || 50;
-    const logPaths = [
-      path2.join(workspaceRoot, "lurek2d.log"),
-      path2.join(workspaceRoot, "target", "lurek2d.log")
-    ];
-    for (const logPath of logPaths) {
-      if (fs2.existsSync(logPath)) {
-        const content = fs2.readFileSync(logPath, "utf-8");
-        const allLines = content.split("\n");
-        const tail = allLines.slice(-lines);
-        return tail.join("\n");
-      }
-    }
-    return "No log file found. Engine logs are written to stdout by default. Use RUST_LOG=lurek2d=debug to enable verbose logging.";
-  };
-}
-function listExampleDirs(workspaceRoot) {
-  const examplesDir = path2.join(workspaceRoot, "content", "games", "showcase");
-  if (!fs2.existsSync(examplesDir)) {
-    return [];
-  }
-  try {
-    return fs2.readdirSync(examplesDir, { withFileTypes: true }).filter((entry) => entry.isDirectory()).map((entry) => entry.name);
-  } catch {
-    return [];
-  }
-}
-var fs2, path2;
-var init_tools = __esm({
-  "src/mcp/tools.ts"() {
-    "use strict";
-    fs2 = __toESM(require("fs"));
-    path2 = __toESM(require("path"));
-    init_apiDocs();
-    init_parallelCargo();
-  }
-});
+---
 
-// src/providers/perfDashboard.ts
-var perfDashboard_exports = {};
-__export(perfDashboard_exports, {
-  clearHistory: () => clearHistory,
-  openPerfDashboard: () => openPerfDashboard,
-  recordSample: () => recordSample
-});
-function openPerfDashboard(context) {
-  if (_panel) {
-    _panel.reveal(vscode16.ViewColumn.Two);
-    return;
-  }
-  _panel = vscode16.window.createWebviewPanel(
-    "lurek.perfDashboard",
-    "Lurek2D Performance",
-    vscode16.ViewColumn.Two,
-    { enableScripts: true, retainContextWhenHidden: true }
-  );
-  _panel.webview.html = buildHtml();
-  _panel.onDidDispose(() => {
-    _panel = void 0;
-  }, null, context.subscriptions);
-  _panel.webview.onDidReceiveMessage((msg) => {
-    if (msg.type === "clear") clearHistory();
-  }, null, context.subscriptions);
-  pushToPanel();
-}
-function recordSample(fps, frameMs, luaHeapKb) {
-  _history.push({ timestamp: Date.now(), fps, frameMs, luaHeapKb });
-  if (_history.length > MAX_HISTORY) _history.shift();
-  if (_panel?.visible) pushToPanel();
-}
-function clearHistory() {
-  _history.length = 0;
-  if (_panel?.visible) pushToPanel();
-}
-function pushToPanel() {
-  if (!_panel) return;
-  _panel.webview.postMessage({ type: "data", samples: [..._history] });
-}
-function buildHtml() {
-  return (
-    /* html */
-    `<!DOCTYPE html>
+`)}}function ss(n){return async()=>{let e=$a(n);return e.length===0?"No showcase games found in content/games/showcase/.":e.join(`
+`)}}function ls(n){return async e=>{let t=e.file;if(!t)return"Error: 'file' parameter is required.";let r=ze.resolve(n,t);if(!r.startsWith(n))return"Error: file path must be within the workspace.";if(!_e.existsSync(r))return`Test file not found: ${t}`;let a=ze.relative(n,r).replace(/\\/g,"/");return nn(n,["run","debug","--",a],12e4)}}function ps(n){return async()=>nn(n,["check"],12e4)}function us(n){return async e=>{let t=e.lines||50,r=[ze.join(n,"lurek2d.log"),ze.join(n,"target","lurek2d.log")];for(let a of r)if(_e.existsSync(a))return _e.readFileSync(a,"utf-8").split(`
+`).slice(-t).join(`
+`);return"No log file found. Engine logs are written to stdout by default. Use RUST_LOG=lurek2d=debug to enable verbose logging."}}function $a(n){let e=ze.join(n,"content","games","showcase");if(!_e.existsSync(e))return[];try{return _e.readdirSync(e,{withFileTypes:!0}).filter(t=>t.isDirectory()).map(t=>t.name)}catch{return[]}}var _e,ze,Cr=kt(()=>{"use strict";_e=C(require("fs")),ze=C(require("path"));Jt();Lt()});var xi={};Zt(xi,{clearHistory:()=>wi,openPerfDashboard:()=>zr,recordSample:()=>Hl});function zr(n){if(Ne){Ne.reveal(At.ViewColumn.Two);return}Ne=At.window.createWebviewPanel("lurek.perfDashboard","Lurek2D Performance",At.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),Ne.webview.html=Vl(),Ne.onDidDispose(()=>{Ne=void 0},null,n.subscriptions),Ne.webview.onDidReceiveMessage(e=>{e.type==="clear"&&wi()},null,n.subscriptions),_r()}function Hl(n,e,t){Bt.push({timestamp:Date.now(),fps:n,frameMs:e,luaHeapKb:t}),Bt.length>Gl&&Bt.shift(),Ne?.visible&&_r()}function wi(){Bt.length=0,Ne?.visible&&_r()}function _r(){Ne&&Ne.webview.postMessage({type:"data",samples:[...Bt]})}function Vl(){return`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -662,7183 +130,93 @@ window.addEventListener('message', (event) => {
 window.addEventListener('resize', updateUI);
 </script>
 </body>
-</html>`
-  );
-}
-var vscode16, _panel, _history, MAX_HISTORY;
-var init_perfDashboard = __esm({
-  "src/providers/perfDashboard.ts"() {
-    "use strict";
-    vscode16 = __toESM(require("vscode"));
-    _history = [];
-    MAX_HISTORY = 300;
-  }
-});
-
-// src/services/debugBridge.ts
-var debugBridge_exports = {};
-__export(debugBridge_exports, {
-  DebugBridge: () => DebugBridge
-});
-var vscode35, net, DEFAULT_PORT, CONNECT_TIMEOUT, REQUEST_TIMEOUT, DebugBridge;
-var init_debugBridge = __esm({
-  "src/services/debugBridge.ts"() {
-    "use strict";
-    vscode35 = __toESM(require("vscode"));
-    net = __toESM(require("net"));
-    DEFAULT_PORT = 19740;
-    CONNECT_TIMEOUT = 5e3;
-    REQUEST_TIMEOUT = 1e4;
-    DebugBridge = class {
-      socket = null;
-      outputChannel;
-      connected = false;
-      requestId = 0;
-      pending = /* @__PURE__ */ new Map();
-      buffer = "";
-      statsItem = null;
-      statsInterval = null;
-      constructor() {
-        this.outputChannel = vscode35.window.createOutputChannel("Lurek2D Debug");
-      }
-      /** Whether the bridge is currently connected. */
-      get isConnected() {
-        return this.connected;
-      }
-      /** Connect to running Lurek2D engine debug port. */
-      async connect(port) {
-        if (this.connected) {
-          this.outputChannel.appendLine("[debug] Already connected.");
-          return true;
-        }
-        const targetPort = port ?? vscode35.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT);
-        return new Promise((resolve5) => {
-          const socket = new net.Socket();
-          const timeout = setTimeout(() => {
-            socket.destroy();
-            this.outputChannel.appendLine(`[debug] Connection timed out on port ${targetPort}`);
-            resolve5(false);
-          }, CONNECT_TIMEOUT);
-          socket.connect(targetPort, "127.0.0.1", () => {
-            clearTimeout(timeout);
-            this.socket = socket;
-            this.connected = true;
-            this.buffer = "";
-            this.outputChannel.appendLine(`[debug] Connected to Lurek2D on port ${targetPort}`);
-            resolve5(true);
-          });
-          socket.on("data", (data) => this.onData(data));
-          socket.on("error", (err) => {
-            clearTimeout(timeout);
-            this.outputChannel.appendLine(`[debug] Connection error: ${err.message}`);
-            this.cleanup();
-            resolve5(false);
-          });
-          socket.on("close", () => {
-            this.outputChannel.appendLine("[debug] Connection closed.");
-            this.cleanup();
-          });
-        });
-      }
-      /** Disconnect from engine. */
-      disconnect() {
-        if (this.socket) {
-          this.socket.destroy();
-        }
-        this.cleanup();
-        this.outputChannel.appendLine("[debug] Disconnected.");
-      }
-      /** Send a Lua expression for evaluation, return the result string. */
-      async evaluate(expression) {
-        const resp = await this.sendRequest("evaluate", { expression });
-        if (resp.error) {
-          throw new Error(resp.error);
-        }
-        return String(resp.data?.result ?? "nil");
-      }
-      /** Request current variable state from the engine. */
-      async getVariables() {
-        const resp = await this.sendRequest("getVariables", {});
-        if (resp.error) {
-          throw new Error(resp.error);
-        }
-        const vars = resp.data?.variables;
-        if (vars && typeof vars === "object") {
-          const result = {};
-          for (const [k, v] of Object.entries(vars)) {
-            result[k] = String(v);
-          }
-          return result;
-        }
-        return {};
-      }
-      /** Set a breakpoint in a Lua file. */
-      async setBreakpoint(file, line) {
-        const resp = await this.sendRequest("setBreakpoint", { file, line });
-        return !resp.error;
-      }
-      /** Remove a breakpoint. */
-      async removeBreakpoint(file, line) {
-        const resp = await this.sendRequest("removeBreakpoint", { file, line });
-        return !resp.error;
-      }
-      /** Step to next line. */
-      async step() {
-        await this.sendRequest("step", {});
-      }
-      /** Step into function. */
-      async stepInto() {
-        await this.sendRequest("stepInto", {});
-      }
-      /** Step out of function. */
-      async stepOut() {
-        await this.sendRequest("stepOut", {});
-      }
-      /** Continue execution. */
-      async continueExecution() {
-        await this.sendRequest("continue", {});
-      }
-      /** Hot-reload: send updated Lua file content to engine. */
-      async hotReload(uri) {
-        const doc = await vscode35.workspace.openTextDocument(uri);
-        const content = doc.getText();
-        const relativePath = vscode35.workspace.asRelativePath(uri, false);
-        const resp = await this.sendRequest("hotReload", {
-          file: relativePath,
-          content
-        });
-        return !resp.error;
-      }
-      /** Get engine performance stats. */
-      async getStats() {
-        const resp = await this.sendRequest("getStats", {});
-        if (resp.error) {
-          throw new Error(resp.error);
-        }
-        return {
-          fps: Number(resp.data?.fps ?? 0),
-          drawCalls: Number(resp.data?.drawCalls ?? 0),
-          memory: Number(resp.data?.memory ?? 0)
-        };
-      }
-      /** Get the current Lua call stack from the engine. */
-      async getCallStack() {
-        const resp = await this.sendRequest("getCallStack", {});
-        if (resp.error) {
-          throw new Error(resp.error);
-        }
-        const frames = resp.data?.frames;
-        if (Array.isArray(frames)) {
-          return frames.map((f, i) => ({
-            level: i,
-            source: String(f["source"] ?? "?"),
-            line: Number(f["line"] ?? 0),
-            name: String(f["name"] ?? "?")
-          }));
-        }
-        return [];
-      }
-      /** Request a PNG screenshot from the engine, returned as base64. */
-      async takeScreenshot() {
-        const resp = await this.sendRequest("screenshot", {});
-        if (resp.error) {
-          throw new Error(resp.error);
-        }
-        return String(resp.data?.png_base64 ?? "");
-      }
-      /** Get connection port and uptime info. */
-      getStatusInfo() {
-        return {
-          connected: this.connected,
-          port: vscode35.workspace.getConfiguration("lurek.debugBridge").get("port", DEFAULT_PORT)
-        };
-      }
-      /** Show a persistent status bar item with live engine stats. */
-      startStatsPolling() {
-        if (this.statsItem) {
-          return;
-        }
-        this.statsItem = vscode35.window.createStatusBarItem(vscode35.StatusBarAlignment.Right, 50);
-        this.statsItem.text = "$(pulse) FPS: --";
-        this.statsItem.tooltip = "Lurek2D Engine Stats";
-        this.statsItem.show();
-        this.statsInterval = setInterval(async () => {
-          if (!this.connected) {
-            this.stopStatsPolling();
-            return;
-          }
-          try {
-            const stats = await this.getStats();
-            if (this.statsItem) {
-              this.statsItem.text = `$(pulse) FPS: ${stats.fps} | Draw: ${stats.drawCalls} | Mem: ${(stats.memory / 1024 / 1024).toFixed(1)}MB`;
-            }
-          } catch {
-          }
-        }, 1e3);
-      }
-      /** Stop polling and hide stats status bar item. */
-      stopStatsPolling() {
-        if (this.statsInterval) {
-          clearInterval(this.statsInterval);
-          this.statsInterval = null;
-        }
-        if (this.statsItem) {
-          this.statsItem.dispose();
-          this.statsItem = null;
-        }
-      }
-      /** Show the debug output channel. */
-      showOutput() {
-        this.outputChannel.show();
-      }
-      /** Clean up all resources. */
-      dispose() {
-        this.disconnect();
-        this.stopStatsPolling();
-        this.outputChannel.dispose();
-      }
-      // ─── Private ─────────────────────────────────────────────
-      sendRequest(type, data) {
-        return new Promise((resolve5, reject) => {
-          if (!this.connected || !this.socket) {
-            reject(new Error("Not connected to Lurek2D engine."));
-            return;
-          }
-          const id = ++this.requestId;
-          const message = JSON.stringify({ id, type, data }) + "\n";
-          const timer = setTimeout(() => {
-            this.pending.delete(id);
-            reject(new Error(`Request ${type} timed out.`));
-          }, REQUEST_TIMEOUT);
-          this.pending.set(id, { resolve: resolve5, reject, timer });
-          this.socket.write(message, (err) => {
-            if (err) {
-              clearTimeout(timer);
-              this.pending.delete(id);
-              reject(new Error(`Failed to send request: ${err.message}`));
-            }
-          });
-        });
-      }
-      onData(data) {
-        this.buffer += data.toString("utf-8");
-        const lines = this.buffer.split("\n");
-        this.buffer = lines.pop() ?? "";
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) {
-            continue;
-          }
-          try {
-            const msg = JSON.parse(trimmed);
-            const entry = this.pending.get(msg.id);
-            if (entry) {
-              clearTimeout(entry.timer);
-              this.pending.delete(msg.id);
-              entry.resolve(msg);
-            } else {
-              this.outputChannel.appendLine(`[engine] ${trimmed}`);
-            }
-          } catch {
-            this.outputChannel.appendLine(`[engine] ${trimmed}`);
-          }
-        }
-      }
-      cleanup() {
-        this.connected = false;
-        this.socket = null;
-        for (const [, entry] of this.pending) {
-          clearTimeout(entry.timer);
-          entry.reject(new Error("Connection lost."));
-        }
-        this.pending.clear();
-        this.stopStatsPolling();
-      }
-    };
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/messages.js
-var require_messages = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/messages.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.Event = exports2.Response = exports2.Message = void 0;
-    var Message = class {
-      constructor(type) {
-        this.seq = 0;
-        this.type = type;
-      }
-    };
-    exports2.Message = Message;
-    var Response = class extends Message {
-      constructor(request, message) {
-        super("response");
-        this.request_seq = request.seq;
-        this.command = request.command;
-        if (message) {
-          this.success = false;
-          this.message = message;
-        } else {
-          this.success = true;
-        }
-      }
-    };
-    exports2.Response = Response;
-    var Event = class extends Message {
-      constructor(event, body) {
-        super("event");
-        this.event = event;
-        if (body) {
-          this.body = body;
-        }
-      }
-    };
-    exports2.Event = Event;
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/protocol.js
-var require_protocol = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/protocol.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.ProtocolServer = void 0;
-    var ee = require("events");
-    var messages_1 = require_messages();
-    var Emitter = class {
-      get event() {
-        if (!this._event) {
-          this._event = (listener, thisArg) => {
-            this._listener = listener;
-            this._this = thisArg;
-            let result;
-            result = {
-              dispose: () => {
-                this._listener = void 0;
-                this._this = void 0;
-              }
-            };
-            return result;
-          };
-        }
-        return this._event;
-      }
-      fire(event) {
-        if (this._listener) {
-          try {
-            this._listener.call(this._this, event);
-          } catch (e) {
-          }
-        }
-      }
-      hasListener() {
-        return !!this._listener;
-      }
-      dispose() {
-        this._listener = void 0;
-        this._this = void 0;
-      }
-    };
-    var ProtocolServer = class _ProtocolServer extends ee.EventEmitter {
-      constructor() {
-        super();
-        this._sendMessage = new Emitter();
-        this._sequence = 1;
-        this._pendingRequests = /* @__PURE__ */ new Map();
-        this.onDidSendMessage = this._sendMessage.event;
-      }
-      // ---- implements vscode.Debugadapter interface ---------------------------
-      dispose() {
-      }
-      handleMessage(msg) {
-        if (msg.type === "request") {
-          this.dispatchRequest(msg);
-        } else if (msg.type === "response") {
-          const response = msg;
-          const clb = this._pendingRequests.get(response.request_seq);
-          if (clb) {
-            this._pendingRequests.delete(response.request_seq);
-            clb(response);
-          }
-        }
-      }
-      _isRunningInline() {
-        return this._sendMessage && this._sendMessage.hasListener();
-      }
-      //--------------------------------------------------------------------------
-      start(inStream, outStream) {
-        this._writableStream = outStream;
-        this._rawData = Buffer.alloc(0);
-        inStream.on("data", (data) => this._handleData(data));
-        inStream.on("close", () => {
-          this._emitEvent(new messages_1.Event("close"));
-        });
-        inStream.on("error", (error) => {
-          this._emitEvent(new messages_1.Event("error", "inStream error: " + (error && error.message)));
-        });
-        outStream.on("error", (error) => {
-          this._emitEvent(new messages_1.Event("error", "outStream error: " + (error && error.message)));
-        });
-        inStream.resume();
-      }
-      stop() {
-        if (this._writableStream) {
-          this._writableStream.end();
-        }
-      }
-      sendEvent(event) {
-        this._send("event", event);
-      }
-      sendResponse(response) {
-        if (response.seq > 0) {
-          console.error(`attempt to send more than one response for command ${response.command}`);
-        } else {
-          this._send("response", response);
-        }
-      }
-      sendRequest(command, args, timeout, cb) {
-        const request = {
-          command
-        };
-        if (args && Object.keys(args).length > 0) {
-          request.arguments = args;
-        }
-        this._send("request", request);
-        if (cb) {
-          this._pendingRequests.set(request.seq, cb);
-          const timer = setTimeout(() => {
-            clearTimeout(timer);
-            const clb = this._pendingRequests.get(request.seq);
-            if (clb) {
-              this._pendingRequests.delete(request.seq);
-              clb(new messages_1.Response(request, "timeout"));
-            }
-          }, timeout);
-        }
-      }
-      // ---- protected ----------------------------------------------------------
-      dispatchRequest(request) {
-      }
-      // ---- private ------------------------------------------------------------
-      _emitEvent(event) {
-        this.emit(event.event, event);
-      }
-      _send(typ, message) {
-        message.type = typ;
-        message.seq = this._sequence++;
-        if (this._writableStream) {
-          const json = JSON.stringify(message);
-          this._writableStream.write(`Content-Length: ${Buffer.byteLength(json, "utf8")}\r
+</html>`}var At,Ne,Bt,Gl,Nr=kt(()=>{"use strict";At=C(require("vscode")),Bt=[],Gl=300});var go={};Zt(go,{DebugBridge:()=>Vt});var Ue,ho,mo,mp,hp,Vt,Kr=kt(()=>{"use strict";Ue=C(require("vscode")),ho=C(require("net")),mo=19740,mp=5e3,hp=1e4,Vt=class{socket=null;outputChannel;connected=!1;requestId=0;pending=new Map;buffer="";statsItem=null;statsInterval=null;constructor(){this.outputChannel=Ue.window.createOutputChannel("Lurek2D Debug")}get isConnected(){return this.connected}async connect(e){if(this.connected)return this.outputChannel.appendLine("[debug] Already connected."),!0;let t=e??Ue.workspace.getConfiguration("lurek.debugBridge").get("port",mo);return new Promise(r=>{let a=new ho.Socket,i=setTimeout(()=>{a.destroy(),this.outputChannel.appendLine(`[debug] Connection timed out on port ${t}`),r(!1)},mp);a.connect(t,"127.0.0.1",()=>{clearTimeout(i),this.socket=a,this.connected=!0,this.buffer="",this.outputChannel.appendLine(`[debug] Connected to Lurek2D on port ${t}`),r(!0)}),a.on("data",o=>this.onData(o)),a.on("error",o=>{clearTimeout(i),this.outputChannel.appendLine(`[debug] Connection error: ${o.message}`),this.cleanup(),r(!1)}),a.on("close",()=>{this.outputChannel.appendLine("[debug] Connection closed."),this.cleanup()})})}disconnect(){this.socket&&this.socket.destroy(),this.cleanup(),this.outputChannel.appendLine("[debug] Disconnected.")}async evaluate(e){let t=await this.sendRequest("evaluate",{expression:e});if(t.error)throw new Error(t.error);return String(t.data?.result??"nil")}async getVariables(){let e=await this.sendRequest("getVariables",{});if(e.error)throw new Error(e.error);let t=e.data?.variables;if(t&&typeof t=="object"){let r={};for(let[a,i]of Object.entries(t))r[a]=String(i);return r}return{}}async setBreakpoint(e,t){return!(await this.sendRequest("setBreakpoint",{file:e,line:t})).error}async removeBreakpoint(e,t){return!(await this.sendRequest("removeBreakpoint",{file:e,line:t})).error}async step(){await this.sendRequest("step",{})}async stepInto(){await this.sendRequest("stepInto",{})}async stepOut(){await this.sendRequest("stepOut",{})}async continueExecution(){await this.sendRequest("continue",{})}async hotReload(e){let r=(await Ue.workspace.openTextDocument(e)).getText(),a=Ue.workspace.asRelativePath(e,!1);return!(await this.sendRequest("hotReload",{file:a,content:r})).error}async getStats(){let e=await this.sendRequest("getStats",{});if(e.error)throw new Error(e.error);return{fps:Number(e.data?.fps??0),drawCalls:Number(e.data?.drawCalls??0),memory:Number(e.data?.memory??0)}}async getCallStack(){let e=await this.sendRequest("getCallStack",{});if(e.error)throw new Error(e.error);let t=e.data?.frames;return Array.isArray(t)?t.map((r,a)=>({level:a,source:String(r.source??"?"),line:Number(r.line??0),name:String(r.name??"?")})):[]}async takeScreenshot(){let e=await this.sendRequest("screenshot",{});if(e.error)throw new Error(e.error);return String(e.data?.png_base64??"")}getStatusInfo(){return{connected:this.connected,port:Ue.workspace.getConfiguration("lurek.debugBridge").get("port",mo)}}startStatsPolling(){this.statsItem||(this.statsItem=Ue.window.createStatusBarItem(Ue.StatusBarAlignment.Right,50),this.statsItem.text="$(pulse) FPS: --",this.statsItem.tooltip="Lurek2D Engine Stats",this.statsItem.show(),this.statsInterval=setInterval(async()=>{if(!this.connected){this.stopStatsPolling();return}try{let e=await this.getStats();this.statsItem&&(this.statsItem.text=`$(pulse) FPS: ${e.fps} | Draw: ${e.drawCalls} | Mem: ${(e.memory/1024/1024).toFixed(1)}MB`)}catch{}},1e3))}stopStatsPolling(){this.statsInterval&&(clearInterval(this.statsInterval),this.statsInterval=null),this.statsItem&&(this.statsItem.dispose(),this.statsItem=null)}showOutput(){this.outputChannel.show()}dispose(){this.disconnect(),this.stopStatsPolling(),this.outputChannel.dispose()}sendRequest(e,t){return new Promise((r,a)=>{if(!this.connected||!this.socket){a(new Error("Not connected to Lurek2D engine."));return}let i=++this.requestId,o=JSON.stringify({id:i,type:e,data:t})+`
+`,s=setTimeout(()=>{this.pending.delete(i),a(new Error(`Request ${e} timed out.`))},hp);this.pending.set(i,{resolve:r,reject:a,timer:s}),this.socket.write(o,l=>{l&&(clearTimeout(s),this.pending.delete(i),a(new Error(`Failed to send request: ${l.message}`)))})})}onData(e){this.buffer+=e.toString("utf-8");let t=this.buffer.split(`
+`);this.buffer=t.pop()??"";for(let r of t){let a=r.trim();if(a)try{let i=JSON.parse(a),o=this.pending.get(i.id);o?(clearTimeout(o.timer),this.pending.delete(i.id),o.resolve(i)):this.outputChannel.appendLine(`[engine] ${a}`)}catch{this.outputChannel.appendLine(`[engine] ${a}`)}}}cleanup(){this.connected=!1,this.socket=null;for(let[,e]of this.pending)clearTimeout(e.timer),e.reject(new Error("Connection lost."));this.pending.clear(),this.stopStatsPolling()}}});var or=$e(st=>{"use strict";Object.defineProperty(st,"__esModule",{value:!0});st.Event=st.Response=st.Message=void 0;var Ut=class{constructor(e){this.seq=0,this.type=e}};st.Message=Ut;var na=class extends Ut{constructor(e,t){super("response"),this.request_seq=e.seq,this.command=e.command,t?(this.success=!1,this.message=t):this.success=!0}};st.Response=na;var ra=class extends Ut{constructor(e,t){super("event"),this.event=e,t&&(this.body=t)}};st.Event=ra});var wo=$e(lr=>{"use strict";Object.defineProperty(lr,"__esModule",{value:!0});lr.ProtocolServer=void 0;var Pp=require("events"),qt=or(),aa=class{get event(){return this._event||(this._event=(e,t)=>{this._listener=e,this._this=t;let r;return r={dispose:()=>{this._listener=void 0,this._this=void 0}},r}),this._event}fire(e){if(this._listener)try{this._listener.call(this._this,e)}catch{}}hasListener(){return!!this._listener}dispose(){this._listener=void 0,this._this=void 0}},sr=class n extends Pp.EventEmitter{constructor(){super(),this._sendMessage=new aa,this._sequence=1,this._pendingRequests=new Map,this.onDidSendMessage=this._sendMessage.event}dispose(){}handleMessage(e){if(e.type==="request")this.dispatchRequest(e);else if(e.type==="response"){let t=e,r=this._pendingRequests.get(t.request_seq);r&&(this._pendingRequests.delete(t.request_seq),r(t))}}_isRunningInline(){return this._sendMessage&&this._sendMessage.hasListener()}start(e,t){this._writableStream=t,this._rawData=Buffer.alloc(0),e.on("data",r=>this._handleData(r)),e.on("close",()=>{this._emitEvent(new qt.Event("close"))}),e.on("error",r=>{this._emitEvent(new qt.Event("error","inStream error: "+(r&&r.message)))}),t.on("error",r=>{this._emitEvent(new qt.Event("error","outStream error: "+(r&&r.message)))}),e.resume()}stop(){this._writableStream&&this._writableStream.end()}sendEvent(e){this._send("event",e)}sendResponse(e){e.seq>0?console.error(`attempt to send more than one response for command ${e.command}`):this._send("response",e)}sendRequest(e,t,r,a){let i={command:e};if(t&&Object.keys(t).length>0&&(i.arguments=t),this._send("request",i),a){this._pendingRequests.set(i.seq,a);let o=setTimeout(()=>{clearTimeout(o);let s=this._pendingRequests.get(i.seq);s&&(this._pendingRequests.delete(i.seq),s(new qt.Response(i,"timeout")))},r)}}dispatchRequest(e){}_emitEvent(e){this.emit(e.event,e)}_send(e,t){if(t.type=e,t.seq=this._sequence++,this._writableStream){let r=JSON.stringify(t);this._writableStream.write(`Content-Length: ${Buffer.byteLength(r,"utf8")}\r
 \r
-${json}`, "utf8");
-        }
-        this._sendMessage.fire(message);
-      }
-      _handleData(data) {
-        this._rawData = Buffer.concat([this._rawData, data]);
-        while (true) {
-          if (this._contentLength >= 0) {
-            if (this._rawData.length >= this._contentLength) {
-              const message = this._rawData.toString("utf8", 0, this._contentLength);
-              this._rawData = this._rawData.slice(this._contentLength);
-              this._contentLength = -1;
-              if (message.length > 0) {
-                try {
-                  let msg = JSON.parse(message);
-                  this.handleMessage(msg);
-                } catch (e) {
-                  this._emitEvent(new messages_1.Event("error", "Error handling data: " + (e && e.message)));
-                }
-              }
-              continue;
-            }
-          } else {
-            const idx = this._rawData.indexOf(_ProtocolServer.TWO_CRLF);
-            if (idx !== -1) {
-              const header = this._rawData.toString("utf8", 0, idx);
-              const lines = header.split("\r\n");
-              for (let i = 0; i < lines.length; i++) {
-                const pair = lines[i].split(/: +/);
-                if (pair[0] == "Content-Length") {
-                  this._contentLength = +pair[1];
-                }
-              }
-              this._rawData = this._rawData.slice(idx + _ProtocolServer.TWO_CRLF.length);
-              continue;
-            }
-          }
-          break;
-        }
-      }
-    };
-    exports2.ProtocolServer = ProtocolServer;
-    ProtocolServer.TWO_CRLF = "\r\n\r\n";
-  }
-});
+${r}`,"utf8")}this._sendMessage.fire(t)}_handleData(e){for(this._rawData=Buffer.concat([this._rawData,e]);;){if(this._contentLength>=0){if(this._rawData.length>=this._contentLength){let t=this._rawData.toString("utf8",0,this._contentLength);if(this._rawData=this._rawData.slice(this._contentLength),this._contentLength=-1,t.length>0)try{let r=JSON.parse(t);this.handleMessage(r)}catch(r){this._emitEvent(new qt.Event("error","Error handling data: "+(r&&r.message)))}continue}}else{let t=this._rawData.indexOf(n.TWO_CRLF);if(t!==-1){let a=this._rawData.toString("utf8",0,t).split(`\r
+`);for(let i=0;i<a.length;i++){let o=a[i].split(/: +/);o[0]=="Content-Length"&&(this._contentLength=+o[1])}this._rawData=this._rawData.slice(t+n.TWO_CRLF.length);continue}}break}}};lr.ProtocolServer=sr;sr.TWO_CRLF=`\r
+\r
+`});var xo=$e(pr=>{"use strict";Object.defineProperty(pr,"__esModule",{value:!0});pr.runDebugAdapter=void 0;var Mp=require("net");function Sp(n){let e=0;if(process.argv.slice(2).forEach(function(r,a,i){let o=/^--server=(\d{4,5})$/.exec(r);o&&(e=parseInt(o[1],10))}),e>0)console.error(`waiting for debug protocol on port ${e}`),Mp.createServer(r=>{console.error(">> accepted connection from client"),r.on("end",()=>{console.error(`>> client connection closed
+`)});let a=new n(!1,!0);a.setRunAsServer(!0),a.start(r,r)}).listen(e);else{let r=new n(!1);process.on("SIGTERM",()=>{r.shutdown()}),r.start(process.stdin,process.stdout)}}pr.runDebugAdapter=Sp});var dr=$e(F=>{"use strict";Object.defineProperty(F,"__esModule",{value:!0});F.DebugSession=F.ErrorDestination=F.MemoryEvent=F.InvalidatedEvent=F.ProgressEndEvent=F.ProgressUpdateEvent=F.ProgressStartEvent=F.CapabilitiesEvent=F.LoadedSourceEvent=F.ModuleEvent=F.BreakpointEvent=F.ThreadEvent=F.OutputEvent=F.ExitedEvent=F.TerminatedEvent=F.InitializedEvent=F.ContinuedEvent=F.StoppedEvent=F.CompletionItem=F.Module=F.Breakpoint=F.Variable=F.Thread=F.StackFrame=F.Scope=F.Source=void 0;var kp=wo(),ge=or(),jp=xo(),Po=require("url"),ia=class{constructor(e,t,r=0,a,i){this.name=e,this.path=t,this.sourceReference=r,a&&(this.origin=a),i&&(this.adapterData=i)}};F.Source=ia;var oa=class{constructor(e,t,r=!1){this.name=e,this.variablesReference=t,this.expensive=r}};F.Scope=oa;var sa=class{constructor(e,t,r,a=0,i=0){this.id=e,this.source=r,this.line=a,this.column=i,this.name=t}};F.StackFrame=sa;var la=class{constructor(e,t){this.id=e,t?this.name=t:this.name="Thread #"+e}};F.Thread=la;var pa=class{constructor(e,t,r=0,a,i){this.name=e,this.value=t,this.variablesReference=r,typeof i=="number"&&(this.namedVariables=i),typeof a=="number"&&(this.indexedVariables=a)}};F.Variable=pa;var ua=class{constructor(e,t,r,a){this.verified=e;let i=this;typeof t=="number"&&(i.line=t),typeof r=="number"&&(i.column=r),a&&(i.source=a)}setId(e){this.id=e}};F.Breakpoint=ua;var da=class{constructor(e,t){this.id=e,this.name=t}};F.Module=da;var ca=class{constructor(e,t,r=0){this.label=e,this.start=t,this.length=r}};F.CompletionItem=ca;var ma=class extends ge.Event{constructor(e,t,r){super("stopped"),this.body={reason:e},typeof t=="number"&&(this.body.threadId=t),typeof r=="string"&&(this.body.text=r)}};F.StoppedEvent=ma;var ha=class extends ge.Event{constructor(e,t){super("continued"),this.body={threadId:e},typeof t=="boolean"&&(this.body.allThreadsContinued=t)}};F.ContinuedEvent=ha;var ga=class extends ge.Event{constructor(){super("initialized")}};F.InitializedEvent=ga;var ya=class extends ge.Event{constructor(e){if(super("terminated"),typeof e=="boolean"||e){let t=this;t.body={restart:e}}}};F.TerminatedEvent=ya;var fa=class extends ge.Event{constructor(e){super("exited"),this.body={exitCode:e}}};F.ExitedEvent=fa;var ba=class extends ge.Event{constructor(e,t="console",r){super("output"),this.body={category:t,output:e},r!==void 0&&(this.body.data=r)}};F.OutputEvent=ba;var Ta=class extends ge.Event{constructor(e,t){super("thread"),this.body={reason:e,threadId:t}}};F.ThreadEvent=Ta;var va=class extends ge.Event{constructor(e,t){super("breakpoint"),this.body={reason:e,breakpoint:t}}};F.BreakpointEvent=va;var La=class extends ge.Event{constructor(e,t){super("module"),this.body={reason:e,module:t}}};F.ModuleEvent=La;var wa=class extends ge.Event{constructor(e,t){super("loadedSource"),this.body={reason:e,source:t}}};F.LoadedSourceEvent=wa;var xa=class extends ge.Event{constructor(e){super("capabilities"),this.body={capabilities:e}}};F.CapabilitiesEvent=xa;var Pa=class extends ge.Event{constructor(e,t,r){super("progressStart"),this.body={progressId:e,title:t},typeof r=="string"&&(this.body.message=r)}};F.ProgressStartEvent=Pa;var Ma=class extends ge.Event{constructor(e,t){super("progressUpdate"),this.body={progressId:e},typeof t=="string"&&(this.body.message=t)}};F.ProgressUpdateEvent=Ma;var Sa=class extends ge.Event{constructor(e,t){super("progressEnd"),this.body={progressId:e},typeof t=="string"&&(this.body.message=t)}};F.ProgressEndEvent=Sa;var ka=class extends ge.Event{constructor(e,t,r){super("invalidated"),this.body={},e&&(this.body.areas=e),t&&(this.body.threadId=t),r&&(this.body.stackFrameId=r)}};F.InvalidatedEvent=ka;var ja=class extends ge.Event{constructor(e,t,r){super("memory"),this.body={memoryReference:e,offset:t,count:r}}};F.MemoryEvent=ja;var Tt;(function(n){n[n.User=1]="User",n[n.Telemetry=2]="Telemetry"})(Tt=F.ErrorDestination||(F.ErrorDestination={}));var ur=class n extends kp.ProtocolServer{constructor(e,t){super();let r=typeof e=="boolean"?e:!1;this._debuggerLinesStartAt1=r,this._debuggerColumnsStartAt1=r,this._debuggerPathsAreURIs=!1,this._clientLinesStartAt1=!0,this._clientColumnsStartAt1=!0,this._clientPathsAreURIs=!1,this._isServer=typeof t=="boolean"?t:!1,this.on("close",()=>{this.shutdown()}),this.on("error",a=>{this.shutdown()})}setDebuggerPathFormat(e){this._debuggerPathsAreURIs=e!=="path"}setDebuggerLinesStartAt1(e){this._debuggerLinesStartAt1=e}setDebuggerColumnsStartAt1(e){this._debuggerColumnsStartAt1=e}setRunAsServer(e){this._isServer=e}static run(e){(0,jp.runDebugAdapter)(e)}shutdown(){this._isServer||this._isRunningInline()||setTimeout(()=>{process.exit(0)},100)}sendErrorResponse(e,t,r,a,i=Tt.User){let o;typeof t=="number"?(o={id:t,format:r},a&&(o.variables=a),i&Tt.User&&(o.showUser=!0),i&Tt.Telemetry&&(o.sendTelemetry=!0)):o=t,e.success=!1,e.message=n.formatPII(o.format,!0,o.variables),e.body||(e.body={}),e.body.error=o,this.sendResponse(e)}runInTerminalRequest(e,t,r){this.sendRequest("runInTerminal",e,t,r)}dispatchRequest(e){let t=new ge.Response(e);try{if(e.command==="initialize"){var r=e.arguments;if(typeof r.linesStartAt1=="boolean"&&(this._clientLinesStartAt1=r.linesStartAt1),typeof r.columnsStartAt1=="boolean"&&(this._clientColumnsStartAt1=r.columnsStartAt1),r.pathFormat!=="path")this.sendErrorResponse(t,2018,"debug adapter only supports native paths",null,Tt.Telemetry);else{let a=t;a.body={},this.initializeRequest(a,r)}}else e.command==="launch"?this.launchRequest(t,e.arguments,e):e.command==="attach"?this.attachRequest(t,e.arguments,e):e.command==="disconnect"?this.disconnectRequest(t,e.arguments,e):e.command==="terminate"?this.terminateRequest(t,e.arguments,e):e.command==="restart"?this.restartRequest(t,e.arguments,e):e.command==="setBreakpoints"?this.setBreakPointsRequest(t,e.arguments,e):e.command==="setFunctionBreakpoints"?this.setFunctionBreakPointsRequest(t,e.arguments,e):e.command==="setExceptionBreakpoints"?this.setExceptionBreakPointsRequest(t,e.arguments,e):e.command==="configurationDone"?this.configurationDoneRequest(t,e.arguments,e):e.command==="continue"?this.continueRequest(t,e.arguments,e):e.command==="next"?this.nextRequest(t,e.arguments,e):e.command==="stepIn"?this.stepInRequest(t,e.arguments,e):e.command==="stepOut"?this.stepOutRequest(t,e.arguments,e):e.command==="stepBack"?this.stepBackRequest(t,e.arguments,e):e.command==="reverseContinue"?this.reverseContinueRequest(t,e.arguments,e):e.command==="restartFrame"?this.restartFrameRequest(t,e.arguments,e):e.command==="goto"?this.gotoRequest(t,e.arguments,e):e.command==="pause"?this.pauseRequest(t,e.arguments,e):e.command==="stackTrace"?this.stackTraceRequest(t,e.arguments,e):e.command==="scopes"?this.scopesRequest(t,e.arguments,e):e.command==="variables"?this.variablesRequest(t,e.arguments,e):e.command==="setVariable"?this.setVariableRequest(t,e.arguments,e):e.command==="setExpression"?this.setExpressionRequest(t,e.arguments,e):e.command==="source"?this.sourceRequest(t,e.arguments,e):e.command==="threads"?this.threadsRequest(t,e):e.command==="terminateThreads"?this.terminateThreadsRequest(t,e.arguments,e):e.command==="evaluate"?this.evaluateRequest(t,e.arguments,e):e.command==="stepInTargets"?this.stepInTargetsRequest(t,e.arguments,e):e.command==="gotoTargets"?this.gotoTargetsRequest(t,e.arguments,e):e.command==="completions"?this.completionsRequest(t,e.arguments,e):e.command==="exceptionInfo"?this.exceptionInfoRequest(t,e.arguments,e):e.command==="loadedSources"?this.loadedSourcesRequest(t,e.arguments,e):e.command==="dataBreakpointInfo"?this.dataBreakpointInfoRequest(t,e.arguments,e):e.command==="setDataBreakpoints"?this.setDataBreakpointsRequest(t,e.arguments,e):e.command==="readMemory"?this.readMemoryRequest(t,e.arguments,e):e.command==="writeMemory"?this.writeMemoryRequest(t,e.arguments,e):e.command==="disassemble"?this.disassembleRequest(t,e.arguments,e):e.command==="cancel"?this.cancelRequest(t,e.arguments,e):e.command==="breakpointLocations"?this.breakpointLocationsRequest(t,e.arguments,e):e.command==="setInstructionBreakpoints"?this.setInstructionBreakpointsRequest(t,e.arguments,e):this.customRequest(e.command,t,e.arguments,e)}catch(a){this.sendErrorResponse(t,1104,"{_stack}",{_exception:a.message,_stack:a.stack},Tt.Telemetry)}}initializeRequest(e,t){e.body.supportsConditionalBreakpoints=!1,e.body.supportsHitConditionalBreakpoints=!1,e.body.supportsFunctionBreakpoints=!1,e.body.supportsConfigurationDoneRequest=!0,e.body.supportsEvaluateForHovers=!1,e.body.supportsStepBack=!1,e.body.supportsSetVariable=!1,e.body.supportsRestartFrame=!1,e.body.supportsStepInTargetsRequest=!1,e.body.supportsGotoTargetsRequest=!1,e.body.supportsCompletionsRequest=!1,e.body.supportsRestartRequest=!1,e.body.supportsExceptionOptions=!1,e.body.supportsValueFormattingOptions=!1,e.body.supportsExceptionInfoRequest=!1,e.body.supportTerminateDebuggee=!1,e.body.supportsDelayedStackTraceLoading=!1,e.body.supportsLoadedSourcesRequest=!1,e.body.supportsLogPoints=!1,e.body.supportsTerminateThreadsRequest=!1,e.body.supportsSetExpression=!1,e.body.supportsTerminateRequest=!1,e.body.supportsDataBreakpoints=!1,e.body.supportsReadMemoryRequest=!1,e.body.supportsDisassembleRequest=!1,e.body.supportsCancelRequest=!1,e.body.supportsBreakpointLocationsRequest=!1,e.body.supportsClipboardContext=!1,e.body.supportsSteppingGranularity=!1,e.body.supportsInstructionBreakpoints=!1,e.body.supportsExceptionFilterOptions=!1,this.sendResponse(e)}disconnectRequest(e,t,r){this.sendResponse(e),this.shutdown()}launchRequest(e,t,r){this.sendResponse(e)}attachRequest(e,t,r){this.sendResponse(e)}terminateRequest(e,t,r){this.sendResponse(e)}restartRequest(e,t,r){this.sendResponse(e)}setBreakPointsRequest(e,t,r){this.sendResponse(e)}setFunctionBreakPointsRequest(e,t,r){this.sendResponse(e)}setExceptionBreakPointsRequest(e,t,r){this.sendResponse(e)}configurationDoneRequest(e,t,r){this.sendResponse(e)}continueRequest(e,t,r){this.sendResponse(e)}nextRequest(e,t,r){this.sendResponse(e)}stepInRequest(e,t,r){this.sendResponse(e)}stepOutRequest(e,t,r){this.sendResponse(e)}stepBackRequest(e,t,r){this.sendResponse(e)}reverseContinueRequest(e,t,r){this.sendResponse(e)}restartFrameRequest(e,t,r){this.sendResponse(e)}gotoRequest(e,t,r){this.sendResponse(e)}pauseRequest(e,t,r){this.sendResponse(e)}sourceRequest(e,t,r){this.sendResponse(e)}threadsRequest(e,t){this.sendResponse(e)}terminateThreadsRequest(e,t,r){this.sendResponse(e)}stackTraceRequest(e,t,r){this.sendResponse(e)}scopesRequest(e,t,r){this.sendResponse(e)}variablesRequest(e,t,r){this.sendResponse(e)}setVariableRequest(e,t,r){this.sendResponse(e)}setExpressionRequest(e,t,r){this.sendResponse(e)}evaluateRequest(e,t,r){this.sendResponse(e)}stepInTargetsRequest(e,t,r){this.sendResponse(e)}gotoTargetsRequest(e,t,r){this.sendResponse(e)}completionsRequest(e,t,r){this.sendResponse(e)}exceptionInfoRequest(e,t,r){this.sendResponse(e)}loadedSourcesRequest(e,t,r){this.sendResponse(e)}dataBreakpointInfoRequest(e,t,r){this.sendResponse(e)}setDataBreakpointsRequest(e,t,r){this.sendResponse(e)}readMemoryRequest(e,t,r){this.sendResponse(e)}writeMemoryRequest(e,t,r){this.sendResponse(e)}disassembleRequest(e,t,r){this.sendResponse(e)}cancelRequest(e,t,r){this.sendResponse(e)}breakpointLocationsRequest(e,t,r){this.sendResponse(e)}setInstructionBreakpointsRequest(e,t,r){this.sendResponse(e)}customRequest(e,t,r,a){this.sendErrorResponse(t,1014,"unrecognized request",null,Tt.Telemetry)}convertClientLineToDebugger(e){return this._debuggerLinesStartAt1?this._clientLinesStartAt1?e:e+1:this._clientLinesStartAt1?e-1:e}convertDebuggerLineToClient(e){return this._debuggerLinesStartAt1?this._clientLinesStartAt1?e:e-1:this._clientLinesStartAt1?e+1:e}convertClientColumnToDebugger(e){return this._debuggerColumnsStartAt1?this._clientColumnsStartAt1?e:e+1:this._clientColumnsStartAt1?e-1:e}convertDebuggerColumnToClient(e){return this._debuggerColumnsStartAt1?this._clientColumnsStartAt1?e:e-1:this._clientColumnsStartAt1?e+1:e}convertClientPathToDebugger(e){return this._clientPathsAreURIs!==this._debuggerPathsAreURIs?this._clientPathsAreURIs?n.uri2path(e):n.path2uri(e):e}convertDebuggerPathToClient(e){return this._debuggerPathsAreURIs!==this._clientPathsAreURIs?this._debuggerPathsAreURIs?n.uri2path(e):n.path2uri(e):e}static path2uri(e){process.platform==="win32"&&(/^[A-Z]:/.test(e)&&(e=e[0].toLowerCase()+e.substr(1)),e=e.replace(/\\/g,"/")),e=encodeURI(e);let t=new Po.URL("file:");return t.pathname=e,t.toString()}static uri2path(e){let t=new Po.URL(e),r=decodeURIComponent(t.pathname);return process.platform==="win32"&&(/^\/[a-zA-Z]:/.test(r)&&(r=r[1].toLowerCase()+r.substr(2)),r=r.replace(/\//g,"\\")),r}static formatPII(e,t,r){return e.replace(n._formatPIIRegexp,function(a,i){return t&&i.length>0&&i[0]!=="_"?a:r[i]&&r.hasOwnProperty(i)?r[i]:a})}};F.DebugSession=ur;ur._formatPIIRegexp=/{([^}]+)}/g});var jo=$e(mr=>{"use strict";Object.defineProperty(mr,"__esModule",{value:!0});mr.InternalLogger=void 0;var Mo=require("fs"),So=require("path"),Ce=hr(),Ca=class{constructor(e,t){this.beforeExitCallback=()=>this.dispose(),this._logCallback=e,this._logToConsole=t,this._minLogLevel=Ce.LogLevel.Warn,this.disposeCallback=(r,a)=>{this.dispose(),a=a||2,a+=128,process.exit(a)}}async setup(e){if(this._minLogLevel=e.consoleMinLogLevel,this._prependTimestamp=e.prependTimestamp,e.logFilePath)if(!So.isAbsolute(e.logFilePath))this.log(`logFilePath must be an absolute path: ${e.logFilePath}`,Ce.LogLevel.Error);else{let t=r=>this.sendLog(`Error creating log file at path: ${e.logFilePath}. Error: ${r.toString()}
+`,Ce.LogLevel.Error);try{await Mo.promises.mkdir(So.dirname(e.logFilePath),{recursive:!0}),this.log(`Verbose logs are written to:
+`,Ce.LogLevel.Warn),this.log(e.logFilePath+`
+`,Ce.LogLevel.Warn),this._logFileStream=Mo.createWriteStream(e.logFilePath),this.logDateTime(),this.setupShutdownListeners(),this._logFileStream.on("error",r=>{t(r)})}catch(r){t(r)}}}logDateTime(){let e=new Date,r=e.getUTCFullYear()+`-${e.getUTCMonth()+1}-`+e.getUTCDate()+", "+ko();this.log(r+`
+`,Ce.LogLevel.Verbose,!1)}setupShutdownListeners(){process.on("beforeExit",this.beforeExitCallback),process.on("SIGTERM",this.disposeCallback),process.on("SIGINT",this.disposeCallback)}removeShutdownListeners(){process.removeListener("beforeExit",this.beforeExitCallback),process.removeListener("SIGTERM",this.disposeCallback),process.removeListener("SIGINT",this.disposeCallback)}dispose(){return new Promise(e=>{this.removeShutdownListeners(),this._logFileStream?(this._logFileStream.end(e),this._logFileStream=null):e()})}log(e,t,r=!0){if(this._minLogLevel!==Ce.LogLevel.Stop){if(t>=this._minLogLevel&&this.sendLog(e,t),this._logToConsole){let a=t===Ce.LogLevel.Error?console.error:t===Ce.LogLevel.Warn?console.warn:null;a&&a((0,Ce.trimLastNewline)(e))}t===Ce.LogLevel.Error&&(e=`[${Ce.LogLevel[t]}] ${e}`),this._prependTimestamp&&r&&(e="["+ko()+"] "+e),this._logFileStream&&this._logFileStream.write(e)}}sendLog(e,t){if(e.length>1500){let r=!!e.match(/(\n|\r\n)$/);e=e.substr(0,1500)+"[...]",r&&(e=e+`
+`)}if(this._logCallback){let r=new Ce.LogOutputEvent(e,t);this._logCallback(r)}}};mr.InternalLogger=Ca;function ko(){let n=new Date,e=cr(2,String(n.getUTCHours())),t=cr(2,String(n.getUTCMinutes())),r=cr(2,String(n.getUTCSeconds())),a=cr(3,String(n.getUTCMilliseconds()));return e+":"+t+":"+r+"."+a+" UTC"}function cr(n,e){return e.length>=n?e:String("0".repeat(n)+e).slice(-n)}});var hr=$e(Re=>{"use strict";Object.defineProperty(Re,"__esModule",{value:!0});Re.trimLastNewline=Re.LogOutputEvent=Re.logger=Re.Logger=Re.LogLevel=void 0;var Cp=jo(),Rp=dr(),lt;(function(n){n[n.Verbose=0]="Verbose",n[n.Log=1]="Log",n[n.Warn=2]="Warn",n[n.Error=3]="Error",n[n.Stop=4]="Stop"})(lt=Re.LogLevel||(Re.LogLevel={}));var gr=class{constructor(){this._pendingLogQ=[]}log(e,t=lt.Log){e=e+`
+`,this._write(e,t)}verbose(e){this.log(e,lt.Verbose)}warn(e){this.log(e,lt.Warn)}error(e){this.log(e,lt.Error)}dispose(){if(this._currentLogger){let e=this._currentLogger.dispose();return this._currentLogger=null,e}else return Promise.resolve()}_write(e,t=lt.Log){e=e+"",this._pendingLogQ?this._pendingLogQ.push({msg:e,level:t}):this._currentLogger&&this._currentLogger.log(e,t)}setup(e,t,r=!0){let a=typeof t=="string"?t:t&&this._logFilePathFromInit;if(this._currentLogger){let i={consoleMinLogLevel:e,logFilePath:a,prependTimestamp:r};this._currentLogger.setup(i).then(()=>{if(this._pendingLogQ){let o=this._pendingLogQ;this._pendingLogQ=null,o.forEach(s=>this._write(s.msg,s.level))}})}}init(e,t,r){this._pendingLogQ=this._pendingLogQ||[],this._currentLogger=new Cp.InternalLogger(e,r),this._logFilePathFromInit=t}};Re.Logger=gr;Re.logger=new gr;var Ra=class extends Rp.OutputEvent{constructor(e,t){let r=t===lt.Error?"stderr":t===lt.Warn?"console":"stdout";super(e,r)}};Re.LogOutputEvent=Ra;function Ip(n){return n.replace(/(\n|\r\n)$/,"")}Re.trimLastNewline=Ip});var Io=$e(yr=>{"use strict";Object.defineProperty(yr,"__esModule",{value:!0});yr.LoggingDebugSession=void 0;var Ro=hr(),St=Ro.logger,Co=dr(),Ia=class extends Co.DebugSession{constructor(e,t,r){super(t,r),this.obsolete_logFilePath=e,this.on("error",a=>{St.error(a.body)})}start(e,t){super.start(e,t),St.init(r=>this.sendEvent(r),this.obsolete_logFilePath,this._isServer)}sendEvent(e){if(!(e instanceof Ro.LogOutputEvent)){let t=e;e instanceof Co.OutputEvent&&e.body&&e.body.data&&e.body.data.doNotLogOutput&&(delete e.body.data.doNotLogOutput,t={...e},t.body={...e.body,output:"<output not logged>"}),St.verbose(`To client: ${JSON.stringify(t)}`)}super.sendEvent(e)}sendRequest(e,t,r,a){St.verbose(`To client: ${JSON.stringify(e)}(${JSON.stringify(t)}), timeout: ${r}`),super.sendRequest(e,t,r,a)}sendResponse(e){St.verbose(`To client: ${JSON.stringify(e)}`),super.sendResponse(e)}dispatchRequest(e){St.verbose(`From client: ${e.command}(${JSON.stringify(e.arguments)})`),super.dispatchRequest(e)}};yr.LoggingDebugSession=Ia});var Eo=$e(fr=>{"use strict";Object.defineProperty(fr,"__esModule",{value:!0});fr.Handles=void 0;var Ea=class{constructor(e){this.START_HANDLE=1e3,this._handleMap=new Map,this._nextHandle=typeof e=="number"?e:this.START_HANDLE}reset(){this._nextHandle=this.START_HANDLE,this._handleMap=new Map}create(e){var t=this._nextHandle++;return this._handleMap.set(t,e),t}get(e,t){return this._handleMap.get(e)||t}};fr.Handles=Ea});var Ao=$e(R=>{"use strict";Object.defineProperty(R,"__esModule",{value:!0});R.Handles=R.Response=R.Event=R.ErrorDestination=R.CompletionItem=R.Module=R.Source=R.Breakpoint=R.Variable=R.Scope=R.StackFrame=R.Thread=R.MemoryEvent=R.InvalidatedEvent=R.ProgressEndEvent=R.ProgressUpdateEvent=R.ProgressStartEvent=R.CapabilitiesEvent=R.LoadedSourceEvent=R.ModuleEvent=R.BreakpointEvent=R.ThreadEvent=R.OutputEvent=R.ContinuedEvent=R.StoppedEvent=R.ExitedEvent=R.TerminatedEvent=R.InitializedEvent=R.logger=R.Logger=R.LoggingDebugSession=R.DebugSession=void 0;var ee=dr();Object.defineProperty(R,"DebugSession",{enumerable:!0,get:function(){return ee.DebugSession}});Object.defineProperty(R,"InitializedEvent",{enumerable:!0,get:function(){return ee.InitializedEvent}});Object.defineProperty(R,"TerminatedEvent",{enumerable:!0,get:function(){return ee.TerminatedEvent}});Object.defineProperty(R,"ExitedEvent",{enumerable:!0,get:function(){return ee.ExitedEvent}});Object.defineProperty(R,"StoppedEvent",{enumerable:!0,get:function(){return ee.StoppedEvent}});Object.defineProperty(R,"ContinuedEvent",{enumerable:!0,get:function(){return ee.ContinuedEvent}});Object.defineProperty(R,"OutputEvent",{enumerable:!0,get:function(){return ee.OutputEvent}});Object.defineProperty(R,"ThreadEvent",{enumerable:!0,get:function(){return ee.ThreadEvent}});Object.defineProperty(R,"BreakpointEvent",{enumerable:!0,get:function(){return ee.BreakpointEvent}});Object.defineProperty(R,"ModuleEvent",{enumerable:!0,get:function(){return ee.ModuleEvent}});Object.defineProperty(R,"LoadedSourceEvent",{enumerable:!0,get:function(){return ee.LoadedSourceEvent}});Object.defineProperty(R,"CapabilitiesEvent",{enumerable:!0,get:function(){return ee.CapabilitiesEvent}});Object.defineProperty(R,"ProgressStartEvent",{enumerable:!0,get:function(){return ee.ProgressStartEvent}});Object.defineProperty(R,"ProgressUpdateEvent",{enumerable:!0,get:function(){return ee.ProgressUpdateEvent}});Object.defineProperty(R,"ProgressEndEvent",{enumerable:!0,get:function(){return ee.ProgressEndEvent}});Object.defineProperty(R,"InvalidatedEvent",{enumerable:!0,get:function(){return ee.InvalidatedEvent}});Object.defineProperty(R,"MemoryEvent",{enumerable:!0,get:function(){return ee.MemoryEvent}});Object.defineProperty(R,"Thread",{enumerable:!0,get:function(){return ee.Thread}});Object.defineProperty(R,"StackFrame",{enumerable:!0,get:function(){return ee.StackFrame}});Object.defineProperty(R,"Scope",{enumerable:!0,get:function(){return ee.Scope}});Object.defineProperty(R,"Variable",{enumerable:!0,get:function(){return ee.Variable}});Object.defineProperty(R,"Breakpoint",{enumerable:!0,get:function(){return ee.Breakpoint}});Object.defineProperty(R,"Source",{enumerable:!0,get:function(){return ee.Source}});Object.defineProperty(R,"Module",{enumerable:!0,get:function(){return ee.Module}});Object.defineProperty(R,"CompletionItem",{enumerable:!0,get:function(){return ee.CompletionItem}});Object.defineProperty(R,"ErrorDestination",{enumerable:!0,get:function(){return ee.ErrorDestination}});var Ep=Io();Object.defineProperty(R,"LoggingDebugSession",{enumerable:!0,get:function(){return Ep.LoggingDebugSession}});var Do=hr();R.Logger=Do;var Bo=or();Object.defineProperty(R,"Event",{enumerable:!0,get:function(){return Bo.Event}});Object.defineProperty(R,"Response",{enumerable:!0,get:function(){return Bo.Response}});var Dp=Eo();Object.defineProperty(R,"Handles",{enumerable:!0,get:function(){return Dp.Handles}});var Bp=Do.logger;R.logger=Bp});var Gp={};Zt(Gp,{activate:()=>Ap,deactivate:()=>Fp});module.exports=Qt(Gp);var S=C(require("vscode")),Fe=C(require("path")),Ie=C(require("fs"));var Xa=C(require("readline"));function Za(n){return{kill:()=>{}}}function ds(n){let e=ms(n),t=hs(n);Xa.createInterface({input:process.stdin,output:void 0,terminal:!1}).on("line",a=>{let i=a.trim();if(!i)return;let o;try{o=JSON.parse(i)}catch{Ya({jsonrpc:"2.0",id:0,error:{code:-32700,message:"Parse error"}});return}cs(o,e,t).then(s=>{Ya(s)})})}function Ya(n){let e=JSON.stringify(n);process.stdout.write(e+`
+`)}async function cs(n,e,t){let{id:r,method:a,params:i}=n;switch(a){case"initialize":return{jsonrpc:"2.0",id:r,result:{protocolVersion:"2024-11-05",capabilities:{tools:{}},serverInfo:{name:"lurek2d-mcp",version:"0.1.0"}}};case"notifications/initialized":return{jsonrpc:"2.0",id:r,result:{}};case"tools/list":return{jsonrpc:"2.0",id:r,result:{tools:t}};case"tools/call":{let o=i?.name,s=i?.arguments??{},l=e.get(o);if(!l)return{jsonrpc:"2.0",id:r,error:{code:-32601,message:`Unknown tool: ${o}`}};try{let p=await l(s);return{jsonrpc:"2.0",id:r,result:{content:[{type:"text",text:p}]}}}catch(p){return{jsonrpc:"2.0",id:r,result:{content:[{type:"text",text:`Error: ${p instanceof Error?p.message:String(p)}`}],isError:!0}}}}default:return{jsonrpc:"2.0",id:r,error:{code:-32601,message:`Method not found: ${a}`}}}}function ms(n){let{handleRunExample:e,handleGetApiDoc:t,handleListExamples:r,handleRunLuaTest:a,handleCheckBuild:i,handleGetLogs:o}=(Cr(),Qt(jr)),s=new Map;return s.set("lurek2d.runExample",e(n)),s.set("lurek2d.getApiDoc",t(n)),s.set("lurek2d.listExamples",r(n)),s.set("lurek2d.runLuaTest",a(n)),s.set("lurek2d.checkBuild",i(n)),s.set("lurek2d.getLogs",o(n)),s}function hs(n){let{getToolDefinitions:e}=(Cr(),Qt(jr));return e()}if(require.main===module){let n=process.argv.slice(2),e=process.cwd(),t=n.indexOf("--workspace");t!==-1&&n[t+1]&&(e=n[t+1]),ds(e)}var Se=C(require("vscode")),Rt=C(require("path")),rn=C(require("fs"));Lt();var an=class{terminal=null;_onStatusChange=new Se.EventEmitter;onStatusChange=this._onStatusChange.event;async findLurekBinary(){let e=Se.workspace.getConfiguration("lurek").get("enginePath","");if(e&&rn.existsSync(e))return e;let t=process.platform==="win32"?"lurek2d.exe":"lurek2d",r=(process.env.PATH??"").split(Rt.delimiter);for(let i of r){let o=Rt.join(i,t);if(rn.existsSync(o))return o}let a=Qa();if(a){let i=Rt.join(a,"Cargo.toml");if(rn.existsSync(i))return}throw new Error("Lurek2D binary not found. Install it or set lurek.lurekPath in settings.")}async run(e,t=[]){if(this.isRunning()){Se.window.showWarningMessage("Lurek2D is already running.");return}Se.workspace.getConfiguration("lurek").get("saveOnRun",!0)&&await Se.workspace.saveAll(!1);let a=await this.findLurekBinary(),i=[e,...t],o=a?Mr(a,i):jt("debug",i);this.terminal=Se.window.createTerminal({name:"Lurek2D",cwd:Qa()}),this.terminal.show(),this.terminal.sendText(o),this._onStatusChange.fire(!0),Se.commands.executeCommand("setContext","lurek.gameRunning",!0)}stop(){this.terminal&&(this.terminal.dispose(),this.terminal=null),this._onStatusChange.fire(!1),Se.commands.executeCommand("setContext","lurek.gameRunning",!1)}isRunning(){return this.terminal!==null}dispose(){this.stop(),this._onStatusChange.dispose()}};function Qa(){return Se.workspace.workspaceFolders?.[0]?.uri.fsPath}var dt=C(require("vscode")),on=class{item;constructor(){this.item=dt.window.createStatusBarItem(dt.StatusBarAlignment.Left,100),this.setStopped(),this.item.show()}setRunning(){this.item.text="$(play) Lurek2D: Running",this.item.tooltip="Lurek2D game is running \u2014 click to stop",this.item.command="lurek.stopGame",this.item.backgroundColor=new dt.ThemeColor("statusBarItem.warningBackground")}setStopped(){this.item.text="$(rocket) Lurek2D",this.item.tooltip="Lurek2D Toolkit \u2014 click to run game",this.item.command="lurek.runGame",this.item.backgroundColor=void 0}setDebugConnected(){this.item.text="$(debug-alt) Lurek2D: Debug",this.item.tooltip="Lurek2D debug bridge connected",this.item.command="lurek.debug.status",this.item.backgroundColor=new dt.ThemeColor("statusBarItem.prominentBackground")}dispose(){this.item.dispose()}};var ln=C(require("fs")),Ja=C(require("path")),gs={string:{common:[{name:"byte",signature:"string.byte(s, i, j)",description:"Returns the internal numeric codes of the characters s[i], s[i+1], ..., s[j].",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"i",type:"number",description:"Start index",optional:!0,default:"1"},{name:"j",type:"number",description:"End index",optional:!0,default:"i"}],returns:"number..."},{name:"char",signature:"string.char(...)",description:"Returns a string with characters with the given internal numeric codes.",params:[{name:"...",type:"number",description:"Byte values",optional:!1}],returns:"string"},{name:"find",signature:"string.find(s, pattern, init, plain)",description:"Looks for the first match of pattern in the string.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"pattern",type:"string",description:"Search pattern",optional:!1},{name:"init",type:"number",description:"Start position",optional:!0,default:"1"},{name:"plain",type:"boolean",description:"Plain text search",optional:!0,default:"false"}],returns:"number, number, ...string"},{name:"format",signature:"string.format(formatstring, ...)",description:"Returns a formatted string following the description given in its arguments.",params:[{name:"formatstring",type:"string",description:"Format string",optional:!1},{name:"...",type:"any",description:"Format arguments",optional:!0}],returns:"string"},{name:"gmatch",signature:"string.gmatch(s, pattern)",description:"Returns an iterator function that returns the next captures from pattern over string s.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"pattern",type:"string",description:"Pattern",optional:!1}],returns:"function"},{name:"gsub",signature:"string.gsub(s, pattern, repl, n)",description:"Returns a copy of s in which all (or the first n) occurrences of the pattern are replaced.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"pattern",type:"string",description:"Pattern",optional:!1},{name:"repl",type:"string|table|function",description:"Replacement",optional:!1},{name:"n",type:"number",description:"Max replacements",optional:!0}],returns:"string, number"},{name:"len",signature:"string.len(s)",description:"Returns the length of the string.",params:[{name:"s",type:"string",description:"Input string",optional:!1}],returns:"number"},{name:"lower",signature:"string.lower(s)",description:"Returns a copy of this string with all uppercase letters changed to lowercase.",params:[{name:"s",type:"string",description:"Input string",optional:!1}],returns:"string"},{name:"match",signature:"string.match(s, pattern, init)",description:"Looks for the first match of pattern in the string.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"pattern",type:"string",description:"Pattern",optional:!1},{name:"init",type:"number",description:"Start position",optional:!0,default:"1"}],returns:"string..."},{name:"rep",signature:"string.rep(s, n, sep)",description:"Returns a string that is the concatenation of n copies of the string s.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"n",type:"number",description:"Repetitions",optional:!1},{name:"sep",type:"string",description:"Separator",optional:!0,default:'""'}],returns:"string"},{name:"reverse",signature:"string.reverse(s)",description:"Returns a string that is the string s reversed.",params:[{name:"s",type:"string",description:"Input string",optional:!1}],returns:"string"},{name:"sub",signature:"string.sub(s, i, j)",description:"Returns the substring from i to j.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"i",type:"number",description:"Start index",optional:!1},{name:"j",type:"number",description:"End index",optional:!0,default:"-1"}],returns:"string"},{name:"upper",signature:"string.upper(s)",description:"Returns a copy of this string with all lowercase letters changed to uppercase.",params:[{name:"s",type:"string",description:"Input string",optional:!1}],returns:"string"},{name:"dump",signature:"string.dump(function, strip)",description:"Returns a string containing a binary representation of the given function.",params:[{name:"function",type:"function",description:"Function to dump",optional:!1},{name:"strip",type:"boolean",description:"Strip debug info",optional:!0}],returns:"string"}]},table:{common:[{name:"concat",signature:"table.concat(list, sep, i, j)",description:"Concatenates elements of a table into a string.",params:[{name:"list",type:"table",description:"Input table",optional:!1},{name:"sep",type:"string",description:"Separator",optional:!0,default:'""'},{name:"i",type:"number",description:"Start index",optional:!0,default:"1"},{name:"j",type:"number",description:"End index",optional:!0,default:"#list"}],returns:"string"},{name:"insert",signature:"table.insert(list, pos, value)",description:"Inserts element value at position pos in list.",params:[{name:"list",type:"table",description:"Target table",optional:!1},{name:"pos",type:"number",description:"Position",optional:!0},{name:"value",type:"any",description:"Value to insert",optional:!1}],returns:"nil"},{name:"remove",signature:"table.remove(list, pos)",description:"Removes from list the element at position pos.",params:[{name:"list",type:"table",description:"Target table",optional:!1},{name:"pos",type:"number",description:"Position",optional:!0,default:"#list"}],returns:"any"},{name:"sort",signature:"table.sort(list, comp)",description:"Sorts list elements in-place using the given comparison function.",params:[{name:"list",type:"table",description:"Table to sort",optional:!1},{name:"comp",type:"function",description:"Comparison function",optional:!0}],returns:"nil"},{name:"unpack",signature:"table.unpack(list, i, j)",description:"Returns the elements from the given table.",params:[{name:"list",type:"table",description:"Input table",optional:!1},{name:"i",type:"number",description:"Start index",optional:!0,default:"1"},{name:"j",type:"number",description:"End index",optional:!0,default:"#list"}],returns:"any..."}],lua54Only:[{name:"move",signature:"table.move(a1, f, e, t, a2)",description:"Moves elements from table a1 into table a2.",params:[{name:"a1",type:"table",description:"Source table",optional:!1},{name:"f",type:"number",description:"From index",optional:!1},{name:"e",type:"number",description:"End index",optional:!1},{name:"t",type:"number",description:"Target start",optional:!1},{name:"a2",type:"table",description:"Dest table",optional:!0,default:"a1"}],returns:"table"},{name:"pack",signature:"table.pack(...)",description:"Returns a new table with all arguments stored into keys 1, 2, etc.",params:[{name:"...",type:"any",description:"Values to pack",optional:!1}],returns:"table"}],luajitOnly:[{name:"new",signature:"table.new(narray, nhash)",description:"Pre-allocates a table with the given number of array and hash slots.",params:[{name:"narray",type:"number",description:"Array slots",optional:!1},{name:"nhash",type:"number",description:"Hash slots",optional:!1}],returns:"table"},{name:"clear",signature:"table.clear(tab)",description:"Clears all keys and values from a table.",params:[{name:"tab",type:"table",description:"Table to clear",optional:!1}],returns:"nil"}]},math:{common:[{name:"abs",signature:"math.abs(x)",description:"Returns the absolute value of x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"acos",signature:"math.acos(x)",description:"Returns the arc cosine of x (in radians).",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"asin",signature:"math.asin(x)",description:"Returns the arc sine of x (in radians).",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"atan",signature:"math.atan(y, x)",description:"Returns the arc tangent of y/x (in radians).",params:[{name:"y",type:"number",description:"Y value",optional:!1},{name:"x",type:"number",description:"X value",optional:!0,default:"1"}],returns:"number"},{name:"ceil",signature:"math.ceil(x)",description:"Returns the smallest integer larger than or equal to x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"cos",signature:"math.cos(x)",description:"Returns the cosine of x (in radians).",params:[{name:"x",type:"number",description:"Angle in radians",optional:!1}],returns:"number"},{name:"deg",signature:"math.deg(x)",description:"Converts angle x from radians to degrees.",params:[{name:"x",type:"number",description:"Angle in radians",optional:!1}],returns:"number"},{name:"exp",signature:"math.exp(x)",description:"Returns the value e^x.",params:[{name:"x",type:"number",description:"Exponent",optional:!1}],returns:"number"},{name:"floor",signature:"math.floor(x)",description:"Returns the largest integer smaller than or equal to x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"fmod",signature:"math.fmod(x, y)",description:"Returns the remainder of the division of x by y.",params:[{name:"x",type:"number",description:"Dividend",optional:!1},{name:"y",type:"number",description:"Divisor",optional:!1}],returns:"number"},{name:"huge",signature:"math.huge",description:"The value HUGE_VAL, representing positive infinity.",params:[],returns:"number"},{name:"log",signature:"math.log(x, base)",description:"Returns the logarithm of x in the given base.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"base",type:"number",description:"Log base",optional:!0,default:"e"}],returns:"number"},{name:"max",signature:"math.max(x, ...)",description:"Returns the maximum value among its arguments.",params:[{name:"x",type:"number",description:"First value",optional:!1},{name:"...",type:"number",description:"More values",optional:!0}],returns:"number"},{name:"min",signature:"math.min(x, ...)",description:"Returns the minimum value among its arguments.",params:[{name:"x",type:"number",description:"First value",optional:!1},{name:"...",type:"number",description:"More values",optional:!0}],returns:"number"},{name:"modf",signature:"math.modf(x)",description:"Returns the integral and fractional parts of x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number, number"},{name:"pi",signature:"math.pi",description:"The value of pi.",params:[],returns:"number"},{name:"rad",signature:"math.rad(x)",description:"Converts angle x from degrees to radians.",params:[{name:"x",type:"number",description:"Angle in degrees",optional:!1}],returns:"number"},{name:"random",signature:"math.random(m, n)",description:"Returns a pseudo-random number.",params:[{name:"m",type:"number",description:"Lower bound",optional:!0},{name:"n",type:"number",description:"Upper bound",optional:!0}],returns:"number"},{name:"randomseed",signature:"math.randomseed(x)",description:"Sets x as the seed for the pseudo-random generator.",params:[{name:"x",type:"number",description:"Seed value",optional:!1}],returns:"nil"},{name:"sin",signature:"math.sin(x)",description:"Returns the sine of x (in radians).",params:[{name:"x",type:"number",description:"Angle in radians",optional:!1}],returns:"number"},{name:"sqrt",signature:"math.sqrt(x)",description:"Returns the square root of x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"tan",signature:"math.tan(x)",description:"Returns the tangent of x (in radians).",params:[{name:"x",type:"number",description:"Angle in radians",optional:!1}],returns:"number"}],lua54Only:[{name:"maxinteger",signature:"math.maxinteger",description:"An integer with the maximum value for an integer.",params:[],returns:"integer"},{name:"mininteger",signature:"math.mininteger",description:"An integer with the minimum value for an integer.",params:[],returns:"integer"},{name:"tointeger",signature:"math.tointeger(x)",description:"If x is convertible to an integer, returns that integer.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"integer|nil"},{name:"type",signature:"math.type(x)",description:"Returns 'integer', 'float', or false.",params:[{name:"x",type:"any",description:"Value to check",optional:!1}],returns:"string|false"},{name:"ult",signature:"math.ult(m, n)",description:"Returns true if m < n when compared as unsigned integers.",params:[{name:"m",type:"integer",description:"First value",optional:!1},{name:"n",type:"integer",description:"Second value",optional:!1}],returns:"boolean"}]},os:{common:[{name:"clock",signature:"os.clock()",description:"Returns CPU time used by the program in seconds.",params:[],returns:"number"},{name:"date",signature:"os.date(format, time)",description:"Returns a string or table with date and time.",params:[{name:"format",type:"string",description:"Date format",optional:!0,default:'"%c"'},{name:"time",type:"number",description:"Time value",optional:!0}],returns:"string|table"},{name:"difftime",signature:"os.difftime(t2, t1)",description:"Returns the difference in seconds between two times.",params:[{name:"t2",type:"number",description:"End time",optional:!1},{name:"t1",type:"number",description:"Start time",optional:!1}],returns:"number"},{name:"time",signature:"os.time(table)",description:"Returns the current time or converts the given table to a timestamp.",params:[{name:"table",type:"table",description:"Date table",optional:!0}],returns:"number"}]},io:{common:[{name:"close",signature:"io.close(file)",description:"Closes file, or the default output file.",params:[{name:"file",type:"file",description:"File handle",optional:!0}],returns:"boolean"},{name:"lines",signature:"io.lines(filename, ...)",description:"Opens the given file and returns an iterator function.",params:[{name:"filename",type:"string",description:"File path",optional:!0},{name:"...",type:"string|number",description:"Read formats",optional:!0}],returns:"function"},{name:"open",signature:"io.open(filename, mode)",description:"Opens a file in the given mode.",params:[{name:"filename",type:"string",description:"File path",optional:!1},{name:"mode",type:"string",description:"Open mode",optional:!0,default:'"r"'}],returns:"file|nil, string"},{name:"read",signature:"io.read(...)",description:"Reads from the default input file.",params:[{name:"...",type:"string|number",description:"Read formats",optional:!0}],returns:"string|number|nil"},{name:"write",signature:"io.write(...)",description:"Writes to the default output file.",params:[{name:"...",type:"string|number",description:"Values to write",optional:!1}],returns:"file|nil, string"},{name:"type",signature:"io.type(obj)",description:"Checks whether obj is a valid file handle.",params:[{name:"obj",type:"any",description:"Value to check",optional:!1}],returns:"string|nil"}]},coroutine:{common:[{name:"create",signature:"coroutine.create(f)",description:"Creates a new coroutine with body f.",params:[{name:"f",type:"function",description:"Coroutine body",optional:!1}],returns:"thread"},{name:"resume",signature:"coroutine.resume(co, ...)",description:"Starts or continues the execution of coroutine co.",params:[{name:"co",type:"thread",description:"Coroutine",optional:!1},{name:"...",type:"any",description:"Arguments",optional:!0}],returns:"boolean, any..."},{name:"yield",signature:"coroutine.yield(...)",description:"Suspends the execution of the calling coroutine.",params:[{name:"...",type:"any",description:"Values to yield",optional:!0}],returns:"any..."},{name:"status",signature:"coroutine.status(co)",description:"Returns the status of coroutine co.",params:[{name:"co",type:"thread",description:"Coroutine",optional:!1}],returns:"string"},{name:"wrap",signature:"coroutine.wrap(f)",description:"Creates a coroutine and returns a resume function.",params:[{name:"f",type:"function",description:"Coroutine body",optional:!1}],returns:"function"},{name:"isyieldable",signature:"coroutine.isyieldable()",description:"Returns true if the running coroutine can yield.",params:[],returns:"boolean"},{name:"running",signature:"coroutine.running()",description:"Returns the running coroutine plus a boolean.",params:[],returns:"thread, boolean"}]},debug:{common:[{name:"getinfo",signature:"debug.getinfo(f, what)",description:"Returns a table with information about a function.",params:[{name:"f",type:"function|number",description:"Function or stack level",optional:!1},{name:"what",type:"string",description:"Info selector",optional:!0}],returns:"table"},{name:"getlocal",signature:"debug.getlocal(f, local)",description:"Returns name and value of local variable.",params:[{name:"f",type:"function|number",description:"Function or stack level",optional:!1},{name:"local",type:"number",description:"Local index",optional:!1}],returns:"string, any"},{name:"sethook",signature:"debug.sethook(hook, mask, count)",description:"Sets the given function as a hook.",params:[{name:"hook",type:"function",description:"Hook function",optional:!1},{name:"mask",type:"string",description:"Hook mask",optional:!1},{name:"count",type:"number",description:"Instruction count",optional:!0}],returns:"nil"},{name:"traceback",signature:"debug.traceback(message, level)",description:"Returns a string with a traceback of the call stack.",params:[{name:"message",type:"string",description:"Prefix message",optional:!0},{name:"level",type:"number",description:"Stack level",optional:!0,default:"1"}],returns:"string"}]},package:{common:[{name:"loaded",signature:"package.loaded",description:"A table of already-loaded modules.",params:[],returns:"table"},{name:"path",signature:"package.path",description:"The path used by require to search for a Lua loader.",params:[],returns:"string"},{name:"preload",signature:"package.preload",description:"A table to store loaders for specific modules.",params:[],returns:"table"},{name:"searchpath",signature:"package.searchpath(name, path, sep, rep)",description:"Searches for the given name in the given path.",params:[{name:"name",type:"string",description:"Module name",optional:!1},{name:"path",type:"string",description:"Search path",optional:!1},{name:"sep",type:"string",description:"Name separator",optional:!0,default:'"."'},{name:"rep",type:"string",description:"Replacement",optional:!0,default:'"/"'}],returns:"string|nil, string"}]},utf8:{common:[],lua54Only:[{name:"char",signature:"utf8.char(...)",description:"Returns a UTF-8 string from one or more codepoints.",params:[{name:"...",type:"number",description:"Codepoints",optional:!1}],returns:"string"},{name:"codepoint",signature:"utf8.codepoint(s, i, j)",description:"Returns the codepoints of all characters in s between positions i and j.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"i",type:"number",description:"Start",optional:!0,default:"1"},{name:"j",type:"number",description:"End",optional:!0,default:"i"}],returns:"number..."},{name:"codes",signature:"utf8.codes(s)",description:"Returns an iterator for all codepoints in string s.",params:[{name:"s",type:"string",description:"Input string",optional:!1}],returns:"function"},{name:"len",signature:"utf8.len(s, i, j)",description:"Returns the number of UTF-8 characters in string s.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"i",type:"number",description:"Start byte",optional:!0,default:"1"},{name:"j",type:"number",description:"End byte",optional:!0,default:"-1"}],returns:"number|nil, number"},{name:"offset",signature:"utf8.offset(s, n, i)",description:"Returns the byte position where the n-th character starts.",params:[{name:"s",type:"string",description:"Input string",optional:!1},{name:"n",type:"number",description:"Character offset",optional:!1},{name:"i",type:"number",description:"Start byte",optional:!0}],returns:"number"},{name:"charpattern",signature:"utf8.charpattern",description:"The pattern that matches exactly one UTF-8 byte sequence.",params:[],returns:"string"}]},bit:{common:[],luajitOnly:[{name:"tobit",signature:"bit.tobit(x)",description:"Normalizes a number to the numeric range of a 32-bit integer.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"tohex",signature:"bit.tohex(x, n)",description:"Converts x to a hex string with n digits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Number of digits",optional:!0}],returns:"string"},{name:"bnot",signature:"bit.bnot(x)",description:"Returns the bitwise NOT of x.",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"},{name:"band",signature:"bit.band(x1, ...)",description:"Returns the bitwise AND of all arguments.",params:[{name:"x1",type:"number",description:"First value",optional:!1},{name:"...",type:"number",description:"More values",optional:!0}],returns:"number"},{name:"bor",signature:"bit.bor(x1, ...)",description:"Returns the bitwise OR of all arguments.",params:[{name:"x1",type:"number",description:"First value",optional:!1},{name:"...",type:"number",description:"More values",optional:!0}],returns:"number"},{name:"bxor",signature:"bit.bxor(x1, ...)",description:"Returns the bitwise XOR of all arguments.",params:[{name:"x1",type:"number",description:"First value",optional:!1},{name:"...",type:"number",description:"More values",optional:!0}],returns:"number"},{name:"lshift",signature:"bit.lshift(x, n)",description:"Returns x logically shifted left by n bits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Shift amount",optional:!1}],returns:"number"},{name:"rshift",signature:"bit.rshift(x, n)",description:"Returns x logically shifted right by n bits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Shift amount",optional:!1}],returns:"number"},{name:"arshift",signature:"bit.arshift(x, n)",description:"Returns x arithmetically shifted right by n bits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Shift amount",optional:!1}],returns:"number"},{name:"rol",signature:"bit.rol(x, n)",description:"Returns x rotated left by n bits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Rotation amount",optional:!1}],returns:"number"},{name:"ror",signature:"bit.ror(x, n)",description:"Returns x rotated right by n bits.",params:[{name:"x",type:"number",description:"Input value",optional:!1},{name:"n",type:"number",description:"Rotation amount",optional:!1}],returns:"number"},{name:"bswap",signature:"bit.bswap(x)",description:"Swaps the bytes of x (byte-reverse).",params:[{name:"x",type:"number",description:"Input value",optional:!1}],returns:"number"}]},jit:{common:[],luajitOnly:[{name:"on",signature:"jit.on(func, recursive)",description:"Enables JIT compilation.",params:[{name:"func",type:"function",description:"Function or true for all",optional:!0},{name:"recursive",type:"boolean",description:"Include sub-functions",optional:!0}],returns:"nil"},{name:"off",signature:"jit.off(func, recursive)",description:"Disables JIT compilation.",params:[{name:"func",type:"function",description:"Function or true for all",optional:!0},{name:"recursive",type:"boolean",description:"Include sub-functions",optional:!0}],returns:"nil"},{name:"flush",signature:"jit.flush(func, recursive)",description:"Flushes the compiled code cache.",params:[{name:"func",type:"function",description:"Function to flush",optional:!0},{name:"recursive",type:"boolean",description:"Include sub-functions",optional:!0}],returns:"nil"},{name:"status",signature:"jit.status()",description:"Returns the current JIT status and architecture.",params:[],returns:"boolean, string..."},{name:"version",signature:"jit.version",description:"The LuaJIT version string.",params:[],returns:"string"},{name:"version_num",signature:"jit.version_num",description:"The LuaJIT version number.",params:[],returns:"number"},{name:"os",signature:"jit.os",description:"The target OS name.",params:[],returns:"string"},{name:"arch",signature:"jit.arch",description:"The target architecture name.",params:[],returns:"string"}]},ffi:{common:[],luajitOnly:[{name:"cdef",signature:"ffi.cdef(def)",description:"Adds C declarations.",params:[{name:"def",type:"string",description:"C declarations",optional:!1}],returns:"nil"},{name:"new",signature:"ffi.new(ctype, ...)",description:"Creates a C data object of the given type.",params:[{name:"ctype",type:"string|ctype",description:"C type",optional:!1},{name:"...",type:"any",description:"Initializers",optional:!0}],returns:"cdata"},{name:"cast",signature:"ffi.cast(ctype, init)",description:"Creates a scalar C data object with ctype and init.",params:[{name:"ctype",type:"string|ctype",description:"Target type",optional:!1},{name:"init",type:"any",description:"Initial value",optional:!1}],returns:"cdata"},{name:"typeof",signature:"ffi.typeof(ctype)",description:"Creates a C type object.",params:[{name:"ctype",type:"string",description:"C type declaration",optional:!1}],returns:"ctype"},{name:"sizeof",signature:"ffi.sizeof(ctype, nelem)",description:"Returns the size of a C type in bytes.",params:[{name:"ctype",type:"string|ctype|cdata",description:"C type",optional:!1},{name:"nelem",type:"number",description:"Number of elements",optional:!0}],returns:"number"},{name:"alignof",signature:"ffi.alignof(ctype)",description:"Returns the minimum required alignment of a C type.",params:[{name:"ctype",type:"string|ctype",description:"C type",optional:!1}],returns:"number"},{name:"istype",signature:"ffi.istype(ctype, obj)",description:"Returns true if obj has the given C type.",params:[{name:"ctype",type:"string|ctype",description:"C type",optional:!1},{name:"obj",type:"any",description:"Object to check",optional:!1}],returns:"boolean"},{name:"load",signature:"ffi.load(name, global)",description:"Loads a shared library.",params:[{name:"name",type:"string",description:"Library name",optional:!1},{name:"global",type:"boolean",description:"Export symbols globally",optional:!0}],returns:"clib"},{name:"string",signature:"ffi.string(ptr, len)",description:"Creates a Lua string from a C char pointer.",params:[{name:"ptr",type:"cdata",description:"Char pointer",optional:!1},{name:"len",type:"number",description:"Length",optional:!0}],returns:"string"},{name:"copy",signature:"ffi.copy(dst, src, len)",description:"Copies data between C objects.",params:[{name:"dst",type:"cdata",description:"Destination",optional:!1},{name:"src",type:"cdata|string",description:"Source",optional:!1},{name:"len",type:"number",description:"Byte count",optional:!0}],returns:"nil"},{name:"fill",signature:"ffi.fill(dst, len, c)",description:"Fills a memory region with a byte value.",params:[{name:"dst",type:"cdata",description:"Destination",optional:!1},{name:"len",type:"number",description:"Byte count",optional:!1},{name:"c",type:"number",description:"Fill byte",optional:!0,default:"0"}],returns:"nil"},{name:"gc",signature:"ffi.gc(cdata, finalizer)",description:"Associates a finalizer with a C data object.",params:[{name:"cdata",type:"cdata",description:"C data object",optional:!1},{name:"finalizer",type:"function",description:"Finalizer function",optional:!1}],returns:"cdata"}]}},sn=class{modules=new Map;classes=new Map;allFunctions=new Map;enums=new Map;methodsByObjectType=new Map;callbackList=[];keyNames=[];gamepadButtons=[];gamepadAxes=[];loaded=!1;async load(e){if(this.loaded)return;let t=Ja.join(e,"data","lurek-api.json");if(ln.existsSync(t))try{let r=ln.readFileSync(t,"utf-8");this.loadFromJson(JSON.parse(r))}catch{}this.loaded=!0}getModuleNames(){return Array.from(this.modules.keys())}getModule(e){return this.modules.get(e)}getClasses(){return Array.from(this.classes.values())}getClass(e){return this.classes.get(e)}getFunctions(e){return this.modules.get(e)?.functions??[]}getFunction(e){return this.allFunctions.get(e)}getAllFunctions(){return Array.from(this.allFunctions.values())}searchFunctions(e){let t=e.toLowerCase(),r=[];for(let a of this.allFunctions.values())(a.fullPath.toLowerCase().includes(t)||a.name.toLowerCase().includes(t)||a.description.toLowerCase().includes(t))&&r.push(a);return r}getMethods(e){return this.methodsByObjectType.get(e)??[]}getMethod(e,t){return this.methodsByObjectType.get(e)?.find(a=>a.name===t)}getFactoryTypes(){let e=new Set(["nil","any","string","number","boolean","table","function","multiple","integer","thread","userdata"]),t=new Map;for(let r of this.allFunctions.values())if(!r.isMethod&&r.returnType){let a=r.returnType.trim();a.length>0&&!e.has(a.toLowerCase())&&t.set(r.fullPath,a)}return t}getEnumValues(e){return this.enums.get(e)?.values??[]}getEnum(e){return this.enums.get(e)}getCallbacks(){return this.callbackList}getKeyNames(){return this.keyNames}getGamepadButtons(){return this.gamepadButtons}getGamepadAxes(){return this.gamepadAxes}getLuaStdlib(e){let t=[];for(let[r,a]of Object.entries(gs)){for(let i of a.common)t.push(this.stdlibToApiFunction(r,i));if(e==="5.4"&&a.lua54Only)for(let i of a.lua54Only)t.push(this.stdlibToApiFunction(r,i));if(e==="luajit"&&a.luajitOnly)for(let i of a.luajitOnly)t.push(this.stdlibToApiFunction(r,i))}return t}getStats(){let e=0,t=0,r=0;for(let a of this.modules.values())e+=a.functions.length,t+=a.methods.length,r+=a.documentedEntries;return{modules:this.modules.size,functions:e,methods:t,documented:r}}loadFromJson(e){if(!e||typeof e!="object")return;let t=e;if(Array.isArray(t.modules))for(let i of t.modules){let o=String(i.name??""),s={name:o,fullPath:`lurek.${o}`,description:String(i.description??""),functions:[],methods:[],totalEntries:0,documentedEntries:0},l=Array.isArray(i.functions)?i.functions:[];for(let u of l){let c=this.rawToApiFunction(o,u);c.isMethod?(s.methods.push(c),this.indexMethod(c)):s.functions.push(c),this.allFunctions.set(c.fullPath,c)}let p=Array.isArray(i.methods)?i.methods:[];for(let u of p){let c=this.rawToApiFunction(o,u);c.isMethod=!0,s.methods.push(c),this.indexMethod(c),this.allFunctions.set(c.fullPath,c)}s.totalEntries=s.functions.length+s.methods.length,s.documentedEntries=[...s.functions,...s.methods].filter(u=>u.description.length>0).length,this.modules.set(o,s)}let r=t.enums;if(r&&typeof r=="object"&&!Array.isArray(r))for(let[i,o]of Object.entries(r))Array.isArray(o)&&this.enums.set(i,{name:i,values:o,descriptions:new Map});let a=Array.isArray(t.callbacks)?t.callbacks:[];if(this.callbackList=a.map(i=>({module:"",name:String(i.name??""),fullPath:`lurek.${i.name??""}`,signature:String(i.signature??""),description:String(i.description??""),parameters:Array.isArray(i.parameters)?i.parameters.map(o=>({name:String(o.name??""),type:String(o.type??"any"),description:String(o.description??""),optional:!!o.optional})):[],isMethod:!1})),Array.isArray(t.classes))for(let i of t.classes){let o=String(i.name??""),s={name:o,description:String(i.description??""),methods:[]},l=Array.isArray(i.methods)?i.methods:[];for(let p of l){let u=this.rawToApiFunction(o,p);u.isMethod=!0,u.objectType||(u.objectType=o),s.methods.push(u),this.allFunctions.has(u.fullPath)||(this.allFunctions.set(u.fullPath,u),this.indexMethod(u))}this.classes.set(o,s)}this.keyNames=Array.isArray(t.keyNames)?t.keyNames:[],this.gamepadButtons=Array.isArray(t.gamepadButtons)?t.gamepadButtons:[],this.gamepadAxes=Array.isArray(t.gamepadAxes)?t.gamepadAxes:[]}rawToApiFunction(e,t){let r=String(t.name??""),a=String(t.fullPath??`lurek.${e}.${r}`),i=Array.isArray(t.parameters)?t.parameters.map(o=>({name:String(o.name??""),type:String(o.type??"any"),description:String(o.description??""),optional:!!o.optional,default:o.default!=null?String(o.default):void 0})):[];return{module:e,name:r,fullPath:a,signature:String(t.signature??`${a}(${i.map(o=>o.name).join(", ")})`),description:String(t.description??""),parameters:i,returns:t.returns!=null?String(t.returns):void 0,returnType:t.returnType!=null?String(t.returnType):void 0,since:t.since!=null?String(t.since):void 0,deprecated:t.deprecated!=null?String(t.deprecated):void 0,isMethod:!!t.isMethod,objectType:t.objectType!=null?String(t.objectType):void 0,sourceFile:t.sourceFile!=null?String(t.sourceFile):void 0}}indexMethod(e){let t=e.objectType;if(!t)return;let r=this.methodsByObjectType.get(t);r||(r=[],this.methodsByObjectType.set(t,r)),r.push(e)}stdlibToApiFunction(e,t){return{module:e,name:t.name,fullPath:`${e}.${t.name}`,signature:t.signature,description:t.description,parameters:t.params,returns:t.returns,returnType:t.returns,isMethod:!1}}};var y=C(require("vscode")),tt=C(require("fs")),ct=C(require("path")),b=class extends y.TreeItem{constructor(t,r,a,i,o){super(t,r);this.label=t;this.collapsibleState=r;this.commandId=a;this.icon=i;this.statusDescription=o;a&&(this.command={command:a,title:t}),i&&(this.iconPath=new y.ThemeIcon(i)),o&&(this.description=o)}},pn=class{_onDidChangeTreeData=new y.EventEmitter;onDidChangeTreeData=this._onDidChangeTreeData.event;refresh(){this._onDidChangeTreeData.fire(void 0)}getTreeItem(e){return e}getChildren(e){if(!e)return[new b("Project Health",y.TreeItemCollapsibleState.Expanded,void 0,"heart"),new b("Create",y.TreeItemCollapsibleState.Expanded,void 0,"new-folder"),new b("Package",y.TreeItemCollapsibleState.Collapsed,void 0,"package"),new b("Libraries",y.TreeItemCollapsibleState.Collapsed,void 0,"library")];switch(e.label){case"Project Health":return this.getProjectHealthItems();case"Create":return[new b("New Project from Template",y.TreeItemCollapsibleState.None,"lurek.scaffold.project","file-add"),new b("New File from Template",y.TreeItemCollapsibleState.None,"lurek.scaffold.file","new-file")];case"Package":return[new b("Package .zip",y.TreeItemCollapsibleState.None,"lurek.package.zip","file-zip"),new b("Package for Windows",y.TreeItemCollapsibleState.None,"lurek.package.windows","desktop-download"),new b("Package for Linux",y.TreeItemCollapsibleState.None,"lurek.package.linux","terminal-linux"),new b("Repackage (skip build)",y.TreeItemCollapsibleState.None,"lurek.dist.repackage","file-zip"),new b("Install Windows",y.TreeItemCollapsibleState.None,"lurek.dist.installWindows","desktop-download")];case"Libraries":return[new b("Browse Pattern Library",y.TreeItemCollapsibleState.None,"lurek.library.browse","search"),new b("Insert Code Snippet",y.TreeItemCollapsibleState.None,"lurek.library.insertSnippet","code"),new b("Save Selection as Pattern",y.TreeItemCollapsibleState.None,"lurek.library.newPattern","save")];default:return[]}}getProjectHealthItems(){let e=y.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!e)return[new b("No workspace open",y.TreeItemCollapsibleState.None,void 0,"warning")];let t=[],r=tt.existsSync(ct.join(e,"main.lua"));t.push(new b("main.lua",y.TreeItemCollapsibleState.None,r?void 0:"lurek.scaffold.file",r?"pass":"error",r?"found":"missing"));let a=tt.existsSync(ct.join(e,"conf.lua"));t.push(new b("conf.lua",y.TreeItemCollapsibleState.None,void 0,a?"pass":"warning",a?"found":"optional"));let i=0;try{let s=l=>{let p=tt.readdirSync(l,{withFileTypes:!0});for(let u of p){if(u.name.startsWith(".")||u.name==="node_modules")continue;let c=ct.join(l,u.name);u.isDirectory()?s(c):u.name.endsWith(".lua")&&i++}};s(e)}catch{}t.push(new b("Lua files",y.TreeItemCollapsibleState.None,void 0,"file-code",`${i}`));let o=tt.existsSync(ct.join(e,"tests"))||tt.existsSync(ct.join(e,"test"))||tt.existsSync(ct.join(e,"tests.lua"));return t.push(new b("Tests",y.TreeItemCollapsibleState.None,void 0,o?"pass":"warning",o?"detected":"none found")),t}},un=class{_onDidChangeTreeData=new y.EventEmitter;onDidChangeTreeData=this._onDidChangeTreeData.event;_gameStatus="stopped";_lastTestResult;setGameStatus(e){this._gameStatus=e,this._onDidChangeTreeData.fire(void 0)}setTestResult(e){this._lastTestResult=e,this._onDidChangeTreeData.fire(void 0)}refresh(){this._onDidChangeTreeData.fire(void 0)}getTreeItem(e){return e}getChildren(e){if(!e)return[new b("Build",y.TreeItemCollapsibleState.Collapsed,void 0,"tools"),new b("Run",y.TreeItemCollapsibleState.Expanded,void 0,"play"),new b("Testing",y.TreeItemCollapsibleState.Collapsed,void 0,"beaker"),new b("Quality",y.TreeItemCollapsibleState.Collapsed,void 0,"pass"),new b("Docs",y.TreeItemCollapsibleState.Collapsed,void 0,"book"),new b("Audit",y.TreeItemCollapsibleState.Collapsed,void 0,"graph"),new b("Validate",y.TreeItemCollapsibleState.Collapsed,void 0,"check-all"),new b("Editors",y.TreeItemCollapsibleState.Collapsed,void 0,"window"),new b("Debug",y.TreeItemCollapsibleState.Collapsed,void 0,"bug"),new b("Reference",y.TreeItemCollapsibleState.Collapsed,void 0,"book"),new b("Assets",y.TreeItemCollapsibleState.Collapsed,void 0,"file-media"),new b("Dependencies",y.TreeItemCollapsibleState.Collapsed,void 0,"list-tree"),new b("Performance",y.TreeItemCollapsibleState.Collapsed,void 0,"dashboard")];switch(e.label){case"Build":return[new b("Build: Debug",y.TreeItemCollapsibleState.None,"lurek.build.debug","tools"),new b("Build: Release",y.TreeItemCollapsibleState.None,"lurek.build.release","tools"),new b("Build: Dist",y.TreeItemCollapsibleState.None,"lurek.build.dist","package"),new b("Build: Check (type only)",y.TreeItemCollapsibleState.None,"lurek.build.check","checklist")];case"Run":return[new b("Game Status",y.TreeItemCollapsibleState.None,void 0,this._gameStatus==="running"?"debug-start":this._gameStatus==="crashed"?"error":"debug-stop",this._gameStatus),new b("Run Game",y.TreeItemCollapsibleState.None,"lurek.runGame","play"),new b("Stop Game",y.TreeItemCollapsibleState.None,"lurek.stopGame","debug-stop"),new b("Run with Arguments",y.TreeItemCollapsibleState.None,"lurek.runWithArgs","terminal"),new b("Run Example",y.TreeItemCollapsibleState.None,"lurek.runExample","file-code"),new b("Run Debug \u2014 pick demo",y.TreeItemCollapsibleState.None,"lurek.run.debugPickDemo","list-selection"),new b("Run Release \u2014 pick demo",y.TreeItemCollapsibleState.None,"lurek.run.releasePickDemo","list-selection"),new b("Run Debug (no rebuild)",y.TreeItemCollapsibleState.None,"lurek.run.debugNoRebuild","play"),new b("Run Release (no rebuild)",y.TreeItemCollapsibleState.None,"lurek.run.releaseNoRebuild","play")];case"Testing":return[...this._lastTestResult?[new b("Last Result",y.TreeItemCollapsibleState.None,void 0,this._lastTestResult.includes("fail")?"error":"pass",this._lastTestResult)]:[],new b("Open Test Runner",y.TreeItemCollapsibleState.None,"lurek.editor.testRunner","beaker"),new b("Run All Tests",y.TreeItemCollapsibleState.None,"lurek.test.all","testing-run-all-icon"),new b("Run Rust Tests",y.TreeItemCollapsibleState.None,"lurek.test.rust.all","testing-run-icon"),new b("Run Lua Tests",y.TreeItemCollapsibleState.None,"lurek.test.lua.all","test-view-icon"),new b("Run Golden Tests",y.TreeItemCollapsibleState.None,"lurek.test.lua.golden","file-media"),new b("Test: Math",y.TreeItemCollapsibleState.None,"lurek.test.target.math","symbol-numeric"),new b("Test: Physics",y.TreeItemCollapsibleState.None,"lurek.test.target.physics","settings-gear"),new b("Test: Graphics",y.TreeItemCollapsibleState.None,"lurek.test.target.graphics","symbol-color"),new b("Test: Audio",y.TreeItemCollapsibleState.None,"lurek.test.target.audio","unmute"),new b("Test: Input",y.TreeItemCollapsibleState.None,"lurek.test.target.input","keyboard"),new b("Generate Tests for File",y.TreeItemCollapsibleState.None,"lurek.test.generateForFile","wand")];case"Quality":return[new b("Quality Gate (full pre-push)",y.TreeItemCollapsibleState.None,"lurek.quality.gate","pass"),new b("Clippy (strict)",y.TreeItemCollapsibleState.None,"lurek.quality.clippy","search"),new b("Format Apply",y.TreeItemCollapsibleState.None,"lurek.quality.fmtApply","symbol-ruler"),new b("Format Check",y.TreeItemCollapsibleState.None,"lurek.quality.fmtCheck","symbol-ruler")];case"Docs":return[new b("Full Pipeline",y.TreeItemCollapsibleState.None,"lurek.docs.fullPipeline","book"),new b("Rust Docs (browser)",y.TreeItemCollapsibleState.None,"lurek.docs.rustBrowser","browser"),new b("Library API",y.TreeItemCollapsibleState.None,"lurek.docs.libraryApi","library"),new b("Validate Lua Stubs",y.TreeItemCollapsibleState.None,"lurek.docs.validateLuaStubs","verified")];case"Audit":return[new b("Quality Report",y.TreeItemCollapsibleState.None,"lurek.audit.qualityReport","graph"),new b("Test Coverage",y.TreeItemCollapsibleState.None,"lurek.audit.testCoverage","graph-line"),new b("Doc Coverage",y.TreeItemCollapsibleState.None,"lurek.audit.docCoverage","book"),new b("Example Coverage",y.TreeItemCollapsibleState.None,"lurek.audit.exampleCoverage","file-code"),new b("Lua API Test Coverage",y.TreeItemCollapsibleState.None,"lurek.audit.luaTestCoverage","beaker"),new b("Lua Spec Coverage",y.TreeItemCollapsibleState.None,"lurek.audit.luaSpecCoverage","file-text"),new b("CAG Link Check (strict)",y.TreeItemCollapsibleState.None,"lurek.audit.cagLinkCheck","link")];case"Validate":return[new b("Validate Lua API",y.TreeItemCollapsibleState.None,"lurek.validate.luaApi","check-all"),new b("Validate Library",y.TreeItemCollapsibleState.None,"lurek.validate.library","library"),new b("Validate Changelog",y.TreeItemCollapsibleState.None,"lurek.validate.changelog","file-text"),new b("Validate Module Coverage",y.TreeItemCollapsibleState.None,"lurek.validate.moduleCoverage","graph"),new b("Check Callbacks",y.TreeItemCollapsibleState.None,"lurek.validate.callbacks","symbol-event"),new b("Validate CAG Files",y.TreeItemCollapsibleState.None,"lurek.validate.cag","hubot")];case"Editors":return[new b("Tile Map Editor",y.TreeItemCollapsibleState.None,"lurek.editor.tileMap","symbol-misc"),new b("Tileset Editor",y.TreeItemCollapsibleState.None,"lurek.editor.tileset","layers"),new b("Tilemap Script Editor",y.TreeItemCollapsibleState.None,"lurek.editor.tilemapScript","code"),new b("World Map Editor",y.TreeItemCollapsibleState.None,"lurek.editor.worldMap","map"),new b("Procedural Map Generator",y.TreeItemCollapsibleState.None,"lurek.editor.procMap","globe"),new b("Pixel Art Editor",y.TreeItemCollapsibleState.None,"lurek.editor.pixelArt","paintcan"),new b("Sprite Animation Editor",y.TreeItemCollapsibleState.None,"lurek.editor.spriteAnim","play-circle"),new b("Shader Preview",y.TreeItemCollapsibleState.None,"lurek.editor.shaderPreview","wand"),new b("Color Palette",y.TreeItemCollapsibleState.None,"lurek.editor.colorPalette","symbol-color"),new b("Font Preview",y.TreeItemCollapsibleState.None,"lurek.editor.fontPreview","text-size"),new b("Scene Flow Editor",y.TreeItemCollapsibleState.None,"lurek.editor.sceneFlow","type-hierarchy"),new b("Entity Designer",y.TreeItemCollapsibleState.None,"lurek.editor.entity","symbol-class"),new b("Dialog Editor",y.TreeItemCollapsibleState.None,"lurek.editor.dialog","comment-discussion"),new b("Quest Tree Editor",y.TreeItemCollapsibleState.None,"lurek.editor.questTree","git-merge"),new b("GUI Widget Editor",y.TreeItemCollapsibleState.None,"lurek.editor.guiWidget","symbol-interface"),new b("Timeline / Cutscene",y.TreeItemCollapsibleState.None,"lurek.editor.timeline","history"),new b("Input Mapper",y.TreeItemCollapsibleState.None,"lurek.editor.inputMapper","keyboard"),new b("Localization Editor",y.TreeItemCollapsibleState.None,"lurek.editor.localization","book"),new b("Particle Designer",y.TreeItemCollapsibleState.None,"lurek.editor.particle","sparkle"),new b("Physics Materials",y.TreeItemCollapsibleState.None,"lurek.editor.physicsMaterials","settings-gear"),new b("AI Behavior Tree",y.TreeItemCollapsibleState.None,"lurek.editor.aiBehavior","hubot"),new b("Voxel Editor",y.TreeItemCollapsibleState.None,"lurek.editor.voxel","layers"),new b("Audio Mixer",y.TreeItemCollapsibleState.None,"lurek.editor.audioMixer","unmute"),new b("Sound DSP Panel",y.TreeItemCollapsibleState.None,"lurek.editor.soundDsp","radio-tower"),new b("PostFX & Overlay Designer",y.TreeItemCollapsibleState.None,"lurek.editor.postfxOverlay","color-mode"),new b("Database Browser",y.TreeItemCollapsibleState.None,"lurek.editor.database","database"),new b("Graph Editor",y.TreeItemCollapsibleState.None,"lurek.editor.graph","graph")];case"Debug":return[new b("Debug Run + Connect",y.TreeItemCollapsibleState.None,"lurek.debug.runAndConnect","debug-start"),new b("Connect",y.TreeItemCollapsibleState.None,"lurek.debug.connect","plug"),new b("Disconnect",y.TreeItemCollapsibleState.None,"lurek.debug.disconnect","debug-disconnect"),new b("Evaluate Lua",y.TreeItemCollapsibleState.None,"lurek.debug.evaluate","terminal"),new b("Watchers Panel",y.TreeItemCollapsibleState.None,"lurek.debug.openWatchers","eye"),new b("Variable Inspector",y.TreeItemCollapsibleState.None,"lurek.debug.openInspector","symbol-variable"),new b("Call Stack",y.TreeItemCollapsibleState.None,"lurek.debug.openCallStack","list-tree"),new b("Performance",y.TreeItemCollapsibleState.None,"lurek.debug.performance","dashboard"),new b("Screenshot",y.TreeItemCollapsibleState.None,"lurek.debug.screenshot","device-camera"),new b("Status",y.TreeItemCollapsibleState.None,"lurek.debug.status","info")];case"Reference":return[new b("Browse API",y.TreeItemCollapsibleState.None,"lurek.browseApi","search"),new b("Open API Docs",y.TreeItemCollapsibleState.None,"lurek.openApiDocs","book"),new b("Open Wiki",y.TreeItemCollapsibleState.None,"lurek.openWiki","globe"),new b("Dependency Graph",y.TreeItemCollapsibleState.None,"lurek.depGraph","graph"),new b("Dependency List",y.TreeItemCollapsibleState.None,"lurek.depList","list-tree"),new b("API Coverage",y.TreeItemCollapsibleState.None,"lurek.apiCoverage","graph-line")];case"Assets":return[new b("Refresh Assets",y.TreeItemCollapsibleState.None,"lurek.assets.refresh","refresh"),new b("Open Asset Explorer",y.TreeItemCollapsibleState.None,"lurek.assets.openPanel","file-media"),new b("Find Missing Assets",y.TreeItemCollapsibleState.None,"lurek.assets.findMissing","warning")];case"Dependencies":return[new b("Show Module Graph",y.TreeItemCollapsibleState.None,"lurek.deps.showGraph","type-hierarchy"),new b("Find Circular Deps",y.TreeItemCollapsibleState.None,"lurek.deps.findCircular","warning"),new b("Show Orphan Modules",y.TreeItemCollapsibleState.None,"lurek.deps.findOrphans","question")];case"Performance":return[new b("Open Performance Dashboard",y.TreeItemCollapsibleState.None,"lurek.perf.openDashboard","dashboard"),new b("System Monitor",y.TreeItemCollapsibleState.None,"lurek.runtime.openMonitor","pulse"),new b("API Usage Report",y.TreeItemCollapsibleState.None,"lurek.api.usageReport","graph"),new b("Open Hot Reload History",y.TreeItemCollapsibleState.None,"lurek.perf.openHotReload","history"),new b("Clear History",y.TreeItemCollapsibleState.None,"lurek.perf.clearHistory","clear-all")];default:return[]}}},dn=class{_onDidChangeTreeData=new y.EventEmitter;onDidChangeTreeData=this._onDidChangeTreeData.event;refresh(){this._onDidChangeTreeData.fire(void 0)}getTreeItem(e){return e}getChildren(e){if(!e)return[new b("CAG (AI Config)",y.TreeItemCollapsibleState.Expanded,void 0,"hubot"),new b("MCP Server",y.TreeItemCollapsibleState.Collapsed,void 0,"server"),new b("Game Jam",y.TreeItemCollapsibleState.Collapsed,void 0,"flame")];switch(e.label){case"CAG (AI Config)":return[new b("Install AI Config",y.TreeItemCollapsibleState.None,"lurek.cag.install","cloud-download"),new b("Select Agent",y.TreeItemCollapsibleState.None,"lurek.cag.selectAgent","person"),new b("Select Skill",y.TreeItemCollapsibleState.None,"lurek.cag.selectSkill","mortar-board"),new b("Select Prompt",y.TreeItemCollapsibleState.None,"lurek.cag.selectPrompt","comment"),new b("Update CAG Files",y.TreeItemCollapsibleState.None,"lurek.cag.update","sync")];case"MCP Server":return[new b("Install MCP Server",y.TreeItemCollapsibleState.None,"lurek.mcp.install","cloud-download"),new b("MCP Status",y.TreeItemCollapsibleState.None,"lurek.mcp.status","info")];case"Game Jam":return[new b("Game Jam Quick Start",y.TreeItemCollapsibleState.None,"lurek.gameJam.quickStart","rocket"),new b("Add Game Module",y.TreeItemCollapsibleState.None,"lurek.gameJam.addModule","add"),new b("Game Jam Timer",y.TreeItemCollapsibleState.None,"lurek.gameJam.timer","watch"),new b("Quick Build",y.TreeItemCollapsibleState.None,"lurek.jam.quickBuild","zap"),new b("Submission Checklist",y.TreeItemCollapsibleState.None,"lurek.jam.checklist","checklist")];default:return[]}}};var ie=C(require("vscode")),It=C(require("path")),ys={scheme:"file",language:"lua"},Ka="lurek-api",Rr=class{constructor(e){this.apiData=e}provideTextDocumentContent(e){let t=e.path.replace(/^\//,""),r=this.apiData.getFunction(t);if(r)return this.renderFunction(r);let a=t.replace("lurek.",""),i=this.apiData.getModule(a);return i?this.renderModule(i):`-- No API definition found for: ${t}`}renderFunction(e){let t=[];if(t.push("-- Lurek2D API Definition"),t.push(`-- ${e.fullPath}`),t.push("--"),e.description&&(t.push(`-- ${e.description}`),t.push("--")),e.parameters.length>0){t.push("-- Parameters:");for(let a of e.parameters){let i=a.optional?" (optional)":"",o=a.default?` [default: ${a.default}]`:"",s=a.description?` -- ${a.description}`:"";t.push(`--   ${a.name}: ${a.type}${i}${o}${s}`)}t.push("--")}e.returns&&(t.push(`-- Returns: ${e.returns}`),t.push("--")),e.deprecated&&(t.push(`-- DEPRECATED: ${e.deprecated}`),t.push("--")),e.sourceFile&&t.push(`-- Source: ${e.sourceFile}`),t.push("");let r=e.parameters.map(a=>a.name).join(", ");return e.isMethod?t.push(`function ${e.objectType??"Object"}:${e.name}(${r})`):t.push(`function ${e.fullPath}(${r})`),t.push("  -- Implemented in Rust (native)"),t.push("end"),t.join(`
+`)}renderModule(e){let t=[];t.push(`-- Lurek2D API Module: ${e.fullPath}`),e.description&&t.push(`-- ${e.description}`),t.push(`-- ${e.functions.length} functions, ${e.methods.length} methods`),t.push(""),t.push(`${e.name} = {}`),t.push("");for(let r of e.functions){let a=r.parameters.map(i=>i.name).join(", ");r.description&&t.push(`--- ${r.description}`),t.push(`function ${r.fullPath}(${a}) end`),t.push("")}for(let r of e.methods){let a=r.parameters.map(i=>i.name).join(", ");r.description&&t.push(`--- ${r.description}`),t.push(`function ${r.objectType??"Object"}:${r.name}(${a}) end`),t.push("")}return t.join(`
+`)}};async function fs(n,e){let t=e.replace(/\./g,"/"),r=[t+".lua",t+"/init.lua"],a=It.dirname(n.uri.fsPath);for(let i of r){let o=ie.Uri.file(It.resolve(a,i));try{return await ie.workspace.fs.stat(o),new ie.Location(o,new ie.Position(0,0))}catch{}let s=ie.workspace.workspaceFolders?.[0]?.uri.fsPath;if(s){let p=ie.Uri.file(It.resolve(s,i));try{return await ie.workspace.fs.stat(p),new ie.Location(p,new ie.Position(0,0))}catch{}}let l=await ie.workspace.findFiles(`**/${i}`,"**/node_modules/**",1);if(l.length>0)return new ie.Location(l[0],new ie.Position(0,0))}}function ei(n,e){let t=new Rr(e);n.subscriptions.push(ie.workspace.registerTextDocumentContentProvider(Ka,t));let r=ie.languages.registerDefinitionProvider(ys,{async provideDefinition(a,i){let o=a.lineAt(i).text,s=o.match(/require\s*\(\s*["']([^"']+)["']\s*\)/);if(s){let h=s[1],L=o.indexOf(h),d=L+h.length;if(i.character>=L&&i.character<=d)return fs(a,h)}let l=a.getWordRangeAtPosition(i,/lurek\.\w+\.\w+/);if(l){let h=a.getText(l);if(e.getFunction(h)){let d=ie.Uri.parse(`${Ka}:/${h}`);return new ie.Location(d,new ie.Position(0,0))}}let p=a.getWordRangeAtPosition(i,/\w+/);if(!p)return;let u=a.getText(p),c=o.substring(0,p.start.character)}});n.subscriptions.push(r)}var O=C(require("vscode")),ri=C(require("fs")),nt=C(require("path"));var Ye=new Set(["load","update","draw","keypressed","keyreleased","textinput","mousepressed","mousereleased","mousemoved","wheelmoved","gamepadpressed","gamepadreleased","gamepadaxis","joystickadded","joystickremoved","focus","visible","resize","quit","init","ready","process","process_late","process_physics","fixedUpdate","draw_ui","exit","touchpressed","touchmoved","touchreleased","textedited"]);var Ts=new Set(["and","break","do","else","elseif","end","false","for","function","goto","if","in","local","nil","not","or","repeat","return","then","true","until","while"]),ti=new Set(["+","-","*","/","%","^","#","==","~=","<",">","<=",">=","=","..","...","//"]),vs=new Set(["(",")","{","}","[","]",";",":",",","."]),De=class{tokenize(e){let t=[],r=e.length,a=0,i=0,o=0;for(;a<r;){let s=e[a];if(s===" "||s==="	"||s==="\r"||s===`
+`){let l=a,p=i,u=o;for(;a<r&&(e[a]===" "||e[a]==="	"||e[a]==="\r"||e[a]===`
+`);)e[a]===`
+`?(i++,o=0):o++,a++;t.push({type:7,value:e.slice(l,a),line:p,column:u,length:a-l});continue}if(s==="-"&&a+1<r&&e[a+1]==="-"){let l=i,p=o;if(a+2<r&&e[a+2]==="["){let L=this.countLongBracketLevel(e,a+2);if(L>=0){let d="]"+"=".repeat(L)+"]",g=e.indexOf(d,a+4+L),v=g>=0?g+d.length:r,x=e.slice(a,v),w=Ir(x);t.push({type:4,value:x,line:l,column:p,length:v-a});for(let T=a;T<v;T++)e[T]===`
+`?(i++,o=0):o++;a=v;continue}}let u=e.indexOf(`
+`,a),c=u>=0?u:r,h=e.slice(a,c);t.push({type:4,value:h,line:l,column:p,length:c-a}),o+=c-a,a=c;continue}if(s==="["){let l=this.countLongBracketLevel(e,a);if(l>=0){let p="]"+"=".repeat(l)+"]",u=a+2+l,c=e.indexOf(p,u),h=c>=0?c+p.length:r,L=e.slice(a,h),d=i,g=o;for(let v=a;v<h;v++)e[v]===`
+`?(i++,o=0):o++;t.push({type:2,value:L,line:d,column:g,length:h-a}),a=h;continue}}if(s==='"'||s==="'"){let l=i,p=o,u=s,c=a+1;for(;c<r;){if(e[c]==="\\"){c+=2;continue}if(e[c]===u){c++;break}if(e[c]===`
+`)break;c++}let h=e.slice(a,c);t.push({type:2,value:h,line:l,column:p,length:c-a}),o+=c-a,a=c;continue}if(mt(s)||s==="."&&a+1<r&&mt(e[a+1])){let l=i,p=o,u=a;if(s==="0"&&u+1<r&&(e[u+1]==="x"||e[u+1]==="X"))for(u+=2;u<r&&Ls(e[u]);)u++;else if(s==="0"&&u+1<r&&(e[u+1]==="b"||e[u+1]==="B"))for(u+=2;u<r&&(e[u]==="0"||e[u]==="1");)u++;else{for(;u<r&&mt(e[u]);)u++;if(u<r&&e[u]===".")for(u++;u<r&&mt(e[u]);)u++;if(u<r&&(e[u]==="e"||e[u]==="E"))for(u++,u<r&&(e[u]==="+"||e[u]==="-")&&u++;u<r&&mt(e[u]);)u++}let c=e.slice(a,u);t.push({type:3,value:c,line:l,column:p,length:u-a}),o+=u-a,a=u;continue}if(ni(s)){let l=o,p=a+1;for(;p<r&&Et(e[p]);)p++;let u=e.slice(a,p),c=Ts.has(u)?0:1;t.push({type:c,value:u,line:i,column:l,length:p-a}),o+=p-a,a=p;continue}if(a+2<r){let l=e.slice(a,a+3);if(l==="..."){t.push({type:5,value:l,line:i,column:o,length:3}),o+=3,a+=3;continue}}if(a+1<r){let l=e.slice(a,a+2);if(ti.has(l)){t.push({type:5,value:l,line:i,column:o,length:2}),o+=2,a+=2;continue}}if(ti.has(s)){t.push({type:5,value:s,line:i,column:o,length:1}),o++,a++;continue}if(vs.has(s)){t.push({type:6,value:s,line:i,column:o,length:1}),o++,a++;continue}o++,a++}return t.push({type:8,value:"",line:i,column:o,length:0}),t}analyze(e){let t=this.tokenize(e),r=[],a=[],i=[],o=[],s=[];for(let x of t)if(x.type===4){let w=x.value.replace(/^--\[=*\[/,"").replace(/\]=*\]$/,"").replace(/^--/,"").trim();s.push({text:w,line:x.line,isBlock:x.value.startsWith("--["),isLuaCATS:x.value.startsWith("---@")})}let l=t.filter(x=>x.type!==7&&x.type!==4),p=[],u=0,c=(x=0)=>l[u+x],h=(x,w)=>{let T=c();return!(!T||T.type!==x||w!==void 0&&T.value!==w)},L=()=>l[u++],d=x=>{for(let w=s.length-1;w>=0;w--)if(s[w].line===x-1||s[w].line===x)return s[w].text};for(;u<l.length&&c()?.type!==8;){let x=c();if(h(0,"local")){let w=L();if(h(0,"function")){if(L(),c()?.type===1){let T=L(),M=this.parseParamList(l,u);u=M.nextIndex;let E=d(w.line),N={name:T.value,kind:"function",line:T.line,column:T.column,scope:p.length>0?p[p.length-1].name:void 0,parameters:M.names,isLocal:!0,description:E};r.push(N);for(let $ of M.names)r.push({name:$,kind:"parameter",line:T.line,column:T.column,scope:T.value,isLocal:!0});p.push({name:T.value,startLine:T.line,kind:"function"})}continue}if(c()?.type===1){let T=L();if(h(5,"=")){if(L(),c()?.type===1&&c()?.value==="require"&&(L(),h(6,"(")&&(L(),c()?.type===2))){let E=L().value.slice(1,-1);a.push({modulePath:E,localName:T.value,line:T.line,column:T.column})}if(c()?.type===6&&c()?.value==="{"){r.push({name:T.value,kind:"table",line:T.line,column:T.column,scope:p.length>0?p[p.length-1].name:void 0,isLocal:!0,description:d(T.line)});continue}}for(r.push({name:T.value,kind:"local",line:T.line,column:T.column,scope:p.length>0?p[p.length-1].name:void 0,isLocal:!0,description:d(T.line)});h(6,",");)if(L(),c()?.type===1){let M=L();r.push({name:M.value,kind:"local",line:M.line,column:M.column,scope:p.length>0?p[p.length-1].name:void 0,isLocal:!0})}}continue}if(h(0,"function")){let w=L();if(c()?.type===1){let M=L().value,E=!1,N;for(;;)if(h(6,"."))L(),c()?.type===1&&(M+="."+L().value);else if(h(6,":")){if(L(),E=!0,N=M,c()?.type===1){let de=L();M+=":"+de.value}}else break;let $=this.parseParamList(l,u);u=$.nextIndex;let Pe=M.lastIndexOf("."),te=M.lastIndexOf(":"),ve=Math.max(Pe,te),Ee=ve>=0?M.slice(ve+1):M,V={name:Ee,kind:E?"method":"function",line:w.line,column:w.column,scope:p.length>0?p[p.length-1].name:void 0,type:N,parameters:$.names,isLocal:!1,description:d(w.line)};r.push(V),M.startsWith("lurek.")&&Ye.has(Ee)&&i.push(V);for(let de of $.names)r.push({name:de,kind:"parameter",line:w.line,column:w.column,scope:Ee,isLocal:!0});p.push({name:Ee,startLine:w.line,kind:"function"});continue}p.push({name:"<anonymous>",startLine:w.line,kind:"function"}),h(6,"(")&&(u=this.parseParamList(l,u).nextIndex);continue}if(x.type===1){let w=u,T=x.value,M=u+1,E=!1;for(;M<l.length;)if(l[M]?.value==="."&&l[M+1]?.type===1)T+="."+l[M+1].value,M+=2;else if(l[M]?.value===":"&&l[M+1]?.type===1)T+=":"+l[M+1].value,E=!0,M+=2;else break;if(M<l.length&&l[M]?.value==="="){let N=M,$=l[N+1];if($?.type===0&&$.value==="function"){u=N+2;let Pe=this.parseParamList(l,u);u=Pe.nextIndex;let te=T.lastIndexOf("."),ve=te>=0?T.slice(te+1):T,Ee={name:ve,kind:"function",line:x.line,column:x.column,parameters:Pe.names,isLocal:!1,description:d(x.line)};r.push(Ee),T.startsWith("lurek.")&&Ye.has(ve)&&i.push(Ee);for(let V of Pe.names)r.push({name:V,kind:"parameter",line:x.line,column:x.column,scope:ve,isLocal:!0});p.push({name:ve,startLine:x.line,kind:"function"});continue}if(T.endsWith(".__index")&&$?.type===1){u=N+2;continue}}L();continue}if(x.type===0){if(x.value==="do"){p.push({name:"do",startLine:x.line,kind:"do"}),L();continue}if(x.value==="if"||x.value==="elseif"){x.value==="if"&&p.push({name:"if",startLine:x.line,kind:"if"}),L();continue}if(x.value==="for"){p.push({name:"for",startLine:x.line,kind:"for"}),L();continue}if(x.value==="while"){p.push({name:"while",startLine:x.line,kind:"while"}),L();continue}if(x.value==="repeat"){p.push({name:"repeat",startLine:x.line,kind:"repeat"}),L();continue}if(x.value==="end"||x.value==="until"){let w=p.pop();if(w){o.push({name:w.name,startLine:w.startLine,endLine:x.line,kind:w.kind});for(let T=r.length-1;T>=0;T--)if(r[T].kind==="function"&&r[T].name===w.name&&r[T].line===w.startLine){r[T].endLine=x.line;break}}L();continue}}L()}let g=e.split(`
+`).length-1;for(;p.length>0;){let x=p.pop();o.push({name:x.name,startLine:x.startLine,endLine:g,kind:x.kind})}let v={symbols:r,requires:a,callbacks:i,scopes:o,comments:s,classes:[]};return v.classes=this.detectClasses(v),v}getSymbolAt(e,t,r){for(let a of e.symbols)if(a.line===t&&r>=a.column&&r<a.column+a.name.length)return a}getScopeAt(e,t){let r;for(let a of e.scopes)t>=a.startLine&&t<=a.endLine&&(!r||a.startLine>r.startLine)&&(r=a);return r}findReferencesInDocument(e,t){let r=[],a=this.tokenize(e);for(let i of a)i.type===1&&i.value===t&&r.push({line:i.line,column:i.column});return r}getVisibleLocals(e,t){let r=this.getScopeAt(e,t);return e.symbols.filter(a=>!a.isLocal||a.line>t?!1:a.scope&&r?a.scope===r.name||!a.scope:!0)}detectClasses(e){let t=[],r=new Set;for(let a of e.symbols)a.kind==="method"&&a.type&&r.add(a.type);for(let a of r){let i=e.symbols.filter(l=>l.kind==="method"&&l.type===a),o=e.symbols.filter(l=>l.kind==="field"&&l.scope===a).map(l=>l.name),s=i[0];s&&t.push({name:a,methods:i,fields:o,line:s.line})}return t}getWordAtPosition(e,t,r){let a=e.split(`
+`);if(t<0||t>=a.length)return"";let i=a[t];if(r<0||r>=i.length)return"";let o=r,s=r;for(;o>0&&Et(i[o-1]);)o--;for(;s<i.length&&Et(i[s]);)s++;for(;o>0&&(i[o-1]==="."||i[o-1]===":");)for(o--;o>0&&Et(i[o-1]);)o--;return i.slice(o,s)}getFunctionCallContext(e,t,r){let a=e.split(`
+`);if(t<0||t>=a.length)return;let i=a[t],o=0,s=0,l=t,p=Math.min(r,i.length)-1;for(;l>=0;){let u=a[l],c=l===t?p:u.length-1;for(let h=c;h>=0;h--){let L=u[h];if(L===")"){o++;continue}if(L==="("){if(o===0){let d=h-1;for(;d>=0&&u[d]===" ";)d--;let g=d;for(;g>0&&(Et(u[g-1])||u[g-1]==="."||u[g-1]===":");)g--;let v=u.slice(g,d+1);return v.length>0?{functionName:v,paramIndex:s}:void 0}o--;continue}L===","&&o===0&&s++}l--,l>=0&&(p=a[l].length-1)}}isInsideString(e,t,r){let a=this.tokenize(e);for(let i of a){if(i.type!==2)continue;let o=i.line+Ir(i.value);if(i.line===o){if(i.line===t&&r>=i.column&&r<i.column+i.length)return!0}else{if(t>i.line&&t<o||t===i.line&&r>=i.column)return!0;if(t===o){let s=i.value.lastIndexOf(`
+`),l=i.value.length-s-1;if(r<l)return!0}}}return!1}isInsideComment(e,t,r){let a=this.tokenize(e);for(let i of a){if(i.type!==4)continue;let o=i.line+Ir(i.value);if(i.line===o){if(i.line===t&&r>=i.column)return!0}else{if(t>i.line&&t<o||t===i.line&&r>=i.column)return!0;if(t===o){let s=i.value.lastIndexOf(`
+`),l=i.value.length-s-1;if(r<l)return!0}}}return!1}countLongBracketLevel(e,t){if(e[t]!=="[")return-1;let r=0,a=t+1;for(;a<e.length&&e[a]==="=";)r++,a++;return a<e.length&&e[a]==="["?r:-1}parseParamList(e,t){let r=[],a=t;if(a>=e.length||e[a]?.value!=="(")return{names:r,nextIndex:a};for(a++;a<e.length&&e[a]?.value!==")";)e[a]?.type===1?r.push(e[a].value):e[a]?.value==="..."&&r.push("..."),a++;return a<e.length&&e[a]?.value===")"&&a++,{names:r,nextIndex:a}}};function mt(n){return n>="0"&&n<="9"}function Ls(n){return mt(n)||n>="a"&&n<="f"||n>="A"&&n<="F"}function ni(n){return n>="a"&&n<="z"||n>="A"&&n<="Z"||n==="_"}function Et(n){return ni(n)||mt(n)}function Ir(n){let e=0;for(let t=0;t<n.length;t++)n[t]===`
+`&&e++;return e}var ai=new De;function ii(n,e){let t=O.languages.createDiagnosticCollection("lurek");n.subscriptions.push(t);let r=new Map,a=new Map,i=s=>{if(s.languageId!=="lua")return;let l=s.uri.toString(),p=s.version;a.set(l,p);try{if(a.get(l)!==p)return;let u=s.getText(),c=ai.analyze(u),h=[];h.push(...ws(u,e)),h.push(...xs(u)),Ps(u,s,h),h.push(...Ms(u,c)),h.push(...Ss(u,s,c)),h.push(...Cs(u,e)),Is(u,s,h);let L=O.workspace.asRelativePath(s.uri.fsPath,!1);!L.startsWith("content/examples/")&&!L.startsWith("content\\examples\\")&&h.push(...Es(u,c,e)),h.push(...Ds(u,s)),h.push(...Bs(u)),t.set(s.uri,h)}catch{}},o=s=>{let l=s.uri.toString(),p=s.version;a.set(l,p);let u=r.get(l);u&&clearTimeout(u),r.set(l,setTimeout(()=>{r.delete(l),a.get(l)===p&&i(s)},800))};n.subscriptions.push(O.window.onDidChangeVisibleTextEditors(s=>{for(let l of s)i(l.document)}),O.workspace.onDidSaveTextDocument(i),O.workspace.onDidChangeTextDocument(s=>o(s.document)),O.workspace.onDidCloseTextDocument(s=>{t.delete(s.uri);let l=s.uri.toString(),p=r.get(l);p&&(clearTimeout(p),r.delete(l))}));for(let s of O.window.visibleTextEditors)i(s.document)}function ws(n,e){let t=[],r=e.getAllFunctions().filter(i=>i.deprecated);if(r.length===0)return t;let a=n.split(`
+`);for(let i of r){let o=i.fullPath.replace(/\./g,"\\."),s=new RegExp(o,"g");for(let l=0;l<a.length;l++){let p=a[l];if(p.trimStart().startsWith("--"))continue;let u;for(;(u=s.exec(p))!==null;){let c=new O.Range(l,u.index,l,u.index+i.fullPath.length),h=new O.Diagnostic(c,`${i.fullPath} is deprecated. ${i.deprecated}`,O.DiagnosticSeverity.Warning);h.code="lurek.deprecated",h.source="Lurek2D Toolkit",h.tags=[O.DiagnosticTag.Deprecated],t.push(h)}}}return t}function xs(n){let e=[],t=n.split(`
+`),r=/lurek\.render\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;for(let a=0;a<t.length;a++){let i=t[a].split("--",1)[0];if(i.trimStart().startsWith("--"))continue;let o;for(;(o=r.exec(i))!==null;){let s=[parseFloat(o[1]),parseFloat(o[2]),parseFloat(o[3])];if(o[4]!==void 0&&s.push(parseFloat(o[4])),!s.some(h=>h>1))continue;let p=s.slice(0,3).map(h=>(h/255).toFixed(2)),u=new O.Range(a,o.index,a,o.index+o[0].length),c=new O.Diagnostic(u,`Color values should be in 0-1 range. Did you mean ${p.join(", ")}?`,O.DiagnosticSeverity.Warning);c.code="lurek.colorRange",c.source="Lurek2D Toolkit",e.push(c)}}return e}function Ps(n,e,t){if(!O.workspace.workspaceFolders?.length)return;let r=O.workspace.asRelativePath(e.uri.fsPath,!1);if(r.startsWith("content/examples/")||r.startsWith("content\\examples\\"))return;let a=n.split(`
+`),i=/lurek\.(?:render\.newImage|audio\.newSource|fs\.read)\s*\(\s*["']([^"']+)["']/g,o=nt.dirname(e.uri.fsPath),s=O.workspace.workspaceFolders[0].uri.fsPath;for(let l=0;l<a.length;l++){let p=a[l];if(p.trimStart().startsWith("--"))continue;let u;for(;(u=i.exec(p))!==null;){let c=u[1];if(c.includes("://")||!c.includes("."))continue;if(![nt.resolve(o,c),nt.resolve(s,c)].some(d=>{try{return ri.existsSync(d)}catch{return!1}})){let d=p.indexOf(c,u.index),g=new O.Range(l,d,l,d+c.length),v=new O.Diagnostic(g,`Asset file '${c}' not found in workspace`,O.DiagnosticSeverity.Warning);v.code="lurek.assetNotFound",v.source="Lurek2D Toolkit",t.push(v)}}}}function Ms(n,e){let t=[];if(!n.includes("lurek.thread"))return t;let r=n.split(`
+`),a=/\bmath\.random\s*\(/g;for(let i=0;i<r.length;i++){let o=r[i];if(o.trimStart().startsWith("--"))continue;let s;for(;(s=a.exec(o))!==null;){let l=ai.getScopeAt(e,i);if(!l||!r.slice(l.startLine,l.endLine+1).join(`
+`).includes("lurek.thread"))continue;let u=new O.Range(i,s.index,i,s.index+11),c=new O.Diagnostic(u,"math.random in threads may produce identical sequences. Consider seeding with thread ID.",O.DiagnosticSeverity.Information);c.code="lurek.threadRandom",c.source="Lurek2D Toolkit",t.push(c)}}return t}function Ss(n,e,t){let r=[];if(nt.basename(e.uri.fsPath)!=="main.lua"||!e.uri.fsPath.replace(/\\/g,"/").includes("/content/games/"))return r;let o=Ye.has("process")?"process":"update",s="draw",l=t.callbacks.some(u=>u.name===o)||new RegExp(`lurek\\.${o}\\s*=\\s*function`).test(n),p=t.callbacks.some(u=>u.name===s)||/lurek\.draw\s*=\s*function/.test(n);if(!l&&!p){let u=n.split(`
+`),c=new O.Range(0,0,0,u[0]?.length??0),h=new O.Diagnostic(c,`main.lua should define lurek.${o}(dt) and/or lurek.${s}()`,O.DiagnosticSeverity.Information);h.code="lurek.missingCallback",h.source="Lurek2D Toolkit",r.push(h)}return r}var ks=[{pattern:/lurek\.render\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,valid:["fill","line"],label:"draw mode"},{pattern:/lurek\.render\.setBlendMode\s*\(\s*["']([^"']+)["']/g,valid:["alpha","add","subtract","multiply","replace","screen","darken","lighten","none"],label:"blend mode"},{pattern:/lurek\.render\.setLineStyle\s*\(\s*["']([^"']+)["']/g,valid:["smooth","rough"],label:"line style"},{pattern:/lurek\.render\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,valid:["linear","nearest"],label:"texture filter"},{pattern:/lurek\.render\.setFilter\s*\(\s*["']([^"']+)["']/g,valid:["linear","nearest"],label:"texture filter"},{pattern:/lurek\.audio\.newSource\s*\([^,]*,\s*["']([^"']+)["']/g,valid:["static","stream"],label:"audio source type"},{pattern:/lurek\.physics\.newBody\s*\([^,]*,[^,]*,[^,]*,\s*["']([^"']+)["']/g,valid:["dynamic","static","kinematic"],label:"body type"},{pattern:/lurek\.render\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,valid:["left","center","right","justify"],label:"text alignment"}];function js(n,e){for(let t of e){if(t===n)return;if(Math.abs(t.length-n.length)<=2){let r=0,a=Math.max(t.length,n.length);for(let i=0;i<a;i++)(t[i]??"")!==(n[i]??"")&&r++;if(r<=2)return t}}}function Cs(n,e){let t=[],r=n.split(`
+`);for(let a of ks)for(let i=0;i<r.length;i++){let o=r[i];if(o.trimStart().startsWith("--"))continue;a.pattern.lastIndex=0;let s;for(;(s=a.pattern.exec(o))!==null;){let l=s[1];if(a.valid.includes(l))continue;let p=js(l,a.valid),u=o.indexOf(`"${l}"`,s.index)!==-1?o.indexOf(`"${l}"`,s.index)+1:o.indexOf(`'${l}'`,s.index)+1,c=new O.Range(i,u,i,u+l.length),h=p?`Unknown ${a.label} "${l}". Did you mean "${p}"? Valid: ${a.valid.join(", ")}`:`Unknown ${a.label} "${l}". Valid values: ${a.valid.join(", ")}`,L=new O.Diagnostic(c,h,O.DiagnosticSeverity.Warning);L.code="lurek.wrongEnumValue",L.source="Lurek2D Toolkit",t.push(L)}}return t}var Rs={window:["title","width","height","vsync","fullscreen","resizable","highdpi","minwidth","minheight","x","y","borderless","displayindex","icon"],performance:["target_fps","fixed_dt"],modules:["physics","audio","graphics","input","timer","filesystem","math","thread"],log:["file","append","level"]};function Is(n,e,t){if(nt.basename(e.uri.fsPath)!=="conf.lua")return;let r=n.split(`
+`),a=/\bt\.(\w+)\.(\w+)\s*=/g;for(let i=0;i<r.length;i++){let o=r[i];if(o.trimStart().startsWith("--"))continue;a.lastIndex=0;let s;for(;(s=a.exec(o))!==null;){let l=s[1],p=s[2],u=Rs[l];if(!u||u.includes(p))continue;let c=s.index+`t.${l}.`.length,h=new O.Range(i,c,i,c+p.length),L=new O.Diagnostic(h,`"${p}" is not a recognised conf.lua key in t.${l}. Valid: ${u.join(", ")}`,O.DiagnosticSeverity.Warning);L.code="lurek.confKey",L.source="Lurek2D Toolkit",t.push(L)}}}function Es(n,e,t){let r=[],a=n.split(`
+`),i=/lurek\.(?:render\.(?:newImage|newFont|newCanvas|newShader)|audio\.(?:newSource)|image\.load)\s*\(/g,o=t.getCallbacks().map(l=>l.name).filter(l=>["process","process_late","process_physics","fixedUpdate","draw","draw_ui"].includes(l));o.length===0&&o.push("process","process_late","process_physics","draw","draw_ui");function s(l){for(let p=l;p>=0;p--){let u=a[p].match(/function\s+lurek\.([A-Za-z_][\w]*)\s*\(/)||a[p].match(/lurek\.([A-Za-z_][\w]*)\s*=\s*function\s*\(/);if(u)return u[1]}}for(let l=0;l<a.length;l++){let p=a[l];if(p.trimStart().startsWith("--"))continue;i.lastIndex=0;let u;for(;(u=i.exec(p))!==null;){let c=s(l);if(!c||!o.includes(c))continue;let h=u[0].replace(/\s*\($/,""),L=new O.Range(l,u.index,l,u.index+h.length),d=new O.Diagnostic(L,`${h} called inside a per-frame callback. This allocates every frame \u2014 move to lurek.init() or lurek.ready().`,O.DiagnosticSeverity.Warning);d.code="lurek.perFrameAlloc",d.source="Lurek2D Toolkit",r.push(d)}}return r}function Ds(n,e){let t=[],r=e.uri.fsPath.replace(/\\/g,"/");if(!r.includes("tests/lua/")&&!r.includes("tests\\lua\\")||!r.endsWith(".lua")||r.endsWith("init.lua"))return t;if(!/\btest_summary\s*\(\s*\)/.test(n)){let i=n.split(`
+`),o=i.length-1,s=new O.Range(o,0,o,i[o]?.length??0),l=new O.Diagnostic(s,"Lua test file is missing test_summary() call at the end. Required by the Lurek2D test harness.",O.DiagnosticSeverity.Warning);l.code="lurek.missingTestSummary",l.source="Lurek2D Toolkit",t.push(l)}return t}function Bs(n){let e=[],t=n.split(`
+`),r=/\blocal\s+(\w+)\s*=\s*lurek\.entity\.find\s*\(/g;for(let a=0;a<t.length;a++){let i=t[a];if(i.trimStart().startsWith("--"))continue;r.lastIndex=0;let o;for(;(o=r.exec(i))!==null;){let s=o[1],l=!1;for(let p=a+1;p<Math.min(a+6,t.length);p++){let u=t[p].trim();if(u.startsWith("--"))continue;if(u.includes(`if ${s}`)||u.includes(`if not ${s}`)){l=!0;break}if(new RegExp(`\\b${s}\\s*[:.:]\\s*\\w+`).test(u)&&!l){let h=u.indexOf(s),L=new O.Range(p,h,p,h+s.length),d=new O.Diagnostic(L,`'${s}' from lurek.ecs.find() may be nil. Consider adding: if ${s} then`,O.DiagnosticSeverity.Information);d.code="lurek.entityNilAccess",d.source="Lurek2D Toolkit",e.push(d);break}}}}return e}var fe=C(require("vscode")),Fs={scheme:"file",language:"lua"},Os=["setColor","setBackgroundColor","clear","newColor"];function oi(n,e){let t=fe.languages.registerColorProvider(Fs,{provideDocumentColors(r){try{return _s(r)}catch{return[]}},provideColorPresentations(r,a){try{return Ns(r,a)}catch{return[]}}});n.subscriptions.push(t)}var zs=new RegExp(`lurek\\.graphics\\.(?:${Os.join("|")})\\s*\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)\\s*,\\s*([\\d.]+)(?:\\s*,\\s*([\\d.]+))?\\s*\\)`,"g");function _s(n){let e=[],t=n.getText(),r=new RegExp(zs.source,"g"),a;for(;(a=r.exec(t))!==null;){let i=parseFloat(a[1]),o=parseFloat(a[2]),s=parseFloat(a[3]),l=a[4]!==void 0?parseFloat(a[4]):1;if(i>1||o>1||s>1||l>1)continue;let p=a[0],u=p.indexOf("(")+1,c=p.lastIndexOf(")"),h=a.index+u,L=c-u,d=n.positionAt(h),g=n.positionAt(h+L),v=new fe.Range(d,g);e.push(new fe.ColorInformation(v,new fe.Color(i,o,s,l)))}return e}function Ns(n,e){let t=cn(n.red),r=cn(n.green),a=cn(n.blue),i=cn(n.alpha),o=[],s=new fe.ColorPresentation(`${t}, ${r}, ${a}, ${i}`);if(s.textEdit=new fe.TextEdit(e.range,`${t}, ${r}, ${a}, ${i}`),o.push(s),Math.abs(n.alpha-1)<.005){let h=new fe.ColorPresentation(`${t}, ${r}, ${a}`);h.textEdit=new fe.TextEdit(e.range,`${t}, ${r}, ${a}`),o.push(h)}let l=Math.round(n.red*255).toString(16).padStart(2,"0"),p=Math.round(n.green*255).toString(16).padStart(2,"0"),u=Math.round(n.blue*255).toString(16).padStart(2,"0"),c=new fe.ColorPresentation(`${t}, ${r}, ${a} --[[ #${l}${p}${u} ]]`);return c.textEdit=new fe.TextEdit(e.range,`${t}, ${r}, ${a} --[[ #${l}${p}${u} ]]`),o.push(c),o}function cn(n){return n.toFixed(2).replace(/\.?0+$/,"")||"0"}var ke=C(require("vscode")),ht=C(require("path"));var Gs={scheme:"file",language:"lua"},ou=new De,si={"lurek.graphics.newImage":[".png",".jpg",".jpeg",".bmp",".gif"],"lurek.audio.newSource":[".ogg",".wav",".mp3",".flac"],"lurek.filesystem.read":[],"lurek.filesystem.write":[],"lurek.filesystem.exists":[]},Hs=[".lua"];function li(n,e){let t=ke.languages.registerCompletionItemProvider(Gs,{async provideCompletionItems(r,a){try{return await Vs(r,a)}catch{return}}},'"',"'","/");n.subscriptions.push(t)}async function Vs(n,e){let r=n.lineAt(e).text.substring(0,e.character),a=r.match(/(lurek\.\w+\.\w+)\s*\(\s*["']([^"']*)$/),i=r.match(/require\s*\(\s*["']([^"']*)$/);if(!a&&!i)return;let o=a?a[1]:"require",s=a?a[2]:i[1],l=[];if(o==="require")l=Hs;else if(o in si)l=si[o];else return;let p=ke.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!p)return;let u=s.includes("/")?ht.dirname(s):"",c=u?`${u}/**/*`:"**/*",h=await ke.workspace.findFiles(c,"**/node_modules/**",200),L=[],d=new Set;for(let g of h){let v=ht.extname(g.fsPath).toLowerCase();if(l.length>0&&!l.includes(v))continue;let x=ht.relative(p,g.fsPath).replace(/\\/g,"/");if(o==="require"){let E=x.replace(/\.lua$/,"").replace(/\//g,"."),N=new ke.CompletionItem(E,ke.CompletionItemKind.Module);N.detail="Lua module",N.insertText=E;let $=E.split(".").length;N.sortText=String($).padStart(3,"0")+E,L.push(N);continue}let w=ht.dirname(x);if(w!=="."&&!d.has(w)&&(d.add(w),!s||w.startsWith(s.split("/")[0]))){let E=new ke.CompletionItem(w+"/",ke.CompletionItemKind.Folder);E.sortText="0"+w,L.push(E)}let T=new ke.CompletionItem(x,ke.CompletionItemKind.File);T.detail=v.toUpperCase().substring(1)+" file",T.insertText=x;let M=x.split("/").length;T.sortText=String(M).padStart(3,"0")+x,L.push(T)}return L}var rt=C(require("vscode"));var qs={scheme:"file",language:"lua"},lu=new De;function pi(n,e){let t=rt.languages.registerInlayHintsProvider(qs,{provideInlayHints(r,a){try{return rt.workspace.getConfiguration("lurek").get("inlayHints.enabled")===!1?[]:$s(r,a,e)}catch{return[]}}});n.subscriptions.push(t)}function $s(n,e,t){let r=[],a=n.getText(e),i=n.offsetAt(e.start),o=/(lurek\.\w+\.\w+)\s*\(/g,s;for(;(s=o.exec(a))!==null;){let l=s[1],p=t.getFunction(l);if(!p||p.parameters.length===0)continue;let u=s.index+s[0].length-1,c=Ys(a,u);if(!c)continue;let h=Xs(c);if(h.length<=1)continue;let d=i+u+1;for(let g=0;g<h.length&&g<p.parameters.length;g++){let v=h[g],x=v.trimStart(),w=v.length-x.length;if(/^\w+\s*=/.test(x)){d+=v.length+1;continue}let T=p.parameters[g];if(x===T.name){d+=v.length+1;continue}if(Zs(x,T.name)){d+=v.length+1;continue}let M=n.positionAt(d+w),E=new rt.InlayHint(M,`${T.name}:`,rt.InlayHintKind.Parameter);E.paddingRight=!0,r.push(E),d+=v.length+1}}return r}function Ys(n,e){if(n[e]!=="(")return;let t=1,r=e+1;for(;r<n.length&&t>0;){let a=n[r];a==="("?t++:a===")"&&t--,r++}if(t===0)return n.slice(e+1,r-1)}function Xs(n){if(!n.trim())return[];let e=[],t="",r=0,a=null;for(let i=0;i<n.length;i++){let o=n[i];if(a&&o==="\\"){t+=o,i+1<n.length&&(t+=n[i+1],i++);continue}if(!a&&(o==='"'||o==="'")){a=o,t+=o;continue}if(a&&o===a){a=null,t+=o;continue}if(a){t+=o;continue}o==="("||o==="{"||o==="["?(r++,t+=o):o===")"||o==="}"||o==="]"?(r--,t+=o):o===","&&r===0?(e.push(t),t=""):t+=o}return t&&e.push(t),e}function Zs(n,e){return(n==="true"||n==="false"||n==="nil")&&e.length<=4}var z=C(require("vscode"));var Js={scheme:"file",language:"lua"},uu=new De;function ui(n,e){let t=z.languages.registerCodeActionsProvider(Js,{provideCodeActions(r,a,i){try{return Ks(r,a,i)}catch{return[]}}},{providedCodeActionKinds:[z.CodeActionKind.QuickFix,z.CodeActionKind.RefactorExtract]});n.subscriptions.push(t)}function Ks(n,e,t){let r=[];for(let l of t.diagnostics)switch(l.code){case"lurek.unusedRequire":r.push(...el(n,l));break;case"lurek.missingCallback":r.push(...tl(n,l));break;case"lurek.colorRange":r.push(...nl(n,l));break}let a=n.lineAt(e.start.line).text;e.isEmpty||(r.push(rl(n,e)),r.push(ol(n,e)));let i=a.match(/^(\s*)(\w+)\s*=\s*(.+)/);i&&!a.trimStart().startsWith("local ")&&!a.trimStart().startsWith("function ")&&!a.trimStart().startsWith("--")&&!a.includes("lurek.")&&!a.includes(".")&&!a.includes(":")&&r.push(al(n,e.start.line,i)),/\brequire\s*\(/.test(a)&&!/pcall/.test(a)&&r.push(il(n,e.start.line));let o=a.match(/^(\s*)local\s+(\w+)\s*=\s*(.+)/);if(o&&!e.isEmpty&&r.push(sl(n,e.start.line,o)),/^\s*if\s+/.test(a)){let l=ll(n,e.start.line);l&&r.push(l)}let s=a.match(/^(\s*)local\s+(\w+)\s*=/);if(s&&!a.includes("---@type")&&r.push(pl(n,e.start.line,s[2])),/(\w+)\.__index\s*=\s*\1/.test(a)||/setmetatable\s*\(\s*{/.test(a)){let l=a.match(/(\w+)\.__index/)?.[1];l&&r.push(ul(n,e.start.line,l))}return r}function el(n,e){let t=new z.CodeAction("Remove unused require",z.CodeActionKind.QuickFix);t.edit=new z.WorkspaceEdit;let r=e.range.start.line,a=new z.Range(r,0,r+1,0);return t.edit.delete(n.uri,a),t.diagnostics=[e],t.isPreferred=!0,[t]}function tl(n,e){let t=n.getText(),r=[];if(!/function\s+lurek\.load\s*\(/.test(t)&&!/lurek\.load\s*=\s*function/.test(t)&&r.push("load"),!/function\s+lurek\.update\s*\(/.test(t)&&!/lurek\.update\s*=\s*function/.test(t)&&r.push("update"),!/function\s+lurek\.draw\s*\(/.test(t)&&!/lurek\.draw\s*=\s*function/.test(t)&&r.push("draw"),r.length===0)return[];let a=new z.CodeAction("Generate Lurek2D callbacks",z.CodeActionKind.QuickFix);a.edit=new z.WorkspaceEdit;let i=[];r.includes("load")&&i.push(`function lurek.load()
+    -- Initialize game
+end`),r.includes("update")&&i.push(`function lurek.update(dt)
+    -- Update game logic
+end`),r.includes("draw")&&i.push(`function lurek.draw()
+    -- Draw game objects
+end`);let o=n.lineAt(n.lineCount-1).range.end;return a.edit.insert(n.uri,o,`
 
-// node_modules/@vscode/debugadapter/lib/runDebugAdapter.js
-var require_runDebugAdapter = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/runDebugAdapter.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.runDebugAdapter = void 0;
-    var Net = require("net");
-    function runDebugAdapter(debugSession) {
-      let port = 0;
-      const args = process.argv.slice(2);
-      args.forEach(function(val, index, array) {
-        const portMatch = /^--server=(\d{4,5})$/.exec(val);
-        if (portMatch) {
-          port = parseInt(portMatch[1], 10);
-        }
-      });
-      if (port > 0) {
-        console.error(`waiting for debug protocol on port ${port}`);
-        Net.createServer((socket) => {
-          console.error(">> accepted connection from client");
-          socket.on("end", () => {
-            console.error(">> client connection closed\n");
-          });
-          const session = new debugSession(false, true);
-          session.setRunAsServer(true);
-          session.start(socket, socket);
-        }).listen(port);
-      } else {
-        const session = new debugSession(false);
-        process.on("SIGTERM", () => {
-          session.shutdown();
-        });
-        session.start(process.stdin, process.stdout);
-      }
-    }
-    exports2.runDebugAdapter = runDebugAdapter;
-  }
-});
+`+i.join(`
 
-// node_modules/@vscode/debugadapter/lib/debugSession.js
-var require_debugSession = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/debugSession.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.DebugSession = exports2.ErrorDestination = exports2.MemoryEvent = exports2.InvalidatedEvent = exports2.ProgressEndEvent = exports2.ProgressUpdateEvent = exports2.ProgressStartEvent = exports2.CapabilitiesEvent = exports2.LoadedSourceEvent = exports2.ModuleEvent = exports2.BreakpointEvent = exports2.ThreadEvent = exports2.OutputEvent = exports2.ExitedEvent = exports2.TerminatedEvent = exports2.InitializedEvent = exports2.ContinuedEvent = exports2.StoppedEvent = exports2.CompletionItem = exports2.Module = exports2.Breakpoint = exports2.Variable = exports2.Thread = exports2.StackFrame = exports2.Scope = exports2.Source = void 0;
-    var protocol_1 = require_protocol();
-    var messages_1 = require_messages();
-    var runDebugAdapter_1 = require_runDebugAdapter();
-    var url_1 = require("url");
-    var Source2 = class {
-      constructor(name, path23, id = 0, origin, data) {
-        this.name = name;
-        this.path = path23;
-        this.sourceReference = id;
-        if (origin) {
-          this.origin = origin;
-        }
-        if (data) {
-          this.adapterData = data;
-        }
-      }
-    };
-    exports2.Source = Source2;
-    var Scope2 = class {
-      constructor(name, reference, expensive = false) {
-        this.name = name;
-        this.variablesReference = reference;
-        this.expensive = expensive;
-      }
-    };
-    exports2.Scope = Scope2;
-    var StackFrame2 = class {
-      constructor(i, nm, src, ln = 0, col = 0) {
-        this.id = i;
-        this.source = src;
-        this.line = ln;
-        this.column = col;
-        this.name = nm;
-      }
-    };
-    exports2.StackFrame = StackFrame2;
-    var Thread2 = class {
-      constructor(id, name) {
-        this.id = id;
-        if (name) {
-          this.name = name;
-        } else {
-          this.name = "Thread #" + id;
-        }
-      }
-    };
-    exports2.Thread = Thread2;
-    var Variable2 = class {
-      constructor(name, value, ref = 0, indexedVariables, namedVariables) {
-        this.name = name;
-        this.value = value;
-        this.variablesReference = ref;
-        if (typeof namedVariables === "number") {
-          this.namedVariables = namedVariables;
-        }
-        if (typeof indexedVariables === "number") {
-          this.indexedVariables = indexedVariables;
-        }
-      }
-    };
-    exports2.Variable = Variable2;
-    var Breakpoint2 = class {
-      constructor(verified, line, column, source) {
-        this.verified = verified;
-        const e = this;
-        if (typeof line === "number") {
-          e.line = line;
-        }
-        if (typeof column === "number") {
-          e.column = column;
-        }
-        if (source) {
-          e.source = source;
-        }
-      }
-      setId(id) {
-        this.id = id;
-      }
-    };
-    exports2.Breakpoint = Breakpoint2;
-    var Module = class {
-      constructor(id, name) {
-        this.id = id;
-        this.name = name;
-      }
-    };
-    exports2.Module = Module;
-    var CompletionItem4 = class {
-      constructor(label, start, length = 0) {
-        this.label = label;
-        this.start = start;
-        this.length = length;
-      }
-    };
-    exports2.CompletionItem = CompletionItem4;
-    var StoppedEvent2 = class extends messages_1.Event {
-      constructor(reason, threadId, exceptionText) {
-        super("stopped");
-        this.body = {
-          reason
-        };
-        if (typeof threadId === "number") {
-          this.body.threadId = threadId;
-        }
-        if (typeof exceptionText === "string") {
-          this.body.text = exceptionText;
-        }
-      }
-    };
-    exports2.StoppedEvent = StoppedEvent2;
-    var ContinuedEvent = class extends messages_1.Event {
-      constructor(threadId, allThreadsContinued) {
-        super("continued");
-        this.body = {
-          threadId
-        };
-        if (typeof allThreadsContinued === "boolean") {
-          this.body.allThreadsContinued = allThreadsContinued;
-        }
-      }
-    };
-    exports2.ContinuedEvent = ContinuedEvent;
-    var InitializedEvent2 = class extends messages_1.Event {
-      constructor() {
-        super("initialized");
-      }
-    };
-    exports2.InitializedEvent = InitializedEvent2;
-    var TerminatedEvent2 = class extends messages_1.Event {
-      constructor(restart) {
-        super("terminated");
-        if (typeof restart === "boolean" || restart) {
-          const e = this;
-          e.body = {
-            restart
-          };
-        }
-      }
-    };
-    exports2.TerminatedEvent = TerminatedEvent2;
-    var ExitedEvent = class extends messages_1.Event {
-      constructor(exitCode) {
-        super("exited");
-        this.body = {
-          exitCode
-        };
-      }
-    };
-    exports2.ExitedEvent = ExitedEvent;
-    var OutputEvent2 = class extends messages_1.Event {
-      constructor(output, category = "console", data) {
-        super("output");
-        this.body = {
-          category,
-          output
-        };
-        if (data !== void 0) {
-          this.body.data = data;
-        }
-      }
-    };
-    exports2.OutputEvent = OutputEvent2;
-    var ThreadEvent = class extends messages_1.Event {
-      constructor(reason, threadId) {
-        super("thread");
-        this.body = {
-          reason,
-          threadId
-        };
-      }
-    };
-    exports2.ThreadEvent = ThreadEvent;
-    var BreakpointEvent = class extends messages_1.Event {
-      constructor(reason, breakpoint) {
-        super("breakpoint");
-        this.body = {
-          reason,
-          breakpoint
-        };
-      }
-    };
-    exports2.BreakpointEvent = BreakpointEvent;
-    var ModuleEvent = class extends messages_1.Event {
-      constructor(reason, module3) {
-        super("module");
-        this.body = {
-          reason,
-          module: module3
-        };
-      }
-    };
-    exports2.ModuleEvent = ModuleEvent;
-    var LoadedSourceEvent = class extends messages_1.Event {
-      constructor(reason, source) {
-        super("loadedSource");
-        this.body = {
-          reason,
-          source
-        };
-      }
-    };
-    exports2.LoadedSourceEvent = LoadedSourceEvent;
-    var CapabilitiesEvent = class extends messages_1.Event {
-      constructor(capabilities) {
-        super("capabilities");
-        this.body = {
-          capabilities
-        };
-      }
-    };
-    exports2.CapabilitiesEvent = CapabilitiesEvent;
-    var ProgressStartEvent = class extends messages_1.Event {
-      constructor(progressId, title, message) {
-        super("progressStart");
-        this.body = {
-          progressId,
-          title
-        };
-        if (typeof message === "string") {
-          this.body.message = message;
-        }
-      }
-    };
-    exports2.ProgressStartEvent = ProgressStartEvent;
-    var ProgressUpdateEvent = class extends messages_1.Event {
-      constructor(progressId, message) {
-        super("progressUpdate");
-        this.body = {
-          progressId
-        };
-        if (typeof message === "string") {
-          this.body.message = message;
-        }
-      }
-    };
-    exports2.ProgressUpdateEvent = ProgressUpdateEvent;
-    var ProgressEndEvent = class extends messages_1.Event {
-      constructor(progressId, message) {
-        super("progressEnd");
-        this.body = {
-          progressId
-        };
-        if (typeof message === "string") {
-          this.body.message = message;
-        }
-      }
-    };
-    exports2.ProgressEndEvent = ProgressEndEvent;
-    var InvalidatedEvent = class extends messages_1.Event {
-      constructor(areas, threadId, stackFrameId) {
-        super("invalidated");
-        this.body = {};
-        if (areas) {
-          this.body.areas = areas;
-        }
-        if (threadId) {
-          this.body.threadId = threadId;
-        }
-        if (stackFrameId) {
-          this.body.stackFrameId = stackFrameId;
-        }
-      }
-    };
-    exports2.InvalidatedEvent = InvalidatedEvent;
-    var MemoryEvent = class extends messages_1.Event {
-      constructor(memoryReference, offset, count) {
-        super("memory");
-        this.body = { memoryReference, offset, count };
-      }
-    };
-    exports2.MemoryEvent = MemoryEvent;
-    var ErrorDestination;
-    (function(ErrorDestination2) {
-      ErrorDestination2[ErrorDestination2["User"] = 1] = "User";
-      ErrorDestination2[ErrorDestination2["Telemetry"] = 2] = "Telemetry";
-    })(ErrorDestination = exports2.ErrorDestination || (exports2.ErrorDestination = {}));
-    var DebugSession = class _DebugSession extends protocol_1.ProtocolServer {
-      constructor(obsolete_debuggerLinesAndColumnsStartAt1, obsolete_isServer) {
-        super();
-        const linesAndColumnsStartAt1 = typeof obsolete_debuggerLinesAndColumnsStartAt1 === "boolean" ? obsolete_debuggerLinesAndColumnsStartAt1 : false;
-        this._debuggerLinesStartAt1 = linesAndColumnsStartAt1;
-        this._debuggerColumnsStartAt1 = linesAndColumnsStartAt1;
-        this._debuggerPathsAreURIs = false;
-        this._clientLinesStartAt1 = true;
-        this._clientColumnsStartAt1 = true;
-        this._clientPathsAreURIs = false;
-        this._isServer = typeof obsolete_isServer === "boolean" ? obsolete_isServer : false;
-        this.on("close", () => {
-          this.shutdown();
-        });
-        this.on("error", (error) => {
-          this.shutdown();
-        });
-      }
-      setDebuggerPathFormat(format) {
-        this._debuggerPathsAreURIs = format !== "path";
-      }
-      setDebuggerLinesStartAt1(enable) {
-        this._debuggerLinesStartAt1 = enable;
-      }
-      setDebuggerColumnsStartAt1(enable) {
-        this._debuggerColumnsStartAt1 = enable;
-      }
-      setRunAsServer(enable) {
-        this._isServer = enable;
-      }
-      /**
-       * A virtual constructor...
-       */
-      static run(debugSession) {
-        (0, runDebugAdapter_1.runDebugAdapter)(debugSession);
-      }
-      shutdown() {
-        if (this._isServer || this._isRunningInline()) {
-        } else {
-          setTimeout(() => {
-            process.exit(0);
-          }, 100);
-        }
-      }
-      sendErrorResponse(response, codeOrMessage, format, variables, dest = ErrorDestination.User) {
-        let msg;
-        if (typeof codeOrMessage === "number") {
-          msg = {
-            id: codeOrMessage,
-            format
-          };
-          if (variables) {
-            msg.variables = variables;
-          }
-          if (dest & ErrorDestination.User) {
-            msg.showUser = true;
-          }
-          if (dest & ErrorDestination.Telemetry) {
-            msg.sendTelemetry = true;
-          }
-        } else {
-          msg = codeOrMessage;
-        }
-        response.success = false;
-        response.message = _DebugSession.formatPII(msg.format, true, msg.variables);
-        if (!response.body) {
-          response.body = {};
-        }
-        response.body.error = msg;
-        this.sendResponse(response);
-      }
-      runInTerminalRequest(args, timeout, cb) {
-        this.sendRequest("runInTerminal", args, timeout, cb);
-      }
-      dispatchRequest(request) {
-        const response = new messages_1.Response(request);
-        try {
-          if (request.command === "initialize") {
-            var args = request.arguments;
-            if (typeof args.linesStartAt1 === "boolean") {
-              this._clientLinesStartAt1 = args.linesStartAt1;
-            }
-            if (typeof args.columnsStartAt1 === "boolean") {
-              this._clientColumnsStartAt1 = args.columnsStartAt1;
-            }
-            if (args.pathFormat !== "path") {
-              this.sendErrorResponse(response, 2018, "debug adapter only supports native paths", null, ErrorDestination.Telemetry);
-            } else {
-              const initializeResponse = response;
-              initializeResponse.body = {};
-              this.initializeRequest(initializeResponse, args);
-            }
-          } else if (request.command === "launch") {
-            this.launchRequest(response, request.arguments, request);
-          } else if (request.command === "attach") {
-            this.attachRequest(response, request.arguments, request);
-          } else if (request.command === "disconnect") {
-            this.disconnectRequest(response, request.arguments, request);
-          } else if (request.command === "terminate") {
-            this.terminateRequest(response, request.arguments, request);
-          } else if (request.command === "restart") {
-            this.restartRequest(response, request.arguments, request);
-          } else if (request.command === "setBreakpoints") {
-            this.setBreakPointsRequest(response, request.arguments, request);
-          } else if (request.command === "setFunctionBreakpoints") {
-            this.setFunctionBreakPointsRequest(response, request.arguments, request);
-          } else if (request.command === "setExceptionBreakpoints") {
-            this.setExceptionBreakPointsRequest(response, request.arguments, request);
-          } else if (request.command === "configurationDone") {
-            this.configurationDoneRequest(response, request.arguments, request);
-          } else if (request.command === "continue") {
-            this.continueRequest(response, request.arguments, request);
-          } else if (request.command === "next") {
-            this.nextRequest(response, request.arguments, request);
-          } else if (request.command === "stepIn") {
-            this.stepInRequest(response, request.arguments, request);
-          } else if (request.command === "stepOut") {
-            this.stepOutRequest(response, request.arguments, request);
-          } else if (request.command === "stepBack") {
-            this.stepBackRequest(response, request.arguments, request);
-          } else if (request.command === "reverseContinue") {
-            this.reverseContinueRequest(response, request.arguments, request);
-          } else if (request.command === "restartFrame") {
-            this.restartFrameRequest(response, request.arguments, request);
-          } else if (request.command === "goto") {
-            this.gotoRequest(response, request.arguments, request);
-          } else if (request.command === "pause") {
-            this.pauseRequest(response, request.arguments, request);
-          } else if (request.command === "stackTrace") {
-            this.stackTraceRequest(response, request.arguments, request);
-          } else if (request.command === "scopes") {
-            this.scopesRequest(response, request.arguments, request);
-          } else if (request.command === "variables") {
-            this.variablesRequest(response, request.arguments, request);
-          } else if (request.command === "setVariable") {
-            this.setVariableRequest(response, request.arguments, request);
-          } else if (request.command === "setExpression") {
-            this.setExpressionRequest(response, request.arguments, request);
-          } else if (request.command === "source") {
-            this.sourceRequest(response, request.arguments, request);
-          } else if (request.command === "threads") {
-            this.threadsRequest(response, request);
-          } else if (request.command === "terminateThreads") {
-            this.terminateThreadsRequest(response, request.arguments, request);
-          } else if (request.command === "evaluate") {
-            this.evaluateRequest(response, request.arguments, request);
-          } else if (request.command === "stepInTargets") {
-            this.stepInTargetsRequest(response, request.arguments, request);
-          } else if (request.command === "gotoTargets") {
-            this.gotoTargetsRequest(response, request.arguments, request);
-          } else if (request.command === "completions") {
-            this.completionsRequest(response, request.arguments, request);
-          } else if (request.command === "exceptionInfo") {
-            this.exceptionInfoRequest(response, request.arguments, request);
-          } else if (request.command === "loadedSources") {
-            this.loadedSourcesRequest(response, request.arguments, request);
-          } else if (request.command === "dataBreakpointInfo") {
-            this.dataBreakpointInfoRequest(response, request.arguments, request);
-          } else if (request.command === "setDataBreakpoints") {
-            this.setDataBreakpointsRequest(response, request.arguments, request);
-          } else if (request.command === "readMemory") {
-            this.readMemoryRequest(response, request.arguments, request);
-          } else if (request.command === "writeMemory") {
-            this.writeMemoryRequest(response, request.arguments, request);
-          } else if (request.command === "disassemble") {
-            this.disassembleRequest(response, request.arguments, request);
-          } else if (request.command === "cancel") {
-            this.cancelRequest(response, request.arguments, request);
-          } else if (request.command === "breakpointLocations") {
-            this.breakpointLocationsRequest(response, request.arguments, request);
-          } else if (request.command === "setInstructionBreakpoints") {
-            this.setInstructionBreakpointsRequest(response, request.arguments, request);
-          } else {
-            this.customRequest(request.command, response, request.arguments, request);
-          }
-        } catch (e) {
-          this.sendErrorResponse(response, 1104, "{_stack}", { _exception: e.message, _stack: e.stack }, ErrorDestination.Telemetry);
-        }
-      }
-      initializeRequest(response, args) {
-        response.body.supportsConditionalBreakpoints = false;
-        response.body.supportsHitConditionalBreakpoints = false;
-        response.body.supportsFunctionBreakpoints = false;
-        response.body.supportsConfigurationDoneRequest = true;
-        response.body.supportsEvaluateForHovers = false;
-        response.body.supportsStepBack = false;
-        response.body.supportsSetVariable = false;
-        response.body.supportsRestartFrame = false;
-        response.body.supportsStepInTargetsRequest = false;
-        response.body.supportsGotoTargetsRequest = false;
-        response.body.supportsCompletionsRequest = false;
-        response.body.supportsRestartRequest = false;
-        response.body.supportsExceptionOptions = false;
-        response.body.supportsValueFormattingOptions = false;
-        response.body.supportsExceptionInfoRequest = false;
-        response.body.supportTerminateDebuggee = false;
-        response.body.supportsDelayedStackTraceLoading = false;
-        response.body.supportsLoadedSourcesRequest = false;
-        response.body.supportsLogPoints = false;
-        response.body.supportsTerminateThreadsRequest = false;
-        response.body.supportsSetExpression = false;
-        response.body.supportsTerminateRequest = false;
-        response.body.supportsDataBreakpoints = false;
-        response.body.supportsReadMemoryRequest = false;
-        response.body.supportsDisassembleRequest = false;
-        response.body.supportsCancelRequest = false;
-        response.body.supportsBreakpointLocationsRequest = false;
-        response.body.supportsClipboardContext = false;
-        response.body.supportsSteppingGranularity = false;
-        response.body.supportsInstructionBreakpoints = false;
-        response.body.supportsExceptionFilterOptions = false;
-        this.sendResponse(response);
-      }
-      disconnectRequest(response, args, request) {
-        this.sendResponse(response);
-        this.shutdown();
-      }
-      launchRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      attachRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      terminateRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      restartRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setBreakPointsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setFunctionBreakPointsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setExceptionBreakPointsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      configurationDoneRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      continueRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      nextRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      stepInRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      stepOutRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      stepBackRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      reverseContinueRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      restartFrameRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      gotoRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      pauseRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      sourceRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      threadsRequest(response, request) {
-        this.sendResponse(response);
-      }
-      terminateThreadsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      stackTraceRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      scopesRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      variablesRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setVariableRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setExpressionRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      evaluateRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      stepInTargetsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      gotoTargetsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      completionsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      exceptionInfoRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      loadedSourcesRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      dataBreakpointInfoRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setDataBreakpointsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      readMemoryRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      writeMemoryRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      disassembleRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      cancelRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      breakpointLocationsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      setInstructionBreakpointsRequest(response, args, request) {
-        this.sendResponse(response);
-      }
-      /**
-       * Override this hook to implement custom requests.
-       */
-      customRequest(command, response, args, request) {
-        this.sendErrorResponse(response, 1014, "unrecognized request", null, ErrorDestination.Telemetry);
-      }
-      //---- protected -------------------------------------------------------------------------------------------------
-      convertClientLineToDebugger(line) {
-        if (this._debuggerLinesStartAt1) {
-          return this._clientLinesStartAt1 ? line : line + 1;
-        }
-        return this._clientLinesStartAt1 ? line - 1 : line;
-      }
-      convertDebuggerLineToClient(line) {
-        if (this._debuggerLinesStartAt1) {
-          return this._clientLinesStartAt1 ? line : line - 1;
-        }
-        return this._clientLinesStartAt1 ? line + 1 : line;
-      }
-      convertClientColumnToDebugger(column) {
-        if (this._debuggerColumnsStartAt1) {
-          return this._clientColumnsStartAt1 ? column : column + 1;
-        }
-        return this._clientColumnsStartAt1 ? column - 1 : column;
-      }
-      convertDebuggerColumnToClient(column) {
-        if (this._debuggerColumnsStartAt1) {
-          return this._clientColumnsStartAt1 ? column : column - 1;
-        }
-        return this._clientColumnsStartAt1 ? column + 1 : column;
-      }
-      convertClientPathToDebugger(clientPath) {
-        if (this._clientPathsAreURIs !== this._debuggerPathsAreURIs) {
-          if (this._clientPathsAreURIs) {
-            return _DebugSession.uri2path(clientPath);
-          } else {
-            return _DebugSession.path2uri(clientPath);
-          }
-        }
-        return clientPath;
-      }
-      convertDebuggerPathToClient(debuggerPath) {
-        if (this._debuggerPathsAreURIs !== this._clientPathsAreURIs) {
-          if (this._debuggerPathsAreURIs) {
-            return _DebugSession.uri2path(debuggerPath);
-          } else {
-            return _DebugSession.path2uri(debuggerPath);
-          }
-        }
-        return debuggerPath;
-      }
-      //---- private -------------------------------------------------------------------------------
-      static path2uri(path23) {
-        if (process.platform === "win32") {
-          if (/^[A-Z]:/.test(path23)) {
-            path23 = path23[0].toLowerCase() + path23.substr(1);
-          }
-          path23 = path23.replace(/\\/g, "/");
-        }
-        path23 = encodeURI(path23);
-        let uri = new url_1.URL(`file:`);
-        uri.pathname = path23;
-        return uri.toString();
-      }
-      static uri2path(sourceUri) {
-        let uri = new url_1.URL(sourceUri);
-        let s = decodeURIComponent(uri.pathname);
-        if (process.platform === "win32") {
-          if (/^\/[a-zA-Z]:/.test(s)) {
-            s = s[1].toLowerCase() + s.substr(2);
-          }
-          s = s.replace(/\//g, "\\");
-        }
-        return s;
-      }
-      /*
-      * If argument starts with '_' it is OK to send its value to telemetry.
-      */
-      static formatPII(format, excludePII, args) {
-        return format.replace(_DebugSession._formatPIIRegexp, function(match, paramName) {
-          if (excludePII && paramName.length > 0 && paramName[0] !== "_") {
-            return match;
-          }
-          return args[paramName] && args.hasOwnProperty(paramName) ? args[paramName] : match;
-        });
-      }
-    };
-    exports2.DebugSession = DebugSession;
-    DebugSession._formatPIIRegexp = /{([^}]+)}/g;
-  }
-});
+`)+`
+`),a.diagnostics=[e],[a]}function nl(n,e){let r=n.getText(e.range).match(/(lurek\.graphics\.(?:setColor|setBackgroundColor|clear))\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/);if(!r)return[];let a=r[1],i=c=>(parseFloat(c)/255).toFixed(2).replace(/\.?0+$/,"")||"0",o=i(r[2]),s=i(r[3]),l=i(r[4]),p;if(r[5]!==void 0){let c=i(r[5]);p=`${a}(${o}, ${s}, ${l}, ${c})`}else p=`${a}(${o}, ${s}, ${l})`;let u=new z.CodeAction("Convert to 0-1 color range",z.CodeActionKind.QuickFix);return u.edit=new z.WorkspaceEdit,u.edit.replace(n.uri,e.range,p),u.diagnostics=[e],u.isPreferred=!0,[u]}function rl(n,e){let t=new z.CodeAction("Extract to local function",z.CodeActionKind.RefactorExtract);t.edit=new z.WorkspaceEdit;let r=n.getText(e),a=n.lineAt(e.start.line).text.match(/^(\s*)/)?.[1]??"",i="extracted_function",o=r.split(`
+`).map((l,p)=>p===0?l:a+"    "+l),s=`${a}local function ${i}()
+${a}    ${o.join(`
+`)}
+${a}end
 
-// node_modules/@vscode/debugadapter/lib/internalLogger.js
-var require_internalLogger = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/internalLogger.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.InternalLogger = void 0;
-    var fs20 = require("fs");
-    var path23 = require("path");
-    var logger_1 = require_logger();
-    var InternalLogger = class {
-      constructor(logCallback, isServer) {
-        this.beforeExitCallback = () => this.dispose();
-        this._logCallback = logCallback;
-        this._logToConsole = isServer;
-        this._minLogLevel = logger_1.LogLevel.Warn;
-        this.disposeCallback = (signal, code) => {
-          this.dispose();
-          code = code || 2;
-          code += 128;
-          process.exit(code);
-        };
-      }
-      async setup(options) {
-        this._minLogLevel = options.consoleMinLogLevel;
-        this._prependTimestamp = options.prependTimestamp;
-        if (options.logFilePath) {
-          if (!path23.isAbsolute(options.logFilePath)) {
-            this.log(`logFilePath must be an absolute path: ${options.logFilePath}`, logger_1.LogLevel.Error);
-          } else {
-            const handleError = (err) => this.sendLog(`Error creating log file at path: ${options.logFilePath}. Error: ${err.toString()}
-`, logger_1.LogLevel.Error);
-            try {
-              await fs20.promises.mkdir(path23.dirname(options.logFilePath), { recursive: true });
-              this.log(`Verbose logs are written to:
-`, logger_1.LogLevel.Warn);
-              this.log(options.logFilePath + "\n", logger_1.LogLevel.Warn);
-              this._logFileStream = fs20.createWriteStream(options.logFilePath);
-              this.logDateTime();
-              this.setupShutdownListeners();
-              this._logFileStream.on("error", (err) => {
-                handleError(err);
-              });
-            } catch (err) {
-              handleError(err);
-            }
-          }
-        }
-      }
-      logDateTime() {
-        let d = /* @__PURE__ */ new Date();
-        let dateString = d.getUTCFullYear() + `-${d.getUTCMonth() + 1}-` + d.getUTCDate();
-        const timeAndDateStamp = dateString + ", " + getFormattedTimeString();
-        this.log(timeAndDateStamp + "\n", logger_1.LogLevel.Verbose, false);
-      }
-      setupShutdownListeners() {
-        process.on("beforeExit", this.beforeExitCallback);
-        process.on("SIGTERM", this.disposeCallback);
-        process.on("SIGINT", this.disposeCallback);
-      }
-      removeShutdownListeners() {
-        process.removeListener("beforeExit", this.beforeExitCallback);
-        process.removeListener("SIGTERM", this.disposeCallback);
-        process.removeListener("SIGINT", this.disposeCallback);
-      }
-      dispose() {
-        return new Promise((resolve5) => {
-          this.removeShutdownListeners();
-          if (this._logFileStream) {
-            this._logFileStream.end(resolve5);
-            this._logFileStream = null;
-          } else {
-            resolve5();
-          }
-        });
-      }
-      log(msg, level, prependTimestamp = true) {
-        if (this._minLogLevel === logger_1.LogLevel.Stop) {
-          return;
-        }
-        if (level >= this._minLogLevel) {
-          this.sendLog(msg, level);
-        }
-        if (this._logToConsole) {
-          const logFn = level === logger_1.LogLevel.Error ? console.error : level === logger_1.LogLevel.Warn ? console.warn : null;
-          if (logFn) {
-            logFn((0, logger_1.trimLastNewline)(msg));
-          }
-        }
-        if (level === logger_1.LogLevel.Error) {
-          msg = `[${logger_1.LogLevel[level]}] ${msg}`;
-        }
-        if (this._prependTimestamp && prependTimestamp) {
-          msg = "[" + getFormattedTimeString() + "] " + msg;
-        }
-        if (this._logFileStream) {
-          this._logFileStream.write(msg);
-        }
-      }
-      sendLog(msg, level) {
-        if (msg.length > 1500) {
-          const endsInNewline = !!msg.match(/(\n|\r\n)$/);
-          msg = msg.substr(0, 1500) + "[...]";
-          if (endsInNewline) {
-            msg = msg + "\n";
-          }
-        }
-        if (this._logCallback) {
-          const event = new logger_1.LogOutputEvent(msg, level);
-          this._logCallback(event);
-        }
-      }
-    };
-    exports2.InternalLogger = InternalLogger;
-    function getFormattedTimeString() {
-      let d = /* @__PURE__ */ new Date();
-      let hourString = _padZeroes(2, String(d.getUTCHours()));
-      let minuteString = _padZeroes(2, String(d.getUTCMinutes()));
-      let secondString = _padZeroes(2, String(d.getUTCSeconds()));
-      let millisecondString = _padZeroes(3, String(d.getUTCMilliseconds()));
-      return hourString + ":" + minuteString + ":" + secondString + "." + millisecondString + " UTC";
-    }
-    function _padZeroes(minDesiredLength, numberToPad) {
-      if (numberToPad.length >= minDesiredLength) {
-        return numberToPad;
-      } else {
-        return String("0".repeat(minDesiredLength) + numberToPad).slice(-minDesiredLength);
-      }
-    }
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/logger.js
-var require_logger = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/logger.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.trimLastNewline = exports2.LogOutputEvent = exports2.logger = exports2.Logger = exports2.LogLevel = void 0;
-    var internalLogger_1 = require_internalLogger();
-    var debugSession_1 = require_debugSession();
-    var LogLevel;
-    (function(LogLevel2) {
-      LogLevel2[LogLevel2["Verbose"] = 0] = "Verbose";
-      LogLevel2[LogLevel2["Log"] = 1] = "Log";
-      LogLevel2[LogLevel2["Warn"] = 2] = "Warn";
-      LogLevel2[LogLevel2["Error"] = 3] = "Error";
-      LogLevel2[LogLevel2["Stop"] = 4] = "Stop";
-    })(LogLevel = exports2.LogLevel || (exports2.LogLevel = {}));
-    var Logger = class {
-      constructor() {
-        this._pendingLogQ = [];
-      }
-      log(msg, level = LogLevel.Log) {
-        msg = msg + "\n";
-        this._write(msg, level);
-      }
-      verbose(msg) {
-        this.log(msg, LogLevel.Verbose);
-      }
-      warn(msg) {
-        this.log(msg, LogLevel.Warn);
-      }
-      error(msg) {
-        this.log(msg, LogLevel.Error);
-      }
-      dispose() {
-        if (this._currentLogger) {
-          const disposeP = this._currentLogger.dispose();
-          this._currentLogger = null;
-          return disposeP;
-        } else {
-          return Promise.resolve();
-        }
-      }
-      /**
-       * `log` adds a newline, `write` doesn't
-       */
-      _write(msg, level = LogLevel.Log) {
-        msg = msg + "";
-        if (this._pendingLogQ) {
-          this._pendingLogQ.push({ msg, level });
-        } else if (this._currentLogger) {
-          this._currentLogger.log(msg, level);
-        }
-      }
-      /**
-       * Set the logger's minimum level to log in the console, and whether to log to the file. Log messages are queued before this is
-       * called the first time, because minLogLevel defaults to Warn.
-       */
-      setup(consoleMinLogLevel, _logFilePath, prependTimestamp = true) {
-        const logFilePath = typeof _logFilePath === "string" ? _logFilePath : _logFilePath && this._logFilePathFromInit;
-        if (this._currentLogger) {
-          const options = {
-            consoleMinLogLevel,
-            logFilePath,
-            prependTimestamp
-          };
-          this._currentLogger.setup(options).then(() => {
-            if (this._pendingLogQ) {
-              const logQ = this._pendingLogQ;
-              this._pendingLogQ = null;
-              logQ.forEach((item) => this._write(item.msg, item.level));
-            }
-          });
-        }
-      }
-      init(logCallback, logFilePath, logToConsole) {
-        this._pendingLogQ = this._pendingLogQ || [];
-        this._currentLogger = new internalLogger_1.InternalLogger(logCallback, logToConsole);
-        this._logFilePathFromInit = logFilePath;
-      }
-    };
-    exports2.Logger = Logger;
-    exports2.logger = new Logger();
-    var LogOutputEvent = class extends debugSession_1.OutputEvent {
-      constructor(msg, level) {
-        const category = level === LogLevel.Error ? "stderr" : level === LogLevel.Warn ? "console" : "stdout";
-        super(msg, category);
-      }
-    };
-    exports2.LogOutputEvent = LogOutputEvent;
-    function trimLastNewline(str) {
-      return str.replace(/(\n|\r\n)$/, "");
-    }
-    exports2.trimLastNewline = trimLastNewline;
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/loggingDebugSession.js
-var require_loggingDebugSession = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/loggingDebugSession.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.LoggingDebugSession = void 0;
-    var Logger = require_logger();
-    var logger = Logger.logger;
-    var debugSession_1 = require_debugSession();
-    var LoggingDebugSession2 = class extends debugSession_1.DebugSession {
-      constructor(obsolete_logFilePath, obsolete_debuggerLinesAndColumnsStartAt1, obsolete_isServer) {
-        super(obsolete_debuggerLinesAndColumnsStartAt1, obsolete_isServer);
-        this.obsolete_logFilePath = obsolete_logFilePath;
-        this.on("error", (event) => {
-          logger.error(event.body);
-        });
-      }
-      start(inStream, outStream) {
-        super.start(inStream, outStream);
-        logger.init((e) => this.sendEvent(e), this.obsolete_logFilePath, this._isServer);
-      }
-      /**
-       * Overload sendEvent to log
-       */
-      sendEvent(event) {
-        if (!(event instanceof Logger.LogOutputEvent)) {
-          let objectToLog = event;
-          if (event instanceof debugSession_1.OutputEvent && event.body && event.body.data && event.body.data.doNotLogOutput) {
-            delete event.body.data.doNotLogOutput;
-            objectToLog = { ...event };
-            objectToLog.body = { ...event.body, output: "<output not logged>" };
-          }
-          logger.verbose(`To client: ${JSON.stringify(objectToLog)}`);
-        }
-        super.sendEvent(event);
-      }
-      /**
-       * Overload sendRequest to log
-       */
-      sendRequest(command, args, timeout, cb) {
-        logger.verbose(`To client: ${JSON.stringify(command)}(${JSON.stringify(args)}), timeout: ${timeout}`);
-        super.sendRequest(command, args, timeout, cb);
-      }
-      /**
-       * Overload sendResponse to log
-       */
-      sendResponse(response) {
-        logger.verbose(`To client: ${JSON.stringify(response)}`);
-        super.sendResponse(response);
-      }
-      dispatchRequest(request) {
-        logger.verbose(`From client: ${request.command}(${JSON.stringify(request.arguments)})`);
-        super.dispatchRequest(request);
-      }
-    };
-    exports2.LoggingDebugSession = LoggingDebugSession2;
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/handles.js
-var require_handles = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/handles.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.Handles = void 0;
-    var Handles = class {
-      constructor(startHandle) {
-        this.START_HANDLE = 1e3;
-        this._handleMap = /* @__PURE__ */ new Map();
-        this._nextHandle = typeof startHandle === "number" ? startHandle : this.START_HANDLE;
-      }
-      reset() {
-        this._nextHandle = this.START_HANDLE;
-        this._handleMap = /* @__PURE__ */ new Map();
-      }
-      create(value) {
-        var handle = this._nextHandle++;
-        this._handleMap.set(handle, value);
-        return handle;
-      }
-      get(handle, dflt) {
-        return this._handleMap.get(handle) || dflt;
-      }
-    };
-    exports2.Handles = Handles;
-  }
-});
-
-// node_modules/@vscode/debugadapter/lib/main.js
-var require_main = __commonJS({
-  "node_modules/@vscode/debugadapter/lib/main.js"(exports2) {
-    "use strict";
-    Object.defineProperty(exports2, "__esModule", { value: true });
-    exports2.Handles = exports2.Response = exports2.Event = exports2.ErrorDestination = exports2.CompletionItem = exports2.Module = exports2.Source = exports2.Breakpoint = exports2.Variable = exports2.Scope = exports2.StackFrame = exports2.Thread = exports2.MemoryEvent = exports2.InvalidatedEvent = exports2.ProgressEndEvent = exports2.ProgressUpdateEvent = exports2.ProgressStartEvent = exports2.CapabilitiesEvent = exports2.LoadedSourceEvent = exports2.ModuleEvent = exports2.BreakpointEvent = exports2.ThreadEvent = exports2.OutputEvent = exports2.ContinuedEvent = exports2.StoppedEvent = exports2.ExitedEvent = exports2.TerminatedEvent = exports2.InitializedEvent = exports2.logger = exports2.Logger = exports2.LoggingDebugSession = exports2.DebugSession = void 0;
-    var debugSession_1 = require_debugSession();
-    Object.defineProperty(exports2, "DebugSession", { enumerable: true, get: function() {
-      return debugSession_1.DebugSession;
-    } });
-    Object.defineProperty(exports2, "InitializedEvent", { enumerable: true, get: function() {
-      return debugSession_1.InitializedEvent;
-    } });
-    Object.defineProperty(exports2, "TerminatedEvent", { enumerable: true, get: function() {
-      return debugSession_1.TerminatedEvent;
-    } });
-    Object.defineProperty(exports2, "ExitedEvent", { enumerable: true, get: function() {
-      return debugSession_1.ExitedEvent;
-    } });
-    Object.defineProperty(exports2, "StoppedEvent", { enumerable: true, get: function() {
-      return debugSession_1.StoppedEvent;
-    } });
-    Object.defineProperty(exports2, "ContinuedEvent", { enumerable: true, get: function() {
-      return debugSession_1.ContinuedEvent;
-    } });
-    Object.defineProperty(exports2, "OutputEvent", { enumerable: true, get: function() {
-      return debugSession_1.OutputEvent;
-    } });
-    Object.defineProperty(exports2, "ThreadEvent", { enumerable: true, get: function() {
-      return debugSession_1.ThreadEvent;
-    } });
-    Object.defineProperty(exports2, "BreakpointEvent", { enumerable: true, get: function() {
-      return debugSession_1.BreakpointEvent;
-    } });
-    Object.defineProperty(exports2, "ModuleEvent", { enumerable: true, get: function() {
-      return debugSession_1.ModuleEvent;
-    } });
-    Object.defineProperty(exports2, "LoadedSourceEvent", { enumerable: true, get: function() {
-      return debugSession_1.LoadedSourceEvent;
-    } });
-    Object.defineProperty(exports2, "CapabilitiesEvent", { enumerable: true, get: function() {
-      return debugSession_1.CapabilitiesEvent;
-    } });
-    Object.defineProperty(exports2, "ProgressStartEvent", { enumerable: true, get: function() {
-      return debugSession_1.ProgressStartEvent;
-    } });
-    Object.defineProperty(exports2, "ProgressUpdateEvent", { enumerable: true, get: function() {
-      return debugSession_1.ProgressUpdateEvent;
-    } });
-    Object.defineProperty(exports2, "ProgressEndEvent", { enumerable: true, get: function() {
-      return debugSession_1.ProgressEndEvent;
-    } });
-    Object.defineProperty(exports2, "InvalidatedEvent", { enumerable: true, get: function() {
-      return debugSession_1.InvalidatedEvent;
-    } });
-    Object.defineProperty(exports2, "MemoryEvent", { enumerable: true, get: function() {
-      return debugSession_1.MemoryEvent;
-    } });
-    Object.defineProperty(exports2, "Thread", { enumerable: true, get: function() {
-      return debugSession_1.Thread;
-    } });
-    Object.defineProperty(exports2, "StackFrame", { enumerable: true, get: function() {
-      return debugSession_1.StackFrame;
-    } });
-    Object.defineProperty(exports2, "Scope", { enumerable: true, get: function() {
-      return debugSession_1.Scope;
-    } });
-    Object.defineProperty(exports2, "Variable", { enumerable: true, get: function() {
-      return debugSession_1.Variable;
-    } });
-    Object.defineProperty(exports2, "Breakpoint", { enumerable: true, get: function() {
-      return debugSession_1.Breakpoint;
-    } });
-    Object.defineProperty(exports2, "Source", { enumerable: true, get: function() {
-      return debugSession_1.Source;
-    } });
-    Object.defineProperty(exports2, "Module", { enumerable: true, get: function() {
-      return debugSession_1.Module;
-    } });
-    Object.defineProperty(exports2, "CompletionItem", { enumerable: true, get: function() {
-      return debugSession_1.CompletionItem;
-    } });
-    Object.defineProperty(exports2, "ErrorDestination", { enumerable: true, get: function() {
-      return debugSession_1.ErrorDestination;
-    } });
-    var loggingDebugSession_1 = require_loggingDebugSession();
-    Object.defineProperty(exports2, "LoggingDebugSession", { enumerable: true, get: function() {
-      return loggingDebugSession_1.LoggingDebugSession;
-    } });
-    var Logger = require_logger();
-    exports2.Logger = Logger;
-    var messages_1 = require_messages();
-    Object.defineProperty(exports2, "Event", { enumerable: true, get: function() {
-      return messages_1.Event;
-    } });
-    Object.defineProperty(exports2, "Response", { enumerable: true, get: function() {
-      return messages_1.Response;
-    } });
-    var handles_1 = require_handles();
-    Object.defineProperty(exports2, "Handles", { enumerable: true, get: function() {
-      return handles_1.Handles;
-    } });
-    var logger = Logger.logger;
-    exports2.logger = logger;
-  }
-});
-
-// src/extension.ts
-var extension_exports = {};
-__export(extension_exports, {
-  activate: () => activate,
-  deactivate: () => deactivate
-});
-module.exports = __toCommonJS(extension_exports);
-var vscode41 = __toESM(require("vscode"));
-var path22 = __toESM(require("path"));
-var fs19 = __toESM(require("fs"));
-
-// src/mcp/server.ts
-var readline = __toESM(require("readline"));
-function startMcpServer(workspaceRoot) {
-  return { kill: () => {
-  } };
-}
-function runStdioServer(workspaceRoot) {
-  const tools = buildToolRegistry(workspaceRoot);
-  const toolDefs = getToolDefinitions2(workspaceRoot);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: void 0,
-    terminal: false
-  });
-  rl.on("line", (line) => {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      return;
-    }
-    let request;
-    try {
-      request = JSON.parse(trimmed);
-    } catch {
-      writeResponse({
-        jsonrpc: "2.0",
-        id: 0,
-        error: { code: -32700, message: "Parse error" }
-      });
-      return;
-    }
-    handleRequest(request, tools, toolDefs).then((response) => {
-      writeResponse(response);
-    });
-  });
-}
-function writeResponse(response) {
-  const json = JSON.stringify(response);
-  process.stdout.write(json + "\n");
-}
-async function handleRequest(request, tools, toolDefs) {
-  const { id, method, params } = request;
-  switch (method) {
-    case "initialize":
-      return {
-        jsonrpc: "2.0",
-        id,
-        result: {
-          protocolVersion: "2024-11-05",
-          capabilities: { tools: {} },
-          serverInfo: {
-            name: "lurek2d-mcp",
-            version: "0.1.0"
-          }
-        }
-      };
-    case "notifications/initialized":
-      return { jsonrpc: "2.0", id, result: {} };
-    case "tools/list":
-      return {
-        jsonrpc: "2.0",
-        id,
-        result: {
-          tools: toolDefs
-        }
-      };
-    case "tools/call": {
-      const toolName = params?.name;
-      const toolArgs = params?.arguments ?? {};
-      const handler = tools.get(toolName);
-      if (!handler) {
-        return {
-          jsonrpc: "2.0",
-          id,
-          error: {
-            code: -32601,
-            message: `Unknown tool: ${toolName}`
-          }
-        };
-      }
-      try {
-        const result = await handler(toolArgs);
-        return {
-          jsonrpc: "2.0",
-          id,
-          result: {
-            content: [{ type: "text", text: result }]
-          }
-        };
-      } catch (err) {
-        return {
-          jsonrpc: "2.0",
-          id,
-          result: {
-            content: [
-              {
-                type: "text",
-                text: `Error: ${err instanceof Error ? err.message : String(err)}`
-              }
-            ],
-            isError: true
-          }
-        };
-      }
-    }
-    default:
-      return {
-        jsonrpc: "2.0",
-        id,
-        error: {
-          code: -32601,
-          message: `Method not found: ${method}`
-        }
-      };
-  }
-}
-function buildToolRegistry(workspaceRoot) {
-  const {
-    handleRunExample: handleRunExample2,
-    handleGetApiDoc: handleGetApiDoc2,
-    handleListExamples: handleListExamples2,
-    handleRunLuaTest: handleRunLuaTest2,
-    handleCheckBuild: handleCheckBuild2,
-    handleGetLogs: handleGetLogs2
-  } = (init_tools(), __toCommonJS(tools_exports));
-  const registry = /* @__PURE__ */ new Map();
-  registry.set("lurek2d.runExample", handleRunExample2(workspaceRoot));
-  registry.set("lurek2d.getApiDoc", handleGetApiDoc2(workspaceRoot));
-  registry.set("lurek2d.listExamples", handleListExamples2(workspaceRoot));
-  registry.set("lurek2d.runLuaTest", handleRunLuaTest2(workspaceRoot));
-  registry.set("lurek2d.checkBuild", handleCheckBuild2(workspaceRoot));
-  registry.set("lurek2d.getLogs", handleGetLogs2(workspaceRoot));
-  return registry;
-}
-function getToolDefinitions2(workspaceRoot) {
-  const { getToolDefinitions: getDefs } = (init_tools(), __toCommonJS(tools_exports));
-  return getDefs();
-}
-if (require.main === module) {
-  const args = process.argv.slice(2);
-  let workspace30 = process.cwd();
-  const wsIndex = args.indexOf("--workspace");
-  if (wsIndex !== -1 && args[wsIndex + 1]) {
-    workspace30 = args[wsIndex + 1];
-  }
-  runStdioServer(workspace30);
-}
-
-// src/services/lurekProcess.ts
-var vscode = __toESM(require("vscode"));
-var path3 = __toESM(require("path"));
-var fs3 = __toESM(require("fs"));
-init_parallelCargo();
-var LurekProcessService = class {
-  terminal = null;
-  _onStatusChange = new vscode.EventEmitter();
-  onStatusChange = this._onStatusChange.event;
-  /**
-   * Finds an installed lurek2d binary. Checks the user setting first,
-   * then PATH, then falls back to the repo wrapper if the workspace contains Cargo.toml.
-   */
-  async findLurekBinary() {
-    const configured = vscode.workspace.getConfiguration("lurek").get("enginePath", "");
-    if (configured && fs3.existsSync(configured)) {
-      return configured;
-    }
-    const binaryName = process.platform === "win32" ? "lurek2d.exe" : "lurek2d";
-    const pathDirs = (process.env.PATH ?? "").split(path3.delimiter);
-    for (const dir of pathDirs) {
-      const candidate = path3.join(dir, binaryName);
-      if (fs3.existsSync(candidate)) {
-        return candidate;
-      }
-    }
-    const workspaceRoot = getWorkspaceRoot();
-    if (workspaceRoot) {
-      const cargoToml = path3.join(workspaceRoot, "Cargo.toml");
-      if (fs3.existsSync(cargoToml)) {
-        return void 0;
-      }
-    }
-    throw new Error(
-      "Lurek2D binary not found. Install it or set lurek.lurekPath in settings."
-    );
-  }
-  /**
-   * Runs the game in an integrated terminal.
-   */
-  async run(gameDir, args = []) {
-    if (this.isRunning()) {
-      vscode.window.showWarningMessage("Lurek2D is already running.");
-      return;
-    }
-    const saveOnRun = vscode.workspace.getConfiguration("lurek").get("saveOnRun", true);
-    if (saveOnRun) {
-      await vscode.workspace.saveAll(false);
-    }
-    const binary = await this.findLurekBinary();
-    const launchArgs = [gameDir, ...args];
-    const cmd = binary ? buildTerminalCommand(binary, launchArgs) : buildRunCommand("debug", launchArgs);
-    this.terminal = vscode.window.createTerminal({
-      name: "Lurek2D",
-      cwd: getWorkspaceRoot()
-    });
-    this.terminal.show();
-    this.terminal.sendText(cmd);
-    this._onStatusChange.fire(true);
-    vscode.commands.executeCommand("setContext", "lurek.gameRunning", true);
-  }
-  /**
-   * Stops the running game process.
-   */
-  stop() {
-    if (this.terminal) {
-      this.terminal.dispose();
-      this.terminal = null;
-    }
-    this._onStatusChange.fire(false);
-    vscode.commands.executeCommand("setContext", "lurek.gameRunning", false);
-  }
-  /**
-   * Returns whether a game process is currently running.
-   */
-  isRunning() {
-    return this.terminal !== null;
-  }
-  dispose() {
-    this.stop();
-    this._onStatusChange.dispose();
-  }
-};
-function getWorkspaceRoot() {
-  const folders = vscode.workspace.workspaceFolders;
-  return folders?.[0]?.uri.fsPath;
-}
-
-// src/services/statusBar.ts
-var vscode2 = __toESM(require("vscode"));
-var StatusBarService = class {
-  item;
-  constructor() {
-    this.item = vscode2.window.createStatusBarItem(
-      vscode2.StatusBarAlignment.Left,
-      100
-    );
-    this.setStopped();
-    this.item.show();
-  }
-  /** Show "Running" state with play icon. */
-  setRunning() {
-    this.item.text = "$(play) Lurek2D: Running";
-    this.item.tooltip = "Lurek2D game is running \u2014 click to stop";
-    this.item.command = "lurek.stopGame";
-    this.item.backgroundColor = new vscode2.ThemeColor(
-      "statusBarItem.warningBackground"
-    );
-  }
-  /** Show default idle state. */
-  setStopped() {
-    this.item.text = "$(rocket) Lurek2D";
-    this.item.tooltip = "Lurek2D Toolkit \u2014 click to run game";
-    this.item.command = "lurek.runGame";
-    this.item.backgroundColor = void 0;
-  }
-  /** Show debug-connected state. */
-  setDebugConnected() {
-    this.item.text = "$(debug-alt) Lurek2D: Debug";
-    this.item.tooltip = "Lurek2D debug bridge connected";
-    this.item.command = "lurek.debug.status";
-    this.item.backgroundColor = new vscode2.ThemeColor(
-      "statusBarItem.prominentBackground"
-    );
-  }
-  dispose() {
-    this.item.dispose();
-  }
-};
-
-// src/services/apiData.ts
-var fs4 = __toESM(require("fs"));
-var path4 = __toESM(require("path"));
-var LUA_STDLIB = {
-  string: {
-    common: [
-      { name: "byte", signature: "string.byte(s, i, j)", description: "Returns the internal numeric codes of the characters s[i], s[i+1], ..., s[j].", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "i", type: "number", description: "Start index", optional: true, default: "1" }, { name: "j", type: "number", description: "End index", optional: true, default: "i" }], returns: "number..." },
-      { name: "char", signature: "string.char(...)", description: "Returns a string with characters with the given internal numeric codes.", params: [{ name: "...", type: "number", description: "Byte values", optional: false }], returns: "string" },
-      { name: "find", signature: "string.find(s, pattern, init, plain)", description: "Looks for the first match of pattern in the string.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "pattern", type: "string", description: "Search pattern", optional: false }, { name: "init", type: "number", description: "Start position", optional: true, default: "1" }, { name: "plain", type: "boolean", description: "Plain text search", optional: true, default: "false" }], returns: "number, number, ...string" },
-      { name: "format", signature: "string.format(formatstring, ...)", description: "Returns a formatted string following the description given in its arguments.", params: [{ name: "formatstring", type: "string", description: "Format string", optional: false }, { name: "...", type: "any", description: "Format arguments", optional: true }], returns: "string" },
-      { name: "gmatch", signature: "string.gmatch(s, pattern)", description: "Returns an iterator function that returns the next captures from pattern over string s.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "pattern", type: "string", description: "Pattern", optional: false }], returns: "function" },
-      { name: "gsub", signature: "string.gsub(s, pattern, repl, n)", description: "Returns a copy of s in which all (or the first n) occurrences of the pattern are replaced.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "pattern", type: "string", description: "Pattern", optional: false }, { name: "repl", type: "string|table|function", description: "Replacement", optional: false }, { name: "n", type: "number", description: "Max replacements", optional: true }], returns: "string, number" },
-      { name: "len", signature: "string.len(s)", description: "Returns the length of the string.", params: [{ name: "s", type: "string", description: "Input string", optional: false }], returns: "number" },
-      { name: "lower", signature: "string.lower(s)", description: "Returns a copy of this string with all uppercase letters changed to lowercase.", params: [{ name: "s", type: "string", description: "Input string", optional: false }], returns: "string" },
-      { name: "match", signature: "string.match(s, pattern, init)", description: "Looks for the first match of pattern in the string.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "pattern", type: "string", description: "Pattern", optional: false }, { name: "init", type: "number", description: "Start position", optional: true, default: "1" }], returns: "string..." },
-      { name: "rep", signature: "string.rep(s, n, sep)", description: "Returns a string that is the concatenation of n copies of the string s.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "n", type: "number", description: "Repetitions", optional: false }, { name: "sep", type: "string", description: "Separator", optional: true, default: '""' }], returns: "string" },
-      { name: "reverse", signature: "string.reverse(s)", description: "Returns a string that is the string s reversed.", params: [{ name: "s", type: "string", description: "Input string", optional: false }], returns: "string" },
-      { name: "sub", signature: "string.sub(s, i, j)", description: "Returns the substring from i to j.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "i", type: "number", description: "Start index", optional: false }, { name: "j", type: "number", description: "End index", optional: true, default: "-1" }], returns: "string" },
-      { name: "upper", signature: "string.upper(s)", description: "Returns a copy of this string with all lowercase letters changed to uppercase.", params: [{ name: "s", type: "string", description: "Input string", optional: false }], returns: "string" },
-      { name: "dump", signature: "string.dump(function, strip)", description: "Returns a string containing a binary representation of the given function.", params: [{ name: "function", type: "function", description: "Function to dump", optional: false }, { name: "strip", type: "boolean", description: "Strip debug info", optional: true }], returns: "string" }
-    ]
-  },
-  table: {
-    common: [
-      { name: "concat", signature: "table.concat(list, sep, i, j)", description: "Concatenates elements of a table into a string.", params: [{ name: "list", type: "table", description: "Input table", optional: false }, { name: "sep", type: "string", description: "Separator", optional: true, default: '""' }, { name: "i", type: "number", description: "Start index", optional: true, default: "1" }, { name: "j", type: "number", description: "End index", optional: true, default: "#list" }], returns: "string" },
-      { name: "insert", signature: "table.insert(list, pos, value)", description: "Inserts element value at position pos in list.", params: [{ name: "list", type: "table", description: "Target table", optional: false }, { name: "pos", type: "number", description: "Position", optional: true }, { name: "value", type: "any", description: "Value to insert", optional: false }], returns: "nil" },
-      { name: "remove", signature: "table.remove(list, pos)", description: "Removes from list the element at position pos.", params: [{ name: "list", type: "table", description: "Target table", optional: false }, { name: "pos", type: "number", description: "Position", optional: true, default: "#list" }], returns: "any" },
-      { name: "sort", signature: "table.sort(list, comp)", description: "Sorts list elements in-place using the given comparison function.", params: [{ name: "list", type: "table", description: "Table to sort", optional: false }, { name: "comp", type: "function", description: "Comparison function", optional: true }], returns: "nil" },
-      { name: "unpack", signature: "table.unpack(list, i, j)", description: "Returns the elements from the given table.", params: [{ name: "list", type: "table", description: "Input table", optional: false }, { name: "i", type: "number", description: "Start index", optional: true, default: "1" }, { name: "j", type: "number", description: "End index", optional: true, default: "#list" }], returns: "any..." }
-    ],
-    lua54Only: [
-      { name: "move", signature: "table.move(a1, f, e, t, a2)", description: "Moves elements from table a1 into table a2.", params: [{ name: "a1", type: "table", description: "Source table", optional: false }, { name: "f", type: "number", description: "From index", optional: false }, { name: "e", type: "number", description: "End index", optional: false }, { name: "t", type: "number", description: "Target start", optional: false }, { name: "a2", type: "table", description: "Dest table", optional: true, default: "a1" }], returns: "table" },
-      { name: "pack", signature: "table.pack(...)", description: "Returns a new table with all arguments stored into keys 1, 2, etc.", params: [{ name: "...", type: "any", description: "Values to pack", optional: false }], returns: "table" }
-    ],
-    luajitOnly: [
-      { name: "new", signature: "table.new(narray, nhash)", description: "Pre-allocates a table with the given number of array and hash slots.", params: [{ name: "narray", type: "number", description: "Array slots", optional: false }, { name: "nhash", type: "number", description: "Hash slots", optional: false }], returns: "table" },
-      { name: "clear", signature: "table.clear(tab)", description: "Clears all keys and values from a table.", params: [{ name: "tab", type: "table", description: "Table to clear", optional: false }], returns: "nil" }
-    ]
-  },
-  math: {
-    common: [
-      { name: "abs", signature: "math.abs(x)", description: "Returns the absolute value of x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "acos", signature: "math.acos(x)", description: "Returns the arc cosine of x (in radians).", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "asin", signature: "math.asin(x)", description: "Returns the arc sine of x (in radians).", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "atan", signature: "math.atan(y, x)", description: "Returns the arc tangent of y/x (in radians).", params: [{ name: "y", type: "number", description: "Y value", optional: false }, { name: "x", type: "number", description: "X value", optional: true, default: "1" }], returns: "number" },
-      { name: "ceil", signature: "math.ceil(x)", description: "Returns the smallest integer larger than or equal to x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "cos", signature: "math.cos(x)", description: "Returns the cosine of x (in radians).", params: [{ name: "x", type: "number", description: "Angle in radians", optional: false }], returns: "number" },
-      { name: "deg", signature: "math.deg(x)", description: "Converts angle x from radians to degrees.", params: [{ name: "x", type: "number", description: "Angle in radians", optional: false }], returns: "number" },
-      { name: "exp", signature: "math.exp(x)", description: "Returns the value e^x.", params: [{ name: "x", type: "number", description: "Exponent", optional: false }], returns: "number" },
-      { name: "floor", signature: "math.floor(x)", description: "Returns the largest integer smaller than or equal to x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "fmod", signature: "math.fmod(x, y)", description: "Returns the remainder of the division of x by y.", params: [{ name: "x", type: "number", description: "Dividend", optional: false }, { name: "y", type: "number", description: "Divisor", optional: false }], returns: "number" },
-      { name: "huge", signature: "math.huge", description: "The value HUGE_VAL, representing positive infinity.", params: [], returns: "number" },
-      { name: "log", signature: "math.log(x, base)", description: "Returns the logarithm of x in the given base.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "base", type: "number", description: "Log base", optional: true, default: "e" }], returns: "number" },
-      { name: "max", signature: "math.max(x, ...)", description: "Returns the maximum value among its arguments.", params: [{ name: "x", type: "number", description: "First value", optional: false }, { name: "...", type: "number", description: "More values", optional: true }], returns: "number" },
-      { name: "min", signature: "math.min(x, ...)", description: "Returns the minimum value among its arguments.", params: [{ name: "x", type: "number", description: "First value", optional: false }, { name: "...", type: "number", description: "More values", optional: true }], returns: "number" },
-      { name: "modf", signature: "math.modf(x)", description: "Returns the integral and fractional parts of x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number, number" },
-      { name: "pi", signature: "math.pi", description: "The value of pi.", params: [], returns: "number" },
-      { name: "rad", signature: "math.rad(x)", description: "Converts angle x from degrees to radians.", params: [{ name: "x", type: "number", description: "Angle in degrees", optional: false }], returns: "number" },
-      { name: "random", signature: "math.random(m, n)", description: "Returns a pseudo-random number.", params: [{ name: "m", type: "number", description: "Lower bound", optional: true }, { name: "n", type: "number", description: "Upper bound", optional: true }], returns: "number" },
-      { name: "randomseed", signature: "math.randomseed(x)", description: "Sets x as the seed for the pseudo-random generator.", params: [{ name: "x", type: "number", description: "Seed value", optional: false }], returns: "nil" },
-      { name: "sin", signature: "math.sin(x)", description: "Returns the sine of x (in radians).", params: [{ name: "x", type: "number", description: "Angle in radians", optional: false }], returns: "number" },
-      { name: "sqrt", signature: "math.sqrt(x)", description: "Returns the square root of x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "tan", signature: "math.tan(x)", description: "Returns the tangent of x (in radians).", params: [{ name: "x", type: "number", description: "Angle in radians", optional: false }], returns: "number" }
-    ],
-    lua54Only: [
-      { name: "maxinteger", signature: "math.maxinteger", description: "An integer with the maximum value for an integer.", params: [], returns: "integer" },
-      { name: "mininteger", signature: "math.mininteger", description: "An integer with the minimum value for an integer.", params: [], returns: "integer" },
-      { name: "tointeger", signature: "math.tointeger(x)", description: "If x is convertible to an integer, returns that integer.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "integer|nil" },
-      { name: "type", signature: "math.type(x)", description: "Returns 'integer', 'float', or false.", params: [{ name: "x", type: "any", description: "Value to check", optional: false }], returns: "string|false" },
-      { name: "ult", signature: "math.ult(m, n)", description: "Returns true if m < n when compared as unsigned integers.", params: [{ name: "m", type: "integer", description: "First value", optional: false }, { name: "n", type: "integer", description: "Second value", optional: false }], returns: "boolean" }
-    ]
-  },
-  os: {
-    common: [
-      { name: "clock", signature: "os.clock()", description: "Returns CPU time used by the program in seconds.", params: [], returns: "number" },
-      { name: "date", signature: "os.date(format, time)", description: "Returns a string or table with date and time.", params: [{ name: "format", type: "string", description: "Date format", optional: true, default: '"%c"' }, { name: "time", type: "number", description: "Time value", optional: true }], returns: "string|table" },
-      { name: "difftime", signature: "os.difftime(t2, t1)", description: "Returns the difference in seconds between two times.", params: [{ name: "t2", type: "number", description: "End time", optional: false }, { name: "t1", type: "number", description: "Start time", optional: false }], returns: "number" },
-      { name: "time", signature: "os.time(table)", description: "Returns the current time or converts the given table to a timestamp.", params: [{ name: "table", type: "table", description: "Date table", optional: true }], returns: "number" }
-    ]
-  },
-  io: {
-    common: [
-      { name: "close", signature: "io.close(file)", description: "Closes file, or the default output file.", params: [{ name: "file", type: "file", description: "File handle", optional: true }], returns: "boolean" },
-      { name: "lines", signature: "io.lines(filename, ...)", description: "Opens the given file and returns an iterator function.", params: [{ name: "filename", type: "string", description: "File path", optional: true }, { name: "...", type: "string|number", description: "Read formats", optional: true }], returns: "function" },
-      { name: "open", signature: "io.open(filename, mode)", description: "Opens a file in the given mode.", params: [{ name: "filename", type: "string", description: "File path", optional: false }, { name: "mode", type: "string", description: "Open mode", optional: true, default: '"r"' }], returns: "file|nil, string" },
-      { name: "read", signature: "io.read(...)", description: "Reads from the default input file.", params: [{ name: "...", type: "string|number", description: "Read formats", optional: true }], returns: "string|number|nil" },
-      { name: "write", signature: "io.write(...)", description: "Writes to the default output file.", params: [{ name: "...", type: "string|number", description: "Values to write", optional: false }], returns: "file|nil, string" },
-      { name: "type", signature: "io.type(obj)", description: "Checks whether obj is a valid file handle.", params: [{ name: "obj", type: "any", description: "Value to check", optional: false }], returns: "string|nil" }
-    ]
-  },
-  coroutine: {
-    common: [
-      { name: "create", signature: "coroutine.create(f)", description: "Creates a new coroutine with body f.", params: [{ name: "f", type: "function", description: "Coroutine body", optional: false }], returns: "thread" },
-      { name: "resume", signature: "coroutine.resume(co, ...)", description: "Starts or continues the execution of coroutine co.", params: [{ name: "co", type: "thread", description: "Coroutine", optional: false }, { name: "...", type: "any", description: "Arguments", optional: true }], returns: "boolean, any..." },
-      { name: "yield", signature: "coroutine.yield(...)", description: "Suspends the execution of the calling coroutine.", params: [{ name: "...", type: "any", description: "Values to yield", optional: true }], returns: "any..." },
-      { name: "status", signature: "coroutine.status(co)", description: "Returns the status of coroutine co.", params: [{ name: "co", type: "thread", description: "Coroutine", optional: false }], returns: "string" },
-      { name: "wrap", signature: "coroutine.wrap(f)", description: "Creates a coroutine and returns a resume function.", params: [{ name: "f", type: "function", description: "Coroutine body", optional: false }], returns: "function" },
-      { name: "isyieldable", signature: "coroutine.isyieldable()", description: "Returns true if the running coroutine can yield.", params: [], returns: "boolean" },
-      { name: "running", signature: "coroutine.running()", description: "Returns the running coroutine plus a boolean.", params: [], returns: "thread, boolean" }
-    ]
-  },
-  debug: {
-    common: [
-      { name: "getinfo", signature: "debug.getinfo(f, what)", description: "Returns a table with information about a function.", params: [{ name: "f", type: "function|number", description: "Function or stack level", optional: false }, { name: "what", type: "string", description: "Info selector", optional: true }], returns: "table" },
-      { name: "getlocal", signature: "debug.getlocal(f, local)", description: "Returns name and value of local variable.", params: [{ name: "f", type: "function|number", description: "Function or stack level", optional: false }, { name: "local", type: "number", description: "Local index", optional: false }], returns: "string, any" },
-      { name: "sethook", signature: "debug.sethook(hook, mask, count)", description: "Sets the given function as a hook.", params: [{ name: "hook", type: "function", description: "Hook function", optional: false }, { name: "mask", type: "string", description: "Hook mask", optional: false }, { name: "count", type: "number", description: "Instruction count", optional: true }], returns: "nil" },
-      { name: "traceback", signature: "debug.traceback(message, level)", description: "Returns a string with a traceback of the call stack.", params: [{ name: "message", type: "string", description: "Prefix message", optional: true }, { name: "level", type: "number", description: "Stack level", optional: true, default: "1" }], returns: "string" }
-    ]
-  },
-  package: {
-    common: [
-      { name: "loaded", signature: "package.loaded", description: "A table of already-loaded modules.", params: [], returns: "table" },
-      { name: "path", signature: "package.path", description: "The path used by require to search for a Lua loader.", params: [], returns: "string" },
-      { name: "preload", signature: "package.preload", description: "A table to store loaders for specific modules.", params: [], returns: "table" },
-      { name: "searchpath", signature: "package.searchpath(name, path, sep, rep)", description: "Searches for the given name in the given path.", params: [{ name: "name", type: "string", description: "Module name", optional: false }, { name: "path", type: "string", description: "Search path", optional: false }, { name: "sep", type: "string", description: "Name separator", optional: true, default: '"."' }, { name: "rep", type: "string", description: "Replacement", optional: true, default: '"/"' }], returns: "string|nil, string" }
-    ]
-  },
-  utf8: {
-    common: [],
-    lua54Only: [
-      { name: "char", signature: "utf8.char(...)", description: "Returns a UTF-8 string from one or more codepoints.", params: [{ name: "...", type: "number", description: "Codepoints", optional: false }], returns: "string" },
-      { name: "codepoint", signature: "utf8.codepoint(s, i, j)", description: "Returns the codepoints of all characters in s between positions i and j.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "i", type: "number", description: "Start", optional: true, default: "1" }, { name: "j", type: "number", description: "End", optional: true, default: "i" }], returns: "number..." },
-      { name: "codes", signature: "utf8.codes(s)", description: "Returns an iterator for all codepoints in string s.", params: [{ name: "s", type: "string", description: "Input string", optional: false }], returns: "function" },
-      { name: "len", signature: "utf8.len(s, i, j)", description: "Returns the number of UTF-8 characters in string s.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "i", type: "number", description: "Start byte", optional: true, default: "1" }, { name: "j", type: "number", description: "End byte", optional: true, default: "-1" }], returns: "number|nil, number" },
-      { name: "offset", signature: "utf8.offset(s, n, i)", description: "Returns the byte position where the n-th character starts.", params: [{ name: "s", type: "string", description: "Input string", optional: false }, { name: "n", type: "number", description: "Character offset", optional: false }, { name: "i", type: "number", description: "Start byte", optional: true }], returns: "number" },
-      { name: "charpattern", signature: "utf8.charpattern", description: "The pattern that matches exactly one UTF-8 byte sequence.", params: [], returns: "string" }
-    ]
-  },
-  bit: {
-    common: [],
-    luajitOnly: [
-      { name: "tobit", signature: "bit.tobit(x)", description: "Normalizes a number to the numeric range of a 32-bit integer.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "tohex", signature: "bit.tohex(x, n)", description: "Converts x to a hex string with n digits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Number of digits", optional: true }], returns: "string" },
-      { name: "bnot", signature: "bit.bnot(x)", description: "Returns the bitwise NOT of x.", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" },
-      { name: "band", signature: "bit.band(x1, ...)", description: "Returns the bitwise AND of all arguments.", params: [{ name: "x1", type: "number", description: "First value", optional: false }, { name: "...", type: "number", description: "More values", optional: true }], returns: "number" },
-      { name: "bor", signature: "bit.bor(x1, ...)", description: "Returns the bitwise OR of all arguments.", params: [{ name: "x1", type: "number", description: "First value", optional: false }, { name: "...", type: "number", description: "More values", optional: true }], returns: "number" },
-      { name: "bxor", signature: "bit.bxor(x1, ...)", description: "Returns the bitwise XOR of all arguments.", params: [{ name: "x1", type: "number", description: "First value", optional: false }, { name: "...", type: "number", description: "More values", optional: true }], returns: "number" },
-      { name: "lshift", signature: "bit.lshift(x, n)", description: "Returns x logically shifted left by n bits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Shift amount", optional: false }], returns: "number" },
-      { name: "rshift", signature: "bit.rshift(x, n)", description: "Returns x logically shifted right by n bits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Shift amount", optional: false }], returns: "number" },
-      { name: "arshift", signature: "bit.arshift(x, n)", description: "Returns x arithmetically shifted right by n bits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Shift amount", optional: false }], returns: "number" },
-      { name: "rol", signature: "bit.rol(x, n)", description: "Returns x rotated left by n bits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Rotation amount", optional: false }], returns: "number" },
-      { name: "ror", signature: "bit.ror(x, n)", description: "Returns x rotated right by n bits.", params: [{ name: "x", type: "number", description: "Input value", optional: false }, { name: "n", type: "number", description: "Rotation amount", optional: false }], returns: "number" },
-      { name: "bswap", signature: "bit.bswap(x)", description: "Swaps the bytes of x (byte-reverse).", params: [{ name: "x", type: "number", description: "Input value", optional: false }], returns: "number" }
-    ]
-  },
-  jit: {
-    common: [],
-    luajitOnly: [
-      { name: "on", signature: "jit.on(func, recursive)", description: "Enables JIT compilation.", params: [{ name: "func", type: "function", description: "Function or true for all", optional: true }, { name: "recursive", type: "boolean", description: "Include sub-functions", optional: true }], returns: "nil" },
-      { name: "off", signature: "jit.off(func, recursive)", description: "Disables JIT compilation.", params: [{ name: "func", type: "function", description: "Function or true for all", optional: true }, { name: "recursive", type: "boolean", description: "Include sub-functions", optional: true }], returns: "nil" },
-      { name: "flush", signature: "jit.flush(func, recursive)", description: "Flushes the compiled code cache.", params: [{ name: "func", type: "function", description: "Function to flush", optional: true }, { name: "recursive", type: "boolean", description: "Include sub-functions", optional: true }], returns: "nil" },
-      { name: "status", signature: "jit.status()", description: "Returns the current JIT status and architecture.", params: [], returns: "boolean, string..." },
-      { name: "version", signature: "jit.version", description: "The LuaJIT version string.", params: [], returns: "string" },
-      { name: "version_num", signature: "jit.version_num", description: "The LuaJIT version number.", params: [], returns: "number" },
-      { name: "os", signature: "jit.os", description: "The target OS name.", params: [], returns: "string" },
-      { name: "arch", signature: "jit.arch", description: "The target architecture name.", params: [], returns: "string" }
-    ]
-  },
-  ffi: {
-    common: [],
-    luajitOnly: [
-      { name: "cdef", signature: "ffi.cdef(def)", description: "Adds C declarations.", params: [{ name: "def", type: "string", description: "C declarations", optional: false }], returns: "nil" },
-      { name: "new", signature: "ffi.new(ctype, ...)", description: "Creates a C data object of the given type.", params: [{ name: "ctype", type: "string|ctype", description: "C type", optional: false }, { name: "...", type: "any", description: "Initializers", optional: true }], returns: "cdata" },
-      { name: "cast", signature: "ffi.cast(ctype, init)", description: "Creates a scalar C data object with ctype and init.", params: [{ name: "ctype", type: "string|ctype", description: "Target type", optional: false }, { name: "init", type: "any", description: "Initial value", optional: false }], returns: "cdata" },
-      { name: "typeof", signature: "ffi.typeof(ctype)", description: "Creates a C type object.", params: [{ name: "ctype", type: "string", description: "C type declaration", optional: false }], returns: "ctype" },
-      { name: "sizeof", signature: "ffi.sizeof(ctype, nelem)", description: "Returns the size of a C type in bytes.", params: [{ name: "ctype", type: "string|ctype|cdata", description: "C type", optional: false }, { name: "nelem", type: "number", description: "Number of elements", optional: true }], returns: "number" },
-      { name: "alignof", signature: "ffi.alignof(ctype)", description: "Returns the minimum required alignment of a C type.", params: [{ name: "ctype", type: "string|ctype", description: "C type", optional: false }], returns: "number" },
-      { name: "istype", signature: "ffi.istype(ctype, obj)", description: "Returns true if obj has the given C type.", params: [{ name: "ctype", type: "string|ctype", description: "C type", optional: false }, { name: "obj", type: "any", description: "Object to check", optional: false }], returns: "boolean" },
-      { name: "load", signature: "ffi.load(name, global)", description: "Loads a shared library.", params: [{ name: "name", type: "string", description: "Library name", optional: false }, { name: "global", type: "boolean", description: "Export symbols globally", optional: true }], returns: "clib" },
-      { name: "string", signature: "ffi.string(ptr, len)", description: "Creates a Lua string from a C char pointer.", params: [{ name: "ptr", type: "cdata", description: "Char pointer", optional: false }, { name: "len", type: "number", description: "Length", optional: true }], returns: "string" },
-      { name: "copy", signature: "ffi.copy(dst, src, len)", description: "Copies data between C objects.", params: [{ name: "dst", type: "cdata", description: "Destination", optional: false }, { name: "src", type: "cdata|string", description: "Source", optional: false }, { name: "len", type: "number", description: "Byte count", optional: true }], returns: "nil" },
-      { name: "fill", signature: "ffi.fill(dst, len, c)", description: "Fills a memory region with a byte value.", params: [{ name: "dst", type: "cdata", description: "Destination", optional: false }, { name: "len", type: "number", description: "Byte count", optional: false }, { name: "c", type: "number", description: "Fill byte", optional: true, default: "0" }], returns: "nil" },
-      { name: "gc", signature: "ffi.gc(cdata, finalizer)", description: "Associates a finalizer with a C data object.", params: [{ name: "cdata", type: "cdata", description: "C data object", optional: false }, { name: "finalizer", type: "function", description: "Finalizer function", optional: false }], returns: "cdata" }
-    ]
-  }
-};
-var ApiDataService = class {
-  modules = /* @__PURE__ */ new Map();
-  classes = /* @__PURE__ */ new Map();
-  allFunctions = /* @__PURE__ */ new Map();
-  enums = /* @__PURE__ */ new Map();
-  methodsByObjectType = /* @__PURE__ */ new Map();
-  callbackList = [];
-  keyNames = [];
-  gamepadButtons = [];
-  gamepadAxes = [];
-  loaded = false;
-  /**
-   * Load API data from `data/lurek-api.json` bundled with the extension.
-   * That file is generated by: python tools/docs/gen_extension_api.py
-   * Re-run whenever the Lurek API changes, then rebuild the extension.
-   */
-  async load(extensionPath) {
-    if (this.loaded) return;
-    const bundledJson = path4.join(extensionPath, "data", "lurek-api.json");
-    if (fs4.existsSync(bundledJson)) {
-      try {
-        const raw = fs4.readFileSync(bundledJson, "utf-8");
-        this.loadFromJson(JSON.parse(raw));
-      } catch {
-      }
-    }
-    this.loaded = true;
-  }
-  // â”€â”€ Module access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getModuleNames() {
-    return Array.from(this.modules.keys());
-  }
-  getModule(name) {
-    return this.modules.get(name);
-  }
-  getClasses() {
-    return Array.from(this.classes.values());
-  }
-  getClass(name) {
-    return this.classes.get(name);
-  }
-  // â”€â”€ Function access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getFunctions(moduleName) {
-    return this.modules.get(moduleName)?.functions ?? [];
-  }
-  getFunction(fullPath) {
-    return this.allFunctions.get(fullPath);
-  }
-  getAllFunctions() {
-    return Array.from(this.allFunctions.values());
-  }
-  searchFunctions(query) {
-    const lower = query.toLowerCase();
-    const results = [];
-    for (const fn of this.allFunctions.values()) {
-      if (fn.fullPath.toLowerCase().includes(lower) || fn.name.toLowerCase().includes(lower) || fn.description.toLowerCase().includes(lower)) {
-        results.push(fn);
-      }
-    }
-    return results;
-  }
-  // â”€â”€ Method access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getMethods(objectType) {
-    return this.methodsByObjectType.get(objectType) ?? [];
-  }
-  getMethod(objectType, methodName) {
-    const methods = this.methodsByObjectType.get(objectType);
-    return methods?.find((m) => m.name === methodName);
-  }
-  /**
-   * Returns a map of factory function fullPath → return type name
-   * for all non-primitive-returning non-method functions in the API.
-   * Used by typeInference to avoid hardcoded factory type maps.
-   */
-  getFactoryTypes() {
-    const primitives = /* @__PURE__ */ new Set([
-      "nil",
-      "any",
-      "string",
-      "number",
-      "boolean",
-      "table",
-      "function",
-      "multiple",
-      "integer",
-      "thread",
-      "userdata"
-    ]);
-    const result = /* @__PURE__ */ new Map();
-    for (const fn of this.allFunctions.values()) {
-      if (!fn.isMethod && fn.returnType) {
-        const rt = fn.returnType.trim();
-        if (rt.length > 0 && !primitives.has(rt.toLowerCase())) {
-          result.set(fn.fullPath, rt);
-        }
-      }
-    }
-    return result;
-  }
-  // â”€â”€ Enum access â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getEnumValues(enumName) {
-    return this.enums.get(enumName)?.values ?? [];
-  }
-  getEnum(name) {
-    return this.enums.get(name);
-  }
-  // â”€â”€ Callbacks â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getCallbacks() {
-    return this.callbackList;
-  }
-  getKeyNames() {
-    return this.keyNames;
-  }
-  getGamepadButtons() {
-    return this.gamepadButtons;
-  }
-  getGamepadAxes() {
-    return this.gamepadAxes;
-  }
-  // â”€â”€ Lua stdlib â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getLuaStdlib(version) {
-    const result = [];
-    for (const [tableName, data] of Object.entries(LUA_STDLIB)) {
-      for (const entry of data.common) {
-        result.push(this.stdlibToApiFunction(tableName, entry));
-      }
-      if (version === "5.4" && data.lua54Only) {
-        for (const entry of data.lua54Only) {
-          result.push(this.stdlibToApiFunction(tableName, entry));
-        }
-      }
-      if (version === "luajit" && data.luajitOnly) {
-        for (const entry of data.luajitOnly) {
-          result.push(this.stdlibToApiFunction(tableName, entry));
-        }
-      }
-    }
-    return result;
-  }
-  // â”€â”€ Stats â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  getStats() {
-    let functions = 0;
-    let methods = 0;
-    let documented = 0;
-    for (const mod of this.modules.values()) {
-      functions += mod.functions.length;
-      methods += mod.methods.length;
-      documented += mod.documentedEntries;
-    }
-    return { modules: this.modules.size, functions, methods, documented };
-  }
-  // â”€â”€ JSON loader â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  loadFromJson(data) {
-    if (!data || typeof data !== "object") return;
-    const obj = data;
-    if (Array.isArray(obj.modules)) {
-      for (const raw of obj.modules) {
-        const modName = String(raw.name ?? "");
-        const mod = {
-          name: modName,
-          fullPath: `lurek.${modName}`,
-          description: String(raw.description ?? ""),
-          functions: [],
-          methods: [],
-          totalEntries: 0,
-          documentedEntries: 0
-        };
-        const rawFunctions = Array.isArray(raw.functions) ? raw.functions : [];
-        for (const rf of rawFunctions) {
-          const fn = this.rawToApiFunction(modName, rf);
-          if (fn.isMethod) {
-            mod.methods.push(fn);
-            this.indexMethod(fn);
-          } else {
-            mod.functions.push(fn);
-          }
-          this.allFunctions.set(fn.fullPath, fn);
-        }
-        const rawMethods = Array.isArray(raw.methods) ? raw.methods : [];
-        for (const rm of rawMethods) {
-          const fn = this.rawToApiFunction(modName, rm);
-          fn.isMethod = true;
-          mod.methods.push(fn);
-          this.indexMethod(fn);
-          this.allFunctions.set(fn.fullPath, fn);
-        }
-        mod.totalEntries = mod.functions.length + mod.methods.length;
-        mod.documentedEntries = [...mod.functions, ...mod.methods].filter((f) => f.description.length > 0).length;
-        this.modules.set(modName, mod);
-      }
-    }
-    const rawEnums = obj.enums;
-    if (rawEnums && typeof rawEnums === "object" && !Array.isArray(rawEnums)) {
-      for (const [name, values] of Object.entries(rawEnums)) {
-        if (Array.isArray(values)) {
-          this.enums.set(name, { name, values, descriptions: /* @__PURE__ */ new Map() });
-        }
-      }
-    }
-    const rawCallbacks = Array.isArray(obj.callbacks) ? obj.callbacks : [];
-    this.callbackList = rawCallbacks.map((cb) => ({
-      module: "",
-      name: String(cb.name ?? ""),
-      fullPath: `lurek.${cb.name ?? ""}`,
-      signature: String(cb.signature ?? ""),
-      description: String(cb.description ?? ""),
-      parameters: Array.isArray(cb.parameters) ? cb.parameters.map((p) => ({
-        name: String(p.name ?? ""),
-        type: String(p.type ?? "any"),
-        description: String(p.description ?? ""),
-        optional: Boolean(p.optional)
-      })) : [],
-      isMethod: false
-    }));
-    if (Array.isArray(obj.classes)) {
-      for (const cls of obj.classes) {
-        const clsName = String(cls.name ?? "");
-        const apiClass = {
-          name: clsName,
-          description: String(cls.description ?? ""),
-          methods: []
-        };
-        const methods = Array.isArray(cls.methods) ? cls.methods : [];
-        for (const rm of methods) {
-          const fn = this.rawToApiFunction(clsName, rm);
-          fn.isMethod = true;
-          if (!fn.objectType) fn.objectType = clsName;
-          apiClass.methods.push(fn);
-          if (!this.allFunctions.has(fn.fullPath)) {
-            this.allFunctions.set(fn.fullPath, fn);
-            this.indexMethod(fn);
-          }
-        }
-        this.classes.set(clsName, apiClass);
-      }
-    }
-    this.keyNames = Array.isArray(obj.keyNames) ? obj.keyNames : [];
-    this.gamepadButtons = Array.isArray(obj.gamepadButtons) ? obj.gamepadButtons : [];
-    this.gamepadAxes = Array.isArray(obj.gamepadAxes) ? obj.gamepadAxes : [];
-  }
-  rawToApiFunction(modName, raw) {
-    const name = String(raw.name ?? "");
-    const fullPath = String(raw.fullPath ?? `lurek.${modName}.${name}`);
-    const params = Array.isArray(raw.parameters) ? raw.parameters.map((p) => ({
-      name: String(p.name ?? ""),
-      type: String(p.type ?? "any"),
-      description: String(p.description ?? ""),
-      optional: Boolean(p.optional),
-      default: p.default != null ? String(p.default) : void 0
-    })) : [];
-    return {
-      module: modName,
-      name,
-      fullPath,
-      signature: String(raw.signature ?? `${fullPath}(${params.map((p) => p.name).join(", ")})`),
-      description: String(raw.description ?? ""),
-      parameters: params,
-      returns: raw.returns != null ? String(raw.returns) : void 0,
-      returnType: raw.returnType != null ? String(raw.returnType) : void 0,
-      since: raw.since != null ? String(raw.since) : void 0,
-      deprecated: raw.deprecated != null ? String(raw.deprecated) : void 0,
-      isMethod: Boolean(raw.isMethod),
-      objectType: raw.objectType != null ? String(raw.objectType) : void 0,
-      sourceFile: raw.sourceFile != null ? String(raw.sourceFile) : void 0
-    };
-  }
-  indexMethod(fn) {
-    const objType = fn.objectType;
-    if (!objType) return;
-    let list = this.methodsByObjectType.get(objType);
-    if (!list) {
-      list = [];
-      this.methodsByObjectType.set(objType, list);
-    }
-    list.push(fn);
-  }
-  // â”€â”€ Stdlib helper â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  stdlibToApiFunction(tableName, entry) {
-    return {
-      module: tableName,
-      name: entry.name,
-      fullPath: `${tableName}.${entry.name}`,
-      signature: entry.signature,
-      description: entry.description,
-      parameters: entry.params,
-      returns: entry.returns,
-      returnType: entry.returns,
-      isMethod: false
-    };
-  }
-};
-
-// src/providers/sidebar.ts
-var vscode3 = __toESM(require("vscode"));
-var fs5 = __toESM(require("fs"));
-var path5 = __toESM(require("path"));
-var SidebarItem = class extends vscode3.TreeItem {
-  constructor(label, collapsibleState, commandId, icon, statusDescription) {
-    super(label, collapsibleState);
-    this.label = label;
-    this.collapsibleState = collapsibleState;
-    this.commandId = commandId;
-    this.icon = icon;
-    this.statusDescription = statusDescription;
-    if (commandId) {
-      this.command = {
-        command: commandId,
-        title: label
-      };
-    }
-    if (icon) {
-      this.iconPath = new vscode3.ThemeIcon(icon);
-    }
-    if (statusDescription) {
-      this.description = statusDescription;
-    }
-  }
-};
-var ProjectToolsProvider = class {
-  _onDidChangeTreeData = new vscode3.EventEmitter();
-  onDidChangeTreeData = this._onDidChangeTreeData.event;
-  refresh() {
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  getTreeItem(element) {
-    return element;
-  }
-  getChildren(element) {
-    if (!element) {
-      return [
-        new SidebarItem(
-          "Project Health",
-          vscode3.TreeItemCollapsibleState.Expanded,
-          void 0,
-          "heart"
-        ),
-        new SidebarItem(
-          "Create",
-          vscode3.TreeItemCollapsibleState.Expanded,
-          void 0,
-          "new-folder"
-        ),
-        new SidebarItem(
-          "Package",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "package"
-        ),
-        new SidebarItem(
-          "Libraries",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "library"
-        )
-      ];
-    }
-    switch (element.label) {
-      case "Project Health":
-        return this.getProjectHealthItems();
-      case "Create":
-        return [
-          new SidebarItem(
-            "New Project from Template",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.scaffold.project",
-            "file-add"
-          ),
-          new SidebarItem(
-            "New File from Template",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.scaffold.file",
-            "new-file"
-          )
-        ];
-      case "Package":
-        return [
-          new SidebarItem(
-            "Package .zip",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.package.zip",
-            "file-zip"
-          ),
-          new SidebarItem(
-            "Package for Windows",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.package.windows",
-            "desktop-download"
-          ),
-          new SidebarItem(
-            "Package for Linux",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.package.linux",
-            "terminal-linux"
-          )
-        ];
-      case "Libraries":
-        return [
-          new SidebarItem(
-            "Browse Pattern Library",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.library.browse",
-            "search"
-          ),
-          new SidebarItem(
-            "Insert Code Snippet",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.library.insertSnippet",
-            "code"
-          ),
-          new SidebarItem(
-            "Save Selection as Pattern",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.library.newPattern",
-            "save"
-          )
-        ];
-      default:
-        return [];
-    }
-  }
-  /** Scans the workspace for key project files and returns health indicators. */
-  getProjectHealthItems() {
-    const wsRoot = vscode3.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!wsRoot) {
-      return [
-        new SidebarItem("No workspace open", vscode3.TreeItemCollapsibleState.None, void 0, "warning")
-      ];
-    }
-    const items = [];
-    const hasMainLua = fs5.existsSync(path5.join(wsRoot, "main.lua"));
-    items.push(new SidebarItem(
-      "main.lua",
-      vscode3.TreeItemCollapsibleState.None,
-      hasMainLua ? void 0 : "lurek.scaffold.file",
-      hasMainLua ? "pass" : "error",
-      hasMainLua ? "found" : "missing"
-    ));
-    const hasConfLua = fs5.existsSync(path5.join(wsRoot, "conf.lua"));
-    items.push(new SidebarItem(
-      "conf.lua",
-      vscode3.TreeItemCollapsibleState.None,
-      void 0,
-      hasConfLua ? "pass" : "warning",
-      hasConfLua ? "found" : "optional"
-    ));
-    let luaFileCount = 0;
-    try {
-      const countLuaFiles = (dir) => {
-        const entries = fs5.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.name.startsWith(".") || entry.name === "node_modules") {
-            continue;
-          }
-          const fullPath = path5.join(dir, entry.name);
-          if (entry.isDirectory()) {
-            countLuaFiles(fullPath);
-          } else if (entry.name.endsWith(".lua")) {
-            luaFileCount++;
-          }
-        }
-      };
-      countLuaFiles(wsRoot);
-    } catch {
-    }
-    items.push(new SidebarItem(
-      "Lua files",
-      vscode3.TreeItemCollapsibleState.None,
-      void 0,
-      "file-code",
-      `${luaFileCount}`
-    ));
-    const hasTests = fs5.existsSync(path5.join(wsRoot, "tests")) || fs5.existsSync(path5.join(wsRoot, "test")) || fs5.existsSync(path5.join(wsRoot, "tests.lua"));
-    items.push(new SidebarItem(
-      "Tests",
-      vscode3.TreeItemCollapsibleState.None,
-      void 0,
-      hasTests ? "pass" : "warning",
-      hasTests ? "detected" : "none found"
-    ));
-    return items;
-  }
-};
-var DevToolsProvider = class {
-  _onDidChangeTreeData = new vscode3.EventEmitter();
-  onDidChangeTreeData = this._onDidChangeTreeData.event;
-  _gameStatus = "stopped";
-  _lastTestResult;
-  /** Update the game running status and refresh the tree. */
-  setGameStatus(status) {
-    this._gameStatus = status;
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  /** Update the last test result summary and refresh the tree. */
-  setTestResult(summary) {
-    this._lastTestResult = summary;
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  refresh() {
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  getTreeItem(element) {
-    return element;
-  }
-  getChildren(element) {
-    if (!element) {
-      return [
-        new SidebarItem(
-          "Run",
-          vscode3.TreeItemCollapsibleState.Expanded,
-          void 0,
-          "play"
-        ),
-        new SidebarItem(
-          "Testing",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "beaker"
-        ),
-        new SidebarItem(
-          "Editors",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "window"
-        ),
-        new SidebarItem(
-          "Debug",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "bug"
-        ),
-        new SidebarItem(
-          "Reference",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "book"
-        ),
-        new SidebarItem(
-          "Assets",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "file-media"
-        ),
-        new SidebarItem(
-          "Dependencies",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "list-tree"
-        ),
-        new SidebarItem(
-          "Performance",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "dashboard"
-        )
-      ];
-    }
-    switch (element.label) {
-      case "Run":
-        return [
-          new SidebarItem(
-            "Game Status",
-            vscode3.TreeItemCollapsibleState.None,
-            void 0,
-            this._gameStatus === "running" ? "debug-start" : this._gameStatus === "crashed" ? "error" : "debug-stop",
-            this._gameStatus
-          ),
-          new SidebarItem(
-            "Run Game",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.runGame",
-            "play"
-          ),
-          new SidebarItem(
-            "Stop Game",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.stopGame",
-            "debug-stop"
-          ),
-          new SidebarItem(
-            "Run with Arguments",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.runWithArgs",
-            "terminal"
-          ),
-          new SidebarItem(
-            "Run Example",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.runExample",
-            "file-code"
-          )
-        ];
-      case "Testing":
-        return [
-          ...this._lastTestResult ? [
-            new SidebarItem(
-              "Last Result",
-              vscode3.TreeItemCollapsibleState.None,
-              void 0,
-              this._lastTestResult.includes("fail") ? "error" : "pass",
-              this._lastTestResult
-            )
-          ] : [],
-          new SidebarItem(
-            "Open Test Runner",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.editor.testRunner",
-            "beaker"
-          ),
-          new SidebarItem(
-            "Run All Tests",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.test.all",
-            "testing-run-all-icon"
-          ),
-          new SidebarItem(
-            "Run Lua Tests",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.test.lua.all",
-            "test-view-icon"
-          ),
-          new SidebarItem(
-            "Run Golden Tests",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.test.lua.golden",
-            "file-media"
-          ),
-          new SidebarItem(
-            "Generate Tests for File",
-            vscode3.TreeItemCollapsibleState.None,
-            "lurek.test.generateForFile",
-            "wand"
-          )
-        ];
-      case "Editors":
-        return [
-          // ── Level / World ─────────────────────────────────────
-          new SidebarItem("Tile Map Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tileMap", "symbol-misc"),
-          new SidebarItem("Tileset Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tileset", "layers"),
-          new SidebarItem("Tilemap Script Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.tilemapScript", "code"),
-          new SidebarItem("World Map Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.worldMap", "map"),
-          new SidebarItem("Procedural Map Generator", vscode3.TreeItemCollapsibleState.None, "lurek.editor.procMap", "globe"),
-          // ── Art / Visual ──────────────────────────────────────
-          new SidebarItem("Pixel Art Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.pixelArt", "paintcan"),
-          new SidebarItem("Sprite Animation Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.spriteAnim", "play-circle"),
-          new SidebarItem("Shader Preview", vscode3.TreeItemCollapsibleState.None, "lurek.editor.shaderPreview", "wand"),
-          new SidebarItem("Color Palette", vscode3.TreeItemCollapsibleState.None, "lurek.editor.colorPalette", "symbol-color"),
-          new SidebarItem("Font Preview", vscode3.TreeItemCollapsibleState.None, "lurek.editor.fontPreview", "text-size"),
-          // ── Game Design ───────────────────────────────────────
-          new SidebarItem("Scene Flow Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.sceneFlow", "type-hierarchy"),
-          new SidebarItem("Entity Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.entity", "symbol-class"),
-          new SidebarItem("Dialog Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.dialog", "comment-discussion"),
-          new SidebarItem("Quest Tree Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.questTree", "git-merge"),
-          new SidebarItem("GUI Widget Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.guiWidget", "symbol-interface"),
-          new SidebarItem("Timeline / Cutscene", vscode3.TreeItemCollapsibleState.None, "lurek.editor.timeline", "history"),
-          new SidebarItem("Input Mapper", vscode3.TreeItemCollapsibleState.None, "lurek.editor.inputMapper", "keyboard"),
-          new SidebarItem("Localization Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.localization", "book"),
-          // ── Simulation ────────────────────────────────────────
-          new SidebarItem("Particle Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.particle", "sparkle"),
-          new SidebarItem("Physics Materials", vscode3.TreeItemCollapsibleState.None, "lurek.editor.physicsMaterials", "settings-gear"),
-          new SidebarItem("AI Behavior Tree", vscode3.TreeItemCollapsibleState.None, "lurek.editor.aiBehavior", "hubot"),
-          new SidebarItem("Voxel Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.voxel", "layers"),
-          // ── Audio / FX ───────────────────────────────────────
-          new SidebarItem("Audio Mixer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.audioMixer", "unmute"),
-          new SidebarItem("Sound DSP Panel", vscode3.TreeItemCollapsibleState.None, "lurek.editor.soundDsp", "radio-tower"),
-          new SidebarItem("PostFX & Overlay Designer", vscode3.TreeItemCollapsibleState.None, "lurek.editor.postfxOverlay", "color-mode"),
-          // ── Data ──────────────────────────────────────────────
-          new SidebarItem("Database Browser", vscode3.TreeItemCollapsibleState.None, "lurek.editor.database", "database"),
-          new SidebarItem("Graph Editor", vscode3.TreeItemCollapsibleState.None, "lurek.editor.graph", "graph")
-        ];
-      case "Debug":
-        return [
-          new SidebarItem("Debug Run + Connect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.runAndConnect", "debug-start"),
-          new SidebarItem("Connect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.connect", "plug"),
-          new SidebarItem("Disconnect", vscode3.TreeItemCollapsibleState.None, "lurek.debug.disconnect", "debug-disconnect"),
-          new SidebarItem("Evaluate Lua", vscode3.TreeItemCollapsibleState.None, "lurek.debug.evaluate", "terminal"),
-          new SidebarItem("Watchers Panel", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openWatchers", "eye"),
-          new SidebarItem("Variable Inspector", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openInspector", "symbol-variable"),
-          new SidebarItem("Call Stack", vscode3.TreeItemCollapsibleState.None, "lurek.debug.openCallStack", "list-tree"),
-          new SidebarItem("Performance", vscode3.TreeItemCollapsibleState.None, "lurek.debug.performance", "dashboard"),
-          new SidebarItem("Screenshot", vscode3.TreeItemCollapsibleState.None, "lurek.debug.screenshot", "device-camera"),
-          new SidebarItem("Status", vscode3.TreeItemCollapsibleState.None, "lurek.debug.status", "info")
-        ];
-      case "Reference":
-        return [
-          new SidebarItem("Browse API", vscode3.TreeItemCollapsibleState.None, "lurek.browseApi", "search"),
-          new SidebarItem("Open API Docs", vscode3.TreeItemCollapsibleState.None, "lurek.openApiDocs", "book"),
-          new SidebarItem("Open Wiki", vscode3.TreeItemCollapsibleState.None, "lurek.openWiki", "globe"),
-          new SidebarItem("Dependency Graph", vscode3.TreeItemCollapsibleState.None, "lurek.depGraph", "graph"),
-          new SidebarItem("Dependency List", vscode3.TreeItemCollapsibleState.None, "lurek.depList", "list-tree"),
-          new SidebarItem("API Coverage", vscode3.TreeItemCollapsibleState.None, "lurek.apiCoverage", "graph-line")
-        ];
-      case "Assets":
-        return [
-          new SidebarItem("Refresh Assets", vscode3.TreeItemCollapsibleState.None, "lurek.assets.refresh", "refresh"),
-          new SidebarItem("Open Asset Explorer", vscode3.TreeItemCollapsibleState.None, "lurek.assets.openPanel", "file-media"),
-          new SidebarItem("Find Missing Assets", vscode3.TreeItemCollapsibleState.None, "lurek.assets.findMissing", "warning")
-        ];
-      case "Dependencies":
-        return [
-          new SidebarItem("Show Module Graph", vscode3.TreeItemCollapsibleState.None, "lurek.deps.showGraph", "type-hierarchy"),
-          new SidebarItem("Find Circular Deps", vscode3.TreeItemCollapsibleState.None, "lurek.deps.findCircular", "warning"),
-          new SidebarItem("Show Orphan Modules", vscode3.TreeItemCollapsibleState.None, "lurek.deps.findOrphans", "question")
-        ];
-      case "Performance":
-        return [
-          new SidebarItem("Open Performance Dashboard", vscode3.TreeItemCollapsibleState.None, "lurek.perf.openDashboard", "dashboard"),
-          new SidebarItem("System Monitor", vscode3.TreeItemCollapsibleState.None, "lurek.runtime.openMonitor", "pulse"),
-          new SidebarItem("API Usage Report", vscode3.TreeItemCollapsibleState.None, "lurek.api.usageReport", "graph"),
-          new SidebarItem("Open Hot Reload History", vscode3.TreeItemCollapsibleState.None, "lurek.perf.openHotReload", "history"),
-          new SidebarItem("Clear History", vscode3.TreeItemCollapsibleState.None, "lurek.perf.clearHistory", "clear-all")
-        ];
-      default:
-        return [];
-    }
-  }
-};
-var AiToolsProvider = class {
-  _onDidChangeTreeData = new vscode3.EventEmitter();
-  onDidChangeTreeData = this._onDidChangeTreeData.event;
-  refresh() {
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  getTreeItem(element) {
-    return element;
-  }
-  getChildren(element) {
-    if (!element) {
-      return [
-        new SidebarItem(
-          "CAG (AI Config)",
-          vscode3.TreeItemCollapsibleState.Expanded,
-          void 0,
-          "hubot"
-        ),
-        new SidebarItem(
-          "MCP Server",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "server"
-        ),
-        new SidebarItem(
-          "Game Jam",
-          vscode3.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "flame"
-        )
-      ];
-    }
-    switch (element.label) {
-      case "CAG (AI Config)":
-        return [
-          new SidebarItem("Install AI Config", vscode3.TreeItemCollapsibleState.None, "lurek.cag.install", "cloud-download"),
-          new SidebarItem("Select Agent", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectAgent", "person"),
-          new SidebarItem("Select Skill", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectSkill", "mortar-board"),
-          new SidebarItem("Select Prompt", vscode3.TreeItemCollapsibleState.None, "lurek.cag.selectPrompt", "comment"),
-          new SidebarItem("Update CAG Files", vscode3.TreeItemCollapsibleState.None, "lurek.cag.update", "sync")
-        ];
-      case "MCP Server":
-        return [
-          new SidebarItem("Install MCP Server", vscode3.TreeItemCollapsibleState.None, "lurek.mcp.install", "cloud-download"),
-          new SidebarItem("MCP Status", vscode3.TreeItemCollapsibleState.None, "lurek.mcp.status", "info")
-        ];
-      case "Game Jam":
-        return [
-          new SidebarItem("Game Jam Quick Start", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.quickStart", "rocket"),
-          new SidebarItem("Add Game Module", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.addModule", "add"),
-          new SidebarItem("Game Jam Timer", vscode3.TreeItemCollapsibleState.None, "lurek.gameJam.timer", "watch"),
-          new SidebarItem("Quick Build", vscode3.TreeItemCollapsibleState.None, "lurek.jam.quickBuild", "zap"),
-          new SidebarItem("Submission Checklist", vscode3.TreeItemCollapsibleState.None, "lurek.jam.checklist", "checklist")
-        ];
-      default:
-        return [];
-    }
-  }
-};
-
-// src/providers/definition.ts
-var vscode4 = __toESM(require("vscode"));
-var path6 = __toESM(require("path"));
-var LUA_SELECTOR = { scheme: "file", language: "lua" };
-var LUREK_API_SCHEME = "lurek-api";
-var LurekApiDocumentProvider = class {
-  constructor(apiData2) {
-    this.apiData = apiData2;
-  }
-  provideTextDocumentContent(uri) {
-    const fullPath = uri.path.replace(/^\//, "");
-    const fn = this.apiData.getFunction(fullPath);
-    if (fn) {
-      return this.renderFunction(fn);
-    }
-    const modName = fullPath.replace("lurek.", "");
-    const mod = this.apiData.getModule(modName);
-    if (mod) {
-      return this.renderModule(mod);
-    }
-    return `-- No API definition found for: ${fullPath}`;
-  }
-  renderFunction(fn) {
-    const lines = [];
-    lines.push(`-- Lurek2D API Definition`);
-    lines.push(`-- ${fn.fullPath}`);
-    lines.push(`--`);
-    if (fn.description) {
-      lines.push(`-- ${fn.description}`);
-      lines.push(`--`);
-    }
-    if (fn.parameters.length > 0) {
-      lines.push(`-- Parameters:`);
-      for (const p of fn.parameters) {
-        const opt = p.optional ? " (optional)" : "";
-        const def = p.default ? ` [default: ${p.default}]` : "";
-        const desc = p.description ? ` -- ${p.description}` : "";
-        lines.push(`--   ${p.name}: ${p.type}${opt}${def}${desc}`);
-      }
-      lines.push(`--`);
-    }
-    if (fn.returns) {
-      lines.push(`-- Returns: ${fn.returns}`);
-      lines.push(`--`);
-    }
-    if (fn.deprecated) {
-      lines.push(`-- DEPRECATED: ${fn.deprecated}`);
-      lines.push(`--`);
-    }
-    if (fn.sourceFile) {
-      lines.push(`-- Source: ${fn.sourceFile}`);
-    }
-    lines.push(``);
-    const params = fn.parameters.map((p) => p.name).join(", ");
-    if (fn.isMethod) {
-      lines.push(`function ${fn.objectType ?? "Object"}:${fn.name}(${params})`);
-    } else {
-      lines.push(`function ${fn.fullPath}(${params})`);
-    }
-    lines.push(`  -- Implemented in Rust (native)`);
-    lines.push(`end`);
-    return lines.join("\n");
-  }
-  renderModule(mod) {
-    const lines = [];
-    lines.push(`-- Lurek2D API Module: ${mod.fullPath}`);
-    if (mod.description) {
-      lines.push(`-- ${mod.description}`);
-    }
-    lines.push(`-- ${mod.functions.length} functions, ${mod.methods.length} methods`);
-    lines.push(``);
-    lines.push(`${mod.name} = {}`);
-    lines.push(``);
-    for (const fn of mod.functions) {
-      const params = fn.parameters.map((p) => p.name).join(", ");
-      if (fn.description) lines.push(`--- ${fn.description}`);
-      lines.push(`function ${fn.fullPath}(${params}) end`);
-      lines.push(``);
-    }
-    for (const m of mod.methods) {
-      const params = m.parameters.map((p) => p.name).join(", ");
-      if (m.description) lines.push(`--- ${m.description}`);
-      lines.push(`function ${m.objectType ?? "Object"}:${m.name}(${params}) end`);
-      lines.push(``);
-    }
-    return lines.join("\n");
-  }
-};
-async function resolveRequire(document, requirePath) {
-  const fsPath = requirePath.replace(/\./g, "/");
-  const candidates = [fsPath + ".lua", fsPath + "/init.lua"];
-  const docDir = path6.dirname(document.uri.fsPath);
-  for (const candidate of candidates) {
-    const relUri = vscode4.Uri.file(path6.resolve(docDir, candidate));
-    try {
-      await vscode4.workspace.fs.stat(relUri);
-      return new vscode4.Location(relUri, new vscode4.Position(0, 0));
-    } catch {
-    }
-    const wsRoot = vscode4.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (wsRoot) {
-      const absUri = vscode4.Uri.file(path6.resolve(wsRoot, candidate));
-      try {
-        await vscode4.workspace.fs.stat(absUri);
-        return new vscode4.Location(absUri, new vscode4.Position(0, 0));
-      } catch {
-      }
-    }
-    const files = await vscode4.workspace.findFiles(`**/${candidate}`, "**/node_modules/**", 1);
-    if (files.length > 0) {
-      return new vscode4.Location(files[0], new vscode4.Position(0, 0));
-    }
-  }
-  return void 0;
-}
-function register(context, apiData2) {
-  const docProvider = new LurekApiDocumentProvider(apiData2);
-  context.subscriptions.push(
-    vscode4.workspace.registerTextDocumentContentProvider(LUREK_API_SCHEME, docProvider)
-  );
-  const provider = vscode4.languages.registerDefinitionProvider(LUA_SELECTOR, {
-    async provideDefinition(document, position) {
-      const lineText = document.lineAt(position).text;
-      const requireMatch = lineText.match(/require\s*\(\s*["']([^"']+)["']\s*\)/);
-      if (requireMatch) {
-        const reqPath = requireMatch[1];
-        const charStart = lineText.indexOf(reqPath);
-        const charEnd = charStart + reqPath.length;
-        if (position.character >= charStart && position.character <= charEnd) {
-          return resolveRequire(document, reqPath);
-        }
-      }
-      const lurekRange = document.getWordRangeAtPosition(position, /lurek\.\w+\.\w+/);
-      if (lurekRange) {
-        const fullPath = document.getText(lurekRange);
-        const fn = apiData2.getFunction(fullPath);
-        if (fn) {
-          const uri = vscode4.Uri.parse(`${LUREK_API_SCHEME}:/${fullPath}`);
-          return new vscode4.Location(uri, new vscode4.Position(0, 0));
-        }
-      }
-      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
-      if (!wordRange) return void 0;
-      const word = document.getText(wordRange);
-      const beforeWord = lineText.substring(0, wordRange.start.character);
-      return void 0;
-    }
-  });
-  context.subscriptions.push(provider);
-}
-
-// src/providers/diagnostics.ts
-var vscode5 = __toESM(require("vscode"));
-var fs6 = __toESM(require("fs"));
-var path7 = __toESM(require("path"));
-
-// src/generated/lurekApiData.ts
-var LUREK_CALLBACK_NAMES = /* @__PURE__ */ new Set([
-  "load",
-  "update",
-  "draw",
-  "keypressed",
-  "keyreleased",
-  "textinput",
-  "mousepressed",
-  "mousereleased",
-  "mousemoved",
-  "wheelmoved",
-  "gamepadpressed",
-  "gamepadreleased",
-  "gamepadaxis",
-  "joystickadded",
-  "joystickremoved",
-  "focus",
-  "visible",
-  "resize",
-  "quit",
-  "init",
-  "ready",
-  "process",
-  "process_late",
-  "process_physics",
-  "fixedUpdate",
-  "draw_ui",
-  "exit",
-  "touchpressed",
-  "touchmoved",
-  "touchreleased",
-  "textedited"
-]);
-
-// src/services/luaParser.ts
-var LUA_KEYWORDS = /* @__PURE__ */ new Set([
-  "and",
-  "break",
-  "do",
-  "else",
-  "elseif",
-  "end",
-  "false",
-  "for",
-  "function",
-  "goto",
-  "if",
-  "in",
-  "local",
-  "nil",
-  "not",
-  "or",
-  "repeat",
-  "return",
-  "then",
-  "true",
-  "until",
-  "while"
-]);
-var OPERATORS = /* @__PURE__ */ new Set([
-  "+",
-  "-",
-  "*",
-  "/",
-  "%",
-  "^",
-  "#",
-  "==",
-  "~=",
-  "<",
-  ">",
-  "<=",
-  ">=",
-  "=",
-  "..",
-  "...",
-  "//"
-]);
-var PUNCTUATION = /* @__PURE__ */ new Set([
-  "(",
-  ")",
-  "{",
-  "}",
-  "[",
-  "]",
-  ";",
-  ":",
-  ",",
-  "."
-]);
-var LuaDocumentAnalyzer = class {
-  tokenize(text) {
-    const tokens = [];
-    const len = text.length;
-    let pos = 0;
-    let line = 0;
-    let col = 0;
-    while (pos < len) {
-      const ch = text[pos];
-      if (ch === " " || ch === "	" || ch === "\r" || ch === "\n") {
-        const start = pos;
-        const startLine = line;
-        const startCol = col;
-        while (pos < len && (text[pos] === " " || text[pos] === "	" || text[pos] === "\r" || text[pos] === "\n")) {
-          if (text[pos] === "\n") {
-            line++;
-            col = 0;
-          } else {
-            col++;
-          }
-          pos++;
-        }
-        tokens.push({ type: 7 /* Whitespace */, value: text.slice(start, pos), line: startLine, column: startCol, length: pos - start });
-        continue;
-      }
-      if (ch === "-" && pos + 1 < len && text[pos + 1] === "-") {
-        const startLine = line;
-        const startCol = col;
-        if (pos + 2 < len && text[pos + 2] === "[") {
-          const level = this.countLongBracketLevel(text, pos + 2);
-          if (level >= 0) {
-            const closing = "]" + "=".repeat(level) + "]";
-            const endIdx = text.indexOf(closing, pos + 4 + level);
-            const end2 = endIdx >= 0 ? endIdx + closing.length : len;
-            const value2 = text.slice(pos, end2);
-            const nlCount = countNewlines(value2);
-            tokens.push({ type: 4 /* Comment */, value: value2, line: startLine, column: startCol, length: end2 - pos });
-            for (let i = pos; i < end2; i++) {
-              if (text[i] === "\n") {
-                line++;
-                col = 0;
-              } else {
-                col++;
-              }
-            }
-            pos = end2;
-            continue;
-          }
-        }
-        const nlIdx = text.indexOf("\n", pos);
-        const end = nlIdx >= 0 ? nlIdx : len;
-        const value = text.slice(pos, end);
-        tokens.push({ type: 4 /* Comment */, value, line: startLine, column: startCol, length: end - pos });
-        col += end - pos;
-        pos = end;
-        continue;
-      }
-      if (ch === "[") {
-        const level = this.countLongBracketLevel(text, pos);
-        if (level >= 0) {
-          const closing = "]" + "=".repeat(level) + "]";
-          const contentStart = pos + 2 + level;
-          const endIdx = text.indexOf(closing, contentStart);
-          const end = endIdx >= 0 ? endIdx + closing.length : len;
-          const value = text.slice(pos, end);
-          const startLine = line;
-          const startCol = col;
-          for (let i = pos; i < end; i++) {
-            if (text[i] === "\n") {
-              line++;
-              col = 0;
-            } else {
-              col++;
-            }
-          }
-          tokens.push({ type: 2 /* String */, value, line: startLine, column: startCol, length: end - pos });
-          pos = end;
-          continue;
-        }
-      }
-      if (ch === '"' || ch === "'") {
-        const startLine = line;
-        const startCol = col;
-        const quote = ch;
-        let end = pos + 1;
-        while (end < len) {
-          if (text[end] === "\\") {
-            end += 2;
-            continue;
-          }
-          if (text[end] === quote) {
-            end++;
-            break;
-          }
-          if (text[end] === "\n") break;
-          end++;
-        }
-        const value = text.slice(pos, end);
-        tokens.push({ type: 2 /* String */, value, line: startLine, column: startCol, length: end - pos });
-        col += end - pos;
-        pos = end;
-        continue;
-      }
-      if (isDigit(ch) || ch === "." && pos + 1 < len && isDigit(text[pos + 1])) {
-        const startLine = line;
-        const startCol = col;
-        let end = pos;
-        if (ch === "0" && end + 1 < len && (text[end + 1] === "x" || text[end + 1] === "X")) {
-          end += 2;
-          while (end < len && isHexDigit(text[end])) end++;
-        } else if (ch === "0" && end + 1 < len && (text[end + 1] === "b" || text[end + 1] === "B")) {
-          end += 2;
-          while (end < len && (text[end] === "0" || text[end] === "1")) end++;
-        } else {
-          while (end < len && isDigit(text[end])) end++;
-          if (end < len && text[end] === ".") {
-            end++;
-            while (end < len && isDigit(text[end])) end++;
-          }
-          if (end < len && (text[end] === "e" || text[end] === "E")) {
-            end++;
-            if (end < len && (text[end] === "+" || text[end] === "-")) end++;
-            while (end < len && isDigit(text[end])) end++;
-          }
-        }
-        const value = text.slice(pos, end);
-        tokens.push({ type: 3 /* Number */, value, line: startLine, column: startCol, length: end - pos });
-        col += end - pos;
-        pos = end;
-        continue;
-      }
-      if (isIdentStart(ch)) {
-        const startCol = col;
-        let end = pos + 1;
-        while (end < len && isIdentPart(text[end])) end++;
-        const value = text.slice(pos, end);
-        const type = LUA_KEYWORDS.has(value) ? 0 /* Keyword */ : 1 /* Identifier */;
-        tokens.push({ type, value, line, column: startCol, length: end - pos });
-        col += end - pos;
-        pos = end;
-        continue;
-      }
-      if (pos + 2 < len) {
-        const three = text.slice(pos, pos + 3);
-        if (three === "...") {
-          tokens.push({ type: 5 /* Operator */, value: three, line, column: col, length: 3 });
-          col += 3;
-          pos += 3;
-          continue;
-        }
-      }
-      if (pos + 1 < len) {
-        const two = text.slice(pos, pos + 2);
-        if (OPERATORS.has(two)) {
-          tokens.push({ type: 5 /* Operator */, value: two, line, column: col, length: 2 });
-          col += 2;
-          pos += 2;
-          continue;
-        }
-      }
-      if (OPERATORS.has(ch)) {
-        tokens.push({ type: 5 /* Operator */, value: ch, line, column: col, length: 1 });
-        col++;
-        pos++;
-        continue;
-      }
-      if (PUNCTUATION.has(ch)) {
-        tokens.push({ type: 6 /* Punctuation */, value: ch, line, column: col, length: 1 });
-        col++;
-        pos++;
-        continue;
-      }
-      col++;
-      pos++;
-    }
-    tokens.push({ type: 8 /* EOF */, value: "", line, column: col, length: 0 });
-    return tokens;
-  }
-  // ── Document analysis ──────────────────────────────────────
-  analyze(text) {
-    const tokens = this.tokenize(text);
-    const symbols = [];
-    const requires = [];
-    const callbacks = [];
-    const scopes = [];
-    const comments = [];
-    for (const tok of tokens) {
-      if (tok.type === 4 /* Comment */) {
-        const stripped = tok.value.replace(/^--\[=*\[/, "").replace(/\]=*\]$/, "").replace(/^--/, "").trim();
-        comments.push({
-          text: stripped,
-          line: tok.line,
-          isBlock: tok.value.startsWith("--["),
-          isLuaCATS: tok.value.startsWith("---@")
-        });
-      }
-    }
-    const toks = tokens.filter((t) => t.type !== 7 /* Whitespace */ && t.type !== 4 /* Comment */);
-    const scopeStack = [];
-    let i = 0;
-    const peek = (offset = 0) => toks[i + offset];
-    const match = (type, value) => {
-      const t = peek();
-      if (!t) return false;
-      if (t.type !== type) return false;
-      if (value !== void 0 && t.value !== value) return false;
-      return true;
-    };
-    const advance = () => toks[i++];
-    const getPrecedingComment = (targetLine) => {
-      for (let c = comments.length - 1; c >= 0; c--) {
-        if (comments[c].line === targetLine - 1 || comments[c].line === targetLine) {
-          return comments[c].text;
-        }
-      }
-      return void 0;
-    };
-    while (i < toks.length && peek()?.type !== 8 /* EOF */) {
-      const cur = peek();
-      if (match(0 /* Keyword */, "local")) {
-        const localTok = advance();
-        if (match(0 /* Keyword */, "function")) {
-          advance();
-          if (peek()?.type === 1 /* Identifier */) {
-            const nameTok = advance();
-            const params = this.parseParamList(toks, i);
-            i = params.nextIndex;
-            const desc = getPrecedingComment(localTok.line);
-            const sym = {
-              name: nameTok.value,
-              kind: "function",
-              line: nameTok.line,
-              column: nameTok.column,
-              scope: scopeStack.length > 0 ? scopeStack[scopeStack.length - 1].name : void 0,
-              parameters: params.names,
-              isLocal: true,
-              description: desc
-            };
-            symbols.push(sym);
-            for (const pName of params.names) {
-              symbols.push({
-                name: pName,
-                kind: "parameter",
-                line: nameTok.line,
-                column: nameTok.column,
-                scope: nameTok.value,
-                isLocal: true
-              });
-            }
-            scopeStack.push({ name: nameTok.value, startLine: nameTok.line, kind: "function" });
-          }
-          continue;
-        }
-        if (peek()?.type === 1 /* Identifier */) {
-          const nameTok = advance();
-          if (match(5 /* Operator */, "=")) {
-            advance();
-            if (peek()?.type === 1 /* Identifier */ && peek()?.value === "require") {
-              advance();
-              if (match(6 /* Punctuation */, "(")) {
-                advance();
-                if (peek()?.type === 2 /* String */) {
-                  const strTok = advance();
-                  const modPath = strTok.value.slice(1, -1);
-                  requires.push({
-                    modulePath: modPath,
-                    localName: nameTok.value,
-                    line: nameTok.line,
-                    column: nameTok.column
-                  });
-                }
-              }
-            }
-            if (peek()?.type === 6 /* Punctuation */ && peek()?.value === "{") {
-              symbols.push({
-                name: nameTok.value,
-                kind: "table",
-                line: nameTok.line,
-                column: nameTok.column,
-                scope: scopeStack.length > 0 ? scopeStack[scopeStack.length - 1].name : void 0,
-                isLocal: true,
-                description: getPrecedingComment(nameTok.line)
-              });
-              continue;
-            }
-          }
-          symbols.push({
-            name: nameTok.value,
-            kind: "local",
-            line: nameTok.line,
-            column: nameTok.column,
-            scope: scopeStack.length > 0 ? scopeStack[scopeStack.length - 1].name : void 0,
-            isLocal: true,
-            description: getPrecedingComment(nameTok.line)
-          });
-          while (match(6 /* Punctuation */, ",")) {
-            advance();
-            if (peek()?.type === 1 /* Identifier */) {
-              const extraTok = advance();
-              symbols.push({
-                name: extraTok.value,
-                kind: "local",
-                line: extraTok.line,
-                column: extraTok.column,
-                scope: scopeStack.length > 0 ? scopeStack[scopeStack.length - 1].name : void 0,
-                isLocal: true
-              });
-            }
-          }
-        }
-        continue;
-      }
-      if (match(0 /* Keyword */, "function")) {
-        const funcTok = advance();
-        if (peek()?.type === 1 /* Identifier */) {
-          const nameTok = advance();
-          let fullName = nameTok.value;
-          let isMethod = false;
-          let objectType;
-          while (true) {
-            if (match(6 /* Punctuation */, ".")) {
-              advance();
-              if (peek()?.type === 1 /* Identifier */) {
-                fullName += "." + advance().value;
-              }
-            } else if (match(6 /* Punctuation */, ":")) {
-              advance();
-              isMethod = true;
-              objectType = fullName;
-              if (peek()?.type === 1 /* Identifier */) {
-                const methTok = advance();
-                fullName += ":" + methTok.value;
-              }
-            } else {
-              break;
-            }
-          }
-          const params = this.parseParamList(toks, i);
-          i = params.nextIndex;
-          const lastDot = fullName.lastIndexOf(".");
-          const lastColon = fullName.lastIndexOf(":");
-          const sep3 = Math.max(lastDot, lastColon);
-          const shortName = sep3 >= 0 ? fullName.slice(sep3 + 1) : fullName;
-          const sym = {
-            name: shortName,
-            kind: isMethod ? "method" : "function",
-            line: funcTok.line,
-            column: funcTok.column,
-            scope: scopeStack.length > 0 ? scopeStack[scopeStack.length - 1].name : void 0,
-            type: objectType,
-            parameters: params.names,
-            isLocal: false,
-            description: getPrecedingComment(funcTok.line)
-          };
-          symbols.push(sym);
-          if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
-            callbacks.push(sym);
-          }
-          for (const pName of params.names) {
-            symbols.push({
-              name: pName,
-              kind: "parameter",
-              line: funcTok.line,
-              column: funcTok.column,
-              scope: shortName,
-              isLocal: true
-            });
-          }
-          scopeStack.push({ name: shortName, startLine: funcTok.line, kind: "function" });
-          continue;
-        }
-        scopeStack.push({ name: "<anonymous>", startLine: funcTok.line, kind: "function" });
-        if (match(6 /* Punctuation */, "(")) {
-          const params = this.parseParamList(toks, i);
-          i = params.nextIndex;
-        }
-        continue;
-      }
-      if (cur.type === 1 /* Identifier */) {
-        const startIdx = i;
-        let fullName = cur.value;
-        let tempI = i + 1;
-        let isColon = false;
-        while (tempI < toks.length) {
-          if (toks[tempI]?.value === "." && toks[tempI + 1]?.type === 1 /* Identifier */) {
-            fullName += "." + toks[tempI + 1].value;
-            tempI += 2;
-          } else if (toks[tempI]?.value === ":" && toks[tempI + 1]?.type === 1 /* Identifier */) {
-            fullName += ":" + toks[tempI + 1].value;
-            isColon = true;
-            tempI += 2;
-          } else {
-            break;
-          }
-        }
-        if (tempI < toks.length && toks[tempI]?.value === "=") {
-          const eqIdx = tempI;
-          const afterEq = toks[eqIdx + 1];
-          if (afterEq?.type === 0 /* Keyword */ && afterEq.value === "function") {
-            i = eqIdx + 2;
-            const params = this.parseParamList(toks, i);
-            i = params.nextIndex;
-            const lastDot = fullName.lastIndexOf(".");
-            const shortName = lastDot >= 0 ? fullName.slice(lastDot + 1) : fullName;
-            const sym = {
-              name: shortName,
-              kind: "function",
-              line: cur.line,
-              column: cur.column,
-              parameters: params.names,
-              isLocal: false,
-              description: getPrecedingComment(cur.line)
-            };
-            symbols.push(sym);
-            if (fullName.startsWith("lurek.") && LUREK_CALLBACK_NAMES.has(shortName)) {
-              callbacks.push(sym);
-            }
-            for (const pName of params.names) {
-              symbols.push({
-                name: pName,
-                kind: "parameter",
-                line: cur.line,
-                column: cur.column,
-                scope: shortName,
-                isLocal: true
-              });
-            }
-            scopeStack.push({ name: shortName, startLine: cur.line, kind: "function" });
-            continue;
-          }
-          if (fullName.endsWith(".__index") && afterEq?.type === 1 /* Identifier */) {
-            i = eqIdx + 2;
-            continue;
-          }
-        }
-        advance();
-        continue;
-      }
-      if (cur.type === 0 /* Keyword */) {
-        if (cur.value === "do") {
-          scopeStack.push({ name: "do", startLine: cur.line, kind: "do" });
-          advance();
-          continue;
-        }
-        if (cur.value === "if" || cur.value === "elseif") {
-          if (cur.value === "if") {
-            scopeStack.push({ name: "if", startLine: cur.line, kind: "if" });
-          }
-          advance();
-          continue;
-        }
-        if (cur.value === "for") {
-          scopeStack.push({ name: "for", startLine: cur.line, kind: "for" });
-          advance();
-          continue;
-        }
-        if (cur.value === "while") {
-          scopeStack.push({ name: "while", startLine: cur.line, kind: "while" });
-          advance();
-          continue;
-        }
-        if (cur.value === "repeat") {
-          scopeStack.push({ name: "repeat", startLine: cur.line, kind: "repeat" });
-          advance();
-          continue;
-        }
-        if (cur.value === "end" || cur.value === "until") {
-          const popped = scopeStack.pop();
-          if (popped) {
-            scopes.push({
-              name: popped.name,
-              startLine: popped.startLine,
-              endLine: cur.line,
-              kind: popped.kind
-            });
-            for (let s = symbols.length - 1; s >= 0; s--) {
-              if (symbols[s].kind === "function" && symbols[s].name === popped.name && symbols[s].line === popped.startLine) {
-                symbols[s].endLine = cur.line;
-                break;
-              }
-            }
-          }
-          advance();
-          continue;
-        }
-      }
-      advance();
-    }
-    const lastLine = text.split("\n").length - 1;
-    while (scopeStack.length > 0) {
-      const popped = scopeStack.pop();
-      scopes.push({ name: popped.name, startLine: popped.startLine, endLine: lastLine, kind: popped.kind });
-    }
-    const baseInfo = {
-      symbols,
-      requires,
-      callbacks,
-      scopes,
-      comments,
-      classes: []
-    };
-    baseInfo.classes = this.detectClasses(baseInfo);
-    return baseInfo;
-  }
-  // ── Position-based queries ─────────────────────────────────
-  getSymbolAt(info, line, column) {
-    for (const sym of info.symbols) {
-      if (sym.line === line && column >= sym.column && column < sym.column + sym.name.length) {
-        return sym;
-      }
-    }
-    return void 0;
-  }
-  getScopeAt(info, line) {
-    let best;
-    for (const scope of info.scopes) {
-      if (line >= scope.startLine && line <= scope.endLine) {
-        if (!best || scope.startLine > best.startLine) {
-          best = scope;
-        }
-      }
-    }
-    return best;
-  }
-  findReferencesInDocument(text, symbolName) {
-    const results = [];
-    const tokens = this.tokenize(text);
-    for (const tok of tokens) {
-      if (tok.type === 1 /* Identifier */ && tok.value === symbolName) {
-        results.push({ line: tok.line, column: tok.column });
-      }
-    }
-    return results;
-  }
-  getVisibleLocals(info, line) {
-    const scope = this.getScopeAt(info, line);
-    return info.symbols.filter((sym) => {
-      if (!sym.isLocal) return false;
-      if (sym.line > line) return false;
-      if (sym.scope && scope) {
-        return sym.scope === scope.name || !sym.scope;
-      }
-      return true;
-    });
-  }
-  detectClasses(info) {
-    const classes = [];
-    const classNames = /* @__PURE__ */ new Set();
-    for (const sym of info.symbols) {
-      if (sym.kind === "method" && sym.type) {
-        classNames.add(sym.type);
-      }
-    }
-    for (const name of classNames) {
-      const methods = info.symbols.filter((s) => s.kind === "method" && s.type === name);
-      const fields = info.symbols.filter((s) => s.kind === "field" && s.scope === name).map((s) => s.name);
-      const firstMethod = methods[0];
-      if (firstMethod) {
-        classes.push({
-          name,
-          methods,
-          fields,
-          line: firstMethod.line
-        });
-      }
-    }
-    return classes;
-  }
-  getWordAtPosition(text, line, column) {
-    const lines = text.split("\n");
-    if (line < 0 || line >= lines.length) return "";
-    const lineText = lines[line];
-    if (column < 0 || column >= lineText.length) return "";
-    let start = column;
-    let end = column;
-    while (start > 0 && isIdentPart(lineText[start - 1])) start--;
-    while (end < lineText.length && isIdentPart(lineText[end])) end++;
-    while (start > 0 && (lineText[start - 1] === "." || lineText[start - 1] === ":")) {
-      start--;
-      while (start > 0 && isIdentPart(lineText[start - 1])) start--;
-    }
-    return lineText.slice(start, end);
-  }
-  getFunctionCallContext(text, line, column) {
-    const lines = text.split("\n");
-    if (line < 0 || line >= lines.length) return void 0;
-    const lineText = lines[line];
-    let parenDepth = 0;
-    let paramIndex = 0;
-    let searchLine = line;
-    let searchCol = Math.min(column, lineText.length) - 1;
-    while (searchLine >= 0) {
-      const sLine = lines[searchLine];
-      const startCol = searchLine === line ? searchCol : sLine.length - 1;
-      for (let c = startCol; c >= 0; c--) {
-        const ch = sLine[c];
-        if (ch === ")") {
-          parenDepth++;
-          continue;
-        }
-        if (ch === "(") {
-          if (parenDepth === 0) {
-            let nameEnd = c - 1;
-            while (nameEnd >= 0 && sLine[nameEnd] === " ") nameEnd--;
-            let nameStart = nameEnd;
-            while (nameStart > 0 && (isIdentPart(sLine[nameStart - 1]) || sLine[nameStart - 1] === "." || sLine[nameStart - 1] === ":")) {
-              nameStart--;
-            }
-            const funcName = sLine.slice(nameStart, nameEnd + 1);
-            if (funcName.length > 0) {
-              return { functionName: funcName, paramIndex };
-            }
-            return void 0;
-          }
-          parenDepth--;
-          continue;
-        }
-        if (ch === "," && parenDepth === 0) {
-          paramIndex++;
-        }
-      }
-      searchLine--;
-      if (searchLine >= 0) {
-        searchCol = lines[searchLine].length - 1;
-      }
-    }
-    return void 0;
-  }
-  isInsideString(text, line, column) {
-    const tokens = this.tokenize(text);
-    for (const tok of tokens) {
-      if (tok.type !== 2 /* String */) continue;
-      const endLine = tok.line + countNewlines(tok.value);
-      if (tok.line === endLine) {
-        if (tok.line === line && column >= tok.column && column < tok.column + tok.length) {
-          return true;
-        }
-      } else {
-        if (line > tok.line && line < endLine) return true;
-        if (line === tok.line && column >= tok.column) return true;
-        if (line === endLine) {
-          const lastNl = tok.value.lastIndexOf("\n");
-          const endCol = tok.value.length - lastNl - 1;
-          if (column < endCol) return true;
-        }
-      }
-    }
-    return false;
-  }
-  isInsideComment(text, line, column) {
-    const tokens = this.tokenize(text);
-    for (const tok of tokens) {
-      if (tok.type !== 4 /* Comment */) continue;
-      const endLine = tok.line + countNewlines(tok.value);
-      if (tok.line === endLine) {
-        if (tok.line === line && column >= tok.column) return true;
-      } else {
-        if (line > tok.line && line < endLine) return true;
-        if (line === tok.line && column >= tok.column) return true;
-        if (line === endLine) {
-          const lastNl = tok.value.lastIndexOf("\n");
-          const endCol = tok.value.length - lastNl - 1;
-          if (column < endCol) return true;
-        }
-      }
-    }
-    return false;
-  }
-  // ── Internal helpers ───────────────────────────────────────
-  countLongBracketLevel(text, pos) {
-    if (text[pos] !== "[") return -1;
-    let level = 0;
-    let p = pos + 1;
-    while (p < text.length && text[p] === "=") {
-      level++;
-      p++;
-    }
-    if (p < text.length && text[p] === "[") return level;
-    return -1;
-  }
-  parseParamList(toks, startIndex) {
-    const names = [];
-    let i = startIndex;
-    if (i >= toks.length || toks[i]?.value !== "(") return { names, nextIndex: i };
-    i++;
-    while (i < toks.length && toks[i]?.value !== ")") {
-      if (toks[i]?.type === 1 /* Identifier */) {
-        names.push(toks[i].value);
-      } else if (toks[i]?.value === "...") {
-        names.push("...");
-      }
-      i++;
-    }
-    if (i < toks.length && toks[i]?.value === ")") i++;
-    return { names, nextIndex: i };
-  }
-};
-function isDigit(ch) {
-  return ch >= "0" && ch <= "9";
-}
-function isHexDigit(ch) {
-  return isDigit(ch) || ch >= "a" && ch <= "f" || ch >= "A" && ch <= "F";
-}
-function isIdentStart(ch) {
-  return ch >= "a" && ch <= "z" || ch >= "A" && ch <= "Z" || ch === "_";
-}
-function isIdentPart(ch) {
-  return isIdentStart(ch) || isDigit(ch);
-}
-function countNewlines(text) {
-  let count = 0;
-  for (let i = 0; i < text.length; i++) {
-    if (text[i] === "\n") count++;
-  }
-  return count;
-}
-
-// src/providers/diagnostics.ts
-var analyzer = new LuaDocumentAnalyzer();
-function register2(context, apiData2) {
-  const collection = vscode5.languages.createDiagnosticCollection("lurek");
-  context.subscriptions.push(collection);
-  const debounceTimers = /* @__PURE__ */ new Map();
-  const docVersions = /* @__PURE__ */ new Map();
-  const diagnose = (document) => {
-    if (document.languageId !== "lua") return;
-    const key = document.uri.toString();
-    const currentVersion = document.version;
-    docVersions.set(key, currentVersion);
-    try {
-      if (docVersions.get(key) !== currentVersion) return;
-      const text = document.getText();
-      const info = analyzer.analyze(text);
-      const diagnostics = [];
-      diagnostics.push(...checkDeprecated(text, apiData2));
-      diagnostics.push(...checkColorRange(text));
-      checkAssetNotFound(text, document, diagnostics);
-      diagnostics.push(...checkThreadRandom(text, info));
-      diagnostics.push(...checkMissingCallback(text, document, info));
-      diagnostics.push(...checkWrongEnumValue(text, apiData2));
-      checkConfLua(text, document, diagnostics);
-      const relPath = vscode5.workspace.asRelativePath(document.uri.fsPath, false);
-      if (!relPath.startsWith("content/examples/") && !relPath.startsWith("content\\examples\\")) {
-        diagnostics.push(...checkPerFrameAllocation(text, info, apiData2));
-      }
-      diagnostics.push(...checkMissingTestSummary(text, document));
-      diagnostics.push(...checkEntityNilAccess(text));
-      collection.set(document.uri, diagnostics);
-    } catch {
-    }
-  };
-  const debouncedDiagnose = (document) => {
-    const key = document.uri.toString();
-    const version = document.version;
-    docVersions.set(key, version);
-    const existing = debounceTimers.get(key);
-    if (existing) clearTimeout(existing);
-    debounceTimers.set(key, setTimeout(() => {
-      debounceTimers.delete(key);
-      if (docVersions.get(key) === version) {
-        diagnose(document);
-      }
-    }, 800));
-  };
-  context.subscriptions.push(
-    // NOTE: Do NOT use onDidOpenTextDocument here.
-    // Many internal providers (symbols, references, requireGraph) open documents
-    // programmatically via openTextDocument() — that fires onDidOpenTextDocument for
-    // every file they scan, causing diagnostics to run on 200+ files per query.
-    // Instead, only run diagnostics on documents visible in the editor.
-    vscode5.window.onDidChangeVisibleTextEditors((editors) => {
-      for (const editor of editors) {
-        diagnose(editor.document);
-      }
-    }),
-    vscode5.workspace.onDidSaveTextDocument(diagnose),
-    vscode5.workspace.onDidChangeTextDocument((e) => debouncedDiagnose(e.document)),
-    vscode5.workspace.onDidCloseTextDocument((doc) => {
-      collection.delete(doc.uri);
-      const key = doc.uri.toString();
-      const timer = debounceTimers.get(key);
-      if (timer) {
-        clearTimeout(timer);
-        debounceTimers.delete(key);
-      }
-    })
-  );
-  for (const editor of vscode5.window.visibleTextEditors) {
-    diagnose(editor.document);
-  }
-}
-function checkDeprecated(text, apiData2) {
-  const diagnostics = [];
-  const deprecatedFns = apiData2.getAllFunctions().filter((f) => f.deprecated);
-  if (deprecatedFns.length === 0) return diagnostics;
-  const lines = text.split("\n");
-  for (const fn of deprecatedFns) {
-    const escaped = fn.fullPath.replace(/\./g, "\\.");
-    const regex = new RegExp(escaped, "g");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.trimStart().startsWith("--")) continue;
-      let match;
-      while ((match = regex.exec(line)) !== null) {
-        const range = new vscode5.Range(i, match.index, i, match.index + fn.fullPath.length);
-        const diag = new vscode5.Diagnostic(
-          range,
-          `${fn.fullPath} is deprecated. ${fn.deprecated}`,
-          vscode5.DiagnosticSeverity.Warning
-        );
-        diag.code = "lurek.deprecated";
-        diag.source = "Lurek2D Toolkit";
-        diag.tags = [vscode5.DiagnosticTag.Deprecated];
-        diagnostics.push(diag);
-      }
-    }
-  }
-  return diagnostics;
-}
-function checkColorRange(text) {
-  const diagnostics = [];
-  const lines = text.split("\n");
-  const colorFuncPattern = /lurek\.render\.(?:setColor|setBackgroundColor|clear)\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/g;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].split("--", 1)[0];
-    if (line.trimStart().startsWith("--")) continue;
-    let match;
-    while ((match = colorFuncPattern.exec(line)) !== null) {
-      const vals = [parseFloat(match[1]), parseFloat(match[2]), parseFloat(match[3])];
-      if (match[4] !== void 0) vals.push(parseFloat(match[4]));
-      const hasLargeValue = vals.some((v) => v > 1);
-      if (!hasLargeValue) continue;
-      const converted = vals.slice(0, 3).map((v) => (v / 255).toFixed(2));
-      const range = new vscode5.Range(i, match.index, i, match.index + match[0].length);
-      const diag = new vscode5.Diagnostic(
-        range,
-        `Color values should be in 0-1 range. Did you mean ${converted.join(", ")}?`,
-        vscode5.DiagnosticSeverity.Warning
-      );
-      diag.code = "lurek.colorRange";
-      diag.source = "Lurek2D Toolkit";
-      diagnostics.push(diag);
-    }
-  }
-  return diagnostics;
-}
-function checkAssetNotFound(text, document, diagnostics) {
-  if (!vscode5.workspace.workspaceFolders?.length) return;
-  const relPath = vscode5.workspace.asRelativePath(document.uri.fsPath, false);
-  if (relPath.startsWith("content/examples/") || relPath.startsWith("content\\examples\\")) return;
-  const lines = text.split("\n");
-  const assetFuncPattern = /lurek\.(?:render\.newImage|audio\.newSource|fs\.read)\s*\(\s*["']([^"']+)["']/g;
-  const docDir = path7.dirname(document.uri.fsPath);
-  const wsRoot = vscode5.workspace.workspaceFolders[0].uri.fsPath;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trimStart().startsWith("--")) continue;
-    let match;
-    while ((match = assetFuncPattern.exec(line)) !== null) {
-      const assetPath = match[1];
-      if (assetPath.includes("://") || !assetPath.includes(".")) continue;
-      const candidates = [
-        path7.resolve(docDir, assetPath),
-        path7.resolve(wsRoot, assetPath)
-      ];
-      const exists = candidates.some((c) => {
-        try {
-          return fs6.existsSync(c);
-        } catch {
-          return false;
-        }
-      });
-      if (!exists) {
-        const strStart = line.indexOf(assetPath, match.index);
-        const range = new vscode5.Range(i, strStart, i, strStart + assetPath.length);
-        const diag = new vscode5.Diagnostic(
-          range,
-          `Asset file '${assetPath}' not found in workspace`,
-          vscode5.DiagnosticSeverity.Warning
-        );
-        diag.code = "lurek.assetNotFound";
-        diag.source = "Lurek2D Toolkit";
-        diagnostics.push(diag);
-      }
-    }
-  }
-}
-function checkThreadRandom(text, info) {
-  const diagnostics = [];
-  if (!text.includes("lurek.thread")) return diagnostics;
-  const lines = text.split("\n");
-  const randomPattern = /\bmath\.random\s*\(/g;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trimStart().startsWith("--")) continue;
-    let match;
-    while ((match = randomPattern.exec(line)) !== null) {
-      const scope = analyzer.getScopeAt(info, i);
-      if (!scope) continue;
-      const scopeLines = lines.slice(scope.startLine, scope.endLine + 1).join("\n");
-      if (!scopeLines.includes("lurek.thread")) continue;
-      const range = new vscode5.Range(i, match.index, i, match.index + "math.random".length);
-      const diag = new vscode5.Diagnostic(
-        range,
-        "math.random in threads may produce identical sequences. Consider seeding with thread ID.",
-        vscode5.DiagnosticSeverity.Information
-      );
-      diag.code = "lurek.threadRandom";
-      diag.source = "Lurek2D Toolkit";
-      diagnostics.push(diag);
-    }
-  }
-  return diagnostics;
-}
-function checkMissingCallback(text, document, info) {
-  const diagnostics = [];
-  const fileName = path7.basename(document.uri.fsPath);
-  if (fileName !== "main.lua") return diagnostics;
-  const filePath = document.uri.fsPath.replace(/\\/g, "/");
-  if (!filePath.includes("/content/games/")) return diagnostics;
-  const processName = LUREK_CALLBACK_NAMES.has("process") ? "process" : "update";
-  const drawName = "draw";
-  const hasProcess = info.callbacks.some((cb) => cb.name === processName) || new RegExp(`lurek\\.${processName}\\s*=\\s*function`).test(text);
-  const hasDraw = info.callbacks.some((cb) => cb.name === drawName) || /lurek\.draw\s*=\s*function/.test(text);
-  if (!hasProcess && !hasDraw) {
-    const lines = text.split("\n");
-    const range = new vscode5.Range(0, 0, 0, lines[0]?.length ?? 0);
-    const diag = new vscode5.Diagnostic(
-      range,
-      `main.lua should define lurek.${processName}(dt) and/or lurek.${drawName}()`,
-      vscode5.DiagnosticSeverity.Information
-    );
-    diag.code = "lurek.missingCallback";
-    diag.source = "Lurek2D Toolkit";
-    diagnostics.push(diag);
-  }
-  return diagnostics;
-}
-var ENUM_RULES = [
-  {
-    // lurek.render.* is the current draw API namespace
-    pattern: /lurek\.render\.(?:rectangle|circle|arc|polygon|ellipse)\s*\(\s*["']([^"']+)["']/g,
-    valid: ["fill", "line"],
-    label: "draw mode"
-  },
-  {
-    pattern: /lurek\.render\.setBlendMode\s*\(\s*["']([^"']+)["']/g,
-    valid: ["alpha", "add", "subtract", "multiply", "replace", "screen", "darken", "lighten", "none"],
-    label: "blend mode"
-  },
-  {
-    pattern: /lurek\.render\.setLineStyle\s*\(\s*["']([^"']+)["']/g,
-    valid: ["smooth", "rough"],
-    label: "line style"
-  },
-  {
-    pattern: /lurek\.render\.setFilter\s*\([^,]*,\s*["']([^"']+)["']/g,
-    valid: ["linear", "nearest"],
-    label: "texture filter"
-  },
-  {
-    pattern: /lurek\.render\.setFilter\s*\(\s*["']([^"']+)["']/g,
-    valid: ["linear", "nearest"],
-    label: "texture filter"
-  },
-  {
-    pattern: /lurek\.audio\.newSource\s*\([^,]*,\s*["']([^"']+)["']/g,
-    valid: ["static", "stream"],
-    label: "audio source type"
-  },
-  {
-    pattern: /lurek\.physics\.newBody\s*\([^,]*,[^,]*,[^,]*,\s*["']([^"']+)["']/g,
-    valid: ["dynamic", "static", "kinematic"],
-    label: "body type"
-  },
-  {
-    pattern: /lurek\.render\.printf\s*\([^)]*,[^)]*,[^)]*,[^)]*,\s*["']([^"']+)["']/g,
-    valid: ["left", "center", "right", "justify"],
-    label: "text alignment"
-  }
-];
-function fuzzyMatch(word, candidates) {
-  for (const c of candidates) {
-    if (c === word) return void 0;
-    if (Math.abs(c.length - word.length) <= 2) {
-      let diff = 0;
-      const len = Math.max(c.length, word.length);
-      for (let i = 0; i < len; i++) {
-        if ((c[i] ?? "") !== (word[i] ?? "")) diff++;
-      }
-      if (diff <= 2) return c;
-    }
-  }
-  return void 0;
-}
-function checkWrongEnumValue(text, _apiData) {
-  const diagnostics = [];
-  const lines = text.split("\n");
-  for (const rule of ENUM_RULES) {
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.trimStart().startsWith("--")) continue;
-      rule.pattern.lastIndex = 0;
-      let m;
-      while ((m = rule.pattern.exec(line)) !== null) {
-        const value = m[1];
-        if (rule.valid.includes(value)) continue;
-        const suggestion = fuzzyMatch(value, rule.valid);
-        const valueStart = line.indexOf(`"${value}"`, m.index) !== -1 ? line.indexOf(`"${value}"`, m.index) + 1 : line.indexOf(`'${value}'`, m.index) + 1;
-        const range = new vscode5.Range(i, valueStart, i, valueStart + value.length);
-        const msg = suggestion ? `Unknown ${rule.label} "${value}". Did you mean "${suggestion}"? Valid: ${rule.valid.join(", ")}` : `Unknown ${rule.label} "${value}". Valid values: ${rule.valid.join(", ")}`;
-        const diag = new vscode5.Diagnostic(range, msg, vscode5.DiagnosticSeverity.Warning);
-        diag.code = "lurek.wrongEnumValue";
-        diag.source = "Lurek2D Toolkit";
-        diagnostics.push(diag);
-      }
-    }
-  }
-  return diagnostics;
-}
-var VALID_CONF_KEYS = {
-  window: [
-    "title",
-    "width",
-    "height",
-    "vsync",
-    "fullscreen",
-    "resizable",
-    "highdpi",
-    "minwidth",
-    "minheight",
-    "x",
-    "y",
-    "borderless",
-    "displayindex",
-    "icon"
-  ],
-  performance: ["target_fps", "fixed_dt"],
-  modules: [
-    "physics",
-    "audio",
-    "graphics",
-    "input",
-    "timer",
-    "filesystem",
-    "math",
-    "thread"
-  ],
-  log: ["file", "append", "level"]
-};
-function checkConfLua(text, document, diagnostics) {
-  if (path7.basename(document.uri.fsPath) !== "conf.lua") return;
-  const lines = text.split("\n");
-  const keyPattern = /\bt\.(\w+)\.(\w+)\s*=/g;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trimStart().startsWith("--")) continue;
-    keyPattern.lastIndex = 0;
-    let m;
-    while ((m = keyPattern.exec(line)) !== null) {
-      const section = m[1];
-      const key = m[2];
-      const validKeys = VALID_CONF_KEYS[section];
-      if (!validKeys) continue;
-      if (validKeys.includes(key)) continue;
-      const col = m.index + `t.${section}.`.length;
-      const range = new vscode5.Range(i, col, i, col + key.length);
-      const diag = new vscode5.Diagnostic(
-        range,
-        `"${key}" is not a recognised conf.lua key in t.${section}. Valid: ${validKeys.join(", ")}`,
-        vscode5.DiagnosticSeverity.Warning
-      );
-      diag.code = "lurek.confKey";
-      diag.source = "Lurek2D Toolkit";
-      diagnostics.push(diag);
-    }
-  }
-}
-function checkPerFrameAllocation(text, info, apiData2) {
-  const diagnostics = [];
-  const lines = text.split("\n");
-  const allocPattern = /lurek\.(?:render\.(?:newImage|newFont|newCanvas|newShader)|audio\.(?:newSource)|image\.load)\s*\(/g;
-  const frameCallbacks = apiData2.getCallbacks().map((cb) => cb.name).filter((n) => ["process", "process_late", "process_physics", "fixedUpdate", "draw", "draw_ui"].includes(n));
-  if (frameCallbacks.length === 0) frameCallbacks.push("process", "process_late", "process_physics", "draw", "draw_ui");
-  function enclosingLurekCallback(lineIndex) {
-    for (let j = lineIndex; j >= 0; j--) {
-      const callbackMatch = lines[j].match(/function\s+lurek\.([A-Za-z_][\w]*)\s*\(/) || lines[j].match(/lurek\.([A-Za-z_][\w]*)\s*=\s*function\s*\(/);
-      if (callbackMatch) return callbackMatch[1];
-    }
-    return void 0;
-  }
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trimStart().startsWith("--")) continue;
-    allocPattern.lastIndex = 0;
-    let m;
-    while ((m = allocPattern.exec(line)) !== null) {
-      const callbackName = enclosingLurekCallback(i);
-      if (!callbackName || !frameCallbacks.includes(callbackName)) continue;
-      const funcName = m[0].replace(/\s*\($/, "");
-      const range = new vscode5.Range(i, m.index, i, m.index + funcName.length);
-      const diag = new vscode5.Diagnostic(
-        range,
-        `${funcName} called inside a per-frame callback. This allocates every frame \u2014 move to lurek.init() or lurek.ready().`,
-        vscode5.DiagnosticSeverity.Warning
-      );
-      diag.code = "lurek.perFrameAlloc";
-      diag.source = "Lurek2D Toolkit";
-      diagnostics.push(diag);
-    }
-  }
-  return diagnostics;
-}
-function checkMissingTestSummary(text, document) {
-  const diagnostics = [];
-  const filePath = document.uri.fsPath.replace(/\\/g, "/");
-  if (!filePath.includes("tests/lua/") && !filePath.includes("tests\\lua\\")) return diagnostics;
-  if (!filePath.endsWith(".lua")) return diagnostics;
-  if (filePath.endsWith("init.lua")) return diagnostics;
-  const hasTestSummary = /\btest_summary\s*\(\s*\)/.test(text);
-  if (!hasTestSummary) {
-    const lines = text.split("\n");
-    const lastLine = lines.length - 1;
-    const range = new vscode5.Range(lastLine, 0, lastLine, lines[lastLine]?.length ?? 0);
-    const diag = new vscode5.Diagnostic(
-      range,
-      "Lua test file is missing test_summary() call at the end. Required by the Lurek2D test harness.",
-      vscode5.DiagnosticSeverity.Warning
-    );
-    diag.code = "lurek.missingTestSummary";
-    diag.source = "Lurek2D Toolkit";
-    diagnostics.push(diag);
-  }
-  return diagnostics;
-}
-function checkEntityNilAccess(text) {
-  const diagnostics = [];
-  const lines = text.split("\n");
-  const findPattern = /\blocal\s+(\w+)\s*=\s*lurek\.entity\.find\s*\(/g;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (line.trimStart().startsWith("--")) continue;
-    findPattern.lastIndex = 0;
-    let m;
-    while ((m = findPattern.exec(line)) !== null) {
-      const varName = m[1];
-      let hasGuard = false;
-      for (let j = i + 1; j < Math.min(i + 6, lines.length); j++) {
-        const checkLine = lines[j].trim();
-        if (checkLine.startsWith("--")) continue;
-        if (checkLine.includes(`if ${varName}`) || checkLine.includes(`if not ${varName}`)) {
-          hasGuard = true;
-          break;
-        }
-        const accessPattern = new RegExp(`\\b${varName}\\s*[:.:]\\s*\\w+`);
-        if (accessPattern.test(checkLine) && !hasGuard) {
-          const col = checkLine.indexOf(varName);
-          const range = new vscode5.Range(j, col, j, col + varName.length);
-          const diag = new vscode5.Diagnostic(
-            range,
-            `'${varName}' from lurek.ecs.find() may be nil. Consider adding: if ${varName} then`,
-            vscode5.DiagnosticSeverity.Information
-          );
-          diag.code = "lurek.entityNilAccess";
-          diag.source = "Lurek2D Toolkit";
-          diagnostics.push(diag);
-          break;
-        }
-      }
-    }
-  }
-  return diagnostics;
-}
-
-// src/providers/color.ts
-var vscode6 = __toESM(require("vscode"));
-var LUA_SELECTOR2 = { scheme: "file", language: "lua" };
-var COLOR_FUNCTIONS = ["setColor", "setBackgroundColor", "clear", "newColor"];
-function register3(context, apiData2) {
-  const provider = vscode6.languages.registerColorProvider(LUA_SELECTOR2, {
-    provideDocumentColors(document) {
-      try {
-        return detectColors(document);
-      } catch {
-        return [];
-      }
-    },
-    provideColorPresentations(color, colorContext) {
-      try {
-        return createPresentations(color, colorContext);
-      } catch {
-        return [];
-      }
-    }
-  });
-  context.subscriptions.push(provider);
-}
-var COLOR_CALL_PATTERN = new RegExp(
-  `lurek\\.graphics\\.(?:${COLOR_FUNCTIONS.join("|")})\\s*\\(\\s*([\\d.]+)\\s*,\\s*([\\d.]+)\\s*,\\s*([\\d.]+)(?:\\s*,\\s*([\\d.]+))?\\s*\\)`,
-  "g"
-);
-function detectColors(document) {
-  const colors = [];
-  const text = document.getText();
-  const pattern = new RegExp(COLOR_CALL_PATTERN.source, "g");
-  let match;
-  while ((match = pattern.exec(text)) !== null) {
-    const r = parseFloat(match[1]);
-    const g = parseFloat(match[2]);
-    const b = parseFloat(match[3]);
-    const a = match[4] !== void 0 ? parseFloat(match[4]) : 1;
-    if (r > 1 || g > 1 || b > 1 || a > 1) continue;
-    const fullMatchText = match[0];
-    const argsStart = fullMatchText.indexOf("(") + 1;
-    const argsEnd = fullMatchText.lastIndexOf(")");
-    const argsOffset = match.index + argsStart;
-    const argsLen = argsEnd - argsStart;
-    const startPos = document.positionAt(argsOffset);
-    const endPos = document.positionAt(argsOffset + argsLen);
-    const range = new vscode6.Range(startPos, endPos);
-    colors.push(new vscode6.ColorInformation(range, new vscode6.Color(r, g, b, a)));
-  }
-  return colors;
-}
-function createPresentations(color, colorContext) {
-  const r = formatComponent(color.red);
-  const g = formatComponent(color.green);
-  const b = formatComponent(color.blue);
-  const a = formatComponent(color.alpha);
-  const presentations = [];
-  const withAlpha = new vscode6.ColorPresentation(`${r}, ${g}, ${b}, ${a}`);
-  withAlpha.textEdit = new vscode6.TextEdit(colorContext.range, `${r}, ${g}, ${b}, ${a}`);
-  presentations.push(withAlpha);
-  if (Math.abs(color.alpha - 1) < 5e-3) {
-    const noAlpha = new vscode6.ColorPresentation(`${r}, ${g}, ${b}`);
-    noAlpha.textEdit = new vscode6.TextEdit(colorContext.range, `${r}, ${g}, ${b}`);
-    presentations.push(noAlpha);
-  }
-  const hexR = Math.round(color.red * 255).toString(16).padStart(2, "0");
-  const hexG = Math.round(color.green * 255).toString(16).padStart(2, "0");
-  const hexB = Math.round(color.blue * 255).toString(16).padStart(2, "0");
-  const hexPresentation = new vscode6.ColorPresentation(`${r}, ${g}, ${b} --[[ #${hexR}${hexG}${hexB} ]]`);
-  hexPresentation.textEdit = new vscode6.TextEdit(
-    colorContext.range,
-    `${r}, ${g}, ${b} --[[ #${hexR}${hexG}${hexB} ]]`
-  );
-  presentations.push(hexPresentation);
-  return presentations;
-}
-function formatComponent(value) {
-  return value.toFixed(2).replace(/\.?0+$/, "") || "0";
-}
-
-// src/providers/assetPath.ts
-var vscode7 = __toESM(require("vscode"));
-var path8 = __toESM(require("path"));
-var LUA_SELECTOR3 = { scheme: "file", language: "lua" };
-var analyzer2 = new LuaDocumentAnalyzer();
-var ASSET_FUNC_EXTENSIONS = {
-  "lurek.graphics.newImage": [".png", ".jpg", ".jpeg", ".bmp", ".gif"],
-  "lurek.audio.newSource": [".ogg", ".wav", ".mp3", ".flac"],
-  "lurek.filesystem.read": [],
-  "lurek.filesystem.write": [],
-  "lurek.filesystem.exists": []
-};
-var LUA_EXTENSIONS = [".lua"];
-function register4(context, apiData2) {
-  const provider = vscode7.languages.registerCompletionItemProvider(
-    LUA_SELECTOR3,
-    {
-      async provideCompletionItems(document, position) {
-        try {
-          return await getAssetCompletions(document, position);
-        } catch {
-          return void 0;
-        }
-      }
-    },
-    '"',
-    "'",
-    "/"
-  );
-  context.subscriptions.push(provider);
-}
-async function getAssetCompletions(document, position) {
-  const lineText = document.lineAt(position).text;
-  const textBefore = lineText.substring(0, position.character);
-  const assetMatch = textBefore.match(/(lurek\.\w+\.\w+)\s*\(\s*["']([^"']*)$/);
-  const requireMatch = textBefore.match(/require\s*\(\s*["']([^"']*)$/);
-  if (!assetMatch && !requireMatch) return void 0;
-  const funcPath = assetMatch ? assetMatch[1] : "require";
-  const partialPath = assetMatch ? assetMatch[2] : requireMatch[1];
-  let extensions = [];
-  if (funcPath === "require") {
-    extensions = LUA_EXTENSIONS;
-  } else if (funcPath in ASSET_FUNC_EXTENSIONS) {
-    extensions = ASSET_FUNC_EXTENSIONS[funcPath];
-  } else {
-    return void 0;
-  }
-  const workspaceRoot = vscode7.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!workspaceRoot) return void 0;
-  const searchDir = partialPath.includes("/") ? path8.dirname(partialPath) : "";
-  const globPattern = searchDir ? `${searchDir}/**/*` : "**/*";
-  const files = await vscode7.workspace.findFiles(globPattern, "**/node_modules/**", 200);
-  const items = [];
-  const seenDirs = /* @__PURE__ */ new Set();
-  for (const file of files) {
-    const ext = path8.extname(file.fsPath).toLowerCase();
-    if (extensions.length > 0 && !extensions.includes(ext)) continue;
-    const relativePath = path8.relative(workspaceRoot, file.fsPath).replace(/\\/g, "/");
-    if (funcPath === "require") {
-      const requirePath = relativePath.replace(/\.lua$/, "").replace(/\//g, ".");
-      const item2 = new vscode7.CompletionItem(requirePath, vscode7.CompletionItemKind.Module);
-      item2.detail = "Lua module";
-      item2.insertText = requirePath;
-      const depth2 = requirePath.split(".").length;
-      item2.sortText = String(depth2).padStart(3, "0") + requirePath;
-      items.push(item2);
-      continue;
-    }
-    const dir = path8.dirname(relativePath);
-    if (dir !== "." && !seenDirs.has(dir)) {
-      seenDirs.add(dir);
-      if (!partialPath || dir.startsWith(partialPath.split("/")[0])) {
-        const dirItem = new vscode7.CompletionItem(dir + "/", vscode7.CompletionItemKind.Folder);
-        dirItem.sortText = "0" + dir;
-        items.push(dirItem);
-      }
-    }
-    const item = new vscode7.CompletionItem(relativePath, vscode7.CompletionItemKind.File);
-    item.detail = ext.toUpperCase().substring(1) + " file";
-    item.insertText = relativePath;
-    const depth = relativePath.split("/").length;
-    item.sortText = String(depth).padStart(3, "0") + relativePath;
-    items.push(item);
-  }
-  return items;
-}
-
-// src/providers/inlayHints.ts
-var vscode8 = __toESM(require("vscode"));
-var LUA_SELECTOR4 = { scheme: "file", language: "lua" };
-var analyzer3 = new LuaDocumentAnalyzer();
-function register5(context, apiData2) {
-  const provider = vscode8.languages.registerInlayHintsProvider(LUA_SELECTOR4, {
-    provideInlayHints(document, range) {
-      try {
-        const config = vscode8.workspace.getConfiguration("lurek");
-        if (config.get("inlayHints.enabled") === false) return [];
-        return getInlayHints(document, range, apiData2);
-      } catch {
-        return [];
-      }
-    }
-  });
-  context.subscriptions.push(provider);
-}
-function getInlayHints(document, range, apiData2) {
-  const hints = [];
-  const text = document.getText(range);
-  const offset = document.offsetAt(range.start);
-  const callPattern = /(lurek\.\w+\.\w+)\s*\(/g;
-  let callMatch;
-  while ((callMatch = callPattern.exec(text)) !== null) {
-    const fullPath = callMatch[1];
-    const fn = apiData2.getFunction(fullPath);
-    if (!fn || fn.parameters.length === 0) continue;
-    const openParenIdx = callMatch.index + callMatch[0].length - 1;
-    const argsText = extractArgsText(text, openParenIdx);
-    if (!argsText) continue;
-    const args = splitArgs(argsText);
-    if (args.length <= 1) continue;
-    const argsStartOffset = offset + openParenIdx + 1;
-    let argOffset = argsStartOffset;
-    for (let i = 0; i < args.length && i < fn.parameters.length; i++) {
-      const arg = args[i];
-      const trimmedArg = arg.trimStart();
-      const leadingSpaces = arg.length - trimmedArg.length;
-      if (/^\w+\s*=/.test(trimmedArg)) {
-        argOffset += arg.length + 1;
-        continue;
-      }
-      const param = fn.parameters[i];
-      if (trimmedArg === param.name) {
-        argOffset += arg.length + 1;
-        continue;
-      }
-      if (shouldSkipHint(trimmedArg, param.name)) {
-        argOffset += arg.length + 1;
-        continue;
-      }
-      const pos = document.positionAt(argOffset + leadingSpaces);
-      const hint = new vscode8.InlayHint(
-        pos,
-        `${param.name}:`,
-        vscode8.InlayHintKind.Parameter
-      );
-      hint.paddingRight = true;
-      hints.push(hint);
-      argOffset += arg.length + 1;
-    }
-  }
-  return hints;
-}
-function extractArgsText(text, openParenIdx) {
-  if (text[openParenIdx] !== "(") return void 0;
-  let depth = 1;
-  let pos = openParenIdx + 1;
-  while (pos < text.length && depth > 0) {
-    const ch = text[pos];
-    if (ch === "(") depth++;
-    else if (ch === ")") depth--;
-    pos++;
-  }
-  if (depth !== 0) return void 0;
-  return text.slice(openParenIdx + 1, pos - 1);
-}
-function splitArgs(argsText) {
-  if (!argsText.trim()) return [];
-  const args = [];
-  let current = "";
-  let depth = 0;
-  let inString = null;
-  for (let i = 0; i < argsText.length; i++) {
-    const ch = argsText[i];
-    if (inString && ch === "\\") {
-      current += ch;
-      if (i + 1 < argsText.length) {
-        current += argsText[i + 1];
-        i++;
-      }
-      continue;
-    }
-    if (!inString && (ch === '"' || ch === "'")) {
-      inString = ch;
-      current += ch;
-      continue;
-    }
-    if (inString && ch === inString) {
-      inString = null;
-      current += ch;
-      continue;
-    }
-    if (inString) {
-      current += ch;
-      continue;
-    }
-    if (ch === "(" || ch === "{" || ch === "[") {
-      depth++;
-      current += ch;
-    } else if (ch === ")" || ch === "}" || ch === "]") {
-      depth--;
-      current += ch;
-    } else if (ch === "," && depth === 0) {
-      args.push(current);
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  if (current) args.push(current);
-  return args;
-}
-function shouldSkipHint(arg, paramName) {
-  if ((arg === "true" || arg === "false" || arg === "nil") && paramName.length <= 4) {
-    return true;
-  }
-  return false;
-}
-
-// src/providers/codeActions.ts
-var vscode9 = __toESM(require("vscode"));
-var LUA_SELECTOR5 = { scheme: "file", language: "lua" };
-var analyzer4 = new LuaDocumentAnalyzer();
-function register6(context, apiData2) {
-  const provider = vscode9.languages.registerCodeActionsProvider(
-    LUA_SELECTOR5,
-    {
-      provideCodeActions(document, range, actionContext) {
-        try {
-          return getCodeActions(document, range, actionContext);
-        } catch {
-          return [];
-        }
-      }
-    },
-    {
-      providedCodeActionKinds: [
-        vscode9.CodeActionKind.QuickFix,
-        vscode9.CodeActionKind.RefactorExtract
-      ]
-    }
-  );
-  context.subscriptions.push(provider);
-}
-function getCodeActions(document, range, actionContext) {
-  const actions = [];
-  for (const diag of actionContext.diagnostics) {
-    switch (diag.code) {
-      case "lurek.unusedRequire":
-        actions.push(...createRemoveUnusedRequire(document, diag));
-        break;
-      case "lurek.missingCallback":
-        actions.push(...createGenerateCallbacks(document, diag));
-        break;
-      case "lurek.colorRange":
-        actions.push(...createConvertColorRange(document, diag));
-        break;
-    }
-  }
-  const lineText = document.lineAt(range.start.line).text;
-  if (!range.isEmpty) {
-    actions.push(createExtractFunction(document, range));
-    actions.push(createExtractToFileModule(document, range));
-  }
-  const globalMatch = lineText.match(/^(\s*)(\w+)\s*=\s*(.+)/);
-  if (globalMatch && !lineText.trimStart().startsWith("local ") && !lineText.trimStart().startsWith("function ") && !lineText.trimStart().startsWith("--") && !lineText.includes("lurek.") && !lineText.includes(".") && !lineText.includes(":")) {
-    actions.push(createConvertToLocal(document, range.start.line, globalMatch));
-  }
-  if (/\brequire\s*\(/.test(lineText) && !/pcall/.test(lineText)) {
-    actions.push(createWrapRequirePcall(document, range.start.line));
-  }
-  const inlineMatch = lineText.match(/^(\s*)local\s+(\w+)\s*=\s*(.+)/);
-  if (inlineMatch && !range.isEmpty) {
-    actions.push(createInlineVariable(document, range.start.line, inlineMatch));
-  }
-  if (/^\s*if\s+/.test(lineText)) {
-    const stateMap = tryCreateStateMapConversion(document, range.start.line);
-    if (stateMap) actions.push(stateMap);
-  }
-  const localVarMatch = lineText.match(/^(\s*)local\s+(\w+)\s*=/);
-  if (localVarMatch && !lineText.includes("---@type")) {
-    actions.push(createAddTypeAnnotation(document, range.start.line, localVarMatch[2]));
-  }
-  if (/(\w+)\.__index\s*=\s*\1/.test(lineText) || /setmetatable\s*\(\s*{/.test(lineText)) {
-    const className = lineText.match(/(\w+)\.__index/)?.[1];
-    if (className) {
-      actions.push(createGenerateTostring(document, range.start.line, className));
-    }
-  }
-  return actions;
-}
-function createRemoveUnusedRequire(document, diag) {
-  const action = new vscode9.CodeAction(
-    "Remove unused require",
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const line = diag.range.start.line;
-  const deleteRange = new vscode9.Range(line, 0, line + 1, 0);
-  action.edit.delete(document.uri, deleteRange);
-  action.diagnostics = [diag];
-  action.isPreferred = true;
-  return [action];
-}
-function createGenerateCallbacks(document, diag) {
-  const text = document.getText();
-  const missing = [];
-  if (!/function\s+lurek\.load\s*\(/.test(text) && !/lurek\.load\s*=\s*function/.test(text)) {
-    missing.push("load");
-  }
-  if (!/function\s+lurek\.update\s*\(/.test(text) && !/lurek\.update\s*=\s*function/.test(text)) {
-    missing.push("update");
-  }
-  if (!/function\s+lurek\.draw\s*\(/.test(text) && !/lurek\.draw\s*=\s*function/.test(text)) {
-    missing.push("draw");
-  }
-  if (missing.length === 0) return [];
-  const action = new vscode9.CodeAction(
-    "Generate Lurek2D callbacks",
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const stubs = [];
-  if (missing.includes("load")) {
-    stubs.push("function lurek.load()\n    -- Initialize game\nend");
-  }
-  if (missing.includes("update")) {
-    stubs.push("function lurek.update(dt)\n    -- Update game logic\nend");
-  }
-  if (missing.includes("draw")) {
-    stubs.push("function lurek.draw()\n    -- Draw game objects\nend");
-  }
-  const endPos = document.lineAt(document.lineCount - 1).range.end;
-  action.edit.insert(document.uri, endPos, "\n\n" + stubs.join("\n\n") + "\n");
-  action.diagnostics = [diag];
-  return [action];
-}
-function createConvertColorRange(document, diag) {
-  const text = document.getText(diag.range);
-  const match = text.match(
-    /(lurek\.graphics\.(?:setColor|setBackgroundColor|clear))\s*\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/
-  );
-  if (!match) return [];
-  const func = match[1];
-  const format = (v) => (parseFloat(v) / 255).toFixed(2).replace(/\.?0+$/, "") || "0";
-  const r = format(match[2]);
-  const g = format(match[3]);
-  const b = format(match[4]);
-  let replacement;
-  if (match[5] !== void 0) {
-    const a = format(match[5]);
-    replacement = `${func}(${r}, ${g}, ${b}, ${a})`;
-  } else {
-    replacement = `${func}(${r}, ${g}, ${b})`;
-  }
-  const action = new vscode9.CodeAction(
-    "Convert to 0-1 color range",
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  action.edit.replace(document.uri, diag.range, replacement);
-  action.diagnostics = [diag];
-  action.isPreferred = true;
-  return [action];
-}
-function createExtractFunction(document, range) {
-  const action = new vscode9.CodeAction(
-    "Extract to local function",
-    vscode9.CodeActionKind.RefactorExtract
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const selectedText = document.getText(range);
-  const indent = document.lineAt(range.start.line).text.match(/^(\s*)/)?.[1] ?? "";
-  const funcName = "extracted_function";
-  const bodyLines = selectedText.split("\n").map((l, i) => i === 0 ? l : indent + "    " + l);
-  const funcDef = `${indent}local function ${funcName}()
-${indent}    ${bodyLines.join("\n")}
-${indent}end
-
-`;
-  action.edit.insert(document.uri, new vscode9.Position(range.start.line, 0), funcDef);
-  action.edit.replace(document.uri, range, `${funcName}()`);
-  return action;
-}
-function createConvertToLocal(document, line, match) {
-  const action = new vscode9.CodeAction(
-    "Convert to local variable",
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const lineRange = document.lineAt(line).range;
-  const newText = `${match[1]}local ${match[2]} = ${match[3]}`;
-  action.edit.replace(document.uri, lineRange, newText);
-  return action;
-}
-function createWrapRequirePcall(document, line) {
-  const lineText = document.lineAt(line).text;
-  const indent = lineText.match(/^(\s*)/)?.[1] ?? "";
-  const action = new vscode9.CodeAction(
-    "Wrap require in pcall",
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const match = lineText.match(/^(\s*)local\s+(\w+)\s*=\s*require\s*\(\s*["']([^"']+)["']\s*\)/);
-  if (match) {
-    const varName = match[2];
-    const modName = match[3];
-    const newText = [
-      `${indent}local ok, ${varName} = pcall(require, "${modName}")`,
-      `${indent}if not ok then`,
-      `${indent}    error("Failed to load module: " .. tostring(${varName}))`,
-      `${indent}end`
-    ].join("\n");
-    action.edit.replace(document.uri, document.lineAt(line).range, newText);
-  } else {
-    const requireMatch = lineText.match(/require\s*\(\s*["']([^"']+)["']\s*\)/);
-    if (requireMatch) {
-      const modName = requireMatch[1];
-      const newText = [
-        `${indent}local ok, module = pcall(require, "${modName}")`,
-        `${indent}if not ok then`,
-        `${indent}    error("Failed to load module: " .. tostring(module))`,
-        `${indent}end`
-      ].join("\n");
-      action.edit.replace(document.uri, document.lineAt(line).range, newText);
-    }
-  }
-  return action;
-}
-function createExtractToFileModule(document, range) {
-  const action = new vscode9.CodeAction(
-    "Extract selection to new module file",
-    vscode9.CodeActionKind.RefactorExtract
-  );
-  action.command = {
-    command: "lurek.extractToModuleFile",
-    title: "Extract to new module file",
-    arguments: [document.uri, range]
-  };
-  return action;
-}
-function createInlineVariable(document, line, match) {
-  const action = new vscode9.CodeAction(
-    `Inline variable '${match[2]}'`,
-    vscode9.CodeActionKind.RefactorInline
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const indent = match[1];
-  const rhs = match[3].trim();
-  action.edit.replace(
-    document.uri,
-    document.lineAt(line).range,
-    `${indent}-- TODO: inline '${match[2]}' = ${rhs}`
-  );
-  return action;
-}
-function tryCreateStateMapConversion(document, startLine) {
-  const lines = [];
-  const stateVar = document.lineAt(startLine).text.match(/if\s+(\w+)\s*==\s*['"]/)?.[1];
-  if (!stateVar) return void 0;
-  for (let i2 = startLine; i2 < Math.min(startLine + 40, document.lineCount); i2++) {
-    lines.push(document.lineAt(i2).text);
-    if (document.lineAt(i2).text.trimStart() === "end") break;
-  }
-  const cases = [];
-  let i = 0;
-  while (i < lines.length) {
-    const caseMatch = lines[i].match(/(?:if|elseif)\s+\w+\s*==\s*['"](\w+)['"]\s*then/);
-    if (caseMatch) {
-      const key = caseMatch[1];
-      const bodyLines = [];
-      i++;
-      while (i < lines.length && !/(?:elseif|else|end)/.test(lines[i].trimStart())) {
-        bodyLines.push(lines[i].replace(/^\s{4}/, "    "));
-        i++;
-      }
-      cases.push({ key, body: bodyLines.join("\n") });
-    } else {
-      i++;
-    }
-  }
-  if (cases.length < 2) return void 0;
-  const indent = (document.lineAt(startLine).text.match(/^(\s*)/) ?? ["", ""])[1];
-  const mapName = `${stateVar}Handlers`;
-  const mapLines = [
-    `${indent}local ${mapName} = {`,
-    ...cases.map((c) => `${indent}  ${c.key} = function()
+`;return t.edit.insert(n.uri,new z.Position(e.start.line,0),s),t.edit.replace(n.uri,e,`${i}()`),t}function al(n,e,t){let r=new z.CodeAction("Convert to local variable",z.CodeActionKind.QuickFix);r.edit=new z.WorkspaceEdit;let a=n.lineAt(e).range,i=`${t[1]}local ${t[2]} = ${t[3]}`;return r.edit.replace(n.uri,a,i),r}function il(n,e){let t=n.lineAt(e).text,r=t.match(/^(\s*)/)?.[1]??"",a=new z.CodeAction("Wrap require in pcall",z.CodeActionKind.QuickFix);a.edit=new z.WorkspaceEdit;let i=t.match(/^(\s*)local\s+(\w+)\s*=\s*require\s*\(\s*["']([^"']+)["']\s*\)/);if(i){let o=i[2],s=i[3],l=[`${r}local ok, ${o} = pcall(require, "${s}")`,`${r}if not ok then`,`${r}    error("Failed to load module: " .. tostring(${o}))`,`${r}end`].join(`
+`);a.edit.replace(n.uri,n.lineAt(e).range,l)}else{let o=t.match(/require\s*\(\s*["']([^"']+)["']\s*\)/);if(o){let s=o[1],l=[`${r}local ok, module = pcall(require, "${s}")`,`${r}if not ok then`,`${r}    error("Failed to load module: " .. tostring(module))`,`${r}end`].join(`
+`);a.edit.replace(n.uri,n.lineAt(e).range,l)}}return a}function ol(n,e){let t=new z.CodeAction("Extract selection to new module file",z.CodeActionKind.RefactorExtract);return t.command={command:"lurek.extractToModuleFile",title:"Extract to new module file",arguments:[n.uri,e]},t}function sl(n,e,t){let r=new z.CodeAction(`Inline variable '${t[2]}'`,z.CodeActionKind.RefactorInline);r.edit=new z.WorkspaceEdit;let a=t[1],i=t[3].trim();return r.edit.replace(n.uri,n.lineAt(e).range,`${a}-- TODO: inline '${t[2]}' = ${i}`),r}function ll(n,e){let t=[],r=n.lineAt(e).text.match(/if\s+(\w+)\s*==\s*['"]/)?.[1];if(!r)return;for(let c=e;c<Math.min(e+40,n.lineCount)&&(t.push(n.lineAt(c).text),n.lineAt(c).text.trimStart()!=="end");c++);let a=[],i=0;for(;i<t.length;){let c=t[i].match(/(?:if|elseif)\s+\w+\s*==\s*['"](\w+)['"]\s*then/);if(c){let h=c[1],L=[];for(i++;i<t.length&&!/(?:elseif|else|end)/.test(t[i].trimStart());)L.push(t[i].replace(/^\s{4}/,"    ")),i++;a.push({key:h,body:L.join(`
+`)})}else i++}if(a.length<2)return;let o=(n.lineAt(e).text.match(/^(\s*)/)??["",""])[1],s=`${r}Handlers`,l=[`${o}local ${s} = {`,...a.map(c=>`${o}  ${c.key} = function()
 ${c.body}
-${indent}  end,`),
-    `${indent}}`,
-    `${indent}local _handler = ${mapName}[${stateVar}]`,
-    `${indent}if _handler then _handler() end`
-  ];
-  const action = new vscode9.CodeAction(
-    `Convert if/elseif chain to state-map (${mapName})`,
-    vscode9.CodeActionKind.RefactorRewrite
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const replaceRange = new vscode9.Range(
-    startLine,
-    0,
-    startLine + lines.length - 1,
-    document.lineAt(startLine + lines.length - 1).range.end.character
-  );
-  action.edit.replace(document.uri, replaceRange, mapLines.join("\n"));
-  return action;
-}
-function createAddTypeAnnotation(document, line, varName) {
-  const action = new vscode9.CodeAction(
-    `Add ---@type annotation for '${varName}'`,
-    vscode9.CodeActionKind.RefactorRewrite
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const indent = (document.lineAt(line).text.match(/^(\s*)/) ?? ["", ""])[1];
-  const insertPos = new vscode9.Position(line, 0);
-  action.edit.insert(document.uri, insertPos, `${indent}---@type any
-`);
-  return action;
-}
-function createGenerateTostring(document, line, className) {
-  const action = new vscode9.CodeAction(
-    `Generate __tostring for ${className}`,
-    vscode9.CodeActionKind.QuickFix
-  );
-  action.edit = new vscode9.WorkspaceEdit();
-  const indent = (document.lineAt(line).text.match(/^(\s*)/) ?? ["", ""])[1];
-  const insertPos = new vscode9.Position(line + 1, 0);
-  action.edit.insert(
-    document.uri,
-    insertPos,
-    `
-${indent}function ${className}:__tostring()
-${indent}  return "${className}()"  -- TODO: fill in fields
-${indent}end
-`
-  );
-  return action;
-}
+${o}  end,`),`${o}}`,`${o}local _handler = ${s}[${r}]`,`${o}if _handler then _handler() end`],p=new z.CodeAction(`Convert if/elseif chain to state-map (${s})`,z.CodeActionKind.RefactorRewrite);p.edit=new z.WorkspaceEdit;let u=new z.Range(e,0,e+t.length-1,n.lineAt(e+t.length-1).range.end.character);return p.edit.replace(n.uri,u,l.join(`
+`)),p}function pl(n,e,t){let r=new z.CodeAction(`Add ---@type annotation for '${t}'`,z.CodeActionKind.RefactorRewrite);r.edit=new z.WorkspaceEdit;let a=(n.lineAt(e).text.match(/^(\s*)/)??["",""])[1],i=new z.Position(e,0);return r.edit.insert(n.uri,i,`${a}---@type any
+`),r}function ul(n,e,t){let r=new z.CodeAction(`Generate __tostring for ${t}`,z.CodeActionKind.QuickFix);r.edit=new z.WorkspaceEdit;let a=(n.lineAt(e).text.match(/^(\s*)/)??["",""])[1],i=new z.Position(e+1,0);return r.edit.insert(n.uri,i,`
+${a}function ${t}:__tostring()
+${a}  return "${t}()"  -- TODO: fill in fields
+${a}end
+`),r}var Q=C(require("vscode"));var cl=[{code:"lurek.perf.tableAllocHotPath",pattern:/\{\s*\}/,message:"Table allocation `{}` in hot path \u2014 consider pre-allocating or using an object pool.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!0},{code:"lurek.perf.newInHotPath",pattern:/lurek\.\w+\.new\w*\s*\(/,message:"Resource creation (lurek.*.new*) in hot path \u2014 move to lurek.load() or cache the result.",severity:Q.DiagnosticSeverity.Warning,hotPathOnly:!0},{code:"lurek.perf.globalInLoop",pattern:/\bfor\b.+\bdo\b/,message:"Loop detected \u2014 ensure frequently accessed globals are cached as locals above the loop.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!1},{code:"lurek.perf.stringConcatLoop",pattern:/\.\.\s*["']/,message:"String concatenation in loop \u2014 consider table.insert + table.concat for better performance.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!0},{code:"lurek.perf.pcallHotPath",pattern:/\bpcall\s*\(/,message:"pcall in hot path adds overhead \u2014 consider error handling outside the frame loop.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!0},{code:"lurek.perf.mathFloor",pattern:/math\.floor\s*\(/,message:"Consider bit.tobit() or x%1 for faster integer conversion in LuaJIT.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!0},{code:"lurek.perf.mathRandom",pattern:/math\.random\s*\(/,message:"Use lurek.math.random() for deterministic, seedable RNG consistent across platforms.",severity:Q.DiagnosticSeverity.Information,hotPathOnly:!0},{code:"lurek.perf.unpackInLoop",pattern:/\bunpack\s*\(/,message:"unpack() in hot path creates temporary values \u2014 prefer indexed access for known structures.",severity:Q.DiagnosticSeverity.Hint,hotPathOnly:!0}],ml=[{code:"lurek.compat.constAttribute",pattern:/\blocal\s+\w+\s*<\s*const\s*>/,message:"Lua 5.4 `<const>` attribute is not supported in LuaJIT. Remove the attribute \u2014 LuaJIT inlines constants automatically."},{code:"lurek.compat.closeAttribute",pattern:/\blocal\s+\w+\s*<\s*close\s*>/,message:"Lua 5.4 `<close>` (to-be-closed variable) is not supported in LuaJIT. Use explicit :close() or defer via a wrapper."},{code:"lurek.compat.utf8Library",pattern:/\butf8\s*\.\s*\w+\s*\(/,message:"The `utf8` standard library is not available in LuaJIT. Use lurek.utf8.* instead or the luajit-utf8 binding."},{code:"lurek.compat.tableMove",pattern:/\btable\s*\.\s*move\s*\(/,message:"`table.move` behaviour differs between Lua 5.4 and LuaJIT. Test carefully, or use a manual loop for portability."},{code:"lurek.compat.bitwiseTilde",pattern:/(?<![=<>~])\s*~(?!\s*=)\s*(?![-\\/])/,message:"Lua 5.4 bitwise `~` (XOR / NOT) operator is not supported in LuaJIT. Use `bit.bxor(a, b)` or `bit.bnot(a)` instead."},{code:"lurek.compat.intDivOp",pattern:/\/\//,message:"Floor-division operator `//` is a LuaJIT extension that matches Lua 5.4. Behaviour is consistent \u2014 no action needed. (Hint only.)"},{code:"lurek.compat.warnLevel",pattern:/(?<!\.)(?<!\w)\bwarn\s*\(/,message:"`warn()` is a Lua 5.4-only function and is not available in LuaJIT. Use `print()` or `lurek.log.warn()` instead."}];function hl(n){let e=new Set,t=n.split(`
+`),r=0,a=!1;for(let i=0;i<t.length;i++){let o=t[i];if(/^\s*function\s+lurek\.(update|draw)\s*\(/.test(o)&&(a=!0,r=0),a){let s=(o.match(/\b(function|do|then|repeat)\b/g)||[]).length,l=(o.match(/\b(end|until)\b/g)||[]).length;r+=s-l,e.add(i),r<=0&&i>0&&(a=!1)}}return e}function di(n,e){let t=[],r=Q.languages.createDiagnosticCollection("lurek.luajit");t.push(r);let a=Q.languages.createDiagnosticCollection("lurek.compat");t.push(a);function i(s){if(s.languageId!=="lua")return;let l=s.getText(),p=hl(l),u=[],c=l.split(`
+`);for(let h=0;h<c.length;h++){let L=c[h];if(!/^\s*--/.test(L))for(let d of cl){if(d.hotPathOnly&&!p.has(h))continue;let g=d.pattern.exec(L);if(g){let v=g.index,x=g.index+g[0].length,w=new Q.Range(h,v,h,x),T=new Q.Diagnostic(w,d.message,d.severity);T.code=d.code,T.source="Lurek2D LuaJIT",u.push(T)}}}r.set(s.uri,u)}function o(s){if(s.languageId!=="lua")return;let l=s.getText(),p=[],u=l.split(`
+`);for(let c=0;c<u.length;c++){let h=u[c];if(/^\s*--/.test(h))continue;let L=h.replace(/--.*$/,"");for(let d of ml){let g=d.pattern.exec(L);if(g){let v=g.index,x=g.index+g[0].length,w=new Q.Range(c,v,c,x),T=d.code==="lurek.compat.intDivOp"?Q.DiagnosticSeverity.Hint:Q.DiagnosticSeverity.Warning,M=new Q.Diagnostic(w,d.message,T);M.code=d.code,M.source="Lurek2D Compat",p.push(M)}}}a.set(s.uri,p)}Q.window.activeTextEditor&&(i(Q.window.activeTextEditor.document),o(Q.window.activeTextEditor.document)),t.push(Q.window.onDidChangeActiveTextEditor(s=>{s&&(i(s.document),o(s.document))}),Q.workspace.onDidChangeTextDocument(s=>{i(s.document),o(s.document)}),Q.workspace.onDidCloseTextDocument(s=>{r.delete(s.uri),a.delete(s.uri)})),n.subscriptions.push(...t)}var X=C(require("vscode")),at=null;function yl(n){at=n}function Br(n){if(at){let e=at.getFactoryTypes().get(n);if(e)return e}return mn[n]?.typeName}function Ar(n){if(at){let e=at.getMethods(n);if(e.length>0){let t=Object.values(mn).find(r=>r.typeName===n);return{typeName:n,methods:e.map(r=>({name:r.name,sig:r.signature,desc:r.description})),...t?.fields?{fields:t.fields}:{}}}}return Object.values(mn).find(e=>e.typeName===n)}function fl(){let n=new Set(Object.keys(mn));if(at)for(let e of at.getFactoryTypes().keys())n.add(e);return Array.from(n)}var Er={scheme:"file",language:"lua"},mn={"lurek.graphics.newImage":{typeName:"LImage",fields:[{name:"width",type:"number",desc:"Image width in pixels"},{name:"height",type:"number",desc:"Image height in pixels"}],methods:[{name:"getDimensions",sig:":getDimensions()",desc:"Returns width, height"},{name:"getWidth",sig:":getWidth()",desc:"Returns pixel width"},{name:"getHeight",sig:":getHeight()",desc:"Returns pixel height"},{name:"getFilter",sig:":getFilter()",desc:"Returns min, mag filter modes"},{name:"setFilter",sig:":setFilter(min, mag)",desc:"Set texture filter"},{name:"setWrap",sig:":setWrap(horiz, vert)",desc:"Set texture wrap mode"},{name:"getWrap",sig:":getWrap()",desc:"Returns horizontal, vertical wrap"},{name:"release",sig:":release()",desc:"Free GPU resources"},{name:"type",sig:":type()",desc:"Returns 'LImage'"}]},"lurek.graphics.newCanvas":{typeName:"LCanvas",fields:[{name:"width",type:"number",desc:"Canvas width in pixels"},{name:"height",type:"number",desc:"Canvas height in pixels"}],methods:[{name:"getDimensions",sig:":getDimensions()",desc:"Returns width, height"},{name:"getWidth",sig:":getWidth()",desc:"Returns pixel width"},{name:"getHeight",sig:":getHeight()",desc:"Returns pixel height"},{name:"getFilter",sig:":getFilter()",desc:"Returns min, mag filter modes"},{name:"setFilter",sig:":setFilter(min, mag)",desc:"Set texture filter"},{name:"renderTo",sig:":renderTo(fn)",desc:"Render to this canvas"},{name:"release",sig:":release()",desc:"Free GPU resources"},{name:"type",sig:":type()",desc:"Returns 'LCanvas'"}]},"lurek.graphics.newFont":{typeName:"LFont",methods:[{name:"getWidth",sig:":getWidth(text)",desc:"Width of text in pixels"},{name:"getHeight",sig:":getHeight()",desc:"Font height in pixels"},{name:"getLineHeight",sig:":getLineHeight()",desc:"Returns line height multiplier"},{name:"setLineHeight",sig:":setLineHeight(h)",desc:"Set line height multiplier"},{name:"getAscent",sig:":getAscent()",desc:"Returns font ascent"},{name:"getDescent",sig:":getDescent()",desc:"Returns font descent"},{name:"hasGlyphs",sig:":hasGlyphs(text)",desc:"Check if font has glyphs"},{name:"release",sig:":release()",desc:"Free resources"},{name:"type",sig:":type()",desc:"Returns 'LFont'"}]},"lurek.graphics.newShader":{typeName:"LShader",methods:[{name:"send",sig:":send(name, value)",desc:"Set uniform value"},{name:"hasUniform",sig:":hasUniform(name)",desc:"Check if uniform exists"},{name:"release",sig:":release()",desc:"Free GPU resources"},{name:"type",sig:":type()",desc:"Returns 'LShader'"}]},"lurek.graphics.newMesh":{typeName:"LMesh",methods:[{name:"setVertices",sig:":setVertices(verts)",desc:"Set vertex data"},{name:"setTexture",sig:":setTexture(tex)",desc:"Set texture for mesh"},{name:"getVertexCount",sig:":getVertexCount()",desc:"Returns vertex count"},{name:"release",sig:":release()",desc:"Free GPU resources"},{name:"type",sig:":type()",desc:"Returns 'LMesh'"}]},"lurek.graphics.newSpriteBatch":{typeName:"LSpriteBatch",methods:[{name:"add",sig:":add(quad, x, y, r, sx, sy)",desc:"Add sprite to batch"},{name:"clear",sig:":clear()",desc:"Remove all sprites"},{name:"getCount",sig:":getCount()",desc:"Returns current sprite count"},{name:"set",sig:":set(id, quad, x, y, r, sx, sy)",desc:"Update sprite at index"},{name:"flush",sig:":flush()",desc:"Upload data to GPU"},{name:"release",sig:":release()",desc:"Free GPU resources"},{name:"type",sig:":type()",desc:"Returns 'LSpriteBatch'"}]},"lurek.graphics.newQuad":{typeName:"LQuad",methods:[{name:"getViewport",sig:":getViewport()",desc:"Returns x, y, w, h"},{name:"setViewport",sig:":setViewport(x, y, w, h)",desc:"Set viewport rect"},{name:"getTextureDimensions",sig:":getTextureDimensions()",desc:"Returns ref width, height"},{name:"type",sig:":type()",desc:"Returns 'LQuad'"}]},"lurek.audio.newSource":{typeName:"LSource",methods:[{name:"play",sig:":play()",desc:"Start or resume playback"},{name:"pause",sig:":pause()",desc:"Pause playback"},{name:"stop",sig:":stop()",desc:"Stop and rewind"},{name:"isPlaying",sig:":isPlaying()",desc:"Returns true if playing"},{name:"setVolume",sig:":setVolume(v)",desc:"Set volume (0-1)"},{name:"getVolume",sig:":getVolume()",desc:"Returns current volume"},{name:"setPitch",sig:":setPitch(p)",desc:"Set pitch multiplier"},{name:"getPitch",sig:":getPitch()",desc:"Returns pitch"},{name:"setLooping",sig:":setLooping(loop)",desc:"Enable/disable loop"},{name:"isLooping",sig:":isLooping()",desc:"Returns loop state"},{name:"seek",sig:":seek(seconds)",desc:"Seek to position"},{name:"tell",sig:":tell()",desc:"Returns current position"},{name:"getDuration",sig:":getDuration()",desc:"Returns duration in seconds"},{name:"release",sig:":release()",desc:"Free audio resources"},{name:"type",sig:":type()",desc:"Returns 'LSource'"}]},"lurek.physics.newWorld":{typeName:"LWorld",methods:[{name:"update",sig:":update(dt)",desc:"Step the simulation"},{name:"setGravity",sig:":setGravity(gx, gy)",desc:"Set gravity vector"},{name:"getGravity",sig:":getGravity()",desc:"Returns gx, gy"},{name:"getBodyCount",sig:":getBodyCount()",desc:"Number of bodies"},{name:"queryBoundingBox",sig:":queryBoundingBox(x1, y1, x2, y2, fn)",desc:"Query AABB"},{name:"rayCast",sig:":rayCast(x1, y1, x2, y2, fn)",desc:"Cast a ray"},{name:"setCallbacks",sig:":setCallbacks(begin, end, pre, post)",desc:"Set collision callbacks"},{name:"destroy",sig:":destroy()",desc:"Destroy physics world"},{name:"type",sig:":type()",desc:"Returns 'LWorld'"}]},"lurek.physics.newBody":{typeName:"LBody",methods:[{name:"getPosition",sig:":getPosition()",desc:"Returns x, y"},{name:"setPosition",sig:":setPosition(x, y)",desc:"Set position"},{name:"getAngle",sig:":getAngle()",desc:"Returns rotation in radians"},{name:"setAngle",sig:":setAngle(angle)",desc:"Set rotation"},{name:"getLinearVelocity",sig:":getLinearVelocity()",desc:"Returns vx, vy"},{name:"setLinearVelocity",sig:":setLinearVelocity(vx, vy)",desc:"Set velocity"},{name:"applyForce",sig:":applyForce(fx, fy)",desc:"Apply force at center"},{name:"applyLinearImpulse",sig:":applyLinearImpulse(ix, iy)",desc:"Apply impulse"},{name:"setMass",sig:":setMass(mass)",desc:"Set body mass"},{name:"getMass",sig:":getMass()",desc:"Returns body mass"},{name:"setType",sig:":setType(type)",desc:"Set body type"},{name:"getType",sig:":getType()",desc:"Returns body type string"},{name:"isAwake",sig:":isAwake()",desc:"Returns true if body is awake"},{name:"destroy",sig:":destroy()",desc:"Remove body from world"},{name:"type",sig:":type()",desc:"Returns 'LBody'"}]},"lurek.graphics.newParticleSystem":{typeName:"LParticleSystem",methods:[{name:"emit",sig:":emit(count)",desc:"Emit particles"},{name:"update",sig:":update(dt)",desc:"Update particle system"},{name:"start",sig:":start()",desc:"Start emitting"},{name:"stop",sig:":stop()",desc:"Stop emitting"},{name:"pause",sig:":pause()",desc:"Pause system"},{name:"reset",sig:":reset()",desc:"Reset and clear particles"},{name:"getCount",sig:":getCount()",desc:"Returns active particle count"},{name:"setEmissionRate",sig:":setEmissionRate(rate)",desc:"Particles per second"},{name:"setLifetime",sig:":setLifetime(min, max)",desc:"Set particle lifetime range"},{name:"setPosition",sig:":setPosition(x, y)",desc:"Set emitter position"},{name:"setSpeed",sig:":setSpeed(min, max)",desc:"Set speed range"},{name:"setDirection",sig:":setDirection(angle)",desc:"Set emission direction"},{name:"setSpread",sig:":setSpread(spread)",desc:"Set emission cone angle"},{name:"release",sig:":release()",desc:"Free resources"},{name:"type",sig:":type()",desc:"Returns 'LParticleSystem'"}]},"lurek.cardgame.clone":{typeName:"LCard",fields:[{name:"card_type",type:"string",desc:"The registered card type name"},{name:"name",type:"string",desc:"Card display name"},{name:"category",type:"string",desc:"Category (creature, spell, etc.)"},{name:"face_up",type:"boolean",desc:"Whether the card is face-up"},{name:"tapped",type:"boolean",desc:"Whether the card is tapped/exhausted"},{name:"owner",type:"string",desc:"Owner player identifier"},{name:"controller",type:"string",desc:"Controller player identifier"},{name:"zone",type:"string",desc:"Current zone name"}],methods:[{name:"hasTag",sig:":hasTag(tag)",desc:"Returns true if card has the tag"},{name:"addTag",sig:":addTag(tag)",desc:"Add a tag (deduplicated)"},{name:"removeTag",sig:":removeTag(tag)",desc:"Remove a tag by value"},{name:"getStat",sig:":getStat(name)",desc:"Get a numeric stat value"},{name:"setStat",sig:":setStat(name, value)",desc:"Set a numeric stat value"},{name:"addCounter",sig:":addCounter(kind, amount)",desc:"Add to a counter, returns new total"},{name:"getCounter",sig:":getCounter(kind)",desc:"Get a counter value"},{name:"tap",sig:":tap()",desc:"Tap the card (exhausted)"},{name:"untap",sig:":untap()",desc:"Untap the card"},{name:"getMeta",sig:":getMeta(key)",desc:"Get metadata value"},{name:"setMeta",sig:":setMeta(key, value)",desc:"Set metadata value"}]},"lurek.cardgame.newCard":{typeName:"LCard",fields:[{name:"card_type",type:"string",desc:"The registered card type name"},{name:"name",type:"string",desc:"Card display name"},{name:"category",type:"string",desc:"Category (creature, spell, etc.)"},{name:"face_up",type:"boolean",desc:"Whether the card is face-up"},{name:"tapped",type:"boolean",desc:"Whether the card is tapped/exhausted"},{name:"owner",type:"string",desc:"Owner player identifier"},{name:"controller",type:"string",desc:"Controller player identifier"},{name:"zone",type:"string",desc:"Current zone name"}],methods:[{name:"hasTag",sig:":hasTag(tag)",desc:"Returns true if card has the tag"},{name:"addTag",sig:":addTag(tag)",desc:"Add a tag (deduplicated)"},{name:"removeTag",sig:":removeTag(tag)",desc:"Remove a tag by value"},{name:"getStat",sig:":getStat(name)",desc:"Get a numeric stat value"},{name:"setStat",sig:":setStat(name, value)",desc:"Set a numeric stat value"},{name:"addCounter",sig:":addCounter(kind, amount)",desc:"Add to a counter, returns new total"},{name:"getCounter",sig:":getCounter(kind)",desc:"Get a counter value"},{name:"removeCounters",sig:":removeCounters(kind)",desc:"Remove all counters of a type"},{name:"getMeta",sig:":getMeta(key)",desc:"Get metadata value"},{name:"setMeta",sig:":setMeta(key, value)",desc:"Set metadata value"},{name:"tap",sig:":tap()",desc:"Tap the card (exhausted)"},{name:"untap",sig:":untap()",desc:"Untap the card"},{name:"getAllCounters",sig:":getAllCounters()",desc:"Returns all (kind, count) counter pairs"}]},"lurek.cardgame.newDeck":{typeName:"LDeck",fields:[{name:"name",type:"string",desc:"Deck display name"}],methods:[{name:"shuffle",sig:":shuffle()",desc:"Shuffle using Fisher-Yates"},{name:"draw",sig:":draw()",desc:"Draw from the top; returns Card or nil"},{name:"drawBottom",sig:":drawBottom()",desc:"Draw from the bottom"},{name:"pushTop",sig:":pushTop(card)",desc:"Add a card to the top"},{name:"pushBottom",sig:":pushBottom(card)",desc:"Add a card to the bottom"},{name:"peek",sig:":peek()",desc:"Peek at the top card without removing"},{name:"insertAt",sig:":insertAt(index, card)",desc:"Insert a card at a 0-based position"},{name:"removeAt",sig:":removeAt(index)",desc:"Remove and return card at index"},{name:"moveWithin",sig:":moveWithin(from, to)",desc:"Move card at from_index to to_index"},{name:"size",sig:":size()",desc:"Returns card count"},{name:"isEmpty",sig:":isEmpty()",desc:"Returns true if empty"},{name:"searchByTag",sig:":searchByTag(tag)",desc:"Returns indices of cards with tag"},{name:"searchByType",sig:":searchByType(card_type)",desc:"Returns indices of matching type"},{name:"countByType",sig:":countByType(card_type)",desc:"Count cards of a specific type"},{name:"revealTop",sig:":revealTop(n)",desc:"Peek at top n cards, returns type strings"},{name:"reset",sig:":reset()",desc:"Reset to original state"}]},"lurek.cardgame.newDeckBuilder":{typeName:"LDeckBuilder",fields:[{name:"min_cards",type:"integer",desc:"Minimum total cards required"},{name:"max_cards",type:"integer",desc:"Maximum total cards allowed (0 = no limit)"},{name:"max_copies",type:"integer",desc:"Maximum copies of a single card type"}],methods:[{name:"validate",sig:":validate(deck)",desc:"Validate a deck, returns list of violation messages"}]},"lurek.cardgame.newStackManager":{typeName:"LStackManager",methods:[{name:"push",sig:":push(entry)",desc:"Push an entry onto the stack"},{name:"resolve",sig:":resolve()",desc:"Pop and return the top entry"},{name:"peek",sig:":peek()",desc:"Peek at the top entry"},{name:"isEmpty",sig:":isEmpty()",desc:"Whether the stack has anything to resolve"},{name:"size",sig:":size()",desc:"Number of entries on the stack"},{name:"clear",sig:":clear()",desc:"Clear all entries"},{name:"findByKind",sig:":findByKind(kind)",desc:"Find first entry matching a kind"}]},"lurek.cardgame.newZone":{typeName:"LZone",fields:[{name:"name",type:"string",desc:"Zone name"},{name:"capacity",type:"integer",desc:"Max capacity (0 = unlimited)"}],methods:[{name:"canAdd",sig:":canAdd()",desc:"Returns true if zone accepts one more card"},{name:"add",sig:":add(card)",desc:"Add a card (returns error if zone full)"},{name:"removeAt",sig:":removeAt(index)",desc:"Remove card at 0-based index"},{name:"size",sig:":size()",desc:"Number of cards in zone"},{name:"isEmpty",sig:":isEmpty()",desc:"True if empty"},{name:"findByType",sig:":findByType(card_type)",desc:"Find first card by type"},{name:"countByType",sig:":countByType(card_type)",desc:"Count cards of a specific type"},{name:"getAllTypes",sig:":getAllTypes()",desc:"Return type strings of all cards"}]},"lurek.cardgame.newCardPool":{typeName:"LCardPool",fields:[{name:"name",type:"string",desc:"Pool name"}],methods:[{name:"add",sig:":add(card_type, weight)",desc:"Add a card type with weight (default 1)"},{name:"remove",sig:":remove(card_type)",desc:"Remove a card type from pool"},{name:"draw",sig:":draw(n)",desc:"Draw n cards (with replacement), returns type names"},{name:"size",sig:":size()",desc:"Number of entries"},{name:"getTypes",sig:":getTypes()",desc:"Returns all card types in pool"},{name:"totalWeight",sig:":totalWeight()",desc:"Total weight of all entries"}]},"lurek.ecs.new":{typeName:"LEntity",methods:[{name:"getId",sig:":getId()",desc:"Returns entity ID"},{name:"getTag",sig:":getTag()",desc:"Returns entity tag"},{name:"setTag",sig:":setTag(tag)",desc:"Set entity tag"},{name:"getPosition",sig:":getPosition()",desc:"Returns x, y"},{name:"setPosition",sig:":setPosition(x, y)",desc:"Set position"},{name:"getComponent",sig:":getComponent(name)",desc:"Get component by name"},{name:"addComponent",sig:":addComponent(name, data)",desc:"Add component"},{name:"removeComponent",sig:":removeComponent(name)",desc:"Remove component"},{name:"hasComponent",sig:":hasComponent(name)",desc:"Returns true if entity has component"},{name:"destroy",sig:":destroy()",desc:"Destroy entity"},{name:"isAlive",sig:":isAlive()",desc:"Returns true if entity is alive"},{name:"type",sig:":type()",desc:"Returns 'LEntity'"}]},"lurek.timer.after":{typeName:"LTimer",methods:[{name:"cancel",sig:":cancel()",desc:"Cancel the timer"},{name:"pause",sig:":pause()",desc:"Pause the timer"},{name:"resume",sig:":resume()",desc:"Resume the timer"},{name:"isActive",sig:":isActive()",desc:"Returns true if still active"},{name:"type",sig:":type()",desc:"Returns 'LTimer'"}]},"lurek.timer.every":{typeName:"LTimer",methods:[{name:"cancel",sig:":cancel()",desc:"Cancel the timer"},{name:"pause",sig:":pause()",desc:"Pause the timer"},{name:"resume",sig:":resume()",desc:"Resume the timer"},{name:"isActive",sig:":isActive()",desc:"Returns true if still active"},{name:"type",sig:":type()",desc:"Returns 'LTimer'"}]},"lurek.timer.tween":{typeName:"LTween",methods:[{name:"cancel",sig:":cancel()",desc:"Cancel the tween"},{name:"pause",sig:":pause()",desc:"Pause the tween"},{name:"resume",sig:":resume()",desc:"Resume the tween"},{name:"isActive",sig:":isActive()",desc:"Returns true if still active"},{name:"getProgress",sig:":getProgress()",desc:"Returns progress 0-1"},{name:"type",sig:":type()",desc:"Returns 'LTween'"}]},"lurek.tilemap.load":{typeName:"LTilemap",methods:[{name:"draw",sig:":draw()",desc:"Draw the tilemap"},{name:"getWidth",sig:":getWidth()",desc:"Returns width in tiles"},{name:"getHeight",sig:":getHeight()",desc:"Returns height in tiles"},{name:"getTileAt",sig:":getTileAt(x, y)",desc:"Get tile at grid position"},{name:"setTileAt",sig:":setTileAt(x, y, tile)",desc:"Set tile at grid position"},{name:"getLayer",sig:":getLayer(name)",desc:"Get layer by name"},{name:"getLayerCount",sig:":getLayerCount()",desc:"Returns number of layers"},{name:"getProperty",sig:":getProperty(name)",desc:"Get map property"},{name:"type",sig:":type()",desc:"Returns 'LTilemap'"}]},"lurek.scene.new":{typeName:"LScene",methods:[{name:"enter",sig:":enter()",desc:"Called when scene becomes active"},{name:"exit",sig:":exit()",desc:"Called when scene is deactivated"},{name:"update",sig:":update(dt)",desc:"Update scene"},{name:"draw",sig:":draw()",desc:"Draw scene"},{name:"getName",sig:":getName()",desc:"Returns scene name"},{name:"type",sig:":type()",desc:"Returns 'LScene'"}]},"lurek.data.newStore":{typeName:"LDataStore",methods:[{name:"get",sig:":get(key)",desc:"Get value by key"},{name:"set",sig:":set(key, value)",desc:"Set a key-value pair"},{name:"delete",sig:":delete(key)",desc:"Delete a key"},{name:"has",sig:":has(key)",desc:"Returns true if key exists"},{name:"keys",sig:":keys()",desc:"Returns all keys"},{name:"values",sig:":values()",desc:"Returns all values"},{name:"clear",sig:":clear()",desc:"Remove all entries"},{name:"size",sig:":size()",desc:"Returns number of entries"},{name:"type",sig:":type()",desc:"Returns 'LDataStore'"}]},"lurek.event.on":{typeName:"LEventHandle",methods:[{name:"cancel",sig:":cancel()",desc:"Unsubscribe from event"},{name:"type",sig:":type()",desc:"Returns 'LEventHandle'"}]},"lurek.camera.new":{typeName:"LCamera",methods:[{name:"getPosition",sig:":getPosition()",desc:"Returns x, y"},{name:"setPosition",sig:":setPosition(x, y)",desc:"Set camera position"},{name:"getZoom",sig:":getZoom()",desc:"Returns zoom level"},{name:"setZoom",sig:":setZoom(zoom)",desc:"Set zoom level"},{name:"getRotation",sig:":getRotation()",desc:"Returns rotation in radians"},{name:"setRotation",sig:":setRotation(angle)",desc:"Set rotation"},{name:"lookAt",sig:":lookAt(x, y)",desc:"Center camera on position"},{name:"shake",sig:":shake(intensity, duration)",desc:"Apply screen shake"},{name:"attach",sig:":attach()",desc:"Apply camera transform"},{name:"detach",sig:":detach()",desc:"Reset camera transform"},{name:"worldToScreen",sig:":worldToScreen(wx, wy)",desc:"Convert world to screen coords"},{name:"screenToWorld",sig:":screenToWorld(sx, sy)",desc:"Convert screen to world coords"},{name:"type",sig:":type()",desc:"Returns 'LCamera'"}]}},bl=["graphics","render","audio","physics","input","timer","filesystem","compute","data","image","ecs","window","thread","animation","camera","automation","event","math","particle","tilemap","scene","save","mods","graph","pathfind","ai","dataframe","ui","minimap","effect","postfx","terminal","cardgame","tween"];function Dr(n){let e=[],t=[],r=[],a=new Map,o=n.getText().split(`
+`);for(let s=0;s<o.length;s++){let l=o[s],p=l.match(/\blocal\s+(\w+)\s*=\s*(lurek\.\w+\.\w+)\s*\(/);if(p){let[,w,T]=p,M=Br(T);M&&e.push({varName:w,typeName:M,factoryCall:T,line:s})}let u=l.match(/\blocal\s+(\w+)\s*=\s*(lurek\.(\w+))\s*(?:$|--)/);if(u){let[,w,T,M]=u;(at?.getModuleNames()??bl).includes(M)&&r.push({varName:w,modulePath:T,alias:w,module:T,line:s})}let c=l.match(/\blocal\s+(\w+)\s*=\s*(\w+)\.(\w+)\s*\(/);if(c){let[,w,T,M]=c,E=r.find(N=>N.varName===T&&N.line<s);if(E){let N=`${E.modulePath}.${M}`,$=Br(N);$&&e.push({varName:w,typeName:$,factoryCall:N,line:s})}}let h=l.match(/\blocal\s+(\w+)\s*=\s*(\w+)\s*(?:$|--)/);if(h){let[,w,T]=h,M=e.find(E=>E.varName===T&&E.line<s);M&&e.push({varName:w,typeName:M.typeName,factoryCall:M.factoryCall,line:s})}let L=l.match(/\b(?:local\s+)?(\w+)\s*=\s*\{\s*\}/);if(L){let w=L[1];if(s+1<o.length){let T=o[s+1];(T.includes(`${w}.__index`)||T.includes(`__index = ${w}`))&&(a.has(w)||a.set(w,{name:w,methods:[],instances:[]}))}}let d=l.match(/\b(\w+)\.__index\s*=\s*\1\b/);if(d){let w=d[1];a.has(w)||a.set(w,{name:w,methods:[],instances:[]})}let g=l.match(/\bfunction\s+(\w+):(\w+)\s*\(/);if(g){let[,w,T]=g,M=a.get(w);M||(M={name:w,methods:[],instances:[]},a.set(w,M)),M.methods.find(E=>E.name===T)||M.methods.push({name:T,sig:`:${T}(...)`,desc:`Method of ${w}`})}let v=l.match(/\blocal\s+(\w+)\s*=\s*(\w+)[:.](new|create)\s*\(/);if(v){let[,w,T]=v,M=a.get(T);M&&M.instances.push({varName:w,line:s})}let x=l.match(/\blocal\s+(\w+)\s*=\s*setmetatable\s*\([^,]*,\s*(\w+)\s*\)/)??l.match(/\blocal\s+(\w+)\s*=\s*setmetatable\s*\([^,]*,\s*\{[^}]*__index\s*=\s*(\w+)[^}]*\}\s*\)/);if(x){let[,w,T]=x,M=a.get(T);M&&M.instances.push({varName:w,line:s})}}for(let s of a.values())t.push(s);return{varTypes:e,classes:t,moduleAliases:r}}function Tl(n,e,t,r){let a=t.find(i=>i.varName===n&&i.line<e.line);if(a){let i=Ar(a.typeName);if(i)return{typeInfo:i,factoryCall:a.factoryCall}}}function vl(n,e,t,r){let a=t.find(i=>i.varName===n&&i.line<e.line);if(a){let i=Ar(a.typeName);if(i)return i.methods}for(let i of r)if(i.instances.find(s=>s.varName===n&&s.line<e.line)&&i.methods.length>0)return i.methods}function ci(n,e){yl(e);let t=X.languages.registerCompletionItemProvider(Er,{provideCompletionItems(i,o){let p=i.lineAt(o).text.substring(0,o.character).match(/\b(\w+):(\w*)$/);if(!p)return;let u=p[1],c=p[2].toLowerCase(),{varTypes:h,classes:L}=Dr(i),d=vl(u,o,h,L);if(d)return d.filter(g=>!c||g.name.toLowerCase().startsWith(c)).map(g=>{let v=new X.CompletionItem(g.name,X.CompletionItemKind.Method);return v.detail=g.sig,v.documentation=new X.MarkdownString(g.desc),v.sortText=`0${g.name}`,v})}},":"),r=X.languages.registerCompletionItemProvider(Er,{provideCompletionItems(i,o){let p=i.lineAt(o).text.substring(0,o.character).match(/\b(\w+)\.(\w*)$/);if(!p)return;let u=p[1];if(u==="lurek")return;let c=p[2].toLowerCase(),{varTypes:h,classes:L,moduleAliases:d}=Dr(i),g=d.find(w=>w.varName===u&&w.line<o.line);if(g){let w=g.modulePath+".",T=[];for(let M of fl())if(M.startsWith(w)){let E=M.substring(w.length);if(!c||E.toLowerCase().startsWith(c)){let N=Br(M);if(!N)continue;let $=new X.CompletionItem(E,X.CompletionItemKind.Function);$.detail=`\u2192 ${N}`,$.documentation=new X.MarkdownString(`Factory from \`${M}\``),$.sortText=`0${E}`,T.push($)}}if(T.length>0)return T}let v=[],x=h.find(w=>w.varName===u&&w.line<o.line);if(x){let w=Ar(x.typeName);if(w){if(w.fields)for(let T of w.fields){if(c&&!T.name.toLowerCase().startsWith(c))continue;let M=new X.CompletionItem(T.name,X.CompletionItemKind.Field);M.detail=T.type,M.documentation=new X.MarkdownString(T.desc),M.sortText=`0a${T.name}`,v.push(M)}for(let T of w.methods){if(c&&!T.name.toLowerCase().startsWith(c))continue;let M=new X.CompletionItem(T.name,X.CompletionItemKind.Method);M.detail=T.sig,M.documentation=new X.MarkdownString(T.desc),M.sortText=`0b${T.name}`,v.push(M)}}}if(v.length===0){for(let w of L)if(w.instances.find(M=>M.varName===u&&M.line<o.line)&&w.methods.length>0){for(let M of w.methods){if(c&&!M.name.toLowerCase().startsWith(c))continue;let E=new X.CompletionItem(M.name,X.CompletionItemKind.Method);E.detail=M.sig,E.documentation=new X.MarkdownString(M.desc),E.sortText=`0${M.name}`,v.push(E)}break}}return v.length>0?v:void 0}},"."),a=X.languages.registerHoverProvider(Er,{provideHover(i,o){let s=i.getWordRangeAtPosition(o,/\w+/);if(!s)return;let l=i.getText(s),{varTypes:p,classes:u,moduleAliases:c}=Dr(i),h=c.find(d=>d.varName===l&&d.line<o.line);if(h){let d=new X.MarkdownString;return d.appendCodeblock(`${l}: module (${h.modulePath})`,"lua"),d.appendMarkdown(`Alias for \`${h.modulePath}\``),new X.Hover(d,s)}let L=Tl(l,o,p,u);if(L){let{typeInfo:d,factoryCall:g}=L,v=new X.MarkdownString;return v.appendCodeblock(`${l}: ${d.typeName}`,"lua"),v.appendMarkdown(`Created by \`${g}()\`
 
-// src/providers/luajitHints.ts
-var vscode10 = __toESM(require("vscode"));
-var PERF_RULES = [
-  {
-    code: "lurek.perf.tableAllocHotPath",
-    pattern: /\{\s*\}/,
-    message: "Table allocation `{}` in hot path \u2014 consider pre-allocating or using an object pool.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.newInHotPath",
-    pattern: /lurek\.\w+\.new\w*\s*\(/,
-    message: "Resource creation (lurek.*.new*) in hot path \u2014 move to lurek.load() or cache the result.",
-    severity: vscode10.DiagnosticSeverity.Warning,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.globalInLoop",
-    pattern: /\bfor\b.+\bdo\b/,
-    message: "Loop detected \u2014 ensure frequently accessed globals are cached as locals above the loop.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: false
-  },
-  {
-    code: "lurek.perf.stringConcatLoop",
-    pattern: /\.\.\s*["']/,
-    message: "String concatenation in loop \u2014 consider table.insert + table.concat for better performance.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.pcallHotPath",
-    pattern: /\bpcall\s*\(/,
-    message: "pcall in hot path adds overhead \u2014 consider error handling outside the frame loop.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.mathFloor",
-    pattern: /math\.floor\s*\(/,
-    message: "Consider bit.tobit() or x%1 for faster integer conversion in LuaJIT.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.mathRandom",
-    pattern: /math\.random\s*\(/,
-    message: "Use lurek.math.random() for deterministic, seedable RNG consistent across platforms.",
-    severity: vscode10.DiagnosticSeverity.Information,
-    hotPathOnly: true
-  },
-  {
-    code: "lurek.perf.unpackInLoop",
-    pattern: /\bunpack\s*\(/,
-    message: "unpack() in hot path creates temporary values \u2014 prefer indexed access for known structures.",
-    severity: vscode10.DiagnosticSeverity.Hint,
-    hotPathOnly: true
-  }
-];
-var COMPAT_RULES = [
-  {
-    code: "lurek.compat.constAttribute",
-    pattern: /\blocal\s+\w+\s*<\s*const\s*>/,
-    message: "Lua 5.4 `<const>` attribute is not supported in LuaJIT. Remove the attribute \u2014 LuaJIT inlines constants automatically."
-  },
-  {
-    code: "lurek.compat.closeAttribute",
-    pattern: /\blocal\s+\w+\s*<\s*close\s*>/,
-    message: "Lua 5.4 `<close>` (to-be-closed variable) is not supported in LuaJIT. Use explicit :close() or defer via a wrapper."
-  },
-  {
-    code: "lurek.compat.utf8Library",
-    pattern: /\butf8\s*\.\s*\w+\s*\(/,
-    message: "The `utf8` standard library is not available in LuaJIT. Use lurek.utf8.* instead or the luajit-utf8 binding."
-  },
-  {
-    code: "lurek.compat.tableMove",
-    pattern: /\btable\s*\.\s*move\s*\(/,
-    message: "`table.move` behaviour differs between Lua 5.4 and LuaJIT. Test carefully, or use a manual loop for portability."
-  },
-  {
-    code: "lurek.compat.bitwiseTilde",
-    pattern: /(?<![=<>~])\s*~(?!\s*=)\s*(?![-\\/])/,
-    message: "Lua 5.4 bitwise `~` (XOR / NOT) operator is not supported in LuaJIT. Use `bit.bxor(a, b)` or `bit.bnot(a)` instead."
-  },
-  {
-    code: "lurek.compat.intDivOp",
-    pattern: /\/\//,
-    message: "Floor-division operator `//` is a LuaJIT extension that matches Lua 5.4. Behaviour is consistent \u2014 no action needed. (Hint only.)"
-  },
-  {
-    code: "lurek.compat.warnLevel",
-    pattern: /(?<!\.)(?<!\w)\bwarn\s*\(/,
-    message: "`warn()` is a Lua 5.4-only function and is not available in LuaJIT. Use `print()` or `lurek.log.warn()` instead."
-  }
-];
-function findHotPathLines(text) {
-  const hot = /* @__PURE__ */ new Set();
-  const lines = text.split("\n");
-  let depth = 0;
-  let inHotPath = false;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (/^\s*function\s+lurek\.(update|draw)\s*\(/.test(line)) {
-      inHotPath = true;
-      depth = 0;
-    }
-    if (inHotPath) {
-      const opens = (line.match(/\b(function|do|then|repeat)\b/g) || []).length;
-      const closes = (line.match(/\b(end|until)\b/g) || []).length;
-      depth += opens - closes;
-      hot.add(i);
-      if (depth <= 0 && i > 0) {
-        inHotPath = false;
-      }
-    }
-  }
-  return hot;
-}
-function register7(context, _apiData) {
-  const disposables = [];
-  const diagCollection = vscode10.languages.createDiagnosticCollection("lurek.luajit");
-  disposables.push(diagCollection);
-  const compatCollection = vscode10.languages.createDiagnosticCollection("lurek.compat");
-  disposables.push(compatCollection);
-  function analyzePerfHints(document) {
-    if (document.languageId !== "lua") return;
-    const text = document.getText();
-    const hotLines = findHotPathLines(text);
-    const diagnostics = [];
-    const lines = text.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (/^\s*--/.test(line)) continue;
-      for (const rule of PERF_RULES) {
-        if (rule.hotPathOnly && !hotLines.has(i)) continue;
-        const match = rule.pattern.exec(line);
-        if (match) {
-          const startCol = match.index;
-          const endCol = match.index + match[0].length;
-          const range = new vscode10.Range(i, startCol, i, endCol);
-          const diag = new vscode10.Diagnostic(range, rule.message, rule.severity);
-          diag.code = rule.code;
-          diag.source = "Lurek2D LuaJIT";
-          diagnostics.push(diag);
-        }
-      }
-    }
-    diagCollection.set(document.uri, diagnostics);
-  }
-  function analyzeCompatWarnings(document) {
-    if (document.languageId !== "lua") return;
-    const text = document.getText();
-    const diagnostics = [];
-    const lines = text.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (/^\s*--/.test(line)) continue;
-      const stripped = line.replace(/--.*$/, "");
-      for (const rule of COMPAT_RULES) {
-        const match = rule.pattern.exec(stripped);
-        if (match) {
-          const startCol = match.index;
-          const endCol = match.index + match[0].length;
-          const range = new vscode10.Range(i, startCol, i, endCol);
-          const sev = rule.code === "lurek.compat.intDivOp" ? vscode10.DiagnosticSeverity.Hint : vscode10.DiagnosticSeverity.Warning;
-          const diag = new vscode10.Diagnostic(range, rule.message, sev);
-          diag.code = rule.code;
-          diag.source = "Lurek2D Compat";
-          diagnostics.push(diag);
-        }
-      }
-    }
-    compatCollection.set(document.uri, diagnostics);
-  }
-  if (vscode10.window.activeTextEditor) {
-    analyzePerfHints(vscode10.window.activeTextEditor.document);
-    analyzeCompatWarnings(vscode10.window.activeTextEditor.document);
-  }
-  disposables.push(
-    vscode10.window.onDidChangeActiveTextEditor((editor) => {
-      if (editor) {
-        analyzePerfHints(editor.document);
-        analyzeCompatWarnings(editor.document);
-      }
-    }),
-    vscode10.workspace.onDidChangeTextDocument((e) => {
-      analyzePerfHints(e.document);
-      analyzeCompatWarnings(e.document);
-    }),
-    vscode10.workspace.onDidCloseTextDocument((doc) => {
-      diagCollection.delete(doc.uri);
-      compatCollection.delete(doc.uri);
-    })
-  );
-  context.subscriptions.push(...disposables);
-}
+`),d.fields&&d.fields.length>0&&v.appendMarkdown(`**Fields:** ${d.fields.map(x=>`\`${x.name}\``).join(", ")}
 
-// src/providers/typeInference.ts
-var vscode11 = __toESM(require("vscode"));
-var _apiDataSingleton = null;
-function setApiData(data) {
-  _apiDataSingleton = data;
-}
-function getReturnTypeName(fullPath) {
-  if (_apiDataSingleton) {
-    const typeName = _apiDataSingleton.getFactoryTypes().get(fullPath);
-    if (typeName) return typeName;
-  }
-  return FACTORY_TYPES[fullPath]?.typeName;
-}
-function getTypeInfoByName(typeName) {
-  if (_apiDataSingleton) {
-    const methods = _apiDataSingleton.getMethods(typeName);
-    if (methods.length > 0) {
-      const legacyEntry = Object.values(FACTORY_TYPES).find((t) => t.typeName === typeName);
-      return {
-        typeName,
-        methods: methods.map((fn) => ({
-          name: fn.name,
-          sig: fn.signature,
-          desc: fn.description
-        })),
-        ...legacyEntry?.fields ? { fields: legacyEntry.fields } : {}
-      };
-    }
-  }
-  return Object.values(FACTORY_TYPES).find((t) => t.typeName === typeName);
-}
-function getAllFactoryPaths() {
-  const paths = new Set(Object.keys(FACTORY_TYPES));
-  if (_apiDataSingleton) {
-    for (const key of _apiDataSingleton.getFactoryTypes().keys()) {
-      paths.add(key);
-    }
-  }
-  return Array.from(paths);
-}
-var LUA_SELECTOR6 = {
-  scheme: "file",
-  language: "lua"
-};
-var FACTORY_TYPES = {
-  "lurek.graphics.newImage": {
-    typeName: "LImage",
-    fields: [
-      { name: "width", type: "number", desc: "Image width in pixels" },
-      { name: "height", type: "number", desc: "Image height in pixels" }
-    ],
-    methods: [
-      { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
-      { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
-      { name: "getHeight", sig: ":getHeight()", desc: "Returns pixel height" },
-      { name: "getFilter", sig: ":getFilter()", desc: "Returns min, mag filter modes" },
-      { name: "setFilter", sig: ":setFilter(min, mag)", desc: "Set texture filter" },
-      { name: "setWrap", sig: ":setWrap(horiz, vert)", desc: "Set texture wrap mode" },
-      { name: "getWrap", sig: ":getWrap()", desc: "Returns horizontal, vertical wrap" },
-      { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LImage'" }
-    ]
-  },
-  "lurek.graphics.newCanvas": {
-    typeName: "LCanvas",
-    fields: [
-      { name: "width", type: "number", desc: "Canvas width in pixels" },
-      { name: "height", type: "number", desc: "Canvas height in pixels" }
-    ],
-    methods: [
-      { name: "getDimensions", sig: ":getDimensions()", desc: "Returns width, height" },
-      { name: "getWidth", sig: ":getWidth()", desc: "Returns pixel width" },
-      { name: "getHeight", sig: ":getHeight()", desc: "Returns pixel height" },
-      { name: "getFilter", sig: ":getFilter()", desc: "Returns min, mag filter modes" },
-      { name: "setFilter", sig: ":setFilter(min, mag)", desc: "Set texture filter" },
-      { name: "renderTo", sig: ":renderTo(fn)", desc: "Render to this canvas" },
-      { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LCanvas'" }
-    ]
-  },
-  "lurek.graphics.newFont": {
-    typeName: "LFont",
-    methods: [
-      { name: "getWidth", sig: ":getWidth(text)", desc: "Width of text in pixels" },
-      { name: "getHeight", sig: ":getHeight()", desc: "Font height in pixels" },
-      { name: "getLineHeight", sig: ":getLineHeight()", desc: "Returns line height multiplier" },
-      { name: "setLineHeight", sig: ":setLineHeight(h)", desc: "Set line height multiplier" },
-      { name: "getAscent", sig: ":getAscent()", desc: "Returns font ascent" },
-      { name: "getDescent", sig: ":getDescent()", desc: "Returns font descent" },
-      { name: "hasGlyphs", sig: ":hasGlyphs(text)", desc: "Check if font has glyphs" },
-      { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LFont'" }
-    ]
-  },
-  "lurek.graphics.newShader": {
-    typeName: "LShader",
-    methods: [
-      { name: "send", sig: ":send(name, value)", desc: "Set uniform value" },
-      { name: "hasUniform", sig: ":hasUniform(name)", desc: "Check if uniform exists" },
-      { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LShader'" }
-    ]
-  },
-  "lurek.graphics.newMesh": {
-    typeName: "LMesh",
-    methods: [
-      { name: "setVertices", sig: ":setVertices(verts)", desc: "Set vertex data" },
-      { name: "setTexture", sig: ":setTexture(tex)", desc: "Set texture for mesh" },
-      { name: "getVertexCount", sig: ":getVertexCount()", desc: "Returns vertex count" },
-      { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LMesh'" }
-    ]
-  },
-  "lurek.graphics.newSpriteBatch": {
-    typeName: "LSpriteBatch",
-    methods: [
-      { name: "add", sig: ":add(quad, x, y, r, sx, sy)", desc: "Add sprite to batch" },
-      { name: "clear", sig: ":clear()", desc: "Remove all sprites" },
-      { name: "getCount", sig: ":getCount()", desc: "Returns current sprite count" },
-      { name: "set", sig: ":set(id, quad, x, y, r, sx, sy)", desc: "Update sprite at index" },
-      { name: "flush", sig: ":flush()", desc: "Upload data to GPU" },
-      { name: "release", sig: ":release()", desc: "Free GPU resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LSpriteBatch'" }
-    ]
-  },
-  "lurek.graphics.newQuad": {
-    typeName: "LQuad",
-    methods: [
-      { name: "getViewport", sig: ":getViewport()", desc: "Returns x, y, w, h" },
-      { name: "setViewport", sig: ":setViewport(x, y, w, h)", desc: "Set viewport rect" },
-      { name: "getTextureDimensions", sig: ":getTextureDimensions()", desc: "Returns ref width, height" },
-      { name: "type", sig: ":type()", desc: "Returns 'LQuad'" }
-    ]
-  },
-  "lurek.audio.newSource": {
-    typeName: "LSource",
-    methods: [
-      { name: "play", sig: ":play()", desc: "Start or resume playback" },
-      { name: "pause", sig: ":pause()", desc: "Pause playback" },
-      { name: "stop", sig: ":stop()", desc: "Stop and rewind" },
-      { name: "isPlaying", sig: ":isPlaying()", desc: "Returns true if playing" },
-      { name: "setVolume", sig: ":setVolume(v)", desc: "Set volume (0-1)" },
-      { name: "getVolume", sig: ":getVolume()", desc: "Returns current volume" },
-      { name: "setPitch", sig: ":setPitch(p)", desc: "Set pitch multiplier" },
-      { name: "getPitch", sig: ":getPitch()", desc: "Returns pitch" },
-      { name: "setLooping", sig: ":setLooping(loop)", desc: "Enable/disable loop" },
-      { name: "isLooping", sig: ":isLooping()", desc: "Returns loop state" },
-      { name: "seek", sig: ":seek(seconds)", desc: "Seek to position" },
-      { name: "tell", sig: ":tell()", desc: "Returns current position" },
-      { name: "getDuration", sig: ":getDuration()", desc: "Returns duration in seconds" },
-      { name: "release", sig: ":release()", desc: "Free audio resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LSource'" }
-    ]
-  },
-  "lurek.physics.newWorld": {
-    typeName: "LWorld",
-    methods: [
-      { name: "update", sig: ":update(dt)", desc: "Step the simulation" },
-      { name: "setGravity", sig: ":setGravity(gx, gy)", desc: "Set gravity vector" },
-      { name: "getGravity", sig: ":getGravity()", desc: "Returns gx, gy" },
-      { name: "getBodyCount", sig: ":getBodyCount()", desc: "Number of bodies" },
-      { name: "queryBoundingBox", sig: ":queryBoundingBox(x1, y1, x2, y2, fn)", desc: "Query AABB" },
-      { name: "rayCast", sig: ":rayCast(x1, y1, x2, y2, fn)", desc: "Cast a ray" },
-      { name: "setCallbacks", sig: ":setCallbacks(begin, end, pre, post)", desc: "Set collision callbacks" },
-      { name: "destroy", sig: ":destroy()", desc: "Destroy physics world" },
-      { name: "type", sig: ":type()", desc: "Returns 'LWorld'" }
-    ]
-  },
-  "lurek.physics.newBody": {
-    typeName: "LBody",
-    methods: [
-      { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
-      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set position" },
-      { name: "getAngle", sig: ":getAngle()", desc: "Returns rotation in radians" },
-      { name: "setAngle", sig: ":setAngle(angle)", desc: "Set rotation" },
-      { name: "getLinearVelocity", sig: ":getLinearVelocity()", desc: "Returns vx, vy" },
-      { name: "setLinearVelocity", sig: ":setLinearVelocity(vx, vy)", desc: "Set velocity" },
-      { name: "applyForce", sig: ":applyForce(fx, fy)", desc: "Apply force at center" },
-      { name: "applyLinearImpulse", sig: ":applyLinearImpulse(ix, iy)", desc: "Apply impulse" },
-      { name: "setMass", sig: ":setMass(mass)", desc: "Set body mass" },
-      { name: "getMass", sig: ":getMass()", desc: "Returns body mass" },
-      { name: "setType", sig: ":setType(type)", desc: "Set body type" },
-      { name: "getType", sig: ":getType()", desc: "Returns body type string" },
-      { name: "isAwake", sig: ":isAwake()", desc: "Returns true if body is awake" },
-      { name: "destroy", sig: ":destroy()", desc: "Remove body from world" },
-      { name: "type", sig: ":type()", desc: "Returns 'LBody'" }
-    ]
-  },
-  "lurek.graphics.newParticleSystem": {
-    typeName: "LParticleSystem",
-    methods: [
-      { name: "emit", sig: ":emit(count)", desc: "Emit particles" },
-      { name: "update", sig: ":update(dt)", desc: "Update particle system" },
-      { name: "start", sig: ":start()", desc: "Start emitting" },
-      { name: "stop", sig: ":stop()", desc: "Stop emitting" },
-      { name: "pause", sig: ":pause()", desc: "Pause system" },
-      { name: "reset", sig: ":reset()", desc: "Reset and clear particles" },
-      { name: "getCount", sig: ":getCount()", desc: "Returns active particle count" },
-      { name: "setEmissionRate", sig: ":setEmissionRate(rate)", desc: "Particles per second" },
-      { name: "setLifetime", sig: ":setLifetime(min, max)", desc: "Set particle lifetime range" },
-      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set emitter position" },
-      { name: "setSpeed", sig: ":setSpeed(min, max)", desc: "Set speed range" },
-      { name: "setDirection", sig: ":setDirection(angle)", desc: "Set emission direction" },
-      { name: "setSpread", sig: ":setSpread(spread)", desc: "Set emission cone angle" },
-      { name: "release", sig: ":release()", desc: "Free resources" },
-      { name: "type", sig: ":type()", desc: "Returns 'LParticleSystem'" }
-    ]
-  },
-  // ── cardgame types ────────────────────────────────────────
-  // lurek.cardgame.clone is an alias — it clones a Card from another (advanced use)
-  "lurek.cardgame.clone": {
-    typeName: "LCard",
-    fields: [
-      { name: "card_type", type: "string", desc: "The registered card type name" },
-      { name: "name", type: "string", desc: "Card display name" },
-      { name: "category", type: "string", desc: "Category (creature, spell, etc.)" },
-      { name: "face_up", type: "boolean", desc: "Whether the card is face-up" },
-      { name: "tapped", type: "boolean", desc: "Whether the card is tapped/exhausted" },
-      { name: "owner", type: "string", desc: "Owner player identifier" },
-      { name: "controller", type: "string", desc: "Controller player identifier" },
-      { name: "zone", type: "string", desc: "Current zone name" }
-    ],
-    methods: [
-      { name: "hasTag", sig: ":hasTag(tag)", desc: "Returns true if card has the tag" },
-      { name: "addTag", sig: ":addTag(tag)", desc: "Add a tag (deduplicated)" },
-      { name: "removeTag", sig: ":removeTag(tag)", desc: "Remove a tag by value" },
-      { name: "getStat", sig: ":getStat(name)", desc: "Get a numeric stat value" },
-      { name: "setStat", sig: ":setStat(name, value)", desc: "Set a numeric stat value" },
-      { name: "addCounter", sig: ":addCounter(kind, amount)", desc: "Add to a counter, returns new total" },
-      { name: "getCounter", sig: ":getCounter(kind)", desc: "Get a counter value" },
-      { name: "tap", sig: ":tap()", desc: "Tap the card (exhausted)" },
-      { name: "untap", sig: ":untap()", desc: "Untap the card" },
-      { name: "getMeta", sig: ":getMeta(key)", desc: "Get metadata value" },
-      { name: "setMeta", sig: ":setMeta(key, value)", desc: "Set metadata value" }
-    ]
-  },
-  "lurek.cardgame.newCard": {
-    typeName: "LCard",
-    fields: [
-      { name: "card_type", type: "string", desc: "The registered card type name" },
-      { name: "name", type: "string", desc: "Card display name" },
-      { name: "category", type: "string", desc: "Category (creature, spell, etc.)" },
-      { name: "face_up", type: "boolean", desc: "Whether the card is face-up" },
-      { name: "tapped", type: "boolean", desc: "Whether the card is tapped/exhausted" },
-      { name: "owner", type: "string", desc: "Owner player identifier" },
-      { name: "controller", type: "string", desc: "Controller player identifier" },
-      { name: "zone", type: "string", desc: "Current zone name" }
-    ],
-    methods: [
-      { name: "hasTag", sig: ":hasTag(tag)", desc: "Returns true if card has the tag" },
-      { name: "addTag", sig: ":addTag(tag)", desc: "Add a tag (deduplicated)" },
-      { name: "removeTag", sig: ":removeTag(tag)", desc: "Remove a tag by value" },
-      { name: "getStat", sig: ":getStat(name)", desc: "Get a numeric stat value" },
-      { name: "setStat", sig: ":setStat(name, value)", desc: "Set a numeric stat value" },
-      { name: "addCounter", sig: ":addCounter(kind, amount)", desc: "Add to a counter, returns new total" },
-      { name: "getCounter", sig: ":getCounter(kind)", desc: "Get a counter value" },
-      { name: "removeCounters", sig: ":removeCounters(kind)", desc: "Remove all counters of a type" },
-      { name: "getMeta", sig: ":getMeta(key)", desc: "Get metadata value" },
-      { name: "setMeta", sig: ":setMeta(key, value)", desc: "Set metadata value" },
-      { name: "tap", sig: ":tap()", desc: "Tap the card (exhausted)" },
-      { name: "untap", sig: ":untap()", desc: "Untap the card" },
-      { name: "getAllCounters", sig: ":getAllCounters()", desc: "Returns all (kind, count) counter pairs" }
-    ]
-  },
-  "lurek.cardgame.newDeck": {
-    typeName: "LDeck",
-    fields: [
-      { name: "name", type: "string", desc: "Deck display name" }
-    ],
-    methods: [
-      { name: "shuffle", sig: ":shuffle()", desc: "Shuffle using Fisher-Yates" },
-      { name: "draw", sig: ":draw()", desc: "Draw from the top; returns Card or nil" },
-      { name: "drawBottom", sig: ":drawBottom()", desc: "Draw from the bottom" },
-      { name: "pushTop", sig: ":pushTop(card)", desc: "Add a card to the top" },
-      { name: "pushBottom", sig: ":pushBottom(card)", desc: "Add a card to the bottom" },
-      { name: "peek", sig: ":peek()", desc: "Peek at the top card without removing" },
-      { name: "insertAt", sig: ":insertAt(index, card)", desc: "Insert a card at a 0-based position" },
-      { name: "removeAt", sig: ":removeAt(index)", desc: "Remove and return card at index" },
-      { name: "moveWithin", sig: ":moveWithin(from, to)", desc: "Move card at from_index to to_index" },
-      { name: "size", sig: ":size()", desc: "Returns card count" },
-      { name: "isEmpty", sig: ":isEmpty()", desc: "Returns true if empty" },
-      { name: "searchByTag", sig: ":searchByTag(tag)", desc: "Returns indices of cards with tag" },
-      { name: "searchByType", sig: ":searchByType(card_type)", desc: "Returns indices of matching type" },
-      { name: "countByType", sig: ":countByType(card_type)", desc: "Count cards of a specific type" },
-      { name: "revealTop", sig: ":revealTop(n)", desc: "Peek at top n cards, returns type strings" },
-      { name: "reset", sig: ":reset()", desc: "Reset to original state" }
-    ]
-  },
-  "lurek.cardgame.newDeckBuilder": {
-    typeName: "LDeckBuilder",
-    fields: [
-      { name: "min_cards", type: "integer", desc: "Minimum total cards required" },
-      { name: "max_cards", type: "integer", desc: "Maximum total cards allowed (0 = no limit)" },
-      { name: "max_copies", type: "integer", desc: "Maximum copies of a single card type" }
-    ],
-    methods: [
-      { name: "validate", sig: ":validate(deck)", desc: "Validate a deck, returns list of violation messages" }
-    ]
-  },
-  "lurek.cardgame.newStackManager": {
-    typeName: "LStackManager",
-    methods: [
-      { name: "push", sig: ":push(entry)", desc: "Push an entry onto the stack" },
-      { name: "resolve", sig: ":resolve()", desc: "Pop and return the top entry" },
-      { name: "peek", sig: ":peek()", desc: "Peek at the top entry" },
-      { name: "isEmpty", sig: ":isEmpty()", desc: "Whether the stack has anything to resolve" },
-      { name: "size", sig: ":size()", desc: "Number of entries on the stack" },
-      { name: "clear", sig: ":clear()", desc: "Clear all entries" },
-      { name: "findByKind", sig: ":findByKind(kind)", desc: "Find first entry matching a kind" }
-    ]
-  },
-  "lurek.cardgame.newZone": {
-    typeName: "LZone",
-    fields: [
-      { name: "name", type: "string", desc: "Zone name" },
-      { name: "capacity", type: "integer", desc: "Max capacity (0 = unlimited)" }
-    ],
-    methods: [
-      { name: "canAdd", sig: ":canAdd()", desc: "Returns true if zone accepts one more card" },
-      { name: "add", sig: ":add(card)", desc: "Add a card (returns error if zone full)" },
-      { name: "removeAt", sig: ":removeAt(index)", desc: "Remove card at 0-based index" },
-      { name: "size", sig: ":size()", desc: "Number of cards in zone" },
-      { name: "isEmpty", sig: ":isEmpty()", desc: "True if empty" },
-      { name: "findByType", sig: ":findByType(card_type)", desc: "Find first card by type" },
-      { name: "countByType", sig: ":countByType(card_type)", desc: "Count cards of a specific type" },
-      { name: "getAllTypes", sig: ":getAllTypes()", desc: "Return type strings of all cards" }
-    ]
-  },
-  "lurek.cardgame.newCardPool": {
-    typeName: "LCardPool",
-    fields: [
-      { name: "name", type: "string", desc: "Pool name" }
-    ],
-    methods: [
-      { name: "add", sig: ":add(card_type, weight)", desc: "Add a card type with weight (default 1)" },
-      { name: "remove", sig: ":remove(card_type)", desc: "Remove a card type from pool" },
-      { name: "draw", sig: ":draw(n)", desc: "Draw n cards (with replacement), returns type names" },
-      { name: "size", sig: ":size()", desc: "Number of entries" },
-      { name: "getTypes", sig: ":getTypes()", desc: "Returns all card types in pool" },
-      { name: "totalWeight", sig: ":totalWeight()", desc: "Total weight of all entries" }
-    ]
-  },
-  // ── entity types ──────────────────────────────────────────
-  "lurek.ecs.new": {
-    typeName: "LEntity",
-    methods: [
-      { name: "getId", sig: ":getId()", desc: "Returns entity ID" },
-      { name: "getTag", sig: ":getTag()", desc: "Returns entity tag" },
-      { name: "setTag", sig: ":setTag(tag)", desc: "Set entity tag" },
-      { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
-      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set position" },
-      { name: "getComponent", sig: ":getComponent(name)", desc: "Get component by name" },
-      { name: "addComponent", sig: ":addComponent(name, data)", desc: "Add component" },
-      { name: "removeComponent", sig: ":removeComponent(name)", desc: "Remove component" },
-      { name: "hasComponent", sig: ":hasComponent(name)", desc: "Returns true if entity has component" },
-      { name: "destroy", sig: ":destroy()", desc: "Destroy entity" },
-      { name: "isAlive", sig: ":isAlive()", desc: "Returns true if entity is alive" },
-      { name: "type", sig: ":type()", desc: "Returns 'LEntity'" }
-    ]
-  },
-  // ── timer types ───────────────────────────────────────────
-  "lurek.timer.after": {
-    typeName: "LTimer",
-    methods: [
-      { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
-      { name: "pause", sig: ":pause()", desc: "Pause the timer" },
-      { name: "resume", sig: ":resume()", desc: "Resume the timer" },
-      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" }
-    ]
-  },
-  "lurek.timer.every": {
-    typeName: "LTimer",
-    methods: [
-      { name: "cancel", sig: ":cancel()", desc: "Cancel the timer" },
-      { name: "pause", sig: ":pause()", desc: "Pause the timer" },
-      { name: "resume", sig: ":resume()", desc: "Resume the timer" },
-      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "type", sig: ":type()", desc: "Returns 'LTimer'" }
-    ]
-  },
-  "lurek.timer.tween": {
-    typeName: "LTween",
-    methods: [
-      { name: "cancel", sig: ":cancel()", desc: "Cancel the tween" },
-      { name: "pause", sig: ":pause()", desc: "Pause the tween" },
-      { name: "resume", sig: ":resume()", desc: "Resume the tween" },
-      { name: "isActive", sig: ":isActive()", desc: "Returns true if still active" },
-      { name: "getProgress", sig: ":getProgress()", desc: "Returns progress 0-1" },
-      { name: "type", sig: ":type()", desc: "Returns 'LTween'" }
-    ]
-  },
-  // ── tilemap types ─────────────────────────────────────────
-  "lurek.tilemap.load": {
-    typeName: "LTilemap",
-    methods: [
-      { name: "draw", sig: ":draw()", desc: "Draw the tilemap" },
-      { name: "getWidth", sig: ":getWidth()", desc: "Returns width in tiles" },
-      { name: "getHeight", sig: ":getHeight()", desc: "Returns height in tiles" },
-      { name: "getTileAt", sig: ":getTileAt(x, y)", desc: "Get tile at grid position" },
-      { name: "setTileAt", sig: ":setTileAt(x, y, tile)", desc: "Set tile at grid position" },
-      { name: "getLayer", sig: ":getLayer(name)", desc: "Get layer by name" },
-      { name: "getLayerCount", sig: ":getLayerCount()", desc: "Returns number of layers" },
-      { name: "getProperty", sig: ":getProperty(name)", desc: "Get map property" },
-      { name: "type", sig: ":type()", desc: "Returns 'LTilemap'" }
-    ]
-  },
-  // ── scene types ───────────────────────────────────────────
-  "lurek.scene.new": {
-    typeName: "LScene",
-    methods: [
-      { name: "enter", sig: ":enter()", desc: "Called when scene becomes active" },
-      { name: "exit", sig: ":exit()", desc: "Called when scene is deactivated" },
-      { name: "update", sig: ":update(dt)", desc: "Update scene" },
-      { name: "draw", sig: ":draw()", desc: "Draw scene" },
-      { name: "getName", sig: ":getName()", desc: "Returns scene name" },
-      { name: "type", sig: ":type()", desc: "Returns 'LScene'" }
-    ]
-  },
-  // ── data types ────────────────────────────────────────────
-  "lurek.data.newStore": {
-    typeName: "LDataStore",
-    methods: [
-      { name: "get", sig: ":get(key)", desc: "Get value by key" },
-      { name: "set", sig: ":set(key, value)", desc: "Set a key-value pair" },
-      { name: "delete", sig: ":delete(key)", desc: "Delete a key" },
-      { name: "has", sig: ":has(key)", desc: "Returns true if key exists" },
-      { name: "keys", sig: ":keys()", desc: "Returns all keys" },
-      { name: "values", sig: ":values()", desc: "Returns all values" },
-      { name: "clear", sig: ":clear()", desc: "Remove all entries" },
-      { name: "size", sig: ":size()", desc: "Returns number of entries" },
-      { name: "type", sig: ":type()", desc: "Returns 'LDataStore'" }
-    ]
-  },
-  // ── event types ───────────────────────────────────────────
-  "lurek.event.on": {
-    typeName: "LEventHandle",
-    methods: [
-      { name: "cancel", sig: ":cancel()", desc: "Unsubscribe from event" },
-      { name: "type", sig: ":type()", desc: "Returns 'LEventHandle'" }
-    ]
-  },
-  // ── camera types ──────────────────────────────────────────
-  "lurek.camera.new": {
-    typeName: "LCamera",
-    methods: [
-      { name: "getPosition", sig: ":getPosition()", desc: "Returns x, y" },
-      { name: "setPosition", sig: ":setPosition(x, y)", desc: "Set camera position" },
-      { name: "getZoom", sig: ":getZoom()", desc: "Returns zoom level" },
-      { name: "setZoom", sig: ":setZoom(zoom)", desc: "Set zoom level" },
-      { name: "getRotation", sig: ":getRotation()", desc: "Returns rotation in radians" },
-      { name: "setRotation", sig: ":setRotation(angle)", desc: "Set rotation" },
-      { name: "lookAt", sig: ":lookAt(x, y)", desc: "Center camera on position" },
-      { name: "shake", sig: ":shake(intensity, duration)", desc: "Apply screen shake" },
-      { name: "attach", sig: ":attach()", desc: "Apply camera transform" },
-      { name: "detach", sig: ":detach()", desc: "Reset camera transform" },
-      { name: "worldToScreen", sig: ":worldToScreen(wx, wy)", desc: "Convert world to screen coords" },
-      { name: "screenToWorld", sig: ":screenToWorld(sx, sy)", desc: "Convert screen to world coords" },
-      { name: "type", sig: ":type()", desc: "Returns 'LCamera'" }
-    ]
-  }
-};
-var LUREK_MODULES = [
-  "graphics",
-  "render",
-  "audio",
-  "physics",
-  "input",
-  "timer",
-  "filesystem",
-  "compute",
-  "data",
-  "image",
-  "ecs",
-  "window",
-  "thread",
-  "animation",
-  "camera",
-  "automation",
-  "event",
-  "math",
-  "particle",
-  "tilemap",
-  "scene",
-  "save",
-  "mods",
-  "graph",
-  "pathfind",
-  "ai",
-  "dataframe",
-  "ui",
-  "minimap",
-  "effect",
-  "postfx",
-  "terminal",
-  "cardgame",
-  "tween"
-];
-function scanDocument(document) {
-  const varTypes = [];
-  const classes = [];
-  const moduleAliases = [];
-  const classMap = /* @__PURE__ */ new Map();
-  const text = document.getText();
-  const lines = text.split("\n");
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const factoryMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(lurek\.\w+\.\w+)\s*\(/
-    );
-    if (factoryMatch) {
-      const [, varName, factoryCall] = factoryMatch;
-      const returnTypeName = getReturnTypeName(factoryCall);
-      if (returnTypeName) {
-        varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
-      }
-    }
-    const aliasMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(lurek\.(\w+))\s*(?:$|--)/
-    );
-    if (aliasMatch) {
-      const [, varName, modulePath, moduleName] = aliasMatch;
-      if ((_apiDataSingleton?.getModuleNames() ?? LUREK_MODULES).includes(moduleName)) {
-        moduleAliases.push({ varName, modulePath, alias: varName, module: modulePath, line: i });
-      }
-    }
-    const aliasedFactoryMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(\w+)\.(\w+)\s*\(/
-    );
-    if (aliasedFactoryMatch) {
-      const [, varName, aliasName, factoryName] = aliasedFactoryMatch;
-      const aliasInfo = moduleAliases.find(
-        (alias) => alias.varName === aliasName && alias.line < i
-      );
-      if (aliasInfo) {
-        const factoryCall = `${aliasInfo.modulePath}.${factoryName}`;
-        const returnTypeName = getReturnTypeName(factoryCall);
-        if (returnTypeName) {
-          varTypes.push({ varName, typeName: returnTypeName, factoryCall, line: i });
-        }
-      }
-    }
-    const reassignMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(\w+)\s*(?:$|--)/
-    );
-    if (reassignMatch) {
-      const [, newVar, sourceVar] = reassignMatch;
-      const sourceType = varTypes.find(
-        (v) => v.varName === sourceVar && v.line < i
-      );
-      if (sourceType) {
-        varTypes.push({
-          varName: newVar,
-          typeName: sourceType.typeName,
-          factoryCall: sourceType.factoryCall,
-          line: i
-        });
-      }
-    }
-    const classDefMatch = line.match(
-      /\b(?:local\s+)?(\w+)\s*=\s*\{\s*\}/
-    );
-    if (classDefMatch) {
-      const className = classDefMatch[1];
-      if (i + 1 < lines.length) {
-        const nextLine = lines[i + 1];
-        if (nextLine.includes(`${className}.__index`) || nextLine.includes(`__index = ${className}`)) {
-          if (!classMap.has(className)) {
-            classMap.set(className, { name: className, methods: [], instances: [] });
-          }
-        }
-      }
-    }
-    const indexMatch = line.match(/\b(\w+)\.__index\s*=\s*\1\b/);
-    if (indexMatch) {
-      const className = indexMatch[1];
-      if (!classMap.has(className)) {
-        classMap.set(className, { name: className, methods: [], instances: [] });
-      }
-    }
-    const methodMatch = line.match(
-      /\bfunction\s+(\w+):(\w+)\s*\(/
-    );
-    if (methodMatch) {
-      const [, className, methodName] = methodMatch;
-      let cls = classMap.get(className);
-      if (!cls) {
-        cls = { name: className, methods: [], instances: [] };
-        classMap.set(className, cls);
-      }
-      if (!cls.methods.find((m) => m.name === methodName)) {
-        cls.methods.push({
-          name: methodName,
-          sig: `:${methodName}(...)`,
-          desc: `Method of ${className}`
-        });
-      }
-    }
-    const instanceMatch = line.match(
-      /\blocal\s+(\w+)\s*=\s*(\w+)[:.](new|create)\s*\(/
-    );
-    if (instanceMatch) {
-      const [, varName, className] = instanceMatch;
-      const cls = classMap.get(className);
-      if (cls) {
-        cls.instances.push({ varName, line: i });
-      }
-    }
-    const setmetaMatch = line.match(/\blocal\s+(\w+)\s*=\s*setmetatable\s*\([^,]*,\s*(\w+)\s*\)/) ?? line.match(/\blocal\s+(\w+)\s*=\s*setmetatable\s*\([^,]*,\s*\{[^}]*__index\s*=\s*(\w+)[^}]*\}\s*\)/);
-    if (setmetaMatch) {
-      const [, varName, className] = setmetaMatch;
-      const cls = classMap.get(className);
-      if (cls) {
-        cls.instances.push({ varName, line: i });
-      }
-    }
-  }
-  for (const cls of classMap.values()) {
-    classes.push(cls);
-  }
-  return { varTypes, classes, moduleAliases };
-}
-function getTypeInfoForVar(varName, position, varTypes, classes) {
-  const factoryVar = varTypes.find(
-    (v) => v.varName === varName && v.line < position.line
-  );
-  if (factoryVar) {
-    const typeInfo = getTypeInfoByName(factoryVar.typeName);
-    if (typeInfo) return { typeInfo, factoryCall: factoryVar.factoryCall };
-  }
-  return void 0;
-}
-function getMethodsForVar(varName, position, varTypes, classes) {
-  const factoryVar = varTypes.find(
-    (v) => v.varName === varName && v.line < position.line
-  );
-  if (factoryVar) {
-    const typeInfo = getTypeInfoByName(factoryVar.typeName);
-    if (typeInfo) return typeInfo.methods;
-  }
-  for (const cls of classes) {
-    const instance = cls.instances.find(
-      (inst) => inst.varName === varName && inst.line < position.line
-    );
-    if (instance && cls.methods.length > 0) {
-      return cls.methods;
-    }
-  }
-  return void 0;
-}
-function register8(context, apiData2) {
-  setApiData(apiData2);
-  const colonProvider = vscode11.languages.registerCompletionItemProvider(
-    LUA_SELECTOR6,
-    {
-      provideCompletionItems(document, position) {
-        const lineText = document.lineAt(position).text;
-        const before = lineText.substring(0, position.character);
-        const colonMatch = before.match(/\b(\w+):(\w*)$/);
-        if (!colonMatch) return void 0;
-        const varName = colonMatch[1];
-        const partial = colonMatch[2].toLowerCase();
-        const { varTypes, classes } = scanDocument(document);
-        const methods = getMethodsForVar(varName, position, varTypes, classes);
-        if (!methods) return void 0;
-        return methods.filter((m) => !partial || m.name.toLowerCase().startsWith(partial)).map((m) => {
-          const item = new vscode11.CompletionItem(
-            m.name,
-            vscode11.CompletionItemKind.Method
-          );
-          item.detail = m.sig;
-          item.documentation = new vscode11.MarkdownString(m.desc);
-          item.sortText = `0${m.name}`;
-          return item;
-        });
-      }
-    },
-    ":"
-  );
-  const dotProvider = vscode11.languages.registerCompletionItemProvider(
-    LUA_SELECTOR6,
-    {
-      provideCompletionItems(document, position) {
-        const lineText = document.lineAt(position).text;
-        const before = lineText.substring(0, position.character);
-        const dotMatch = before.match(/\b(\w+)\.(\w*)$/);
-        if (!dotMatch) return void 0;
-        const varName = dotMatch[1];
-        if (varName === "lurek") return void 0;
-        const partial = dotMatch[2].toLowerCase();
-        const { varTypes, classes, moduleAliases } = scanDocument(document);
-        const alias = moduleAliases.find(
-          (a) => a.varName === varName && a.line < position.line
-        );
-        if (alias) {
-          const prefix = alias.modulePath + ".";
-          const items2 = [];
-          for (const key of getAllFactoryPaths()) {
-            if (key.startsWith(prefix)) {
-              const funcName = key.substring(prefix.length);
-              if (!partial || funcName.toLowerCase().startsWith(partial)) {
-                const typeName = getReturnTypeName(key);
-                if (!typeName) continue;
-                const item = new vscode11.CompletionItem(
-                  funcName,
-                  vscode11.CompletionItemKind.Function
-                );
-                item.detail = `\u2192 ${typeName}`;
-                item.documentation = new vscode11.MarkdownString(
-                  `Factory from \`${key}\``
-                );
-                item.sortText = `0${funcName}`;
-                items2.push(item);
-              }
-            }
-          }
-          if (items2.length > 0) return items2;
-        }
-        const items = [];
-        const factoryVar = varTypes.find(
-          (v) => v.varName === varName && v.line < position.line
-        );
-        if (factoryVar) {
-          const typeInfo = getTypeInfoByName(factoryVar.typeName);
-          if (typeInfo) {
-            if (typeInfo.fields) {
-              for (const f of typeInfo.fields) {
-                if (partial && !f.name.toLowerCase().startsWith(partial)) continue;
-                const item = new vscode11.CompletionItem(
-                  f.name,
-                  vscode11.CompletionItemKind.Field
-                );
-                item.detail = f.type;
-                item.documentation = new vscode11.MarkdownString(f.desc);
-                item.sortText = `0a${f.name}`;
-                items.push(item);
-              }
-            }
-            for (const m of typeInfo.methods) {
-              if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
-              const item = new vscode11.CompletionItem(
-                m.name,
-                vscode11.CompletionItemKind.Method
-              );
-              item.detail = m.sig;
-              item.documentation = new vscode11.MarkdownString(m.desc);
-              item.sortText = `0b${m.name}`;
-              items.push(item);
-            }
-          }
-        }
-        if (items.length === 0) {
-          for (const cls of classes) {
-            const instance = cls.instances.find(
-              (inst) => inst.varName === varName && inst.line < position.line
-            );
-            if (instance && cls.methods.length > 0) {
-              for (const m of cls.methods) {
-                if (partial && !m.name.toLowerCase().startsWith(partial)) continue;
-                const item = new vscode11.CompletionItem(
-                  m.name,
-                  vscode11.CompletionItemKind.Method
-                );
-                item.detail = m.sig;
-                item.documentation = new vscode11.MarkdownString(m.desc);
-                item.sortText = `0${m.name}`;
-                items.push(item);
-              }
-              break;
-            }
-          }
-        }
-        return items.length > 0 ? items : void 0;
-      }
-    },
-    "."
-  );
-  const hoverProvider = vscode11.languages.registerHoverProvider(LUA_SELECTOR6, {
-    provideHover(document, position) {
-      const wordRange = document.getWordRangeAtPosition(position, /\w+/);
-      if (!wordRange) return void 0;
-      const word = document.getText(wordRange);
-      const { varTypes, classes, moduleAliases } = scanDocument(document);
-      const alias = moduleAliases.find(
-        (a) => a.varName === word && a.line < position.line
-      );
-      if (alias) {
-        const md = new vscode11.MarkdownString();
-        md.appendCodeblock(`${word}: module (${alias.modulePath})`, "lua");
-        md.appendMarkdown(`Alias for \`${alias.modulePath}\``);
-        return new vscode11.Hover(md, wordRange);
-      }
-      const result = getTypeInfoForVar(word, position, varTypes, classes);
-      if (result) {
-        const { typeInfo, factoryCall } = result;
-        const md = new vscode11.MarkdownString();
-        md.appendCodeblock(`${word}: ${typeInfo.typeName}`, "lua");
-        md.appendMarkdown(`Created by \`${factoryCall}()\`
+`),v.appendMarkdown(`**Methods:** ${d.methods.map(x=>`\`${x.name}\``).join(", ")}`),new X.Hover(v,s)}for(let d of u)if(d.instances.find(v=>v.varName===l&&v.line<o.line)&&d.methods.length>0){let v=new X.MarkdownString;return v.appendCodeblock(`${l}: ${d.name}`,"lua"),v.appendMarkdown(`**Methods:** ${d.methods.map(x=>`\`${x.name}\``).join(", ")}`),new X.Hover(v,s)}}});n.subscriptions.push(t,r,a)}var oe=C(require("vscode")),hn=C(require("path"));var wl=new Set(["tests/lua/init","tests.lua.init","socket"]);function mi(n,e){let r=n.substring(0,e).split(`
+`);return new oe.Position(r.length-1,r[r.length-1].length)}function xl(n){let e=[],t=n.replace(/--\[\[[\s\S]*?\]\]/g,i=>" ".repeat(i.length)).replace(/--[^\n]*/g,i=>" ".repeat(i.length)),r=/\brequire\s*\(\s*["']([^"']+)["']\s*\)/g,a;for(;(a=r.exec(t))!==null;){let i=a[1],o=a.index,s=a.index+a[0].length,l=mi(n,o),p=mi(n,s);e.push({moduleName:i,range:new oe.Range(l,p)})}return e}function Pl(n,e){let t=n.replace(/\./g,"/"),r=[`${t}.lua`,`${t}/init.lua`];for(let a of r)return oe.Uri.joinPath(e,a)}function Ml(n){let a=new Map,i=new Map,o=[];for(let l of n.keys())a.set(l,0);function s(l,p){a.set(l,1);let u=n.get(l)||[];for(let c of u)if(a.has(c))if(a.get(c)===1){let h=p.indexOf(c);if(h>=0){let L=p.slice(h);L.push(c),o.push(L)}}else a.get(c)===0&&(i.set(c,l),s(c,[...p,c]));a.set(l,2)}for(let l of n.keys())a.get(l)===0&&s(l,[l]);return o}function hi(n){let e=oe.languages.createDiagnosticCollection("lurek.requireGraph");n.subscriptions.push(e);let t=new Map,r;function a(){r&&clearTimeout(r),r=setTimeout(()=>{r=void 0,i()},500)}async function i(){let s=oe.workspace.workspaceFolders?.[0]?.uri;if(!s)return;t.clear();let l=await oe.workspace.findFiles("**/*.lua","{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**,**/cag/**}");for(let p of l)try{let u=await oe.workspace.fs.readFile(p),c=new TextDecoder().decode(u),h=xl(c);for(let L of h)L.resolvedUri=Pl(L.moduleName,s);t.set(p.toString(),{uri:p,requires:h})}catch{}o(s)}function o(s){let l=new Map,p=new Map;for(let[L,d]of t){let g=hn.relative(s.fsPath,d.uri.fsPath).replace(/\\/g,"/").replace(/\.lua$/,"").replace(/\/init$/,"");p.set(g,L),l.set(L,[])}for(let[L,d]of t){let g=[];for(let v of d.requires){let x=v.moduleName.replace(/\./g,"/"),w=p.get(x);w&&g.push(w)}l.set(L,g)}let u=Ml(l),c=new Set;for(let L of u)for(let d of L)c.add(d);e.clear();let h=new Map;for(let[L,d]of t){let g=[];for(let v of d.requires){if(v.resolvedUri){let T=v.moduleName.replace(/\./g,"/"),M=p.get(T),E=oe.workspace.asRelativePath(d.uri.fsPath).replace(/\\/g,"/"),N=E.includes("/")?E.replace(/\/[^/]+$/,""):"",$=N?`${N}/${T}`:T,Pe=p.get($);if(!M&&!Pe&&!wl.has(v.moduleName)){let te=new oe.Diagnostic(v.range,`Cannot resolve module "${v.moduleName}" \u2014 file not found in workspace.`,oe.DiagnosticSeverity.Warning);te.code="lurek.requireMissing",te.source="Lurek2D Require Graph",g.push(te)}}let x=v.moduleName.replace(/\./g,"/"),w=p.get(x);if(w&&c.has(L)&&c.has(w)){for(let T of u)if(T.includes(L)&&T.includes(w)){let M=T.map(N=>{let $=t.get(N);return $?hn.basename($.uri.fsPath,".lua"):"?"}),E=new oe.Diagnostic(v.range,`Circular dependency detected: ${M.join(" \u2192 ")}`,oe.DiagnosticSeverity.Warning);E.code="lurek.requireCycle",E.source="Lurek2D Require Graph",g.push(E);break}}}g.length>0&&h.set(L,g)}for(let[L,d]of h){let g=t.get(L);g&&e.set(g.uri,d)}}i(),n.subscriptions.push(oe.workspace.onDidSaveTextDocument(s=>{s.languageId==="lua"&&a()}),oe.workspace.onDidCreateFiles(()=>a()),oe.workspace.onDidDeleteFiles(()=>a()))}var Z=C(require("vscode")),kl=[{regex:/\bfunction\s+(\w+\.\w+)\s*\(/g,kind:Z.SymbolKind.Function,group:1},{regex:/\bfunction\s+(\w+)\s*\(/g,kind:Z.SymbolKind.Function,group:1},{regex:/\blocal\s+function\s+(\w+)\s*\(/g,kind:Z.SymbolKind.Function,group:1},{regex:/\bfunction\s+(\w+:\w+)\s*\(/g,kind:Z.SymbolKind.Method,group:1},{regex:/^(\w+)\s*=\s*\{\s*\}/gm,kind:Z.SymbolKind.Class,group:1},{regex:/\blocal\s+(\w+)\s*=\s*\{\s*\}/g,kind:Z.SymbolKind.Class,group:1},{regex:/^([A-Z][A-Z_0-9]+)\s*=/gm,kind:Z.SymbolKind.Constant,group:1},{regex:/\b(lurek\.\w+)\s*=\s*function/g,kind:Z.SymbolKind.Function,group:1},{regex:/\bfunction\s+(lurek\.\w+)\s*\(/g,kind:Z.SymbolKind.Function,group:1}],Fr=class{symbols=new Map;fileSymbols=new Map;building=!1;async buildIndex(){if(!this.building){this.building=!0;try{this.symbols.clear(),this.fileSymbols.clear();let e=await Z.workspace.findFiles("**/*.lua","{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}");for(let t of e)try{let r=await Z.workspace.fs.readFile(t),a=new TextDecoder().decode(r);this.indexText(t,a)}catch{}}finally{this.building=!1}}}async updateFile(e){try{let t=await Z.workspace.openTextDocument(e);this.indexDocument(t)}catch{this.removeFile(e)}}removeFile(e){let t=e.toString(),r=this.fileSymbols.get(t)||[];for(let a of r){let i=this.symbols.get(a.name);if(i){let o=i.filter(s=>s.uri.toString()!==t);o.length>0?this.symbols.set(a.name,o):this.symbols.delete(a.name)}}this.fileSymbols.delete(t)}findDefinition(e){let t=this.symbols.get(e);if(!(!t||t.length===0))return t.find(r=>r.kind===Z.SymbolKind.Function)||t.find(r=>r.kind===Z.SymbolKind.Method)||t[0]}findReferences(e){return this.symbols.get(e)||[]}getWorkspaceSymbols(e){let t=e.toLowerCase(),r=[];for(let[a,i]of this.symbols)if(!t||a.toLowerCase().includes(t))for(let o of i)r.push(new Z.SymbolInformation(o.name,o.kind,o.containerName||"",new Z.Location(o.uri,o.range)));return r}getFileSymbols(e){return this.fileSymbols.get(e.toString())||[]}positionFromOffset(e,t){let a=e.substring(0,t).split(`
+`);return new Z.Position(a.length-1,a[a.length-1].length)}indexText(e,t){let r=e.toString();this.removeFile(e);let a=[];for(let i of kl){i.regex.lastIndex=0;let o;for(;(o=i.regex.exec(t))!==null;){let s=o[i.group],l=this.positionFromOffset(t,o.index),p=this.positionFromOffset(t,o.index+o[0].length),u;s.includes(":")?u=s.split(":")[0]:s.includes(".")&&!s.startsWith("lurek.")&&(u=s.split(".")[0]);let c={name:s,kind:i.kind,uri:e,range:new Z.Range(l,p),containerName:u};a.push(c);let h=this.symbols.get(s)||[];h.push(c),this.symbols.set(s,h)}}this.fileSymbols.set(r,a)}indexDocument(e){this.indexText(e.uri,e.getText())}};function gi(n){let e=new Fr;e.buildIndex(),n.subscriptions.push(Z.workspace.onDidSaveTextDocument(r=>{r.languageId==="lua"&&e.updateFile(r.uri)}),Z.workspace.onDidDeleteFiles(r=>{for(let a of r.files)e.removeFile(a)}),Z.workspace.onDidCreateFiles(r=>{for(let a of r.files)a.fsPath.endsWith(".lua")&&e.updateFile(a)}));let t=Z.languages.registerWorkspaceSymbolProvider({provideWorkspaceSymbols(r){return e.getWorkspaceSymbols(r)}});return n.subscriptions.push(t),e}var gt=C(require("vscode"));var Cl={scheme:"file",language:"lua"},Rl=new De,fi=["namespace","function","enumMember","lurekCallback"],bi=["declaration","definition","readonly","deprecated","modification","documentation","defaultLibrary"],Or=new gt.SemanticTokensLegend(fi,bi),yi=new Map;function Ti(n,e){n.subscriptions.push(gt.languages.registerDocumentSemanticTokensProvider(Cl,{provideDocumentSemanticTokens(t){try{return Il(t,e)}catch{return new gt.SemanticTokensBuilder(Or).build()}}},Or))}function Il(n,e){let t=n.uri.toString(),r=yi.get(t);if(r&&r.version===n.version)return r.tokens;let a=n.getText(),i=Rl.tokenize(a),o=new gt.SemanticTokensBuilder(Or),s=new Set(e.getAllFunctions().map(c=>c.name)),l=new Set(e.getAllFunctions().filter(c=>c.deprecated).map(c=>c.name)),p=new Set;for(let c of e.getModuleNames()){let h=e.getModule(c);if(h){for(let L of[...h.functions,...h.methods])for(let d of L.parameters)if(d.type.includes("|"))for(let g of d.type.split("|")){let v=g.trim().replace(/^["']|["']$/g,"");v&&!v.includes(" ")&&p.add(v)}}}for(let c=0;c<i.length;c++){let h=i[c];if(h.type===2){let v=El(h.value);v&&p.has(v)&&Dt(o,h,"enumMember",[]);continue}if(h.type!==1)continue;let L=h.value,d=Dl(i,c),g=Bl(i,c);if(L==="lurek"){Dt(o,h,"namespace",[]);continue}if(d?.value==="."||d?.value===":"){let v=Al(i,c);if(v.startsWith("lurek.")){let w=v.slice(6).split(".");if(w.length===1&&Ye.has(L)){Dt(o,h,"lurekCallback",[]);continue}if(w.length===1&&e.getModule(L)){Dt(o,h,"namespace",[]);continue}if(s.has(L)){let T=["defaultLibrary"];l.has(L)&&T.push("deprecated"),Dt(o,h,"function",T);continue}}}}let u=o.build();return yi.set(t,{version:n.version,tokens:u}),u}function El(n){return n.startsWith('"')&&n.endsWith('"')||n.startsWith("'")&&n.endsWith("'")?n.slice(1,-1):""}function Dt(n,e,t,r){let i=e.value.split(`
+`)[0].length;if(i===0)return;let o=fi.indexOf(t);if(o<0)return;let s=0;for(let l of r){let p=bi.indexOf(l);p>=0&&(s|=1<<p)}n.push(e.line,e.column,i,o,s)}function Dl(n,e){for(let t=e-1;t>=0;t--)if(n[t].type!==7)return n[t]}function Bl(n,e){for(let t=e+1;t<n.length;t++)if(n[t].type!==7)return n[t]}function Al(n,e){let t=n[e].value,r=e-1;for(;r>=0;){if(n[r].type===7){r--;continue}if(n[r].type===6&&(n[r].value==="."||n[r].value===":")){for(r--;r>=0&&n[r].type===7;)r--;if(r>=0&&n[r].type===1){t=n[r].value+"."+t,r--;continue}}break}return t}var ne=C(require("vscode")),be=C(require("path")),je=C(require("fs")),yt=class n extends ne.TreeItem{constructor(t,r,a,i,o){super(t,r);this.label=t;this.collapsibleState=r;this.resourceUri=a;this.assetType=i;this.sizeBytes=o;a&&(this.resourceUri=a,this.tooltip=a.fsPath),this.iconPath=i?new ne.ThemeIcon(n.iconFor(i)):void 0,o!==void 0&&(this.description=n.formatSize(o)),i&&i!=="folder"&&a&&(this.command={command:"vscode.open",title:"Open File",arguments:[a]})}static iconFor(t){switch(t){case"image":return"file-media";case"audio":return"unmute";case"font":return"text-size";case"shader":return"symbol-color";case"folder":return"folder";default:return"file"}}static formatSize(t){return t<1024?`${t} B`:t<1024*1024?`${(t/1024).toFixed(1)} KB`:`${(t/1024/1024).toFixed(1)} MB`}},Ol=new Set([".png",".jpg",".jpeg",".bmp",".gif",".tga",".tiff",".webp"]),zl=new Set([".wav",".ogg",".mp3",".flac",".aiff"]),_l=new Set([".ttf",".otf"]),Nl=new Set([".glsl",".vert",".frag",".wgsl"]);function Wl(n){if(Ol.has(n))return"image";if(zl.has(n))return"audio";if(_l.has(n))return"font";if(Nl.has(n))return"shader"}var gn=class{_onDidChangeTreeData=new ne.EventEmitter;onDidChangeTreeData=this._onDidChangeTreeData.event;categories=[];_missingAssets=[];constructor(){this.refresh()}refresh(){this.categories=[{label:"Images",type:"image",icon:"file-media",root:this._newFolder("",""),totalCount:0},{label:"Audio",type:"audio",icon:"unmute",root:this._newFolder("",""),totalCount:0},{label:"Fonts",type:"font",icon:"text-size",root:this._newFolder("",""),totalCount:0},{label:"Shaders",type:"shader",icon:"symbol-color",root:this._newFolder("",""),totalCount:0}],this._missingAssets=[],this._scanGameRoot(),this._onDidChangeTreeData.fire(void 0)}get missingAssets(){return this._missingAssets}_findGameRoot(){let e=ne.workspace.workspaceFolders;if(!e?.length)return;let t=e[0].uri.fsPath;if(je.existsSync(be.join(t,"main.lua")))return t;let r=["content/demos","content/examples","examples","game","src"];for(let a of r){let i=be.join(t,a);if(je.existsSync(i))try{let o=je.readdirSync(i,{withFileTypes:!0});for(let s of o)if(s.isDirectory()){let l=be.join(i,s.name);if(je.existsSync(be.join(l,"main.lua")))return l}}catch{}}return t}_scanGameRoot(){let e=this._findGameRoot();e&&this._walk(e,e)}_newFolder(e,t){return{name:e,relPath:t,children:new Map,files:[]}}_ensureFolder(e,t){if(!t||t===".")return e;let r=t.split("/"),a=e,i="";for(let o of r){i=i?`${i}/${o}`:o;let s=a.children.get(o);s||(s=this._newFolder(o,i),a.children.set(o,s)),a=s}return a}_walk(e,t){let r;try{r=je.readdirSync(e,{withFileTypes:!0})}catch{return}for(let a of r){let i=be.join(e,a.name);if(!(a.name.startsWith(".")||a.name==="node_modules"||a.name==="target"||a.name==="build")){if(a.isDirectory())this._walk(i,t);else if(a.isFile()){let o=be.extname(a.name).toLowerCase(),s=Wl(o);if(!s)continue;let l=this.categories.find(L=>L.type===s);if(!l)continue;let p=0;try{p=je.statSync(i).size}catch{}let u=be.relative(t,i).replace(/\\/g,"/"),c=be.dirname(u);this._ensureFolder(l.root,c==="."?"":c).files.push({name:a.name,relPath:u,uri:ne.Uri.file(i),size:p,type:s}),l.totalCount++}}}}getTreeItem(e){return e}getChildren(e){if(!e)return this.categories.filter(i=>i.totalCount>0).map(i=>{let o=new yt(`${i.label} (${i.totalCount})`,ne.TreeItemCollapsibleState.Collapsed,void 0,"folder",void 0);return o.contextValue=`assetCategory.${i.type}`,o._catType=i.type,o});let t=e._catType;if(t){let i=this.categories.find(o=>o.type===t);return i?this._folderChildren(i.root,i.type):[]}let r=e._folderNode,a=e._fileType;return r?this._folderChildren(r,a||"image"):[]}_folderChildren(e,t){let r=[],a=Array.from(e.children.entries()).sort((o,s)=>o[0].localeCompare(s[0]));for(let[o,s]of a){let l=this._countFiles(s),p=new yt(`${o} (${l})`,ne.TreeItemCollapsibleState.Collapsed,void 0,"folder",void 0);p._folderNode=s,p._fileType=t,r.push(p)}let i=[...e.files].sort((o,s)=>o.name.localeCompare(s.name));for(let o of i){let s=new yt(o.name,ne.TreeItemCollapsibleState.None,o.uri,o.type,o.size);s.contextValue="assetItem",r.push(s)}return r}_countFiles(e){let t=e.files.length;for(let r of e.children.values())t+=this._countFiles(r);return t}};async function vi(){let n=ne.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!n){ne.window.showWarningMessage("No workspace folder open.");return}let e=await ne.workspace.findFiles("**/*.lua","{**/node_modules/**,ideas/**,work/**,.github/**}"),t=/lurek\.(?:graphics\.newImage|audio\.newSource)\s*\(\s*["']([^"']+)["']/g,r=[];for(let o of e){let s;try{s=je.readFileSync(o.fsPath,"utf8")}catch{continue}let l=s.split(`
+`);for(let p=0;p<l.length;p++){t.lastIndex=0;let u;for(;(u=t.exec(l[p]))!==null;){let c=u[1];if(!c.includes("."))continue;let h=be.resolve(be.dirname(o.fsPath),c),L=be.resolve(n,c);!je.existsSync(h)&&!je.existsSync(L)&&r.push({file:ne.workspace.asRelativePath(o),line:p+1,asset:c})}}}if(r.length===0){ne.window.showInformationMessage("No missing assets found.");return}let a=r.map(o=>`${o.file}:${o.line}  \u2192  ${o.asset}`).join(`
+`),i=await ne.workspace.openTextDocument({content:`Missing assets:
 
-`);
-        if (typeInfo.fields && typeInfo.fields.length > 0) {
-          md.appendMarkdown(
-            `**Fields:** ${typeInfo.fields.map((f) => `\`${f.name}\``).join(", ")}
-
-`
-          );
-        }
-        md.appendMarkdown(
-          `**Methods:** ${typeInfo.methods.map((m) => `\`${m.name}\``).join(", ")}`
-        );
-        return new vscode11.Hover(md, wordRange);
-      }
-      for (const cls of classes) {
-        const instance = cls.instances.find(
-          (inst) => inst.varName === word && inst.line < position.line
-        );
-        if (instance && cls.methods.length > 0) {
-          const md = new vscode11.MarkdownString();
-          md.appendCodeblock(`${word}: ${cls.name}`, "lua");
-          md.appendMarkdown(
-            `**Methods:** ${cls.methods.map((m) => `\`${m.name}\``).join(", ")}`
-          );
-          return new vscode11.Hover(md, wordRange);
-        }
-      }
-      return void 0;
-    }
-  });
-  context.subscriptions.push(colonProvider, dotProvider, hoverProvider);
-}
-
-// src/providers/requireGraph.ts
-var vscode12 = __toESM(require("vscode"));
-var path9 = __toESM(require("path"));
-var KNOWN_RUNTIME_MODULES = /* @__PURE__ */ new Set([
-  "tests/lua/init",
-  // injected by tests/lua/harness.rs
-  "tests.lua.init",
-  // dot-notation variant used by some library tests
-  "socket"
-  // LuaJIT socket — blocked in sandbox (security tests)
-]);
-function positionFromOffset(text, offset) {
-  const before = text.substring(0, offset);
-  const lines = before.split("\n");
-  return new vscode12.Position(lines.length - 1, lines[lines.length - 1].length);
-}
-function parseRequires(text) {
-  const requires = [];
-  const stripped = text.replace(/--\[\[[\s\S]*?\]\]/g, (m) => " ".repeat(m.length)).replace(/--[^\n]*/g, (m) => " ".repeat(m.length));
-  const regex = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
-  let match;
-  while ((match = regex.exec(stripped)) !== null) {
-    const moduleName = match[1];
-    const startOffset = match.index;
-    const endOffset = match.index + match[0].length;
-    const startPos = positionFromOffset(text, startOffset);
-    const endPos = positionFromOffset(text, endOffset);
-    requires.push({
-      moduleName,
-      range: new vscode12.Range(startPos, endPos)
-    });
-  }
-  return requires;
-}
-function resolveModule(moduleName, workspaceFolder) {
-  const relativePath = moduleName.replace(/\./g, "/");
-  const candidates = [
-    `${relativePath}.lua`,
-    `${relativePath}/init.lua`
-  ];
-  for (const candidate of candidates) {
-    const uri = vscode12.Uri.joinPath(workspaceFolder, candidate);
-    return uri;
-  }
-  return void 0;
-}
-function detectCycles(graph) {
-  const WHITE = 0, GRAY = 1, BLACK = 2;
-  const color = /* @__PURE__ */ new Map();
-  const parent = /* @__PURE__ */ new Map();
-  const cycles = [];
-  for (const node of graph.keys()) {
-    color.set(node, WHITE);
-  }
-  function dfs(u, pathStack) {
-    color.set(u, GRAY);
-    const neighbors = graph.get(u) || [];
-    for (const v of neighbors) {
-      if (!color.has(v)) {
-        continue;
-      }
-      if (color.get(v) === GRAY) {
-        const cycleStart = pathStack.indexOf(v);
-        if (cycleStart >= 0) {
-          const cycle = pathStack.slice(cycleStart);
-          cycle.push(v);
-          cycles.push(cycle);
-        }
-      } else if (color.get(v) === WHITE) {
-        parent.set(v, u);
-        dfs(v, [...pathStack, v]);
-      }
-    }
-    color.set(u, BLACK);
-  }
-  for (const node of graph.keys()) {
-    if (color.get(node) === WHITE) {
-      dfs(node, [node]);
-    }
-  }
-  return cycles;
-}
-function register9(context) {
-  const diagCollection = vscode12.languages.createDiagnosticCollection("lurek.requireGraph");
-  context.subscriptions.push(diagCollection);
-  const nodeCache = /* @__PURE__ */ new Map();
-  let buildDebounceTimer;
-  function scheduleBuildGraph() {
-    if (buildDebounceTimer) clearTimeout(buildDebounceTimer);
-    buildDebounceTimer = setTimeout(() => {
-      buildDebounceTimer = void 0;
-      buildGraph();
-    }, 500);
-  }
-  async function buildGraph() {
-    const workspaceFolder = vscode12.workspace.workspaceFolders?.[0]?.uri;
-    if (!workspaceFolder) return;
-    nodeCache.clear();
-    const luaFiles = await vscode12.workspace.findFiles(
-      "**/*.lua",
-      "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**,**/cag/**}"
-    );
-    for (const fileUri of luaFiles) {
-      try {
-        const bytes = await vscode12.workspace.fs.readFile(fileUri);
-        const text = new TextDecoder().decode(bytes);
-        const requires = parseRequires(text);
-        for (const req of requires) {
-          req.resolvedUri = resolveModule(req.moduleName, workspaceFolder);
-        }
-        nodeCache.set(fileUri.toString(), { uri: fileUri, requires });
-      } catch {
-      }
-    }
-    analyzeGraph(workspaceFolder);
-  }
-  function analyzeGraph(workspaceFolder) {
-    const adj = /* @__PURE__ */ new Map();
-    const uriByModule = /* @__PURE__ */ new Map();
-    for (const [uriStr, node] of nodeCache) {
-      const relPath = path9.relative(
-        workspaceFolder.fsPath,
-        node.uri.fsPath
-      ).replace(/\\/g, "/").replace(/\.lua$/, "").replace(/\/init$/, "");
-      uriByModule.set(relPath, uriStr);
-      adj.set(uriStr, []);
-    }
-    for (const [uriStr, node] of nodeCache) {
-      const edges = [];
-      for (const req of node.requires) {
-        const modulePath = req.moduleName.replace(/\./g, "/");
-        const targetUri = uriByModule.get(modulePath);
-        if (targetUri) {
-          edges.push(targetUri);
-        }
-      }
-      adj.set(uriStr, edges);
-    }
-    const cycles = detectCycles(adj);
-    const cycleMembers = /* @__PURE__ */ new Set();
-    for (const cycle of cycles) {
-      for (const member of cycle) {
-        cycleMembers.add(member);
-      }
-    }
-    diagCollection.clear();
-    const allDiags = /* @__PURE__ */ new Map();
-    for (const [uriStr, node] of nodeCache) {
-      const diagnostics = [];
-      for (const req of node.requires) {
-        if (req.resolvedUri) {
-          const modulePath2 = req.moduleName.replace(/\./g, "/");
-          const targetUri2 = uriByModule.get(modulePath2);
-          const relPath = vscode12.workspace.asRelativePath(node.uri.fsPath).replace(/\\/g, "/");
-          const relDir = relPath.includes("/") ? relPath.replace(/\/[^/]+$/, "") : "";
-          const localModulePath = relDir ? `${relDir}/${modulePath2}` : modulePath2;
-          const localTargetUri = uriByModule.get(localModulePath);
-          if (!targetUri2 && !localTargetUri && !KNOWN_RUNTIME_MODULES.has(req.moduleName)) {
-            const diag = new vscode12.Diagnostic(
-              req.range,
-              `Cannot resolve module "${req.moduleName}" \u2014 file not found in workspace.`,
-              vscode12.DiagnosticSeverity.Warning
-            );
-            diag.code = "lurek.requireMissing";
-            diag.source = "Lurek2D Require Graph";
-            diagnostics.push(diag);
-          }
-        }
-        const modulePath = req.moduleName.replace(/\./g, "/");
-        const targetUri = uriByModule.get(modulePath);
-        if (targetUri && cycleMembers.has(uriStr) && cycleMembers.has(targetUri)) {
-          for (const cycle of cycles) {
-            if (cycle.includes(uriStr) && cycle.includes(targetUri)) {
-              const cycleNames = cycle.map((u) => {
-                const n = nodeCache.get(u);
-                if (!n) return "?";
-                return path9.basename(n.uri.fsPath, ".lua");
-              });
-              const diag = new vscode12.Diagnostic(
-                req.range,
-                `Circular dependency detected: ${cycleNames.join(" \u2192 ")}`,
-                vscode12.DiagnosticSeverity.Warning
-              );
-              diag.code = "lurek.requireCycle";
-              diag.source = "Lurek2D Require Graph";
-              diagnostics.push(diag);
-              break;
-            }
-          }
-        }
-      }
-      if (diagnostics.length > 0) {
-        allDiags.set(uriStr, diagnostics);
-      }
-    }
-    for (const [uriStr, diags] of allDiags) {
-      const node = nodeCache.get(uriStr);
-      if (node) {
-        diagCollection.set(node.uri, diags);
-      }
-    }
-  }
-  buildGraph();
-  context.subscriptions.push(
-    vscode12.workspace.onDidSaveTextDocument((doc) => {
-      if (doc.languageId === "lua") {
-        scheduleBuildGraph();
-      }
-    }),
-    vscode12.workspace.onDidCreateFiles(() => scheduleBuildGraph()),
-    vscode12.workspace.onDidDeleteFiles(() => scheduleBuildGraph())
-  );
-}
-
-// src/services/symbolIndex.ts
-var vscode13 = __toESM(require("vscode"));
-var PATTERNS = [
-  // function moduleName.funcName(...)
-  { regex: /\bfunction\s+(\w+\.\w+)\s*\(/g, kind: vscode13.SymbolKind.Function, group: 1 },
-  // function funcName(...)
-  { regex: /\bfunction\s+(\w+)\s*\(/g, kind: vscode13.SymbolKind.Function, group: 1 },
-  // local function funcName(...)
-  { regex: /\blocal\s+function\s+(\w+)\s*\(/g, kind: vscode13.SymbolKind.Function, group: 1 },
-  // function Class:method(...)
-  { regex: /\bfunction\s+(\w+:\w+)\s*\(/g, kind: vscode13.SymbolKind.Method, group: 1 },
-  // ModuleName = {} (table/class)
-  { regex: /^(\w+)\s*=\s*\{\s*\}/gm, kind: vscode13.SymbolKind.Class, group: 1 },
-  // local ModuleName = {} (table/class)
-  { regex: /\blocal\s+(\w+)\s*=\s*\{\s*\}/g, kind: vscode13.SymbolKind.Class, group: 1 },
-  // CONSTANT = value (all-caps)
-  { regex: /^([A-Z][A-Z_0-9]+)\s*=/gm, kind: vscode13.SymbolKind.Constant, group: 1 },
-  // lurek.callback assignment: lurek.load = function ...
-  { regex: /\b(lurek\.\w+)\s*=\s*function/g, kind: vscode13.SymbolKind.Function, group: 1 },
-  // function lurek.callback(...)
-  { regex: /\bfunction\s+(lurek\.\w+)\s*\(/g, kind: vscode13.SymbolKind.Function, group: 1 }
-];
-var SymbolIndex = class {
-  symbols = /* @__PURE__ */ new Map();
-  fileSymbols = /* @__PURE__ */ new Map();
-  building = false;
-  /** Build the full workspace index. */
-  async buildIndex() {
-    if (this.building) return;
-    this.building = true;
-    try {
-      this.symbols.clear();
-      this.fileSymbols.clear();
-      const luaFiles = await vscode13.workspace.findFiles(
-        "**/*.lua",
-        "{**/node_modules/**,ideas/**,work/**,.github/**,**/build/**,**/save/**,**/assets/**,**/logs/**}"
-      );
-      for (const fileUri of luaFiles) {
-        try {
-          const bytes = await vscode13.workspace.fs.readFile(fileUri);
-          const text = new TextDecoder().decode(bytes);
-          this.indexText(fileUri, text);
-        } catch {
-        }
-      }
-    } finally {
-      this.building = false;
-    }
-  }
-  /** Update index for a single file. */
-  async updateFile(uri) {
-    try {
-      const doc = await vscode13.workspace.openTextDocument(uri);
-      this.indexDocument(doc);
-    } catch {
-      this.removeFile(uri);
-    }
-  }
-  /** Remove a file from the index. */
-  removeFile(uri) {
-    const key = uri.toString();
-    const oldSymbols = this.fileSymbols.get(key) || [];
-    for (const sym of oldSymbols) {
-      const existing = this.symbols.get(sym.name);
-      if (existing) {
-        const filtered = existing.filter((s) => s.uri.toString() !== key);
-        if (filtered.length > 0) {
-          this.symbols.set(sym.name, filtered);
-        } else {
-          this.symbols.delete(sym.name);
-        }
-      }
-    }
-    this.fileSymbols.delete(key);
-  }
-  /** Find the primary definition of a symbol. */
-  findDefinition(name) {
-    const syms = this.symbols.get(name);
-    if (!syms || syms.length === 0) return void 0;
-    return syms.find((s) => s.kind === vscode13.SymbolKind.Function) || syms.find((s) => s.kind === vscode13.SymbolKind.Method) || syms[0];
-  }
-  /** Find all references/definitions of a symbol. */
-  findReferences(name) {
-    return this.symbols.get(name) || [];
-  }
-  /** Search for workspace symbols matching a query. */
-  getWorkspaceSymbols(query) {
-    const lower = query.toLowerCase();
-    const results = [];
-    for (const [name, syms] of this.symbols) {
-      if (!lower || name.toLowerCase().includes(lower)) {
-        for (const sym of syms) {
-          results.push(
-            new vscode13.SymbolInformation(
-              sym.name,
-              sym.kind,
-              sym.containerName || "",
-              new vscode13.Location(sym.uri, sym.range)
-            )
-          );
-        }
-      }
-    }
-    return results;
-  }
-  /** Get all symbols in a specific file. */
-  getFileSymbols(uri) {
-    return this.fileSymbols.get(uri.toString()) || [];
-  }
-  // ── Internal ────────────────────────────────────────────
-  /** Compute a vscode.Position from a raw text offset (line/col from newlines). */
-  positionFromOffset(text, offset) {
-    const before = text.substring(0, offset);
-    const lines = before.split("\n");
-    return new vscode13.Position(lines.length - 1, lines[lines.length - 1].length);
-  }
-  /** Index a file from raw text, without requiring an open TextDocument. */
-  indexText(uri, text) {
-    const key = uri.toString();
-    this.removeFile(uri);
-    const fileSyms = [];
-    for (const pat of PATTERNS) {
-      pat.regex.lastIndex = 0;
-      let match;
-      while ((match = pat.regex.exec(text)) !== null) {
-        const name = match[pat.group];
-        const startPos = this.positionFromOffset(text, match.index);
-        const endPos = this.positionFromOffset(text, match.index + match[0].length);
-        let containerName;
-        if (name.includes(":")) {
-          containerName = name.split(":")[0];
-        } else if (name.includes(".") && !name.startsWith("lurek.")) {
-          containerName = name.split(".")[0];
-        }
-        const sym = {
-          name,
-          kind: pat.kind,
-          uri,
-          range: new vscode13.Range(startPos, endPos),
-          containerName
-        };
-        fileSyms.push(sym);
-        const existing = this.symbols.get(name) || [];
-        existing.push(sym);
-        this.symbols.set(name, existing);
-      }
-    }
-    this.fileSymbols.set(key, fileSyms);
-  }
-  /** Index an already-open TextDocument (used for per-file updates). */
-  indexDocument(doc) {
-    this.indexText(doc.uri, doc.getText());
-  }
-};
-function register10(context) {
-  const index = new SymbolIndex();
-  index.buildIndex();
-  context.subscriptions.push(
-    vscode13.workspace.onDidSaveTextDocument((doc) => {
-      if (doc.languageId === "lua") {
-        index.updateFile(doc.uri);
-      }
-    }),
-    vscode13.workspace.onDidDeleteFiles((e) => {
-      for (const uri of e.files) {
-        index.removeFile(uri);
-      }
-    }),
-    vscode13.workspace.onDidCreateFiles((e) => {
-      for (const uri of e.files) {
-        if (uri.fsPath.endsWith(".lua")) {
-          index.updateFile(uri);
-        }
-      }
-    })
-  );
-  const wsProvider = vscode13.languages.registerWorkspaceSymbolProvider({
-    provideWorkspaceSymbols(query) {
-      return index.getWorkspaceSymbols(query);
-    }
-  });
-  context.subscriptions.push(wsProvider);
-  return index;
-}
-
-// src/providers/semanticTokens.ts
-var vscode14 = __toESM(require("vscode"));
-var LUA_SELECTOR7 = { scheme: "file", language: "lua" };
-var analyzer5 = new LuaDocumentAnalyzer();
-var tokenTypes = [
-  "namespace",
-  // 0  lurek, lurek.graphics, lurek.physics, ...
-  "function",
-  // 1  lurek API function calls
-  "enumMember",
-  // 2  enum string literals ("fill", "alpha", "nearest", ...)
-  "lurekCallback"
-  // 3  lifecycle callbacks (lurek.init, lurek.draw, ...)
-];
-var tokenModifiers = [
-  "declaration",
-  // 0
-  "definition",
-  // 1
-  "readonly",
-  // 2
-  "deprecated",
-  // 3
-  "modification",
-  // 4
-  "documentation",
-  // 5
-  "defaultLibrary"
-  // 6
-];
-var legend = new vscode14.SemanticTokensLegend(tokenTypes, tokenModifiers);
-var cache = /* @__PURE__ */ new Map();
-function register11(context, apiData2) {
-  context.subscriptions.push(
-    vscode14.languages.registerDocumentSemanticTokensProvider(LUA_SELECTOR7, {
-      provideDocumentSemanticTokens(document) {
-        try {
-          return computeSemanticTokens(document, apiData2);
-        } catch {
-          return new vscode14.SemanticTokensBuilder(legend).build();
-        }
-      }
-    }, legend)
-  );
-}
-function computeSemanticTokens(document, apiData2) {
-  const key = document.uri.toString();
-  const cached = cache.get(key);
-  if (cached && cached.version === document.version) {
-    return cached.tokens;
-  }
-  const text = document.getText();
-  const tokens = analyzer5.tokenize(text);
-  const builder = new vscode14.SemanticTokensBuilder(legend);
-  const lurekFuncNames = new Set(apiData2.getAllFunctions().map((f) => f.name));
-  const deprecatedFuncs = new Set(apiData2.getAllFunctions().filter((f) => f.deprecated).map((f) => f.name));
-  const enumValues = /* @__PURE__ */ new Set();
-  for (const modName of apiData2.getModuleNames()) {
-    const mod = apiData2.getModule(modName);
-    if (mod) {
-      for (const fn of [...mod.functions, ...mod.methods]) {
-        for (const p of fn.parameters) {
-          if (p.type.includes("|")) {
-            for (const v of p.type.split("|")) {
-              const trimmed = v.trim().replace(/^["']|["']$/g, "");
-              if (trimmed && !trimmed.includes(" ")) enumValues.add(trimmed);
-            }
-          }
-        }
-      }
-    }
-  }
-  for (let i = 0; i < tokens.length; i++) {
-    const tok = tokens[i];
-    if (tok.type === 2 /* String */) {
-      const content = extractStringContent(tok.value);
-      if (content && enumValues.has(content)) {
-        pushToken(builder, tok, "enumMember", []);
-      }
-      continue;
-    }
-    if (tok.type !== 1 /* Identifier */) continue;
-    const name = tok.value;
-    const prevCode = findPrevNonWhitespace(tokens, i);
-    const nextCode = findNextNonWhitespace(tokens, i);
-    if (name === "lurek") {
-      pushToken(builder, tok, "namespace", []);
-      continue;
-    }
-    if (prevCode?.value === "." || prevCode?.value === ":") {
-      const chain = getIdentifierChain(tokens, i);
-      if (chain.startsWith("lurek.")) {
-        const afterLurek = chain.slice(6);
-        const parts = afterLurek.split(".");
-        if (parts.length === 1 && LUREK_CALLBACK_NAMES.has(name)) {
-          pushToken(builder, tok, "lurekCallback", []);
-          continue;
-        }
-        if (parts.length === 1 && apiData2.getModule(name)) {
-          pushToken(builder, tok, "namespace", []);
-          continue;
-        }
-        if (lurekFuncNames.has(name)) {
-          const mods = ["defaultLibrary"];
-          if (deprecatedFuncs.has(name)) mods.push("deprecated");
-          pushToken(builder, tok, "function", mods);
-          continue;
-        }
-      }
-    }
-  }
-  const result = builder.build();
-  cache.set(key, { version: document.version, tokens: result });
-  return result;
-}
-function extractStringContent(raw) {
-  if (raw.startsWith('"') && raw.endsWith('"') || raw.startsWith("'") && raw.endsWith("'")) {
-    return raw.slice(1, -1);
-  }
-  return "";
-}
-function pushToken(builder, tok, tokenType, modifiers) {
-  const lines = tok.value.split("\n");
-  const firstLineLen = lines[0].length;
-  if (firstLineLen === 0) return;
-  const typeIdx = tokenTypes.indexOf(tokenType);
-  if (typeIdx < 0) return;
-  let modBits = 0;
-  for (const mod of modifiers) {
-    const modIdx = tokenModifiers.indexOf(mod);
-    if (modIdx >= 0) modBits |= 1 << modIdx;
-  }
-  builder.push(tok.line, tok.column, firstLineLen, typeIdx, modBits);
-}
-function findPrevNonWhitespace(tokens, idx) {
-  for (let i = idx - 1; i >= 0; i--) {
-    if (tokens[i].type !== 7 /* Whitespace */) return tokens[i];
-  }
-  return void 0;
-}
-function findNextNonWhitespace(tokens, idx) {
-  for (let i = idx + 1; i < tokens.length; i++) {
-    if (tokens[i].type !== 7 /* Whitespace */) return tokens[i];
-  }
-  return void 0;
-}
-function getIdentifierChain(tokens, idx) {
-  let chain = tokens[idx].value;
-  let i = idx - 1;
-  while (i >= 0) {
-    if (tokens[i].type === 7 /* Whitespace */) {
-      i--;
-      continue;
-    }
-    if (tokens[i].type === 6 /* Punctuation */ && (tokens[i].value === "." || tokens[i].value === ":")) {
-      i--;
-      while (i >= 0 && tokens[i].type === 7 /* Whitespace */) i--;
-      if (i >= 0 && tokens[i].type === 1 /* Identifier */) {
-        chain = tokens[i].value + "." + chain;
-        i--;
-        continue;
-      }
-    }
-    break;
-  }
-  return chain;
-}
-
-// src/providers/assetExplorer.ts
-var vscode15 = __toESM(require("vscode"));
-var path10 = __toESM(require("path"));
-var fs7 = __toESM(require("fs"));
-var AssetItem = class _AssetItem extends vscode15.TreeItem {
-  constructor(label, collapsibleState, resourceUri, assetType, sizeBytes) {
-    super(label, collapsibleState);
-    this.label = label;
-    this.collapsibleState = collapsibleState;
-    this.resourceUri = resourceUri;
-    this.assetType = assetType;
-    this.sizeBytes = sizeBytes;
-    if (resourceUri) {
-      this.resourceUri = resourceUri;
-      this.tooltip = resourceUri.fsPath;
-    }
-    this.iconPath = assetType ? new vscode15.ThemeIcon(_AssetItem.iconFor(assetType)) : void 0;
-    if (sizeBytes !== void 0) {
-      this.description = _AssetItem.formatSize(sizeBytes);
-    }
-    if (assetType && assetType !== "folder" && resourceUri) {
-      this.command = {
-        command: "vscode.open",
-        title: "Open File",
-        arguments: [resourceUri]
-      };
-    }
-  }
-  static iconFor(kind) {
-    switch (kind) {
-      case "image":
-        return "file-media";
-      case "audio":
-        return "unmute";
-      case "font":
-        return "text-size";
-      case "shader":
-        return "symbol-color";
-      case "folder":
-        return "folder";
-      default:
-        return "file";
-    }
-  }
-  static formatSize(bytes) {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
-  }
-};
-var IMAGE_EXT = /* @__PURE__ */ new Set([".png", ".jpg", ".jpeg", ".bmp", ".gif", ".tga", ".tiff", ".webp"]);
-var AUDIO_EXT = /* @__PURE__ */ new Set([".wav", ".ogg", ".mp3", ".flac", ".aiff"]);
-var FONT_EXT = /* @__PURE__ */ new Set([".ttf", ".otf"]);
-var SHADER_EXT = /* @__PURE__ */ new Set([".glsl", ".vert", ".frag", ".wgsl"]);
-function classifyFile(ext) {
-  if (IMAGE_EXT.has(ext)) return "image";
-  if (AUDIO_EXT.has(ext)) return "audio";
-  if (FONT_EXT.has(ext)) return "font";
-  if (SHADER_EXT.has(ext)) return "shader";
-  return void 0;
-}
-var AssetExplorerProvider = class {
-  _onDidChangeTreeData = new vscode15.EventEmitter();
-  onDidChangeTreeData = this._onDidChangeTreeData.event;
-  categories = [];
-  _missingAssets = [];
-  constructor() {
-    this.refresh();
-  }
-  refresh() {
-    this.categories = [
-      { label: "Images", type: "image", icon: "file-media", root: this._newFolder("", ""), totalCount: 0 },
-      { label: "Audio", type: "audio", icon: "unmute", root: this._newFolder("", ""), totalCount: 0 },
-      { label: "Fonts", type: "font", icon: "text-size", root: this._newFolder("", ""), totalCount: 0 },
-      { label: "Shaders", type: "shader", icon: "symbol-color", root: this._newFolder("", ""), totalCount: 0 }
-    ];
-    this._missingAssets = [];
-    this._scanGameRoot();
-    this._onDidChangeTreeData.fire(void 0);
-  }
-  get missingAssets() {
-    return this._missingAssets;
-  }
-  /** Find the game project root — the folder containing main.lua closest to workspace root. */
-  _findGameRoot() {
-    const folders = vscode15.workspace.workspaceFolders;
-    if (!folders?.length) return void 0;
-    const wsRoot = folders[0].uri.fsPath;
-    if (fs7.existsSync(path10.join(wsRoot, "main.lua"))) {
-      return wsRoot;
-    }
-    const searchDirs = ["content/demos", "content/examples", "examples", "game", "src"];
-    for (const rel of searchDirs) {
-      const dir = path10.join(wsRoot, rel);
-      if (!fs7.existsSync(dir)) continue;
-      try {
-        const entries = fs7.readdirSync(dir, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.isDirectory()) {
-            const candidate = path10.join(dir, entry.name);
-            if (fs7.existsSync(path10.join(candidate, "main.lua"))) {
-              return candidate;
-            }
-          }
-        }
-      } catch {
-      }
-    }
-    return wsRoot;
-  }
-  _scanGameRoot() {
-    const gameRoot = this._findGameRoot();
-    if (!gameRoot) return;
-    this._walk(gameRoot, gameRoot);
-  }
-  _newFolder(name, relPath) {
-    return { name, relPath, children: /* @__PURE__ */ new Map(), files: [] };
-  }
-  _ensureFolder(root, relDir) {
-    if (!relDir || relDir === ".") return root;
-    const parts = relDir.split("/");
-    let current = root;
-    let builtPath = "";
-    for (const part of parts) {
-      builtPath = builtPath ? `${builtPath}/${part}` : part;
-      let child = current.children.get(part);
-      if (!child) {
-        child = this._newFolder(part, builtPath);
-        current.children.set(part, child);
-      }
-      current = child;
-    }
-    return current;
-  }
-  _walk(dir, root) {
-    let entries;
-    try {
-      entries = fs7.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      const fullPath = path10.join(dir, entry.name);
-      if (entry.name.startsWith(".") || entry.name === "node_modules" || entry.name === "target" || entry.name === "build") continue;
-      if (entry.isDirectory()) {
-        this._walk(fullPath, root);
-      } else if (entry.isFile()) {
-        const ext = path10.extname(entry.name).toLowerCase();
-        const kind = classifyFile(ext);
-        if (!kind) continue;
-        const cat = this.categories.find((c) => c.type === kind);
-        if (!cat) continue;
-        let size = 0;
-        try {
-          size = fs7.statSync(fullPath).size;
-        } catch {
-        }
-        const relPath = path10.relative(root, fullPath).replace(/\\/g, "/");
-        const relDir = path10.dirname(relPath);
-        const folder = this._ensureFolder(cat.root, relDir === "." ? "" : relDir);
-        folder.files.push({
-          name: entry.name,
-          relPath,
-          uri: vscode15.Uri.file(fullPath),
-          size,
-          type: kind
-        });
-        cat.totalCount++;
-      }
-    }
-  }
-  getTreeItem(element) {
-    return element;
-  }
-  getChildren(element) {
-    if (!element) {
-      return this.categories.filter((cat) => cat.totalCount > 0).map((cat) => {
-        const item = new AssetItem(
-          `${cat.label} (${cat.totalCount})`,
-          vscode15.TreeItemCollapsibleState.Collapsed,
-          void 0,
-          "folder",
-          void 0
-        );
-        item.contextValue = `assetCategory.${cat.type}`;
-        item._catType = cat.type;
-        return item;
-      });
-    }
-    const catType = element._catType;
-    if (catType) {
-      const cat = this.categories.find((c) => c.type === catType);
-      if (!cat) return [];
-      return this._folderChildren(cat.root, cat.type);
-    }
-    const folderData = element._folderNode;
-    const fileType = element._fileType;
-    if (folderData) {
-      return this._folderChildren(folderData, fileType || "image");
-    }
-    return [];
-  }
-  _folderChildren(folder, fileType) {
-    const items = [];
-    const sortedFolders = Array.from(folder.children.entries()).sort((a, b) => a[0].localeCompare(b[0]));
-    for (const [name, child] of sortedFolders) {
-      const fileCount = this._countFiles(child);
-      const item = new AssetItem(
-        `${name} (${fileCount})`,
-        vscode15.TreeItemCollapsibleState.Collapsed,
-        void 0,
-        "folder",
-        void 0
-      );
-      item._folderNode = child;
-      item._fileType = fileType;
-      items.push(item);
-    }
-    const sortedFiles = [...folder.files].sort((a, b) => a.name.localeCompare(b.name));
-    for (const file of sortedFiles) {
-      const item = new AssetItem(
-        file.name,
-        vscode15.TreeItemCollapsibleState.None,
-        file.uri,
-        file.type,
-        file.size
-      );
-      item.contextValue = "assetItem";
-      items.push(item);
-    }
-    return items;
-  }
-  _countFiles(folder) {
-    let count = folder.files.length;
-    for (const child of folder.children.values()) {
-      count += this._countFiles(child);
-    }
-    return count;
-  }
-};
-async function findMissingAssets() {
-  const wsRoot = vscode15.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!wsRoot) {
-    vscode15.window.showWarningMessage("No workspace folder open.");
-    return;
-  }
-  const luaFiles = await vscode15.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
-  const assetPattern = /lurek\.(?:graphics\.newImage|audio\.newSource)\s*\(\s*["']([^"']+)["']/g;
-  const missing = [];
-  for (const uri of luaFiles) {
-    let text;
-    try {
-      text = fs7.readFileSync(uri.fsPath, "utf8");
-    } catch {
-      continue;
-    }
-    const lines = text.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      assetPattern.lastIndex = 0;
-      let m;
-      while ((m = assetPattern.exec(lines[i])) !== null) {
-        const assetPath = m[1];
-        if (!assetPath.includes(".")) continue;
-        const abs = path10.resolve(path10.dirname(uri.fsPath), assetPath);
-        const abs2 = path10.resolve(wsRoot, assetPath);
-        if (!fs7.existsSync(abs) && !fs7.existsSync(abs2)) {
-          missing.push({ file: vscode15.workspace.asRelativePath(uri), line: i + 1, asset: assetPath });
-        }
-      }
-    }
-  }
-  if (missing.length === 0) {
-    vscode15.window.showInformationMessage("No missing assets found.");
-    return;
-  }
-  const report = missing.map((m) => `${m.file}:${m.line}  \u2192  ${m.asset}`).join("\n");
-  const doc = await vscode15.workspace.openTextDocument({ content: `Missing assets:
-
-${report}`, language: "plaintext" });
-  vscode15.window.showTextDocument(doc);
-}
-function insertAssetPath(item) {
-  const editor = vscode15.window.activeTextEditor;
-  if (!editor || !item.resourceUri) return;
-  const wsRoot = vscode15.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
-  let rel = item.resourceUri.fsPath;
-  if (wsRoot && rel.startsWith(wsRoot)) rel = rel.substring(wsRoot.length + 1);
-  rel = rel.replace(/\\/g, "/");
-  editor.edit((b) => b.replace(editor.selection, `"${rel}"`));
-}
-
-// src/extension.ts
-init_perfDashboard();
-
-// src/providers/codeLens.ts
-var vscode17 = __toESM(require("vscode"));
-var LUA_SELECTOR8 = { scheme: "file", language: "lua" };
-var LuaCodeLensProvider = class {
-  _onDidChange = new vscode17.EventEmitter();
-  onDidChangeCodeLenses = this._onDidChange.event;
-  provideCodeLenses(document) {
-    const lenses = [];
-    const text = document.getText();
-    const lines = text.split("\n");
-    const funcDef = /^(?:local\s+function\s+(\w+)|function\s+([\w.:]+))/;
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const m = funcDef.exec(line.trimStart());
-      if (!m) continue;
-      const funcName = m[1] ?? m[2];
-      if (!funcName) continue;
-      const range = new vscode17.Range(i, 0, i, 0);
-      const lurekCallbackMatch = funcName.match(/^lurek\.(\w+)$/);
-      const cbName = lurekCallbackMatch?.[1];
-      if (cbName && _lurekCallbacks.has(cbName)) {
-        lenses.push(new vscode17.CodeLens(range, {
-          title: `\u26A1 lurek.${cbName} callback`,
-          command: "lurek.browseApi",
-          arguments: [`lurek.${cbName}`],
-          tooltip: `Open API documentation for lurek.${cbName}`
-        }));
-      } else if (funcName.startsWith("lurek.")) {
-        lenses.push(new vscode17.CodeLens(range, {
-          title: `\u{1F527} lurek API override`,
-          command: "lurek.browseApi",
-          arguments: [funcName],
-          tooltip: `This overrides a lurek API function: ${funcName}`
-        }));
-      }
-      if (/^test_|_test\b/.test(funcName)) {
-        lenses.push(new vscode17.CodeLens(range, {
-          title: "\u25B6 Run test",
-          command: "lurek.test.runSingleLua",
-          arguments: [document.uri, funcName],
-          tooltip: `Run Lua test "${funcName}"`
-        }));
-      }
-    }
-    const filePath = document.uri.fsPath.replace(/\\/g, "/");
-    const firstLine = document.lineAt(0).text;
-    const lineCount = document.lineCount;
-    if (filePath.includes("/library/") && filePath.endsWith("/init.lua")) {
-      const libName = filePath.match(/\/library\/([^/]+)\//)?.[1];
-      if (libName) {
-        lenses.push(new vscode17.CodeLens(new vscode17.Range(0, 0, 0, 0), {
-          title: `\u{1F4E6} Lunasome library: ${libName}`,
-          command: "",
-          tooltip: `This is the entry point for the "${libName}" Lunasome library`
-        }));
-      }
-    }
-    if (filePath.includes("/content/games/") && filePath.endsWith("/main.lua")) {
-      const demoName = filePath.match(/\/content\/games\/([^/]+)\//)?.[1];
-      if (demoName) {
-        lenses.push(new vscode17.CodeLens(new vscode17.Range(0, 0, 0, 0), {
-          title: `\u{1F3AE} Demo: ${demoName}`,
-          command: "lurek.runDemo",
-          arguments: [demoName],
-          tooltip: `Run the "${demoName}" demo`
-        }));
-      }
-    }
-    if (filePath.includes("/content/examples/") && filePath.endsWith(".lua")) {
-      const exName = filePath.match(/\/content\/examples\/([^/]+)\.lua$/)?.[1];
-      if (exName) {
-        lenses.push(new vscode17.CodeLens(new vscode17.Range(0, 0, 0, 0), {
-          title: `\u{1F4D6} Example: ${exName}`,
-          command: "",
-          tooltip: `API example script demonstrating ${exName}`
-        }));
-      }
-    }
-    if (filePath.includes("/tests/lua/") && filePath.endsWith(".lua")) {
-      const testName = filePath.match(/\/tests\/lua\/.*?\/([^/]+)\.lua$/)?.[1];
-      if (testName) {
-        lenses.push(new vscode17.CodeLens(new vscode17.Range(0, 0, 0, 0), {
-          title: `\u{1F9EA} Lua test: ${testName}`,
-          command: "lurek.test.runSingleLua",
-          arguments: [document.uri, testName],
-          tooltip: `Test file: ${testName}`
-        }));
-      }
-    }
-    return lenses;
-  }
-  refresh() {
-    this._onDidChange.fire();
-  }
-};
-function buildVariableInspector(context) {
-  const barItem = vscode17.window.createStatusBarItem(
-    vscode17.StatusBarAlignment.Right,
-    95
-  );
-  barItem.name = "Lurek2D Variable Type";
-  barItem.tooltip = "Type of the Lua symbol under the cursor";
-  barItem.command = "lurek.debug.openInspector";
-  context.subscriptions.push(barItem);
-  const TYPE_INIT = [
-    { pattern: /=\s*\d+(?:\.\d+)?(?!\w)/, type: "number" },
-    { pattern: /=\s*["']/, type: "string" },
-    { pattern: /=\s*(?:true|false)\b/, type: "boolean" },
-    { pattern: /=\s*\{/, type: "table" },
-    { pattern: /=\s*function\s*\(/, type: "function" },
-    { pattern: /=\s*nil\b/, type: "nil" },
-    { pattern: /lurek\.graphics\.newImage\s*\(/, type: "Image" },
-    { pattern: /lurek\.graphics\.newCanvas\s*\(/, type: "Canvas" },
-    { pattern: /lurek\.graphics\.newFont\s*\(/, type: "Font" },
-    { pattern: /lurek\.graphics\.newShader\s*\(/, type: "Shader" },
-    { pattern: /lurek\.graphics\.newMesh\s*\(/, type: "Mesh" },
-    { pattern: /lurek\.graphics\.newSpriteBatch\s*\(/, type: "SpriteBatch" },
-    { pattern: /lurek\.graphics\.newParticleSystem\s*\(/, type: "ParticleSystem" },
-    { pattern: /lurek\.audio\.newSource\s*\(/, type: "Source" },
-    { pattern: /lurek\.physics\.newWorld\s*\(/, type: "World" },
-    { pattern: /lurek\.physics\.newBody\s*\(/, type: "Body" },
-    { pattern: /lurek\.physics\.newFixture\s*\(/, type: "Fixture" },
-    { pattern: /lurek\.physics\.newRectangleShape\s*\(/, type: "PolygonShape" },
-    { pattern: /lurek\.physics\.newCircleShape\s*\(/, type: "CircleShape" },
-    { pattern: /lurek\.math\.newTransform\s*\(/, type: "Transform" },
-    { pattern: /lurek\.cardgame\.newCard\s*\(/, type: "Card" },
-    { pattern: /lurek\.cardgame\.newDeck\s*\(/, type: "Deck" }
-  ];
-  function inferType(document, word) {
-    const text = document.getText();
-    const lines = text.split("\n");
-    for (let i = lines.length - 1; i >= 0; i--) {
-      const line = lines[i];
-      const assignPattern = new RegExp(`\\blocal\\s+${word}\\s*=|\\b${word}\\s*=(?!=)`, "g");
-      if (!assignPattern.test(line)) continue;
-      for (const { pattern, type } of TYPE_INIT) {
-        if (pattern.test(line)) return type;
-      }
-      return "?";
-    }
-    return void 0;
-  }
-  context.subscriptions.push(
-    vscode17.window.onDidChangeTextEditorSelection((e) => {
-      const editor = e.textEditor;
-      if (editor.document.languageId !== "lua") {
-        barItem.hide();
-        return;
-      }
-      const pos = editor.selection.active;
-      const wordRange = editor.document.getWordRangeAtPosition(pos, /\w+/);
-      if (!wordRange) {
-        barItem.hide();
-        return;
-      }
-      const word = editor.document.getText(wordRange);
-      if (/^(local|function|return|end|if|then|else|for|while|do|and|or|not|nil|true|false|repeat|until|break|goto|in)$/.test(word)) {
-        barItem.hide();
-        return;
-      }
-      const t = inferType(editor.document, word);
-      if (t) {
-        barItem.text = `$(symbol-variable) ${word}: ${t}`;
-        barItem.show();
-      } else {
-        barItem.hide();
-      }
-    })
-  );
-}
-var _lurekCallbacks = LUREK_CALLBACK_NAMES;
-function register12(context, apiData2) {
-  const provider = new LuaCodeLensProvider();
-  context.subscriptions.push(
-    vscode17.languages.registerCodeLensProvider(LUA_SELECTOR8, provider)
-  );
-  context.subscriptions.push(
-    vscode17.workspace.onDidChangeTextDocument((e) => {
-      if (e.document.languageId === "lua") provider.refresh();
-    })
-  );
-  context.subscriptions.push(
-    vscode17.commands.registerCommand(
-      "lurek.codelens.findRefs",
-      async (_uri, pos) => {
-        await vscode17.commands.executeCommand("editor.action.referenceSearch.trigger", pos);
-      }
-    )
-  );
-  buildVariableInspector(context);
-  context.subscriptions.push(
-    vscode17.commands.registerCommand("lurek.codeLens.toggle", () => {
-      const cfg = vscode17.workspace.getConfiguration("lurek");
-      const current = cfg.get("codeLens.enabled", true);
-      cfg.update("codeLens.enabled", !current, vscode17.ConfigurationTarget.Global);
-      vscode17.window.showInformationMessage(
-        `Lurek2D Code Lens ${!current ? "enabled" : "disabled"}`
-      );
-    })
-  );
-}
-
-// src/providers/debugWatchers.ts
-var vscode18 = __toESM(require("vscode"));
-var _panel2;
-var _watches = [];
-var _nextId = 1;
-var _connected = false;
-var _refreshInterval;
-var _evalFn;
-function setEvaluator(fn) {
-  _evalFn = fn;
-}
-function setConnected(connected) {
-  _connected = connected;
-  if (!connected) {
-    _watches.forEach((w) => {
-      w.value = "\u2013";
-      w.type = "?";
-      w.error = void 0;
-    });
-  }
-  pushUpdate();
-  if (connected) startAutoRefresh();
-  else stopAutoRefresh();
-}
-function startAutoRefresh() {
-  if (_refreshInterval) return;
-  _refreshInterval = setInterval(() => {
-    void refreshAll();
-  }, 1500);
-}
-function stopAutoRefresh() {
-  if (_refreshInterval) {
-    clearInterval(_refreshInterval);
-    _refreshInterval = void 0;
-  }
-}
-async function refreshAll() {
-  if (!_evalFn || !_connected || _watches.length === 0) return;
-  for (const w of _watches) {
-    try {
-      const result = await _evalFn(w.expression);
-      if (result) {
-        w.value = result.value;
-        w.type = result.type;
-        w.error = void 0;
-      } else {
-        w.value = "nil";
-        w.type = "nil";
-      }
-    } catch (e) {
-      w.value = "\u2013";
-      w.type = "error";
-      w.error = e instanceof Error ? e.message : String(e);
-    }
-    w.lastUpdated = Date.now();
-  }
-  pushUpdate();
-}
-function openWatchersPanel(context) {
-  if (_panel2) {
-    _panel2.reveal(vscode18.ViewColumn.Two);
-    return;
-  }
-  _panel2 = vscode18.window.createWebviewPanel(
-    "lurek.debugWatchers",
-    "Lurek2D Watchers",
-    vscode18.ViewColumn.Two,
-    { enableScripts: true, retainContextWhenHidden: true }
-  );
-  _panel2.webview.html = buildHtml2();
-  _panel2.onDidDispose(() => {
-    _panel2 = void 0;
-    stopAutoRefresh();
-  }, null, context.subscriptions);
-  _panel2.webview.onDidReceiveMessage(async (msg) => {
-    switch (msg.type) {
-      case "add":
-        addWatch(msg.expression);
-        await refreshAll();
-        break;
-      case "remove":
-        _watches = _watches.filter((w) => w.id !== msg.id);
-        pushUpdate();
-        break;
-      case "edit":
-        editWatch(msg.id, msg.expression);
-        await refreshAll();
-        break;
-      case "refresh":
-        await refreshAll();
-        break;
-      case "clear":
-        _watches = [];
-        pushUpdate();
-        break;
-    }
-  }, null, context.subscriptions);
-  pushUpdate();
-  if (_connected) startAutoRefresh();
-}
-function addWatch(expression) {
-  if (!expression.trim()) return;
-  _watches.push({ id: _nextId++, expression: expression.trim(), value: "\u2013", type: "?", lastUpdated: 0 });
-  pushUpdate();
-}
-function editWatch(id, expression) {
-  const w = _watches.find((x) => x.id === id);
-  if (w) {
-    w.expression = expression.trim();
-    w.value = "\u2013";
-    w.type = "?";
-  }
-  pushUpdate();
-}
-function pushUpdate() {
-  if (!_panel2) return;
-  _panel2.webview.postMessage({ type: "update", watches: _watches, connected: _connected });
-}
-function buildHtml2() {
-  return (
-    /* html */
-    `<!DOCTYPE html>
+${a}`,language:"plaintext"});ne.window.showTextDocument(i)}function Li(n){let e=ne.window.activeTextEditor;if(!e||!n.resourceUri)return;let t=ne.workspace.workspaceFolders?.[0]?.uri.fsPath??"",r=n.resourceUri.fsPath;t&&r.startsWith(t)&&(r=r.substring(t.length+1)),r=r.replace(/\\/g,"/"),e.edit(a=>a.replace(e.selection,`"${r}"`))}Nr();var Y=C(require("vscode"));var Ul={scheme:"file",language:"lua"},Wr=class{_onDidChange=new Y.EventEmitter;onDidChangeCodeLenses=this._onDidChange.event;provideCodeLenses(e){let t=[],a=e.getText().split(`
+`),i=/^(?:local\s+function\s+(\w+)|function\s+([\w.:]+))/;for(let p=0;p<a.length;p++){let u=a[p],c=i.exec(u.trimStart());if(!c)continue;let h=c[1]??c[2];if(!h)continue;let L=new Y.Range(p,0,p,0),g=h.match(/^lurek\.(\w+)$/)?.[1];g&&$l.has(g)?t.push(new Y.CodeLens(L,{title:`\u26A1 lurek.${g} callback`,command:"lurek.browseApi",arguments:[`lurek.${g}`],tooltip:`Open API documentation for lurek.${g}`})):h.startsWith("lurek.")&&t.push(new Y.CodeLens(L,{title:"\u{1F527} lurek API override",command:"lurek.browseApi",arguments:[h],tooltip:`This overrides a lurek API function: ${h}`})),/^test_|_test\b/.test(h)&&t.push(new Y.CodeLens(L,{title:"\u25B6 Run test",command:"lurek.test.runSingleLua",arguments:[e.uri,h],tooltip:`Run Lua test "${h}"`}))}let o=e.uri.fsPath.replace(/\\/g,"/"),s=e.lineAt(0).text,l=e.lineCount;if(o.includes("/library/")&&o.endsWith("/init.lua")){let p=o.match(/\/library\/([^/]+)\//)?.[1];p&&t.push(new Y.CodeLens(new Y.Range(0,0,0,0),{title:`\u{1F4E6} Lunasome library: ${p}`,command:"",tooltip:`This is the entry point for the "${p}" Lunasome library`}))}if(o.includes("/content/games/")&&o.endsWith("/main.lua")){let p=o.match(/\/content\/games\/([^/]+)\//)?.[1];p&&t.push(new Y.CodeLens(new Y.Range(0,0,0,0),{title:`\u{1F3AE} Demo: ${p}`,command:"lurek.runDemo",arguments:[p],tooltip:`Run the "${p}" demo`}))}if(o.includes("/content/examples/")&&o.endsWith(".lua")){let p=o.match(/\/content\/examples\/([^/]+)\.lua$/)?.[1];p&&t.push(new Y.CodeLens(new Y.Range(0,0,0,0),{title:`\u{1F4D6} Example: ${p}`,command:"",tooltip:`API example script demonstrating ${p}`}))}if(o.includes("/tests/lua/")&&o.endsWith(".lua")){let p=o.match(/\/tests\/lua\/.*?\/([^/]+)\.lua$/)?.[1];p&&t.push(new Y.CodeLens(new Y.Range(0,0,0,0),{title:`\u{1F9EA} Lua test: ${p}`,command:"lurek.test.runSingleLua",arguments:[e.uri,p],tooltip:`Test file: ${p}`}))}return t}refresh(){this._onDidChange.fire()}};function ql(n){let e=Y.window.createStatusBarItem(Y.StatusBarAlignment.Right,95);e.name="Lurek2D Variable Type",e.tooltip="Type of the Lua symbol under the cursor",e.command="lurek.debug.openInspector",n.subscriptions.push(e);let t=[{pattern:/=\s*\d+(?:\.\d+)?(?!\w)/,type:"number"},{pattern:/=\s*["']/,type:"string"},{pattern:/=\s*(?:true|false)\b/,type:"boolean"},{pattern:/=\s*\{/,type:"table"},{pattern:/=\s*function\s*\(/,type:"function"},{pattern:/=\s*nil\b/,type:"nil"},{pattern:/lurek\.graphics\.newImage\s*\(/,type:"Image"},{pattern:/lurek\.graphics\.newCanvas\s*\(/,type:"Canvas"},{pattern:/lurek\.graphics\.newFont\s*\(/,type:"Font"},{pattern:/lurek\.graphics\.newShader\s*\(/,type:"Shader"},{pattern:/lurek\.graphics\.newMesh\s*\(/,type:"Mesh"},{pattern:/lurek\.graphics\.newSpriteBatch\s*\(/,type:"SpriteBatch"},{pattern:/lurek\.graphics\.newParticleSystem\s*\(/,type:"ParticleSystem"},{pattern:/lurek\.audio\.newSource\s*\(/,type:"Source"},{pattern:/lurek\.physics\.newWorld\s*\(/,type:"World"},{pattern:/lurek\.physics\.newBody\s*\(/,type:"Body"},{pattern:/lurek\.physics\.newFixture\s*\(/,type:"Fixture"},{pattern:/lurek\.physics\.newRectangleShape\s*\(/,type:"PolygonShape"},{pattern:/lurek\.physics\.newCircleShape\s*\(/,type:"CircleShape"},{pattern:/lurek\.math\.newTransform\s*\(/,type:"Transform"},{pattern:/lurek\.cardgame\.newCard\s*\(/,type:"Card"},{pattern:/lurek\.cardgame\.newDeck\s*\(/,type:"Deck"}];function r(a,i){let s=a.getText().split(`
+`);for(let l=s.length-1;l>=0;l--){let p=s[l];if(new RegExp(`\\blocal\\s+${i}\\s*=|\\b${i}\\s*=(?!=)`,"g").test(p)){for(let{pattern:c,type:h}of t)if(c.test(p))return h;return"?"}}}n.subscriptions.push(Y.window.onDidChangeTextEditorSelection(a=>{let i=a.textEditor;if(i.document.languageId!=="lua"){e.hide();return}let o=i.selection.active,s=i.document.getWordRangeAtPosition(o,/\w+/);if(!s){e.hide();return}let l=i.document.getText(s);if(/^(local|function|return|end|if|then|else|for|while|do|and|or|not|nil|true|false|repeat|until|break|goto|in)$/.test(l)){e.hide();return}let p=r(i.document,l);p?(e.text=`$(symbol-variable) ${l}: ${p}`,e.show()):e.hide()}))}var $l=Ye;function Pi(n,e){let t=new Wr;n.subscriptions.push(Y.languages.registerCodeLensProvider(Ul,t)),n.subscriptions.push(Y.workspace.onDidChangeTextDocument(r=>{r.document.languageId==="lua"&&t.refresh()})),n.subscriptions.push(Y.commands.registerCommand("lurek.codelens.findRefs",async(r,a)=>{await Y.commands.executeCommand("editor.action.referenceSearch.trigger",a)})),ql(n),n.subscriptions.push(Y.commands.registerCommand("lurek.codeLens.toggle",()=>{let r=Y.workspace.getConfiguration("lurek"),a=r.get("codeLens.enabled",!0);r.update("codeLens.enabled",!a,Y.ConfigurationTarget.Global),Y.window.showInformationMessage(`Lurek2D Code Lens ${a?"disabled":"enabled"}`)}))}var Ot=C(require("vscode")),Xe,Ze=[],Xl=1,fn=!1,Ft,Gr;function Mi(n){Gr=n}function Hr(n){fn=n,n||Ze.forEach(e=>{e.value="\u2013",e.type="?",e.error=void 0}),ft(),n?Si():ki()}function Si(){Ft||(Ft=setInterval(()=>{yn()},1500))}function ki(){Ft&&(clearInterval(Ft),Ft=void 0)}async function yn(){if(!(!Gr||!fn||Ze.length===0)){for(let n of Ze){try{let e=await Gr(n.expression);e?(n.value=e.value,n.type=e.type,n.error=void 0):(n.value="nil",n.type="nil")}catch(e){n.value="\u2013",n.type="error",n.error=e instanceof Error?e.message:String(e)}n.lastUpdated=Date.now()}ft()}}function ji(n){if(Xe){Xe.reveal(Ot.ViewColumn.Two);return}Xe=Ot.window.createWebviewPanel("lurek.debugWatchers","Lurek2D Watchers",Ot.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),Xe.webview.html=Ql(),Xe.onDidDispose(()=>{Xe=void 0,ki()},null,n.subscriptions),Xe.webview.onDidReceiveMessage(async e=>{switch(e.type){case"add":Ci(e.expression),await yn();break;case"remove":Ze=Ze.filter(t=>t.id!==e.id),ft();break;case"edit":Zl(e.id,e.expression),await yn();break;case"refresh":await yn();break;case"clear":Ze=[],ft();break}},null,n.subscriptions),ft(),fn&&Si()}function Ci(n){n.trim()&&(Ze.push({id:Xl++,expression:n.trim(),value:"\u2013",type:"?",lastUpdated:0}),ft())}function Zl(n,e){let t=Ze.find(r=>r.id===n);t&&(t.expression=e.trim(),t.value="\u2013",t.type="?"),ft()}function ft(){Xe&&Xe.webview.postMessage({type:"update",watches:Ze,connected:fn})}function Ql(){return`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7985,42 +363,7 @@ window.addEventListener('message', (e) => {
 });
 </script>
 </body>
-</html>`
-  );
-}
-function addWatchFromEditor(editor) {
-  const selection = editor.selection;
-  const word = editor.document.getText(selection.isEmpty ? editor.document.getWordRangeAtPosition(selection.active, /[\w.:\[\]"']+/) : selection);
-  if (word) addWatch(word);
-}
-
-// src/providers/systemMonitor.ts
-var vscode19 = __toESM(require("vscode"));
-var import_child_process = require("child_process");
-var import_util = require("util");
-var execFileAsync = (0, import_util.promisify)(import_child_process.execFile);
-var _panel3;
-var _history2 = [];
-var MAX_SAMPLES = 120;
-var _pollInterval;
-async function collectSample() {
-  const sample = {
-    timestamp: Date.now(),
-    cpuPercent: 0,
-    ramUsedMb: 0,
-    ramTotalMb: 0,
-    lurekProcessCpu: 0,
-    lurekProcessRamMb: 0
-  };
-  if (process.platform === "win32") {
-    await collectWindows(sample);
-  } else {
-    await collectUnix(sample);
-  }
-  return sample;
-}
-async function collectWindows(sample) {
-  const script = `
+</html>`}function Ri(n){let e=n.selection,t=n.document.getText(e.isEmpty?n.document.getWordRangeAtPosition(e.active,/[\w.:\[\]"']+/):e);t&&Ci(t)}var _t=C(require("vscode")),Di=require("child_process"),Bi=require("util"),bn=(0,Bi.promisify)(Di.execFile),Ve,wt=[],Jl=120,zt;async function Kl(){let n={timestamp:Date.now(),cpuPercent:0,ramUsedMb:0,ramTotalMb:0,lurekProcessCpu:0,lurekProcessRamMb:0};return process.platform==="win32"?await ep(n):await tp(n),n}async function ep(n){let e=`
 $ErrorActionPreference = 'SilentlyContinue'
 $mem = Get-CimInstance Win32_OperatingSystem | Select-Object FreePhysicalMemory, TotalVisibleMemorySize
 $cpu = (Get-CimInstance -ClassName Win32_Processor | Measure-Object -Property LoadPercentage -Average).Average
@@ -8037,108 +380,8 @@ $net = Get-CimInstance Win32_PerfFormattedData_Tcpip_NetworkInterface | Measure-
   DiskWriteBps = if($disk){ [long]$disk.DiskWriteBytesPersec } else { 0 }
   NetSentBps = [long]$net.Sum[0]
   NetRecvBps = [long]$net.Sum[1]
-} | ConvertTo-Json -Compress`.trim();
-  try {
-    const { stdout } = await execFileAsync("powershell", ["-NoProfile", "-NonInteractive", "-Command", script], { timeout: 4e3 });
-    const data = JSON.parse(stdout.trim());
-    sample.cpuPercent = data["CPU"] ?? 0;
-    sample.ramTotalMb = Math.round((data["MemTotalKB"] ?? 0) / 1024);
-    const freeMb = Math.round((data["MemFreeKB"] ?? 0) / 1024);
-    sample.ramUsedMb = sample.ramTotalMb - freeMb;
-    sample.lurekProcessCpu = data["LurekCPU"] ?? 0;
-    sample.lurekProcessRamMb = data["LurekRAMMB"] ?? 0;
-    const dr = data["DiskReadBps"] ?? 0;
-    const dw = data["DiskWriteBps"] ?? 0;
-    sample.diskReadKbs = Math.round(dr / 1024);
-    sample.diskWriteKbs = Math.round(dw / 1024);
-    const ns = data["NetSentBps"] ?? 0;
-    const nr = data["NetRecvBps"] ?? 0;
-    sample.netSentKbs = Math.round(ns / 1024);
-    sample.netRecvKbs = Math.round(nr / 1024);
-  } catch {
-  }
-  try {
-    const { stdout: gpuOut } = await execFileAsync(
-      "nvidia-smi",
-      ["--query-gpu=utilization.gpu,memory.used", "--format=csv,noheader,nounits"],
-      { timeout: 2e3 }
-    );
-    const parts = gpuOut.trim().split(",");
-    sample.gpuPercent = parseInt(parts[0] ?? "0", 10);
-    sample.gpuVramMb = parseInt(parts[1]?.trim() ?? "0", 10);
-  } catch {
-  }
-}
-async function collectUnix(sample) {
-  try {
-    const { stdout: topOut } = await execFileAsync("sh", [
-      "-c",
-      `top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1; free -m | grep Mem | awk '{print $3" "$2}'`
-    ], { timeout: 3e3 });
-    const lines = topOut.trim().split("\n");
-    sample.cpuPercent = parseFloat(lines[0] ?? "0");
-    const memParts = (lines[1] ?? "").split(" ");
-    sample.ramUsedMb = parseInt(memParts[0] ?? "0", 10);
-    sample.ramTotalMb = parseInt(memParts[1] ?? "0", 10);
-  } catch {
-  }
-  try {
-    const { stdout: procOut } = await execFileAsync("sh", [
-      "-c",
-      "ps -C lurek2d -o %cpu=,rss= 2>/dev/null || ps aux | grep '[l]urek2d' | awk '{print $3, $6}' | head -1"
-    ], { timeout: 2e3 });
-    const parts = procOut.trim().split(/\s+/);
-    sample.lurekProcessCpu = parseFloat(parts[0] ?? "0");
-    sample.lurekProcessRamMb = Math.round(parseInt(parts[1] ?? "0", 10) / 1024);
-  } catch {
-  }
-}
-function startPolling() {
-  if (_pollInterval) return;
-  _pollInterval = setInterval(async () => {
-    const sample = await collectSample();
-    _history2.push(sample);
-    if (_history2.length > MAX_SAMPLES) _history2.shift();
-    if (_panel3?.visible) {
-      _panel3.webview.postMessage({ type: "data", samples: _history2 });
-    }
-  }, 2e3);
-}
-function stopPolling() {
-  if (_pollInterval) {
-    clearInterval(_pollInterval);
-    _pollInterval = void 0;
-  }
-}
-function openSystemMonitor(context) {
-  if (_panel3) {
-    _panel3.reveal(vscode19.ViewColumn.Two);
-    return;
-  }
-  _panel3 = vscode19.window.createWebviewPanel(
-    "lurek.systemMonitor",
-    "Lurek2D System Monitor",
-    vscode19.ViewColumn.Two,
-    { enableScripts: true, retainContextWhenHidden: true }
-  );
-  _panel3.webview.html = buildHtml3();
-  _panel3.onDidDispose(() => {
-    _panel3 = void 0;
-    stopPolling();
-  }, null, context.subscriptions);
-  _panel3.webview.onDidReceiveMessage((msg) => {
-    if (msg.type === "start") startPolling();
-    if (msg.type === "stop") stopPolling();
-  }, null, context.subscriptions);
-  startPolling();
-  if (_history2.length) {
-    _panel3.webview.postMessage({ type: "data", samples: _history2 });
-  }
-}
-function buildHtml3() {
-  return (
-    /* html */
-    `<!DOCTYPE html>
+} | ConvertTo-Json -Compress`.trim();try{let{stdout:t}=await bn("powershell",["-NoProfile","-NonInteractive","-Command",e],{timeout:4e3}),r=JSON.parse(t.trim());n.cpuPercent=r.CPU??0,n.ramTotalMb=Math.round((r.MemTotalKB??0)/1024);let a=Math.round((r.MemFreeKB??0)/1024);n.ramUsedMb=n.ramTotalMb-a,n.lurekProcessCpu=r.LurekCPU??0,n.lurekProcessRamMb=r.LurekRAMMB??0;let i=r.DiskReadBps??0,o=r.DiskWriteBps??0;n.diskReadKbs=Math.round(i/1024),n.diskWriteKbs=Math.round(o/1024);let s=r.NetSentBps??0,l=r.NetRecvBps??0;n.netSentKbs=Math.round(s/1024),n.netRecvKbs=Math.round(l/1024)}catch{}try{let{stdout:t}=await bn("nvidia-smi",["--query-gpu=utilization.gpu,memory.used","--format=csv,noheader,nounits"],{timeout:2e3}),r=t.trim().split(",");n.gpuPercent=parseInt(r[0]??"0",10),n.gpuVramMb=parseInt(r[1]?.trim()??"0",10)}catch{}}async function tp(n){try{let{stdout:e}=await bn("sh",["-c",`top -bn1 | grep 'Cpu(s)' | awk '{print $2}' | cut -d'%' -f1; free -m | grep Mem | awk '{print $3" "$2}'`],{timeout:3e3}),t=e.trim().split(`
+`);n.cpuPercent=parseFloat(t[0]??"0");let r=(t[1]??"").split(" ");n.ramUsedMb=parseInt(r[0]??"0",10),n.ramTotalMb=parseInt(r[1]??"0",10)}catch{}try{let{stdout:e}=await bn("sh",["-c","ps -C lurek2d -o %cpu=,rss= 2>/dev/null || ps aux | grep '[l]urek2d' | awk '{print $3, $6}' | head -1"],{timeout:2e3}),t=e.trim().split(/\s+/);n.lurekProcessCpu=parseFloat(t[0]??"0"),n.lurekProcessRamMb=Math.round(parseInt(t[1]??"0",10)/1024)}catch{}}function Ii(){zt||(zt=setInterval(async()=>{let n=await Kl();wt.push(n),wt.length>Jl&&wt.shift(),Ve?.visible&&Ve.webview.postMessage({type:"data",samples:wt})},2e3))}function Ei(){zt&&(clearInterval(zt),zt=void 0)}function Ai(n){if(Ve){Ve.reveal(_t.ViewColumn.Two);return}Ve=_t.window.createWebviewPanel("lurek.systemMonitor","Lurek2D System Monitor",_t.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),Ve.webview.html=np(),Ve.onDidDispose(()=>{Ve=void 0,Ei()},null,n.subscriptions),Ve.webview.onDidReceiveMessage(e=>{e.type==="start"&&Ii(),e.type==="stop"&&Ei()},null,n.subscriptions),Ii(),wt.length&&Ve.webview.postMessage({type:"data",samples:wt})}function np(){return`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8321,114 +564,13 @@ window.addEventListener('message', (e) => {
 });
 </script>
 </body>
-</html>`
-  );
-}
-
-// src/providers/apiUsage.ts
-var vscode20 = __toESM(require("vscode"));
-var fs8 = __toESM(require("fs"));
-var path11 = __toESM(require("path"));
-async function scanApiUsage() {
-  const luaFiles = await vscode20.workspace.findFiles("**/*.lua", "{**/node_modules/**,ideas/**,work/**,.github/**}");
-  const usage = /* @__PURE__ */ new Map();
-  for (const uri of luaFiles) {
-    let text;
-    try {
-      text = fs8.readFileSync(uri.fsPath, "utf8");
-    } catch {
-      continue;
-    }
-    const relFile = vscode20.workspace.asRelativePath(uri);
-    const lines = text.split("\n");
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      if (line.trimStart().startsWith("--")) continue;
-      const re = /lurek\.(\w+)\.(\w+)\s*\(/g;
-      let m;
-      while ((m = re.exec(line)) !== null) {
-        const key = `lurek.${m[1]}.${m[2]}`;
-        if (!usage.has(key)) {
-          usage.set(key, { func: key, count: 0, files: /* @__PURE__ */ new Set(), lines: [] });
-        }
-        const entry = usage.get(key);
-        entry.count++;
-        entry.files.add(relFile);
-        if (entry.lines.length < 5) {
-          entry.lines.push({ file: relFile, line: i + 1, text: line.trim() });
-        }
-      }
-    }
-  }
-  return Array.from(usage.values()).sort((a, b) => b.count - a.count);
-}
-var _panel4;
-async function openApiUsageReport(context) {
-  if (_panel4) {
-    _panel4.reveal(vscode20.ViewColumn.Two);
-    await refreshPanel();
-    return;
-  }
-  _panel4 = vscode20.window.createWebviewPanel(
-    "lurek.apiUsage",
-    "Lurek2D API Usage",
-    vscode20.ViewColumn.Two,
-    { enableScripts: true, retainContextWhenHidden: true }
-  );
-  _panel4.onDidDispose(() => {
-    _panel4 = void 0;
-  }, null, context.subscriptions);
-  _panel4.webview.onDidReceiveMessage(async (msg) => {
-    if (msg.type === "refresh") await refreshPanel();
-    if (msg.type === "open") {
-      const uri = vscode20.Uri.file(path11.join(
-        vscode20.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "",
-        msg.file
-      ));
-      await vscode20.window.showTextDocument(uri, {
-        selection: new vscode20.Range(msg.line - 1, 0, msg.line - 1, 0)
-      });
-    }
-  }, null, context.subscriptions);
-  await refreshPanel();
-}
-async function refreshPanel() {
-  if (!_panel4) return;
-  _panel4.webview.postMessage({ type: "loading" });
-  const usages = await scanApiUsage();
-  _panel4.webview.html = buildHtml4(usages);
-}
-function buildHtml4(usages) {
-  const totalCalls = usages.reduce((s, u) => s + u.count, 0);
-  const uniqueFuncs = usages.length;
-  const top10 = usages.slice(0, 10);
-  const byModule = /* @__PURE__ */ new Map();
-  for (const u of usages) {
-    const mod = u.func.split(".")[1] ?? "?";
-    if (!byModule.has(mod)) byModule.set(mod, []);
-    byModule.get(mod).push(u);
-  }
-  const moduleRows = Array.from(byModule.entries()).sort((a, b) => b[1].reduce((s, u) => s + u.count, 0) - a[1].reduce((s, u) => s + u.count, 0)).map(([mod, fns]) => {
-    const total = fns.reduce((s, u) => s + u.count, 0);
-    return `<tr><td><code>lurek.${esc(mod)}</code></td><td>${fns.length}</td><td>${total}</td></tr>`;
-  }).join("");
-  const topRows = top10.map((u) => {
-    const lineLinks = u.lines.map(
-      (l) => `<a href="#" data-file="${esc(l.file)}" data-line="${l.line}" class="loc">${esc(l.file)}:${l.line}</a>`
-    ).join(", ");
-    return `<tr>
-      <td><code>${esc(u.func)}</code></td>
-      <td>${u.count}</td>
-      <td>${u.files.size}</td>
-      <td style="font-size:11px;opacity:.7">${lineLinks}</td>
-    </tr>`;
-  }).join("");
-  const unusedRows = usages.filter((u) => u.count === 0).map(
-    (u) => `<tr><td><code>${esc(u.func)}</code></td></tr>`
-  ).join("");
-  return (
-    /* html */
-    `<!DOCTYPE html>
+</html>`}var pe=C(require("vscode")),Fi=C(require("fs")),Oi=C(require("path"));async function rp(){let n=await pe.workspace.findFiles("**/*.lua","{**/node_modules/**,ideas/**,work/**,.github/**}"),e=new Map;for(let t of n){let r;try{r=Fi.readFileSync(t.fsPath,"utf8")}catch{continue}let a=pe.workspace.asRelativePath(t),i=r.split(`
+`);for(let o=0;o<i.length;o++){let s=i[o];if(s.trimStart().startsWith("--"))continue;let l=/lurek\.(\w+)\.(\w+)\s*\(/g,p;for(;(p=l.exec(s))!==null;){let u=`lurek.${p[1]}.${p[2]}`;e.has(u)||e.set(u,{func:u,count:0,files:new Set,lines:[]});let c=e.get(u);c.count++,c.files.add(a),c.lines.length<5&&c.lines.push({file:a,line:o+1,text:s.trim()})}}}return Array.from(e.values()).sort((t,r)=>r.count-t.count)}var Qe;async function zi(n){if(Qe){Qe.reveal(pe.ViewColumn.Two),await Vr();return}Qe=pe.window.createWebviewPanel("lurek.apiUsage","Lurek2D API Usage",pe.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),Qe.onDidDispose(()=>{Qe=void 0},null,n.subscriptions),Qe.webview.onDidReceiveMessage(async e=>{if(e.type==="refresh"&&await Vr(),e.type==="open"){let t=pe.Uri.file(Oi.join(pe.workspace.workspaceFolders?.[0]?.uri.fsPath??"",e.file));await pe.window.showTextDocument(t,{selection:new pe.Range(e.line-1,0,e.line-1,0)})}},null,n.subscriptions),await Vr()}async function Vr(){if(!Qe)return;Qe.webview.postMessage({type:"loading"});let n=await rp();Qe.webview.html=ap(n)}function ap(n){let e=n.reduce((l,p)=>l+p.count,0),t=n.length,r=n.slice(0,10),a=new Map;for(let l of n){let p=l.func.split(".")[1]??"?";a.has(p)||a.set(p,[]),a.get(p).push(l)}let i=Array.from(a.entries()).sort((l,p)=>p[1].reduce((u,c)=>u+c.count,0)-l[1].reduce((u,c)=>u+c.count,0)).map(([l,p])=>{let u=p.reduce((c,h)=>c+h.count,0);return`<tr><td><code>lurek.${Nt(l)}</code></td><td>${p.length}</td><td>${u}</td></tr>`}).join(""),o=r.map(l=>{let p=l.lines.map(u=>`<a href="#" data-file="${Nt(u.file)}" data-line="${u.line}" class="loc">${Nt(u.file)}:${u.line}</a>`).join(", ");return`<tr>
+      <td><code>${Nt(l.func)}</code></td>
+      <td>${l.count}</td>
+      <td>${l.files.size}</td>
+      <td style="font-size:11px;opacity:.7">${p}</td>
+    </tr>`}).join(""),s=n.filter(l=>l.count===0).map(l=>`<tr><td><code>${Nt(l.func)}</code></td></tr>`).join("");return`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -8455,24 +597,24 @@ function buildHtml4(usages) {
 <button onclick="vscode.postMessage({type:'refresh'})">\u27F3 Re-scan</button>
 
 <div class="stats">
-  <div class="stat"><div class="stat-val">${totalCalls}</div><div class="stat-lbl">Total Calls</div></div>
-  <div class="stat"><div class="stat-val">${uniqueFuncs}</div><div class="stat-lbl">Unique Functions</div></div>
-  <div class="stat"><div class="stat-val">${byModule.size}</div><div class="stat-lbl">Modules Used</div></div>
+  <div class="stat"><div class="stat-val">${e}</div><div class="stat-lbl">Total Calls</div></div>
+  <div class="stat"><div class="stat-val">${t}</div><div class="stat-lbl">Unique Functions</div></div>
+  <div class="stat"><div class="stat-val">${a.size}</div><div class="stat-lbl">Modules Used</div></div>
 </div>
 
 <h3>By Module</h3>
 <table>
   <thead><tr><th>Module</th><th>Functions</th><th>Total Calls</th></tr></thead>
-  <tbody>${moduleRows}</tbody>
+  <tbody>${i}</tbody>
 </table>
 
 <h3>Top 10 Most Called</h3>
 <table>
   <thead><tr><th>Function</th><th>Calls</th><th>Files</th><th>Locations</th></tr></thead>
-  <tbody>${topRows}</tbody>
+  <tbody>${o}</tbody>
 </table>
 
-${unusedRows ? `<h3>Called 0 times</h3><table><thead><tr><th>Function</th></tr></thead><tbody>${unusedRows}</tbody></table>` : ""}
+${s?`<h3>Called 0 times</h3><table><thead><tr><th>Function</th></tr></thead><tbody>${s}</tbody></table>`:""}
 
 <script>
 const vscode = acquireVsCodeApi();
@@ -8484,544 +626,66 @@ document.querySelectorAll('a.loc').forEach(a => {
 });
 </script>
 </body>
-</html>`
-  );
-}
-function esc(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-async function quickInsertLurekApi(apiData2) {
-  const editor = vscode20.window.activeTextEditor;
-  if (!editor) {
-    vscode20.window.showWarningMessage("Open a Lua file first.");
-    return;
-  }
-  const funcs = apiData2.getAllFunctions();
-  const items = funcs.filter((f) => f.fullPath.startsWith("lurek.")).map((f) => ({
-    label: f.fullPath,
-    description: f.description ?? "",
-    detail: f.parameters?.map((p) => `${p.name}: ${p.type}`).join(", ")
-  }));
-  const picked = await vscode20.window.showQuickPick(items, {
-    placeHolder: "Search lurek.* function to insert\u2026",
-    matchOnDescription: true,
-    matchOnDetail: true
-  });
-  if (!picked) return;
-  const func = funcs.find((f) => f.fullPath === picked.label);
-  if (!func) return;
-  let snippet = func.fullPath + "(";
-  if (func.parameters?.length) {
-    const args = func.parameters.filter((p) => !p.optional).map((p, i) => `\${${i + 1}:${p.name}}`).join(", ");
-    snippet += args;
-  }
-  snippet += ")$0";
-  editor.insertSnippet(new vscode20.SnippetString(snippet));
-}
+</html>`}function Nt(n){return n.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}async function _i(n){let e=pe.window.activeTextEditor;if(!e){pe.window.showWarningMessage("Open a Lua file first.");return}let t=n.getAllFunctions(),r=t.filter(s=>s.fullPath.startsWith("lurek.")).map(s=>({label:s.fullPath,description:s.description??"",detail:s.parameters?.map(l=>`${l.name}: ${l.type}`).join(", ")})),a=await pe.window.showQuickPick(r,{placeHolder:"Search lurek.* function to insert\u2026",matchOnDescription:!0,matchOnDetail:!0});if(!a)return;let i=t.find(s=>s.fullPath===a.label);if(!i)return;let o=i.fullPath+"(";if(i.parameters?.length){let s=i.parameters.filter(l=>!l.optional).map((l,p)=>`\${${p+1}:${l.name}}`).join(", ");o+=s}o+=")$0",e.insertSnippet(new pe.SnippetString(o))}var he=C(require("vscode")),Wt=C(require("path")),Tn=C(require("fs"));async function Ur(n){let e=qr();if(!e){he.window.showErrorMessage("No workspace folder open.");return}let t=he.workspace.getConfiguration("lurek").get("srcDir",""),r=t?Wt.join(e,t):e;try{await n.run(r)}catch(a){let i=a instanceof Error?a.message:String(a);he.window.showErrorMessage(`Failed to run Lurek2D: ${i}`)}}function Ni(n){if(!n.isRunning()){he.window.showInformationMessage("No Lurek2D game is running.");return}n.stop(),he.window.showInformationMessage("Lurek2D game stopped.")}async function Wi(n){let e=await he.window.showInputBox({prompt:"Enter arguments for Lurek2D",placeHolder:"e.g. --debug --fps-cap 60"});if(e===void 0)return;let t=qr();if(!t){he.window.showErrorMessage("No workspace folder open.");return}let r=he.workspace.getConfiguration("lurek").get("srcDir",""),a=r?Wt.join(t,r):t;try{await n.run(a,e.split(/\s+/).filter(Boolean))}catch(i){let o=i instanceof Error?i.message:String(i);he.window.showErrorMessage(`Failed to run Lurek2D: ${o}`)}}async function vn(n){let e=qr();if(!e){he.window.showErrorMessage("No workspace folder open.");return}let t=Wt.join(e,"content","games","showcase");if(!Tn.existsSync(t)){he.window.showWarningMessage("No content/games/showcase/ directory found.");return}let r=Tn.readdirSync(t,{withFileTypes:!0}).filter(i=>i.isDirectory()).map(i=>i.name);if(r.length===0){he.window.showWarningMessage("No examples found.");return}let a=await he.window.showQuickPick(r,{placeHolder:"Select a demo to run"});if(a)try{await n.run(Wt.join(t,a))}catch(i){let o=i instanceof Error?i.message:String(i);he.window.showErrorMessage(`Failed to run example: ${o}`)}}function qr(){return he.workspace.workspaceFolders?.[0]?.uri.fsPath}var Le=C(require("vscode")),$r=C(require("path")),xt=C(require("fs")),Gi=[{label:"Minimal",description:"Empty main.lua with gameloop stubs",files:{"main.lua":["function lurek.load()","end","","function lurek.update(dt)","end","","function lurek.draw()","end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "My Game"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}},{label:"Game Loop",description:"Full game loop with player movement",files:{"main.lua":["local x, y = 400, 300","local speed = 200","","function lurek.load()",'  lurek.window.setTitle("Game Loop Demo")',"end","","function lurek.update(dt)",'  if lurek.input.keyboard.isDown("left") then x = x - speed * dt end','  if lurek.input.keyboard.isDown("right") then x = x + speed * dt end','  if lurek.input.keyboard.isDown("up") then y = y - speed * dt end','  if lurek.input.keyboard.isDown("down") then y = y + speed * dt end',"end","","function lurek.draw()","  lurek.graphics.clear(0.1, 0.1, 0.2)","  lurek.graphics.setColor(1, 1, 1)",'  lurek.graphics.circle("fill", x, y, 20)',"end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "Game Loop Demo"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}},{label:"Physics",description:"Physics world with falling objects",files:{"main.lua":["local world","local ground, ball","","function lurek.load()","  world = lurek.physics.newWorld(0, 981)",'  ground = lurek.physics.newBody(world, 400, 580, "static")',"  lurek.physics.newRectangleShape(ground, 800, 40)",'  ball = lurek.physics.newBody(world, 400, 100, "dynamic")',"  lurek.physics.newCircleShape(ball, 20)","end","","function lurek.update(dt)","  world:update(dt)","end","","function lurek.draw()","  lurek.graphics.clear(0.1, 0.1, 0.2)","  lurek.graphics.setColor(0.3, 0.3, 0.3)",'  lurek.graphics.rectangle("fill", 0, 560, 800, 40)',"  lurek.graphics.setColor(1, 0.3, 0.3)","  local bx, by = ball:getPosition()",'  lurek.graphics.circle("fill", bx, by, 20)',"end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "Physics Demo"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}},{label:"Platformer",description:"Simple platformer with gravity and jumping",files:{"main.lua":["local player = { x = 100, y = 400, vy = 0, w = 32, h = 48, onGround = false }","local gravity = 900","local jumpForce = -400","local moveSpeed = 200","local groundY = 500","","function lurek.update(dt)","  -- Horizontal movement",'  if lurek.input.keyboard.isDown("left") then player.x = player.x - moveSpeed * dt end','  if lurek.input.keyboard.isDown("right") then player.x = player.x + moveSpeed * dt end',"","  -- Gravity","  player.vy = player.vy + gravity * dt","  player.y = player.y + player.vy * dt","","  -- Ground collision","  if player.y + player.h >= groundY then","    player.y = groundY - player.h","    player.vy = 0","    player.onGround = true","  else","    player.onGround = false","  end","end","","function lurek.keypressed(key)",'  if key == "space" and player.onGround then',"    player.vy = jumpForce","  end","end","","function lurek.draw()","  lurek.graphics.clear(0.2, 0.3, 0.4)","  lurek.graphics.setColor(0.4, 0.4, 0.4)",'  lurek.graphics.rectangle("fill", 0, groundY, 800, 100)',"  lurek.graphics.setColor(0.2, 0.8, 0.4)",'  lurek.graphics.rectangle("fill", player.x, player.y, player.w, player.h)',"end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "Platformer"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}},{label:"Top-Down",description:"Top-down view with WASD movement",files:{"main.lua":["local player = { x = 400, y = 300, speed = 200, size = 16 }","","function lurek.update(dt)",'  if lurek.input.keyboard.isDown("w") then player.y = player.y - player.speed * dt end','  if lurek.input.keyboard.isDown("s") then player.y = player.y + player.speed * dt end','  if lurek.input.keyboard.isDown("a") then player.x = player.x - player.speed * dt end','  if lurek.input.keyboard.isDown("d") then player.x = player.x + player.speed * dt end',"end","","function lurek.draw()","  lurek.graphics.clear(0.15, 0.15, 0.2)","  lurek.graphics.setColor(0.3, 0.7, 1)",'  lurek.graphics.rectangle("fill", player.x - player.size/2, player.y - player.size/2, player.size, player.size)',"end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "Top-Down"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}},{label:"ECS",description:"Entity Component System with lurek.ecs",files:{"main.lua":["local universe","","function lurek.load()","  universe = lurek.ecs.newUniverse()","","  for i = 1, 10 do","    local e = universe:spawn()",'    e:set("position", { x = math.random(50, 750), y = math.random(50, 550) })','    e:set("velocity", { x = math.random(-100, 100), y = math.random(-100, 100) })','    e:set("radius", math.random(5, 20))',"  end","end","","function lurek.update(dt)",'  for _, e in universe:query("position", "velocity") do','    local pos = e:get("position")','    local vel = e:get("velocity")',"    pos.x = pos.x + vel.x * dt","    pos.y = pos.y + vel.y * dt","    if pos.x < 0 or pos.x > 800 then vel.x = -vel.x end","    if pos.y < 0 or pos.y > 600 then vel.y = -vel.y end","  end","end","","function lurek.draw()","  lurek.graphics.clear(0.1, 0.1, 0.15)",'  for _, e in universe:query("position", "radius") do','    local pos = e:get("position")','    local r = e:get("radius")',"    lurek.graphics.setColor(0.4, 0.8, 1)",'    lurek.graphics.circle("fill", pos.x, pos.y, r)',"  end","end",""].join(`
+`),"conf.lua":["function lurek.conf(t)",'  t.window.title = "ECS Demo"',"  t.window.width = 800","  t.window.height = 600","end"].join(`
+`)}}],Hi={"main.lua":`function lurek.load()
+end
 
-// src/commands/run.ts
-var vscode21 = __toESM(require("vscode"));
-var path12 = __toESM(require("path"));
-var fs9 = __toESM(require("fs"));
-async function runGame(lurekProcess2) {
-  const root = getWorkspaceRoot2();
-  if (!root) {
-    vscode21.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const srcDir = vscode21.workspace.getConfiguration("lurek").get("srcDir", "");
-  const gameDir = srcDir ? path12.join(root, srcDir) : root;
-  try {
-    await lurekProcess2.run(gameDir);
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    vscode21.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
-  }
-}
-function stopGame(lurekProcess2) {
-  if (!lurekProcess2.isRunning()) {
-    vscode21.window.showInformationMessage("No Lurek2D game is running.");
-    return;
-  }
-  lurekProcess2.stop();
-  vscode21.window.showInformationMessage("Lurek2D game stopped.");
-}
-async function runWithArgs(lurekProcess2) {
-  const args = await vscode21.window.showInputBox({
-    prompt: "Enter arguments for Lurek2D",
-    placeHolder: "e.g. --debug --fps-cap 60"
-  });
-  if (args === void 0) {
-    return;
-  }
-  const root = getWorkspaceRoot2();
-  if (!root) {
-    vscode21.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const srcDir = vscode21.workspace.getConfiguration("lurek").get("srcDir", "");
-  const gameDir = srcDir ? path12.join(root, srcDir) : root;
-  try {
-    await lurekProcess2.run(gameDir, args.split(/\s+/).filter(Boolean));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    vscode21.window.showErrorMessage(`Failed to run Lurek2D: ${msg}`);
-  }
-}
-async function runExample(lurekProcess2) {
-  const root = getWorkspaceRoot2();
-  if (!root) {
-    vscode21.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const examplesDir = path12.join(root, "content", "games", "showcase");
-  if (!fs9.existsSync(examplesDir)) {
-    vscode21.window.showWarningMessage("No content/games/showcase/ directory found.");
-    return;
-  }
-  const examples = fs9.readdirSync(examplesDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-  if (examples.length === 0) {
-    vscode21.window.showWarningMessage("No examples found.");
-    return;
-  }
-  const selected = await vscode21.window.showQuickPick(examples, {
-    placeHolder: "Select a demo to run"
-  });
-  if (!selected) {
-    return;
-  }
-  try {
-    await lurekProcess2.run(path12.join(examplesDir, selected));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    vscode21.window.showErrorMessage(`Failed to run example: ${msg}`);
-  }
-}
-function getWorkspaceRoot2() {
-  return vscode21.workspace.workspaceFolders?.[0]?.uri.fsPath;
-}
+function lurek.update(dt)
+end
 
-// src/commands/scaffold.ts
-var vscode22 = __toESM(require("vscode"));
-var path13 = __toESM(require("path"));
-var fs10 = __toESM(require("fs"));
-var PROJECT_TEMPLATES = [
-  {
-    label: "Minimal",
-    description: "Empty main.lua with gameloop stubs",
-    files: {
-      "main.lua": [
-        "function lurek.load()",
-        "end",
-        "",
-        "function lurek.update(dt)",
-        "end",
-        "",
-        "function lurek.draw()",
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "My Game"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  },
-  {
-    label: "Game Loop",
-    description: "Full game loop with player movement",
-    files: {
-      "main.lua": [
-        "local x, y = 400, 300",
-        "local speed = 200",
-        "",
-        "function lurek.load()",
-        '  lurek.window.setTitle("Game Loop Demo")',
-        "end",
-        "",
-        "function lurek.update(dt)",
-        '  if lurek.input.keyboard.isDown("left") then x = x - speed * dt end',
-        '  if lurek.input.keyboard.isDown("right") then x = x + speed * dt end',
-        '  if lurek.input.keyboard.isDown("up") then y = y - speed * dt end',
-        '  if lurek.input.keyboard.isDown("down") then y = y + speed * dt end',
-        "end",
-        "",
-        "function lurek.draw()",
-        "  lurek.graphics.clear(0.1, 0.1, 0.2)",
-        "  lurek.graphics.setColor(1, 1, 1)",
-        '  lurek.graphics.circle("fill", x, y, 20)',
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "Game Loop Demo"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  },
-  {
-    label: "Physics",
-    description: "Physics world with falling objects",
-    files: {
-      "main.lua": [
-        "local world",
-        "local ground, ball",
-        "",
-        "function lurek.load()",
-        "  world = lurek.physics.newWorld(0, 981)",
-        '  ground = lurek.physics.newBody(world, 400, 580, "static")',
-        "  lurek.physics.newRectangleShape(ground, 800, 40)",
-        '  ball = lurek.physics.newBody(world, 400, 100, "dynamic")',
-        "  lurek.physics.newCircleShape(ball, 20)",
-        "end",
-        "",
-        "function lurek.update(dt)",
-        "  world:update(dt)",
-        "end",
-        "",
-        "function lurek.draw()",
-        "  lurek.graphics.clear(0.1, 0.1, 0.2)",
-        "  lurek.graphics.setColor(0.3, 0.3, 0.3)",
-        '  lurek.graphics.rectangle("fill", 0, 560, 800, 40)',
-        "  lurek.graphics.setColor(1, 0.3, 0.3)",
-        "  local bx, by = ball:getPosition()",
-        '  lurek.graphics.circle("fill", bx, by, 20)',
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "Physics Demo"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  },
-  {
-    label: "Platformer",
-    description: "Simple platformer with gravity and jumping",
-    files: {
-      "main.lua": [
-        "local player = { x = 100, y = 400, vy = 0, w = 32, h = 48, onGround = false }",
-        "local gravity = 900",
-        "local jumpForce = -400",
-        "local moveSpeed = 200",
-        "local groundY = 500",
-        "",
-        "function lurek.update(dt)",
-        "  -- Horizontal movement",
-        '  if lurek.input.keyboard.isDown("left") then player.x = player.x - moveSpeed * dt end',
-        '  if lurek.input.keyboard.isDown("right") then player.x = player.x + moveSpeed * dt end',
-        "",
-        "  -- Gravity",
-        "  player.vy = player.vy + gravity * dt",
-        "  player.y = player.y + player.vy * dt",
-        "",
-        "  -- Ground collision",
-        "  if player.y + player.h >= groundY then",
-        "    player.y = groundY - player.h",
-        "    player.vy = 0",
-        "    player.onGround = true",
-        "  else",
-        "    player.onGround = false",
-        "  end",
-        "end",
-        "",
-        "function lurek.keypressed(key)",
-        '  if key == "space" and player.onGround then',
-        "    player.vy = jumpForce",
-        "  end",
-        "end",
-        "",
-        "function lurek.draw()",
-        "  lurek.graphics.clear(0.2, 0.3, 0.4)",
-        "  lurek.graphics.setColor(0.4, 0.4, 0.4)",
-        '  lurek.graphics.rectangle("fill", 0, groundY, 800, 100)',
-        "  lurek.graphics.setColor(0.2, 0.8, 0.4)",
-        '  lurek.graphics.rectangle("fill", player.x, player.y, player.w, player.h)',
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "Platformer"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  },
-  {
-    label: "Top-Down",
-    description: "Top-down view with WASD movement",
-    files: {
-      "main.lua": [
-        "local player = { x = 400, y = 300, speed = 200, size = 16 }",
-        "",
-        "function lurek.update(dt)",
-        '  if lurek.input.keyboard.isDown("w") then player.y = player.y - player.speed * dt end',
-        '  if lurek.input.keyboard.isDown("s") then player.y = player.y + player.speed * dt end',
-        '  if lurek.input.keyboard.isDown("a") then player.x = player.x - player.speed * dt end',
-        '  if lurek.input.keyboard.isDown("d") then player.x = player.x + player.speed * dt end',
-        "end",
-        "",
-        "function lurek.draw()",
-        "  lurek.graphics.clear(0.15, 0.15, 0.2)",
-        "  lurek.graphics.setColor(0.3, 0.7, 1)",
-        '  lurek.graphics.rectangle("fill", player.x - player.size/2, player.y - player.size/2, player.size, player.size)',
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "Top-Down"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  },
-  {
-    label: "ECS",
-    description: "Entity Component System with lurek.ecs",
-    files: {
-      "main.lua": [
-        "local universe",
-        "",
-        "function lurek.load()",
-        "  universe = lurek.ecs.newUniverse()",
-        "",
-        "  for i = 1, 10 do",
-        "    local e = universe:spawn()",
-        '    e:set("position", { x = math.random(50, 750), y = math.random(50, 550) })',
-        '    e:set("velocity", { x = math.random(-100, 100), y = math.random(-100, 100) })',
-        '    e:set("radius", math.random(5, 20))',
-        "  end",
-        "end",
-        "",
-        "function lurek.update(dt)",
-        '  for _, e in universe:query("position", "velocity") do',
-        '    local pos = e:get("position")',
-        '    local vel = e:get("velocity")',
-        "    pos.x = pos.x + vel.x * dt",
-        "    pos.y = pos.y + vel.y * dt",
-        "    if pos.x < 0 or pos.x > 800 then vel.x = -vel.x end",
-        "    if pos.y < 0 or pos.y > 600 then vel.y = -vel.y end",
-        "  end",
-        "end",
-        "",
-        "function lurek.draw()",
-        "  lurek.graphics.clear(0.1, 0.1, 0.15)",
-        '  for _, e in universe:query("position", "radius") do',
-        '    local pos = e:get("position")',
-        '    local r = e:get("radius")',
-        "    lurek.graphics.setColor(0.4, 0.8, 1)",
-        '    lurek.graphics.circle("fill", pos.x, pos.y, r)',
-        "  end",
-        "end",
-        ""
-      ].join("\n"),
-      "conf.lua": [
-        "function lurek.conf(t)",
-        '  t.window.title = "ECS Demo"',
-        "  t.window.width = 800",
-        "  t.window.height = 600",
-        "end"
-      ].join("\n")
-    }
-  }
-];
-var FILE_TEMPLATES = {
-  "main.lua": "function lurek.load()\nend\n\nfunction lurek.update(dt)\nend\n\nfunction lurek.draw()\nend\n",
-  "conf.lua": 'function lurek.conf(t)\n  t.window.title = "My Game"\n  t.window.width = 800\n  t.window.height = 600\nend\n',
-  "class.lua": "local MyClass = {}\nMyClass.__index = MyClass\n\nfunction MyClass.new()\n  return setmetatable({}, MyClass)\nend\n\nfunction MyClass:update(dt)\nend\n\nfunction MyClass:draw()\nend\n\nreturn MyClass\n",
-  "scene.lua": "local Scene = {}\nScene.__index = Scene\n\nfunction Scene.new()\n  return setmetatable({}, Scene)\nend\n\nfunction Scene:enter()\nend\n\nfunction Scene:update(dt)\nend\n\nfunction Scene:draw()\nend\n\nfunction Scene:leave()\nend\n\nreturn Scene\n"
-};
-async function scaffoldProject() {
-  const items = PROJECT_TEMPLATES.map((t) => ({
-    label: t.label,
-    description: t.description
-  }));
-  const picked = await vscode22.window.showQuickPick(items, {
-    placeHolder: "Select a project template"
-  });
-  if (!picked) {
-    return;
-  }
-  const folder = await vscode22.window.showOpenDialog({
-    canSelectFolders: true,
-    canSelectFiles: false,
-    canSelectMany: false,
-    openLabel: "Select Project Folder"
-  });
-  if (!folder || folder.length === 0) {
-    return;
-  }
-  const projectDir = folder[0].fsPath;
-  const template = PROJECT_TEMPLATES.find((t) => t.label === picked.label);
-  if (!template) {
-    return;
-  }
-  for (const [filename, content] of Object.entries(template.files)) {
-    const filePath = path13.join(projectDir, filename);
-    if (!fs10.existsSync(filePath)) {
-      fs10.writeFileSync(filePath, content, "utf-8");
-    }
-  }
-  const uri = vscode22.Uri.file(projectDir);
-  await vscode22.commands.executeCommand("vscode.openFolder", uri);
-}
-async function scaffoldFile() {
-  const templateNames = Object.keys(FILE_TEMPLATES);
-  const picked = await vscode22.window.showQuickPick(templateNames, {
-    placeHolder: "Select a file template"
-  });
-  if (!picked) {
-    return;
-  }
-  const root = vscode22.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode22.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const filename = await vscode22.window.showInputBox({
-    prompt: "Enter file name",
-    value: picked
-  });
-  if (!filename) {
-    return;
-  }
-  const filePath = path13.join(root, filename);
-  if (fs10.existsSync(filePath)) {
-    vscode22.window.showWarningMessage(`File already exists: ${filename}`);
-    return;
-  }
-  fs10.writeFileSync(filePath, FILE_TEMPLATES[picked], "utf-8");
-  const doc = await vscode22.workspace.openTextDocument(filePath);
-  await vscode22.window.showTextDocument(doc);
-}
+function lurek.draw()
+end
+`,"conf.lua":`function lurek.conf(t)
+  t.window.title = "My Game"
+  t.window.width = 800
+  t.window.height = 600
+end
+`,"class.lua":`local MyClass = {}
+MyClass.__index = MyClass
 
-// src/commands/test.ts
-var vscode23 = __toESM(require("vscode"));
-init_parallelCargo();
-function testAll() {
-  const terminal = getOrCreateTerminal("Lurek2D Tests");
-  terminal.show();
-  terminal.sendText(buildTestAllCommand());
-}
-function testModule(moduleName) {
-  const terminal = getOrCreateTerminal("Lurek2D Tests");
-  terminal.show();
-  terminal.sendText(buildTestTargetCommand(moduleName));
-}
-function testLuaAll() {
-  const terminal = getOrCreateTerminal("Lurek2D Tests");
-  terminal.show();
-  terminal.sendText(buildLuaTestsCommand());
-}
-function testLuaGolden() {
-  const terminal = getOrCreateTerminal("Lurek2D Tests");
-  terminal.show();
-  terminal.sendText(buildTestTargetCommand("golden_tests"));
-}
-function getOrCreateTerminal(name) {
-  const existing = vscode23.window.terminals.find((t) => t.name === name);
-  if (existing) {
-    return existing;
-  }
-  return vscode23.window.createTerminal(name);
-}
+function MyClass.new()
+  return setmetatable({}, MyClass)
+end
 
-// src/commands/packaging.ts
-var vscode24 = __toESM(require("vscode"));
-function packageZip() {
-  const terminal = getOrCreateTerminal2("Lurek2D Package");
-  terminal.show();
-  if (process.platform === "win32") {
-    terminal.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1");
-  } else {
-    terminal.sendText("bash tools/dist.sh");
-  }
-}
-function packageWindows() {
-  const terminal = getOrCreateTerminal2("Lurek2D Package");
-  terminal.show();
-  terminal.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1");
-}
-function packageLinux() {
-  const terminal = getOrCreateTerminal2("Lurek2D Package");
-  terminal.show();
-  terminal.sendText("bash tools/dist.sh");
-}
-function getOrCreateTerminal2(name) {
-  const existing = vscode24.window.terminals.find((t) => t.name === name);
-  if (existing) {
-    return existing;
-  }
-  return vscode24.window.createTerminal(name);
-}
+function MyClass:update(dt)
+end
 
-// src/commands/editors.ts
-var vscode31 = __toESM(require("vscode"));
+function MyClass:draw()
+end
 
-// src/editors/shared.ts
-var vscode25 = __toESM(require("vscode"));
-function getNonce() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-var ICONS = {
-  // toolbar actions
-  save: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.354 1.146l1.5 1.5A.5.5 0 0115 3v11a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1h10.5a.5.5 0 01.354.146zM4 2H2v12h1V9.5A.5.5 0 013.5 9h9a.5.5 0 01.5.5V14h1V3.207l-1-1V5.5A.5.5 0 0112.5 6h-7A.5.5 0 015 5.5V2H4zm9 12v-4H4v4h9zM6 2v3h6V2H6z"/></svg>',
-  undo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 7H2v3h1V8.414l1.243 1.243a5.5 5.5 0 117.514 0l-.707-.707a4.5 4.5 0 10-6.172 0L6.5 10.414V7h-1z"/></svg>',
-  redo: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M10.5 7H14v3h-1V8.414l-1.243 1.243a5.5 5.5 0 11-7.514 0l.707-.707a4.5 4.5 0 106.172 0L9.5 10.414V7h1z"/></svg>',
-  exportFile: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l4 4h-3v5H7V5H4l4-4zM2 12h12v2H2v-2z"/></svg>',
-  importFile: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 10L4 6h3V1h2v5h3l-4 4zM2 12h12v2H2v-2z"/></svg>',
-  copy: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 4h8v10H4V4zm1 1v8h6V5H5zM2 2h8v1H3v9H2V2z"/></svg>',
-  insert: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2z"/></svg>',
-  play: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>',
-  stop: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1"/></svg>',
-  refresh: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13 3a7 7 0 00-10.95 1.7L3.5 6H1v-2.5l1.12 1.12A8 8 0 0114 3.07V3zM3 13a7 7 0 0010.95-1.7L12.5 10H15v2.5l-1.12-1.12A8 8 0 012 12.93V13z"/></svg>',
-  trash: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 1h5l.5.5V3h4v1h-1v10l-.5.5h-11L2 14V4H1V3h4V1.5l.5-.5zM6 2v1h4V2H6zM3 4v10h10V4H3zm2 2h1v7H5V6zm3 0h1v7H8V6zm3 0h1v7h-1V6z"/></svg>',
-  zoomIn: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.472 10.058l3.235 3.235-.707.707-3.235-3.235A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2zm.5 2v2.5H10v1H7.5V10h-1V7.5H4v-1h2.5V4h1z"/></svg>',
-  zoomOut: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.472 10.058l3.235 3.235-.707.707-3.235-3.235A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2zm3 4v1H4v-1h6z"/></svg>',
-  settings: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M9.1 2L9 1H7l-.1 1-.9.4-.7-.7-1.4 1.4.7.7-.4.9-1 .1V6l1 .1.4.9-.7.7 1.4 1.4.7-.7.9.4.1 1h2l.1-1 .9-.4.7.7 1.4-1.4-.7-.7.4-.9 1-.1V4l-1-.1-.4-.9.7-.7-1.4-1.4-.7.7-.9-.4zM8 6a2 2 0 110 4 2 2 0 010-4z"/></svg>',
-  grid: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h4v4H1V1zm5 0h4v4H6V1zm5 0h4v4h-4V1zM1 6h4v4H1V6zm5 0h4v4H6V6zm5 0h4v4h-4V6zM1 11h4v4H1v-4zm5 0h4v4H6v-4zm5 0h4v4h-4v-4z"/></svg>',
-  eye: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3C4.36 3 1.26 5.28 0 8.5c1.26 3.22 4.36 5.5 8 5.5s6.74-2.28 8-5.5C14.74 5.28 11.64 3 8 3zm0 9a3.5 3.5 0 110-7 3.5 3.5 0 010 7zm0-5.5a2 2 0 100 4 2 2 0 000-4z"/></svg>',
-  eyeOff: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1.1l13.4 13.4-.7.7L.8 1.8l.7-.7zM8 3c3.64 0 6.74 2.28 8 5.5a9.77 9.77 0 01-2.43 3.53l-.71-.71A8.77 8.77 0 0015 8.5C13.82 5.7 11.11 4 8 4c-.82 0-1.62.12-2.37.34l-.8-.8C5.7 3.19 6.83 3 8 3zM1 8.5C2.18 11.3 4.89 13 8 13c.82 0 1.62-.12 2.37-.34l.8.8C10.3 13.81 9.17 14 8 14c-3.64 0-6.74-2.28-8-5.5.44-1.13 1.08-2.14 1.87-2.97l.71.71A8.77 8.77 0 001 8.5z"/></svg>',
-  lock: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 7V5a4 4 0 118 0v2h1v7H3V7h1zm1-2a3 3 0 116 0v2H5V5zm-1 3v5h8V8H4z"/></svg>',
-  unlock: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11 1a4 4 0 00-4 4v2H3v7h10V7H8V5a3 3 0 016 0v1h1V5a4 4 0 00-4-4zM4 8h8v5H4V8z"/></svg>',
-  add: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2z"/></svg>',
-  remove: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 7h12v2H2V7z"/></svg>',
-  moveUp: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3l5 5h-3v5H6V8H3l5-5z"/></svg>',
-  moveDown: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 13l-5-5h3V3h4v5h3l-5 5z"/></svg>',
-  // tool icons
-  pen: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.23.71a1 1 0 00-1.41 0L10 2.54l3 3 1.83-1.83a1 1 0 000-1.41l-1.6-1.6zM9.13 3.4L2 10.54V13.5h2.96l7.13-7.14-3-2.96z"/></svg>',
-  eraser: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8.09 2L14 7.91l-5.5 5.5-1.5.59H2v-1l.59-1.5L8.09 2zM3.5 13h3.09l5-5L8.5 4.91l-5 5V13z"/></svg>',
-  bucket: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1l7 7-4.5 4.5L2 6l4-5zm.5 1.71L3.71 6 9 11.29l3.29-3.29L6.5 2.71zM12 10s2 2.5 2 3.5a2 2 0 01-4 0c0-1 2-3.5 2-3.5z"/></svg>',
-  rect: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v10H1V3zm1 1v8h12V4H2z"/></svg>',
-  line: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5l.7.7-11.3 11.3-.7-.7L13.5 2.5z"/></svg>',
-  select: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h4v1H3v3H2V2zm8 0h4v4h-1V3h-3V2zM2 10h1v3h3v1H2v-4zm11 0h1v4h-4v-1h3v-3z" opacity=".7"/><rect x="1" y="1" width="14" height="14" fill="none" stroke="currentColor" stroke-dasharray="2 2"/></svg>',
-  pick: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.47 10.06l3.24 3.23-.71.71-3.23-3.24A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2z"/></svg>',
-  hand: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a2 2 0 012 2v3a2 2 0 012 2v1a2 2 0 012 2v1c0 2.21-1.79 4-4 4H8c-2.21 0-4-1.79-4-4V5a2 2 0 014 0V3a2 2 0 012-2zm1 2a1 1 0 10-2 0v5h-1V5a1 1 0 10-2 0v7c0 1.66 1.34 3 3 3h2c1.66 0 3-1.34 3-3v-1a1 1 0 10-2 0v-1h-1V8a1 1 0 10-2 0V6h-1V3a1 1 0 011-1z"/></svg>',
-  stamp: '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1h4v4h2l-1 4H5L4 5h2V1zm-4 10h12v1H2v-1zm0 3h12v1H2v-1z"/></svg>',
-  // status
-  dirty: '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#e2b340"/></svg>',
-  clean: '<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#4caf50"/></svg>'
-};
-function getSharedCss() {
-  return `
+return MyClass
+`,"scene.lua":`local Scene = {}
+Scene.__index = Scene
+
+function Scene.new()
+  return setmetatable({}, Scene)
+end
+
+function Scene:enter()
+end
+
+function Scene:update(dt)
+end
+
+function Scene:draw()
+end
+
+function Scene:leave()
+end
+
+return Scene
+`};async function Vi(){let n=Gi.map(o=>({label:o.label,description:o.description})),e=await Le.window.showQuickPick(n,{placeHolder:"Select a project template"});if(!e)return;let t=await Le.window.showOpenDialog({canSelectFolders:!0,canSelectFiles:!1,canSelectMany:!1,openLabel:"Select Project Folder"});if(!t||t.length===0)return;let r=t[0].fsPath,a=Gi.find(o=>o.label===e.label);if(!a)return;for(let[o,s]of Object.entries(a.files)){let l=$r.join(r,o);xt.existsSync(l)||xt.writeFileSync(l,s,"utf-8")}let i=Le.Uri.file(r);await Le.commands.executeCommand("vscode.openFolder",i)}async function Ui(){let n=Object.keys(Hi),e=await Le.window.showQuickPick(n,{placeHolder:"Select a file template"});if(!e)return;let t=Le.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!t){Le.window.showErrorMessage("No workspace folder open.");return}let r=await Le.window.showInputBox({prompt:"Enter file name",value:e});if(!r)return;let a=$r.join(t,r);if(xt.existsSync(a)){Le.window.showWarningMessage(`File already exists: ${r}`);return}xt.writeFileSync(a,Hi[e],"utf-8");let i=await Le.workspace.openTextDocument(a);await Le.window.showTextDocument(i)}var Ln=C(require("vscode"));Lt();function qi(){let n=wn("Lurek2D Tests");n.show(),n.sendText(tn())}function $i(n){let e=wn("Lurek2D Tests");e.show(),e.sendText(et(n))}function Yi(){let n=wn("Lurek2D Tests");n.show(),n.sendText(Ct())}function Xi(){let n=wn("Lurek2D Tests");n.show(),n.sendText(et("golden_tests"))}function wn(n){let e=Ln.window.terminals.find(t=>t.name===n);return e||Ln.window.createTerminal(n)}var Yr=C(require("vscode"));function Zi(){let n=Xr("Lurek2D Package");n.show(),process.platform==="win32"?n.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1"):n.sendText("bash tools/dist.sh")}function Qi(){let n=Xr("Lurek2D Package");n.show(),n.sendText("powershell -ExecutionPolicy Bypass -File tools/dist.ps1")}function Ji(){let n=Xr("Lurek2D Package");n.show(),n.sendText("bash tools/dist.sh")}function Xr(n){let e=Yr.window.terminals.find(t=>t.name===n);return e||Yr.window.createTerminal(n)}var Ki=C(require("vscode"));var ue=C(require("vscode"));function D(){let n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",e="";for(let t=0;t<32;t++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}var m={save:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.354 1.146l1.5 1.5A.5.5 0 0115 3v11a1 1 0 01-1 1H2a1 1 0 01-1-1V2a1 1 0 011-1h10.5a.5.5 0 01.354.146zM4 2H2v12h1V9.5A.5.5 0 013.5 9h9a.5.5 0 01.5.5V14h1V3.207l-1-1V5.5A.5.5 0 0112.5 6h-7A.5.5 0 015 5.5V2H4zm9 12v-4H4v4h9zM6 2v3h6V2H6z"/></svg>',undo:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 7H2v3h1V8.414l1.243 1.243a5.5 5.5 0 117.514 0l-.707-.707a4.5 4.5 0 10-6.172 0L6.5 10.414V7h-1z"/></svg>',redo:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M10.5 7H14v3h-1V8.414l-1.243 1.243a5.5 5.5 0 11-7.514 0l.707-.707a4.5 4.5 0 106.172 0L9.5 10.414V7h1z"/></svg>',exportFile:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l4 4h-3v5H7V5H4l4-4zM2 12h12v2H2v-2z"/></svg>',importFile:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 10L4 6h3V1h2v5h3l-4 4zM2 12h12v2H2v-2z"/></svg>',copy:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 4h8v10H4V4zm1 1v8h6V5H5zM2 2h8v1H3v9H2V2z"/></svg>',insert:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2z"/></svg>',play:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l10 6-10 6V2z"/></svg>',stop:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="3" y="3" width="10" height="10" rx="1"/></svg>',refresh:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13 3a7 7 0 00-10.95 1.7L3.5 6H1v-2.5l1.12 1.12A8 8 0 0114 3.07V3zM3 13a7 7 0 0010.95-1.7L12.5 10H15v2.5l-1.12-1.12A8 8 0 012 12.93V13z"/></svg>',trash:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M5.5 1h5l.5.5V3h4v1h-1v10l-.5.5h-11L2 14V4H1V3h4V1.5l.5-.5zM6 2v1h4V2H6zM3 4v10h10V4H3zm2 2h1v7H5V6zm3 0h1v7H8V6zm3 0h1v7h-1V6z"/></svg>',zoomIn:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.472 10.058l3.235 3.235-.707.707-3.235-3.235A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2zm.5 2v2.5H10v1H7.5V10h-1V7.5H4v-1h2.5V4h1z"/></svg>',zoomOut:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.472 10.058l3.235 3.235-.707.707-3.235-3.235A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2zm3 4v1H4v-1h6z"/></svg>',settings:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M9.1 2L9 1H7l-.1 1-.9.4-.7-.7-1.4 1.4.7.7-.4.9-1 .1V6l1 .1.4.9-.7.7 1.4 1.4.7-.7.9.4.1 1h2l.1-1 .9-.4.7.7 1.4-1.4-.7-.7.4-.9 1-.1V4l-1-.1-.4-.9.7-.7-1.4-1.4-.7.7-.9-.4zM8 6a2 2 0 110 4 2 2 0 010-4z"/></svg>',grid:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h4v4H1V1zm5 0h4v4H6V1zm5 0h4v4h-4V1zM1 6h4v4H1V6zm5 0h4v4H6V6zm5 0h4v4h-4V6zM1 11h4v4H1v-4zm5 0h4v4H6v-4zm5 0h4v4h-4v-4z"/></svg>',eye:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3C4.36 3 1.26 5.28 0 8.5c1.26 3.22 4.36 5.5 8 5.5s6.74-2.28 8-5.5C14.74 5.28 11.64 3 8 3zm0 9a3.5 3.5 0 110-7 3.5 3.5 0 010 7zm0-5.5a2 2 0 100 4 2 2 0 000-4z"/></svg>',eyeOff:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 1.1l13.4 13.4-.7.7L.8 1.8l.7-.7zM8 3c3.64 0 6.74 2.28 8 5.5a9.77 9.77 0 01-2.43 3.53l-.71-.71A8.77 8.77 0 0015 8.5C13.82 5.7 11.11 4 8 4c-.82 0-1.62.12-2.37.34l-.8-.8C5.7 3.19 6.83 3 8 3zM1 8.5C2.18 11.3 4.89 13 8 13c.82 0 1.62-.12 2.37-.34l.8.8C10.3 13.81 9.17 14 8 14c-3.64 0-6.74-2.28-8-5.5.44-1.13 1.08-2.14 1.87-2.97l.71.71A8.77 8.77 0 001 8.5z"/></svg>',lock:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M4 7V5a4 4 0 118 0v2h1v7H3V7h1zm1-2a3 3 0 116 0v2H5V5zm-1 3v5h8V8H4z"/></svg>',unlock:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M11 1a4 4 0 00-4 4v2H3v7h10V7H8V5a3 3 0 016 0v1h1V5a4 4 0 00-4-4zM4 8h8v5H4V8z"/></svg>',add:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5V2z"/></svg>',remove:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 7h12v2H2V7z"/></svg>',moveUp:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3l5 5h-3v5H6V8H3l5-5z"/></svg>',moveDown:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 13l-5-5h3V3h4v5h3l-5 5z"/></svg>',pen:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.23.71a1 1 0 00-1.41 0L10 2.54l3 3 1.83-1.83a1 1 0 000-1.41l-1.6-1.6zM9.13 3.4L2 10.54V13.5h2.96l7.13-7.14-3-2.96z"/></svg>',eraser:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8.09 2L14 7.91l-5.5 5.5-1.5.59H2v-1l.59-1.5L8.09 2zM3.5 13h3.09l5-5L8.5 4.91l-5 5V13z"/></svg>',bucket:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1l7 7-4.5 4.5L2 6l4-5zm.5 1.71L3.71 6 9 11.29l3.29-3.29L6.5 2.71zM12 10s2 2.5 2 3.5a2 2 0 01-4 0c0-1 2-3.5 2-3.5z"/></svg>',rect:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v10H1V3zm1 1v8h12V4H2z"/></svg>',line:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M13.5 2.5l.7.7-11.3 11.3-.7-.7L13.5 2.5z"/></svg>',select:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h4v1H3v3H2V2zm8 0h4v4h-1V3h-3V2zM2 10h1v3h3v1H2v-4zm11 0h1v4h-4v-1h3v-3z" opacity=".7"/><rect x="1" y="1" width="14" height="14" fill="none" stroke="currentColor" stroke-dasharray="2 2"/></svg>',pick:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M7 1a6 6 0 014.47 10.06l3.24 3.23-.71.71-3.23-3.24A6 6 0 117 1zm0 1a5 5 0 100 10A5 5 0 007 2z"/></svg>',hand:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a2 2 0 012 2v3a2 2 0 012 2v1a2 2 0 012 2v1c0 2.21-1.79 4-4 4H8c-2.21 0-4-1.79-4-4V5a2 2 0 014 0V3a2 2 0 012-2zm1 2a1 1 0 10-2 0v5h-1V5a1 1 0 10-2 0v7c0 1.66 1.34 3 3 3h2c1.66 0 3-1.34 3-3v-1a1 1 0 10-2 0v-1h-1V8a1 1 0 10-2 0V6h-1V3a1 1 0 011-1z"/></svg>',stamp:'<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M6 1h4v4h2l-1 4H5L4 5h2V1zm-4 10h12v1H2v-1zm0 3h12v1H2v-1z"/></svg>',dirty:'<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#e2b340"/></svg>',clean:'<svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="4" fill="#4caf50"/></svg>'};function ip(){return`
     /* \u2500\u2500 Reset & Theme \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
     :root {
       /* Map to VS Code theme tokens with game-editor fallbacks */
@@ -9385,10 +1049,7 @@ function getSharedCss() {
     }
     .empty-state svg { width: 48px; height: 48px; opacity: 0.3; }
     .empty-state p { max-width: 280px; line-height: 1.5; }
-  `;
-}
-function getSharedScripts() {
-  return `
+  `}function op(){return`
     // \u2500\u2500 Undo / Redo Stack \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     class UndoStack {
       constructor(maxSize = 100) {
@@ -9532,7 +1193,7 @@ function getSharedScripts() {
     function markDirty() {
       _isDirty = true;
       document.querySelectorAll('.dirty-indicator').forEach(el => {
-        el.innerHTML = '${ICONS.dirty}';
+        el.innerHTML = '${m.dirty}';
         el.setAttribute('data-tooltip', 'Unsaved changes');
       });
       vscode.postMessage({ type: 'stateChanged', dirty: true });
@@ -9540,7 +1201,7 @@ function getSharedScripts() {
     function markClean() {
       _isDirty = false;
       document.querySelectorAll('.dirty-indicator').forEach(el => {
-        el.innerHTML = '${ICONS.clean}';
+        el.innerHTML = '${m.clean}';
         el.setAttribute('data-tooltip', 'All changes saved');
       });
       vscode.postMessage({ type: 'stateChanged', dirty: false });
@@ -9558,193 +1219,34 @@ function getSharedScripts() {
     } else {
       initCollapsibleSections();
     }
-  `;
-}
-function wrapHtml(nonce, title, extraCss, body, scripts) {
-  return `<!DOCTYPE html>
+  `}function B(n,e,t,r,a){return`<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="Content-Security-Policy"
-    content="default-src 'none'; style-src 'nonce-${nonce}'; script-src 'nonce-${nonce}'; img-src data:;">
+    content="default-src 'none'; style-src 'nonce-${n}'; script-src 'nonce-${n}'; img-src data:;">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <style nonce="${nonce}">${getSharedCss()}${extraCss}</style>
+  <title>${e}</title>
+  <style nonce="${n}">${ip()}${t}</style>
 </head>
 <body>
-${body}
-<script nonce="${nonce}">
+${r}
+<script nonce="${n}">
 const vscode = acquireVsCodeApi();
-${getSharedScripts()}
-${scripts}
+${op()}
+${a}
 </script>
 </body>
-</html>`;
-}
-function toolbarSep() {
-  return '<div class="sep"></div>';
-}
-function toolbarSpacer() {
-  return '<div class="spacer"></div>';
-}
-function iconButton(icon, opts = {}) {
-  const cls = ["icon-btn", opts.className || ""].filter(Boolean).join(" ");
-  const pressed = opts.ariaPressed ? ' aria-pressed="true"' : "";
-  const idAttr = opts.id ? ` id="${opts.id}"` : "";
-  const titleAttr = opts.title ? ` title="${opts.title}" data-tooltip="${opts.title}"` : "";
-  return `<button class="${cls}"${idAttr}${titleAttr}${pressed}>${ICONS[icon]}</button>`;
-}
-function panelSection(title, bodyHtml, collapsed = false) {
-  const colClass = collapsed ? " collapsed" : "";
-  return `
+</html>`}function k(){return'<div class="sep"></div>'}function A(){return'<div class="spacer"></div>'}function f(n,e={}){let t=["icon-btn",e.className||""].filter(Boolean).join(" "),r=e.ariaPressed?' aria-pressed="true"':"",a=e.id?` id="${e.id}"`:"",i=e.title?` title="${e.title}" data-tooltip="${e.title}"`:"";return`<button class="${t}"${a}${i}${r}>${m[n]}</button>`}function P(n,e,t=!1){let r=t?" collapsed":"";return`
     <div class="panel-section">
       <div class="panel-header">
-        <h3>${title}</h3>
-        <svg class="toggle-icon${colClass}" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+        <h3>${n}</h3>
+        <svg class="toggle-icon${r}" width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
           <path d="M5.7 13.7L4.3 12.3 8.6 8 4.3 3.7 5.7 2.3 11.4 8z"/>
         </svg>
       </div>
-      <div class="panel-body${colClass}">${bodyHtml}</div>
-    </div>`;
-}
-function fieldInline(label, inputHtml) {
-  return `<div class="field-inline"><label>${label}</label>${inputHtml}</div>`;
-}
-var WebviewEditor = class {
-  constructor(context, viewType, title, data = {}) {
-    this.context = context;
-    this.data = data;
-    this.stateKey = `lurek.editorState.${viewType}`;
-    this.panel = vscode25.window.createWebviewPanel(
-      viewType,
-      title,
-      vscode25.ViewColumn.One,
-      { enableScripts: true, retainContextWhenHidden: true }
-    );
-    this.panel.iconPath = vscode25.Uri.joinPath(
-      context.extensionUri,
-      "media",
-      "icon.png"
-    );
-    this.panel.webview.onDidReceiveMessage(
-      (msg) => this.onMessage(msg),
-      void 0,
-      this.disposables
-    );
-    this.panel.onDidDispose(
-      () => this.dispose(),
-      void 0,
-      this.disposables
-    );
-    this.panel.webview.html = this.getHtml();
-    const saved = this.context.workspaceState.get(this.stateKey);
-    if (saved) {
-      this.panel.webview.postMessage({ type: "restoreState", data: saved });
-    }
-  }
-  panel;
-  isDirty = false;
-  disposables = [];
-  stateKey;
-  onMessage(msg) {
-    switch (msg.type) {
-      case "stateChanged":
-        this.isDirty = msg.dirty;
-        break;
-      case "persistState":
-        this.context.workspaceState.update(this.stateKey, msg.data);
-        break;
-      case "exportLua":
-        this.exportLua(msg.content, msg.name || "export.lua");
-        break;
-      case "exportToml":
-        this.exportToml(msg.content, msg.name || "export.toml");
-        break;
-      case "exportJson":
-        this.exportFile(msg.content, msg.name || "export.json", "JSON", "json");
-        break;
-      case "exportPng":
-        this.exportFile(msg.content, msg.name || "export.png", "PNG", "png");
-        break;
-      case "copyToClipboard":
-        vscode25.env.clipboard.writeText(msg.content).then(() => {
-          vscode25.window.showInformationMessage("Copied to clipboard");
-        });
-        break;
-      case "insertToEditor": {
-        const editor = vscode25.window.activeTextEditor;
-        if (editor) {
-          editor.edit((edit) => {
-            edit.insert(editor.selection.active, msg.content);
-          });
-        } else {
-          vscode25.window.showWarningMessage("No active text editor to insert into");
-        }
-        break;
-      }
-      case "showToast":
-        if (msg.level === "error") {
-          vscode25.window.showErrorMessage(msg.message);
-        } else if (msg.level === "warn") {
-          vscode25.window.showWarningMessage(msg.message);
-        } else {
-          vscode25.window.showInformationMessage(msg.message);
-        }
-        break;
-      default:
-        this.handleMessage(msg);
-    }
-  }
-  async exportFile(content, defaultName, filterLabel, ext) {
-    const uri = await vscode25.window.showSaveDialog({
-      defaultUri: vscode25.Uri.file(defaultName),
-      filters: { [filterLabel]: [ext] }
-    });
-    if (uri) {
-      await vscode25.workspace.fs.writeFile(
-        uri,
-        Buffer.from(content, "utf-8")
-      );
-      vscode25.window.showInformationMessage(`Exported to ${uri.fsPath}`);
-    }
-  }
-  async exportLua(content, defaultName) {
-    return this.exportFile(content, defaultName, "Lua", "lua");
-  }
-  async exportToml(content, defaultName) {
-    return this.exportFile(content, defaultName, "TOML", "toml");
-  }
-  dispose() {
-    if (this.isDirty) {
-      this.panel.webview.postMessage({ type: "requestState" });
-    }
-    for (const d of this.disposables) {
-      d.dispose();
-    }
-  }
-};
-
-// src/editors/tileMapEditor.ts
-var TileMapEditor = class _TileMapEditor extends WebviewEditor {
-  static open(context) {
-    return new _TileMapEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.tileMap", "Tile Map Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "tilemap.lua");
-        break;
-      case "exportToml":
-        this.exportToml(msg.content, "tilemap.toml");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Tile Map Editor", `
+      <div class="panel-body${r}">${e}</div>
+    </div>`}function _(n,e){return`<div class="field-inline"><label>${n}</label>${e}</div>`}var I=class{constructor(e,t,r,a={}){this.context=e;this.data=a;this.stateKey=`lurek.editorState.${t}`,this.panel=ue.window.createWebviewPanel(t,r,ue.ViewColumn.One,{enableScripts:!0,retainContextWhenHidden:!0}),this.panel.iconPath=ue.Uri.joinPath(e.extensionUri,"media","icon.png"),this.panel.webview.onDidReceiveMessage(o=>this.onMessage(o),void 0,this.disposables),this.panel.onDidDispose(()=>this.dispose(),void 0,this.disposables),this.panel.webview.html=this.getHtml();let i=this.context.workspaceState.get(this.stateKey);i&&this.panel.webview.postMessage({type:"restoreState",data:i})}panel;isDirty=!1;disposables=[];stateKey;onMessage(e){switch(e.type){case"stateChanged":this.isDirty=e.dirty;break;case"persistState":this.context.workspaceState.update(this.stateKey,e.data);break;case"exportLua":this.exportLua(e.content,e.name||"export.lua");break;case"exportToml":this.exportToml(e.content,e.name||"export.toml");break;case"exportJson":this.exportFile(e.content,e.name||"export.json","JSON","json");break;case"exportPng":this.exportFile(e.content,e.name||"export.png","PNG","png");break;case"copyToClipboard":ue.env.clipboard.writeText(e.content).then(()=>{ue.window.showInformationMessage("Copied to clipboard")});break;case"insertToEditor":{let t=ue.window.activeTextEditor;t?t.edit(r=>{r.insert(t.selection.active,e.content)}):ue.window.showWarningMessage("No active text editor to insert into");break}case"showToast":e.level==="error"?ue.window.showErrorMessage(e.message):e.level==="warn"?ue.window.showWarningMessage(e.message):ue.window.showInformationMessage(e.message);break;default:this.handleMessage(e)}}async exportFile(e,t,r,a){let i=await ue.window.showSaveDialog({defaultUri:ue.Uri.file(t),filters:{[r]:[a]}});i&&(await ue.workspace.fs.writeFile(i,Buffer.from(e,"utf-8")),ue.window.showInformationMessage(`Exported to ${i.fsPath}`))}async exportLua(e,t){return this.exportFile(e,t,"Lua","lua")}async exportToml(e,t){return this.exportFile(e,t,"TOML","toml")}dispose(){this.isDirty&&this.panel.webview.postMessage({type:"requestState"});for(let e of this.disposables)e.dispose()}};var xn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.tileMap","Tile Map Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"tilemap.lua");break;case"exportToml":this.exportToml(e.content,"tilemap.toml");break}}getHtml(){let e=D();return B(e,"Tile Map Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 38px 1fr 220px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -9788,7 +1290,7 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
       .layer-item .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .layer-actions { display: flex; gap: 2px; margin-bottom: 4px; }
       .layer-actions button { flex: 1; font-size: 10px; padding: 3px 0; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -9799,43 +1301,43 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
             <input type="number" id="mapHeight" value="15" min="1" max="256" style="width:48px" title="Height">
             <button id="btnResize" title="Apply size" data-tooltip="Resize map">Apply</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label>Tile</label>
             <input type="number" id="tileSize" value="32" min="8" max="128" style="width:48px" title="Tile pixel size">
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("grid", { id: "btnGrid", title: "Toggle Grid", className: "active" })}
+            ${f("grid",{id:"btnGrid",title:"Toggle Grid",className:"active"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Tool Rail -->
         <div class="tool-rail" id="tools">
           <div class="tool-group">
-            <button class="icon-btn active" data-tool="paint" title="Paint (B)" data-tooltip="Paint">${ICONS.pen}</button>
-            <button class="icon-btn" data-tool="erase" title="Eraser (E)" data-tooltip="Eraser">${ICONS.eraser}</button>
-            <button class="icon-btn" data-tool="fill" title="Fill (G)" data-tooltip="Fill">${ICONS.bucket}</button>
+            <button class="icon-btn active" data-tool="paint" title="Paint (B)" data-tooltip="Paint">${m.pen}</button>
+            <button class="icon-btn" data-tool="erase" title="Eraser (E)" data-tooltip="Eraser">${m.eraser}</button>
+            <button class="icon-btn" data-tool="fill" title="Fill (G)" data-tooltip="Fill">${m.bucket}</button>
           </div>
           <div class="tool-group">
-            <button class="icon-btn" data-tool="rect" title="Rectangle (R)" data-tooltip="Rect Fill">${ICONS.rect}</button>
-            <button class="icon-btn" data-tool="stamp" title="Stamp (S)" data-tooltip="Stamp">${ICONS.stamp}</button>
+            <button class="icon-btn" data-tool="rect" title="Rectangle (R)" data-tooltip="Rect Fill">${m.rect}</button>
+            <button class="icon-btn" data-tool="stamp" title="Stamp (S)" data-tooltip="Stamp">${m.stamp}</button>
           </div>
           <div class="tool-group">
-            <button class="icon-btn" data-tool="pick" title="Pick Tile (I)" data-tooltip="Pick">${ICONS.pick}</button>
-            <button class="icon-btn" data-tool="hand" title="Pan (H / Middle Mouse)" data-tooltip="Pan">${ICONS.hand}</button>
+            <button class="icon-btn" data-tool="pick" title="Pick Tile (I)" data-tooltip="Pick">${m.pick}</button>
+            <button class="icon-btn" data-tool="hand" title="Pan (H / Middle Mouse)" data-tooltip="Pan">${m.hand}</button>
           </div>
         </div>
 
@@ -9844,31 +1346,31 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
 
         <!-- Properties Panel -->
         <div class="properties">
-          ${panelSection("Layers", `
+          ${P("Layers",`
             <div class="layer-actions">
-              <button id="btnAddLayer">${ICONS.add} Add</button>
-              <button id="btnDelLayer">${ICONS.trash} Del</button>
-              <button id="btnMoveLayerUp">${ICONS.moveUp}</button>
-              <button id="btnMoveLayerDown">${ICONS.moveDown}</button>
+              <button id="btnAddLayer">${m.add} Add</button>
+              <button id="btnDelLayer">${m.trash} Del</button>
+              <button id="btnMoveLayerUp">${m.moveUp}</button>
+              <button id="btnMoveLayerDown">${m.moveDown}</button>
             </div>
             <div id="layerList"></div>
           `)}
-          ${panelSection("Tile Palette", `
+          ${P("Tile Palette",`
             <div class="palette-grid" id="palette"></div>
           `)}
-          ${panelSection("View", `
+          ${P("View",`
             <div class="field-row"><input type="checkbox" id="showGrid" checked><label for="showGrid">Grid overlay</label></div>
             <div class="field-row"><input type="checkbox" id="showIds"><label for="showIds">Tile IDs</label></div>
             <div class="field-row"><input type="checkbox" id="showAllLayers" checked><label for="showAllLayers">Show all layers</label></div>
           `)}
-          ${panelSection("Tile Properties", `
+          ${P("Tile Properties",`
             <div id="tileProps">
-              ${fieldInline("Selected", '<span id="selectedTileId">1</span>')}
-              ${fieldInline("Color", '<span id="selectedTileColor" style="display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;border:1px solid var(--border)"></span>')}
-              ${fieldInline("Name", '<input id="tileName" value="" placeholder="unnamed" style="width:100%">')}
-              ${fieldInline("Solid", '<input type="checkbox" id="tileSolid">')}
+              ${_("Selected",'<span id="selectedTileId">1</span>')}
+              ${_("Color",'<span id="selectedTileColor" style="display:inline-block;width:14px;height:14px;border-radius:2px;vertical-align:middle;border:1px solid var(--border)"></span>')}
+              ${_("Name",'<input id="tileName" value="" placeholder="unnamed" style="width:100%">')}
+              ${_("Solid",'<input type="checkbox" id="tileSolid">')}
             </div>
-          `, true)}
+          `,!0)}
         </div>
 
         <!-- Status Bar -->
@@ -9883,10 +1385,10 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusSize">20\xD715</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       // \u2500\u2500 Constants \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       const TILE_COLORS = [
         '#1a1a2e','#16213e','#0f3460','#533483','#e94560','#4ec9b0',
@@ -10212,7 +1714,7 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
         LAYER_NAMES.forEach(name => {
           const div = document.createElement('div');
           div.className = 'layer-item' + (name === currentLayer ? ' sel' : '');
-          const visIcon = layerVisible[name] ? '${ICONS.eye}' : '${ICONS.eyeOff}';
+          const visIcon = layerVisible[name] ? '${m.eye}' : '${m.eyeOff}';
           div.innerHTML = '<button class="vis-btn" title="Toggle">' + visIcon + '</button>' +
             '<span class="name">' + name + '</span>';
           div.querySelector('.vis-btn').addEventListener('click', (ev) => {
@@ -10337,28 +1839,7 @@ var TileMapEditor = class _TileMapEditor extends WebviewEditor {
       resizeCanvas();
       centerCanvas();
       render();
-    `);
-  }
-};
-
-// src/editors/sceneFlowEditor.ts
-var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
-  static open(context) {
-    return new _SceneFlowEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.sceneFlow", "Scene Flow Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "scenes.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Scene Flow Editor", `
+    `)}};var Pn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.sceneFlow","Scene Flow Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"scenes.lua");break}}getHtml(){let e=D();return B(e,"Scene Flow Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 240px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -10391,32 +1872,32 @@ var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
         border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg);
         margin: 0 8px; height: 100px; position: relative; overflow: hidden;
       }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("add", { id: "btnAdd", title: "Add Scene (A)" })}
-            ${iconButton("link", { id: "btnConnect", title: "Connect Mode (C)" })}
-            ${iconButton("trash", { id: "btnDelete", title: "Delete Selected (Del)", cls: "danger" })}
+            ${f("add",{id:"btnAdd",title:"Add Scene (A)"})}
+            ${f("link",{id:"btnConnect",title:"Connect Mode (C)"})}
+            ${f("trash",{id:"btnDelete",title:"Delete Selected (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnAutoLayout" title="Auto-arrange nodes">Auto Layout</button>
             <button id="btnFitView" title="Fit all nodes in view">Fit View</button>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Canvas -->
@@ -10424,9 +1905,9 @@ var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
 
         <!-- Properties Panel -->
         <div class="props-panel">
-          ${panelSection("Scene Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:8px;">Select a scene node.</p></div>')}
-          ${panelSection("Transitions", '<div id="transContent"></div>', true)}
-          ${panelSection("Minimap", '<div class="minimap"><canvas id="minimapCanvas" width="200" height="100"></canvas></div>', true)}
+          ${P("Scene Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:8px;">Select a scene node.</p></div>')}
+          ${P("Transitions",'<div id="transContent"></div>',!0)}
+          ${P("Minimap",'<div class="minimap"><canvas id="minimapCanvas" width="200" height="100"></canvas></div>',!0)}
         </div>
 
         <!-- Status Bar -->
@@ -10441,10 +1922,10 @@ var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusZoom">100%</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('flowCanvas');
       const ctx = canvas.getContext('2d');
       let nodes = [], edges = [];
@@ -10635,7 +2116,7 @@ var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
           thtml += '<div style="font-size:10px;color:var(--text-dim);margin-bottom:2px">OUTGOING</div>';
           for (const e of outEdges) {
             const t = nodes.find(n => n.id === e.to);
-            thtml += '<div class="transition-item"><span class="arrow">\u2192</span><span class="target">' + (t ? t.name : '?') + '</span><button class="icon-btn" data-del-edge="' + e.from + '-' + e.to + '">${ICONS.trash}</button></div>';
+            thtml += '<div class="transition-item"><span class="arrow">\u2192</span><span class="target">' + (t ? t.name : '?') + '</span><button class="icon-btn" data-del-edge="' + e.from + '-' + e.to + '">${m.trash}</button></div>';
           }
         }
         if (inEdges.length) {
@@ -10813,28 +2294,7 @@ var SceneFlowEditor = class _SceneFlowEditor extends WebviewEditor {
       updateStatus();
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
-    `);
-  }
-};
-
-// src/editors/entityEditor.ts
-var EntityEditor = class _EntityEditor extends WebviewEditor {
-  static open(context) {
-    return new _EntityEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.entity", "Entity Designer");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "entities.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Entity Designer", `
+    `)}};var Mn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.entity","Entity Designer")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"entities.lua");break}}getHtml(){let e=D();return B(e,"Entity Designer",`
       .editor-layout {
         display: grid; grid-template-columns: 200px 1fr 220px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -10882,42 +2342,42 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
 
       .stat-row { display: flex; justify-content: space-between; font-size: 10px; padding: 2px 0; color: var(--text-dim); }
       .stat-row .val { color: var(--text); font-family: var(--font-mono); }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("add", { id: "btnNewEntity", title: "New Entity (N)" })}
-            ${iconButton("copy", { id: "btnDuplicate", title: "Duplicate (Ctrl+D)" })}
-            ${iconButton("trash", { id: "btnDeleteEntity", title: "Delete Entity (Del)", cls: "danger" })}
+            ${f("add",{id:"btnNewEntity",title:"New Entity (N)"})}
+            ${f("copy",{id:"btnDuplicate",title:"Duplicate (Ctrl+D)"})}
+            ${f("trash",{id:"btnDeleteEntity",title:"Delete Entity (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Entity List -->
         <div class="entity-list">
-          ${panelSection("Entities", '<div id="entityList"></div>')}
-          ${panelSection("Templates", `
+          ${P("Entities",'<div id="entityList"></div>')}
+          ${P("Templates",`
             <div class="template-grid">
-              <button data-tpl="player">${ICONS.entity} Player</button>
-              <button data-tpl="enemy">${ICONS.entity} Enemy</button>
-              <button data-tpl="pickup">${ICONS.entity} Pickup</button>
-              <button data-tpl="projectile">${ICONS.entity} Projectile</button>
-              <button data-tpl="npc">${ICONS.entity} NPC</button>
-              <button data-tpl="trigger">${ICONS.entity} Trigger</button>
+              <button data-tpl="player">${m.entity} Player</button>
+              <button data-tpl="enemy">${m.entity} Enemy</button>
+              <button data-tpl="pickup">${m.entity} Pickup</button>
+              <button data-tpl="projectile">${m.entity} Projectile</button>
+              <button data-tpl="npc">${m.entity} NPC</button>
+              <button data-tpl="trigger">${m.entity} Trigger</button>
             </div>
-          `, true)}
+          `,!0)}
         </div>
 
         <!-- Component Editor (center) -->
@@ -10927,15 +2387,15 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
 
         <!-- Preview Panel -->
         <div class="preview-panel">
-          ${panelSection("Preview", `
+          ${P("Preview",`
             <div class="preview-canvas-wrap"><canvas id="previewCanvas" width="180" height="180"></canvas></div>
           `)}
-          ${panelSection("Stats", '<div id="statsArea"></div>')}
-          ${panelSection("Quick Add", `
+          ${P("Stats",'<div id="statsArea"></div>')}
+          ${P("Quick Add",`
             <select id="addCompSelect" style="width:100%; margin-bottom:4px;">
               <option value="">Add Component...</option>
             </select>
-          `, true)}
+          `,!0)}
         </div>
 
         <!-- Status Bar -->
@@ -10948,10 +2408,10 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusSelected">None selected</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       // \u2500\u2500 Component Definitions \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       const COMPONENT_DEFS = {
         Transform: { x: 0, y: 0, rotation: 0, scaleX: 1, scaleY: 1 },
@@ -11000,7 +2460,7 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
           const div = document.createElement('div');
           div.className = 'entity-item' + (i === selectedIdx ? ' selected' : '');
           const compCount = Object.keys(ent.components).length;
-          div.innerHTML = '<span class="icon">${ICONS.entity}</span><span style="flex:1">' + ent.name + '</span><span style="font-size:10px;color:var(--text-dim)">' + compCount + '</span>';
+          div.innerHTML = '<span class="icon">${m.entity}</span><span style="flex:1">' + ent.name + '</span><span style="font-size:10px;color:var(--text-dim)">' + compCount + '</span>';
           div.addEventListener('click', () => { selectedIdx = i; refreshAll(); });
           el.appendChild(div);
         });
@@ -11030,7 +2490,7 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
         for (const [name, data] of Object.entries(ent.components)) {
           const clr = COMP_COLORS[name] || '#9399b2';
           html += '<div class="comp-card"><div class="comp-card-header"><span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:' + clr + '"></span>' + name + '</span>';
-          html += '<span class="actions"><button class="icon-btn" data-remove="' + name + '" title="Remove">${ICONS.trash}</button></span></div>';
+          html += '<span class="actions"><button class="icon-btn" data-remove="' + name + '" title="Remove">${m.trash}</button></span></div>';
           html += '<div class="comp-card-body">';
           for (const [key, val] of Object.entries(data)) {
             if (typeof val === 'boolean') {
@@ -11225,31 +2685,7 @@ var EntityEditor = class _EntityEditor extends WebviewEditor {
 
       // \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       refreshAll();
-    `);
-  }
-};
-
-// src/editors/pixelArtEditor.ts
-var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
-  static open(context) {
-    return new _PixelArtEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.pixelArt", "Pixel Art Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportPng":
-        this.exportFile(msg.content, "sprite.png", "PNG Image", "png");
-        break;
-      case "exportSpriteSheet":
-        this.exportFile(msg.content, "spritesheet.png", "PNG Image", "png");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Pixel Art Editor", `
+    `)}};var Sn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.pixelArt","Pixel Art Editor")}handleMessage(e){switch(e.type){case"exportPng":this.exportFile(e.content,"sprite.png","PNG Image","png");break;case"exportSpriteSheet":this.exportFile(e.content,"spritesheet.png","PNG Image","png");break}}getHtml(){let e=D();return B(e,"Pixel Art Editor",`
       .editor-layout {
         display: grid;
         grid-template-columns: 38px 1fr 220px;
@@ -11340,7 +2776,7 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
         display: flex; gap: 4px; font-size: 10px; align-items: center;
       }
       .symmetry-indicator button { font-size: 10px; padding: 2px 6px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -11354,44 +2790,44 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
               <option value="128">128\xD7128</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("grid", { id: "btnGrid", title: "Toggle Grid", className: "active" })}
+            ${f("grid",{id:"btnGrid",title:"Toggle Grid",className:"active"})}
           </div>
           <div class="group symmetry-indicator">
             <label>Mirror:</label>
             <button id="btnMirrorH" title="Mirror Horizontal" data-tooltip="Mirror H">H</button>
             <button id="btnMirrorV" title="Mirror Vertical" data-tooltip="Mirror V">V</button>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Tool Rail -->
         <div class="tool-rail" id="tools">
           <div class="tool-group">
-            <button class="icon-btn active" data-tool="pen" title="Pen (B)" data-tooltip="Pen">${ICONS.pen}</button>
-            <button class="icon-btn" data-tool="eraser" title="Eraser (E)" data-tooltip="Eraser">${ICONS.eraser}</button>
-            <button class="icon-btn" data-tool="bucket" title="Fill (G)" data-tooltip="Fill">${ICONS.bucket}</button>
+            <button class="icon-btn active" data-tool="pen" title="Pen (B)" data-tooltip="Pen">${m.pen}</button>
+            <button class="icon-btn" data-tool="eraser" title="Eraser (E)" data-tooltip="Eraser">${m.eraser}</button>
+            <button class="icon-btn" data-tool="bucket" title="Fill (G)" data-tooltip="Fill">${m.bucket}</button>
           </div>
           <div class="tool-group">
-            <button class="icon-btn" data-tool="rect" title="Rectangle (R)" data-tooltip="Rectangle">${ICONS.rect}</button>
-            <button class="icon-btn" data-tool="line" title="Line (L)" data-tooltip="Line">${ICONS.line}</button>
-            <button class="icon-btn" data-tool="select" title="Select (M)" data-tooltip="Select">${ICONS.select}</button>
+            <button class="icon-btn" data-tool="rect" title="Rectangle (R)" data-tooltip="Rectangle">${m.rect}</button>
+            <button class="icon-btn" data-tool="line" title="Line (L)" data-tooltip="Line">${m.line}</button>
+            <button class="icon-btn" data-tool="select" title="Select (M)" data-tooltip="Select">${m.select}</button>
           </div>
           <div class="tool-group">
-            <button class="icon-btn" data-tool="pick" title="Color Pick (I)" data-tooltip="Pick">${ICONS.pick}</button>
-            <button class="icon-btn" data-tool="hand" title="Pan (H / Middle Mouse)" data-tooltip="Pan">${ICONS.hand}</button>
+            <button class="icon-btn" data-tool="pick" title="Color Pick (I)" data-tooltip="Pick">${m.pick}</button>
+            <button class="icon-btn" data-tool="hand" title="Pan (H / Middle Mouse)" data-tooltip="Pan">${m.hand}</button>
           </div>
         </div>
 
@@ -11400,7 +2836,7 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
 
         <!-- Properties Panel -->
         <div class="properties">
-          ${panelSection("Color", `
+          ${P("Color",`
             <div class="color-wells">
               <div class="color-well active" id="leftColor" title="Primary color (left click)">
                 <span class="label">L</span>
@@ -11410,37 +2846,37 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
                 <span class="label">R</span>
               </div>
             </div>
-            ${fieldInline("Hex", '<input id="hexInput" value="#000000" maxlength="7" style="width:100%">')}
-            ${fieldInline("Opacity", '<input type="range" id="opacitySlider" min="0" max="100" value="100" style="width:100%"><span id="opacityVal" style="width:28px;text-align:right;font-size:10px;color:var(--text-dim)">100%</span>')}
+            ${_("Hex",'<input id="hexInput" value="#000000" maxlength="7" style="width:100%">')}
+            ${_("Opacity",'<input type="range" id="opacitySlider" min="0" max="100" value="100" style="width:100%"><span id="opacityVal" style="width:28px;text-align:right;font-size:10px;color:var(--text-dim)">100%</span>')}
           `)}
-          ${panelSection("Palette", `
+          ${P("Palette",`
             <div class="palette-grid" id="palette"></div>
           `)}
-          ${panelSection("Layers", `
+          ${P("Layers",`
             <div class="layer-actions">
-              <button id="btnAddLayer">${ICONS.add} Add</button>
-              <button id="btnDelLayer">${ICONS.trash} Del</button>
-              <button id="btnMoveLayerUp">${ICONS.moveUp}</button>
-              <button id="btnMoveLayerDown">${ICONS.moveDown}</button>
+              <button id="btnAddLayer">${m.add} Add</button>
+              <button id="btnDelLayer">${m.trash} Del</button>
+              <button id="btnMoveLayerUp">${m.moveUp}</button>
+              <button id="btnMoveLayerDown">${m.moveDown}</button>
             </div>
             <div id="layerList"></div>
           `)}
-          ${panelSection("Animation", `
+          ${P("Animation",`
             <div class="frame-strip" id="frameStrip"></div>
             <div class="frame-actions">
-              <button id="btnAddFrame">${ICONS.add} Frame</button>
-              <button id="btnDupFrame">${ICONS.copy} Dup</button>
-              <button id="btnDelFrame">${ICONS.trash}</button>
+              <button id="btnAddFrame">${m.add} Frame</button>
+              <button id="btnDupFrame">${m.copy} Dup</button>
+              <button id="btnDelFrame">${m.trash}</button>
             </div>
             <div style="margin-top:6px">
-              ${fieldInline("FPS", '<input type="number" id="fpsInput" value="8" min="1" max="60" style="width:50px">')}
+              ${_("FPS",'<input type="number" id="fpsInput" value="8" min="1" max="60" style="width:50px">')}
               <div style="display:flex;gap:4px;margin-top:4px">
-                <button id="btnPlay" style="flex:1">${ICONS.play} Play</button>
-                <button id="btnOnionSkin" style="flex:1" data-tooltip="Onion skin">${ICONS.eye} Onion</button>
+                <button id="btnPlay" style="flex:1">${m.play} Play</button>
+                <button id="btnOnionSkin" style="flex:1" data-tooltip="Onion skin">${m.eye} Onion</button>
               </div>
             </div>
           `)}
-          ${panelSection("Preview", `
+          ${P("Preview",`
             <div class="preview-wrap">
               <canvas id="previewCanvas" width="64" height="64"></canvas>
             </div>
@@ -11466,10 +2902,10 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
             <span id="statusLayerInfo">Layer 1/1</span>
           </span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       // \u2500\u2500 Constants \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       const PICO8 = [
         '#000000','#1d2b53','#7e2553','#008751','#ab5236','#5f574f','#c2c3c7','#fff1e8',
@@ -11881,7 +3317,7 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
         layers.forEach((l, i) => {
           const div = document.createElement('div');
           div.className = 'layer-item' + (i === currentLayer ? ' sel' : '');
-          const visIcon = l.visible ? '${ICONS.eye}' : '${ICONS.eyeOff}';
+          const visIcon = l.visible ? '${m.eye}' : '${m.eyeOff}';
           div.innerHTML = '<button class="vis-btn" title="Toggle visibility">' + visIcon + '</button>' +
             '<span class="name">' + l.name + '</span>';
           div.querySelector('.vis-btn').addEventListener('click', (ev) => {
@@ -11957,7 +3393,7 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
 
       document.getElementById('btnPlay').addEventListener('click', function() {
         playing = !playing;
-        this.innerHTML = playing ? '${ICONS.stop} Stop' : '${ICONS.play} Play';
+        this.innerHTML = playing ? '${m.stop} Stop' : '${m.play} Play';
         if (playing && frames.length > 1) {
           let fi = currentFrame;
           animTimer = setInterval(() => {
@@ -12072,28 +3508,7 @@ var PixelArtEditor = class _PixelArtEditor extends WebviewEditor {
       resizeCanvas();
       centerCanvas();
       render();
-    `);
-  }
-};
-
-// src/editors/particleEditor.ts
-var ParticleEditor = class _ParticleEditor extends WebviewEditor {
-  static open(context) {
-    return new _ParticleEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.particle", "Particle Designer");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "particles.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Particle Designer", `
+    `)}};var kn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.particle","Particle Designer")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"particles.lua");break}}getHtml(){let e=D();return B(e,"Particle Designer",`
       .editor-layout {
         display: grid; grid-template-columns: 180px 1fr 240px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -12132,15 +3547,15 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
 
       .emitter-shape-btns { display: flex; gap: 2px; }
       .emitter-shape-btns button { flex: 1; font-size: 10px; padding: 3px 0; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("refresh", { id: "btnReset", title: "Reset (R)" })}
-            <button id="btnPause">${ICONS.play} Pause</button>
+            ${f("refresh",{id:"btnReset",title:"Reset (R)"})}
+            <button id="btnPause">${m.play} Pause</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label>BG:</label>
             <select id="bgSelect">
@@ -12150,7 +3565,7 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
               <option value="white">White</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label>Blend:</label>
             <select id="blendSelect">
@@ -12158,27 +3573,27 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
               <option value="source-over" selected>Normal</option>
             </select>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Presets Panel -->
         <div class="presets">
-          ${panelSection("Presets", '<div id="presetList"></div>')}
-          ${panelSection("Emitter Shape", `
+          ${P("Presets",'<div id="presetList"></div>')}
+          ${P("Emitter Shape",`
             <div class="emitter-shape-btns">
               <button class="active" data-shape="point">Point</button>
               <button data-shape="line">Line</button>
               <button data-shape="circle">Circle</button>
               <button data-shape="rect">Rect</button>
             </div>
-            ${fieldInline("Radius", '<input type="number" id="emitRadius" value="0" min="0" max="200" style="width:50px">')}
-          `, true)}
+            ${_("Radius",'<input type="number" id="emitRadius" value="0" min="0" max="200" style="width:50px">')}
+          `,!0)}
         </div>
 
         <!-- Canvas -->
@@ -12186,10 +3601,10 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
 
         <!-- Parameters Panel -->
         <div class="params">
-          ${panelSection("Emission", '<div id="emissionParams"></div>')}
-          ${panelSection("Motion", '<div id="motionParams"></div>')}
-          ${panelSection("Appearance", '<div id="appearanceParams"></div>')}
-          ${panelSection("Colors", '<div id="colorControls"></div>')}
+          ${P("Emission",'<div id="emissionParams"></div>')}
+          ${P("Motion",'<div id="motionParams"></div>')}
+          ${P("Appearance",'<div id="appearanceParams"></div>')}
+          ${P("Colors",'<div id="colorControls"></div>')}
         </div>
 
         <!-- Status Bar -->
@@ -12202,10 +3617,10 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusFps">60 FPS</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       // \u2500\u2500 Constants & Presets \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       const canvas = document.getElementById('particleCanvas');
       const ctx = canvas.getContext('2d');
@@ -12455,14 +3870,14 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
       // \u2500\u2500 Controls \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       document.getElementById('btnPause').addEventListener('click', function() {
         paused = !paused;
-        this.innerHTML = paused ? '${ICONS.play} Resume' : '${ICONS.stop} Pause';
+        this.innerHTML = paused ? '${m.play} Resume' : '${m.stop} Pause';
         if (!paused) { lastTime = performance.now(); }
       });
       document.getElementById('btnReset').addEventListener('click', () => { particles = []; emitAccum = 0; });
       registerShortcut('r', () => { particles = []; emitAccum = 0; });
       registerShortcut('space', () => {
         paused = !paused;
-        document.getElementById('btnPause').innerHTML = paused ? '${ICONS.play} Resume' : '${ICONS.stop} Pause';
+        document.getElementById('btnPause').innerHTML = paused ? '${m.play} Resume' : '${m.stop} Pause';
         if (!paused) { lastTime = performance.now(); }
       });
 
@@ -12517,28 +3932,7 @@ var ParticleEditor = class _ParticleEditor extends WebviewEditor {
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
       requestAnimationFrame(update);
-    `);
-  }
-};
-
-// src/editors/dialogEditor.ts
-var DialogEditor = class _DialogEditor extends WebviewEditor {
-  static open(context) {
-    return new _DialogEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.dialog", "Dialog Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "dialog.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Dialog Editor", `
+    `)}};var jn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.dialog","Dialog Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"dialog.lua");break}}getHtml(){let e=D();return B(e,"Dialog Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 260px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -12578,7 +3972,7 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
 
       .node-type-btn { display: flex; align-items: center; gap: 4px; font-size: 11px; padding: 4px 8px; }
       .node-type-btn .dot { width: 8px; height: 8px; border-radius: 50%; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -12588,28 +3982,28 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
             <button class="node-type-btn" id="btnAddCondition"><span class="dot" style="background:#bbaa44"></span>Condition</button>
             <button class="node-type-btn" id="btnAddAction"><span class="dot" style="background:#bb6644"></span>Action</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("link", { id: "btnConnect", title: "Connect Mode (C)" })}
-            ${iconButton("trash", { id: "btnDelete", title: "Delete Selected (Del)", cls: "danger" })}
+            ${f("link",{id:"btnConnect",title:"Connect Mode (C)"})}
+            ${f("trash",{id:"btnDelete",title:"Delete Selected (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnAutoLayout" title="Auto-arrange nodes">Auto Layout</button>
             <button id="btnFitView" title="Fit all nodes in view">Fit View</button>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Canvas -->
@@ -12617,13 +4011,13 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
 
         <!-- Properties Panel -->
         <div class="props-panel">
-          ${panelSection("Node Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:8px;">Select a dialog node.</p></div>')}
-          ${panelSection("Connections", '<div id="connsContent"></div>', true)}
-          ${panelSection("Preview", `
+          ${P("Node Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:8px;">Select a dialog node.</p></div>')}
+          ${P("Connections",'<div id="connsContent"></div>',!0)}
+          ${P("Preview",`
             <div id="previewArea" style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:8px;margin:0 8px;font-size:12px;min-height:60px;color:var(--text-dim);text-align:center;">
               Select a node to preview dialog.
             </div>
-          `, true)}
+          `,!0)}
         </div>
 
         <!-- Status Bar -->
@@ -12638,10 +4032,10 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusZoom">100%</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('dialogCanvas');
       const ctx = canvas.getContext('2d');
       let nodes = [], edges = [];
@@ -12796,9 +4190,9 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
         if (node.type === 'choice') {
           html += '<div class="prop-field"><label>Choices</label><div id="choiceList">';
           node.choices.forEach((c, i) => {
-            html += '<div class="choice-item"><input value="' + c + '" data-ci="' + i + '"><button class="icon-btn" data-delc="' + i + '" title="Remove">${ICONS.trash}</button></div>';
+            html += '<div class="choice-item"><input value="' + c + '" data-ci="' + i + '"><button class="icon-btn" data-delc="' + i + '" title="Remove">${m.trash}</button></div>';
           });
-          html += '</div><button id="btnAddChoiceItem" style="width:100%;margin-top:4px;font-size:11px;">${ICONS.add} Add Choice</button></div>';
+          html += '</div><button id="btnAddChoiceItem" style="width:100%;margin-top:4px;font-size:11px;">${m.add} Add Choice</button></div>';
         }
         if (node.type === 'condition') {
           html += '<div class="prop-field"><label>Condition Expression</label><textarea id="pCondition">' + node.condition + '</textarea></div>';
@@ -12834,7 +4228,7 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
             const t = nodes.find(n => n.id === e.to);
             chtml += '<div class="conn-item"><span class="arrow">\u2192</span><span class="target">' + (t ? (NODE_TYPES[t.type].label + ': ' + (t.speaker || t.text || '...').substring(0, 16)) : '?') + '</span>';
             if (e.label) chtml += '<span style="font-size:9px;color:var(--accent-2)">' + e.label + '</span>';
-            chtml += '<button class="icon-btn" data-del-edge="' + e.from + '-' + e.to + '">${ICONS.trash}</button></div>';
+            chtml += '<button class="icon-btn" data-del-edge="' + e.from + '-' + e.to + '">${m.trash}</button></div>';
           }
         }
         if (inEdges.length) {
@@ -13046,45 +4440,7 @@ var DialogEditor = class _DialogEditor extends WebviewEditor {
       updateStatus();
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
-    `);
-  }
-};
-
-// src/editors/databaseEditor.ts
-var vscode26 = __toESM(require("vscode"));
-var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
-  static open(context) {
-    return new _DatabaseEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.database", "Database Browser");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "data.lua");
-        break;
-      case "exportToml":
-        this.exportToml(msg.content, "data.toml");
-        break;
-      case "importCsv":
-        this.importCsv();
-        break;
-    }
-  }
-  async importCsv() {
-    const uri = await vscode26.window.showOpenDialog({
-      filters: { "CSV Files": ["csv"], "TOML Files": ["toml"] }
-    });
-    if (uri && uri[0]) {
-      const data = await vscode26.workspace.fs.readFile(uri[0]);
-      const text = new globalThis.TextDecoder().decode(data);
-      this.panel.webview.postMessage({ type: "csvData", content: text, name: uri[0].fsPath });
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Database Browser", `
+    `)}};var Rn=C(require("vscode"));var Cn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.database","Database Browser")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"data.lua");break;case"exportToml":this.exportToml(e.content,"data.toml");break;case"importCsv":this.importCsv();break}}async importCsv(){let e=await Rn.window.showOpenDialog({filters:{"CSV Files":["csv"],"TOML Files":["toml"]}});if(e&&e[0]){let t=await Rn.workspace.fs.readFile(e[0]),r=new globalThis.TextDecoder().decode(t);this.panel.webview.postMessage({type:"csvData",content:r,name:e[0].fsPath})}}getHtml(){let e=D();return B(e,"Database Browser",`
       .editor-layout {
         display: grid; grid-template-columns: 180px 1fr;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -13125,39 +4481,39 @@ var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
       .data-grid .sort-indicator { margin-left: 2px; }
 
       .col-type-select { font-size: 10px; padding: 1px 4px; margin-left: 4px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("add", { id: "btnNewTable", title: "New Table" })}
-            ${iconButton("trash", { id: "btnDeleteTable", title: "Delete Table", cls: "danger" })}
+            ${f("add",{id:"btnNewTable",title:"New Table"})}
+            ${f("trash",{id:"btnDeleteTable",title:"Delete Table",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("add", { id: "btnAddRow", title: "Add Row" })}
+            ${f("add",{id:"btnAddRow",title:"Add Row"})}
             <button id="btnAddCol" title="Add Column">+ Col</button>
-            ${iconButton("trash", { id: "btnDeleteRow", title: "Delete Selected Row", cls: "danger" })}
+            ${f("trash",{id:"btnDeleteRow",title:"Delete Selected Row",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnImport">${ICONS.importFile} Import</button>
-          ${toolbarSpacer()}
+          ${k()}
+          <button id="btnImport">${m.importFile} Import</button>
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Table List -->
         <div class="table-list">
-          ${panelSection("Tables", '<div id="tableList"></div>')}
+          ${P("Tables",'<div id="tableList"></div>')}
         </div>
 
         <!-- Data Area -->
@@ -13180,10 +4536,10 @@ var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusSelected">No selection</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       let tables = {
         items: {
           columns: ['id', 'name', 'type', 'value'],
@@ -13421,28 +4777,7 @@ var DatabaseEditor = class _DatabaseEditor extends WebviewEditor {
 
       // \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       refreshAll();
-    `);
-  }
-};
-
-// src/editors/procMapEditor.ts
-var ProcMapEditor = class _ProcMapEditor extends WebviewEditor {
-  static open(context) {
-    return new _ProcMapEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.procMap", "Procedural Map Generator");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "mapgen.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Procedural Map Generator", `
+    `)}};var In=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.procMap","Procedural Map Generator")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"mapgen.lua");break}}getHtml(){let e=D();return B(e,"Procedural Map Generator",`
       .editor-layout {
         display: grid; grid-template-columns: 260px 1fr;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -13478,36 +4813,36 @@ var ProcMapEditor = class _ProcMapEditor extends WebviewEditor {
       .config-field label { font-size: 10px; text-align: right; color: var(--text-dim); text-transform: uppercase; }
 
       .add-step-btn { width: calc(100% - 16px); margin: 4px 8px; font-size: 11px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            <button id="btnGenerate" class="primary">${ICONS.refresh} Generate</button>
-            <button id="btnRandomSeed">${ICONS.dice} Random Seed</button>
+            <button id="btnGenerate" class="primary">${m.refresh} Generate</button>
+            <button id="btnRandomSeed">${m.dice} Random Seed</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Pipeline Panel -->
         <div class="pipeline-panel">
-          ${panelSection("Map Config", `
+          ${P("Map Config",`
             <div class="config-field"><label>Width</label><input type="number" id="mapW" value="60" min="10" max="200" style="width:60px"></div>
             <div class="config-field"><label>Height</label><input type="number" id="mapH" value="40" min="10" max="200" style="width:60px"></div>
             <div class="config-field"><label>Seed</label><input type="number" id="seed" value="42" style="width:80px"></div>
           `)}
-          ${panelSection("Pipeline Steps", '<div id="stepList"></div>')}
+          ${P("Pipeline Steps",'<div id="stepList"></div>')}
           <select id="addStepSelect" class="add-step-btn">
             <option value="">+ Add Step...</option>
             <option value="fill">Fill</option>
@@ -13534,10 +4869,10 @@ var ProcMapEditor = class _ProcMapEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusTiles">0 walls / 0 floor</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       let mapW = 60, mapH = 40, seed = 42;
       let mapData = [];
       let steps = [
@@ -13674,9 +5009,9 @@ var ProcMapEditor = class _ProcMapEditor extends WebviewEditor {
           }
           card.innerHTML = '<div class="step-card-header"><span><span class="num">' + (i + 1) + '</span>' + step.type + '</span>' +
             '<span class="actions">' +
-            '<button class="icon-btn" data-up="' + i + '" title="Move Up">${ICONS.up}</button>' +
-            '<button class="icon-btn" data-down="' + i + '" title="Move Down">${ICONS.down}</button>' +
-            '<button class="icon-btn" data-del="' + i + '" title="Remove">${ICONS.trash}</button>' +
+            '<button class="icon-btn" data-up="' + i + '" title="Move Up">${m.up}</button>' +
+            '<button class="icon-btn" data-down="' + i + '" title="Move Down">${m.down}</button>' +
+            '<button class="icon-btn" data-del="' + i + '" title="Remove">${m.trash}</button>' +
             '</span></div><div class="step-card-body">' + paramsHtml + '</div>';
           el.appendChild(card);
           card.querySelectorAll('input[data-si]').forEach(inp => {
@@ -13766,28 +5101,7 @@ var ProcMapEditor = class _ProcMapEditor extends WebviewEditor {
       refreshStepList();
       window.addEventListener('resize', () => renderMap());
       generate();
-    `);
-  }
-};
-
-// src/editors/questTreeEditor.ts
-var QuestTreeEditor = class _QuestTreeEditor extends WebviewEditor {
-  static open(context) {
-    return new _QuestTreeEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.questTree", "Quest / Tech Tree Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "quests.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Quest / Tech Tree Editor", `
+    `)}};var En=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.questTree","Quest / Tech Tree Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"quests.lua");break}}getHtml(){let e=D();return B(e,"Quest / Tech Tree Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 260px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -13814,32 +5128,32 @@ var QuestTreeEditor = class _QuestTreeEditor extends WebviewEditor {
       }
       .mode-badge.select { background: var(--surface-2); color: var(--text-dim); }
       .mode-badge.link { background: var(--warning); color: var(--bg); }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("add", { id: "btnAdd", title: "Add Quest (A)" })}
-            ${iconButton("link", { id: "btnConnect", title: "Link Prerequisites (C)" })}
-            ${iconButton("trash", { id: "btnDelete", title: "Delete (Del)", cls: "danger" })}
+            ${f("add",{id:"btnAdd",title:"Add Quest (A)"})}
+            ${f("link",{id:"btnConnect",title:"Link Prerequisites (C)"})}
+            ${f("trash",{id:"btnDelete",title:"Delete (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("layout", { id: "btnAutoLayout", title: "Auto Layout" })}
-            ${iconButton("fitView", { id: "btnFitView", title: "Fit View (F)" })}
+            ${f("layout",{id:"btnAutoLayout",title:"Auto Layout"})}
+            ${f("fitView",{id:"btnFitView",title:"Fit View (F)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Canvas -->
@@ -13847,8 +5161,8 @@ var QuestTreeEditor = class _QuestTreeEditor extends WebviewEditor {
 
         <!-- Properties -->
         <div class="props-panel">
-          ${panelSection("Quest Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a quest node</p></div>')}
-          ${panelSection("Statistics", '<div id="statsContent"></div>', true)}
+          ${P("Quest Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a quest node</p></div>')}
+          ${P("Statistics",'<div id="statsContent"></div>',!0)}
         </div>
 
         <!-- Status Bar -->
@@ -13863,10 +5177,10 @@ var QuestTreeEditor = class _QuestTreeEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusZoom">100%</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('questCanvas');
       const ctx = canvas.getContext('2d');
       let nodes = [], edges = [];
@@ -14175,28 +5489,7 @@ var QuestTreeEditor = class _QuestTreeEditor extends WebviewEditor {
       updateStatus();
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
-    `);
-  }
-};
-
-// src/editors/guiWidgetEditor.ts
-var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
-  static open(context) {
-    return new _GuiWidgetEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.guiWidget", "GUI Widget Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "gui_layout.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "GUI Widget Editor", `
+    `)}};var Dn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.guiWidget","GUI Widget Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"gui_layout.lua");break}}getHtml(){let e=D();return B(e,"GUI Widget Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 180px 1fr 240px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -14220,7 +5513,7 @@ var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
       .prop-field label { display: block; font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
       .prop-row { display: grid; grid-template-columns: 30px 1fr 30px 1fr; gap: 4px; align-items: center; margin-bottom: 4px; }
       .prop-row label { font-size: 10px; text-align: right; color: var(--text-dim); }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -14235,31 +5528,31 @@ var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
               <option value="Slider">Slider</option>
               <option value="Image">Image</option>
             </select>
-            ${iconButton("trash", { id: "btnDelete", title: "Delete (Del)", cls: "danger" })}
+            ${f("trash",{id:"btnDelete",title:"Delete (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            <button id="btnGrid" title="Toggle Grid Snap">${ICONS.grid} Snap</button>
+            <button id="btnGrid" title="Toggle Grid Snap">${m.grid} Snap</button>
             <button id="btnAlignH" title="Align Horizontal Centers">\u27F7</button>
             <button id="btnAlignV" title="Align Vertical Centers">\u27D8</button>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Hierarchy -->
         <div class="hierarchy-panel">
-          ${panelSection("Widget Hierarchy", '<div id="hierarchy"></div>')}
+          ${P("Widget Hierarchy",'<div id="hierarchy"></div>')}
         </div>
 
         <!-- Canvas -->
@@ -14267,7 +5560,7 @@ var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
 
         <!-- Properties -->
         <div class="props-panel">
-          ${panelSection("Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a widget</p></div>')}
+          ${P("Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a widget</p></div>')}
         </div>
 
         <!-- Status Bar -->
@@ -14280,10 +5573,10 @@ var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusGrid">Snap: Off</span>
           <div class="spacer"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('guiCanvas');
       const ctx = canvas.getContext('2d');
       let widgets = [], selectedIdx = -1;
@@ -14579,28 +5872,7 @@ var GuiWidgetEditor = class _GuiWidgetEditor extends WebviewEditor {
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
       refreshAll();
-    `);
-  }
-};
-
-// src/editors/aiBehaviorEditor.ts
-var AiBehaviorEditor = class _AiBehaviorEditor extends WebviewEditor {
-  static open(context) {
-    return new _AiBehaviorEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.aiBehavior", "AI Behavior Tree");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "behavior_tree.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "AI Behavior Tree", `
+    `)}};var Bn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.aiBehavior","AI Behavior Tree")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"behavior_tree.lua");break}}getHtml(){let e=D();return B(e,"AI Behavior Tree",`
       .editor-layout {
         display: grid; grid-template-columns: 180px 1fr 240px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -14629,60 +5901,60 @@ var AiBehaviorEditor = class _AiBehaviorEditor extends WebviewEditor {
       .sim-badge { padding: 1px 8px; border-radius: 9px; font-size: 10px; font-weight: 600; }
       .sim-badge.idle { background: var(--surface-2); color: var(--text-dim); }
       .sim-badge.running { background: #ff9800; color: #1e1e2e; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("trash", { id: "btnClearTree", title: "Clear Tree", cls: "danger" })}
-            ${iconButton("trash", { id: "btnDelete", title: "Delete Node (Del)", cls: "danger" })}
+            ${f("trash",{id:"btnClearTree",title:"Clear Tree",cls:"danger"})}
+            ${f("trash",{id:"btnDelete",title:"Delete Node (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            <button id="btnSimulate">${ICONS.play} Simulate</button>
-            <button id="btnReset">${ICONS.refresh} Reset</button>
+            <button id="btnSimulate">${m.play} Simulate</button>
+            <button id="btnReset">${m.refresh} Reset</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("layout", { id: "btnAutoLayout", title: "Auto Layout" })}
-            ${iconButton("fitView", { id: "btnFitView", title: "Fit View (F)" })}
+            ${f("layout",{id:"btnAutoLayout",title:"Auto Layout"})}
+            ${f("fitView",{id:"btnFitView",title:"Fit View (F)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Palette -->
         <div class="palette-panel">
-          ${panelSection("Composites", `
+          ${P("Composites",`
             <div class="drag-node" data-type="Sequence"><span class="cat-dot" style="background:#4caf50"></span>Sequence</div>
             <div class="drag-node" data-type="Selector"><span class="cat-dot" style="background:#4caf50"></span>Selector</div>
             <div class="drag-node" data-type="Parallel"><span class="cat-dot" style="background:#4caf50"></span>Parallel</div>
             <div class="drag-node" data-type="RandomSelector"><span class="cat-dot" style="background:#4caf50"></span>RandomSelector</div>
           `)}
-          ${panelSection("Decorators", `
+          ${P("Decorators",`
             <div class="drag-node" data-type="Inverter"><span class="cat-dot" style="background:#f38ba8"></span>Inverter</div>
             <div class="drag-node" data-type="Repeater"><span class="cat-dot" style="background:#f38ba8"></span>Repeater</div>
             <div class="drag-node" data-type="Succeeder"><span class="cat-dot" style="background:#f38ba8"></span>Succeeder</div>
             <div class="drag-node" data-type="Cooldown"><span class="cat-dot" style="background:#f38ba8"></span>Cooldown</div>
             <div class="drag-node" data-type="Guard"><span class="cat-dot" style="background:#f38ba8"></span>Guard</div>
           `)}
-          ${panelSection("Conditions", `
+          ${P("Conditions",`
             <div class="drag-node" data-type="HasTarget"><span class="cat-dot" style="background:#89b4fa"></span>HasTarget</div>
             <div class="drag-node" data-type="InRange"><span class="cat-dot" style="background:#89b4fa"></span>InRange</div>
             <div class="drag-node" data-type="HealthCheck"><span class="cat-dot" style="background:#89b4fa"></span>HealthCheck</div>
             <div class="drag-node" data-type="Custom"><span class="cat-dot" style="background:#89b4fa"></span>Custom</div>
           `)}
-          ${panelSection("Actions", `
+          ${P("Actions",`
             <div class="drag-node" data-type="MoveTo"><span class="cat-dot" style="background:#f9e2af"></span>MoveTo</div>
             <div class="drag-node" data-type="Attack"><span class="cat-dot" style="background:#f9e2af"></span>Attack</div>
             <div class="drag-node" data-type="Flee"><span class="cat-dot" style="background:#f9e2af"></span>Flee</div>
@@ -14695,8 +5967,8 @@ var AiBehaviorEditor = class _AiBehaviorEditor extends WebviewEditor {
 
         <!-- Properties -->
         <div class="props-panel">
-          ${panelSection("Node Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Click palette to add nodes</p></div>')}
-          ${panelSection("Tree Stats", '<div id="treeStats"></div>', true)}
+          ${P("Node Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Click palette to add nodes</p></div>')}
+          ${P("Tree Stats",'<div id="treeStats"></div>',!0)}
         </div>
 
         <!-- Status Bar -->
@@ -14711,10 +5983,10 @@ var AiBehaviorEditor = class _AiBehaviorEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusZoom">100%</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('btCanvas');
       const ctx = canvas.getContext('2d');
       let nodes = [], selectedNode = null, dragNode = null, dragOff = { x: 0, y: 0 };
@@ -15034,28 +6306,7 @@ var AiBehaviorEditor = class _AiBehaviorEditor extends WebviewEditor {
       updateStatus();
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
-    `);
-  }
-};
-
-// src/editors/graphEditor.ts
-var GraphEditor = class _GraphEditor extends WebviewEditor {
-  static open(context) {
-    return new _GraphEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.graph", "Graph / Node Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "graph.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Graph / Node Editor", `
+    `)}};var An=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.graph","Graph / Node Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"graph.lua");break}}getHtml(){let e=D();return B(e,"Graph / Node Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 240px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -15074,32 +6325,32 @@ var GraphEditor = class _GraphEditor extends WebviewEditor {
       }
       .mode-badge.select { background: var(--surface-2); color: var(--text-dim); }
       .mode-badge.connect { background: #ff9800; color: var(--bg); }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            ${iconButton("add", { id: "btnAddNode", title: "Add Node (A)" })}
+            ${f("add",{id:"btnAddNode",title:"Add Node (A)"})}
             <input id="nodeType" value="Process" style="width:80px" title="Node type">
-            ${iconButton("link", { id: "btnConnect", title: "Connect Ports (C)" })}
-            ${iconButton("trash", { id: "btnDelete", title: "Delete (Del)", cls: "danger" })}
+            ${f("link",{id:"btnConnect",title:"Connect Ports (C)"})}
+            ${f("trash",{id:"btnDelete",title:"Delete (Del)",cls:"danger"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("fitView", { id: "btnFitView", title: "Fit View (F)" })}
+            ${f("fitView",{id:"btnFitView",title:"Fit View (F)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Canvas -->
@@ -15107,8 +6358,8 @@ var GraphEditor = class _GraphEditor extends WebviewEditor {
 
         <!-- Properties -->
         <div class="props-panel">
-          ${panelSection("Node Properties", '<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a node</p></div>')}
-          ${panelSection("Port Editor", '<div id="portEditor"><p style="color:var(--text-dim);font-size:11px">Ports are defined per-node</p></div>')}
+          ${P("Node Properties",'<div id="propsContent"><p style="color:var(--text-dim);font-size:12px;text-align:center;margin-top:20px;">Select a node</p></div>')}
+          ${P("Port Editor",'<div id="portEditor"><p style="color:var(--text-dim);font-size:11px">Ports are defined per-node</p></div>')}
         </div>
 
         <!-- Status Bar -->
@@ -15123,10 +6374,10 @@ var GraphEditor = class _GraphEditor extends WebviewEditor {
           <div class="spacer"></div>
           <span id="statusZoom">100%</span>
           <div class="sep"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('graphCanvas');
       const ctx = canvas.getContext('2d');
       let nodes = [], edges = [];
@@ -15384,28 +6635,7 @@ var GraphEditor = class _GraphEditor extends WebviewEditor {
       updateStatus();
       window.addEventListener('resize', resizeCanvas);
       resizeCanvas();
-    `);
-  }
-};
-
-// src/editors/tilemapScriptEditor.ts
-var TilemapScriptEditor = class _TilemapScriptEditor extends WebviewEditor {
-  static open(context) {
-    return new _TilemapScriptEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.tilemapScript", "Tilemap Script Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "tilemap_script.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Tilemap Script Editor", `
+    `)}};var Fn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.tilemapScript","Tilemap Script Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"tilemap_script.lua");break}}getHtml(){let e=D();return B(e,"Tilemap Script Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 180px 1fr 280px;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -15435,7 +6665,7 @@ var TilemapScriptEditor = class _TilemapScriptEditor extends WebviewEditor {
       .script-step .step-num { color: var(--accent); font-weight: 700; font-size: 10px; }
       .step-controls button { padding: 1px 5px; font-size: 10px; }
       .preview-canvas { flex: 1; display: flex; align-items: center; justify-content: center; background: #111; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -15444,27 +6674,27 @@ var TilemapScriptEditor = class _TilemapScriptEditor extends WebviewEditor {
             <label style="font-size:11px">H:</label><input type="number" id="mapH" value="30" min="5" max="100" style="width:44px">
             <label style="font-size:11px">Seed:</label><input type="number" id="seed" value="1234" style="width:56px">
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            <button id="btnRun">${ICONS.play} Run Script</button>
+            <button id="btnRun">${m.play} Run Script</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Blocks Palette -->
         <div class="blocks-panel">
-          ${panelSection("Script Blocks", `
+          ${P("Script Blocks",`
             <button class="block-btn" data-block="fill"><span class="block-dot" style="background:#585b70"></span>Fill All</button>
             <button class="block-btn" data-block="noise"><span class="block-dot" style="background:#89b4fa"></span>Random Noise</button>
             <button class="block-btn" data-block="rooms"><span class="block-dot" style="background:#a6e3a1"></span>Place Rooms</button>
@@ -15498,10 +6728,10 @@ var TilemapScriptEditor = class _TilemapScriptEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusSeed">Seed: 1234</span>
           <div class="spacer"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       let mapW = 40, mapH = 30, seed = 1234;
       let mapData = [];
       let steps = [];
@@ -15699,28 +6929,7 @@ var TilemapScriptEditor = class _TilemapScriptEditor extends WebviewEditor {
       // \u2500\u2500 Init \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
       addStep('fill'); addStep('noise'); addStep('cellular'); addStep('border');
       refreshSteps(); runScript();
-    `);
-  }
-};
-
-// src/editors/voxelEditor.ts
-var VoxelEditor = class _VoxelEditor extends WebviewEditor {
-  static open(context) {
-    return new _VoxelEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.voxel", "Voxel Editor");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "voxel_model.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Voxel Editor", `
+    `)}};var On=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.voxel","Voxel Editor")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"voxel_model.lua");break}}getHtml(){let e=D();return B(e,"Voxel Editor",`
       .editor-layout {
         display: grid; grid-template-columns: 44px 1fr 1fr 200px;
         grid-template-rows: auto 1fr 1fr auto; height: 100vh;
@@ -15764,7 +6973,7 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
       }
       .layer-btn:hover { background: var(--hover); }
       .layer-btn.sel { background: var(--accent); color: var(--bg); font-weight: 600; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -15774,29 +6983,29 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
             <label style="font-size:11px">Z:</label>
             <input type="number" id="layerZ" value="0" min="0" max="15" style="width:38px">
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("undo", { id: "btnUndo", title: "Undo (Ctrl+Z)" })}
-            ${iconButton("redo", { id: "btnRedo", title: "Redo (Ctrl+Y)" })}
+            ${f("undo",{id:"btnUndo",title:"Undo (Ctrl+Z)"})}
+            ${f("redo",{id:"btnRedo",title:"Redo (Ctrl+Y)"})}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton("trash", { id: "btnClear", title: "Clear All", cls: "danger" })}
+            ${f("trash",{id:"btnClear",title:"Clear All",cls:"danger"})}
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
-            ${iconButton("copy", { id: "btnCopyLua", title: "Copy Lua Code" })}
-            ${iconButton("insert", { id: "btnInsert", title: "Insert to Editor" })}
+            ${f("copy",{id:"btnCopyLua",title:"Copy Lua Code"})}
+            ${f("insert",{id:"btnInsert",title:"Insert to Editor"})}
           </div>
-          ${toolbarSep()}
-          <button id="btnExport" class="primary">${ICONS.exportFile} Export \u25BE</button>
+          ${k()}
+          <button id="btnExport" class="primary">${m.exportFile} Export \u25BE</button>
         </div>
 
         <!-- Tool Rail -->
         <div class="tool-rail" id="tools">
-          <button class="active" data-tool="pen" title="Pen (P)">${ICONS.pencil}</button>
-          <button data-tool="erase" title="Eraser (E)">${ICONS.eraser}</button>
-          <button data-tool="fill" title="Fill Layer (F)">${ICONS.bucket}</button>
+          <button class="active" data-tool="pen" title="Pen (P)">${m.pencil}</button>
+          <button data-tool="erase" title="Eraser (E)">${m.eraser}</button>
+          <button data-tool="fill" title="Fill Layer (F)">${m.bucket}</button>
         </div>
 
         <!-- Views -->
@@ -15806,11 +7015,11 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
 
         <!-- Right Panel -->
         <div class="right-panel">
-          ${panelSection("Color", `
+          ${P("Color",`
             <input type="color" id="voxelColor" value="#4ec9b0" class="color-well">
             <div id="palette" class="palette-grid"></div>
           `)}
-          ${panelSection("Layers (Z)", '<div id="layerList"></div>')}
+          ${P("Layers (Z)",'<div id="layerList"></div>')}
         </div>
 
         <!-- Status Bar -->
@@ -15821,10 +7030,10 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusTool">Pen</span>
           <div class="spacer"></div>
-          <span class="dirty-indicator">${ICONS.clean}</span>
+          <span class="dirty-indicator">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const PALETTE = ['#4ec9b0','#007acc','#f44336','#ff9800','#4caf50','#9c27b0','#ffeb3b','#795548','#ffffff','#888888','#444444','#000000','#ff77a8','#29adff','#00e436','#ab5236'];
       let gridSize = 16, currentZ = 0, currentColor = '#4ec9b0', currentTool = 'pen';
       let voxels = {};
@@ -16026,153 +7235,8 @@ var VoxelEditor = class _VoxelEditor extends WebviewEditor {
       refreshLayers();
       window.addEventListener('resize', renderAll);
       renderAll();
-    `);
-  }
-};
-
-// src/editors/testRunnerEditor.ts
-var vscode27 = __toESM(require("vscode"));
-var path14 = __toESM(require("path"));
-var fs11 = __toESM(require("fs"));
-init_parallelCargo();
-var KNOWN_MODULES = [
-  "ai",
-  "audio",
-  "cardgame",
-  "combat",
-  "compute",
-  "config",
-  "crafting",
-  "data",
-  "dataframe",
-  "dialog",
-  "engine",
-  "ecs",
-  "event",
-  "filesystem",
-  "graph",
-  "render",
-  "graphics_ext",
-  "image",
-  "input",
-  "inventory",
-  "math",
-  "math_ext",
-  "minimap",
-  "mods",
-  "particle",
-  "pathfind",
-  "physics",
-  "postfx",
-  "quest",
-  "resource",
-  "save",
-  "scene",
-  "sound",
-  "stats",
-  "thread",
-  "tilemap",
-  "timer"
-];
-var TestRunnerEditor = class _TestRunnerEditor extends WebviewEditor {
-  static open(context) {
-    return new _TestRunnerEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.testRunner", "Test Runner");
-    setTimeout(() => this.pushDiscoveredSuites(), 300);
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "discoverSuites":
-        this.pushDiscoveredSuites();
-        break;
-      case "runAll":
-        this.runParallelTestCommand(buildTestAllCommand(), "all");
-        break;
-      case "runSuite":
-        this.runSuite(msg.suite);
-        break;
-      case "runLua":
-        this.runParallelTestCommand(buildLuaTestsCommand(), "lua");
-        break;
-      case "runGolden":
-        this.runParallelTestCommand(buildTestTargetCommand("golden_tests"), "golden");
-        break;
-      case "stop":
-        vscode27.window.showInformationMessage("Use the terminal to cancel the running test.");
-        break;
-    }
-  }
-  pushDiscoveredSuites() {
-    const suites = this.discoverTestSuites();
-    this.panel.webview.postMessage({ type: "suites", suites });
-  }
-  /** Scan tests/ directory for *_tests.rs and extract test function names. */
-  discoverTestSuites() {
-    const ws = vscode27.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!ws) return this.fallbackSuites();
-    const testsDir = path14.join(ws, "tests");
-    if (!fs11.existsSync(testsDir)) return this.fallbackSuites();
-    const result = [];
-    const special = /* @__PURE__ */ new Set(["golden_tests", "lua_tests"]);
-    let files;
-    try {
-      files = fs11.readdirSync(testsDir);
-    } catch {
-      return this.fallbackSuites();
-    }
-    for (const file of files.sort()) {
-      if (!file.endsWith("_tests.rs")) continue;
-      const suiteName = file.replace(/\.rs$/, "");
-      if (special.has(suiteName)) continue;
-      const tests = this.extractTestNames(path14.join(testsDir, file));
-      result.push({ name: suiteName, tests });
-    }
-    result.push({ name: "lua_tests", tests: ["(lua vm tests \u2014 run via parallel_cargo.py test lua)"] });
-    result.push({ name: "golden_tests", tests: ["(golden output tests \u2014 run via parallel_cargo.py test target golden_tests)"] });
-    return result;
-  }
-  extractTestNames(filePath) {
-    try {
-      const src = fs11.readFileSync(filePath, "utf8");
-      const names = [];
-      const re = /^\s*(?:#\[test\]\s*(?:#\[.*?\]\s*)*)?(?:async\s+)?fn\s+(\w+)/gm;
-      let m;
-      const lines = src.split("\n");
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].trimStart().startsWith("#[test]")) {
-          for (let j = i + 1; j < Math.min(i + 5, lines.length); j++) {
-            const fnMatch = lines[j].match(/\bfn\s+(\w+)/);
-            if (fnMatch) {
-              names.push(fnMatch[1]);
-              break;
-            }
-          }
-        }
-      }
-      return names.length ? names : ["(no #[test] functions found)"];
-    } catch {
-      return ["(could not read file)"];
-    }
-  }
-  fallbackSuites() {
-    return KNOWN_MODULES.map((m) => ({ name: `${m}_tests`, tests: [`(run: python tools/dev/parallel_cargo.py test target ${m}_tests)`] }));
-  }
-  runSuite(suite) {
-    const command = suite === "lua_tests" ? buildLuaTestsCommand() : buildTestTargetCommand(suite);
-    this.runParallelTestCommand(command, suite);
-  }
-  runParallelTestCommand(command, label) {
-    const existing = vscode27.window.terminals.find((t) => t.name === "Lurek2D Tests");
-    const terminal = existing ?? vscode27.window.createTerminal("Lurek2D Tests");
-    terminal.show();
-    terminal.sendText(command);
-    this.panel.webview.postMessage({ type: "testStarted", filter: label, command });
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Test Runner", `
+    `)}};var Pt=C(require("vscode")),Zr=C(require("path")),Mt=C(require("fs"));Lt();var sp=["ai","audio","cardgame","combat","compute","config","crafting","data","dataframe","dialog","engine","ecs","event","filesystem","graph","render","graphics_ext","image","input","inventory","math","math_ext","minimap","mods","particle","pathfind","physics","postfx","quest","resource","save","scene","sound","stats","thread","tilemap","timer"],zn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.testRunner","Test Runner"),setTimeout(()=>this.pushDiscoveredSuites(),300)}handleMessage(e){switch(e.type){case"discoverSuites":this.pushDiscoveredSuites();break;case"runAll":this.runParallelTestCommand(tn(),"all");break;case"runSuite":this.runSuite(e.suite);break;case"runLua":this.runParallelTestCommand(Ct(),"lua");break;case"runGolden":this.runParallelTestCommand(et("golden_tests"),"golden");break;case"stop":Pt.window.showInformationMessage("Use the terminal to cancel the running test.");break}}pushDiscoveredSuites(){let e=this.discoverTestSuites();this.panel.webview.postMessage({type:"suites",suites:e})}discoverTestSuites(){let e=Pt.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!e)return this.fallbackSuites();let t=Zr.join(e,"tests");if(!Mt.existsSync(t))return this.fallbackSuites();let r=[],a=new Set(["golden_tests","lua_tests"]),i;try{i=Mt.readdirSync(t)}catch{return this.fallbackSuites()}for(let o of i.sort()){if(!o.endsWith("_tests.rs"))continue;let s=o.replace(/\.rs$/,"");if(a.has(s))continue;let l=this.extractTestNames(Zr.join(t,o));r.push({name:s,tests:l})}return r.push({name:"lua_tests",tests:["(lua vm tests \u2014 run via parallel_cargo.py test lua)"]}),r.push({name:"golden_tests",tests:["(golden output tests \u2014 run via parallel_cargo.py test target golden_tests)"]}),r}extractTestNames(e){try{let t=Mt.readFileSync(e,"utf8"),r=[],a=/^\s*(?:#\[test\]\s*(?:#\[.*?\]\s*)*)?(?:async\s+)?fn\s+(\w+)/gm,i,o=t.split(`
+`);for(let s=0;s<o.length;s++)if(o[s].trimStart().startsWith("#[test]"))for(let l=s+1;l<Math.min(s+5,o.length);l++){let p=o[l].match(/\bfn\s+(\w+)/);if(p){r.push(p[1]);break}}return r.length?r:["(no #[test] functions found)"]}catch{return["(could not read file)"]}}fallbackSuites(){return sp.map(e=>({name:`${e}_tests`,tests:[`(run: python tools/dev/parallel_cargo.py test target ${e}_tests)`]}))}runSuite(e){let t=e==="lua_tests"?Ct():et(e);this.runParallelTestCommand(t,e)}runParallelTestCommand(e,t){let a=Pt.window.terminals.find(i=>i.name==="Lurek2D Tests")??Pt.window.createTerminal("Lurek2D Tests");a.show(),a.sendText(e),this.panel.webview.postMessage({type:"testStarted",filter:t,command:e})}getHtml(){let e=D();return B(e,"Test Runner",`
       .editor-layout {
         display: grid; grid-template-columns: 260px 1fr;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -16211,21 +7275,21 @@ var TestRunnerEditor = class _TestRunnerEditor extends WebviewEditor {
       .result-badge.pass { background: rgba(76,175,80,0.15); color: #4caf50; }
       .result-badge.fail { background: rgba(244,67,54,0.15); color: #f44336; }
       #discovering { padding: 12px; font-size: 11px; color: var(--text-dim); }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
           <div class="group">
-            <button id="btnRunAll">${ICONS.play} Run All</button>
+            <button id="btnRunAll">${m.play} Run All</button>
             <button id="btnRunLua">Run Lua</button>
             <button id="btnRunGolden">Run Golden</button>
             <button id="btnRunSelected">Run Selected</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <input id="filter" placeholder="Filter tests\u2026" style="width:130px">
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <span id="statusSummary" style="font-size:11px;color:var(--text-dim)">Discovering\u2026</span>
         </div>
 
@@ -16250,7 +7314,7 @@ Select a suite and click "Run Selected", or click \u25B6 next to any suite name.
           <span id="statusState">Ready</span>
         </div>
       </div>
-    `, `
+    `,`
       let TEST_SUITES = [];
       let results = {};
       let selectedSuite = '';
@@ -16344,42 +7408,7 @@ Select a suite and click "Run Selected", or click \u25B6 next to any suite name.
 
       // Request suite discovery
       vscode.postMessage({ type: 'discoverSuites' });
-    `);
-  }
-};
-
-// src/editors/apiReferenceEditor.ts
-var vscode28 = __toESM(require("vscode"));
-init_apiDocs();
-var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
-  static open(context) {
-    return new _ApiReferenceEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.apiReference", "API Reference");
-    this.loadApiData();
-  }
-  async loadApiData() {
-    try {
-      const workspaceFolders = vscode28.workspace.workspaceFolders;
-      if (!workspaceFolders) {
-        return;
-      }
-      const apiPath = resolveWorkspaceApiDocPath(workspaceFolders[0].uri.fsPath);
-      if (!apiPath) {
-        return;
-      }
-      const data = await vscode28.workspace.fs.readFile(vscode28.Uri.file(apiPath));
-      const text = new globalThis.TextDecoder().decode(data);
-      this.panel.webview.postMessage({ type: "apiData", content: text });
-    } catch {
-    }
-  }
-  handleMessage(msg) {
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "API Reference", `
+    `)}};var Gt=C(require("vscode"));Jt();var _n=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.apiReference","API Reference"),this.loadApiData()}async loadApiData(){try{let e=Gt.workspace.workspaceFolders;if(!e)return;let t=Je(e[0].uri.fsPath);if(!t)return;let r=await Gt.workspace.fs.readFile(Gt.Uri.file(t)),a=new globalThis.TextDecoder().decode(r);this.panel.webview.postMessage({type:"apiData",content:a})}catch{}}handleMessage(e){}getHtml(){let e=D();return B(e,"API Reference",`
       .editor-layout {
         display: grid; grid-template-columns: 200px 1fr;
         grid-template-rows: auto 1fr auto; height: 100vh;
@@ -16412,7 +7441,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
       .module-desc { font-size: 11px; color: var(--text-dim); margin-bottom: 14px; line-height: 1.5; }
       .tag { display: inline-block; padding: 1px 6px; border-radius: 9px; font-size: 9px; margin-left: 6px; font-weight: 600; }
       .tag.event { background: rgba(76,175,80,0.15); color: #4caf50; }
-    `, `
+    `,`
       <div class="editor-layout">
         <!-- Toolbar -->
         <div class="toolbar">
@@ -16445,7 +7474,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
           <span id="statusSource" style="font-size:10px;color:var(--text-dim)">Built-in data</span>
         </div>
       </div>
-    `, `
+    `,`
       const API_DATA = {
         'lurek.graphic': {
           desc: 'Drawing primitives, colors, transforms, and render state. Also available as lurek.render table.',
@@ -16610,36 +7639,7 @@ var ApiReferenceEditor = class _ApiReferenceEditor extends WebviewEditor {
 
       renderModuleList();
       renderDocs();
-    `);
-  }
-};
-
-// src/editors/postfxOverlayEditor.ts
-var vscode29 = __toESM(require("vscode"));
-var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
-  static open(context) {
-    return new _PostFxOverlayEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.postfxOverlay", "PostFX & Overlay Designer");
-  }
-  handleMessage(msg) {
-    if (msg.type === "copyCode") {
-      vscode29.env.clipboard.writeText(msg.code);
-      vscode29.window.showInformationMessage("PostFX code copied to clipboard.");
-    }
-    if (msg.type === "insertCode") {
-      const editor = vscode29.window.activeTextEditor;
-      if (editor) {
-        editor.insertSnippet(new vscode29.SnippetString(msg.code));
-      } else {
-        vscode29.window.showWarningMessage("Open a Lua file to insert code.");
-      }
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "PostFX & Overlay Designer", `
+    `)}};var it=C(require("vscode"));var Nn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.postfxOverlay","PostFX & Overlay Designer")}handleMessage(e){if(e.type==="copyCode"&&(it.env.clipboard.writeText(e.code),it.window.showInformationMessage("PostFX code copied to clipboard.")),e.type==="insertCode"){let t=it.window.activeTextEditor;t?t.insertSnippet(new it.SnippetString(e.code)):it.window.showWarningMessage("Open a Lua file to insert code.")}}getHtml(){let e=D();return B(e,"PostFX & Overlay Designer",`
       .editor-layout { display:grid; grid-template-rows:auto auto 1fr auto; height:100vh; overflow:hidden; }
       .toolbar { display:flex; align-items:center; gap:6px; padding:6px 10px; background:var(--surface); border-bottom:1px solid var(--border); }
       .toolbar .title { font-weight:600; font-size:13px; white-space:nowrap; }
@@ -16665,15 +7665,15 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
       .sep { width:1px; height:14px; background:var(--border); }
       .spacer { flex:1; }
       .code-label { font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.05em; margin:0 0 4px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
-          <span class="title">${ICONS.effect ?? "\u{1F3A8}"} PostFX & Overlay Designer</span>
-          ${toolbarSep()}
-          ${iconButton(ICONS.copy, "btnCopy", "Copy Code")}
-          ${iconButton(ICONS.add, "btnInsert", "Insert at Cursor")}
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          <span class="title">${m.effect??"\u{1F3A8}"} PostFX & Overlay Designer</span>
+          ${k()}
+          ${f(m.copy,"btnCopy","Copy Code")}
+          ${f(m.add,"btnInsert","Insert at Cursor")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
         <div class="tab-bar" id="tabs">
           <button class="tab sel" data-tab="weather">Weather</button>
@@ -16686,7 +7686,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
           <div class="props-col">
             <!-- WEATHER -->
             <div id="tab-weather">
-              ${panelSection("Weather", `
+              ${P("Weather",`
                 <div class="dsp-row"><label>Preset</label>
                   <select id="weatherPreset"><option>Clear</option><option>Rain</option><option>Heavy Rain</option><option>Snow</option><option>Blizzard</option><option>Fog</option><option>Sandstorm</option><option>Thunderstorm</option></select>
                 </div>
@@ -16700,7 +7700,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
             </div>
             <!-- TIME OF DAY -->
             <div id="tab-timeofday" style="display:none">
-              ${panelSection("Time of Day", `
+              ${P("Time of Day",`
                 <div class="dsp-row"><label>Hour</label><input type="range" id="hour" min="0" max="23.99" step="0.25" value="12"><span class="val" id="hourVal">12:00</span></div>
                 <div class="dsp-row"><label>Sky Color</label><input type="color" id="skyColor" value="#87ceeb"></div>
                 <div class="dsp-row"><label>Ambient Light</label><input type="range" id="ambientLight" min="0" max="1" step="0.01" value="1.0"><span class="val" id="ambientLightVal">1.00</span></div>
@@ -16715,7 +7715,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
             </div>
             <!-- SCREEN EFFECTS -->
             <div id="tab-screen" style="display:none">
-              ${panelSection("Screen Effects", `
+              ${P("Screen Effects",`
                 <div class="dsp-row"><label>Vignette</label><input type="range" id="vignette" min="0" max="1" step="0.01" value="0"><span class="val" id="vignetteVal">0.00</span></div>
                 <div class="dsp-row"><label>Vignette Color</label><input type="color" id="vignetteColor" value="#000000"></div>
                 <div class="dsp-row"><label>Scanlines</label><input type="range" id="scanlines" min="0" max="1" step="0.01" value="0"><span class="val" id="scanlinesVal">0.00</span></div>
@@ -16730,7 +7730,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
             </div>
             <!-- CAMERA SHAKE -->
             <div id="tab-shake" style="display:none">
-              ${panelSection("Camera Shake", `
+              ${P("Camera Shake",`
                 <div class="dsp-row"><label>Amplitude</label><input type="range" id="shakeAmplitude" min="0" max="50" step="0.5" value="5"><span class="val" id="shakeAmplitudeVal">5.0</span></div>
                 <div class="dsp-row"><label>Frequency</label><input type="range" id="shakeFrequency" min="1" max="60" step="1" value="20"><span class="val" id="shakeFrequencyVal">20</span></div>
                 <div class="dsp-row"><label>Duration (s)</label><input type="range" id="shakeDuration" min="0.1" max="5" step="0.1" value="0.5"><span class="val" id="shakeDurationVal">0.50</span></div>
@@ -16741,7 +7741,7 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
             </div>
             <!-- OVERLAY PRESETS -->
             <div id="tab-overlay" style="display:none">
-              ${panelSection("Overlay Presets", `
+              ${P("Overlay Presets",`
                 <div class="dsp-row"><label>Preset</label>
                   <select id="overlayPreset"><option>None</option><option>Blood Vignette</option><option>Underwater</option><option>Night Vision</option><option>Thermal Vision</option><option>Old Film</option><option>Heatwave</option><option>Poison</option><option>Fire Overlay</option></select>
                 </div>
@@ -16766,10 +7766,10 @@ var PostFxOverlayEditor = class _PostFxOverlayEditor extends WebviewEditor {
           <span class="sep"></span>
           <span id="effectCount">0 effects</span>
           <span class="spacer"></span>
-          <span id="dirtyFlag">${ICONS.clean ?? "\u2713"}</span>
+          <span id="dirtyFlag">${m.clean??"\u2713"}</span>
         </div>
       </div>
-    `, `
+    `,`
       const vscode = acquireVsCodeApi();
       let currentTab = 'weather';
       const undo = new UndoStack();
@@ -17120,36 +8120,7 @@ end';
 
       undo.push(snap());
       updateCode(); drawPreview();
-    `);
-  }
-};
-
-// src/editors/soundDspEditor.ts
-var vscode30 = __toESM(require("vscode"));
-var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
-  static open(context) {
-    return new _SoundDspEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.editor.soundDsp", "Sound DSP Panel");
-  }
-  handleMessage(msg) {
-    if (msg.type === "copyCode") {
-      vscode30.env.clipboard.writeText(msg.code);
-      vscode30.window.showInformationMessage("Sound DSP code copied to clipboard.");
-    }
-    if (msg.type === "insertCode") {
-      const editor = vscode30.window.activeTextEditor;
-      if (editor) {
-        editor.insertSnippet(new vscode30.SnippetString(msg.code));
-      } else {
-        vscode30.window.showWarningMessage("Open a Lua file to insert code.");
-      }
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Sound DSP Panel", `
+    `)}};var ot=C(require("vscode"));var Wn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.editor.soundDsp","Sound DSP Panel")}handleMessage(e){if(e.type==="copyCode"&&(ot.env.clipboard.writeText(e.code),ot.window.showInformationMessage("Sound DSP code copied to clipboard.")),e.type==="insertCode"){let t=ot.window.activeTextEditor;t?t.insertSnippet(new ot.SnippetString(e.code)):ot.window.showWarningMessage("Open a Lua file to insert code.")}}getHtml(){let e=D();return B(e,"Sound DSP Panel",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr;
         grid-template-rows: auto auto 1fr auto;
@@ -17184,17 +8155,17 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
       .code-out { font-family: var(--font-mono, 'Cascadia Code', monospace); font-size: 10px; background: var(--bg); color: var(--accent); border-radius: var(--radius); border: 1px solid var(--border); padding: 6px; overflow-x: auto; white-space: pre; max-height: 280px; overflow-y: auto; margin: 4px 0; }
       .vis-mode-row { display: flex; gap: 8px; margin: 4px 0 6px; font-size: 10px; color: var(--text-dim); align-items: center; }
       .vis-mode-row label { cursor: pointer; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.copy, "btnCopy", "Copy Code")}
-            ${iconButton(ICONS.add, "btnInsert", "Insert at Cursor")}
+            ${f(m.copy,"btnCopy","Copy Code")}
+            ${f(m.add,"btnInsert","Insert at Cursor")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group" style="font-size:10px;color:var(--text-dim)">Sound DSP Designer</div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="tab-bar" id="tabs">
@@ -17212,8 +8183,8 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
           <div class="controls-panel">
             <!-- SIGNAL CHAIN -->
             <div id="tab-chain">
-              ${panelSection("Signal Chain", '<div id="signalChain" class="signal-chain"></div>')}
-              ${panelSection("Master", `
+              ${P("Signal Chain",'<div id="signalChain" class="signal-chain"></div>')}
+              ${P("Master",`
                 <div class="dsp-row"><label>Volume</label><input type="range" id="masterVolume" min="0" max="2" step="0.01" value="1"><span class="val" id="masterVolumeVal">1.00</span></div>
                 <div class="dsp-row"><label>Pan</label><input type="range" id="masterPan" min="-1" max="1" step="0.01" value="0"><span class="val" id="masterPanVal">0.00</span></div>
                 <div class="dsp-row"><label>Sample Rate</label>
@@ -17223,7 +8194,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- EQ -->
             <div id="tab-eq" style="display:none">
-              ${panelSection("EQ Presets", `
+              ${P("EQ Presets",`
                 <div class="preset-row">
                   <button class="preset-btn" data-eq="flat">Flat</button>
                   <button class="preset-btn" data-eq="bass">Bass</button>
@@ -17234,11 +8205,11 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
                   <button class="preset-btn" data-eq="radio">Lo-Fi</button>
                 </div>
               `)}
-              ${panelSection("7-Band Parametric EQ", '<div class="eq-bands" id="eqBands"></div>')}
+              ${P("7-Band Parametric EQ",'<div class="eq-bands" id="eqBands"></div>')}
             </div>
             <!-- REVERB -->
             <div id="tab-reverb" style="display:none">
-              ${panelSection("Room Presets", `
+              ${P("Room Presets",`
                 <div class="preset-row">
                   <button class="preset-btn" data-reverb="small">Small</button>
                   <button class="preset-btn" data-reverb="medium">Medium</button>
@@ -17248,7 +8219,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
                   <button class="preset-btn" data-reverb="spring">Spring</button>
                 </div>
               `)}
-              ${panelSection("Reverb", `
+              ${P("Reverb",`
                 <div class="dsp-row"><label>Room Size</label><input type="range" id="reverbRoom" min="0" max="1" step="0.01" value="0.5"><span class="val" id="reverbRoomVal">0.50</span></div>
                 <div class="dsp-row"><label>Damping</label><input type="range" id="reverbDamp" min="0" max="1" step="0.01" value="0.5"><span class="val" id="reverbDampVal">0.50</span></div>
                 <div class="dsp-row"><label>Wet / Dry</label><input type="range" id="reverbMix" min="0" max="1" step="0.01" value="0.3"><span class="val" id="reverbMixVal">0.30</span></div>
@@ -17259,7 +8230,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- ECHO -->
             <div id="tab-echo" style="display:none">
-              ${panelSection("Echo / Delay", `
+              ${P("Echo / Delay",`
                 <div class="dsp-row"><label>Delay (ms)</label><input type="range" id="echoDelay" min="10" max="2000" step="10" value="400"><span class="val" id="echoDelayVal">400</span></div>
                 <div class="dsp-row"><label>Feedback</label><input type="range" id="echoFeedback" min="0" max="0.99" step="0.01" value="0.4"><span class="val" id="echoFeedbackVal">0.40</span></div>
                 <div class="dsp-row"><label>Wet / Dry</label><input type="range" id="echoMix" min="0" max="1" step="0.01" value="0.4"><span class="val" id="echoMixVal">0.40</span></div>
@@ -17273,7 +8244,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- CHORUS -->
             <div id="tab-chorus" style="display:none">
-              ${panelSection("Chorus / Flanger", `
+              ${P("Chorus / Flanger",`
                 <div class="dsp-row"><label>Mode</label>
                   <select id="chorusMode"><option>Chorus</option><option>Flanger</option><option>Ensemble</option><option>Vibrato</option></select>
                 </div>
@@ -17287,13 +8258,13 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- PITCH -->
             <div id="tab-pitch" style="display:none">
-              ${panelSection("Pitch Shift", `
+              ${P("Pitch Shift",`
                 <div class="dsp-row"><label>Semitones</label><input type="range" id="pitchSemitones" min="-24" max="24" step="1" value="0"><span class="val" id="pitchSemitonesVal">0 st</span></div>
                 <div class="dsp-row"><label>Fine (cents)</label><input type="range" id="pitchCents" min="-100" max="100" step="1" value="0"><span class="val" id="pitchCentsVal">0\xA2</span></div>
                 <div class="dsp-row"><label>Formant</label><input type="checkbox" id="pitchFormant"></div>
                 <div class="dsp-row"><label>Rate</label><input type="range" id="pitchRate" min="0.25" max="4" step="0.05" value="1"><span class="val" id="pitchRateVal">1.00\xD7</span></div>
               `)}
-              ${panelSection("Pitch Envelope", `
+              ${P("Pitch Envelope",`
                 <div class="dsp-row"><label>Sweep Start</label><input type="range" id="pitchSweepFrom" min="-12" max="12" step="1" value="0"><span class="val" id="pitchSweepFromVal">0 st</span></div>
                 <div class="dsp-row"><label>Sweep End</label><input type="range" id="pitchSweepTo" min="-12" max="12" step="1" value="0"><span class="val" id="pitchSweepToVal">0 st</span></div>
                 <div class="dsp-row"><label>Sweep Time (s)</label><input type="range" id="pitchSweepTime" min="0.01" max="2" step="0.01" value="0.5"><span class="val" id="pitchSweepTimeVal">0.50</span></div>
@@ -17301,18 +8272,18 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- DYNAMICS -->
             <div id="tab-dynamics" style="display:none">
-              ${panelSection("Compressor", `
+              ${P("Compressor",`
                 <div class="dsp-row"><label>Threshold (dB)</label><input type="range" id="compThreshold" min="-60" max="0" step="1" value="-24"><span class="val" id="compThresholdVal">-24</span></div>
                 <div class="dsp-row"><label>Ratio</label><input type="range" id="compRatio" min="1" max="20" step="0.5" value="4"><span class="val" id="compRatioVal">4:1</span></div>
                 <div class="dsp-row"><label>Attack (ms)</label><input type="range" id="compAttack" min="0.1" max="200" step="0.1" value="10"><span class="val" id="compAttackVal">10</span></div>
                 <div class="dsp-row"><label>Release (ms)</label><input type="range" id="compRelease" min="10" max="2000" step="10" value="200"><span class="val" id="compReleaseVal">200</span></div>
                 <div class="dsp-row"><label>Makeup (dB)</label><input type="range" id="compMakeup" min="0" max="24" step="0.5" value="0"><span class="val" id="compMakeupVal">0</span></div>
               `)}
-              ${panelSection("Gate / Limiter", `
+              ${P("Gate / Limiter",`
                 <div class="dsp-row"><label>Gate (dB)</label><input type="range" id="gateThreshold" min="-80" max="0" step="1" value="-60"><span class="val" id="gateThresholdVal">-60</span></div>
                 <div class="dsp-row"><label>Ceiling (dB)</label><input type="range" id="limiterCeil" min="-20" max="0" step="0.5" value="-0.3"><span class="val" id="limiterCeilVal">-0.3</span></div>
               `)}
-              ${panelSection("Distortion", `
+              ${P("Distortion",`
                 <div class="dsp-row"><label>Drive</label><input type="range" id="distDrive" min="0" max="1" step="0.01" value="0"><span class="val" id="distDriveVal">0.00</span></div>
                 <div class="dsp-row"><label>Mode</label>
                   <select id="distMode"><option>Soft Clip</option><option>Hard Clip</option><option>Fuzz</option><option>Bit Crush</option><option>Overdrive</option></select>
@@ -17322,7 +8293,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
             </div>
             <!-- GENERATOR -->
             <div id="tab-generator" style="display:none">
-              ${panelSection("Waveform", `
+              ${P("Waveform",`
                 <div class="dsp-row"><label>Type</label>
                   <select id="genType"><option>Sine</option><option>Square</option><option>Sawtooth</option><option>Triangle</option><option>Noise</option><option>Pulse</option></select>
                 </div>
@@ -17330,13 +8301,13 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
                 <div class="dsp-row"><label>Volume</label><input type="range" id="genVol" min="0" max="1" step="0.01" value="0.5"><span class="val" id="genVolVal">0.50</span></div>
                 <div class="dsp-row"><label>Duration (s)</label><input type="range" id="genDur" min="0.01" max="5" step="0.01" value="0.5"><span class="val" id="genDurVal">0.50</span></div>
               `)}
-              ${panelSection("ADSR Envelope", `
+              ${P("ADSR Envelope",`
                 <div class="dsp-row"><label>Attack (s)</label><input type="range" id="adsrAttack" min="0.001" max="2" step="0.001" value="0.01"><span class="val" id="adsrAttackVal">0.010</span></div>
                 <div class="dsp-row"><label>Decay (s)</label><input type="range" id="adsrDecay" min="0.001" max="2" step="0.001" value="0.1"><span class="val" id="adsrDecayVal">0.100</span></div>
                 <div class="dsp-row"><label>Sustain</label><input type="range" id="adsrSustain" min="0" max="1" step="0.01" value="0.7"><span class="val" id="adsrSustainVal">0.70</span></div>
                 <div class="dsp-row"><label>Release (s)</label><input type="range" id="adsrRelease" min="0.001" max="3" step="0.001" value="0.3"><span class="val" id="adsrReleaseVal">0.300</span></div>
               `)}
-              ${panelSection("Sound Presets", `
+              ${P("Sound Presets",`
                 <div class="preset-row">
                   <button class="preset-btn" data-sound="laser">Laser</button>
                   <button class="preset-btn" data-sound="explosion">Explosion</button>
@@ -17359,7 +8330,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
               <label><input type="radio" name="visMode" value="wave"> Waveform</label>
               <label><input type="radio" name="visMode" value="lissajous"> Lissajous</label>
             </div>
-            ${panelSection("Generated Lua Code", '<pre class="code-out" id="codeOut"></pre>')}
+            ${P("Generated Lua Code",'<pre class="code-out" id="codeOut"></pre>')}
           </div>
         </div>
 
@@ -17370,10 +8341,10 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusVol">vol 1.00</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let curTab = 'chain';
 
@@ -17555,28 +8526,7 @@ var SoundDspEditor = class _SoundDspEditor extends WebviewEditor {
       document.getElementById('btnInsert').addEventListener('click', () => { vscode.postMessage({type:'insertCode',code:g('codeOut').textContent}); });
       document.getElementById('btnExport').addEventListener('click', () => { vscode.postMessage({type:'exportLua',content:g('codeOut').textContent}); });
       genCode(); drawVis();
-    `);
-  }
-};
-
-// src/editors/spriteAnimEditor.ts
-var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
-  static open(context) {
-    return new _SpriteAnimEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.spriteAnimEditor", "Sprite Animation");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "animation.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Sprite Animation", `
+    `)}};var Gn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.spriteAnimEditor","Sprite Animation")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"animation.lua");break}}getHtml(){let e=D();return B(e,"Sprite Animation",`
       .editor-layout {
         display: grid; grid-template-columns: 200px 1fr 200px;
         grid-template-rows: auto 1fr auto auto;
@@ -17614,18 +8564,18 @@ var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
       .anim-tag .rm:hover { opacity: 1; }
       .playback-controls { display: flex; align-items: center; gap: 2px; }
       .playback-controls button { min-width: 28px; padding: 2px 6px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.grid, "btnLoadSheet", "Load Sheet")}
+            ${f(m.grid,"btnLoadSheet","Load Sheet")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label>Cols:</label><input type="number" id="cols" value="4" min="1" max="64" style="width:40px">
             <label>Rows:</label><input type="number" id="rows" value="4" min="1" max="64" style="width:40px">
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="playback-controls">
             <button id="btnFirst" title="First frame">\u23EE</button>
             <button id="btnPrev" title="Previous frame">\u25C0</button>
@@ -17633,12 +8583,12 @@ var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
             <button id="btnNext" title="Next frame">\u25B6</button>
             <button id="btnLast" title="Last frame">\u23ED</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <label>Speed:</label>
           <input type="range" id="speed" min="1" max="60" value="12" style="width:70px">
           <span id="speedLabel" style="font-size:10px;min-width:36px">12 fps</span>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <!-- Frame List -->
@@ -17655,16 +8605,16 @@ var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
 
         <!-- Properties -->
         <div class="props-panel">
-          ${panelSection("Frame", `
-            ${fieldInline("Duration (ms)", '<input type="number" id="frameDuration" value="100" min="16" max="5000">')}
-            ${fieldInline("Origin X", '<input type="number" id="originX" value="0">')}
-            ${fieldInline("Origin Y", '<input type="number" id="originY" value="0">')}
+          ${P("Frame",`
+            ${_("Duration (ms)",'<input type="number" id="frameDuration" value="100" min="16" max="5000">')}
+            ${_("Origin X",'<input type="number" id="originX" value="0">')}
+            ${_("Origin Y",'<input type="number" id="originY" value="0">')}
           `)}
-          ${panelSection("Animation", `
-            ${fieldInline("Name", '<input type="text" id="animName" value="idle">')}
+          ${P("Animation",`
+            ${_("Name",'<input type="text" id="animName" value="idle">')}
             <div class="field-row"><input type="checkbox" id="looping" checked><label for="looping">Loop</label></div>
           `)}
-          ${panelSection("Tags", `
+          ${P("Tags",`
             <div class="tag-list" id="tagList"></div>
             <div class="field-row" style="margin-top:4px">
               <input type="text" id="newTag" placeholder="New tag\u2026" style="flex:1">
@@ -17687,10 +8637,10 @@ var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusAnim">idle</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let cols = 4, rows = 4;
       let frames = [];
@@ -17830,28 +8780,7 @@ var SpriteAnimEditor = class _SpriteAnimEditor extends WebviewEditor {
 
       initFrames();
       renderTags();
-    `);
-  }
-};
-
-// src/editors/tilesetEditor.ts
-var TilesetEditor = class _TilesetEditor extends WebviewEditor {
-  static open(context) {
-    return new _TilesetEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.tilesetEditor", "Tileset");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "tileset.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Tileset", `
+    `)}};var Hn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.tilesetEditor","Tileset")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"tileset.lua");break}}getHtml(){let e=D();return B(e,"Tileset",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 220px;
         grid-template-rows: auto 1fr auto;
@@ -17879,24 +8808,24 @@ var TilesetEditor = class _TilesetEditor extends WebviewEditor {
         cursor: pointer; border-radius: 1px; transition: background 0.08s;
       }
       .auto-rule-cell.on { background: var(--accent); }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnUpload", "Upload Image")}
+            ${f(m.add,"btnUpload","Upload Image")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label>W:</label><input type="number" id="tileW" value="32" min="8" max="256" style="width:44px">
             <label>H:</label><input type="number" id="tileH" value="32" min="8" max="256" style="width:44px">
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton(ICONS.grid, "btnShowGrid", "Toggle Grid")}
+            ${f(m.grid,"btnShowGrid","Toggle Grid")}
             <button id="btnShowIds" title="Show Tile IDs" style="font-size:10px;padding:2px 6px">IDs</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="tileset-area" id="tilesetArea">
@@ -17908,20 +8837,20 @@ var TilesetEditor = class _TilesetEditor extends WebviewEditor {
         </div>
 
         <div class="props-panel">
-          ${panelSection("Selected Tile", `
-            ${fieldInline("Tile ID", '<input type="text" id="tileId" readonly>')}
-            ${fieldInline("Name", '<input type="text" id="tileName" placeholder="(optional)">')}
+          ${P("Selected Tile",`
+            ${_("Tile ID",'<input type="text" id="tileId" readonly>')}
+            ${_("Name",'<input type="text" id="tileName" placeholder="(optional)">')}
           `)}
-          ${panelSection("Properties", `
+          ${P("Properties",`
             <div class="tile-props-grid">
               <div class="prop-chip"><input type="checkbox" id="propSolid"><label for="propSolid">Solid</label></div>
               <div class="prop-chip"><input type="checkbox" id="propAnimated"><label for="propAnimated">Animated</label></div>
               <div class="prop-chip"><input type="checkbox" id="propSlope"><label for="propSlope">Slope</label></div>
               <div class="prop-chip"><input type="checkbox" id="propHazard"><label for="propHazard">Hazard</label></div>
             </div>
-            ${fieldInline("Slope Angle", '<input type="range" id="slopeAngle" min="0" max="90" value="45" style="width:100%"><span id="slopeLabel" style="font-size:10px;min-width:24px">45\xB0</span>')}
+            ${_("Slope Angle",'<input type="range" id="slopeAngle" min="0" max="90" value="45" style="width:100%"><span id="slopeLabel" style="font-size:10px;min-width:24px">45\xB0</span>')}
           `)}
-          ${panelSection("Auto-Tile Rules", `
+          ${P("Auto-Tile Rules",`
             <div id="autoRules"></div>
             <button id="btnAddRule" style="margin-top:4px;width:100%">+ Add Rule</button>
           `)}
@@ -17934,10 +8863,10 @@ var TilesetEditor = class _TilesetEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusTotal">0 tiles</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('tilesetCanvas');
       const ctx = canvas.getContext('2d');
       const undo = new UndoStack();
@@ -18105,28 +9034,7 @@ var TilesetEditor = class _TilesetEditor extends WebviewEditor {
       });
 
       vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
-    `);
-  }
-};
-
-// src/editors/audioMixerEditor.ts
-var AudioMixerEditor = class _AudioMixerEditor extends WebviewEditor {
-  static open(context) {
-    return new _AudioMixerEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.audioMixerEditor", "Audio Mixer");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "mixer.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Audio Mixer", `
+    `)}};var Vn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.audioMixerEditor","Audio Mixer")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"mixer.lua");break}}getHtml(){let e=D();return B(e,"Audio Mixer",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 210px;
         grid-template-rows: auto 1fr auto;
@@ -18184,25 +9092,25 @@ var AudioMixerEditor = class _AudioMixerEditor extends WebviewEditor {
       .fx-item:hover { background: var(--hover); }
       .fx-item.sel { border-left: 2px solid var(--accent); }
       .bus-row { display: flex; align-items: center; gap: 4px; margin-bottom: 3px; font-size: 10px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAddCh", "Add Channel")}
-            ${iconButton(ICONS.delete, "btnRemCh", "Remove Channel")}
+            ${f(m.add,"btnAddCh","Add Channel")}
+            ${f(m.delete,"btnRemCh","Remove Channel")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnReset" title="Reset All" style="font-size:10px;padding:2px 8px">Reset</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="mixer-area" id="mixerArea"></div>
 
         <div class="fx-panel">
-          ${panelSection("Effects Chain", `
+          ${P("Effects Chain",`
             <div id="fxList"></div>
             <select id="addFx" style="width:100%;margin-top:4px;font-size:10px;">
               <option value="">+ Add Effect\u2026</option>
@@ -18214,8 +9122,8 @@ var AudioMixerEditor = class _AudioMixerEditor extends WebviewEditor {
               <option value="distortion">Distortion</option>
             </select>
           `)}
-          ${panelSection("Bus Routing", '<div id="busRouting"></div>')}
-          ${panelSection("Effect Params", `
+          ${P("Bus Routing",'<div id="busRouting"></div>')}
+          ${P("Effect Params",`
             <div id="fxParams"><p style="font-size:10px;color:var(--text-dim)">Select an effect</p></div>
           `)}
         </div>
@@ -18227,10 +9135,10 @@ var AudioMixerEditor = class _AudioMixerEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="stFx">0 fx</span>
           <div class="spacer"></div>
-          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       const NAMES = ['Master','Music','SFX','Voice','Ambient'];
       let channels = NAMES.map((name, i) => ({ name, vol: i===0?100:80, pan: 50, mute: false, solo: false, bus: 'master' }));
@@ -18344,28 +9252,7 @@ var AudioMixerEditor = class _AudioMixerEditor extends WebviewEditor {
 
       build(); buildFx(); buildBus();
       vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
-    `);
-  }
-};
-
-// src/editors/colorPaletteEditor.ts
-var ColorPaletteEditor = class _ColorPaletteEditor extends WebviewEditor {
-  static open(context) {
-    return new _ColorPaletteEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.colorPaletteEditor", "Color Palette");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "palette.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Color Palette", `
+    `)}};var Un=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.colorPaletteEditor","Color Palette")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"palette.lua");break}}getHtml(){let e=D();return B(e,"Color Palette",`
       .editor-layout {
         display: grid; grid-template-columns: 240px 1fr 210px;
         grid-template-rows: auto 1fr auto;
@@ -18416,41 +9303,41 @@ var ColorPaletteEditor = class _ColorPaletteEditor extends WebviewEditor {
       .contrast-no { background: var(--error); color: #fff; }
       .harmony-swatches { display: flex; gap: 3px; margin-top: 6px; justify-content: center; }
       .harmony-sw { width: 24px; height: 24px; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAdd", "Add Color")}
-            ${iconButton(ICONS.delete, "btnRem", "Remove Color")}
+            ${f(m.add,"btnAdd","Add Color")}
+            ${f(m.delete,"btnRem","Remove Color")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <select id="colorMode" style="font-size:10px">
               <option value="hsl">HSL</option>
               <option value="rgb">RGB</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnSortH" style="font-size:10px;padding:2px 6px">Sort Hue</button>
             <button id="btnSortL" style="font-size:10px;padding:2px 6px">Sort Light</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="picker-panel">
-          ${panelSection("Color Picker", `
+          ${P("Color Picker",`
             <div class="color-preview" id="colorPreview"></div>
             <input type="text" class="hex-input" id="hexInput" value="#89B4FA">
           `)}
-          ${panelSection("Sliders", `
+          ${P("Sliders",`
             <div class="slider-grp"><label>H <span id="hVal">217</span></label><input type="range" id="hSlider" min="0" max="360" value="217"></div>
             <div class="slider-grp"><label>S <span id="sVal">92</span></label><input type="range" id="sSlider" min="0" max="100" value="92"></div>
             <div class="slider-grp"><label>L <span id="lVal">76</span></label><input type="range" id="lSlider" min="0" max="100" value="76"></div>
             <div class="slider-grp"><label>A <span id="aVal">255</span></label><input type="range" id="aSlider" min="0" max="255" value="255"></div>
           `)}
-          ${panelSection("Accessibility", `
+          ${P("Accessibility",`
             <div style="font-size:10px">
               <p>On white: <span id="crW" class="contrast-pill">--</span></p>
               <p style="margin-top:3px">On black: <span id="crB" class="contrast-pill">--</span></p>
@@ -18464,7 +9351,7 @@ var ColorPaletteEditor = class _ColorPaletteEditor extends WebviewEditor {
         </div>
 
         <div class="harmony-panel">
-          ${panelSection("Harmony", `
+          ${P("Harmony",`
             <select id="harmType" style="width:100%;font-size:10px">
               <option value="complementary">Complementary</option>
               <option value="triadic">Triadic</option>
@@ -18485,10 +9372,10 @@ var ColorPaletteEditor = class _ColorPaletteEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="stTotal">0 colors</span>
           <div class="spacer"></div>
-          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let palette = [], selIdx = -1;
       let h = 217, s = 92, l = 76, a = 255;
@@ -18633,28 +9520,7 @@ var ColorPaletteEditor = class _ColorPaletteEditor extends WebviewEditor {
 
       updateColor(); renderPal();
       vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
-    `);
-  }
-};
-
-// src/editors/inputMapperEditor.ts
-var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
-  static open(context) {
-    return new _InputMapperEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.inputMapperEditor", "Input Mapper");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "input_map.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Input Mapper", `
+    `)}};var qn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.inputMapperEditor","Input Mapper")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"input_map.lua");break}}getHtml(){let e=D();return B(e,"Input Mapper",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 210px;
         grid-template-rows: auto 1fr auto;
@@ -18696,19 +9562,19 @@ var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
         background: var(--surface); padding: 20px 36px; border-radius: var(--radius);
         border: 2px solid var(--accent); text-align: center;
       }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAdd", "Add Action")}
-            ${iconButton(ICONS.delete, "btnRem", "Remove Action")}
+            ${f(m.add,"btnAdd","Add Action")}
+            ${f(m.delete,"btnRem","Remove Action")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnConflicts" style="font-size:10px;padding:2px 8px">Check Conflicts</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="mapping-area">
@@ -18724,15 +9590,15 @@ var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
         </div>
 
         <div class="config-panel">
-          ${panelSection("Selected Action", `
-            ${fieldInline("Name", '<input type="text" id="actName" style="width:100%">')}
-            ${fieldInline("Desc", '<input type="text" id="actDesc" style="width:100%">')}
+          ${P("Selected Action",`
+            ${_("Name",'<input type="text" id="actName" style="width:100%">')}
+            ${_("Desc",'<input type="text" id="actDesc" style="width:100%">')}
           `)}
-          ${panelSection("Analog", `
-            ${fieldInline("Dead Zone", '<input type="range" id="deadzone" min="0" max="50" value="15" style="flex:1"><span id="dzVal" style="font-size:9px;min-width:28px">0.15</span>')}
-            ${fieldInline("Sensitivity", '<input type="range" id="sens" min="1" max="30" value="10" style="flex:1"><span id="sensVal" style="font-size:9px;min-width:28px">1.0</span>')}
+          ${P("Analog",`
+            ${_("Dead Zone",'<input type="range" id="deadzone" min="0" max="50" value="15" style="flex:1"><span id="dzVal" style="font-size:9px;min-width:28px">0.15</span>')}
+            ${_("Sensitivity",'<input type="range" id="sens" min="1" max="30" value="10" style="flex:1"><span id="sensVal" style="font-size:9px;min-width:28px">1.0</span>')}
           `)}
-          ${panelSection("Presets", `
+          ${P("Presets",`
             <button id="prePlatformer" style="width:100%;margin-bottom:3px;font-size:10px">Platformer</button>
             <button id="preRPG" style="width:100%;margin-bottom:3px;font-size:10px">RPG</button>
             <button id="preShooter" style="width:100%;font-size:10px">Top-Down Shooter</button>
@@ -18744,7 +9610,7 @@ var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="stConf">0 conflicts</span>
           <div class="spacer"></div>
-          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="stDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
       <div class="listen-overlay" id="listenOverlay" style="display:none;">
@@ -18753,7 +9619,7 @@ var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
           <p style="font-size:10px;color:var(--text-dim)">Escape to cancel</p>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let actions = [
         { name:'move_left', desc:'Move left', keys:['a','left'], gamepad:['dpad_left','lstick_left'], dz:0.15, sens:1.0 },
@@ -18908,28 +9774,7 @@ var InputMapperEditor = class _InputMapperEditor extends WebviewEditor {
 
       build(); updateProps();
       vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
-    `);
-  }
-};
-
-// src/editors/timelineEditor.ts
-var TimelineEditor = class _TimelineEditor extends WebviewEditor {
-  static open(context) {
-    return new _TimelineEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.timelineEditor", "Timeline");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "timeline.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Timeline", `
+    `)}};var $n=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.timelineEditor","Timeline")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"timeline.lua");break}}getHtml(){let e=D();return B(e,"Timeline",`
       .editor-layout {
         display: grid; grid-template-columns: 140px 1fr 200px;
         grid-template-rows: auto 1fr auto;
@@ -18978,11 +9823,11 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
         left: -4px; cursor: pointer; pointer-events: auto; clip-path: polygon(0 0, 100% 0, 50% 100%);
       }
       .easing-preview { width: 100%; height: 50px; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAddTrack", "Add Track")}
+            ${f(m.add,"btnAddTrack","Add Track")}
             <select id="trackType" style="font-size:10px">
               <option value="dialog">Dialog</option>
               <option value="camera">Camera</option>
@@ -18991,13 +9836,13 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
               <option value="custom">Custom</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton(ICONS.play, "btnPlay", "Play")}
-            ${iconButton(ICONS.pause, "btnStop", "Stop")}
+            ${f(m.play,"btnPlay","Play")}
+            ${f(m.pause,"btnStop","Stop")}
             <span id="timeDisplay" style="font-family:var(--font-mono,monospace);font-size:11px;min-width:70px;">00:00.000</span>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label style="font-size:10px">Dur:</label><input type="number" id="duration" value="10" min="1" max="300" style="width:40px">
             <label style="font-size:10px;margin-left:4px">Snap:</label>
@@ -19009,13 +9854,13 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
               <option value="1">1s</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnAddKeyframe" style="font-size:10px;padding:2px 6px">+ KF</button>
             <button id="btnDeleteKeyframe" style="font-size:10px;padding:2px 6px;color:var(--error)">\xD7 KF</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="track-list" id="trackList"></div>
@@ -19030,10 +9875,10 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
         </div>
 
         <div class="props-panel">
-          ${panelSection("Keyframe", `
-            ${fieldInline("Time (s)", '<input type="number" id="kfTime" step="0.01" min="0">')}
-            ${fieldInline("Value", '<input type="text" id="kfValue">')}
-            ${fieldInline("Easing", `<select id="kfEasing" style="flex:1">
+          ${P("Keyframe",`
+            ${_("Time (s)",'<input type="number" id="kfTime" step="0.01" min="0">')}
+            ${_("Value",'<input type="text" id="kfValue">')}
+            ${_("Easing",`<select id="kfEasing" style="flex:1">
               <option value="linear">Linear</option>
               <option value="easeIn">Ease In</option>
               <option value="easeOut">Ease Out</option>
@@ -19043,11 +9888,11 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
             </select>`)}
             <canvas class="easing-preview" id="easingPreview"></canvas>
           `)}
-          ${panelSection("Segment", `
-            ${fieldInline("Label", '<input type="text" id="segLabel">')}
+          ${P("Segment",`
+            ${_("Label",'<input type="text" id="segLabel">')}
             <div style="display:flex;gap:4px">
-              ${fieldInline("Start", '<input type="number" id="segStart" step="0.1" style="width:56px">')}
-              ${fieldInline("End", '<input type="number" id="segEnd" step="0.1" style="width:56px">')}
+              ${_("Start",'<input type="number" id="segStart" step="0.1" style="width:56px">')}
+              ${_("End",'<input type="number" id="segEnd" step="0.1" style="width:56px">')}
             </div>
           `)}
         </div>
@@ -19059,10 +9904,10 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusDuration">10s</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const TRACK_ICONS = { dialog: '\\u{1F4AC}', camera: '\\u{1F3A5}', audio: '\\u{1F50A}', effects: '\\u2728', custom: '\\u{1F527}' };
       const undo = new UndoStack();
       let tracks = [
@@ -19247,28 +10092,7 @@ var TimelineEditor = class _TimelineEditor extends WebviewEditor {
 
       build(); drawEasingPreview('linear');
       vscode.postMessage({ type: 'stateChanged', state: { ready: true } });
-    `);
-  }
-};
-
-// src/editors/shaderPreviewEditor.ts
-var ShaderPreviewEditor = class _ShaderPreviewEditor extends WebviewEditor {
-  static open(context) {
-    return new _ShaderPreviewEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.shaderPreviewEditor", "Shader Preview");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "shader.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Shader Preview", `
+    `)}};var Yn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.shaderPreviewEditor","Shader Preview")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"shader.lua");break}}getHtml(){let e=D();return B(e,"Shader Preview",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 1fr;
         grid-template-rows: auto 1fr auto;
@@ -19301,7 +10125,7 @@ var ShaderPreviewEditor = class _ShaderPreviewEditor extends WebviewEditor {
       }
       .preset-btn:hover { background: var(--hover); }
       .preset-btn.sel { background: var(--accent); color: var(--bg); }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
@@ -19313,13 +10137,13 @@ var ShaderPreviewEditor = class _ShaderPreviewEditor extends WebviewEditor {
             <button class="preset-btn" data-preset="wave">Wave</button>
             <button class="preset-btn" data-preset="custom">Custom</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton(ICONS.play, "btnRun", "Run")}
-            ${iconButton(ICONS.pause, "btnPause", "Pause")}
+            ${f(m.play,"btnRun","Run")}
+            ${f(m.pause,"btnPause","Pause")}
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="code-area">
@@ -19341,10 +10165,10 @@ var ShaderPreviewEditor = class _ShaderPreviewEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="perfTime" style="font-family:var(--font-mono,monospace)">Frame: -- ms</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('previewCanvas');
       const ctx = canvas.getContext('2d');
       const editor = document.getElementById('codeEditor');
@@ -19456,28 +10280,7 @@ var ShaderPreviewEditor = class _ShaderPreviewEditor extends WebviewEditor {
       document.getElementById('btnExport').addEventListener('click', () => { vscode.postMessage({ type: 'exportLua', content: editor.value }); });
 
       loadPreset('blur'); renderPreview();
-    `);
-  }
-};
-
-// src/editors/fontPreviewEditor.ts
-var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
-  static open(context) {
-    return new _FontPreviewEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.fontPreviewEditor", "Font Preview");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "font_config.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Font Preview", `
+    `)}};var Xn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.fontPreviewEditor","Font Preview")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"font_config.lua");break}}getHtml(){let e=D();return B(e,"Font Preview",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 200px;
         grid-template-rows: auto 1fr auto;
@@ -19503,7 +10306,7 @@ var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
       .size-preview { border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 8px; }
       .color-row { display: flex; align-items: center; gap: 6px; }
       .preset-size { font-size: 10px; padding: 2px 6px; min-width: 26px; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
@@ -19516,19 +10319,19 @@ var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
               <option value="fantasy">Fantasy</option>
             </select>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <label style="font-size:10px">Size:</label>
             <input type="range" id="fontSize" min="8" max="72" value="24" style="width:80px">
             <span id="sizeLabel" style="font-size:10px;min-width:30px">24pt</span>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnBold" style="font-weight:700;font-size:11px;padding:2px 6px">B</button>
             <button id="btnItalic" style="font-style:italic;font-size:11px;padding:2px 6px">I</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="preview-area" id="previewArea">
@@ -19549,27 +10352,27 @@ var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
         </div>
 
         <div class="config-panel">
-          ${panelSection("Text Color", `
+          ${P("Text Color",`
             <div class="color-row">
               <input type="color" id="textColor" value="#cccccc">
               <span id="textColorHex" style="font-size:10px">#cccccc</span>
             </div>
           `)}
-          ${panelSection("Background", `
+          ${P("Background",`
             <div class="color-row">
               <input type="color" id="bgColor" value="#1e1e1e">
               <span id="bgColorHex" style="font-size:10px">#1e1e1e</span>
             </div>
           `)}
-          ${panelSection("Spacing", `
-            ${fieldInline('Line Height: <span id="lhVal">1.5</span>', '<input type="range" id="lineHeight" min="10" max="30" value="15" style="width:100%">')}
-            ${fieldInline('Letter Spacing: <span id="lsVal">0</span>px', '<input type="range" id="letterSpacing" min="-5" max="20" value="0" style="width:100%">')}
+          ${P("Spacing",`
+            ${_('Line Height: <span id="lhVal">1.5</span>','<input type="range" id="lineHeight" min="10" max="30" value="15" style="width:100%">')}
+            ${_('Letter Spacing: <span id="lsVal">0</span>px','<input type="range" id="letterSpacing" min="-5" max="20" value="0" style="width:100%">')}
           `)}
-          ${panelSection("Selected Glyph", `
+          ${P("Selected Glyph",`
             <div style="text-align:center;font-size:40px;padding:8px;" id="selectedGlyph">A</div>
             <div style="text-align:center;font-size:10px;color:var(--text-dim);" id="glyphInfo">U+0041 | Code: 65</div>
           `)}
-          ${panelSection("Quick Sizes", `
+          ${P("Quick Sizes",`
             <div style="display:flex;flex-wrap:wrap;gap:3px">
               <button class="preset-size" data-s="8">8</button>
               <button class="preset-size" data-s="12">12</button>
@@ -19589,10 +10392,10 @@ var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusGlyphs">95 glyphs</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       let fontFamily = 'sans-serif', fontSize = 24, bold = false, italic = false;
       let textColor = '#cccccc', bgColor = '#1e1e1e', lineHeight = 1.5, letterSpacing = 0;
       const PRINTABLE_START = 32, PRINTABLE_END = 126;
@@ -19663,31 +10466,7 @@ var FontPreviewEditor = class _FontPreviewEditor extends WebviewEditor {
       registerShortcut('ctrl+s', () => document.getElementById('btnExport').click());
 
       updatePreview(); buildGlyphGrid();
-    `);
-  }
-};
-
-// src/editors/localizationEditor.ts
-var LocalizationEditor = class _LocalizationEditor extends WebviewEditor {
-  static open(context) {
-    return new _LocalizationEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.localizationEditor", "Localization");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "strings.lua");
-        break;
-      case "exportJson":
-        this.exportFile(msg.content, "strings.json", "JSON", "json");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Localization", `
+    `)}};var Zn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.localizationEditor","Localization")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"strings.lua");break;case"exportJson":this.exportFile(e.content,"strings.json","JSON","json");break}}getHtml(){let e=D();return B(e,"Localization",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr;
         grid-template-rows: auto auto 1fr auto auto;
@@ -19718,26 +10497,26 @@ var LocalizationEditor = class _LocalizationEditor extends WebviewEditor {
       .coverage-bar { display: flex; align-items: center; gap: 4px; font-size: 10px; }
       .coverage-fill { width: 50px; height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; }
       .coverage-fill-inner { height: 100%; border-radius: 3px; transition: width 0.3s; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAddKey", "Add Key")}
-            ${iconButton(ICONS.trash, "btnRemoveKey", "Remove Key")}
+            ${f(m.add,"btnAddKey","Add Key")}
+            ${f(m.trash,"btnRemoveKey","Remove Key")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnAddLang" style="font-size:10px;padding:2px 6px">+ Lang</button>
             <button id="btnRemoveLang" style="font-size:10px;padding:2px 6px;color:var(--error)">- Lang</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnImportJson" style="font-size:10px;padding:2px 6px">Import JSON</button>
           </div>
-          ${toolbarSpacer()}
+          ${A()}
           <div class="group">
             <button id="btnExportJson" style="font-size:10px;padding:2px 6px">JSON</button>
-            ${iconButton(ICONS.save, "btnExportLua", "Export Lua")}
+            ${f(m.save,"btnExportLua","Export Lua")}
           </div>
         </div>
 
@@ -19768,10 +10547,10 @@ var LocalizationEditor = class _LocalizationEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusTotal">translations</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let languages = ['en', 'es', 'fr', 'de'];
       let baseLang = 'en';
@@ -19890,28 +10669,7 @@ var LocalizationEditor = class _LocalizationEditor extends WebviewEditor {
       });
 
       build();
-    `);
-  }
-};
-
-// src/editors/physicsMaterialsEditor.ts
-var PhysicsMaterialsEditor = class _PhysicsMaterialsEditor extends WebviewEditor {
-  static open(context) {
-    return new _PhysicsMaterialsEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.physicsMaterialsEditor", "Physics Materials");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "physics_materials.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "Physics Materials", `
+    `)}};var Qn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.physicsMaterialsEditor","Physics Materials")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"physics_materials.lua");break}}getHtml(){let e=D();return B(e,"Physics Materials",`
       .editor-layout {
         display: grid; grid-template-columns: 160px 1fr 200px;
         grid-template-rows: auto 1fr auto;
@@ -19941,20 +10699,20 @@ var PhysicsMaterialsEditor = class _PhysicsMaterialsEditor extends WebviewEditor
       .slider-row { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
       .slider-row input[type="range"] { flex: 1; }
       .slider-row .val { font-family: var(--font-mono,monospace); font-size: 10px; min-width: 32px; text-align: right; }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAdd", "Add Material")}
+            ${f(m.add,"btnAdd","Add Material")}
             <button id="btnDuplicate" style="font-size:10px;padding:2px 6px">Dup</button>
-            ${iconButton(ICONS.trash, "btnRemove", "Remove")}
+            ${f(m.trash,"btnRemove","Remove")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button id="btnPresets" style="font-size:10px;padding:2px 6px">Presets</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="material-list" id="materialList"></div>
@@ -19970,16 +10728,16 @@ var PhysicsMaterialsEditor = class _PhysicsMaterialsEditor extends WebviewEditor
         </div>
 
         <div class="props-panel">
-          ${panelSection("Material", `
-            ${fieldInline("Name", '<input type="text" id="matName" style="width:100%">')}
-            ${fieldInline("Color", '<input type="color" id="matColor" value="#89b4fa">')}
+          ${P("Material",`
+            ${_("Name",'<input type="text" id="matName" style="width:100%">')}
+            ${_("Color",'<input type="color" id="matColor" value="#89b4fa">')}
           `)}
-          ${panelSection("Physics", `
+          ${P("Physics",`
             <div class="slider-row"><label style="font-size:10px;min-width:60px">Friction</label><input type="range" id="friction" min="0" max="100" value="50"><span class="val" id="frictionVal">0.50</span></div>
             <div class="slider-row"><label style="font-size:10px;min-width:60px">Bounce</label><input type="range" id="restitution" min="0" max="100" value="30"><span class="val" id="restitutionVal">0.30</span></div>
             <div class="slider-row"><label style="font-size:10px;min-width:60px">Density</label><input type="range" id="density" min="1" max="200" value="10"><span class="val" id="densityVal">1.0</span></div>
           `)}
-          ${panelSection("Collision Layer", `
+          ${P("Collision Layer",`
             <select id="collisionLayer" style="width:100%;font-size:10px">
               <option value="0">Layer 0 (Default)</option>
               <option value="1">Layer 1</option>
@@ -20000,10 +10758,10 @@ var PhysicsMaterialsEditor = class _PhysicsMaterialsEditor extends WebviewEditor
           <div class="sep"></div>
           <span id="statusLayers">8 layers</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const undo = new UndoStack();
       let materials = [
         { name: 'Default', friction: 0.5, restitution: 0.3, density: 1.0, layer: 0, color: '#858585' },
@@ -20130,28 +10888,7 @@ var PhysicsMaterialsEditor = class _PhysicsMaterialsEditor extends WebviewEditor
       });
 
       build(); updateProps(); animatePreview();
-    `);
-  }
-};
-
-// src/editors/worldMapEditor.ts
-var WorldMapEditor = class _WorldMapEditor extends WebviewEditor {
-  static open(context) {
-    return new _WorldMapEditor(context);
-  }
-  constructor(context) {
-    super(context, "lurek.worldMapEditor", "World Map");
-  }
-  handleMessage(msg) {
-    switch (msg.type) {
-      case "exportLua":
-        this.exportLua(msg.content, "world_map.lua");
-        break;
-    }
-  }
-  getHtml() {
-    const nonce = getNonce();
-    return wrapHtml(nonce, "World Map", `
+    `)}};var Jn=class n extends I{static open(e){return new n(e)}constructor(e){super(e,"lurek.worldMapEditor","World Map")}handleMessage(e){switch(e.type){case"exportLua":this.exportLua(e.content,"world_map.lua");break}}getHtml(){let e=D();return B(e,"World Map",`
       .editor-layout {
         display: grid; grid-template-columns: 1fr 200px;
         grid-template-rows: auto 1fr auto;
@@ -20176,30 +10913,30 @@ var WorldMapEditor = class _WorldMapEditor extends WebviewEditor {
       .room-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
       .mode-btn { font-size: 10px; padding: 2px 7px; }
       .mode-btn.sel { background: var(--accent); color: var(--bg); }
-    `, `
+    `,`
       <div class="editor-layout">
         <div class="toolbar">
           <div class="group">
-            ${iconButton(ICONS.add, "btnAddRoom", "Add Room")}
-            ${iconButton(ICONS.trash, "btnRemoveRoom", "Remove")}
+            ${f(m.add,"btnAddRoom","Add Room")}
+            ${f(m.trash,"btnRemoveRoom","Remove")}
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <button class="mode-btn sel" id="btnConnect">Connect</button>
             <button class="mode-btn" id="btnMove">Move</button>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
             <input type="checkbox" id="snapGrid" checked><label style="font-size:10px" for="snapGrid">Snap</label>
           </div>
-          ${toolbarSep()}
+          ${k()}
           <div class="group">
-            ${iconButton(ICONS.zoomIn, "btnZoomIn", "Zoom In")}
-            ${iconButton(ICONS.zoomOut, "btnZoomOut", "Zoom Out")}
+            ${f(m.zoomIn,"btnZoomIn","Zoom In")}
+            ${f(m.zoomOut,"btnZoomOut","Zoom Out")}
             <button id="btnFitAll" style="font-size:10px;padding:2px 6px">Fit</button>
           </div>
-          ${toolbarSpacer()}
-          ${iconButton(ICONS.save, "btnExport", "Export Lua")}
+          ${A()}
+          ${f(m.save,"btnExport","Export Lua")}
         </div>
 
         <div class="canvas-area">
@@ -20207,18 +10944,18 @@ var WorldMapEditor = class _WorldMapEditor extends WebviewEditor {
         </div>
 
         <div class="props-panel">
-          ${panelSection("Minimap", '<canvas class="minimap" id="minimap"></canvas>')}
-          ${panelSection("Room", `
-            ${fieldInline("Name", '<input type="text" id="roomName" style="width:100%">')}
+          ${P("Minimap",'<canvas class="minimap" id="minimap"></canvas>')}
+          ${P("Room",`
+            ${_("Name",'<input type="text" id="roomName" style="width:100%">')}
             <div style="display:flex;gap:4px">
-              ${fieldInline("W", '<input type="number" id="roomW" min="40" max="400" value="120" style="width:50px">')}
-              ${fieldInline("H", '<input type="number" id="roomH" min="30" max="300" value="80" style="width:50px">')}
+              ${_("W",'<input type="number" id="roomW" min="40" max="400" value="120" style="width:50px">')}
+              ${_("H",'<input type="number" id="roomH" min="30" max="300" value="80" style="width:50px">')}
             </div>
-            ${fieldInline("Color", '<input type="color" id="roomColor" value="#2d5a88">')}
-            ${fieldInline("BG", '<input type="text" id="roomBg" placeholder="bg.png" style="width:100%">')}
+            ${_("Color",'<input type="color" id="roomColor" value="#2d5a88">')}
+            ${_("BG",'<input type="text" id="roomBg" placeholder="bg.png" style="width:100%">')}
           `)}
-          ${panelSection("Rooms", '<div class="room-list" id="roomList"></div>')}
-          ${panelSection("Connections", '<div id="connectionList" style="font-size:10px;max-height:80px;overflow-y:auto;"></div>')}
+          ${P("Rooms",'<div class="room-list" id="roomList"></div>')}
+          ${P("Connections",'<div id="connectionList" style="font-size:10px;max-height:80px;overflow-y:auto;"></div>')}
         </div>
 
         <div class="status-bar">
@@ -20230,10 +10967,10 @@ var WorldMapEditor = class _WorldMapEditor extends WebviewEditor {
           <div class="sep"></div>
           <span id="statusPos" style="font-family:var(--font-mono,monospace)">0, 0</span>
           <div class="spacer"></div>
-          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${ICONS.clean}</span>
+          <span id="statusDirty" style="font-size:10px;color:var(--text-dim)">${m.clean}</span>
         </div>
       </div>
-    `, `
+    `,`
       const canvas = document.getElementById('mapCanvas');
       const ctx = canvas.getContext('2d');
       const miniCanvas = document.getElementById('minimap');
@@ -20368,253 +11105,13 @@ var WorldMapEditor = class _WorldMapEditor extends WebviewEditor {
         lua+='  }\\n}';vscode.postMessage({type:'exportLua',content:lua});
       });
       window.addEventListener('resize',resizeCanvas); resizeCanvas(); updateList(); updateProps();
-    `);
-  }
-};
-
-// src/commands/editors.ts
-var EDITORS = [
-  { id: "tileMap", open: (ctx) => TileMapEditor.open(ctx) },
-  { id: "sceneFlow", open: (ctx) => SceneFlowEditor.open(ctx) },
-  { id: "ecs", open: (ctx) => EntityEditor.open(ctx) },
-  { id: "pixelArt", open: (ctx) => PixelArtEditor.open(ctx) },
-  { id: "particle", open: (ctx) => ParticleEditor.open(ctx) },
-  { id: "dialog", open: (ctx) => DialogEditor.open(ctx) },
-  { id: "database", open: (ctx) => DatabaseEditor.open(ctx) },
-  { id: "procMap", open: (ctx) => ProcMapEditor.open(ctx) },
-  { id: "questTree", open: (ctx) => QuestTreeEditor.open(ctx) },
-  { id: "guiWidget", open: (ctx) => GuiWidgetEditor.open(ctx) },
-  { id: "aiBehavior", open: (ctx) => AiBehaviorEditor.open(ctx) },
-  { id: "graph", open: (ctx) => GraphEditor.open(ctx) },
-  { id: "tilemapScript", open: (ctx) => TilemapScriptEditor.open(ctx) },
-  { id: "voxel", open: (ctx) => VoxelEditor.open(ctx) },
-  { id: "testRunner", open: (ctx) => TestRunnerEditor.open(ctx) },
-  { id: "apiReference", open: (ctx) => ApiReferenceEditor.open(ctx) },
-  { id: "postfxOverlay", open: (ctx) => PostFxOverlayEditor.open(ctx) },
-  { id: "soundDsp", open: (ctx) => SoundDspEditor.open(ctx) },
-  { id: "spriteAnim", open: (ctx) => SpriteAnimEditor.open(ctx) },
-  { id: "tileset", open: (ctx) => TilesetEditor.open(ctx) },
-  { id: "audioMixer", open: (ctx) => AudioMixerEditor.open(ctx) },
-  { id: "colorPalette", open: (ctx) => ColorPaletteEditor.open(ctx) },
-  { id: "inputMapper", open: (ctx) => InputMapperEditor.open(ctx) },
-  { id: "timeline", open: (ctx) => TimelineEditor.open(ctx) },
-  { id: "shaderPreview", open: (ctx) => ShaderPreviewEditor.open(ctx) },
-  { id: "fontPreview", open: (ctx) => FontPreviewEditor.open(ctx) },
-  { id: "i18n", open: (ctx) => LocalizationEditor.open(ctx) },
-  { id: "physicsMaterials", open: (ctx) => PhysicsMaterialsEditor.open(ctx) },
-  { id: "worldMap", open: (ctx) => WorldMapEditor.open(ctx) }
-];
-function registerEditorCommands(context) {
-  return EDITORS.map(
-    (entry) => vscode31.commands.registerCommand(
-      `lurek.editor.${entry.id}`,
-      () => entry.open(context)
-    )
-  );
-}
-
-// src/commands/reference.ts
-var vscode32 = __toESM(require("vscode"));
-var path15 = __toESM(require("path"));
-var fs12 = __toESM(require("fs"));
-init_apiDocs();
-async function browseApi() {
-  const root = vscode32.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode32.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const apiPath = resolveWorkspaceApiDocPath(root);
-  if (!apiPath || !fs12.existsSync(apiPath)) {
-    vscode32.window.showWarningMessage(
-      "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
-    );
-    return;
-  }
-  const content = fs12.readFileSync(apiPath, "utf-8");
-  const entries = listApiEntries(content, apiPath);
-  if (entries.length === 0) {
-    vscode32.window.showInformationMessage("No API entries found.");
-    return;
-  }
-  const picked = await vscode32.window.showQuickPick(entries.map((entry) => ({
-    label: entry.label,
-    description: entry.kind,
-    line: entry.line
-  })), {
-    placeHolder: "Search Lurek2D API...",
-    matchOnDescription: true
-  });
-  if (picked) {
-    const doc = await vscode32.workspace.openTextDocument(apiPath);
-    const editor = await vscode32.window.showTextDocument(doc);
-    const lineIndex = typeof picked.line === "number" ? picked.line : findApiSymbolLine(content, apiPath, picked.label);
-    if (lineIndex >= 0) {
-      const pos = new vscode32.Position(lineIndex, 0);
-      editor.selection = new vscode32.Selection(pos, pos);
-      editor.revealRange(new vscode32.Range(pos, pos));
-    }
-  }
-}
-async function openApiDocs() {
-  const root = vscode32.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode32.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const apiPath = resolveWorkspaceApiDocPath(root);
-  if (!apiPath || !fs12.existsSync(apiPath)) {
-    vscode32.window.showWarningMessage(
-      "API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md."
-    );
-    return;
-  }
-  const doc = await vscode32.workspace.openTextDocument(apiPath);
-  await vscode32.window.showTextDocument(doc);
-}
-async function openWiki() {
-  const editor = vscode32.window.activeTextEditor;
-  const wordRange = editor?.document.getWordRangeAtPosition(
-    editor.selection.active,
-    /lurek\.[a-zA-Z0-9_.]+/
-  );
-  const symbol = wordRange ? editor.document.getText(wordRange) : void 0;
-  const root = vscode32.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode32.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const docPath = resolveWorkspaceApiDocPath(root) ?? null;
-  if (docPath) {
-    const content = fs12.readFileSync(docPath, "utf-8");
-    if (symbol) {
-      const lineIndex = findApiSymbolLine(content, docPath, symbol);
-      const doc = await vscode32.workspace.openTextDocument(docPath);
-      const editorDoc = await vscode32.window.showTextDocument(doc);
-      const pos = new vscode32.Position(Math.max(0, lineIndex), 0);
-      editorDoc.selection = new vscode32.Selection(pos, pos);
-      editorDoc.revealRange(new vscode32.Range(pos, pos), vscode32.TextEditorRevealType.InCenter);
-      if (lineIndex < 0) {
-        vscode32.window.showInformationMessage(`"${symbol}" not found in API docs \u2014 showing full reference.`);
-      }
-    } else {
-      const doc = await vscode32.workspace.openTextDocument(docPath);
-      await vscode32.window.showTextDocument(doc);
-    }
-  } else {
-    await browseApi();
-  }
-}
-function depGraph(context) {
-  const root = vscode32.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  const panel = vscode32.window.createWebviewPanel(
-    "lurek.depGraph",
-    "Lurek2D Module Dependency Graph",
-    vscode32.ViewColumn.One,
-    { enableScripts: true, retainContextWhenHidden: true }
-  );
-  const nodes = [];
-  const edges = [];
-  const tiers = {
-    math: "leaf",
-    engine: "core",
-    lua_api: "integration",
-    window: "core",
-    graphics: "domain",
-    physics: "domain",
-    audio: "domain",
-    input: "domain",
-    timer: "domain",
-    filesystem: "domain",
-    tilemap: "domain",
-    sound: "domain",
-    ai: "domain",
-    compute: "domain",
-    data: "domain",
-    dataframe: "domain",
-    entity: "domain",
-    event: "domain",
-    graph: "domain",
-    image: "domain",
-    modding: "domain",
-    particle: "domain",
-    savegame: "domain",
-    scene: "domain",
-    stats: "domain",
-    thread: "domain",
-    pathfinding: "domain",
-    dialog: "domain",
-    cardgame: "domain",
-    combat: "domain",
-    crafting: "domain",
-    inventory: "domain",
-    quest: "domain",
-    resource: "domain"
-  };
-  if (root) {
-    const srcDir = path15.join(root, "src");
-    if (fs12.existsSync(srcDir)) {
-      const dirs = fs12.readdirSync(srcDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-      for (const dir of dirs) {
-        nodes.push({ id: dir, tier: tiers[dir] ?? "domain" });
-      }
-      for (const dir of dirs) {
-        const modFile = path15.join(srcDir, dir, "mod.rs");
-        const libFile = path15.join(srcDir, dir, "lib.rs");
-        const candidate = fs12.existsSync(modFile) ? modFile : fs12.existsSync(libFile) ? libFile : null;
-        if (!candidate) continue;
-        try {
-          const src = fs12.readFileSync(candidate, "utf-8");
-          const matches = [...src.matchAll(/use crate::([a-z_]+)/g)];
-          const seen = /* @__PURE__ */ new Set();
-          for (const m of matches) {
-            const dep = m[1];
-            if (dep !== dir && dirs.includes(dep) && !seen.has(dep)) {
-              seen.add(dep);
-              edges.push({ from: dir, to: dep });
-            }
-          }
-        } catch {
-        }
-      }
-    }
-  }
-  if (nodes.length === 0) {
-    for (const [id, tier] of Object.entries(tiers)) {
-      nodes.push({ id, tier });
-    }
-    const archEdges = [
-      { from: "engine", to: "math" },
-      { from: "render", to: "math" },
-      { from: "physics", to: "math" },
-      { from: "audio", to: "math" },
-      { from: "input", to: "math" },
-      { from: "timer", to: "math" },
-      { from: "lua_api", to: "engine" },
-      { from: "lua_api", to: "render" },
-      { from: "lua_api", to: "physics" },
-      { from: "lua_api", to: "audio" },
-      { from: "lua_api", to: "input" },
-      { from: "lua_api", to: "timer" },
-      { from: "lua_api", to: "filesystem" },
-      { from: "lua_api", to: "tilemap" },
-      { from: "lua_api", to: "ai" },
-      { from: "lua_api", to: "ecs" },
-      { from: "lua_api", to: "scene" },
-      { from: "lua_api", to: "particle" }
-    ];
-    edges.push(...archEdges);
-  }
-  const nonce = getNonce2();
-  const nodesJson = JSON.stringify(nodes);
-  const edgesJson = JSON.stringify(edges);
-  panel.webview.html = `<!DOCTYPE html>
+    `)}};var lp=[{id:"tileMap",open:n=>xn.open(n)},{id:"sceneFlow",open:n=>Pn.open(n)},{id:"ecs",open:n=>Mn.open(n)},{id:"pixelArt",open:n=>Sn.open(n)},{id:"particle",open:n=>kn.open(n)},{id:"dialog",open:n=>jn.open(n)},{id:"database",open:n=>Cn.open(n)},{id:"procMap",open:n=>In.open(n)},{id:"questTree",open:n=>En.open(n)},{id:"guiWidget",open:n=>Dn.open(n)},{id:"aiBehavior",open:n=>Bn.open(n)},{id:"graph",open:n=>An.open(n)},{id:"tilemapScript",open:n=>Fn.open(n)},{id:"voxel",open:n=>On.open(n)},{id:"testRunner",open:n=>zn.open(n)},{id:"apiReference",open:n=>_n.open(n)},{id:"postfxOverlay",open:n=>Nn.open(n)},{id:"soundDsp",open:n=>Wn.open(n)},{id:"spriteAnim",open:n=>Gn.open(n)},{id:"tileset",open:n=>Hn.open(n)},{id:"audioMixer",open:n=>Vn.open(n)},{id:"colorPalette",open:n=>Un.open(n)},{id:"inputMapper",open:n=>qn.open(n)},{id:"timeline",open:n=>$n.open(n)},{id:"shaderPreview",open:n=>Yn.open(n)},{id:"fontPreview",open:n=>Xn.open(n)},{id:"i18n",open:n=>Zn.open(n)},{id:"physicsMaterials",open:n=>Qn.open(n)},{id:"worldMap",open:n=>Jn.open(n)}];function eo(n){return lp.map(e=>Ki.commands.registerCommand(`lurek.editor.${e.id}`,()=>e.open(n)))}var H=C(require("vscode")),Kn=C(require("path")),Be=C(require("fs"));Jt();async function er(){let n=H.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!n){H.window.showErrorMessage("No workspace folder open.");return}let e=Je(n);if(!e||!Be.existsSync(e)){H.window.showWarningMessage("API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md.");return}let t=Be.readFileSync(e,"utf-8"),r=za(t,e);if(r.length===0){H.window.showInformationMessage("No API entries found.");return}let a=await H.window.showQuickPick(r.map(i=>({label:i.label,description:i.kind,line:i.line})),{placeHolder:"Search Lurek2D API...",matchOnDescription:!0});if(a){let i=await H.workspace.openTextDocument(e),o=await H.window.showTextDocument(i),s=typeof a.line=="number"?a.line:xr(t,e,a.label);if(s>=0){let l=new H.Position(s,0);o.selection=new H.Selection(l,l),o.revealRange(new H.Range(l,l))}}}async function to(){let n=H.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!n){H.window.showErrorMessage("No workspace folder open.");return}let e=Je(n);if(!e||!Be.existsSync(e)){H.window.showWarningMessage("API reference not found. Expected docs/api/lurek.lua or docs/api/lurek.md.");return}let t=await H.workspace.openTextDocument(e);await H.window.showTextDocument(t)}async function no(){let n=H.window.activeTextEditor,e=n?.document.getWordRangeAtPosition(n.selection.active,/lurek\.[a-zA-Z0-9_.]+/),t=e?n.document.getText(e):void 0,r=H.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!r){H.window.showErrorMessage("No workspace folder open.");return}let a=Je(r)??null;if(a){let i=Be.readFileSync(a,"utf-8");if(t){let o=xr(i,a,t),s=await H.workspace.openTextDocument(a),l=await H.window.showTextDocument(s),p=new H.Position(Math.max(0,o),0);l.selection=new H.Selection(p,p),l.revealRange(new H.Range(p,p),H.TextEditorRevealType.InCenter),o<0&&H.window.showInformationMessage(`"${t}" not found in API docs \u2014 showing full reference.`)}else{let o=await H.workspace.openTextDocument(a);await H.window.showTextDocument(o)}}else await er()}function Qr(n){let e=H.workspace.workspaceFolders?.[0]?.uri.fsPath,t=H.window.createWebviewPanel("lurek.depGraph","Lurek2D Module Dependency Graph",H.ViewColumn.One,{enableScripts:!0,retainContextWhenHidden:!0}),r=[],a=[],i={math:"leaf",engine:"core",lua_api:"integration",window:"core",graphics:"domain",physics:"domain",audio:"domain",input:"domain",timer:"domain",filesystem:"domain",tilemap:"domain",sound:"domain",ai:"domain",compute:"domain",data:"domain",dataframe:"domain",entity:"domain",event:"domain",graph:"domain",image:"domain",modding:"domain",particle:"domain",savegame:"domain",scene:"domain",stats:"domain",thread:"domain",pathfinding:"domain",dialog:"domain",cardgame:"domain",combat:"domain",crafting:"domain",inventory:"domain",quest:"domain",resource:"domain"};if(e){let p=Kn.join(e,"src");if(Be.existsSync(p)){let u=Be.readdirSync(p,{withFileTypes:!0}).filter(c=>c.isDirectory()).map(c=>c.name);for(let c of u)r.push({id:c,tier:i[c]??"domain"});for(let c of u){let h=Kn.join(p,c,"mod.rs"),L=Kn.join(p,c,"lib.rs"),d=Be.existsSync(h)?h:Be.existsSync(L)?L:null;if(d)try{let v=[...Be.readFileSync(d,"utf-8").matchAll(/use crate::([a-z_]+)/g)],x=new Set;for(let w of v){let T=w[1];T!==c&&u.includes(T)&&!x.has(T)&&(x.add(T),a.push({from:c,to:T}))}}catch{}}}}if(r.length===0){for(let[u,c]of Object.entries(i))r.push({id:u,tier:c});let p=[{from:"engine",to:"math"},{from:"render",to:"math"},{from:"physics",to:"math"},{from:"audio",to:"math"},{from:"input",to:"math"},{from:"timer",to:"math"},{from:"lua_api",to:"engine"},{from:"lua_api",to:"render"},{from:"lua_api",to:"physics"},{from:"lua_api",to:"audio"},{from:"lua_api",to:"input"},{from:"lua_api",to:"timer"},{from:"lua_api",to:"filesystem"},{from:"lua_api",to:"tilemap"},{from:"lua_api",to:"ai"},{from:"lua_api",to:"ecs"},{from:"lua_api",to:"scene"},{from:"lua_api",to:"particle"}];a.push(...p)}let o=pp(),s=JSON.stringify(r),l=JSON.stringify(a);t.webview.html=`<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${nonce}'; style-src 'nonce-${nonce}';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'nonce-${o}'; style-src 'nonce-${o}';">
 <title>Module Dependency Graph</title>
-<style nonce="${nonce}">
+<style nonce="${o}">
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: var(--vscode-font-family); background: var(--vscode-editor-background); color: var(--vscode-foreground); overflow: hidden; height: 100vh; }
   #toolbar { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid var(--vscode-panel-border,#444); flex-wrap: wrap; font-size: 12px; }
@@ -20647,9 +11144,9 @@ function depGraph(context) {
 </div>
 <canvas id="c"></canvas>
 <div id="tooltip"></div>
-<script nonce="${nonce}">
-const NODES = ${nodesJson};
-const EDGES = ${edgesJson};
+<script nonce="${o}">
+const NODES = ${s};
+const EDGES = ${l};
 
 const COLORS = { leaf:'#4ec9b0', core:'#569cd6', integration:'#dcdcaa', domain:'#9cdcfe' };
 const canvas = document.getElementById('c');
@@ -20819,696 +11316,19 @@ simulate(400);
 draw();
 </script>
 </body>
-</html>`;
-}
-function depList() {
-  const terminal = vscode32.window.createTerminal("Lurek2D Deps");
-  terminal.show();
-  terminal.sendText("cargo tree --depth 1");
-}
-function getNonce2() {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < 32; i++) {
-    result += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return result;
-}
-
-// src/commands/cag.ts
-var vscode33 = __toESM(require("vscode"));
-var path16 = __toESM(require("path"));
-var fs13 = __toESM(require("fs"));
-async function installCag() {
-  const root = vscode33.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode33.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  let engineGithub = null;
-  let dir = __dirname;
-  for (let i = 0; i < 6; i++) {
-    const candidate = path16.join(dir, ".github");
-    if (fs13.existsSync(candidate)) {
-      engineGithub = candidate;
-      break;
-    }
-    dir = path16.dirname(dir);
-  }
-  if (!engineGithub) {
-    vscode33.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the lurek2d repository root.");
-    return;
-  }
-  const targetDir = path16.join(root, ".github");
-  if (fs13.existsSync(targetDir)) {
-    const overwrite = await vscode33.window.showWarningMessage(
-      ".github/ directory already exists in your workspace. Overwrite all CAG files?",
-      "Yes \u2014 Overwrite",
-      "Cancel"
-    );
-    if (overwrite !== "Yes \u2014 Overwrite") {
-      return;
-    }
-  }
-  let copied = 0;
-  function copyDir(src, dest) {
-    fs13.mkdirSync(dest, { recursive: true });
-    for (const entry of fs13.readdirSync(src, { withFileTypes: true })) {
-      const s = path16.join(src, entry.name), d = path16.join(dest, entry.name);
-      if (entry.isDirectory()) {
-        copyDir(s, d);
-      } else {
-        fs13.copyFileSync(s, d);
-        copied++;
-      }
-    }
-  }
-  try {
-    copyDir(engineGithub, targetDir);
-    vscode33.window.showInformationMessage(`\u2705 CAG installed: ${copied} file(s) copied to .github/`);
-  } catch (err) {
-    vscode33.window.showErrorMessage(`CAG install failed: ${err}`);
-  }
-}
-async function selectAgent() {
-  const agents = await listCagFiles("agents", "*.agent.md");
-  if (agents.length === 0) {
-    vscode33.window.showWarningMessage("No agent definitions found.");
-    return;
-  }
-  const picked = await vscode33.window.showQuickPick(agents, {
-    placeHolder: "Select an agent"
-  });
-  if (picked) {
-    const root = vscode33.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (root) {
-      const filePath = path16.join(root, ".github", "agents", picked);
-      if (fs13.existsSync(filePath)) {
-        const doc = await vscode33.workspace.openTextDocument(filePath);
-        await vscode33.window.showTextDocument(doc);
-      }
-    }
-  }
-}
-async function selectSkill() {
-  const root = vscode33.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    vscode33.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const skillsDir = path16.join(root, ".github", "skills");
-  if (!fs13.existsSync(skillsDir)) {
-    vscode33.window.showWarningMessage("No skills directory found.");
-    return;
-  }
-  const skills = fs13.readdirSync(skillsDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-  if (skills.length === 0) {
-    vscode33.window.showWarningMessage("No skills found.");
-    return;
-  }
-  const picked = await vscode33.window.showQuickPick(skills, {
-    placeHolder: "Select a skill"
-  });
-  if (picked) {
-    const skillFile = path16.join(skillsDir, picked, "SKILL.md");
-    if (fs13.existsSync(skillFile)) {
-      const doc = await vscode33.workspace.openTextDocument(skillFile);
-      await vscode33.window.showTextDocument(doc);
-    }
-  }
-}
-async function selectPrompt() {
-  const prompts = await listCagFiles("prompts", "*.prompt.md");
-  if (prompts.length === 0) {
-    vscode33.window.showWarningMessage("No prompts found.");
-    return;
-  }
-  const picked = await vscode33.window.showQuickPick(prompts, {
-    placeHolder: "Select a prompt"
-  });
-  if (picked) {
-    const root = vscode33.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (root) {
-      const filePath = path16.join(root, ".github", "prompts", picked);
-      if (fs13.existsSync(filePath)) {
-        const doc = await vscode33.workspace.openTextDocument(filePath);
-        await vscode33.window.showTextDocument(doc);
-      }
-    }
-  }
-}
-async function listCagFiles(subdir, _pattern) {
-  const root = vscode33.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  if (!root) {
-    return [];
-  }
-  const dir = path16.join(root, ".github", subdir);
-  if (!fs13.existsSync(dir)) {
-    return [];
-  }
-  try {
-    return fs13.readdirSync(dir, { withFileTypes: true }).filter((e) => e.isFile() && e.name.endsWith(".md")).map((e) => e.name);
-  } catch {
-    return [];
-  }
-}
-
-// src/commands/testGenerator.ts
-var vscode34 = __toESM(require("vscode"));
-var path17 = __toESM(require("path"));
-var fs14 = __toESM(require("fs"));
-function detectLurekCalls(text) {
-  const calls = [];
-  const seen = /* @__PURE__ */ new Set();
-  const regex = /lurek\.(\w+)\.(\w+)\s*\(/g;
-  for (const [lineIdx, line] of text.split("\n").entries()) {
-    let match;
-    regex.lastIndex = 0;
-    while ((match = regex.exec(line)) !== null) {
-      const module2 = match[1];
-      const func = match[2];
-      const key = `${module2}.${func}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        calls.push({ module: module2, func, line: lineIdx + 1, text: line.trim() });
-      }
-    }
-  }
-  return calls;
-}
-function detectFunctions(text) {
-  const fns = [];
-  const lines = text.split("\n");
-  const funcPattern = /^(?:local\s+)?function\s+([\w.:]+)\s*\(/;
-  for (let i = 0; i < lines.length; i++) {
-    const match = funcPattern.exec(lines[i]);
-    if (match) {
-      const name = match[1];
-      const startLine = i;
-      let depth = 1;
-      let j = i + 1;
-      for (; j < lines.length && depth > 0; j++) {
-        const trimmed = lines[j].trim();
-        if (/^(?:function|if|for|while|repeat)\b/.test(trimmed) && !trimmed.endsWith("end")) {
-          depth++;
-        }
-        if (/^end\b/.test(trimmed)) {
-          depth--;
-        }
-      }
-      fns.push({
-        name,
-        line: startLine + 1,
-        endLine: j,
-        body: lines.slice(startLine, j).join("\n")
-      });
-    }
-  }
-  return fns;
-}
-function generateTestContent(sourceFileName, calls) {
-  const lines = [
-    `-- Auto-generated tests for ${sourceFileName}`,
-    `-- Generated by Lurek2D Toolkit`,
-    "",
-    `local passed = 0`,
-    `local failed = 0`,
-    `local total = 0`,
-    "",
-    `local function test(name, fn)`,
-    `  total = total + 1`,
-    `  local ok, err = pcall(fn)`,
-    `  if ok then`,
-    `    passed = passed + 1`,
-    `    print("[PASS] " .. name)`,
-    `  else`,
-    `    failed = failed + 1`,
-    `    print("[FAIL] " .. name .. ": " .. tostring(err))`,
-    `  end`,
-    `end`,
-    ""
-  ];
-  const modules = /* @__PURE__ */ new Map();
-  for (const call of calls) {
-    const list = modules.get(call.module) ?? [];
-    list.push(call);
-    modules.set(call.module, list);
-  }
-  for (const [mod, modCalls] of modules) {
-    lines.push(`-- Tests for lurek.${mod}`, "");
-    for (const call of modCalls) {
-      lines.push(
-        `test("lurek.${mod}.${call.func} works", function()`,
-        `  -- Source line ${call.line}: ${call.text}`,
-        `  -- TODO: Add proper test assertion`,
-        `  local result = lurek.${mod}.${call.func}()`,
-        `  assert(result ~= nil, "lurek.${mod}.${call.func} should return a value")`,
-        `end)`,
-        ""
-      );
-    }
-  }
-  lines.push(
-    `-- Summary`,
-    `print(string.format("\\n%d/%d tests passed (%d failed)", passed, total, failed))`,
-    `if failed > 0 then`,
-    `  error(string.format("%d tests failed", failed))`,
-    `end`,
-    ""
-  );
-  return lines.join("\n");
-}
-function generateFunctionTestContent(sourceFileName, funcName, funcBody) {
-  const calls = detectLurekCalls(funcBody);
-  const lines = [
-    `-- Tests for function: ${funcName}`,
-    `-- Source: ${sourceFileName}`,
-    `-- Generated by Lurek2D Toolkit`,
-    "",
-    `local passed = 0`,
-    `local failed = 0`,
-    `local total = 0`,
-    "",
-    `local function test(name, fn)`,
-    `  total = total + 1`,
-    `  local ok, err = pcall(fn)`,
-    `  if ok then`,
-    `    passed = passed + 1`,
-    `    print("[PASS] " .. name)`,
-    `  else`,
-    `    failed = failed + 1`,
-    `    print("[FAIL] " .. name .. ": " .. tostring(err))`,
-    `  end`,
-    `end`,
-    "",
-    `-- Basic existence test`,
-    `test("${funcName} is defined", function()`,
-    `  assert(type(${funcName}) == "function", "${funcName} should be a function")`,
-    `end)`,
-    "",
-    `-- Call test`,
-    `test("${funcName} can be called", function()`,
-    `  -- TODO: Provide appropriate arguments`,
-    `  local ok, err = pcall(${funcName})`,
-    `  -- Adjust based on expected behavior`,
-    `end)`,
-    ""
-  ];
-  if (calls.length > 0) {
-    lines.push(`-- API dependency tests`);
-    for (const call of calls) {
-      lines.push(
-        `test("${funcName} uses lurek.${call.module}.${call.func}", function()`,
-        `  -- Verify lurek.${call.module}.${call.func} is available`,
-        `  assert(type(lurek.${call.module}.${call.func}) == "function",`,
-        `    "lurek.${call.module}.${call.func} should be available")`,
-        `end)`,
-        ""
-      );
-    }
-  }
-  lines.push(
-    `-- Summary`,
-    `print(string.format("\\n%d/%d tests passed (%d failed)", passed, total, failed))`,
-    `if failed > 0 then`,
-    `  error(string.format("%d tests failed", failed))`,
-    `end`,
-    ""
-  );
-  return lines.join("\n");
-}
-function getGameRoot(filePath) {
-  let dir = path17.dirname(filePath);
-  for (let i = 0; i < 10; i++) {
-    if (fs14.existsSync(path17.join(dir, "main.lua")) || fs14.existsSync(path17.join(dir, "conf.lua"))) {
-      return dir;
-    }
-    const parent = path17.dirname(dir);
-    if (parent === dir) {
-      break;
-    }
-    dir = parent;
-  }
-  return vscode34.workspace.workspaceFolders?.[0]?.uri.fsPath;
-}
-function registerTestCommands(context) {
-  context.subscriptions.push(
-    vscode34.commands.registerCommand("lurek.test.generateForFile", async () => {
-      const editor = vscode34.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== "lua") {
-        vscode34.window.showWarningMessage("Open a Lua file first.");
-        return;
-      }
-      const doc = editor.document;
-      const text = doc.getText();
-      const calls = detectLurekCalls(text);
-      if (calls.length === 0) {
-        vscode34.window.showInformationMessage("No lurek.* API calls detected in this file.");
-        return;
-      }
-      const sourceFileName = path17.basename(doc.fileName);
-      const gameRoot = getGameRoot(doc.fileName);
-      if (!gameRoot) {
-        vscode34.window.showErrorMessage("Could not determine game root directory.");
-        return;
-      }
-      const testsDir = path17.join(gameRoot, "tests");
-      if (!fs14.existsSync(testsDir)) {
-        fs14.mkdirSync(testsDir, { recursive: true });
-      }
-      const testFileName = `test_${sourceFileName}`;
-      const testFilePath = path17.join(testsDir, testFileName);
-      const content = generateTestContent(sourceFileName, calls);
-      fs14.writeFileSync(testFilePath, content, "utf-8");
-      const testDoc = await vscode34.workspace.openTextDocument(testFilePath);
-      await vscode34.window.showTextDocument(testDoc);
-      vscode34.window.showInformationMessage(
-        `Generated test file: tests/${testFileName} (${calls.length} API calls detected)`
-      );
-    })
-  );
-  context.subscriptions.push(
-    vscode34.commands.registerCommand("lurek.test.generateForFunction", async () => {
-      const editor = vscode34.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== "lua") {
-        vscode34.window.showWarningMessage("Open a Lua file first.");
-        return;
-      }
-      const doc = editor.document;
-      const text = doc.getText();
-      const cursorLine = editor.selection.active.line + 1;
-      const fns = detectFunctions(text);
-      const target = fns.find((f) => cursorLine >= f.line && cursorLine <= f.endLine);
-      if (!target) {
-        vscode34.window.showWarningMessage("No function found at cursor position.");
-        return;
-      }
-      const sourceFileName = path17.basename(doc.fileName);
-      const gameRoot = getGameRoot(doc.fileName);
-      if (!gameRoot) {
-        vscode34.window.showErrorMessage("Could not determine game root directory.");
-        return;
-      }
-      const testsDir = path17.join(gameRoot, "tests");
-      if (!fs14.existsSync(testsDir)) {
-        fs14.mkdirSync(testsDir, { recursive: true });
-      }
-      const safeName = target.name.replace(/[.:]/g, "_");
-      const testFileName = `test_${safeName}.lua`;
-      const testFilePath = path17.join(testsDir, testFileName);
-      const content = generateFunctionTestContent(sourceFileName, target.name, target.body);
-      fs14.writeFileSync(testFilePath, content, "utf-8");
-      const testDoc = await vscode34.workspace.openTextDocument(testFilePath);
-      await vscode34.window.showTextDocument(testDoc);
-      vscode34.window.showInformationMessage(
-        `Generated test file: tests/${testFileName} for ${target.name}()`
-      );
-    })
-  );
-  context.subscriptions.push(
-    vscode34.commands.registerCommand("lurek.test.runCurrent", async () => {
-      const editor = vscode34.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== "lua") {
-        vscode34.window.showWarningMessage("Open a Lua test file first.");
-        return;
-      }
-      const filePath = editor.document.fileName;
-      const gameRoot = getGameRoot(filePath);
-      if (!gameRoot) {
-        vscode34.window.showErrorMessage("Could not determine game root directory.");
-        return;
-      }
-      const lurekPath = vscode34.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
-      const terminal = getOrCreateTerminal3("Lurek2D Tests");
-      terminal.show();
-      const relPath = path17.relative(gameRoot, filePath).replace(/\\/g, "/");
-      terminal.sendText(`cd "${gameRoot}" && "${lurekPath}" --test "${relPath}"`);
-    })
-  );
-  context.subscriptions.push(
-    vscode34.commands.registerCommand("lurek.test.runAll", async () => {
-      const editor = vscode34.window.activeTextEditor;
-      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode34.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (!gameRoot) {
-        vscode34.window.showErrorMessage("No game project found.");
-        return;
-      }
-      const testsDir = path17.join(gameRoot, "tests");
-      if (!fs14.existsSync(testsDir)) {
-        vscode34.window.showWarningMessage("No tests/ directory found in the game project.");
-        return;
-      }
-      const testFiles = fs14.readdirSync(testsDir).filter((f) => f.endsWith(".lua"));
-      if (testFiles.length === 0) {
-        vscode34.window.showWarningMessage("No Lua test files found in tests/.");
-        return;
-      }
-      const outputChannel = vscode34.window.createOutputChannel("Lurek2D Test Results");
-      outputChannel.show();
-      outputChannel.appendLine(`Running ${testFiles.length} test file(s)...`);
-      outputChannel.appendLine("\u2500".repeat(50));
-      const lurekPath = vscode34.workspace.getConfiguration("lurek").get("enginePath", "lurek2d");
-      const terminal = getOrCreateTerminal3("Lurek2D Tests");
-      terminal.show();
-      for (const testFile of testFiles) {
-        outputChannel.appendLine(`
-Running: ${testFile}`);
-        terminal.sendText(`cd "${gameRoot}" && "${lurekPath}" --test "tests/${testFile}"`);
-      }
-      outputChannel.appendLine("\n" + "\u2500".repeat(50));
-      outputChannel.appendLine(`Queued ${testFiles.length} test files.`);
-    })
-  );
-  context.subscriptions.push(
-    vscode34.commands.registerCommand("lurek.test.coverage", async () => {
-      const editor = vscode34.window.activeTextEditor;
-      const gameRoot = editor ? getGameRoot(editor.document.fileName) : vscode34.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (!gameRoot) {
-        vscode34.window.showErrorMessage("No game project found.");
-        return;
-      }
-      const luaFiles = findLuaFiles(gameRoot);
-      const allCalls = /* @__PURE__ */ new Set();
-      const testedCalls = /* @__PURE__ */ new Set();
-      for (const file of luaFiles) {
-        const content = fs14.readFileSync(file, "utf-8");
-        const calls = detectLurekCalls(content);
-        const isTest = file.includes(`${path17.sep}tests${path17.sep}`) || path17.basename(file).startsWith("test_");
-        for (const call of calls) {
-          const key = `lurek.${call.module}.${call.func}`;
-          allCalls.add(key);
-          if (isTest) {
-            testedCalls.add(key);
-          }
-        }
-      }
-      const outputChannel = vscode34.window.createOutputChannel("Lurek2D API Coverage");
-      outputChannel.show();
-      outputChannel.appendLine("Lurek2D API Coverage Report");
-      outputChannel.appendLine("\u2550".repeat(50));
-      outputChannel.appendLine(`Total API calls used: ${allCalls.size}`);
-      outputChannel.appendLine(`Covered by tests:     ${testedCalls.size}`);
-      const pct = allCalls.size > 0 ? Math.round(testedCalls.size / allCalls.size * 100) : 0;
-      outputChannel.appendLine(`Coverage:             ${pct}%`);
-      outputChannel.appendLine("");
-      if (allCalls.size > testedCalls.size) {
-        outputChannel.appendLine("Untested API calls:");
-        for (const call of [...allCalls].sort()) {
-          if (!testedCalls.has(call)) {
-            outputChannel.appendLine(`  \u26A0 ${call}`);
-          }
-        }
-      }
-      outputChannel.appendLine("");
-      outputChannel.appendLine("Tested API calls:");
-      for (const call of [...testedCalls].sort()) {
-        outputChannel.appendLine(`  \u2713 ${call}`);
-      }
-    })
-  );
-}
-function findLuaFiles(dir, results = []) {
-  if (!fs14.existsSync(dir)) {
-    return results;
-  }
-  const entries = fs14.readdirSync(dir, { withFileTypes: true });
-  for (const entry of entries) {
-    const fullPath = path17.join(dir, entry.name);
-    if (entry.isDirectory() && entry.name !== "node_modules" && entry.name !== ".git") {
-      findLuaFiles(fullPath, results);
-    } else if (entry.isFile() && entry.name.endsWith(".lua")) {
-      results.push(fullPath);
-    }
-  }
-  return results;
-}
-function getOrCreateTerminal3(name) {
-  const existing = vscode34.window.terminals.find((t) => t.name === name);
-  if (existing) {
-    return existing;
-  }
-  return vscode34.window.createTerminal(name);
-}
-
-// src/extension.ts
-init_debugBridge();
-init_parallelCargo();
-
-// src/commands/debugBridge.ts
-var vscode36 = __toESM(require("vscode"));
-function registerDebugBridgeCommands(context, bridge) {
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.connect", async () => {
-      if (bridge.isConnected) {
-        vscode36.window.showInformationMessage("Already connected to Lurek2D engine.");
-        return;
-      }
-      const portStr = await vscode36.window.showInputBox({
-        prompt: "Debug bridge port",
-        value: String(
-          vscode36.workspace.getConfiguration("lurek.debugBridge").get("port", 19740)
-        ),
-        validateInput: (v) => {
-          const n = Number(v);
-          if (isNaN(n) || n < 1024 || n > 65535) {
-            return "Port must be 1024\u201365535";
-          }
-          return void 0;
-        }
-      });
-      if (portStr === void 0) {
-        return;
-      }
-      bridge.showOutput();
-      const ok = await bridge.connect(Number(portStr));
-      if (ok) {
-        vscode36.window.showInformationMessage("Connected to Lurek2D engine.");
-        vscode36.commands.executeCommand("setContext", "lurek.debugConnected", true);
-      } else {
-        vscode36.window.showErrorMessage(
-          "Failed to connect. Is the engine running with debug bridge enabled?"
-        );
-      }
-    })
-  );
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.disconnect", () => {
-      bridge.disconnect();
-      vscode36.commands.executeCommand("setContext", "lurek.debugConnected", false);
-      vscode36.window.showInformationMessage("Disconnected from Lurek2D engine.");
-    })
-  );
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.evaluate", async () => {
-      if (!bridge.isConnected) {
-        vscode36.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
-        return;
-      }
-      const expression = await vscode36.window.showInputBox({
-        prompt: "Lua expression to evaluate",
-        placeHolder: 'e.g. print("hello") or player.x'
-      });
-      if (!expression) {
-        return;
-      }
-      try {
-        const result = await bridge.evaluate(expression);
-        bridge.showOutput();
-        vscode36.window.showInformationMessage(`Result: ${result}`);
-      } catch (err) {
-        vscode36.window.showErrorMessage(`Evaluation failed: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    })
-  );
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.hotReload", async () => {
-      if (!bridge.isConnected) {
-        vscode36.window.showErrorMessage("Not connected to Lurek2D engine.");
-        return;
-      }
-      const editor = vscode36.window.activeTextEditor;
-      if (!editor || editor.document.languageId !== "lua") {
-        vscode36.window.showWarningMessage("Open a Lua file to hot-reload.");
-        return;
-      }
-      if (editor.document.isDirty) {
-        await editor.document.save();
-      }
-      try {
-        const ok = await bridge.hotReload(editor.document.uri);
-        if (ok) {
-          vscode36.window.showInformationMessage(
-            `Hot-reloaded: ${vscode36.workspace.asRelativePath(editor.document.uri)}`
-          );
-        } else {
-          vscode36.window.showErrorMessage("Hot-reload failed. Check debug output for details.");
-        }
-      } catch (err) {
-        vscode36.window.showErrorMessage(`Hot-reload error: ${err instanceof Error ? err.message : String(err)}`);
-      }
-    })
-  );
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.showStats", async () => {
-      if (!bridge.isConnected) {
-        vscode36.window.showErrorMessage("Not connected to Lurek2D engine.");
-        return;
-      }
-      bridge.startStatsPolling();
-      vscode36.window.showInformationMessage("Engine stats enabled in status bar.");
-    })
-  );
-  context.subscriptions.push(
-    vscode36.commands.registerCommand("lurek.debug.inspect", async () => {
-      if (!bridge.isConnected) {
-        vscode36.window.showErrorMessage("Not connected to Lurek2D engine.");
-        return;
-      }
-      const editor = vscode36.window.activeTextEditor;
-      if (!editor) {
-        vscode36.window.showWarningMessage("No active editor.");
-        return;
-      }
-      const selection = editor.selection;
-      let expression;
-      if (!selection.isEmpty) {
-        expression = editor.document.getText(selection);
-      } else {
-        const wordRange = editor.document.getWordRangeAtPosition(selection.active, /[\w.:\[\]]+/);
-        if (!wordRange) {
-          vscode36.window.showWarningMessage("No variable found at cursor.");
-          return;
-        }
-        expression = editor.document.getText(wordRange);
-      }
-      try {
-        const result = await bridge.evaluate(`return tostring(${expression})`);
-        const typeResult = await bridge.evaluate(`return type(${expression})`);
-        vscode36.window.showInformationMessage(`${expression} = ${result} (${typeResult})`);
-      } catch (err) {
-        vscode36.window.showErrorMessage(
-          `Failed to inspect '${expression}': ${err instanceof Error ? err.message : String(err)}`
-        );
-      }
-    })
-  );
-}
-
-// src/commands/gameJam.ts
-var vscode37 = __toESM(require("vscode"));
-var path18 = __toESM(require("path"));
-var fs15 = __toESM(require("fs"));
-var TEMPLATES = [
-  {
-    label: "Platformer",
-    description: "Side-scrolling platformer with jump physics",
-    confLua: `function lurek.conf(t)
+</html>`}function ro(){let n=H.window.createTerminal("Lurek2D Deps");n.show(),n.sendText("cargo tree --depth 1")}function pp(){let n="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",e="";for(let t=0;t<32;t++)e+=n.charAt(Math.floor(Math.random()*n.length));return e}var K=C(require("vscode")),Ae=C(require("path")),Te=C(require("fs"));async function ao(){let n=K.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!n){K.window.showErrorMessage("No workspace folder open.");return}let e=null,t=__dirname;for(let o=0;o<6;o++){let s=Ae.join(t,".github");if(Te.existsSync(s)){e=s;break}t=Ae.dirname(t)}if(!e){K.window.showErrorMessage("Could not locate engine .github/ folder. Make sure the extension is run from the lurek2d repository root.");return}let r=Ae.join(n,".github");if(Te.existsSync(r)&&await K.window.showWarningMessage(".github/ directory already exists in your workspace. Overwrite all CAG files?","Yes \u2014 Overwrite","Cancel")!=="Yes \u2014 Overwrite")return;let a=0;function i(o,s){Te.mkdirSync(s,{recursive:!0});for(let l of Te.readdirSync(o,{withFileTypes:!0})){let p=Ae.join(o,l.name),u=Ae.join(s,l.name);l.isDirectory()?i(p,u):(Te.copyFileSync(p,u),a++)}}try{i(e,r),K.window.showInformationMessage(`\u2705 CAG installed: ${a} file(s) copied to .github/`)}catch(o){K.window.showErrorMessage(`CAG install failed: ${o}`)}}async function io(){let n=await lo("agents","*.agent.md");if(n.length===0){K.window.showWarningMessage("No agent definitions found.");return}let e=await K.window.showQuickPick(n,{placeHolder:"Select an agent"});if(e){let t=K.workspace.workspaceFolders?.[0]?.uri.fsPath;if(t){let r=Ae.join(t,".github","agents",e);if(Te.existsSync(r)){let a=await K.workspace.openTextDocument(r);await K.window.showTextDocument(a)}}}}async function oo(){let n=K.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!n){K.window.showErrorMessage("No workspace folder open.");return}let e=Ae.join(n,".github","skills");if(!Te.existsSync(e)){K.window.showWarningMessage("No skills directory found.");return}let t=Te.readdirSync(e,{withFileTypes:!0}).filter(a=>a.isDirectory()).map(a=>a.name);if(t.length===0){K.window.showWarningMessage("No skills found.");return}let r=await K.window.showQuickPick(t,{placeHolder:"Select a skill"});if(r){let a=Ae.join(e,r,"SKILL.md");if(Te.existsSync(a)){let i=await K.workspace.openTextDocument(a);await K.window.showTextDocument(i)}}}async function so(){let n=await lo("prompts","*.prompt.md");if(n.length===0){K.window.showWarningMessage("No prompts found.");return}let e=await K.window.showQuickPick(n,{placeHolder:"Select a prompt"});if(e){let t=K.workspace.workspaceFolders?.[0]?.uri.fsPath;if(t){let r=Ae.join(t,".github","prompts",e);if(Te.existsSync(r)){let a=await K.workspace.openTextDocument(r);await K.window.showTextDocument(a)}}}}async function lo(n,e){let t=K.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!t)return[];let r=Ae.join(t,".github",n);if(!Te.existsSync(r))return[];try{return Te.readdirSync(r,{withFileTypes:!0}).filter(a=>a.isFile()&&a.name.endsWith(".md")).map(a=>a.name)}catch{return[]}}var W=C(require("vscode")),se=C(require("path")),ce=C(require("fs"));function Jr(n){let e=[],t=new Set,r=/lurek\.(\w+)\.(\w+)\s*\(/g;for(let[a,i]of n.split(`
+`).entries()){let o;for(r.lastIndex=0;(o=r.exec(i))!==null;){let s=o[1],l=o[2],p=`${s}.${l}`;t.has(p)||(t.add(p),e.push({module:s,func:l,line:a+1,text:i.trim()}))}}return e}function up(n){let e=[],t=n.split(`
+`),r=/^(?:local\s+)?function\s+([\w.:]+)\s*\(/;for(let a=0;a<t.length;a++){let i=r.exec(t[a]);if(i){let o=i[1],s=a,l=1,p=a+1;for(;p<t.length&&l>0;p++){let u=t[p].trim();/^(?:function|if|for|while|repeat)\b/.test(u)&&!u.endsWith("end")&&l++,/^end\b/.test(u)&&l--}e.push({name:o,line:s+1,endLine:p,body:t.slice(s,p).join(`
+`)})}}return e}function dp(n,e){let t=[`-- Auto-generated tests for ${n}`,"-- Generated by Lurek2D Toolkit","","local passed = 0","local failed = 0","local total = 0","","local function test(name, fn)","  total = total + 1","  local ok, err = pcall(fn)","  if ok then","    passed = passed + 1",'    print("[PASS] " .. name)',"  else","    failed = failed + 1",'    print("[FAIL] " .. name .. ": " .. tostring(err))',"  end","end",""],r=new Map;for(let a of e){let i=r.get(a.module)??[];i.push(a),r.set(a.module,i)}for(let[a,i]of r){t.push(`-- Tests for lurek.${a}`,"");for(let o of i)t.push(`test("lurek.${a}.${o.func} works", function()`,`  -- Source line ${o.line}: ${o.text}`,"  -- TODO: Add proper test assertion",`  local result = lurek.${a}.${o.func}()`,`  assert(result ~= nil, "lurek.${a}.${o.func} should return a value")`,"end)","")}return t.push("-- Summary",'print(string.format("\\n%d/%d tests passed (%d failed)", passed, total, failed))',"if failed > 0 then",'  error(string.format("%d tests failed", failed))',"end",""),t.join(`
+`)}function cp(n,e,t){let r=Jr(t),a=[`-- Tests for function: ${e}`,`-- Source: ${n}`,"-- Generated by Lurek2D Toolkit","","local passed = 0","local failed = 0","local total = 0","","local function test(name, fn)","  total = total + 1","  local ok, err = pcall(fn)","  if ok then","    passed = passed + 1",'    print("[PASS] " .. name)',"  else","    failed = failed + 1",'    print("[FAIL] " .. name .. ": " .. tostring(err))',"  end","end","","-- Basic existence test",`test("${e} is defined", function()`,`  assert(type(${e}) == "function", "${e} should be a function")`,"end)","","-- Call test",`test("${e} can be called", function()`,"  -- TODO: Provide appropriate arguments",`  local ok, err = pcall(${e})`,"  -- Adjust based on expected behavior","end)",""];if(r.length>0){a.push("-- API dependency tests");for(let i of r)a.push(`test("${e} uses lurek.${i.module}.${i.func}", function()`,`  -- Verify lurek.${i.module}.${i.func} is available`,`  assert(type(lurek.${i.module}.${i.func}) == "function",`,`    "lurek.${i.module}.${i.func} should be available")`,"end)","")}return a.push("-- Summary",'print(string.format("\\n%d/%d tests passed (%d failed)", passed, total, failed))',"if failed > 0 then",'  error(string.format("%d tests failed", failed))',"end",""),a.join(`
+`)}function Ht(n){let e=se.dirname(n);for(let t=0;t<10;t++){if(ce.existsSync(se.join(e,"main.lua"))||ce.existsSync(se.join(e,"conf.lua")))return e;let r=se.dirname(e);if(r===e)break;e=r}return W.workspace.workspaceFolders?.[0]?.uri.fsPath}function uo(n){n.subscriptions.push(W.commands.registerCommand("lurek.test.generateForFile",async()=>{let e=W.window.activeTextEditor;if(!e||e.document.languageId!=="lua"){W.window.showWarningMessage("Open a Lua file first.");return}let t=e.document,r=t.getText(),a=Jr(r);if(a.length===0){W.window.showInformationMessage("No lurek.* API calls detected in this file.");return}let i=se.basename(t.fileName),o=Ht(t.fileName);if(!o){W.window.showErrorMessage("Could not determine game root directory.");return}let s=se.join(o,"tests");ce.existsSync(s)||ce.mkdirSync(s,{recursive:!0});let l=`test_${i}`,p=se.join(s,l),u=dp(i,a);ce.writeFileSync(p,u,"utf-8");let c=await W.workspace.openTextDocument(p);await W.window.showTextDocument(c),W.window.showInformationMessage(`Generated test file: tests/${l} (${a.length} API calls detected)`)})),n.subscriptions.push(W.commands.registerCommand("lurek.test.generateForFunction",async()=>{let e=W.window.activeTextEditor;if(!e||e.document.languageId!=="lua"){W.window.showWarningMessage("Open a Lua file first.");return}let t=e.document,r=t.getText(),a=e.selection.active.line+1,o=up(r).find(g=>a>=g.line&&a<=g.endLine);if(!o){W.window.showWarningMessage("No function found at cursor position.");return}let s=se.basename(t.fileName),l=Ht(t.fileName);if(!l){W.window.showErrorMessage("Could not determine game root directory.");return}let p=se.join(l,"tests");ce.existsSync(p)||ce.mkdirSync(p,{recursive:!0});let c=`test_${o.name.replace(/[.:]/g,"_")}.lua`,h=se.join(p,c),L=cp(s,o.name,o.body);ce.writeFileSync(h,L,"utf-8");let d=await W.workspace.openTextDocument(h);await W.window.showTextDocument(d),W.window.showInformationMessage(`Generated test file: tests/${c} for ${o.name}()`)})),n.subscriptions.push(W.commands.registerCommand("lurek.test.runCurrent",async()=>{let e=W.window.activeTextEditor;if(!e||e.document.languageId!=="lua"){W.window.showWarningMessage("Open a Lua test file first.");return}let t=e.document.fileName,r=Ht(t);if(!r){W.window.showErrorMessage("Could not determine game root directory.");return}let a=W.workspace.getConfiguration("lurek").get("enginePath","lurek2d"),i=po("Lurek2D Tests");i.show();let o=se.relative(r,t).replace(/\\/g,"/");i.sendText(`cd "${r}" && "${a}" --test "${o}"`)})),n.subscriptions.push(W.commands.registerCommand("lurek.test.runAll",async()=>{let e=W.window.activeTextEditor,t=e?Ht(e.document.fileName):W.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!t){W.window.showErrorMessage("No game project found.");return}let r=se.join(t,"tests");if(!ce.existsSync(r)){W.window.showWarningMessage("No tests/ directory found in the game project.");return}let a=ce.readdirSync(r).filter(l=>l.endsWith(".lua"));if(a.length===0){W.window.showWarningMessage("No Lua test files found in tests/.");return}let i=W.window.createOutputChannel("Lurek2D Test Results");i.show(),i.appendLine(`Running ${a.length} test file(s)...`),i.appendLine("\u2500".repeat(50));let o=W.workspace.getConfiguration("lurek").get("enginePath","lurek2d"),s=po("Lurek2D Tests");s.show();for(let l of a)i.appendLine(`
+Running: ${l}`),s.sendText(`cd "${t}" && "${o}" --test "tests/${l}"`);i.appendLine(`
+`+"\u2500".repeat(50)),i.appendLine(`Queued ${a.length} test files.`)})),n.subscriptions.push(W.commands.registerCommand("lurek.test.coverage",async()=>{let e=W.window.activeTextEditor,t=e?Ht(e.document.fileName):W.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!t){W.window.showErrorMessage("No game project found.");return}let r=co(t),a=new Set,i=new Set;for(let l of r){let p=ce.readFileSync(l,"utf-8"),u=Jr(p),c=l.includes(`${se.sep}tests${se.sep}`)||se.basename(l).startsWith("test_");for(let h of u){let L=`lurek.${h.module}.${h.func}`;a.add(L),c&&i.add(L)}}let o=W.window.createOutputChannel("Lurek2D API Coverage");o.show(),o.appendLine("Lurek2D API Coverage Report"),o.appendLine("\u2550".repeat(50)),o.appendLine(`Total API calls used: ${a.size}`),o.appendLine(`Covered by tests:     ${i.size}`);let s=a.size>0?Math.round(i.size/a.size*100):0;if(o.appendLine(`Coverage:             ${s}%`),o.appendLine(""),a.size>i.size){o.appendLine("Untested API calls:");for(let l of[...a].sort())i.has(l)||o.appendLine(`  \u26A0 ${l}`)}o.appendLine(""),o.appendLine("Tested API calls:");for(let l of[...i].sort())o.appendLine(`  \u2713 ${l}`)}))}function co(n,e=[]){if(!ce.existsSync(n))return e;let t=ce.readdirSync(n,{withFileTypes:!0});for(let r of t){let a=se.join(n,r.name);r.isDirectory()&&r.name!=="node_modules"&&r.name!==".git"?co(a,e):r.isFile()&&r.name.endsWith(".lua")&&e.push(a)}return e}function po(n){let e=W.window.terminals.find(t=>t.name===n);return e||W.window.createTerminal(n)}Kr();var U=C(require("vscode"));function yo(n,e){n.subscriptions.push(U.commands.registerCommand("lurek.debug.connect",async()=>{if(e.isConnected){U.window.showInformationMessage("Already connected to Lurek2D engine.");return}let t=await U.window.showInputBox({prompt:"Debug bridge port",value:String(U.workspace.getConfiguration("lurek.debugBridge").get("port",19740)),validateInput:a=>{let i=Number(a);if(isNaN(i)||i<1024||i>65535)return"Port must be 1024\u201365535"}});if(t===void 0)return;e.showOutput(),await e.connect(Number(t))?(U.window.showInformationMessage("Connected to Lurek2D engine."),U.commands.executeCommand("setContext","lurek.debugConnected",!0)):U.window.showErrorMessage("Failed to connect. Is the engine running with debug bridge enabled?")})),n.subscriptions.push(U.commands.registerCommand("lurek.debug.disconnect",()=>{e.disconnect(),U.commands.executeCommand("setContext","lurek.debugConnected",!1),U.window.showInformationMessage("Disconnected from Lurek2D engine.")})),n.subscriptions.push(U.commands.registerCommand("lurek.debug.evaluate",async()=>{if(!e.isConnected){U.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");return}let t=await U.window.showInputBox({prompt:"Lua expression to evaluate",placeHolder:'e.g. print("hello") or player.x'});if(t)try{let r=await e.evaluate(t);e.showOutput(),U.window.showInformationMessage(`Result: ${r}`)}catch(r){U.window.showErrorMessage(`Evaluation failed: ${r instanceof Error?r.message:String(r)}`)}})),n.subscriptions.push(U.commands.registerCommand("lurek.debug.hotReload",async()=>{if(!e.isConnected){U.window.showErrorMessage("Not connected to Lurek2D engine.");return}let t=U.window.activeTextEditor;if(!t||t.document.languageId!=="lua"){U.window.showWarningMessage("Open a Lua file to hot-reload.");return}t.document.isDirty&&await t.document.save();try{await e.hotReload(t.document.uri)?U.window.showInformationMessage(`Hot-reloaded: ${U.workspace.asRelativePath(t.document.uri)}`):U.window.showErrorMessage("Hot-reload failed. Check debug output for details.")}catch(r){U.window.showErrorMessage(`Hot-reload error: ${r instanceof Error?r.message:String(r)}`)}})),n.subscriptions.push(U.commands.registerCommand("lurek.debug.showStats",async()=>{if(!e.isConnected){U.window.showErrorMessage("Not connected to Lurek2D engine.");return}e.startStatsPolling(),U.window.showInformationMessage("Engine stats enabled in status bar.")})),n.subscriptions.push(U.commands.registerCommand("lurek.debug.inspect",async()=>{if(!e.isConnected){U.window.showErrorMessage("Not connected to Lurek2D engine.");return}let t=U.window.activeTextEditor;if(!t){U.window.showWarningMessage("No active editor.");return}let r=t.selection,a;if(!r.isEmpty)a=t.document.getText(r);else{let i=t.document.getWordRangeAtPosition(r.active,/[\w.:\[\]]+/);if(!i){U.window.showWarningMessage("No variable found at cursor.");return}a=t.document.getText(i)}try{let i=await e.evaluate(`return tostring(${a})`),o=await e.evaluate(`return type(${a})`);U.window.showInformationMessage(`${a} = ${i} (${o})`)}catch(i){U.window.showErrorMessage(`Failed to inspect '${a}': ${i instanceof Error?i.message:String(i)}`)}}))}var q=C(require("vscode")),We=C(require("path")),le=C(require("fs")),gp=[{label:"Platformer",description:"Side-scrolling platformer with jump physics",confLua:`function lurek.conf(t)
   t.window.title = "My Platformer"
   t.window.width = 800
   t.window.height = 600
 end
-`,
-    mainLua: `-- Platformer Starter
+`,mainLua:`-- Platformer Starter
 local player = { x = 100, y = 400, w = 32, h = 48, vy = 0, speed = 200, jumping = false }
 local gravity = 980
 local jumpForce = -450
@@ -21565,18 +11385,12 @@ function lurek.draw()
   lurek.graphics.setColor(1, 1, 1)
   lurek.graphics.print("Arrow keys / WASD to move, Space to jump", 10, 10)
 end
-`
-  },
-  {
-    label: "Top-Down RPG",
-    description: "Tile-based RPG with 4-directional movement",
-    confLua: `function lurek.conf(t)
+`},{label:"Top-Down RPG",description:"Tile-based RPG with 4-directional movement",confLua:`function lurek.conf(t)
   t.window.title = "My RPG"
   t.window.width = 640
   t.window.height = 480
 end
-`,
-    mainLua: `-- Top-Down RPG Starter
+`,mainLua:`-- Top-Down RPG Starter
 local player = { x = 320, y = 240, w = 32, h = 32, speed = 150, dir = "down" }
 local map_w, map_h = 20, 15
 local tile_size = 32
@@ -21651,18 +11465,12 @@ function lurek.draw()
   lurek.graphics.setColor(1, 1, 1)
   lurek.graphics.print("WASD / Arrow keys to move", 10, 10)
 end
-`
-  },
-  {
-    label: "Shooter",
-    description: "Top-down shooter with projectiles",
-    confLua: `function lurek.conf(t)
+`},{label:"Shooter",description:"Top-down shooter with projectiles",confLua:`function lurek.conf(t)
   t.window.title = "My Shooter"
   t.window.width = 800
   t.window.height = 600
 end
-`,
-    mainLua: `-- Shooter Starter
+`,mainLua:`-- Shooter Starter
 local player = { x = 400, y = 500, w = 24, h = 24, speed = 250 }
 local bullets = {}
 local enemies = {}
@@ -21765,18 +11573,12 @@ function lurek.draw()
   lurek.graphics.print("Score: " .. score, 10, 10)
   lurek.graphics.print("WASD to move, Space to shoot", 10, 30)
 end
-`
-  },
-  {
-    label: "Puzzle",
-    description: "Grid-based puzzle with tile swapping",
-    confLua: `function lurek.conf(t)
+`},{label:"Puzzle",description:"Grid-based puzzle with tile swapping",confLua:`function lurek.conf(t)
   t.window.title = "My Puzzle"
   t.window.width = 480
   t.window.height = 520
 end
-`,
-    mainLua: `-- Puzzle Starter
+`,mainLua:`-- Puzzle Starter
 local grid_size = 4
 local tile_size = 100
 local padding = 40
@@ -21875,18 +11677,12 @@ function lurek.draw()
   lurek.graphics.setColor(1, 1, 1)
   lurek.graphics.print("Moves: " .. moves .. "  |  R to restart", 10, 10)
 end
-`
-  },
-  {
-    label: "Visual Novel",
-    description: "Dialog-driven narrative with choices",
-    confLua: `function lurek.conf(t)
+`},{label:"Visual Novel",description:"Dialog-driven narrative with choices",confLua:`function lurek.conf(t)
   t.window.title = "My Visual Novel"
   t.window.width = 800
   t.window.height = 600
 end
-`,
-    mainLua: `-- Visual Novel Starter
+`,mainLua:`-- Visual Novel Starter
 local scenes = {
   intro = {
     text = "You find yourself at the entrance of a mysterious forest.",
@@ -22015,251 +11811,16 @@ function lurek.draw()
     lurek.graphics.print(i .. ". " .. choice.text, 120, cy + 10)
   end
 end
-`
-  }
-];
-var MODULES = [
-  { label: "Camera", description: "Smooth follow camera with zoom and shake", patternFile: "camera.lua", requireLine: 'local Camera = require("libs.camera")' },
-  { label: "Tilemap", description: "Tile-based map rendering and collision", patternFile: "grid.lua", requireLine: 'local Grid = require("libs.grid")' },
-  { label: "Physics", description: "Simple physics wrappers", patternFile: "component-system.lua", requireLine: 'local ECS = require("libs.component-system")' },
-  { label: "UI", description: "Basic UI components", patternFile: "stack.lua", requireLine: 'local Stack = require("libs.stack")' },
-  { label: "Particles", description: "Particle effects system", patternFile: "timer.lua", requireLine: 'local Timer = require("libs.timer")' },
-  { label: "Save/Load", description: "Game state serialization", patternFile: "class.lua", requireLine: 'local Class = require("libs.class")' },
-  { label: "Sound Manager", description: "Audio management with fade and crossfade", patternFile: "event-bus.lua", requireLine: 'local EventBus = require("libs.event-bus")' },
-  { label: "State Machine", description: "Finite state machine for game states", patternFile: "fsm.lua", requireLine: 'local FSM = require("libs.fsm")' },
-  { label: "Signal", description: "Pub-sub signal / observer pattern", patternFile: "signal.lua", requireLine: 'local Signal = require("libs.signal")' },
-  { label: "Tween", description: "Property tweening / animation engine", patternFile: "tween.lua", requireLine: 'local Tween = require("libs.tween")' },
-  { label: "Object Pool", description: "Recycling pool for bullets/particles/etc.", patternFile: "object-pool.lua", requireLine: 'local Pool = require("libs.object-pool")' }
-];
-var jamTimerInterval;
-var jamTimerItem;
-var jamEndTime;
-function startJamTimer(minutes) {
-  stopJamTimer();
-  jamEndTime = Date.now() + minutes * 6e4;
-  jamTimerItem = vscode37.window.createStatusBarItem(vscode37.StatusBarAlignment.Right, 200);
-  jamTimerItem.show();
-  const totalMs = minutes * 6e4;
-  let notified50 = false;
-  let notified25 = false;
-  let notified10 = false;
-  const update = () => {
-    if (!jamEndTime || !jamTimerItem) {
-      return;
-    }
-    const remaining = jamEndTime - Date.now();
-    if (remaining <= 0) {
-      jamTimerItem.text = "$(bell) TIME'S UP!";
-      jamTimerItem.backgroundColor = new vscode37.ThemeColor("statusBarItem.errorBackground");
-      vscode37.window.showWarningMessage("Game Jam Timer: Time's up!");
-      stopJamTimer();
-      return;
-    }
-    const pct = remaining / totalMs;
-    const mins = Math.floor(remaining / 6e4);
-    const secs = Math.floor(remaining % 6e4 / 1e3);
-    jamTimerItem.text = `$(clock) ${mins}:${String(secs).padStart(2, "0")} remaining`;
-    if (pct <= 0.1 && !notified10) {
-      notified10 = true;
-      jamTimerItem.backgroundColor = new vscode37.ThemeColor("statusBarItem.errorBackground");
-      vscode37.window.showWarningMessage("Game Jam Timer: 10% time remaining!");
-    } else if (pct <= 0.25 && !notified25) {
-      notified25 = true;
-      jamTimerItem.backgroundColor = new vscode37.ThemeColor("statusBarItem.warningBackground");
-      vscode37.window.showWarningMessage("Game Jam Timer: 25% time remaining!");
-    } else if (pct <= 0.5 && !notified50) {
-      notified50 = true;
-      vscode37.window.showInformationMessage("Game Jam Timer: 50% time remaining.");
-    }
-  };
-  update();
-  jamTimerInterval = setInterval(update, 1e3);
-}
-function stopJamTimer() {
-  if (jamTimerInterval) {
-    clearInterval(jamTimerInterval);
-    jamTimerInterval = void 0;
-  }
-  if (jamTimerItem) {
-    jamTimerItem.dispose();
-    jamTimerItem = void 0;
-  }
-  jamEndTime = void 0;
-}
-function registerGameJamCommands(context) {
-  context.subscriptions.push(
-    vscode37.commands.registerCommand("lurek.gameJam.quickStart", async () => {
-      const picked = await vscode37.window.showQuickPick(
-        TEMPLATES.map((t) => ({ label: t.label, description: t.description, template: t })),
-        { placeHolder: "Choose a game template" }
-      );
-      if (!picked) {
-        return;
-      }
-      const name = await vscode37.window.showInputBox({
-        prompt: "Project name",
-        placeHolder: "my-game",
-        validateInput: (v) => {
-          if (!v.trim()) {
-            return "Name cannot be empty";
-          }
-          if (/[<>:"/\\|?*]/.test(v)) {
-            return "Name contains invalid characters";
-          }
-          return void 0;
-        }
-      });
-      if (!name) {
-        return;
-      }
-      const parentUri = await vscode37.window.showOpenDialog({
-        canSelectFolders: true,
-        canSelectFiles: false,
-        canSelectMany: false,
-        openLabel: "Select parent folder"
-      });
-      if (!parentUri || parentUri.length === 0) {
-        return;
-      }
-      const projectDir = path18.join(parentUri[0].fsPath, name);
-      if (fs15.existsSync(projectDir)) {
-        vscode37.window.showErrorMessage(`Folder already exists: ${projectDir}`);
-        return;
-      }
-      const template = picked.template;
-      fs15.mkdirSync(projectDir, { recursive: true });
-      fs15.mkdirSync(path18.join(projectDir, "assets"), { recursive: true });
-      fs15.mkdirSync(path18.join(projectDir, "libs"), { recursive: true });
-      fs15.writeFileSync(path18.join(projectDir, "conf.lua"), template.confLua, "utf-8");
-      fs15.writeFileSync(path18.join(projectDir, "main.lua"), template.mainLua, "utf-8");
-      fs15.writeFileSync(
-        path18.join(projectDir, "assets", "README.md"),
-        "# Assets\n\nPlace your game assets (images, sounds, fonts) in this folder.\n",
-        "utf-8"
-      );
-      const uri = vscode37.Uri.file(projectDir);
-      await vscode37.commands.executeCommand("vscode.openFolder", uri);
-      vscode37.window.showInformationMessage(`Created "${name}" with ${template.label} template!`);
-    })
-  );
-  context.subscriptions.push(
-    vscode37.commands.registerCommand("lurek.gameJam.addModule", async () => {
-      const picked = await vscode37.window.showQuickPick(
-        MODULES.map((m) => ({ label: m.label, description: m.description, module: m })),
-        { placeHolder: "Choose a module to add" }
-      );
-      if (!picked) {
-        return;
-      }
-      const workspaceRoot = vscode37.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (!workspaceRoot) {
-        vscode37.window.showErrorMessage("No workspace folder open.");
-        return;
-      }
-      const mod = picked.module;
-      const libsDir = path18.join(workspaceRoot, "libs");
-      if (!fs15.existsSync(libsDir)) {
-        fs15.mkdirSync(libsDir, { recursive: true });
-      }
-      const destFile = path18.join(libsDir, mod.patternFile);
-      if (fs15.existsSync(destFile)) {
-        const overwrite = await vscode37.window.showWarningMessage(
-          `libs/${mod.patternFile} already exists. Overwrite?`,
-          "Yes",
-          "No"
-        );
-        if (overwrite !== "Yes") {
-          return;
-        }
-      }
-      const patternPath = path18.join(context.extensionPath, "data", "patterns", mod.patternFile);
-      if (!fs15.existsSync(patternPath)) {
-        vscode37.window.showErrorMessage(`Pattern file not found: ${mod.patternFile}`);
-        return;
-      }
-      fs15.copyFileSync(patternPath, destFile);
-      const mainLuaPath = path18.join(workspaceRoot, "main.lua");
-      if (fs15.existsSync(mainLuaPath)) {
-        const content = fs15.readFileSync(mainLuaPath, "utf-8");
-        if (!content.includes(mod.requireLine)) {
-          const lines = content.split("\n");
-          let insertIdx = 0;
-          for (let i = 0; i < lines.length; i++) {
-            if (lines[i].startsWith("local ") && lines[i].includes("require")) {
-              insertIdx = i + 1;
-            }
-          }
-          lines.splice(insertIdx, 0, mod.requireLine);
-          fs15.writeFileSync(mainLuaPath, lines.join("\n"), "utf-8");
-        }
-      }
-      vscode37.window.showInformationMessage(`Added ${mod.label} module to libs/${mod.patternFile}`);
-    })
-  );
-  context.subscriptions.push(
-    vscode37.commands.registerCommand("lurek.gameJam.timer", async () => {
-      const picked = await vscode37.window.showQuickPick(
-        [
-          { label: "30 minutes", minutes: 30 },
-          { label: "1 hour", minutes: 60 },
-          { label: "2 hours", minutes: 120 },
-          { label: "Custom...", minutes: -1 },
-          { label: "Stop timer", minutes: 0 }
-        ],
-        { placeHolder: "Game Jam countdown duration" }
-      );
-      if (!picked) {
-        return;
-      }
-      if (picked.minutes === 0) {
-        stopJamTimer();
-        vscode37.window.showInformationMessage("Game Jam Timer stopped.");
-        return;
-      }
-      let minutes = picked.minutes;
-      if (minutes < 0) {
-        const custom = await vscode37.window.showInputBox({
-          prompt: "Duration in minutes",
-          placeHolder: "90",
-          validateInput: (v) => {
-            const n = Number(v);
-            if (isNaN(n) || n <= 0) {
-              return "Enter a positive number";
-            }
-            return void 0;
-          }
-        });
-        if (!custom) {
-          return;
-        }
-        minutes = Number(custom);
-      }
-      startJamTimer(minutes);
-      vscode37.window.showInformationMessage(`Game Jam Timer started: ${minutes} minutes.`);
-    })
-  );
-  context.subscriptions.push({ dispose: stopJamTimer });
-}
+`}],yp=[{label:"Camera",description:"Smooth follow camera with zoom and shake",patternFile:"camera.lua",requireLine:'local Camera = require("libs.camera")'},{label:"Tilemap",description:"Tile-based map rendering and collision",patternFile:"grid.lua",requireLine:'local Grid = require("libs.grid")'},{label:"Physics",description:"Simple physics wrappers",patternFile:"component-system.lua",requireLine:'local ECS = require("libs.component-system")'},{label:"UI",description:"Basic UI components",patternFile:"stack.lua",requireLine:'local Stack = require("libs.stack")'},{label:"Particles",description:"Particle effects system",patternFile:"timer.lua",requireLine:'local Timer = require("libs.timer")'},{label:"Save/Load",description:"Game state serialization",patternFile:"class.lua",requireLine:'local Class = require("libs.class")'},{label:"Sound Manager",description:"Audio management with fade and crossfade",patternFile:"event-bus.lua",requireLine:'local EventBus = require("libs.event-bus")'},{label:"State Machine",description:"Finite state machine for game states",patternFile:"fsm.lua",requireLine:'local FSM = require("libs.fsm")'},{label:"Signal",description:"Pub-sub signal / observer pattern",patternFile:"signal.lua",requireLine:'local Signal = require("libs.signal")'},{label:"Tween",description:"Property tweening / animation engine",patternFile:"tween.lua",requireLine:'local Tween = require("libs.tween")'},{label:"Object Pool",description:"Recycling pool for bullets/particles/etc.",patternFile:"object-pool.lua",requireLine:'local Pool = require("libs.object-pool")'}],tr,Ge,nr;function fp(n){rr(),nr=Date.now()+n*6e4,Ge=q.window.createStatusBarItem(q.StatusBarAlignment.Right,200),Ge.show();let e=n*6e4,t=!1,r=!1,a=!1,i=()=>{if(!nr||!Ge)return;let o=nr-Date.now();if(o<=0){Ge.text="$(bell) TIME'S UP!",Ge.backgroundColor=new q.ThemeColor("statusBarItem.errorBackground"),q.window.showWarningMessage("Game Jam Timer: Time's up!"),rr();return}let s=o/e,l=Math.floor(o/6e4),p=Math.floor(o%6e4/1e3);Ge.text=`$(clock) ${l}:${String(p).padStart(2,"0")} remaining`,s<=.1&&!a?(a=!0,Ge.backgroundColor=new q.ThemeColor("statusBarItem.errorBackground"),q.window.showWarningMessage("Game Jam Timer: 10% time remaining!")):s<=.25&&!r?(r=!0,Ge.backgroundColor=new q.ThemeColor("statusBarItem.warningBackground"),q.window.showWarningMessage("Game Jam Timer: 25% time remaining!")):s<=.5&&!t&&(t=!0,q.window.showInformationMessage("Game Jam Timer: 50% time remaining."))};i(),tr=setInterval(i,1e3)}function rr(){tr&&(clearInterval(tr),tr=void 0),Ge&&(Ge.dispose(),Ge=void 0),nr=void 0}function fo(n){n.subscriptions.push(q.commands.registerCommand("lurek.gameJam.quickStart",async()=>{let e=await q.window.showQuickPick(gp.map(s=>({label:s.label,description:s.description,template:s})),{placeHolder:"Choose a game template"});if(!e)return;let t=await q.window.showInputBox({prompt:"Project name",placeHolder:"my-game",validateInput:s=>{if(!s.trim())return"Name cannot be empty";if(/[<>:"/\\|?*]/.test(s))return"Name contains invalid characters"}});if(!t)return;let r=await q.window.showOpenDialog({canSelectFolders:!0,canSelectFiles:!1,canSelectMany:!1,openLabel:"Select parent folder"});if(!r||r.length===0)return;let a=We.join(r[0].fsPath,t);if(le.existsSync(a)){q.window.showErrorMessage(`Folder already exists: ${a}`);return}let i=e.template;le.mkdirSync(a,{recursive:!0}),le.mkdirSync(We.join(a,"assets"),{recursive:!0}),le.mkdirSync(We.join(a,"libs"),{recursive:!0}),le.writeFileSync(We.join(a,"conf.lua"),i.confLua,"utf-8"),le.writeFileSync(We.join(a,"main.lua"),i.mainLua,"utf-8"),le.writeFileSync(We.join(a,"assets","README.md"),`# Assets
 
-// src/commands/library.ts
-var vscode38 = __toESM(require("vscode"));
-var path19 = __toESM(require("path"));
-var fs16 = __toESM(require("fs"));
-var SNIPPETS = [
-  // Graphics
-  {
-    label: "Draw sprite",
-    category: "Graphics",
-    code: `local img = lurek.graphics.newImage("assets/sprite.png")
+Place your game assets (images, sounds, fonts) in this folder.
+`,"utf-8");let o=q.Uri.file(a);await q.commands.executeCommand("vscode.openFolder",o),q.window.showInformationMessage(`Created "${t}" with ${i.label} template!`)})),n.subscriptions.push(q.commands.registerCommand("lurek.gameJam.addModule",async()=>{let e=await q.window.showQuickPick(yp.map(l=>({label:l.label,description:l.description,module:l})),{placeHolder:"Choose a module to add"});if(!e)return;let t=q.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!t){q.window.showErrorMessage("No workspace folder open.");return}let r=e.module,a=We.join(t,"libs");le.existsSync(a)||le.mkdirSync(a,{recursive:!0});let i=We.join(a,r.patternFile);if(le.existsSync(i)&&await q.window.showWarningMessage(`libs/${r.patternFile} already exists. Overwrite?`,"Yes","No")!=="Yes")return;let o=We.join(n.extensionPath,"data","patterns",r.patternFile);if(!le.existsSync(o)){q.window.showErrorMessage(`Pattern file not found: ${r.patternFile}`);return}le.copyFileSync(o,i);let s=We.join(t,"main.lua");if(le.existsSync(s)){let l=le.readFileSync(s,"utf-8");if(!l.includes(r.requireLine)){let p=l.split(`
+`),u=0;for(let c=0;c<p.length;c++)p[c].startsWith("local ")&&p[c].includes("require")&&(u=c+1);p.splice(u,0,r.requireLine),le.writeFileSync(s,p.join(`
+`),"utf-8")}}q.window.showInformationMessage(`Added ${r.label} module to libs/${r.patternFile}`)})),n.subscriptions.push(q.commands.registerCommand("lurek.gameJam.timer",async()=>{let e=await q.window.showQuickPick([{label:"30 minutes",minutes:30},{label:"1 hour",minutes:60},{label:"2 hours",minutes:120},{label:"Custom...",minutes:-1},{label:"Stop timer",minutes:0}],{placeHolder:"Game Jam countdown duration"});if(!e)return;if(e.minutes===0){rr(),q.window.showInformationMessage("Game Jam Timer stopped.");return}let t=e.minutes;if(t<0){let r=await q.window.showInputBox({prompt:"Duration in minutes",placeHolder:"90",validateInput:a=>{let i=Number(a);if(isNaN(i)||i<=0)return"Enter a positive number"}});if(!r)return;t=Number(r)}fp(t),q.window.showInformationMessage(`Game Jam Timer started: ${t} minutes.`)})),n.subscriptions.push({dispose:rr})}var J=C(require("vscode")),bt=C(require("path")),we=C(require("fs")),bo=[{label:"Draw sprite",category:"Graphics",code:`local img = lurek.graphics.newImage("assets/sprite.png")
 
 function lurek.draw()
   lurek.graphics.draw(img, x, y)
-end`
-  },
-  {
-    label: "Animation loop",
-    category: "Graphics",
-    code: `local frames = {}
+end`},{label:"Animation loop",category:"Graphics",code:`local frames = {}
 local current_frame = 1
 local frame_timer = 0
 local frame_duration = 0.1
@@ -22280,12 +11841,7 @@ end
 
 function lurek.draw()
   lurek.graphics.draw(frames[current_frame], x, y)
-end`
-  },
-  {
-    label: "Particle burst",
-    category: "Graphics",
-    code: `local particles = {}
+end`},{label:"Particle burst",category:"Graphics",code:`local particles = {}
 
 local function emit(px, py, count)
   for i = 1, count do
@@ -22317,12 +11873,7 @@ function lurek.draw()
     lurek.graphics.circle("fill", p.x, p.y, 3)
   end
   lurek.graphics.setColor(1, 1, 1, 1)
-end`
-  },
-  {
-    label: "Screen shake",
-    category: "Graphics",
-    code: `local shake_timer = 0
+end`},{label:"Screen shake",category:"Graphics",code:`local shake_timer = 0
 local shake_intensity = 0
 local shake_ox, shake_oy = 0, 0
 
@@ -22346,13 +11897,7 @@ function lurek.draw()
   lurek.graphics.translate(shake_ox, shake_oy)
   -- Draw your game here
   lurek.graphics.pop()
-end`
-  },
-  // Input
-  {
-    label: "WASD movement",
-    category: "Input",
-    code: `local player = { x = 400, y = 300, speed = 200 }
+end`},{label:"WASD movement",category:"Input",code:`local player = { x = 400, y = 300, speed = 200 }
 
 function lurek.update(dt)
   if lurek.input.keyboard.isDown("w") or lurek.input.keyboard.isDown("up") then
@@ -22367,12 +11912,7 @@ function lurek.update(dt)
   if lurek.input.keyboard.isDown("d") or lurek.input.keyboard.isDown("right") then
     player.x = player.x + player.speed * dt
   end
-end`
-  },
-  {
-    label: "Mouse aim",
-    category: "Input",
-    code: `local player = { x = 400, y = 300, angle = 0 }
+end`},{label:"Mouse aim",category:"Input",code:`local player = { x = 400, y = 300, angle = 0 }
 
 function lurek.update(dt)
   local mx, my = lurek.input.mouse.getPosition()
@@ -22386,12 +11926,7 @@ function lurek.draw()
   lurek.graphics.setColor(0.3, 0.7, 1)
   lurek.graphics.rectangle("fill", -16, -8, 32, 16)
   lurek.graphics.pop()
-end`
-  },
-  {
-    label: "Gamepad support",
-    category: "Input",
-    code: `local player = { x = 400, y = 300, speed = 200 }
+end`},{label:"Gamepad support",category:"Input",code:`local player = { x = 400, y = 300, speed = 200 }
 
 function lurek.update(dt)
   local axes = lurek.input.gamepad.getAxes(1)
@@ -22410,12 +11945,7 @@ function lurek.gamepadpressed(id, button)
   if button == "a" then
     -- Jump or action
   end
-end`
-  },
-  {
-    label: "Touch controls",
-    category: "Input",
-    code: `local touches = {}
+end`},{label:"Touch controls",category:"Input",code:`local touches = {}
 
 function lurek.touchpressed(id, x, y, dx, dy, pressure)
   touches[id] = { x = x, y = y, startX = x, startY = y }
@@ -22441,13 +11971,7 @@ function lurek.touchreleased(id, x, y, dx, dy, pressure)
     end
     touches[id] = nil
   end
-end`
-  },
-  // Physics
-  {
-    label: "Platformer controller",
-    category: "Physics",
-    code: `local player = { x = 100, y = 400, w = 32, h = 48, vx = 0, vy = 0, onGround = false }
+end`},{label:"Platformer controller",category:"Physics",code:`local player = { x = 100, y = 400, w = 32, h = 48, vx = 0, vy = 0, onGround = false }
 local gravity = 980
 local jumpForce = -450
 local moveSpeed = 200
@@ -22481,12 +12005,7 @@ function lurek.keypressed(key)
   if key == "space" and player.onGround then
     player.vy = jumpForce
   end
-end`
-  },
-  {
-    label: "Top-down movement",
-    category: "Physics",
-    code: `local player = { x = 400, y = 300, vx = 0, vy = 0, speed = 200, friction = 8 }
+end`},{label:"Top-down movement",category:"Physics",code:`local player = { x = 400, y = 300, vx = 0, vy = 0, speed = 200, friction = 8 }
 
 function lurek.update(dt)
   local ix, iy = 0, 0
@@ -22509,12 +12028,7 @@ function lurek.update(dt)
 
   player.x = player.x + player.vx * dt
   player.y = player.y + player.vy * dt
-end`
-  },
-  {
-    label: "Projectile",
-    category: "Physics",
-    code: `local bullets = {}
+end`},{label:"Projectile",category:"Physics",code:`local bullets = {}
 
 local function shoot(x, y, angle, speed)
   table.insert(bullets, {
@@ -22542,12 +12056,7 @@ function lurek.draw()
   for _, b in ipairs(bullets) do
     lurek.graphics.circle("fill", b.x, b.y, 3)
   end
-end`
-  },
-  {
-    label: "Raycast",
-    category: "Physics",
-    code: `-- Simple DDA raycast on a tile grid
+end`},{label:"Raycast",category:"Physics",code:`-- Simple DDA raycast on a tile grid
 local function raycast(grid, x, y, angle, maxDist)
   local dx = math.cos(angle)
   local dy = math.sin(angle)
@@ -22567,13 +12076,7 @@ local function raycast(grid, x, y, angle, maxDist)
   end
 
   return { hit = false, x = x + dx * maxDist, y = y + dy * maxDist, dist = maxDist }
-end`
-  },
-  // UI
-  {
-    label: "Health bar",
-    category: "UI",
-    code: `local hp = { current = 75, max = 100 }
+end`},{label:"Health bar",category:"UI",code:`local hp = { current = 75, max = 100 }
 
 local function drawHealthBar(x, y, w, h)
   local pct = hp.current / hp.max
@@ -22595,12 +12098,7 @@ local function drawHealthBar(x, y, w, h)
   -- Text
   lurek.graphics.setColor(1, 1, 1)
   lurek.graphics.print(hp.current .. "/" .. hp.max, x + 4, y + 2)
-end`
-  },
-  {
-    label: "Dialog box",
-    category: "UI",
-    code: `local dialog = { active = false, text = "", speaker = "", char_idx = 0, timer = 0, speed = 0.03 }
+end`},{label:"Dialog box",category:"UI",code:`local dialog = { active = false, text = "", speaker = "", char_idx = 0, timer = 0, speed = 0.03 }
 
 local function showDialog(speaker, text)
   dialog.active = true
@@ -22639,12 +12137,7 @@ local function drawDialog()
   lurek.graphics.print(dialog.speaker, 70, 410)
   lurek.graphics.setColor(1, 1, 1)
   lurek.graphics.print(string.sub(dialog.text, 1, dialog.char_idx), 70, 440)
-end`
-  },
-  {
-    label: "Menu system",
-    category: "UI",
-    code: `local menu = {
+end`},{label:"Menu system",category:"UI",code:`local menu = {
   items = { "Start Game", "Options", "Quit" },
   selected = 1,
 }
@@ -22675,12 +12168,7 @@ function lurek.draw()
       lurek.graphics.print("  " .. item, 300, y)
     end
   end
-end`
-  },
-  {
-    label: "Minimap",
-    category: "UI",
-    code: `local minimap = { x = 620, y = 10, w = 160, h = 120, scale = 0.1 }
+end`},{label:"Minimap",category:"UI",code:`local minimap = { x = 620, y = 10, w = 160, h = 120, scale = 0.1 }
 
 local function drawMinimap(world_objects, player, world_w, world_h)
   -- Background
@@ -22703,13 +12191,7 @@ local function drawMinimap(world_objects, player, world_w, world_h)
   -- Player dot
   lurek.graphics.setColor(0, 1, 0)
   lurek.graphics.circle("fill", minimap.x + player.x * sx, minimap.y + player.y * sy, 3)
-end`
-  },
-  // Audio
-  {
-    label: "Music manager",
-    category: "Audio",
-    code: `local music = { current = nil, volume = 0.7 }
+end`},{label:"Music manager",category:"Audio",code:`local music = { current = nil, volume = 0.7 }
 
 local function playMusic(file)
   if music.current then
@@ -22732,12 +12214,7 @@ local function stopMusic()
     lurek.audio.stop(music.current)
     music.current = nil
   end
-end`
-  },
-  {
-    label: "SFX player",
-    category: "Audio",
-    code: `local sfx = {}
+end`},{label:"SFX player",category:"Audio",code:`local sfx = {}
 
 local function loadSFX(name, file)
   sfx[name] = lurek.audio.newSource(file, "static")
@@ -22755,12 +12232,7 @@ end
 
 -- Usage:
 -- loadSFX("jump", "assets/sounds/jump.wav")
--- playSFX("jump", 0.8)`
-  },
-  {
-    label: "Volume control",
-    category: "Audio",
-    code: `local master_volume = 1.0
+-- playSFX("jump", 0.8)`},{label:"Volume control",category:"Audio",code:`local master_volume = 1.0
 
 function lurek.keypressed(key)
   if key == "+" or key == "=" then
@@ -22777,12 +12249,7 @@ function lurek.keypressed(key)
     end
     lurek.audio.setMasterVolume(master_volume)
   end
-end`
-  },
-  {
-    label: "Crossfade",
-    category: "Audio",
-    code: `local crossfade = { from = nil, to = nil, progress = 0, duration = 2.0, active = false }
+end`},{label:"Crossfade",category:"Audio",code:`local crossfade = { from = nil, to = nil, progress = 0, duration = 2.0, active = false }
 
 local function crossfadeTo(newMusic, duration)
   crossfade.from = crossfade.to or nil
@@ -22804,13 +12271,7 @@ function lurek.update(dt)
   end
   if crossfade.from then lurek.audio.setVolume(crossfade.from, 1 - crossfade.progress) end
   if crossfade.to then lurek.audio.setVolume(crossfade.to, crossfade.progress) end
-end`
-  },
-  // Data
-  {
-    label: "Save/Load",
-    category: "Data",
-    code: `local function saveGame(data, filename)
+end`},{label:"Save/Load",category:"Data",code:`local function saveGame(data, filename)
   filename = filename or "save.lua"
   local function serialize(val, indent)
     indent = indent or ""
@@ -22838,12 +12299,7 @@ local function loadGame(filename)
   local content = lurek.filesystem.read(filename)
   local fn = load(content)
   return fn and fn() or nil
-end`
-  },
-  {
-    label: "Config file",
-    category: "Data",
-    code: `local config = {
+end`},{label:"Config file",category:"Data",code:`local config = {
   music_volume = 0.7,
   sfx_volume = 1.0,
   fullscreen = false,
@@ -22874,12 +12330,7 @@ local function saveConfig()
   end
   table.insert(lines, "}")
   lurek.filesystem.write("config.lua", table.concat(lines, "\\n"))
-end`
-  },
-  {
-    label: "High scores",
-    category: "Data",
-    code: `local scores = {}
+end`},{label:"High scores",category:"Data",code:`local scores = {}
 local MAX_SCORES = 10
 
 local function loadScores()
@@ -22904,12 +12355,7 @@ local function addScore(name, score)
   table.sort(scores, function(a, b) return a.score > b.score end)
   while #scores > MAX_SCORES do table.remove(scores) end
   saveScores()
-end`
-  },
-  {
-    label: "Inventory",
-    category: "Data",
-    code: `local inventory = { slots = {}, maxSlots = 20 }
+end`},{label:"Inventory",category:"Data",code:`local inventory = { slots = {}, maxSlots = 20 }
 
 local function addItem(name, count)
   count = count or 1
@@ -22944,1481 +12390,26 @@ local function hasItem(name, count)
     if slot.name == name and slot.count >= count then return true end
   end
   return false
-end`
-  }
-];
-function getCategories() {
-  const cats = /* @__PURE__ */ new Set();
-  for (const s of SNIPPETS) {
-    cats.add(s.category);
-  }
-  return [...cats].sort();
-}
-function listPatternFiles(extensionPath) {
-  const dir = path19.join(extensionPath, "data", "patterns");
-  if (!fs16.existsSync(dir)) {
-    return [];
-  }
-  return fs16.readdirSync(dir).filter((f) => f.endsWith(".lua")).map((f) => ({ name: f.replace(".lua", ""), fullPath: path19.join(dir, f) }));
-}
-function registerLibraryCommands(context) {
-  context.subscriptions.push(
-    vscode38.commands.registerCommand("lurek.library.browse", async () => {
-      const patterns = listPatternFiles(context.extensionPath);
-      if (patterns.length === 0) {
-        vscode38.window.showInformationMessage("No patterns found in data/patterns/.");
-        return;
-      }
-      const picked = await vscode38.window.showQuickPick(
-        patterns.map((p) => ({
-          label: p.name,
-          description: `data/patterns/${p.name}.lua`,
-          fullPath: p.fullPath
-        })),
-        { placeHolder: "Browse Lurek2D patterns" }
-      );
-      if (!picked) {
-        return;
-      }
-      const action = await vscode38.window.showQuickPick(
-        [
-          { label: "Preview", description: "Open the pattern file in a new tab" },
-          { label: "Copy to project", description: "Copy to libs/ folder in your project" }
-        ],
-        { placeHolder: `${picked.label}: What would you like to do?` }
-      );
-      if (!action) {
-        return;
-      }
-      if (action.label === "Preview") {
-        const doc = await vscode38.workspace.openTextDocument(picked.fullPath);
-        await vscode38.window.showTextDocument(doc, { preview: true });
-      } else {
-        const workspaceRoot = vscode38.workspace.workspaceFolders?.[0]?.uri.fsPath;
-        if (!workspaceRoot) {
-          vscode38.window.showErrorMessage("No workspace folder open.");
-          return;
-        }
-        const libsDir = path19.join(workspaceRoot, "libs");
-        if (!fs16.existsSync(libsDir)) {
-          fs16.mkdirSync(libsDir, { recursive: true });
-        }
-        const dest = path19.join(libsDir, `${picked.label}.lua`);
-        if (fs16.existsSync(dest)) {
-          const overwrite = await vscode38.window.showWarningMessage(
-            `libs/${picked.label}.lua already exists. Overwrite?`,
-            "Yes",
-            "No"
-          );
-          if (overwrite !== "Yes") {
-            return;
-          }
-        }
-        fs16.copyFileSync(picked.fullPath, dest);
-        vscode38.window.showInformationMessage(`Copied ${picked.label} to libs/${picked.label}.lua`);
-      }
-    })
-  );
-  context.subscriptions.push(
-    vscode38.commands.registerCommand("lurek.library.insertSnippet", async () => {
-      const categories = getCategories();
-      const catPick = await vscode38.window.showQuickPick(
-        categories.map((c) => ({ label: c })),
-        { placeHolder: "Choose snippet category" }
-      );
-      if (!catPick) {
-        return;
-      }
-      const snippetsInCat = SNIPPETS.filter((s) => s.category === catPick.label);
-      const snippetPick = await vscode38.window.showQuickPick(
-        snippetsInCat.map((s) => ({ label: s.label, snippet: s })),
-        { placeHolder: `${catPick.label} snippets` }
-      );
-      if (!snippetPick) {
-        return;
-      }
-      const editor = vscode38.window.activeTextEditor;
-      if (!editor) {
-        const doc = await vscode38.workspace.openTextDocument({
-          language: "lua",
-          content: snippetPick.snippet.code + "\n"
-        });
-        await vscode38.window.showTextDocument(doc);
-        return;
-      }
-      await editor.edit((editBuilder) => {
-        editBuilder.insert(editor.selection.active, snippetPick.snippet.code + "\n");
-      });
-    })
-  );
-  context.subscriptions.push(
-    vscode38.commands.registerCommand("lurek.library.newPattern", async () => {
-      const editor = vscode38.window.activeTextEditor;
-      if (!editor || editor.selection.isEmpty) {
-        vscode38.window.showWarningMessage("Select some Lua code first to create a pattern from it.");
-        return;
-      }
-      const selectedText = editor.document.getText(editor.selection);
-      const name = await vscode38.window.showInputBox({
-        prompt: "Pattern name",
-        placeHolder: "my-pattern",
-        validateInput: (v) => {
-          if (!v.trim()) {
-            return "Name cannot be empty";
-          }
-          if (/[<>:"/\\|?*\s]/.test(v)) {
-            return "Name should be a simple identifier (use dashes, no spaces)";
-          }
-          return void 0;
-        }
-      });
-      if (!name) {
-        return;
-      }
-      const category = await vscode38.window.showInputBox({
-        prompt: "Category",
-        placeHolder: "e.g. gameplay, ui, utility"
-      });
-      const description = await vscode38.window.showInputBox({
-        prompt: "Brief description",
-        placeHolder: "What does this pattern do?"
-      });
-      const header = [
-        `--- ${name} pattern for Lurek2D.`,
-        `--- ${description ?? "Custom pattern."}`,
-        `---`,
-        `--- Category: ${category ?? "general"}`,
-        `---`,
-        ""
-      ].join("\n");
-      const patternsDir = path19.join(context.extensionPath, "data", "patterns");
-      if (!fs16.existsSync(patternsDir)) {
-        fs16.mkdirSync(patternsDir, { recursive: true });
-      }
-      const destFile = path19.join(patternsDir, `${name}.lua`);
-      if (fs16.existsSync(destFile)) {
-        const overwrite = await vscode38.window.showWarningMessage(
-          `Pattern "${name}" already exists. Overwrite?`,
-          "Yes",
-          "No"
-        );
-        if (overwrite !== "Yes") {
-          return;
-        }
-      }
-      fs16.writeFileSync(destFile, header + selectedText + "\n", "utf-8");
-      vscode38.window.showInformationMessage(`Pattern "${name}" saved to data/patterns/${name}.lua`);
-    })
-  );
-}
-
-// src/commands/gameDevCag.ts
-var vscode39 = __toESM(require("vscode"));
-var path20 = __toESM(require("path"));
-var fs17 = __toESM(require("fs"));
-var CAG_COMPONENTS = [
-  { label: "Agents", description: "AI agent definitions for game dev roles", srcDir: "agents" },
-  { label: "Skills", description: "Domain skill packages for AI assistants", srcDir: "skills" },
-  { label: "Prompts", description: "Task-driven playbooks for game development", srcDir: "prompts" },
-  { label: "Instructions", description: "Contextual coding instructions", srcDir: "instructions" }
-];
-var TEMPLATES2 = [
-  { label: "Minimal", description: "Bare-bones starter with essential callbacks", dir: "minimal" },
-  { label: "Game Loop", description: "Structured loop with class system and event bus", dir: "game-loop" },
-  { label: "Platformer", description: "Side-scrolling platformer with jump physics", dir: "platformer" },
-  { label: "Top-Down RPG", description: "8-dir movement, scene management, HUD", dir: "top-down-rpg" },
-  { label: "Shoot 'em Up", description: "Vertical scrolling shooter with bullet pool", dir: "shoot-em-up" },
-  { label: "Puzzle", description: "Grid-based puzzle with click interaction", dir: "puzzle" },
-  { label: "Roguelike", description: "Turn-based with BSP dungeon generation", dir: "roguelike" },
-  { label: "Visual Novel", description: "Typewriter dialog and scene progression", dir: "visual-novel" },
-  { label: "Arcade", description: "Simple arcade loop with score and lives", dir: "arcade" },
-  { label: "Tower Defense", description: "Path-following enemies, placeable towers, waves", dir: "tower-defense" },
-  { label: "Game Jam", description: "Minimal fast-start template for game jams", dir: "game-jam" },
-  { label: "Demo Scene", description: "Scene switcher with multiple demo scenes", dir: "demo-scene" }
-];
-function getGameDevCagRoot(context) {
-  return path20.join(context.extensionPath, "cag", "game-dev");
-}
-function getWorkspaceRoot3() {
-  return vscode39.workspace.workspaceFolders?.[0]?.uri.fsPath;
-}
-function copyDirRecursive(src, dest) {
-  if (!fs17.existsSync(dest)) {
-    fs17.mkdirSync(dest, { recursive: true });
-  }
-  for (const entry of fs17.readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path20.join(src, entry.name);
-    const destPath = path20.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDirRecursive(srcPath, destPath);
-    } else {
-      fs17.copyFileSync(srcPath, destPath);
-    }
-  }
-}
-function countFiles(dir) {
-  if (!fs17.existsSync(dir)) {
-    return 0;
-  }
-  let count = 0;
-  for (const entry of fs17.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.isDirectory()) {
-      count += countFiles(path20.join(dir, entry.name));
-    } else {
-      count++;
-    }
-  }
-  return count;
-}
-async function deployCag(context) {
-  const root = getWorkspaceRoot3();
-  if (!root) {
-    vscode39.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const cagRoot = getGameDevCagRoot(context);
-  if (!fs17.existsSync(cagRoot)) {
-    vscode39.window.showErrorMessage("Game Dev CAG files not found in extension bundle.");
-    return;
-  }
-  const picks = await vscode39.window.showQuickPick(
-    CAG_COMPONENTS.map((c) => ({
-      label: c.label,
-      description: c.description,
-      picked: true,
-      srcDir: c.srcDir
-    })),
-    {
-      canPickMany: true,
-      placeHolder: "Select CAG components to deploy",
-      title: "Deploy Game Dev AI Layer"
-    }
-  );
-  if (!picks || picks.length === 0) {
-    return;
-  }
-  const targetGithub = path20.join(root, ".github");
-  let totalFiles = 0;
-  for (const pick of picks) {
-    const srcDir = path20.join(cagRoot, pick.srcDir);
-    if (!fs17.existsSync(srcDir)) {
-      continue;
-    }
-    const destDir = path20.join(targetGithub, pick.srcDir);
-    copyDirRecursive(srcDir, destDir);
-    totalFiles += countFiles(srcDir);
-  }
-  vscode39.window.showInformationMessage(
-    `Deployed ${totalFiles} file(s) to .github/ (${picks.map((p) => p.label).join(", ")})`
-  );
-}
-async function scaffoldFromTemplate(context) {
-  const root = getWorkspaceRoot3();
-  if (!root) {
-    vscode39.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const cagRoot = getGameDevCagRoot(context);
-  const templatesRoot = path20.join(cagRoot, "templates");
-  if (!fs17.existsSync(templatesRoot)) {
-    vscode39.window.showErrorMessage("Game Dev templates not found in extension bundle.");
-    return;
-  }
-  const pick = await vscode39.window.showQuickPick(
-    TEMPLATES2.map((t) => ({ label: t.label, description: t.description, dir: t.dir })),
-    { placeHolder: "Select a game template", title: "Scaffold Project from Template" }
-  );
-  if (!pick) {
-    return;
-  }
-  const srcDir = path20.join(templatesRoot, pick.dir);
-  if (!fs17.existsSync(srcDir)) {
-    vscode39.window.showErrorMessage(`Template "${pick.label}" not found.`);
-    return;
-  }
-  const mainLua = path20.join(root, "main.lua");
-  if (fs17.existsSync(mainLua)) {
-    const overwrite = await vscode39.window.showWarningMessage(
-      "main.lua already exists in workspace. Overwrite project files?",
-      "Yes",
-      "No"
-    );
-    if (overwrite !== "Yes") {
-      return;
-    }
-  }
-  copyDirRecursive(srcDir, root);
-  const fileCount = countFiles(srcDir);
-  vscode39.window.showInformationMessage(
-    `Scaffolded "${pick.label}" template (${fileCount} files)`
-  );
-  const newMain = path20.join(root, "main.lua");
-  if (fs17.existsSync(newMain)) {
-    const doc = await vscode39.workspace.openTextDocument(newMain);
-    await vscode39.window.showTextDocument(doc);
-  }
-}
-async function updateCag(context) {
-  const root = getWorkspaceRoot3();
-  if (!root) {
-    vscode39.window.showErrorMessage("No workspace folder open.");
-    return;
-  }
-  const targetGithub = path20.join(root, ".github");
-  if (!fs17.existsSync(targetGithub)) {
-    vscode39.window.showInformationMessage(
-      "No .github/ folder found. Use 'Deploy Game Dev AI Layer' first."
-    );
-    return;
-  }
-  const confirm = await vscode39.window.showWarningMessage(
-    "This will overwrite existing CAG files in .github/ with the latest from the extension. Continue?",
-    "Yes",
-    "No"
-  );
-  if (confirm !== "Yes") {
-    return;
-  }
-  const cagRoot = getGameDevCagRoot(context);
-  let totalFiles = 0;
-  for (const comp of CAG_COMPONENTS) {
-    const srcDir = path20.join(cagRoot, comp.srcDir);
-    if (!fs17.existsSync(srcDir)) {
-      continue;
-    }
-    const destDir = path20.join(targetGithub, comp.srcDir);
-    copyDirRecursive(srcDir, destDir);
-    totalFiles += countFiles(srcDir);
-  }
-  vscode39.window.showInformationMessage(
-    `Updated ${totalFiles} CAG file(s) in .github/`
-  );
-}
-function registerGameDevCagCommands(context) {
-  context.subscriptions.push(
-    vscode39.commands.registerCommand("lurek.cag.deploy", () => deployCag(context)),
-    vscode39.commands.registerCommand("lurek.cag.scaffold", () => scaffoldFromTemplate(context)),
-    vscode39.commands.registerCommand("lurek.cag.updateGameDev", () => updateCag(context))
-  );
-}
-
-// src/debug/luaDebugAdapter.ts
-var vscode40 = __toESM(require("vscode"));
-
-// src/debug/luaDebugSession.ts
-var import_debugadapter = __toESM(require_main());
-var net2 = __toESM(require("net"));
-var path21 = __toESM(require("path"));
-var import_child_process2 = require("child_process");
-var fs18 = __toESM(require("fs"));
-var THREAD_ID = 1;
-var MAX_CONNECT_RETRIES = 5;
-var RETRY_DELAY_MS = 800;
-var DEFAULT_DEBUG_PORT = 8172;
-var LuaDebugSession = class extends import_debugadapter.LoggingDebugSession {
-  socket = null;
-  engineProcess = null;
-  breakpoints = /* @__PURE__ */ new Map();
-  variablesMap = /* @__PURE__ */ new Map();
-  nextVariableRef = 1;
-  pendingRequests = /* @__PURE__ */ new Map();
-  nextRequestId = 1;
-  receiveBuffer = "";
-  gamePath = "";
-  debugPort = DEFAULT_DEBUG_PORT;
-  loadedSources = [];
-  constructor() {
-    super("lurek-debug.log");
-    this.setDebuggerLinesStartAt1(true);
-    this.setDebuggerColumnsStartAt1(true);
-  }
-  // ── Initialization ──────────────────────────────────────
-  initializeRequest(response, _args) {
-    response.body = {
-      supportsConfigurationDoneRequest: true,
-      supportsFunctionBreakpoints: false,
-      supportsConditionalBreakpoints: true,
-      supportsHitConditionalBreakpoints: true,
-      supportsEvaluateForHovers: true,
-      supportsStepBack: false,
-      supportsSetVariable: true,
-      supportsRestartFrame: false,
-      supportsGotoTargetsRequest: false,
-      supportsStepInTargetsRequest: false,
-      supportsCompletionsRequest: true,
-      supportsModulesRequest: false,
-      supportsExceptionOptions: false,
-      supportsValueFormattingOptions: false,
-      supportsExceptionInfoRequest: false,
-      supportTerminateDebuggee: true,
-      supportsDelayedStackTraceLoading: false,
-      supportsLoadedSourcesRequest: true,
-      supportsLogPoints: true,
-      supportsTerminateThreadsRequest: false,
-      supportsSetExpression: false,
-      supportsTerminateRequest: true,
-      supportsDataBreakpoints: false,
-      supportsReadMemoryRequest: false,
-      supportsDisassembleRequest: false,
-      supportsBreakpointLocationsRequest: true,
-      supportsClipboardContext: false,
-      supportsExceptionFilterOptions: false,
-      supportsSteppingGranularity: false,
-      supportsInstructionBreakpoints: false
-    };
-    this.sendResponse(response);
-    this.sendEvent(new import_debugadapter.InitializedEvent());
-  }
-  // ── Launch / Attach ─────────────────────────────────────
-  async launchRequest(response, args) {
-    this.gamePath = args.program;
-    this.debugPort = args.debugPort ?? DEFAULT_DEBUG_PORT;
-    const stopOnEntry = args.stopOnEntry ?? false;
-    const engineBinary = this.findEngineBinary(args.enginePath);
-    if (!engineBinary) {
-      this.sendErrorResponse(response, 1001, "Lurek2D engine not found. Set 'lurek.enginePath' in settings or ensure lurek2d is on PATH.");
-      return;
-    }
-    const spawnArgs = [
-      `--debug-port=${this.debugPort}`,
-      this.gamePath,
-      ...args.args ?? []
-    ];
-    this.log(`Launching: ${engineBinary} ${spawnArgs.join(" ")}`);
-    try {
-      this.engineProcess = (0, import_child_process2.spawn)(engineBinary, spawnArgs, {
-        cwd: path21.dirname(this.gamePath),
-        stdio: ["ignore", "pipe", "pipe"]
-      });
-      this.engineProcess.stdout?.on("data", (data) => {
-        this.sendEvent(
-          new import_debugadapter.OutputEvent(data.toString(), "stdout")
-        );
-      });
-      this.engineProcess.stderr?.on("data", (data) => {
-        this.sendEvent(
-          new import_debugadapter.OutputEvent(data.toString(), "stderr")
-        );
-      });
-      this.engineProcess.on("exit", (code) => {
-        this.log(`Engine exited with code ${code}`);
-        this.sendEvent(new import_debugadapter.TerminatedEvent());
-      });
-      this.engineProcess.on("error", (err) => {
-        this.sendEvent(
-          new import_debugadapter.OutputEvent(`Engine error: ${err.message}
-`, "stderr")
-        );
-        this.sendEvent(new import_debugadapter.TerminatedEvent());
-      });
-      await this.connectToEngine(this.debugPort);
-      if (stopOnEntry) {
-        await this.sendToEngine("pause");
-      }
-      this.sendResponse(response);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      this.sendErrorResponse(response, 1002, `Failed to launch: ${message}`);
-    }
-  }
-  async attachRequest(response, args) {
-    this.debugPort = args.debugPort ?? DEFAULT_DEBUG_PORT;
-    try {
-      await this.connectToEngine(this.debugPort);
-      this.sendResponse(response);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      this.sendErrorResponse(response, 1003, `Failed to attach: ${message}`);
-    }
-  }
-  configurationDoneRequest(response, _args) {
-    this.sendResponse(response);
-  }
-  async disconnectRequest(response, args) {
-    if (args.terminateDebuggee !== false && this.engineProcess) {
-      try {
-        await this.sendToEngine("terminate");
-      } catch {
-      }
-    }
-    this.cleanup();
-    this.sendResponse(response);
-  }
-  async terminateRequest(response, _args) {
-    try {
-      await this.sendToEngine("terminate");
-    } catch {
-    }
-    this.cleanup();
-    this.sendResponse(response);
-  }
-  // ── Breakpoints ─────────────────────────────────────────
-  async setBreakPointsRequest(response, args) {
-    const sourcePath = args.source.path ?? "";
-    const clientLines = args.lines ?? [];
-    const relativePath = this.toRelativePath(sourcePath);
-    try {
-      const engineResp = await this.sendToEngine("setBreakpoints", {
-        file: relativePath,
-        lines: clientLines
-      });
-      const bps = clientLines.map((line, idx) => {
-        const bp = new import_debugadapter.Breakpoint(true, line);
-        bp.id = idx + 1;
-        if (engineResp.body && Array.isArray(engineResp.body.breakpoints)) {
-          const engineBp = engineResp.body.breakpoints[idx];
-          if (engineBp) {
-            bp.verified = engineBp.verified;
-            if (engineBp.line !== void 0) {
-              bp.line = engineBp.line;
-            }
-          }
-        }
-        return bp;
-      });
-      this.breakpoints.set(sourcePath, bps);
-      if (!this.loadedSources.find((s) => s.path === sourcePath)) {
-        this.loadedSources.push(
-          new import_debugadapter.Source(path21.basename(sourcePath), sourcePath)
-        );
-      }
-      response.body = { breakpoints: bps };
-    } catch {
-      const bps = clientLines.map((line, idx) => {
-        const bp = new import_debugadapter.Breakpoint(false, line);
-        bp.id = idx + 1;
-        return bp;
-      });
-      this.breakpoints.set(sourcePath, bps);
-      response.body = { breakpoints: bps };
-    }
-    this.sendResponse(response);
-  }
-  breakpointLocationsRequest(response, args) {
-    const startLine = args.line;
-    const endLine = args.endLine ?? startLine;
-    const locations = [];
-    for (let line = startLine; line <= endLine; line++) {
-      locations.push({ line });
-    }
-    response.body = { breakpoints: locations };
-    this.sendResponse(response);
-  }
-  // ── Threads ─────────────────────────────────────────────
-  threadsRequest(response) {
-    response.body = {
-      threads: [new import_debugadapter.Thread(THREAD_ID, "Lurek2D Main")]
-    };
-    this.sendResponse(response);
-  }
-  // ── Stack Trace ─────────────────────────────────────────
-  async stackTraceRequest(response, args) {
-    try {
-      const engineResp = await this.sendToEngine("stackTrace");
-      const frames = [];
-      if (engineResp.body && Array.isArray(engineResp.body.frames)) {
-        const engineFrames = engineResp.body.frames;
-        const startFrame = args.startFrame ?? 0;
-        const levels = args.levels ?? engineFrames.length;
-        const endFrame = Math.min(startFrame + levels, engineFrames.length);
-        for (let i = startFrame; i < endFrame; i++) {
-          const ef = engineFrames[i];
-          const fullPath = this.toAbsolutePath(ef.file);
-          const source = new import_debugadapter.Source(path21.basename(ef.file), fullPath);
-          frames.push(
-            new import_debugadapter.StackFrame(i, ef.name, source, ef.line, ef.column ?? 1)
-          );
-        }
-      }
-      response.body = {
-        stackFrames: frames,
-        totalFrames: engineResp.body?.frames?.length ?? frames.length
-      };
-    } catch {
-      response.body = { stackFrames: [], totalFrames: 0 };
-    }
-    this.sendResponse(response);
-  }
-  // ── Scopes ──────────────────────────────────────────────
-  async scopesRequest(response, args) {
-    try {
-      const engineResp = await this.sendToEngine("scopes", {
-        frameId: args.frameId
-      });
-      const scopes = [];
-      if (engineResp.body && Array.isArray(engineResp.body.scopes)) {
-        for (const s of engineResp.body.scopes) {
-          scopes.push(
-            new import_debugadapter.Scope(s.name, s.variablesReference, s.expensive ?? false)
-          );
-        }
-      } else {
-        const localsRef = this.nextVariableRef++;
-        const upvaluesRef = this.nextVariableRef++;
-        scopes.push(new import_debugadapter.Scope("Locals", localsRef, false));
-        scopes.push(new import_debugadapter.Scope("Upvalues", upvaluesRef, false));
-      }
-      response.body = { scopes };
-    } catch {
-      response.body = { scopes: [] };
-    }
-    this.sendResponse(response);
-  }
-  // ── Variables ───────────────────────────────────────────
-  async variablesRequest(response, args) {
-    try {
-      const cached = this.variablesMap.get(args.variablesReference);
-      if (cached) {
-        response.body = { variables: cached };
-        this.sendResponse(response);
-        return;
-      }
-      const engineResp = await this.sendToEngine("variables", {
-        variablesReference: args.variablesReference
-      });
-      const variables = [];
-      if (engineResp.body && Array.isArray(engineResp.body.variables)) {
-        for (const v of engineResp.body.variables) {
-          let varRef = 0;
-          if (v.children && v.children.length > 0) {
-            varRef = this.nextVariableRef++;
-            const childVars = v.children.map((c) => {
-              let childRef = 0;
-              if (c.children && c.children.length > 0) {
-                childRef = this.nextVariableRef++;
-                this.variablesMap.set(
-                  childRef,
-                  c.children.map(
-                    (gc) => new import_debugadapter.Variable(gc.name, gc.value, 0)
-                  )
-                );
-              }
-              return new import_debugadapter.Variable(c.name, c.value, childRef);
-            });
-            this.variablesMap.set(varRef, childVars);
-          } else if (v.variablesReference) {
-            varRef = v.variablesReference;
-          }
-          variables.push(new import_debugadapter.Variable(v.name, v.value, varRef));
-        }
-      }
-      this.variablesMap.set(args.variablesReference, variables);
-      response.body = { variables };
-    } catch {
-      response.body = { variables: [] };
-    }
-    this.sendResponse(response);
-  }
-  async setVariableRequest(response, args) {
-    try {
-      const engineResp = await this.sendToEngine("setVariable", {
-        variablesReference: args.variablesReference,
-        name: args.name,
-        value: args.value
-      });
-      response.body = {
-        value: engineResp.body?.value ?? args.value
-      };
-      this.variablesMap.delete(args.variablesReference);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      this.sendErrorResponse(response, 1010, `Failed to set variable: ${message}`);
-      return;
-    }
-    this.sendResponse(response);
-  }
-  // ── Execution Control ───────────────────────────────────
-  async continueRequest(response, _args) {
-    this.variablesMap.clear();
-    try {
-      await this.sendToEngine("continue");
-    } catch {
-    }
-    response.body = { allThreadsContinued: true };
-    this.sendResponse(response);
-  }
-  async nextRequest(response, _args) {
-    this.variablesMap.clear();
-    try {
-      await this.sendToEngine("next");
-    } catch {
-    }
-    this.sendResponse(response);
-  }
-  async stepInRequest(response, _args) {
-    this.variablesMap.clear();
-    try {
-      await this.sendToEngine("stepIn");
-    } catch {
-    }
-    this.sendResponse(response);
-  }
-  async stepOutRequest(response, _args) {
-    this.variablesMap.clear();
-    try {
-      await this.sendToEngine("stepOut");
-    } catch {
-    }
-    this.sendResponse(response);
-  }
-  async pauseRequest(response, _args) {
-    try {
-      await this.sendToEngine("pause");
-    } catch {
-    }
-    this.sendResponse(response);
-  }
-  // ── Evaluate ────────────────────────────────────────────
-  async evaluateRequest(response, args) {
-    try {
-      const engineResp = await this.sendToEngine("evaluate", {
-        expression: args.expression,
-        frameId: args.frameId ?? 0,
-        context: args.context
-      });
-      const result = engineResp.body?.result ?? "nil";
-      const varRef = engineResp.body?.variablesReference ?? 0;
-      response.body = {
-        result,
-        variablesReference: varRef
-      };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
-      response.body = {
-        result: `Error: ${message}`,
-        variablesReference: 0
-      };
-    }
-    this.sendResponse(response);
-  }
-  // ── Completions ─────────────────────────────────────────
-  completionsRequest(response, args) {
-    const text = args.text;
-    const targets = [];
-    if (text.startsWith("lurek.")) {
-      let lurekModules = [];
-      try {
-        const apiJsonPath = path21.join(__dirname, "..", "data", "lurek-api.json");
-        const raw = JSON.parse(fs18.readFileSync(apiJsonPath, "utf8"));
-        lurekModules = (raw.modules ?? []).map((m) => m.name);
-      } catch {
-        lurekModules = [
-          "ai",
-          "animation",
-          "audio",
-          "camera",
-          "compute",
-          "data",
-          "ecs",
-          "event",
-          "filesystem",
-          "image",
-          "input",
-          "math",
-          "mods",
-          "particle",
-          "pathfind",
-          "physics",
-          "render",
-          "save",
-          "scene",
-          "thread",
-          "tilemap",
-          "timer",
-          "tween",
-          "ui",
-          "window"
-        ];
-      }
-      for (const mod of lurekModules) {
-        if (mod.startsWith(text.slice(5))) {
-          targets.push(new import_debugadapter.CompletionItem(mod, 9));
-        }
-      }
-    }
-    const keywords = [
-      "local",
-      "function",
-      "if",
-      "then",
-      "else",
-      "elseif",
-      "end",
-      "for",
-      "while",
-      "do",
-      "repeat",
-      "until",
-      "return",
-      "break",
-      "in",
-      "not",
-      "and",
-      "or",
-      "true",
-      "false",
-      "nil"
-    ];
-    for (const kw of keywords) {
-      if (kw.startsWith(text)) {
-        targets.push(new import_debugadapter.CompletionItem(kw, 14));
-      }
-    }
-    response.body = { targets };
-    this.sendResponse(response);
-  }
-  // ── Loaded Sources ──────────────────────────────────────
-  loadedSourcesRequest(response) {
-    response.body = { sources: this.loadedSources };
-    this.sendResponse(response);
-  }
-  // ── TCP Communication ───────────────────────────────────
-  connectToEngine(port) {
-    return new Promise((resolve5, reject) => {
-      let retries = 0;
-      const attempt = () => {
-        const socket = new net2.Socket();
-        const onError = (err) => {
-          socket.destroy();
-          retries++;
-          if (retries < MAX_CONNECT_RETRIES) {
-            this.log(
-              `Connection attempt ${retries} failed, retrying in ${RETRY_DELAY_MS}ms...`
-            );
-            setTimeout(attempt, RETRY_DELAY_MS);
-          } else {
-            reject(
-              new Error(
-                `Failed to connect to Lurek2D engine on port ${port} after ${MAX_CONNECT_RETRIES} attempts: ${err.message}`
-              )
-            );
-          }
-        };
-        socket.once("error", onError);
-        socket.connect(port, "127.0.0.1", () => {
-          socket.removeListener("error", onError);
-          this.socket = socket;
-          this.receiveBuffer = "";
-          this.log(`Connected to Lurek2D engine on port ${port}`);
-          socket.on("data", (data) => {
-            this.onSocketData(data);
-          });
-          socket.on("error", (err) => {
-            this.sendEvent(
-              new import_debugadapter.OutputEvent(`Engine connection error: ${err.message}
-`, "stderr")
-            );
-            this.cleanup();
-            this.sendEvent(new import_debugadapter.TerminatedEvent());
-          });
-          socket.on("close", () => {
-            this.log("Engine connection closed");
-            this.cleanup();
-            this.sendEvent(new import_debugadapter.TerminatedEvent());
-          });
-          resolve5();
-        });
-      };
-      attempt();
-    });
-  }
-  sendToEngine(command, args) {
-    return new Promise((resolve5, reject) => {
-      if (!this.socket || this.socket.destroyed) {
-        reject(new Error("Not connected to engine"));
-        return;
-      }
-      const id = this.nextRequestId++;
-      const message = JSON.stringify({ id, command, args: args ?? {} });
-      const packet = `Content-Length: ${Buffer.byteLength(message)}\r
+end`}];function bp(){let n=new Set;for(let e of bo)n.add(e.category);return[...n].sort()}function Tp(n){let e=bt.join(n,"data","patterns");return we.existsSync(e)?we.readdirSync(e).filter(t=>t.endsWith(".lua")).map(t=>({name:t.replace(".lua",""),fullPath:bt.join(e,t)})):[]}function To(n){n.subscriptions.push(J.commands.registerCommand("lurek.library.browse",async()=>{let e=Tp(n.extensionPath);if(e.length===0){J.window.showInformationMessage("No patterns found in data/patterns/.");return}let t=await J.window.showQuickPick(e.map(a=>({label:a.name,description:`data/patterns/${a.name}.lua`,fullPath:a.fullPath})),{placeHolder:"Browse Lurek2D patterns"});if(!t)return;let r=await J.window.showQuickPick([{label:"Preview",description:"Open the pattern file in a new tab"},{label:"Copy to project",description:"Copy to libs/ folder in your project"}],{placeHolder:`${t.label}: What would you like to do?`});if(r)if(r.label==="Preview"){let a=await J.workspace.openTextDocument(t.fullPath);await J.window.showTextDocument(a,{preview:!0})}else{let a=J.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!a){J.window.showErrorMessage("No workspace folder open.");return}let i=bt.join(a,"libs");we.existsSync(i)||we.mkdirSync(i,{recursive:!0});let o=bt.join(i,`${t.label}.lua`);if(we.existsSync(o)&&await J.window.showWarningMessage(`libs/${t.label}.lua already exists. Overwrite?`,"Yes","No")!=="Yes")return;we.copyFileSync(t.fullPath,o),J.window.showInformationMessage(`Copied ${t.label} to libs/${t.label}.lua`)}})),n.subscriptions.push(J.commands.registerCommand("lurek.library.insertSnippet",async()=>{let e=bp(),t=await J.window.showQuickPick(e.map(o=>({label:o})),{placeHolder:"Choose snippet category"});if(!t)return;let r=bo.filter(o=>o.category===t.label),a=await J.window.showQuickPick(r.map(o=>({label:o.label,snippet:o})),{placeHolder:`${t.label} snippets`});if(!a)return;let i=J.window.activeTextEditor;if(!i){let o=await J.workspace.openTextDocument({language:"lua",content:a.snippet.code+`
+`});await J.window.showTextDocument(o);return}await i.edit(o=>{o.insert(i.selection.active,a.snippet.code+`
+`)})})),n.subscriptions.push(J.commands.registerCommand("lurek.library.newPattern",async()=>{let e=J.window.activeTextEditor;if(!e||e.selection.isEmpty){J.window.showWarningMessage("Select some Lua code first to create a pattern from it.");return}let t=e.document.getText(e.selection),r=await J.window.showInputBox({prompt:"Pattern name",placeHolder:"my-pattern",validateInput:p=>{if(!p.trim())return"Name cannot be empty";if(/[<>:"/\\|?*\s]/.test(p))return"Name should be a simple identifier (use dashes, no spaces)"}});if(!r)return;let a=await J.window.showInputBox({prompt:"Category",placeHolder:"e.g. gameplay, ui, utility"}),i=await J.window.showInputBox({prompt:"Brief description",placeHolder:"What does this pattern do?"}),o=[`--- ${r} pattern for Lurek2D.`,`--- ${i??"Custom pattern."}`,"---",`--- Category: ${a??"general"}`,"---",""].join(`
+`),s=bt.join(n.extensionPath,"data","patterns");we.existsSync(s)||we.mkdirSync(s,{recursive:!0});let l=bt.join(s,`${r}.lua`);we.existsSync(l)&&await J.window.showWarningMessage(`Pattern "${r}" already exists. Overwrite?`,"Yes","No")!=="Yes"||(we.writeFileSync(l,o+t+`
+`,"utf-8"),J.window.showInformationMessage(`Pattern "${r}" saved to data/patterns/${r}.lua`))}))}var re=C(require("vscode")),xe=C(require("path")),me=C(require("fs")),vo=[{label:"Agents",description:"AI agent definitions for game dev roles",srcDir:"agents"},{label:"Skills",description:"Domain skill packages for AI assistants",srcDir:"skills"},{label:"Prompts",description:"Task-driven playbooks for game development",srcDir:"prompts"},{label:"Instructions",description:"Contextual coding instructions",srcDir:"instructions"}],vp=[{label:"Minimal",description:"Bare-bones starter with essential callbacks",dir:"minimal"},{label:"Game Loop",description:"Structured loop with class system and event bus",dir:"game-loop"},{label:"Platformer",description:"Side-scrolling platformer with jump physics",dir:"platformer"},{label:"Top-Down RPG",description:"8-dir movement, scene management, HUD",dir:"top-down-rpg"},{label:"Shoot 'em Up",description:"Vertical scrolling shooter with bullet pool",dir:"shoot-em-up"},{label:"Puzzle",description:"Grid-based puzzle with click interaction",dir:"puzzle"},{label:"Roguelike",description:"Turn-based with BSP dungeon generation",dir:"roguelike"},{label:"Visual Novel",description:"Typewriter dialog and scene progression",dir:"visual-novel"},{label:"Arcade",description:"Simple arcade loop with score and lives",dir:"arcade"},{label:"Tower Defense",description:"Path-following enemies, placeable towers, waves",dir:"tower-defense"},{label:"Game Jam",description:"Minimal fast-start template for game jams",dir:"game-jam"},{label:"Demo Scene",description:"Scene switcher with multiple demo scenes",dir:"demo-scene"}];function ea(n){return xe.join(n.extensionPath,"cag","game-dev")}function ta(){return re.workspace.workspaceFolders?.[0]?.uri.fsPath}function ar(n,e){me.existsSync(e)||me.mkdirSync(e,{recursive:!0});for(let t of me.readdirSync(n,{withFileTypes:!0})){let r=xe.join(n,t.name),a=xe.join(e,t.name);t.isDirectory()?ar(r,a):me.copyFileSync(r,a)}}function ir(n){if(!me.existsSync(n))return 0;let e=0;for(let t of me.readdirSync(n,{withFileTypes:!0}))t.isDirectory()?e+=ir(xe.join(n,t.name)):e++;return e}async function Lp(n){let e=ta();if(!e){re.window.showErrorMessage("No workspace folder open.");return}let t=ea(n);if(!me.existsSync(t)){re.window.showErrorMessage("Game Dev CAG files not found in extension bundle.");return}let r=await re.window.showQuickPick(vo.map(o=>({label:o.label,description:o.description,picked:!0,srcDir:o.srcDir})),{canPickMany:!0,placeHolder:"Select CAG components to deploy",title:"Deploy Game Dev AI Layer"});if(!r||r.length===0)return;let a=xe.join(e,".github"),i=0;for(let o of r){let s=xe.join(t,o.srcDir);if(!me.existsSync(s))continue;let l=xe.join(a,o.srcDir);ar(s,l),i+=ir(s)}re.window.showInformationMessage(`Deployed ${i} file(s) to .github/ (${r.map(o=>o.label).join(", ")})`)}async function wp(n){let e=ta();if(!e){re.window.showErrorMessage("No workspace folder open.");return}let t=ea(n),r=xe.join(t,"templates");if(!me.existsSync(r)){re.window.showErrorMessage("Game Dev templates not found in extension bundle.");return}let a=await re.window.showQuickPick(vp.map(p=>({label:p.label,description:p.description,dir:p.dir})),{placeHolder:"Select a game template",title:"Scaffold Project from Template"});if(!a)return;let i=xe.join(r,a.dir);if(!me.existsSync(i)){re.window.showErrorMessage(`Template "${a.label}" not found.`);return}let o=xe.join(e,"main.lua");if(me.existsSync(o)&&await re.window.showWarningMessage("main.lua already exists in workspace. Overwrite project files?","Yes","No")!=="Yes")return;ar(i,e);let s=ir(i);re.window.showInformationMessage(`Scaffolded "${a.label}" template (${s} files)`);let l=xe.join(e,"main.lua");if(me.existsSync(l)){let p=await re.workspace.openTextDocument(l);await re.window.showTextDocument(p)}}async function xp(n){let e=ta();if(!e){re.window.showErrorMessage("No workspace folder open.");return}let t=xe.join(e,".github");if(!me.existsSync(t)){re.window.showInformationMessage("No .github/ folder found. Use 'Deploy Game Dev AI Layer' first.");return}if(await re.window.showWarningMessage("This will overwrite existing CAG files in .github/ with the latest from the extension. Continue?","Yes","No")!=="Yes")return;let a=ea(n),i=0;for(let o of vo){let s=xe.join(a,o.srcDir);if(!me.existsSync(s))continue;let l=xe.join(t,o.srcDir);ar(s,l),i+=ir(s)}re.window.showInformationMessage(`Updated ${i} CAG file(s) in .github/`)}function Lo(n){n.subscriptions.push(re.commands.registerCommand("lurek.cag.deploy",()=>Lp(n)),re.commands.registerCommand("lurek.cag.scaffold",()=>wp(n)),re.commands.registerCommand("lurek.cag.updateGameDev",()=>xp(n)))}var He=C(require("vscode"));var G=C(Ao()),_o=C(require("net")),ae=C(require("path")),No=require("child_process"),pt=C(require("fs")),Fo=1,Oo=5,zo=800,Da=8172,br=class extends G.LoggingDebugSession{socket=null;engineProcess=null;breakpoints=new Map;variablesMap=new Map;nextVariableRef=1;pendingRequests=new Map;nextRequestId=1;receiveBuffer="";gamePath="";debugPort=Da;loadedSources=[];constructor(){super("lurek-debug.log"),this.setDebuggerLinesStartAt1(!0),this.setDebuggerColumnsStartAt1(!0)}initializeRequest(e,t){e.body={supportsConfigurationDoneRequest:!0,supportsFunctionBreakpoints:!1,supportsConditionalBreakpoints:!0,supportsHitConditionalBreakpoints:!0,supportsEvaluateForHovers:!0,supportsStepBack:!1,supportsSetVariable:!0,supportsRestartFrame:!1,supportsGotoTargetsRequest:!1,supportsStepInTargetsRequest:!1,supportsCompletionsRequest:!0,supportsModulesRequest:!1,supportsExceptionOptions:!1,supportsValueFormattingOptions:!1,supportsExceptionInfoRequest:!1,supportTerminateDebuggee:!0,supportsDelayedStackTraceLoading:!1,supportsLoadedSourcesRequest:!0,supportsLogPoints:!0,supportsTerminateThreadsRequest:!1,supportsSetExpression:!1,supportsTerminateRequest:!0,supportsDataBreakpoints:!1,supportsReadMemoryRequest:!1,supportsDisassembleRequest:!1,supportsBreakpointLocationsRequest:!0,supportsClipboardContext:!1,supportsExceptionFilterOptions:!1,supportsSteppingGranularity:!1,supportsInstructionBreakpoints:!1},this.sendResponse(e),this.sendEvent(new G.InitializedEvent)}async launchRequest(e,t){this.gamePath=t.program,this.debugPort=t.debugPort??Da;let r=t.stopOnEntry??!1,a=this.findEngineBinary(t.enginePath);if(!a){this.sendErrorResponse(e,1001,"Lurek2D engine not found. Set 'lurek.enginePath' in settings or ensure lurek2d is on PATH.");return}let i=[`--debug-port=${this.debugPort}`,this.gamePath,...t.args??[]];this.log(`Launching: ${a} ${i.join(" ")}`);try{this.engineProcess=(0,No.spawn)(a,i,{cwd:ae.dirname(this.gamePath),stdio:["ignore","pipe","pipe"]}),this.engineProcess.stdout?.on("data",o=>{this.sendEvent(new G.OutputEvent(o.toString(),"stdout"))}),this.engineProcess.stderr?.on("data",o=>{this.sendEvent(new G.OutputEvent(o.toString(),"stderr"))}),this.engineProcess.on("exit",o=>{this.log(`Engine exited with code ${o}`),this.sendEvent(new G.TerminatedEvent)}),this.engineProcess.on("error",o=>{this.sendEvent(new G.OutputEvent(`Engine error: ${o.message}
+`,"stderr")),this.sendEvent(new G.TerminatedEvent)}),await this.connectToEngine(this.debugPort),r&&await this.sendToEngine("pause"),this.sendResponse(e)}catch(o){let s=o instanceof Error?o.message:String(o);this.sendErrorResponse(e,1002,`Failed to launch: ${s}`)}}async attachRequest(e,t){this.debugPort=t.debugPort??Da;try{await this.connectToEngine(this.debugPort),this.sendResponse(e)}catch(r){let a=r instanceof Error?r.message:String(r);this.sendErrorResponse(e,1003,`Failed to attach: ${a}`)}}configurationDoneRequest(e,t){this.sendResponse(e)}async disconnectRequest(e,t){if(t.terminateDebuggee!==!1&&this.engineProcess)try{await this.sendToEngine("terminate")}catch{}this.cleanup(),this.sendResponse(e)}async terminateRequest(e,t){try{await this.sendToEngine("terminate")}catch{}this.cleanup(),this.sendResponse(e)}async setBreakPointsRequest(e,t){let r=t.source.path??"",a=t.lines??[],i=this.toRelativePath(r);try{let o=await this.sendToEngine("setBreakpoints",{file:i,lines:a}),s=a.map((l,p)=>{let u=new G.Breakpoint(!0,l);if(u.id=p+1,o.body&&Array.isArray(o.body.breakpoints)){let c=o.body.breakpoints[p];c&&(u.verified=c.verified,c.line!==void 0&&(u.line=c.line))}return u});this.breakpoints.set(r,s),this.loadedSources.find(l=>l.path===r)||this.loadedSources.push(new G.Source(ae.basename(r),r)),e.body={breakpoints:s}}catch{let o=a.map((s,l)=>{let p=new G.Breakpoint(!1,s);return p.id=l+1,p});this.breakpoints.set(r,o),e.body={breakpoints:o}}this.sendResponse(e)}breakpointLocationsRequest(e,t){let r=t.line,a=t.endLine??r,i=[];for(let o=r;o<=a;o++)i.push({line:o});e.body={breakpoints:i},this.sendResponse(e)}threadsRequest(e){e.body={threads:[new G.Thread(Fo,"Lurek2D Main")]},this.sendResponse(e)}async stackTraceRequest(e,t){try{let r=await this.sendToEngine("stackTrace"),a=[];if(r.body&&Array.isArray(r.body.frames)){let i=r.body.frames,o=t.startFrame??0,s=t.levels??i.length,l=Math.min(o+s,i.length);for(let p=o;p<l;p++){let u=i[p],c=this.toAbsolutePath(u.file),h=new G.Source(ae.basename(u.file),c);a.push(new G.StackFrame(p,u.name,h,u.line,u.column??1))}}e.body={stackFrames:a,totalFrames:r.body?.frames?.length??a.length}}catch{e.body={stackFrames:[],totalFrames:0}}this.sendResponse(e)}async scopesRequest(e,t){try{let r=await this.sendToEngine("scopes",{frameId:t.frameId}),a=[];if(r.body&&Array.isArray(r.body.scopes))for(let i of r.body.scopes)a.push(new G.Scope(i.name,i.variablesReference,i.expensive??!1));else{let i=this.nextVariableRef++,o=this.nextVariableRef++;a.push(new G.Scope("Locals",i,!1)),a.push(new G.Scope("Upvalues",o,!1))}e.body={scopes:a}}catch{e.body={scopes:[]}}this.sendResponse(e)}async variablesRequest(e,t){try{let r=this.variablesMap.get(t.variablesReference);if(r){e.body={variables:r},this.sendResponse(e);return}let a=await this.sendToEngine("variables",{variablesReference:t.variablesReference}),i=[];if(a.body&&Array.isArray(a.body.variables))for(let o of a.body.variables){let s=0;if(o.children&&o.children.length>0){s=this.nextVariableRef++;let l=o.children.map(p=>{let u=0;return p.children&&p.children.length>0&&(u=this.nextVariableRef++,this.variablesMap.set(u,p.children.map(c=>new G.Variable(c.name,c.value,0)))),new G.Variable(p.name,p.value,u)});this.variablesMap.set(s,l)}else o.variablesReference&&(s=o.variablesReference);i.push(new G.Variable(o.name,o.value,s))}this.variablesMap.set(t.variablesReference,i),e.body={variables:i}}catch{e.body={variables:[]}}this.sendResponse(e)}async setVariableRequest(e,t){try{let r=await this.sendToEngine("setVariable",{variablesReference:t.variablesReference,name:t.name,value:t.value});e.body={value:r.body?.value??t.value},this.variablesMap.delete(t.variablesReference)}catch(r){let a=r instanceof Error?r.message:String(r);this.sendErrorResponse(e,1010,`Failed to set variable: ${a}`);return}this.sendResponse(e)}async continueRequest(e,t){this.variablesMap.clear();try{await this.sendToEngine("continue")}catch{}e.body={allThreadsContinued:!0},this.sendResponse(e)}async nextRequest(e,t){this.variablesMap.clear();try{await this.sendToEngine("next")}catch{}this.sendResponse(e)}async stepInRequest(e,t){this.variablesMap.clear();try{await this.sendToEngine("stepIn")}catch{}this.sendResponse(e)}async stepOutRequest(e,t){this.variablesMap.clear();try{await this.sendToEngine("stepOut")}catch{}this.sendResponse(e)}async pauseRequest(e,t){try{await this.sendToEngine("pause")}catch{}this.sendResponse(e)}async evaluateRequest(e,t){try{let r=await this.sendToEngine("evaluate",{expression:t.expression,frameId:t.frameId??0,context:t.context}),a=r.body?.result??"nil",i=r.body?.variablesReference??0;e.body={result:a,variablesReference:i}}catch(r){let a=r instanceof Error?r.message:String(r);e.body={result:`Error: ${a}`,variablesReference:0}}this.sendResponse(e)}completionsRequest(e,t){let r=t.text,a=[];if(r.startsWith("lurek.")){let o=[];try{let s=ae.join(__dirname,"..","data","lurek-api.json");o=(JSON.parse(pt.readFileSync(s,"utf8")).modules??[]).map(p=>p.name)}catch{o=["ai","animation","audio","camera","compute","data","ecs","event","filesystem","image","input","math","mods","particle","pathfind","physics","render","save","scene","thread","tilemap","timer","tween","ui","window"]}for(let s of o)s.startsWith(r.slice(5))&&a.push(new G.CompletionItem(s,9))}let i=["local","function","if","then","else","elseif","end","for","while","do","repeat","until","return","break","in","not","and","or","true","false","nil"];for(let o of i)o.startsWith(r)&&a.push(new G.CompletionItem(o,14));e.body={targets:a},this.sendResponse(e)}loadedSourcesRequest(e){e.body={sources:this.loadedSources},this.sendResponse(e)}connectToEngine(e){return new Promise((t,r)=>{let a=0,i=()=>{let o=new _o.Socket,s=l=>{o.destroy(),a++,a<Oo?(this.log(`Connection attempt ${a} failed, retrying in ${zo}ms...`),setTimeout(i,zo)):r(new Error(`Failed to connect to Lurek2D engine on port ${e} after ${Oo} attempts: ${l.message}`))};o.once("error",s),o.connect(e,"127.0.0.1",()=>{o.removeListener("error",s),this.socket=o,this.receiveBuffer="",this.log(`Connected to Lurek2D engine on port ${e}`),o.on("data",l=>{this.onSocketData(l)}),o.on("error",l=>{this.sendEvent(new G.OutputEvent(`Engine connection error: ${l.message}
+`,"stderr")),this.cleanup(),this.sendEvent(new G.TerminatedEvent)}),o.on("close",()=>{this.log("Engine connection closed"),this.cleanup(),this.sendEvent(new G.TerminatedEvent)}),t()})};i()})}sendToEngine(e,t){return new Promise((r,a)=>{if(!this.socket||this.socket.destroyed){a(new Error("Not connected to engine"));return}let i=this.nextRequestId++,o=JSON.stringify({id:i,command:e,args:t??{}}),s=`Content-Length: ${Buffer.byteLength(o)}\r
 \r
-${message}`;
-      this.pendingRequests.set(id, { resolve: resolve5, reject });
-      const timer = setTimeout(() => {
-        this.pendingRequests.delete(id);
-        reject(new Error(`Request '${command}' timed out`));
-      }, 1e4);
-      const original = this.pendingRequests.get(id);
-      this.pendingRequests.set(id, {
-        resolve: (resp) => {
-          clearTimeout(timer);
-          original.resolve(resp);
-        },
-        reject: (err) => {
-          clearTimeout(timer);
-          original.reject(err);
-        }
-      });
-      try {
-        this.socket.write(packet);
-      } catch (err) {
-        clearTimeout(timer);
-        this.pendingRequests.delete(id);
-        reject(err instanceof Error ? err : new Error(String(err)));
-      }
-    });
-  }
-  onSocketData(data) {
-    this.receiveBuffer += data.toString("utf-8");
-    while (true) {
-      const headerEnd = this.receiveBuffer.indexOf("\r\n\r\n");
-      if (headerEnd === -1) {
-        break;
-      }
-      const header = this.receiveBuffer.substring(0, headerEnd);
-      const match = /Content-Length:\s*(\d+)/i.exec(header);
-      if (!match) {
-        this.receiveBuffer = this.receiveBuffer.substring(headerEnd + 4);
-        continue;
-      }
-      const contentLength = parseInt(match[1], 10);
-      const bodyStart = headerEnd + 4;
-      if (this.receiveBuffer.length < bodyStart + contentLength) {
-        break;
-      }
-      const body = this.receiveBuffer.substring(
-        bodyStart,
-        bodyStart + contentLength
-      );
-      this.receiveBuffer = this.receiveBuffer.substring(
-        bodyStart + contentLength
-      );
-      try {
-        const message = JSON.parse(body);
-        if ("event" in message) {
-          this.handleEngineEvent(message);
-        } else if ("id" in message) {
-          this.handleEngineResponse(message);
-        }
-      } catch {
-        this.log(`Failed to parse engine message: ${body}`);
-      }
-    }
-  }
-  handleEngineEvent(event) {
-    switch (event.event) {
-      case "stopped": {
-        const stoppedEvent = new import_debugadapter.StoppedEvent(
-          event.reason ?? "breakpoint",
-          THREAD_ID
-        );
-        this.variablesMap.clear();
-        this.sendEvent(stoppedEvent);
-        break;
-      }
-      case "output": {
-        this.sendEvent(
-          new import_debugadapter.OutputEvent(
-            event.output ?? "",
-            event.category ?? "console"
-          )
-        );
-        break;
-      }
-      case "terminated": {
-        this.sendEvent(new import_debugadapter.TerminatedEvent());
-        break;
-      }
-      case "breakpointValidated": {
-        if (event.id !== void 0 && event.verified !== void 0) {
-          for (const [, bps] of this.breakpoints) {
-            for (const bp of bps) {
-              if (bp.id === event.id) {
-                bp.verified = event.verified;
-              }
-            }
-          }
-        }
-        break;
-      }
-      default:
-        this.log(`Unknown engine event: ${event.event}`);
-    }
-  }
-  handleEngineResponse(response) {
-    const pending = this.pendingRequests.get(response.id);
-    if (pending) {
-      this.pendingRequests.delete(response.id);
-      if (response.success) {
-        pending.resolve(response);
-      } else {
-        pending.reject(new Error(response.error ?? "Unknown engine error"));
-      }
-    }
-  }
-  // ── Helpers ─────────────────────────────────────────────
-  findEngineBinary(configPath) {
-    if (configPath && fs18.existsSync(configPath)) {
-      return configPath;
-    }
-    const settingsPath = (
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require("vscode").workspace.getConfiguration("lurek").get("enginePath", "")
-    );
-    if (settingsPath && fs18.existsSync(settingsPath)) {
-      return settingsPath;
-    }
-    const wsRoot = (
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      require("vscode").workspace.workspaceFolders?.[0]?.uri.fsPath
-    );
-    if (wsRoot) {
-      const exeName = process.platform === "win32" ? "lurek2d.exe" : "lurek2d";
-      const buildCandidates = [
-        path21.join(wsRoot, "build", "debug", exeName),
-        path21.join(wsRoot, "build", "release", exeName),
-        path21.join(wsRoot, "target", "debug", exeName),
-        path21.join(wsRoot, "target", "release", exeName)
-      ];
-      for (const candidate of buildCandidates) {
-        if (fs18.existsSync(candidate)) {
-          this.log(`Found engine binary: ${candidate}`);
-          return candidate;
-        }
-      }
-    }
-    const homeDir = process.env.USERPROFILE ?? process.env.HOME ?? "";
-    const candidates = [
-      path21.join(homeDir, "bin", "lurek2d.exe"),
-      path21.join(homeDir, "bin", "lurek2d"),
-      path21.join(homeDir, ".local", "bin", "lurek2d"),
-      "/usr/local/bin/lurek2d"
-    ];
-    for (const candidate of candidates) {
-      if (fs18.existsSync(candidate)) {
-        return candidate;
-      }
-    }
-    const pathExe = process.platform === "win32" ? "lurek2d.exe" : "lurek2d";
-    const pathDirs = (process.env.PATH ?? "").split(path21.delimiter);
-    for (const dir of pathDirs) {
-      const fullPath = path21.join(dir, pathExe);
-      if (fs18.existsSync(fullPath)) {
-        return fullPath;
-      }
-    }
-    return null;
-  }
-  toRelativePath(absolutePath) {
-    if (this.gamePath && absolutePath.startsWith(this.gamePath)) {
-      let rel = absolutePath.substring(this.gamePath.length);
-      if (rel.startsWith(path21.sep) || rel.startsWith("/")) {
-        rel = rel.substring(1);
-      }
-      return rel.replace(/\\/g, "/");
-    }
-    return path21.basename(absolutePath);
-  }
-  toAbsolutePath(relativePath) {
-    if (path21.isAbsolute(relativePath)) {
-      return relativePath;
-    }
-    return path21.join(this.gamePath, relativePath);
-  }
-  cleanup() {
-    if (this.socket) {
-      this.socket.removeAllListeners();
-      this.socket.destroy();
-      this.socket = null;
-    }
-    if (this.engineProcess) {
-      try {
-        this.engineProcess.kill();
-      } catch {
-      }
-      this.engineProcess = null;
-    }
-    for (const [, pending] of this.pendingRequests) {
-      pending.reject(new Error("Debug session ended"));
-    }
-    this.pendingRequests.clear();
-    this.variablesMap.clear();
-  }
-  log(message) {
-    this.sendEvent(new import_debugadapter.OutputEvent(`[Lurek2D Debug] ${message}
-`, "console"));
-  }
-};
-
-// src/debug/luaDebugAdapter.ts
-var LuaDebugAdapterFactory = class {
-  createDebugAdapterDescriptor(_session, _executable) {
-    return new vscode40.DebugAdapterInlineImplementation(new LuaDebugSession());
-  }
-};
-var LuaDebugConfigurationProvider = class {
-  resolveDebugConfiguration(folder, config, _token) {
-    if (!config.type) {
-      config.type = "lurek";
-    }
-    if (!config.request) {
-      config.request = "launch";
-    }
-    if (!config.name) {
-      config.name = "Lurek2D: Debug Game";
-    }
-    if (!config.program) {
-      const wsRoot = folder?.uri.fsPath ?? vscode40.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      const activeFile = vscode40.window.activeTextEditor?.document.uri.fsPath;
-      if (activeFile) {
-        const activeDir = require("path").dirname(activeFile);
-        const mainLua = require("path").join(activeDir, "main.lua");
-        if (require("fs").existsSync(mainLua)) {
-          config.program = activeDir;
-        } else {
-          config.program = wsRoot ?? "${workspaceFolder}";
-        }
-      } else {
-        config.program = wsRoot ?? "${workspaceFolder}";
-      }
-    }
-    if (!config.luaVersion) {
-      config.luaVersion = vscode40.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
-    }
-    if (config.stopOnEntry === void 0) {
-      config.stopOnEntry = false;
-    }
-    if (!config.debugPort) {
-      config.debugPort = 8172;
-    }
-    if (!config.enginePath) {
-      const wsRoot = folder?.uri.fsPath ?? vscode40.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (wsRoot) {
-        const buildDebug = require("path").join(wsRoot, "build", "debug", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
-        const buildRelease = require("path").join(wsRoot, "build", "release", process.platform === "win32" ? "lurek2d.exe" : "lurek2d");
-        if (require("fs").existsSync(buildDebug)) {
-          config.enginePath = buildDebug;
-        } else if (require("fs").existsSync(buildRelease)) {
-          config.enginePath = buildRelease;
-        }
-      }
-    }
-    return config;
-  }
-  provideDebugConfigurations(_folder) {
-    return [
-      {
-        type: "lurek",
-        request: "launch",
-        name: "Lurek2D: Debug Game",
-        program: "${workspaceFolder}",
-        stopOnEntry: false
-      },
-      {
-        type: "lurek",
-        request: "launch",
-        name: "Lurek2D: Debug Current Demo",
-        program: "${fileDirname}",
-        stopOnEntry: false
-      },
-      {
-        type: "lurek",
-        request: "launch",
-        name: "Lurek2D: Debug with Stop on Entry",
-        program: "${workspaceFolder}",
-        stopOnEntry: true
-      },
-      {
-        type: "lurek",
-        request: "attach",
-        name: "Lurek2D: Attach to Running",
-        debugPort: 8172
-      }
-    ];
-  }
-};
-function register13(context) {
-  const factory = new LuaDebugAdapterFactory();
-  const configProvider = new LuaDebugConfigurationProvider();
-  context.subscriptions.push(
-    vscode40.debug.registerDebugAdapterDescriptorFactory("lurek", factory),
-    vscode40.debug.registerDebugConfigurationProvider("lurek", configProvider)
-  );
-}
-
-// src/extension.ts
-var mcpProcess;
-var lurekProcess;
-var statusBar;
-var apiData;
-var debugBridge;
-function activate(context) {
-  lurekProcess = new LurekProcessService();
-  statusBar = new StatusBarService();
-  apiData = new ApiDataService();
-  debugBridge = new DebugBridge();
-  context.subscriptions.push(lurekProcess, statusBar, debugBridge);
-  apiData.load(context.extensionPath).catch((err) => {
-    console.error("Failed to load Lurek2D API data:", err);
-  });
-  lurekProcess.onStatusChange((running) => {
-    if (running) {
-      statusBar.setRunning();
-    } else {
-      statusBar.setStopped();
-    }
-  });
-  const projectTools = new ProjectToolsProvider();
-  const devTools = new DevToolsProvider();
-  const aiTools = new AiToolsProvider();
-  context.subscriptions.push(
-    vscode41.window.registerTreeDataProvider("lurek.projectTools", projectTools),
-    vscode41.window.registerTreeDataProvider("lurek.devTools", devTools),
-    vscode41.window.registerTreeDataProvider("lurek.aiCopilot", aiTools)
-  );
-  register(context, apiData);
-  register2(context, apiData);
-  register3(context, apiData);
-  register4(context, apiData);
-  register5(context, apiData);
-  register6(context, apiData);
-  register7(context, apiData);
-  register8(context, apiData);
-  register9(context);
-  register10(context);
-  register11(context, apiData);
-  const assetExplorer = new AssetExplorerProvider();
-  context.subscriptions.push(
-    vscode41.window.registerTreeDataProvider("lurek.assetExplorer", assetExplorer)
-  );
-  registerCommand(context, "lurek.runGame", () => runGame(lurekProcess));
-  registerCommand(context, "lurek.stopGame", () => stopGame(lurekProcess));
-  registerCommand(context, "lurek.runWithArgs", () => runWithArgs(lurekProcess));
-  registerCommand(context, "lurek.runExample", () => runExample(lurekProcess));
-  registerCommand(context, "lurek.test.all", () => testAll());
-  const rustModules = [
-    "ai",
-    "audio",
-    "cardgame",
-    "combat",
-    "compute",
-    "config",
-    "crafting",
-    "data",
-    "dataframe",
-    "dialog",
-    "engine",
-    "ecs",
-    "event",
-    "filesystem",
-    "graph",
-    "render",
-    "graphics_ext",
-    "image",
-    "input",
-    "inventory",
-    "math",
-    "math_ext",
-    "minimap",
-    "mods",
-    "particle",
-    "pathfind",
-    "physics",
-    "postfx",
-    "quest",
-    "resource",
-    "save",
-    "scene",
-    "sound",
-    "stats",
-    "thread",
-    "tilemap",
-    "timer"
-  ];
-  for (const mod of rustModules) {
-    registerCommand(context, `lurek.test.rust.${mod}`, () => testModule(mod));
-  }
-  registerCommand(context, "lurek.test.lua.all", () => testLuaAll());
-  registerCommand(context, "lurek.test.lua.golden", () => testLuaGolden());
-  registerTestCommands(context);
-  registerCommand(context, "lurek.scaffold.project", () => scaffoldProject());
-  registerCommand(context, "lurek.scaffold.file", () => scaffoldFile());
-  registerCommand(
-    context,
-    "lurek.extractToModuleFile",
-    async (...args) => {
-      const uri = args[0];
-      const range = args[1];
-      if (!uri || !range) return;
-      const moduleName = await vscode41.window.showInputBox({
-        prompt: "New module file name (without .lua)",
-        placeHolder: "my_module",
-        validateInput: (v) => /^[a-z_][a-z0-9_]*$/i.test(v) ? null : "Use letters, digits, underscores"
-      });
-      if (!moduleName) return;
-      const doc = await vscode41.workspace.openTextDocument(uri);
-      const selectedText = doc.getText(range);
-      const folder = uri.fsPath.replace(/[/\\][^/\\]+$/, "");
-      const newUri = vscode41.Uri.file(`${folder}/${moduleName}.lua`);
-      const we = new vscode41.WorkspaceEdit();
-      we.createFile(newUri, { ignoreIfExists: true });
-      we.insert(
-        newUri,
-        new vscode41.Position(0, 0),
-        `-- ${moduleName}.lua
+${o}`;this.pendingRequests.set(i,{resolve:r,reject:a});let l=setTimeout(()=>{this.pendingRequests.delete(i),a(new Error(`Request '${e}' timed out`))},1e4),p=this.pendingRequests.get(i);this.pendingRequests.set(i,{resolve:u=>{clearTimeout(l),p.resolve(u)},reject:u=>{clearTimeout(l),p.reject(u)}});try{this.socket.write(s)}catch(u){clearTimeout(l),this.pendingRequests.delete(i),a(u instanceof Error?u:new Error(String(u)))}})}onSocketData(e){for(this.receiveBuffer+=e.toString("utf-8");;){let t=this.receiveBuffer.indexOf(`\r
+\r
+`);if(t===-1)break;let r=this.receiveBuffer.substring(0,t),a=/Content-Length:\s*(\d+)/i.exec(r);if(!a){this.receiveBuffer=this.receiveBuffer.substring(t+4);continue}let i=parseInt(a[1],10),o=t+4;if(this.receiveBuffer.length<o+i)break;let s=this.receiveBuffer.substring(o,o+i);this.receiveBuffer=this.receiveBuffer.substring(o+i);try{let l=JSON.parse(s);"event"in l?this.handleEngineEvent(l):"id"in l&&this.handleEngineResponse(l)}catch{this.log(`Failed to parse engine message: ${s}`)}}}handleEngineEvent(e){switch(e.event){case"stopped":{let t=new G.StoppedEvent(e.reason??"breakpoint",Fo);this.variablesMap.clear(),this.sendEvent(t);break}case"output":{this.sendEvent(new G.OutputEvent(e.output??"",e.category??"console"));break}case"terminated":{this.sendEvent(new G.TerminatedEvent);break}case"breakpointValidated":{if(e.id!==void 0&&e.verified!==void 0)for(let[,t]of this.breakpoints)for(let r of t)r.id===e.id&&(r.verified=e.verified);break}default:this.log(`Unknown engine event: ${e.event}`)}}handleEngineResponse(e){let t=this.pendingRequests.get(e.id);t&&(this.pendingRequests.delete(e.id),e.success?t.resolve(e):t.reject(new Error(e.error??"Unknown engine error")))}findEngineBinary(e){if(e&&pt.existsSync(e))return e;let t=require("vscode").workspace.getConfiguration("lurek").get("enginePath","");if(t&&pt.existsSync(t))return t;let r=require("vscode").workspace.workspaceFolders?.[0]?.uri.fsPath;if(r){let l=process.platform==="win32"?"lurek2d.exe":"lurek2d",p=[ae.join(r,"build","debug",l),ae.join(r,"build","release",l),ae.join(r,"target","debug",l),ae.join(r,"target","release",l)];for(let u of p)if(pt.existsSync(u))return this.log(`Found engine binary: ${u}`),u}let a=process.env.USERPROFILE??process.env.HOME??"",i=[ae.join(a,"bin","lurek2d.exe"),ae.join(a,"bin","lurek2d"),ae.join(a,".local","bin","lurek2d"),"/usr/local/bin/lurek2d"];for(let l of i)if(pt.existsSync(l))return l;let o=process.platform==="win32"?"lurek2d.exe":"lurek2d",s=(process.env.PATH??"").split(ae.delimiter);for(let l of s){let p=ae.join(l,o);if(pt.existsSync(p))return p}return null}toRelativePath(e){if(this.gamePath&&e.startsWith(this.gamePath)){let t=e.substring(this.gamePath.length);return(t.startsWith(ae.sep)||t.startsWith("/"))&&(t=t.substring(1)),t.replace(/\\/g,"/")}return ae.basename(e)}toAbsolutePath(e){return ae.isAbsolute(e)?e:ae.join(this.gamePath,e)}cleanup(){if(this.socket&&(this.socket.removeAllListeners(),this.socket.destroy(),this.socket=null),this.engineProcess){try{this.engineProcess.kill()}catch{}this.engineProcess=null}for(let[,e]of this.pendingRequests)e.reject(new Error("Debug session ended"));this.pendingRequests.clear(),this.variablesMap.clear()}log(e){this.sendEvent(new G.OutputEvent(`[Lurek2D Debug] ${e}
+`,"console"))}};var Ba=class{createDebugAdapterDescriptor(e,t){return new He.DebugAdapterInlineImplementation(new br)}},Aa=class{resolveDebugConfiguration(e,t,r){if(t.type||(t.type="lurek"),t.request||(t.request="launch"),t.name||(t.name="Lurek2D: Debug Game"),!t.program){let a=e?.uri.fsPath??He.workspace.workspaceFolders?.[0]?.uri.fsPath,i=He.window.activeTextEditor?.document.uri.fsPath;if(i){let o=require("path").dirname(i),s=require("path").join(o,"main.lua");require("fs").existsSync(s)?t.program=o:t.program=a??"${workspaceFolder}"}else t.program=a??"${workspaceFolder}"}if(t.luaVersion||(t.luaVersion=He.workspace.getConfiguration("lurek").get("luaVersion","luajit")),t.stopOnEntry===void 0&&(t.stopOnEntry=!1),t.debugPort||(t.debugPort=8172),!t.enginePath){let a=e?.uri.fsPath??He.workspace.workspaceFolders?.[0]?.uri.fsPath;if(a){let i=require("path").join(a,"build","debug",process.platform==="win32"?"lurek2d.exe":"lurek2d"),o=require("path").join(a,"build","release",process.platform==="win32"?"lurek2d.exe":"lurek2d");require("fs").existsSync(i)?t.enginePath=i:require("fs").existsSync(o)&&(t.enginePath=o)}}return t}provideDebugConfigurations(e){return[{type:"lurek",request:"launch",name:"Lurek2D: Debug Game",program:"${workspaceFolder}",stopOnEntry:!1},{type:"lurek",request:"launch",name:"Lurek2D: Debug Current Demo",program:"${fileDirname}",stopOnEntry:!1},{type:"lurek",request:"launch",name:"Lurek2D: Debug with Stop on Entry",program:"${workspaceFolder}",stopOnEntry:!0},{type:"lurek",request:"attach",name:"Lurek2D: Attach to Running",debugPort:8172}]}};function Wo(n){let e=new Ba,t=new Aa;n.subscriptions.push(He.debug.registerDebugAdapterDescriptorFactory("lurek",e),He.debug.registerDebugConfigurationProvider("lurek",t))}Lt();var $t,qe,Tr,Me,ye;function Ap(n){qe=new an,Tr=new on,Me=new sn,ye=new Vt,n.subscriptions.push(qe,Tr,ye),Me.load(n.extensionPath).catch(d=>{console.error("Failed to load Lurek2D API data:",d)}),qe.onStatusChange(d=>{d?Tr.setRunning():Tr.setStopped()});let e=new pn,t=new un,r=new dn;n.subscriptions.push(S.window.registerTreeDataProvider("lurek.projectTools",e),S.window.registerTreeDataProvider("lurek.devTools",t),S.window.registerTreeDataProvider("lurek.aiCopilot",r)),ei(n,Me),ii(n,Me),oi(n,Me),li(n,Me),pi(n,Me),ui(n,Me),di(n,Me),ci(n,Me),hi(n),gi(n),Ti(n,Me);let a=new gn;n.subscriptions.push(S.window.registerTreeDataProvider("lurek.assetExplorer",a)),j(n,"lurek.runGame",()=>Ur(qe)),j(n,"lurek.stopGame",()=>Ni(qe)),j(n,"lurek.runWithArgs",()=>Wi(qe)),j(n,"lurek.runExample",()=>vn(qe)),j(n,"lurek.test.all",()=>qi());let i=["ai","audio","cardgame","combat","compute","config","crafting","data","dataframe","dialog","engine","ecs","event","filesystem","graph","render","graphics_ext","image","input","inventory","math","math_ext","minimap","mods","particle","pathfind","physics","postfx","quest","resource","save","scene","sound","stats","thread","tilemap","timer"];for(let d of i)j(n,`lurek.test.rust.${d}`,()=>$i(d));if(j(n,"lurek.test.lua.all",()=>Yi()),j(n,"lurek.test.lua.golden",()=>Xi()),uo(n),j(n,"lurek.scaffold.project",()=>Vi()),j(n,"lurek.scaffold.file",()=>Ui()),j(n,"lurek.extractToModuleFile",async(...d)=>{let g=d[0],v=d[1];if(!g||!v)return;let x=await S.window.showInputBox({prompt:"New module file name (without .lua)",placeHolder:"my_module",validateInput:$=>/^[a-z_][a-z0-9_]*$/i.test($)?null:"Use letters, digits, underscores"});if(!x)return;let T=(await S.workspace.openTextDocument(g)).getText(v),M=g.fsPath.replace(/[/\\][^/\\]+$/,""),E=S.Uri.file(`${M}/${x}.lua`),N=new S.WorkspaceEdit;N.createFile(E,{ignoreIfExists:!0}),N.insert(E,new S.Position(0,0),`-- ${x}.lua
 local M = {}
 
-${selectedText}
+${T}
 
 return M
-`
-      );
-      we.replace(uri, range, `require("${moduleName}")`);
-      await vscode41.workspace.applyEdit(we);
-      await vscode41.window.showTextDocument(newUri);
-    }
-  );
-  registerCommand(context, "lurek.package.zip", () => packageZip());
-  registerCommand(context, "lurek.package.windows", () => packageWindows());
-  registerCommand(context, "lurek.package.linux", () => packageLinux());
-  context.subscriptions.push(...registerEditorCommands(context));
-  registerCommand(context, "lurek.assets.refresh", () => assetExplorer.refresh());
-  registerCommand(context, "lurek.assets.openPanel", () => {
-    vscode41.window.showInformationMessage("Asset Explorer is in the sidebar under Lurek2D.");
-  });
-  registerCommand(context, "lurek.assets.findMissing", () => findMissingAssets());
-  registerCommand(context, "lurek.assets.insertPath", (item) => {
-    if (item instanceof AssetItem) insertAssetPath(item);
-  });
-  registerCommand(context, "lurek.perf.openDashboard", () => openPerfDashboard(context));
-  registerCommand(context, "lurek.perf.clearHistory", () => {
-    const { clearHistory: clearHistory2 } = (init_perfDashboard(), __toCommonJS(perfDashboard_exports));
-    clearHistory2();
-  });
-  registerCommand(context, "lurek.perf.openHotReload", () => {
-    const panel = vscode41.window.createWebviewPanel(
-      "lurek.hotReload",
-      "Hot-Reload History",
-      vscode41.ViewColumn.Two,
-      { enableScripts: true, retainContextWhenHidden: true }
-    );
-    const events = [];
-    const wsRoot = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath ?? "";
-    const watcher = vscode41.workspace.createFileSystemWatcher(
-      new vscode41.RelativePattern(wsRoot, "**/*.lua")
-    );
-    const push = (file, status) => {
-      events.unshift({ time: (/* @__PURE__ */ new Date()).toLocaleTimeString(), file: vscode41.workspace.asRelativePath(file), status });
-      if (events.length > 200) events.pop();
-      panel.webview.postMessage({ type: "events", events });
-    };
-    watcher.onDidChange((u) => push(u, "changed"));
-    watcher.onDidCreate((u) => push(u, "created"));
-    watcher.onDidDelete((u) => push(u, "deleted"));
-    panel.onDidDispose(() => watcher.dispose());
-    panel.webview.html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';"><style>body{font-family:var(--vscode-font-family);background:var(--vscode-editor-background);color:var(--vscode-foreground);padding:12px;margin:0;font-size:12px}h2{margin:0 0 10px;font-size:14px}table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--vscode-panel-border,#444);padding:4px 8px;text-align:left}th{background:var(--vscode-editorWidget-background,#1e1e1e)}.changed{color:#4ec9b0}.created{color:#dcdcaa}.deleted{color:#f44747}#empty{opacity:.5;margin-top:20px}</style></head><body><h2>\u{1F504} Hot-Reload File Watcher</h2><p id="empty">Watching *.lua files \u2014 save a file to see events here.</p><table id="tbl" style="display:none"><thead><tr><th>Time</th><th>File</th><th>Status</th></tr></thead><tbody id="body"></tbody></table><script>window.addEventListener('message',e=>{const{events}=e.data;if(!events||!events.length)return;document.getElementById('empty').style.display='none';document.getElementById('tbl').style.display='';document.getElementById('body').innerHTML=events.map(ev=>'<tr><td>'+ev.time+'</td><td>'+ev.file+'</td><td class="'+ev.status+'">'+ev.status+'</td></tr>').join('');});</script></body></html>`;
-  });
-  registerCommand(context, "lurek.deps.showGraph", () => depGraph(context));
-  registerCommand(context, "lurek.deps.findCircular", async () => {
-    const wsRoot = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!wsRoot) {
-      vscode41.window.showErrorMessage("No workspace folder open.");
-      return;
-    }
-    const out = vscode41.window.createOutputChannel("Lurek2D Circular Deps");
-    out.show(true);
-    out.appendLine("\u{1F50D} Scanning for circular dependencies...");
-    const nodeFsModule = require("fs");
-    const nodePathModule = require("path");
-    const srcDir = nodePathModule.join(wsRoot, "src");
-    if (!nodeFsModule.existsSync(srcDir)) {
-      out.appendLine("src/ directory not found.");
-      return;
-    }
-    const modules = nodeFsModule.readdirSync(srcDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-    const adj = {};
-    for (const mod of modules) {
-      adj[mod] = [];
-      const modFile = nodePathModule.join(srcDir, mod, "mod.rs");
-      if (!nodeFsModule.existsSync(modFile)) continue;
-      const src = nodeFsModule.readFileSync(modFile, "utf-8");
-      for (const m of src.matchAll(/use crate::([a-z_]+)/g)) {
-        if (m[1] !== mod && modules.includes(m[1]) && !adj[mod].includes(m[1])) adj[mod].push(m[1]);
-      }
-    }
-    const indexMap = {}, lowlink = {}, onStack = {}, stack = [];
-    let idx = 0;
-    const sccs = [];
-    function strongconnect(v) {
-      indexMap[v] = lowlink[v] = idx++;
-      stack.push(v);
-      onStack[v] = true;
-      for (const w of adj[v] || []) {
-        if (indexMap[w] === void 0) {
-          strongconnect(w);
-          lowlink[v] = Math.min(lowlink[v], lowlink[w]);
-        } else if (onStack[w]) {
-          lowlink[v] = Math.min(lowlink[v], indexMap[w]);
-        }
-      }
-      if (lowlink[v] === indexMap[v]) {
-        const scc = [];
-        let w;
-        do {
-          w = stack.pop();
-          onStack[w] = false;
-          scc.push(w);
-        } while (w !== v);
-        if (scc.length > 1) sccs.push(scc);
-      }
-    }
-    for (const v of modules) {
-      if (indexMap[v] === void 0) strongconnect(v);
-    }
-    if (sccs.length === 0) {
-      out.appendLine("\u2705 No circular dependencies found.");
-    } else {
-      out.appendLine(`\u26A0\uFE0F  Found ${sccs.length} circular dependency cycle(s):`);
-      sccs.forEach((scc, i) => out.appendLine(`  Cycle ${i + 1}: ${scc.join(" \u2192 ")} \u2192 ${scc[scc.length - 1]}`));
-    }
-    out.appendLine("\nDone.");
-  });
-  registerCommand(context, "lurek.deps.findOrphans", async () => {
-    const wsRoot = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-    if (!wsRoot) {
-      vscode41.window.showErrorMessage("No workspace folder open.");
-      return;
-    }
-    const out = vscode41.window.createOutputChannel("Lurek2D Orphan Modules");
-    out.show(true);
-    out.appendLine("\u{1F50D} Scanning for orphan modules...");
-    const nodeFsModule = require("fs");
-    const nodePathModule = require("path");
-    const srcDir = nodePathModule.join(wsRoot, "src");
-    if (!nodeFsModule.existsSync(srcDir)) {
-      out.appendLine("src/ not found.");
-      return;
-    }
-    const modules = nodeFsModule.readdirSync(srcDir, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name);
-    const libRs = nodePathModule.join(wsRoot, "src", "lib.rs");
-    const libContent = nodeFsModule.existsSync(libRs) ? nodeFsModule.readFileSync(libRs, "utf-8") : "";
-    const referencedInLib = new Set(modules.filter((m) => libContent.includes(`pub mod ${m}`) || libContent.includes(`mod ${m}`)));
-    const referencedByOthers = /* @__PURE__ */ new Set();
-    for (const mod of modules) {
-      const modFile = nodePathModule.join(srcDir, mod, "mod.rs");
-      if (!nodeFsModule.existsSync(modFile)) continue;
-      const src = nodeFsModule.readFileSync(modFile, "utf-8");
-      for (const m of src.matchAll(/use crate::([a-z_]+)/g)) if (m[1] !== mod) referencedByOthers.add(m[1]);
-    }
-    const orphans = modules.filter((m) => !referencedInLib.has(m) && !referencedByOthers.has(m));
-    if (orphans.length === 0) {
-      out.appendLine("\u2705 No orphan modules found \u2014 all modules are referenced.");
-    } else {
-      out.appendLine(`\u26A0\uFE0F  Found ${orphans.length} potentially orphaned module(s):`);
-      orphans.forEach((m) => out.appendLine(`  \u2022 ${m}`));
-    }
-    out.appendLine("\nDone.");
-  });
-  register12(context, apiData);
-  registerCommand(context, "lurek.debug.openWatchers", () => openWatchersPanel(context));
-  registerCommand(context, "lurek.debug.openInspector", () => {
-    const panel = vscode41.window.createWebviewPanel(
-      "lurekVariableInspector",
-      "Lurek2D Variable Inspector",
-      vscode41.ViewColumn.Two,
-      { enableScripts: true, retainContextWhenHidden: true }
-    );
-    const getHtml = (entries) => `<!DOCTYPE html><html><head>
+`),N.replace(g,v,`require("${x}")`),await S.workspace.applyEdit(N),await S.window.showTextDocument(E)}),j(n,"lurek.package.zip",()=>Zi()),j(n,"lurek.package.windows",()=>Qi()),j(n,"lurek.package.linux",()=>Ji()),n.subscriptions.push(...eo(n)),j(n,"lurek.assets.refresh",()=>a.refresh()),j(n,"lurek.assets.openPanel",()=>{S.window.showInformationMessage("Asset Explorer is in the sidebar under Lurek2D.")}),j(n,"lurek.assets.findMissing",()=>vi()),j(n,"lurek.assets.insertPath",d=>{d instanceof yt&&Li(d)}),j(n,"lurek.perf.openDashboard",()=>zr(n)),j(n,"lurek.perf.clearHistory",()=>{let{clearHistory:d}=(Nr(),Qt(xi));d()}),j(n,"lurek.perf.openHotReload",()=>{let d=S.window.createWebviewPanel("lurek.hotReload","Hot-Reload History",S.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),g=[],v=S.workspace.workspaceFolders?.[0]?.uri.fsPath??"",x=S.workspace.createFileSystemWatcher(new S.RelativePattern(v,"**/*.lua")),w=(T,M)=>{g.unshift({time:new Date().toLocaleTimeString(),file:S.workspace.asRelativePath(T),status:M}),g.length>200&&g.pop(),d.webview.postMessage({type:"events",events:g})};x.onDidChange(T=>w(T,"changed")),x.onDidCreate(T=>w(T,"created")),x.onDidDelete(T=>w(T,"deleted")),d.onDidDispose(()=>x.dispose()),d.webview.html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';"><style>body{font-family:var(--vscode-font-family);background:var(--vscode-editor-background);color:var(--vscode-foreground);padding:12px;margin:0;font-size:12px}h2{margin:0 0 10px;font-size:14px}table{border-collapse:collapse;width:100%}th,td{border:1px solid var(--vscode-panel-border,#444);padding:4px 8px;text-align:left}th{background:var(--vscode-editorWidget-background,#1e1e1e)}.changed{color:#4ec9b0}.created{color:#dcdcaa}.deleted{color:#f44747}#empty{opacity:.5;margin-top:20px}</style></head><body><h2>\u{1F504} Hot-Reload File Watcher</h2><p id="empty">Watching *.lua files \u2014 save a file to see events here.</p><table id="tbl" style="display:none"><thead><tr><th>Time</th><th>File</th><th>Status</th></tr></thead><tbody id="body"></tbody></table><script>window.addEventListener('message',e=>{const{events}=e.data;if(!events||!events.length)return;document.getElementById('empty').style.display='none';document.getElementById('tbl').style.display='';document.getElementById('body').innerHTML=events.map(ev=>'<tr><td>'+ev.time+'</td><td>'+ev.file+'</td><td class="'+ev.status+'">'+ev.status+'</td></tr>').join('');});</script></body></html>`}),j(n,"lurek.deps.showGraph",()=>Qr(n)),j(n,"lurek.deps.findCircular",async()=>{let d=S.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!d){S.window.showErrorMessage("No workspace folder open.");return}let g=S.window.createOutputChannel("Lurek2D Circular Deps");g.show(!0),g.appendLine("\u{1F50D} Scanning for circular dependencies...");let v=require("fs"),x=require("path"),w=x.join(d,"src");if(!v.existsSync(w)){g.appendLine("src/ directory not found.");return}let T=v.readdirSync(w,{withFileTypes:!0}).filter(V=>V.isDirectory()).map(V=>V.name),M={};for(let V of T){M[V]=[];let de=x.join(w,V,"mod.rs");if(!v.existsSync(de))continue;let vt=v.readFileSync(de,"utf-8");for(let Yt of vt.matchAll(/use crate::([a-z_]+)/g))Yt[1]!==V&&T.includes(Yt[1])&&!M[V].includes(Yt[1])&&M[V].push(Yt[1])}let E={},N={},$={},Pe=[],te=0,ve=[];function Ee(V){E[V]=N[V]=te++,Pe.push(V),$[V]=!0;for(let de of M[V]||[])E[de]===void 0?(Ee(de),N[V]=Math.min(N[V],N[de])):$[de]&&(N[V]=Math.min(N[V],E[de]));if(N[V]===E[V]){let de=[],vt;do vt=Pe.pop(),$[vt]=!1,de.push(vt);while(vt!==V);de.length>1&&ve.push(de)}}for(let V of T)E[V]===void 0&&Ee(V);ve.length===0?g.appendLine("\u2705 No circular dependencies found."):(g.appendLine(`\u26A0\uFE0F  Found ${ve.length} circular dependency cycle(s):`),ve.forEach((V,de)=>g.appendLine(`  Cycle ${de+1}: ${V.join(" \u2192 ")} \u2192 ${V[V.length-1]}`))),g.appendLine(`
+Done.`)}),j(n,"lurek.deps.findOrphans",async()=>{let d=S.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!d){S.window.showErrorMessage("No workspace folder open.");return}let g=S.window.createOutputChannel("Lurek2D Orphan Modules");g.show(!0),g.appendLine("\u{1F50D} Scanning for orphan modules...");let v=require("fs"),x=require("path"),w=x.join(d,"src");if(!v.existsSync(w)){g.appendLine("src/ not found.");return}let T=v.readdirSync(w,{withFileTypes:!0}).filter(te=>te.isDirectory()).map(te=>te.name),M=x.join(d,"src","lib.rs"),E=v.existsSync(M)?v.readFileSync(M,"utf-8"):"",N=new Set(T.filter(te=>E.includes(`pub mod ${te}`)||E.includes(`mod ${te}`))),$=new Set;for(let te of T){let ve=x.join(w,te,"mod.rs");if(!v.existsSync(ve))continue;let Ee=v.readFileSync(ve,"utf-8");for(let V of Ee.matchAll(/use crate::([a-z_]+)/g))V[1]!==te&&$.add(V[1])}let Pe=T.filter(te=>!N.has(te)&&!$.has(te));Pe.length===0?g.appendLine("\u2705 No orphan modules found \u2014 all modules are referenced."):(g.appendLine(`\u26A0\uFE0F  Found ${Pe.length} potentially orphaned module(s):`),Pe.forEach(te=>g.appendLine(`  \u2022 ${te}`))),g.appendLine(`
+Done.`)}),Pi(n,Me),j(n,"lurek.debug.openWatchers",()=>ji(n)),j(n,"lurek.debug.openInspector",()=>{let d=S.window.createWebviewPanel("lurekVariableInspector","Lurek2D Variable Inspector",S.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0}),g=x=>`<!DOCTYPE html><html><head>
 <meta charset="UTF-8">
 <style>
   body{font-family:var(--vscode-font-family);font-size:13px;padding:12px;color:var(--vscode-editor-foreground);background:var(--vscode-editor-background)}
@@ -24443,7 +12434,7 @@ return M
 </div>
 <table>
   <thead><tr><th>Expression</th><th>Value</th><th>Type</th></tr></thead>
-  <tbody id="rows">${entries.length === 0 ? '<tr><td colspan="3" class="empty">No watched expressions. Enter a Lua expression above.</td></tr>' : entries.map((e) => `<tr><td>${e.expr}</td><td class="val">${e.value}</td><td class="type">${e.type}</td></tr>`).join("")}</tbody>
+  <tbody id="rows">${x.length===0?'<tr><td colspan="3" class="empty">No watched expressions. Enter a Lua expression above.</td></tr>':x.map(w=>`<tr><td>${w.expr}</td><td class="val">${w.value}</td><td class="type">${w.type}</td></tr>`).join("")}</tbody>
 </table>
 <script>
   const vscode = acquireVsCodeApi();
@@ -24452,93 +12443,7 @@ return M
   document.getElementById('expr').addEventListener('keydown',e=>{ if(e.key==='Enter') addExpr(); });
   window.addEventListener('message',e=>{ if(e.data.cmd==='refresh') location.reload(); });
 </script>
-</body></html>`;
-    const watches = [];
-    panel.webview.html = getHtml(watches);
-    panel.webview.onDidReceiveMessage(async (msg) => {
-      if (msg.cmd === "watch") {
-        let value = "(not connected \u2014 run game with debug bridge)";
-        let type = "?";
-        try {
-          const { DebugBridge: DebugBridge2 } = await Promise.resolve().then(() => (init_debugBridge(), debugBridge_exports));
-          if (DebugBridge2.instance?.isConnected()) {
-            const result = await DebugBridge2.instance.evaluate(msg.expr);
-            value = result?.resultString ?? "(nil)";
-            type = result?.luaType ?? "?";
-          }
-        } catch (_) {
-        }
-        watches.push({ expr: msg.expr, value, type });
-        panel.webview.html = getHtml(watches);
-      } else if (msg.cmd === "clear") {
-        watches.length = 0;
-        panel.webview.html = getHtml(watches);
-      }
-    }, void 0, context.subscriptions);
-  });
-  registerCommand(context, "lurek.debug.openCallStack", () => {
-    vscode41.window.showInformationMessage("Call stack available when connected to the Lua debug bridge.");
-  });
-  registerCommand(context, "lurek.debug.addWatch", () => {
-    const editor = vscode41.window.activeTextEditor;
-    if (editor) addWatchFromEditor(editor);
-  });
-  registerCommand(context, "lurek.runtime.openMonitor", () => openSystemMonitor(context));
-  registerCommand(context, "lurek.api.usageReport", () => openApiUsageReport(context));
-  registerCommand(context, "lurek.api.quickInsert", () => quickInsertLurekApi(apiData));
-  if (typeof debugBridge.onConnected === "function") {
-    const bridge = debugBridge;
-    bridge.onConnected(() => setConnected(true));
-    bridge.onDisconnected?.(() => setConnected(false));
-    if (bridge.evaluate) {
-      setEvaluator(async (expr) => {
-        try {
-          const raw = await bridge.evaluate(expr);
-          return { value: String(raw), type: typeof raw };
-        } catch {
-          return void 0;
-        }
-      });
-    }
-  }
-  registerCommand(context, "lurek.browseApi", () => browseApi());
-  registerCommand(context, "lurek.openApiDocs", () => openApiDocs());
-  registerCommand(context, "lurek.openWiki", () => openWiki());
-  registerCommand(context, "lurek.depGraph", () => depGraph(context));
-  registerCommand(context, "lurek.depList", () => depList());
-  registerCommand(context, "lurek.apiCoverage", () => {
-    const terminal = vscode41.window.createTerminal("Lurek2D API Coverage");
-    terminal.show();
-    terminal.sendText("python tools/integration_coverage.py");
-  });
-  registerDebugBridgeCommands(context, debugBridge);
-  register13(context);
-  registerCommand(context, "lurek.debug.runAndConnect", async () => {
-    await runGame(lurekProcess);
-    await new Promise((res) => setTimeout(res, 1500));
-    const ok = await debugBridge.connect();
-    if (ok) {
-      vscode41.commands.executeCommand("setContext", "lurek.debugConnected", true);
-      debugBridge.startStatsPolling();
-      vscode41.window.showInformationMessage("Lurek2D started and debug bridge connected.");
-    } else {
-      vscode41.window.showWarningMessage(
-        "Game launched but debug bridge could not connect. Is debug bridge enabled in conf.lua?"
-      );
-    }
-  });
-  registerCommand(context, "lurek.debug.performance", () => {
-    if (!debugBridge.isConnected) {
-      vscode41.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
-      return;
-    }
-    const panel = vscode41.window.createWebviewPanel(
-      "lurek.debugPerf",
-      "Lurek2D Live Performance",
-      vscode41.ViewColumn.Two,
-      { enableScripts: true, retainContextWhenHidden: true }
-    );
-    panel.webview.html = `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
+</body></html>`,v=[];d.webview.html=g(v),d.webview.onDidReceiveMessage(async x=>{if(x.cmd==="watch"){let w="(not connected \u2014 run game with debug bridge)",T="?";try{let{DebugBridge:M}=await Promise.resolve().then(()=>(Kr(),go));if(M.instance?.isConnected()){let E=await M.instance.evaluate(x.expr);w=E?.resultString??"(nil)",T=E?.luaType??"?"}}catch{}v.push({expr:x.expr,value:w,type:T}),d.webview.html=g(v)}else x.cmd==="clear"&&(v.length=0,d.webview.html=g(v))},void 0,n.subscriptions)}),j(n,"lurek.debug.openCallStack",()=>{S.window.showInformationMessage("Call stack available when connected to the Lua debug bridge.")}),j(n,"lurek.debug.addWatch",()=>{let d=S.window.activeTextEditor;d&&Ri(d)}),j(n,"lurek.runtime.openMonitor",()=>Ai(n)),j(n,"lurek.api.usageReport",()=>zi(n)),j(n,"lurek.api.quickInsert",()=>_i(Me)),typeof ye.onConnected=="function"){let d=ye;d.onConnected(()=>Hr(!0)),d.onDisconnected?.(()=>Hr(!1)),d.evaluate&&Mi(async g=>{try{let v=await d.evaluate(g);return{value:String(v),type:typeof v}}catch{return}})}j(n,"lurek.browseApi",()=>er()),j(n,"lurek.openApiDocs",()=>to()),j(n,"lurek.openWiki",()=>no()),j(n,"lurek.depGraph",()=>Qr(n)),j(n,"lurek.depList",()=>ro()),j(n,"lurek.apiCoverage",()=>{let d=S.window.createTerminal("Lurek2D API Coverage");d.show(),d.sendText("python tools/integration_coverage.py")}),yo(n,ye),Wo(n),j(n,"lurek.debug.runAndConnect",async()=>{await Ur(qe),await new Promise(g=>setTimeout(g,1500)),await ye.connect()?(S.commands.executeCommand("setContext","lurek.debugConnected",!0),ye.startStatsPolling(),S.window.showInformationMessage("Lurek2D started and debug bridge connected.")):S.window.showWarningMessage("Game launched but debug bridge could not connect. Is debug bridge enabled in conf.lua?")}),j(n,"lurek.debug.performance",()=>{if(!ye.isConnected){S.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");return}let d=S.window.createWebviewPanel("lurek.debugPerf","Lurek2D Live Performance",S.ViewColumn.Two,{enableScripts:!0,retainContextWhenHidden:!0});d.webview.html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline';">
 <style>
   body{font-family:var(--vscode-font-family);color:var(--vscode-foreground);background:var(--vscode-editor-background);padding:16px;margin:0}
@@ -24562,284 +12467,4 @@ const vscode=acquireVsCodeApi(),hist=[];
 function draw(){const c=document.getElementById('fpsChart');if(!c)return;const W=c.offsetWidth||600;c.width=W;c.height=80;const ctx=c.getContext('2d');ctx.clearRect(0,0,W,80);if(hist.length<2)return;const mx=Math.max(...hist,1);ctx.strokeStyle='#4ec9b0';ctx.lineWidth=1.5;ctx.beginPath();hist.forEach((v,i)=>{const x=i/(hist.length-1)*W,y=80-(v/mx)*74-3;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y)});ctx.stroke();ctx.lineTo(W,80);ctx.lineTo(0,80);ctx.closePath();const g=ctx.createLinearGradient(0,0,0,80);g.addColorStop(0,'#4ec9b033');g.addColorStop(1,'#4ec9b000');ctx.fillStyle=g;ctx.fill()}
 window.addEventListener('message',e=>{if(e.data.type==='stats'){const{fps,drawCalls,memory}=e.data;document.getElementById('fps').textContent=fps;document.getElementById('fps').className='val '+(fps>=55?'fps-ok':fps>=25?'fps-warn':'fps-bad');document.getElementById('dc').textContent=drawCalls;document.getElementById('mem').textContent=(memory/1024/1024).toFixed(1);hist.push(fps);if(hist.length>120)hist.shift();draw()}});
 window.addEventListener('resize',draw);
-</script></body></html>`;
-    const perfInterval = setInterval(async () => {
-      if (!debugBridge.isConnected) {
-        clearInterval(perfInterval);
-        return;
-      }
-      try {
-        const stats = await debugBridge.getStats();
-        panel.webview.postMessage({ type: "stats", ...stats });
-      } catch {
-      }
-    }, 500);
-    panel.onDidDispose(() => clearInterval(perfInterval));
-  });
-  registerCommand(context, "lurek.debug.printHistory", () => {
-    debugBridge.showOutput();
-  });
-  registerCommand(context, "lurek.debug.screenshot", async () => {
-    if (!debugBridge.isConnected) {
-      vscode41.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
-      return;
-    }
-    try {
-      const b64 = await debugBridge.takeScreenshot();
-      if (!b64) {
-        vscode41.window.showWarningMessage("Engine did not return screenshot data.");
-        return;
-      }
-      const buf = Buffer.from(b64, "base64");
-      const wsFolder = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-      if (!wsFolder) {
-        vscode41.window.showErrorMessage("No workspace folder.");
-        return;
-      }
-      const ts = (/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-");
-      const outPath = require("path").join(wsFolder, `screenshot-${ts}.png`);
-      require("fs").writeFileSync(outPath, buf);
-      const uri = vscode41.Uri.file(outPath);
-      await vscode41.commands.executeCommand("vscode.open", uri);
-      vscode41.window.showInformationMessage(`Screenshot saved: screenshot-${ts}.png`);
-    } catch (err) {
-      vscode41.window.showErrorMessage(`Screenshot failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  });
-  registerCommand(context, "lurek.debug.callStack", async () => {
-    if (!debugBridge.isConnected) {
-      vscode41.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");
-      return;
-    }
-    try {
-      const frames = await debugBridge.getCallStack();
-      if (frames.length === 0) {
-        vscode41.window.showInformationMessage("Call stack is empty (game may not be paused).");
-        return;
-      }
-      const items = frames.map((f) => ({
-        label: `#${f.level} ${f.name}`,
-        description: `${f.source}:${f.line}`,
-        detail: `${f.source} line ${f.line}`,
-        source: f.source,
-        line: f.line
-      }));
-      const picked = await vscode41.window.showQuickPick(items, {
-        title: "Lua Call Stack",
-        placeHolder: "Select a frame to navigate to"
-      });
-      if (picked?.source && picked.source !== "?" && picked.source !== "[C]") {
-        const relPath = picked.source.startsWith("@") ? picked.source.slice(1) : picked.source;
-        const wsFolder = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-        if (wsFolder) {
-          const filePath = require("path").join(wsFolder, relPath);
-          if (require("fs").existsSync(filePath)) {
-            const doc = await vscode41.workspace.openTextDocument(filePath);
-            await vscode41.window.showTextDocument(doc, {
-              selection: new vscode41.Range(picked.line - 1, 0, picked.line - 1, 0)
-            });
-          }
-        }
-      }
-    } catch (err) {
-      vscode41.window.showErrorMessage(`Call stack failed: ${err instanceof Error ? err.message : String(err)}`);
-    }
-  });
-  registerCommand(context, "lurek.debug.status", async () => {
-    const info = debugBridge.getStatusInfo();
-    if (!info.connected) {
-      const choice = await vscode41.window.showInformationMessage(
-        `Lurek2D debug bridge: NOT connected (port ${info.port})`,
-        "Connect Now",
-        "Dismiss"
-      );
-      if (choice === "Connect Now") {
-        vscode41.commands.executeCommand("lurek.debug.connect");
-      }
-    } else {
-      try {
-        const stats = await debugBridge.getStats();
-        vscode41.window.showInformationMessage(
-          `Lurek2D connected on port ${info.port} \xB7 FPS: ${stats.fps} \xB7 Draw calls: ${stats.drawCalls} \xB7 Memory: ${(stats.memory / 1024 / 1024).toFixed(1)} MB`
-        );
-      } catch {
-        vscode41.window.showInformationMessage(`Lurek2D debug bridge connected on port ${info.port}.`);
-      }
-    }
-  });
-  registerCommand(context, "lurek.cag.install", () => installCag());
-  registerCommand(context, "lurek.cag.selectAgent", () => selectAgent());
-  registerCommand(context, "lurek.cag.selectSkill", () => selectSkill());
-  registerCommand(context, "lurek.cag.selectPrompt", () => selectPrompt());
-  registerCommand(context, "lurek.cag.update", () => {
-    vscode41.window.showInformationMessage(
-      "CAG update is not yet implemented."
-    );
-  });
-  registerCommand(context, "lurek.mcp.install", () => {
-    vscode41.window.showInformationMessage(
-      "MCP server installation is not yet implemented."
-    );
-  });
-  registerCommand(context, "lurek.mcp.status", () => {
-    vscode41.window.showInformationMessage(
-      mcpProcess ? "MCP server is running." : "MCP server is not running."
-    );
-  });
-  registerGameJamCommands(context);
-  registerCommand(context, "lurek.jam.quickBuild", () => {
-    const terminal = vscode41.window.createTerminal("Lurek2D Quick Build");
-    terminal.show();
-    terminal.sendText(buildBuildCommand("release"));
-  });
-  registerCommand(context, "lurek.jam.checklist", () => {
-    vscode41.window.showInformationMessage(
-      "Submission Checklist is not yet implemented."
-    );
-  });
-  registerLibraryCommands(context);
-  registerGameDevCagCommands(context);
-  registerCommand(context, "lurek2d.runExample", () => runExample(lurekProcess));
-  registerCommand(context, "lurek2d.listExamples", () => runExample(lurekProcess));
-  registerCommand(context, "lurek2d.checkBuild", () => {
-    const terminal = vscode41.window.createTerminal("Lurek2D Build Check");
-    terminal.show();
-    terminal.sendText(buildCheckCommand());
-  });
-  registerCommand(context, "lurek2d.getApiDoc", () => browseApi());
-  registerCommand(context, "lurek2d.scanAllGames", async () => {
-    const wsRoot = getWorkspaceRoot4();
-    if (!wsRoot) {
-      vscode41.window.showErrorMessage("No workspace open.");
-      return;
-    }
-    const uris = await vscode41.workspace.findFiles(
-      LUA_WORKSPACE_SCAN_INCLUDE,
-      LUA_WORKSPACE_SCAN_EXCLUDE
-    );
-    if (uris.length === 0) {
-      vscode41.window.showInformationMessage(
-        "No Lua files found under src/, library/, content/, .github/, or tests/."
-      );
-      return;
-    }
-    await vscode41.window.withProgress(
-      {
-        location: vscode41.ProgressLocation.Notification,
-        title: `Scanning ${uris.length} Lua files\u2026`,
-        cancellable: false
-      },
-      async (progress) => {
-        let done = 0;
-        for (const uri of uris) {
-          try {
-            const doc = await vscode41.workspace.openTextDocument(uri);
-            await vscode41.window.showTextDocument(doc, { preview: true, preserveFocus: true });
-          } catch {
-          }
-          done++;
-          progress.report({ increment: 100 / uris.length, message: `${done}/${uris.length}` });
-        }
-      }
-    );
-    await vscode41.commands.executeCommand("workbench.action.problems.focus");
-    vscode41.window.showInformationMessage(
-      `Scanned ${uris.length} Lua files. Check the Problems panel for errors.`
-    );
-  });
-  const workspaceRoot = getWorkspaceRoot4();
-  if (workspaceRoot) {
-    mcpProcess = startMcpServer(workspaceRoot);
-  }
-  configureLuaWorkspaceLibrary(context);
-  context.subscriptions.push(
-    vscode41.workspace.onDidChangeConfiguration((e) => {
-      if (e.affectsConfiguration("lurek.luaVersion")) {
-        apiData.load(context.extensionPath).catch((err) => {
-          console.error("Failed to reload Lurek2D API data:", err);
-        });
-        configureLuaWorkspaceLibrary(context);
-      }
-    })
-  );
-  vscode41.commands.executeCommand("setContext", "lurek.gameRunning", false);
-}
-function deactivate() {
-  if (mcpProcess) {
-    mcpProcess.kill();
-    mcpProcess = void 0;
-  }
-}
-function registerCommand(context, id, handler) {
-  context.subscriptions.push(
-    vscode41.commands.registerCommand(id, handler)
-  );
-}
-function getWorkspaceRoot4() {
-  return vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-}
-var LUA_WORKSPACE_SCAN_INCLUDE = "{src,library,content,.github,tests}/**/*.lua";
-var LUA_WORKSPACE_SCAN_EXCLUDE = "{**/node_modules/**,**/build/**,**/dist/**,**/out/**,**/save/**,**/logs/**,ideas/**,work/**}";
-var BUNDLED_LUACATS_BASENAME = "lurek.luacats";
-function normalizeLibraryPath(filePath) {
-  return path22.normalize(filePath).replace(/[\\/]+$/, "").toLowerCase();
-}
-function sameLibraryPaths(left, right) {
-  if (left.length !== right.length) {
-    return false;
-  }
-  return left.every((entry, index) => {
-    return normalizeLibraryPath(entry) === normalizeLibraryPath(right[index]);
-  });
-}
-function ensureBundledAnnotationsDir(context) {
-  const bundledSource = path22.join(
-    context.extensionPath,
-    "data",
-    BUNDLED_LUACATS_BASENAME
-  );
-  if (!fs19.existsSync(bundledSource)) {
-    return void 0;
-  }
-  const targetDir = path22.join(context.globalStorageUri.fsPath, "luacats");
-  const targetFile = path22.join(targetDir, "lurek.lua");
-  fs19.mkdirSync(targetDir, { recursive: true });
-  const shouldRefresh = !fs19.existsSync(targetFile) || fs19.statSync(targetFile).size !== fs19.statSync(bundledSource).size || fs19.statSync(targetFile).mtimeMs < fs19.statSync(bundledSource).mtimeMs;
-  if (shouldRefresh) {
-    fs19.copyFileSync(bundledSource, targetFile);
-  }
-  return targetDir;
-}
-function configureLuaWorkspaceLibrary(context) {
-  const wsRoot = vscode41.workspace.workspaceFolders?.[0]?.uri.fsPath;
-  const wsDocsApi = wsRoot ? path22.join(wsRoot, "docs", "api") : void 0;
-  const bundledData = path22.join(context.extensionPath, "data");
-  const materializedBundledDir = ensureBundledAnnotationsDir(context);
-  const annotationsDir = wsDocsApi && fs19.existsSync(path22.join(wsDocsApi, "lurek.lua")) ? wsDocsApi : materializedBundledDir;
-  const luaConfig = vscode41.workspace.getConfiguration("Lua");
-  const currentLibrary = luaConfig.get("workspace.library") ?? [];
-  const managedLibraryPaths = new Set([
-    wsDocsApi,
-    bundledData,
-    materializedBundledDir,
-    wsRoot ? path22.join(wsRoot, "extensions", "vscode", "data") : void 0
-  ].filter((entry) => Boolean(entry)).map(normalizeLibraryPath));
-  const filtered = currentLibrary.filter((entry) => {
-    return !managedLibraryPaths.has(normalizeLibraryPath(entry));
-  });
-  const updated = annotationsDir ? [...filtered, annotationsDir] : filtered;
-  if (!sameLibraryPaths(currentLibrary, updated)) {
-    luaConfig.update("workspace.library", updated, vscode41.ConfigurationTarget.Global).then(void 0, () => {
-    });
-  }
-  const lurekVersion = vscode41.workspace.getConfiguration("lurek").get("luaVersion", "luajit");
-  const runtimeVersion = lurekVersion === "lua54" ? "Lua 5.4" : "LuaJIT";
-  luaConfig.update("runtime.version", runtimeVersion, vscode41.ConfigurationTarget.Global).then(void 0, () => {
-  });
-}
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  activate,
-  deactivate
-});
-//# sourceMappingURL=extension.js.map
+</script></body></html>`;let g=setInterval(async()=>{if(!ye.isConnected){clearInterval(g);return}try{let v=await ye.getStats();d.webview.postMessage({type:"stats",...v})}catch{}},500);d.onDidDispose(()=>clearInterval(g))}),j(n,"lurek.debug.printHistory",()=>{ye.showOutput()}),j(n,"lurek.debug.screenshot",async()=>{if(!ye.isConnected){S.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");return}try{let d=await ye.takeScreenshot();if(!d){S.window.showWarningMessage("Engine did not return screenshot data.");return}let g=Buffer.from(d,"base64"),v=S.workspace.workspaceFolders?.[0]?.uri.fsPath;if(!v){S.window.showErrorMessage("No workspace folder.");return}let x=new Date().toISOString().replace(/[:.]/g,"-"),w=require("path").join(v,`screenshot-${x}.png`);require("fs").writeFileSync(w,g);let T=S.Uri.file(w);await S.commands.executeCommand("vscode.open",T),S.window.showInformationMessage(`Screenshot saved: screenshot-${x}.png`)}catch(d){S.window.showErrorMessage(`Screenshot failed: ${d instanceof Error?d.message:String(d)}`)}}),j(n,"lurek.debug.callStack",async()=>{if(!ye.isConnected){S.window.showErrorMessage("Not connected to Lurek2D engine. Run 'Lurek2D: Debug Connect' first.");return}try{let d=await ye.getCallStack();if(d.length===0){S.window.showInformationMessage("Call stack is empty (game may not be paused).");return}let g=d.map(x=>({label:`#${x.level} ${x.name}`,description:`${x.source}:${x.line}`,detail:`${x.source} line ${x.line}`,source:x.source,line:x.line})),v=await S.window.showQuickPick(g,{title:"Lua Call Stack",placeHolder:"Select a frame to navigate to"});if(v?.source&&v.source!=="?"&&v.source!=="[C]"){let x=v.source.startsWith("@")?v.source.slice(1):v.source,w=S.workspace.workspaceFolders?.[0]?.uri.fsPath;if(w){let T=require("path").join(w,x);if(require("fs").existsSync(T)){let M=await S.workspace.openTextDocument(T);await S.window.showTextDocument(M,{selection:new S.Range(v.line-1,0,v.line-1,0)})}}}}catch(d){S.window.showErrorMessage(`Call stack failed: ${d instanceof Error?d.message:String(d)}`)}}),j(n,"lurek.debug.status",async()=>{let d=ye.getStatusInfo();if(!d.connected)await S.window.showInformationMessage(`Lurek2D debug bridge: NOT connected (port ${d.port})`,"Connect Now","Dismiss")==="Connect Now"&&S.commands.executeCommand("lurek.debug.connect");else try{let g=await ye.getStats();S.window.showInformationMessage(`Lurek2D connected on port ${d.port} \xB7 FPS: ${g.fps} \xB7 Draw calls: ${g.drawCalls} \xB7 Memory: ${(g.memory/1024/1024).toFixed(1)} MB`)}catch{S.window.showInformationMessage(`Lurek2D debug bridge connected on port ${d.port}.`)}}),j(n,"lurek.cag.install",()=>ao()),j(n,"lurek.cag.selectAgent",()=>io()),j(n,"lurek.cag.selectSkill",()=>oo()),j(n,"lurek.cag.selectPrompt",()=>so()),j(n,"lurek.cag.update",()=>{S.window.showInformationMessage("CAG update is not yet implemented.")}),j(n,"lurek.mcp.install",()=>{S.window.showInformationMessage("MCP server installation is not yet implemented.")}),j(n,"lurek.mcp.status",()=>{S.window.showInformationMessage($t?"MCP server is running.":"MCP server is not running.")}),fo(n),j(n,"lurek.jam.quickBuild",()=>{let d=S.window.createTerminal("Lurek2D Quick Build");d.show(),d.sendText(en("release"))}),j(n,"lurek.jam.checklist",()=>{S.window.showInformationMessage("Submission Checklist is not yet implemented.")}),To(n),Lo(n);let o=()=>S.window.terminals.find(g=>g.name==="Lurek2D Build")??S.window.createTerminal("Lurek2D Build");j(n,"lurek.build.debug",()=>{let d=o();d.show(),d.sendText(en("debug"))}),j(n,"lurek.build.release",()=>{let d=o();d.show(),d.sendText(en("release"))}),j(n,"lurek.build.dist",()=>{let d=o();d.show(),d.sendText(Ua())}),j(n,"lurek.build.check",()=>{let d=o();d.show(),d.sendText(Sr())});let s=[{label:"Hello World",value:"content/games/showcase/hello_world"},{label:"Sprites",value:"content/games/showcase/sprites"},{label:"Scene Demo",value:"content/games/showcase/scene_demo"},{label:"Particles Demo",value:"content/games/showcase/particles_demo"},{label:"Light Demo",value:"content/games/showcase/light_demo"},{label:"Globe Demo",value:"content/games/showcase/globe_demo"},{label:"Terminal Demo",value:"content/games/showcase/terminal_demo"},{label:"Hacking Game",value:"content/games/showcase/hacking_game"},{label:"Tween Demo",value:"content/games/showcase/tween_demo"},{label:"PostFX Demo",value:"content/games/showcase/postfx_demo"},{label:"Minimap Demo",value:"content/games/showcase/minimap_demo"},{label:"Demo Game",value:"content/games/showcase/demo_game"}];j(n,"lurek.run.debugPickDemo",async()=>{let d=await S.window.showQuickPick(s,{title:"Pick Demo (Debug)"});if(!d)return;let g=o();g.show(),g.sendText(jt("debug",[d.value]))}),j(n,"lurek.run.releasePickDemo",async()=>{let d=await S.window.showQuickPick(s,{title:"Pick Demo (Release)"});if(!d)return;let g=o();g.show(),g.sendText(jt("release",[d.value]))}),j(n,"lurek.run.debugNoRebuild",()=>{let d=vr()??".",g=Fe.join(d,"build","debug","lurek2d.exe"),v=o();v.show(),v.sendText(`"${g}"`)}),j(n,"lurek.run.releaseNoRebuild",()=>{let d=vr()??".",g=Fe.join(d,"build","release","lurek2d.exe"),v=o();v.show(),v.sendText(`"${g}"`)});let l=()=>S.window.terminals.find(g=>g.name==="Lurek2D Tests")??S.window.createTerminal("Lurek2D Tests");j(n,"lurek.test.rust.all",()=>{let d=l();d.show(),d.sendText(qa())});for(let d of["math","physics","graphics","audio","input"])j(n,`lurek.test.target.${d}`,()=>{let g=l();g.show(),g.sendText(et(d))});let p=()=>S.window.terminals.find(g=>g.name==="Lurek2D Quality")??S.window.createTerminal("Lurek2D Quality");j(n,"lurek.quality.gate",()=>{let d=p();d.show(),d.sendText("python tools/dev/parallel_cargo.py fmt check && python tools/dev/parallel_cargo.py clippy --deny-warnings && python tools/dev/parallel_cargo.py test all")}),j(n,"lurek.quality.clippy",()=>{let d=p();d.show(),d.sendText(Ha(!0))}),j(n,"lurek.quality.fmtApply",()=>{let d=p();d.show(),d.sendText(kr("apply"))}),j(n,"lurek.quality.fmtCheck",()=>{let d=p();d.show(),d.sendText(kr("check"))});let u=()=>S.window.terminals.find(g=>g.name==="Lurek2D Docs")??S.window.createTerminal("Lurek2D Docs");j(n,"lurek.docs.fullPipeline",()=>{let d=u();d.show(),d.sendText("python tools/gen_all_docs.py")}),j(n,"lurek.docs.rustBrowser",()=>{let d=u();d.show(),d.sendText(Va(!0,!0))}),j(n,"lurek.docs.libraryApi",()=>{let d=u();d.show(),d.sendText("python tools/docs/gen_lib_docs.py")}),j(n,"lurek.docs.validateLuaStubs",()=>{let d=u();d.show(),d.sendText("python tools/validate/validate_generated_lua_stubs.py")}),j(n,"lurek.dist.repackage",()=>{let d=o();d.show(),d.sendText("powershell -ExecutionPolicy Bypass -File tools/dist/dist.ps1 -SkipBuild")}),j(n,"lurek.dist.installWindows",()=>{let d=o();d.show(),d.sendText("powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1")});let c=()=>S.window.terminals.find(g=>g.name==="Lurek2D Audit")??S.window.createTerminal("Lurek2D Audit");j(n,"lurek.audit.qualityReport",()=>{let d=c();d.show(),d.sendText("python tools/audit/quality_report.py")}),j(n,"lurek.audit.testCoverage",()=>{let d=c();d.show(),d.sendText("python tools/audit/test_coverage.py")}),j(n,"lurek.audit.docCoverage",()=>{let d=c();d.show(),d.sendText("python tools/audit/doc_coverage.py")}),j(n,"lurek.audit.exampleCoverage",()=>{let d=c();d.show(),d.sendText("python tools/audit/example_coverage.py")}),j(n,"lurek.audit.luaTestCoverage",()=>{let d=c();d.show(),d.sendText("python tools/audit/lua_api_test_coverage.py")}),j(n,"lurek.audit.luaSpecCoverage",()=>{let d=c();d.show(),d.sendText("python tools/audit/lua_spec_coverage.py")}),j(n,"lurek.audit.cagLinkCheck",()=>{let d=c();d.show(),d.sendText("python tools/audit/cag_link_check.py --strict")});let h=()=>S.window.terminals.find(g=>g.name==="Lurek2D Validate")??S.window.createTerminal("Lurek2D Validate");j(n,"lurek.validate.luaApi",()=>{let d=h();d.show(),d.sendText("python tools/validate/validate_lua_api.py")}),j(n,"lurek.validate.library",()=>{let d=h();d.show(),d.sendText("python tools/validate/validate_library.py")}),j(n,"lurek.validate.changelog",()=>{let d=h();d.show(),d.sendText("python tools/validate/validate_changelog.py")}),j(n,"lurek.validate.moduleCoverage",()=>{let d=h();d.show(),d.sendText("python tools/validate/validate_module_coverage.py")}),j(n,"lurek.validate.callbacks",()=>{let d=h();d.show(),d.sendText("python tools/validate/check_callbacks.py")}),j(n,"lurek.validate.cag",()=>{let d=h();d.show(),d.sendText("python tools/validate/cag_validate.py")}),j(n,"lurek2d.runExample",()=>vn(qe)),j(n,"lurek2d.listExamples",()=>vn(qe)),j(n,"lurek2d.checkBuild",()=>{let d=S.window.createTerminal("Lurek2D Build Check");d.show(),d.sendText(Sr())}),j(n,"lurek2d.getApiDoc",()=>er()),j(n,"lurek2d.scanAllGames",async()=>{if(!vr()){S.window.showErrorMessage("No workspace open.");return}let g=await S.workspace.findFiles(Op,zp);if(g.length===0){S.window.showInformationMessage("No Lua files found under src/, library/, content/, .github/, or tests/.");return}await S.window.withProgress({location:S.ProgressLocation.Notification,title:`Scanning ${g.length} Lua files\u2026`,cancellable:!1},async v=>{let x=0;for(let w of g){try{let T=await S.workspace.openTextDocument(w);await S.window.showTextDocument(T,{preview:!0,preserveFocus:!0})}catch{}x++,v.report({increment:100/g.length,message:`${x}/${g.length}`})}}),await S.commands.executeCommand("workbench.action.problems.focus"),S.window.showInformationMessage(`Scanned ${g.length} Lua files. Check the Problems panel for errors.`)});let L=vr();L&&($t=Za(L)),Go(n),n.subscriptions.push(S.workspace.onDidChangeConfiguration(d=>{d.affectsConfiguration("lurek.luaVersion")&&(Me.load(n.extensionPath).catch(g=>{console.error("Failed to reload Lurek2D API data:",g)}),Go(n))})),S.commands.executeCommand("setContext","lurek.gameRunning",!1)}function Fp(){$t&&($t.kill(),$t=void 0)}function j(n,e,t){n.subscriptions.push(S.commands.registerCommand(e,t))}function vr(){return S.workspace.workspaceFolders?.[0]?.uri.fsPath}var Op="{src,library,content,.github,tests}/**/*.lua",zp="{**/node_modules/**,**/build/**,**/dist/**,**/out/**,**/save/**,**/logs/**,ideas/**,work/**}",_p="lurek.luacats";function Lr(n){return Fe.normalize(n).replace(/[\\/]+$/,"").toLowerCase()}function Np(n,e){return n.length!==e.length?!1:n.every((t,r)=>Lr(t)===Lr(e[r]))}function Wp(n){let e=Fe.join(n.extensionPath,"data",_p);if(!Ie.existsSync(e))return;let t=Fe.join(n.globalStorageUri.fsPath,"luacats"),r=Fe.join(t,"lurek.lua");return Ie.mkdirSync(t,{recursive:!0}),(!Ie.existsSync(r)||Ie.statSync(r).size!==Ie.statSync(e).size||Ie.statSync(r).mtimeMs<Ie.statSync(e).mtimeMs)&&Ie.copyFileSync(e,r),t}function Go(n){let e=S.workspace.workspaceFolders?.[0]?.uri.fsPath,t=e?Fe.join(e,"docs","api"):void 0,r=Fe.join(n.extensionPath,"data"),a=Wp(n),i=t&&Ie.existsSync(Fe.join(t,"lurek.lua"))?t:a,o=S.workspace.getConfiguration("Lua"),s=o.get("workspace.library")??[],l=new Set([t,r,a,e?Fe.join(e,"extensions","vscode","data"):void 0].filter(L=>!!L).map(Lr)),p=s.filter(L=>!l.has(Lr(L))),u=i?[...p,i]:p;Np(s,u)||o.update("workspace.library",u,S.ConfigurationTarget.Global).then(void 0,()=>{});let h=S.workspace.getConfiguration("lurek").get("luaVersion","luajit")==="lua54"?"Lua 5.4":"LuaJIT";o.update("runtime.version",h,S.ConfigurationTarget.Global).then(void 0,()=>{})}0&&(module.exports={activate,deactivate});

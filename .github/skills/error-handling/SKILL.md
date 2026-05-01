@@ -18,16 +18,16 @@ description: "Load this skill when designing Result flows, EngineError variants,
 - Test writing.
 
 ## Domain Knowledge
-- src/runtime/error.rs is the engine-side error hub, and Lua boundaries should translate failures into clear, safe user-facing messages that preserve meaning without leaking internals.
-- src/lua_api/ and app startup paths are common sites for recoverable errors that must not panic; these are the places where boundary quality matters more than raw stack detail.
-- Avoid leaking absolute paths, raw Rust type names, private handles, or internal state details in Lua-visible errors unless that detail is truly required for the user to fix content.
-- Callback failures, file IO, asset decode, registry-key lookup, channel handoff, and config parsing should prefer Result-based flow over panic or silent ignore behavior.
-- Recoverable content errors should keep the engine running when possible, while fatal exits should be reserved for unrecoverable boot, renderer, or configuration failures that prevent safe continuation.
-- Good error wording here matches Lua-facing behavior and next action, not just Rust internals; say what failed and what kind of input or state caused it.
-- Distinguish invalid content, missing assets, unsupported runtime state, unavailable resource, and engine defect as separate failure classes because they imply different fixes and different severity.
-- Preserve internal context in Rust where useful, but sanitize the outward message so content authors see a stable error contract instead of implementation trivia.
-- When an error crosses async or threaded boundaries, preserve enough category information that the receiver can still decide whether to retry, abort, or surface a fatal message.
-- Do not log and rewrap the same failure at every layer; one well-placed error with clear propagation is better than duplicate noise.
+- `src/runtime/error.rs` defines `EngineError` with distinct variants — never collapse distinct failure classes (asset missing, shader compile, audio decode, IO, config parse) into a generic `String` variant. Each variant enables targeted recovery logic.
+- Lua-visible error messages follow this pattern: `map_err(|e| mlua::Error::RuntimeError(format!("lurek.audio.play: {}", e)))`. Include the module and function in the message so content authors can locate the failing call without a Rust stack trace.
+- Recoverable vs. fatal classification: `asset_not_found` is recoverable — log at warn, return `nil` or a fallback. `shader_compile_failed` is fatal — abort render pipeline, surface a developer-visible message. Config parse errors at startup are fatal. Missing optional asset at runtime is recoverable.
+- The `src/lua_api/` and app startup paths are the highest-risk panic sites. Every boundary function must return `mlua::Result<T>` and propagate with `?`, never `unwrap()` or `expect()` unless the invariant is truly unbreakable and commented.
+- Do not log and re-wrap the same error at every layer. One `error!()` at the origination site plus one `map_err()` for context at the boundary is the pattern. Duplicate logs at three layers make traces unreadable.
+- Leak no internals in outward messages: no absolute filesystem paths (use relative from GameFS root), no raw Rust type names, no memory addresses or internal handle IDs. Content authors see a stable error surface, not implementation detail.
+- Callback and thread-crossing errors: preserve the error category and a human-readable string across channel sends. Receivers need to decide retry-vs-abort, so the error type must survive the send without losing its intent.
+- Five distinct failure classes to treat separately: invalid content (bad asset, wrong data shape), missing required resource, unsupported runtime state (API called in wrong phase), unavailable external resource (file IO), and engine defect (internal assertion or logic error). Each implies a different response — reject input, fallback, reject call, retry, and panic respectively.
+- When converting from `std::io::Error`, `image::ImageError`, or similar external errors into `EngineError`, choose the variant by semantic meaning not by the source type. An IO error reading a .png is an asset error, not a generic IO error.
+- `panic!` is acceptable only for internal invariant violations that indicate a programmer error, not for any user-input-triggered path. All `unwrap()` on user-facing paths must be replaced with explicit error propagation.
 ## Companion File Index
 - None.
 

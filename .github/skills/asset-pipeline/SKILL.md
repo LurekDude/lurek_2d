@@ -18,16 +18,15 @@ description: "Load this skill when working on asset loading, GameFS, image decod
 - Audio playback logic.
 
 ## Domain Knowledge
-- Game-facing asset access should resolve through GameFS and stay relative to the game root or mounted content root; direct host-path assumptions break the sandbox contract quickly.
-- src/filesystem/ owns sandboxing and path rules, while src/image/ and audio source loaders own decode only; render and playback are downstream consumers, not asset-pipeline concerns.
-- Normalize or canonicalize paths before caching so repeated loads hit one stable cache key instead of duplicating entries for equivalent caller strings.
-- Missing assets, bad decode, blocked paths, and unsupported formats should surface as clear Lua-visible errors, not panics or silent fallback.
-- Keep script loading, image decode, raw bytes access, and audio source loading separate from render, mixer, or scene decisions so failures stay attributable to the right layer.
-- save/ is runtime state, not a content root for shipping assets, demos, or examples; loader rules should keep that boundary obvious.
-- content/, library/, mods/, and game folders are content roots in this repo, and asset rules should preserve those boundaries instead of leaking workstation-specific filesystem layout into Lua APIs.
-- Cache invalidation should follow stable path and decode assumptions, not transient caller state such as the current scene or a one-off access pattern.
-- If an asset path comes from Lua, validate it at the boundary and preserve the same sandbox semantics across images, scripts, bytes, and audio sources.
-- Good asset behavior here makes the loaded root, normalized path, and failure class obvious enough that a game author can correct content quickly.
+- GameFS is the access boundary. All asset loads must go through `lurek.fs.*` or the Rust `GameFS` API in `src/filesystem/`. Direct host path access (`std::fs::read`) inside `src/<module>/` is a defect — it bypasses sandbox rules, breaks relative-path portability, and makes content roots non-fungible.
+- Path normalization rule: convert `\` to `/`, collapse `..` and `.` segments, and lower-case the extension before building a cache key. The canonical path is the GameFS-relative string after normalization. Two callers with `sprites/hero.png` and `./sprites/hero.png` must hit the same cache slot.
+- Layer ownership: `src/filesystem/` = sandbox rules, path normalization, access control. `src/image/` = decode PNG/JPEG/LIMG to raw RGBA. `src/audio/source.rs` = decode WAV/OGG to PCM. Render and mixer consume decoded output; they do not own decode. Script loader is a separate pipeline from asset loader.
+- Supported formats: images — PNG, JPEG, LIMG (engine-specific); audio — WAV, OGG; scripts — `.lua` only. Any other format produces a clear error, not silent fallback. When adding a new format, add it to `docs/specs/filesystem.md` under Supported Formats.
+- Cache invalidation: the asset cache key is (normalized-path, mount-point-id). Invalidate on unmount or explicit `lurek.fs.cache_clear()`. Never invalidate on scene change unless a new content root is mounted for that scene.
+- `save/` directory is runtime state, not a content root. Do not load game assets from `save/`. Assets stored in `save/` are serialized game data (save files, high scores) and may be corrupt or tampered by the user.
+- `mods/` directory is a secondary content root with lower priority than the primary game root. A mod asset at `mods/<name>/sprites/hero.png` shadows the game asset at `sprites/hero.png` only when the mod is explicitly mounted.
+- Hot-reload: `lurek.fs.watch(path, callback)` watches a file for changes. In release/dist builds, this API is a no-op. Content that depends on hot-reload must not break when the watcher is absent.
+- Error contract: asset errors surface as `mlua::Error::RuntimeError` with the pattern `"lurek.image.load: file not found: <normalized-path>"`. Never let a missing asset produce a panic, a blank default, or a log message that the author cannot see.
 ## Companion File Index
 - None.
 

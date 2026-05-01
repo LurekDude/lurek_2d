@@ -18,17 +18,15 @@ description: "Load this skill when adding or tuning log output, log levels, RUST
 - Analytics from saved logs.
 
 ## Domain Knowledge
-- The repo uses the log crate, and src/log/ plus startup paths define sinks and default filter behavior, so log changes should stay consistent with the existing runtime pipeline.
-- Avoid noisy info or warn logs in hot paths such as render, physics, timer, worker polling, or per-frame AI loops; the observability gain rarely justifies the runtime cost.
-- Include enough identifiers for grep and parse_test_log.py without leaking absolute paths, private handles, or irrelevant implementation detail.
-- Trace and debug are for transient state and developer diagnosis, while info, warn, and error should map to operational impact a user or tester can understand.
-- One log line should usually answer one question: what operation ran, what object or path it touched, and why it succeeded, failed, or changed state.
-- For tests, pair RUST_LOG with --nocapture before adding temporary output; prefer filter tuning to permanent noisy logs when the problem is still under investigation.
-- Avoid duplicated logging at every layer of the same failure path; log where the event becomes actionable, then propagate errors cleanly.
-- RUST_LOG filters, log level choice, and parseable context matter because repo tooling already expects structured diagnosis from captured output and grep-driven review.
-- Logging in hot loops should be rare and deliberate; if high-frequency detail is necessary, guard it tightly behind trace or debug and keep the wording compact.
-- Good log wording in this repo is stable, grep-friendly, and concrete enough that later audits can cluster similar failures without post-hoc interpretation.
-- This skill owns runtime observability wording, level choice, and filter strategy, not general debugging method, failure semantics, or offline analytics.
+- Log crate target naming convention: `lurek2d::<module>` for engine modules (e.g., `lurek2d::render`, `lurek2d::physics`), `lurek2d::lua_api::<module>` for binding layer. RUST_LOG filters work on these targets: `RUST_LOG=lurek2d::render=trace,lurek2d::lua_api=debug cargo run`.
+- Level assignment rules: `error!` = operation failed and the engine cannot continue safely (fatal, developer must act). `warn!` = operation failed but the engine recovered or fell back (developer should investigate). `info!` = significant lifecycle event (startup, shutdown, scene load). `debug!` = developer-relevant decision point. `trace!` = per-frame or high-frequency detail. Never use `info!` for anything that fires more than once per second at runtime.
+- Hot path log guard: every `trace!` or `debug!` call inside `on_process`, render loop, physics step, or audio callback must be guarded by `if log::log_enabled!(log::Level::Trace)`. Unguarded log calls in hot paths disable the JIT for surrounding Lua code and add Rust string allocation overhead even when output is suppressed.
+- `println!` in `src/<module>/` is a defect — the `module-audit` scanner flags it. All engine output goes through `log::*`. `eprintln!` is acceptable in `src/bin/` and `tools/` only.
+- Context format rule: `warn!("lurek2d::audio: failed to load source '{}': {}", normalized_path, err)`. The message must include the module path, the key identifiers (path, handle, config key), and the error. Do not include absolute host paths — use the GameFS-normalized path.
+- `parse_test_log.py` expects log lines in the standard `[LEVEL target] message` format. Custom log formats or log redirection that changes this format will break the CI log parser.
+- `src/log/` configures the log sink (env_logger or custom). When modifying startup log configuration, check that headless test mode (`LUREK_HEADLESS=1`) does not suppress error-level output needed by CI.
+- For Lua-side logging: `lurek.log.debug(msg)`, `lurek.log.warn(msg)`, `lurek.log.error(msg)` route through the same sink with target `lurek2d::lua_script`. Game authors should use these instead of `print()` for structured, filterable output.
+- Structured event logging for analytics: game events (score, death, level complete) should use `lurek.log.event(name, data_table)` rather than plain log messages. This produces JSON lines in `logs/data/` that analytics tools can query.
 ## Companion File Index
 - None.
 

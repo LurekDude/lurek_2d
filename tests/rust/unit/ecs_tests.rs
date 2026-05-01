@@ -51,7 +51,6 @@ mod relationships_tests {
         assert_eq!(t.default_level, "open");
     }
 
-
     #[test]
     fn all_relations_for_filters_correctly() {
         let mut mgr = RelationshipManager::new();
@@ -61,5 +60,4 @@ mod relationships_tests {
         let rels = mgr.all_relations_for(1);
         assert_eq!(rels.len(), 2);
     }
-
 }

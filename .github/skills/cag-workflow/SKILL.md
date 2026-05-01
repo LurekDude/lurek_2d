@@ -19,15 +19,16 @@ description: "Load this skill when editing .github agents, skills, prompts, or t
 - Roadmap planning.
 
 ## Domain Knowledge
-- In this repo, .github/ is a validated contract layer, not loose prose, so every edit should preserve discoverability, routing, and validator compatibility at the same time.
-- Front-load concrete trigger words in description fields because discovery depends on short matching text, and vague prose near the end of a description is effectively invisible to the loader.
-- Keep one concern per file type: agent for role and delegation, skill for reusable domain knowledge, prompt for a focused workflow, and the system prompt for global discovery rules.
-- Choose the smallest valid primitive first; if the behavior is always-on it belongs in instructions, if it is task-scoped it belongs in a skill or prompt, and if it needs context isolation it belongs in an agent.
-- SKILL.md files should stay code-block free, example-light, and easy to scan; the value is concentrated bullets that change search and execution behavior, not long tutorial text.
-- Distinct scope matters more than coverage count: overlapping skills dilute discovery, create conflicting advice, and make it harder for the router to pick the right file with confidence.
-- Manager remains the only router between specialists, so agent files should describe clear ownership boundaries instead of partial overlap or fallback-to-everything behavior.
-- Shared policy should live once in .github/copilot-instructions.md or the relevant architecture doc, not be restated with different wording across skills, prompts, and agents.
-- Companion File Index should name only files that materially improve execution of that skill; dumping broad reading lists there weakens the signal and wastes context.
+- File type selection rule: system prompt (`copilot-instructions.md`) = always-on global rules; agent (`*.agent.md`) = role identity, owned scope, and routing; skill (`SKILL.md`) = HOW-TO domain knowledge loaded on demand; prompt (`*.prompt.md`) = a focused multi-step workflow for one recurring task. Mixing these purposes into the wrong file type breaks discoverability.
+- `description` field is the discovery key for skills and agents. It is searched first by the skill loader. The first sentence must state the trigger condition precisely. Bad: "General Rust coding help." Good: "Load this skill when writing or reviewing Rust engine code in src/."
+- `When To Load` and `When To Skip` sections are hard routing guards. When To Skip prevents skill stacking: two overlapping skills loaded simultaneously create conflicting advice. If two skills have overlapping When To Load triggers, one of them is too broad.
+- Shared policy belongs in `copilot-instructions.md` exactly once. If the same rule appears in a skill AND an agent AND a prompt, delete it from two of the three and add a link. Duplication causes version drift — rule changes get applied inconsistently.
+- Companion File Index lists only files that the skill reader must open to execute the skill correctly. Do not list architecture reference docs that are nice-to-know. A companion file is a hard dependency for a specific action in the skill.
+- Agent scope must be mutually exclusive. When two agents could plausibly handle the same request, that is a routing defect — the scope must be sharpened or one agent must defer explicitly. Check `docs/architecture/cag-system.md § 4.1` to confirm skill bundles do not create ambiguous routing.
+- Before creating a new skill, check if an existing skill can absorb the domain knowledge. A new skill is justified when: (1) its When To Load triggers are unique and non-overlapping, (2) its domain knowledge is not duplicated elsewhere, (3) at least one agent lists it in their bundle.
+- Token cost rule: every line added to `copilot-instructions.md` is loaded on every request. Anything that is not always-relevant belongs in a skill or agent, not in the system prompt. Prune regularly.
+- Validation is mandatory before any CAG commit. Run `python tools/validate/cag_validate.py` for schema compliance, `python tools/audit/cag_link_check.py --strict` for file reference integrity. Both must pass.
+- Workflow: baseline validate → minimal change → validate again → run `cag_link_check.py --strict` → update `docs/CHANGELOG.md` → commit. Never commit a CAG change without a green validator run.
 ## Companion File Index
 - None.
 

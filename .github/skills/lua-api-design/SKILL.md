@@ -17,17 +17,17 @@ description: "Load this skill when designing or changing the lurek.* Lua API sur
 - Pure Lua game scripts.
 
 ## Domain Knowledge
-- The public namespace is lurek.* only and should stay aligned with src/lua_api/register.rs, docs/specs, and generated docs; naming drift across those surfaces is an API defect, not just a doc bug.
-- Prefer stable arity, explicit defaults, fixed return shapes, and predictable callback contracts over overloaded string-driven APIs or behavior that changes by hidden convention.
-- Test API shape early with content/examples and Lua tests before binding work grows around a weak signature; it is cheaper to change a sketch than a widely copied example.
-- Keep Lua-visible type names, callback names, option-table fields, and return values consistent with generated docs and neighboring APIs in the same namespace.
-- If an API is niche, game-specific, or mostly composition, check whether it belongs in library/ or example content before adding it to core lurek.*.
-- Public API changes imply sync work across docs, examples, tests, dependent libraries, and sometimes changelog or migration guidance.
-- Public APIs should fit existing lurek.* language rather than importing patterns wholesale from unrelated engines with different runtime and content assumptions.
-- Prefer explicit option tables when the parameter list would otherwise become fragile, but keep table keys stable, well-named, and documented.
-- Avoid magic strings and shape-shifting returns when an enum-like value, dedicated function, or consistent tuple is clearer for game authors.
-- Breaking or subtle API changes should come with migration notes and visible examples because tests, docs, and library modules are downstream from the shape chosen here.
-- This skill owns external API ergonomics, discoverability, and consistency for authors, not binding mechanics, backend runtime tuning, or pure Lua script structure.
+- All public functions live under `lurek.*` exactly — no bare globals, no `engine.*`, no alternative top-level tables. This is binding constraint C-01; any new namespace proposal goes through Lua-Designer, not Developer.
+- Test the API shape with a short Lua snippet in `content/examples/` before writing binding code. A design flaw in a 10-line sketch costs nothing; the same flaw in a bound+tested+documented API costs a breaking change.
+- Arity rule: prefer fixed-arity functions or option tables. Avoid optional positional arguments beyond 2 — they break autocomplete and make `lurek.*` calls hard to read six months later. `lurek.sprite.draw(sprite, x, y, opts)` is acceptable; `lurek.sprite.draw(sprite, x, y, rot, sx, sy, ox, oy)` is not.
+- Return shape must be stable and documented. Functions that return `nil` on failure should say so explicitly in the docstring. Never return `nil` and `error` depending on context for the same function — choose one pattern per function.
+- Callback contracts must state: when it fires (frame phase), what arguments it receives (types and units), what happens if it raises an error (caught/logged or propagated), and whether it fires once or repeatedly.
+- Check `src/lua_api/register.rs` and `docs/api/lurek.md` for existing naming patterns before proposing a name. `lurek.audio.play` vs `lurek.audio.start` vs `lurek.audio.source.play` — pick the one that matches the nearest neighbor.
+- Run `python tools/validate/validate_lua_api.py` on any new or changed binding to verify docstring shape, argument naming, and type annotation completeness. This feeds generated docs.
+- Migration notes are mandatory for: changed argument order, renamed params, removed functions, changed return type, changed callback signature. Migration notes go in `docs/specs/<module>.md` under a Changelog or Migration section.
+- If a proposed function is only useful for one game genre, check `library/` first. Core `lurek.*` is for universal game behaviors; domain logic belongs in library modules.
+- Enums should be represented as Lua strings with a small closed set, documented in the docstring. Magic strings with an open set are a design smell; if the set is open, use a type alias or documentation that says so explicitly.
+- `docs/api/lurek.lua` and `docs/api/lurek.md` are generated — never hand-edit them. Always fix docstring issues in `src/lua_api/<module>_api.rs`, then regenerate with `python tools/gen_all_docs.py`.
 ## Companion File Index
 - None.
 

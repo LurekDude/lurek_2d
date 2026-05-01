@@ -20,15 +20,14 @@ alwaysApply: false
 - Engine implementation, testing, or API naming.
 
 ## Domain Knowledge
-- docs/architecture/togaf-research.md is the local source of truth for TOGAF work in this repo; treat it as an evidence-first research brief, not as a conformance claim.
-- Start from TOGAF as a comparison lens, not a compliance target.
-- Keep TOGAF axes separate: ADM lifecycle, four architecture domains, Enterprise Continuum, architecture repository, deliverables, and governance.
-- TOGAF 10 public material emphasizes the split between Fundamental Content and Series Guides; for this repo, stable constraints usually map better to fundamentals.
-- For Lurek2D, Business/Data/Application/Technology should be reinterpreted against a product-plus-tooling repository instead of copied literally from enterprise IT wording.
+- docs/architecture/togaf.md is the authoritative TOGAF alignment doc for this repo; it defines the four-domain mapping, artifact taxonomy, governance model, and scope boundaries. Read it first.
+- Start from TOGAF as a comparison lens, not a compliance target. Lurek2D is TOGAF-aware, not TOGAF-certified.
+- Keep TOGAF axes separate: four architecture domains, architecture repository, governance, and scope boundaries.
+- For Lurek2D, Business/Data/Application/Technology should be reinterpreted against a product-plus-tooling repository — see §2 of togaf.md for the established mappings.
 - Compare TOGAF repository and governance concepts against docs/, .agents/, tools/validate/, quality gates, and work/ artifacts before inventing new document types.
-- Avoid checkbox gap analyses. If a TOGAF concept is too enterprise-heavy for this repo, say so directly.
+- Avoid checkbox gap analyses. If a TOGAF concept is too enterprise-heavy for this repo, name the mismatch explicitly and move on.
 
 ## References
-- docs/architecture/togaf-research.md
+- docs/architecture/togaf.md
 - docs/architecture/philosophy.md
 - docs/architecture/cag-system.md

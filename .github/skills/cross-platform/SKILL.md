@@ -18,17 +18,15 @@ description: "Load this skill when handling platform-specific code, cfg gates, o
 - Lua script work.
 
 ## Domain Knowledge
-- Lurek2D targets desktop only: Windows, Linux, and macOS on x86_64 and ARM, so portability work should optimize for those three surfaces and ignore mobile or WASM branches entirely.
-- Windows is a strong local path in this repo, which makes PowerShell 5.1 compatibility important for user-facing scripts, installers, and dist helpers.
-- Prefer shared winit, wgpu, rodio, and filesystem behavior before adding cfg-specific branches; the portable path should remain the default, not the exception.
-- Use Path and PathBuf plus GameFS rules everywhere you can; never hardcode separators, drive assumptions, or shell-specific path logic inside engine code.
-- Window startup, file paths, install scripts, dist packaging, and extension tooling are the most common places where platform drift appears first here.
-- Keep platform-specific code isolated to the narrowest surface and document why the branch exists; hidden cfg behavior spread across many files becomes hard to reason about quickly.
-- Desktop-only support means Windows, Linux, and macOS behavior should stay aligned for startup, filesystem access, logging paths, and packaging outputs.
-- Shell commands in docs or scripts should be explicit about which shell they target; PowerShell, bash, and cargo invocations should not be casually mixed.
-- Install, dist, and editor tooling often surface cross-platform drift faster than pure engine code, so a portability review should include those outer layers.
-- Prefer repo-level helpers and library abstractions before introducing OS-specific APIs; if a branch is unavoidable, prove the exact behavior that differs.
-- Cross-platform work here is successful when the common path stays simple and the exceptional branch is both narrow and easy to validate on the affected OS.
+- Supported targets: Windows x86_64, Linux x86_64, macOS x86_64, macOS ARM64. No mobile, no WASM (binding constraint A-02). Any cfg gate for `target_os = "android"` or `target_arch = "wasm32"` is out of scope and should not be added.
+- Windows is the primary development and CI platform. PowerShell 5.1 is the minimum shell version for scripts and dist helpers. Scripts must not use PowerShell 7-only syntax (e.g., `??=`, `ForEach-Object -Parallel`). When in doubt, test in PS 5.1.
+- Platform drift checklist for path handling: (1) use `std::path::Path` and `PathBuf`, (2) never use `\` as a path separator literal, (3) never use `:` or drive letters in GameFS paths, (4) never call `std::fs` directly in engine modules (use GameFS). A path that works on Windows by accident but breaks on Linux is a defect.
+- `winit` and `wgpu` abstract most platform differences for window and GPU. When a window/GPU issue is platform-specific, check `winit`/`wgpu` issue trackers before adding a `cfg` branch in engine code.
+- Platform-specific code pattern: isolate in a `platform/` submodule or behind a `cfg` block with a `// Platform-specific:` comment explaining why the branch exists and what the alternative behavior is on other targets. Undocumented `cfg` branches are invisible maintenance debt.
+- Audio differences: `rodio` has platform-specific output device enumeration. Windows uses WASAPI, Linux uses ALSA/PipeWire, macOS uses CoreAudio. The Lua API surface is identical on all platforms. `lurek.audio.devices()` is the platform-specific surface — test it separately on each target.
+- Install script behavior: `tools/dist/install.ps1` targets Windows only. Linux installation is manual or via a future Makefile. Document clearly which install path applies to which platform rather than using conditionals that silently no-op.
+- CI platform testing minimum: Windows x86_64 (mandatory), Linux x86_64 (mandatory). macOS can use the free GitHub Actions macOS runner but is optional given resource cost.
+- When adding a cfg-gated feature, add a corresponding test or smoke scenario that exercises the cfg path on the affected platform. An untested cfg branch will regress at next update.
 ## Companion File Index
 - None.
 

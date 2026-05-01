@@ -18,17 +18,15 @@ description: "Load this skill when creating demo projects in content/games/, inc
 - Engine Rust code.
 
 ## Domain Knowledge
-- Demos live under content/games/<category>/<name> and should be runnable with main.lua plus conf.lua or conf.toml, so the folder itself remains a self-contained showcase unit.
-- README.md should explain the demo goal quickly, the capability family it proves, and how to run it; screen.png is supporting material, not the contract.
-- Demo smoke coverage currently lives in tests/demo_smoke_tests.rs and Lua smoke files under tests/lua/demos/, so new demos should fit that verification model instead of living as untracked content.
-- A demo should showcase one capability cluster clearly, not become a dumping ground for unrelated APIs or a pseudo-game that obscures what is under test.
-- If the demo exposes public API behavior, keep related docs, examples, and any affected smoke or load tests in sync with the same capability.
-- Prefer small, robust setup over heavy content that hides the engine feature being demonstrated; the point is clear evidence, not asset volume.
-- Good demo content should make both the success path and the likely regression path obvious so a broken engine feature is visible quickly.
-- Registration, load tests, and smoke coverage should line up with the current tests/demo_smoke_tests.rs and other demo-oriented checks already in the repo.
-- Asset choices in a demo should support the feature being shown, not introduce unrelated complexity that makes failures harder to attribute.
-- Demos are broader than examples but still narrower than full games; they should be playable enough to demonstrate behavior without turning into open-ended content maintenance.
-- This skill owns runnable showcase content, demo folder shape, and demo-level sync work, not generic examples, reusable library layout, or engine Rust implementation.
+- Demo folder structure is mandatory: `content/games/<category>/<name>/conf.lua`, `main.lua`, `README.md`. Optional but recommended: `screen.png` (240×135), `assets/`. A demo folder missing `conf.lua` will fail `tests/games_load_test.rs`.
+- `conf.lua` required keys: `title` (string), `width` (integer), `height` (integer). Optional recommended keys: `fps_target` (default 60), `vsync` (default true). Check `src/runtime/config.rs` for the full list and defaults before writing a conf template.
+- After creating a demo, register it in three places: (1) `tests/games_load_test.rs` — add a `lua_game_<name>` test, (2) `tests/demo_smoke_tests.rs` — add a `#[ignore]` smoke test if screenshot evidence is needed, (3) `tests/lua/harness.rs` — add an entry if the demo has a Lua test file. Missing any registration means the demo is invisible to CI.
+- Smoke tests in `tests/demo_smoke_tests.rs` run with `#[ignore]` and require a window. They are run manually or in dedicated CI jobs with a display. Do not make a smoke test part of the default `cargo test` run.
+- README.md structure: one-line description, feature list (3-5 bullets), "How to run" section (one cargo command or task label), and "What to look for" section explaining the expected behavior. Keep it under 30 lines.
+- Asset budget: demos should use only assets already in `assets/` (shared fonts, test images) or tiny purpose-specific assets in `content/games/<name>/assets/`. Do not add large binary assets to prove a small point.
+- A demo that proves one capability cluster (e.g., particle systems, tilemap rendering, dialog flow) is more useful than a demo that proves many. If a demo grows beyond ~200 lines in `main.lua`, consider splitting it or promoting it to a full game.
+- `content/games/<name>/` category choices: `demos/` (engine feature showcase), `tests/` (Lua-test-adjacent), `games/` (playable content). Do not place engine feature demos in `games/` or playable content in `demos/`.
+- How to write `main.lua` for a demo: start with `function lurek.load()` for one-time setup (load assets, create physics world, initialize state), `function lurek.update(dt)` for per-frame logic, and `function lurek.draw()` for all draw calls. The demo must not use `require` on library modules unless demonstrating that specific library — bare `lurek.*` calls only.
 ## Companion File Index
 - None.
 

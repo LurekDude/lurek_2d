@@ -5,36 +5,28 @@ description: "Load this skill when designing or reviewing TOML UI layouts in con
 # ui-layout
 
 ## Mission
-
-Own the TOML UI layout format: grid system, widget types, naming conventions, hierarchy rules, and the layout tooling pipeline.
+- Own the TOML UI layout format: grid system, widget types, naming conventions, hierarchy rules, and the layout tooling pipeline.
 
 ## When To Load
-
-- Creating or editing content/layouts/*.toml files
-- Choosing widget types or layout structure for a game screen
-- Running layout validation or rendering tools
-- Snapping coordinates to the grid system
+- Creating or editing `content/layouts/*.toml` files.
+- Choosing widget types or layout structure for a game screen.
+- Running layout validation or rendering tools.
+- Snapping coordinates to the grid system.
 
 ## When To Skip
-
-- Rust engine UI code -> see src/ui/
-- Lua game-logic scripting -> use lua-scripting skill
+- Rust engine UI code — see `src/ui/`.
+- Lua game-logic scripting — use `lua-scripting` skill.
 
 ## Domain Knowledge
-- content/layouts/ currently splits into apps/ and games/ layout trees, so layout authoring should keep those content roles distinct instead of merging every screen into one folder style.
-- Use tools/ui/render_layout.py, snap_to_grid.py, and fix_layouts.py before hand-tuning screenshots or pixel offsets by eye; the tooling is the intended feedback loop for this format.
-- The project grid baseline is 8px, with 4px for fine offsets and larger multiples for grouping, so spacing choices should feel systematic rather than ad hoc.
-- Choose widget patterns already supported by src/ui/ loaders and renderers; unsupported schema ideas belong in engine work, not in speculative TOML files.
-- Keep layout hierarchy shallow, IDs snake_case, and screen purpose obvious so scripts and tools can refer to elements without brittle naming.
-- TOML layouts here should follow the supported widget, hierarchy, and data rules from the current layout system instead of importing HTML or generic UI-builder conventions.
-- Prefer a small number of well-grouped containers over deeply nested structures that make alignment and maintenance harder.
-- IDs should be stable and semantic because layout files often become the anchor for script wiring, screenshots, and bug reports.
-- This skill is for declarative TOML layout authoring and its tooling loop, not HTML screens, CSS styling, or Rust widget implementation.
-- Good layout work here produces screens that snap cleanly to the grid, render predictably with the repo tools, and remain easy to read as plain text.
-- If a screen needs dynamic document behavior, reconsider whether it belongs in the HTML path rather than stretching the TOML format beyond its intended use.
+- TOML layout schema: every file has a `[root]` table with `widget_type`, `id`, `x`, `y`, `w`, `h` fields, then `[[root.children]]` array entries for child widgets. Supported `widget_type` values are: `panel`, `label`, `button`, `progressbar`, `checkbox`, `image`, `slider`, `list`. Each type has additional optional fields (`text` for labels, `min/max/value` for progressbar, `src` for image). Check `content/layouts/games/fps_hud.toml` for a minimal real example.
+- Coordinate system: x and y are top-left pixel offsets from the parent's top-left corner, not the screen origin. For root-level widgets, `x` and `y` are screen-absolute. Viewport comment at the top of each file (e.g., `# Viewport: 1280 × 720`) documents the design canvas size — coordinates must fit within it.
+- Grid discipline: run `python tools/ui/snap_to_grid.py content/layouts/ --grid 8 --recursive` to snap `x`, `y`, `w`, `h` to 8-pixel multiples. Run this before committing any layout change. Fine adjustments use `--grid 4`. The tool only modifies geometry fields — `min`, `max`, `value`, and other semantic fields are untouched.
+- How to validate a layout: run `python tools/ui/render_layout.py content/layouts/games/my_layout.toml` to produce a PNG preview. Compare against the `.png` reference file that lives beside each `.toml` file (e.g., `fps_hud.png`). If the rendered output differs from the reference, the layout change is a visual regression. Update the reference PNG in the same commit as the layout change.
+- How to run `fix_layouts.py`: `python tools/ui/fix_layouts.py content/layouts/` normalises field ordering, strips extra whitespace, and enforces TOML array formatting. Run it after hand-editing to avoid diff noise from formatting differences.
+- ID naming rules: `snake_case`, prefixed by widget role (e.g., `hp_bar`, `score_label`, `pause_btn`). IDs must be unique within a file. IDs are referenced from Lua scripts via `lurek.ui.getElementById("id")` — changing an ID after a script has been written breaks the wiring silently.
+- `apps/` layouts are for standalone UI demos (calculator, login form, dashboard). `games/` layouts are in-game HUDs and menus. Keep these folders distinct in meaning: a games/ layout should assume a game is running; an apps/ layout should not. Do not add game-specific IDs (e.g., `hp_bar`) to apps/ layouts.
 ## Companion File Index
-
-None - all guidance is inline.
+- None.
 
 ## References
 - content/layouts/

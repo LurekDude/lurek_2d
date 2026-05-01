@@ -18,16 +18,18 @@ description: "Load this skill when writing or reviewing Rust engine code. It own
 - Docs-only work.
 
 ## Domain Knowledge
-- mod.rs files stay thin in this repo; public logic, data types, and helpers belong in sibling files, with module roots limited to exports, attributes, and doc comments.
-- No #[cfg(test)] blocks belong in src/, and product logic should not be pushed into src/lua_api/ for convenience; binding files stay thin and engine behavior stays in src/<module>/.
-- Thin Wrapper Rule and docs/specs sync rules are part of normal Rust work here, not optional cleanup, so implementation changes should keep module contracts and ownership legible.
-- Prefer root-cause fixes over defensive layering, explicit error propagation over silent fallback, and narrow validation before broader cleanups or speculative refactors.
-- Safe, idiomatic Rust in this codebase means clear ownership, small mutation surfaces, predictable module boundaries, and no hidden policy spread across unrelated files.
-- Keep unsafe tiny, justified, and wrapped in stable invariants; if safety depends on order or lifetime assumptions, make that relationship obvious in surrounding code.
-- Respect the runtime constraints that shape implementation choices: desktop only, wgpu 22 only, LuaJIT as primary runtime, and isolated Lua VMs across thread boundaries.
-- Prefer existing domain modules and helper types before inventing parallel abstractions; consistency across src/ matters more here than importing a fresh pattern from another project.
-- Public Rust changes often imply adjacent sync work in specs, tests, examples, or changelog files, so implementation is not complete when the compiler alone is green.
-- The repo favors explicit file staging, one logical change per commit, and minimal unrelated churn.
+- mod.rs in src/ must contain only `pub mod`, `pub use`, doc comments, and `#[allow]` attributes. Definitions belong in sibling files. If a mod.rs has function or struct bodies, that is a defect to fix.
+- No `#[cfg(test)]` blocks in src/. Unit tests for private code go in `tests/rust/unit/<module>_tests.rs`, named `<module>_tests.rs` not `<module>_test.rs`. If you see `#[cfg(test)]` in src/, move it.
+- `src/lua_api/*_api.rs` must stay thin: `LuaUserData` impls, `add_methods`, registration, and type conversions only. Business logic belongs in `src/<module>/`. A binding file that starts accumulating `if/match/for` logic is drifting.
+- Never hold `borrow_mut()` or `RefCell::borrow_mut()` across a Lua callback invocation. The pattern is: extract all needed values while holding the borrow, release it, then invoke Lua. Re-entry during borrow causes a runtime panic.
+- SharedState access rule: `{ let guard = state.borrow(); let val = guard.field.clone(); } /* borrow released */ call_lua(val)`. The guard must be dropped before any call that might re-enter Rust.
+- Pinned library versions: mlua 0.9, wgpu 22, winit 0.30, rapier2d 0.32, rodio 0.17, fontdue 0.9. Do not bump without explicit authorization; each bump needs wgpu/winit API adjustments.
+- When a Rust change touches public types or functions visible through `lurek.*`, run `python tools/validate/validate_lua_api.py` to catch shape drift in generated docs.
+- Public changes (new API, removed method, changed signature) must update `docs/specs/<module>.md` and `docs/CHANGELOG.md` in the same commit. Compiler green does not mean the task is done.
+- Use `?` for propagation but never let it cross a callback boundary silently. Closures passed to mlua must return `mlua::Result`; inner `?` should map errors before they reach Lua with a clear message.
+- Keep `unsafe` blocks small, one-purpose, and accompanied by a `// SAFETY:` comment that explains the invariant. No `unsafe` for convenience when a safe alternative exists.
+- Prefer explicit module imports over glob imports (`use module::*`). Glob imports make it impossible to grep what the file actually depends on during refactors.
+- Tests in `tests/rust/unit/` name their test functions `test_<behavior>_<condition>`. Keep each test assertion to one failure mode so failing tests name the problem immediately.
 ## Companion File Index
 - None.
 

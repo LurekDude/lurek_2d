@@ -114,6 +114,18 @@ export class ProjectToolsProvider
             "lurek.package.linux",
             "terminal-linux"
           ),
+          new SidebarItem(
+            "Repackage (skip build)",
+            vscode.TreeItemCollapsibleState.None,
+            "lurek.dist.repackage",
+            "file-zip"
+          ),
+          new SidebarItem(
+            "Install Windows",
+            vscode.TreeItemCollapsibleState.None,
+            "lurek.dist.installWindows",
+            "desktop-download"
+          ),
         ];
       case "Libraries":
         return [
@@ -249,6 +261,12 @@ export class DevToolsProvider
     if (!element) {
       return [
         new SidebarItem(
+          "Build",
+          vscode.TreeItemCollapsibleState.Collapsed,
+          undefined,
+          "tools"
+        ),
+        new SidebarItem(
           "Run",
           vscode.TreeItemCollapsibleState.Expanded,
           undefined,
@@ -259,6 +277,30 @@ export class DevToolsProvider
           vscode.TreeItemCollapsibleState.Collapsed,
           undefined,
           "beaker"
+        ),
+        new SidebarItem(
+          "Quality",
+          vscode.TreeItemCollapsibleState.Collapsed,
+          undefined,
+          "pass"
+        ),
+        new SidebarItem(
+          "Docs",
+          vscode.TreeItemCollapsibleState.Collapsed,
+          undefined,
+          "book"
+        ),
+        new SidebarItem(
+          "Audit",
+          vscode.TreeItemCollapsibleState.Collapsed,
+          undefined,
+          "graph"
+        ),
+        new SidebarItem(
+          "Validate",
+          vscode.TreeItemCollapsibleState.Collapsed,
+          undefined,
+          "check-all"
         ),
         new SidebarItem(
           "Editors",
@@ -300,6 +342,13 @@ export class DevToolsProvider
     }
 
     switch (element.label) {
+      case "Build":
+        return [
+          new SidebarItem("Build: Debug", vscode.TreeItemCollapsibleState.None, "lurek.build.debug", "tools"),
+          new SidebarItem("Build: Release", vscode.TreeItemCollapsibleState.None, "lurek.build.release", "tools"),
+          new SidebarItem("Build: Dist", vscode.TreeItemCollapsibleState.None, "lurek.build.dist", "package"),
+          new SidebarItem("Build: Check (type only)", vscode.TreeItemCollapsibleState.None, "lurek.build.check", "checklist"),
+        ];
       case "Run":
         return [
           new SidebarItem(
@@ -310,30 +359,14 @@ export class DevToolsProvider
             this._gameStatus === "crashed" ? "error" : "debug-stop",
             this._gameStatus
           ),
-          new SidebarItem(
-            "Run Game",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.runGame",
-            "play"
-          ),
-          new SidebarItem(
-            "Stop Game",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.stopGame",
-            "debug-stop"
-          ),
-          new SidebarItem(
-            "Run with Arguments",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.runWithArgs",
-            "terminal"
-          ),
-          new SidebarItem(
-            "Run Example",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.runExample",
-            "file-code"
-          ),
+          new SidebarItem("Run Game", vscode.TreeItemCollapsibleState.None, "lurek.runGame", "play"),
+          new SidebarItem("Stop Game", vscode.TreeItemCollapsibleState.None, "lurek.stopGame", "debug-stop"),
+          new SidebarItem("Run with Arguments", vscode.TreeItemCollapsibleState.None, "lurek.runWithArgs", "terminal"),
+          new SidebarItem("Run Example", vscode.TreeItemCollapsibleState.None, "lurek.runExample", "file-code"),
+          new SidebarItem("Run Debug — pick demo", vscode.TreeItemCollapsibleState.None, "lurek.run.debugPickDemo", "list-selection"),
+          new SidebarItem("Run Release — pick demo", vscode.TreeItemCollapsibleState.None, "lurek.run.releasePickDemo", "list-selection"),
+          new SidebarItem("Run Debug (no rebuild)", vscode.TreeItemCollapsibleState.None, "lurek.run.debugNoRebuild", "play"),
+          new SidebarItem("Run Release (no rebuild)", vscode.TreeItemCollapsibleState.None, "lurek.run.releaseNoRebuild", "play"),
         ];
       case "Testing":
         return [
@@ -346,36 +379,50 @@ export class DevToolsProvider
               this._lastTestResult
             ),
           ] : []),
-          new SidebarItem(
-            "Open Test Runner",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.editor.testRunner",
-            "beaker"
-          ),
-          new SidebarItem(
-            "Run All Tests",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.test.all",
-            "testing-run-all-icon"
-          ),
-          new SidebarItem(
-            "Run Lua Tests",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.test.lua.all",
-            "test-view-icon"
-          ),
-          new SidebarItem(
-            "Run Golden Tests",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.test.lua.golden",
-            "file-media"
-          ),
-          new SidebarItem(
-            "Generate Tests for File",
-            vscode.TreeItemCollapsibleState.None,
-            "lurek.test.generateForFile",
-            "wand"
-          ),
+          new SidebarItem("Open Test Runner", vscode.TreeItemCollapsibleState.None, "lurek.editor.testRunner", "beaker"),
+          new SidebarItem("Run All Tests", vscode.TreeItemCollapsibleState.None, "lurek.test.all", "testing-run-all-icon"),
+          new SidebarItem("Run Rust Tests", vscode.TreeItemCollapsibleState.None, "lurek.test.rust.all", "testing-run-icon"),
+          new SidebarItem("Run Lua Tests", vscode.TreeItemCollapsibleState.None, "lurek.test.lua.all", "test-view-icon"),
+          new SidebarItem("Run Golden Tests", vscode.TreeItemCollapsibleState.None, "lurek.test.lua.golden", "file-media"),
+          new SidebarItem("Test: Math", vscode.TreeItemCollapsibleState.None, "lurek.test.target.math", "symbol-numeric"),
+          new SidebarItem("Test: Physics", vscode.TreeItemCollapsibleState.None, "lurek.test.target.physics", "settings-gear"),
+          new SidebarItem("Test: Graphics", vscode.TreeItemCollapsibleState.None, "lurek.test.target.graphics", "symbol-color"),
+          new SidebarItem("Test: Audio", vscode.TreeItemCollapsibleState.None, "lurek.test.target.audio", "unmute"),
+          new SidebarItem("Test: Input", vscode.TreeItemCollapsibleState.None, "lurek.test.target.input", "keyboard"),
+          new SidebarItem("Generate Tests for File", vscode.TreeItemCollapsibleState.None, "lurek.test.generateForFile", "wand"),
+        ];
+      case "Quality":
+        return [
+          new SidebarItem("Quality Gate (full pre-push)", vscode.TreeItemCollapsibleState.None, "lurek.quality.gate", "pass"),
+          new SidebarItem("Clippy (strict)", vscode.TreeItemCollapsibleState.None, "lurek.quality.clippy", "search"),
+          new SidebarItem("Format Apply", vscode.TreeItemCollapsibleState.None, "lurek.quality.fmtApply", "symbol-ruler"),
+          new SidebarItem("Format Check", vscode.TreeItemCollapsibleState.None, "lurek.quality.fmtCheck", "symbol-ruler"),
+        ];
+      case "Docs":
+        return [
+          new SidebarItem("Full Pipeline", vscode.TreeItemCollapsibleState.None, "lurek.docs.fullPipeline", "book"),
+          new SidebarItem("Rust Docs (browser)", vscode.TreeItemCollapsibleState.None, "lurek.docs.rustBrowser", "browser"),
+          new SidebarItem("Library API", vscode.TreeItemCollapsibleState.None, "lurek.docs.libraryApi", "library"),
+          new SidebarItem("Validate Lua Stubs", vscode.TreeItemCollapsibleState.None, "lurek.docs.validateLuaStubs", "verified"),
+        ];
+      case "Audit":
+        return [
+          new SidebarItem("Quality Report", vscode.TreeItemCollapsibleState.None, "lurek.audit.qualityReport", "graph"),
+          new SidebarItem("Test Coverage", vscode.TreeItemCollapsibleState.None, "lurek.audit.testCoverage", "graph-line"),
+          new SidebarItem("Doc Coverage", vscode.TreeItemCollapsibleState.None, "lurek.audit.docCoverage", "book"),
+          new SidebarItem("Example Coverage", vscode.TreeItemCollapsibleState.None, "lurek.audit.exampleCoverage", "file-code"),
+          new SidebarItem("Lua API Test Coverage", vscode.TreeItemCollapsibleState.None, "lurek.audit.luaTestCoverage", "beaker"),
+          new SidebarItem("Lua Spec Coverage", vscode.TreeItemCollapsibleState.None, "lurek.audit.luaSpecCoverage", "file-text"),
+          new SidebarItem("CAG Link Check (strict)", vscode.TreeItemCollapsibleState.None, "lurek.audit.cagLinkCheck", "link"),
+        ];
+      case "Validate":
+        return [
+          new SidebarItem("Validate Lua API", vscode.TreeItemCollapsibleState.None, "lurek.validate.luaApi", "check-all"),
+          new SidebarItem("Validate Library", vscode.TreeItemCollapsibleState.None, "lurek.validate.library", "library"),
+          new SidebarItem("Validate Changelog", vscode.TreeItemCollapsibleState.None, "lurek.validate.changelog", "file-text"),
+          new SidebarItem("Validate Module Coverage", vscode.TreeItemCollapsibleState.None, "lurek.validate.moduleCoverage", "graph"),
+          new SidebarItem("Check Callbacks", vscode.TreeItemCollapsibleState.None, "lurek.validate.callbacks", "symbol-event"),
+          new SidebarItem("Validate CAG Files", vscode.TreeItemCollapsibleState.None, "lurek.validate.cag", "hubot"),
         ];
       case "Editors":
         return [

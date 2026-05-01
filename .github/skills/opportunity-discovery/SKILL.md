@@ -19,17 +19,13 @@ description: "Load this skill when mapping ideas, finding product or engine gaps
 - API design.
 
 ## Domain Knowledge
-- ideas/ is the current discovery backlog surface and there is no formal docs/roadmap/ tree yet, so opportunity work should start from actual repo signals rather than assuming a mature planning stack exists.
-- Use repo evidence first: ideas/, logs/reports/, audit outputs, coverage gaps, docs drift, content friction, and repeated maintenance pain are all stronger signals than raw novelty.
-- Cluster repeated signals into one opportunity family instead of duplicating the same gap many times under different feature names.
-- Separate evidence-backed opportunities from speculative ideas and mark confidence explicitly so decision makers can see where more research is still needed.
-- Rank by impact, leverage, confidence, dependency cost, and breadth of reuse, not novelty alone; a small workflow fix with wide benefit often beats a flashy subsystem idea.
-- Tie each opportunity to a real layer, module, tool, or content pain point in the repo so the problem is anchored in something a maintainer can inspect.
-- A roadmap-ready opportunity needs a clear problem statement, likely owner, affected area, and validation gate, not just a title and an optimistic outcome.
-- Discovery output should say which ideas are evidence-backed now, which depend on missing telemetry or repo research, and which are still just candidate hypotheses.
-- Avoid locking into solutions too early; good discovery work preserves several plausible implementation paths until the problem shape is clear.
-- If three different notes all point to the same docs, tooling, or module boundary issue, summarize the shared opportunity instead of inflating backlog count.
-- This skill owns opportunity shaping, signal clustering, and ranking, not phase planning, solution design, or implementation sequencing.
+- Where to find signals in this repo: `ideas/` is the primary discovery backlog — scan all subdirectories (`ideas/rust/`, `ideas/extension/`, `ideas/plugins/`, `ideas/simulation/`, `ideas/tests/`). Secondary signals: `logs/quality/` for repeated lint or test failures, `tools/audit/` outputs for coverage gaps, `docs/specs/` TODO sections, and any spec file that has not been touched in many commits (drift signal).
+- How to cluster signals: group by affected layer (Foundations, Core Runtime, Platform Services, Feature Systems, Edge/Integration). Within a layer, group by pain type: missing capability, fragile boundary, documentation gap, test gap, or tooling gap. One cluster = one opportunity card. Avoid naming the solution in the opportunity title — keep it as a problem statement.
+- How to write an opportunity card: title (problem statement, not solution), evidence list (file paths, audit results, or issue references), affected layer and module, estimated author impact (which personas: EngDev, GameDev, Modder, GameTest, EngTest), confidence level (low/medium/high), and next validation action (what to run or read to confirm the gap). No opportunity is complete without a validation action.
+- Ranking formula: score each opportunity on (impact × leverage × confidence) / dependency cost. Impact = how many personas are affected. Leverage = how many future tasks unblock. Confidence = strength of evidence (audit output = high, single idea note = low). Dependency cost = how many other changes must land first.
+- How to distinguish an opportunity from a task: an opportunity is a problem shape that could be solved multiple ways. A task is a specific solution already chosen. Discovery ends when you have a ranked, anchored opportunity list — it hands off to `planner` (for task breakdown) or `architect` (for solution design). Do not merge phases.
+- Freshness check: before generating new opportunities, run `python tools/audit/test_coverage.py` and `python tools/audit/doc_coverage.py`. These produce the most up-to-date gap data. Discovery from stale notes without checking current audit output often produces already-resolved opportunities.
+- Output shape: a ranked list where each entry has: rank, problem title, evidence, affected area, personas, confidence, validation action, and suggested next owner. Deliver as a `work/<session>/reports/opportunities.md` file, not as inline chat prose, so the planner can act on it.
 ## Companion File Index
 - None.
 

@@ -73,7 +73,7 @@ Session workflow:
 
 Key references:
 - docs/architecture/test-framework.md - Test placement rules and the Lua-vs-Rust decision tree.
-- docs/architecture/togaf-research.md - TOGAF terminology, source limits, and comparison cues for enterprise-architecture work.
+- docs/architecture/togaf.md - TOGAF terminology, source limits, and comparison cues for enterprise-architecture work.
 - docs/specs/README.md - Module-spec catalog and where to add or rename specs.
 - tools/README.md - Tool inventory plus generator, validator, and audit entry points.
 - docs/handbook.md - Contributor workflow, setup, and repo-wide quality expectations.
