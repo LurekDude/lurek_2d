@@ -1,1 +1,0 @@
-hit=true cell_value=1 side=0 distance=1.5000 tex_u=0.5000 hit_x=4.0000 hit_y=2.5000
