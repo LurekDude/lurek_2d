@@ -15,7 +15,7 @@ describe("light_demo: lighting API usage", function()
     end)
 
     it("creates a light source (lurek.light.new)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.light%.new%s*%(") ~= nil or
             src:find("lurek%.light%.point%s*%(") ~= nil or
@@ -25,7 +25,7 @@ describe("light_demo: lighting API usage", function()
     end)
 
     it("moves or animates a light in the process loop", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":setPosition%s*%(") ~= nil or
             src:find(":moveTo%s*%(") ~= nil or
@@ -35,11 +35,10 @@ describe("light_demo: lighting API usage", function()
     end)
 
     it("does not use lurek.lighting (old namespace)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.lighting") ~= nil,
             "Old namespace lurek.lighting found     use lurek.light")
     end)
 end)
-
 test_summary()

@@ -51,5 +51,4 @@ describe("serial + filesystem integration", function()
         expect_true(lurek.filesystem.exists(path), "exists after write")
     end)
 end)
-
 test_summary()

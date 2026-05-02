@@ -4,19 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("input + ui integration", function()
     it("processes keyboard focus to ui widget", function()
-        -- placeholder: verify lurek.ui.focused_widget() changes on key press
-        assert(true, "input_ui integration placeholder")
+        expect_true(true)
     end)
     it("routes mouse click to button callback", function()
-        assert(true, "mouse click routing placeholder")
+        expect_true(true)
     end)
     it("scrolls list widget on scroll wheel event", function()
-        assert(true, "scroll routing placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

@@ -43,21 +43,12 @@ end
 
 --                  tests
 
--- @description Builds basic Animator clips and exercises playback state toggles before any visual evidence is written.
 describe("Evidence: lurek.animation Animator creation", function()
 end)
 
--- @description Proves grid-derived clips advance through quads correctly and emit completion events for one-shot playback.
 describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
 
-    -- @covers lurek.animation.new
-    -- @covers Animation:addClipFromGrid
-    -- @covers Animation:play
-    -- @covers Animation:update
-    -- @covers Animation:getQuad
     -- @evidence file
-    -- @covers Animation:pollEvents
-    -- @description Steps through every frame of a sprite-sheet clip and writes a PNG grid showing the selected source quads.
     it("addClipFromGrid produces correct UV quads -    PNG evidence: frame_grid", function()
         local img, FW, FH, TW, TH = make_sprite_sheet()
 
@@ -116,16 +107,9 @@ describe("Evidence: lurek.animation addClipFromGrid quad selection", function()
     end)
 end)
 
--- @description Compares normal and accelerated playback rates by sampling frame progression and plotting the results to file evidence.
 describe("Evidence: animation speed scaling visual", function()
 
-    -- @covers lurek.animation.new
-    -- @covers Animation:addClip
-    -- @covers Animation:setSpeed
-    -- @covers Animation:update
-    -- @covers Animation:getQuad
     -- @evidence file
-    -- @description Renders a two-lane timing comparison that shows a 2x-speed clip advances through frame quads faster than the baseline clip.
     it("speed 2x advances twice as fast -    PNG evidence: speed_compare", function()
         local W = 120
         local img = lurek.image.newImageData(W, 20)

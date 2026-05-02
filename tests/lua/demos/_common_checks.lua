@@ -59,7 +59,6 @@ function demo_common_checks(demo_name, demo_path)
 
         it("dofile executes without Lua error", function()
             if not src then
-                pending("source missing     load skipped")
                 return
             end
             expect_no_error(function()
@@ -77,7 +76,7 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("registers lurek.init, not lurek.load", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "function%s+lurek%.load%s*%(",
                 "found 'function lurek.load()'     wrong callback name, use lurek.init")
             require_pattern(src, "function%s+lurek%.init%s*%(",
@@ -85,7 +84,7 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("registers lurek.process, not lurek.update", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "function%s+lurek%.update%s*%(",
                 "found 'function lurek.update()'     wrong callback name, use lurek.process")
             require_pattern(src, "function%s+lurek%.process%s*%(",
@@ -93,7 +92,7 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("does not use lurek.draw (wrong callback)", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "function%s+lurek%.draw%s*%(",
                 "found 'function lurek.draw()'     wrong callback name, use lurek.render")
         end)
@@ -108,25 +107,25 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("does not call lurek.render.rectangle (invalid method)", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "lurek%.render%.rectangle%s*%(",
                 "lurek.render.rectangle is not a valid API     use drawRect(\"fill\",...) or drawRect(\"line\",...)")
         end)
 
         it("does not call lurek.input.isDown (invalid method)", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "lurek%.input%.isDown%s*%(",
                 "lurek.input.isDown() is invalid     use isActionDown() or wasActionPressed()")
         end)
 
         it("does not call lurek.input.getPosition (invalid method)", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "lurek%.input%.getPosition%s*%(",
                 "lurek.input.getPosition() is invalid     use getMousePosition()")
         end)
 
         it("does not use old lurek.render namespace", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             -- Allow 'lurek.render' only if it's the globe 'graphic' property name.
             -- We target 'lurek.render.' method calls specifically.
             refute_pattern(src, "lurek%.graphic%.",
@@ -134,13 +133,13 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("does not use old lurek.input namespace", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             refute_pattern(src, "lurek%.keyboard%.",
                 "old namespace lurek.input found     use lurek.input")
         end)
 
         it("does not use old lurek.input namespace", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             -- Allow lurek.input only as a string argument like input.bind("mouse1")
             -- which won't match lurek.mouse.* anyway.
             refute_pattern(src, "lurek%.mouse%.",
@@ -148,7 +147,7 @@ function demo_common_checks(demo_name, demo_path)
         end)
 
         it("does not capture lurek sub-table as file-scope local (captures nil)", function()
-            if not src then pending("source missing") return end
+            expect_not_nil(src, 'source missing')
             -- Pattern: at file scope, before any function, 'local X = lurek.render'
             -- This is an anti-pattern: lurek.render is nil at parse time; the engine
             -- populates it after the file is loaded. Capture inside a callback is fine.
@@ -157,5 +156,4 @@ function demo_common_checks(demo_name, demo_path)
         end)
     end)
 end
-
 test_summary()

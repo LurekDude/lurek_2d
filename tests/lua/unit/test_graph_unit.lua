@@ -1,7 +1,6 @@
 -- Lurek2D Graph API Tests
 
 -- Helper: build a simple 2-node graph with one edge
--- @covers lurek.graph.newGraph
 
 local function make_simple_graph()
     local g = lurek.graph.newGraph()
@@ -1375,7 +1374,6 @@ describe("graph regression coverage", function()
         return false
     end
 
-    -- @covers Graph:mst
     it("mst prefers the lighter two edges in a triangle", function()
         local g = lurek.graph.newGraph()
         local a = g:addNode()
@@ -1396,7 +1394,6 @@ describe("graph regression coverage", function()
         expect_false(contains(mst, 3))
     end)
 
-    -- @covers Graph:colorGraph
     it("colorGraph colors a path with two colors", function()
         local g = lurek.graph.newGraph()
         local a = g:addNode()
@@ -1414,7 +1411,6 @@ describe("graph regression coverage", function()
         expect_equal(colors[1], colors[3])
     end)
 
-    -- @covers Graph:isBipartite
     it("isBipartite distinguishes a path from a triangle", function()
         local path_graph = lurek.graph.newGraph()
         local p1 = path_graph:addNode()
@@ -1434,5 +1430,4 @@ describe("graph regression coverage", function()
         expect_false(tri_graph:isBipartite())
     end)
 end)
-
 test_summary()

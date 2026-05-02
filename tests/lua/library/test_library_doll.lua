@@ -3,21 +3,9 @@
 
 local doll = require("library.doll")
 
---                  Part                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Part
 
--- @description Verifies part defaults plus texture, transform, colour, flip, attribute, fixture, origin, and rotation-following helpers.
 describe("Part", function()
-    -- @covers library.doll.newPart
-    -- @description Verifies case: creates with default values.
-    -- @covers library.doll.Part:getDrawOrder
-    -- @covers library.doll.Part:getFollowsRotation
-    -- @covers library.doll.Part:getOffset
-    -- @covers library.doll.Part:getPartType
-    -- @covers library.doll.Part:getQuad
-    -- @covers library.doll.Part:getRotation
-    -- @covers library.doll.Part:getScale
-    -- @covers library.doll.Part:getTexture
-    -- @covers library.doll.Part:isVisible
     it("creates with default values", function()
         local p = doll.newPart()
         expect_not_nil(p, "newPart returns object")
@@ -36,20 +24,12 @@ describe("Part", function()
         expect_true(p:getFollowsRotation(), "followsRotation by default")
     end)
 
-    -- @description Verifies case: sets and gets texture.
-    -- @covers library.doll.Part:getTexture
-    -- @covers library.doll.Part:setTexture
-    -- @covers library.doll.newPart
     it("sets and gets texture", function()
         local p = doll.newPart()
         p:setTexture("hero.png")
         expect_equal("hero.png", p:getTexture())
     end)
 
-    -- @description Verifies case: sets and gets offset.
-    -- @covers library.doll.Part:getOffset
-    -- @covers library.doll.Part:setOffset
-    -- @covers library.doll.newPart
     it("sets and gets offset", function()
         local p = doll.newPart()
         p:setOffset(10, 20)
@@ -58,10 +38,6 @@ describe("Part", function()
         expect_equal(20, oy)
     end)
 
-    -- @description Verifies case: sets and gets scale with single arg.
-    -- @covers library.doll.Part:getScale
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newPart
     it("sets and gets scale with single arg", function()
         local p = doll.newPart()
         p:setScale(2)
@@ -70,10 +46,6 @@ describe("Part", function()
         expect_equal(2, sy)
     end)
 
-    -- @description Verifies case: sets and gets scale with two args.
-    -- @covers library.doll.Part:getScale
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newPart
     it("sets and gets scale with two args", function()
         local p = doll.newPart()
         p:setScale(3, 4)
@@ -82,10 +54,6 @@ describe("Part", function()
         expect_equal(4, sy)
     end)
 
-    -- @description Verifies case: sets and gets color.
-    -- @covers library.doll.Part:getColor
-    -- @covers library.doll.Part:setColor
-    -- @covers library.doll.newPart
     it("sets and gets color", function()
         local p = doll.newPart()
         p:setColor(0.5, 0.6, 0.7, 0.8)
@@ -96,10 +64,6 @@ describe("Part", function()
         expect_near(0.8, a, 0.001)
     end)
 
-    -- @description Verifies case: default color alpha = 1 when omitted.
-    -- @covers library.doll.Part:getColor
-    -- @covers library.doll.Part:setColor
-    -- @covers library.doll.newPart
     it("default color alpha = 1 when omitted", function()
         local p = doll.newPart()
         p:setColor(1, 0, 0)
@@ -107,10 +71,6 @@ describe("Part", function()
         expect_equal(1, a)
     end)
 
-    -- @description Verifies case: sets and gets flip.
-    -- @covers library.doll.Part:getFlip
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.newPart
     it("sets and gets flip", function()
         local p = doll.newPart()
         p:setFlip(true, false)
@@ -119,10 +79,6 @@ describe("Part", function()
         expect_false(fy)
     end)
 
-    -- @description Verifies case: flip with single arg defaults fy to false.
-    -- @covers library.doll.Part:getFlip
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.newPart
     it("flip with single arg defaults fy to false", function()
         local p = doll.newPart()
         p:setFlip(true)
@@ -131,10 +87,6 @@ describe("Part", function()
         expect_false(fy)
     end)
 
-    -- @description Verifies case: sets and gets attributes.
-    -- @covers library.doll.Part:getAttribute
-    -- @covers library.doll.Part:setAttribute
-    -- @covers library.doll.newPart
     it("sets and gets attributes", function()
         local p = doll.newPart()
         p:setAttribute("material", "steel")
@@ -144,10 +96,6 @@ describe("Part", function()
         expect_nil(p:getAttribute("nonexist"))
     end)
 
-    -- @description Verifies case: returns attribute keys.
-    -- @covers library.doll.Part:getAttributeKeys
-    -- @covers library.doll.Part:setAttribute
-    -- @covers library.doll.newPart
     it("returns attribute keys", function()
         local p = doll.newPart()
         p:setAttribute("a", 1)
@@ -156,10 +104,6 @@ describe("Part", function()
         expect_equal(2, #keys, "two keys")
     end)
 
-    -- @description Verifies case: sets and gets fixture ref.
-    -- @covers library.doll.Part:getFixture
-    -- @covers library.doll.Part:setFixture
-    -- @covers library.doll.newPart
     it("sets and gets fixture ref", function()
         local p = doll.newPart()
         expect_nil(p:getFixture())
@@ -168,20 +112,12 @@ describe("Part", function()
         expect_equal(99, p:getFixture().id)
     end)
 
-    -- @description Verifies case: sets and gets followsRotation.
-    -- @covers library.doll.Part:getFollowsRotation
-    -- @covers library.doll.Part:setFollowsRotation
-    -- @covers library.doll.newPart
     it("sets and gets followsRotation", function()
         local p = doll.newPart()
         p:setFollowsRotation(false)
         expect_false(p:getFollowsRotation())
     end)
 
-    -- @description Verifies case: sets and gets origin.
-    -- @covers library.doll.Part:getOrigin
-    -- @covers library.doll.Part:setOrigin
-    -- @covers library.doll.newPart
     it("sets and gets origin", function()
         local p = doll.newPart()
         p:setOrigin(16, 32)
@@ -191,32 +127,20 @@ describe("Part", function()
     end)
 end)
 
---                  DollTemplate                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  DollTemplate
 
--- @description Covers template naming, socket registration, duplicate rejection, removal, lookup, ordering, and default socket field values.
 describe("DollTemplate", function()
-    -- @covers library.doll.newTemplate
-    -- @description Verifies case: creates with name.
-    -- @covers library.doll.DollTemplate:getName
     it("creates with name", function()
         local t = doll.newTemplate("player")
         expect_equal("player", t:getName())
     end)
 
-    -- @description Verifies case: renames.
-    -- @covers library.doll.DollTemplate:getName
-    -- @covers library.doll.DollTemplate:setName
-    -- @covers library.doll.newTemplate
     it("renames", function()
         local t = doll.newTemplate("old")
         t:setName("new")
         expect_equal("new", t:getName())
     end)
 
-    -- @description Verifies case: adds sockets.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocketCount
-    -- @covers library.doll.newTemplate
     it("adds sockets", function()
         local t = doll.newTemplate("char")
         t:addSocket("head",  "head",  0, -32, 0, 10)
@@ -225,51 +149,38 @@ describe("DollTemplate", function()
         expect_equal(3, t:getSocketCount())
     end)
 
-    -- @description Verifies case: gets socket by name.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocket
-    -- @covers library.doll.newTemplate
     it("gets socket by name", function()
         local t = doll.newTemplate("char")
         t:addSocket("head", "head", 5, -10, 0.1, 10)
         local s = t:getSocket("head")
         expect_not_nil(s)
-        expect_equal("head", s.name)
-        expect_equal("head", s.acceptType)
-        expect_equal(5, s.x)
-        expect_equal(-10, s.y)
-        expect_near(0.1, s.rotation, 0.001)
-        expect_equal(10, s.drawOrder)
+        if s ~= nil then
+            expect_equal("head", s.name)
+            expect_equal("head", s.acceptType)
+            expect_equal(5, s.x)
+            expect_equal(-10, s.y)
+            expect_near(0.1, s.rotation, 0.001)
+            expect_equal(10, s.drawOrder)
+        end
     end)
 
-    -- @description Verifies case: get socket returns nil for missing name.
-    -- @covers library.doll.DollTemplate:getSocket
-    -- @covers library.doll.newTemplate
     it("get socket returns nil for missing name", function()
         local t = doll.newTemplate("char")
         expect_nil(t:getSocket("nonexist"))
     end)
 
-    -- @description Verifies case: rejects duplicate socket names.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocket
-    -- @covers library.doll.DollTemplate:getSocketCount
-    -- @covers library.doll.newTemplate
     it("rejects duplicate socket names", function()
         local t = doll.newTemplate("char")
         t:addSocket("head", "head", 0, 0)
         t:addSocket("head", "head", 5, 5)
         expect_equal(1, t:getSocketCount(), "still 1 socket")
         local s = t:getSocket("head")
-        expect_equal(0, s.x, "original socket unchanged")
+        expect_not_nil(s)
+        if s ~= nil then
+            expect_equal(0, s.x, "original socket unchanged")
+        end
     end)
 
-    -- @description Verifies case: removes socket.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocket
-    -- @covers library.doll.DollTemplate:getSocketCount
-    -- @covers library.doll.DollTemplate:removeSocket
-    -- @covers library.doll.newTemplate
     it("removes socket", function()
         local t = doll.newTemplate("char")
         t:addSocket("head", "", 0, 0)
@@ -280,18 +191,11 @@ describe("DollTemplate", function()
         expect_not_nil(t:getSocket("body"))
     end)
 
-    -- @description Verifies case: remove nonexistent returns false.
-    -- @covers library.doll.DollTemplate:removeSocket
-    -- @covers library.doll.newTemplate
     it("remove nonexistent returns false", function()
         local t = doll.newTemplate("char")
         expect_false(t:removeSocket("nope"))
     end)
 
-    -- @description Verifies case: lists socket names in order.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocketNames
-    -- @covers library.doll.newTemplate
     it("lists socket names in order", function()
         local t = doll.newTemplate("char")
         t:addSocket("c_legs", "", 0, 0)
@@ -304,25 +208,23 @@ describe("DollTemplate", function()
         expect_equal("b_body", names[3])
     end)
 
-    -- @description Verifies case: uses defaults for optional parameters.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.DollTemplate:getSocket
-    -- @covers library.doll.newTemplate
     it("uses defaults for optional parameters", function()
         local t = doll.newTemplate("simple")
         t:addSocket("s1")
         local s = t:getSocket("s1")
-        expect_equal("", s.acceptType)
-        expect_equal(0, s.x)
-        expect_equal(0, s.y)
-        expect_equal(0, s.rotation)
-        expect_equal(0, s.drawOrder)
+        expect_not_nil(s)
+        if s ~= nil then
+            expect_equal("", s.acceptType)
+            expect_equal(0, s.x)
+            expect_equal(0, s.y)
+            expect_equal(0, s.rotation)
+            expect_equal(0, s.drawOrder)
+        end
     end)
 end)
 
---                  Doll                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Doll
 
--- @description Exercises doll transforms, attachment rules, detach flows, socket occupancy queries, and body or userdata references.
 describe("Doll", function()
     local function make_template()
         local t = doll.newTemplate("vehicle")
@@ -332,9 +234,6 @@ describe("Doll", function()
         return t
     end
 
-    -- @description Verifies case: creates with template.
-    -- @covers library.doll.Doll:getTemplate
-    -- @covers library.doll.newDoll
     it("creates with template", function()
         local t = make_template()
         local d = doll.newDoll(t)
@@ -342,12 +241,6 @@ describe("Doll", function()
         expect_equal(t, d:getTemplate())
     end)
 
-    -- @description Verifies case: default transform.
-    -- @covers library.doll.Doll:getPosition
-    -- @covers library.doll.Doll:getRotation
-    -- @covers library.doll.Doll:getScale
-    -- @covers library.doll.Doll:isVisible
-    -- @covers library.doll.newDoll
     it("default transform", function()
         local d = doll.newDoll(make_template())
         local x, y = d:getPosition()
@@ -360,12 +253,6 @@ describe("Doll", function()
         expect_true(d:isVisible())
     end)
 
-    -- @description Verifies case: sets position and rotation.
-    -- @covers library.doll.Doll:getPosition
-    -- @covers library.doll.Doll:getRotation
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.Doll:setRotation
-    -- @covers library.doll.newDoll
     it("sets position and rotation", function()
         local d = doll.newDoll(make_template())
         d:setPosition(100, 200)
@@ -376,12 +263,6 @@ describe("Doll", function()
         expect_near(1.5, d:getRotation(), 0.001)
     end)
 
-    -- @description Verifies case: attaches part to matching socket.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getPartAt
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("attaches part to matching socket", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -390,11 +271,6 @@ describe("Doll", function()
         expect_equal(part, d:getPartAt("chassis"))
     end)
 
-    -- @description Verifies case: rejects attach with wrong type.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("rejects attach with wrong type", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -402,11 +278,6 @@ describe("Doll", function()
         expect_false(d:attach("chassis", part), "chassis accepts 'chassis' type only")
     end)
 
-    -- @description Verifies case: accepts any type on empty acceptType socket.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("accepts any type on empty acceptType socket", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -414,23 +285,12 @@ describe("Doll", function()
         expect_true(d:attach("exhaust", part), "exhaust accepts anything")
     end)
 
-    -- @description Verifies case: rejects attach to nonexistent socket.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("rejects attach to nonexistent socket", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
         expect_false(d:attach("nonexist", part))
     end)
 
-    -- @description Verifies case: detaches part.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:detach
-    -- @covers library.doll.Doll:getPartAt
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("detaches part", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -441,21 +301,11 @@ describe("Doll", function()
         expect_nil(d:getPartAt("chassis"))
     end)
 
-    -- @description Verifies case: detach nonexistent returns nil.
-    -- @covers library.doll.Doll:detach
-    -- @covers library.doll.newDoll
     it("detach nonexistent returns nil", function()
         local d = doll.newDoll(make_template())
         expect_nil(d:detach("nonexist"))
     end)
 
-    -- @description Verifies case: detachAll clears slots.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:detachAll
-    -- @covers library.doll.Doll:getAttachedSockets
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("detachAll clears slots", function()
         local d = doll.newDoll(make_template())
         local p1 = doll.newPart()
@@ -468,12 +318,6 @@ describe("Doll", function()
         expect_equal(0, #d:getAttachedSockets())
     end)
 
-    -- @description Verifies case: findSocket returns socket name for a part.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:findSocket
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("findSocket returns socket name for a part", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -482,23 +326,12 @@ describe("Doll", function()
         expect_equal("turret", d:findSocket(part))
     end)
 
-    -- @description Verifies case: findSocket returns nil for unattached part.
-    -- @covers library.doll.Doll:findSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("findSocket returns nil for unattached part", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
         expect_nil(d:findSocket(part))
     end)
 
-    -- @description Verifies case: lists attached and empty sockets.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getAttachedSockets
-    -- @covers library.doll.Doll:getEmptySockets
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
     it("lists attached and empty sockets", function()
         local d = doll.newDoll(make_template())
         local part = doll.newPart()
@@ -508,12 +341,6 @@ describe("Doll", function()
         expect_equal(2, #d:getEmptySockets())
     end)
 
-    -- @description Verifies case: body and userData refs.
-    -- @covers library.doll.Doll:getBody
-    -- @covers library.doll.Doll:getUserData
-    -- @covers library.doll.Doll:setBody
-    -- @covers library.doll.Doll:setUserData
-    -- @covers library.doll.newDoll
     it("body and userData refs", function()
         local d = doll.newDoll(make_template())
         expect_nil(d:getBody())
@@ -525,15 +352,9 @@ describe("Doll", function()
     end)
 end)
 
---                  getDrawList                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+--                  getDrawList
 
--- @description Validates draw-list generation for empty and populated dolls, combined ordering, world transforms, visibility, and scale effects.
 describe("Doll:getDrawList", function()
-    -- @covers library.doll.newDoll
-    -- @description Verifies case: empty doll returns empty list.
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newTemplate
     it("empty doll returns empty list", function()
         local t = doll.newTemplate("empty")
         t:addSocket("slot1", "", 0, 0)
@@ -542,14 +363,6 @@ describe("Doll:getDrawList", function()
         expect_equal(0, #dl)
     end)
 
-    -- @description Verifies case: returns entries for attached parts.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("returns entries for attached parts", function()
         local t = doll.newTemplate("char")
         t:addSocket("head", "", 0, -20, 0, 10)
@@ -566,13 +379,6 @@ describe("Doll:getDrawList", function()
         expect_equal(2, #dl, "two entries")
     end)
 
-    -- @description Verifies case: sorts by combined drawOrder.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("sorts by combined drawOrder", function()
         local t = doll.newTemplate("char")
         t:addSocket("bg",   "", 0, 0, 0, 0)
@@ -593,14 +399,6 @@ describe("Doll:getDrawList", function()
         expect_equal("fg",  dl[3].socketName)
     end)
 
-    -- @description Verifies case: computes world position at doll origin.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("computes world position at doll origin", function()
         local t = doll.newTemplate("simple")
         t:addSocket("s", "", 10, 20, 0, 0)
@@ -615,15 +413,6 @@ describe("Doll:getDrawList", function()
         expect_near(220, dl[1].y, 0.01, "y = doll.y + socket.y")
     end)
 
-    -- @description Verifies case: applies doll rotation to socket positions.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.Doll:setRotation
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("applies doll rotation to socket positions", function()
         local t = doll.newTemplate("rot")
         t:addSocket("right", "", 10, 0, 0, 0)  -- 10 px to the right
@@ -640,15 +429,6 @@ describe("Doll:getDrawList", function()
         expect_near(10, dl[1].y, 0.01, "rotated y")
     end)
 
-    -- @description Verifies case: applies doll scale.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("applies doll scale", function()
         local t = doll.newTemplate("scaled")
         t:addSocket("s", "", 10, 20, 0, 0)
@@ -666,15 +446,6 @@ describe("Doll:getDrawList", function()
         expect_near(2, dl[1].scaleY, 0.01)
     end)
 
-    -- @description Verifies case: part.followsRotation=false excludes doll rotation.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setRotation
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFollowsRotation
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("part.followsRotation=false excludes doll rotation", function()
         local t = doll.newTemplate("nofr")
         t:addSocket("s", "", 0, 0, 0.5, 0)
@@ -690,15 +461,6 @@ describe("Doll:getDrawList", function()
         expect_near(0.5, dl[1].rotation, 0.001)
     end)
 
-    -- @description Verifies case: part.followsRotation=true includes doll rotation.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setRotation
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFollowsRotation
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("part.followsRotation=true includes doll rotation", function()
         local t = doll.newTemplate("fr")
         t:addSocket("s", "", 0, 0, 0.5, 0)
@@ -714,14 +476,6 @@ describe("Doll:getDrawList", function()
         expect_near(1.5, dl[1].rotation, 0.001)
     end)
 
-    -- @description Verifies case: flip negates scale in draw list.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("flip negates scale in draw list", function()
         local t = doll.newTemplate("flip")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -736,14 +490,6 @@ describe("Doll:getDrawList", function()
         expect_near(1,  dl[1].scaleY, 0.01, "no flipY")
     end)
 
-    -- @description Verifies case: part drawOrder adds to socket drawOrder.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setDrawOrder
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("part drawOrder adds to socket drawOrder", function()
         local t = doll.newTemplate("order")
         t:addSocket("s1", "", 0, 0, 0, 10)
@@ -763,15 +509,6 @@ describe("Doll:getDrawList", function()
         expect_equal("s2", dl[2].socketName, "s2 drawOrder 5 comes second")
     end)
 
-    -- @description Verifies case: includes part offset in world position.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setOffset
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("includes part offset in world position", function()
         local t = doll.newTemplate("offset")
         t:addSocket("s", "", 10, 0, 0, 0)
@@ -788,18 +525,9 @@ describe("Doll:getDrawList", function()
     end)
 end)
 
---                  Hot-swap                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+--                  Hot-swap
 
--- @description Tests replacing attached parts at runtime so hot-swapping preserves socket routing and updated draw output.
 describe("Doll hot-swap", function()
-    -- @covers library.doll.newDoll
-    -- @description Verifies case: replaces part at socket.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getPartAt
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setPartType
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("replaces part at socket", function()
         local t = doll.newTemplate("swap")
         t:addSocket("weapon", "", 0, 0, 0, 0)
@@ -817,13 +545,9 @@ describe("Doll hot-swap", function()
     end)
 end)
 
---        Input Validation                                                                                                                                                                               
+--        Input Validation
 
--- @description Verifies input validation for socket names, scale values, and draw orders.
 describe("Input Validation", function()
-    -- @description Verifies case: addSocket returns false for duplicate name.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newTemplate
     it("addSocket returns false for duplicate name", function()
         local t = doll.newTemplate("val")
         local ok1 = t:addSocket("head", "", 0, 0)
@@ -833,18 +557,12 @@ describe("Input Validation", function()
         expect_not_nil(msg, "returns error message")
     end)
 
-    -- @description Verifies case: addSocket returns true on success.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newTemplate
     it("addSocket returns true on success", function()
         local t = doll.newTemplate("val2")
         local ok = t:addSocket("arm", "limb", 5, 10, 0.1, 3)
         expect_true(ok, "valid add returns true")
     end)
 
-    -- @description Verifies case: addSocket returns false for empty name.
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newTemplate
     it("addSocket returns false for empty name", function()
         local t = doll.newTemplate("val3")
         local ok, msg = t:addSocket("", "", 0, 0)
@@ -852,30 +570,18 @@ describe("Input Validation", function()
         expect_not_nil(msg, "returns error message")
     end)
 
-    -- @description Verifies case: setScale rejects non-number.
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newPart
     it("setScale rejects non-number", function()
         local p = doll.newPart()
         local ok = pcall(function() p:setScale("big") end)
         expect_false(ok, "string scale rejected")
     end)
 
-    -- @description Verifies case: setDrawOrder rejects non-number.
-    -- @covers library.doll.Part:setDrawOrder
-    -- @covers library.doll.newPart
     it("setDrawOrder rejects non-number", function()
         local p = doll.newPart()
         local ok = pcall(function() p:setDrawOrder("high") end)
         expect_false(ok, "string drawOrder rejected")
     end)
 
-    -- @description Verifies case: attach rejects empty string socketName.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("attach rejects empty string socketName", function()
         local t = doll.newTemplate("valatt")
         t:addSocket("s", "", 0, 0)
@@ -885,15 +591,9 @@ describe("Input Validation", function()
     end)
 end)
 
---        Part:getAbsoluteScale                                                                                                                                                                
+--        Part:getAbsoluteScale
 
--- @description Verifies getAbsoluteScale returns positive magnitude regardless of flip or negative scale.
 describe("Part:getAbsoluteScale", function()
-    -- @description Verifies case: positive scale unaffected by flip flags.
-    -- @covers library.doll.Part:getAbsoluteScale
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newPart
     it("returns positive scale regardless of flip", function()
         local p = doll.newPart()
         p:setScale(3, 4)
@@ -903,10 +603,6 @@ describe("Part:getAbsoluteScale", function()
         expect_equal(4, asy, "absolute scaleY")
     end)
 
-    -- @description Verifies case: absolute of negative scale values.
-    -- @covers library.doll.Part:getAbsoluteScale
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newPart
     it("returns absolute of negative scale values", function()
         local p = doll.newPart()
         p:setScale(-2, -5)
@@ -916,14 +612,9 @@ describe("Part:getAbsoluteScale", function()
     end)
 end)
 
---        Part:getAttributes                                                                                                                                                                         
+--        Part:getAttributes
 
--- @description Verifies getAttributes returns a shallow copy of all stored key-value attributes.
 describe("Part:getAttributes", function()
-    -- @description Verifies case: empty attributes.
-    -- @covers library.doll.Part:getAttributeKeys
-    -- @covers library.doll.Part:getAttributes
-    -- @covers library.doll.newPart
     it("returns empty table when no attributes set", function()
         local p = doll.newPart()
         local attrs = p:getAttributes()
@@ -934,11 +625,6 @@ describe("Part:getAttributes", function()
         expect_equal(0, count)
     end)
 
-    -- @description Verifies case: returns shallow copy; mutation does not affect original.
-    -- @covers library.doll.Part:getAttribute
-    -- @covers library.doll.Part:getAttributes
-    -- @covers library.doll.Part:setAttribute
-    -- @covers library.doll.newPart
     it("returns shallow copy of all attributes", function()
         local p = doll.newPart()
         p:setAttribute("color", "red")
@@ -952,19 +638,9 @@ describe("Part:getAttributes", function()
     end)
 end)
 
---        doll.getAbsoluteScale (module function)                                                                                                          
+--        doll.getAbsoluteScale (module function)
 
--- @description Verifies the module-level getAbsoluteScale helper strips flip sign from draw-list entries.
 describe("doll.getAbsoluteScale", function()
-    -- @description Verifies case: positive magnitude from flipped draw entry.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("returns positive magnitude from flipped draw entry", function()
         local t = doll.newTemplate("abs")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -981,16 +657,6 @@ describe("doll.getAbsoluteScale", function()
         expect_near(3, asy, 0.01, "abs scaleY = 3")
     end)
 
-    -- @description Verifies case: compound part+doll scale with flip.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("compounds doll+part scale with flip correctly", function()
         local t = doll.newTemplate("abs2")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1012,19 +678,9 @@ describe("doll.getAbsoluteScale", function()
     end)
 end)
 
---        Socket rotation transforms                                                                                                                                                 
+--        Socket rotation transforms
 
--- @description Verifies part offset is rotated by socket rotation in the draw list.
 describe("Socket rotation transforms", function()
-    -- @description Verifies case: part offset rotated by socket rotation.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setPosition
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setOffset
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("rotates part offset by socket rotation", function()
         local t = doll.newTemplate("sockrot")
         -- socket at (0,0) rotated 90 degrees
@@ -1042,14 +698,6 @@ describe("Socket rotation transforms", function()
         expect_near(110, dl[1].y, 0.01, "y shifted by rotated offset")
     end)
 
-    -- @description Verifies case: draw list includes part origin fields.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setOrigin
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("draw list includes part origin", function()
         local t = doll.newTemplate("origin")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1064,13 +712,6 @@ describe("Socket rotation transforms", function()
         expect_equal(32, dl[1].originY, "originY in draw entry")
     end)
 
-    -- @description Verifies case: default origin is (0,0) in draw list.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("default origin is zero in draw list", function()
         local t = doll.newTemplate("deforigin")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1085,19 +726,9 @@ describe("Socket rotation transforms", function()
     end)
 end)
 
---        Flip behaviour                                                                                                                                                                                     
+--        Flip behaviour
 
--- @description Verifies flip flags produce correct negative scale values in the draw list.
 describe("Flip behaviour", function()
-    -- @description Verifies case: both flipX and flipY negate corresponding scales.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("flipX + flipY both negate corresponding scales", function()
         local t = doll.newTemplate("flip2")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1113,16 +744,6 @@ describe("Flip behaviour", function()
         expect_near(-3, dl[1].scaleY, 0.01, "flipY negates")
     end)
 
-    -- @description Verifies case: flip with part scale compounds correctly.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setFlip
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("flip with part scale compounds correctly", function()
         local t = doll.newTemplate("flipscale")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1140,15 +761,6 @@ describe("Flip behaviour", function()
         expect_near(6,  dl[1].scaleY, 0.01, "no flip on Y")
     end)
 
-    -- @description Verifies case: no flip means positive scale.
-    -- @covers library.doll.Doll:attach
-    -- @covers library.doll.Doll:getDrawList
-    -- @covers library.doll.Doll:setScale
-    -- @covers library.doll.DollTemplate:addSocket
-    -- @covers library.doll.Part:setScale
-    -- @covers library.doll.newDoll
-    -- @covers library.doll.newPart
-    -- @covers library.doll.newTemplate
     it("no flip means positive scale", function()
         local t = doll.newTemplate("noflip")
         t:addSocket("s", "", 0, 0, 0, 0)
@@ -1164,5 +776,4 @@ describe("Flip behaviour", function()
         expect_near(6, dl[1].scaleY, 0.01, "positive scaleY")
     end)
 end)
-
 test_summary()

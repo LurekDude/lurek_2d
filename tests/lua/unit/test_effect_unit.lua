@@ -68,7 +68,7 @@ end)
 
 local function make_overlay()
     local ov = lurek.effect.newOverlay()
-    assert(ov ~= nil, "newOverlay() must return non-nil")
+    expect_true(ov ~= nil, "newOverlay() must return non-nil")
     return ov
 end
 
@@ -184,11 +184,6 @@ end)
 -- Namespace surface
 -- ============================================================
 describe("lurek.effect module", function()
-    -- @covers lurek.effect.getEffectTypes
-    -- @covers lurek.effect.newEffect
-    -- @covers lurek.effect.newStack
-    -- @covers lurek.effect.newPass
-    -- @covers lurek.effect.newCustomEffect
     it("is a table", function()
         expect_type("table", lurek.effect)
     end)
@@ -394,83 +389,66 @@ end)
 -- Lurek2D PostFX API Tests covers lurek.effect post-processing effects (headless)
 
 describe("lurek.effect module exists", function()
-    -- @tests lurek.effect
-    -- @covers lurek.effect.getEffectTypes
-    -- @covers lurek.effect.newEffect
-    -- @covers lurek.effect.newPass
-    -- @covers lurek.effect.newStack
     it("lurek.effect is a table", function()
         expect_type("table", lurek.effect)
     end)
 end)
 
 describe("lurek.effect factory functions", function()
-    -- @covers lurek.effect.newEffect
     it("newEffect is a function", function()
         expect_type("function", lurek.effect.newEffect)
     end)
 
-    -- @covers lurek.effect.newPass
     it("newPass is a function", function()
         expect_type("function", lurek.effect.newPass)
     end)
 
-    -- @covers lurek.effect.newStack
     it("newStack is a function", function()
         expect_type("function", lurek.effect.newStack)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
     it("getEffectTypes is a function", function()
         expect_type("function", lurek.effect.getEffectTypes)
     end)
 end)
 
 describe("lurek.effect.newEffect built-in types", function()
-    -- @covers lurek.effect.newEffect
     it("creates bloom effect", function()
         local e = lurek.effect.newEffect("bloom")
         expect_equal(e:getEffectType(), "bloom")
         expect_equal(e:isBuiltIn(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates blur effect", function()
         local e = lurek.effect.newEffect("blur")
         expect_equal(e:getEffectType(), "blur")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates crt effect", function()
         local e = lurek.effect.newEffect("crt")
         expect_equal(e:getEffectType(), "crt")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates godrays effect", function()
         local e = lurek.effect.newEffect("godrays")
         expect_equal(e:getEffectType(), "godrays")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates vignette effect", function()
         local e = lurek.effect.newEffect("vignette")
         expect_equal(e:getEffectType(), "vignette")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates colourgrade effect", function()
         local e = lurek.effect.newEffect("colourgrade")
         expect_equal(e:getEffectType(), "colourgrade")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("creates chromatic effect", function()
         local e = lurek.effect.newEffect("chromatic")
         expect_equal(e:getEffectType(), "chromatic")
     end)
 
-    -- @covers lurek.effect.newEffect
     it("rejects invalid effect type", function()
         expect_error(function()
             lurek.effect.newEffect("invalid_type")
@@ -479,7 +457,6 @@ describe("lurek.effect.newEffect built-in types", function()
 end)
 
 describe("lurek.effect.newPass custom effects", function()
-    -- @covers lurek.effect.newPass
     it("creates custom pass", function()
         local p = lurek.effect.newPass(1)
         expect_equal(p:getEffectType(), "custom")
@@ -488,14 +465,12 @@ describe("lurek.effect.newPass custom effects", function()
 end)
 
 describe("lurek.effect.getEffectTypes", function()
-    -- @covers lurek.effect.getEffectTypes
     it("returns table of 23 types", function()
         local types = lurek.effect.getEffectTypes()
         expect_type("table", types)
         expect_equal(#types, 23)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
     it("contains bloom", function()
         local types = lurek.effect.getEffectTypes()
         local found = false
@@ -507,20 +482,17 @@ describe("lurek.effect.getEffectTypes", function()
 end)
 
 describe("PostFxEffect parameters", function()
-    -- @covers lurek.effect.newEffect
     it("bloom has default threshold", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:hasParameter("threshold"), true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("getParameter returns value", function()
         local bloom = lurek.effect.newEffect("bloom")
         local t = bloom:getParameter("threshold")
         expect_type("number", t)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setParameter changes value", function()
         local bloom = lurek.effect.newEffect("bloom")
         bloom:setParameter("threshold", 0.5)
@@ -528,14 +500,12 @@ describe("PostFxEffect parameters", function()
         expect_equal(math.abs(v - 0.5) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("getParameter uses default for missing", function()
         local bloom = lurek.effect.newEffect("bloom")
         local v = bloom:getParameter("nonexistent", 42.0)
         expect_equal(math.abs(v - 42.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("getParameterNames returns sorted list", function()
         local bloom = lurek.effect.newEffect("bloom")
         local names = bloom:getParameterNames()
@@ -545,63 +515,54 @@ describe("PostFxEffect parameters", function()
 end)
 
 describe("PostFxEffect convenience setters", function()
-    -- @covers lurek.effect.newEffect
     it("setThreshold works", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_no_error(function() bloom:setThreshold(0.8) end)
         expect_equal(math.abs(bloom:getParameter("threshold") - 0.8) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setIntensity works", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_no_error(function() bloom:setIntensity(2.0) end)
         expect_equal(math.abs(bloom:getParameter("intensity") - 2.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setRadius works on blur", function()
         local blur = lurek.effect.newEffect("blur")
         expect_no_error(function() blur:setRadius(5.0) end)
         expect_equal(math.abs(blur:getParameter("radius") - 5.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setStrength works on vignette", function()
         local vig = lurek.effect.newEffect("vignette")
         expect_no_error(function() vig:setStrength(0.8) end)
         expect_equal(math.abs(vig:getParameter("strength") - 0.8) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setScanlineStrength works on crt", function()
         local crt = lurek.effect.newEffect("crt")
         expect_no_error(function() crt:setScanlineStrength(0.4) end)
         expect_equal(math.abs(crt:getParameter("scanline_strength") - 0.4) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setOffset works on chromatic", function()
         local chr = lurek.effect.newEffect("chromatic")
         expect_no_error(function() chr:setOffset(3.0) end)
         expect_equal(math.abs(chr:getParameter("offset") - 3.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setBrightness works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
         expect_no_error(function() cg:setBrightness(1.5) end)
         expect_equal(math.abs(cg:getParameter("brightness") - 1.5) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setContrast works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
         expect_no_error(function() cg:setContrast(0.9) end)
         expect_equal(math.abs(cg:getParameter("contrast") - 0.9) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setSaturation works on colourgrade", function()
         local cg = lurek.effect.newEffect("colourgrade")
         expect_no_error(function() cg:setSaturation(0.7) end)
@@ -610,20 +571,17 @@ describe("PostFxEffect convenience setters", function()
 end)
 
 describe("PostFxEffect enable/disable", function()
-    -- @covers lurek.effect.newEffect
     it("is enabled by default", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:isEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setEnabled false", function()
         local bloom = lurek.effect.newEffect("bloom")
         bloom:setEnabled(false)
         expect_equal(bloom:isEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("setEnabled true after false", function()
         local bloom = lurek.effect.newEffect("bloom")
         bloom:setEnabled(false)
@@ -633,22 +591,17 @@ describe("PostFxEffect enable/disable", function()
 end)
 
 describe("PostFxEffect auto uniforms", function()
-    -- @tests PostFxEffect.isAutoUniforms
     it("starts with auto uniforms disabled", function()
         local bloom = lurek.effect.newEffect("bloom")
         expect_equal(bloom:isAutoUniforms(), false)
     end)
 
-    -- @tests PostFxEffect.enableAutoUniforms
-    -- @tests PostFxEffect.isAutoUniforms
     it("enableAutoUniforms turns the flag on", function()
         local bloom = lurek.effect.newEffect("bloom")
         bloom:enableAutoUniforms()
         expect_equal(bloom:isAutoUniforms(), true)
     end)
 
-    -- @tests PostFxEffect.disableAutoUniforms
-    -- @tests PostFxEffect.isAutoUniforms
     it("disableAutoUniforms turns the flag off", function()
         local bloom = lurek.effect.newEffect("bloom")
         bloom:enableAutoUniforms()
@@ -658,23 +611,17 @@ describe("PostFxEffect auto uniforms", function()
 end)
 
 describe("ScreenTransition", function()
-    -- @covers lurek.effect.newTransition
     it("unknown kind defaults to fade", function()
         local transition = lurek.effect.newTransition("unknown", 1.0)
         expect_equal(transition:kind(), "fade")
     end)
 
-    -- @covers lurek.effect.newTransition
-    -- @tests ScreenTransition.isActive
-    -- @tests ScreenTransition.isDone
     it("starts inactive and not done", function()
         local transition = lurek.effect.newTransition("fade", 1.0)
         expect_equal(transition:isActive(), false)
         expect_equal(transition:isDone(), false)
     end)
 
-    -- @covers lurek.effect.newTransition
-    -- @tests ScreenTransition.kind
     it("roundtrips every supported kind", function()
         local kinds = {"fade", "wipe", "iris_wipe", "dissolve"}
         for _, kind in ipairs(kinds) do
@@ -683,10 +630,6 @@ describe("ScreenTransition", function()
         end
     end)
 
-    -- @covers lurek.effect.newTransition
-    -- @tests ScreenTransition.play
-    -- @tests ScreenTransition.progress
-    -- @tests ScreenTransition.isActive
     it("play activates and update advances progress", function()
         local transition = lurek.effect.newTransition("wipe", 2.0)
         expect_equal(transition:isActive(), false)
@@ -697,9 +640,6 @@ describe("ScreenTransition", function()
         expect_near(transition:progress(), 0.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newTransition
-    -- @tests ScreenTransition.reverse
-    -- @tests ScreenTransition.progress
     it("reverse advances progress", function()
         local transition = lurek.effect.newTransition("fade", 2.0)
         transition:reverse()
@@ -707,9 +647,6 @@ describe("ScreenTransition", function()
         expect_near(transition:progress(), 0.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newTransition
-    -- @tests ScreenTransition.isDone
-    -- @tests ScreenTransition.isActive
     it("completes after duration", function()
         local transition = lurek.effect.newTransition("dissolve", 0.5)
         transition:play()
@@ -720,49 +657,42 @@ describe("ScreenTransition", function()
 end)
 
 describe("PostFxEffect type() method", function()
-    -- @covers lurek.effect.newEffect
     it("returns PostFxEffect", function()
         local bloom = lurek.effect.newEffect("bloom")
-        expect_equal(bloom:type(), "PostFxEffect")
+        expect_equal(bloom:type(), "LPostFxEffect")
     end)
 
-    -- @covers lurek.effect.newPass
     it("custom pass also returns PostFxEffect", function()
         local pass = lurek.effect.newPass(1)
-        expect_equal(pass:type(), "PostFxEffect")
+        expect_equal(pass:type(), "LPostFxEffect")
     end)
 end)
 
 describe("lurek.effect.newStack", function()
-    -- @covers lurek.effect.newStack
     it("creates stack with default dimensions", function()
         local stack = lurek.effect.newStack()
         expect_equal(stack:getWidth(), 800)
         expect_equal(stack:getHeight(), 600)
     end)
 
-    -- @covers lurek.effect.newStack
     it("creates stack with custom dimensions", function()
         local stack = lurek.effect.newStack(1920, 1080)
         expect_equal(stack:getWidth(), 1920)
         expect_equal(stack:getHeight(), 1080)
     end)
 
-    -- @covers lurek.effect.newStack
     it("starts empty", function()
         local stack = lurek.effect.newStack()
         expect_equal(stack:getEffectCount(), 0)
     end)
 
-    -- @covers lurek.effect.newStack
     it("type is PostFxStack", function()
         local stack = lurek.effect.newStack()
-        expect_equal(stack:type(), "PostFxStack")
+        expect_equal(stack:type(), "LPostFxStack")
     end)
 end)
 
 describe("PostFxStack add/remove", function()
-    -- @covers lurek.effect.newStack
     it("add increases count", function()
         local stack = lurek.effect.newStack()
         local bloom = lurek.effect.newEffect("bloom")
@@ -770,7 +700,6 @@ describe("PostFxStack add/remove", function()
         expect_equal(stack:getEffectCount(), 1)
     end)
 
-    -- @covers lurek.effect.newStack
     it("add multiple effects", function()
         local stack = lurek.effect.newStack()
         stack:add(lurek.effect.newEffect("bloom"))
@@ -779,7 +708,6 @@ describe("PostFxStack add/remove", function()
         expect_equal(stack:getEffectCount(), 3)
     end)
 
-    -- @covers lurek.effect.newStack
     it("remove decreases count", function()
         local stack = lurek.effect.newStack()
         local bloom = lurek.effect.newEffect("bloom")
@@ -790,7 +718,6 @@ describe("PostFxStack add/remove", function()
 end)
 
 describe("PostFxStack insert", function()
-    -- @covers lurek.effect.newStack
     it("insert at position 1", function()
         local stack = lurek.effect.newStack()
         local bloom = lurek.effect.newEffect("bloom")
@@ -805,7 +732,6 @@ describe("PostFxStack insert", function()
 end)
 
 describe("PostFxStack dimensions", function()
-    -- @covers lurek.effect.newStack
     it("getDimensions returns both", function()
         local stack = lurek.effect.newStack(800, 600)
         local w, h = stack:getDimensions()
@@ -813,7 +739,6 @@ describe("PostFxStack dimensions", function()
         expect_equal(h, 600)
     end)
 
-    -- @covers lurek.effect.newStack
     it("resize changes dimensions", function()
         local stack = lurek.effect.newStack(800, 600)
         stack:resize(1920, 1080)
@@ -823,7 +748,6 @@ describe("PostFxStack dimensions", function()
 end)
 
 describe("PostFxStack capturing state", function()
-    -- @covers lurek.effect.newStack
     it("not capturing by default", function()
         local stack = lurek.effect.newStack()
         expect_equal(stack:isCapturing(), false)
@@ -832,58 +756,47 @@ end)
 
 -- New effect types
 
--- @covers lurek.effect.newEffect
--- @covers lurek.effect.getEffectTypes
 describe("New effect types construction and defaults", function()
-    -- @covers lurek.effect.newEffect
     it("pixelate has block_size default 4.0", function()
         local e = lurek.effect.newEffect("pixelate")
         expect_equal(math.abs(e:getParameter("block_size") - 4.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("sepia has strength default 1.0", function()
         local e = lurek.effect.newEffect("sepia")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("grayscale is built-in", function()
         local e = lurek.effect.newEffect("grayscale")
         expect_equal(e:isBuiltIn(), true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("invert has strength default 1.0", function()
         local e = lurek.effect.newEffect("invert")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("scanlines has spacing default 4.0", function()
         local e = lurek.effect.newEffect("scanlines")
         expect_equal(math.abs(e:getParameter("spacing") - 4.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("edgedetect has strength default 1.0", function()
         local e = lurek.effect.newEffect("edgedetect")
         expect_equal(math.abs(e:getParameter("strength") - 1.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("hueshift has angle default 0.0", function()
         local e = lurek.effect.newEffect("hueshift")
         expect_equal(math.abs(e:getParameter("angle") - 0.0) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("noise has strength default 0.1", function()
         local e = lurek.effect.newEffect("noise")
         expect_equal(math.abs(e:getParameter("strength") - 0.1) < 0.001, true)
     end)
 
-    -- @covers lurek.effect.newEffect
     it("all new types round-trip through getEffectType", function()
         local names = {"pixelate","sepia","grayscale","invert","scanlines","edgedetect","hueshift","noise"}
         local all_ok = true
@@ -894,7 +807,6 @@ describe("New effect types construction and defaults", function()
         expect_equal(all_ok, true)
     end)
 
-    -- @covers lurek.effect.getEffectTypes
     it("getEffectTypes includes all new types", function()
         local types = lurek.effect.getEffectTypes()
         local set = {}
@@ -1005,7 +917,6 @@ end)
 
 -- tests/lua/unit/test_effect_overlay.lua
 -- BDD tests for the lurek.effect.* screen-effect effect API.
--- @covers lurek.effect.newOverlay
 
 require("tests/lua/init")
 
@@ -1014,26 +925,18 @@ require("tests/lua/init")
 -- ============================================================
 
 describe("lurek.effect factory", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.getWidth
-    -- @tests Overlay.getHeight
     it("creates an overlay with custom dimensions", function()
         local ov = lurek.effect.newOverlay(1024, 768)
         expect_equal(ov:getWidth(), 1024)
         expect_equal(ov:getHeight(), 768)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.getWidth
-    -- @tests Overlay.getHeight
     it("creates an overlay with default dimensions", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:getWidth(), 800)
         expect_equal(ov:getHeight(), 600)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.getDimensions
     it("returns dimensions as tuple", function()
         local ov = lurek.effect.newOverlay(640, 480)
         local w, h = ov:getDimensions()
@@ -1047,29 +950,21 @@ end)
 -- ============================================================
 
 describe("overlay type", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.type
     it("reports type as LOverlay", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:type(), "LOverlay")
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.typeOf
     it("typeOf Object returns true", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:typeOf("Object"), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.typeOf
     it("typeOf Overlay returns true", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:typeOf("Overlay"), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.typeOf
     it("typeOf unrelated returns false", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:typeOf("PostFxEffect"), false)
@@ -1081,17 +976,11 @@ end)
 -- ============================================================
 
 describe("overlay core", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isActive
     it("starts inactive", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.resize
-    -- @tests Overlay.getWidth
-    -- @tests Overlay.getHeight
     it("resize updates dimensions", function()
         local ov = lurek.effect.newOverlay(800, 600)
         ov:resize(1920, 1080)
@@ -1099,29 +988,17 @@ describe("overlay core", function()
         expect_equal(ov:getHeight(), 1080)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.update
-    -- @tests Overlay.isActive
     it("update does not error on empty overlay", function()
         local ov = lurek.effect.newOverlay()
         ov:update(0.016)
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.draw
-    xit("draw does not error", function()
+    it("draw does not error", function()
         local ov = lurek.effect.newOverlay()
         ov:render()
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeatherEnabled
-    -- @tests Overlay.setFogEnabled
-    -- @tests Overlay.setVignetteEnabled
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.clear
-    -- @tests Overlay.isActive
     it("clear resets all effects", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeatherEnabled(true)
@@ -1139,10 +1016,6 @@ end)
 -- ============================================================
 
 describe("overlay ambient", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isAmbientEnabled
-    -- @tests Overlay.getTimeOfDay
-    -- @tests Overlay.getAmbientColor
     it("starts disabled with white noon tint", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isAmbientEnabled(), false)
@@ -1154,10 +1027,6 @@ describe("overlay ambient", function()
         expect_near(a, 1.0, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.isAmbientEnabled
-    -- @tests Overlay.isActive
     it("enables ambient lighting", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientEnabled(true)
@@ -1165,9 +1034,6 @@ describe("overlay ambient", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.isAmbientEnabled
     it("disables ambient lighting", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientEnabled(true)
@@ -1175,9 +1041,6 @@ describe("overlay ambient", function()
         expect_equal(ov:isAmbientEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientColor
-    -- @tests Overlay.getAmbientColor
     it("sets and gets ambient color with alpha", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientColor(0.3, 0.4, 0.5, 0.6)
@@ -1188,9 +1051,6 @@ describe("overlay ambient", function()
         expect_near(a, 0.6, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientColor
-    -- @tests Overlay.getAmbientColor
     it("ambient color alpha defaults to 1.0", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientColor(0.5, 0.5, 0.5)
@@ -1198,20 +1058,12 @@ describe("overlay ambient", function()
         expect_near(a, 1.0, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setTimeOfDay
-    -- @tests Overlay.getTimeOfDay
     it("sets and gets time of day", function()
         local ov = lurek.effect.newOverlay()
         ov:setTimeOfDay(6.5)
         expect_near(ov:getTimeOfDay(), 6.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.setTimeOfDay
-    -- @tests Overlay.update
-    -- @tests Overlay.getAmbientColor
     it("update applies time-of-day color when ambient enabled", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientEnabled(true)
@@ -1224,11 +1076,6 @@ describe("overlay ambient", function()
         expect_near(b, 0.3, 0.01)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.setTimeOfDay
-    -- @tests Overlay.update
-    -- @tests Overlay.getAmbientColor
     it("time-of-day noon produces bright color", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientEnabled(true)
@@ -1240,11 +1087,6 @@ describe("overlay ambient", function()
         expect_near(b, 0.6, 0.01)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.setTimeOfDay
-    -- @tests Overlay.update
-    -- @tests Overlay.getAmbientColor
     it("time-of-day wraps past 24 hours", function()
         local ov = lurek.effect.newOverlay()
         ov:setAmbientEnabled(true)
@@ -1261,36 +1103,24 @@ end)
 -- ============================================================
 
 describe("overlay weather", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isWeatherEnabled
-    -- @tests Overlay.getWeather
     it("starts disabled with weather set to none", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isWeatherEnabled(), false)
         expect_equal(ov:getWeather(), "none")
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeatherEnabled
-    -- @tests Overlay.isWeatherEnabled
     it("enables weather", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeatherEnabled(true)
         expect_equal(ov:isWeatherEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeather
-    -- @tests Overlay.getWeather
     it("sets weather type", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeather("rain")
         expect_equal(ov:getWeather(), "rain")
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeather
-    -- @tests Overlay.getWeather
     it("roundtrips all weather types", function()
         local ov = lurek.effect.newOverlay()
         local types = {"none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen"}
@@ -1300,8 +1130,6 @@ describe("overlay weather", function()
         end
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeather
     it("rejects invalid weather type", function()
         local ov = lurek.effect.newOverlay()
         expect_error(function()
@@ -1309,27 +1137,18 @@ describe("overlay weather", function()
         end)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeatherIntensity
-    -- @tests Overlay.getWeatherIntensity
     it("sets and gets weather intensity", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeatherIntensity(0.8)
         expect_near(ov:getWeatherIntensity(), 0.8, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWindDirection
-    -- @tests Overlay.getWindDirection
     it("sets and gets wind direction", function()
         local ov = lurek.effect.newOverlay()
         ov:setWindDirection(1.57)
         expect_near(ov:getWindDirection(), 1.57, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWindSpeed
-    -- @tests Overlay.getWindSpeed
     it("sets and gets wind speed", function()
         local ov = lurek.effect.newOverlay()
         ov:setWindSpeed(75.0)
@@ -1342,9 +1161,6 @@ end)
 -- ============================================================
 
 describe("overlay flash", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isFlashing
-    -- @tests Overlay.flash
     it("triggers a flash", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isFlashing(), false)
@@ -1352,10 +1168,6 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.flash
-    -- @tests Overlay.update
-    -- @tests Overlay.isFlashing
     it("flash with default alpha and duration", function()
         local ov = lurek.effect.newOverlay()
         ov:flash(1, 1, 1)
@@ -1365,10 +1177,6 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.flash
-    -- @tests Overlay.update
-    -- @tests Overlay.isFlashing
     it("flash completes after duration", function()
         local ov = lurek.effect.newOverlay()
         ov:flash(1, 0, 0, 1, 0.1)
@@ -1376,9 +1184,6 @@ describe("overlay flash", function()
         expect_equal(ov:isFlashing(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.flash
-    -- @tests Overlay.isActive
     it("flash activates isActive", function()
         local ov = lurek.effect.newOverlay()
         ov:flash(1, 1, 1)
@@ -1391,9 +1196,6 @@ end)
 -- ============================================================
 
 describe("overlay shake", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isShaking
-    -- @tests Overlay.shake
     it("triggers a shake", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isShaking(), false)
@@ -1401,10 +1203,6 @@ describe("overlay shake", function()
         expect_equal(ov:isShaking(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.shake
-    -- @tests Overlay.update
-    -- @tests Overlay.isShaking
     it("shake with default duration", function()
         local ov = lurek.effect.newOverlay()
         ov:shake(8.0)
@@ -1414,10 +1212,6 @@ describe("overlay shake", function()
         expect_equal(ov:isShaking(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.shake
-    -- @tests Overlay.update
-    -- @tests Overlay.getShakeOffset
     it("shake produces non-zero offset", function()
         local ov = lurek.effect.newOverlay()
         ov:shake(10, 1.0)
@@ -1428,10 +1222,6 @@ describe("overlay shake", function()
         expect_equal(total > 0, true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.shake
-    -- @tests Overlay.update
-    -- @tests Overlay.getShakeOffset
     it("shake offset returns to zero after completion", function()
         local ov = lurek.effect.newOverlay()
         ov:shake(10, 0.5)
@@ -1447,9 +1237,6 @@ end)
 -- ============================================================
 
 describe("overlay fade", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isFading
-    -- @tests Overlay.fade
     it("triggers a fade", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isFading(), false)
@@ -1457,10 +1244,6 @@ describe("overlay fade", function()
         expect_equal(ov:isFading(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.fade
-    -- @tests Overlay.update
-    -- @tests Overlay.isFading
     it("fade with defaults", function()
         local ov = lurek.effect.newOverlay()
         ov:fade(0, 0, 0)
@@ -1470,10 +1253,6 @@ describe("overlay fade", function()
         expect_equal(ov:isFading(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.fade
-    -- @tests Overlay.update
-    -- @tests Overlay.isFading
     it("fade completes after duration", function()
         local ov = lurek.effect.newOverlay()
         ov:fade(0, 0, 0, 0.8, 0.5)
@@ -1487,19 +1266,12 @@ end)
 -- ============================================================
 
 describe("overlay clouds", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isCloudShadowsEnabled
-    -- @tests Overlay.getCloudCount
     it("starts disabled with default cloud count", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isCloudShadowsEnabled(), false)
         expect_equal(ov:getCloudCount(), 5)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudShadows
-    -- @tests Overlay.isCloudShadowsEnabled
-    -- @tests Overlay.isActive
     it("enables cloud shadows", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudShadows(true)
@@ -1507,9 +1279,6 @@ describe("overlay clouds", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudShadows
-    -- @tests Overlay.isCloudShadowsEnabled
     it("disables cloud shadows", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudShadows(true)
@@ -1517,36 +1286,24 @@ describe("overlay clouds", function()
         expect_equal(ov:isCloudShadowsEnabled(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudCount
-    -- @tests Overlay.getCloudCount
     it("sets and gets cloud count", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudCount(12)
         expect_equal(ov:getCloudCount(), 12)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudSpeed
-    -- @tests Overlay.getCloudSpeed
     it("sets and gets cloud speed", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudSpeed(35.0)
         expect_near(ov:getCloudSpeed(), 35.0, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudScale
-    -- @tests Overlay.getCloudScale
     it("sets and gets cloud scale", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudScale(2.5)
         expect_near(ov:getCloudScale(), 2.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setCloudOpacity
-    -- @tests Overlay.getCloudOpacity
     it("sets and gets cloud opacity", function()
         local ov = lurek.effect.newOverlay()
         ov:setCloudOpacity(0.6)
@@ -1559,36 +1316,24 @@ end)
 -- ============================================================
 
 describe("overlay fog", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isFogEnabled
-    -- @tests Overlay.getFogDensity
     it("starts disabled with default density", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isFogEnabled(), false)
         expect_near(ov:getFogDensity(), 0.3, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFogEnabled
-    -- @tests Overlay.isFogEnabled
     it("enables fog", function()
         local ov = lurek.effect.newOverlay()
         ov:setFogEnabled(true)
         expect_equal(ov:isFogEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFogDensity
-    -- @tests Overlay.getFogDensity
     it("sets and gets fog density", function()
         local ov = lurek.effect.newOverlay()
         ov:setFogDensity(0.7)
         expect_near(ov:getFogDensity(), 0.7, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFogColor
-    -- @tests Overlay.getFogColor
     it("sets and gets fog color", function()
         local ov = lurek.effect.newOverlay()
         ov:setFogColor(0.5, 0.5, 0.6, 0.9)
@@ -1599,9 +1344,6 @@ describe("overlay fog", function()
         expect_near(a, 0.9, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFogColor
-    -- @tests Overlay.getFogColor
     it("fog color alpha defaults to 1.0", function()
         local ov = lurek.effect.newOverlay()
         ov:setFogColor(0.3, 0.3, 0.4)
@@ -1615,27 +1357,18 @@ end)
 -- ============================================================
 
 describe("overlay heat haze", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isHeatHazeEnabled
-    -- @tests Overlay.getHeatHazeIntensity
     it("starts disabled with default intensity", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isHeatHazeEnabled(), false)
         expect_near(ov:getHeatHazeIntensity(), 0.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setHeatHazeEnabled
-    -- @tests Overlay.isHeatHazeEnabled
     it("enables heat haze", function()
         local ov = lurek.effect.newOverlay()
         ov:setHeatHazeEnabled(true)
         expect_equal(ov:isHeatHazeEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setHeatHazeIntensity
-    -- @tests Overlay.getHeatHazeIntensity
     it("sets and gets intensity", function()
         local ov = lurek.effect.newOverlay()
         ov:setHeatHazeIntensity(0.9)
@@ -1648,27 +1381,18 @@ end)
 -- ============================================================
 
 describe("overlay vignette", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isVignetteEnabled
-    -- @tests Overlay.getVignetteStrength
     it("starts disabled with default strength", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isVignetteEnabled(), false)
         expect_near(ov:getVignetteStrength(), 0.5, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setVignetteEnabled
-    -- @tests Overlay.isVignetteEnabled
     it("enables vignette", function()
         local ov = lurek.effect.newOverlay()
         ov:setVignetteEnabled(true)
         expect_equal(ov:isVignetteEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setVignetteStrength
-    -- @tests Overlay.getVignetteStrength
     it("sets and gets strength", function()
         local ov = lurek.effect.newOverlay()
         ov:setVignetteStrength(0.8)
@@ -1681,27 +1405,18 @@ end)
 -- ============================================================
 
 describe("overlay film grain", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.isFilmGrainEnabled
-    -- @tests Overlay.getFilmGrainIntensity
     it("starts disabled with default intensity", function()
         local ov = lurek.effect.newOverlay()
         expect_equal(ov:isFilmGrainEnabled(), false)
         expect_near(ov:getFilmGrainIntensity(), 0.3, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFilmGrainEnabled
-    -- @tests Overlay.isFilmGrainEnabled
     it("enables film grain", function()
         local ov = lurek.effect.newOverlay()
         ov:setFilmGrainEnabled(true)
         expect_equal(ov:isFilmGrainEnabled(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setFilmGrainIntensity
-    -- @tests Overlay.getFilmGrainIntensity
     it("sets and gets intensity", function()
         local ov = lurek.effect.newOverlay()
         ov:setFilmGrainIntensity(0.6)
@@ -1714,9 +1429,6 @@ end)
 -- ============================================================
 
 describe("overlay lightning", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.triggerLightning
-    -- @tests Overlay.isActive
     it("triggers lightning", function()
         local ov = lurek.effect.newOverlay()
         ov:triggerLightning()
@@ -1724,9 +1436,6 @@ describe("overlay lightning", function()
         expect_equal(ov:isActive(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setLightningColor
-    -- @tests Overlay.getLightningColor
     it("sets and gets lightning color", function()
         local ov = lurek.effect.newOverlay()
         ov:setLightningColor(1.0, 0.9, 0.8, 0.7)
@@ -1737,9 +1446,6 @@ describe("overlay lightning", function()
         expect_near(a, 0.7, 0.001)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setLightningColor
-    -- @tests Overlay.getLightningColor
     it("lightning color alpha defaults to 0.8", function()
         local ov = lurek.effect.newOverlay()
         ov:setLightningColor(1, 1, 1)
@@ -1753,12 +1459,6 @@ end)
 -- ============================================================
 
 describe("overlay combined", function()
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeatherEnabled
-    -- @tests Overlay.setFogEnabled
-    -- @tests Overlay.setVignetteEnabled
-    -- @tests Overlay.flash
-    -- @tests Overlay.isActive
     it("multiple effects active simultaneously", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeatherEnabled(true)
@@ -1772,20 +1472,6 @@ describe("overlay combined", function()
         expect_equal(ov:isFlashing(), true)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.setWeatherEnabled
-    -- @tests Overlay.setFogEnabled
-    -- @tests Overlay.setVignetteEnabled
-    -- @tests Overlay.setFilmGrainEnabled
-    -- @tests Overlay.setHeatHazeEnabled
-    -- @tests Overlay.setCloudShadows
-    -- @tests Overlay.setAmbientEnabled
-    -- @tests Overlay.flash
-    -- @tests Overlay.shake
-    -- @tests Overlay.fade
-    -- @tests Overlay.triggerLightning
-    -- @tests Overlay.clear
-    -- @tests Overlay.isActive
     it("clear removes all active effects", function()
         local ov = lurek.effect.newOverlay()
         ov:setWeatherEnabled(true)
@@ -1804,12 +1490,6 @@ describe("overlay combined", function()
         expect_equal(ov:isActive(), false)
     end)
 
-    -- @covers lurek.effect.newOverlay
-    -- @tests Overlay.flash
-    -- @tests Overlay.shake
-    -- @tests Overlay.update
-    -- @tests Overlay.isFlashing
-    -- @tests Overlay.isShaking
     it("update advances multiple timed effects", function()
         local ov = lurek.effect.newOverlay()
         ov:flash(1, 1, 1, 1, 0.1)
@@ -1819,5 +1499,4 @@ describe("overlay combined", function()
         expect_equal(ov:isShaking(), false)
     end)
 end)
-
 test_summary()

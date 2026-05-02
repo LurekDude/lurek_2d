@@ -1,4 +1,4 @@
-﻿-- tests/lua/demos/test_html_scoreboard.lua
+-- tests/lua/demos/test_html_scoreboard.lua
 -- Static-analysis checks for the html-scoreboard showcase demo.
 -- read_file is injected by the test harness; not visible to LuaLS.
 ---@diagnostic disable: undefined-global
@@ -23,7 +23,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     end)
 
     it("calls lurek.html.newDocument", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.html%.newDocument") ~= nil,
             "html-scoreboard must call newDocument"
@@ -31,7 +31,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     end)
 
     it("uses HTML table markup (<table>)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("<table") ~= nil,
             "html-scoreboard must use <table> markup"
@@ -39,7 +39,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     end)
 
     it("calls setHtml + relayout to refresh the board", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         local has_set = src:find(":setHtml") ~= nil
         local has_rel = src:find(":relayout") ~= nil
         expect_true(has_set and has_rel,
@@ -47,7 +47,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     end)
 
     it("sorts scores before rendering", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("table%.sort") ~= nil,
             "html-scoreboard must sort scores before building the table"
@@ -55,7 +55,7 @@ describe("demo html-scoreboard â€” static analysis", function()
     end)
 
     it("defines all required lurek callbacks", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         local ok = src:find("function lurek%.load")
                 and src:find("function lurek%.update")
                 and src:find("function lurek%.draw")
@@ -63,5 +63,4 @@ describe("demo html-scoreboard â€” static analysis", function()
             "html-scoreboard must define lurek.load, lurek.update, lurek.draw")
     end)
 end)
-
 test_summary()

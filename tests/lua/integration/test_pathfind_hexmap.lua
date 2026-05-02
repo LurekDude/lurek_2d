@@ -193,5 +193,4 @@ describe("pathfinding.rangeMap", function()
         expect_true(#r6.cells >= #r3.cells, "larger budget should reach at least as many cells")
     end)
 end)
-
 test_summary()

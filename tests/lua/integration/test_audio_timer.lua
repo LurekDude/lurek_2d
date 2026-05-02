@@ -1,12 +1,7 @@
 -- Lurek2D Integration Test: Audio + Timer
 -- Tests audio volume timing with timer delta
 
--- @description Covers suite: audio + timer integration.
 describe("audio + timer integration", function()
-    -- @covers lurek.audio.setMasterVolume
-    -- @covers lurek.timer.getDelta
-    -- @covers lurek.timer.getTime
-    -- @description Verifies a dt-driven fade-in calculation can be applied back to the audio API and reflected in the engine's master volume.
     it("audio volume can be ramped over time", function()
         -- Start at zero
         lurek.audio.setMasterVolume(0.0)
@@ -30,18 +25,12 @@ describe("audio + timer integration", function()
         lurek.audio.setMasterVolume(1.0)
     end)
 
-    -- @covers lurek.audio
-    -- @covers lurek.timer.getDelta
-    -- @description Verifies the timer API provides a numeric non-negative timestep for audio update code.
     it("timer delta provides consistent timestep", function()
         local dt = lurek.timer.getDelta()
         expect_type("number", dt)
         expect_true(dt >= 0, "delta is non-negative")
     end)
 
-    -- @covers lurek.audio
-    -- @covers lurek.timer.getTime
-    -- @description Verifies audio-side scheduling code can query a numeric monotonic time value from the timer module.
     it("timer getTime returns increasing values", function()
         local t1 = lurek.timer.getTime()
         expect_type("number", t1)
@@ -49,9 +38,6 @@ describe("audio + timer integration", function()
         expect_true(t1 >= 0, "time is non-negative")
     end)
 
-    -- @covers lurek.audio.setMasterVolume
-    -- @covers lurek.timer.getDelta
-    -- @description Verifies an exponential decay curve computed from repeated time steps can be committed to the audio master volume.
     it("audio volume fade-out follows exponential decay", function()
         lurek.audio.setMasterVolume(1.0)
 
@@ -75,5 +61,4 @@ describe("audio + timer integration", function()
         lurek.audio.setMasterVolume(1.0)
     end)
 end)
-
 test_summary()

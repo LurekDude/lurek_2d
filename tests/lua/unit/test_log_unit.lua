@@ -5,19 +5,6 @@
 
 -- Module presence
 describe("lurek.log module", function()
-    -- @covers lurek.log.debug
-    -- @covers lurek.log.info
-    -- @covers lurek.log.warn
-    -- @covers lurek.log.error
-    -- @covers lurek.log.print
-    -- @covers lurek.log.setLevel
-    -- @covers lurek.log.getLevel
-    -- @covers lurek.log.addSink
-    -- @covers lurek.log.removeSink
-    -- @covers lurek.log.clearSinks
-    -- @covers lurek.log.listSinks
-    -- @covers lurek.log.readMemory
-    -- @covers lurek.log.flushFile
     it("lurek.log is a table", function()
         expect_type("table", lurek.log)
     end)
@@ -604,5 +591,4 @@ describe("lurek.log memory sink  plain + structured mixed", function()
         lurek.log.removeSink(sid)
     end)
 end)
-
 test_summary()

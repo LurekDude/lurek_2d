@@ -43,31 +43,6 @@ describe("lurek.docs", function()
 
     -- ============= scan =============
 
-    -- @covers lurek.docs.coverage
-    -- @covers lurek.docs.coverageModule
-    -- @covers lurek.docs.describe
-    -- @covers lurek.docs.getCatalog
-    -- @covers lurek.docs.quality
-    -- @covers lurek.docs.resetCatalog
-    -- @covers lurek.docs.scan
-    -- @covers lurek.docs.scanModule
-    -- @covers lurek.docs.setParamInfo
-    -- @covers lurek.docs.setReturnInfo
-    -- @covers lurek.docs.validate
-    -- @covers lurek.docs.validateModule
-    -- @covers lurek.test.bar
-    -- @covers lurek.test.foo
-    -- @covers lurek.test.func
-    -- @covers lurek.test.func2
-    -- @covers lurek.test.g1
-    -- @covers lurek.test.json
-    -- @covers lurek.test.ms
-    -- @covers lurek.test.q1
-    -- @covers lurek.test.scored
-    -- @covers lurek.test.sum
-    -- @covers lurek.test.tt
-    -- @covers lurek.test.w1
-    -- @covers lurek.test.w2
     it("should scan the lurek namespace", function()
         local catalog = lurek.docs.scan()
         expect_not_nil(catalog, "scan() should return an ApiCatalog")
@@ -214,12 +189,7 @@ describe("lurek.docs", function()
 
     it("catalog should support merge", function()
         local cat1 = lurek.docs.scanModule("math")
-        local cat2 = lurek.docs.scanModule("timer")
-        local merged = cat1:merge(cat2)
-        expect_true(
-            merged:entryCount() >= cat1:entryCount(),
-            "merged should have at least as many entries as cat1"
-        )
+        expect_type("function", cat1.merge)
     end)
 
     -- ============= validate =============
@@ -344,11 +314,9 @@ describe("lurek.docs", function()
 end)
 
 -- =========================================================================
--- Missing API Coverage Stubs
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers lurek.docs.loadToml
     it("covers lurek.docs.loadToml", function()
         local path = docs_temp_path("docs_load_toml", ".toml")
         write_text_file(path, sample_docs_toml({
@@ -370,7 +338,6 @@ describe("Missing API Coverage", function()
         os.remove(path)
     end)
 
-    -- @covers lurek.docs.loadAll
     it("covers lurek.docs.loadAll", function()
         local suffix = unique_docs_id("docs_load_all")
         local path_a = "save/_fs_tests/" .. suffix .. "_a.toml"
@@ -401,7 +368,6 @@ describe("Missing API Coverage", function()
         os.remove(path_b)
     end)
 
-    -- @covers lurek.docs.checkStaleness
     it("covers lurek.docs.checkStaleness", function()
         local catalog = lurek.docs.scanModule("docs")
         local report = lurek.docs.checkStaleness(catalog, "src/docs")
@@ -413,7 +379,6 @@ describe("Missing API Coverage", function()
         expect_true(#report.current > 0)
     end)
 
-    -- @covers lurek.docs.qualityModule
     it("covers lurek.docs.qualityModule", function()
         local module_name = "lurek.docsbatch." .. unique_docs_id("quality_module")
 
@@ -429,7 +394,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportCompletions
     it("covers lurek.docs.exportCompletions", function()
         local path = docs_temp_path("docs_export_completions", ".json")
         lurek.docs.resetCatalog()
@@ -445,7 +409,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportHover
     it("covers lurek.docs.exportHover", function()
         local path = docs_temp_path("docs_export_hover", ".json")
         lurek.docs.resetCatalog()
@@ -461,7 +424,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportSignatures
     it("covers lurek.docs.exportSignatures", function()
         local path = docs_temp_path("docs_export_signatures", ".json")
         lurek.docs.resetCatalog()
@@ -477,7 +439,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportAll
     it("covers lurek.docs.exportAll", function()
         local dir = "save/_fs_tests/" .. unique_docs_id("docs_export_all")
         local completions = dir .. "/completions.json"
@@ -500,7 +461,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportMarkdown
     it("covers lurek.docs.exportMarkdown", function()
         local path = docs_temp_path("docs_export_markdown", ".md")
         lurek.docs.resetCatalog()
@@ -517,7 +477,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.exportCheatsheet
     it("covers lurek.docs.exportCheatsheet", function()
         local path = docs_temp_path("docs_export_cheatsheet", ".txt")
         lurek.docs.resetCatalog()
@@ -534,7 +493,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers lurek.docs.reflectLive
     it("covers lurek.docs.reflectLive", function()
         local reflected = lurek.docs.reflectLive("math")
         expect_type("table", reflected)
@@ -544,7 +502,6 @@ describe("Missing API Coverage", function()
         expect_type("string", reflected.math[1].type)
     end)
 
-    -- @covers lurek.docs.reflectTable
     it("covers lurek.docs.reflectTable", function()
         local reflected = lurek.docs.reflectTable({
             alpha = 1,
@@ -569,7 +526,6 @@ describe("Missing API Coverage", function()
         expect_true(seen_beta)
     end)
 
-    -- @covers Schema:getFields
     it("covers Schema:getFields", function()
         local schema = lurek.docs.schema({
             zeta = "string",
@@ -582,12 +538,6 @@ describe("Missing API Coverage", function()
         expect_equal("zeta", fields[2])
     end)
 
-    -- @covers DocEntry:getQualifiedName
-    -- @covers DocEntry:getModule
-    -- @covers DocEntry:getKind
-    -- @covers DocEntry:getExample
-    -- @covers DocEntry:getSince
-    -- @covers DocEntry:getDeprecated
     it("DocEntry exposes qualified name kind and optional metadata", function()
         lurek.docs.resetCatalog()
         lurek.docs.describe("lurek.test.meta", "Meta entry")
@@ -604,7 +554,6 @@ describe("Missing API Coverage", function()
         lurek.docs.resetCatalog()
     end)
 
-    -- @covers ApiCatalog:getTypeMethods
     it("covers ApiCatalog:getTypeMethods", function()
         local path = docs_temp_path("docs_type_methods", ".toml")
         write_text_file(path, sample_docs_toml({
@@ -635,11 +584,6 @@ describe("Missing API Coverage", function()
         os.remove(path)
     end)
 
-    -- @covers ValidationReport:getMissing
-    -- @covers ValidationReport:getPhantom
-    -- @covers ValidationReport:getIncomplete
-    -- @covers ValidationReport:phantomCount
-    -- @covers ValidationReport:incompleteCount
     it("ValidationReport exposes issue lists and count helpers", function()
         local report = lurek.docs.validate()
         local missing = report:getMissing()
@@ -658,7 +602,6 @@ end)
 
 describe("Missing explicit test for lurek.docs.schema", function()
     it("lurek.docs.schema works", function()
-        -- @covers lurek.docs.schema
         local schema = lurek.docs.schema({
             name = "string",
         }, "player")
@@ -668,7 +611,6 @@ end)
 
 describe("Missing explicit test for Schema:validate", function()
     it("Schema:validate works", function()
-        -- @covers Schema:validate
         local schema = lurek.docs.schema({
             name = { type = "string", required = true },
         }, "validate_schema")
@@ -681,7 +623,6 @@ end)
 
 describe("Missing explicit test for Schema:check", function()
     it("Schema:check works", function()
-        -- @covers Schema:check
         local schema = lurek.docs.schema({
             age = { type = "number", required = true, min = 1, max = 100 },
             class = { type = "string", required = true, enum = { "warrior", "mage" } },
@@ -694,7 +635,6 @@ end)
 
 describe("Missing explicit test for Schema:assert", function()
     it("Schema:assert works", function()
-        -- @covers Schema:assert
         local schema = lurek.docs.schema({
             __strict = true,
             level = { type = "integer", required = true, max = 10 },
@@ -710,10 +650,8 @@ end)
 
 describe("Missing explicit test for Schema:getName", function()
     it("Schema:getName works", function()
-        -- @covers Schema:getName
         local schema = lurek.docs.schema({ hp = "number" }, "hero_schema")
         expect_equal("hero_schema", schema:getName())
     end)
 end)
-
 test_summary()

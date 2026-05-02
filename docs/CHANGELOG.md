@@ -2,6 +2,17 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.21] - 2026-05-02
+
+### chore(build): audit and fix all build, packaging, and install scripts
+
+- `tools/dist/dist.ps1`: corrected version `0.20.0` → `1.0.0`; fixed content source paths (`examples/` → `content/examples/`, `demos/` → `content/games/`); fixed API docs path from `docs\API\lua-api.md` to `docs\api\lurek.md`/`lurek.lua`; corrected HOW-TO-RUN callbacks (`lurek.init/process/render` → `lurek.load/update/draw`), `conf.toml` → `conf.lua`, placeholder GitHub URL fixed.
+- `tools/dist/dist.sh`: corrected version `0.4.0` → `1.0.0`; fixed binary name `luna` → `lurek2d` in all references; fixed content path (`$WORKSPACE/examples` → `$WORKSPACE/content/examples`); updated HOW-TO-RUN.txt to use `lurek2d` and correct game paths.
+- `tools/dist/install.ps1`: fixed binary lookup `build\release\lurek.exe` → `build\release\lurek2d.exe`; fixed content source `examples/` → `content/games/`; corrected final success message binary name.
+- `tools/dist/install.sh`: fixed binary name `luna` → `lurek2d` in dest path, built-binary path, PATH check (`command -v luna` → `command -v lurek2d`), examples source, and success message.
+- `docs/handbook.md`: corrected engine version `0.20.0` → `1.0.0`; updated task label table to match actual `tasks.json` labels (replaced stale labels like `Run Debug: Splash (drag-drop ready)`, `Lint: Clippy (deny warnings)`, `Quality Gate: Full`) and replaced raw `cargo` CLI equivalents with `python tools/dev/parallel_cargo.py` commands.
+- `CONTRIBUTING.md`: fixed UTF-8 BOM mojibake (5 garbled sequences → correct Unicode); corrected `cd lurek2d` → `cd luna_2d` after git clone; replaced bare `cargo build/run/clippy/fmt/test` commands with `python tools/dev/parallel_cargo.py` equivalents; updated demo paths from `content/demos/` to `content/games/` and test paths from `tests/lua/content/demos/` to `tests/lua/demos/`.
+
 ## [1.0.9-fix.20] - 2026-05-01
 
 ### docs(architecture): cleanup and sync of docs/architecture + templates

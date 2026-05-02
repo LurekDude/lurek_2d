@@ -15,14 +15,14 @@ describe("tower_defense: mechanics checks", function()
     end)
 
     it("has tower placement mechanic", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("tower") ~= nil,
             "No tower reference found")
     end)
 
     it("has enemy wave or path system", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("enemy") ~= nil or
             src:find("wave") ~= nil or
@@ -31,7 +31,7 @@ describe("tower_defense: mechanics checks", function()
     end)
 
     it("has health or lives system", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("health") ~= nil or
             src:find("hp") ~= nil or
@@ -40,7 +40,7 @@ describe("tower_defense: mechanics checks", function()
     end)
 
     it("has currency or resource system", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("gold") ~= nil or
             src:find("money") ~= nil or
@@ -51,12 +51,11 @@ describe("tower_defense: mechanics checks", function()
     end)
 
     it("has HUD rendering for game state", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.render%.print%s*%(") ~= nil or
             src:find("lurek%.render%.drawText%s*%(") ~= nil,
             "No HUD text rendering found")
     end)
 end)
-
 test_summary()

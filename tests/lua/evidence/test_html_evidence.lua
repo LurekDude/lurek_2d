@@ -1,7 +1,5 @@
 -- Evidence tests: html module
 -- Produces text/JSON artifacts from lurek.html document lifecycle.
--- @module html
--- @description Evidence suite for lurek.html: creates documents, manipulates DOM,
 -- and saves state snapshots to the evidence output directory.
 
 describe("evidence: html", function()
@@ -17,10 +15,7 @@ describe("evidence: html", function()
         end
     end
 
-    -- @covers lurek.html.newDocument
-    -- @covers HtmlDocument:getHtml
     -- @evidence file
-    -- @description Creates a document from HTML and saves the parsed-back markup.
     it("creates a document and saves markup snapshot", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "document_markup.txt"
@@ -35,11 +30,7 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers HtmlDocument:setCss
-    -- @covers HtmlDocument:relayout
-    -- @covers HtmlElement:getRect
     -- @evidence file
-    -- @description Applies CSS, forces relayout, and saves element rects as JSON.
     it("saves element layout rects after CSS", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "element_rects.json"
@@ -60,10 +51,7 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers HtmlDocument:queryAll
-    -- @covers HtmlElement:getText
     -- @evidence file
-    -- @description Queries all list items and saves their text as a JSON array.
     it("saves query results for list items", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "list_items.json"
@@ -86,11 +74,7 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers HtmlElement:addClass
-    -- @covers HtmlElement:hasClass
-    -- @covers HtmlElement:toggleClass
     -- @evidence file
-    -- @description Manipulates CSS classes and saves before/after state.
     it("saves class manipulation evidence", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "class_state.json"
@@ -109,10 +93,7 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers HtmlDocument:on
-    -- @covers HtmlDocument:mousepressed
     -- @evidence file
-    -- @description Registers a click listener and verifies event dispatch via artifact.
     it("saves event dispatch evidence", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "event_log.json"
@@ -130,10 +111,7 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers HtmlDocument:setViewport
-    -- @covers HtmlDocument:getViewport
     -- @evidence file
-    -- @description Changes viewport and saves dimensions.
     it("saves viewport change evidence", function()
         local dir  = evidence_output_dir("html")
         local path = dir .. "viewport.json"
@@ -145,5 +123,4 @@ describe("evidence: html", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

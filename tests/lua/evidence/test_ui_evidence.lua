@@ -14,13 +14,9 @@
 
 local OUT = "tests/output/ui_layout/"
 
--- @description Evidence tests for lurek.ui.loadLayout + renderToImage.
 describe("Evidence: lurek.ui layout loader renderToImage", function()
 
-    -- @covers lurek.ui.loadLayout
-    -- @covers lurek.ui.renderToImage
     -- @evidence file
-    -- @description Renders a simple HUD-style layout (label + button + progress
     -- bar) to PNG via renderToImage to prove the layout loader produces visible
     -- widget rectangles.
     it("PNG: simple_hud.png -- label, button, progressbar via loadLayout", function()
@@ -43,10 +39,7 @@ describe("Evidence: lurek.ui layout loader renderToImage", function()
         expect_evidence_created(OUT .. "simple_hud.png")
     end)
 
-    -- @covers lurek.ui.loadLayout
-    -- @covers lurek.ui.renderToImage
     -- @evidence file
-    -- @description Renders a nested-panel layout (panel with label, slider, and checkbox),
     -- slider, and checkbox) to PNG to prove recursive child loading works
     -- end-to-end through renderToImage.
     it("PNG: nested_panel.png -- nested panel with slider and checkbox", function()
@@ -96,13 +89,9 @@ end)
 
 local OUT = "tests/output/ui_layout/"
 
--- @description Evidence tests for lurek.ui.loadLayout + renderToImage.
 describe("Evidence: lurek.ui layout loader renderToImage", function()
 
-    -- @covers lurek.ui.loadLayout
-    -- @covers lurek.ui.renderToImage
     -- @evidence file
-    -- @description Renders a simple HUD-style layout (label + button + progress
     -- bar) to PNG via renderToImage to prove the layout loader produces visible
     -- widget rectangles.
     it("PNG: simple_hud.png -- label, button, progressbar via loadLayout", function()
@@ -125,10 +114,7 @@ describe("Evidence: lurek.ui layout loader renderToImage", function()
         expect_evidence_created(OUT .. "simple_hud.png")
     end)
 
-    -- @covers lurek.ui.loadLayout
-    -- @covers lurek.ui.renderToImage
     -- @evidence file
-    -- @description Renders a nested-panel layout (panel with label, slider, and checkbox),
     -- slider, and checkbox) to PNG to prove recursive child loading works
     -- end-to-end through renderToImage.
     it("PNG: nested_panel.png -- nested panel with slider and checkbox", function()
@@ -167,21 +153,9 @@ end)
 
 local OUT = "tests/output/charts/"
 
--- @description Covers suite: Evidence: Charts.
 describe("Evidence: Charts", function()
 
-    -- @covers lurek.ui.newLineChart
-    -- @covers LineChart:setYMax
-    -- @covers LineChart:setXMax
-    -- @covers LineChart:addSeries
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @covers lurek.ui.newBarChart
-    -- @covers lurek.ui.newScatterPlot
-    -- @covers lurek.ui.newPieChart
-    -- @covers lurek.ui.newAreaChart
-    -- @description Builds a two-series line chart with explicit axis limits, rasterizes it into image data, and saves a PNG so the generated polyline and legend output can be inspected visually.
     it("renders a line chart", function()
         local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Monthly Sales" })
         chart:setYMax(100)
@@ -193,13 +167,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "line_chart.png")
     end)
 
-    -- @covers lurek.ui.newBarChart
-    -- @covers BarChart:addSeries
-    -- @covers BarChart:addCategory
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a grouped bar chart with two yearly series and four quarter buckets, then exports the rendered chart image to verify bar placement, category spacing, and color assignment.
     it("renders a bar chart", function()
         local chart = lurek.ui.newBarChart({ width = 400, height = 300, title = "Quarterly Revenue" })
         chart:addSeries("2023", 0.22, 0.63, 0.87)
@@ -213,14 +181,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "bar_chart.png")
     end)
 
-    -- @covers lurek.ui.newScatterPlot
-    -- @covers ScatterPlot:setXRange
-    -- @covers ScatterPlot:setYRange
-    -- @covers ScatterPlot:addSeries
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Populates two synthetic point clusters with different trigonometric distributions, renders them as a scatter plot, and saves the image to confirm point plotting and axis scaling.
     it("renders a scatter plot", function()
         local chart = lurek.ui.newScatterPlot({ width = 400, height = 400, title = "Data Clusters" })
         chart:setXRange(0, 10)
@@ -238,12 +199,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "scatter_plot.png")
     end)
 
-    -- @covers lurek.ui.newPieChart
-    -- @covers PieChart:addSegment
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Assembles a pie chart from four named market-share slices and exports the render so the slice angles, ordering, and palette can be checked from file evidence.
     it("renders a pie chart", function()
         local chart = lurek.ui.newPieChart({ width = 400, height = 400, title = "Market Share" })
         chart:addSegment("Alpha",   35, 0.22, 0.63, 0.87)
@@ -255,13 +211,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "pie_chart.png")
     end)
 
-    -- @covers lurek.ui.newAreaChart
-    -- @covers AreaChart:setYMax
-    -- @covers AreaChart:addLayer
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a stacked area chart with three layers over seven samples, renders the composite fill output, and saves the PNG to capture layer accumulation behavior.
     it("renders an area chart", function()
         local chart = lurek.ui.newAreaChart({ width = 400, height = 300, title = "Stacked Area" })
         chart:setYMax(100)
@@ -286,21 +236,9 @@ end)
 
 local OUT = "tests/output/charts/"
 
--- @description Covers suite: Evidence: Charts.
 describe("Evidence: Charts", function()
 
-    -- @covers lurek.ui.newLineChart
-    -- @covers LineChart:setYMax
-    -- @covers LineChart:setXMax
-    -- @covers LineChart:addSeries
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @covers lurek.ui.newBarChart
-    -- @covers lurek.ui.newScatterPlot
-    -- @covers lurek.ui.newPieChart
-    -- @covers lurek.ui.newAreaChart
-    -- @description Builds a two-series line chart with explicit axis limits, rasterizes it into image data, and saves a PNG so the generated polyline and legend output can be inspected visually.
     it("renders a line chart", function()
         local chart = lurek.ui.newLineChart({ width = 400, height = 300, title = "Monthly Sales" })
         chart:setYMax(100)
@@ -312,13 +250,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "line_chart.png")
     end)
 
-    -- @covers lurek.ui.newBarChart
-    -- @covers BarChart:addSeries
-    -- @covers BarChart:addCategory
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a grouped bar chart with two yearly series and four quarter buckets, then exports the rendered chart image to verify bar placement, category spacing, and color assignment.
     it("renders a bar chart", function()
         local chart = lurek.ui.newBarChart({ width = 400, height = 300, title = "Quarterly Revenue" })
         chart:addSeries("2023", 0.22, 0.63, 0.87)
@@ -332,14 +264,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "bar_chart.png")
     end)
 
-    -- @covers lurek.ui.newScatterPlot
-    -- @covers ScatterPlot:setXRange
-    -- @covers ScatterPlot:setYRange
-    -- @covers ScatterPlot:addSeries
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Populates two synthetic point clusters with different trigonometric distributions, renders them as a scatter plot, and saves the image to confirm point plotting and axis scaling.
     it("renders a scatter plot", function()
         local chart = lurek.ui.newScatterPlot({ width = 400, height = 400, title = "Data Clusters" })
         chart:setXRange(0, 10)
@@ -357,12 +282,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "scatter_plot.png")
     end)
 
-    -- @covers lurek.ui.newPieChart
-    -- @covers PieChart:addSegment
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Assembles a pie chart from four named market-share slices and exports the render so the slice angles, ordering, and palette can be checked from file evidence.
     it("renders a pie chart", function()
         local chart = lurek.ui.newPieChart({ width = 400, height = 400, title = "Market Share" })
         chart:addSegment("Alpha",   35, 0.22, 0.63, 0.87)
@@ -374,13 +294,7 @@ describe("Evidence: Charts", function()
         lurek.image.savePNG(img, OUT .. "pie_chart.png")
     end)
 
-    -- @covers lurek.ui.newAreaChart
-    -- @covers AreaChart:setYMax
-    -- @covers AreaChart:addLayer
-    -- @covers Chart:drawToImage
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a stacked area chart with three layers over seven samples, renders the composite fill output, and saves the PNG to capture layer accumulation behavior.
     it("renders an area chart", function()
         local chart = lurek.ui.newAreaChart({ width = 400, height = 300, title = "Stacked Area" })
         chart:setYMax(100)
@@ -407,16 +321,10 @@ end)
 
 local OUT = "tests/output/gui/"
 
--- @description Test suite for Evidence: lurek.ui widgets via drawToImage
 describe("Evidence: lurek.ui widgets via drawToImage", function()
     -- PNG evidence ---------------------------------------------------------
 
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newLabel
     -- @evidence file
-    -- @description Renders enabled and disabled buttons with a label into one PNG to prove the widget tree rasterizes through drawToImage.
     it("PNG: button_states.png -- button and label widgets via drawToImage", function()
         local root = lurek.ui.getRoot()
         local W, H = 300, 80
@@ -445,11 +353,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.removeChild(b2)
         root.removeChild(b1)
     end)
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newProgressBar
     -- @evidence file
-    -- @description Renders three progress bars at different fill levels to produce HUD-style bar evidence in one PNG.
     it("PNG: hud_bars.png -- progress bar widgets via drawToImage", function()
         local root = lurek.ui.getRoot()
         local W, H = 220, 90
@@ -482,14 +386,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.removeChild(hp)
     end)
 
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newLabel
-    -- @covers lurek.ui.newPanel
-    -- @covers lurek.ui.newSlider
     -- @evidence file
-    -- @description Builds a nested panel layout with several child widget types and saves the composed UI tree as PNG evidence.
     it("PNG: panel_layout.png -- panel with nested button, label, slider", function()
         local root = lurek.ui.getRoot()
         local W, H = 210, 160
@@ -539,16 +436,10 @@ end)
 
 local OUT = "tests/output/gui/"
 
--- @description Test suite for Evidence: lurek.ui widgets via drawToImage
 describe("Evidence: lurek.ui widgets via drawToImage", function()
     -- PNG evidence ---------------------------------------------------------
 
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newLabel
     -- @evidence file
-    -- @description Renders enabled and disabled buttons with a label into one PNG to prove the widget tree rasterizes through drawToImage.
     it("PNG: button_states.png -- button and label widgets via drawToImage", function()
         local root = lurek.ui.getRoot()
         local W, H = 300, 80
@@ -577,11 +468,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.removeChild(b2)
         root.removeChild(b1)
     end)
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newProgressBar
     -- @evidence file
-    -- @description Renders three progress bars at different fill levels to produce HUD-style bar evidence in one PNG.
     it("PNG: hud_bars.png -- progress bar widgets via drawToImage", function()
         local root = lurek.ui.getRoot()
         local W, H = 220, 90
@@ -613,14 +500,7 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.removeChild(hp)
     end)
 
-    -- @covers lurek.ui.drawToImage
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newLabel
-    -- @covers lurek.ui.newPanel
-    -- @covers lurek.ui.newSlider
     -- @evidence file
-    -- @description Builds a nested panel layout with several child widget types and saves the composed UI tree as PNG evidence.
     it("PNG: panel_layout.png -- panel with nested button, label, slider", function()
         local root = lurek.ui.getRoot()
         local W, H = 210, 160
@@ -654,5 +534,4 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
     end)
 
 end)
-
 test_summary()

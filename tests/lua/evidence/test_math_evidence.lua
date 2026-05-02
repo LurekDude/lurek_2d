@@ -1,24 +1,15 @@
 -- Evidence suite for math module core operations.
--- @module math
--- @description Covers lurek.math vector, matrix, and random number generation; produces CSV and PNG artefacts.
 
--- @covers lurek.math.newVec2
--- @covers Vec2:length
--- @covers Vec2:normalize
--- @covers Vec2:dot
--- @covers Vec2:distance
--- @evidence file
 describe("evidence: math", function()
     before_each(function()
         ensure_evidence_dir("math")
     end)
 
-    -- @description Writes a CSV table of Vec2 arithmetic results as math evidence.
     it("records Vec2 arithmetic results as CSV", function()
         local dir  = evidence_output_dir("math")
         local path = dir .. "vec2_arithmetic.csv"
         local f = io.open(path, "w")
-        assert(f, "could not open math evidence CSV")
+        expect_true(f, "could not open math evidence CSV")
         f:write("op,ax,ay,bx,by,result\n")
 
         local function v2(x, y) return lurek.math.newVec2(x, y) end
@@ -36,9 +27,6 @@ describe("evidence: math", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.newVec2
-    -- @covers Vec2:normalize
-    -- @description Renders a unit-circle visualization of normalized Vec2 vectors as PNG.
     it("renders Vec2 normalize on unit circle PNG", function()
         local dir  = evidence_output_dir("math")
         local path = dir .. "vec2_unit_circle.png"
@@ -59,14 +47,11 @@ describe("evidence: math", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.random
-    -- @covers lurek.math.randomSeed
-    -- @description Writes a CSV of seeded random number sequences for determinism evidence.
     it("records seeded random sequences as CSV", function()
         local dir  = evidence_output_dir("math")
         local path = dir .. "random_sequences.csv"
         local f = io.open(path, "w")
-        assert(f, "could not open random CSV")
+        expect_true(f, "could not open random CSV")
         f:write("seed,r1,r2,r3,r4,r5\n")
         for _, seed in ipairs({ 1, 42, 999, 12345 }) do
             lurek.math.randomSeed(seed)
@@ -90,16 +75,12 @@ end)
 -- Migrated 15 tests from Rust evidence
 local OUT = "tests/output/migrated_15/"
 
--- @description Covers suite: evidence: migrated 15.
 describe("evidence: migrated 15", function()
     before_each(function()
         ensure_evidence_dir("migrated_15")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a blank 64x64 image and saves it as baseline evidence for empty image allocation.
     it("evidence_image_new_blank", function()
         local img = lurek.image.newImageData(64, 64)
         local path = OUT .. "new_blank_64x64.png"
@@ -107,11 +88,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Fills a small image with solid orange and saves the result as simple fill evidence.
     it("evidence_image_fill_solid", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(255, 128, 0, 255)
@@ -120,12 +97,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints crossing diagonal pixel patterns into an image and saves the result.
     it("evidence_image_set_pixel_pattern", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(0, 0, 0, 255)
@@ -140,14 +112,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawLine
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a multi-shape scene from primitive drawing calls and saves the composed result.
     it("evidence_image_draw_shapes_combined", function()
         local img = lurek.image.newImageData(256, 256)
         img:fill(20, 20, 40, 255)
@@ -175,13 +140,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:paste
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Composites one sprite image onto a background several times and saves the resulting paste test.
     it("evidence_image_paste_composite", function()
         local bg = lurek.image.newImageData(128, 128)
         bg:fill(40, 40, 80, 255)
@@ -195,13 +154,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:crop
-    -- @covers ImageData:noise
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Copies an image and applies noise to the copy before saving the noisy variant.
     it("evidence_effect_noise", function()
         local img = lurek.image.newImageData(128, 128)
         img:fill(128, 128, 128, 255)
@@ -212,13 +165,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers ImageData:crop
-    -- @covers ImageData:flipHorizontal
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a two-color image, flips it horizontally, and writes the mirrored result.
     it("evidence_effect_flip_horizontal", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -232,13 +179,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers ImageData:crop
-    -- @covers ImageData:flipVertical
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a two-color image, flips it vertically, and writes the mirrored result.
     it("evidence_effect_flip_vertical", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 31 do
@@ -254,12 +195,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:rotate90cw
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Rotates a rectangular image clockwise and saves the rotated artifact.
     it("evidence_effect_rotate", function()
         local img = lurek.image.newImageData(64, 32)
         img:fill(255, 255, 0, 255)
@@ -269,13 +205,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:crop
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Crops the central red square from a larger image and writes the cropped output.
     it("evidence_effect_crop", function()
         local img = lurek.image.newImageData(128, 128)
         img:fill(200, 200, 200, 255)
@@ -286,13 +216,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:resizeNearest
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Upscales a small magenta image with a dark circle using nearest-neighbor resizing.
     it("evidence_effect_resize", function()
         local img = lurek.image.newImageData(32, 32)
         img:fill(255, 0, 255, 255)
@@ -303,13 +227,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:crop
-    -- @covers ImageData:mapPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies an alpha mask through mapPixel and saves the masked output.
     it("evidence_effect_alpha_mask", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(0, 255, 0, 255)
@@ -326,14 +244,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:crop
-    -- @covers ImageData:blur
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies a blur stage to a simple image-processing pipeline and saves the intermediate output.
     it("evidence_effect_pipeline", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(100, 100, 100, 255)
@@ -345,12 +256,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.perlinFast
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Colors Perlin noise into terrain bands and saves the resulting terrain map.
     it("evidence_math_noise_colored_terrain", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -368,12 +274,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.simplex
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples simplex noise into a grayscale heightmap and writes the generated map image.
     it("evidence_math_generate_map", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -398,16 +299,12 @@ end)
 -- Migrated 15 tests from Rust evidence
 local OUT = "tests/output/migrated_15/"
 
--- @description Covers suite: evidence: migrated 15.
 describe("evidence: migrated 15", function()
     before_each(function()
         ensure_evidence_dir("migrated_15")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a blank 64x64 image and saves it as baseline evidence for empty image allocation.
     it("evidence_image_new_blank", function()
         local img = lurek.image.newImageData(64, 64)
         local path = OUT .. "new_blank_64x64.png"
@@ -415,11 +312,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Fills a small image with solid orange and saves the result as simple fill evidence.
     it("evidence_image_fill_solid", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(255, 128, 0, 255)
@@ -428,12 +321,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints crossing diagonal pixel patterns into an image and saves the result.
     it("evidence_image_set_pixel_pattern", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(0, 0, 0, 255)
@@ -448,14 +336,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawLine
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a multi-shape scene from primitive drawing calls and saves the composed result.
     it("evidence_image_draw_shapes_combined", function()
         local img = lurek.image.newImageData(256, 256)
         img:fill(20, 20, 40, 255)
@@ -483,13 +364,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:paste
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Composites one sprite image onto a background several times and saves the resulting paste test.
     it("evidence_image_paste_composite", function()
         local bg = lurek.image.newImageData(128, 128)
         bg:fill(40, 40, 80, 255)
@@ -503,13 +378,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:crop
-    -- @covers ImageData:noise
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Copies an image and applies noise to the copy before saving the noisy variant.
     it("evidence_effect_noise", function()
         local img = lurek.image.newImageData(128, 128)
         img:fill(128, 128, 128, 255)
@@ -520,13 +389,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers ImageData:crop
-    -- @covers ImageData:flipHorizontal
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a two-color image, flips it horizontally, and writes the mirrored result.
     it("evidence_effect_flip_horizontal", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -540,13 +403,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers ImageData:crop
-    -- @covers ImageData:flipVertical
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a two-color image, flips it vertically, and writes the mirrored result.
     it("evidence_effect_flip_vertical", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 31 do
@@ -562,12 +419,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:rotate90cw
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Rotates a rectangular image clockwise and saves the rotated artifact.
     it("evidence_effect_rotate", function()
         local img = lurek.image.newImageData(64, 32)
         img:fill(255, 255, 0, 255)
@@ -577,13 +429,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:crop
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Crops the central red square from a larger image and writes the cropped output.
     it("evidence_effect_crop", function()
         local img = lurek.image.newImageData(128, 128)
         img:fill(200, 200, 200, 255)
@@ -594,13 +440,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:resizeNearest
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Upscales a small magenta image with a dark circle using nearest-neighbor resizing.
     it("evidence_effect_resize", function()
         local img = lurek.image.newImageData(32, 32)
         img:fill(255, 0, 255, 255)
@@ -611,13 +451,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:crop
-    -- @covers ImageData:mapPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies an alpha mask through mapPixel and saves the masked output.
     it("evidence_effect_alpha_mask", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(0, 255, 0, 255)
@@ -634,14 +468,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:crop
-    -- @covers ImageData:blur
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies a blur stage to a simple image-processing pipeline and saves the intermediate output.
     it("evidence_effect_pipeline", function()
         local img = lurek.image.newImageData(64, 64)
         img:fill(100, 100, 100, 255)
@@ -653,12 +480,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.perlinFast
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Colors Perlin noise into terrain bands and saves the resulting terrain map.
     it("evidence_math_noise_colored_terrain", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -676,12 +498,7 @@ describe("evidence: migrated 15", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.simplex
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples simplex noise into a grayscale heightmap and writes the generated map image.
     it("evidence_math_generate_map", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -703,10 +520,7 @@ end)
 -- Merged from: test_evidence_misc.lua
 -- ================================================================
 
--- Placeholder evidence suite for migrated image-effect artifacts.
--- Tracks evidence cases that still need a concrete Lua translation before the placeholder tests can become real artifact producers.
 
--- @description Placeholder suite for migrated image-effect evidence cases that still need a Lua implementation.
 describe('Evidence misc', function()
 end)
 
@@ -716,10 +530,7 @@ end)
 -- Merged from: test_misc_evidence.lua
 -- ================================================================
 
--- Placeholder evidence suite for migrated image-effect artifacts.
--- Tracks evidence cases that still need a concrete Lua translation before the placeholder tests can become real artifact producers.
 
--- @description Placeholder suite for migrated image-effect evidence cases that still need a Lua implementation.
 describe('Evidence misc', function()
 end)
 
@@ -749,15 +560,9 @@ local function plot_control_points(img, curve)
     end
 end
 
--- @description Covers suite: Evidence: Bezier curves.
 describe("Evidence: Bezier curves", function()
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Samples a quadratic Bezier and saves a PNG showing both the curve and its control polygon.
     it("quadratic bezier (3 control points)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -783,12 +588,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_quadratic.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Samples a cubic Bezier and exports a PNG showing how four control points shape the final curve.
     it("cubic bezier (4 control points)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -813,12 +613,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_cubic.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Draws a higher-order Bezier curve with seven control points to prove complex paths evaluate and render correctly.
     it("complex bezier (7 control points)", function()
         local W, H = 500, 400
         local img = lurek.image.newImageData(W, H)
@@ -860,11 +655,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_complex.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:getDerivative
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Evaluates the derivative curve to render tangent vectors at multiple points along a cubic Bezier.
     it("derivative visualisation (tangent lines)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -938,15 +729,9 @@ local function plot_control_points(img, curve)
     end
 end
 
--- @description Covers suite: Evidence: Bezier curves.
 describe("Evidence: Bezier curves", function()
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Samples a quadratic Bezier and saves a PNG showing both the curve and its control polygon.
     it("quadratic bezier (3 control points)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -972,12 +757,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_quadratic.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Samples a cubic Bezier and exports a PNG showing how four control points shape the final curve.
     it("cubic bezier (4 control points)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -1002,12 +782,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_cubic.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
-    -- @covers BezierCurve:getControlPoint
     -- @evidence file
-    -- @description Draws a higher-order Bezier curve with seven control points to prove complex paths evaluate and render correctly.
     it("complex bezier (7 control points)", function()
         local W, H = 500, 400
         local img = lurek.image.newImageData(W, H)
@@ -1049,11 +824,7 @@ describe("Evidence: Bezier curves", function()
         lurek.image.savePNG(img, OUT .. "bezier_complex.png")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:getDerivative
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Evaluates the derivative curve to render tangent vectors at multiple points along a cubic Bezier.
     it("derivative visualisation (tangent lines)", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -1122,13 +893,9 @@ local function draw_dot(img, cx, cy, radius, r, g, b)
     end
 end
 
--- @description Test suite for Evidence: geometry shapes and queries
 describe("Evidence: geometry shapes and queries", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a gallery of polygon outlines so basic vertex stepping and PNG export can be inspected visually.
     it("polygon gallery (triangle, quad, pentagon, hexagon)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1161,10 +928,7 @@ describe("Evidence: geometry shapes and queries", function()
         lurek.image.savePNG(img, OUT .. "shapes_polygon_gallery.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints filled circles and rectangles into one PNG to document simple raster-shape composition.
     it("filled primitives (circles and rectangles)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1182,10 +946,7 @@ describe("Evidence: geometry shapes and queries", function()
         lurek.image.savePNG(img, OUT .. "shapes_filled_primitives.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Renders an Archimedean spiral into a PNG so the generated parametric shape can be reviewed manually.
     it("spirals (Archimedean spiral)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1229,13 +990,9 @@ local function draw_dot(img, cx, cy, radius, r, g, b)
     end
 end
 
--- @description Test suite for Evidence: geometry shapes and queries
 describe("Evidence: geometry shapes and queries", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a gallery of polygon outlines so basic vertex stepping and PNG export can be inspected visually.
     it("polygon gallery (triangle, quad, pentagon, hexagon)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1268,10 +1025,7 @@ describe("Evidence: geometry shapes and queries", function()
         lurek.image.savePNG(img, OUT .. "shapes_polygon_gallery.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints filled circles and rectangles into one PNG to document simple raster-shape composition.
     it("filled primitives (circles and rectangles)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1289,10 +1043,7 @@ describe("Evidence: geometry shapes and queries", function()
         lurek.image.savePNG(img, OUT .. "shapes_filled_primitives.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Renders an Archimedean spiral into a PNG so the generated parametric shape can be reviewed manually.
     it("spirals (Archimedean spiral)", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -1327,14 +1078,9 @@ local function noise_to_byte(v)
     return math.floor((clamped + 1) * 0.5 * 255 + 0.5)
 end
 
--- @description Covers suite: Evidence: Noise generation.
 describe("Evidence: Noise generation", function()
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:perlin2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Perlin noise over a 2D grid and writes the grayscale field to a PNG.
     it("generates Perlin 2D noise image", function()
         local size = 256
         local scale = 50
@@ -1350,11 +1096,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_perlin2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:simplex2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Simplex noise over a 2D grid and writes the grayscale field to a PNG.
     it("generates Simplex 2D noise image", function()
         local size = 256
         local scale = 50
@@ -1370,11 +1112,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_simplex2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:fbm
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples FBM noise with multiple octaves and writes the grayscale field to a PNG.
     it("generates FBM noise image", function()
         local size = 256
         local scale = 50
@@ -1390,11 +1128,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_fbm.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:worley2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Worley noise and writes the resulting cell-like structure to a PNG.
     it("generates Worley 2D noise image", function()
         local size = 256
         local scale = 30
@@ -1410,11 +1144,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_worley2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:ridged
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples ridged noise and writes the high-contrast ridge pattern to a PNG.
     it("generates Ridged noise image", function()
         local size = 256
         local scale = 50
@@ -1430,11 +1160,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_ridged.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:turbulence
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples turbulence noise and writes the resulting warped grayscale field to a PNG.
     it("generates Turbulence noise image", function()
         local size = 256
         local scale = 50
@@ -1469,14 +1195,9 @@ local function noise_to_byte(v)
     return math.floor((clamped + 1) * 0.5 * 255 + 0.5)
 end
 
--- @description Covers suite: Evidence: Noise generation.
 describe("Evidence: Noise generation", function()
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:perlin2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Perlin noise over a 2D grid and writes the grayscale field to a PNG.
     it("generates Perlin 2D noise image", function()
         local size = 256
         local scale = 50
@@ -1492,11 +1213,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_perlin2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:simplex2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Simplex noise over a 2D grid and writes the grayscale field to a PNG.
     it("generates Simplex 2D noise image", function()
         local size = 256
         local scale = 50
@@ -1512,11 +1229,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_simplex2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:fbm
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples FBM noise with multiple octaves and writes the grayscale field to a PNG.
     it("generates FBM noise image", function()
         local size = 256
         local scale = 50
@@ -1532,11 +1245,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_fbm.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:worley2d
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples Worley noise and writes the resulting cell-like structure to a PNG.
     it("generates Worley 2D noise image", function()
         local size = 256
         local scale = 30
@@ -1552,11 +1261,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_worley2d.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:ridged
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples ridged noise and writes the high-contrast ridge pattern to a PNG.
     it("generates Ridged noise image", function()
         local size = 256
         local scale = 50
@@ -1572,11 +1277,7 @@ describe("Evidence: Noise generation", function()
         lurek.image.savePNG(img, OUT .. "noise_ridged.png")
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:turbulence
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples turbulence noise and writes the resulting warped grayscale field to a PNG.
     it("generates Turbulence noise image", function()
         local size = 256
         local scale = 50
@@ -1593,5 +1294,4 @@ describe("Evidence: Noise generation", function()
     end)
 
 end)
-
 test_summary()

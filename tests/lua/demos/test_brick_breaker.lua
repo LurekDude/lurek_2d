@@ -15,7 +15,7 @@ describe("brick_breaker: mechanics checks", function()
     end)
 
     it("has paddle that follows mouse or left/right input", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("getMousePosition%s*%(") ~= nil or
             src:find("isActionDown%s*%(") ~= nil,
@@ -23,7 +23,7 @@ describe("brick_breaker: mechanics checks", function()
     end)
 
     it("has ball with velocity", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("ball") ~= nil and
             (src:find("vel") ~= nil or src:find("speed") ~= nil or src:find("dx") ~= nil),
@@ -31,7 +31,7 @@ describe("brick_breaker: mechanics checks", function()
     end)
 
     it("has brick grid data", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("brick") ~= nil or
             src:find("block") ~= nil or
@@ -40,7 +40,7 @@ describe("brick_breaker: mechanics checks", function()
     end)
 
     it("has collision detection between ball and bricks", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("collide") ~= nil or
             src:find("hit") ~= nil or
@@ -50,7 +50,7 @@ describe("brick_breaker: mechanics checks", function()
     end)
 
     it("has lives or fail condition", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lives") ~= nil or
             src:find("life") ~= nil or
@@ -59,5 +59,4 @@ describe("brick_breaker: mechanics checks", function()
             "No failure condition found     ball falling below screen is unhandled")
     end)
 end)
-
 test_summary()

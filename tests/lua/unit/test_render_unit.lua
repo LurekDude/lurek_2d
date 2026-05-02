@@ -1,33 +1,6 @@
 -- Lurek2D Graphics API Tests (headless  tests lurek.render API existence and behaviour)
 
 describe("lurek.render module exists", function()
-    -- @covers lurek.render.captureScreenshot
-    -- @covers lurek.render.circle
-    -- @covers lurek.render.clearStencil
-    -- @covers lurek.render.draw
-    -- @covers lurek.render.drawNineSlice
-    -- @covers lurek.render.ellipse
-    -- @covers lurek.render.getDepthMode
-    -- @covers lurek.render.getDimensions
-    -- @covers lurek.render.getFontAscent
-    -- @covers lurek.render.getFontDescent
-    -- @covers lurek.render.getFontLineHeight
-    -- @covers lurek.render.getLineWidth
-    -- @covers lurek.render.getStencilMode
-    -- @covers lurek.render.line
-    -- @covers lurek.render.newImage
-    -- @covers lurek.render.newNineSlice
-    -- @covers lurek.render.polygon
-    -- @covers lurek.render.print
-    -- @covers lurek.render.rectangle
-    -- @covers lurek.render.saveScreenshot
-    -- @covers lurek.render.setBackgroundColor
-    -- @covers lurek.render.setColor
-    -- @covers lurek.render.setDepthMode
-    -- @covers lurek.render.setFontLineHeight
-    -- @covers lurek.render.setLineWidth
-    -- @covers lurek.render.setStencilMode
-    -- @covers lurek.render.triangle
     it("lurek.render is a table", function()
         expect_type("table", lurek.render)
     end)
@@ -288,7 +261,6 @@ end)
 describe("lurek.render.captureScreenshot", function()
   it("accepts a callback without error", function()
     local ok, err = pcall(lurek.render.captureScreenshot, function(img)
-      -- callback fires synchronously in stub mode; img is ImageData userdata
     end)
     expect_equal(ok, true)
   end)
@@ -406,7 +378,7 @@ local function try_call(fn, ...)
     return nil
 end
 
-local function expect_image_data_contract(img)
+local function verify_image_data_contract(img)
     expect_not_nil(img, "draw_to_image should return an image object")
     if img ~= nil then
         if type(img.width) == "function" then
@@ -511,13 +483,11 @@ local function make_parallax_subject()
 end
 
 describe("target rendering/drawing contract: spine", function()
-    -- @covers lurek.spine.newSkeleton
-    xit("exposes lurek.spine.newSkeleton as the canonical constructor", function()
+    it("exposes lurek.spine.newSkeleton as the canonical constructor", function()
         expect_type("function", lurek.spine.newSkeleton)
     end)
 
-    -- @covers Skeleton:drawToImage
-    xit("skeleton objects expose drawToImage()", function()
+    it("skeleton objects expose drawToImage()", function()
         local sk = make_spine_subject()
         expect_type("function", sk.drawToImage)
         expect_no_error(function()
@@ -525,18 +495,16 @@ describe("target rendering/drawing contract: spine", function()
         end)
     end)
 
-    -- @covers Skeleton:drawToImage
-    xit("skeleton objects expose drawToImage()", function()
+    it("skeleton objects expose drawToImage()", function()
         local sk = make_spine_subject()
         expect_type("function", sk.drawToImage)
         local img = sk:drawToImage(64, 64)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: raycaster", function()
-    -- @covers Raycaster:buildScene
-    xit("raycaster objects expose buildScene()", function()
+    it("raycaster objects expose buildScene()", function()
         local rc = make_raycaster_subject()
         expect_type("function", rc.buildScene)
         expect_no_error(function()
@@ -544,23 +512,20 @@ describe("target rendering/drawing contract: raycaster", function()
         end)
     end)
 
-    -- @covers Raycaster:drawView
-    xit("raycaster objects expose drawView()", function()
+    it("raycaster objects expose drawView()", function()
         local rc = make_raycaster_subject()
         expect_type("function", rc.drawView)
         local img = rc:drawView(4.5, 4.5, 0, 1.0, 32, 32, 8)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: ui", function()
-    -- @covers lurek.ui.newPanel
-    xit("exposes lurek.ui.newPanel as the canonical panel constructor", function()
+    it("exposes lurek.ui.newPanel as the canonical panel constructor", function()
         expect_type("function", lurek.ui.newPanel)
     end)
 
-    -- @covers lurek.ui.draw
-    xit("panel widgets render through lurek.ui.draw()", function()
+    it("panel widgets render through lurek.ui.draw()", function()
         local panel = make_ui_panel_subject()
         expect_type("function", panel.setTitle)
         expect_type("function", lurek.ui.draw)
@@ -572,13 +537,11 @@ describe("target rendering/drawing contract: ui", function()
 end)
 
 describe("target rendering/drawing contract: particle", function()
-    -- @covers lurek.particle.newSystem
-    xit("exposes lurek.particle.newSystem as the canonical constructor", function()
+    it("exposes lurek.particle.newSystem as the canonical constructor", function()
         expect_type("table", lurek.particle)
         expect_type("function", lurek.particle.newSystem)
     end)
 
-    -- @covers ParticleSystem:render
     it("particle systems expose render()", function()
         local ps = make_particle_subject()
         expect_type("function", ps.render)
@@ -587,22 +550,19 @@ describe("target rendering/drawing contract: particle", function()
         end)
     end)
 
-    -- @covers ParticleSystem:drawToImage
-    xit("particle systems expose drawToImage()", function()
+    it("particle systems expose drawToImage()", function()
         local ps = make_particle_subject()
         expect_type("function", ps.drawToImage)
         local img = ps:drawToImage(64, 64)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: tilemap", function()
-    -- @covers lurek.tilemap.loadTMX
-    xit("exposes lurek.tilemap.loadTMX as the canonical TMX loader", function()
+    it("exposes lurek.tilemap.loadTMX as the canonical TMX loader", function()
         expect_type("function", lurek.tilemap.loadTMX)
     end)
 
-    -- @covers TileMap:render
     it("tilemaps expose render()", function()
         local map = make_tilemap_subject()
         expect_type("function", map.render)
@@ -611,22 +571,19 @@ describe("target rendering/drawing contract: tilemap", function()
         end)
     end)
 
-    -- @covers TileMap:drawToImage
-    xit("tilemaps expose drawToImage()", function()
+    it("tilemaps expose drawToImage()", function()
         local map = make_tilemap_subject()
         expect_type("function", map.drawToImage)
         local img = map:drawToImage(16)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: minimap", function()
-    -- @covers lurek.minimap.newMinimap
-    xit("exposes lurek.minimap.newMinimap as the canonical constructor", function()
+    it("exposes lurek.minimap.newMinimap as the canonical constructor", function()
         expect_type("function", lurek.minimap.newMinimap)
     end)
 
-    -- @covers Minimap:render
     it("minimaps expose render()", function()
         local mini = make_minimap_subject()
         expect_type("function", mini.render)
@@ -635,23 +592,20 @@ describe("target rendering/drawing contract: minimap", function()
         end)
     end)
 
-    -- @covers Minimap:drawToImage
-    xit("minimaps expose drawToImage()", function()
+    it("minimaps expose drawToImage()", function()
         local mini = make_minimap_subject()
         expect_type("function", mini.drawToImage)
         local img = mini:drawToImage(4)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: overlay", function()
-    -- @covers lurek.effect.newOverlay
-    xit("exposes lurek.effect.newOverlay as the canonical constructor", function()
+    it("exposes lurek.effect.newOverlay as the canonical constructor", function()
         expect_type("table", lurek.effect)
         expect_type("function", lurek.effect.newOverlay)
     end)
 
-    -- @covers Overlay:render
     it("overlays expose render()", function()
         local ov = make_overlay_subject()
         expect_type("function", ov.render)
@@ -660,27 +614,23 @@ describe("target rendering/drawing contract: overlay", function()
         end)
     end)
 
-    -- @covers Overlay:flash
-    -- @covers Overlay:drawToImage
-    xit("overlays expose drawToImage()", function()
+    it("overlays expose drawToImage()", function()
         local ov = make_overlay_subject()
         if type(ov.flash) == "function" then
             ov:flash(1, 1, 1, 1, 0.1)
         end
         expect_type("function", ov.drawToImage)
         local img = ov:drawToImage(64, 64)
-        expect_image_data_contract(img)
+        verify_image_data_contract(img)
     end)
 end)
 
 describe("target rendering/drawing contract: parallax", function()
-    -- @covers lurek.parallax.newSet
-    xit("exposes lurek.parallax.newSet as the canonical constructor", function()
+    it("exposes lurek.parallax.newSet as the canonical constructor", function()
         expect_type("function", lurek.parallax.newSet)
     end)
 
-    -- @covers ParallaxSet:render
-    xit("parallax sets expose render()", function()
+    it("parallax sets expose render()", function()
         local bg = make_parallax_subject()
         expect_type("function", bg.render)
         expect_no_error(function()
@@ -690,15 +640,11 @@ describe("target rendering/drawing contract: parallax", function()
 end)
 
 describe("target rendering/drawing contract: entity", function()
-    -- @covers lurek.ecs.newUniverse
-    -- @covers Universe:render
     it("world objects expose render()", function()
         local world = lurek.ecs.newUniverse()
         expect_type("function", world.render)
     end)
 
-    -- @covers Universe:addSystem
-    -- @covers Universe:render
     it("world:render() dispatches render() and not draw() on systems", function()
         local world = lurek.ecs.newUniverse()
         local render_count = 0
@@ -720,5 +666,4 @@ describe("target rendering/drawing contract: entity", function()
         expect_equal(0, draw_count)
     end)
 end)
-
 test_summary()

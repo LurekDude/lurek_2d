@@ -36,7 +36,7 @@ done
 # ── Setup ──────────────────────────────────────────────────────────────────────
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE="$(dirname "$(dirname "$SCRIPT_DIR")")"
-VERSION="0.4.0"
+VERSION="1.0.0"
 
 # Detect target triple
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -48,7 +48,7 @@ ARCH_NAME="lurek2d-${TARGET_TRIPLE}"
 
 PACKAGE_DIR="$OUT_DIR/$ARCH_NAME"
 TARBALL="$OUT_DIR/${ARCH_NAME}.tar.gz"
-BINARY_SOURCE="$WORKSPACE/build/release/luna"
+BINARY_SOURCE="$WORKSPACE/build/release/lurek2d"
 
 ok()   { echo -e "\033[32m[ OK ]\033[0m  $*"; }
 step() { echo -e "\033[36m[dist]\033[0m  $*"; }
@@ -81,14 +81,14 @@ step "Assembling distribution package at '$PACKAGE_DIR' …"
 rm -rf "$PACKAGE_DIR"
 mkdir -p "$PACKAGE_DIR"
 
-cp "$BINARY_SOURCE" "$PACKAGE_DIR/luna"
-chmod +x "$PACKAGE_DIR/luna"
-ok "Copied luna binary."
+cp "$BINARY_SOURCE" "$PACKAGE_DIR/lurek2d"
+chmod +x "$PACKAGE_DIR/lurek2d"
+ok "Copied lurek2d binary."
 
-[[ -d "$WORKSPACE/assets"   ]] && cp -r "$WORKSPACE/assets"   "$PACKAGE_DIR/assets"   && ok "Copied assets/"
-[[ -d "$WORKSPACE/examples" ]] && cp -r "$WORKSPACE/examples" "$PACKAGE_DIR/examples" && ok "Copied content/demos/"
+[[ -d "$WORKSPACE/assets"          ]] && cp -r "$WORKSPACE/assets"          "$PACKAGE_DIR/assets"   && ok "Copied assets/"
+[[ -d "$WORKSPACE/content/examples" ]] && cp -r "$WORKSPACE/content/examples" "$PACKAGE_DIR/examples" && ok "Copied content/examples/"
 [[ -f "$WORKSPACE/README.md" ]] && cp "$WORKSPACE/README.md" "$PACKAGE_DIR/"
-[[ -f "$WORKSPACE/LICENSE"  ]]  && cp "$WORKSPACE/LICENSE"  "$PACKAGE_DIR/"
+[[ -f "$WORKSPACE/LICENSE"   ]]  && cp "$WORKSPACE/LICENSE"  "$PACKAGE_DIR/"
 
 cat > "$PACKAGE_DIR/HOW-TO-RUN.txt" << EOF
 LUREK2D $VERSION — ${TARGET_TRIPLE} Distribution
@@ -96,26 +96,25 @@ LUREK2D $VERSION — ${TARGET_TRIPLE} Distribution
 
 How to run a game
 -----------------
-  ./luna  content/demos/hello_world
-  ./luna  path/to/your_game
+  ./lurek2d  content/games/showcase/hello_world
+  ./lurek2d  path/to/your_game
 
 How to show the splash screen (no game)
 ----------------------------------------
-  ./luna
+  ./lurek2d
 
 Bundled examples
 ----------------
-  content/demos/hello_world   — shapes, text, FPS counter
-  content/demos/physics_demo  — falling ball with AABB physics
-  content/demos/sprites       — keyboard-controlled sprite
+  examples/   — single-file API usage scripts (one per lurek.* module)
 
 Writing your own game
 ---------------------
   1. Create a folder, e.g. my_game/
   2. Add main.lua with lurek.load() / lurek.update(dt) / lurek.draw()
-  3. Run:  ./luna my_game
+  3. Run:  ./lurek2d my_game
 
 API reference:  see README.md
+Source & docs:  https://github.com/RandomBladeDude/lurek2d
 EOF
 ok "Written HOW-TO-RUN.txt"
 

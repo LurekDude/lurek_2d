@@ -3,30 +3,6 @@
 -- Tests the lurek.filesystem namespace: read, write, append, exists, remove,
 -- openFile (FileHandle), newFileData (FileData), directory ops,
 -- path queries, identity, lines, async read, mount/unmount, load.
--- @covers lurek.filesystem.read
--- @covers lurek.filesystem.write
--- @covers lurek.filesystem.exists
--- @covers lurek.filesystem.append
--- @covers lurek.filesystem.remove
--- @covers lurek.filesystem.openFile
--- @covers lurek.filesystem.newFileData
--- @covers lurek.filesystem.getDirectoryItems
--- @covers lurek.filesystem.isFile
--- @covers lurek.filesystem.isDirectory
--- @covers lurek.filesystem.createDirectory
--- @covers lurek.filesystem.getInfo
--- @covers lurek.filesystem.getSource
--- @covers lurek.filesystem.getSaveDirectory
--- @covers lurek.filesystem.getWorkingDirectory
--- @covers lurek.filesystem.getUserDirectory
--- @covers lurek.filesystem.getIdentity
--- @covers lurek.filesystem.setIdentity
--- @covers lurek.filesystem.lines
--- @covers lurek.filesystem.readAsync
--- @covers lurek.filesystem.pollAsync
--- @covers lurek.filesystem.mount
--- @covers lurek.filesystem.unmount
--- @covers lurek.filesystem.load
 
 -- helpers
 local TMP = "save/_fs_tests/"
@@ -610,12 +586,10 @@ end)
 
 -- listRecursive
 describe("lurek.filesystem.listRecursive", function()
-  -- @covers lurek.filesystem.listRecursive
   it("listRecursive is a function", function()
     expect_type("function", lurek.filesystem.listRecursive)
   end)
 
-  -- @covers lurek.filesystem.listRecursive
   it("returns a table with recursive file paths", function()
     local dir  = TMP .. "lr/"
     local sub  = dir .. "sub/"
@@ -632,7 +606,6 @@ describe("lurek.filesystem.listRecursive", function()
     lurek.filesystem.remove(dir)
   end)
 
-  -- @covers lurek.filesystem.listRecursive
   it("returns empty table for empty directory", function()
     local dir = TMP .. "lr_empty/"
     lurek.filesystem.createDirectory(dir)
@@ -642,7 +615,6 @@ describe("lurek.filesystem.listRecursive", function()
     lurek.filesystem.remove(dir)
   end)
 
-  -- @covers lurek.filesystem.listRecursive
   it("path traversal is rejected with an error", function()
     local ok = pcall(lurek.filesystem.listRecursive, "save/../..")
     expect_equal(false, ok)
@@ -650,18 +622,15 @@ describe("lurek.filesystem.listRecursive", function()
 end)
 
 describe("lurek.filesystem.stat lightweight file statistics", function()
-  -- @covers lurek.filesystem.stat
   it("stat is a function", function()
     expect_equal("function", type(lurek.filesystem.stat))
   end)
 
-  -- @covers lurek.filesystem.stat
   it("stat rejects path traversal", function()
     local ok = pcall(lurek.filesystem.stat, "../../etc/passwd")
     expect_equal(false, ok)
   end)
 
-  -- @covers lurek.filesystem.stat
   it("stat returns table with size, isFile, isDir fields", function()
     -- Write a known file first so stat can find it
     lurek.filesystem.write("save/_stat_test.txt", "hello")
@@ -674,7 +643,6 @@ describe("lurek.filesystem.stat lightweight file statistics", function()
     expect_true(not info.isDir)
   end)
 
-  -- @covers lurek.filesystem.stat
   it("stat size matches written content length", function()
     lurek.filesystem.write("save/_stat_size.txt", "abcde")
     local info = lurek.filesystem.stat("save/_stat_size.txt")
@@ -683,25 +651,21 @@ describe("lurek.filesystem.stat lightweight file statistics", function()
 end)
 
 describe("lurek.filesystem.createTempFile temporary file creation", function()
-  -- @covers lurek.filesystem.createTempFile
   it("createTempFile is a function", function()
     expect_equal("function", type(lurek.filesystem.createTempFile))
   end)
 
-  -- @covers lurek.filesystem.createTempFile
   it("createTempFile returns a string path", function()
     local path = lurek.filesystem.createTempFile("test_")
     expect_equal("string", type(path))
     expect_true(#path > 0)
   end)
 
-  -- @covers lurek.filesystem.createTempFile
   it("createTempFile path starts with save/", function()
     local path = lurek.filesystem.createTempFile("pfx_")
     expect_equal("save/", path:sub(1, 5))
   end)
 
-  -- @covers lurek.filesystem.createTempFile
   it("two calls return different paths", function()
     local a = lurek.filesystem.createTempFile("tmp")
     local b = lurek.filesystem.createTempFile("tmp")
@@ -710,7 +674,6 @@ describe("lurek.filesystem.createTempFile temporary file creation", function()
 end)
 
 describe("lurek.filesystem remaining coverage", function()
-    -- @covers lurek.filesystem.removeDir
     it("removeDir removes nested directories recursively", function()
         local dir = TMP .. "remove_dir_case/"
         local nested = dir .. "deep/nested/"
@@ -723,7 +686,6 @@ describe("lurek.filesystem remaining coverage", function()
         expect_false(lurek.filesystem.exists(nested .. "file.txt"))
     end)
 
-    -- @covers lurek.filesystem.copy
     it("copy duplicates file contents into destination", function()
         local src = TMP .. "copy_src.txt"
         local dst = TMP .. "copy_dst.txt"
@@ -736,7 +698,6 @@ describe("lurek.filesystem remaining coverage", function()
         expect_equal("copy me", lurek.filesystem.read(dst))
     end)
 
-    -- @covers lurek.filesystem.move
     it("move relocates file within save sandbox", function()
         local src = TMP .. "move_src.txt"
         local dst = TMP .. "move_dst.txt"
@@ -749,7 +710,6 @@ describe("lurek.filesystem remaining coverage", function()
         expect_equal("move me", lurek.filesystem.read(dst))
     end)
 
-    -- @covers lurek.filesystem.glob
     it("glob returns sorted wildcard matches", function()
         local dir = TMP .. "glob_case/"
         lurek.filesystem.createDirectory(dir)
@@ -764,19 +724,16 @@ describe("lurek.filesystem remaining coverage", function()
         expect_equal(dir .. "b.lua", matches[2])
     end)
 
-    -- @covers lurek.filesystem.mkdir
     it("mkdir creates nested directories", function()
         local dir = TMP .. "mkdir_case/deep/nested/"
         lurek.filesystem.mkdir(dir)
         expect_true(lurek.filesystem.isDirectory(dir))
     end)
 
-    -- @covers lurek.filesystem.toAbsolutePath
     it("toAbsolutePath returns an absolute path string", function()
         local abs = lurek.filesystem.toAbsolutePath(TMP .. "absolute_case.txt")
         expect_type("string", abs)
         expect_true(string.find(abs, "_fs_tests", 1, true) ~= nil)
     end)
 end)
-
 test_summary()

@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: Signal + Entity
 -- Tests entities emitting and receiving signals.
 
--- @description Covers suite: integration: entity events via signal.
 describe("integration: entity events via signal", function()
-    -- @covers lurek.ecs.Universe.spawn
-    -- @covers lurek.event.Signal.emit
-    -- @covers lurek.ecs.newUniverse
-    -- @covers lurek.event.new
-    -- @description Verifies spawning entities can drive a connected signal callback for each created entity.
     it("entity creation triggers signal", function()
         local universe    = lurek.ecs.newUniverse()
         local on_spawn    = lurek.event.newSignal()
@@ -27,9 +21,6 @@ describe("integration: entity events via signal", function()
         expect_equal(5, spawn_count, "spawn signal emitted 5 times")
     end)
 
-    -- @covers lurek.ecs.Universe.kill
-    -- @covers lurek.event.Signal.emit
-    -- @description Verifies entity destruction events can be mirrored through a signal log.
     it("entity kill triggers destroy signal", function()
         local universe     = lurek.ecs.newUniverse()
         local on_destroy   = lurek.event.newSignal()
@@ -54,9 +45,6 @@ describe("integration: entity events via signal", function()
         expect_equal(3, #destroy_log, "destroy signal emitted for each entity")
     end)
 
-    -- @covers lurek.ecs.Universe.get
-    -- @covers lurek.event.Signal.emit
-    -- @description Verifies signal payloads can carry entity-related data while entity state updates remain in sync.
     it("signal listener receives entity component data", function()
         local universe   = lurek.ecs.newUniverse()
         local on_damaged = lurek.event.newSignal()
@@ -79,9 +67,6 @@ describe("integration: entity events via signal", function()
         expect_equal(55, universe:get(id, "hp"), "entity hp reduced correctly")
     end)
 
-    -- @covers lurek.event.Connection.disconnect
-    -- @covers lurek.ecs
-    -- @description Verifies disconnecting a listener stops further entity-related signal delivery.
     it("disconnected signal listener not called", function()
         local sig   = lurek.event.newSignal()
         local count = 0
@@ -99,5 +84,4 @@ describe("integration: entity events via signal", function()
         expect_equal(1, count, "listener not called after disconnect")
     end)
 end)
-
 test_summary()

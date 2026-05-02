@@ -11,11 +11,6 @@
 -- (default true) and works headless. The "lurek.timer" name (NOT
 -- "lurek.timer") is the runtime namespace per P1 map.
 --
--- @covers library.quest.newQuest
--- @covers library.quest.newQuestStage
--- @covers library.quest.newObjective
--- @covers library.quest.newQuestLog
--- @covers lurek.timer.newScheduler
 
 local quest = require("library.quest")
 
@@ -33,7 +28,6 @@ end
 
 describe("integration: library.quest    lurek.timer.Scheduler", function()
 
-    -- @description A scheduled deadline auto-fails an in-progress quest when its callback fires.
     it("scheduler:after deadline auto-fails an active quest", function()
         local log, q = build_log_with_quest("ticking")
         local sched = lurek.timer.newScheduler()
@@ -46,7 +40,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description scheduler:every drives objective progress one tick at a time until it completes.
     it("scheduler:every advances objective progress and completes it", function()
         local log = quest.newQuestLog()
         local q = quest.newQuest("hunt", "Hunt")
@@ -66,7 +59,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_true(stage:getObjective("kills"):isComplete())
     end)
 
-    -- @description Cancelling the scheduled deadline before it fires keeps the quest active.
     it("cancel aborts the deadline and the quest stays active", function()
         local log, q = build_log_with_quest("cancellable")
         local sched = lurek.timer.newScheduler()
@@ -79,7 +71,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal(0, sched:getCount())
     end)
 
-    -- @description Pausing a deadline mid-countdown freezes the quest's expiry, and
     -- resuming lets it fire after the remaining wall time elapses.
     it("pause and resume preserves the remaining deadline window", function()
         local log, q = build_log_with_quest("pausable")
@@ -95,7 +86,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description Zero-delay scheduler callbacks fire on the next update tick.
     it("zero-delay deadline fires on the next update", function()
         local log, q = build_log_with_quest("instant")
         local sched = lurek.timer.newScheduler()
@@ -104,7 +94,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description Failure path: scheduler:after rejects a non-function callback with an error.
     it("scheduler:after rejects a non-function callback", function()
         local sched = lurek.timer.newScheduler()
         expect_error(function()
@@ -113,7 +102,8 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
     end)
 
 end)
-
+
+
 
 
 -- ================================================================
@@ -133,11 +123,6 @@ end)
 -- (default true) and works headless. The "lurek.timer" name (NOT
 -- "lurek.timer") is the runtime namespace per P1 map.
 --
--- @covers library.quest.newQuest
--- @covers library.quest.newQuestStage
--- @covers library.quest.newObjective
--- @covers library.quest.newQuestLog
--- @covers lurek.timer.newScheduler
 
 local quest = require("library.quest")
 
@@ -155,7 +140,6 @@ end
 
 describe("integration: library.quest    lurek.timer.Scheduler", function()
 
-    -- @description A scheduled deadline auto-fails an in-progress quest when its callback fires.
     it("scheduler:after deadline auto-fails an active quest", function()
         local log, q = build_log_with_quest("ticking")
         local sched = lurek.timer.newScheduler()
@@ -168,7 +152,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description scheduler:every drives objective progress one tick at a time until it completes.
     it("scheduler:every advances objective progress and completes it", function()
         local log = quest.newQuestLog()
         local q = quest.newQuest("hunt", "Hunt")
@@ -188,7 +171,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_true(stage:getObjective("kills"):isComplete())
     end)
 
-    -- @description Cancelling the scheduled deadline before it fires keeps the quest active.
     it("cancel aborts the deadline and the quest stays active", function()
         local log, q = build_log_with_quest("cancellable")
         local sched = lurek.timer.newScheduler()
@@ -201,7 +183,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal(0, sched:getCount())
     end)
 
-    -- @description Pausing a deadline mid-countdown freezes the quest's expiry, and
     -- resuming lets it fire after the remaining wall time elapses.
     it("pause and resume preserves the remaining deadline window", function()
         local log, q = build_log_with_quest("pausable")
@@ -217,7 +198,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description Zero-delay scheduler callbacks fire on the next update tick.
     it("zero-delay deadline fires on the next update", function()
         local log, q = build_log_with_quest("instant")
         local sched = lurek.timer.newScheduler()
@@ -226,7 +206,6 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
         expect_equal("failed", q.status)
     end)
 
-    -- @description Failure path: scheduler:after rejects a non-function callback with an error.
     it("scheduler:after rejects a non-function callback", function()
         local sched = lurek.timer.newScheduler()
         expect_error(function()
@@ -235,5 +214,4 @@ describe("integration: library.quest    lurek.timer.Scheduler", function()
     end)
 
 end)
-
 test_summary()

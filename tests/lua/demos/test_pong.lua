@@ -15,7 +15,7 @@ describe("pong: game mechanics", function()
     end)
 
     it("uses isActionDown for paddle movement", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("isActionDown%s*%(") ~= nil or
             src:find("wasActionPressed%s*%(") ~= nil,
@@ -23,7 +23,7 @@ describe("pong: game mechanics", function()
     end)
 
     it("draws rectangles for paddles and ball", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("drawRect%s*%(") ~= nil or
             src:find("drawCircle%s*%(") ~= nil,
@@ -31,14 +31,14 @@ describe("pong: game mechanics", function()
     end)
 
     it("has score tracking variables or table", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("score") ~= nil,
             "No score variable found in source")
     end)
 
     it("has ball velocity variables", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("vel") ~= nil or
             src:find("speed") ~= nil or
@@ -47,5 +47,4 @@ describe("pong: game mechanics", function()
             "No ball velocity reference found     ball physics missing")
     end)
 end)
-
 test_summary()

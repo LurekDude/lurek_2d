@@ -1,56 +1,6 @@
 -- Lurek2D Input API Tests
 
 describe("lurek.input.keyboard module exists", function()
-    -- @covers lurek.input.gamepad.getAxis
-    -- @covers lurek.input.gamepad.getAxisCount
-    -- @covers lurek.input.gamepad.getButtonCount
-    -- @covers lurek.input.gamepad.getCount
-    -- @covers lurek.input.gamepad.getGUID
-    -- @covers lurek.input.gamepad.getGamepadMappingString
-    -- @covers lurek.input.gamepad.getHat
-    -- @covers lurek.input.gamepad.getJoystickCount
-    -- @covers lurek.input.gamepad.getJoysticks
-    -- @covers lurek.input.gamepad.getName
-    -- @covers lurek.input.gamepad.isConnected
-    -- @covers lurek.input.gamepad.isDown
-    -- @covers lurek.input.gamepad.isGamepad
-    -- @covers lurek.input.gamepad.isVibrationSupported
-    -- @covers lurek.input.gamepad.loadGamepadMappings
-    -- @covers lurek.input.gamepad.saveGamepadMappings
-    -- @covers lurek.input.gamepad.setGamepadMapping
-    -- @covers lurek.input.gamepad.setVibration
-    -- @covers lurek.input.keyboard.getKeyFromScancode
-    -- @covers lurek.input.keyboard.getScancodeFromKey
-    -- @covers lurek.input.keyboard.hasKeyRepeat
-    -- @covers lurek.input.keyboard.hasTextInput
-    -- @covers lurek.input.keyboard.isDown
-    -- @covers lurek.input.keyboard.isModifierActive
-    -- @covers lurek.input.keyboard.isScancodeDown
-    -- @covers lurek.input.keyboard.setKeyRepeat
-    -- @covers lurek.input.keyboard.setTextInput
-    -- @covers lurek.input.mouse.getCursor
-    -- @covers lurek.input.mouse.getPosition
-    -- @covers lurek.input.mouse.getSystemCursor
-    -- @covers lurek.input.mouse.getX
-    -- @covers lurek.input.mouse.getY
-    -- @covers lurek.input.mouse.isCursorSupported
-    -- @covers lurek.input.mouse.isDown
-    -- @covers lurek.input.mouse.setCursor
-    -- @covers lurek.input.touch.getPosition
-    -- @covers lurek.input.touch.getPressure
-    -- @covers lurek.input.touch.getTouchCount
-    -- @covers lurek.input.touch.getTouches
-    -- @covers lurek.input.mouse.setVisible
-    -- @covers lurek.input.mouse.isVisible
-    -- @covers lurek.input.mouse.setGrabbed
-    -- @covers lurek.input.mouse.isGrabbed
-    -- @covers lurek.input.mouse.setRelativeMode
-    -- @covers lurek.input.mouse.getRelativeMode
-    -- @covers lurek.input.mouse.setPosition
-    -- @covers lurek.input.mouse.getWheelDelta
-    -- @covers lurek.input.mouse.newCursor
-    -- @covers lurek.input.Cursor.release
-    -- @covers lurek.input.Cursor.getType
     it("lurek.input.keyboard is a table", function()
         expect_type("table", lurek.input.keyboard)
     end)
@@ -394,8 +344,6 @@ describe("Cursor.getType / Cursor.release", function()
 end)
 
 describe("lurek.input action mapping", function()
-  -- @covers lurek.input.bind
-  -- @covers lurek.input.getBindings
   it("bind registers an action", function()
     lurek.input.bind("jump", {"space", "up"})
     local bindings = lurek.input.getBindings()
@@ -404,7 +352,6 @@ describe("lurek.input action mapping", function()
     expect_equal(#bindings["jump"], 2)
   end)
 
-  -- @covers lurek.input.unbind
   it("unbind removes an action", function()
     lurek.input.bind("fire", "ctrl")
     local removed = lurek.input.unbind("fire")
@@ -413,7 +360,6 @@ describe("lurek.input action mapping", function()
     expect_equal(b["fire"], nil)
   end)
 
-  -- @covers lurek.input.clearBindings
   it("clearBindings empties all mappings", function()
     lurek.input.bind("run", "shift")
     lurek.input.clearBindings()
@@ -423,23 +369,19 @@ describe("lurek.input action mapping", function()
     expect_equal(count, 0)
   end)
 
-  -- @covers lurek.input.isActionDown
   it("isActionDown is false for an unmapped action", function()
     lurek.input.clearBindings()
     expect_equal(lurek.input.isActionDown("nosuchaction"), false)
   end)
 
-  -- @covers lurek.input.wasActionPressed
   it("wasActionPressed is false for an unmapped action", function()
     expect_equal(lurek.input.wasActionPressed("nosuchaction"), false)
   end)
 
-  -- @covers lurek.input.wasActionReleased
   it("wasActionReleased is false for an unmapped action", function()
     expect_equal(lurek.input.wasActionReleased("nosuchaction"), false)
   end)
 
-  -- @covers lurek.input.wasActionPressedWithin
   it("wasActionPressedWithin is false for an action never pressed", function()
     expect_equal(lurek.input.wasActionPressedWithin("nosuchaction", 10), false)
   end)
@@ -782,19 +724,16 @@ end)
 
 
 describe("lurek.input.gamepad vibration API types", function()
-  -- @covers lurek.input.gamepad.vibrate
   it("vibrate is a function", function()
     expect_type("function", lurek.input.gamepad.vibrate)
   end)
 
-  -- @covers lurek.input.gamepad.isVibrationSupported
   it("isVibrationSupported is a function", function()
     expect_type("function", lurek.input.gamepad.isVibrationSupported)
   end)
 end)
 
 describe("lurek.input.gamepad.isVibrationSupported", function()
-  -- @covers lurek.input.gamepad.isVibrationSupported
   it("returns a boolean", function()
     local result = lurek.input.gamepad.isVibrationSupported(0)
     expect_type("boolean", result)
@@ -807,7 +746,6 @@ describe("lurek.input.gamepad.isVibrationSupported", function()
 end)
 
 describe("lurek.input.gamepad.vibrate", function()
-  -- @covers lurek.input.gamepad.vibrate
   it("returns a boolean", function()
     local result = lurek.input.gamepad.vibrate(0, 0.5, 0.5, 200)
     expect_type("boolean", result)
@@ -837,28 +775,21 @@ end)
 -- Joystick Background Events (merged from test_joystick_ext.lua)
 
 describe("lurek.input.gamepad.getBackgroundEvents", function()
-    -- @covers lurek.input.gamepad.getBackgroundEvents
-    -- @covers lurek.input.gamepad.setBackgroundEvents
     it("defaults to false", function()
         expect_equal(false, lurek.input.gamepad.getBackgroundEvents())
     end)
 end)
 
 describe("lurek.input.gamepad.setBackgroundEvents", function()
-    -- @covers lurek.input.gamepad.setBackgroundEvents
-    -- @covers lurek.input.gamepad.getBackgroundEvents
     it("can enable background events", function()
         lurek.input.gamepad.setBackgroundEvents(true)
         expect_equal(true, lurek.input.gamepad.getBackgroundEvents())
     end)
 
-    -- @covers lurek.input.gamepad.setBackgroundEvents
-    -- @covers lurek.input.gamepad.getBackgroundEvents
     it("can disable background events", function()
         lurek.input.gamepad.setBackgroundEvents(true)
         lurek.input.gamepad.setBackgroundEvents(false)
         expect_equal(false, lurek.input.gamepad.getBackgroundEvents())
     end)
 end)
-
 test_summary()

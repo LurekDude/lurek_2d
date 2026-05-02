@@ -1,13 +1,7 @@
 -- Lurek2D Stress Test: DataFrame Bulk Operations
 -- Tests large DataFrames with many rows and columns
 
--- @description Covers suite: dataframe stress: bulk row insertion.
 describe("dataframe stress: bulk row insertion", function()
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addColumn
-    -- @covers DataFrame:addRow
-    -- @stress Inserts 5000 structured rows into a three-column DataFrame.
-    -- @description Stresses row-allocation and column-population throughput by repeatedly appending records with integer, string, and float fields.
     it("inserts 5000 rows", function()
         local df = lurek.dataframe.newDataFrame()
         df:addColumn("id", 0)
@@ -22,11 +16,6 @@ describe("dataframe stress: bulk row insertion", function()
         expect_equal(3, df:ncols(), "3 columns")
     end)
 
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addRow
-    -- @covers DataFrame:getValue
-    -- @stress Writes 5000 rows and performs indexed spot-check reads across the table.
-    -- @description Stresses row insertion followed by lookup throughput by filling a single-column DataFrame and reading first, middle, and last records.
     it("reads back all 5000 rows correctly", function()
         local df = lurek.dataframe.newDataFrame()
         df:addColumn("value", 0)
@@ -46,14 +35,7 @@ describe("dataframe stress: bulk row insertion", function()
     end)
 end)
 
--- @description Covers suite: dataframe stress: many columns.
 describe("dataframe stress: many columns", function()
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addColumn
-    -- @covers DataFrame:addRow
-    -- @covers DataFrame:getValue
-    -- @stress Creates 50 columns, populates 100 wide rows, and reads one computed cell.
-    -- @description Stresses wide-table schema growth and row materialization by filling a DataFrame with many named columns and multi-field records.
     it("creates DataFrame with 50 columns", function()
         local df = lurek.dataframe.newDataFrame()
 
@@ -79,13 +61,7 @@ describe("dataframe stress: many columns", function()
     end)
 end)
 
--- @description Covers suite: dataframe stress: column operations.
 describe("dataframe stress: column operations", function()
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addColumn
-    -- @covers DataFrame:removeColumn
-    -- @stress Repeats 100 add/remove column churn cycles after seeding 20 persistent rows.
-    -- @description Stresses schema mutation overhead by repeatedly creating and deleting temporary columns while verifying existing row data survives intact.
     it("adds and removes columns repeatedly", function()
         local df = lurek.dataframe.newDataFrame()
 
@@ -107,5 +83,4 @@ describe("dataframe stress: column operations", function()
         expect_equal(1, df:ncols(), "only base column remains")
     end)
 end)
-
 test_summary()

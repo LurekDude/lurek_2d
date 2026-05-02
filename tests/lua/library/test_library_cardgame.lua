@@ -9,14 +9,7 @@ local cg = require("library.cardgame")
 
 --                  Registry
 
--- @description Exercises registry lifecycle operations including define, lookup, sorted name enumeration, and full reset of registered card types.
 describe("Registry", function()
-    -- @covers library.cardgame.defineCardType
-    --- @covers library.cardgame.newCardTypeDef
-    --- @covers library.cardgame.getCardType
-    --- @covers library.cardgame.getCardTypeNames
-    --- @covers library.cardgame.clearCardTypes
-    -- @description Verifies case: defineCardType and getCardType round-trip.
     it("defineCardType and getCardType round-trip", function()
         cg.clearCardTypes()
         local def = cg.newCardTypeDef("Fireball")
@@ -30,7 +23,6 @@ describe("Registry", function()
         expect_equal(got.base_stats.damage, 5)
     end)
 
-    -- @description Verifies case: getCardTypeNames returns sorted list.
     it("getCardTypeNames returns sorted list", function()
         cg.clearCardTypes()
         cg.defineCardType("Zap", cg.newCardTypeDef("Zap"))
@@ -40,7 +32,6 @@ describe("Registry", function()
         expect_equal(names[2], "Zap")
     end)
 
-    -- @description Verifies case: clearCardTypes empties registry.
     it("clearCardTypes empties registry", function()
         cg.clearCardTypes()
         cg.defineCardType("X", cg.newCardTypeDef("X"))
@@ -52,33 +43,7 @@ end)
 
 --                  Card
 
--- @description Verifies cards inherit registry defaults and support stat, tag, counter, metadata, reset, identity, and default presentation fields.
 describe("Card", function()
-    -- @covers library.cardgame.newCard
-    --- @covers library.cardgame.Card:getStat
-    --- @covers library.cardgame.Card:setStat
-    --- @covers library.cardgame.Card:addStat
-    --- @covers library.cardgame.Card:removeStat
-    --- @covers library.cardgame.Card:hasTag
-    --- @covers library.cardgame.Card:addTag
-    --- @covers library.cardgame.Card:removeTag
-    --- @covers library.cardgame.Card:getCounter
-    --- @covers library.cardgame.Card:setCounter
-    --- @covers library.cardgame.Card:addCounter
-    --- @covers library.cardgame.Card:removeCounter
-    --- @covers library.cardgame.Card:getMeta
-    --- @covers library.cardgame.Card:setMeta
-    --- @covers library.cardgame.Card:resetStats
-    --- @covers library.cardgame.Card:flip
-    --- @covers library.cardgame.Card:tap
-    --- @covers library.cardgame.Card:untap
-    --- @covers library.cardgame.Card:isFaceUp
-    --- @covers library.cardgame.Card:isTapped
-    --- @covers library.cardgame.Card:setRarity
-    --- @covers library.cardgame.Card:getRarity
-    --- @covers library.cardgame.Card:setTilePosition
-    --- @covers library.cardgame.Card:getTilePosition
-    -- @description Verifies case: seeds fields from registry.
     it("seeds fields from registry", function()
         cg.clearCardTypes()
         local def = cg.newCardTypeDef("Goblin")
@@ -93,7 +58,6 @@ describe("Card", function()
         expect_equal(c:hasTag("green"), true)
     end)
 
-    -- @description Verifies case: stat operations.
     it("stat operations", function()
         cg.clearCardTypes()
         local c = cg.newCard("plain")
@@ -104,7 +68,6 @@ describe("Card", function()
         expect_equal(c:getStat("atk"), 0)
     end)
 
-    -- @description Verifies case: tag operations.
     it("tag operations", function()
         cg.clearCardTypes()
         local c = cg.newCard("plain")
@@ -115,7 +78,6 @@ describe("Card", function()
         expect_equal(c:removeTag("flying"), false)
     end)
 
-    -- @description Verifies case: counter operations.
     it("counter operations", function()
         cg.clearCardTypes()
         local c = cg.newCard("plain")
@@ -126,7 +88,6 @@ describe("Card", function()
         expect_equal(c:getCounter("charge"), 0)
     end)
 
-    -- @description Verifies case: metadata operations.
     it("metadata operations", function()
         cg.clearCardTypes()
         local c = cg.newCard("plain")
@@ -135,7 +96,6 @@ describe("Card", function()
         expect_equal(c:getMeta("missing"), nil)
     end)
 
-    -- @description Verifies case: resetStats restores type defaults.
     it("resetStats restores type defaults", function()
         cg.clearCardTypes()
         local def = cg.newCardTypeDef("Knight")
@@ -147,7 +107,6 @@ describe("Card", function()
         expect_equal(c:getStat("hp"), 10)
     end)
 
-    -- @description Verifies case: unique ids.
     it("unique ids", function()
         cg.clearCardTypes()
         local a = cg.newCard("x")
@@ -155,7 +114,6 @@ describe("Card", function()
         expect_equal(a.id ~= b.id, true)
     end)
 
-    -- @description Verifies case: default tile dimensions.
     it("default tile dimensions", function()
         cg.clearCardTypes()
         local c = cg.newCard("x")
@@ -168,55 +126,7 @@ end)
 
 --                  Stack
 
--- @description Covers ordered stack behavior including push and pop variants, capacity, search and counting helpers, sorting, shuffling, snapshots, and zone flags.
 describe("Stack", function()
-    -- @covers library.cardgame.newStack
-    --- @covers library.cardgame.newStackWithCapacity
-    --- @covers library.cardgame.Stack:pushTop
-    --- @covers library.cardgame.Stack:pushBottom
-    --- @covers library.cardgame.Stack:popTop
-    --- @covers library.cardgame.Stack:popBottom
-    --- @covers library.cardgame.Stack:popMany
-    --- @covers library.cardgame.Stack:peekTop
-    --- @covers library.cardgame.Stack:peekBottom
-    --- @covers library.cardgame.Stack:peekAt
-    --- @covers library.cardgame.Stack:size
-    --- @covers library.cardgame.Stack:isEmpty
-    --- @covers library.cardgame.Stack:isFull
-    --- @covers library.cardgame.Stack:capacity
-    --- @covers library.cardgame.Stack:setCapacity
-    --- @covers library.cardgame.Stack:insertAt
-    --- @covers library.cardgame.Stack:removeAt
-    --- @covers library.cardgame.Stack:moveWithin
-    --- @covers library.cardgame.Stack:clear
-    --- @covers library.cardgame.Stack:searchByType
-    --- @covers library.cardgame.Stack:searchByTag
-    --- @covers library.cardgame.Stack:searchByCategory
-    --- @covers library.cardgame.Stack:findByType
-    --- @covers library.cardgame.Stack:findByTag
-    --- @covers library.cardgame.Stack:findByCategoryAll
-    --- @covers library.cardgame.Stack:findByTypeAll
-    --- @covers library.cardgame.Stack:findByTagAll
-    --- @covers library.cardgame.Stack:removeById
-    --- @covers library.cardgame.Stack:containsId
-    --- @covers library.cardgame.Stack:countByType
-    --- @covers library.cardgame.Stack:countByCategory
-    --- @covers library.cardgame.Stack:countByTag
-    --- @covers library.cardgame.Stack:sortByStat
-    --- @covers library.cardgame.Stack:sortByStatDesc
-    --- @covers library.cardgame.Stack:sortByCategory
-    --- @covers library.cardgame.Stack:sortByName
-    --- @covers library.cardgame.Stack:shuffle
-    --- @covers library.cardgame.Stack:items
-    --- @covers library.cardgame.Stack:peekTopNTypes
-    --- @covers library.cardgame.Stack:snapshotCards
-    --- @covers library.cardgame.Stack:restoreCards
-    --- @covers library.cardgame.Stack:isOrdered
-    --- @covers library.cardgame.Stack:setOrdered
-    --- @covers library.cardgame.Stack:isPublic
-    --- @covers library.cardgame.Stack:setPublic
-    --- @covers library.cardgame.Stack:setName
-    -- @description Verifies case: push and pop from top.
     it("push and pop from top", function()
         cg.clearCardTypes()
         local s = cg.newStack("hand")
@@ -230,7 +140,6 @@ describe("Stack", function()
         expect_equal(s:size(), 1)
     end)
 
-    -- @description Verifies case: push and pop from bottom.
     it("push and pop from bottom", function()
         cg.clearCardTypes()
         local s = cg.newStack("deck")
@@ -240,7 +149,6 @@ describe("Stack", function()
         expect_equal(popped.card_type, "b")
     end)
 
-    -- @description Verifies case: capacity enforcement.
     it("capacity enforcement", function()
         cg.clearCardTypes()
         local s = cg.newStackWithCapacity("tiny", 2)
@@ -250,7 +158,6 @@ describe("Stack", function()
         expect_equal(s:pushTop(cg.newCard("c")), false)
     end)
 
-    -- @description Verifies case: popMany removes from top.
     it("popMany removes from top", function()
         cg.clearCardTypes()
         local s = cg.newStack("deck")
@@ -262,7 +169,6 @@ describe("Stack", function()
         expect_equal(s:size(), 1)
     end)
 
-    -- @description Verifies case: peek operations.
     it("peek operations", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -273,7 +179,6 @@ describe("Stack", function()
         expect_equal(s:peekAt(1).card_type, "a")
     end)
 
-    -- @description Verifies case: insertAt and removeAt.
     it("insertAt and removeAt", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -285,7 +190,6 @@ describe("Stack", function()
         expect_equal(removed.card_type, "b")
     end)
 
-    -- @description Verifies case: moveWithin.
     it("moveWithin", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -296,7 +200,6 @@ describe("Stack", function()
         expect_equal(s:peekAt(3).card_type, "a")
     end)
 
-    -- @description Verifies case: search by type, tag, category.
     it("search by type, tag, category", function()
         cg.clearCardTypes()
         local def_s = cg.newCardTypeDef("spell")
@@ -313,7 +216,6 @@ describe("Stack", function()
         expect_equal(#s:searchByCategory("magic"), 1)
     end)
 
-    -- @description Verifies case: findByType and findByTag.
     it("findByType and findByTag", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -327,7 +229,6 @@ describe("Stack", function()
         expect_equal(s:findByType("missing"), nil)
     end)
 
-    -- @description Verifies case: removeById and containsId.
     it("removeById and containsId", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -340,7 +241,6 @@ describe("Stack", function()
         expect_equal(s:containsId(id), false)
     end)
 
-    -- @description Verifies case: count by type/category/tag.
     it("count by type/category/tag", function()
         cg.clearCardTypes()
         local def = cg.newCardTypeDef("goblin")
@@ -356,7 +256,6 @@ describe("Stack", function()
         expect_equal(s:countByTag("green"), 2)
     end)
 
-    -- @description Verifies case: sort by stat ascending.
     it("sort by stat ascending", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -369,7 +268,6 @@ describe("Stack", function()
         expect_equal(s:peekAt(3):getStat("cost"), 5)
     end)
 
-    -- @description Verifies case: sort by name.
     it("sort by name", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -380,7 +278,6 @@ describe("Stack", function()
         expect_equal(s:peekAt(1).name, "Alpha")
     end)
 
-    -- @description Verifies case: shuffle changes order (probabilistic).
     it("shuffle changes order (probabilistic)", function()
         cg.clearCardTypes()
         math.randomseed(42)
@@ -399,7 +296,6 @@ describe("Stack", function()
         expect_equal(changed, true)
     end)
 
-    -- @description Verifies case: peekTopNTypes.
     it("peekTopNTypes", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -412,7 +308,6 @@ describe("Stack", function()
         expect_equal(types[2], "b")
     end)
 
-    -- @description Verifies case: snapshot and restore.
     it("snapshot and restore", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -425,7 +320,6 @@ describe("Stack", function()
         expect_equal(s:size(), 2)
     end)
 
-    -- @description Verifies case: zone properties.
     it("zone properties", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -437,7 +331,6 @@ describe("Stack", function()
         expect_equal(s:isPublic(), true)
     end)
 
-    -- @description Verifies case: clear returns cards.
     it("clear returns cards", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -448,7 +341,6 @@ describe("Stack", function()
         expect_equal(s:isEmpty(), true)
     end)
 
-    -- @description Verifies case: findByCategoryAll and findByTypeAll.
     it("findByCategoryAll and findByTypeAll", function()
         cg.clearCardTypes()
         local def = cg.newCardTypeDef("goblin")
@@ -465,20 +357,7 @@ end)
 
 --                  Slot
 
--- @description Tests slot-style containers for push and pop flow, capacity checks, tag or type predicates, and full clearing semantics.
 describe("Slot", function()
-    -- @covers library.cardgame.newSlot
-    --- @covers library.cardgame.newSlotWithCapacity
-    --- @covers library.cardgame.Slot:push
-    --- @covers library.cardgame.Slot:pop
-    --- @covers library.cardgame.Slot:peek
-    --- @covers library.cardgame.Slot:peekAt
-    --- @covers library.cardgame.Slot:getItems
-    --- @covers library.cardgame.Slot:hasItemWithTag
-    --- @covers library.cardgame.Slot:hasItemOfType
-    --- @covers library.cardgame.Slot:removeAt
-    --- @covers library.cardgame.Slot:setCapacity
-    -- @description Verifies case: push and pop.
     it("push and pop", function()
         cg.clearCardTypes()
         local s = cg.newSlot("weapon")
@@ -489,7 +368,6 @@ describe("Slot", function()
         expect_equal(card.card_type, "sword")
     end)
 
-    -- @description Verifies case: capacity enforcement.
     it("capacity enforcement", function()
         cg.clearCardTypes()
         local s = cg.newSlotWithCapacity("ring", 1)
@@ -499,7 +377,6 @@ describe("Slot", function()
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: has_item_with_tag and has_item_of_type.
     it("has_item_with_tag and has_item_of_type", function()
         cg.clearCardTypes()
         local s = cg.newSlot("z")
@@ -511,7 +388,6 @@ describe("Slot", function()
         expect_equal(s:hasItemWithTag("melee"), false)
     end)
 
-    -- @description Verifies case: clear returns items.
     it("clear returns items", function()
         cg.clearCardTypes()
         local s = cg.newSlot("z")
@@ -525,23 +401,7 @@ end)
 
 --                  CardPool
 
--- @description Validates weighted card pools for repeated draws, unique draws, card instantiation, weight updates, name listing, and rarity-filtered pulls.
 describe("CardPool", function()
-    -- @covers library.cardgame.newCardPool
-    --- @covers library.cardgame.CardPool:add
-    --- @covers library.cardgame.CardPool:remove
-    --- @covers library.cardgame.CardPool:setWeight
-    --- @covers library.cardgame.CardPool:getWeight
-    --- @covers library.cardgame.CardPool:totalWeight
-    --- @covers library.cardgame.CardPool:getTypeNames
-    --- @covers library.cardgame.CardPool:drawTypes
-    --- @covers library.cardgame.CardPool:drawItems
-    --- @covers library.cardgame.CardPool:drawUniqueTypes
-    --- @covers library.cardgame.CardPool:drawUniqueItems
-    --- @covers library.cardgame.CardPool:drawItemsSeeded
-    --- @covers library.cardgame.CardPool:drawByRarity
-    --- @covers library.cardgame.CardPool:setRarityWeight
-    -- @description Verifies case: add and draw types.
     it("add and draw types", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("loot")
@@ -554,7 +414,6 @@ describe("CardPool", function()
         expect_equal(#result, 5)
     end)
 
-    -- @description Verifies case: draw unique types.
     it("draw unique types", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -571,7 +430,6 @@ describe("CardPool", function()
         end
     end)
 
-    -- @description Verifies case: draw items creates Card instances.
     it("draw items creates Card instances", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -582,7 +440,6 @@ describe("CardPool", function()
         expect_equal(items[1].card_type, "warrior")
     end)
 
-    -- @description Verifies case: remove and set_weight.
     it("remove and set_weight", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -594,7 +451,6 @@ describe("CardPool", function()
         expect_equal(pool:size(), 1)
     end)
 
-    -- @description Verifies case: getTypeNames returns all types.
     it("getTypeNames returns all types", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -604,7 +460,6 @@ describe("CardPool", function()
         expect_equal(#names, 2)
     end)
 
-    -- @description Verifies case: drawByRarity filters by rarity.
     it("drawByRarity filters by rarity", function()
         cg.clearCardTypes()
         local def_c = cg.newCardTypeDef("common_card")
@@ -625,21 +480,7 @@ end)
 
 --                  StackManager
 
--- @description Exercises stack manager orchestration for creating stacks, moving top cards or typed cards, counting totals, and removing named stacks.
 describe("StackManager", function()
-    -- @covers library.cardgame.newStackManager
-    --- @covers library.cardgame.StackManager:addStack
-    --- @covers library.cardgame.StackManager:createStack
-    --- @covers library.cardgame.StackManager:createStackCapped
-    --- @covers library.cardgame.StackManager:removeStack
-    --- @covers library.cardgame.StackManager:hasStack
-    --- @covers library.cardgame.StackManager:getStack
-    --- @covers library.cardgame.StackManager:stackNames
-    --- @covers library.cardgame.StackManager:totalItems
-    --- @covers library.cardgame.StackManager:moveItem
-    --- @covers library.cardgame.StackManager:moveItemByType
-    --- @covers library.cardgame.StackManager:moveTop
-    -- @description Verifies case: create and manage stacks.
     it("create and manage stacks", function()
         cg.clearCardTypes()
         local mgr = cg.newStackManager()
@@ -649,7 +490,6 @@ describe("StackManager", function()
         expect_equal(#mgr:stackNames(), 2)
     end)
 
-    -- @description Verifies case: moveTop transfers card.
     it("moveTop transfers card", function()
         cg.clearCardTypes()
         local mgr = cg.newStackManager()
@@ -663,7 +503,6 @@ describe("StackManager", function()
         expect_equal(mgr:getStack("deck"):size(), 1)
     end)
 
-    -- @description Verifies case: moveItemByType transfers first match.
     it("moveItemByType transfers first match", function()
         cg.clearCardTypes()
         local mgr = cg.newStackManager()
@@ -677,7 +516,6 @@ describe("StackManager", function()
         expect_equal(mgr:getStack("dst"):size(), 1)
     end)
 
-    -- @description Verifies case: totalItems sums all stacks.
     it("totalItems sums all stacks", function()
         cg.clearCardTypes()
         local mgr = cg.newStackManager()
@@ -689,7 +527,6 @@ describe("StackManager", function()
         expect_equal(mgr:totalItems(), 3)
     end)
 
-    -- @description Verifies case: removeStack returns the stack.
     it("removeStack returns the stack", function()
         cg.clearCardTypes()
         local mgr = cg.newStackManager()
@@ -703,23 +540,7 @@ end)
 
 --                  DeckBuilder
 
--- @description Covers deck builder recipes that add entries, expand quantities, and produce stacks populated with the expected card types.
 describe("DeckBuilder", function()
-    -- @covers library.cardgame.newDeckBuilder
-    --- @covers library.cardgame.newBuildEntry
-    --- @covers library.cardgame.DeckBuilder:add
-    --- @covers library.cardgame.DeckBuilder:addWith
-    --- @covers library.cardgame.DeckBuilder:requireType
-    --- @covers library.cardgame.DeckBuilder:banType
-    --- @covers library.cardgame.DeckBuilder:removeBannedType
-    --- @covers library.cardgame.DeckBuilder:setMaxCopiesForType
-    --- @covers library.cardgame.DeckBuilder:addRequiredTag
-    --- @covers library.cardgame.DeckBuilder:addRequiredCategory
-    --- @covers library.cardgame.DeckBuilder:validateEntries
-    --- @covers library.cardgame.DeckBuilder:validateStack
-    --- @covers library.cardgame.DeckBuilder:build
-    --- @covers library.cardgame.DeckBuilder:buildNamed
-    -- @description Verifies case: build creates stack with entries.
     it("build creates stack with entries", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("test_deck")
@@ -730,7 +551,6 @@ describe("DeckBuilder", function()
         expect_equal(deck.name, "test_deck")
     end)
 
-    -- @description Verifies case: buildNamed uses custom name.
     it("buildNamed uses custom name", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("template")
@@ -739,7 +559,6 @@ describe("DeckBuilder", function()
         expect_equal(deck.name, "player_deck")
     end)
 
-    -- @description Verifies case: shuffle_on_build shuffles the result.
     it("shuffle_on_build shuffles the result", function()
         cg.clearCardTypes()
         math.randomseed(42)
@@ -750,7 +569,6 @@ describe("DeckBuilder", function()
         expect_equal(deck:size(), 20)
     end)
 
-    -- @description Verifies case: addWith applies stat overrides and extra tags.
     it("addWith applies stat overrides and extra tags", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -761,7 +579,6 @@ describe("DeckBuilder", function()
         expect_equal(c:hasTag("elite"), true)
     end)
 
-    -- @description Verifies case: validateEntries detects banned types.
     it("validateEntries detects banned types", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -771,7 +588,6 @@ describe("DeckBuilder", function()
         expect_equal(#errs > 0, true)
     end)
 
-    -- @description Verifies case: validateEntries detects min/max size violation.
     it("validateEntries detects min/max size violation", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -781,7 +597,6 @@ describe("DeckBuilder", function()
         expect_equal(#errs > 0, true)
     end)
 
-    -- @description Verifies case: validateEntries detects missing required types.
     it("validateEntries detects missing required types", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -791,7 +606,6 @@ describe("DeckBuilder", function()
         expect_equal(#errs > 0, true)
     end)
 
-    -- @description Verifies case: removeBannedType removes from ban list.
     it("removeBannedType removes from ban list", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -803,26 +617,7 @@ end)
 
 --                  StackHistory
 
--- @description Covers suite: StackHistory.
 describe("StackHistory", function()
-    --- @covers library.cardgame.newStackHistory
-    --- @covers library.cardgame.newStackHistoryWithMaxSize
-    --- @covers library.cardgame.pushed
-    --- @covers library.cardgame.popped
-    --- @covers library.cardgame.moved
-    --- @covers library.cardgame.shuffled
-    --- @covers library.cardgame.sorted
-    --- @covers library.cardgame.cleared
-    --- @covers library.cardgame.built
-    --- @covers library.cardgame.custom
-    --- @covers library.cardgame.StackHistory:record
-    --- @covers library.cardgame.StackHistory:recordCustom
-    --- @covers library.cardgame.StackHistory:len
-    --- @covers library.cardgame.StackHistory:last
-    --- @covers library.cardgame.StackHistory:entries
-    --- @covers library.cardgame.StackHistory:entriesFor
-    --- @covers library.cardgame.StackHistory:clear
-    -- @description Verifies case: record and retrieve entries.
     it("record and retrieve entries", function()
         local h = cg.newStackHistory()
         h:record("deck", cg.HistoryAction.pushed("spell", "Fireball"), 5)
@@ -831,7 +626,6 @@ describe("StackHistory", function()
         expect_equal(h:last().action.kind, "shuffled")
     end)
 
-    -- @description Verifies case: entriesFor filters by stack name.
     it("entriesFor filters by stack name", function()
         local h = cg.newStackHistory()
         h:record("deck", cg.HistoryAction.pushed("a", "A"), 1)
@@ -841,7 +635,6 @@ describe("StackHistory", function()
         expect_equal(#deck_entries, 2)
     end)
 
-    -- @description Verifies case: max_size evicts oldest entries.
     it("max_size evicts oldest entries", function()
         local h = cg.newStackHistoryWithMaxSize(3)
         for i = 1, 5 do
@@ -851,7 +644,6 @@ describe("StackHistory", function()
         expect_equal(h:entries()[1].action.label, "e3")
     end)
 
-    -- @description Verifies case: recordCustom and clear.
     it("recordCustom and clear", function()
         local h = cg.newStackHistory()
         h:recordCustom("deck", "manual_shuffle", 10)
@@ -862,7 +654,6 @@ describe("StackHistory", function()
         expect_equal(h:isEmpty(), true)
     end)
 
-    -- @description Verifies case: history actions cover all variants.
     it("history actions cover all variants", function()
         local a1 = cg.HistoryAction.pushed("t", "n")
         expect_equal(a1.kind, "pushed")
@@ -882,11 +673,7 @@ end)
 
 --                  CardGroup
 
--- @description Covers suite: CardGroup.
 describe("CardGroup", function()
-    --- @covers library.cardgame.newCardGroup
-    --- @covers library.cardgame.CardGroup:itemsFrom
-    -- @description Verifies case: itemsFrom collects cards by index.
     it("itemsFrom collects cards by index", function()
         cg.clearCardTypes()
         local cards = { cg.newCard("a"), cg.newCard("b"), cg.newCard("c") }
@@ -901,17 +688,7 @@ end)
 
 --                  Analysis helpers
 
--- @description Covers suite: Analysis helpers.
 describe("Analysis helpers", function()
-    --- @covers library.cardgame.groupByStat
-    --- @covers library.cardgame.groupByTagPrefix
-    --- @covers library.cardgame.findNOfStat
-    --- @covers library.cardgame.findSequences
-    --- @covers library.cardgame.checkDeckLimit
-    --- @covers library.cardgame.groupByCategory
-    --- @covers library.cardgame.findAtLeastNOfStat
-    --- @covers library.cardgame.findTagGroups
-    -- @description Verifies case: groupByStat buckets by integer stat value.
     it("groupByStat buckets by integer stat value", function()
         cg.clearCardTypes()
         local cards = {}
@@ -926,7 +703,6 @@ describe("Analysis helpers", function()
         expect_equal(#groups[2], 1)
     end)
 
-    -- @description Verifies case: groupByTagPrefix buckets by tag suffix.
     it("groupByTagPrefix buckets by tag suffix", function()
         cg.clearCardTypes()
         local cards = {}
@@ -941,7 +717,6 @@ describe("Analysis helpers", function()
         expect_equal(groups["rank"], nil)
     end)
 
-    -- @description Verifies case: groupByTagPrefix ignores cards without matching prefix.
     it("groupByTagPrefix ignores cards without matching prefix", function()
         cg.clearCardTypes()
         local c = cg.newCard("x")
@@ -952,7 +727,6 @@ describe("Analysis helpers", function()
         expect_equal(count, 0)
     end)
 
-    -- @description Verifies case: findNOfStat returns exact-n groups.
     it("findNOfStat returns exact-n groups", function()
         cg.clearCardTypes()
         local cards = {}
@@ -971,7 +745,6 @@ describe("Analysis helpers", function()
         expect_equal(#groups4, 0)
     end)
 
-    -- @description Verifies case: findNOfStat CardGroup label includes stat name.
     it("findNOfStat CardGroup label includes stat name", function()
         cg.clearCardTypes()
         local cards = {}
@@ -984,7 +757,6 @@ describe("Analysis helpers", function()
         expect_equal(groups[1].label:find("rank") ~= nil, true)
     end)
 
-    -- @description Verifies case: findSequences finds consecutive runs.
     it("findSequences finds consecutive runs", function()
         cg.clearCardTypes()
         local cards = {}
@@ -999,7 +771,6 @@ describe("Analysis helpers", function()
         expect_equal(#seqs2, 2)
     end)
 
-    -- @description Verifies case: findSequences returns empty for min_run larger than any run.
     it("findSequences returns empty for min_run larger than any run", function()
         cg.clearCardTypes()
         local cards = {}
@@ -1011,7 +782,6 @@ describe("Analysis helpers", function()
         expect_equal(#seqs, 0)
     end)
 
-    -- @description Verifies case: findSequences on empty list returns empty.
     it("findSequences on empty list returns empty", function()
         local seqs = cg.findSequences({}, "rank", 2)
         expect_equal(#seqs, 0)
@@ -1020,11 +790,7 @@ end)
 
 --        ID counter
 
--- @description Covers ID counter inspection and session reset behavior.
 describe("ID counter", function()
-    --- @covers library.cardgame.getIdCounter
-    --- @covers library.cardgame.resetIdCounter
-    -- @description Verifies case: getIdCounter returns current value.
     it("getIdCounter returns current value", function()
         cg.clearCardTypes()
         local before = cg.getIdCounter()
@@ -1032,7 +798,6 @@ describe("ID counter", function()
         expect_equal(cg.getIdCounter(), before + 1)
     end)
 
-    -- @description Verifies case: resetIdCounter resets to 1.
     it("resetIdCounter resets to 1", function()
         cg.clearCardTypes()
         cg.newCard("x")
@@ -1043,7 +808,6 @@ describe("ID counter", function()
         expect_equal(c.id, 1)
     end)
 
-    -- @description Verifies case: IDs are sequential after reset.
     it("IDs are sequential after reset", function()
         cg.clearCardTypes()
         cg.resetIdCounter()
@@ -1055,9 +819,7 @@ end)
 
 --        Search return types
 
--- @description Verifies search/find return types are consistent: searchBy* returns indices, findBy*All returns objects.
 describe("Search return types", function()
-    -- @description Verifies case: searchByType returns indices (numbers).
     it("searchByType returns indices (numbers)", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1069,7 +831,6 @@ describe("Search return types", function()
         expect_equal(result[2], 2)
     end)
 
-    -- @description Verifies case: searchByTag returns indices (numbers).
     it("searchByTag returns indices (numbers)", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1080,7 +841,6 @@ describe("Search return types", function()
         expect_equal(result[1], 1)
     end)
 
-    -- @description Verifies case: findByTypeAll returns Card objects.
     it("findByTypeAll returns Card objects", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1091,7 +851,6 @@ describe("Search return types", function()
         expect_equal(result[1].card_type, "goblin")
     end)
 
-    -- @description Verifies case: findByTagAll returns Card objects.
     it("findByTagAll returns Card objects", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1104,14 +863,12 @@ describe("Search return types", function()
         expect_equal(result[1].card_type, "a")
     end)
 
-    -- @description Verifies case: searchByType on empty stack returns empty.
     it("searchByType on empty stack returns empty", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
         expect_equal(#s:searchByType("x"), 0)
     end)
 
-    -- @description Verifies case: findByTagAll on empty stack returns empty.
     it("findByTagAll on empty stack returns empty", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1121,9 +878,7 @@ end)
 
 --        CardTypeDef fields
 
--- @description Verifies CardTypeDef has all documented fields with correct defaults.
 describe("CardTypeDef fields", function()
-    -- @description Verifies case: newCardTypeDef has all documented fields.
     it("newCardTypeDef has all documented fields", function()
         local def = cg.newCardTypeDef("test")
         expect_equal(def.name, "test")
@@ -1136,7 +891,6 @@ describe("CardTypeDef fields", function()
         expect_equal(def.max_per_deck, nil)
     end)
 
-    -- @description Verifies case: newCardTypeDef rejects empty name.
     it("newCardTypeDef rejects empty name", function()
         local ok, _ = pcall(cg.newCardTypeDef, "")
         expect_equal(ok, false)
@@ -1145,23 +899,19 @@ end)
 
 --        Empty stack / pool edge cases
 
--- @description Tests edge cases on empty stacks, slots, and pools.
 describe("Empty edge cases", function()
-    -- @description Verifies case: popTop on empty stack returns nil.
     it("popTop on empty stack returns nil", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
         expect_equal(s:popTop(), nil)
     end)
 
-    -- @description Verifies case: popBottom on empty stack returns nil.
     it("popBottom on empty stack returns nil", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
         expect_equal(s:popBottom(), nil)
     end)
 
-    -- @description Verifies case: popMany on empty stack returns empty table.
     it("popMany on empty stack returns empty table", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1169,14 +919,12 @@ describe("Empty edge cases", function()
         expect_equal(#result, 0)
     end)
 
-    -- @description Verifies case: peekTop on empty stack returns nil.
     it("peekTop on empty stack returns nil", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
         expect_equal(s:peekTop(), nil)
     end)
 
-    -- @description Verifies case: drawTypes from empty pool returns empty.
     it("drawTypes from empty pool returns empty", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -1184,7 +932,6 @@ describe("Empty edge cases", function()
         expect_equal(#result, 0)
     end)
 
-    -- @description Verifies case: drawUniqueTypes from empty pool returns empty.
     it("drawUniqueTypes from empty pool returns empty", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -1192,7 +939,6 @@ describe("Empty edge cases", function()
         expect_equal(#result, 0)
     end)
 
-    -- @description Verifies case: drawItems from empty pool returns empty.
     it("drawItems from empty pool returns empty", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -1200,14 +946,12 @@ describe("Empty edge cases", function()
         expect_equal(#result, 0)
     end)
 
-    -- @description Verifies case: Slot pop on empty returns nil.
     it("Slot pop on empty returns nil", function()
         cg.clearCardTypes()
         local s = cg.newSlot("z")
         expect_equal(s:pop(), nil)
     end)
 
-    -- @description Verifies case: Stack clear on empty returns empty table.
     it("Stack clear on empty returns empty table", function()
         cg.clearCardTypes()
         local s = cg.newStack("z")
@@ -1218,47 +962,39 @@ end)
 
 --        Input validation
 
--- @description Tests that constructors and mutators reject invalid inputs.
 describe("Input validation", function()
-    -- @description Verifies case: defineCardType rejects non-string name.
     it("defineCardType rejects non-string name", function()
         cg.clearCardTypes()
         local ok = pcall(cg.defineCardType, 42, {})
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: defineCardType rejects empty name.
     it("defineCardType rejects empty name", function()
         cg.clearCardTypes()
         local ok = pcall(cg.defineCardType, "", {})
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: newCard rejects non-string type.
     it("newCard rejects non-string type", function()
         local ok = pcall(cg.newCard, 123)
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: newStackWithCapacity rejects zero capacity.
     it("newStackWithCapacity rejects zero capacity", function()
         local ok = pcall(cg.newStackWithCapacity, "z", 0)
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: newStackWithCapacity rejects negative capacity.
     it("newStackWithCapacity rejects negative capacity", function()
         local ok = pcall(cg.newStackWithCapacity, "z", -1)
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: newSlotWithCapacity rejects zero capacity.
     it("newSlotWithCapacity rejects zero capacity", function()
         local ok = pcall(cg.newSlotWithCapacity, "z", 0)
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: CardPool add rejects empty type_name.
     it("CardPool add rejects empty type_name", function()
         cg.clearCardTypes()
         local pool = cg.newCardPool("z")
@@ -1266,7 +1002,6 @@ describe("Input validation", function()
         expect_equal(ok, false)
     end)
 
-    -- @description Verifies case: DeckBuilder add rejects count < 1.
     it("DeckBuilder add rejects count < 1", function()
         cg.clearCardTypes()
         local db = cg.newDeckBuilder("z")
@@ -1274,5 +1009,4 @@ describe("Input validation", function()
         expect_equal(ok, false)
     end)
 end)
-
 test_summary()

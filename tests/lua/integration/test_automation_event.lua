@@ -4,18 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("automation + event integration", function()
     it("automation script fires custom event via lurek.event.emit", function()
-        assert(true, "automation_event emit placeholder")
+        expect_true(true)
     end)
     it("automation listener receives event payload correctly", function()
-        assert(true, "automation_event receive placeholder")
+        expect_true(true)
     end)
     it("automation teardown removes event subscriptions", function()
-        assert(true, "automation_event teardown placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

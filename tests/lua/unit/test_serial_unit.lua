@@ -4,30 +4,20 @@
 -- Headless-safe (no window / GPU / audio required).
 
 describe("lurek.serial module exists", function()
-    -- @tests lurek.serial
-    -- @covers lurek.serial.fromCsv
-    -- @covers lurek.serial.fromJson
-    -- @covers lurek.serial.fromToml
-    -- @covers lurek.serial.toCsv
-    -- @covers lurek.serial.toJson
-    -- @covers lurek.serial.toToml
     it("lurek.serial is a table", function()
         expect_type("table", lurek.serial)
     end)
 end)
 
 describe("JSON round-trip", function()
-    -- @covers lurek.serial.fromJson
     it("fromJson is a function", function()
         expect_type("function", lurek.serial.fromJson)
     end)
 
-    -- @covers lurek.serial.toJson
     it("toJson is a function", function()
         expect_type("function", lurek.serial.toJson)
     end)
 
-    -- @covers lurek.serial.fromJson
     it("fromJson parses a simple object", function()
         local t = lurek.serial.fromJson('{"name":"luna","version":1}')
         expect_type("table", t)
@@ -35,7 +25,6 @@ describe("JSON round-trip", function()
         expect_equal(1, t.version)
     end)
 
-    -- @covers lurek.serial.fromJson
     it("fromJson parses an array", function()
         local t = lurek.serial.fromJson('[1,2,3]')
         expect_type("table", t)
@@ -43,15 +32,12 @@ describe("JSON round-trip", function()
         expect_equal(3, t[3])
     end)
 
-    -- @covers lurek.serial.toJson
     it("toJson serializes a table to a string", function()
         local s = lurek.serial.toJson({ x = 10, y = 20 })
         expect_type("string", s)
         expect_true(#s > 0, "json string is non-empty")
     end)
 
-    -- @covers lurek.serial.toJson
-    -- @covers lurek.serial.fromJson
     it("JSON round-trip preserves string values", function()
         local orig = { greeting = "hello" }
         local json = lurek.serial.toJson(orig)
@@ -59,8 +45,6 @@ describe("JSON round-trip", function()
         expect_equal("hello", back.greeting)
     end)
 
-    -- @covers lurek.serial.toJson
-    -- @covers lurek.serial.fromJson
     it("JSON round-trip preserves numbers", function()
         local orig = { val = 42 }
         local json = lurek.serial.toJson(orig)
@@ -68,7 +52,6 @@ describe("JSON round-trip", function()
         expect_equal(42, back.val)
     end)
 
-    -- @covers lurek.serial.toJson
     it("toJson with pretty=true produces longer output", function()
         local t = { a = 1, b = 2 }
         local compact = lurek.serial.toJson(t, false)
@@ -76,7 +59,6 @@ describe("JSON round-trip", function()
         expect_true(#pretty >= #compact, "pretty >= compact length")
     end)
 
-    -- @covers lurek.serial.fromJson
     it("fromJson returns error on invalid JSON", function()
         expect_error(function()
             lurek.serial.fromJson("not json {{{")
@@ -85,17 +67,14 @@ describe("JSON round-trip", function()
 end)
 
 describe("TOML round-trip", function()
-    -- @covers lurek.serial.fromToml
     it("fromToml is a function", function()
         expect_type("function", lurek.serial.fromToml)
     end)
 
-    -- @covers lurek.serial.toToml
     it("toToml is a function", function()
         expect_type("function", lurek.serial.toToml)
     end)
 
-    -- @covers lurek.serial.fromToml
     it("fromToml parses a simple table", function()
         local t = lurek.serial.fromToml('[window]\ntitle = "Lurek2D"\nwidth = 800\n')
         expect_type("table", t)
@@ -104,15 +83,12 @@ describe("TOML round-trip", function()
         expect_equal(800, t.window.width)
     end)
 
-    -- @covers lurek.serial.toToml
     it("toToml serializes a table", function()
         local s = lurek.serial.toToml({ game = { fps = 60 } })
         expect_type("string", s)
         expect_true(#s > 0, "toml string is non-empty")
     end)
 
-    -- @covers lurek.serial.toToml
-    -- @covers lurek.serial.fromToml
     it("TOML round-trip preserves scalar values", function()
         local orig = { score = 100 }
         local toml = lurek.serial.toToml(orig)
@@ -120,7 +96,6 @@ describe("TOML round-trip", function()
         expect_equal(100, back.score)
     end)
 
-    -- @covers lurek.serial.fromToml
     it("fromToml returns error on invalid TOML", function()
         expect_error(function()
             lurek.serial.fromToml("[[broken = = ]]")
@@ -129,17 +104,14 @@ describe("TOML round-trip", function()
 end)
 
 describe("CSV round-trip", function()
-    -- @covers lurek.serial.fromCsv
     it("fromCsv is a function", function()
         expect_type("function", lurek.serial.fromCsv)
     end)
 
-    -- @covers lurek.serial.toCsv
     it("toCsv is a function", function()
         expect_type("function", lurek.serial.toCsv)
     end)
 
-    -- @covers lurek.serial.fromCsv
     it("fromCsv parses rows", function()
         local csv = "name,score\nalice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv)
@@ -147,7 +119,6 @@ describe("CSV round-trip", function()
         expect_true(#rows >= 1, "has at least one row")
     end)
 
-    -- @covers lurek.serial.toCsv
     it("toCsv produces a non-empty string", function()
         local data = { { name = "a", score = "1" }, { name = "b", score = "2" } }
         local s = lurek.serial.toCsv(data)
@@ -159,7 +130,6 @@ end)
 -- CSV options
 
 describe("CSV advanced options", function()
-    -- @covers lurek.serial.fromCsv
     it("fromCsv with headers creates object-keyed rows", function()
         local csv = "name,score\nalice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv, nil, true)
@@ -168,7 +138,6 @@ describe("CSV advanced options", function()
         expect_equal("10", rows[1].score)
     end)
 
-    -- @covers lurek.serial.fromCsv
     it("fromCsv without headers creates numeric keys", function()
         local csv = "alice,10\nbob,20\n"
         local rows = lurek.serial.fromCsv(csv, nil, false)
@@ -176,7 +145,6 @@ describe("CSV advanced options", function()
         expect_not_nil(rows[1][1])
     end)
 
-    -- @covers lurek.serial.fromCsv
     it("fromCsv with custom delimiter", function()
         local csv = "name\tscore\nalice\t10\nbob\t20\n"
         local rows = lurek.serial.fromCsv(csv, "\t", true)
@@ -184,8 +152,6 @@ describe("CSV advanced options", function()
         expect_equal("alice", rows[1].name)
     end)
 
-    -- @covers lurek.serial.toCsv
-    -- @covers lurek.serial.fromCsv
     it("CSV round-trip preserves data", function()
         local data = { { name = "test", value = "42" } }
         local csv = lurek.serial.toCsv(data)
@@ -198,21 +164,18 @@ end)
 -- error handling
 
 describe("codec error handling", function()
-    -- @covers lurek.serial.fromJson
     it("fromJson error on malformed input", function()
         expect_error(function()
             lurek.serial.fromJson("{bad: json}")
         end)
     end)
 
-    -- @covers lurek.serial.fromToml
     it("fromToml error on malformed input", function()
         expect_error(function()
             lurek.serial.fromToml("invalid = [")
         end)
     end)
 
-    -- @covers lurek.serial.fromJson
     it("fromJson on empty string errors", function()
         expect_error(function()
             lurek.serial.fromJson("")
@@ -514,7 +477,6 @@ end)
 
 describe("lurek.serial regression coverage", function()
   it("encodeMsgPack round-trips a nested table", function()
-    -- @covers lurek.serial.encodeMsgPack
     local source = {
       name = "hero",
       stats = { hp = 10, mp = 3 },
@@ -529,14 +491,12 @@ describe("lurek.serial regression coverage", function()
   end)
 
   it("decodeMsgPack preserves sequential arrays", function()
-    -- @covers lurek.serial.decodeMsgPack
     local decoded = lurek.serial.decodeMsgPack(lurek.serial.encodeMsgPack({ 10, 20, 30 }))
     expect_equal(3, #decoded)
     expect_equal(20, decoded[2])
   end)
 
   it("decodeXml returns root tag text and attributes", function()
-    -- @covers lurek.serial.decodeXml
     local decoded = lurek.serial.decodeXml("<root version=\"1\">hello</root>")
     expect_equal("root", decoded.tag)
     expect_equal("1", decoded.attrs.version)
@@ -544,7 +504,6 @@ describe("lurek.serial regression coverage", function()
   end)
 
   it("validate rejects a missing required field", function()
-    -- @covers lurek.serial.validate
     local ok, err = lurek.serial.validate({ name = "hero" }, {
       type = "table",
       fields = {
@@ -556,5 +515,4 @@ describe("lurek.serial regression coverage", function()
     expect_not_nil(err)
   end)
 end)
-
 test_summary()

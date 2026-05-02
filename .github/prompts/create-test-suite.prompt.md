@@ -17,7 +17,10 @@ agent: "Tester"
 1. Load [skill: testing-rust](../skills/testing-rust/SKILL.md) before acting.
 2. Read existing tests in the same layer, the owning module, harness files, and the repo test placement rules before editing.
 3. Keep the suite organized around one capability, reuse the existing harness patterns, and avoid mixing Rust-only internals with Lua-visible behavior in the same layer.
-4. Run the narrowest suite or target that covers the new tests and confirm the suite proves real behavior rather than scaffolding.
+4. For every `it()` that calls `lurek.*`: add one `-- @covers lurek.module.method` (or `Type:method`) per called symbol, indented to the same level as `it()`, directly above it with no blank lines between. Never use `-- @tests`. Never group covers above a `describe()`.
+5. For legacy cleanup work, process files in batches of max 3: read each file fully, apply manual corrections, and validate those exact files before moving to the next batch.
+6. Run `python tools/audit/lua_test_structure_audit.py --path <file>` for each touched file and confirm PASS before widening validation.
+7. Run the narrowest suite or target that covers the new tests and confirm the suite proves real behavior rather than scaffolding.
 
 ## Success Criteria
 - [ ] The prompt goal was completed: Add a coherent test suite for one behavior slice.
@@ -29,6 +32,11 @@ agent: "Tester"
 - Widen the change into adjacent layers with no new decision.
 - Edit generated artifacts by hand when the source should change instead.
 - Skip the first narrow validation and jump straight to a broad sweep.
+- Use `-- @tests` (forbidden; only `-- @covers` is valid).
+- Put `-- @covers` at column 0 when `it()` is indented.
+- Add `-- @covers` for symbols not called inside the `it()` body.
+- Group `-- @covers` above `describe()` instead of above each `it()`.
+- Rewrite markers repo-wide in one pass without per-file review.
 
 ## Example Invocation
 - /create-test-suite area=pathfind layer=tests/rust/unit

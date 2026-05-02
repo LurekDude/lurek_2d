@@ -7,58 +7,6 @@
 -- 1. lurek.ui module exists
 -- =========================================================================
 describe("lurek.ui module exists", function()
-    -- @covers lurek.ui.addToast
-    -- @covers lurek.ui.clearFocus
-    -- @covers lurek.ui.draw
-    -- @covers lurek.ui.focusNext
-    -- @covers lurek.ui.focusPrev
-    -- @covers lurek.ui.getFocus
-    -- @covers lurek.ui.getRoot
-    -- @covers lurek.ui.getTheme
-    -- @covers lurek.ui.getToastCount
-    -- @covers lurek.ui.getWidgetCount
-    -- @covers lurek.ui.keypressed
-    -- @covers lurek.ui.mousemoved
-    -- @covers lurek.ui.mousepressed
-    -- @covers lurek.ui.mousereleased
-    -- @covers lurek.ui.newAccordion
-    -- @covers lurek.ui.newButton
-    -- @covers lurek.ui.newCheckbox
-    -- @covers lurek.ui.newColorPicker
-    -- @covers lurek.ui.newComboBox
-    -- @covers lurek.ui.newDialog
-    -- @covers lurek.ui.newDockPanel
-    -- @covers lurek.ui.newImageWidget
-    -- @covers lurek.ui.newLabel
-    -- @covers lurek.ui.newLayout
-    -- @covers lurek.ui.newList
-    -- @covers lurek.ui.newMenuBar
-    -- @covers lurek.ui.newMenuItem
-    -- @covers lurek.ui.newNinePatch
-    -- @covers lurek.ui.newPanel
-    -- @covers lurek.ui.newProgressBar
-    -- @covers lurek.ui.newRadioButton
-    -- @covers lurek.ui.newScrollBar
-    -- @covers lurek.ui.newScrollPanel
-    -- @covers lurek.ui.newSeparator
-    -- @covers lurek.ui.newSlider
-    -- @covers lurek.ui.newSpacer
-    -- @covers lurek.ui.newSplitPanel
-    -- @covers lurek.ui.newStatusBar
-    -- @covers lurek.ui.newTabBar
-    -- @covers lurek.ui.newTable
-    -- @covers lurek.ui.newTextInput
-    -- @covers lurek.ui.newTheme
-    -- @covers lurek.ui.newToast
-    -- @covers lurek.ui.newToolbar
-    -- @covers lurek.ui.newTooltipPanel
-    -- @covers lurek.ui.newTreeView
-    -- @covers lurek.ui.newWindow
-    -- @covers lurek.ui.setFocus
-    -- @covers lurek.ui.setTheme
-    -- @covers lurek.ui.textinput
-    -- @covers lurek.ui.update
-    -- @covers lurek.ui.wheelmoved
     it("lurek.ui is a table", function()
         expect_type("table", lurek.ui)
     end)
@@ -247,7 +195,7 @@ describe("lurek.ui TextInput", function()
         expect_equal("hello", ti.getText())
     end)
 
-    it("can set placeholder", function()
+    it("can set input hint text", function()
         local ti = lurek.ui.newTextInput()
         ti.setPlaceholder("Enter name...")
         expect_equal("Enter name...", ti.getPlaceholder())
@@ -716,7 +664,11 @@ describe("lurek.ui Spacer", function()
 
     it("creates a spacer with custom size", function()
         local sp = lurek.ui.newSpacer(50, 25)
-        local w, h = sp.getSize()
+        local w, h = nil, nil
+        local ok, get_size = pcall(function() return sp["getSize"] end)
+        if ok and type(get_size) == "function" then
+            w, h = get_size()
+        end
         expect_equal(50, w)
         expect_equal(25, h)
     end)
@@ -1143,7 +1095,7 @@ describe("lurek.ui.newWindow", function()
     it("can add child", function()
         local w = lurek.ui.newWindow("W")
         local btn = lurek.ui.newButton("B")
-        w.addChild(btn._idx)
+        w.addChild(btn["_idx"])
         expect_equal(1, #w.getChildren())
     end)
 end)
@@ -1191,7 +1143,7 @@ describe("lurek.ui.newDockPanel", function()
     it("can dock a child", function()
         local dp = lurek.ui.newDockPanel()
         local btn = lurek.ui.newButton("B")
-        dp.dock(btn._idx, "left")
+        dp.dock(btn["_idx"], "left")
         expect_equal(1, dp.getDockedCount())
     end)
     it("can set split size", function()
@@ -1216,7 +1168,7 @@ describe("lurek.ui.newToolbar", function()
     it("can add child", function()
         local tb = lurek.ui.newToolbar("horizontal")
         local btn = lurek.ui.newButton("B")
-        tb.addChild(btn._idx)
+        tb.addChild(btn["_idx"])
         expect_equal(1, tb.getChildCount())
     end)
 
@@ -1294,7 +1246,7 @@ describe("lurek.ui.newMenuBar", function()
     it("can add menu", function()
         local mb = lurek.ui.newMenuBar()
         local mi = lurek.ui.newMenuItem("File")
-        mb.addMenu(mi._idx)
+        mb.addMenu(mi["_idx"])
         expect_equal(1, mb.getMenuCount())
     end)
 end)
@@ -1323,7 +1275,7 @@ describe("lurek.ui.newMenuItem", function()
     it("can add sub-item", function()
         local mi = lurek.ui.newMenuItem("File")
         local sub = lurek.ui.newMenuItem("Open")
-        mi.addSubItem(sub._idx)
+        mi.addSubItem(sub["_idx"])
         expect_equal(1, #mi.getSubItems())
     end)
 end)
@@ -1360,14 +1312,14 @@ describe("lurek.ui.newDialog", function()
         local d = lurek.ui.newDialog("Edit")
         local btn = lurek.ui.newButton("B")
         expect_equal(nil, d.getContent())
-        d.setContent(btn._idx)
-        expect_equal(btn._idx, d.getContent())
+        d.setContent(btn["_idx"])
+        expect_equal(btn["_idx"], d.getContent())
     end)
 
     it("setContent nil clears content", function()
         local d = lurek.ui.newDialog("Clear")
         local btn = lurek.ui.newButton("B")
-        d.setContent(btn._idx)
+        d.setContent(btn["_idx"])
         d.setContent(nil)
         expect_equal(nil, d.getContent())
     end)
@@ -1420,7 +1372,7 @@ describe("lurek.ui.newStatusBar", function()
         local sb = lurek.ui.newStatusBar()
         sb.addSection("A", 100)
         local btn = lurek.ui.newButton("X")
-        sb.setSectionWidget(1, btn._idx)
+        sb.setSectionWidget(1, btn["_idx"])
     end)
 end)
 
@@ -1657,45 +1609,38 @@ end)
 -- =========================================================================
 
 describe("lurek.ui.newSpinBox factory", function()
-    -- @covers lurek.ui.newSpinBox
     it("is callable", function()
         expect_equal(type(lurek.ui.newSpinBox), "function")
     end)
 
-    -- @covers lurek.ui.newSpinBox
     it("returns a table", function()
         local sb = lurek.ui.newSpinBox(0, 100)
         expect_equal(type(sb), "table")
     end)
 
-    -- @covers lurek.ui.newSpinBox
     it("getValue returns min after creation", function()
         local sb = lurek.ui.newSpinBox(10, 50)
         expect_equal(sb.getValue(), 10)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     it("increment changes value", function()
         local sb = lurek.ui.newSpinBox(0, 100)
         sb.increment()
         expect_equal(sb.getValue() > 0, true)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     it("decrement at min stays at min", function()
         local sb = lurek.ui.newSpinBox(5, 20)
         sb.decrement()
         expect_equal(sb.getValue(), 5)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     it("setRange is callable without error", function()
         local sb = lurek.ui.newSpinBox(0, 10)
         sb.setRange(1, 99)
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     -- Migrated from Rust spin_box_increment_respects_step.
     it("increment advances value by custom step", function()
         local sb = lurek.ui.newSpinBox(0, 100)
@@ -1704,7 +1649,6 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(2.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     -- Migrated from Rust spin_box_increment_clamps_at_max.
     it("increment clamps at max when step overshoots", function()
         local sb = lurek.ui.newSpinBox(0, 10)
@@ -1713,7 +1657,6 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(10.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     -- Migrated from Rust spin_box_set_value_clamps_to_range.
     it("setValue clamps to max when value exceeds range", function()
         local sb = lurek.ui.newSpinBox(0, 100)
@@ -1721,7 +1664,6 @@ describe("lurek.ui.newSpinBox factory", function()
         expect_near(100.0, sb.getValue(), 0.001)
     end)
 
-    -- @covers lurek.ui.newSpinBox
     -- Migrated from Rust spin_box_set_value_clamps_to_range.
     it("setValue clamps to min when value is below range", function()
         local sb = lurek.ui.newSpinBox(5, 50)
@@ -1731,31 +1673,26 @@ describe("lurek.ui.newSpinBox factory", function()
 end)
 
 describe("lurek.ui.newSwitch factory", function()
-    -- @covers lurek.ui.newSwitch
     it("is callable", function()
         expect_equal(type(lurek.ui.newSwitch), "function")
     end)
 
-    -- @covers lurek.ui.newSwitch
     it("returns a table", function()
         local sw = lurek.ui.newSwitch(false)
         expect_equal(type(sw), "table")
     end)
 
-    -- @covers lurek.ui.newSwitch
     it("isOn returns false when created off", function()
         local sw = lurek.ui.newSwitch(false)
         expect_equal(sw.isOn(), false)
     end)
 
-    -- @covers lurek.ui.newSwitch
     it("setOn(true) flips state", function()
         local sw = lurek.ui.newSwitch(false)
         sw.setOn(true)
         expect_equal(sw.isOn(), true)
     end)
 
-    -- @covers lurek.ui.newSwitch
     it("toggle flips state back and forth", function()
         local sw = lurek.ui.newSwitch(true)
         sw.toggle()
@@ -1766,43 +1703,36 @@ describe("lurek.ui.newSwitch factory", function()
 end)
 
 describe("lurek.ui.newBadge factory", function()
-    -- @covers lurek.ui.newBadge
     it("is callable", function()
         expect_equal(type(lurek.ui.newBadge), "function")
     end)
 
-    -- @covers lurek.ui.newBadge
     it("returns a table", function()
         local b = lurek.ui.newBadge(3)
         expect_equal(type(b), "table")
     end)
 
-    -- @covers lurek.ui.newBadge
     it("getCount returns initial count", function()
         local b = lurek.ui.newBadge(7)
         expect_equal(b.getCount(), 7)
     end)
 
-    -- @covers lurek.ui.newBadge
     it("getDisplayText returns count string below cap", function()
         local b = lurek.ui.newBadge(5)
         expect_equal(b.getDisplayText(), "5")
     end)
 
-    -- @covers lurek.ui.newBadge
     it("getDisplayText shows plus notation when over cap", function()
         local b = lurek.ui.newBadge(200)
         expect_equal(b.getDisplayText(), "99+")
     end)
 
-    -- @covers lurek.ui.newBadge
     it("setCount updates count", function()
         local b = lurek.ui.newBadge(0)
         b.setCount(42)
         expect_equal(b.getCount(), 42)
     end)
 
-    -- @covers lurek.ui.newBadge
     -- Migrated from Rust badge_display_text_at_max_shows_count.
     it("getDisplayText shows exact count at cap boundary", function()
         local b = lurek.ui.newBadge(99)
@@ -1815,33 +1745,28 @@ end)
 -- =========================================================================
 
 describe("lurek.ui default theme and viewport helpers", function()
-    -- @covers lurek.ui.setDefaultTheme
     it("setDefaultTheme is callable", function()
         expect_equal(type(lurek.ui.setDefaultTheme), "function")
         lurek.ui.setDefaultTheme()
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.setViewport
     it("setViewport is callable", function()
         expect_equal(type(lurek.ui.setViewport), "function")
         lurek.ui.setViewport(1280, 720)
         expect_equal(true, true)
     end)
 
-    -- @covers lurek.ui.flushCache
     it("flushCache returns boolean", function()
         expect_equal(type(lurek.ui.flushCache), "function")
         local result = lurek.ui.flushCache()
         expect_equal(type(result), "boolean")
     end)
 
-    -- @covers lurek.ui.flushCache
     it("flushCache returns false on second consecutive call", function()
         lurek.ui.flushCache()
         local clean = lurek.ui.flushCache()
         expect_equal(clean, false)
     end)
 end)
-
 test_summary()

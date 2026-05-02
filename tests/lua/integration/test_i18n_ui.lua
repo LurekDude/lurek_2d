@@ -1,14 +1,7 @@
 -- Lurek2D Integration Test: Localization + UI
 -- Tests localized text flowing into UI elements.
 
--- @description Covers suite: integration: localized strings in UI labels.
 describe("integration: localized strings in UI labels", function()
-    -- @covers lurek.i18n.get
-    -- @covers lurek.ui.setText
-    -- @covers lurek.i18n.load
-    -- @covers lurek.i18n.setLocale
-    -- @covers lurek.ui.newLabel
-    -- @description Verifies localized strings can be fetched from the i18n module and applied to a UI label.
     it("localization provides string and UI label stores it", function()
         -- Load English locale inline
         lurek.i18n.setLanguage("en")
@@ -34,9 +27,6 @@ describe("integration: localized strings in UI labels", function()
         end)
     end)
 
-    -- @covers lurek.i18n.setLocale
-    -- @covers lurek.ui.setText
-    -- @description Verifies switching the active locale changes the text fed into a UI label.
     it("switching locale updates UI text", function()
         lurek.i18n.loadTable("en", { greeting = "Hello" })
         lurek.i18n.loadTable("pl", { greeting = "Cze    " })
@@ -56,9 +46,6 @@ describe("integration: localized strings in UI labels", function()
         end)
     end)
 
-    -- @covers lurek.i18n.get
-    -- @covers lurek.ui
-    -- @description Verifies missing localization keys fall back to a string value instead of breaking UI text flows.
     it("missing key returns key name as fallback", function()
         lurek.i18n.setLanguage("en")
         local val = lurek.i18n.t("non_existent_key_xyz")
@@ -66,5 +53,4 @@ describe("integration: localized strings in UI labels", function()
         expect_type("string", val, "missing key returns a string fallback")
     end)
 end)
-
 test_summary()

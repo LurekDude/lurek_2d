@@ -1,12 +1,7 @@
 -- Lurek2D Integration Test: Input + Camera
 -- Tests screen-to-world coordinate transforms via camera.
 
--- @description Covers suite: integration: input coordinates mapped through camera.
 describe("integration: input coordinates mapped through camera", function()
-    -- @covers lurek.camera.Camera2D.setPosition
-    -- @covers lurek.input.getMousePosition
-    -- @covers lurek.camera.newCamera
-    -- @description Verifies origin camera settings leave screen and world coordinates aligned under the test's mapping formula.
     it("camera at origin: screen coords equal world coords", function()
         local cam = lurek.camera.newCamera()
         cam:setPosition(0, 0)
@@ -29,9 +24,6 @@ describe("integration: input coordinates mapped through camera", function()
         expect_near(240.0, world_y, 0.001, "world y matches screen y")
     end)
 
-    -- @covers lurek.camera.Camera2D.setPosition
-    -- @covers lurek.input.getMousePosition
-    -- @description Verifies camera panning offsets world-space coordinates relative to screen-space values.
     it("camera panned: world coords offset from screen", function()
         local cam = lurek.camera.newCamera()
         cam:setPosition(100, 50)
@@ -48,9 +40,6 @@ describe("integration: input coordinates mapped through camera", function()
         expect_near(50.0,  world_y, 0.001, "world y offset by cam pan")
     end)
 
-    -- @covers lurek.camera.Camera2D.setZoom
-    -- @covers lurek.input.getMousePosition
-    -- @description Verifies doubling camera zoom halves the derived world coordinate for the same screen-space value.
     it("camera zoomed 2x: world coords halved relative to screen", function()
         local cam = lurek.camera.newCamera()
         cam:setPosition(0, 0)
@@ -63,9 +52,6 @@ describe("integration: input coordinates mapped through camera", function()
         expect_near(100.0, world_x, 0.001, "zoom 2x halves screen x to world x")
     end)
 
-    -- @covers lurek.input.getMousePosition
-    -- @covers lurek.camera
-    -- @description Verifies mouse coordinates are returned as numeric values for camera-space mapping code.
     it("getMousePosition returns two numbers", function()
         expect_no_error(function()
             local mx, my = lurek.input.mouse.getPosition()
@@ -74,5 +60,4 @@ describe("integration: input coordinates mapped through camera", function()
         end)
     end)
 end)
-
 test_summary()

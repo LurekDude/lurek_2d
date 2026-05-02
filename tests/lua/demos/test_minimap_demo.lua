@@ -15,7 +15,7 @@ describe("minimap_demo: minimap API usage", function()
     end)
 
     it("creates a minimap (lurek.minimap.new)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.minimap%.new%s*%(") ~= nil or
             src:find("lurek%.minimap%.create%s*%(") ~= nil,
@@ -23,7 +23,7 @@ describe("minimap_demo: minimap API usage", function()
     end)
 
     it("draws the minimap each render frame", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":draw%s*%(") ~= nil or
             src:find(":render%s*%(") ~= nil,
@@ -31,7 +31,7 @@ describe("minimap_demo: minimap API usage", function()
     end)
 
     it("updates the minimap or camera rect", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":update%s*%(") ~= nil or
             src:find(":setCamera%s*%(") ~= nil or
@@ -39,5 +39,4 @@ describe("minimap_demo: minimap API usage", function()
             "No minimap update/setCamera call found")
     end)
 end)
-
 test_summary()

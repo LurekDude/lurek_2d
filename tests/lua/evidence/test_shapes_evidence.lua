@@ -1,16 +1,12 @@
 -- Evidence tests: shapes module
 -- Produces PNG artifacts from ImageData shape drawing primitives.
--- @module shapes
--- @description Evidence suite for lurek.image.ImageData shape drawing: drawRect, drawCircle, drawLine, paste.
 
 describe("evidence: shapes", function()
     before_each(function()
         ensure_evidence_dir("shapes")
     end)
 
-    -- @covers ImageData:drawRect
     -- @evidence file
-    -- @description Draws a grid of coloured rectangles on a 200x200 canvas and saves as PNG.
     it("draws a colour rectangle grid PNG", function()
         local dir  = evidence_output_dir("shapes")
         local path = dir .. "rect_grid.png"
@@ -48,9 +44,7 @@ describe("evidence: shapes", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers ImageData:drawCircle
     -- @evidence file
-    -- @description Draws concentric and overlapping circles on a 200x200 canvas.
     it("draws concentric circles PNG", function()
         local dir  = evidence_output_dir("shapes")
         local path = dir .. "circles.png"
@@ -73,9 +67,7 @@ describe("evidence: shapes", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers ImageData:drawLine
     -- @evidence file
-    -- @description Draws radiating lines from the centre of a 200x200 canvas.
     it("draws radiating lines PNG", function()
         local dir  = evidence_output_dir("shapes")
         local path = dir .. "radiating_lines.png"
@@ -97,9 +89,7 @@ describe("evidence: shapes", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers ImageData:paste
     -- @evidence file
-    -- @description Creates two ImageData objects and pastes one onto the other, saves result.
     it("produces a paste composite PNG", function()
         local dir  = evidence_output_dir("shapes")
         local path = dir .. "paste_composite.png"
@@ -116,5 +106,4 @@ describe("evidence: shapes", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

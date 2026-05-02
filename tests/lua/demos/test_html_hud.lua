@@ -1,4 +1,4 @@
-﻿-- tests/lua/demos/test_html_hud.lua
+-- tests/lua/demos/test_html_hud.lua
 -- Static-analysis checks for the html-hud showcase demo.
 -- Verifies that the game script exists and uses the expected lurek.html API.
 -- read_file is injected by the test harness; not visible to LuaLS.
@@ -24,7 +24,7 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("calls lurek.html.newDocument", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.html%.newDocument") ~= nil,
             "html-hud must call lurek.html.newDocument"
@@ -32,7 +32,7 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("forwards mousemoved to the HTML document", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("hud:mousemoved") ~= nil or src:find("doc:mousemoved") ~= nil,
             "html-hud must forward mousemoved to the HUD document"
@@ -40,7 +40,7 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("calls hud:render() to render the overlay", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":render%(%s*%)") ~= nil,
             "html-hud must call :render() on the HUD document"
@@ -48,7 +48,7 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("defines lurek.load callback", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("function lurek%.load") ~= nil,
             "html-hud must define lurek.load"
@@ -56,7 +56,7 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("defines lurek.update callback", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("function lurek%.update") ~= nil,
             "html-hud must define lurek.update"
@@ -64,12 +64,11 @@ describe("demo html-hud â€” static analysis", function()
     end)
 
     it("defines lurek.draw callback", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("function lurek%.draw") ~= nil,
             "html-hud must define lurek.draw"
         )
     end)
 end)
-
 test_summary()

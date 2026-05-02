@@ -1,16 +1,12 @@
 -- Evidence tests: cellular_sand module
 -- Produces PNG artifacts from lurek.procgen.cellularAutomata.
--- @module cellular_sand
--- @description Evidence suite for lurek.procgen cellular automata: cave/dungeon map generation visualised as PNG.
 
 describe("evidence: cellular_sand", function()
     before_each(function()
         ensure_evidence_dir("cellular_sand")
     end)
 
-    -- @covers lurek.procgen.cellularAutomata
     -- @evidence file
-    -- @description Generates a 64x64 cave map via cellularAutomata and renders it to a greyscale PNG.
     it("generates a cellular automata cave map PNG", function()
         local dir  = evidence_output_dir("cellular_sand")
         local path = dir .. "cave_map.png"
@@ -21,8 +17,8 @@ describe("evidence: cellular_sand", function()
             survival_limit = 4,
             iterations    = 5,
         })
-        assert(type(data) == "table", "cellularAutomata must return a table")
-        assert(#data == W * H, "data length must equal W*H (" .. W * H .. "), got " .. #data)
+        expect_true(type(data) == "table", "cellularAutomata must return a table")
+        expect_true(#data == W * H, "data length must equal W*H (" .. W * H .. "), got " .. #data)
         local img = lurek.image.newImageData(W, H)
         for y = 0, H - 1 do
             for x = 0, W - 1 do
@@ -38,9 +34,7 @@ describe("evidence: cellular_sand", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.procgen.cellularAutomata
     -- @evidence file
-    -- @description Generates a 96x64 cellular automata map with high wall density and renders it.
     it("generates a high-density cellular automata map PNG", function()
         local dir  = evidence_output_dir("cellular_sand")
         local path = dir .. "dense_map.png"
@@ -51,7 +45,7 @@ describe("evidence: cellular_sand", function()
             survival_limit = 3,
             iterations     = 3,
         })
-        assert(#data == W * H, "data length mismatch")
+        expect_true(#data == W * H, "data length mismatch")
         local img = lurek.image.newImageData(W, H)
         for y = 0, H - 1 do
             for x = 0, W - 1 do
@@ -67,5 +61,4 @@ describe("evidence: cellular_sand", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

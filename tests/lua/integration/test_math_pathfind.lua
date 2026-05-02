@@ -261,5 +261,4 @@ describe("vec3 + pathfinding heuristic integration", function()
         end
     end)
 end)
-
 test_summary()

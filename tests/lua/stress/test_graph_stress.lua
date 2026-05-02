@@ -1,14 +1,7 @@
 -- Lurek2D Stress Test: Graph Flow Simulation
 -- Tests large graph creation, edge traversal, and simulation ticks
 
--- @description Covers suite: graph stress: large graph creation.
 describe("graph stress: large graph creation", function()
-    -- @covers lurek.graph.newGraph
-    -- @covers Graph:addNode
-    -- @covers Graph:addEdge
-    -- @covers Graph:getStats
-    -- @stress Creates 500 nodes and 499 connecting edges in a single chain topology.
-    -- @description Stresses graph construction throughput by allocating a long linear pipeline and then querying aggregate node and edge counts.
     it("creates a 500-node chain graph", function()
         local g = lurek.graph.newGraph()
 
@@ -27,12 +20,6 @@ describe("graph stress: large graph creation", function()
         expect_equal(499, stats.edges, "499 edges created")
     end)
 
-    -- @covers lurek.graph.newGraph
-    -- @covers Graph:addNode
-    -- @covers Graph:addEdge
-    -- @covers Graph:getStats
-    -- @stress Builds a 20x20 mesh graph with horizontal and vertical edge connections.
-    -- @description Stresses dense graph construction by filling a 400-node grid and wiring every internal adjacency before validating the resulting edge count.
     it("creates a mesh-connected graph", function()
         local g = lurek.graph.newGraph()
 
@@ -65,14 +52,7 @@ describe("graph stress: large graph creation", function()
     end)
 end)
 
--- @description Covers suite: graph stress: simulation ticks.
 describe("graph stress: simulation ticks", function()
-    -- @covers lurek.graph.newGraph
-    -- @covers Graph:createItem
-    -- @covers Graph:addItem
-    -- @covers Graph:update
-    -- @stress Seeds 50 items into a 200-node pipeline and advances the simulation for 100 ticks.
-    -- @description Stresses steady-state graph simulation by combining nontrivial topology, queued items, and a long fixed-step update loop.
     it("runs 100 ticks on a 200-node pipeline", function()
         local g = lurek.graph.newGraph()
 
@@ -100,5 +80,4 @@ describe("graph stress: simulation ticks", function()
         expect_true(true, "100 ticks completed without error")
     end)
 end)
-
 test_summary()

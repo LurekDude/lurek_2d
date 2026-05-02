@@ -185,5 +185,4 @@ describe("pathfinding stress: hexGrid large map", function()
         expect_true(#r.cells > 0, "expected reachable cells")
     end)
 end)
-
 test_summary()

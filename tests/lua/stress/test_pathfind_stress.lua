@@ -1,13 +1,7 @@
 -- Lurek2D Stress Test: Pathfinding on Large Grids
 -- Tests A* and flow field computation at scale
 
--- @description Covers suite: pathfinding stress: large grid A*.
 describe("pathfinding stress: large grid A*", function()
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers lurek.pathfind.newPathfinder
-    -- @covers UnitPathfinder:findPath
-    -- @stress Runs one A* search across a 200x200 open grid from corner to corner.
-    -- @description Stresses large-search throughput on an obstacle-free nav grid where the algorithm has to traverse a long-distance route.
     it("pathfinds on a 200x200 open grid", function()
         local grid = lurek.pathfind.newNavGrid(200, 200)
         local pf = lurek.pathfind.newPathfinder(grid)
@@ -17,11 +11,6 @@ describe("pathfinding stress: large grid A*", function()
         expect_true(#path > 0, "path has waypoints")
     end)
 
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers NavGrid:setBlocked
-    -- @covers UnitPathfinder:findPath
-    -- @stress Builds an 80-cell wall across a 100x100 grid and searches from one side to the other.
-    -- @description Stresses obstacle-aware routing by forcing the pathfinder to route around a long horizontal barrier instead of taking the direct line.
     it("pathfinds around obstacles on 100x100 grid", function()
         local grid = lurek.pathfind.newNavGrid(100, 100)
 
@@ -36,11 +25,6 @@ describe("pathfinding stress: large grid A*", function()
         expect_true(#path > 50, "path goes around obstacle")
     end)
 
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers NavGrid:setBlocked
-    -- @covers UnitPathfinder:findPath
-    -- @stress Constructs a fully blocking wall across a 50x50 grid and attempts a failed or partial search through it.
-    -- @description Stresses blocked-route handling by forcing a path query against a complete barrier and asserting only that the API remains stable.
     it("handles fully blocked path gracefully", function()
         local grid = lurek.pathfind.newNavGrid(50, 50)
 
@@ -60,11 +44,6 @@ describe("pathfinding stress: large grid A*", function()
         -- If path is nil or empty, that's also acceptable
     end)
 
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers NavGrid:setCost
-    -- @covers UnitPathfinder:findPath
-    -- @stress Marks an 11x11 center region as high cost and searches straight across the map.
-    -- @description Stresses weighted pathfinding by forcing the solver to evaluate whether it should detour around an expensive zone.
     it("costs affect pathfinding", function()
         local grid = lurek.pathfind.newNavGrid(50, 50)
 
@@ -81,13 +60,7 @@ describe("pathfinding stress: large grid A*", function()
     end)
 end)
 
--- @description Covers suite: pathfinding stress: repeated pathfinding.
 describe("pathfinding stress: repeated pathfinding", function()
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers NavGrid:setBlocked
-    -- @covers UnitPathfinder:findPath
-    -- @stress Reuses one 100x100 grid to execute 500 separate path searches with changing endpoints.
-    -- @description Stresses repeated query throughput and cacheless solver stability by running many searches over one obstacle-populated nav grid.
     it("finds 500 paths on same grid", function()
         local grid = lurek.pathfind.newNavGrid(100, 100)
 
@@ -115,14 +88,7 @@ describe("pathfinding stress: repeated pathfinding", function()
     end)
 end)
 
--- @description Covers suite: pathfinding stress: flow field.
 describe("pathfinding stress: flow field", function()
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers lurek.pathfind.newFlowField
-    -- @covers FlowField:calculate
-    -- @covers FlowField:getDirection
-    -- @stress Computes one full flow field on a 100x100 grid and samples a direction vector from it.
-    -- @description Stresses global navigation-field generation by calculating directions toward one target over a large grid and then reading back a vector.
     it("computes flow field on 100x100 grid", function()
         local grid = lurek.pathfind.newNavGrid(100, 100)
         local ff = lurek.pathfind.newFlowField(grid)
@@ -133,5 +99,4 @@ describe("pathfinding stress: flow field", function()
         expect_type("number", dy)
     end)
 end)
-
 test_summary()

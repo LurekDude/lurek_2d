@@ -51,6 +51,9 @@ tools: [vscode/memory, vscode/runCommand, vscode/askQuestions, vscode/toolSearch
   - Reject shortcuts: no #[cfg(test)] blocks in src/, no product logic in src/lua_api/ for easier tests.
   - Translate expected behavior into a small set of assertions that fail for one reason at a time.
   - End each Lua file with test_summary(); add @covers markers; register new Lua tests in harness.rs.
+  - @covers rules: indent @covers to the same level as the it() it precedes; list only symbols called inside that it(); never use -- @tests (forbidden marker); never group @covers above describe() — place them above each individual it() only.
+  - Existing-suite cleanup process: edit at most 3 Lua files per batch; read each file fully; apply manual marker fixes; validate only those 3 files before continuing.
+  - Run python tools/audit/lua_test_structure_audit.py to enforce: missing @covers, wrong indentation, @tests markers, describe-block grouping, test_summary placement.
   - Register new Rust test binaries in Cargo.toml only when the target truly needs a new binary.
   - Use tools/audit/test_coverage.py and related Lua audits to catch uncovered public behavior.
 - **Adversarial probing**:
@@ -89,6 +92,11 @@ Score the work from 1 to 10 stars against these checks.
 - Inflate severity to raise finding counts.
 - Poke at random with no attack model.
 - Mix many attack classes into one probe and lose attribution.
+- Use -- @tests marker (removed; use -- @covers only).
+- Place -- @covers at a different indentation than the it() it annotates.
+- Add -- @covers for functions not called inside the it() body.
+- Group -- @covers above describe() instead of above each specific it().
+- Run a blind repo-wide marker rewrite without per-file review.
 
 ## CAG Metadata
 Communication: simple, direct, low-token, test-first

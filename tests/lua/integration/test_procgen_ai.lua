@@ -133,5 +133,4 @@ describe("wfcGenerate provides tile layout for AI", function()
         expect_equal(144, counts[0] + counts[1] + (counts[2] or 0))
     end)
 end)
-
 test_summary()

@@ -15,7 +15,7 @@ describe("physics_sandbox: interactive physics checks", function()
     end)
 
     it("spawns physics bodies at mouse click", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("wasActionPressed%s*%(") ~= nil or
             src:find("wasMousePressed%s*%(") ~= nil,
@@ -23,7 +23,7 @@ describe("physics_sandbox: interactive physics checks", function()
     end)
 
     it("removes or limits body count", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("remove%s*%(") ~= nil or
             src:find("destroy%s*%(") ~= nil or
@@ -33,7 +33,7 @@ describe("physics_sandbox: interactive physics checks", function()
     end)
 
     it("uses gravity", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("gravity") ~= nil or
             src:find("setGravity") ~= nil,
@@ -41,7 +41,7 @@ describe("physics_sandbox: interactive physics checks", function()
     end)
 
     it("draws physics shapes each frame", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("drawRect%s*%(") ~= nil or
             src:find("drawCircle%s*%(") ~= nil or
@@ -49,5 +49,4 @@ describe("physics_sandbox: interactive physics checks", function()
             "No draw calls found for physics body rendering")
     end)
 end)
-
 test_summary()

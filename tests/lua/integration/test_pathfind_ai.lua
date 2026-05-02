@@ -178,5 +178,4 @@ describe("rangeMap + AI tactical analysis", function()
         expect_equal(4, result.cells[1].y)
     end)
 end)
-
 test_summary()

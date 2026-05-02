@@ -2,12 +2,7 @@
 -- Tests smooth camera pan and zoom via tweens.
 -- Rewritten to use lurek.tween.newState(duration, easing) API.
 
--- @description Covers suite: integration: tween drives camera position and zoom.
 describe("integration: tween drives camera position and zoom", function()
-    -- @covers lurek.tween.newState
-    -- @covers lurek.camera.Camera2D.setPosition
-    -- @covers lurek.camera.newCamera
-    -- @description Verifies tween progress can be applied to camera position during simulated frame updates.
     it("tween advances camera from A to B over simulated time", function()
         local cam   = lurek.camera.newCamera()
         local state = lurek.tween.newState(1.0, "linear")
@@ -28,9 +23,6 @@ describe("integration: tween drives camera position and zoom", function()
         expect_near(250, cx, 5.0, "camera x near 250 at halfway")
     end)
 
-    -- @covers lurek.tween.newState
-    -- @covers lurek.camera
-    -- @description Verifies a tween clamps or saturates at its target value once its duration has elapsed.
     it("tween reaches target at completion", function()
         local state = lurek.tween.newState(0.5, "linear")
 
@@ -40,9 +32,6 @@ describe("integration: tween drives camera position and zoom", function()
         expect_near(200, val, 1.0, "tween reached target value")
     end)
 
-    -- @covers lurek.tween.newState
-    -- @covers lurek.camera.Camera2D.setZoom
-    -- @description Verifies tween output can drive camera zoom values over time.
     it("tween zoom from 1.0 to 2.0 over time", function()
         local cam   = lurek.camera.newCamera()
         local state = lurek.tween.newState(1.0, "linear")
@@ -56,9 +45,6 @@ describe("integration: tween drives camera position and zoom", function()
         expect_near(1.5, cam:getZoom(), 0.05, "camera zoom updated via tween")
     end)
 
-    -- @covers lurek.tween.newState
-    -- @covers lurek.camera
-    -- @description Verifies tween isComplete fires after a full-duration camera tween.
     it("tween isComplete true after full duration", function()
         local state = lurek.tween.newState(0.1, "linear")
 
@@ -67,5 +53,4 @@ describe("integration: tween drives camera position and zoom", function()
         expect_true(done or state:isComplete(), "tween completed after 0.2s > 0.1s duration")
     end)
 end)
-
 test_summary()

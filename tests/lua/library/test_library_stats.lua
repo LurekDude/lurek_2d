@@ -6,10 +6,7 @@ local Stats = require("library.stats")
 
 --                  Attribute
 
--- @description Verifies attribute defaults and optional base-value initialization for simple numeric stats.
 describe("Attribute", function()
-    -- @covers library.stats.newAttribute
-    -- @description Verifies attributes preserve an explicit base value and start with zero regen and growth.
     it("should create with base value", function()
         local a = Stats.newAttribute(50)
         expect_equal(a.base, 50)
@@ -17,8 +14,6 @@ describe("Attribute", function()
         expect_equal(a.growth, 0)
     end)
 
-    -- @covers library.stats.newAttribute
-    -- @description Confirms attributes default their base value to zero when none is supplied.
     it("should default base to 0", function()
         local a = Stats.newAttribute()
         expect_equal(a.base, 0)
@@ -27,10 +22,7 @@ end)
 
 --                  Buff
 
--- @description Covers buff defaults, source metadata, and expiration behavior for timed and permanent modifiers.
 describe("Buff", function()
-    -- @covers library.stats.newBuff
-    -- @description Verifies new buffs capture stat, additive value, multiplier, duration, and source defaults.
     it("should create with defaults", function()
         local b = Stats.newBuff("hp", 10)
         expect_equal(b.stat, "hp")
@@ -40,8 +32,6 @@ describe("Buff", function()
         expect_equal(b.source, "")
     end)
 
-    -- @covers library.stats.newBuff
-    -- @description Checks finite buffs report expired only after their remaining duration reaches zero.
     it("should track expiration", function()
         local b = Stats.newBuff("hp", 5, 1, 3, "potion")
         expect_equal(b:isExpired(), false)
@@ -49,8 +39,6 @@ describe("Buff", function()
         expect_equal(b:isExpired(), true)
     end)
 
-    -- @covers library.stats.newBuff
-    -- @description Confirms permanent buffs never expire even if remaining is driven below zero.
     it("permanent buff never expires", function()
         local b = Stats.newBuff("hp", 5, 1, -1, "trait")
         expect_equal(b:isExpired(), false)
@@ -61,10 +49,7 @@ end)
 
 --                  Skill
 
--- @description Tests skill defaults and option-based overrides for max level, resource costs, and cooldown metadata.
 describe("Skill", function()
-    -- @covers library.stats.newSkill
-    -- @description Verifies new skills expose the documented default level cap, resource, cost, and cooldown values.
     it("should create with defaults", function()
         local sk = Stats.newSkill()
         expect_equal(sk.level, 0)
@@ -74,8 +59,6 @@ describe("Skill", function()
         expect_equal(sk.cooldown, 0)
     end)
 
-    -- @covers library.stats.newSkill
-    -- @description Confirms skill option tables override max level, resource, cost, and cooldown metadata.
     it("should accept options", function()
         local sk = Stats.newSkill({ max_level = 5, resource = "mana", cost = 20, cooldown = 3 })
         expect_equal(sk.max_level, 5)
@@ -87,10 +70,7 @@ end)
 
 --                  Perk
 
--- @description Verifies perk defaults and option-driven requirement or trait metadata.
 describe("Perk", function()
-    -- @covers library.stats.newPerk
-    -- @description Verifies perks start with default level requirements, no trait binding, and an unacquired state.
     it("should create with defaults", function()
         local p = Stats.newPerk()
         expect_equal(p.require_level, 0)
@@ -98,8 +78,6 @@ describe("Perk", function()
         expect_equal(p.acquired, false)
     end)
 
-    -- @covers library.stats.newPerk
-    -- @description Confirms perk option tables override level requirements and trait linkage.
     it("should create with options", function()
         local p = Stats.newPerk({ require_level = 5, trait_name = "tough" })
         expect_equal(p.require_level, 5)
@@ -109,10 +87,7 @@ end)
 
 --                  ActionPoints
 
--- @description Confirms action-point objects start at their configured maximum value.
 describe("ActionPoints", function()
-    -- @covers library.stats.newActionPoints
-    -- @description Checks action-point objects start with current points equal to their configured maximum.
     it("should start at max", function()
         local ap = Stats.newActionPoints(6)
         expect_equal(ap.current, 6)
@@ -122,10 +97,7 @@ end)
 
 --                  Morale
 
--- @description Verifies morale defaults including current, max, and threshold values for panic and berserk states.
 describe("Morale", function()
-    -- @covers library.stats.newMorale
-    -- @description Verifies morale objects start full and expose the documented panic and berserk thresholds.
     it("should start at max", function()
         local m = Stats.newMorale(100)
         expect_equal(m.current, 100)
@@ -137,11 +109,7 @@ end)
 
 --                  LevelThresholds
 
--- @description Exercises table-based and linear level-threshold calculators across known and out-of-range levels.
 describe("LevelThresholds", function()
-    -- @covers library.stats.newTableThresholds
-    -- @covers library.stats.newLinearThresholds
-    -- @description Checks table-based thresholds return exact configured values and infinity for out-of-range levels.
     it("table thresholds", function()
         local t = Stats.newTableThresholds({ 100, 200, 400 })
         expect_equal(t:thresholdFor(1), 100)
@@ -150,8 +118,6 @@ describe("LevelThresholds", function()
         expect_equal(t:thresholdFor(99), math.huge)
     end)
 
-    -- @covers library.stats.newLinearThresholds
-    -- @description Verifies linear thresholds scale level requirements by the configured base and step amounts.
     it("linear thresholds", function()
         local t = Stats.newLinearThresholds(100, 100)
         expect_equal(t:thresholdFor(1), 100)
@@ -162,18 +128,13 @@ end)
 
 --                  Sheet basics
 
--- @description Covers core sheet behavior for defining stats, clamping base values, and querying min, max, regen, and sorted stat names.
 describe("Sheet basics", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies new stat sheets start at level one with zero accumulated XP.
     it("should create empty sheet", function()
         local s = Stats.newSheet()
         expect_equal(s.level, 1)
         expect_equal(s.xp, 0)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks sheets can define an attribute and return both its effective and base values.
     it("should define and get attribute", function()
         local s = Stats.newSheet()
         s:define("hp", 100)
@@ -181,16 +142,12 @@ describe("Sheet basics", function()
         expect_equal(s:getBase("hp"), 100)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms querying an undefined attribute returns nil for both effective and base lookups.
     it("should return nil for undefined attribute", function()
         local s = Stats.newSheet()
         expect_equal(s:get("nope"), nil)
         expect_equal(s:getBase("nope"), nil)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies setBase updates a defined attribute while respecting its stored constraints.
     it("should set base value", function()
         local s = Stats.newSheet()
         s:define("hp", 100, { max = 200 })
@@ -198,8 +155,6 @@ describe("Sheet basics", function()
         expect_equal(s:getBase("hp"), 150)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks base values clamp to configured minimum and maximum bounds.
     it("should clamp base to min/max", function()
         local s = Stats.newSheet()
         s:define("hp", 50, { min = 0, max = 100 })
@@ -209,8 +164,6 @@ describe("Sheet basics", function()
         expect_equal(s:getBase("hp"), 0)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms getStatNames returns defined stat identifiers in sorted order.
     it("getStatNames returns sorted names", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -222,8 +175,6 @@ describe("Sheet basics", function()
         expect_equal(names[3], "str")
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies min, max, and regen accessors round-trip the configured stat metadata.
     it("min/max/regen accessors", function()
         local s = Stats.newSheet()
         s:define("hp", 100)
@@ -238,10 +189,7 @@ end)
 
 --                  Buffs on Sheet
 
--- @description Validates sheet-level buff application, multiplicative modifiers, removal, filtering, and aggregate buff counting.
 describe("Sheet buffs", function()
-    -- @covers library.stats.newSheet
-    -- @description Checks additive buffs increase a stat's effective value while leaving the base intact.
     it("addBuff adjusts effective value", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -249,8 +197,6 @@ describe("Sheet buffs", function()
         expect_equal(s:get("str"), 15)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies multiplicative buffs scale the effective stat value.
     it("multiplicative buff", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -258,8 +204,6 @@ describe("Sheet buffs", function()
         expect_equal(s:get("str"), 20)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms removing a buff restores the effective stat value to its unbuffed amount.
     it("removeBuff restores value", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -269,8 +213,6 @@ describe("Sheet buffs", function()
         expect_equal(s:get("str"), 10)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks clearBuffs without a stat argument removes all active buffs from the sheet.
     it("clearBuffs removes all", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -280,8 +222,6 @@ describe("Sheet buffs", function()
         expect_equal(s:get("str"), 10)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies stat-scoped clearBuffs removes buffs only from the requested stat.
     it("clearBuffs by stat", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -293,8 +233,6 @@ describe("Sheet buffs", function()
         expect_equal(s:get("agi"), 11)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms getBuffs returns the active buffs for a specific stat.
     it("getBuffs returns active buffs", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -304,8 +242,6 @@ describe("Sheet buffs", function()
         expect_equal(buffs[1].add, 5)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks getBuffCount reports per-stat counts and the total active buff count.
     it("getBuffCount", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -319,11 +255,7 @@ end)
 
 --                  Traits
 
--- @description Tests trait registration and application so trait buffs alter sheet values and can be added or removed cleanly.
 describe("Traits", function()
-    -- @covers library.stats.defineTrait
-    -- @covers library.stats.newSheet
-    -- @description Verifies applying a registered trait adds its buffs and removing it restores the original stat values.
     it("apply and remove trait buffs", function()
         Stats.defineTrait("tough", { buffs = { { stat = "hp", add = 20, mul = 1 } } })
         local s = Stats.newSheet()
@@ -337,9 +269,6 @@ describe("Traits", function()
         expect_equal(s:hasTrait("tough"), false)
     end)
 
-    -- @covers library.stats.defineTrait
-    -- @covers library.stats.newSheet
-    -- @description Confirms getActiveTraits reports currently applied traits on the sheet.
     it("getActiveTraits", function()
         Stats.defineTrait("fast", { buffs = { { stat = "agi", add = 5, mul = 1 } } })
         local s = Stats.newSheet()
@@ -353,10 +282,7 @@ end)
 
 --                  Skills
 
--- @description Exercises sheet-managed skills for learning, leveling, resource costs, cooldowns, and ready-state checks.
 describe("Skills", function()
-    -- @covers library.stats.newSheet
-    -- @description Checks sheets can define and learn skills while incrementing their learned level.
     it("define and learn skill", function()
         local s = Stats.newSheet()
         s:defineSkill("fireball", { max_level = 5, resource = "mana", cost = 20, cooldown = 2 })
@@ -365,8 +291,6 @@ describe("Skills", function()
         expect_equal(s:getSkillLevel("fireball"), 1)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies learning a skill stops at the configured maximum level.
     it("cannot exceed max level", function()
         local s = Stats.newSheet()
         s:defineSkill("slash", { max_level = 1 })
@@ -374,8 +298,6 @@ describe("Skills", function()
         expect_equal(s:learnSkill("slash"), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms using a skill spends the required resource and starts the configured cooldown timer.
     it("useSkill costs resource and starts cooldown", function()
         local s = Stats.newSheet()
         s:define("mana", 100)
@@ -387,8 +309,6 @@ describe("Skills", function()
         expect_near(s:getCooldownRemaining("heal"), 5, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks useSkill reports an on-cooldown error when the skill is used again too soon.
     it("useSkill fails when on cooldown", function()
         local s = Stats.newSheet()
         s:define("mana", 100)
@@ -400,8 +320,6 @@ describe("Skills", function()
         expect_equal(reason, "on cooldown")
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies skills cannot be used when the sheet lacks the required resource amount.
     it("useSkill fails when not enough resource", function()
         local s = Stats.newSheet()
         s:define("mana", 10)
@@ -415,10 +333,7 @@ end)
 
 --                  Perks
 
--- @description Covers perk acquisition rules, trait side effects, and level-gated unlock behavior on stat sheets.
 describe("Perks", function()
-    -- @covers library.stats.newSheet
-    -- @description Confirms sheets can define and acquire perks once their level requirement is met.
     it("define and acquire perk", function()
         local s = Stats.newSheet()
         s:definePerk("iron_skin", { require_level = 3 })
@@ -428,16 +343,12 @@ describe("Perks", function()
         expect_equal(s:hasPerk("iron_skin"), true)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies perk acquisition fails while the sheet level remains below the requirement.
     it("cannot acquire if level too low", function()
         local s = Stats.newSheet()
         s:definePerk("iron_skin", { require_level = 5 })
         expect_equal(s:acquirePerk("iron_skin"), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks perks cannot be acquired more than once.
     it("cannot acquire twice", function()
         local s = Stats.newSheet()
         s:definePerk("lucky", {})
@@ -445,8 +356,6 @@ describe("Perks", function()
         expect_equal(s:acquirePerk("lucky"), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms perks linked to traits apply the trait buffs when acquired.
     it("perk with trait applies buffs", function()
         Stats.defineTrait("armor_up", { buffs = { { stat = "def", add = 10, mul = 1 } } })
         local s = Stats.newSheet()
@@ -459,10 +368,7 @@ end)
 
 --                  Flags
 
--- @description Verifies generic boolean flag storage for adding, clearing, and testing named status flags.
 describe("Flags", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies flags can be set, queried, and cleared on a sheet.
     it("set/clear/has/get", function()
         local s = Stats.newSheet()
         s:setFlag("poisoned")
@@ -471,8 +377,6 @@ describe("Flags", function()
         expect_equal(s:hasFlag("poisoned"), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms getFlags returns all active flags in sorted order.
     it("getFlags returns sorted list", function()
         local s = Stats.newSheet()
         s:setFlag("burned")
@@ -485,11 +389,7 @@ end)
 
 --                  XP / Level
 
--- @description Tests XP accumulation, level thresholds, multi-level gains, and threshold assignment on character sheets.
 describe("XP and Levelling", function()
-    -- @covers library.stats.newSheet
-    -- @covers library.stats.newLinearThresholds
-    -- @description Checks XP gains against linear thresholds can promote the sheet by one or more levels while carrying leftover XP.
     it("addXP gains levels with linear thresholds", function()
         local s = Stats.newSheet()
         s:setLevelThresholds(Stats.newLinearThresholds(100, 100))
@@ -501,9 +401,6 @@ describe("XP and Levelling", function()
         expect_equal(s:getXP(), 150)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @covers library.stats.newTableThresholds
-    -- @description Verifies XP gains against table thresholds can cross multiple levels with the correct leftover XP.
     it("addXP gains levels with table thresholds", function()
         local s = Stats.newSheet()
         s:setLevelThresholds(Stats.newTableThresholds({ 50, 100, 200 }))
@@ -513,8 +410,6 @@ describe("XP and Levelling", function()
         expect_equal(s:getXP(), 10)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms XP and level setters directly update the stored progression values.
     it("setXP and setLevel directly", function()
         local s = Stats.newSheet()
         s:setXP(42)
@@ -526,10 +421,7 @@ end)
 
 --                  Use tracking
 
--- @description Covers usage counters and derived proficiency or tracking helpers tied to repeated action use.
 describe("Use tracking", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies recordUse increments the tracked usage count for a stat.
     it("recordUse increments count", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -538,8 +430,6 @@ describe("Use tracking", function()
         expect_equal(s:getUseCount("str"), 2)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks recordUse also applies stat growth over time while respecting the stat maximum.
     it("recordUse applies growth", function()
         local s = Stats.newSheet()
         s:define("str", 10, { growth = 0.5, max = 12 })
@@ -556,10 +446,7 @@ end)
 
 --                  Action Points
 
--- @description Exercises action-point mutation, spending, refreshing, and clamp behavior on the sheet wrapper.
 describe("Action Points", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies sheets can set action points, spend some, and report the remaining and maximum values.
     it("setActionPoints and spend", function()
         local s = Stats.newSheet()
         s:setActionPoints(6)
@@ -571,16 +458,12 @@ describe("Action Points", function()
         expect_equal(cur, 2)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms spending more action points than available fails without changing the state.
     it("cannot overspend", function()
         local s = Stats.newSheet()
         s:setActionPoints(3)
         expect_equal(s:spendActionPoints(4), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks beginTurn refreshes current action points back to their maximum.
     it("beginTurn resets to max", function()
         local s = Stats.newSheet()
         s:setActionPoints(6)
@@ -590,8 +473,6 @@ describe("Action Points", function()
         expect_equal(cur, 6)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies recoverActionPoints restores only part of the missing action points when given a partial amount.
     it("recoverActionPoints partial recovery", function()
         local s = Stats.newSheet()
         s:setActionPoints(6)
@@ -604,10 +485,7 @@ end)
 
 --                  Morale
 
--- @description Validates morale changes, threshold overrides, and panic or berserk state detection with flag side effects.
 describe("Morale system", function()
-    -- @covers library.stats.newSheet
-    -- @description Checks morale loss can trigger panic and set the corresponding status flag.
     it("adjustMorale and checkMorale", function()
         local s = Stats.newSheet()
         s:setMorale(100)
@@ -619,8 +497,6 @@ describe("Morale system", function()
         expect_equal(s:hasFlag("panic"), true)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies extreme morale loss crosses the berserk threshold and sets the berserk flag.
     it("berserk at low morale", function()
         local s = Stats.newSheet()
         s:setMorale(100)
@@ -630,8 +506,6 @@ describe("Morale system", function()
         expect_equal(s:hasFlag("berserk"), true)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms checkMorale returns nil when morale remains above all danger thresholds.
     it("nil when morale is fine", function()
         local s = Stats.newSheet()
         s:setMorale(100)
@@ -639,8 +513,6 @@ describe("Morale system", function()
         expect_equal(state, nil)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks custom panic and berserk thresholds change the state returned by morale evaluation.
     it("custom thresholds", function()
         local s = Stats.newSheet()
         s:setMorale(100)
@@ -654,10 +526,7 @@ end)
 
 --                  Resistances
 
--- @description Covers resistance assignment and typed damage application, including fallback behavior when no damage type is supplied.
 describe("Resistances", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies resistance values can be set and default to zero for unknown damage types.
     it("setResistance and getResistance", function()
         local s = Stats.newSheet()
         s:setResistance("fire", 0.5)
@@ -665,8 +534,6 @@ describe("Resistances", function()
         expect_near(s:getResistance("ice"), 0.0, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks applyDamage scales damage by the configured resistance before subtracting HP.
     it("applyDamage reduced by resistance", function()
         local s = Stats.newSheet()
         s:define("hp", 100)
@@ -676,8 +543,6 @@ describe("Resistances", function()
         expect_near(s:getBase("hp"), 70, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms damage without a type bypasses resistance modifiers.
     it("applyDamage without type ignores resistances", function()
         local s = Stats.newSheet()
         s:define("hp", 100)
@@ -690,10 +555,7 @@ end)
 
 --                  Encumbrance
 
--- @description Verifies encumbrance tracking and the threshold check that marks a sheet as encumbered.
 describe("Encumbrance", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies encumbrance values round-trip and remain unencumbered while current load is within the limit.
     it("setEncumbrance and isEncumbered", function()
         local s = Stats.newSheet()
         s:setEncumbrance(50, 100)
@@ -703,8 +565,6 @@ describe("Encumbrance", function()
         expect_equal(s:isEncumbered(), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms isEncumbered becomes true once current load exceeds the maximum.
     it("over encumbrance limit", function()
         local s = Stats.newSheet()
         s:setEncumbrance(150, 100)
@@ -714,10 +574,7 @@ end)
 
 --                  Initiative
 
--- @description Confirms initiative has a default value and supports direct set or get mutation.
 describe("Initiative", function()
-    -- @covers library.stats.newSheet
-    -- @description Checks initiative starts at the default value and can be updated explicitly.
     it("setInitiative and getInitiative", function()
         local s = Stats.newSheet()
         expect_equal(s:getInitiative(), 10) -- default
@@ -728,10 +585,7 @@ end)
 
 --                  Update (tick)
 
--- @description Exercises periodic update logic for timed buff expiry, cooldown ticking, and regeneration clamped by stat maxima.
 describe("Update tick", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies timed buffs expire and stop affecting stats once their duration elapses during update.
     it("expires timed buffs", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -741,8 +595,6 @@ describe("Update tick", function()
         expect_equal(s:get("str"), 10)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks update decrements active skill cooldown timers until they reach zero.
     it("ticks skill cooldowns", function()
         local s = Stats.newSheet()
         s:defineSkill("heal", { max_level = 5, cooldown = 5 })
@@ -754,8 +606,6 @@ describe("Update tick", function()
         expect_near(s:getCooldownRemaining("heal"), 0, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Confirms update applies per-second regeneration to base stats.
     it("applies regen", function()
         local s = Stats.newSheet()
         s:define("hp", 80, { max = 100, regen = 10 })
@@ -763,8 +613,6 @@ describe("Update tick", function()
         expect_near(s:getBase("hp"), 90, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies regeneration is clamped so base stats never exceed their configured maximum.
     it("regen clamped to max", function()
         local s = Stats.newSheet()
         s:define("hp", 95, { max = 100, regen = 10 })
@@ -775,10 +623,7 @@ end)
 
 --                  Snapshot/Restore
 
--- @description Tests serializing a sheet snapshot and restoring it after mutations to recover stats, flags, resistances, and XP.
 describe("Snapshot and Restore", function()
-    -- @covers library.stats.newSheet
-    -- @description Checks snapshot captures sheet state and restore reinstates stats, flags, resistances, and XP after mutations.
     it("snapshot captures and restores state", function()
         local s = Stats.newSheet()
         s:define("hp", 100, { min = 0, max = 200 })
@@ -808,13 +653,7 @@ end)
 
 --                  Registry
 
--- @description Validates registry helpers for traits, races, and classes together with archetype application and sorted name lookups.
 describe("StatsRegistry", function()
-    -- @covers library.stats.defineTrait
-    -- @covers library.stats.defineRace
-    -- @covers library.stats.defineClass
-    -- @covers library.stats.applyArchetypes
-    -- @description Verifies defining a trait makes its name visible through the exported trait registry lookup.
     it("defineTrait and getTraitNames", function()
         Stats.defineTrait("brawler", { buffs = { { stat = "str", add = 3, mul = 1 } } })
         local names = Stats.getTraitNames()
@@ -823,8 +662,6 @@ describe("StatsRegistry", function()
         expect_equal(found, true)
     end)
 
-    -- @covers library.stats.defineRace
-    -- @description Confirms defined races appear in the exported race-name registry.
     it("defineRace and getRaceNames", function()
         Stats.defineRace("human", { bases = { hp = 10 }, traits = {} })
         Stats.defineRace("elf", { bases = { agi = 5 }, traits = {} })
@@ -834,9 +671,6 @@ describe("StatsRegistry", function()
         expect_equal(found, true)
     end)
 
-    -- @covers library.stats.applyArchetypes
-    -- @covers library.stats.defineRace
-    -- @description Checks applying a race archetype adds its base stat adjustments onto an existing sheet.
     it("applyArchetypes applies race bases", function()
         Stats.defineRace("dwarf", { bases = { hp = 20, str = 5 }, traits = {} })
         local s = Stats.newSheet()
@@ -847,9 +681,6 @@ describe("StatsRegistry", function()
         expect_equal(s:getBase("str"), 15)
     end)
 
-    -- @covers library.stats.applyArchetypes
-    -- @covers library.stats.defineClass
-    -- @description Verifies applying a class archetype adds the class base stats to the sheet.
     it("applyArchetypes applies class", function()
         Stats.defineClass("warrior", { bases = { str = 10 }, traits = {} })
         local s = Stats.newSheet()
@@ -858,10 +689,6 @@ describe("StatsRegistry", function()
         expect_equal(s:getBase("str"), 20)
     end)
 
-    -- @covers library.stats.applyArchetypes
-    -- @covers library.stats.defineTrait
-    -- @covers library.stats.defineRace
-    -- @description Confirms race-linked traits are also applied when applying archetypes for that race.
     it("applyArchetypes applies race traits", function()
         Stats.defineTrait("nimble", { buffs = { { stat = "agi", add = 8, mul = 1 } } })
         Stats.defineRace("catfolk", { bases = {}, traits = { "nimble" } })
@@ -871,8 +698,6 @@ describe("StatsRegistry", function()
         expect_equal(s:get("agi"), 18)
     end)
 
-    -- @covers library.stats.defineClass
-    -- @description Verifies the class registry exposes defined class names and keeps them in sorted order.
     it("getClassNames returns registered class names", function()
         Stats.defineClass("mage", { bases = { int = 10 }, traits = {} })
         Stats.defineClass("rogue", { bases = { agi = 8 }, traits = {} })
@@ -896,10 +721,7 @@ end)
 
 --        Buff formula correctness
 
--- @description Validates the corrected buff formula: base * mul_prod + add_sum.
 describe("Buff formula", function()
-    -- @covers library.stats.newSheet
-    -- @description Verifies that a zero multiplier zeroes only the base, not the additive bonuses.
     it("zero multiplier preserves additive buffs", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -908,8 +730,6 @@ describe("Buff formula", function()
         expect_equal(s:get("str"), 5)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies combined additive and multiplicative buffs use base*mul+add formula.
     it("combined add and mul uses correct order", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -918,8 +738,6 @@ describe("Buff formula", function()
         expect_equal(s:get("str"), 25)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Checks multiple buffs stack correctly with the new formula.
     it("multiple buffs stack correctly", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -930,8 +748,6 @@ describe("Buff formula", function()
         expect_near(s:get("str"), 20, 0.01)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Verifies pure multiplicative buff without additive component.
     it("pure multiplicative only", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -942,10 +758,7 @@ end)
 
 --        Stack mode enforcement
 
--- @description Tests that StackMode is enforced when adding duplicate buffs.
 describe("Buff stack modes", function()
-    -- @covers library.stats.newSheet
-    -- @description StackMode.None rejects a duplicate buff with the same stat+source.
     it("None rejects duplicate", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -957,8 +770,6 @@ describe("Buff stack modes", function()
         expect_equal(s:get("str"), 15)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description StackMode.Duration extends the remaining time of an existing duplicate buff.
     it("Duration extends existing buff", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -974,8 +785,6 @@ describe("Buff stack modes", function()
         expect_equal(buffs[1].remaining, 15) -- 10 + 5
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description StackMode.Intensity increases the additive value of an existing duplicate buff.
     it("Intensity increases add value", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -989,8 +798,6 @@ describe("Buff stack modes", function()
         expect_equal(s:get("str"), 18)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Without stack_mode, duplicate buffs are always added (backward compat).
     it("nil stack_mode allows duplicates", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -1000,8 +807,6 @@ describe("Buff stack modes", function()
         expect_equal(s:get("str"), 20)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description Stack mode only matches same stat AND source; different sources always add.
     it("different sources bypass stack mode", function()
         local s = Stats.newSheet()
         s:define("str", 10)
@@ -1013,10 +818,7 @@ end)
 
 --        Encumbrance update
 
--- @description Tests that the update tick auto-manages the 'encumbered' flag based on weight.
 describe("Encumbrance update", function()
-    -- @covers library.stats.newSheet
-    -- @description update() sets the 'encumbered' flag when current weight exceeds capacity.
     it("sets encumbered flag when over limit", function()
         local s = Stats.newSheet()
         s:setEncumbrance(150, 100)
@@ -1024,8 +826,6 @@ describe("Encumbrance update", function()
         expect_equal(s:hasFlag("encumbered"), true)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description update() clears the 'encumbered' flag when weight is within capacity.
     it("clears encumbered flag when under limit", function()
         local s = Stats.newSheet()
         s:setEncumbrance(150, 100)
@@ -1036,8 +836,6 @@ describe("Encumbrance update", function()
         expect_equal(s:hasFlag("encumbered"), false)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description No encumbrance set means no flag changes.
     it("no encumbrance means no flag", function()
         local s = Stats.newSheet()
         s:update(0)
@@ -1047,26 +845,19 @@ end)
 
 --        Input validation
 
--- @description Tests input validation at public function boundaries.
 describe("Input validation", function()
-    -- @covers library.stats.newSheet
-    -- @description define() silently ignores non-string stat names.
     it("define ignores nil name", function()
         local s = Stats.newSheet()
         s:define(nil, 10)
         expect_equal(#s:getStatNames(), 0)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description addBuff returns nil for non-string stat names.
     it("addBuff returns nil for nil stat", function()
         local s = Stats.newSheet()
         local h = s:addBuff(nil, 5, 1, -1, "x")
         expect_equal(h, nil)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description addXP rejects negative amounts and returns 0 levels gained.
     it("addXP rejects negative amount", function()
         local s = Stats.newSheet()
         local gained = s:addXP(-100)
@@ -1074,8 +865,6 @@ describe("Input validation", function()
         expect_equal(s:getXP(), 0)
     end)
 
-    -- @covers library.stats.newSheet
-    -- @description addXP handles nil amount gracefully (treats as 0).
     it("addXP handles nil amount", function()
         local s = Stats.newSheet()
         local gained = s:addXP(nil)
@@ -1083,5 +872,4 @@ describe("Input validation", function()
         expect_equal(s:getXP(), 0)
     end)
 end)
-
 test_summary()

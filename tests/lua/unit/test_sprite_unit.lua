@@ -1,257 +1,206 @@
 -- Lurek2D Lua BDD tests for lurek.sprite
 -- Headless: no GPU, no audio, no window.
 
-describe("lurek.sprite", function()
 -- module interface
 
-    describe("module interface", function()
-        -- @covers lurek.sprite.newSheet
-        it("exposes newSheet factory", function()
-            expect_type("function", lurek.sprite.newSheet)
-        end)
-
-        -- @covers lurek.sprite.newRPGMakerSheet
-        it("exposes newRPGMakerSheet factory", function()
-            expect_type("function", lurek.sprite.newRPGMakerSheet)
-        end)
-
-        -- @covers lurek.sprite.parseAtlas
-        it("exposes parseAtlas factory", function()
-            expect_type("function", lurek.sprite.parseAtlas)
-        end)
-
-        -- @covers lurek.sprite.newAtlasSheet
-        it("exposes newAtlasSheet factory", function()
-            expect_type("function", lurek.sprite.newAtlasSheet)
-        end)
+describe("module interface", function()
+    it("exposes newSheet factory", function()
+        expect_type("function", lurek.sprite.newSheet)
     end)
+
+    it("exposes newRPGMakerSheet factory", function()
+        expect_type("function", lurek.sprite.newRPGMakerSheet)
+    end)
+
+    it("exposes parseAtlas factory", function()
+        expect_type("function", lurek.sprite.parseAtlas)
+    end)
+
+    it("exposes newAtlasSheet factory", function()
+        expect_type("function", lurek.sprite.newAtlasSheet)
+    end)
+end)
 
 -- newSheet
 
-    describe("newSheet()", function()
-        -- @covers lurek.sprite.newSheet
-        it("returns a userdata", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            expect_type("userdata", s)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getFrameCount
-        it("getFrameCount returns 16 for a 4x4 grid", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            expect_equal(16, s:getFrameCount())
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getGridSize
-        it("getGridSize returns correct columns and rows", function()
-            local s = lurek.sprite.newSheet(128, 64, 32, 32)
-            local cols, rows = s:getGridSize()
-            expect_equal(4, cols)
-            expect_equal(2, rows)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getFrameSize
-        it("getFrameSize returns tile dimensions", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 32)
-            local fw, fh = s:getFrameSize()
-            expect_equal(16, fw)
-            expect_equal(32, fh)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getFrame
-        it("getFrame(0) returns a quad table", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local q = s:getFrame(0)
-            expect_type("table", q)
-            expect_type("number", q.x)
-            expect_type("number", q.y)
-            expect_type("number", q.w)
-            expect_type("number", q.h)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getFrame
-        it("frame 0 starts at (0,0)", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local q = s:getFrame(0)
-            expect_equal(0, q.x)
-            expect_equal(0, q.y)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getFrame
-        it("frame 1 starts at x = tile_w", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local q = s:getFrame(1)
-            expect_equal(16, q.x)
-            expect_equal(0, q.y)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getRow
-        it("getRow(0) returns all frames in first row", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local row = s:getRow(0)
-            expect_type("table", row)
-            expect_equal(4, #row)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getColumn
-        it("getColumn(0) returns all frames in first column", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local col = s:getColumn(0)
-            expect_type("table", col)
-            expect_equal(4, #col)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.nameGroup
-        -- @covers lurek.sprite.getGroupFrames
-        it("nameGroup registers retrievable group", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            s:nameGroup("run", 0, 4)
-            local g = s:getGroupFrames("run")
-            expect_type("table", g)
-            expect_equal(4, #g)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.nameGroup
-        -- @covers lurek.sprite.getGroupNames
-        it("getGroupNames returns registered group names", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            s:nameGroup("idle", 0, 2)
-            s:nameGroup("walk", 2, 4)
-            local names = s:getGroupNames()
-            expect_type("table", names)
-            expect_equal(2, #names)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.getGroupFrames
-        it("getGroupFrames nil for unknown group", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local g = s:getGroupFrames("ghost")
-            expect_equal(nil, g)
-        end)
-
-        -- @covers lurek.sprite.newSheet
-        -- @covers lurek.sprite.drawToImage
-        it("drawToImage returns userdata", function()
-            local s = lurek.sprite.newSheet(64, 64, 16, 16)
-            local img = s:drawToImage(64, 64)
-            expect_type("userdata", img)
-        end)
+describe("newSheet()", function()
+    it("returns a userdata", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        expect_type("userdata", s)
     end)
+
+    it("getFrameCount returns 16 for a 4x4 grid", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        expect_equal(16, s:getFrameCount())
+    end)
+
+    it("getGridSize returns correct columns and rows", function()
+        local s = lurek.sprite.newSheet(128, 64, 32, 32)
+        local cols, rows = s:getGridSize()
+        expect_equal(4, cols)
+        expect_equal(2, rows)
+    end)
+
+    it("getFrameSize returns tile dimensions", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 32)
+        local fw, fh = s:getFrameSize()
+        expect_equal(16, fw)
+        expect_equal(32, fh)
+    end)
+
+    it("getFrame(0) returns a quad table", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local q = s:getFrame(0)
+        expect_type("table", q)
+        expect_type("number", q.x)
+        expect_type("number", q.y)
+        expect_type("number", q.w)
+        expect_type("number", q.h)
+    end)
+
+    it("frame 0 starts at (0,0)", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local q = s:getFrame(0)
+        expect_equal(0, q.x)
+        expect_equal(0, q.y)
+    end)
+
+    it("frame 1 starts at x = tile_w", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local q = s:getFrame(1)
+        expect_equal(16, q.x)
+        expect_equal(0, q.y)
+    end)
+
+    it("getRow(0) returns all frames in first row", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local row = s:getRow(0)
+        expect_type("table", row)
+        expect_equal(4, #row)
+    end)
+
+    it("getColumn(0) returns all frames in first column", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local col = s:getColumn(0)
+        expect_type("table", col)
+        expect_equal(4, #col)
+    end)
+
+    it("nameGroup registers retrievable group", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        s:nameGroup("run", 0, 4)
+        local g = s:getGroupFrames("run")
+        expect_type("table", g)
+        expect_equal(4, #g)
+    end)
+
+    it("getGroupNames returns registered group names", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        s:nameGroup("idle", 0, 2)
+        s:nameGroup("walk", 2, 4)
+        local names = s:getGroupNames()
+        expect_type("table", names)
+        expect_equal(2, #names)
+    end)
+
+    it("getGroupFrames nil for unknown group", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local g = s:getGroupFrames("ghost")
+        expect_equal(nil, g)
+    end)
+
+    it("drawToImage returns userdata", function()
+        local s = lurek.sprite.newSheet(64, 64, 16, 16)
+        local img = s:drawToImage(64, 64)
+        expect_type("userdata", img)
+    end)
+end)
 
 -- newRPGMakerSheet
 
-    describe("newRPGMakerSheet()", function()
-        -- @covers lurek.sprite.newRPGMakerSheet
-        it("returns a userdata", function()
-            local s = lurek.sprite.newRPGMakerSheet(144, 192)
-            expect_type("userdata", s)
-        end)
-
-        -- @covers lurek.sprite.newRPGMakerSheet
-        -- @covers lurek.sprite.getFrameCount
-        it("getFrameCount returns 12 for standard RPGMaker sheet", function()
-            local s = lurek.sprite.newRPGMakerSheet(144, 192)
-            expect_equal(12, s:getFrameCount())
-        end)
-
-        -- @covers lurek.sprite.newRPGMakerSheet
-        -- @covers lurek.sprite.getGroupNames
-        it("has down/left/right/up groups", function()
-            local s = lurek.sprite.newRPGMakerSheet(144, 192)
-            local names = s:getGroupNames()
-            local by_name = {}
-            for _, n in ipairs(names) do by_name[n] = true end
-            expect_true(by_name["down"]  ~= nil, "expected down group")
-            expect_true(by_name["left"]  ~= nil, "expected left group")
-            expect_true(by_name["right"] ~= nil, "expected right group")
-            expect_true(by_name["up"]    ~= nil, "expected up group")
-        end)
+describe("newRPGMakerSheet()", function()
+    it("returns a userdata", function()
+        local s = lurek.sprite.newRPGMakerSheet(144, 192)
+        expect_type("userdata", s)
     end)
+
+    it("getFrameCount returns 12 for standard RPGMaker sheet", function()
+        local s = lurek.sprite.newRPGMakerSheet(144, 192)
+        expect_equal(12, s:getFrameCount())
+    end)
+
+    it("has down/left/right/up groups", function()
+        local s = lurek.sprite.newRPGMakerSheet(144, 192)
+        local names = s:getGroupNames()
+        local by_name = {}
+        for _, n in ipairs(names) do by_name[n] = true end
+        expect_true(by_name["down"]  ~= nil, "expected down group")
+        expect_true(by_name["left"]  ~= nil, "expected left group")
+        expect_true(by_name["right"] ~= nil, "expected right group")
+        expect_true(by_name["up"]    ~= nil, "expected up group")
+    end)
+end)
 
 -- parseAtlas
 
-    describe("parseAtlas()", function()
-        local HASH_JSON = [[{
-            "frames": {
-                "hero_idle": {"frame":{"x":0,"y":0,"w":32,"h":32},"rotated":false},
-                "hero_run":  {"frame":{"x":32,"y":0,"w":32,"h":32},"rotated":false}
-            }
-        }]]
+describe("parseAtlas()", function()
+    local HASH_JSON = [[{
+        "frames": {
+            "hero_idle": {"frame":{"x":0,"y":0,"w":32,"h":32},"rotated":false},
+            "hero_run":  {"frame":{"x":32,"y":0,"w":32,"h":32},"rotated":false}
+        }
+    }]]
 
-        -- @covers lurek.sprite.parseAtlas
-        it("returns a userdata for valid hash JSON", function()
-            local a = lurek.sprite.parseAtlas(HASH_JSON)
-            expect_type("userdata", a)
-        end)
+    it("returns a userdata for valid hash JSON", function()
+        local a = lurek.sprite.parseAtlas(HASH_JSON)
+        expect_type("userdata", a)
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        -- @covers lurek.sprite.entryCount
-        it("entryCount matches frame count", function()
-            local a = lurek.sprite.parseAtlas(HASH_JSON)
-            expect_equal(2, a:entryCount())
-        end)
+    it("entryCount matches frame count", function()
+        local a = lurek.sprite.parseAtlas(HASH_JSON)
+        expect_equal(2, a:entryCount())
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        -- @covers lurek.sprite.getEntry
-        it("getEntry returns correct quad for known name", function()
-            local a = lurek.sprite.parseAtlas(HASH_JSON)
-            local e = a:getEntry("hero_idle")
-            expect_type("table", e)
-            expect_equal(0, e.x)
-            expect_equal(0, e.y)
-            expect_equal(32, e.w)
-            expect_equal(32, e.h)
-        end)
+    it("getEntry returns correct quad for known name", function()
+        local a = lurek.sprite.parseAtlas(HASH_JSON)
+        local e = a:getEntry("hero_idle")
+        expect_type("table", e)
+        expect_equal(0, e.x)
+        expect_equal(0, e.y)
+        expect_equal(32, e.w)
+        expect_equal(32, e.h)
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        -- @covers lurek.sprite.getEntry
-        it("getEntry returns nil for unknown name", function()
-            local a = lurek.sprite.parseAtlas(HASH_JSON)
-            local e = a:getEntry("ghost")
-            expect_equal(nil, e)
-        end)
+    it("getEntry returns nil for unknown name", function()
+        local a = lurek.sprite.parseAtlas(HASH_JSON)
+        local e = a:getEntry("ghost")
+        expect_equal(nil, e)
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        -- @covers lurek.sprite.getByIndex
-        it("getByIndex(1) returns a valid entry", function()
-            local json = [[{"frames":{"hero":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false}}}]]
-            local a = lurek.sprite.parseAtlas(json)
-            local e = a:getByIndex(1)
-            expect_type("table", e)
-            expect_type("string", e.name)
-        end)
+    it("getByIndex(1) returns a valid entry", function()
+        local json = [[{"frames":{"hero":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false}}}]]
+        local a = lurek.sprite.parseAtlas(json)
+        local e = a:getByIndex(1)
+        expect_type("table", e)
+        expect_type("string", e.name)
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        -- @covers lurek.sprite.entryNames
-        it("entryNames returns all sprite names", function()
-            local a = lurek.sprite.parseAtlas(HASH_JSON)
-            local names = a:entryNames()
-            expect_type("table", names)
-            expect_equal(2, #names)
-        end)
+    it("entryNames returns all sprite names", function()
+        local a = lurek.sprite.parseAtlas(HASH_JSON)
+        local names = a:entryNames()
+        expect_type("table", names)
+        expect_equal(2, #names)
+    end)
 
-        -- @covers lurek.sprite.parseAtlas
-        it("errors on invalid JSON", function()
-            expect_error(function()
-                lurek.sprite.parseAtlas("not json at all")
-            end)
+    it("errors on invalid JSON", function()
+        expect_error(function()
+            lurek.sprite.parseAtlas("not json at all")
         end)
     end)
 
 -- newAtlasSheet
 
     describe("newAtlasSheet()", function()
-        -- @covers lurek.sprite.newAtlasSheet
         it("returns a userdata", function()
             local json = [[{"frames":{"a":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false}}}]]
             local atlas = lurek.sprite.parseAtlas(json)
@@ -259,8 +208,6 @@ describe("lurek.sprite", function()
             expect_type("userdata", s)
         end)
 
-        -- @covers lurek.sprite.newAtlasSheet
-        -- @covers lurek.sprite.getFrameCount
         it("frame count equals atlas entry count", function()
             local json = [[{"frames":{
                 "a":{"frame":{"x":0,"y":0,"w":16,"h":16},"rotated":false},
@@ -400,11 +347,6 @@ describe("sprite.atlas.getFlipped", function()
 end)
 
 describe("lurek.sprite regression coverage", function()
-    -- @covers lurek.sprite.parseAsepriteAtlas
-    -- @covers SpriteAtlas:getEntry
-    -- @covers SpriteAtlas:getByIndex
-    -- @covers SpriteAtlas:entryCount
-    -- @covers SpriteAtlas:entryNames
     it("parseAsepriteAtlas exposes atlas entries through every lookup helper", function()
         local atlas = lurek.sprite.parseAsepriteAtlas(ASEPRITE_ARRAY_JSON)
         local entry = atlas:getEntry("hero/run_0.png")
@@ -427,12 +369,6 @@ describe("lurek.sprite regression coverage", function()
         expect_true(seen["hero/run_0.png"] ~= nil, "expected hero/run_0.png in names")
     end)
 
-    -- @covers SpriteSheet:getFrame
-    -- @covers SpriteSheet:getFrameCount
-    -- @covers SpriteSheet:getRow
-    -- @covers SpriteSheet:getColumn
-    -- @covers SpriteSheet:getFrameSize
-    -- @covers SpriteSheet:getGridSize
     it("SpriteSheet geometry helpers stay consistent", function()
         local sheet = lurek.sprite.newSheet(96, 64, 32, 32)
         local frame = sheet:getFrame(4)
@@ -452,9 +388,6 @@ describe("lurek.sprite regression coverage", function()
         expect_equal(2, rows)
     end)
 
-    -- @covers SpriteSheet:getGroupFrames
-    -- @covers SpriteSheet:getGroupNames
-    -- @covers SpriteSheet:drawToImage
     it("SpriteSheet group helpers and drawToImage return usable results", function()
         local sheet = lurek.sprite.newSheet(64, 64, 16, 16)
         sheet:nameGroup("idle", 0, 2)
@@ -470,5 +403,4 @@ describe("lurek.sprite regression coverage", function()
         expect_type("userdata", image)
     end)
 end)
-
 test_summary()

@@ -1,23 +1,6 @@
 -- Lua BDD tests for lurek.automation (automation module)
 
 describe("lurek.automation - namespace", function()
-    -- @covers lurek.automation.getCurrentScript
-    -- @covers lurek.automation.getCurrentStep
-    -- @covers lurek.automation.getElapsedTime
-    -- @covers lurek.automation.getScripts
-    -- @covers lurek.automation.getStepCount
-    -- @covers lurek.automation.hasScript
-    -- @covers lurek.automation.isComplete
-    -- @covers lurek.automation.isPaused
-    -- @covers lurek.automation.isRunning
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.loadFromToml
-    -- @covers lurek.automation.pause
-    -- @covers lurek.automation.resume
-    -- @covers lurek.automation.start
-    -- @covers lurek.automation.stop
-    -- @covers lurek.automation.unload
-    -- @covers lurek.automation.update
     it("should exist as a table", function()
         expect_type("table", lurek.automation)
     end)
@@ -728,26 +711,19 @@ end)
 -- =========================================================================
 
 describe("lurek.automation step limit", function()
-    -- @covers lurek.automation.getStepLimit
     it("getStepLimit_is_a_function", function()
         expect_type("function", lurek.automation.getStepLimit)
     end)
 
-    -- @covers lurek.automation.setStepLimit
     it("setStepLimit_is_a_function", function()
         expect_type("function", lurek.automation.setStepLimit)
     end)
 
-    -- @covers lurek.automation.getStepLimit
     it("getStepLimit_returns_nil_for_unregistered_script", function()
         local result = lurek.automation.getStepLimit("nonexistent_script_xyz")
         expect_nil(result)
     end)
 
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.setStepLimit
-    -- @covers lurek.automation.getStepLimit
-    -- @covers lurek.automation.unload
     it("setStepLimit_registers_on_a_loaded_script", function()
         lurek.automation.load("step_limit_test", {
             steps = { { action = "keypress", key = "a", time = 0.01 } }
@@ -758,16 +734,11 @@ describe("lurek.automation step limit", function()
         lurek.automation.unload("step_limit_test")
     end)
 
-    -- @covers lurek.automation.setStepLimit
     it("setStepLimit_returns_false_for_unknown_script", function()
         local ok = lurek.automation.setStepLimit("no_such_script", 10)
         expect_false(ok)
     end)
 
-    -- @covers lurek.automation.load
-    -- @covers lurek.automation.setStepLimit
-    -- @covers lurek.automation.getStepLimit
-    -- @covers lurek.automation.unload
     it("setStepLimit_overwrites_previous_value", function()
         lurek.automation.load("sl_overwrite", {
             steps = { { action = "keypress", key = "b", time = 0.01 } }
@@ -782,19 +753,16 @@ end)
 --  Automation Highlight (merged from test_automation_highlight.lua) 
 
 describe("lurek.automation highlight mode API types", function()
-  -- @covers lurek.automation.setHighlightMode
   it("setHighlightMode is a function", function()
     expect_type("function", lurek.automation.setHighlightMode)
   end)
 
-  -- @covers lurek.automation.isHighlightMode
   it("isHighlightMode is a function", function()
     expect_type("function", lurek.automation.isHighlightMode)
   end)
 end)
 
 describe("lurek.automation.isHighlightMode default", function()
-  -- @covers lurek.automation.isHighlightMode
   it("default highlight mode is false", function()
     -- Reset state first: enabling then disabling resets to false
     lurek.automation.setHighlightMode(false)
@@ -804,8 +772,6 @@ describe("lurek.automation.isHighlightMode default", function()
 end)
 
 describe("lurek.automation setHighlightMode / isHighlightMode roundtrip", function()
-  -- @covers lurek.automation.setHighlightMode
-  -- @covers lurek.automation.isHighlightMode
   it("enable returns true from isHighlightMode", function()
     lurek.automation.setHighlightMode(true)
     expect_equal(true, lurek.automation.isHighlightMode())
@@ -831,5 +797,4 @@ describe("lurek.automation setHighlightMode / isHighlightMode roundtrip", functi
     expect_type("boolean", result)
   end)
 end)
-
 test_summary()

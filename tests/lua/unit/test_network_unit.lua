@@ -5,44 +5,28 @@
 require("tests/lua/init")
 
 describe("lurek.network", function()
-  -- @tests lurek.network
-  -- @covers lurek.network.newHost
-  -- @covers lurek.network.Host.service
-  -- @covers lurek.network.Host.getAddress
-  -- @covers lurek.network.Host.getPeerLimit
-  -- @covers lurek.network.Host.flush
-  -- @covers lurek.network.Host.destroy
-  -- @covers lurek.network.Host.setBandwidthLimit
-  -- @covers lurek.network.Host.getConnectedPeerIds
-  -- @covers lurek.network.Host.getBandwidthLimit
-  -- @covers lurek.network.Host.connect
-  -- @covers lurek.network.Host.broadcast
   it("is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
 
-  -- @covers lurek.network.newHost
   it("newHost is a function", function()
     expect_equal(type(lurek.network.newHost), "function")
   end)
 end)
 
 describe("lurek.network.newHost", function()
-  -- @covers lurek.network.newHost
   it("creates a client host with no arguments", function()
     local host = lurek.network.newHost({})
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @covers lurek.network.newHost
   it("creates a host with addr option", function()
     local host = lurek.network.newHost({ addr = "0.0.0.0:0" })
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @covers lurek.network.newHost
   it("creates a host with legacy peers alias", function()
     local host = lurek.network.newHost({
       addr = "0.0.0.0:0",
@@ -53,7 +37,6 @@ describe("lurek.network.newHost", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.newHost
   it("clamps maxPeers to 8", function()
     -- Requesting more than MAX_PEERS should clamp, not error
     local host = lurek.network.newHost({ maxPeers = 100 })
@@ -63,7 +46,6 @@ describe("lurek.network.newHost", function()
 end)
 
 describe("lurek.network host methods", function()
-  -- @covers lurek.network.Host.service
   it("service returns nil when no events", function()
     local host = lurek.network.newHost({})
     local event = host:service()
@@ -71,7 +53,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.getAddress
   it("getAddress returns a socket string", function()
     local host = lurek.network.newHost({})
     local addr = host:getAddress()
@@ -80,7 +61,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.getPeerLimit
   it("getPeerLimit returns configured limit", function()
     local host = lurek.network.newHost({ maxPeers = 6 })
     local count = host:getPeerLimit()
@@ -88,7 +68,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.flush
   it("flush succeeds with no pending data", function()
     local host = lurek.network.newHost({})
     local ok = pcall(function() host:flush() end)
@@ -96,7 +75,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.destroy
   it("destroy makes host unusable", function()
     local host = lurek.network.newHost({})
     host:destroy()
@@ -105,8 +83,6 @@ describe("lurek.network host methods", function()
     expect_equal(ok, false)
   end)
 
-  -- @covers lurek.network.Host.setBandwidthLimit
-  -- @covers lurek.network.Host.getBandwidthLimit
   it("setBandwidthLimit updates bandwidth table", function()
     local host = lurek.network.newHost({})
     local ok = pcall(function() host:setBandwidthLimit(100000, 50000) end)
@@ -118,7 +94,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.getConnectedPeerIds
   it("getConnectedPeerIds returns empty table when no connections", function()
     local host = lurek.network.newHost({})
     local peers = host:getConnectedPeerIds()
@@ -129,7 +104,6 @@ describe("lurek.network host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.network.Host.getBandwidthLimit
   it("getBandwidthLimit returns a table", function()
     local host = lurek.network.newHost({})
     local stats = host:getBandwidthLimit()
@@ -144,24 +118,20 @@ end)
 
 if lurek.net then
   describe("lurek.net", function()
-    -- @tests lurek.net
     it("is a table", function()
       expect_equal(type(lurek.net), "table")
     end)
 
-    -- @covers lurek.net.host_create
     it("host_create is a function", function()
       expect_equal(type(lurek.net.host_create), "function")
     end)
 
-    -- @covers lurek.net.linked_version
     it("linked_version is a function", function()
       expect_equal(type(lurek.net.linked_version), "function")
     end)
   end)
 
 describe("lurek.net.linked_version", function()
-  -- @covers lurek.net.linked_version
   it("returns a string", function()
     local ver = lurek.net.linked_version()
     expect_equal(type(ver), "string")
@@ -169,28 +139,24 @@ describe("lurek.net.linked_version", function()
 end)
 
 describe("lurek.net.host_create", function()
-  -- @covers lurek.net.host_create
   it("creates a client host with no arguments", function()
     local host = lurek.net.host_create()
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("creates a server host with bind address", function()
     local host = lurek.net.host_create("*:0")
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("creates a host with peer count", function()
     local host = lurek.net.host_create(nil, 6)
     expect_equal(type(host), "userdata")
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("creates a host with all parameters", function()
     local host = lurek.net.host_create("*:0", 4, 2, 0, 0)
     expect_equal(type(host), "userdata")
@@ -199,7 +165,6 @@ describe("lurek.net.host_create", function()
 end)
 
 describe("lurek.net host methods", function()
-  -- @covers lurek.net.host_create
   it("service returns nil when no events", function()
     local host = lurek.net.host_create()
     local evt = host:service(0)
@@ -207,7 +172,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("get_socket_address returns address string", function()
     local host = lurek.net.host_create()
     local addr = host:get_socket_address()
@@ -215,7 +179,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("connected_peers returns zero initially", function()
     local host = lurek.net.host_create()
     local count = host:connected_peers()
@@ -223,7 +186,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("flush succeeds with no pending data", function()
     local host = lurek.net.host_create()
     local ok, err = pcall(function() host:flush() end)
@@ -231,7 +193,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("destroy makes host unusable", function()
     local host = lurek.net.host_create()
     host:destroy()
@@ -239,7 +200,6 @@ describe("lurek.net host methods", function()
     expect_equal(ok, false)
   end)
 
-  -- @covers lurek.net.host_create
   it("bandwidth_limit returns in and out", function()
     local host = lurek.net.host_create()
     local in_bw, out_bw = host:bandwidth_limit()
@@ -249,7 +209,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("max_packet_size returns a number", function()
     local host = lurek.net.host_create()
     local sz = host:max_packet_size()
@@ -257,7 +216,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("max_waiting_data returns a number", function()
     local host = lurek.net.host_create()
     local wd = host:max_waiting_data()
@@ -265,7 +223,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("duplicate_peers returns a number", function()
     local host = lurek.net.host_create()
     local dp = host:duplicate_peers()
@@ -273,7 +230,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("enable_checksum does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:enable_checksum(true) end)
@@ -281,7 +237,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("compress_with_range_coder does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:compress_with_range_coder() end)
@@ -289,7 +244,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("compress_disable does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:compress_disable() end)
@@ -297,7 +251,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("get_stats returns a table", function()
     local host = lurek.net.host_create()
     local stats = host:get_stats()
@@ -305,7 +258,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("reset_stats does not error", function()
     local host = lurek.net.host_create()
     local ok = pcall(function() host:reset_stats() end)
@@ -313,7 +265,6 @@ describe("lurek.net host methods", function()
     host:destroy()
   end)
 
-  -- @covers lurek.net.host_create
   it("received_address returns a string", function()
     local host = lurek.net.host_create()
     local addr = host:received_address()
@@ -323,13 +274,11 @@ describe("lurek.net host methods", function()
 end)
 
 describe("lurek.net time", function()
-  -- @covers lurek.net.time_get
   it("time_get returns a number", function()
     local t = lurek.net.time_get()
     expect_equal(type(t), "number")
   end)
 
-  -- @covers lurek.net.time_get
   it("time_get increases monotonically", function()
     local t1 = lurek.net.time_get()
     local t2 = lurek.net.time_get()
@@ -344,17 +293,14 @@ local global_env = _G
 
 if global_env.enet then
   describe("enet global alias", function()
-    -- @tests enet
     it("enet is a table", function()
       expect_equal(type(global_env.enet), "table")
     end)
 
-    -- @tests enet.host_create
     it("enet.host_create is a function", function()
       expect_equal(type(global_env.enet.host_create), "function")
     end)
 
-    -- @tests enet.linked_version
     it("enet.linked_version returns a string", function()
       expect_equal(type(global_env.enet.linked_version()), "string")
     end)
@@ -365,52 +311,42 @@ end -- if global_env.enet
   local network_consts = lurek.network
 
 describe("lurek.network constants", function()
-  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
-  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 4096", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 166", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
-  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
-  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is less than or equal to MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is less than or equal to MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
@@ -419,61 +355,46 @@ end)
 -- Merged from test_network_constants.lua
 
 describe("lurek.network constants", function()
-  -- @tests lurek.network
-  -- @covers lurek.network.MAX_PEERS
-  -- @covers lurek.network.DEFAULT_PEERS
-  -- @covers lurek.network.MAX_CHANNELS
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("lurek.network is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
 
-  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
-  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 8", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 4", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
-  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
-  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
-  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS does not exceed MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
-  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS does not exceed MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
@@ -699,9 +620,8 @@ describe("lurek.network.newRuntime", function()
     end)
 end)
 
-describe("NetworkHost:disconnectNow and NetworkHost:disconnectLater (@covers)", function()
+describe("NetworkHost:disconnectNow and NetworkHost:disconnectLater ", function()
     it("disconnectNow accepts an unknown peer without panicking", function()
-        -- @covers NetworkHost:disconnectNow
         local host = lurek.network.newHost({ port = 0 })
         -- peer 0 does not exist; accept error gracefully
         local ok, _ = pcall(function() host:disconnectNow(0) end)
@@ -710,12 +630,10 @@ describe("NetworkHost:disconnectNow and NetworkHost:disconnectLater (@covers)", 
     end)
 
     it("disconnectLater accepts an unknown peer without panicking", function()
-        -- @covers NetworkHost:disconnectLater
         local host = lurek.network.newHost({ port = 0 })
         local ok, _ = pcall(function() host:disconnectLater(0) end)
         expect_type("boolean", ok)
         host:destroy()
     end)
 end)
-
 test_summary()

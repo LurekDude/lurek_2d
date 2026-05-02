@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: AI + Pathfinding
 -- Tests AI agents requesting and following A* paths.
 
--- @description Covers suite: integration: AI agent uses pathfinding to navigate.
 describe("integration: AI agent uses pathfinding to navigate", function()
-    -- @covers lurek.ai.newStateMachine
-    -- @covers lurek.pathfind.Pathfinder.findPath
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers lurek.pathfind.newPathfinder
-    -- @description Verifies finding a valid path is enough to move the AI state machine from IDLE into MOVING.
     it("AI state machine requests path and transitions to moving state", function()
         local grid = lurek.pathfind.newNavGrid(20, 20)
         local pf   = lurek.pathfind.newPathfinder(grid)
@@ -34,9 +28,6 @@ describe("integration: AI agent uses pathfinding to navigate", function()
         expect_equal("MOVING", sm:getCurrentState(), "transitioned to MOVING after path found")
     end)
 
-    -- @covers lurek.ai
-    -- @covers lurek.pathfind.Path.getPoint
-    -- @description Verifies a pathfinder result can be consumed waypoint by waypoint in traversal order for AI movement.
     it("AI agent follows path waypoints step by step", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf   = lurek.pathfind.newPathfinder(grid)
@@ -58,9 +49,6 @@ describe("integration: AI agent uses pathfinding to navigate", function()
         end
     end)
 
-    -- @covers lurek.ai
-    -- @covers lurek.pathfind.NavGrid.setWalkable
-    -- @description Verifies an obstacle wall forces the requested path to detour instead of taking the direct route.
     it("AI requests path around wall, gets detour", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         -- Place vertical wall at column 5 (rows 2..8, 1-based)     uses setBlocked
@@ -75,5 +63,4 @@ describe("integration: AI agent uses pathfinding to navigate", function()
         expect_true(len > 8, "detour path is longer than straight line")
     end)
 end)
-
 test_summary()

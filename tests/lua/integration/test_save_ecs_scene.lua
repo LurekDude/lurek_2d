@@ -1,14 +1,7 @@
 -- Lurek2D Integration Test: SaveGame + Entity + Scene (3-way)
 -- Tests save/load cycle preserving entity state across scene boundaries
 
--- @description Covers suite: savegame + entity + scene integration.
 describe("savegame + entity + scene integration", function()
-    -- @covers lurek.save.SaveManager.register
-    -- @covers lurek.ecs.Universe.get
-    -- @covers lurek.save.newSaveManager
-    -- @covers lurek.ecs.newUniverse
-    -- @covers lurek.scene.newScene
-    -- @description Verifies a save manager can register an entity collector and capture entity state into a snapshot.
     it("save manager collects entity state", function()
         local universe = lurek.ecs.newUniverse()
         local sm = lurek.save.newSaveManager()
@@ -44,9 +37,6 @@ describe("savegame + entity + scene integration", function()
         expect_true(snapshot ~= nil, "snapshot is not nil")
     end)
 
-    -- @covers lurek.save.SaveManager.collect
-    -- @covers lurek.ecs.Universe.getEntityCount
-    -- @description Verifies a save collection pass captures the current entity count for later restoration.
     it("save-load round-trip preserves entity count", function()
         local universe = lurek.ecs.newUniverse()
         local sm = lurek.save.newSaveManager()
@@ -71,9 +61,6 @@ describe("savegame + entity + scene integration", function()
         expect_equal(10, save_count, "collected 10 entities")
     end)
 
-    -- @covers lurek.save.SaveManager.setSummary
-    -- @covers lurek.scene
-    -- @description Verifies save metadata can retain the active scene name across a save cycle.
     it("save metadata tracks scene name", function()
         local sm = lurek.save.newSaveManager()
         sm:setSummary("Forest Temple - Floor 3")
@@ -82,9 +69,6 @@ describe("savegame + entity + scene integration", function()
         expect_equal("Forest Temple - Floor 3", summary, "summary preserved")
     end)
 
-    -- @covers lurek.save.SaveManager.getSchemaVersion
-    -- @covers lurek.ecs
-    -- @description Verifies the save manager exposes a stable non-negative schema version for entity scene saves.
     it("schema version preserved across save cycles", function()
         local sm = lurek.save.newSaveManager()
         local v = sm:getSchemaVersion()
@@ -92,5 +76,4 @@ describe("savegame + entity + scene integration", function()
         expect_true(v >= 0, "schema version is non-negative")
     end)
 end)
-
 test_summary()

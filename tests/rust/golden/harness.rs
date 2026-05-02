@@ -62,7 +62,33 @@ fn assert_golden(name: &str, actual: &[u8]) {
 }
 
 fn assert_golden_text(name: &str, actual: &str) {
-    assert_golden(name, actual.as_bytes());
+    // Normalize CRLF → LF so golden files compare identically on Windows and Unix.
+    let normalized_actual = actual.replace("\r\n", "\n");
+    let expected_path = format!("tests/rust/golden/expected/{}", name);
+    let actual_path = format!("tests/rust/golden/actual/{}", name);
+
+    std::fs::create_dir_all(std::path::Path::new(&actual_path).parent().unwrap()).unwrap();
+    std::fs::write(&actual_path, normalized_actual.as_bytes()).unwrap();
+
+    if std::path::Path::new(&expected_path).exists() {
+        let raw = std::fs::read(&expected_path).unwrap();
+        let normalized_expected =
+            String::from_utf8_lossy(&raw).replace("\r\n", "\n");
+        assert_eq!(
+            normalized_actual,
+            normalized_expected,
+            "Golden file mismatch for '{}'. Actual written to '{}'.",
+            name,
+            actual_path
+        );
+    } else {
+        std::fs::create_dir_all(std::path::Path::new(&expected_path).parent().unwrap()).unwrap();
+        std::fs::write(&expected_path, normalized_actual.as_bytes()).unwrap();
+        println!(
+            "Golden baseline created: {}. Re-run to verify.",
+            expected_path
+        );
+    }
 }
 
 // ===========================================================================

@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: AI + Entity + Scene (3-way)
 -- Tests AI FSM controlling entities within a scene
 
--- @description Covers suite: ai + entity + scene integration.
 describe("ai + entity + scene integration", function()
-    -- @covers lurek.ai.newStateMachine
-    -- @covers lurek.ecs.Universe
-    -- @covers lurek.scene.newScene
-    -- @covers lurek.ecs.newUniverse
-    -- @description Verifies forcing FSM states updates the entity's tracked AI state while the entity remains alive within the same universe and scene setup.
     it("AI FSM drives entity state in scene", function()
         local universe = lurek.ecs.newUniverse()
         local scene = lurek.scene.newScene()
@@ -54,9 +48,6 @@ describe("ai + entity + scene integration", function()
         expect_equal(1, universe:getEntityCount(), "one entity in universe")
     end)
 
-    -- @covers lurek.ai.newStateMachine
-    -- @covers lurek.ecs.Universe
-    -- @description Verifies each spawned entity can own an independent FSM so one guard entering alert does not affect the others.
     it("multiple entities with independent FSMs", function()
         local universe = lurek.ecs.newUniverse()
 
@@ -89,5 +80,4 @@ describe("ai + entity + scene integration", function()
         expect_equal(5, universe:getEntityCount(), "5 guards alive")
     end)
 end)
-
 test_summary()

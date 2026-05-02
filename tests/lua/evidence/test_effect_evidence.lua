@@ -26,14 +26,8 @@ local function blend(base_r, base_g, base_b, over_r, over_g, over_b, alpha)
            math.floor(base_b * ia + over_b * a)
 end
 
--- @description Covers suite: Evidence: lurek.effect effect API + PNG visualization.
 describe("Evidence: lurek.effect effect API + PNG visualization", function()
-    -- @covers Overlay:triggerFlash
-    -- @covers Overlay:getFlashAlpha
-    -- @covers Overlay:update
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples flash alpha decay over several time steps and writes the resulting strip to a PNG.
     it("PNG: flash effect at multiple time steps", function()
         local W, H = 256, 64
         local img = lurek.image.newImageData(W, H)
@@ -59,11 +53,7 @@ describe("Evidence: lurek.effect effect API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "overlay_flash.png")
     end)
 
-    -- @covers Overlay:triggerFade
-    -- @covers Overlay:update
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples a fade-to-black effect across several time slices and writes the progression to PNG evidence.
     it("PNG: fade-to-black effect over time", function()
         local W, H = 256, 64
         local img = lurek.image.newImageData(W, H)
@@ -89,14 +79,7 @@ describe("Evidence: lurek.effect effect API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "overlay_fade.png")
     end)
 
-    -- @covers Overlay:triggerFlash
-    -- @covers Overlay:clear
-    -- @covers Overlay:triggerLightning
-    -- @covers Overlay:getFlashAlpha
-    -- @covers Overlay:getLightningAlpha
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Combines flash and lightning overlays into one comparison PNG to document multiple transient overlay modes.
     it("PNG: combined effects -    flash + lightning visualization", function()
         local W, H = 128, 128
         local img = lurek.image.newImageData(W, H)
@@ -166,13 +149,8 @@ local function draw_rect(img, x0, y0, w, h, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: PostFx + ImageData effects          PNG output.
 describe("Evidence: PostFx + ImageData effects          PNG output", function()
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:getPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies grayscale to a synthetic color gradient and saves the result as post-processing evidence.
     it("PNG: grayscale effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:grayscale()
@@ -181,11 +159,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_grayscale.png")
     end)
 
-    -- @covers ImageData:invert
-    -- @covers ImageData:getPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Inverts a color gradient, samples one pixel before and after, and writes the inverted PNG.
     it("PNG: invert effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         -- Read a pixel before invert
@@ -196,37 +170,21 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_invert.png")
     end)
 
-    -- @covers ImageData:blur
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies blur to a gradient pattern and saves the softened output.
     it("PNG: blur effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:blur(3)
         lurek.image.savePNG(img, OUT .. "postfx_blur.png")
     end)
 
-    -- @covers ImageData:sepia
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies sepia toning to the gradient pattern and saves the transformed output.
     it("PNG: sepia effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:sepia()
         lurek.image.savePNG(img, OUT .. "postfx_sepia.png")
     end)
 
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:sepia
-    -- @covers ImageData:invert
-    -- @covers ImageData:blur
-    -- @covers ImageData:sharpen
-    -- @covers ImageData:brightness
-    -- @covers ImageData:contrast
-    -- @covers ImageData:threshold
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a horizontal strip comparing several image effects side by side on the same source pattern.
     it("PNG: effect strip -    original + 8 effects side by side", function()
         local CELL = 64
         local effects = {"original", "grayscale", "sepia", "invert", "blur", "sharpen", "brightness", "contrast", "threshold"}
@@ -260,12 +218,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(strip, OUT .. "postfx_effects_strip.png")
     end)
 
-    -- @covers ImageData:posterize
-    -- @covers ImageData:gamma
-    -- @covers ImageData:tint
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Chains posterize, gamma, and tint adjustments on one image and saves the combined effect.
     it("PNG: posterize + gamma + tint combined", function()
         local img = make_test_pattern(128, 128)
         img:posterize(4)
@@ -274,11 +227,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_posterize_tint.png")
     end)
 
-    -- @covers ImageData:saturation
-    -- @covers ImageData:flipHorizontal
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Boosts saturation, flips the result horizontally, and saves the transformed image.
     it("PNG: saturation and flipHorizontal", function()
         local img = make_test_pattern(128, 128)
         img:saturation(2.0)
@@ -381,14 +330,8 @@ local function blend(base_r, base_g, base_b, over_r, over_g, over_b, alpha)
            math.floor(base_b * ia + over_b * a)
 end
 
--- @description Covers suite: Evidence: lurek.effect effect API + PNG visualization.
 describe("Evidence: lurek.effect effect API + PNG visualization", function()
-    -- @covers Overlay:triggerFlash
-    -- @covers Overlay:getFlashAlpha
-    -- @covers Overlay:update
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples flash alpha decay over several time steps and writes the resulting strip to a PNG.
     it("PNG: flash effect at multiple time steps", function()
         local W, H = 256, 64
         local img = lurek.image.newImageData(W, H)
@@ -414,11 +357,7 @@ describe("Evidence: lurek.effect effect API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "overlay_flash.png")
     end)
 
-    -- @covers Overlay:triggerFade
-    -- @covers Overlay:update
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Samples a fade-to-black effect across several time slices and writes the progression to PNG evidence.
     it("PNG: fade-to-black effect over time", function()
         local W, H = 256, 64
         local img = lurek.image.newImageData(W, H)
@@ -444,14 +383,7 @@ describe("Evidence: lurek.effect effect API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "overlay_fade.png")
     end)
 
-    -- @covers Overlay:triggerFlash
-    -- @covers Overlay:clear
-    -- @covers Overlay:triggerLightning
-    -- @covers Overlay:getFlashAlpha
-    -- @covers Overlay:getLightningAlpha
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Combines flash and lightning overlays into one comparison PNG to document multiple transient overlay modes.
     it("PNG: combined effects -    flash + lightning visualization", function()
         local W, H = 128, 128
         local img = lurek.image.newImageData(W, H)
@@ -521,13 +453,8 @@ local function draw_rect(img, x0, y0, w, h, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: PostFx + ImageData effects          PNG output.
 describe("Evidence: PostFx + ImageData effects          PNG output", function()
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:getPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies grayscale to a synthetic color gradient and saves the result as post-processing evidence.
     it("PNG: grayscale effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:grayscale()
@@ -536,11 +463,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_grayscale.png")
     end)
 
-    -- @covers ImageData:invert
-    -- @covers ImageData:getPixel
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Inverts a color gradient, samples one pixel before and after, and writes the inverted PNG.
     it("PNG: invert effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         -- Read a pixel before invert
@@ -551,37 +474,21 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_invert.png")
     end)
 
-    -- @covers ImageData:blur
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies blur to a gradient pattern and saves the softened output.
     it("PNG: blur effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:blur(3)
         lurek.image.savePNG(img, OUT .. "postfx_blur.png")
     end)
 
-    -- @covers ImageData:sepia
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Applies sepia toning to the gradient pattern and saves the transformed output.
     it("PNG: sepia effect on color gradient", function()
         local img = make_test_pattern(128, 128)
         img:sepia()
         lurek.image.savePNG(img, OUT .. "postfx_sepia.png")
     end)
 
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:sepia
-    -- @covers ImageData:invert
-    -- @covers ImageData:blur
-    -- @covers ImageData:sharpen
-    -- @covers ImageData:brightness
-    -- @covers ImageData:contrast
-    -- @covers ImageData:threshold
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a horizontal strip comparing several image effects side by side on the same source pattern.
     it("PNG: effect strip -    original + 8 effects side by side", function()
         local CELL = 64
         local effects = {"original", "grayscale", "sepia", "invert", "blur", "sharpen", "brightness", "contrast", "threshold"}
@@ -615,12 +522,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(strip, OUT .. "postfx_effects_strip.png")
     end)
 
-    -- @covers ImageData:posterize
-    -- @covers ImageData:gamma
-    -- @covers ImageData:tint
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Chains posterize, gamma, and tint adjustments on one image and saves the combined effect.
     it("PNG: posterize + gamma + tint combined", function()
         local img = make_test_pattern(128, 128)
         img:posterize(4)
@@ -629,11 +531,7 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
         lurek.image.savePNG(img, OUT .. "postfx_posterize_tint.png")
     end)
 
-    -- @covers ImageData:saturation
-    -- @covers ImageData:flipHorizontal
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Boosts saturation, flips the result horizontally, and saves the transformed image.
     it("PNG: saturation and flipHorizontal", function()
         local img = make_test_pattern(128, 128)
         img:saturation(2.0)
@@ -642,5 +540,4 @@ describe("Evidence: PostFx + ImageData effects          PNG output", function()
     end)
 
 end)
-
 test_summary()

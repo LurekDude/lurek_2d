@@ -80,10 +80,6 @@ local rpc_mod = require("library.rpc")
 ---------------------------------------------------------------------------
 
 describe("RPC Construction", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:getHandlerCount
-    --- @covers library.rpc.Rpc:getPendingCount
-    --- @covers library.rpc.Rpc:getNextId
     it("creates with defaults", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -92,7 +88,6 @@ describe("RPC Construction", function()
         expect_equal(R:getNextId(), 1)
     end)
 
-    -- @covers library.rpc.new
     it("accepts custom channel and timeout", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 3, 60)
@@ -118,10 +113,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Register/Unregister", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:register
-    --- @covers library.rpc.Rpc:unregister
-    -- @covers library.rpc.Rpc:getHandlerCount
     it("registers a handler", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -129,10 +120,6 @@ describe("RPC Register/Unregister", function()
         expect_equal(R:getHandlerCount(), 1)
     end)
 
-    -- @covers library.rpc.Rpc:getHandlerCount
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.Rpc:unregister
-    -- @covers library.rpc.new
     it("unregisters a handler", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -141,8 +128,6 @@ describe("RPC Register/Unregister", function()
         expect_equal(R:getHandlerCount(), 0)
     end)
 
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("rejects empty name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -150,8 +135,6 @@ describe("RPC Register/Unregister", function()
         expect_equal(ok, false)
     end)
 
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("rejects non-function handler", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -159,8 +142,6 @@ describe("RPC Register/Unregister", function()
         expect_equal(ok, false)
     end)
 
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("rejects non-string name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -174,10 +155,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Call", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:call
-    --- @covers library.rpc.Rpc:poll
-    --- @covers library.rpc.Rpc:getPendingCount
     it("sends an rpc_call message", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -190,8 +167,6 @@ describe("RPC Call", function()
         expect_equal(host.sent[1].msg.args[2], 20)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.new
     it("increments request IDs", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -201,9 +176,6 @@ describe("RPC Call", function()
         expect_equal(id2, 2)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.new
     it("stores pending callback", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -211,8 +183,6 @@ describe("RPC Call", function()
         expect_equal(R:getPendingCount(), 1)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.new
     it("rejects empty method name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -220,8 +190,6 @@ describe("RPC Call", function()
         expect_equal(ok, false)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.new
     it("rejects non-function callback", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -235,10 +203,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Response Matching", function()
-    --- @covers library.rpc.new
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:poll
     it("matches response to pending callback by ID", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0) -- no timeout
@@ -262,9 +226,6 @@ describe("RPC Response Matching", function()
         expect_equal(responses[1].id, id)
     end)
 
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.new
     it("ignores response with unknown ID", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -286,8 +247,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Notify", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:notify
     it("sends an rpc_notify with peer_id context", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -300,8 +259,6 @@ describe("RPC Notify", function()
         expect_equal(msg.args[1], "hello")
     end)
 
-    -- @covers library.rpc.Rpc:notify
-    -- @covers library.rpc.new
     it("rejects empty method name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -315,8 +272,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Broadcast", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:broadcast
     it("broadcasts rpc_notify with peer_id=0", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -329,8 +284,6 @@ describe("RPC Broadcast", function()
         expect_equal(msg.args[1], "state_data")
     end)
 
-    -- @covers library.rpc.Rpc:broadcast
-    -- @covers library.rpc.new
     it("rejects empty method name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -344,9 +297,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Incoming Call Dispatch", function()
-    --- @covers library.rpc.new
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
     it("dispatches an incoming rpc_call and sends response", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -367,9 +317,6 @@ describe("RPC Incoming Call Dispatch", function()
         expect_equal(resp.result[1], 10)
     end)
 
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("catches handler errors and sends failure response", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -385,9 +332,6 @@ describe("RPC Incoming Call Dispatch", function()
         expect_equal(host.sent[1].msg.success, false)
     end)
 
-    -- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.new
     it("fires error callback for missing handler", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -406,9 +350,6 @@ describe("RPC Incoming Call Dispatch", function()
         expect_equal(found ~= nil, true)
     end)
 
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("dispatches incoming rpc_notify", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -429,10 +370,6 @@ describe("RPC Incoming Call Dispatch", function()
         expect_equal(received_args, "hello")
     end)
 
-    -- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.new
     it("fires error callback on notify handler failure with method name", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -457,9 +394,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Unpack Failure", function()
-    --- @covers library.rpc.new
-    -- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.Rpc:poll
     it("fires error callback with peer context on unpack failure", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -487,11 +421,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Timeout", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:setTimeout
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:poll
     it("expires pending calls after timeout", function()
         local host = MockHost.new()
         -- Use a very short timeout so os.clock() + 0 is already expired
@@ -521,10 +450,6 @@ describe("RPC Timeout", function()
         expect_equal(found ~= nil, true)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.new
     it("does not expire when timeout is 0", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0) -- no timeout
@@ -541,8 +466,6 @@ describe("RPC Timeout", function()
         expect_equal(R:getPendingCount(), 1)
     end)
 
-    -- @covers library.rpc.Rpc:setTimeout
-    -- @covers library.rpc.new
     it("setTimeout changes timeout for future calls", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -550,8 +473,6 @@ describe("RPC Timeout", function()
         expect_equal(R._timeout, 5)
     end)
 
-    -- @covers library.rpc.Rpc:setTimeout
-    -- @covers library.rpc.new
     it("setTimeout rejects negative values", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -565,10 +486,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC ID Counter", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:resetIdCounter
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getNextId
     it("resetIdCounter resets to 1", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -579,9 +496,6 @@ describe("RPC ID Counter", function()
         expect_equal(R:getNextId(), 1)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getNextId
-    -- @covers library.rpc.new
     it("getNextId returns current counter", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -596,17 +510,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC onError Validation", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.Rpc:broadcast
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getHandlerCount
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:notify
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.Rpc:setLogging
-    -- @covers library.rpc.Rpc:unregister
     it("accepts a function", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -615,8 +518,6 @@ describe("RPC onError Validation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.new
     it("accepts nil to clear", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -625,8 +526,6 @@ describe("RPC onError Validation", function()
         expect_equal(true, true)
     end)
 
-    -- @covers library.rpc.Rpc:onError
-    -- @covers library.rpc.new
     it("rejects non-function", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -640,8 +539,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Logging", function()
-    --- @covers library.rpc.new
-    --- @covers library.rpc.Rpc:setLogging
     it("setLogging toggles log flag", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -652,13 +549,6 @@ describe("RPC Logging", function()
         expect_equal(R._log, false)
     end)
 
-    -- @covers library.rpc.Rpc:broadcast
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:notify
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.Rpc:setLogging
-    -- @covers library.rpc.new
     it("logging does not crash during call/poll cycle", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -691,8 +581,6 @@ end)
 ---------------------------------------------------------------------------
 
 describe("RPC Edge Cases", function()
-    --- @covers library.rpc.new
-    -- @covers library.rpc.Rpc:poll
     it("poll returns empty table when no messages", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -701,8 +589,6 @@ describe("RPC Edge Cases", function()
         expect_equal(#responses, 0)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.new
     it("handles call with no arguments", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -711,8 +597,6 @@ describe("RPC Edge Cases", function()
         expect_equal(#host.sent[1].msg.args, 0)
     end)
 
-    -- @covers library.rpc.Rpc:notify
-    -- @covers library.rpc.new
     it("handles notify with no arguments", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -720,10 +604,6 @@ describe("RPC Edge Cases", function()
         expect_equal(#host.sent[1].msg.args, 0)
     end)
 
-    -- @covers library.rpc.Rpc:call
-    -- @covers library.rpc.Rpc:getPendingCount
-    -- @covers library.rpc.Rpc:poll
-    -- @covers library.rpc.new
     it("handles multiple concurrent pending calls", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host, 0, 0)
@@ -745,10 +625,6 @@ describe("RPC Edge Cases", function()
         expect_equal(R:getPendingCount(), 0)
     end)
 
-    -- @covers library.rpc.Rpc:getHandlerCount
-    -- @covers library.rpc.Rpc:register
-    -- @covers library.rpc.Rpc:unregister
-    -- @covers library.rpc.new
     it("getHandlerCount after multiple register/unregister", function()
         local host = MockHost.new()
         local R = rpc_mod.new(host)
@@ -762,5 +638,4 @@ describe("RPC Edge Cases", function()
 end)
 
 ---------------------------------------------------------------------------
-
 test_summary()

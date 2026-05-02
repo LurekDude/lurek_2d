@@ -143,5 +143,4 @@ describe("procgen worldGraph + JPS grid integration", function()
         end
     end)
 end)
-
 test_summary()

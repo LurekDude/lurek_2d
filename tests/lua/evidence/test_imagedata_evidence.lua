@@ -1,19 +1,12 @@
 -- Evidence tests: imagedata module
 -- Produces PNG artifacts from lurek.image.newImageData pixel manipulation.
--- @module imagedata
--- @description Evidence suite for lurek.image.ImageData: fill, pixel ops, shapes, blur, colour filters.
 
 describe("evidence: imagedata", function()
     before_each(function()
         ensure_evidence_dir("imagedata")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:setPixel
-    -- @covers ImageData:getPixel
     -- @evidence file
-    -- @description Creates an 8×8 pixel grid with unique colours and saves it as PNG.
     it("produces a pixel-grid PNG from setPixel", function()
         local dir  = evidence_output_dir("imagedata")
         local path = dir .. "pixel_grid.png"
@@ -34,16 +27,12 @@ describe("evidence: imagedata", function()
             end
         end
         local r, g, b, a = img:getPixel(CELL + 1, 1)
-        assert(a == 255, "pixel alpha must be 255")
+        expect_true(a == 255, "pixel alpha must be 255")
         lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
 
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:drawLine
     -- @evidence file
-    -- @description Draws primitive shapes (rect, circle, line) on ImageData and saves as PNG.
     it("produces a shapes PNG from drawRect, drawCircle, drawLine", function()
         local dir  = evidence_output_dir("imagedata")
         local path = dir .. "shapes.png"
@@ -58,12 +47,7 @@ describe("evidence: imagedata", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers ImageData:blur
-    -- @covers ImageData:brightness
-    -- @covers ImageData:contrast
-    -- @covers ImageData:grayscale
     -- @evidence file
-    -- @description Applies image filters (blur, brightness, contrast, grayscale) and saves PNG strip.
     it("produces a filtered images PNG", function()
         local dir  = evidence_output_dir("imagedata")
         -- Save four variations side-by-side in separate files for clarity
@@ -94,10 +78,7 @@ describe("evidence: imagedata", function()
         expect_evidence_created(p3)
     end)
 
-    -- @covers ImageData:getDimensions
-    -- @covers ImageData:crop
     -- @evidence file
-    -- @description Crops a region from a larger image and saves the cropped result.
     it("produces a cropped image PNG", function()
         local dir  = evidence_output_dir("imagedata")
         local path = dir .. "cropped.png"
@@ -105,11 +86,10 @@ describe("evidence: imagedata", function()
         img:fill(60, 80, 180, 255)
         img:drawRect(50, 50, 100, 100, 220, 100, 50, 255)
         local w, h = img:getDimensions()
-        assert(w == 200 and h == 200, "dimensions must be 200x200")
+        expect_true(w == 200 and h == 200, "dimensions must be 200x200")
         local cropped = img:crop(40, 40, 120, 120)
         lurek.image.savePNG(cropped, path)
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

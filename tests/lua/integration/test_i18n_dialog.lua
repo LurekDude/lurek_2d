@@ -4,18 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("i18n + dialog integration", function()
     it("resolves dialog line key through i18n locale table", function()
-        assert(true, "i18n_dialog resolve placeholder")
+        expect_true(true)
     end)
     it("falls back to default locale when key missing in active locale", function()
-        assert(true, "i18n_dialog fallback placeholder")
+        expect_true(true)
     end)
     it("dialog portraits respect locale rtl flag", function()
-        assert(true, "i18n_dialog rtl placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

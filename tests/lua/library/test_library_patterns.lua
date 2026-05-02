@@ -3,7 +3,8 @@
 require("tests/lua/init")
 
 describe("library: patterns", function()
-    pending("patterns library tests pending")
+	it("bootstraps library test environment", function()
+		expect_type("table", lurek)
+	end)
 end)
-
 test_summary()

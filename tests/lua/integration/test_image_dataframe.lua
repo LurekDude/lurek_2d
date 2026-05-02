@@ -2,7 +2,7 @@
 -- Integration: lurek.image pixel data and lurek.dataframe tabular analysis combined.
 
 describe("image + dataframe integration", function()
-    xit("creates ImageData and records pixel stats in a DataFrame", function()
+    it("creates ImageData and records pixel stats in a DataFrame", function()
         local img = lurek.image.newImageData(4, 4)
         -- fill with known pixels
         for y = 0, 3 do
@@ -11,7 +11,7 @@ describe("image + dataframe integration", function()
             end
         end
 
-        local df = lurek.dataframe.new()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("r")
         df:addColumn("g")
         df:addColumn("b")
@@ -23,8 +23,8 @@ describe("image + dataframe integration", function()
             end
         end
 
-        expect_equal(df:rowCount(), 16, "16 pixels become 16 DataFrame rows")
-        expect_equal(df:columnCount(), 3, "r/g/b columns present")
+        expect_equal(16, df:nrows(), "16 pixels become 16 DataFrame rows")
+        expect_equal(3, df:ncols(), "r/g/b columns present")
     end)
 
     it("ImageData width/height round-trips", function()
@@ -33,14 +33,13 @@ describe("image + dataframe integration", function()
         expect_equal(img:getHeight(), 16, "height is 16")
     end)
 
-    xit("DataFrame can hold numeric pixel data without overflow", function()
-        local df = lurek.dataframe.new()
+    it("DataFrame can hold numeric pixel data without overflow", function()
+        local df = lurek.dataframe.newDataFrame()
         df:addColumn("value")
         for i = 0, 255 do
             df:addRow({ value = i })
         end
-        expect_equal(df:rowCount(), 256, "256 rows without overflow")
+        expect_equal(256, df:nrows(), "256 rows without overflow")
     end)
 end)
-
 test_summary()

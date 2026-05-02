@@ -11,8 +11,6 @@
 -- (see P1 map). The Signal userdata is the engine's pub/sub primitive;
 -- no fallback was needed.
 --
--- @covers library.dialog.newSequencer
--- @covers lurek.event.newSignal
 
 local dialog = require("library.dialog")
 
@@ -24,7 +22,6 @@ describe("integration: library.dialog    lurek.event", function()
         end
     end
 
-    -- @description A "line" handler attached via Signal:on receives speaker + text once typing finishes.
     it("line event fires through Signal with payload", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -44,7 +41,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal("Hi!", got_text)
     end)
 
-    -- @description Multiple Signal subscribers all receive the same dialog "line" event.
     it("multiple Signal subscribers each receive the event", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -63,7 +59,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal(1, count_b)
     end)
 
-    -- @description "finished" event fires through Signal when the script completes.
     it("finished event fires through Signal at end of script", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -80,7 +75,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_true(finished)
     end)
 
-    -- @description Choice event delivered through Signal carries the dialog into the "choice" state.
     it("choice event fires through Signal when reaching a choice node", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -100,7 +94,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal("choice", seq:getState())
     end)
 
-    -- @description seq:off removes the dialog-side bridge handlers, so further dialog events
     -- no longer reach the Signal subscribers.
     it("seq:off stops further events from reaching Signal subscribers", function()
         local seq = dialog.newSequencer()
@@ -125,7 +118,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal(1, count)
     end)
 
-    -- @description Failure path: registering a non-string event name on the dialog raises a clear error.
     it("seq:on rejects non-string event names with a clear error", function()
         local seq = dialog.newSequencer()
         local err = expect_error(function()
@@ -156,8 +148,6 @@ end)
 -- (see P1 map). The Signal userdata is the engine's pub/sub primitive;
 -- no fallback was needed.
 --
--- @covers library.dialog.newSequencer
--- @covers lurek.event.newSignal
 
 local dialog = require("library.dialog")
 
@@ -169,7 +159,6 @@ describe("integration: library.dialog    lurek.event", function()
         end
     end
 
-    -- @description A "line" handler attached via Signal:on receives speaker + text once typing finishes.
     it("line event fires through Signal with payload", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -189,7 +178,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal("Hi!", got_text)
     end)
 
-    -- @description Multiple Signal subscribers all receive the same dialog "line" event.
     it("multiple Signal subscribers each receive the event", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -208,7 +196,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal(1, count_b)
     end)
 
-    -- @description "finished" event fires through Signal when the script completes.
     it("finished event fires through Signal at end of script", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -225,7 +212,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_true(finished)
     end)
 
-    -- @description Choice event delivered through Signal carries the dialog into the "choice" state.
     it("choice event fires through Signal when reaching a choice node", function()
         local seq = dialog.newSequencer()
         local sig = lurek.event.newSignal()
@@ -245,7 +231,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal("choice", seq:getState())
     end)
 
-    -- @description seq:off removes the dialog-side bridge handlers, so further dialog events
     -- no longer reach the Signal subscribers.
     it("seq:off stops further events from reaching Signal subscribers", function()
         local seq = dialog.newSequencer()
@@ -270,7 +255,6 @@ describe("integration: library.dialog    lurek.event", function()
         expect_equal(1, count)
     end)
 
-    -- @description Failure path: registering a non-string event name on the dialog raises a clear error.
     it("seq:on rejects non-string event names with a clear error", function()
         local seq = dialog.newSequencer()
         local err = expect_error(function()
@@ -280,5 +264,4 @@ describe("integration: library.dialog    lurek.event", function()
     end)
 
 end)
-
 test_summary()

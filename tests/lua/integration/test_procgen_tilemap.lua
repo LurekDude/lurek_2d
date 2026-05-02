@@ -1,12 +1,7 @@
 -- Lurek2D Integration Test: Procgen + Tilemap
 -- Tests procedural generation feeding tilemap placement
 
--- @description Covers suite: procgen + tilemap integration.
 describe("procgen + tilemap integration", function()
-    -- @covers lurek.procgen.noise2d
-    -- @covers lurek.tilemap.Tilemap.setTile
-    -- @covers lurek.tilemap.newTilemap
-    -- @description Verifies procedural noise can be thresholded into tile IDs and written into a tilemap.
     it("noise2d generates tile terrain", function()
         local map = lurek.tilemap.newTileMap(32, 32)
         map:addLayer("tiles", 16, 16)
@@ -33,9 +28,6 @@ describe("procgen + tilemap integration", function()
         expect_true(center_tile >= 0 and center_tile <= 2, "tile in valid range")
     end)
 
-    -- @covers lurek.procgen.noise2d
-    -- @covers lurek.tilemap.Tilemap.getTile
-    -- @description Verifies the same procedural seed offset produces identical tile placement.
     it("seeded noise produces same tilemap", function()
         local function generate_map(seed)
             local map = lurek.tilemap.newTileMap(32, 32)
@@ -63,9 +55,6 @@ describe("procgen + tilemap integration", function()
         end
     end)
 
-    -- @covers lurek.procgen.noise2d
-    -- @covers lurek.tilemap
-    -- @description Verifies different procedural offsets change the sampled noise values that would drive tilemap generation.
     it("different seeds produce different tilemaps", function()
         local map1_tiles = {}
         local map2_tiles = {}
@@ -146,5 +135,4 @@ describe("bspDungeon          tilemap grid passability", function()
         expect_true(type(layer[1]) == "string", "biome should be a string")
     end)
 end)
-
 test_summary()

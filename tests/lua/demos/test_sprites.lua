@@ -15,7 +15,7 @@ describe("sprites: sprite API usage", function()
     end)
 
     it("loads a sprite image (lurek.sprite.new or loadImage)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.sprite%.new") ~= nil or
             src:find("loadImage") ~= nil or
@@ -24,7 +24,7 @@ describe("sprites: sprite API usage", function()
     end)
 
     it("draws sprites each frame", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":draw%s*%(") ~= nil or
             src:find("drawSprite") ~= nil or
@@ -33,11 +33,10 @@ describe("sprites: sprite API usage", function()
     end)
 
     it("does not use lurek.sprite.create (wrong factory)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.sprite%.create%s*%(") ~= nil,
             "lurek.sprite.create() is invalid     use lurek.sprite.new()")
     end)
 end)
-
 test_summary()

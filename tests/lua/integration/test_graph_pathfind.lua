@@ -166,5 +166,4 @@ describe("graph + JPS integration", function()
         end
     end)
 end)
-
 test_summary()

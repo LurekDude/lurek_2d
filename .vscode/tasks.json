@@ -234,6 +234,27 @@
             "command": "powershell -ExecutionPolicy Bypass -File tools/dist/install.ps1",
             "problemMatcher": []
         },
+        {
+            "label": "Dist: NSIS Installer",
+            "detail": "📦 Compile dist/lurek2d-<version>-setup.exe with NSIS (requires makensis on PATH). Run 'Dist: Package Windows' first.",
+            "type": "shell",
+            "command": "makensis tools/dist/installer.nsi",
+            "problemMatcher": []
+        },
+        {
+            "label": "Dist: Build Extension",
+            "detail": "🧩 Build and package the VS Code extension → extensions/vscode/lurek2d-toolkit-<version>.vsix.",
+            "type": "shell",
+            "command": "cd extensions/vscode ; npm install --prefer-offline ; npm run package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Dist: Full Release",
+            "detail": "🚀 Full release pipeline: debug + release + dist builds, portable ZIP, NSIS installer, VS Code extension → dist/github-release/.",
+            "type": "shell",
+            "command": "powershell -ExecutionPolicy Bypass -File tools/dist/release.ps1",
+            "problemMatcher": []
+        },
 
         // ─── 🤖 CAG ───────────────────────────────────────────────────────────
         {

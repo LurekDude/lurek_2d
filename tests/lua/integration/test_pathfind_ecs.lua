@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: Pathfinding + Entity
 -- Tests pathfinding results driving entity positioning
 
--- @description Covers suite: pathfinding + entity integration.
 describe("pathfinding + entity integration", function()
-    -- @covers lurek.pathfind.Grid.findPath
-    -- @covers lurek.ecs.Universe.set
-    -- @covers lurek.pathfind.newGrid
-    -- @covers lurek.ecs.newUniverse
-    -- @description Verifies path points produced by pathfinding can be applied directly to an entity's position.
     it("pathfinding result moves entity along path", function()
         local universe = lurek.ecs.newUniverse()
         local entity = universe:spawn()
@@ -36,9 +30,6 @@ describe("pathfinding + entity integration", function()
         end
     end)
 
-    -- @covers lurek.pathfind.Grid.setWalkable
-    -- @covers lurek.ecs
-    -- @description Verifies blocked cells force the computed route used by entities to take a longer detour.
     it("blocked cells force path around obstacle", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf   = lurek.pathfind.newPathfinder(grid)
@@ -58,9 +49,6 @@ describe("pathfinding + entity integration", function()
         end
     end)
 
-    -- @covers lurek.pathfind.Grid.findPath
-    -- @covers lurek.ecs
-    -- @description Verifies an unreachable goal returns no path instead of producing invalid movement data for entities.
     it("no path returns nil for unreachable goal", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
         local pf   = lurek.pathfind.newPathfinder(grid)
@@ -74,9 +62,6 @@ describe("pathfinding + entity integration", function()
         expect_true(path == nil, "no path to unreachable goal (got " .. tostring(path) .. ")")
     end)
 
-    -- @covers lurek.pathfind.Path.getPoint
-    -- @covers lurek.ecs.Universe.set
-    -- @description Verifies an entity can follow every waypoint in a multi-step path and end at the destination.
     it("entity follows multi-step path", function()
         local universe = lurek.ecs.newUniverse()
         local entity = universe:spawn()
@@ -105,5 +90,4 @@ describe("pathfinding + entity integration", function()
         expect_true(universe:isAlive(entity), "entity survived path walk")
     end)
 end)
-
 test_summary()

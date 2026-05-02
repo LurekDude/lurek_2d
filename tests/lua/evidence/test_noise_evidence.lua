@@ -1,16 +1,12 @@
 -- Evidence tests: noise module
 -- Produces PNG artifacts from lurek.math noise generation functions.
--- @module noise
--- @description Evidence suite for lurek.math noise: perlin2d, simplex2d, and NoiseGenerator map rendering.
 
 describe("evidence: noise", function()
     before_each(function()
         ensure_evidence_dir("noise")
     end)
 
-    -- @covers lurek.math.perlin2d
     -- @evidence file
-    -- @description Renders a 64x64 Perlin noise field to a greyscale PNG.
     it("renders a Perlin noise field PNG", function()
         local dir  = evidence_output_dir("noise")
         local path = dir .. "perlin_field.png"
@@ -28,9 +24,7 @@ describe("evidence: noise", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.simplex2d
     -- @evidence file
-    -- @description Renders a 64x64 Simplex noise field to a greyscale PNG.
     it("renders a Simplex noise field PNG", function()
         local dir  = evidence_output_dir("noise")
         local path = dir .. "simplex_field.png"
@@ -48,10 +42,7 @@ describe("evidence: noise", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:perlin2d
     -- @evidence file
-    -- @description Creates a seeded NoiseGenerator and renders a reproducible noise PNG.
     it("renders a seeded NoiseGenerator PNG", function()
         local dir  = evidence_output_dir("noise")
         local path = dir .. "noise_generator_seeded.png"
@@ -70,9 +61,7 @@ describe("evidence: noise", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.fbm
     -- @evidence file
-    -- @description Renders a fractal Brownian motion (fBm) noise PNG.
     it("renders an fBm noise field PNG", function()
         local dir  = evidence_output_dir("noise")
         local path = dir .. "fbm_field.png"
@@ -92,5 +81,4 @@ describe("evidence: noise", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

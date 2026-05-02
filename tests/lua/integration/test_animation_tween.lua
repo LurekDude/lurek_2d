@@ -62,5 +62,4 @@ describe("animation + tween integration", function()
         expect_true(anim:getCurrentFrame() >= 0, "animation frame is valid")
     end)
 end)
-
 test_summary()

@@ -1,9 +1,6 @@
 -- Golden test: data compare-only evidence validation.
 
--- @description Compares the Lua-generated TOML round-trip evidence file against the migrated Rust sample now stored under Lua golden samples.
 describe("golden: data TOML round-trip", function()
-    -- @golden
-    -- @description Compares toml_roundtrip.toml from the evidence layer against the committed migrated Rust sample.
     it("matches migrated Rust TOML sample", function()
         local evidence = "save/golden_text/migrated_rust/data/toml_roundtrip.toml"
         local golden = "tests/samples/migrated_rust/data/toml_roundtrip.toml"
@@ -19,23 +16,16 @@ end)
 
 -- Golden test: migrated Rust text and binary baselines now compared from the Lua golden layer only.
 
--- @description Compares Lua-generated migrated_rust evidence artifacts against the committed Lua golden samples copied from the former Rust golden baselines.
 describe("golden: migrated Rust baselines", function()
-    -- @golden
-    -- @description Compares the Lua-generated TOML round-trip evidence file against the migrated Rust sample baseline.
     it("matches migrated Rust TOML sample", function()
         expect_golden_text_match("save/golden_text/migrated_rust/data/toml_roundtrip.toml", "tests/samples/migrated_rust/data/toml_roundtrip.toml")
     end)
 
-    -- @golden
-    -- @description Compares the Lua-generated base64 and hex encoding outputs against the migrated Rust sample baselines.
     it("matches migrated Rust encode samples", function()
         expect_golden_text_match("save/golden_text/migrated_rust/encode/base64_encode.txt", "tests/samples/migrated_rust/encode/base64_encode.txt")
         expect_golden_text_match("save/golden_text/migrated_rust/encode/hex_encode.txt", "tests/samples/migrated_rust/encode/hex_encode.txt")
     end)
 
-    -- @golden
-    -- @description Compares the Lua-generated digest outputs against the migrated Rust hash sample baselines.
     it("matches migrated Rust hash samples", function()
         expect_golden_text_match("save/golden_text/migrated_rust/hash/md5_hello.txt", "tests/samples/migrated_rust/hash/md5_hello.txt")
         expect_golden_text_match("save/golden_text/migrated_rust/hash/sha1_engine.txt", "tests/samples/migrated_rust/hash/sha1_engine.txt")
@@ -54,15 +44,11 @@ end)
 
 -- Golden test: migrated 15
 
--- @description Covers suite: golden: migrated 15 evidence comparison.
 describe("golden: migrated 15 evidence comparison", function()
     local OUT = evidence_output_dir("migrated_15")
     local SAMP = "tests/samples/migrated_15/"
 
-    -- @golden
-    -- @covers expect_golden_file_match
-    -- @description Compares the migrated_15 PNG batch, including blank, fill, transforms, blur, terrain, and generated map outputs, against the committed golden samples.
-    xit("matches golden samples", function()
+    it("matches golden samples", function()
         expect_golden_file_match(OUT .. "new_blank_64x64.png", SAMP .. "new_blank_64x64.png")
         expect_golden_file_match(OUT .. "fill_orange.png", SAMP .. "fill_orange.png")
         expect_golden_file_match(OUT .. "diagonal_cross.png", SAMP .. "diagonal_cross.png")
@@ -80,5 +66,4 @@ describe("golden: migrated 15 evidence comparison", function()
         expect_golden_file_match(OUT .. "generate_map.png", SAMP .. "generate_map.png")
     end)
 end)
-
 test_summary()

@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: Data + Compute
 -- Tests data encoding/decoding with compute processing
 
--- @description Covers suite: data + compute integration.
 describe("data + compute integration", function()
-    -- @covers lurek.data.encode
-    -- @covers lurek.compute
-    -- @covers lurek.data.decode
-    -- @covers lurek.compute.newBuffer
-    -- @description Verifies JSON serialization preserves numeric arrays and metadata that compute-oriented code would consume after decoding.
     it("JSON round-trip preserves data for compute", function()
         local original = {
             values = { 1.5, 2.7, 3.14, 4.0 },
@@ -24,9 +18,6 @@ describe("data + compute integration", function()
         expect_near(3.14, decoded.values[3], 0.01, "pi value preserved")
     end)
 
-    -- @covers lurek.data.encode
-    -- @covers lurek.compute
-    -- @description Verifies TOML serialization preserves typed configuration values that would be used to configure compute buffers.
     it("TOML round-trip preserves typed data", function()
         local config = {
             compute = {
@@ -46,9 +37,6 @@ describe("data + compute integration", function()
         expect_equal(true, decoded.compute.enabled, "enabled preserved")
     end)
 
-    -- @covers lurek.serial
-    -- @covers lurek.compute
-    -- @description Verifies serial.toJson round-trip with large compute-style payloads preserves all data.
     it("serial round-trip preserves compute config", function()
         -- lurek.data.compress is not available headless; test serial round-trip instead
         local payload = {
@@ -64,9 +52,6 @@ describe("data + compute integration", function()
         expect_equal(64, decoded.dispatch.x, "dispatch.x preserved")
     end)
 
-    -- @covers lurek.data.decode
-    -- @covers lurek.compute
-    -- @description Verifies large JSON payloads survive serialization and decoding so compute-adjacent bulk data can be restored intact.
     it("large table serialization stress", function()
         local big = {}
         for i = 1, 1000 do
@@ -81,5 +66,4 @@ describe("data + compute integration", function()
         expect_near(100.0, decoded[1000].x, 0.01, "last item x correct")
     end)
 end)
-
 test_summary()

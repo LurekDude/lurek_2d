@@ -2,13 +2,7 @@
 -- Exercises CellularWorld step simulation: sand falling, water spreading,
 -- and serialisation round-trip with non-trivial state.
 
--- @description Covers suite: cellular world simulation integration.
 describe("cellular world simulation integration", function()
-    -- @covers lurek.physics.newCellular
-    -- @covers LuaCellular:fillRect
-    -- @covers LuaCellular:stepN
-    -- @covers LuaCellular:countCells
-    -- @description Verifies that sand placed at the top of a column falls
     --              over 50 steps, reducing sand count at the original row.
     it("sand migrates downward over 50 steps", function()
         local sim = lurek.physics.newCellular(8, 32)
@@ -34,8 +28,6 @@ describe("cellular world simulation integration", function()
         expect_equal(0, top_sand)
     end)
 
-    -- @covers LuaCellular:toImageData
-    -- @description Verifies toImageData returns width*height*4 bytes.
     it("toImageData returns correct byte count", function()
         local w, h = 16, 16
         local sim = lurek.physics.newCellular(w, h)
@@ -43,17 +35,12 @@ describe("cellular world simulation integration", function()
         expect_equal(w * h * 4, #img)
     end)
 
-    -- @covers LuaCellular:toImageDataRegion
-    -- @description Verifies toImageDataRegion returns the sub-region byte count.
     it("toImageDataRegion returns sub-region byte count", function()
         local sim = lurek.physics.newCellular(64, 64)
         local img = sim:toImageDataRegion(0, 0, 8, 8)
         expect_equal(8 * 8 * 4, #img)
     end)
 
-    -- @covers LuaCellular:toBytes
-    -- @covers LuaCellular:loadFromBytes
-    -- @description Verifies serialisation after a non-trivial simulation is lossless.
     it("serialisation after 20 steps is lossless", function()
         local sim1 = lurek.physics.newCellular(16, 16)
         sim1:fillRect(0, 0, 16, 1, lurek.physics.CELL_SAND)
@@ -70,9 +57,6 @@ describe("cellular world simulation integration", function()
         )
     end)
 
-    -- @covers LuaCellular:fillCircle
-    -- @covers LuaCellular:countCells
-    -- @description Verifies fillCircle and countCells agree on placed cell count.
     it("fillCircle count matches countCells after fill", function()
         local sim = lurek.physics.newCellular(32, 32)
         sim:fillCircle(16, 16, 4, lurek.physics.CELL_ROCK)
@@ -82,5 +66,4 @@ describe("cellular world simulation integration", function()
         expect_true(n >= 20, "circle should cover at least 20 cells")
     end)
 end)
-
 test_summary()

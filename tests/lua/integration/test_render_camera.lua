@@ -1,12 +1,7 @@
 -- Lurek2D Integration Test: Graphics + Camera
 -- Tests graphics rendering commands with camera transforms
 
--- @description Covers suite: graphics + camera integration.
 describe("graphics + camera integration", function()
-    -- @covers lurek.camera.Camera2D.setPosition
-    -- @covers lurek.render.rectangle
-    -- @covers lurek.camera.newCamera
-    -- @description Verifies camera position state can coexist with graphics draw commands without preventing rendering calls.
     it("camera transforms affect draw command coordinates", function()
         local cam = lurek.camera.newCamera()
         cam:setPosition(100, 200)
@@ -23,9 +18,6 @@ describe("graphics + camera integration", function()
         end)
     end)
 
-    -- @covers lurek.camera.Camera2D.setZoom
-    -- @covers lurek.render.circle
-    -- @description Verifies camera zoom changes are retained while graphics primitives still draw successfully.
     it("camera zoom scales the viewport", function()
         local cam = lurek.camera.newCamera()
         cam:setZoom(2.0)
@@ -39,9 +31,6 @@ describe("graphics + camera integration", function()
         end)
     end)
 
-    -- @covers lurek.camera.Camera2D.setRotation
-    -- @covers lurek.render.line
-    -- @description Verifies camera rotation state can be updated alongside graphics line drawing.
     it("camera rotation combines with graphics transforms", function()
         local cam = lurek.camera.newCamera()
         cam:setRotation(math.pi / 4)
@@ -55,9 +44,6 @@ describe("graphics + camera integration", function()
         end)
     end)
 
-    -- @covers lurek.camera.Camera2D.worldToScreen
-    -- @covers lurek.render
-    -- @description Verifies camera coordinate conversion helpers round-trip world and screen coordinates when those methods are available.
     it("camera worldToScreen and screenToWorld round-trip", function()
         local cam = lurek.camera.newCamera()
         cam:setPosition(200, 150)
@@ -74,5 +60,4 @@ describe("graphics + camera integration", function()
         end
     end)
 end)
-
 test_summary()

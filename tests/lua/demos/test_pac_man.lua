@@ -15,7 +15,7 @@ describe("pac_man: game mechanics", function()
     end)
 
     it("has maze or level data", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("maze") ~= nil or
             src:find("level") ~= nil or
@@ -25,7 +25,7 @@ describe("pac_man: game mechanics", function()
     end)
 
     it("has ghost entities", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("ghost") ~= nil or
             src:find("enemy") ~= nil,
@@ -33,7 +33,7 @@ describe("pac_man: game mechanics", function()
     end)
 
     it("has dot or pellet collection", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("dot") ~= nil or
             src:find("pellet") ~= nil or
@@ -43,12 +43,12 @@ describe("pac_man: game mechanics", function()
     end)
 
     it("has score system", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(src:find("score") ~= nil, "No score variable found")
     end)
 
     it("has lives tracking", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lives") ~= nil or
             src:find("life") ~= nil or
@@ -56,5 +56,4 @@ describe("pac_man: game mechanics", function()
             "No lives counter found")
     end)
 end)
-
 test_summary()

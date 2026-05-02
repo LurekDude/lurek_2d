@@ -2,11 +2,7 @@
 -- Tests audio playback triggered by event dispatching.
 -- Rewritten: lurek.event.newDispatcher does not exist; uses newSignal instead.
 
--- @description Covers suite: audio + event integration.
 describe("audio + event integration", function()
-    -- @covers lurek.audio.setMasterVolume
-    -- @covers lurek.event.newSignal
-    -- @description Verifies emitting a mute signal invokes the registered handler and drives the audio master volume to zero.
     it("event triggers volume change", function()
         local mute_sig  = lurek.event.newSignal()
         local volume_set = false
@@ -24,9 +20,6 @@ describe("audio + event integration", function()
         lurek.audio.setMasterVolume(1.0)
     end)
 
-    -- @covers lurek.audio.getMasterVolume
-    -- @covers lurek.event.newSignal
-    -- @description Verifies an event callback can restore a previously saved audio volume after the system has been muted.
     it("unmute event restores volume", function()
         local saved_volume = 0.8
         local unmute_sig  = lurek.event.newSignal()
@@ -43,9 +36,6 @@ describe("audio + event integration", function()
         lurek.audio.setMasterVolume(1.0)
     end)
 
-    -- @covers lurek.audio.setMasterVolume
-    -- @covers lurek.event.newSignal
-    -- @description Verifies signal data flows into the audio API so a slider-style event can set the requested volume level.
     it("volume slider event applies value from data", function()
         local vol_sig = lurek.event.newSignal()
 
@@ -60,9 +50,6 @@ describe("audio + event integration", function()
         lurek.audio.setMasterVolume(1.0)
     end)
 
-    -- @covers lurek.audio
-    -- @covers lurek.event.newSignal
-    -- @description Verifies multiple listeners connected to the same signal are all invoked on a single emit.
     it("multiple event listeners on same event", function()
         local sfx_sig   = lurek.event.newSignal()
         local call_count = 0
@@ -74,5 +61,4 @@ describe("audio + event integration", function()
         expect_equal(2, call_count, "both listeners called")
     end)
 end)
-
 test_summary()

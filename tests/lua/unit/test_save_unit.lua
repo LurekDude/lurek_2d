@@ -5,26 +5,6 @@
 -- dirty flag, summary, autoSave/disableAutoSave/update, reset.
 
 describe("lurek.save module exists", function()
-    -- @covers lurek.save.newSaveManager
-    -- @covers lurek.save.SaveManager.register
-    -- @covers lurek.save.SaveManager.unregister
-    -- @covers lurek.save.SaveManager.setSummary
-    -- @covers lurek.save.SaveManager.getSummary
-    -- @covers lurek.save.SaveManager.getSchemaVersion
-    -- @covers lurek.save.SaveManager.setSchemaVersion
-    -- @covers lurek.save.SaveManager.isDirty
-    -- @covers lurek.save.SaveManager.markDirty
-    -- @covers lurek.save.SaveManager.collect
-    -- @covers lurek.save.SaveManager.restore
-    -- @covers lurek.save.SaveManager.save
-    -- @covers lurek.save.SaveManager.load
-    -- @covers lurek.save.SaveManager.delete
-    -- @covers lurek.save.SaveManager.exists
-    -- @covers lurek.save.SaveManager.getSlots
-    -- @covers lurek.save.SaveManager.getSlotInfo
-    -- @covers lurek.save.SaveManager.reset
-    -- @covers lurek.save.SaveManager.disableAutoSave
-    -- @covers lurek.save.SaveManager.update
     it("lurek.save is a table", function()
         expect_type("table", lurek.save)
     end)
@@ -60,19 +40,6 @@ describe("SaveManager registration and metadata", function()
         sm:unregister("temp_sys")
     end)
 
-    -- @covers lurek.save.SaveManager.setSummary
-    -- @covers lurek.save.SaveManager.getSummary
-    -- @covers lurek.save.SaveManager.getSchemaVersion
-    -- @covers lurek.save.SaveManager.setSchemaVersion
-    -- @covers lurek.save.SaveManager.isDirty
-    -- @covers lurek.save.SaveManager.markDirty
-    -- @covers lurek.save.SaveManager.collect
-    -- @covers lurek.save.SaveManager.restore
-    -- @covers lurek.save.SaveManager.save
-    -- @covers lurek.save.SaveManager.load
-    -- @covers lurek.save.SaveManager.delete
-    -- @covers lurek.save.SaveManager.exists
-    -- @covers lurek.save.SaveManager.getSlots
     it("setSummary and getSummary round-trip a string", function()
         local sm = lurek.save.newSaveManager()
         sm:setSummary("Level 3")
@@ -257,7 +224,6 @@ describe("SaveManager.disableAutoSave / update", function()
 end)
 
 describe("SaveManager regression coverage", function()
-    -- @covers SaveManager:unregister
     it("unregister removes collector output from collect", function()
         local sm = lurek.save.newSaveManager()
         sm:register("temp_sys", function() return { hp = 100 } end, function() end)
@@ -267,8 +233,6 @@ describe("SaveManager regression coverage", function()
         expect_equal(nil, snapshot.temp_sys)
     end)
 
-    -- @covers SaveManager:setCompress
-    -- @covers SaveManager:isCompressed
     it("setCompress toggles isCompressed", function()
         local sm = lurek.save.newSaveManager()
 
@@ -279,7 +243,6 @@ describe("SaveManager regression coverage", function()
         expect_false(sm:isCompressed())
     end)
 
-    -- @covers SaveManager:onBeforeSave
     it("onBeforeSave fires with the slot name", function()
         local sm = lurek.save.newSaveManager()
         local slot = "unit_test_before_save_hook"
@@ -296,9 +259,6 @@ describe("SaveManager regression coverage", function()
         sm:delete(slot)
     end)
 
-    -- @covers SaveManager:onAfterLoad
-    -- @covers SaveManager:disableAutoSave
-    -- @covers SaveManager:update
     it("onAfterLoad fires after a successful load and autosave returns the configured slot", function()
         local sm = lurek.save.newSaveManager()
         local slot = "unit_test_after_load_hook"
@@ -333,5 +293,4 @@ describe("SaveManager regression coverage", function()
         sm:delete(slot)
     end)
 end)
-
 test_summary()

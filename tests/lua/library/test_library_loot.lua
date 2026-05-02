@@ -3,81 +3,68 @@
 
 local loot = require("library.loot")
 
-describe("library.loot", function()
 
-    describe("LootTable.sample distribution", function()
-        --- @covers library.loot.fromList
-        --- @covers library.loot.setDefaultRng
-        --- @covers library.loot.LootTable:sample
-        it("samples respect declared weights within   3% over 50k draws", function()
-            local rng = lurek.math.newRandomGenerator()
-            rng:setSeed(424242)
-            loot.setDefaultRng(rng)
+describe("LootTable.sample distribution", function()
+    it("samples respect declared weights within   3% over 50k draws", function()
+        local rng = lurek.math.newRandomGenerator()
+        rng:setSeed(424242)
+        loot.setDefaultRng(rng)
 
-            local tbl = loot.fromList({
-                { id = "a", weight = 70 },
-                { id = "b", weight = 20 },
-                { id = "c", weight = 10 },
-            })
-            local hits = { a = 0, b = 0, c = 0 }
-            local N = 50000
-            for _ = 1, N do
-                local id = tbl:sample()
-                hits[id] = hits[id] + 1
-            end
-            expect_near(0.70, hits.a / N, 0.03)
-            expect_near(0.20, hits.b / N, 0.03)
-            expect_near(0.10, hits.c / N, 0.03)
-        end)
-
-        --- @covers library.loot.newTable
-        --- @covers library.loot.LootTable:add
-        --- @covers library.loot.LootTable:remove
-        it("alias rebuilds after add/remove", function()
-            local tbl = loot.newTable()
-            tbl:add("x", 10)
-            tbl:sample()                      -- forces build
-            expect_equal(false, tbl._dirty)
-            tbl:add("y", 5)
-            expect_equal(true, tbl._dirty)
-            tbl:sample()
-            expect_equal(false, tbl._dirty)
-            tbl:remove("y")
-            expect_equal(true, tbl._dirty)
-            tbl:sample()
-            expect_equal(false, tbl._dirty)
-        end)
+        local tbl = loot.fromList({
+            { id = "a", weight = 70 },
+            { id = "b", weight = 20 },
+            { id = "c", weight = 10 },
+        })
+        local hits = { a = 0, b = 0, c = 0 }
+        local N = 50000
+        for _ = 1, N do
+            local id = tbl:sample()
+            hits[id] = hits[id] + 1
+        end
+        expect_near(0.70, hits.a / N, 0.03)
+        expect_near(0.20, hits.b / N, 0.03)
+        expect_near(0.10, hits.c / N, 0.03)
     end)
 
-    describe("LootTable.sampleN unique", function()
-        --- @covers library.loot.fromList
-        --- @covers library.loot.LootTable:sampleN
-        it("never repeats with unique=true", function()
-            local tbl = loot.fromList({
-                {id="a", weight=1},{id="b", weight=1},
-                {id="c", weight=1},{id="d", weight=1},
-            })
-            local out = tbl:sampleN(4, nil, { unique = true })
-            expect_length(out, 4)
-            local seen = {}
-            for _, id in ipairs(out) do
-                expect_nil(seen[id], "duplicate "..id)
-                seen[id] = true
-            end
-        end)
+    it("alias rebuilds after add/remove", function()
+        local tbl = loot.newTable()
+        tbl:add("x", 10)
+        tbl:sample()                      -- forces build
+        expect_equal(false, tbl._dirty)
+        tbl:add("y", 5)
+        expect_equal(true, tbl._dirty)
+        tbl:sample()
+        expect_equal(false, tbl._dirty)
+        tbl:remove("y")
+        expect_equal(true, tbl._dirty)
+        tbl:sample()
+        expect_equal(false, tbl._dirty)
+    end)
+end)
 
-        --- @covers library.loot.fromList
-        it("errors when unique=true and n > entries", function()
-            local tbl = loot.fromList({{id="a",weight=1},{id="b",weight=1}})
-            expect_error(function()
-                tbl:sampleN(3, nil, { unique = true })
-            end)
+describe("LootTable.sampleN unique", function()
+    it("never repeats with unique=true", function()
+        local tbl = loot.fromList({
+            {id="a", weight=1},{id="b", weight=1},
+            {id="c", weight=1},{id="d", weight=1},
+        })
+        local out = tbl:sampleN(4, nil, { unique = true })
+        expect_length(out, 4)
+        local seen = {}
+        for _, id in ipairs(out) do
+            expect_nil(seen[id], "duplicate "..id)
+            seen[id] = true
+        end
+    end)
+
+    it("errors when unique=true and n > entries", function()
+        local tbl = loot.fromList({{id="a",weight=1},{id="b",weight=1}})
+        expect_error(function()
+            tbl:sampleN(3, nil, { unique = true })
         end)
     end)
 
     describe("LootTable utilities", function()
-        --- @covers library.loot.fromList
-        --- @covers library.loot.LootTable:probability
         it("probability returns normalised weight", function()
             local t = loot.fromList({{id="a",weight=30},{id="b",weight=70}})
             expect_near(0.30, t:probability("a"), 1e-9)
@@ -85,7 +72,6 @@ describe("library.loot", function()
             expect_equal(0, t:probability("nope"))
         end)
 
-        --- @covers library.loot.fromList
         it("clone produces independent copy", function()
             local t = loot.fromList({{id="a",weight=10},{id="b",weight=20}})
             local c = t:clone()
@@ -94,8 +80,6 @@ describe("library.loot", function()
             expect_equal(110, c:weightOf("a"))
         end)
 
-        --- @covers library.loot.merge
-        --- @covers library.loot.LootTable:weightOf
         it("merge sums weights for duplicate ids", function()
             local a = loot.fromList({{id="x",weight=5},{id="y",weight=5}})
             local b = loot.fromList({{id="x",weight=10},{id="z",weight=2}})
@@ -107,9 +91,6 @@ describe("library.loot", function()
     end)
 
     describe("DropSet", function()
-        --- @covers library.loot.newDrop
-        --- @covers library.loot.DropSet:guarantee
-        --- @covers library.loot.DropSet:resolve
         it("guarantee always emits the requested count", function()
             local drop = loot.newDrop():guarantee("recall", 3)
             local out = drop:resolve({})
@@ -117,9 +98,6 @@ describe("library.loot", function()
             expect_equal("recall", out[1].id)
             expect_equal(3, out[1].count)
         end)
-        --- @covers library.loot.newDrop
-        --- @covers library.loot.DropSet:when
-        --- @covers library.loot.DropSet:roll
         it("when-predicate excludes nested clauses when false", function()
             local tbl = loot.fromList({{id="x",weight=1}})
             local drop = loot.newDrop()
@@ -133,10 +111,6 @@ describe("library.loot", function()
     end)
 
     describe("Pity", function()
-        --- @covers library.loot.newPity
-        --- @covers library.loot.Pity:notice
-        --- @covers library.loot.Pity:isPrimed
-        --- @covers library.loot.Pity:getCounter
         it("primes after threshold misses and resets on hit", function()
             local p = loot.newPity("rare", 3)
             p:notice("a"); p:notice("b"); p:notice("c")
@@ -147,9 +121,6 @@ describe("library.loot", function()
             expect_equal(0, p:getCounter())
         end)
 
-        --- @covers library.loot.newPity
-        --- @covers library.loot.Pity:save
-        --- @covers library.loot.Pity:restore
         it("save/restore round-trips counter", function()
             local p = loot.newPity("rare", 5)
             p:notice("a"); p:notice("b")
@@ -160,9 +131,6 @@ describe("library.loot", function()
     end)
 
     describe("Modifier", function()
-        --- @covers library.loot.newModifier
-        --- @covers library.loot.Modifier:add
-        --- @covers library.loot.Modifier:apply
         it("apply yields independent table     original untouched", function()
             local base = loot.fromList({{id="a",weight=10},{id="b",weight=10}})
             local mf = loot.newModifier():add("boost",
@@ -175,7 +143,6 @@ describe("library.loot", function()
     end)
 
     describe("error paths", function()
-        --- @covers library.loot.fromToml
         it("fromToml raises on missing engine bindings", function()
             -- lurek.filesystem.read may not be wired in headless test VM     either way it must error
             -- on a path that does not exist or on missing binding.
@@ -184,7 +151,6 @@ describe("library.loot", function()
             end)
         end)
 
-        --- @covers library.loot.newTable
         it("add raises on non-positive weight", function()
             local t = loot.newTable()
             expect_error(function() t:add("x", 0) end)
@@ -192,5 +158,4 @@ describe("library.loot", function()
         end)
     end)
 end)
-
 test_summary()

@@ -1,82 +1,6 @@
 -- Lurek2D particle system API tests.
 -- Covers particle-system creation, emission controls, configuration getters/setters, render-state helpers, and lifecycle behavior exposed through lurek.particle.
 
--- @covers lurek.particle.clone
--- @covers lurek.particle.emit
--- @covers lurek.particle.getBufferSize
--- @covers lurek.particle.getColors
--- @covers lurek.particle.getCount
--- @covers lurek.particle.getDirection
--- @covers lurek.particle.getEmissionArea
--- @covers lurek.particle.getEmissionRate
--- @covers lurek.particle.getEmitterLifetime
--- @covers lurek.particle.getGravity
--- @covers lurek.particle.getInsertMode
--- @covers lurek.particle.getLinearAcceleration
--- @covers lurek.particle.getLinearDamping
--- @covers lurek.particle.getOffset
--- @covers lurek.particle.getParticleLifetime
--- @covers lurek.particle.getPosition
--- @covers lurek.particle.getRadialAcceleration
--- @covers lurek.particle.getRotation
--- @covers lurek.particle.getSizeVariation
--- @covers lurek.particle.getSizes
--- @covers lurek.particle.getSpeed
--- @covers lurek.particle.getSpin
--- @covers lurek.particle.getSpinVariation
--- @covers lurek.particle.getSpread
--- @covers lurek.particle.getTangentialAcceleration
--- @covers lurek.particle.hasRelativeRotation
--- @covers lurek.particle.isActive
--- @covers lurek.particle.isEmpty
--- @covers lurek.particle.isFull
--- @covers lurek.particle.isPaused
--- @covers lurek.particle.isStopped
--- @covers lurek.particle.moveTo
--- @covers lurek.particle.newSystem
--- @covers lurek.particle.pause
--- @covers lurek.particle.release
--- @covers lurek.particle.reset
--- @covers lurek.particle.setBufferSize
--- @covers lurek.particle.setColors
--- @covers lurek.particle.setDirection
--- @covers lurek.particle.setEmissionArea
--- @covers lurek.particle.setEmissionRate
--- @covers lurek.particle.setEmitterLifetime
--- @covers lurek.particle.setInsertMode
--- @covers lurek.particle.setLinearAcceleration
--- @covers lurek.particle.setLinearDamping
--- @covers lurek.particle.setOffset
--- @covers lurek.particle.setParticleLifetime
--- @covers lurek.particle.setPosition
--- @covers lurek.particle.setRadialAcceleration
--- @covers lurek.particle.setRelativeRotation
--- @covers lurek.particle.setRotation
--- @covers lurek.particle.setSizeVariation
--- @covers lurek.particle.setSizes
--- @covers lurek.particle.setSpeed
--- @covers lurek.particle.setSpin
--- @covers lurek.particle.setSpinVariation
--- @covers lurek.particle.setSpread
--- @covers lurek.particle.setTangentialAcceleration
--- @covers lurek.particle.start
--- @covers lurek.particle.stop
--- @covers lurek.particle.update
--- @covers lurek.particle.addSubSystem
--- @covers lurek.particle.subSystemCount
--- @covers lurek.particle.setCustomEmissionShape
--- @covers lurek.particle.setOnDeathBatch
--- @covers lurek.particle.fromTOML
--- @covers lurek.particle.newTrail
--- @covers Trail:pushPoint
--- @covers Trail:setWidth
--- @covers Trail:getWidth
--- @covers Trail:setLifetime
--- @covers Trail:getLifetime
--- @covers Trail:setMinDistance
--- @covers Trail:getPointCount
--- @covers Trail:clear
--- @covers Trail:drawToImage
 
     -- Lurek2D Particle API Tests
 
@@ -691,7 +615,6 @@ describe("particle bounce bounds", function()
 end)
 
 describe("lurek.particle addSubEmitter", function()
-    -- @covers lurek.particle.ParticleSystem.addSubEmitter
     it("addSubEmitter attaches sub-config", function()
         local ps = lurek.particle.newSystem({ emissionRate = 0 })
         ps:addSubEmitter({
@@ -704,7 +627,6 @@ describe("lurek.particle addSubEmitter", function()
         lurek.particle.release(ps)
     end)
 
-    -- @covers lurek.particle.ParticleSystem.addSubEmitter
     it("addSubEmitter defaults burst_count to 1", function()
         local ps = lurek.particle.newSystem({ emissionRate = 0 })
         ps:addSubEmitter({ emissionRate = 0 })  -- no burst_count; should default to 1
@@ -713,8 +635,6 @@ describe("lurek.particle addSubEmitter", function()
 end)
 
 describe("lurek.particle setFlipbook / getFlipbook", function()
-    -- @covers lurek.particle.ParticleSystem.setFlipbook
-    -- @covers lurek.particle.ParticleSystem.getFlipbook
     it("setFlipbook round-trips via getFlipbook", function()
         local ps = lurek.particle.newSystem({ emissionRate = 0 })
         ps:setFlipbook(4, 2, 12)
@@ -725,7 +645,6 @@ describe("lurek.particle setFlipbook / getFlipbook", function()
         lurek.particle.release(ps)
     end)
 
-    -- @covers lurek.particle.ParticleSystem.getFlipbook
     it("getFlipbook returns nil when not set", function()
         local ps = lurek.particle.newSystem({ emissionRate = 0 })
         local c, r, fps = ps:getFlipbook()
@@ -735,7 +654,6 @@ describe("lurek.particle setFlipbook / getFlipbook", function()
         lurek.particle.release(ps)
     end)
 
-    -- @covers lurek.particle.ParticleSystem.setFlipbook
     it("setFlipbook rejects zero cols", function()
         local ps = lurek.particle.newSystem({ emissionRate = 0 })
         local ok = pcall(function() ps:setFlipbook(0, 2, 12) end)
@@ -750,9 +668,6 @@ end)
 -- =========================================================================
 
 describe("lurek.particle trail", function()
-    -- @covers lurek.particle.newTrail
-    -- @covers Trail:type
-    -- @covers Trail:typeOf
     it("creates a trail userdata", function()
         local trail = lurek.particle.newTrail(1.0, 4.0)
         expect_type("userdata", trail)
@@ -761,9 +676,6 @@ describe("lurek.particle trail", function()
         expect_equal(trail:typeOf("Object"), true)
     end)
 
-    -- @covers Trail:pushPoint
-    -- @covers Trail:getPointCount
-    -- @covers Trail:clear
     it("tracks pushed points and clears them", function()
         local trail = lurek.particle.newTrail(1.0, 4.0)
         expect_equal(trail:getPointCount(), 0)
@@ -774,10 +686,6 @@ describe("lurek.particle trail", function()
         expect_equal(trail:getPointCount(), 0)
     end)
 
-    -- @covers Trail:setWidth
-    -- @covers Trail:getWidth
-    -- @covers Trail:getLifetime
-    -- @covers Trail:setLifetime
     it("round-trips width and lifetime", function()
         local trail = lurek.particle.newTrail(1.0, 4.0)
         trail:setWidth(4.0, 1.0)
@@ -789,8 +697,6 @@ describe("lurek.particle trail", function()
         expect_near(trail:getLifetime(), 2.5, 0.0001)
     end)
 
-    -- @covers Trail:setMinDistance
-    -- @covers Trail:getPointCount
     it("respects minimum point distance", function()
         local trail = lurek.particle.newTrail(1.0, 4.0)
         trail:setMinDistance(10.0)
@@ -800,7 +706,6 @@ describe("lurek.particle trail", function()
         expect_equal(trail:getPointCount(), 2)
     end)
 
-    -- @covers Trail:drawToImage
     it("draws to image data with requested dimensions", function()
         local trail = lurek.particle.newTrail(1.0, 4.0)
         local image = trail:drawToImage(64, 32)
@@ -923,7 +828,6 @@ describe("particle death batch callback", function()
 end)
 
 describe("lurek.particle.fromTOML extensibility", function()
-    -- @covers lurek.particle.fromTOML
     it("fromTOML loads config from file", function()
         expect_type("function", lurek.particle.fromTOML)
 
@@ -936,5 +840,4 @@ describe("lurek.particle.fromTOML extensibility", function()
         expect_near(2.0, max_life, 0.001)
     end)
 end)
-
 test_summary()

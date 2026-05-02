@@ -2,17 +2,6 @@
 -- Covers frame-timing accessors, sleep/step helpers, scheduler behavior, and timing-state queries exposed through lurek.timer.
 
 describe("lurek.timer module exists", function()
-    -- @covers lurek.timer.getAverageDelta
-    -- @covers lurek.timer.getDelta
-    -- @covers lurek.timer.getFrameCount
-    -- @covers lurek.timer.getFPS
-    -- @covers lurek.timer.getMicroTime
-    -- @covers lurek.timer.getPhysicsDelta
-    -- @covers lurek.timer.getTime
-    -- @covers lurek.timer.setPhysicsDelta
-    -- @covers lurek.timer.sleep
-    -- @covers lurek.timer.step
-    -- @covers lurek.timer.newScheduler
     it("lurek.timer is a table", function()
         expect_type("table", lurek.timer)
     end)
@@ -323,7 +312,6 @@ describe("lurek.timer.getFrameCount", function()
 end)
 
 describe("lurek.timer new scheduler features", function()
-  -- @covers lurek.timer.newScheduler
   it("pauseNamed and resumeNamed block and allow events", function()
     local s = lurek.timer.newScheduler()
     local fired = false
@@ -336,7 +324,6 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(fired, true)
   end)
 
-  -- @covers lurek.timer.chain
   it("chain fires steps in sequence", function()
     local results = {}
     local chain_sched = lurek.timer.chain({
@@ -349,8 +336,6 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(#results, 2)
   end)
 
-  -- @covers lurek.timer.afterReal
-  -- @covers lurek.timer.tickRealTimers
   it("afterReal fires via tickRealTimers", function()
     local fired = false
     lurek.timer.afterReal(0.0, function() fired = true end)
@@ -358,15 +343,12 @@ describe("lurek.timer new scheduler features", function()
     expect_equal(fired, true)
   end)
 
-  -- @covers lurek.timer.setSmoothingFactor
-  -- @covers lurek.timer.getSmoothedDelta
   it("getSmoothedDelta returns a positive number", function()
     lurek.timer.setSmoothingFactor(0.5)
     local dt = lurek.timer.getSmoothedDelta()
     expect_true(type(dt) == "number" and dt >= 0, "smoothed delta must be non-negative")
   end)
 
-  -- @covers lurek.timer.newScheduler
   it("isPausedNamed reflects pause state", function()
     local s = lurek.timer.newScheduler()
     s:everyNamed("ticker", 1.0, function() end)
@@ -381,21 +363,17 @@ end)
 -- Coroutine wait support
 
 describe("lurek.timer coroutine wait support", function()
-    -- @covers lurek.timer.tickWaits
     it("timer_tickWaits_is_callable", function()
         lurek.timer.tickWaits()
         expect_true(true, "tickWaits should not error when there are no pending waits")
     end)
 
-    -- @covers lurek.timer.waitFrames
     it("timer_waitFrames_requires_coroutine_context", function()
         expect_error(function()
             lurek.timer.waitFrames(1)
         end)
     end)
 
-    -- @covers lurek.timer.waitFrames
-    -- @covers lurek.timer.tickWaits
     it("timer_waitFrames_resumes_after_tick", function()
         local co = coroutine.create(function()
             lurek.timer.waitFrames(1)
@@ -408,8 +386,6 @@ describe("lurek.timer coroutine wait support", function()
             "coroutine should be dead after waitFrames(1) + tickWaits()")
     end)
 
-    -- @covers lurek.timer.waitSeconds
-    -- @covers lurek.timer.tickWaits
     it("timer_waitSeconds_inside_coroutine_yields", function()
         local co = coroutine.create(function()
             lurek.timer.waitSeconds(0)
@@ -426,40 +402,31 @@ end)
 -- =========================================================================
 
 describe("lurek.timer physicsMaxSteps configurability", function()
-    -- @covers lurek.timer.getPhysicsMaxSteps
     it("getPhysicsMaxSteps is a function", function()
         expect_type("function", lurek.timer.getPhysicsMaxSteps)
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
     it("setPhysicsMaxSteps is a function", function()
         expect_type("function", lurek.timer.setPhysicsMaxSteps)
     end)
 
-    -- @covers lurek.timer.getPhysicsMaxSteps
     it("getPhysicsMaxSteps_default_is_8", function()
         local steps = lurek.timer.getPhysicsMaxSteps()
         expect_equal(8, steps)
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
     it("setPhysicsMaxSteps_roundtrips_value", function()
         lurek.timer.setPhysicsMaxSteps(16)
         expect_equal(16, lurek.timer.getPhysicsMaxSteps())
         lurek.timer.setPhysicsMaxSteps(8) -- restore default
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
     it("setPhysicsMaxSteps_clamps_below_minimum_to_1", function()
         lurek.timer.setPhysicsMaxSteps(0)
         expect_equal(1, lurek.timer.getPhysicsMaxSteps())
         lurek.timer.setPhysicsMaxSteps(8) -- restore default
     end)
 
-    -- @covers lurek.timer.setPhysicsMaxSteps
-    -- @covers lurek.timer.getPhysicsMaxSteps
     it("setPhysicsMaxSteps_clamps_above_maximum_to_64", function()
         lurek.timer.setPhysicsMaxSteps(999)
         expect_equal(64, lurek.timer.getPhysicsMaxSteps())
@@ -469,9 +436,6 @@ end)
 
 -- afterFrames / everyFrames / updateFrames
 describe("lurek.timer scheduler frame events", function()
-  -- @covers lurek.timer.newScheduler
-  -- @covers lurek.timer.Scheduler.afterFrames
-  -- @covers lurek.timer.Scheduler.updateFrames
   it("afterFrames fires after n frames", function()
     local s = lurek.timer.newScheduler()
     local fired = 0
@@ -483,7 +447,6 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(1, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterFrames
   it("afterFrames fires exactly once", function()
     local s = lurek.timer.newScheduler()
     local fired = 0
@@ -492,8 +455,6 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(1, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.everyFrames
-  -- @covers lurek.timer.Scheduler.updateFrames
   it("everyFrames fires every n frames", function()
     local s = lurek.timer.newScheduler()
     local fired = 0
@@ -502,7 +463,6 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(3, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.everyFrames
   it("everyFrames respects count limit", function()
     local s = lurek.timer.newScheduler()
     local fired = 0
@@ -511,7 +471,6 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(3, fired)
   end)
 
-  -- @covers lurek.timer.Scheduler.updateFrames
   it("updateFrames returns fired count", function()
     local s = lurek.timer.newScheduler()
     s:afterFrames(1, function() end)
@@ -520,7 +479,6 @@ describe("lurek.timer scheduler frame events", function()
     expect_equal(2, count)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterFrames
   it("afterFrames(0) fires on first updateFrames", function()
     local s = lurek.timer.newScheduler()
     local fired = 0
@@ -533,7 +491,6 @@ end)
 -- afterNamed replacement semantics
 
 describe("lurek.timer scheduler afterNamed replacement", function()
-  -- @covers lurek.timer.Scheduler.afterNamed
   it("afterNamed with same name replaces the previous timer", function()
     local s = lurek.timer.newScheduler()
     s:afterNamed("step", 5.0, function() end)
@@ -542,7 +499,6 @@ describe("lurek.timer scheduler afterNamed replacement", function()
     expect_equal(1, s:getCount())
   end)
 
-  -- @covers lurek.timer.Scheduler.afterNamed
   it("afterNamed replacement fires the new callback, not the old one", function()
     local s = lurek.timer.newScheduler()
     local fired_old = false
@@ -554,7 +510,6 @@ describe("lurek.timer scheduler afterNamed replacement", function()
     expect_equal(true,  fired_new)
   end)
 
-  -- @covers lurek.timer.Scheduler.afterNamed
   it("afterNamed with different names does not replace", function()
     local s = lurek.timer.newScheduler()
     s:afterNamed("a", 1.0, function() end)
@@ -566,13 +521,10 @@ end)
 -- lurek.timer.delay
 
 describe("lurek.timer.delay", function()
-  -- @covers lurek.timer.delay
   it("delay is a function", function()
         expect_type("function", lurek.timer["delay"])
   end)
 
-  -- @covers lurek.timer.delay
-  -- @covers lurek.timer.tickWaits
   it("delay(0) yields and resumes after tickWaits", function()
     local co = coroutine.create(function()
             lurek.timer["delay"](0)
@@ -584,7 +536,6 @@ describe("lurek.timer.delay", function()
 end)
 
 describe("lurek.timer scheduler remaining coverage", function()
-    -- @covers Scheduler:getRepeatCount
     it("getRepeatCount tracks remaining repetitions", function()
         local s = lurek.timer.newScheduler()
         local id = s:every(0.5, function() end, 3)
@@ -600,7 +551,6 @@ describe("lurek.timer scheduler remaining coverage", function()
         expect_equal(2, count2)
     end)
 
-    -- @covers Scheduler:resetEvent
     it("resetEvent restarts the remaining countdown", function()
         local s = lurek.timer.newScheduler()
         local fired = false
@@ -616,5 +566,4 @@ describe("lurek.timer scheduler remaining coverage", function()
         expect_equal(true, fired)
     end)
 end)
-
 test_summary()

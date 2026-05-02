@@ -15,13 +15,6 @@
 -- of the integration (Chassis HP/armour, CollisionGroupSet masks) is the
 -- focus; the physics side provides authoritative body positions.
 --
--- @covers library.combat.newCollisionGroupSet
--- @covers library.combat.newChassis
--- @covers lurek.physics.newWorld
--- @covers lurek.physics.newBody
--- @covers lurek.physics.getBody
--- @covers lurek.physics.setBodyVelocity
--- @covers lurek.physics.step
 
 local combat = require("library.combat")
 
@@ -65,7 +58,6 @@ end
 
 describe("integration: library.combat    lurek.physics", function()
 
-    -- @description Combat hit detection consumes physics body positions and damages the in-range chassis.
     it("damage is applied to a chassis whose physics body is in range", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -79,7 +71,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(75, t.chassis.hp)
     end)
 
-    -- @description Out-of-range targets are not damaged.
     it("no-op when the only target is outside attack range", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -91,7 +82,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(100, t.chassis.hp)
     end)
 
-    -- @description Multiple targets are returned sorted by distance from the attacker.
     it("multiple targets are sorted nearest-first", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -111,7 +101,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(far,  hits[3].target)
     end)
 
-    -- @description Friendly-fire toggle: when the attack mask omits the player group,
     -- a player chassis at point-blank range receives no damage.
     it("friendly-fire OFF spares same-group chassis", function()
         local world = lurek.physics.newWorld(0, 0)
@@ -128,7 +117,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(enemy, hits[1].target)
     end)
 
-    -- @description Friendly-fire ON: mask covers both groups, both chassis are returned.
     it("friendly-fire ON includes same-group chassis", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -143,7 +131,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(2, #hits)
     end)
 
-    -- @description Failure path: stepping the world with a non-numeric dt raises an error.
     it("physics.step rejects a non-numeric dt", function()
         local world = lurek.physics.newWorld(0, 0)
         expect_error(function()
@@ -177,13 +164,6 @@ end)
 -- of the integration (Chassis HP/armour, CollisionGroupSet masks) is the
 -- focus; the physics side provides authoritative body positions.
 --
--- @covers library.combat.newCollisionGroupSet
--- @covers library.combat.newChassis
--- @covers lurek.physics.newWorld
--- @covers lurek.physics.newBody
--- @covers lurek.physics.getBody
--- @covers lurek.physics.setBodyVelocity
--- @covers lurek.physics.step
 
 local combat = require("library.combat")
 
@@ -226,7 +206,6 @@ end
 
 describe("integration: library.combat    lurek.physics", function()
 
-    -- @description Combat hit detection consumes physics body positions and damages the in-range chassis.
     it("damage is applied to a chassis whose physics body is in range", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -240,7 +219,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(75, t.chassis.hp)
     end)
 
-    -- @description Out-of-range targets are not damaged.
     it("no-op when the only target is outside attack range", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -252,7 +230,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(100, t.chassis.hp)
     end)
 
-    -- @description Multiple targets are returned sorted by distance from the attacker.
     it("multiple targets are sorted nearest-first", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -272,7 +249,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(far,  hits[3].target)
     end)
 
-    -- @description Friendly-fire toggle: when the attack mask omits the player group,
     -- a player chassis at point-blank range receives no damage.
     it("friendly-fire OFF spares same-group chassis", function()
         local world = lurek.physics.newWorld(0, 0)
@@ -289,7 +265,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(enemy, hits[1].target)
     end)
 
-    -- @description Friendly-fire ON: mask covers both groups, both chassis are returned.
     it("friendly-fire ON includes same-group chassis", function()
         local world = lurek.physics.newWorld(0, 0)
         local cgs = combat.newCollisionGroupSet()
@@ -304,7 +279,6 @@ describe("integration: library.combat    lurek.physics", function()
         expect_equal(2, #hits)
     end)
 
-    -- @description Failure path: stepping the world with a non-numeric dt raises an error.
     it("physics.step rejects a non-numeric dt", function()
         local world = lurek.physics.newWorld(0, 0)
         expect_error(function()
@@ -313,5 +287,4 @@ describe("integration: library.combat    lurek.physics", function()
     end)
 
 end)
-
 test_summary()

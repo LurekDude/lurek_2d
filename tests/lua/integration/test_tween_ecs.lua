@@ -2,12 +2,7 @@
 -- Tests tweening entity position and rotation properties.
 -- Rewritten to use lurek.tween.newState(duration, easing) API.
 
--- @description Covers suite: integration: tween drives entity transform.
 describe("integration: tween drives entity transform", function()
-    -- @covers lurek.tween.newState
-    -- @covers lurek.ecs.Universe.set
-    -- @covers lurek.ecs.newUniverse
-    -- @description Verifies TweenState values can drive an entity's x position all the way to its target over simulated frames.
     it("entity x position tweened from 0 to 300", function()
         local universe = lurek.ecs.newUniverse()
         local id = universe:spawn()
@@ -28,9 +23,6 @@ describe("integration: tween drives entity transform", function()
         expect_near(300, x, 5.0, "entity x reached target after 1s")
     end)
 
-    -- @covers lurek.tween.newState
-    -- @covers lurek.ecs.Universe.set
-    -- @description Verifies multiple entities can each consume independent tween state outputs simultaneously.
     it("multiple entities tweened simultaneously", function()
         local universe = lurek.ecs.newUniverse()
         local ids, states, targets = {}, {}, {}
@@ -57,9 +49,6 @@ describe("integration: tween drives entity transform", function()
         end
     end)
 
-    -- @covers lurek.tween.newState
-    -- @covers lurek.ecs
-    -- @description Verifies an ease-in tween starts more slowly than a linear tween when comparing entity motion curves.
     it("ease-in tween moves slowly at start, fast at end", function()
         local from_val, to_val = 0.0, 100.0
         local st_linear  = lurek.tween.newState(1.0, "linear")
@@ -77,5 +66,4 @@ describe("integration: tween drives entity transform", function()
         expect_true(v_ease_in < v_linear, "ease-in slower than linear at 10%")
     end)
 end)
-
 test_summary()

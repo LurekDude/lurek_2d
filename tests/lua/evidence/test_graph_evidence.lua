@@ -63,23 +63,15 @@ end
 
 -- â”€â”€ tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
--- @description Covers graph construction and mutation primitives on the Lua graph wrapper.
 describe("Evidence: lurek.graph Graph creation", function()
 end)
 
--- @description Covers graph search and connectivity helpers on small deterministic topologies.
 describe("Evidence: lurek.graph findPath Dijkstra", function()
 end)
 
--- @description Writes graph topology images that highlight discovered paths through two deterministic layouts.
 describe("Evidence: lurek.graph visual network PNG", function()
 
-    -- @covers Graph:findPath
     -- @evidence file
-    -- @covers lurek.graph.newGraph
-    -- @covers Graph:addNode
-    -- @covers Graph:addEdge
-    -- @description Builds an eight-node ring, finds a path across it, and saves a PNG showing the highlighted route.
     it("ring topology -” PNG evidence: ring_graph", function()
         -- 8-node ring
         local N = 8
@@ -107,9 +99,7 @@ describe("Evidence: lurek.graph visual network PNG", function()
         lurek.image.savePNG(img, OUT .. "evidence_graph_ring.png")
     end)
 
-    -- @covers Graph:findPath
     -- @evidence file
-    -- @description Builds a hub-and-spoke graph with extra spoke links and saves a PNG that highlights the chosen path.
     it("hub-and-spoke topology -” PNG evidence: hub_graph", function()
         local CX, CY = 120, 120
         local R = 80
@@ -146,8 +136,6 @@ describe("Evidence: lurek.graph visual network PNG", function()
     end)
 end)
 
--- @description Covers the graph item-flow helpers used to attach and remove payloads from graph nodes.
 describe("Evidence: lurek.graph item flow", function()
 end)
-
 test_summary()

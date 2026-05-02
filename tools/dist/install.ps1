@@ -30,9 +30,9 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$BinaryName  = 'lurek.exe'
+$BinaryName  = 'lurek2d.exe'
 $BinaryDest  = Join-Path $Destination $BinaryName
-$ExamplesDest = Join-Path $Destination 'luna-examples'
+$ExamplesDest = Join-Path $Destination 'games'
 
 # ── Helper ────────────────────────────────────────────────────────────────────
 function Write-Step([string]$Msg) {
@@ -91,7 +91,7 @@ try {
 Write-OK "Build succeeded."
 
 # 3. Locate the compiled binary
-$BuiltBinary = Join-Path $WorkspaceRoot 'build\release\lurek.exe'
+$BuiltBinary = Join-Path $WorkspaceRoot 'build\release\lurek2d.exe'
 if (-not (Test-Path $BuiltBinary)) {
     Write-Fail "Expected binary at '$BuiltBinary' but it was not found."
 }
@@ -108,15 +108,15 @@ Write-Step "Installing binary to '$BinaryDest' ..."
 Copy-Item $BuiltBinary -Destination $BinaryDest -Force
 Write-OK "Binary installed."
 
-# 6. Copy examples
-$ExamplesSource = Join-Path $WorkspaceRoot 'examples'
+# 6. Copy games (showcase game demos)
+$ExamplesSource = Join-Path $WorkspaceRoot 'content\games'
 if (Test-Path $ExamplesSource) {
-    Write-Step "Copying examples to '$ExamplesDest' ..."
+    Write-Step "Copying content/games to '$ExamplesDest' ..."
     if (Test-Path $ExamplesDest) { Remove-Item $ExamplesDest -Recurse -Force }
     Copy-Item $ExamplesSource -Destination $ExamplesDest -Recurse -Force
-    Write-OK "Examples copied."
+    Write-OK "Games copied."
 } else {
-    Write-Host "[  --  ] content/demos/ folder not found — skipping."
+    Write-Host "[  --  ] content/games/ folder not found — skipping."
 }
 
 # 7. PATH advisory
@@ -129,5 +129,5 @@ if ($Destination -notin $PathDirs) {
     Write-Host ""
 }
 
-Write-OK "Lurek2D installed. Run:  luna examples\hello_world"
-Write-OK "Or use examples from:   $ExamplesDest"
+Write-OK "Lurek2D installed. Run:  lurek2d content\games\showcase\hello_world"
+Write-OK "Or use games from:     $ExamplesDest"

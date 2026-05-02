@@ -15,14 +15,14 @@ describe("scene_demo: scene API usage", function()
     end)
 
     it("uses lurek.scene to manage scenes", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.scene") ~= nil,
             "No lurek.scene reference found")
     end)
 
     it("registers at least one named scene", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.scene%.register%s*%(") ~= nil or
             src:find("lurek%.scene%.add%s*%(") ~= nil or
@@ -31,7 +31,7 @@ describe("scene_demo: scene API usage", function()
     end)
 
     it("switches to a scene at runtime", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.scene%.switch%s*%(") ~= nil or
             src:find("lurek%.scene%.go%s*%(") ~= nil or
@@ -40,5 +40,4 @@ describe("scene_demo: scene API usage", function()
             "No scene switch/go/push call found")
     end)
 end)
-
 test_summary()

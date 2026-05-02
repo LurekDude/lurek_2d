@@ -1,11 +1,7 @@
 -- Golden test: procgen          compare evidence output against golden samples
 
--- @description Covers suite: golden: procgen evidence comparison.
 describe("golden: procgen evidence comparison", function()
-    -- @golden
-    -- @covers expect_golden_file_match
-    -- @description Compares procgen texturing outputs, including noise, cellular, voronoi, and poisson PNG artifacts, against the committed golden samples.
-    xit("matches golden sample for noise_map.png", function()
+    it("matches golden sample for noise_map.png", function()
         local evidence = evidence_output_dir("procgen") .. "noise_map.png"
         local golden = "tests/samples/procgen/noise_map.png"
         expect_golden_file_match(evidence, golden)
@@ -17,5 +13,4 @@ describe("golden: procgen evidence comparison", function()
         expect_golden_file_match(evidence_output_dir("procgen") .. "poisson_dense.png", "tests/samples/procgen/poisson_dense.png")
 end)
 end)
-
 test_summary()

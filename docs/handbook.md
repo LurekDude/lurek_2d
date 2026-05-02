@@ -28,7 +28,7 @@
 
 ## 1. What Lurek2D is
 
-Lurek2D is a desktop 2D game engine written in Rust that loads and executes Lua scripts via LuaJIT. One binary, one scripting language, one afternoon to learn. Source under [src/](../src/) is organised into five responsibility groups — Foundations, Core Runtime, Platform Services, Feature Systems, and Edge/Integration — defined in [architecture/philosophy.md](architecture/philosophy.md) and inventoried in [architecture/engine-architecture.md](architecture/engine-architecture.md). Renderer is `wgpu` (Vulkan / DX12 / Metal); physics is `rapier2d`; audio is `rodio`. Engine version is **0.20.0** ([Cargo.toml](../Cargo.toml)). Licence is MIT. Desktop targets only — Windows, Linux, macOS on x86_64 and ARM (constraint **A-02**).
+Lurek2D is a desktop 2D game engine written in Rust that loads and executes Lua scripts via LuaJIT. One binary, one scripting language, one afternoon to learn. Source under [src/](../src/) is organised into five responsibility groups — Foundations, Core Runtime, Platform Services, Feature Systems, and Edge/Integration — defined in [architecture/philosophy.md](architecture/philosophy.md) and inventoried in [architecture/engine-architecture.md](architecture/engine-architecture.md). Renderer is `wgpu` (Vulkan / DX12 / Metal); physics is `rapier2d`; audio is `rodio`. Engine version is **1.0.0** ([Cargo.toml](../Cargo.toml)). Licence is MIT. Desktop targets only — Windows, Linux, macOS on x86_64 and ARM (constraint **A-02**).
 
 ---
 
@@ -113,17 +113,17 @@ Feature flags:
 
 Common workspace tasks (see [.vscode/tasks.json](../.vscode/tasks.json)) — invoke from VS Code's *Tasks: Run Task*:
 
-| Task label                              | Equivalent CLI                                                                           |
-| --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `Build: Debug`                          | `cargo build`                                                                            |
-| `Build: Release`                        | `cargo build --release`                                                                  |
-| `Run Debug: Splash (drag-drop ready)`   | Launch `build/debug/lurek2d` without rebuilding                                          |
-| `Run Release: Splash (drag-drop ready)` | Launch `build/release/lurek2d` without rebuilding                                        |
-| `Test: All`                             | `cargo test`                                                                             |
-| `Test: <Module> module`                 | `cargo test --test <module>_tests` (Math, Physics, Graphics, Audio, Input, Lua bindings) |
-| `Lint: Clippy (deny warnings)`          | `cargo clippy -- -D warnings`                                                            |
-| `Format: Check`                         | `cargo fmt --check`                                                                      |
-| `Quality Gate: Full`                    | format check → clippy deny → test all (the canonical pre-PR sweep)                       |
+| Task label                         | Equivalent CLI                                                                      |
+| ---------------------------------- | ----------------------------------------------------------------------------------- |
+| `Build: Debug`                     | `python tools/dev/parallel_cargo.py build debug`                                    |
+| `Build: Release`                   | `python tools/dev/parallel_cargo.py build release`                                  |
+| `▶ Run: Debug (no rebuild)`        | Launch `build/debug/lurek2d` without rebuilding                                     |
+| `▶ Run: Release (no rebuild)`      | Launch `build/release/lurek2d` without rebuilding                                   |
+| `Test: All`                        | `python tools/dev/parallel_cargo.py test rust` then `test lua`                      |
+| `Test: Math / Physics / Graphics …`| `python tools/dev/parallel_cargo.py test target <module>_tests`                     |
+| `Quality: Clippy`                  | `python tools/dev/parallel_cargo.py clippy --deny-warnings`                         |
+| `Quality: Format Check`            | `python tools/dev/parallel_cargo.py fmt check`                                      |
+| `Quality: Gate`                    | format check → clippy deny → test all (the canonical pre-PR sweep)                  |
 
 Distribution:
 

@@ -15,7 +15,7 @@ describe("asteroids: game mechanics", function()
     end)
 
     it("has asteroid entities", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("asteroid") ~= nil or
             src:find("rock") ~= nil,
@@ -23,7 +23,7 @@ describe("asteroids: game mechanics", function()
     end)
 
     it("has bullet or projectile system", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("bullet") ~= nil or
             src:find("projectile") ~= nil or
@@ -32,7 +32,7 @@ describe("asteroids: game mechanics", function()
     end)
 
     it("has thrust and rotation controls", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("thrust") ~= nil or
             src:find("accelerat") ~= nil or
@@ -41,7 +41,7 @@ describe("asteroids: game mechanics", function()
     end)
 
     it("has screen wrap-around logic", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("wrap") ~= nil or
             src:find("SCREEN_W") ~= nil or
@@ -50,7 +50,7 @@ describe("asteroids: game mechanics", function()
     end)
 
     it("uses circle drawing for asteroids or ship", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("drawCircle%s*%(") ~= nil or
             src:find("drawPoly") ~= nil or
@@ -58,5 +58,4 @@ describe("asteroids: game mechanics", function()
             "No asteroid/ship geometry draw calls found")
     end)
 end)
-
 test_summary()

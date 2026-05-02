@@ -5,27 +5,6 @@
 -- =========================================================================
 
 describe("lurek.ai module exists", function()
-    -- @covers lurek.ai.newAction
-    -- @covers lurek.ai.newBehaviorTree
-    -- @covers lurek.ai.newBlackboard
-    -- @covers lurek.ai.newCommandQueue
-    -- @covers lurek.ai.newCondition
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers lurek.ai.newInfluenceMap
-    -- @covers lurek.ai.newInverter
-    -- @covers lurek.ai.newParallel
-    -- @covers lurek.ai.newQLearner
-    -- @covers lurek.ai.newRepeater
-    -- @covers lurek.ai.newSelector
-    -- @covers lurek.ai.newSequence
-    -- @covers lurek.ai.newSquad
-    -- @covers lurek.ai.newStateMachine
-    -- @covers lurek.ai.newSteeringManager
-    -- @covers lurek.ai.newSucceeder
-    -- @covers lurek.ai.newUtilityAI
-    -- @covers lurek.ai.newWorld
-    -- @covers lurek.pathfind.newPathFlowField
-    -- @covers lurek.pathfind.newPathGrid
     it("lurek.ai is a table", function()
         expect_type("table", lurek.ai)
     end)
@@ -1506,34 +1485,23 @@ end)
 -- =========================================================================
 
 describe("lurek.ai GOAPPlanner maxIterations configurability", function()
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:getMaxIterations
     it("goap_getMaxIterations_default_is_10000", function()
         local g = lurek.ai.newGOAPPlanner()
         expect_equal(10000, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
     it("goap_setMaxIterations_roundtrips_value", function()
         local g = lurek.ai.newGOAPPlanner()
         g:setMaxIterations(500)
         expect_equal(500, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
     it("goap_setMaxIterations_accepts_small_value", function()
         local g = lurek.ai.newGOAPPlanner()
         g:setMaxIterations(1)
         expect_equal(1, g:getMaxIterations())
     end)
 
-    -- @covers lurek.ai.newGOAPPlanner
-    -- @covers GOAPPlanner:setMaxIterations
-    -- @covers GOAPPlanner:getMaxIterations
     it("goap_setMaxIterations_accepts_large_value", function()
         local g = lurek.ai.newGOAPPlanner()
         g:setMaxIterations(100000)
@@ -1545,24 +1513,20 @@ end)
 -- ContextSteering  - Factory
 -- =========================================================================
 describe("lurek.ai.newContextSteering factory", function()
-    -- @covers lurek.ai.newContextSteering
     it("exists as a function", function()
         expect_type("function", lurek.ai.newContextSteering)
     end)
 
-    -- @covers lurek.ai.newContextSteering
     it("creates a userdata object", function()
         local cs = lurek.ai.newContextSteering(16)
         expect_type("userdata", cs)
     end)
 
-    -- @covers lurek.ai.newContextSteering
     it("slot count reflects argument", function()
         local cs = lurek.ai.newContextSteering(8)
         expect_equal(cs:slotCount(), 8)
     end)
 
-    -- @covers lurek.ai.newContextSteering
     it("defaults to 16 slots for 0 argument", function()
         local cs = lurek.ai.newContextSteering(0)
         expect_equal(cs:slotCount(), 16)
@@ -1573,7 +1537,6 @@ end)
 -- ContextSteering  - Evaluate produces a direction vector
 -- =========================================================================
 describe("ContextSteering evaluate", function()
-    -- @covers lurek.ai.newContextSteering
     it("returns two numbers from evaluate", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addSeekTarget(100, 0, 1.0)
@@ -1582,7 +1545,6 @@ describe("ContextSteering evaluate", function()
         expect_type("number", dy)
     end)
 
-    -- @covers lurek.ai.newContextSteering
     it("wander returns a non-zero vector length", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addWander(0.5, 1.0)
@@ -1591,7 +1553,6 @@ describe("ContextSteering evaluate", function()
         expect_near(cs:chosenMagnitude(), mag, 0.03)
     end)
 
-    -- @covers lurek.ai.newContextSteering
     it("clearBehaviors resets to zero vector", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addSeekTarget(100, 100, 1.0)
@@ -1606,7 +1567,6 @@ end)
 -- ContextSteering  - Avoid pushes away
 -- =========================================================================
 describe("ContextSteering avoid", function()
-    -- @covers lurek.ai.newContextSteering
     it("avoid obstacle pushes away on x-axis", function()
         local cs = lurek.ai.newContextSteering(32)
         -- Place obstacle to the right; agent at origin, avoid weight high
@@ -1621,24 +1581,20 @@ end)
 -- AIDirector  - Factory
 -- =========================================================================
 describe("lurek.ai.newAIDirector factory", function()
-    -- @covers lurek.ai.newAIDirector
     it("exists as a function", function()
         expect_type("function", lurek.ai.newAIDirector)
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("creates a userdata object", function()
         local d = lurek.ai.newAIDirector()
         expect_type("userdata", d)
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("starts with zero tension", function()
         local d = lurek.ai.newAIDirector()
         expect_near(d:tension(), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("starts in Relief phase", function()
         local d = lurek.ai.newAIDirector()
         expect_equal(d:phase(), "relief")
@@ -1649,14 +1605,12 @@ end)
 -- AIDirector  - pushEvent raises tension
 -- =========================================================================
 describe("AIDirector pushEvent", function()
-    -- @covers lurek.ai.newAIDirector
     it("pushEvent raises tension", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(0.8)
         expect_equal(d:tension() > 0.0, true)
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("tension does not exceed 1.0", function()
         local d = lurek.ai.newAIDirector()
         for i = 1, 50 do d:pushEvent(1.0) end
@@ -1668,7 +1622,6 @@ end)
 -- AIDirector  - Update advances phase
 -- =========================================================================
 describe("AIDirector update", function()
-    -- @covers lurek.ai.newAIDirector
     it("update does not crash", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(1.0)
@@ -1676,19 +1629,16 @@ describe("AIDirector update", function()
         expect_type("string", d:phase())
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("spawnRateFactor returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:spawnRateFactor())
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("lootFactor returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:lootFactor())
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("ambientIntensity returns a number", function()
         local d = lurek.ai.newAIDirector()
         expect_type("number", d:ambientIntensity())
@@ -1699,7 +1649,6 @@ end)
 -- AIDirector  - Reset
 -- =========================================================================
 describe("AIDirector reset", function()
-    -- @covers lurek.ai.newAIDirector
     it("reset clears tension", function()
         local d = lurek.ai.newAIDirector()
         d:pushEvent(1.0)
@@ -1707,7 +1656,6 @@ describe("AIDirector reset", function()
         expect_near(d:tension(), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newAIDirector
     it("setTension changes tension directly", function()
         local d = lurek.ai.newAIDirector()
         d:setTension(0.5)
@@ -1719,12 +1667,10 @@ end)
 -- EmotionModel  - Factory
 -- =========================================================================
 describe("lurek.ai.newEmotionModel factory", function()
-    -- @covers lurek.ai.newEmotionModel
     it("exists as a function", function()
         expect_type("function", lurek.ai.newEmotionModel)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("creates a userdata object", function()
         local em = lurek.ai.newEmotionModel()
         expect_type("userdata", em)
@@ -1735,19 +1681,16 @@ end)
 -- EmotionModel  - Add emotions
 -- =========================================================================
 describe("EmotionModel add/query", function()
-    -- @covers lurek.ai.newEmotionModel
     it("dominant returns nil when empty", function()
         local em = lurek.ai.newEmotionModel()
         expect_equal(em:dominant(), nil)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("get returns 0 for unknown emotion", function()
         local em = lurek.ai.newEmotionModel()
         expect_near(em:get("anger"), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("trigger raises emotion value", function()
         local em = lurek.ai.newEmotionModel()
         em:add("fear", 0.0, 0.5, 0.1)
@@ -1755,14 +1698,12 @@ describe("EmotionModel add/query", function()
         expect_equal(em:get("fear") > 0.0, true)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("isActive returns false before trigger", function()
         local em = lurek.ai.newEmotionModel()
         em:add("joy", 0.0, 0.3, 0.2)
         expect_equal(em:isActive("joy"), false)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("isActive returns true after strong trigger", function()
         local em = lurek.ai.newEmotionModel()
         em:add("joy", 0.0, 0.3, 0.2)
@@ -1775,7 +1716,6 @@ end)
 -- EmotionModel  - Dominant
 -- =========================================================================
 describe("EmotionModel dominant", function()
-    -- @covers lurek.ai.newEmotionModel
     it("dominant returns the triggered emotion when only one", function()
         local em = lurek.ai.newEmotionModel()
         em:add("rage", 0.0, 0.2, 0.1)
@@ -1788,14 +1728,12 @@ end)
 -- EmotionModel  - Decay and reset
 -- =========================================================================
 describe("EmotionModel update/reset", function()
-    -- @covers lurek.ai.newEmotionModel
     it("update does not crash", function()
         local em = lurek.ai.newEmotionModel()
         em:update(0.016)
         expect_equal(em:dominant(), nil)
     end)
 
-    -- @covers lurek.ai.newEmotionModel
     it("reset brings emotions to resting level", function()
         local em = lurek.ai.newEmotionModel()
         em:add("dread", 0.0, 0.5, 0.1)
@@ -1809,18 +1747,15 @@ end)
 -- HTNDomain  - Factory
 -- =========================================================================
 describe("lurek.ai.newHTNDomain factory", function()
-    -- @covers lurek.ai.newHTNDomain
     it("exists as a function", function()
         expect_type("function", lurek.ai.newHTNDomain)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
     it("creates a userdata object", function()
         local d = lurek.ai.newHTNDomain()
         expect_type("userdata", d)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
     it("starts with zero tasks", function()
         local d = lurek.ai.newHTNDomain()
         expect_equal(d:taskCount(), 0)
@@ -1831,14 +1766,12 @@ end)
 -- HTNDomain  - Primitives
 -- =========================================================================
 describe("HTNDomain addPrimitive", function()
-    -- @covers lurek.ai.newHTNDomain
     it("addPrimitive increments task count", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("MoveTo", {}, {"at_target"}, {})
         expect_equal(d:taskCount(), 1)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
     it("addPrimitive with preconditions is counted", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("Attack", {"has_weapon", "enemy_visible"}, {"attacked"}, {})
@@ -1850,14 +1783,12 @@ end)
 -- HTNDomain  - Planning
 -- =========================================================================
 describe("HTNDomain plan", function()
-    -- @covers lurek.ai.newHTNDomain
     it("plan returns nil for unknown root task", function()
         local d = lurek.ai.newHTNDomain()
         local result = d:plan("nonexistent", {})
         expect_equal(result, nil)
     end)
 
-    -- @covers lurek.ai.newHTNDomain
     it("plan returns a table of primitive actions for solvable problem", function()
         local d = lurek.ai.newHTNDomain()
         -- Primitives
@@ -1874,7 +1805,6 @@ describe("HTNDomain plan", function()
         expect_equal(plan[2], "PickUp")
     end)
 
-    -- @covers lurek.ai.newHTNDomain
     it("plan returns nil when precondition not satisfied", function()
         local d = lurek.ai.newHTNDomain()
         d:addPrimitive("Attack", {"has_weapon"}, {"attacked"}, {})
@@ -1891,18 +1821,15 @@ end)
 -- AILod  - Factory
 -- =========================================================================
 describe("lurek.ai.newAILod factory", function()
-    -- @covers lurek.ai.newAILod
     it("exists as a function", function()
         expect_type("function", lurek.ai.newAILod)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("creates a userdata object", function()
         local lod = lurek.ai.newAILod()
         expect_type("userdata", lod)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("default tierCount is 3", function()
         local lod = lurek.ai.newAILod()
         expect_equal(3, lod:tierCount())
@@ -1913,7 +1840,6 @@ end)
 -- AILod  - Tier assignment
 -- =========================================================================
 describe("AILod tierFor", function()
-    -- @covers lurek.ai.newAILod
     it("returns an integer tier index", function()
         local lod = lurek.ai.newAILod()
         local tier = lod:tierFor(0, 0, 0, 0)
@@ -1921,14 +1847,12 @@ describe("AILod tierFor", function()
         expect_equal(tier >= 0, true)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("agent at same position as reference gets tier 0 (nearest)", function()
         local lod = lurek.ai.newAILod()
         local tier = lod:tierFor(0, 0, 0, 0)
         expect_equal(tier, 0)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("distant agent gets higher tier than close agent", function()
         local lod = lurek.ai.newAILod()
         local near_tier = lod:tierFor(5, 0, 0, 0)    -- close
@@ -1936,7 +1860,6 @@ describe("AILod tierFor", function()
         expect_equal(far_tier >= near_tier, true)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("tier index never exceeds tierCount-1", function()
         local lod = lurek.ai.newAILod()
         local max_tier = lod:tierCount() - 1
@@ -1949,7 +1872,6 @@ end)
 -- AILod  - shouldUpdate
 -- =========================================================================
 describe("AILod shouldUpdate", function()
-    -- @covers lurek.ai.newAILod
     it("tier 0 updates every frame", function()
         local lod = lurek.ai.newAILod()
         -- Tier 0 (near) should update every frame
@@ -1958,7 +1880,6 @@ describe("AILod shouldUpdate", function()
         expect_equal(lod:shouldUpdate(0, 7), true)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("far tier does not update every frame", function()
         local lod = lurek.ai.newAILod()
         local max_tier = lod:tierCount() - 1
@@ -1984,14 +1905,12 @@ end)
 -- AILod  - tierName
 -- =========================================================================
 describe("AILod tierName", function()
-    -- @covers lurek.ai.newAILod
     it("tier 0 has a non-nil name", function()
         local lod = lurek.ai.newAILod()
         local name = lod:tierName(0)
         expect_type("string", name)
     end)
 
-    -- @covers lurek.ai.newAILod
     it("out-of-bounds tier returns nil", function()
         local lod = lurek.ai.newAILod()
         local name = lod:tierName(9999)
@@ -2003,12 +1922,10 @@ end)
 -- MCTSEngine  - Factory
 -- =========================================================================
 describe("lurek.ai.newMCTSEngine factory", function()
-    -- @covers lurek.ai.newMCTSEngine
     it("exists as a function", function()
         expect_type("function", lurek.ai.newMCTSEngine)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
     it("creates a userdata object", function()
         local mcts = lurek.ai.newMCTSEngine(50, 1.41, 10, 42)
         expect_type("userdata", mcts)
@@ -2022,7 +1939,6 @@ end)
 -- Trivial game: state = integer 0..5.  Actions: +1 or +2.
 -- Evaluate: higher state = better score.  Best first action from 0 = +2.
 describe("MCTSEngine search", function()
-    -- @covers lurek.ai.newMCTSEngine
     it("returns an integer action from search", function()
         local mcts = lurek.ai.newMCTSEngine(100, 1.41, 5, 42)
         local function get_actions(state)
@@ -2039,7 +1955,6 @@ describe("MCTSEngine search", function()
         expect_type("number", action)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
     it("returns nil when no actions available from root", function()
         local mcts = lurek.ai.newMCTSEngine(50, 1.41, 5, 1)
         local action = mcts:search(
@@ -2051,7 +1966,6 @@ describe("MCTSEngine search", function()
         expect_equal(action, nil)
     end)
 
-    -- @covers lurek.ai.newMCTSEngine
     it("prefers higher reward action", function()
         local mcts = lurek.ai.newMCTSEngine(200, 1.41, 8, 99)
         -- Game: state is a bank balance. Action 1 adds 1, action 2 adds 10.
@@ -2077,24 +1991,20 @@ end)
 -- NeuralNet  - Factory
 -- =========================================================================
 describe("lurek.ai.newNeuralNet factory", function()
-    -- @covers lurek.ai.newNeuralNet
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeuralNet)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("creates a userdata object", function()
         local net = lurek.ai.newNeuralNet()
         expect_type("userdata", net)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("starts with zero layers", function()
         local net = lurek.ai.newNeuralNet()
         expect_equal(net:layerCount(), 0)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("addLayer increments layer count", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 4, "relu")
@@ -2102,7 +2012,6 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(net:layerCount(), 2)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("forward returns table of correct size", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(3, 2, "relu")
@@ -2111,7 +2020,6 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(#out, 2)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("paramCount is positive after adding layers", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 3, "tanh")
@@ -2119,7 +2027,6 @@ describe("lurek.ai.newNeuralNet factory", function()
         expect_equal(net:paramCount(), 9)
     end)
 
-    -- @covers lurek.ai.newNeuralNet
     it("setWeights / getWeights roundtrip", function()
         local net = lurek.ai.newNeuralNet()
         net:addLayer(2, 2, "relu")
@@ -2137,24 +2044,20 @@ end)
 -- GeneticAlgorithm  - Factory
 -- =========================================================================
 describe("lurek.ai.newGeneticAlgorithm factory", function()
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("exists as a function", function()
         expect_type("function", lurek.ai.newGeneticAlgorithm)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("creates a userdata object", function()
         local ga = lurek.ai.newGeneticAlgorithm(10, 5, 42)
         expect_type("userdata", ga)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("popSize matches argument", function()
         local ga = lurek.ai.newGeneticAlgorithm(20, 4, 1)
         expect_equal(ga:popSize(), 20)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("getGenes returns table of expected length", function()
         local ga = lurek.ai.newGeneticAlgorithm(5, 8, 7)
         local genes = ga:getGenes(0)
@@ -2162,7 +2065,6 @@ describe("lurek.ai.newGeneticAlgorithm factory", function()
         expect_equal(#genes, 8)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("evolve increments generation", function()
         local ga = lurek.ai.newGeneticAlgorithm(6, 4, 3)
         -- Assign trivial fitness before evolve
@@ -2172,7 +2074,6 @@ describe("lurek.ai.newGeneticAlgorithm factory", function()
         expect_equal(ga:generation(), g0 + 1)
     end)
 
-    -- @covers lurek.ai.newGeneticAlgorithm
     it("bestGenes returns a table", function()
         local ga = lurek.ai.newGeneticAlgorithm(4, 3, 9)
         for i = 0, 3 do ga:setFitness(i, i * 0.5) end
@@ -2186,31 +2087,26 @@ end)
 -- Bandit  - Factory
 -- =========================================================================
 describe("lurek.ai.newBandit factory", function()
-    -- @covers lurek.ai.newBandit
     it("exists as a function", function()
         expect_type("function", lurek.ai.newBandit)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("creates a userdata object", function()
         local b = lurek.ai.newBandit(5, "epsilon_greedy", 0.1, 42)
         expect_type("userdata", b)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("armCount matches argument", function()
         local b = lurek.ai.newBandit(8, "ucb1", 0.0, 1)
         expect_equal(b:armCount(), 8)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("select returns a valid arm index", function()
         local b = lurek.ai.newBandit(4, "epsilon_greedy", 0.2, 10)
         local idx = b:select()
         expect_equal(idx >= 0 and idx < 4, true)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("update does not crash", function()
         local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
         b:update(0, 1.0)
@@ -2219,7 +2115,6 @@ describe("lurek.ai.newBandit factory", function()
         expect_equal(b:totalPulls(), 3)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("bestArm returns a valid index after updates", function()
         local b = lurek.ai.newBandit(3, "ucb1", 0.0, 5)
         b:update(0, 0.1)
@@ -2228,14 +2123,12 @@ describe("lurek.ai.newBandit factory", function()
         expect_equal(b:bestArm() >= 0, true)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("thompson_sampling strategy creates successfully", function()
         local b = lurek.ai.newBandit(4, "thompson", 0.0, 7)
         local idx = b:select()
         expect_equal(idx >= 0 and idx < 4, true)
     end)
 
-    -- @covers lurek.ai.newBandit
     it("reset clears pull history", function()
         local b = lurek.ai.newBandit(2, "epsilon_greedy", 0.5, 99)
         b:update(0, 1.0)
@@ -2248,12 +2141,10 @@ end)
 -- Neuroevolution  - Factory
 -- =========================================================================
 describe("lurek.ai.newNeuroevolution factory", function()
-    -- @covers lurek.ai.newNeuroevolution
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeuroevolution)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
     it("creates a userdata object", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=4, activation="relu"},
@@ -2262,14 +2153,12 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", ne)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
     it("popSize matches argument", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=2, activation="relu"}}, 8, 1)
         expect_equal(ne:popSize(), 8)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
     it("chromosomeToNet returns a NeuralNet userdata", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=2, activation="tanh"}}, 5, 3)
@@ -2277,7 +2166,6 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", net)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
     it("bestNetwork returns userdata after evolve", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=2, outputs=1, activation="sigmoid"}}, 4, 7)
@@ -2287,7 +2175,6 @@ describe("lurek.ai.newNeuroevolution factory", function()
         expect_type("userdata", best)
     end)
 
-    -- @covers lurek.ai.newNeuroevolution
     it("evolve increments generation", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=1, outputs=1, activation="linear"}}, 4, 11)
@@ -2301,12 +2188,10 @@ end)
 -- NeedSystem  - Factory
 -- =========================================================================
 describe("lurek.ai.newNeedSystem factory", function()
-    -- @covers lurek.ai.newNeedSystem
     it("exists as a function", function()
         expect_type("function", lurek.ai.newNeedSystem)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
     it("creates a userdata object", function()
         local ns = lurek.ai.newNeedSystem()
         expect_type("userdata", ns)
@@ -2317,20 +2202,17 @@ end)
 -- NeedSystem  - Add needs
 -- =========================================================================
 describe("NeedSystem add/query", function()
-    -- @covers lurek.ai.newNeedSystem
     it("mostUrgent returns nil when empty", function()
         local ns = lurek.ai.newNeedSystem()
         expect_equal(ns:mostUrgent(), nil)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
     it("valueOf returns 1.0 for new needs (full by default)", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 0.1, 0.3, 2.0)
         expect_near(ns:valueOf("hunger"), 1.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
     it("valueOf returns 0 for unknown need", function()
         local ns = lurek.ai.newNeedSystem()
         expect_near(ns:valueOf("unknown"), 1.0, 0.001)
@@ -2341,14 +2223,12 @@ end)
 -- NeedSystem  - Decay
 -- =========================================================================
 describe("NeedSystem update/decay", function()
-    -- @covers lurek.ai.newNeedSystem
     it("update does not crash with empty system", function()
         local ns = lurek.ai.newNeedSystem()
         ns:update(0.016)
         expect_equal(ns:mostUrgent(), nil)
     end)
 
-    -- @covers lurek.ai.newNeedSystem
     it("hunger decays after large dt", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 1.0, 0.3, 2.0)   -- fast decay
@@ -2361,7 +2241,6 @@ end)
 -- NeedSystem  - Satisfy
 -- =========================================================================
 describe("NeedSystem satisfy", function()
-    -- @covers lurek.ai.newNeedSystem
     it("satisfy increases value", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("hunger", 1.0, 0.3, 2.0)
@@ -2376,7 +2255,6 @@ end)
 -- NeedSystem  - Most urgent
 -- =========================================================================
 describe("NeedSystem mostUrgent", function()
-    -- @covers lurek.ai.newNeedSystem
     it("returns the name of the urgent need when depleted", function()
         local ns = lurek.ai.newNeedSystem()
         ns:addNeed("sleep", 0.1, 0.8, 3.0)
@@ -2391,18 +2269,15 @@ end)
 -- ORCASolver  - Factory
 -- =========================================================================
 describe("lurek.ai.newORCASolver factory", function()
-    -- @covers lurek.ai.newORCASolver
     it("exists as a function", function()
         expect_type("function", lurek.ai.newORCASolver)
     end)
 
-    -- @covers lurek.ai.newORCASolver
     it("creates a userdata object", function()
         local s = lurek.ai.newORCASolver(2.0)
         expect_type("userdata", s)
     end)
 
-    -- @covers lurek.ai.newORCASolver
     it("starts with zero agents", function()
         local s = lurek.ai.newORCASolver(2.0)
         expect_equal(s:agentCount(), 0)
@@ -2413,14 +2288,12 @@ end)
 -- ORCASolver  - Add agents
 -- =========================================================================
 describe("ORCASolver addAgent", function()
-    -- @covers lurek.ai.newORCASolver
     it("addAgent increments count", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
         expect_equal(s:agentCount(), 1)
     end)
 
-    -- @covers lurek.ai.newORCASolver
     it("multiple agents counted", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
@@ -2433,7 +2306,6 @@ end)
 -- ORCASolver  - Compute
 -- =========================================================================
 describe("ORCASolver compute", function()
-    -- @covers lurek.ai.newORCASolver
     it("compute does not crash with one agent", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(0, 0, 0.5, 3.0)
@@ -2444,7 +2316,6 @@ describe("ORCASolver compute", function()
         expect_type("number", vy)
     end)
 
-    -- @covers lurek.ai.newORCASolver
     it("getSafeVelocity returns zeros for out-of-bounds index", function()
         local s = lurek.ai.newORCASolver(2.0)
         local vx, vy = s:getSafeVelocity(99)
@@ -2452,7 +2323,6 @@ describe("ORCASolver compute", function()
         expect_near(vy, 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newORCASolver
     it("two agents heading toward each other get non-colliding velocities", function()
         local s = lurek.ai.newORCASolver(2.0)
         s:addAgent(-5, 0, 0.5, 3.0)
@@ -2473,18 +2343,15 @@ end)
 -- StimulusWorld  - Factory
 -- =========================================================================
 describe("lurek.ai.newStimulusWorld factory", function()
-    -- @covers lurek.ai.newStimulusWorld
     it("exists as a function", function()
         expect_type("function", lurek.ai.newStimulusWorld)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("creates a userdata object", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_type("userdata", sw)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("starts with zero stimuli", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_equal(sw:count(), 0)
@@ -2495,21 +2362,18 @@ end)
 -- StimulusWorld  - Adding stimuli
 -- =========================================================================
 describe("StimulusWorld add stimuli", function()
-    -- @covers lurek.ai.newStimulusWorld
     it("addVisual increases count", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(100, 200, 1.0, 50.0, nil)
         expect_equal(sw:count(), 1)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("addAuditory increases count", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addAuditory(50, 50, 0.8, 80.0, 0.5, "gunshot")
         expect_equal(sw:count(), 1)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("multiple stimuli counted correctly", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(0, 0, 1.0, 40.0, nil)
@@ -2523,7 +2387,6 @@ end)
 -- StimulusWorld  - Remove
 -- =========================================================================
 describe("StimulusWorld remove", function()
-    -- @covers lurek.ai.newStimulusWorld
     it("remove decrements count", function()
         local sw = lurek.ai.newStimulusWorld()
         local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
@@ -2532,14 +2395,12 @@ describe("StimulusWorld remove", function()
         expect_equal(sw:count(), 0)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("remove returns true for valid id", function()
         local sw = lurek.ai.newStimulusWorld()
         local id = sw:addVisual(0, 0, 1.0, 50.0, nil)
         expect_equal(sw:remove(id), true)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("remove returns false for unknown id", function()
         local sw = lurek.ai.newStimulusWorld()
         expect_equal(sw:remove(99999), false)
@@ -2550,14 +2411,12 @@ end)
 -- StimulusWorld  - Update and clear
 -- =========================================================================
 describe("StimulusWorld update/clear", function()
-    -- @covers lurek.ai.newStimulusWorld
     it("update does not crash with empty world", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:update(0.016)
         expect_equal(sw:count(), 0)
     end)
 
-    -- @covers lurek.ai.newStimulusWorld
     it("clear removes all stimuli", function()
         local sw = lurek.ai.newStimulusWorld()
         sw:addVisual(0, 0, 1.0, 50.0, nil)
@@ -2571,18 +2430,15 @@ end)
 -- StrategyAI  - Factory
 -- =========================================================================
 describe("lurek.ai.newStrategyAI factory", function()
-    -- @covers lurek.ai.newStrategyAI
     it("exists as a function", function()
         expect_type("function", lurek.ai.newStrategyAI)
     end)
 
-    -- @covers lurek.ai.newStrategyAI
     it("creates a userdata object", function()
         local s = lurek.ai.newStrategyAI(5.0)
         expect_type("userdata", s)
     end)
 
-    -- @covers lurek.ai.newStrategyAI
     it("starts with no active goal", function()
         local s = lurek.ai.newStrategyAI(5.0)
         expect_equal(s:activeGoal(), nil)
@@ -2593,7 +2449,6 @@ end)
 -- StrategyAI  - Add goals and evaluate
 -- =========================================================================
 describe("StrategyAI addGoal / forceEvaluate", function()
-    -- @covers lurek.ai.newStrategyAI
     it("forceEvaluate sets active goal when one has highest score", function()
         local s = lurek.ai.newStrategyAI(10.0)
         s:addGoal("attack")
@@ -2605,7 +2460,6 @@ describe("StrategyAI addGoal / forceEvaluate", function()
         expect_equal(s:activeGoal(), "attack")
     end)
 
-    -- @covers lurek.ai.newStrategyAI
     it("activeGoal remains nil if all scores zero", function()
         local s = lurek.ai.newStrategyAI(10.0)
         s:addGoal("explore")
@@ -2618,7 +2472,6 @@ end)
 -- StrategyAI  - Update with throttle
 -- =========================================================================
 describe("StrategyAI update throttle", function()
-    -- @covers lurek.ai.newStrategyAI
     it("update does not crash before interval", function()
         local s = lurek.ai.newStrategyAI(5.0)
         s:addGoal("patrol")
@@ -2626,7 +2479,6 @@ describe("StrategyAI update throttle", function()
         expect_type("number", s:timeUntilNext())
     end)
 
-    -- @covers lurek.ai.newStrategyAI
     it("update evaluates after interval passes", function()
         local s = lurek.ai.newStrategyAI(0.1)
         s:addGoal("hunt")
@@ -2648,7 +2500,6 @@ end)
 -- StrategyAI  - Tags
 -- =========================================================================
 describe("StrategyAI tags", function()
-    -- @covers lurek.ai.newStrategyAI
     it("addTag / removeTag do not crash", function()
         local s = lurek.ai.newStrategyAI(5.0)
         s:addTag("night")
@@ -2662,12 +2513,10 @@ end)
 -- TraitProfile  - Factory
 -- =========================================================================
 describe("lurek.ai.newTraitProfile factory", function()
-    -- @covers lurek.ai.newTraitProfile
     it("exists as a function", function()
         expect_type("function", lurek.ai.newTraitProfile)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("creates a userdata object", function()
         local tp = lurek.ai.newTraitProfile()
         expect_type("userdata", tp)
@@ -2678,33 +2527,28 @@ end)
 -- TraitProfile  - set / get roundtrip
 -- =========================================================================
 describe("TraitProfile set/get", function()
-    -- @covers lurek.ai.newTraitProfile
     it("starts with zero for unknown trait", function()
         local tp = lurek.ai.newTraitProfile()
         expect_near(tp:get("aggression"), 0.0, 0.001)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("returns set value", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("courage", 0.75)
         expect_near(tp:get("courage"), 0.75, 0.001)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("has() returns false for unset trait", function()
         local tp = lurek.ai.newTraitProfile()
         expect_equal(tp:has("unknown_trait"), false)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("has() returns true after set", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("loyalty", 0.5)
         expect_equal(tp:has("loyalty"), true)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("traitCount increments after set", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("a", 0.1)
@@ -2717,7 +2561,6 @@ end)
 -- TraitProfile  - Modifiers
 -- =========================================================================
 describe("TraitProfile modifiers", function()
-    -- @covers lurek.ai.newTraitProfile
     it("modifier raises effective value immediately", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("fear", 0.2)
@@ -2725,7 +2568,6 @@ describe("TraitProfile modifiers", function()
         expect_near(tp:get("fear"), 0.7, 0.01)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("removeModifiers restores base value", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("fear", 0.2)
@@ -2734,7 +2576,6 @@ describe("TraitProfile modifiers", function()
         expect_near(tp:get("fear"), 0.2, 0.01)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("getBase is unchanged by modifier", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("strength", 0.8)
@@ -2747,14 +2588,12 @@ end)
 -- TraitProfile  - Update / decay
 -- =========================================================================
 describe("TraitProfile update", function()
-    -- @covers lurek.ai.newTraitProfile
     it("update does not crash with no modifiers", function()
         local tp = lurek.ai.newTraitProfile()
         tp:update(0.016)
         expect_equal(tp:traitCount(), 0)
     end)
 
-    -- @covers lurek.ai.newTraitProfile
     it("timed modifier expires after update", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("speed", 0.5)
@@ -2765,11 +2604,9 @@ describe("TraitProfile update", function()
 end)
 
 -- =========================================================================
--- Missing API Coverage Stubs
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Blackboard:has
     it("covers Blackboard:has", function()
         local bb = lurek.ai.newBlackboard()
         expect_equal(false, bb:has("hp"))
@@ -2777,7 +2614,6 @@ describe("Missing API Coverage", function()
         expect_equal(true, bb:has("hp"))
     end)
 
-    -- @covers BehaviorTree:getDebugState
     it("covers BehaviorTree:getDebugState", function()
         local bt = lurek.ai.newBehaviorTree()
         local dbg = bt:getDebugState()
@@ -2786,7 +2622,6 @@ describe("Missing API Coverage", function()
         expect_type("string", dbg.last_status)
     end)
 
-    -- @covers SteeringManager:setSpatialHashCellSize
     it("covers SteeringManager:setSpatialHashCellSize", function()
         local sm = lurek.ai.newSteeringManager()
         expect_no_error(function()
@@ -2797,7 +2632,6 @@ describe("Missing API Coverage", function()
         expect_type("number", fy)
     end)
 
-    -- @covers SteeringManager:enableSpatialHash
     it("covers SteeringManager:enableSpatialHash", function()
         local sm = lurek.ai.newSteeringManager()
         expect_no_error(function()
@@ -2806,7 +2640,6 @@ describe("Missing API Coverage", function()
         end)
     end)
 
-    -- @covers CommandQueue:getCurrentTarget
     it("covers CommandQueue:getCurrentTarget", function()
         local cq = lurek.ai.newCommandQueue()
         cq:enqueue("move", function() end, {
@@ -2818,21 +2651,18 @@ describe("Missing API Coverage", function()
         expect_equal(200, y)
     end)
 
-    -- @covers TraitProfile:set
     it("covers TraitProfile:set", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("courage", 0.75)
         expect_near(0.75, tp:get("courage"), 0.001)
     end)
 
-    -- @covers TraitProfile:get
     it("covers TraitProfile:get", function()
         local tp = lurek.ai.newTraitProfile()
         tp:set("loyalty", 0.5)
         expect_near(0.5, tp:get("loyalty"), 0.001)
     end)
 
-    -- @covers TraitProfile:has
     it("covers TraitProfile:has", function()
         local tp = lurek.ai.newTraitProfile()
         expect_equal(false, tp:has("focus"))
@@ -2840,7 +2670,6 @@ describe("Missing API Coverage", function()
         expect_equal(true, tp:has("focus"))
     end)
 
-    -- @covers ContextSteering:addAvoidBounds
     it("covers ContextSteering:addAvoidBounds", function()
         local cs = lurek.ai.newContextSteering(16)
         cs:addAvoidBounds(-10, -10, 10, 10, 2, 1)
@@ -2849,14 +2678,12 @@ describe("Missing API Coverage", function()
         expect_type("number", dy)
     end)
 
-    -- @covers EmotionModel:get
     it("covers EmotionModel:get", function()
         local em = lurek.ai.newEmotionModel()
         em:add("joy", 0.1, 0.5, 0.2)
         expect_near(0.1, em:get("joy"), 0.001)
     end)
 
-    -- @covers Neuroevolution:bestFitness
     it("covers Neuroevolution:bestFitness", function()
         local ne = lurek.ai.newNeuroevolution(
             {{inputs=1, outputs=1, activation="linear"}}, 4, 11)
@@ -2871,7 +2698,6 @@ end)
 
 describe("Missing explicit test for AIWorld:addAgent", function()
     it("AIWorld:addAgent works", function()
-        -- @covers AIWorld:addAgent
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_add")
         expect_not_nil(a)
@@ -2881,7 +2707,6 @@ end)
 
 describe("Missing explicit test for AIWorld:getAgent", function()
     it("AIWorld:getAgent works", function()
-        -- @covers AIWorld:getAgent
         local w = lurek.ai.newWorld()
         w:addAgent("agent_get")
         local a = w:getAgent("agent_get")
@@ -2892,7 +2717,6 @@ end)
 
 describe("Missing explicit test for AIWorld:removeAgent", function()
     it("AIWorld:removeAgent works", function()
-        -- @covers AIWorld:removeAgent
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_remove")
         w:removeAgent(a)
@@ -2902,7 +2726,6 @@ end)
 
 describe("Missing explicit test for AIWorld:getAgentCount", function()
     it("AIWorld:getAgentCount works", function()
-        -- @covers AIWorld:getAgentCount
         local w = lurek.ai.newWorld()
         w:addAgent("a")
         w:addAgent("b")
@@ -2912,7 +2735,6 @@ end)
 
 describe("Missing explicit test for AIWorld:getGlobalBlackboard", function()
     it("AIWorld:getGlobalBlackboard works", function()
-        -- @covers AIWorld:getGlobalBlackboard
         local w = lurek.ai.newWorld()
         local bb = w:getGlobalBlackboard()
         expect_not_nil(bb)
@@ -2922,7 +2744,6 @@ end)
 
 describe("Missing explicit test for AIWorld:update", function()
     it("AIWorld:update works", function()
-        -- @covers AIWorld:update
         local w = lurek.ai.newWorld()
         local a = w:addAgent("mover")
         a:setVelocity(10, 0)
@@ -2934,21 +2755,18 @@ end)
 
 describe("Missing explicit test for AIWorld:type", function()
     it("AIWorld:type works", function()
-        -- @covers AIWorld:type
         expect_equal("LAIWorld", lurek.ai.newWorld():type())
     end)
 end)
 
 describe("Missing explicit test for AIWorld:typeOf", function()
     it("AIWorld:typeOf works", function()
-        -- @covers AIWorld:typeOf
         expect_equal(true, lurek.ai.newWorld():typeOf("AIWorld"))
     end)
 end)
 
 describe("Missing explicit test for Agent:getName", function()
     it("Agent:getName works", function()
-        -- @covers Agent:getName
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_name")
         expect_equal("agent_name", a:getName())
@@ -2957,7 +2775,6 @@ end)
 
 describe("Missing explicit test for Agent:setPosition", function()
     it("Agent:setPosition works", function()
-        -- @covers Agent:setPosition
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_pos_set")
         a:setPosition(12, 34)
@@ -2969,7 +2786,6 @@ end)
 
 describe("Missing explicit test for Agent:getPosition", function()
     it("Agent:getPosition works", function()
-        -- @covers Agent:getPosition
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_pos_get")
         a:setPosition(3, 7)
@@ -2981,7 +2797,6 @@ end)
 
 describe("Missing explicit test for Agent:setVelocity", function()
     it("Agent:setVelocity works", function()
-        -- @covers Agent:setVelocity
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_vel_set")
         a:setVelocity(5, -3)
@@ -2993,7 +2808,6 @@ end)
 
 describe("Missing explicit test for Agent:getVelocity", function()
     it("Agent:getVelocity works", function()
-        -- @covers Agent:getVelocity
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_vel_get")
         a:setVelocity(2, 4)
@@ -3005,7 +2819,6 @@ end)
 
 describe("Missing explicit test for Agent:setMaxSpeed", function()
     it("Agent:setMaxSpeed works", function()
-        -- @covers Agent:setMaxSpeed
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_speed_set")
         a:setMaxSpeed(250)
@@ -3015,7 +2828,6 @@ end)
 
 describe("Missing explicit test for Agent:getMaxSpeed", function()
     it("Agent:getMaxSpeed works", function()
-        -- @covers Agent:getMaxSpeed
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_speed_get")
         a:setMaxSpeed(125)
@@ -3025,7 +2837,6 @@ end)
 
 describe("Missing explicit test for Agent:setMaxForce", function()
     it("Agent:setMaxForce works", function()
-        -- @covers Agent:setMaxForce
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_force_set")
         a:setMaxForce(400)
@@ -3035,7 +2846,6 @@ end)
 
 describe("Missing explicit test for Agent:getMaxForce", function()
     it("Agent:getMaxForce works", function()
-        -- @covers Agent:getMaxForce
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_force_get")
         a:setMaxForce(175)
@@ -3045,7 +2855,6 @@ end)
 
 describe("Missing explicit test for Agent:setPriority", function()
     it("Agent:setPriority works", function()
-        -- @covers Agent:setPriority
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_prio_set")
         a:setPriority(9)
@@ -3055,7 +2864,6 @@ end)
 
 describe("Missing explicit test for Agent:getPriority", function()
     it("Agent:getPriority works", function()
-        -- @covers Agent:getPriority
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_prio_get")
         a:setPriority(4)
@@ -3065,7 +2873,6 @@ end)
 
 describe("Missing explicit test for Agent:setDecisionModel", function()
     it("Agent:setDecisionModel works", function()
-        -- @covers Agent:setDecisionModel
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_model_set")
         a:setDecisionModel("bt")
@@ -3075,7 +2882,6 @@ end)
 
 describe("Missing explicit test for Agent:getDecisionModel", function()
     it("Agent:getDecisionModel works", function()
-        -- @covers Agent:getDecisionModel
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_model_get")
         a:setDecisionModel("fsm")
@@ -3085,7 +2891,6 @@ end)
 
 describe("Missing explicit test for Agent:addTag", function()
     it("Agent:addTag works", function()
-        -- @covers Agent:addTag
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_tag_add")
         a:addTag("enemy")
@@ -3095,7 +2900,6 @@ end)
 
 describe("Missing explicit test for Agent:removeTag", function()
     it("Agent:removeTag works", function()
-        -- @covers Agent:removeTag
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_tag_remove")
         a:addTag("enemy")
@@ -3106,7 +2910,6 @@ end)
 
 describe("Missing explicit test for Agent:hasTag", function()
     it("Agent:hasTag works", function()
-        -- @covers Agent:hasTag
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_tag_has")
         expect_equal(false, a:hasTag("support"))
@@ -3117,7 +2920,6 @@ end)
 
 describe("Missing explicit test for Agent:getBlackboard", function()
     it("Agent:getBlackboard works", function()
-        -- @covers Agent:getBlackboard
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_bb")
         local bb = a:getBlackboard()
@@ -3128,7 +2930,6 @@ end)
 
 describe("Missing explicit test for Agent:type", function()
     it("Agent:type works", function()
-        -- @covers Agent:type
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_type")
         expect_equal("LAgent", a:type())
@@ -3137,7 +2938,6 @@ end)
 
 describe("Missing explicit test for Agent:typeOf", function()
     it("Agent:typeOf works", function()
-        -- @covers Agent:typeOf
         local w = lurek.ai.newWorld()
         local a = w:addAgent("agent_typeof")
         expect_equal(true, a:typeOf("Agent"))
@@ -3146,7 +2946,6 @@ end)
 
 describe("Missing explicit test for Blackboard:setNumber", function()
     it("Blackboard:setNumber works", function()
-        -- @covers Blackboard:setNumber
         local bb = lurek.ai.newBlackboard()
         bb:setNumber("hp", 42)
         expect_near(42, bb:getNumber("hp"), 0.001)
@@ -3155,7 +2954,6 @@ end)
 
 describe("Missing explicit test for Blackboard:setBool", function()
     it("Blackboard:setBool works", function()
-        -- @covers Blackboard:setBool
         local bb = lurek.ai.newBlackboard()
         bb:setBool("alive", true)
         expect_equal(true, bb:getBool("alive"))
@@ -3164,7 +2962,6 @@ end)
 
 describe("Missing explicit test for Blackboard:setString", function()
     it("Blackboard:setString works", function()
-        -- @covers Blackboard:setString
         local bb = lurek.ai.newBlackboard()
         bb:setString("role", "tank")
         expect_equal("tank", bb:getString("role"))
@@ -3173,7 +2970,6 @@ end)
 
 describe("Missing explicit test for Blackboard:remove", function()
     it("Blackboard:remove works", function()
-        -- @covers Blackboard:remove
         local bb = lurek.ai.newBlackboard()
         bb:setNumber("hp", 10)
         bb:remove("hp")
@@ -3183,7 +2979,6 @@ end)
 
 describe("Missing explicit test for Blackboard:clear", function()
     it("Blackboard:clear works", function()
-        -- @covers Blackboard:clear
         local bb = lurek.ai.newBlackboard()
         bb:setNumber("a", 1)
         bb:setBool("b", true)
@@ -3194,7 +2989,6 @@ end)
 
 describe("Missing explicit test for Blackboard:getKeys", function()
     it("Blackboard:getKeys works", function()
-        -- @covers Blackboard:getKeys
         local bb = lurek.ai.newBlackboard()
         bb:setNumber("hp", 10)
         bb:setString("name", "hero")
@@ -3206,7 +3000,6 @@ end)
 
 describe("Missing explicit test for Blackboard:getSize", function()
     it("Blackboard:getSize works", function()
-        -- @covers Blackboard:getSize
         local bb = lurek.ai.newBlackboard()
         expect_equal(0, bb:getSize())
         bb:setNumber("hp", 10)
@@ -3216,21 +3009,18 @@ end)
 
 describe("Missing explicit test for Blackboard:type", function()
     it("Blackboard:type works", function()
-        -- @covers Blackboard:type
         expect_equal("LAIBlackboard", lurek.ai.newBlackboard():type())
     end)
 end)
 
 describe("Missing explicit test for Blackboard:typeOf", function()
     it("Blackboard:typeOf works", function()
-        -- @covers Blackboard:typeOf
         expect_equal(true, lurek.ai.newBlackboard():typeOf("Blackboard"))
     end)
 end)
 
 describe("Missing explicit test for StateMachine:addState", function()
     it("StateMachine:addState works", function()
-        -- @covers StateMachine:addState
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
         fsm:setInitialState("idle")
@@ -3240,7 +3030,6 @@ end)
 
 describe("Missing explicit test for StateMachine:setInitialState", function()
     it("StateMachine:setInitialState works", function()
-        -- @covers StateMachine:setInitialState
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("patrol", {})
         fsm:setInitialState("patrol")
@@ -3250,7 +3039,6 @@ end)
 
 describe("Missing explicit test for StateMachine:getCurrentState", function()
     it("StateMachine:getCurrentState works", function()
-        -- @covers StateMachine:getCurrentState
         local fsm = lurek.ai.newStateMachine()
         expect_nil(fsm:getCurrentState())
     end)
@@ -3258,7 +3046,6 @@ end)
 
 describe("Missing explicit test for StateMachine:forceState", function()
     it("StateMachine:forceState works", function()
-        -- @covers StateMachine:forceState
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
         fsm:addState("attack", {})
@@ -3270,7 +3057,6 @@ end)
 
 describe("Missing explicit test for StateMachine:getTimeInState", function()
     it("StateMachine:getTimeInState works", function()
-        -- @covers StateMachine:getTimeInState
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
         fsm:setInitialState("idle")
@@ -3281,21 +3067,18 @@ end)
 
 describe("Missing explicit test for StateMachine:type", function()
     it("StateMachine:type works", function()
-        -- @covers StateMachine:type
         expect_equal("LStateMachine", lurek.ai.newStateMachine():type())
     end)
 end)
 
 describe("Missing explicit test for StateMachine:typeOf", function()
     it("StateMachine:typeOf works", function()
-        -- @covers StateMachine:typeOf
         expect_true(lurek.ai.newStateMachine():typeOf("StateMachine"))
     end)
 end)
 
 describe("Missing explicit test for BehaviorTree:setRoot", function()
     it("BehaviorTree:setRoot works", function()
-        -- @covers BehaviorTree:setRoot
         local bt = lurek.ai.newBehaviorTree()
         bt:setRoot(lurek.ai.newSequence())
         local dbg = bt:getDebugState()
@@ -3305,28 +3088,24 @@ end)
 
 describe("Missing explicit test for BehaviorTree:getLastStatus", function()
     it("BehaviorTree:getLastStatus works", function()
-        -- @covers BehaviorTree:getLastStatus
         expect_equal("success", lurek.ai.newBehaviorTree():getLastStatus())
     end)
 end)
 
 describe("Missing explicit test for BehaviorTree:type", function()
     it("BehaviorTree:type works", function()
-        -- @covers BehaviorTree:type
         expect_equal("LBehaviorTree", lurek.ai.newBehaviorTree():type())
     end)
 end)
 
 describe("Missing explicit test for BehaviorTree:typeOf", function()
     it("BehaviorTree:typeOf works", function()
-        -- @covers BehaviorTree:typeOf
         expect_true(lurek.ai.newBehaviorTree():typeOf("BehaviorTree"))
     end)
 end)
 
 describe("Missing explicit test for BTNode:addChild", function()
     it("BTNode:addChild works", function()
-        -- @covers BTNode:addChild
         local seq = lurek.ai.newSequence()
         seq:addChild(lurek.ai.newAction(function() end))
         expect_equal(1, seq:getChildCount())
@@ -3335,7 +3114,6 @@ end)
 
 describe("Missing explicit test for BTNode:getChildCount", function()
     it("BTNode:getChildCount works", function()
-        -- @covers BTNode:getChildCount
         local par = lurek.ai.newParallel()
         expect_equal(0, par:getChildCount())
         par:addChild(lurek.ai.newAction(function() end))
@@ -3345,7 +3123,6 @@ end)
 
 describe("Missing explicit test for BTNode:reset", function()
     it("BTNode:reset works", function()
-        -- @covers BTNode:reset
         local node = lurek.ai.newRepeater(3)
         node:setChild(lurek.ai.newAction(function() end))
         expect_no_error(function()
@@ -3356,7 +3133,6 @@ end)
 
 describe("Missing explicit test for BTNode:setChild", function()
     it("BTNode:setChild works", function()
-        -- @covers BTNode:setChild
         local inv = lurek.ai.newInverter()
         expect_no_error(function()
             inv:setChild(lurek.ai.newAction(function() end))
@@ -3366,7 +3142,6 @@ end)
 
 describe("Missing explicit test for BTNode:setCount", function()
     it("BTNode:setCount works", function()
-        -- @covers BTNode:setCount
         local rep = lurek.ai.newRepeater(2)
         rep:setCount(7)
         expect_equal(7, rep:getCount())
@@ -3375,14 +3150,12 @@ end)
 
 describe("Missing explicit test for BTNode:getCount", function()
     it("BTNode:getCount works", function()
-        -- @covers BTNode:getCount
         expect_equal(4, lurek.ai.newRepeater(4):getCount())
     end)
 end)
 
 describe("Missing explicit test for BTNode:setSuccessPolicy", function()
     it("BTNode:setSuccessPolicy works", function()
-        -- @covers BTNode:setSuccessPolicy
         local par = lurek.ai.newParallel()
         expect_no_error(function()
             par:setSuccessPolicy("require_all")
@@ -3392,7 +3165,6 @@ end)
 
 describe("Missing explicit test for BTNode:setFailurePolicy", function()
     it("BTNode:setFailurePolicy works", function()
-        -- @covers BTNode:setFailurePolicy
         local par = lurek.ai.newParallel()
         expect_no_error(function()
             par:setFailurePolicy("require_all")
@@ -3402,28 +3174,24 @@ end)
 
 describe("Missing explicit test for BTNode:getNodeType", function()
     it("BTNode:getNodeType works", function()
-        -- @covers BTNode:getNodeType
         expect_equal("selector", lurek.ai.newSelector():getNodeType())
     end)
 end)
 
 describe("Missing explicit test for BTNode:type", function()
     it("BTNode:type works", function()
-        -- @covers BTNode:type
         expect_equal("LBTNode", lurek.ai.newSelector():type())
     end)
 end)
 
 describe("Missing explicit test for BTNode:typeOf", function()
     it("BTNode:typeOf works", function()
-        -- @covers BTNode:typeOf
         expect_true(lurek.ai.newSelector():typeOf("BTNode"))
     end)
 end)
 
 describe("Missing explicit test for SteeringManager:getBehaviorCount", function()
     it("SteeringManager:getBehaviorCount works", function()
-        -- @covers SteeringManager:getBehaviorCount
         local sm = lurek.ai.newSteeringManager()
         expect_equal(0, sm:getBehaviorCount())
         sm:addSeek(100, 50)
@@ -3433,7 +3201,6 @@ end)
 
 describe("Missing explicit test for SteeringManager:setCombineMode", function()
     it("SteeringManager:setCombineMode works", function()
-        -- @covers SteeringManager:setCombineMode
         local sm = lurek.ai.newSteeringManager()
         sm:setCombineMode("priority")
         expect_equal("priority", sm:getCombineMode())
@@ -3442,7 +3209,6 @@ end)
 
 describe("Missing explicit test for SteeringManager:getCombineMode", function()
     it("SteeringManager:getCombineMode works", function()
-        -- @covers SteeringManager:getCombineMode
         local sm = lurek.ai.newSteeringManager()
         sm:setCombineMode("weighted")
         expect_equal("weighted", sm:getCombineMode())
@@ -3451,7 +3217,6 @@ end)
 
 describe("Missing explicit test for SteeringManager:getLastSteering", function()
     it("SteeringManager:getLastSteering works", function()
-        -- @covers SteeringManager:getLastSteering
         local sm = lurek.ai.newSteeringManager()
         sm:addSeek(100, 100)
         sm:calculate(0, 0, 0, 0, 100, 50, 1 / 60)
@@ -3463,21 +3228,18 @@ end)
 
 describe("Missing explicit test for SteeringManager:type", function()
     it("SteeringManager:type works", function()
-        -- @covers SteeringManager:type
         expect_equal("LSteeringManager", lurek.ai.newSteeringManager():type())
     end)
 end)
 
 describe("Missing explicit test for SteeringManager:typeOf", function()
     it("SteeringManager:typeOf works", function()
-        -- @covers SteeringManager:typeOf
         expect_true(lurek.ai.newSteeringManager():typeOf("SteeringManager"))
     end)
 end)
 
 describe("Missing explicit test for QLearner:chooseAction", function()
     it("QLearner:chooseAction works", function()
-        -- @covers QLearner:chooseAction
         local q = lurek.ai.newQLearner(2, 3)
         local action = q:chooseAction(1)
         expect_true(action >= 1 and action <= 3)
@@ -3486,7 +3248,6 @@ end)
 
 describe("Missing explicit test for QLearner:bestAction", function()
     it("QLearner:bestAction works", function()
-        -- @covers QLearner:bestAction
         local q = lurek.ai.newQLearner(2, 3)
         q:setQValue(1, 1, 1.0)
         q:setQValue(1, 2, 5.0)
@@ -3497,7 +3258,6 @@ end)
 
 describe("Missing explicit test for QLearner:getQValue", function()
     it("QLearner:getQValue works", function()
-        -- @covers QLearner:getQValue
         local q = lurek.ai.newQLearner(3, 2)
         q:setQValue(1, 2, 5.0)
         expect_near(5.0, q:getQValue(1, 2), 0.001)
@@ -3506,7 +3266,6 @@ end)
 
 describe("Missing explicit test for QLearner:endEpisode", function()
     it("QLearner:endEpisode works", function()
-        -- @covers QLearner:endEpisode
         local q = lurek.ai.newQLearner(2, 2)
         q:endEpisode()
         expect_equal(1, q:getEpisodeCount())
@@ -3515,7 +3274,6 @@ end)
 
 describe("Missing explicit test for QLearner:getEpisodeCount", function()
     it("QLearner:getEpisodeCount works", function()
-        -- @covers QLearner:getEpisodeCount
         local q = lurek.ai.newQLearner(2, 2)
         expect_equal(0, q:getEpisodeCount())
         q:endEpisode()
@@ -3525,21 +3283,18 @@ end)
 
 describe("Missing explicit test for QLearner:getStateCount", function()
     it("QLearner:getStateCount works", function()
-        -- @covers QLearner:getStateCount
         expect_equal(4, lurek.ai.newQLearner(4, 3):getStateCount())
     end)
 end)
 
 describe("Missing explicit test for QLearner:getActionCount", function()
     it("QLearner:getActionCount works", function()
-        -- @covers QLearner:getActionCount
         expect_equal(3, lurek.ai.newQLearner(4, 3):getActionCount())
     end)
 end)
 
 describe("Missing explicit test for QLearner:setLearningRate", function()
     it("QLearner:setLearningRate works", function()
-        -- @covers QLearner:setLearningRate
         local q = lurek.ai.newQLearner(2, 2)
         q:setLearningRate(0.5)
         expect_near(0.5, q:getLearningRate(), 0.001)
@@ -3548,7 +3303,6 @@ end)
 
 describe("Missing explicit test for QLearner:getLearningRate", function()
     it("QLearner:getLearningRate works", function()
-        -- @covers QLearner:getLearningRate
         local q = lurek.ai.newQLearner(2, 2)
         q:setLearningRate(0.25)
         expect_near(0.25, q:getLearningRate(), 0.001)
@@ -3557,7 +3311,6 @@ end)
 
 describe("Missing explicit test for QLearner:setDiscountFactor", function()
     it("QLearner:setDiscountFactor works", function()
-        -- @covers QLearner:setDiscountFactor
         local q = lurek.ai.newQLearner(2, 2)
         q:setDiscountFactor(0.8)
         expect_near(0.8, q:getDiscountFactor(), 0.001)
@@ -3566,7 +3319,6 @@ end)
 
 describe("Missing explicit test for QLearner:getDiscountFactor", function()
     it("QLearner:getDiscountFactor works", function()
-        -- @covers QLearner:getDiscountFactor
         local q = lurek.ai.newQLearner(2, 2)
         q:setDiscountFactor(0.7)
         expect_near(0.7, q:getDiscountFactor(), 0.001)
@@ -3575,7 +3327,6 @@ end)
 
 describe("Missing explicit test for QLearner:setExplorationRate", function()
     it("QLearner:setExplorationRate works", function()
-        -- @covers QLearner:setExplorationRate
         local q = lurek.ai.newQLearner(2, 2)
         q:setExplorationRate(0.1)
         expect_near(0.1, q:getExplorationRate(), 0.001)
@@ -3584,7 +3335,6 @@ end)
 
 describe("Missing explicit test for QLearner:getExplorationRate", function()
     it("QLearner:getExplorationRate works", function()
-        -- @covers QLearner:getExplorationRate
         local q = lurek.ai.newQLearner(2, 2)
         q:setExplorationRate(0.2)
         expect_near(0.2, q:getExplorationRate(), 0.001)
@@ -3593,7 +3343,6 @@ end)
 
 describe("Missing explicit test for QLearner:setExplorationDecay", function()
     it("QLearner:setExplorationDecay works", function()
-        -- @covers QLearner:setExplorationDecay
         local q = lurek.ai.newQLearner(2, 2)
         q:setExplorationDecay(0.99)
         expect_near(0.99, q:getExplorationDecay(), 0.001)
@@ -3602,7 +3351,6 @@ end)
 
 describe("Missing explicit test for QLearner:getExplorationDecay", function()
     it("QLearner:getExplorationDecay works", function()
-        -- @covers QLearner:getExplorationDecay
         local q = lurek.ai.newQLearner(2, 2)
         q:setExplorationDecay(0.95)
         expect_near(0.95, q:getExplorationDecay(), 0.001)
@@ -3611,7 +3359,6 @@ end)
 
 describe("Missing explicit test for QLearner:serialize", function()
     it("QLearner:serialize works", function()
-        -- @covers QLearner:serialize
         local q = lurek.ai.newQLearner(2, 2)
         q:setQValue(1, 1, 3.14)
         local json = q:serialize()
@@ -3621,7 +3368,6 @@ end)
 
 describe("Missing explicit test for QLearner:deserialize", function()
     it("QLearner:deserialize works", function()
-        -- @covers QLearner:deserialize
         local q = lurek.ai.newQLearner(2, 2)
         q:setQValue(1, 1, 3.14)
         local json = q:serialize()
@@ -3633,21 +3379,18 @@ end)
 
 describe("Missing explicit test for QLearner:type", function()
     it("QLearner:type works", function()
-        -- @covers QLearner:type
         expect_equal("LQLearner", lurek.ai.newQLearner(2, 2):type())
     end)
 end)
 
 describe("Missing explicit test for QLearner:typeOf", function()
     it("QLearner:typeOf works", function()
-        -- @covers QLearner:typeOf
         expect_true(lurek.ai.newQLearner(2, 2):typeOf("QLearner"))
     end)
 end)
 
 describe("Missing explicit test for UtilityAI:evaluate", function()
     it("UtilityAI:evaluate works", function()
-        -- @covers UtilityAI:evaluate
         local u = lurek.ai.newUtilityAI()
         u:addAction("patrol", function() return 0.2 end)
         u:addAction("attack", function() return 0.9 end)
@@ -3657,7 +3400,6 @@ end)
 
 describe("Missing explicit test for UtilityAI:getActionCount", function()
     it("UtilityAI:getActionCount works", function()
-        -- @covers UtilityAI:getActionCount
         local u = lurek.ai.newUtilityAI()
         expect_equal(0, u:getActionCount())
         u:addAction("patrol", function() return 0.2 end)
@@ -3667,7 +3409,6 @@ end)
 
 describe("Missing explicit test for UtilityAI:getLastAction", function()
     it("UtilityAI:getLastAction works", function()
-        -- @covers UtilityAI:getLastAction
         local u = lurek.ai.newUtilityAI()
         u:addAction("patrol", function() return 0.2 end)
         u:evaluate()
@@ -3677,21 +3418,18 @@ end)
 
 describe("Missing explicit test for UtilityAI:type", function()
     it("UtilityAI:type works", function()
-        -- @covers UtilityAI:type
         expect_equal("LUtilityAI", lurek.ai.newUtilityAI():type())
     end)
 end)
 
 describe("Missing explicit test for UtilityAI:typeOf", function()
     it("UtilityAI:typeOf works", function()
-        -- @covers UtilityAI:typeOf
         expect_true(lurek.ai.newUtilityAI():typeOf("UtilityAI"))
     end)
 end)
 
 describe("Missing explicit test for GOAPPlanner:getActionCount", function()
     it("GOAPPlanner:getActionCount works", function()
-        -- @covers GOAPPlanner:getActionCount
         local g = lurek.ai.newGOAPPlanner()
         expect_equal(0, g:getActionCount())
         g:addAction("move", 1.0)
@@ -3701,7 +3439,6 @@ end)
 
 describe("Missing explicit test for GOAPPlanner:getGoalCount", function()
     it("GOAPPlanner:getGoalCount works", function()
-        -- @covers GOAPPlanner:getGoalCount
         local g = lurek.ai.newGOAPPlanner()
         expect_equal(0, g:getGoalCount())
         g:addGoal("survive", 2.0)
@@ -3711,722 +3448,915 @@ end)
 
 describe("Missing explicit test for GOAPPlanner:type", function()
     it("GOAPPlanner:type works", function()
-        -- @covers GOAPPlanner:type
         expect_equal("LGOAPPlanner", lurek.ai.newGOAPPlanner():type())
     end)
 end)
 
 describe("Missing explicit test for GOAPPlanner:typeOf", function()
     it("GOAPPlanner:typeOf works", function()
-        -- @covers GOAPPlanner:typeOf
         expect_true(lurek.ai.newGOAPPlanner():typeOf("GOAPPlanner"))
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:addLayer", function()
     it("InfluenceMap:addLayer works", function()
-        -- @covers InfluenceMap:addLayer
-        -- TODO: add assertion for InfluenceMap:addLayer
+        local m = lurek.ai.newInfluenceMap(10, 10, 1.0)
+        m:addLayer("threat")
+        expect_true(m:hasLayer("threat"), "layer should exist after addLayer")
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:hasLayer", function()
     it("InfluenceMap:hasLayer works", function()
-        -- @covers InfluenceMap:hasLayer
-        -- TODO: add assertion for InfluenceMap:hasLayer
+        local m = lurek.ai.newInfluenceMap(10, 10, 1.0)
+        expect_false(m:hasLayer("nope"), "unknown layer should return false")
+        m:addLayer("nope")
+        expect_true(m:hasLayer("nope"), "layer should exist after addLayer")
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:decay", function()
     it("InfluenceMap:decay works", function()
-        -- @covers InfluenceMap:decay
-        -- TODO: add assertion for InfluenceMap:decay
+        local m = lurek.ai.newInfluenceMap(4, 4, 1.0)
+        m:addLayer("d")
+        m:setInfluence("d", 1, 1, 10.0)
+        m:decay("d", 0.5)
+        local v = m:getInfluence("d", 1, 1)
+        expect_true(v < 10.0, "decay should reduce influence")
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:clearLayer", function()
     it("InfluenceMap:clearLayer works", function()
-        -- @covers InfluenceMap:clearLayer
-        -- TODO: add assertion for InfluenceMap:clearLayer
+        local m = lurek.ai.newInfluenceMap(4, 4, 1.0)
+        m:addLayer("c")
+        m:setInfluence("c", 1, 1, 5.0)
+        m:clearLayer("c")
+        expect_equal(0.0, m:getInfluence("c", 1, 1))
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:clearAll", function()
     it("InfluenceMap:clearAll works", function()
-        -- @covers InfluenceMap:clearAll
-        -- TODO: add assertion for InfluenceMap:clearAll
+        local m = lurek.ai.newInfluenceMap(4, 4, 1.0)
+        m:addLayer("a")
+        m:addLayer("b")
+        m:setInfluence("a", 1, 1, 3.0)
+        m:setInfluence("b", 2, 2, 7.0)
+        m:clearAll()
+        expect_equal(0.0, m:getInfluence("a", 1, 1))
+        expect_equal(0.0, m:getInfluence("b", 2, 2))
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:getMaxPosition", function()
     it("InfluenceMap:getMaxPosition works", function()
-        -- @covers InfluenceMap:getMaxPosition
-        -- TODO: add assertion for InfluenceMap:getMaxPosition
+        local m = lurek.ai.newInfluenceMap(4, 4, 1.0)
+        m:addLayer("mx")
+        m:setInfluence("mx", 3, 3, 9.0)
+        local x, y = m:getMaxPosition("mx")
+        expect_not_nil(x)
+        expect_not_nil(y)
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:getMinPosition", function()
     it("InfluenceMap:getMinPosition works", function()
-        -- @covers InfluenceMap:getMinPosition
-        -- TODO: add assertion for InfluenceMap:getMinPosition
+        local m = lurek.ai.newInfluenceMap(4, 4, 1.0)
+        m:addLayer("mn")
+        local x, y = m:getMinPosition("mn")
+        expect_not_nil(x)
+        expect_not_nil(y)
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:getWidth", function()
     it("InfluenceMap:getWidth works", function()
-        -- @covers InfluenceMap:getWidth
-        -- TODO: add assertion for InfluenceMap:getWidth
+        local m = lurek.ai.newInfluenceMap(8, 4, 1.0)
+        expect_equal(8, m:getWidth())
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:getHeight", function()
     it("InfluenceMap:getHeight works", function()
-        -- @covers InfluenceMap:getHeight
-        -- TODO: add assertion for InfluenceMap:getHeight
+        local m = lurek.ai.newInfluenceMap(8, 4, 1.0)
+        expect_equal(4, m:getHeight())
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:getCellSize", function()
     it("InfluenceMap:getCellSize works", function()
-        -- @covers InfluenceMap:getCellSize
-        -- TODO: add assertion for InfluenceMap:getCellSize
+        local m = lurek.ai.newInfluenceMap(4, 4, 2.5)
+        expect_equal(2.5, m:getCellSize())
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:type", function()
     it("InfluenceMap:type works", function()
-        -- @covers InfluenceMap:type
-        -- TODO: add assertion for InfluenceMap:type
+        expect_equal("LInfluenceMap", lurek.ai.newInfluenceMap(4, 4, 1.0):type())
     end)
 end)
 
 describe("Missing explicit test for InfluenceMap:typeOf", function()
     it("InfluenceMap:typeOf works", function()
-        -- @covers InfluenceMap:typeOf
-        -- TODO: add assertion for InfluenceMap:typeOf
+        expect_true(lurek.ai.newInfluenceMap(4, 4, 1.0):typeOf("InfluenceMap"))
     end)
 end)
 
 describe("Missing explicit test for Squad:getName", function()
     it("Squad:getName works", function()
-        -- @covers Squad:getName
-        -- TODO: add assertion for Squad:getName
+        local sq = lurek.ai.newSquad("alpha")
+        expect_equal("alpha", sq:getName())
     end)
 end)
 
 describe("Missing explicit test for Squad:addMember", function()
     it("Squad:addMember works", function()
-        -- @covers Squad:addMember
-        -- TODO: add assertion for Squad:addMember
+        local sq = lurek.ai.newSquad("bravo")
+        sq:addMember("soldier1")
+        expect_equal(1, sq:getMemberCount())
     end)
 end)
 
 describe("Missing explicit test for Squad:removeMember", function()
     it("Squad:removeMember works", function()
-        -- @covers Squad:removeMember
-        -- TODO: add assertion for Squad:removeMember
+        local sq = lurek.ai.newSquad("charlie")
+        sq:addMember("s1")
+        sq:addMember("s2")
+        sq:removeMember("s1")
+        expect_equal(1, sq:getMemberCount())
     end)
 end)
 
 describe("Missing explicit test for Squad:getMemberCount", function()
     it("Squad:getMemberCount works", function()
-        -- @covers Squad:getMemberCount
-        -- TODO: add assertion for Squad:getMemberCount
+        local sq = lurek.ai.newSquad("delta")
+        expect_equal(0, sq:getMemberCount())
+        sq:addMember("x")
+        expect_equal(1, sq:getMemberCount())
     end)
 end)
 
 describe("Missing explicit test for Squad:getMembers", function()
     it("Squad:getMembers works", function()
-        -- @covers Squad:getMembers
-        -- TODO: add assertion for Squad:getMembers
+        local sq = lurek.ai.newSquad("echo")
+        sq:addMember("a")
+        sq:addMember("b")
+        local members = sq:getMembers()
+        expect_type("table", members)
+        expect_equal(2, #members)
     end)
 end)
 
 describe("Missing explicit test for Squad:setLeader", function()
     it("Squad:setLeader works", function()
-        -- @covers Squad:setLeader
-        -- TODO: add assertion for Squad:setLeader
+        local sq = lurek.ai.newSquad("foxtrot")
+        sq:addMember("leader")
+        sq:setLeader("leader")
+        expect_equal("leader", sq:getLeader())
     end)
 end)
 
 describe("Missing explicit test for Squad:getLeader", function()
     it("Squad:getLeader works", function()
-        -- @covers Squad:getLeader
-        -- TODO: add assertion for Squad:getLeader
+        local sq = lurek.ai.newSquad("golf")
+        expect_nil(sq:getLeader(), "no leader by default")
+        sq:setLeader("cmd")
+        expect_equal("cmd", sq:getLeader())
     end)
 end)
 
 describe("Missing explicit test for Squad:getFormation", function()
     it("Squad:getFormation works", function()
-        -- @covers Squad:getFormation
-        -- TODO: add assertion for Squad:getFormation
+        local sq = lurek.ai.newSquad("hotel")
+        local f = sq:getFormation()
+        expect_type("string", f)
     end)
 end)
 
 describe("Missing explicit test for Squad:getFormationSpacing", function()
     it("Squad:getFormationSpacing works", function()
-        -- @covers Squad:getFormationSpacing
-        -- TODO: add assertion for Squad:getFormationSpacing
+        local sq = lurek.ai.newSquad("india")
+        local s = sq:getFormationSpacing()
+        expect_type("number", s)
     end)
 end)
 
 describe("Missing explicit test for Squad:getBlackboard", function()
     it("Squad:getBlackboard works", function()
-        -- @covers Squad:getBlackboard
-        -- TODO: add assertion for Squad:getBlackboard
+        local sq = lurek.ai.newSquad("juliet")
+        local bb = sq:getBlackboard()
+        expect_not_nil(bb)
     end)
 end)
 
 describe("Missing explicit test for Squad:type", function()
     it("Squad:type works", function()
-        -- @covers Squad:type
-        -- TODO: add assertion for Squad:type
+        expect_equal("LSquad", lurek.ai.newSquad("t"):type())
     end)
 end)
 
 describe("Missing explicit test for Squad:typeOf", function()
     it("Squad:typeOf works", function()
-        -- @covers Squad:typeOf
-        -- TODO: add assertion for Squad:typeOf
+        expect_true(lurek.ai.newSquad("t"):typeOf("Squad"))
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:cancelCurrent", function()
     it("CommandQueue:cancelCurrent works", function()
-        -- @covers CommandQueue:cancelCurrent
-        -- TODO: add assertion for CommandQueue:cancelCurrent
+        local q = lurek.ai.newCommandQueue()
+        q:enqueue("move", function() end)
+        local canceled = q:cancelCurrent()
+        expect_true(canceled, "interruptible command should be canceled")
+        expect_true(q:isEmpty())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:clear", function()
     it("CommandQueue:clear works", function()
-        -- @covers CommandQueue:clear
-        -- TODO: add assertion for CommandQueue:clear
+        local q = lurek.ai.newCommandQueue()
+        q:enqueue("move", function() end)
+        q:enqueue("attack", function() end)
+        q:clear()
+        expect_true(q:isEmpty())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:getCount", function()
     it("CommandQueue:getCount works", function()
-        -- @covers CommandQueue:getCount
-        -- TODO: add assertion for CommandQueue:getCount
+        local q = lurek.ai.newCommandQueue()
+        expect_equal(0, q:getCount())
+        q:enqueue("stop", function() end)
+        expect_equal(1, q:getCount())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:isEmpty", function()
     it("CommandQueue:isEmpty works", function()
-        -- @covers CommandQueue:isEmpty
-        -- TODO: add assertion for CommandQueue:isEmpty
+        local q = lurek.ai.newCommandQueue()
+        expect_true(q:isEmpty())
+        q:enqueue("move", function() end)
+        expect_false(q:isEmpty())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:getCurrentType", function()
     it("CommandQueue:getCurrentType works", function()
-        -- @covers CommandQueue:getCurrentType
-        -- TODO: add assertion for CommandQueue:getCurrentType
+        local q = lurek.ai.newCommandQueue()
+        expect_nil(q:getCurrentType())
+        q:enqueue("patrol", function() end)
+        expect_equal("patrol", q:getCurrentType())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:type", function()
     it("CommandQueue:type works", function()
-        -- @covers CommandQueue:type
-        -- TODO: add assertion for CommandQueue:type
+        expect_equal("LCommandQueue", lurek.ai.newCommandQueue():type())
     end)
 end)
 
 describe("Missing explicit test for CommandQueue:typeOf", function()
     it("CommandQueue:typeOf works", function()
-        -- @covers CommandQueue:typeOf
-        -- TODO: add assertion for CommandQueue:typeOf
+        expect_true(lurek.ai.newCommandQueue():typeOf("CommandQueue"))
     end)
 end)
 
 describe("Missing explicit test for TraitProfile:getBase", function()
     it("TraitProfile:getBase works", function()
-        -- @covers TraitProfile:getBase
-        -- TODO: add assertion for TraitProfile:getBase
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("courage", 0.8)
+        local base = tp:getBase("courage")
+        expect_near(0.8, base, 1e-5)
     end)
 end)
 
 describe("Missing explicit test for TraitProfile:removeModifiers", function()
     it("TraitProfile:removeModifiers works", function()
-        -- @covers TraitProfile:removeModifiers
-        -- TODO: add assertion for TraitProfile:removeModifiers
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("strength", 1.0)
+        tp:addModifier("strength", 0.5, nil, "buff")
+        tp:removeModifiers("buff")
+        -- after removal, effective value should return to base
+        expect_equal(1.0, tp:get("strength"))
     end)
 end)
 
 describe("Missing explicit test for TraitProfile:update", function()
     it("TraitProfile:update works", function()
-        -- @covers TraitProfile:update
-        -- TODO: add assertion for TraitProfile:update
+        local tp = lurek.ai.newTraitProfile()
+        tp:set("patience", 0.5)
+        tp:addModifier("patience", 0.3, 0.01, "temp")
+        tp:update(1.0)
+        -- after expiry the modifier is gone
+        expect_equal(0.5, tp:get("patience"))
     end)
 end)
 
 describe("Missing explicit test for TraitProfile:traitCount", function()
     it("TraitProfile:traitCount works", function()
-        -- @covers TraitProfile:traitCount
-        -- TODO: add assertion for TraitProfile:traitCount
+        local tp = lurek.ai.newTraitProfile()
+        expect_equal(0, tp:traitCount())
+        tp:set("aggression", 0.9)
+        expect_equal(1, tp:traitCount())
     end)
 end)
 
 describe("Missing explicit test for TraitProfile:archetype", function()
     it("TraitProfile:archetype works", function()
-        -- @covers TraitProfile:archetype
-        -- TODO: add assertion for TraitProfile:archetype
+        local tp = lurek.ai.newTraitProfile()
+        -- default: no archetype
+        local a = tp:archetype()
+        expect_true(a == nil or type(a) == "string")
     end)
 end)
 
 describe("Missing explicit test for StimulusWorld:remove", function()
     it("StimulusWorld:remove works", function()
-        -- @covers StimulusWorld:remove
-        -- TODO: add assertion for StimulusWorld:remove
+        local sw = lurek.ai.newStimulusWorld()
+        local id = sw:addVisual(0, 0, 1.0, 5.0)
+        expect_equal(1, sw:count())
+        local removed = sw:remove(id)
+        expect_true(removed)
+        expect_equal(0, sw:count())
     end)
 end)
 
 describe("Missing explicit test for StimulusWorld:update", function()
     it("StimulusWorld:update works", function()
-        -- @covers StimulusWorld:update
-        -- TODO: add assertion for StimulusWorld:update
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addAuditory(0, 0, 1.0, 10.0, 100.0)
+        sw:update(1.0)
+        -- auditory with very high decay should be gone
+        expect_equal(0, sw:count())
     end)
 end)
 
 describe("Missing explicit test for StimulusWorld:clear", function()
     it("StimulusWorld:clear works", function()
-        -- @covers StimulusWorld:clear
-        -- TODO: add assertion for StimulusWorld:clear
+        local sw = lurek.ai.newStimulusWorld()
+        sw:addVisual(0, 0, 1.0, 5.0)
+        sw:addVisual(1, 1, 2.0, 3.0)
+        sw:clear()
+        expect_equal(0, sw:count())
     end)
 end)
 
 describe("Missing explicit test for ContextSteering:addWander", function()
     it("ContextSteering:addWander works", function()
-        -- @covers ContextSteering:addWander
-        -- TODO: add assertion for ContextSteering:addWander
+        local cs = lurek.ai.newContextSteering(16)
+        local ok = pcall(function() cs:addWander(0.1, 1.0) end)
+        expect_true(ok, "addWander should not error")
     end)
 end)
 
 describe("Missing explicit test for ContextSteering:clearBehaviors", function()
     it("ContextSteering:clearBehaviors works", function()
-        -- @covers ContextSteering:clearBehaviors
-        -- TODO: add assertion for ContextSteering:clearBehaviors
+        local cs = lurek.ai.newContextSteering(16)
+        cs:addSeekTarget(10, 0, 1.0)
+        cs:clearBehaviors()
+        local dx, dy = cs:evaluate(0, 0, 0, 0)
+        -- after clearing no strong direction expected (near zero)
+        expect_type("number", dx)
     end)
 end)
 
 describe("Missing explicit test for ContextSteering:chosenMagnitude", function()
     it("ContextSteering:chosenMagnitude works", function()
-        -- @covers ContextSteering:chosenMagnitude
-        -- TODO: add assertion for ContextSteering:chosenMagnitude
+        local cs = lurek.ai.newContextSteering(16)
+        cs:addSeekTarget(100, 0, 1.0)
+        cs:evaluate(0, 0, 0, 0)
+        local m = cs:chosenMagnitude()
+        expect_type("number", m)
     end)
 end)
 
 describe("Missing explicit test for ContextSteering:slotCount", function()
     it("ContextSteering:slotCount works", function()
-        -- @covers ContextSteering:slotCount
-        -- TODO: add assertion for ContextSteering:slotCount
+        local cs = lurek.ai.newContextSteering(8)
+        expect_equal(8, cs:slotCount())
     end)
 end)
 
 describe("Missing explicit test for NeedSystem:addNeed", function()
     it("NeedSystem:addNeed works", function()
-        -- @covers NeedSystem:addNeed
-        -- TODO: add assertion for NeedSystem:addNeed
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("hunger", 0.1, 0.7, 2.0)
+        expect_type("number", ns:valueOf("hunger"))
     end)
 end)
 
 describe("Missing explicit test for NeedSystem:update", function()
     it("NeedSystem:update works", function()
-        -- @covers NeedSystem:update
-        -- TODO: add assertion for NeedSystem:update
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("thirst", 0.5, 0.9, 1.0)
+        local before = ns:valueOf("thirst")
+        ns:update(1.0)
+        local after = ns:valueOf("thirst")
+        expect_true(after <= before, "need should decay or stay same after update")
     end)
 end)
 
 describe("Missing explicit test for NeedSystem:mostUrgent", function()
     it("NeedSystem:mostUrgent works", function()
-        -- @covers NeedSystem:mostUrgent
-        -- TODO: add assertion for NeedSystem:mostUrgent
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("food", 0.0, 0.5, 1.0)
+        -- satisfy below threshold so nothing is urgent
+        ns:satisfy("food", 1.0)
+        local u = ns:mostUrgent()
+        expect_true(u == nil or type(u) == "string")
     end)
 end)
 
 describe("Missing explicit test for NeedSystem:satisfy", function()
     it("NeedSystem:satisfy works", function()
-        -- @covers NeedSystem:satisfy
-        -- TODO: add assertion for NeedSystem:satisfy
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("rest", 0.1, 0.8, 1.0)
+        ns:update(5.0)  -- decay down
+        ns:satisfy("rest", 1.0)
+        local v = ns:valueOf("rest")
+        expect_type("number", v)
     end)
 end)
 
 describe("Missing explicit test for NeedSystem:valueOf", function()
     it("NeedSystem:valueOf works", function()
-        -- @covers NeedSystem:valueOf
-        -- TODO: add assertion for NeedSystem:valueOf
+        local ns = lurek.ai.newNeedSystem()
+        ns:addNeed("energy", 0.0, 0.5, 1.0)
+        local v = ns:valueOf("energy")
+        expect_type("number", v)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:pushEvent", function()
     it("AIDirector:pushEvent works", function()
-        -- @covers AIDirector:pushEvent
-        -- TODO: add assertion for AIDirector:pushEvent
+        local d = lurek.ai.newAIDirector()
+        local ok = pcall(function() d:pushEvent(0.8) end)
+        expect_true(ok, "pushEvent should not error")
     end)
 end)
 
 describe("Missing explicit test for AIDirector:update", function()
     it("AIDirector:update works", function()
-        -- @covers AIDirector:update
-        -- TODO: add assertion for AIDirector:update
+        local d = lurek.ai.newAIDirector()
+        d:pushEvent(0.5)
+        d:update(0.016)
+        expect_type("number", d:tension())
     end)
 end)
 
 describe("Missing explicit test for AIDirector:tension", function()
     it("AIDirector:tension works", function()
-        -- @covers AIDirector:tension
-        -- TODO: add assertion for AIDirector:tension
+        local d = lurek.ai.newAIDirector()
+        local t = d:tension()
+        expect_type("number", t)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:phase", function()
     it("AIDirector:phase works", function()
-        -- @covers AIDirector:phase
-        -- TODO: add assertion for AIDirector:phase
+        local d = lurek.ai.newAIDirector()
+        local p = d:phase()
+        expect_type("string", p)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:spawnRateFactor", function()
     it("AIDirector:spawnRateFactor works", function()
-        -- @covers AIDirector:spawnRateFactor
-        -- TODO: add assertion for AIDirector:spawnRateFactor
+        local d = lurek.ai.newAIDirector()
+        local f = d:spawnRateFactor()
+        expect_type("number", f)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:lootFactor", function()
     it("AIDirector:lootFactor works", function()
-        -- @covers AIDirector:lootFactor
-        -- TODO: add assertion for AIDirector:lootFactor
+        local d = lurek.ai.newAIDirector()
+        local f = d:lootFactor()
+        expect_type("number", f)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:ambientIntensity", function()
     it("AIDirector:ambientIntensity works", function()
-        -- @covers AIDirector:ambientIntensity
-        -- TODO: add assertion for AIDirector:ambientIntensity
+        local d = lurek.ai.newAIDirector()
+        local i = d:ambientIntensity()
+        expect_type("number", i)
     end)
 end)
 
 describe("Missing explicit test for AIDirector:setTension", function()
     it("AIDirector:setTension works", function()
-        -- @covers AIDirector:setTension
-        -- TODO: add assertion for AIDirector:setTension
+        local d = lurek.ai.newAIDirector()
+        d:setTension(0.75)
+        expect_equal(0.75, d:tension())
     end)
 end)
 
 describe("Missing explicit test for AIDirector:reset", function()
     it("AIDirector:reset works", function()
-        -- @covers AIDirector:reset
-        -- TODO: add assertion for AIDirector:reset
+        local d = lurek.ai.newAIDirector()
+        d:setTension(1.0)
+        d:reset()
+        expect_equal(0.0, d:tension())
     end)
 end)
 
 describe("Missing explicit test for HTNDomain:addPrimitive", function()
     it("HTNDomain:addPrimitive works", function()
-        -- @covers HTNDomain:addPrimitive
-        -- TODO: add assertion for HTNDomain:addPrimitive
+        local d = lurek.ai.newHTNDomain()
+        d:addPrimitive("move", {"at_base"}, {"arrived"}, {"at_base"})
+        expect_equal(1, d:taskCount())
     end)
 end)
 
 describe("Missing explicit test for HTNDomain:taskCount", function()
     it("HTNDomain:taskCount works", function()
-        -- @covers HTNDomain:taskCount
-        -- TODO: add assertion for HTNDomain:taskCount
+        local d = lurek.ai.newHTNDomain()
+        expect_equal(0, d:taskCount())
+        d:addPrimitive("patrol", {}, {}, {})
+        expect_equal(1, d:taskCount())
     end)
 end)
 
 describe("Missing explicit test for EmotionModel:trigger", function()
     it("EmotionModel:trigger works", function()
-        -- @covers EmotionModel:trigger
-        -- TODO: add assertion for EmotionModel:trigger
+        local em = lurek.ai.newEmotionModel()
+        em:add("fear", 0.0, 0.1, 0.05)
+        local before = em:get("fear")
+        em:trigger("fear", 0.5)
+        local after = em:get("fear")
+        expect_true(after > before, "trigger should raise emotion value")
     end)
 end)
 
 describe("Missing explicit test for EmotionModel:dominant", function()
     it("EmotionModel:dominant works", function()
-        -- @covers EmotionModel:dominant
-        -- TODO: add assertion for EmotionModel:dominant
+        local em = lurek.ai.newEmotionModel()
+        em:add("joy", 0.0, 0.1, 0.05)
+        em:add("anger", 0.0, 0.1, 0.05)
+        em:trigger("anger", 1.0)
+        local d = em:dominant()
+        expect_equal("anger", d)
     end)
 end)
 
 describe("Missing explicit test for EmotionModel:isActive", function()
     it("EmotionModel:isActive works", function()
-        -- @covers EmotionModel:isActive
-        -- TODO: add assertion for EmotionModel:isActive
+        local em = lurek.ai.newEmotionModel()
+        em:add("sadness", 0.0, 0.0, 0.1)
+        expect_false(em:isActive("sadness"), "below threshold: not active")
+        em:trigger("sadness", 1.0)
+        expect_true(em:isActive("sadness"), "above threshold: active")
     end)
 end)
 
 describe("Missing explicit test for EmotionModel:update", function()
     it("EmotionModel:update works", function()
-        -- @covers EmotionModel:update
-        -- TODO: add assertion for EmotionModel:update
+        local em = lurek.ai.newEmotionModel()
+        em:add("hope", 0.0, 1.0, 0.01)
+        em:trigger("hope", 1.0)
+        em:update(1.0)
+        local v = em:get("hope")
+        expect_type("number", v)
     end)
 end)
 
 describe("Missing explicit test for EmotionModel:reset", function()
     it("EmotionModel:reset works", function()
-        -- @covers EmotionModel:reset
-        -- TODO: add assertion for EmotionModel:reset
+        local em = lurek.ai.newEmotionModel()
+        em:add("rage", 0.0, 0.1, 0.1)
+        em:trigger("rage", 0.9)
+        em:reset()
+        expect_equal(0.0, em:get("rage"))
     end)
 end)
 
 describe("Missing explicit test for ORCASolver:setPosition", function()
     it("ORCASolver:setPosition works", function()
-        -- @covers ORCASolver:setPosition
-        -- TODO: add assertion for ORCASolver:setPosition
+        local s = lurek.ai.newORCASolver(1.5)
+        local idx = s:addAgent(0, 0, 0.5, 3.0)
+        s:setPosition(idx, 5.0, 3.0)
+        local vx, vy = s:getSafeVelocity(idx)
+        expect_type("number", vx)
     end)
 end)
 
 describe("Missing explicit test for ORCASolver:compute", function()
     it("ORCASolver:compute works", function()
-        -- @covers ORCASolver:compute
-        -- TODO: add assertion for ORCASolver:compute
+        local s = lurek.ai.newORCASolver(1.5)
+        s:addAgent(0, 0, 0.5, 3.0)
+        local ok = pcall(function() s:compute(0.016) end)
+        expect_true(ok, "compute should not error")
     end)
 end)
 
 describe("Missing explicit test for ORCASolver:getSafeVelocity", function()
     it("ORCASolver:getSafeVelocity works", function()
-        -- @covers ORCASolver:getSafeVelocity
-        -- TODO: add assertion for ORCASolver:getSafeVelocity
+        local s = lurek.ai.newORCASolver(1.5)
+        local idx = s:addAgent(0, 0, 0.5, 3.0)
+        s:compute(0.016)
+        local vx, vy = s:getSafeVelocity(idx)
+        expect_type("number", vx)
+        expect_type("number", vy)
     end)
 end)
 
 describe("Missing explicit test for ORCASolver:agentCount", function()
     it("ORCASolver:agentCount works", function()
-        -- @covers ORCASolver:agentCount
-        -- TODO: add assertion for ORCASolver:agentCount
+        local s = lurek.ai.newORCASolver(1.5)
+        expect_equal(0, s:agentCount())
+        s:addAgent(0, 0, 0.5, 3.0)
+        expect_equal(1, s:agentCount())
     end)
 end)
 
 describe("Missing explicit test for NeuralNet:forward", function()
     it("NeuralNet:forward works", function()
-        -- @covers NeuralNet:forward
-        -- TODO: add assertion for NeuralNet:forward
+        local nn = lurek.ai.newNeuralNet()
+        nn:addLayer(2, 2, "relu")
+        nn:addLayer(2, 1, "sigmoid")
+        local out = nn:forward({0.5, 0.3})
+        expect_type("table", out)
+        expect_equal(1, #out)
     end)
 end)
 
 describe("Missing explicit test for NeuralNet:setWeights", function()
     it("NeuralNet:setWeights works", function()
-        -- @covers NeuralNet:setWeights
-        -- TODO: add assertion for NeuralNet:setWeights
+        local nn = lurek.ai.newNeuralNet()
+        nn:addLayer(2, 1, "linear")
+        local w = nn:getWeights()
+        for i = 1, #w do w[i] = 0.1 end
+        local ok = nn:setWeights(w)
+        expect_true(ok)
     end)
 end)
 
 describe("Missing explicit test for NeuralNet:getWeights", function()
     it("NeuralNet:getWeights works", function()
-        -- @covers NeuralNet:getWeights
-        -- TODO: add assertion for NeuralNet:getWeights
+        local nn = lurek.ai.newNeuralNet()
+        nn:addLayer(2, 1, "relu")
+        local w = nn:getWeights()
+        expect_type("table", w)
+        expect_true(#w > 0)
     end)
 end)
 
 describe("Missing explicit test for NeuralNet:paramCount", function()
     it("NeuralNet:paramCount works", function()
-        -- @covers NeuralNet:paramCount
-        -- TODO: add assertion for NeuralNet:paramCount
+        local nn = lurek.ai.newNeuralNet()
+        nn:addLayer(3, 2, "relu")
+        local p = nn:paramCount()
+        expect_type("number", p)
+        expect_true(p > 0)
     end)
 end)
 
 describe("Missing explicit test for NeuralNet:layerCount", function()
     it("NeuralNet:layerCount works", function()
-        -- @covers NeuralNet:layerCount
-        -- TODO: add assertion for NeuralNet:layerCount
+        local nn = lurek.ai.newNeuralNet()
+        expect_equal(0, nn:layerCount())
+        nn:addLayer(2, 2, "relu")
+        expect_equal(1, nn:layerCount())
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:evolve", function()
     it("GeneticAlgorithm:evolve works", function()
-        -- @covers GeneticAlgorithm:evolve
-        -- TODO: add assertion for GeneticAlgorithm:evolve
+        local ga = lurek.ai.newGeneticAlgorithm(10, 4, 42)
+        local before = ga:generation()
+        ga:evolve()
+        expect_equal(before + 1, ga:generation())
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:generation", function()
     it("GeneticAlgorithm:generation works", function()
-        -- @covers GeneticAlgorithm:generation
-        -- TODO: add assertion for GeneticAlgorithm:generation
+        local ga = lurek.ai.newGeneticAlgorithm(10, 4, 42)
+        expect_equal(0, ga:generation())
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:popSize", function()
     it("GeneticAlgorithm:popSize works", function()
-        -- @covers GeneticAlgorithm:popSize
-        -- TODO: add assertion for GeneticAlgorithm:popSize
+        local ga = lurek.ai.newGeneticAlgorithm(10, 4, 42)
+        expect_equal(10, ga:popSize())
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:setFitness", function()
     it("GeneticAlgorithm:setFitness works", function()
-        -- @covers GeneticAlgorithm:setFitness
-        -- TODO: add assertion for GeneticAlgorithm:setFitness
+        local ga = lurek.ai.newGeneticAlgorithm(5, 4, 42)
+        local ok = pcall(function() ga:setFitness(0, 1.0) end)
+        expect_true(ok, "setFitness should not error")
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:getGenes", function()
     it("GeneticAlgorithm:getGenes works", function()
-        -- @covers GeneticAlgorithm:getGenes
-        -- TODO: add assertion for GeneticAlgorithm:getGenes
+        local ga = lurek.ai.newGeneticAlgorithm(5, 4, 42)
+        local genes = ga:getGenes(0)
+        expect_type("table", genes)
+        expect_equal(4, #genes)
     end)
 end)
 
 describe("Missing explicit test for GeneticAlgorithm:bestGenes", function()
     it("GeneticAlgorithm:bestGenes works", function()
-        -- @covers GeneticAlgorithm:bestGenes
-        -- TODO: add assertion for GeneticAlgorithm:bestGenes
+        local ga = lurek.ai.newGeneticAlgorithm(5, 4, 42)
+        local bg = ga:bestGenes()
+        expect_type("table", bg)
     end)
 end)
 
 describe("Missing explicit test for Bandit:select", function()
     it("Bandit:select works", function()
-        -- @covers Bandit:select
-        -- TODO: add assertion for Bandit:select
+        local b = lurek.ai.newBandit(4, "epsilon_greedy", 0.1, 0)
+        local arm = b:select()
+        expect_type("number", arm)
+        expect_true(arm >= 0 and arm < 4)
     end)
 end)
 
 describe("Missing explicit test for Bandit:update", function()
     it("Bandit:update works", function()
-        -- @covers Bandit:update
-        -- TODO: add assertion for Bandit:update
+        local b = lurek.ai.newBandit(3, "ucb1", 0.0, 0)
+        local ok = pcall(function() b:update(0, 1.0) end)
+        expect_true(ok, "update should not error")
     end)
 end)
 
 describe("Missing explicit test for Bandit:bestArm", function()
     it("Bandit:bestArm works", function()
-        -- @covers Bandit:bestArm
-        -- TODO: add assertion for Bandit:bestArm
+        local b = lurek.ai.newBandit(3, "epsilon_greedy", 0.0, 0)
+        b:update(1, 10.0)
+        local best = b:bestArm()
+        expect_equal(1, best)
     end)
 end)
 
 describe("Missing explicit test for Bandit:reset", function()
     it("Bandit:reset works", function()
-        -- @covers Bandit:reset
-        -- TODO: add assertion for Bandit:reset
+        local b = lurek.ai.newBandit(3, "epsilon_greedy", 0.1, 0)
+        b:select() b:select()
+        b:reset()
+        expect_equal(0, b:totalPulls())
     end)
 end)
 
 describe("Missing explicit test for Bandit:armCount", function()
     it("Bandit:armCount works", function()
-        -- @covers Bandit:armCount
-        -- TODO: add assertion for Bandit:armCount
+        local b = lurek.ai.newBandit(5, "epsilon_greedy", 0.1, 0)
+        expect_equal(5, b:armCount())
     end)
 end)
 
 describe("Missing explicit test for Bandit:totalPulls", function()
     it("Bandit:totalPulls works", function()
-        -- @covers Bandit:totalPulls
-        -- TODO: add assertion for Bandit:totalPulls
+        local b = lurek.ai.newBandit(3, "epsilon_greedy", 0.1, 0)
+        expect_equal(0, b:totalPulls())
+        local arm = b:select()
+        b:update(arm, 1.0)
+        expect_equal(1, b:totalPulls())
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:evolve", function()
     it("Neuroevolution:evolve works", function()
-        -- @covers Neuroevolution:evolve
-        -- TODO: add assertion for Neuroevolution:evolve
+        local spec = {{2, 2, "relu"}, {2, 1, "sigmoid"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 6, 0)
+        local before = ne:generation()
+        ne:evolve()
+        expect_equal(before + 1, ne:generation())
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:setFitness", function()
     it("Neuroevolution:setFitness works", function()
-        -- @covers Neuroevolution:setFitness
-        -- TODO: add assertion for Neuroevolution:setFitness
+        local spec = {{2, 1, "relu"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 4, 0)
+        local ok = pcall(function() ne:setFitness(0, 5.0) end)
+        expect_true(ok)
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:chromosomeToNet", function()
     it("Neuroevolution:chromosomeToNet works", function()
-        -- @covers Neuroevolution:chromosomeToNet
-        -- TODO: add assertion for Neuroevolution:chromosomeToNet
+        local spec = {{2, 1, "relu"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 4, 0)
+        local net = ne:chromosomeToNet(0)
+        expect_not_nil(net)
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:bestNetwork", function()
     it("Neuroevolution:bestNetwork works", function()
-        -- @covers Neuroevolution:bestNetwork
-        -- TODO: add assertion for Neuroevolution:bestNetwork
+        local spec = {{2, 1, "relu"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 4, 0)
+        local net = ne:bestNetwork()
+        expect_not_nil(net)
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:popSize", function()
     it("Neuroevolution:popSize works", function()
-        -- @covers Neuroevolution:popSize
-        -- TODO: add assertion for Neuroevolution:popSize
+        local spec = {{2, 1, "relu"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 8, 0)
+        expect_equal(8, ne:popSize())
     end)
 end)
 
 describe("Missing explicit test for Neuroevolution:generation", function()
     it("Neuroevolution:generation works", function()
-        -- @covers Neuroevolution:generation
-        -- TODO: add assertion for Neuroevolution:generation
+        local spec = {{2, 1, "relu"}}
+        local ne = lurek.ai.newNeuroevolution(spec, 4, 0)
+        expect_equal(0, ne:generation())
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:addGoal", function()
     it("StrategyAI:addGoal works", function()
-        -- @covers StrategyAI:addGoal
-        -- TODO: add assertion for StrategyAI:addGoal
+        local sa = lurek.ai.newStrategyAI(5.0)
+        local ok = pcall(function() sa:addGoal("expand") end)
+        expect_true(ok)
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:addTag", function()
     it("StrategyAI:addTag works", function()
-        -- @covers StrategyAI:addTag
-        -- TODO: add assertion for StrategyAI:addTag
+        local sa = lurek.ai.newStrategyAI(5.0)
+        local ok = pcall(function() sa:addTag("aggressive") end)
+        expect_true(ok)
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:removeTag", function()
     it("StrategyAI:removeTag works", function()
-        -- @covers StrategyAI:removeTag
-        -- TODO: add assertion for StrategyAI:removeTag
+        local sa = lurek.ai.newStrategyAI(5.0)
+        sa:addTag("defensive")
+        local ok = pcall(function() sa:removeTag("defensive") end)
+        expect_true(ok)
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:update", function()
     it("StrategyAI:update works", function()
-        -- @covers StrategyAI:update
-        -- TODO: add assertion for StrategyAI:update
+        local sa = lurek.ai.newStrategyAI(0.0)
+        sa:addGoal("survive")
+        sa:update(0.016, function(g) return 1.0 end)
+        expect_equal("survive", sa:activeGoal())
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:forceEvaluate", function()
     it("StrategyAI:forceEvaluate works", function()
-        -- @covers StrategyAI:forceEvaluate
-        -- TODO: add assertion for StrategyAI:forceEvaluate
+        local sa = lurek.ai.newStrategyAI(999.0)
+        sa:addGoal("attack")
+        sa:forceEvaluate(function(g) return 0.9 end)
+        expect_equal("attack", sa:activeGoal())
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:activeGoal", function()
     it("StrategyAI:activeGoal works", function()
-        -- @covers StrategyAI:activeGoal
-        -- TODO: add assertion for StrategyAI:activeGoal
+        local sa = lurek.ai.newStrategyAI(0.0)
+        expect_true(sa:activeGoal() == nil, "no active goal before first evaluate")
+        sa:addGoal("guard")
+        sa:forceEvaluate(function(g) return 1.0 end)
+        expect_equal("guard", sa:activeGoal())
     end)
 end)
 
 describe("Missing explicit test for StrategyAI:timeUntilNext", function()
     it("StrategyAI:timeUntilNext works", function()
-        -- @covers StrategyAI:timeUntilNext
-        -- TODO: add assertion for StrategyAI:timeUntilNext
+        local sa = lurek.ai.newStrategyAI(10.0)
+        local t = sa:timeUntilNext()
+        expect_type("number", t)
     end)
 end)
 
 describe("Missing explicit test for AILod:shouldUpdate", function()
     it("AILod:shouldUpdate works", function()
-        -- @covers AILod:shouldUpdate
-        -- TODO: add assertion for AILod:shouldUpdate
+        local lod = lurek.ai.newAILod()
+        local result = lod:shouldUpdate(0, 1)
+        expect_type("boolean", result)
     end)
 end)
 
 describe("Missing explicit test for AILod:tierCount", function()
     it("AILod:tierCount works", function()
-        -- @covers AILod:tierCount
-        -- TODO: add assertion for AILod:tierCount
+        local lod = lurek.ai.newAILod()
+        local c = lod:tierCount()
+        expect_type("number", c)
+        expect_true(c > 0)
     end)
 end)
 
 describe("Missing explicit test for AILod:tierName", function()
     it("AILod:tierName works", function()
-        -- @covers AILod:tierName
-        -- TODO: add assertion for AILod:tierName
+        local lod = lurek.ai.newAILod()
+        local name = lod:tierName(0)
+        expect_type("string", name)
     end)
 end)
 
@@ -4435,14 +4365,12 @@ end)
 -- =========================================================================
 
 describe("lurek.ai extensibility factories", function()
-    -- @covers lurek.ai.newGuard
     it("has newGuard factory", function()
         expect_type("function", lurek.ai.newGuard, "newGuard should be a function")
     end)
 end)
 
 describe("custom decision model", function()
-    -- @covers Agent:setCustomModel
     -- it is invoked when the world is updated.
     it("can set custom model on agent and callback fires on update", function()
         local world = lurek.ai.newWorld()
@@ -4465,7 +4393,6 @@ describe("custom decision model", function()
 end)
 
 describe("BT Guard decorator", function()
-    -- @covers lurek.ai.newGuard
     it("creates guard node via newGuard", function()
         local action = lurek.ai.newAction(function(ag, bb, dt) return "success" end)
         local guard = lurek.ai.newGuard(function(ag, bb) return true end, action)
@@ -4481,7 +4408,6 @@ describe("BT Guard decorator", function()
 end)
 
 describe("custom utility response curve", function()
-    -- @covers UtilityAI:addConsideration
     it("addConsideration accepts function as curve without error", function()
         local ua = lurek.ai.newUtilityAI()
         ua:addAction("test_action", function() return 0.5 end)
@@ -4513,7 +4439,6 @@ describe("custom utility response curve", function()
 end)
 
 describe("custom steering behavior", function()
-    -- @covers SteeringManager:addCustomBehavior
     it("addCustomBehavior adds one behavior to the manager", function()
         local sm = lurek.ai.newSteeringManager()
         local before = sm:getBehaviorCount()
@@ -4522,7 +4447,6 @@ describe("custom steering behavior", function()
             "behavior count should increase by 1")
     end)
 
-    -- @covers SteeringManager:applyCustomSteering
     it("applyCustomSteering returns a force pair without error", function()
         local sm = lurek.ai.newSteeringManager()
         local world = lurek.ai.newWorld()
@@ -4541,8 +4465,6 @@ end)
 
 --   decision model and that getDecisionModel returns "custom" afterwards.
 describe("Agent:setCustomModel extensibility hook", function()
-    -- @covers Agent:setCustomModel
-    -- @covers Agent:getDecisionModel
     it("setCustomModel marks agent with custom model", function()
         local world = lurek.ai.newWorld()
         local agent = world:addAgent("test_agent")
@@ -4562,5 +4484,4 @@ describe("Agent:setCustomModel extensibility hook", function()
         expect_true(called, "custom model callback should be called by world:update")
     end)
 end)
-
 test_summary()

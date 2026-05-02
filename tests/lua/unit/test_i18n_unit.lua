@@ -4,32 +4,6 @@
 -- setLanguage, getLanguages, fallbacks, t(), hasKey, getKeys, setKey,
 -- interpolate, pluralFor, onChange/offChange, keyCount, categories,
 -- keysInCategory, search, buildIndex/searchIndexed, mergeLocale.
--- @covers lurek.i18n.loadTable
--- @covers lurek.i18n.unloadTable
--- @covers lurek.i18n.setLanguage
--- @covers lurek.i18n.getLanguage
--- @covers lurek.i18n.getLanguages
--- @covers lurek.i18n.getAvailableLanguages
--- @covers lurek.i18n.hasLanguage
--- @covers lurek.i18n.setFallbacks
--- @covers lurek.i18n.getFallbacks
--- @covers lurek.i18n.setBase
--- @covers lurek.i18n.getBase
--- @covers lurek.i18n.t
--- @covers lurek.i18n.hasKey
--- @covers lurek.i18n.getKeys
--- @covers lurek.i18n.setKey
--- @covers lurek.i18n.interpolate
--- @covers lurek.i18n.pluralFor
--- @covers lurek.i18n.onChange
--- @covers lurek.i18n.offChange
--- @covers lurek.i18n.keyCount
--- @covers lurek.i18n.categories
--- @covers lurek.i18n.keysInCategory
--- @covers lurek.i18n.search
--- @covers lurek.i18n.buildIndex
--- @covers lurek.i18n.searchIndexed
--- @covers lurek.i18n.mergeLocale
 
 local en = {
     greeting = "Hello",
@@ -175,7 +149,7 @@ describe("lurek.i18n.t basic lookup", function()
         expect_equal("Au revoir", lurek.i18n.t("farewell"))
     end)
 
-    it("replaces {var} placeholders", function()
+    it("replaces {var} tokens", function()
         setup_en_fr()
         local result = lurek.i18n.t("welcome", { name = "Luna" })
         expect_equal("Welcome, Luna!", result)
@@ -337,17 +311,17 @@ describe("lurek.i18n.mergeLocale", function()
 end)
 
 describe("string interpolation (RS parity)", function()
-    it("interpolate replaces a single placeholder", function()
+    it("interpolate replaces a single token", function()
         local result = lurek.i18n.interpolate("Hello, {name}!", { name = "World" })
         expect_equal("Hello, World!", result)
     end)
 
-    it("interpolate replaces multiple placeholders", function()
+    it("interpolate replaces multiple tokens", function()
         local result = lurek.i18n.interpolate("{a} + {b} = {c}", { a = "1", b = "2", c = "3" })
         expect_equal("1 + 2 = 3", result)
     end)
 
-    it("interpolate leaves unknown placeholders as-is", function()
+    it("interpolate leaves unknown tokens as-is", function()
         local result = lurek.i18n.interpolate("Hi {unknown}", {})
         expect_contains(result, "{unknown}")
     end)
@@ -372,7 +346,6 @@ describe("localization format helpers (RS parity)", function()
 end)
 
 describe("lurek.i18n helper coverage", function()
-    -- @covers lurek.i18n.onLanguageChange
     it("onLanguageChange receives new and old locale codes", function()
         setup_en_fr()
         lurek.i18n.offChange()
@@ -393,7 +366,6 @@ describe("lurek.i18n helper coverage", function()
         lurek.i18n.offChange()
     end)
 
-    -- @covers lurek.i18n.formatNumber
     it("formatNumber applies locale separators and decimals", function()
         setup_en_fr()
         lurek.i18n.setLanguage("fr")
@@ -403,7 +375,6 @@ describe("lurek.i18n helper coverage", function()
         expect_equal("12.345,68", formatted)
     end)
 
-    -- @covers lurek.i18n.formatDate
     it("formatDate supports iso and short formats", function()
         setup_en_fr()
         lurek.i18n.setLanguage("en")
@@ -412,7 +383,6 @@ describe("lurek.i18n helper coverage", function()
         expect_equal("Jan 1, 1970", lurek.i18n.formatDate(0, "short"))
     end)
 
-    -- @covers lurek.i18n.tGender
     it("tGender resolves gendered keys and falls back to base key", function()
         setup_en_fr()
         lurek.i18n.setKey("en", "title", "Captain {name}")
@@ -425,7 +395,6 @@ describe("lurek.i18n helper coverage", function()
         expect_equal("Captain Alex", fallback)
     end)
 
-    -- @covers lurek.i18n.getLoadedLocales
     it("getLoadedLocales returns every loaded locale", function()
         setup_en_fr()
         lurek.i18n.loadTable("zz_loaded", { hello = "Ciao" })
@@ -445,5 +414,4 @@ describe("lurek.i18n helper coverage", function()
         lurek.i18n.unloadTable("zz_loaded")
     end)
 end)
-
 test_summary()

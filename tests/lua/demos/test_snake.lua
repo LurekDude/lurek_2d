@@ -15,7 +15,7 @@ describe("snake: game mechanics", function()
     end)
 
     it("uses direction input (up/down/left/right)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             (src:find('"up"') ~= nil or src:find('"w"') ~= nil) and
             (src:find('"down"') ~= nil or src:find('"s"') ~= nil),
@@ -23,7 +23,7 @@ describe("snake: game mechanics", function()
     end)
 
     it("has a snake body table or segment list", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("body") ~= nil or
             src:find("segments") ~= nil or
@@ -32,7 +32,7 @@ describe("snake: game mechanics", function()
     end)
 
     it("has food or item spawning", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("food") ~= nil or
             src:find("apple") ~= nil or
@@ -41,11 +41,10 @@ describe("snake: game mechanics", function()
     end)
 
     it("draws grid cells or snake segments", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("drawRect%s*%(") ~= nil,
             "No drawRect call found     snake segments will not render")
     end)
 end)
-
 test_summary()

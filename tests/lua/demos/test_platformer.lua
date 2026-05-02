@@ -15,7 +15,7 @@ describe("platformer: mechanics checks", function()
     end)
 
     it("has left/right movement input", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             (src:find('"left"') ~= nil or src:find('"a"') ~= nil) and
             (src:find('"right"') ~= nil or src:find('"d"') ~= nil),
@@ -23,7 +23,7 @@ describe("platformer: mechanics checks", function()
     end)
 
     it("has jump mechanic", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("jump") ~= nil or
             src:find('"space"') ~= nil or
@@ -32,7 +32,7 @@ describe("platformer: mechanics checks", function()
     end)
 
     it("has gravity or vertical velocity", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("gravity") ~= nil or
             src:find("vel_y") ~= nil or
@@ -42,7 +42,7 @@ describe("platformer: mechanics checks", function()
     end)
 
     it("has ground collision or on_ground flag", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("on_ground") ~= nil or
             src:find("grounded") ~= nil or
@@ -52,7 +52,7 @@ describe("platformer: mechanics checks", function()
     end)
 
     it("has level or platform data", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("platform") ~= nil or
             src:find("level") ~= nil or
@@ -61,5 +61,4 @@ describe("platformer: mechanics checks", function()
             "No level/platform data found")
     end)
 end)
-
 test_summary()

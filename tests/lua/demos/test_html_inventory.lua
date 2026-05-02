@@ -1,4 +1,4 @@
-﻿-- tests/lua/demos/test_html_inventory.lua
+-- tests/lua/demos/test_html_inventory.lua
 -- Static-analysis checks for the html-inventory showcase demo.
 -- read_file is injected by the test harness; not visible to LuaLS.
 ---@diagnostic disable: undefined-global
@@ -23,7 +23,7 @@ describe("demo html-inventory â€” static analysis", function()
     end)
 
     it("calls lurek.html.newDocument", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.html%.newDocument") ~= nil,
             "html-inventory must call newDocument"
@@ -31,7 +31,7 @@ describe("demo html-inventory â€” static analysis", function()
     end)
 
     it("uses queryAll to select multiple slots", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":queryAll") ~= nil,
             "html-inventory must use queryAll for bulk slot selection"
@@ -39,7 +39,7 @@ describe("demo html-inventory â€” static analysis", function()
     end)
 
     it("uses el:on to wire click handlers", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":on%(\"click\"") ~= nil or src:find(":on%('click'") ~= nil,
             "html-inventory must wire click handlers via el:on"
@@ -47,7 +47,7 @@ describe("demo html-inventory â€” static analysis", function()
     end)
 
     it("uses addClass / removeClass for selection state", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         local has_add = src:find(":addClass") ~= nil
         local has_rem = src:find(":removeClass") ~= nil
         expect_true(has_add and has_rem,
@@ -55,12 +55,11 @@ describe("demo html-inventory â€” static analysis", function()
     end)
 
     it("defines lurek.load, lurek.update, lurek.draw", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         local ok = src:find("function lurek%.load")
                 and src:find("function lurek%.update")
                 and src:find("function lurek%.draw")
         expect_true(ok ~= nil, "html-inventory must define all three lurek callbacks")
     end)
 end)
-
 test_summary()

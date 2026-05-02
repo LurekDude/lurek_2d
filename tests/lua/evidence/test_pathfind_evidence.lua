@@ -1,17 +1,12 @@
 -- Evidence suite: pathfind module
 -- lurek.pathfind NavGrid and A* path-finding evidence.
 -- Full path-finding operations require a configured NavGrid; those cases are xit'd pending API stabilisation.
--- @module pathfind
--- @description Evidence suite for lurek.pathfind: API surface and NavGrid construction evidence.
 
--- @covers lurek.pathfind (API surface)
--- @evidence file
 describe("evidence: pathfind", function()
     before_each(function()
         ensure_evidence_dir("pathfind")
     end)
 
-    -- @description Renders a PNG showing API presence: green=present, red=missing.
     it("records pathfind API surface as PNG evidence", function()
         local dir  = evidence_output_dir("pathfind")
         local path = dir .. "pathfind_api_surface.png"
@@ -82,14 +77,9 @@ end
 
 -- â”€â”€ tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
--- @description Covers suite: Evidence: lurek.pathfind A* basic.
 describe("Evidence: lurek.pathfind A* basic", function()
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers lurek.pathfind.newUnitPathfinder
-    -- @description Verifies A* spatial awareness navigating around a rigid wall gap by exporting a PNG visual array showing path trace routing accurately passing through the non-blocked slot.
-    xit("path avoids walls -\" PNG evidence: astar_basic", function()
+    it("path avoids walls -\" PNG evidence: astar_basic", function()
         local W, H = 20, 15
         local grid = lurek.pathfind.newNavGrid(W, H)
 
@@ -108,14 +98,10 @@ describe("Evidence: lurek.pathfind A* basic", function()
     end)
 end)
 
--- @description Covers suite: Evidence: lurek.pathfind weighted terrain.
 describe("Evidence: lurek.pathfind weighted terrain", function()
 
     -- @evidence file
-    -- @covers lurek.pathfind.newUnitPathfinder
-    -- @covers UnitPathfinder:findPath
-    -- @description Confirms terrain weighting algorithm correctly biases algorithms against high-cost regions (swamps/mud) leading to finding optimal longer routes vs shorter, costly ones. Output generated to an image verification file.
-    xit("higher-cost terrain is avoided when cheaper route exists -\" PNG evidence", function()
+    it("higher-cost terrain is avoided when cheaper route exists -\" PNG evidence", function()
         local W, H = 12, 12
         local grid = lurek.pathfind.newNavGrid(W, H)
 
@@ -133,14 +119,9 @@ describe("Evidence: lurek.pathfind weighted terrain", function()
     end)
 end)
 
--- @description Covers suite: Evidence: lurek.pathfind FlowField.
 describe("Evidence: lurek.pathfind FlowField", function()
     -- @evidence file
-    -- @covers FlowField:calculate
-    -- @covers FlowField:getDirection
-    -- @covers lurek.pathfind.newFlowField
-    -- @description Visually outputs a grid map encoding obstacles, free tiles, and the generated path finding vectors via getDirection calls to show a robust global flow navigation visual.
-    xit("flow field PNG evidence: astar_flow_field", function()
+    it("flow field PNG evidence: astar_flow_field", function()
         local W, H = 16, 16
         local grid = lurek.pathfind.newNavGrid(W, H)
 
@@ -184,22 +165,16 @@ end)
 -- Merged from: test_evidence_pathfind.lua
 -- ================================================================
 
--- Placeholder evidence suite for migrated pathfinding artifacts.
 -- Evidence suite: pathfind heatmap and flow-field.
 -- All lurek.pathfind heatmap / flow-field operations require a live NavGrid;
 -- those tests are xit'd in the extended block above.
 -- This block records which pathfind functions are exposed as an API surface manifest.
--- @module pathfind (manifest)
--- @description Writes a JSON API surface manifest for lurek.pathfind heatmap and flow-field functions.
 
--- @covers lurek.pathfind (API surface manifest)
--- @evidence file
 describe("evidence: pathfind manifest", function()
     before_each(function()
         ensure_evidence_dir("pathfind")
     end)
 
-    -- @description Renders a PNG showing heatmap/flow-field API presence: green=present, red=missing.
     it("records pathfind heatmap API surface as PNG evidence", function()
         local dir  = evidence_output_dir("pathfind")
         local path = dir .. "pathfind_heatmap_surface.png"
@@ -219,5 +194,4 @@ describe("evidence: pathfind manifest", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

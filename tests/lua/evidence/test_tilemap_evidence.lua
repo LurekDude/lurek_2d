@@ -31,14 +31,8 @@ local function gid_to_color(gid)
     return math.floor(r * 200 + 55), math.floor(g * 200 + 55), math.floor(b * 200 + 55)
 end
 
--- @description Covers suite: Evidence: lurek.tilemap API + PNG visualization.
 describe("Evidence: lurek.tilemap API + PNG visualization", function()
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:fill
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a handcrafted multi-GID tile pattern and saves the resulting colorized grid as tilemap evidence.
     it("PNG: tilemap grid with 6 different tile GIDs", function()
         local TILE = 8  -- pixel size per tile in output
         local MAP_W, MAP_H = 16, 12
@@ -86,12 +80,7 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "tilemap_grid.png")
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:getLayerName
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints a checkerboard layer and saves the resulting image as a second tilemap reference output.
     it("PNG: checkerboard tilemap pattern", function()
         local TILE = 8
         local MAP_W, MAP_H = 16, 16
@@ -115,7 +104,8 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "tilemap_checkerboard.png")
     end)
 
-end)
+end)
+
 
 
 -- ================================================================
@@ -155,14 +145,8 @@ local function gid_to_color(gid)
     return math.floor(r * 200 + 55), math.floor(g * 200 + 55), math.floor(b * 200 + 55)
 end
 
--- @description Covers suite: Evidence: lurek.tilemap API + PNG visualization.
 describe("Evidence: lurek.tilemap API + PNG visualization", function()
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:fill
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds a handcrafted multi-GID tile pattern and saves the resulting colorized grid as tilemap evidence.
     it("PNG: tilemap grid with 6 different tile GIDs", function()
         local TILE = 8  -- pixel size per tile in output
         local MAP_W, MAP_H = 16, 12
@@ -210,12 +194,7 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "tilemap_grid.png")
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:getLayerName
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints a checkerboard layer and saves the resulting image as a second tilemap reference output.
     it("PNG: checkerboard tilemap pattern", function()
         local TILE = 8
         local MAP_W, MAP_H = 16, 16
@@ -240,5 +219,4 @@ describe("Evidence: lurek.tilemap API + PNG visualization", function()
     end)
 
 end)
-
 test_summary()

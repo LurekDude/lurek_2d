@@ -96,5 +96,4 @@ describe("lurek.network security", function()
         expect_equal(unpacked.child.value, 2)
     end)
 end)
-
 test_summary()

@@ -35,24 +35,27 @@ describe("globe_demo: callback names", function()
     before_each(function() if not _demo_src then _demo_src = read_file(DEMO_PATH) end end)
 
     it("registers lurek.init, not lurek.load", function()
-        if not _demo_src then pending("source missing") return end
-        expect_false(_demo_src:find("function%s+lurek%.load%s*%(") ~= nil,
+        expect_not_nil(_demo_src, 'source missing')
+        local src = tostring(_demo_src or "")
+        expect_false(string.find(src, "function%s+lurek%.load%s*%(") ~= nil,
             "found 'function lurek.load()'     wrong callback name, use lurek.init")
-        expect_true(_demo_src:find("function%s+lurek%.init%s*%(") ~= nil,
+        expect_true(string.find(src, "function%s+lurek%.init%s*%(") ~= nil,
             "lurek.init callback not found     required by engine loop")
     end)
 
     it("registers lurek.process, not lurek.update", function()
-        if not _demo_src then pending("source missing") return end
-        expect_false(_demo_src:find("function%s+lurek%.update%s*%(") ~= nil,
+        expect_not_nil(_demo_src, 'source missing')
+        local src = tostring(_demo_src or "")
+        expect_false(string.find(src, "function%s+lurek%.update%s*%(") ~= nil,
             "found 'function lurek.update()'     wrong callback name, use lurek.process")
-        expect_true(_demo_src:find("function%s+lurek%.process%s*%(") ~= nil,
+        expect_true(string.find(src, "function%s+lurek%.process%s*%(") ~= nil,
             "lurek.process callback not found     engine update loop won't run")
     end)
 
     it("does not use lurek.draw (wrong callback)", function()
-        if not _demo_src then pending("source missing") return end
-        expect_false(_demo_src:find("function%s+lurek%.draw%s*%(") ~= nil,
+        expect_not_nil(_demo_src, 'source missing')
+        local src = tostring(_demo_src or "")
+        expect_false(string.find(src, "function%s+lurek%.draw%s*%(") ~= nil,
             "found 'function lurek.draw()'     wrong callback name, use lurek.render")
     end)
 end)
@@ -61,14 +64,16 @@ describe("globe_demo: API correctness", function()
     before_each(function() if not _demo_src then _demo_src = read_file(DEMO_PATH) end end)
 
     it("does not call lurek.render.rectangle", function()
-        if not _demo_src then pending("source missing") return end
-        expect_false(_demo_src:find("lurek%.render%.rectangle%s*%(") ~= nil,
+        expect_not_nil(_demo_src, 'source missing')
+        local src = tostring(_demo_src or "")
+        expect_false(string.find(src, "lurek%.render%.rectangle%s*%(") ~= nil,
             "lurek.render.rectangle is not valid     use gfx.rectangle")
     end)
 
     it("does not call lurek.input.isDown", function()
-        if not _demo_src then pending("source missing") return end
-        expect_false(_demo_src:find("lurek%.input%.isDown%s*%(") ~= nil,
+        expect_not_nil(_demo_src, 'source missing')
+        local src = tostring(_demo_src or "")
+        expect_false(string.find(src, "lurek%.input%.isDown%s*%(") ~= nil,
             "lurek.input.isDown() is invalid     use isActionDown()")
     end)
 end)
@@ -84,7 +89,7 @@ describe("globe_demo: globe API usage", function()
     end)
 
     it("calls lurek.globe.new to create the globe", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.globe%.new%s*%b()") ~= nil or
             src:find('lurek%.globe%.new%s*%("') ~= nil or
@@ -93,56 +98,56 @@ describe("globe_demo: globe API usage", function()
     end)
 
     it("uses Globe:addProvince to build the world", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":addProvince") ~= nil,
             "Globe:addProvince not found     world has no provinces")
     end)
 
     it("adds at least one map layer (addLayer)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":addLayer") ~= nil,
             "Globe:addLayer not found     map has no rendering layers")
     end)
 
     it("adds capital markers (addMarker)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":addMarker") ~= nil,
             "Globe:addMarker not found     no markers on the globe")
     end)
 
     it("sets camera position (setCamera)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":setCamera") ~= nil,
             "Globe:setCamera not found     camera will stay at default (0,0,1)")
     end)
 
     it("sets time of day (setTimeOfDay)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":setTimeOfDay") ~= nil,
             "Globe:setTimeOfDay not found     day/night cycle disabled")
     end)
 
     it("uses province picking (pick) in process loop", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":pick%s*%(") ~= nil,
             "Globe:pick not found     hover/select interaction is missing")
     end)
 
     it("uses Globe:update in process loop", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":update%s*%(") ~= nil,
             "Globe:update not found     globe physics/animation will not advance")
     end)
 
     it("expected 200 provinces keyword present in comments or config", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         -- The world-generation code should reference 200 in some form.
         expect_true(
             src:find("200") ~= nil,
@@ -150,21 +155,21 @@ describe("globe_demo: globe API usage", function()
     end)
 
     it("mouse drag panning uses getPosition", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("getPosition") ~= nil,
             "lurek.input.mouse.getPosition not used     drag panning is unimplemented")
     end)
 
     it("mouse wheel zooming uses getWheelDelta", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("getWheelDelta") ~= nil,
             "lurek.input.mouse.getWheelDelta not used     zoom is unimplemented")
     end)
 
     it("uses setBackgroundColor for space background", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("setBackgroundColor") ~= nil,
             "lurek.render.setBackgroundColor not called     background will be white")
@@ -182,25 +187,24 @@ describe("globe_demo: no invalid globe API", function()
     end)
 
     it("does not call Globe:addCountry (wrong method name)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find(":addCountry%s*%(") ~= nil,
             "Globe:addCountry is not a valid API     use Globe:addProvince")
     end)
 
     it("does not call Globe:setProjection (wrong method name)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find(":setProjection%s*%(") ~= nil,
             "Globe:setProjection is not a valid API (removed in v0.4)")
     end)
 
     it("does not call lurek.globe.create (wrong factory name)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.globe%.create%s*%(") ~= nil,
             "lurek.globe.create() is invalid     use lurek.globe.new()")
     end)
 end)
-
 test_summary()

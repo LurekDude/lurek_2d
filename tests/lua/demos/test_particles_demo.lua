@@ -15,7 +15,7 @@ describe("particles_demo: particle API usage", function()
     end)
 
     it("creates a particle system (lurek.particle.new)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.particle%.new") ~= nil or
             src:find("lurek%.particle%.system") ~= nil,
@@ -23,7 +23,7 @@ describe("particles_demo: particle API usage", function()
     end)
 
     it("emits or updates particles each frame", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":emit%s*%(") ~= nil or
             src:find(":update%s*%(") ~= nil or
@@ -32,7 +32,7 @@ describe("particles_demo: particle API usage", function()
     end)
 
     it("draws particles each frame", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find(":draw%s*%(") ~= nil or
             src:find("lurek%.particle%.draw") ~= nil,
@@ -40,11 +40,10 @@ describe("particles_demo: particle API usage", function()
     end)
 
     it("does not use lurek.particle.create (wrong factory)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.particle%.create%s*%(") ~= nil,
             "lurek.particle.create() is invalid     use lurek.particle.new()")
     end)
 end)
-
 test_summary()

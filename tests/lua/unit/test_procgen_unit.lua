@@ -1,212 +1,182 @@
 -- Lurek2D Lua BDD tests for lurek.procgen
 -- Headless: no GPU, no audio, no window.
 
-describe("lurek.procgen", function()
-    describe("module interface", function()
-        -- @covers lurek.procgen.cellularAutomata
-        -- @covers lurek.procgen.floodFill
-        -- @covers lurek.procgen.perlinNoise
-        -- @covers lurek.procgen.poissonDisk
-        -- @covers lurek.procgen.voronoi
-        it("exposes cellularAutomata", function()
-            expect_type("function", lurek.procgen.cellularAutomata)
-        end)
-
-        -- @covers lurek.procgen.floodFill
-        it("exposes floodFill", function()
-            expect_type("function", lurek.procgen.floodFill)
-        end)
-
-        -- @covers lurek.procgen.perlinNoise
-        it("exposes perlinNoise", function()
-            expect_type("function", lurek.procgen.perlinNoise)
-        end)
-
-        -- @covers lurek.procgen.poissonDisk
-        it("exposes poissonDisk", function()
-            expect_type("function", lurek.procgen.poissonDisk)
-        end)
-
-        -- @covers lurek.procgen.voronoi
-        it("exposes voronoi", function()
-            expect_type("function", lurek.procgen.voronoi)
-        end)
+describe("module interface", function()
+    it("exposes cellularAutomata", function()
+        expect_type("function", lurek.procgen.cellularAutomata)
     end)
 
-    describe("cellularAutomata(w, h, opts)", function()
-        -- @covers lurek.procgen.cellularAutomata
-        it("returns a flat table of 0/1 values", function()
-            local data = lurek.procgen.cellularAutomata(8, 6)
-            expect_type("table", data)
-            expect_equal(48, #data)
-        end)
-
-        -- @covers lurek.procgen.cellularAutomata
-        it("all values are 0 or 1", function()
-            local data = lurek.procgen.cellularAutomata(10, 10)
-            for _, v in ipairs(data) do
-                expect_true(v == 0 or v == 1, "unexpected value: " .. tostring(v))
-            end
-        end)
-
-        -- @covers lurek.procgen.cellularAutomata
-        it("accepts opts table with fill parameter", function()
-            local data = lurek.procgen.cellularAutomata(6, 6, { fill = 0.5, iterations = 2 })
-            expect_equal(36, #data)
-        end)
-
-        -- @covers lurek.procgen.cellularAutomata
-        it("is deterministic for the same seed", function()
-            local a = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
-            local b = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
-            expect_equal(#a, #b)
-            for i = 1, #a do
-                expect_equal(a[i], b[i])
-            end
-        end)
+    it("exposes floodFill", function()
+        expect_type("function", lurek.procgen.floodFill)
     end)
 
-    describe("floodFill(data, w, h, sx, sy, threshold, above)", function()
-        -- @covers lurek.procgen.floodFill
-        it("returns a table of the same size as input", function()
-            local data = {}
-            for i = 1, 25 do data[i] = 0 end
-            local result = lurek.procgen.floodFill(data, 5, 5, 2, 2)
-            expect_equal(25, #result)
-        end)
-
-        -- @covers lurek.procgen.floodFill
-        it("fills connected region starting from seed", function()
-            local data = {}
-            for i = 1, 25 do data[i] = 0 end
-            local result = lurek.procgen.floodFill(data, 5, 5, 0, 0)
-            -- With all-zero grid and below-threshold fill, all cells should be marked
-            local filled = 0
-            for _, v in ipairs(result) do
-                if v > 0 then filled = filled + 1 end
-            end
-            expect_true(filled > 0, "expected at least one filled cell")
-        end)
-
-        -- @covers lurek.procgen.floodFill
-        it("fills only cells that meet the threshold rule", function()
-            local data = {1, 1, 0, 0,
-                          1, 1, 0, 0,
-                          0, 0, 0, 0,
-                          0, 0, 0, 1}
-            local result = lurek.procgen.floodFill(data, 4, 4, 0, 0, 1, true)
-            expect_equal(1, result[1])
-            expect_equal(1, result[2])
-            expect_equal(1, result[5])
-            expect_equal(1, result[6])
-            expect_equal(0, result[3])
-        end)
+    it("exposes perlinNoise", function()
+        expect_type("function", lurek.procgen.perlinNoise)
     end)
 
-    describe("perlinNoise(x, y, px, py)", function()
-        -- @covers lurek.procgen.perlinNoise
-        it("returns a number", function()
-            local v = lurek.procgen.perlinNoise(0.5, 0.5, 8.0, 8.0)
-            expect_type("number", v)
-        end)
-
-        -- @covers lurek.procgen.perlinNoise
-        it("value is in [-1, 1]", function()
-            local v = lurek.procgen.perlinNoise(1.0, 2.0, 10.0, 10.0)
-            expect_in_range(v, -1.0, 1.0, "out of range: " .. tostring(v))
-        end)
-
-        -- @covers lurek.procgen.perlinNoise
-        it("wraps at period boundaries", function()
-            local px, py = 8.0, 8.0
-            local v1 = lurek.procgen.perlinNoise(0.0, 3.0, px, py)
-            local v2 = lurek.procgen.perlinNoise(px, 3.0, px, py)
-            local diff = math.abs(v1 - v2)
-            expect_less(diff, 0.001, "does not wrap: diff=" .. tostring(diff))
-        end)
+    it("exposes poissonDisk", function()
+        expect_type("function", lurek.procgen.poissonDisk)
     end)
 
-    describe("poissonDisk(w, h, min_dist, max_attempts, seed)", function()
-        -- @covers lurek.procgen.poissonDisk
-        it("returns a table of point objects", function()
-            local pts = lurek.procgen.poissonDisk(80, 80, 10)
-            expect_type("table", pts)
-        end)
+    it("exposes voronoi", function()
+        expect_type("function", lurek.procgen.voronoi)
+    end)
+end)
 
-        -- @covers lurek.procgen.poissonDisk
-        it("each point has x and y fields", function()
-            local pts = lurek.procgen.poissonDisk(80, 80, 10, 30, 42)
-            expect_true(#pts > 0, "expected at least one point")
-            for _, p in ipairs(pts) do
-                expect_type("number", p.x)
-                expect_type("number", p.y)
-            end
-        end)
-
-        -- @covers lurek.procgen.poissonDisk
-        it("points lie within the specified bounds", function()
-            local w, h = 100, 60
-            local pts = lurek.procgen.poissonDisk(w, h, 8, 30, 7)
-            for _, p in ipairs(pts) do
-                expect_true(p.x >= 0 and p.x < w, "point x=" .. p.x .. " out of bounds")
-                expect_true(p.y >= 0 and p.y < h, "point y=" .. p.y .. " out of bounds")
-            end
-        end)
-
-        -- @covers lurek.procgen.poissonDisk
-        it("keeps points at least min_dist apart", function()
-            local min_dist = 10
-            local pts = lurek.procgen.poissonDisk(80, 80, min_dist, 30, 42)
-            for i = 1, #pts do
-                for j = i + 1, #pts do
-                    local dx = pts[i].x - pts[j].x
-                    local dy = pts[i].y - pts[j].y
-                    local dist_sq = dx * dx + dy * dy
-                    expect_true(dist_sq >= (min_dist * min_dist) - 1e-4,
-                        "points too close: " .. tostring(math.sqrt(dist_sq)))
-                end
-            end
-        end)
+describe("cellularAutomata(w, h, opts)", function()
+    it("returns a flat table of 0/1 values", function()
+        local data = lurek.procgen.cellularAutomata(8, 6)
+        expect_type("table", data)
+        expect_equal(48, #data)
     end)
 
-    describe("voronoi(w, h, seeds)", function()
-        -- @covers lurek.procgen.voronoi
-        it("returns three tables: regions, dist, dist2", function()
-            local pts = { { x = 10, y = 10 }, { x = 30, y = 30 } }
-            local regions, dist, dist2 = lurek.procgen.voronoi(8, 8, pts)
-            expect_type("table", regions)
-            expect_type("table", dist)
-            expect_type("table", dist2)
-        end)
+    it("all values are 0 or 1", function()
+        local data = lurek.procgen.cellularAutomata(10, 10)
+        for _, v in ipairs(data) do
+            expect_true(v == 0 or v == 1, "unexpected value: " .. tostring(v))
+        end
+    end)
 
-        -- @covers lurek.procgen.voronoi
-        it("regions table has w*h entries", function()
-            local pts = { { x = 5, y = 5 }, { x = 15, y = 5 }, { x = 10, y = 15 } }
-            local regions, _, _ = lurek.procgen.voronoi(20, 10, pts)
-            expect_equal(200, #regions)
-        end)
+    it("accepts opts table with fill parameter", function()
+        local data = lurek.procgen.cellularAutomata(6, 6, { fill = 0.5, iterations = 2 })
+        expect_equal(36, #data)
+    end)
 
-        -- @covers lurek.procgen.voronoi
-        it("region indices are within seed count range", function()
-            local pts = { { x = 5, y = 5 }, { x = 15, y = 10 } }
-            local n = #pts
-            local regions, _, _ = lurek.procgen.voronoi(20, 20, pts)
-            for _, r in ipairs(regions) do
-                expect_true(r >= 1 and r <= n, "invalid region index: " .. tostring(r))
+    it("is deterministic for the same seed", function()
+        local a = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
+        local b = lurek.procgen.cellularAutomata(10, 10, { seed = 42 })
+        expect_equal(#a, #b)
+        for i = 1, #a do
+            expect_equal(a[i], b[i])
+        end
+    end)
+end)
+
+describe("floodFill(data, w, h, sx, sy, threshold, above)", function()
+    it("returns a table of the same size as input", function()
+        local data = {}
+        for i = 1, 25 do data[i] = 0 end
+        local result = lurek.procgen.floodFill(data, 5, 5, 2, 2)
+        expect_equal(25, #result)
+    end)
+
+    it("fills connected region starting from seed", function()
+        local data = {}
+        for i = 1, 25 do data[i] = 0 end
+        local result = lurek.procgen.floodFill(data, 5, 5, 0, 0)
+        -- With all-zero grid and below-threshold fill, all cells should be marked
+        local filled = 0
+        for _, v in ipairs(result) do
+            if v > 0 then filled = filled + 1 end
+        end
+        expect_true(filled > 0, "expected at least one filled cell")
+    end)
+
+    it("fills only cells that meet the threshold rule", function()
+        local data = {1, 1, 0, 0,
+                      1, 1, 0, 0,
+                      0, 0, 0, 0,
+                      0, 0, 0, 1}
+        local result = lurek.procgen.floodFill(data, 4, 4, 0, 0, 1, true)
+        expect_equal(1, result[1])
+        expect_equal(1, result[2])
+        expect_equal(1, result[5])
+        expect_equal(1, result[6])
+        expect_equal(0, result[3])
+    end)
+end)
+
+describe("perlinNoise(x, y, px, py)", function()
+    it("returns a number", function()
+        local v = lurek.procgen.perlinNoise(0.5, 0.5, 8.0, 8.0)
+        expect_type("number", v)
+    end)
+
+    it("value is in [-1, 1]", function()
+        local v = lurek.procgen.perlinNoise(1.0, 2.0, 10.0, 10.0)
+        expect_in_range(v, -1.0, 1.0, "out of range: " .. tostring(v))
+    end)
+
+    it("wraps at period boundaries", function()
+        local px, py = 8.0, 8.0
+        local v1 = lurek.procgen.perlinNoise(0.0, 3.0, px, py)
+        local v2 = lurek.procgen.perlinNoise(px, 3.0, px, py)
+        local diff = math.abs(v1 - v2)
+        expect_less(diff, 0.001, "does not wrap: diff=" .. tostring(diff))
+    end)
+end)
+
+describe("poissonDisk(w, h, min_dist, max_attempts, seed)", function()
+    it("returns a table of point objects", function()
+        local pts = lurek.procgen.poissonDisk(80, 80, 10)
+        expect_type("table", pts)
+    end)
+
+    it("each point has x and y fields", function()
+        local pts = lurek.procgen.poissonDisk(80, 80, 10, 30, 42)
+        expect_true(#pts > 0, "expected at least one point")
+        for _, p in ipairs(pts) do
+            expect_type("number", p.x)
+            expect_type("number", p.y)
+        end
+    end)
+
+    it("points lie within the specified bounds", function()
+        local w, h = 100, 60
+        local pts = lurek.procgen.poissonDisk(w, h, 8, 30, 7)
+        for _, p in ipairs(pts) do
+            expect_true(p.x >= 0 and p.x < w, "point x=" .. p.x .. " out of bounds")
+            expect_true(p.y >= 0 and p.y < h, "point y=" .. p.y .. " out of bounds")
+        end
+    end)
+
+    it("keeps points at least min_dist apart", function()
+        local min_dist = 10
+        local pts = lurek.procgen.poissonDisk(80, 80, min_dist, 30, 42)
+        for i = 1, #pts do
+            for j = i + 1, #pts do
+                local dx = pts[i].x - pts[j].x
+                local dy = pts[i].y - pts[j].y
+                local dist_sq = dx * dx + dy * dy
+                expect_true(dist_sq >= (min_dist * min_dist) - 1e-4,
+                    "points too close: " .. tostring(math.sqrt(dist_sq)))
             end
-        end)
+        end
+    end)
+end)
+
+describe("voronoi(w, h, seeds)", function()
+    it("returns three tables: regions, dist, dist2", function()
+        local pts = { { x = 10, y = 10 }, { x = 30, y = 30 } }
+        local regions, dist, dist2 = lurek.procgen.voronoi(8, 8, pts)
+        expect_type("table", regions)
+        expect_type("table", dist)
+        expect_type("table", dist2)
+    end)
+
+    it("regions table has w*h entries", function()
+        local pts = { { x = 5, y = 5 }, { x = 15, y = 5 }, { x = 10, y = 15 } }
+        local regions, _, _ = lurek.procgen.voronoi(20, 10, pts)
+        expect_equal(200, #regions)
+    end)
+
+    it("region indices are within seed count range", function()
+        local pts = { { x = 5, y = 5 }, { x = 15, y = 10 } }
+        local n = #pts
+        local regions, _, _ = lurek.procgen.voronoi(20, 20, pts)
+        for _, r in ipairs(regions) do
+            expect_true(r >= 1 and r <= n, "invalid region index: " .. tostring(r))
+        end
     end)
 end)
 
 describe("procgen determinism", function()
-    -- @covers lurek.procgen.poissonDisk
     it("poissonDisk with same seed returns same point count", function()
         local pts1 = lurek.procgen.poissonDisk(100, 80, 12, 30, 42)
         local pts2 = lurek.procgen.poissonDisk(100, 80, 12, 30, 42)
         expect_equal(#pts1, #pts2)
     end)
 
-    -- @covers lurek.procgen.poissonDisk
     it("poissonDisk with different seeds may differ", function()
         local pts1 = lurek.procgen.poissonDisk(100, 80, 8, 30, 1)
         local pts2 = lurek.procgen.poissonDisk(100, 80, 8, 30, 9999)
@@ -215,7 +185,6 @@ describe("procgen determinism", function()
         expect_true(#pts2 > 0, "seed 9999 result non-empty")
     end)
 
-    -- @covers lurek.procgen.perlinNoise
     it("perlinNoise same coords same period returns identical value", function()
         local v1 = lurek.procgen.perlinNoise(1.5, 2.5, 8.0, 8.0)
         local v2 = lurek.procgen.perlinNoise(1.5, 2.5, 8.0, 8.0)
@@ -224,7 +193,6 @@ describe("procgen determinism", function()
 end)
 
 describe("procgen edge cases", function()
-    -- @covers lurek.procgen.cellularAutomata
     it("cellularAutomata with fill=0 produces mostly zeros", function()
         local data = lurek.procgen.cellularAutomata(20, 20, { fill = 0.0, iterations = 0 })
         local ones = 0
@@ -234,7 +202,6 @@ describe("procgen edge cases", function()
         expect_equal(0, ones, "fill=0 should produce all zeros")
     end)
 
-    -- @covers lurek.procgen.cellularAutomata
     it("cellularAutomata with fill=1 produces mostly ones", function()
         local data = lurek.procgen.cellularAutomata(20, 20, { fill = 1.0, iterations = 0 })
         local zeros = 0
@@ -244,7 +211,6 @@ describe("procgen edge cases", function()
         expect_equal(0, zeros, "fill=1 should produce all ones")
     end)
 
-    -- @covers lurek.procgen.voronoi
     it("voronoi with single seed assigns all cells to region 1", function()
         local pts = { { x = 4, y = 4 } }
         local regions, _, _ = lurek.procgen.voronoi(8, 8, pts)
@@ -452,7 +418,6 @@ describe("procgen.noiseMap / noiseMapParallel", function()
 end)
 
 describe("lurek.procgen regression coverage", function()
-    -- @covers lurek.procgen.wfcGenerate
     it("wfcGenerate returns a fully collapsed grid for a single-tile ruleset", function()
         local grid = lurek.procgen.wfcGenerate({
             width = 4,
@@ -475,8 +440,6 @@ describe("lurek.procgen regression coverage", function()
         end
     end)
 
-    -- @covers lurek.procgen.simplex2d
-    -- @covers lurek.procgen.simplex3d
     it("simplex2d and simplex3d return deterministic numeric samples", function()
         local s2_a = lurek.procgen.simplex2d(0.25, 0.5)
         local s2_b = lurek.procgen.simplex2d(0.25, 0.5)
@@ -489,5 +452,4 @@ describe("lurek.procgen regression coverage", function()
         expect_near(s3_a, s3_b, 0.000001)
     end)
 end)
-
 test_summary()

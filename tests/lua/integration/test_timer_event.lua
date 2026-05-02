@@ -53,5 +53,4 @@ describe("timer + event integration", function()
         expect_equal(received, "hello", "timer callback emits signal correctly")
     end)
 end)
-
 test_summary()

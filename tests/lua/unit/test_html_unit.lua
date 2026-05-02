@@ -1,48 +1,36 @@
 -- tests/lua/unit/test_html_unit.lua
 -- Unit tests for lurek.html (standalone HTML/CSS layout engine).
--- @covers lurek.html
-
-local describe = describe or function(name, fn) print('describe: ' .. name) fn() end
-local it = it or function(name, fn) print('  it: ' .. name) fn() end
-local expect_type = function(v, t, msg) assert(type(v) == t, msg) end
-local expect_not_nil = expect_not_nil or function(v, msg) assert(v ~= nil, msg) end
-local expect_true = expect_true or function(v, msg) assert(v == true, msg) end
-local expect_false = expect_false or function(v, msg) assert(v == false, msg) end
-local expect_equal = expect_equal or function(a, b, msg) assert(a == b, msg) end
-local test_summary = test_summary or function() end
 
 -- =========================================================================
 -- lurek.html Tests
 -- =========================================================================
 
 describe("lurek.html module table exists", function()
-    -- @tests lurek.html
     it("lurek.html is a table", function()
-        expect_type(lurek.html, "table", "lurek.html must be a table")
+        expect_type("table", lurek.html, "lurek.html must be a table")
     end)
     it("newDocument is a function", function()
-        expect_type(lurek.html.newDocument, "function",
+        expect_type("function", lurek.html.newDocument,
             "lurek.html.newDocument must be a function")
     end)
     it("loadDocument is a function", function()
-        expect_type(lurek.html.loadDocument, "function",
+        expect_type("function", lurek.html.loadDocument,
             "lurek.html.loadDocument must be a function")
     end)
     it("supports is a function", function()
-        expect_type(lurek.html.supports, "function",
+        expect_type("function", lurek.html.supports,
             "lurek.html.supports must be a function")
     end)
 end)
 
 describe("lurek.html.newDocument constructor", function()
-    -- @covers lurek.html.newDocument
     it("newDocument() returns a non-nil value", function()
         local doc = lurek.html.newDocument()
         expect_not_nil(doc, "newDocument() must return an HtmlDocument")
     end)
     it("returned document has setHtml method", function()
         local doc = lurek.html.newDocument()
-        expect_type(doc.setHtml, "function", "HtmlDocument must have setHtml method")
+        expect_type("function", doc.setHtml, "HtmlDocument must have setHtml method")
     end)
     it("newDocument(html_string) succeeds without error", function()
         local ok, err = pcall(function()
@@ -66,7 +54,6 @@ describe("lurek.html.newDocument constructor", function()
 end)
 
 describe("HtmlDocument content API", function()
-    -- @tests HtmlDocument.setHtml HtmlDocument.getHtml HtmlDocument.setCss HtmlDocument.addCss HtmlDocument.clearCss HtmlDocument.isDirty HtmlDocument.relayout HtmlDocument.update
     local function make_doc()
         return lurek.html.newDocument()
     end
@@ -75,7 +62,7 @@ describe("HtmlDocument content API", function()
         local doc = make_doc()
         doc:setHtml("<p id='msg'>world</p>")
         local html = doc:getHtml()
-        expect_type(html, "string", "getHtml must return string after setHtml")
+        expect_type("string", html, "getHtml must return string after setHtml")
     end)
     it("setCss does not error", function()
         local doc = make_doc()
@@ -112,7 +99,6 @@ describe("HtmlDocument content API", function()
 end)
 
 describe("HtmlDocument viewport API", function()
-    -- @tests HtmlDocument.setViewport HtmlDocument.getViewport
     it("setViewport / getViewport round-trip", function()
         local doc = lurek.html.newDocument()
         doc:setViewport(1280, 720)
@@ -129,7 +115,6 @@ describe("HtmlDocument viewport API", function()
 end)
 
 describe("HtmlDocument element access API", function()
-    -- @tests HtmlDocument.getRoot HtmlDocument.getElementById HtmlDocument.query HtmlDocument.queryAll
     local function make_doc_with_content()
         local doc = lurek.html.newDocument()
         doc:setHtml([[
@@ -150,7 +135,7 @@ describe("HtmlDocument element access API", function()
     it("getRoot element has getTagName method", function()
         local doc = make_doc_with_content()
         local root = doc:getRoot()
-        expect_type(root.getTagName, "function", "root must expose getTagName")
+        expect_type("function", root.getTagName, "root must expose getTagName")
     end)
     it("getElementById finds element by id", function()
         local doc = make_doc_with_content()
@@ -170,7 +155,7 @@ describe("HtmlDocument element access API", function()
     it("queryAll('.class') returns a table", function()
         local doc = make_doc_with_content()
         local results = doc:queryAll(".text")
-        expect_type(results, "table", "queryAll must return a table")
+        expect_type("table", results, "queryAll must return a table")
     end)
     it("queryAll('.class') finds all matching elements", function()
         local doc = make_doc_with_content()
@@ -180,13 +165,12 @@ describe("HtmlDocument element access API", function()
     it("queryAll with no matches returns empty table", function()
         local doc = make_doc_with_content()
         local results = doc:queryAll(".no-such-class-xyz")
-        expect_type(results, "table", "queryAll must return a table even when empty")
+        expect_type("table", results, "queryAll must return a table even when empty")
         expect_equal(#results, 0, "queryAll with no match must return empty table")
     end)
 end)
 
 describe("HtmlDocument event and input API", function()
-    -- @tests HtmlDocument.on HtmlDocument.off HtmlDocument.mousepressed HtmlDocument.mousereleased HtmlDocument.mousemoved HtmlDocument.wheelmoved HtmlDocument.keypressed HtmlDocument.textinput
     local function make_doc()
         local doc = lurek.html.newDocument()
         doc:setHtml("<button id='btn'>Click</button>")
@@ -207,32 +191,31 @@ describe("HtmlDocument event and input API", function()
     end)
     it("mousepressed returns a boolean", function()
         local result = make_doc():mousepressed(100, 100, 1)
-        expect_type(result, "boolean", "mousepressed must return boolean")
+        expect_type("boolean", result, "mousepressed must return boolean")
     end)
     it("mousereleased returns a boolean", function()
         local result = make_doc():mousereleased(100, 100, 1)
-        expect_type(result, "boolean", "mousereleased must return boolean")
+        expect_type("boolean", result, "mousereleased must return boolean")
     end)
     it("mousemoved returns a boolean", function()
         local result = make_doc():mousemoved(200, 150)
-        expect_type(result, "boolean", "mousemoved must return boolean")
+        expect_type("boolean", result, "mousemoved must return boolean")
     end)
     it("wheelmoved returns a boolean", function()
         local result = make_doc():wheelmoved(0, -1)
-        expect_type(result, "boolean", "wheelmoved must return boolean")
+        expect_type("boolean", result, "wheelmoved must return boolean")
     end)
     it("keypressed returns a boolean", function()
         local result = make_doc():keypressed("return")
-        expect_type(result, "boolean", "keypressed must return boolean")
+        expect_type("boolean", result, "keypressed must return boolean")
     end)
     it("textinput returns a boolean", function()
         local result = make_doc():textinput("a")
-        expect_type(result, "boolean", "textinput must return boolean")
+        expect_type("boolean", result, "textinput must return boolean")
     end)
 end)
 
 describe("HtmlElement DOM manipulation API", function()
-    -- @tests HtmlElement.getDocument HtmlElement.getTagName HtmlElement.getId HtmlElement.setId HtmlElement.getText HtmlElement.setText HtmlElement.getHtml HtmlElement.setHtml HtmlElement.appendHtml HtmlElement.getAttribute HtmlElement.setAttribute HtmlElement.removeAttribute HtmlElement.hasClass HtmlElement.addClass HtmlElement.removeClass HtmlElement.toggleClass HtmlElement.getStyle HtmlElement.setStyle HtmlElement.getRect HtmlElement.focus HtmlElement.blur HtmlElement.query HtmlElement.queryAll HtmlElement.on HtmlElement.off HtmlElement.remove
     local function make_el()
         local doc = lurek.html.newDocument()
         doc:setHtml([[
@@ -246,7 +229,7 @@ describe("HtmlElement DOM manipulation API", function()
 
     it("getTagName returns a string", function()
         local el = make_el()
-        expect_type(el:getTagName(), "string", "getTagName must return a string")
+        expect_type("string", el:getTagName(), "getTagName must return a string")
     end)
     it("getId returns the element's id", function()
         local el = make_el()
@@ -268,7 +251,7 @@ describe("HtmlElement DOM manipulation API", function()
     end)
     it("getHtml returns a string", function()
         local el = make_el()
-        expect_type(el:getHtml(), "string", "getHtml must return a string")
+        expect_type("string", el:getHtml(), "getHtml must return a string")
     end)
     it("setAttribute / getAttribute round-trip", function()
         local el = make_el()
@@ -319,10 +302,10 @@ describe("HtmlElement DOM manipulation API", function()
     it("getRect returns four numbers", function()
         local el = make_el()
         local x, y, w, h = el:getRect()
-        expect_type(x, "number", "getRect x must be a number")
-        expect_type(y, "number", "getRect y must be a number")
-        expect_type(w, "number", "getRect w must be a number")
-        expect_type(h, "number", "getRect h must be a number")
+        expect_type("number", x, "getRect x must be a number")
+        expect_type("number", y, "getRect y must be a number")
+        expect_type("number", w, "getRect w must be a number")
+        expect_type("number", h, "getRect h must be a number")
     end)
     it("focus does not error", function()
         local el = make_el()
@@ -339,7 +322,7 @@ describe("HtmlElement DOM manipulation API", function()
         local owner = el:getDocument()
         expect_not_nil(owner, "getDocument must return the owning document")
         -- The owner should also expose setHtml, confirming it's an HtmlDocument.
-        expect_type(owner.setHtml, "function",
+        expect_type("function", owner.setHtml,
             "getDocument result must expose setHtml")
     end)
     it("element:query finds a descendant", function()
@@ -352,7 +335,7 @@ describe("HtmlElement DOM manipulation API", function()
         local _, doc = make_el()
         local root = doc:getElementById("root")
         local results = root:queryAll(".text")
-        expect_type(results, "table",
+        expect_type("table", results,
             "element:queryAll must return a table")
     end)
     it("element:on returns a handle", function()
@@ -370,13 +353,12 @@ describe("HtmlElement DOM manipulation API", function()
         local el = make_el()
         el:appendHtml("<em>!</em>")
         local html = el:getHtml()
-        expect_type(html, "string", "getHtml after appendHtml must be string")
+        expect_type("string", html, "getHtml after appendHtml must be string")
         expect_true(html:len() > 0, "getHtml after appendHtml must be non-empty")
     end)
 end)
 
 describe("lurek.html.supports feature flags", function()
-    -- @covers lurek.html.supports
     it("supports('html') is true", function()
         expect_true(lurek.html.supports("html"),
             "supports('html') must be true")
@@ -400,7 +382,6 @@ describe("lurek.html.supports feature flags", function()
 end)
 
 describe("lurek.html.loadDocument error handling", function()
-    -- @covers lurek.html.loadDocument
     it("loadDocument on missing file raises an error", function()
         local ok, err = pcall(function()
             lurek.html.loadDocument("nonexistent_file_xyzzy.rml")
@@ -410,5 +391,4 @@ describe("lurek.html.loadDocument error handling", function()
             "the error value must be present and stringify to a non-empty message")
     end)
 end)
-
 test_summary()

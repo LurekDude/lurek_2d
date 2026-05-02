@@ -1,16 +1,7 @@
 -- Lurek2D Integration Test: Entity + Physics
 -- Tests physics bodies attached to entities and position sync.
 
--- @description Covers suite: integration: entity + physics body lifecycle.
 describe("integration: entity + physics body lifecycle", function()
-    -- @covers lurek.ecs.Universe.set
-    -- @covers lurek.physics.newBody
-    -- @covers lurek.ecs.newUniverse
-    -- @covers lurek.physics.newWorld
-    -- @covers lurek.physics.step
-    -- @covers lurek.physics.getBody
-    -- @covers lurek.physics.destroyWorld
-    -- @description Verifies an entity can store the identifier of a physics body created in the same world.
     it("creates entity and attaches physics body in same world", function()
         local universe = lurek.ecs.newUniverse()
         local world    = lurek.physics.newWorld(0, 9.8)
@@ -27,9 +18,6 @@ describe("integration: entity + physics body lifecycle", function()
         lurek.physics.destroyWorld(world)
     end)
 
-    -- @covers lurek.ecs.Universe.set
-    -- @covers lurek.physics.step
-    -- @description Verifies physics simulation updates can be read back and synchronized into entity position fields.
     it("physics step moves dynamic body, entity position updated manually", function()
         local universe = lurek.ecs.newUniverse()
         local world    = lurek.physics.newWorld(0, 9.8)
@@ -52,9 +40,6 @@ describe("integration: entity + physics body lifecycle", function()
         lurek.physics.destroyWorld(world)
     end)
 
-    -- @covers lurek.ecs.Universe.kill
-    -- @covers lurek.physics.destroyWorld
-    -- @description Verifies destroying an entity that still references a physics body does not crash the cleanup path.
     it("killing entity while physics body exists does not crash", function()
         local universe = lurek.ecs.newUniverse()
         local world    = lurek.physics.newWorld(0, 0)
@@ -69,5 +54,4 @@ describe("integration: entity + physics body lifecycle", function()
         expect_true(true, "kill + destroy did not crash")
     end)
 end)
-
 test_summary()

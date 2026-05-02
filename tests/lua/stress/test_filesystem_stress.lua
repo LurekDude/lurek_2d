@@ -1,14 +1,7 @@
 -- Lurek2D Stress Test: Filesystem I/O Operations
 -- Measures file write/read throughput in the sandboxed filesystem.
 
--- @description Covers suite: stress: filesystem write/read throughput.
 describe("stress: filesystem write/read throughput", function()
-    -- @covers lurek.filesystem.write
-    -- @covers lurek.filesystem.read
-    -- @covers lurek.filesystem.exists
-    -- @covers lurek.filesystem.remove
-    -- @stress Writes and reads 100 separate 1KB files, then cleans them all up.
-    -- @description Stresses sandboxed filesystem throughput by running batched small-file writes, batched reads, and existence-checked cleanup in one test.
     it("write + read 100 small files (1KB each): <10s", function()
         local COUNT   = 100
         local payload = string.rep("x", 1024)  -- 1KB
@@ -47,9 +40,6 @@ describe("stress: filesystem write/read throughput", function()
         expect_true(r_elapsed < 10.0, "read budget: " .. r_elapsed .. "s")
     end)
 
-    -- @covers lurek.filesystem.exists
-    -- @stress Performs 10000 existence checks against the same missing path.
-    -- @description Stresses metadata lookup throughput by repeatedly probing a non-existent file path in a tight measured loop.
     it("exists check 10000 times in <5s", function()
         local COUNT   = 10000
         local elapsed = measure("filesystem.exists x" .. COUNT, COUNT, function()
@@ -59,5 +49,4 @@ describe("stress: filesystem write/read throughput", function()
         expect_true(elapsed < 5.0, "exists check budget: " .. elapsed .. "s")
     end)
 end)
-
 test_summary()

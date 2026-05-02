@@ -1,18 +1,12 @@
 -- Evidence tests: bezier module
 -- Produces PNG artifacts from lurek.math.newBezierCurve curve evaluation.
--- @module bezier
--- @description Evidence suite for lurek.math BezierCurve: quadratic and cubic curve visualisation.
 
 describe("evidence: bezier", function()
     before_each(function()
         ensure_evidence_dir("bezier")
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getControlPointCount
     -- @evidence file
-    -- @description Plots a quadratic Bezier curve (3 control points) to a 200x200 PNG.
     it("plots a quadratic Bezier curve PNG", function()
         local dir  = evidence_output_dir("bezier")
         local path = dir .. "bezier_quadratic.png"
@@ -22,7 +16,7 @@ describe("evidence: bezier", function()
 
         -- control points (flat: x1,y1,x2,y2,x3,y3)
         local curve = lurek.math.newBezierCurve({ 20, 180, 100, 20, 180, 180 })
-        assert(curve:getControlPointCount() == 3, "quadratic curve must have 3 control points")
+        expect_true(curve:getControlPointCount() == 3, "quadratic curve must have 3 control points")
 
         -- draw control polygon
         local function cp(i) return curve:getControlPoint(i) end
@@ -49,11 +43,7 @@ describe("evidence: bezier", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
-    -- @covers BezierCurve:getDerivative
     -- @evidence file
-    -- @description Plots a cubic Bezier curve with tangent vectors to a 200x200 PNG.
     it("plots a cubic Bezier curve with tangents PNG", function()
         local dir  = evidence_output_dir("bezier")
         local path = dir .. "bezier_cubic.png"
@@ -62,7 +52,7 @@ describe("evidence: bezier", function()
         img:fill(250, 250, 250, 255)
 
         local curve = lurek.math.newBezierCurve({ 20, 170, 60, 20, 140, 20, 180, 170 })
-        assert(curve:getControlPointCount() == 4, "cubic curve must have 4 control points")
+        expect_true(curve:getControlPointCount() == 4, "cubic curve must have 4 control points")
 
         -- plot the curve
         local steps = 100
@@ -93,5 +83,4 @@ describe("evidence: bezier", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

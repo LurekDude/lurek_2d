@@ -1,16 +1,7 @@
 -- Lurek2D Integration Test: Light + Graphics
 -- Tests light API alongside graphics draw commands.
 
--- @description Covers suite: integration: light placement alongside scene geometry.
 describe("integration: light placement alongside scene geometry", function()
-    -- @covers lurek.light.newLight
-    -- @covers lurek.render.rectangle
-    -- @covers lurek.light.setPosition
-    -- @covers lurek.light.setRadius
-    -- @covers lurek.light.setColor
-    -- @covers lurek.light.setIntensity
-    -- @covers lurek.render.setColor
-    -- @description Verifies light setup and scene geometry draw commands can be issued together without error.
     it("creates lights and draws geometry to same scene", function()
         expect_no_error(function()
             -- Create lights with correct API: newLight(x, y, radius)
@@ -31,9 +22,6 @@ describe("integration: light placement alongside scene geometry", function()
         end)
     end)
 
-    -- @covers lurek.light.setIntensity
-    -- @covers lurek.render
-    -- @description Verifies point light intensity accepts boundary values while remaining compatible with the graphics scene setup.
     it("light intensity range is clamped correctly", function()
         local light = lurek.light.newLight(100, 100, 50)
         light:setIntensity(0.5)
@@ -43,9 +31,6 @@ describe("integration: light placement alongside scene geometry", function()
         end)
     end)
 
-    -- @covers lurek.light.newLight
-    -- @covers lurek.render
-    -- @description Verifies multiple light types can coexist alongside graphics usage without raising errors.
     it("multiple lights of different types created without error", function()
         expect_no_error(function()
             -- Create multiple lights of different positions/sizes
@@ -56,9 +41,6 @@ describe("integration: light placement alongside scene geometry", function()
         end)
     end)
 
-    -- @covers lurek.light.setColor
-    -- @covers lurek.render
-    -- @description Verifies normalized light color values are accepted while used in the same rendering context as graphics commands.
     it("light color components are in 0..1 range", function()
         local light = lurek.light.newLight(100, 100, 50)
         expect_no_error(function()
@@ -68,5 +50,4 @@ describe("integration: light placement alongside scene geometry", function()
         end)
     end)
 end)
-
 test_summary()

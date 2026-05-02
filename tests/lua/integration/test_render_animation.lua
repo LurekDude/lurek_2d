@@ -1,13 +1,7 @@
 -- Lurek2D Integration Test: Graphics + Animation
 -- Tests drawing primitives with animation frame progression
 
--- @description Covers suite: graphics + animation integration.
 describe("graphics + animation integration", function()
-    -- @covers lurek.animation.new
-    -- @covers lurek.animation.addClip
-    -- @covers lurek.animation.play
-    -- @covers lurek.render
-    -- @description Verifies that animation clip playback returns a valid frame index.
     it("animation clip current frame advances with time", function()
         local anim = lurek.animation.new()
         anim:addFramesFromGrid(128, 16, 16, 16, 0, 4)
@@ -22,9 +16,6 @@ describe("graphics + animation integration", function()
         expect_true(f1 >= 0, "frame is valid after 0.15s")
     end)
 
-    -- @covers lurek.animation.getCurrentFrame
-    -- @covers lurek.render.rectangle
-    -- @description Verifies animation frame index can drive graphics parameters.
     it("animation frame drives sprite draw parameters", function()
         local anim = lurek.animation.new()
         anim:addFramesFromGrid(64, 16, 16, 16, 0, 4)
@@ -43,9 +34,6 @@ describe("graphics + animation integration", function()
         end)
     end)
 
-    -- @covers lurek.animation.addClip
-    -- @covers lurek.animation.isLooping
-    -- @description Verifies a looping animation clip reports isLooping correctly.
     it("looping animation clip isLooping is true", function()
         local anim = lurek.animation.new()
         anim:addFramesFromGrid(48, 16, 16, 16, 0, 3)
@@ -59,9 +47,6 @@ describe("graphics + animation integration", function()
         expect_true(anim:isPlaying(), "still playing after looping past end")
     end)
 
-    -- @covers lurek.animation.pause
-    -- @covers lurek.animation.resume
-    -- @description Verifies pausing the animation prevents frame progression.
     it("paused animation does not advance frames", function()
         local anim = lurek.animation.new()
         anim:addFramesFromGrid(32, 16, 16, 16, 0, 2)
@@ -77,5 +62,4 @@ describe("graphics + animation integration", function()
         expect_equal(before, after, "paused animation frame does not change")
     end)
 end)
-
 test_summary()

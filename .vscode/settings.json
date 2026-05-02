@@ -1,0 +1,220 @@
+{
+	// ─── Editor ──────────────────────────────────────────────────────────────
+	"editor.tabSize": 4,
+	"editor.insertSpaces": false,
+	"editor.detectIndentation": false,
+	"editor.rulers": [120],
+	"editor.formatOnSave": false,
+
+	// ─── Files ───────────────────────────────────────────────────────────────
+	"files.trimTrailingWhitespace": true,
+	"files.insertFinalNewline": true,
+	"files.exclude": {
+		"build/": true,
+		"target/": true,
+		"**/__pycache__": true,
+		"**/.DS_Store": true,
+		"tests/output/actual/**": true,
+		"tests/output/difference/**": true
+	},
+	"search.exclude": {
+		"build/**": true,
+		"target/**": true,
+		"tests/output/**": true,
+		"extensions/vscode/dist/**": true,
+		"extensions/vscode/node_modules/**": true
+	},
+
+	// ─── Rust Analyzer ───────────────────────────────────────────────────────
+	// Use clippy for inline diagnostics (matches Quality: Clippy task)
+	"rust-analyzer.check.command": "clippy",
+	"rust-analyzer.check.extraArgs": ["-D", "warnings"],
+	// Default LuaJIT feature (B-01: LuaJIT is main runtime)
+	"rust-analyzer.cargo.features": ["lua-jit"],
+	// Enable all cargo lints
+	"rust-analyzer.cargo.allTargets": true,
+	// Proc-macro support (required for thiserror, derive macros)
+	"rust-analyzer.procMacro.enable": true,
+	// Show inlay hints for types and parameter names
+	"rust-analyzer.inlayHints.parameterHints.enable": true,
+	"rust-analyzer.inlayHints.typeHints.enable": true,
+	"rust-analyzer.inlayHints.chainingHints.enable": true,
+	// Code lens: run tests and benchmarks inline
+	"rust-analyzer.lens.enable": true,
+	"rust-analyzer.lens.run.enable": true,
+	"rust-analyzer.lens.debug.enable": true,
+	// Diagnostics
+	"rust-analyzer.diagnostics.enable": true,
+	"rust-analyzer.diagnostics.experimental.enable": true,
+	// Hover actions
+	"rust-analyzer.hover.actions.enable": true,
+	"rust-analyzer.hover.actions.run.enable": true,
+	"rust-analyzer.hover.actions.debug.enable": true,
+	// Use rust-toolchain.toml pinned toolchain — do not override
+	"rust-analyzer.rustfmt.extraArgs": [],
+	// Import granularity: group by module (idiomatic Rust style)
+	"rust-analyzer.imports.granularity.group": "module",
+
+	// ─── Lua (sumneko.lua) ───────────────────────────────────────────────────
+	"Lua.runtime.version": "LuaJIT",
+	// Point the Lua LSP at the generated lurek.* API stubs and library stubs
+	"Lua.workspace.library": [
+		"${workspaceFolder}/docs/api"
+	],
+	"Lua.codeLens.enable": true,
+	// lurek is the only global namespace (C-01: use lurek.* only)
+	"Lua.diagnostics.globals": ["lurek"],
+	"Lua.diagnostics.disable": ["duplicate-set-field"],
+	"Lua.workspace.ignoreDir": [
+		"build",
+		"target",
+		"extensions/vscode/node_modules"
+	],
+	// Enable strict mode for Lua scripts
+	"Lua.type.castNumberToInteger": true,
+	"Lua.completion.enable": true,
+	"Lua.completion.showWord": "Disable",
+
+	// ─── TOML (tamasfe.even-better-toml) ─────────────────────────────────────
+	"evenBetterToml.schema.associations": {
+		"Cargo.toml": "https://json.schemastore.org/cargo.json"
+	},
+	"evenBetterToml.formatter.alignEntries": false,
+	"evenBetterToml.formatter.reorderKeys": false,
+
+	// ─── Markdown ─────────────────────────────────────────────────────────────
+	"markdownlint.config": {
+		"MD013": false,
+		"MD033": false
+	},
+
+	// ─── Git ─────────────────────────────────────────────────────────────────
+	"git.autofetch": true,
+
+	// ─── Diff editor ─────────────────────────────────────────────────────────
+	"diffEditor.maxComputationTime": 0,
+
+	// ─── Terminal ────────────────────────────────────────────────────────────
+	"terminal.integrated.cwd": "${workspaceFolder}",
+
+	// ─── GitHub Copilot ───────────────────────────────────────────────────────
+	"github.copilot.enable": {
+		"*": true,
+		"lua": true,
+		"rust": true,
+		"toml": true,
+		"markdown": true
+	},
+	"github.copilot.renameSuggestions.triggerAutomatically": true,
+	// Next Edit Suggestions
+	"github.copilot.nextEditSuggestions.enabled": true,
+	"github.copilot.nextEditSuggestions.extendedRange": true,
+	"github.copilot.nextEditSuggestions.eagerness": "auto",
+	"github.copilot.nextEditSuggestions.fixes": true,
+	// Inline edits
+	"github.copilot.chat.inlineEdits.chatSessionContextProvider.enabled": true,
+	"github.copilot.chat.inlineEdits.diagnosticsContextProvider.enabled": true,
+	"github.copilot.chat.inlineEdits.renameSymbolSuggestions": true,
+	// Agent
+	"github.copilot.chat.agent.autoFix": true,
+	"github.copilot.chat.agent.currentEditorContext.enabled": true,
+	"github.copilot.chat.agent.largeToolResultsToDisk.enabled": true,
+	"github.copilot.chat.enableUserPreferences": true,
+	"github.copilot.chat.backgroundAgent.enabled": true,
+	"github.copilot.chat.summarizeAgentConversationHistory.enabled": true,
+	"github.copilot.chat.claudeAgent.enabled": true,
+	"github.copilot.chat.switchAgent.enabled": true,
+	"chat.agent.maxRequests": 100,
+	"chat.autopilot.enabled": true,
+	"chat.edits2.enabled": true,
+	"chat.customAgentInSubagent.enabled": true,
+	"chat.useAgentSkills": true,
+	"chat.checkpoints.showFileChanges": true,
+	"chat.agentSessionProjection.enabled": true,
+	"chat.alternativeToolAction.enabled": true,
+	"chat.askQuestions.enabled": true,
+	"chat.tools.autoExpandFailures": true,
+	"chat.agent.thinking.collapsedTools": "withThinking",
+	"chat.agent.thinking.terminalTools": true,
+	"chat.thinking.style": "detailed",
+	"chat.includeReferencedInstructions": true,
+	"chat.editing.explainChanges.enabled": true,
+	"chat.viewProgressBadge.enabled": true,
+	"chat.experimental.useSkillAdherencePrompt": true,
+	// Context management
+	"github.copilot.chat.backgroundCompaction": true,
+	"github.copilot.chat.responsesApiContextManagement.enabled": true,
+	// Memory
+	"github.copilot.chat.tools.memory.enabled": true,
+	"github.copilot.chat.copilotMemory.enabled": true,
+	// Subagents
+	"github.copilot.chat.searchSubagent.enabled": true,
+	"github.copilot.chat.searchSubagent.useAgenticProxy": true,
+	"github.copilot.chat.searchSubagent.toolCallLimit": 8,
+	"github.copilot.chat.codesearch.agent.enabled": true,
+	"github.copilot.chat.codesearch.enabled": true,
+	"chat.subagents.allowInvocationsFromSubagents": true,
+	// Background agent / CLI
+	"github.copilot.chat.cli.planMode.enabled": true,
+	"github.copilot.chat.cli.branchSupport.enabled": true,
+	"github.copilot.chat.cli.mcp.enabled": true,
+	"github.copilot.chat.cli.customAgents.enabled": true,
+	"github.copilot.chat.cli.sessionController.enabled": true,
+	"github.copilot.chat.cli.terminalLinks.enabled": true,
+	"github.copilot.chat.cli.isolationOption.enabled": true,
+	"github.copilot.chat.cloudAgent.enabled": true,
+	"github.copilot.chat.cli.remote.enabled": true,
+	// GitHub MCP server
+	"github.copilot.chat.githubMcpServer.enabled": true,
+	"github.copilot.chat.githubMcpServer.readonly": false,
+	"github.copilot.chat.githubMcpServer.toolsets": [
+		"default", "repos", "issues", "pull_requests",
+		"actions", "notifications", "secret_protection", "context"
+	],
+	// Anthropic / Claude
+	"github.copilot.chat.anthropic.thinking.budgetTokens": 8000,
+	"github.copilot.chat.anthropic.thinking.effort": "high",
+	"github.copilot.chat.responsesApiReasoningEffort": "high",
+	"github.copilot.chat.responsesApiReasoningSummary": "detailed",
+	"github.copilot.chat.anthropic.useMessagesApi": true,
+	"github.copilot.chat.anthropic.toolSearchTool.enabled": true,
+	"github.copilot.chat.anthropic.toolSearchTool.mode": "server",
+	"github.copilot.chat.anthropic.contextEditing.mode": "clear-both",
+	"github.copilot.chat.anthropic.tools.websearch.enabled": true,
+	"github.copilot.chat.anthropic.tools.websearch.maxUses": 10,
+	"github.copilot.chat.anthropic.cacheBreakpoints.lastTwoMessages": true,
+	// Workspace search
+	"github.copilot.chat.workspace.enableFullWorkspace": true,
+	"github.copilot.chat.workspace.enableCodeSearch": true,
+	"github.copilot.chat.workspace.enableEmbeddingsSearch": true,
+	// Instructions and prompts
+	"github.copilot.chat.codeGeneration.useInstructionFiles": true,
+	"github.copilot.chat.promptFileContextProvider.enabled": true,
+	"github.copilot.chat.organizationInstructions.enabled": true,
+	"github.copilot.chat.organizationCustomAgents.enabled": true,
+	"github.copilot.chat.customInstructionsInSystemMessage": true,
+	"github.copilot.chat.useProjectTemplates": true,
+	// Skills
+	"github.copilot.chat.getSearchViewResultsSkill.enabled": true,
+	"github.copilot.chat.installExtensionSkill.enabled": true,
+	"github.copilot.chat.projectSetupInfoSkill.enabled": true,
+	"github.copilot.chat.newWorkspaceCreation.enabled": true,
+	"github.copilot.chat.newWorkspace.useContext7": true,
+	"github.copilot.chat.setupTests.enabled": true,
+	// Image upload
+	"github.copilot.chat.imageUpload.enabled": true,
+	"github.copilot.chat.tools.viewImage.enabled": true,
+	// Skill tool + local index
+	"github.copilot.chat.skillTool.enabled": true,
+	"github.copilot.chat.localIndex.enabled": true,
+	// Misc
+	"workbench.browser.enableChatTools": true,
+
+	// ─── Language associations ────────────────────────────────────────────────
+	"files.associations": {
+		"*.lua": "lua",
+		"*.toml": "toml",
+		"Cargo.lock": "toml",
+		"rust-toolchain.toml": "toml"
+	}
+}

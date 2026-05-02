@@ -15,11 +15,11 @@
 ; =============================================================================
 
 !define APP_NAME     "Lurek2D"
-!define APP_VERSION  "0.19.0"
+!define APP_VERSION  "1.0.0"
 !define APP_PUBLISHER "Lurek2D Project"
-!define APP_URL      "https://github.com/yourname/lurek2d"
+!define APP_URL      "https://github.com/RandomBladeDude/lurek2d"
 !define APP_EXE      "lurek2d.exe"
-!define APP_ICON     "..\..\assets\icon.ico"
+!define APP_ICON     "..\..\assets\favicon.ico"
 
 ; Output installer filename
 !define OUT_FILE     "..\..\dist\lurek2d-${APP_VERSION}-setup.exe"
@@ -70,8 +70,8 @@ Section "Engine (required)" SecEngine
 
     SetOutPath "$INSTDIR"
 
-    ; Core binary
-    File "..\..\build\release\lurek2d.exe"
+    ; Core binary — use dist-profile binary if present, else release
+    File "..\..\build\dist\lurek2d.exe"
 
     ; Engine assets
     SetOutPath "$INSTDIR\assets"
@@ -83,51 +83,27 @@ Section "Engine (required)" SecEngine
 
     ; API example scripts
     SetOutPath "$INSTDIR\examples"
-    File "..\..\examples\*.lua"
-    File /nonfatal "..\..\examples\README.md"
+    File /r "..\..\content\examples\*.lua"
 
     ; Demos (playable game demos)
-    SetOutPath "$INSTDIR"
-    File /r "..\..\demos"
+    SetOutPath "$INSTDIR\games"
+    File /r "..\..\content\games\*.*"
 
     ; Docs
     SetOutPath "$INSTDIR"
     File "..\..\README.md"
     File "..\..\LICENSE"
 
-    ; Lunasome standard libraries — install each module subdirectory
+    ; Lunasome standard libraries — recurse entire library/ tree
     SetOutPath "$INSTDIR\library"
-    File /nonfatal "..\..\library\README.md"
-    SetOutPath "$INSTDIR\library\battle"       ; File /r recurses into subdirs when given a dir path
-    File "..\..\library\battle\*.lua"
-    SetOutPath "$INSTDIR\library\cardgame"
-    File "..\..\library\cardgame\*.lua"
-    SetOutPath "$INSTDIR\library\combat"
-    File "..\..\library\combat\*.lua"
-    SetOutPath "$INSTDIR\library\crafting"
-    File "..\..\library\crafting\*.lua"
-    SetOutPath "$INSTDIR\library\dialog"
-    File "..\..\library\dialog\*.lua"
-    SetOutPath "$INSTDIR\library\doll"
-    File "..\..\library\doll\*.lua"
-    SetOutPath "$INSTDIR\library\economy"
-    File "..\..\library\economy\*.lua"
-    SetOutPath "$INSTDIR\library\inventory"
-    File "..\..\library\inventory\*.lua"
-    SetOutPath "$INSTDIR\library\item"
-    File "..\..\library\item\*.lua"
-    SetOutPath "$INSTDIR\library\province_map"
-    File "..\..\library\province_map\*.lua"
-    SetOutPath "$INSTDIR\library\quest"
-    File "..\..\library\quest\*.lua"
-    SetOutPath "$INSTDIR\library\stats"
-    File "..\..\library\stats\*.lua"
+    File /r "..\..\library\*.*"
 
-    ; API docs (reports + top-level lua-api.md + lurek.lua)
+    ; API docs (lurek.md, lurek.lua LuaCATS stubs)
     SetOutPath "$INSTDIR\docs"
-    File "..\..\docs\lua-api.md"
-    File "..\..\docs\lurek.lua"
-    File /r "..\..\docs\reports"
+    File "..\..\docs\api\lurek.md"
+    File "..\..\docs\api\lurek.lua"
+    File "..\..\docs\api\library.md"
+    File "..\..\docs\api\library.lua"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayName"          "${APP_NAME} ${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "DisplayVersion"       "${APP_VERSION}"
     WriteRegStr   HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}" "Publisher"            "${APP_PUBLISHER}"
@@ -185,7 +161,7 @@ SectionEnd
 Section "Start Menu Shortcuts" SecStartMenu
     CreateDirectory "$SMPROGRAMS\${APP_NAME}"
     CreateShortcut  "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"             "$INSTDIR\${APP_EXE}"  ""                                      "$INSTDIR\${APP_EXE}"
-    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\API Reference.lnk"           "$INSTDIR\docs\lua-api.md"
+    CreateShortcut  "$SMPROGRAMS\${APP_NAME}\API Reference.lnk"           "$INSTDIR\docs\lurek.md"
     CreateShortcut  "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk"   "$INSTDIR\uninstall.exe"
 SectionEnd
 
@@ -207,8 +183,8 @@ Section "Uninstall"
 
     RMDir /r "$INSTDIR\assets"
     RMDir /r "$INSTDIR\examples"
+    RMDir /r "$INSTDIR\games"
     RMDir /r "$INSTDIR\library"
-    RMDir /r "$INSTDIR\demos"
     RMDir /r "$INSTDIR\docs"
     RMDir    "$INSTDIR"
 

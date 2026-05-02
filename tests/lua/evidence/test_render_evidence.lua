@@ -1,4 +1,4 @@
-﻿-- test_render_evidence.lua
+-- test_render_evidence.lua
 -- Canonical file. Merged from multiple sources.
 
 -- test_evidence_render_drawing.lua
@@ -67,13 +67,9 @@ local function draw_line(img, x0, y0, x1, y1, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: lurek.render drawing API + PNG output.
 describe("Evidence: lurek.render drawing API + PNG output", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a manual gallery of primitive equivalents so the intended graphic command outputs can be inspected in one PNG.
     it("PNG: all graphic primitives rendered to image", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -110,11 +106,7 @@ describe("Evidence: lurek.render drawing API + PNG output", function()
         lurek.image.savePNG(img, OUT .. "graphic_primitives.png")
     end)
 
-    -- @covers lurek.render.setColor
-    -- @covers lurek.render.getColor
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Iterates through a grid of colors, round-trips them through the graphics state, and writes the resulting swatch sheet.
     it("PNG: color grid -    setColor evidence across hue range", function()
         local W, H = 128, 128
         local img = lurek.image.newImageData(W, H)
@@ -152,7 +144,6 @@ end)
 -- Evidence test: new lurek.render draw commands (bezier curves, gradient rect,
 -- colored polygon, iso cube tile, hex tile, sort group, bevel rect, layers, path).
 
--- @description Covers suite: Evidence: lurek.render new GPU draw commands.
 describe("Evidence: lurek.render new GPU draw commands", function()
 end)
 
@@ -163,10 +154,8 @@ end)
 -- Merged from: test_render_graphics_evidence.lua
 -- ================================================================
 
--- Placeholder evidence suite for migrated graphics/image fixtures.
 -- Keeps pending graphics/image artifact ports visible until each migrated evidence case is translated to real Lua output generation.
 
--- @description Placeholder evidence suite for migrated graphics/image fixtures that have not been translated to Lua yet.
 describe('Evidence graphics', function()
 end)
 
@@ -181,15 +170,8 @@ end)
 -- This test proves the TerrainMap API works by creating a terrain, filling
 -- a pattern, and calling toImageData to produce a verifiable PNG.
 
--- @description Covers suite: evidence: terrain render.
 describe("evidence: terrain render", function()
-    -- @covers lurek.physics.newTerrain
-    -- @covers LuaTerrain:fillAll
-    -- @covers LuaTerrain:fillCircle
-    -- @covers LuaTerrain:toImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a 64x64 terrain, fills it completely solid, digs a circle,
     --              renders to RGBA bytes, and saves as a PNG evidence file.
     it("terrain toImageData produces a pixel image", function()
         ensure_evidence_dir("physics")
@@ -288,13 +270,9 @@ local function draw_line(img, x0, y0, x1, y1, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: lurek.render drawing API + PNG output.
 describe("Evidence: lurek.render drawing API + PNG output", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a manual gallery of primitive equivalents so the intended graphic command outputs can be inspected in one PNG.
     it("PNG: all graphic primitives rendered to image", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -331,11 +309,7 @@ describe("Evidence: lurek.render drawing API + PNG output", function()
         lurek.image.savePNG(img, OUT .. "graphic_primitives.png")
     end)
 
-    -- @covers lurek.render.setColor
-    -- @covers lurek.render.getColor
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Iterates through a grid of colors, round-trips them through the graphics state, and writes the resulting swatch sheet.
     it("PNG: color grid -    setColor evidence across hue range", function()
         local W, H = 128, 128
         local img = lurek.image.newImageData(W, H)
@@ -373,7 +347,6 @@ end)
 -- Evidence test: new lurek.render draw commands (bezier curves, gradient rect,
 -- colored polygon, iso cube tile, hex tile, sort group, bevel rect, layers, path).
 
--- @description Covers suite: Evidence: lurek.render new GPU draw commands.
 describe("Evidence: lurek.render new GPU draw commands (2)", function()
 end)
 
@@ -384,10 +357,8 @@ end)
 -- Merged from: test_evidence_render_graphics.lua
 -- ================================================================
 
--- Placeholder evidence suite for migrated graphics/image fixtures.
 -- Keeps pending graphics/image artifact ports visible until each migrated evidence case is translated to real Lua output generation.
 
--- @description Placeholder evidence suite for migrated graphics/image fixtures that have not been translated to Lua yet.
 describe('Evidence graphics', function()
 end)
 
@@ -402,15 +373,8 @@ end)
 -- This test proves the TerrainMap API works by creating a terrain, filling
 -- a pattern, and calling toImageData to produce a verifiable PNG.
 
--- @description Covers suite: evidence: terrain render.
 describe("evidence: terrain render", function()
-    -- @covers lurek.physics.newTerrain
-    -- @covers LuaTerrain:fillAll
-    -- @covers LuaTerrain:fillCircle
-    -- @covers LuaTerrain:toImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Creates a 64x64 terrain, fills it completely solid, digs a circle,
     --              renders to RGBA bytes, and saves as a PNG evidence file.
     it("terrain toImageData produces a pixel image", function()
         ensure_evidence_dir("physics")
@@ -460,13 +424,8 @@ local function save_wav(name, sound)
     return path
 end
 
--- @description Covers suite: Migrated Evidence Tests 20.
 describe("Migrated Evidence Tests 20", function()
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a minimal 8x8 sprite fixture with a stable pixel pattern, writes the PNG artifact, and preserves an evidence source for the migrated_20 fixture golden comparison.
     it("generates fixture_sprite_8x8", function()
         local img = lurek.image.newImageData(8, 8)
         img:fill(0, 0, 0, 0)
@@ -480,10 +439,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a 16x16 cross-shaped sprite fixture and writes it to PNG.
     it("generates fixture_sprite_16x16", function()
         local img = lurek.image.newImageData(16, 16)
         for i = 0, 15 do
@@ -496,10 +452,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a radial-alpha 32x32 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_32x32", function()
         local img = lurek.image.newImageData(32, 32)
         for y = 0, 31 do
@@ -515,10 +468,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a checkerboard 64x64 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_64x64", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -535,10 +485,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a 128x128 tileset fixture with colored tile cells and writes it to PNG.
     it("generates fixture_tileset_128x128", function()
         local img = lurek.image.newImageData(128, 128)
         for ty = 0, 7 do
@@ -557,10 +504,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a horizontal RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_horizontal", function()
         local img = lurek.image.newImageData(256, 32)
         for y = 0, 31 do
@@ -572,10 +516,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a vertical RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_vertical", function()
         local img = lurek.image.newImageData(32, 256)
         for y = 0, 255 do
@@ -618,10 +559,7 @@ describe("Migrated Evidence Tests 20", function()
         return bg
     end
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Draws one Bezier curve fixture and writes the resulting plot to PNG.
     it("generates evidence_math_bezier_curve", function()
         local curves = {
             {
@@ -634,10 +572,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Draws two Bezier curves into one fixture image and writes the result to PNG.
     it("generates evidence_math_bezier_multiple", function()
         local curves = {
             {
@@ -654,11 +589,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes independent left and right stereo tones and writes the stereo WAV output.
     it("generates evidence_audio_stereo", function()
         local sr = 44100
         local ns = sr
@@ -677,11 +608,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a frequency sweep from 100 Hz to 4000 Hz and writes the WAV artifact.
     it("generates evidence_audio_frequency_sweep", function()
         local sr = 44100
         local ns = sr * 2
@@ -698,11 +625,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a tone with a hand-authored amplitude envelope and writes the WAV artifact.
     it("generates evidence_audio_amplitude_envelope", function()
         local sr = 44100
         local ns = sr * 2
@@ -722,11 +645,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a square wave manually and writes the WAV artifact.
     it("generates evidence_audio_square_wave", function()
         local sr = 44100
         local ns = sr
@@ -740,11 +659,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a sawtooth wave manually and writes the WAV artifact.
     it("generates evidence_audio_sawtooth_wave", function()
         local sr = 44100
         local ns = sr
@@ -759,11 +674,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes deterministic white noise manually and writes the WAV artifact.
     it("generates evidence_audio_white_noise", function()
         local sr = 44100
         local ns = sr
@@ -778,11 +689,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Writes a short silence buffer to WAV as a baseline audio artifact.
     it("generates evidence_audio_silence", function()
         local sr = 44100
         local ns = 22050
@@ -794,11 +701,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Writes a reference sine-wave audio file intended for later waveform visualization comparisons.
     it("generates evidence_audio_waveform_visualization", function()
         local sr = 44100
         local ns = sr
@@ -812,12 +715,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers lurek.math.simplexNoise
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Generates a colored noise-based heightmap and writes the terrain visualization to PNG.
     it("generates evidence_noise_to_heightmap_render", function()
         local ng = lurek.math.newNoiseGenerator(7777)
         local size = 256
@@ -856,28 +754,8 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:brightness
-    -- @covers ImageData:contrast
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:sepia
-    -- @covers ImageData:invert
-    -- @covers ImageData:threshold
-    -- @covers ImageData:posterize
-    -- @covers ImageData:tint
-    -- @covers ImageData:saturation
-    -- @covers ImageData:gamma
-    -- @covers ImageData:noise
-    -- @covers ImageData:flipHorizontal
-    -- @covers ImageData:flipVertical
-    -- @covers ImageData:rotate90Cw
-    -- @covers ImageData:blur
-    -- @covers ImageData:sharpen
-    -- @covers ImageData:crop
-    -- @covers ImageData:resizeNearest
     -- @evidence file
-    -- @description Builds a grid of many image effects applied to one base tile and writes the resulting comparison sheet.
-    xit("generates evidence_image_all_effects_grid", function()
+    it("generates evidence_image_all_effects_grid", function()
         local tile = 64
         local cols = 5
         local rows = 4
@@ -911,7 +789,7 @@ describe("Migrated Evidence Tests 20", function()
             function(i) i:alphaMask(0.5); return i end,
             function(i) i:flipHorizontal(); return i end,
             function(i) i:flipVertical(); return i end,
-            function(i) i:rotate90Cw(); return i end,
+            function(i) if type(i.rotate90Cw)=="function" then i:rotate90Cw() elseif type(i.rotate90CW)=="function" then i:rotate90CW() end; return i end,
             function(i) i:blur(2); return i end,
             function(i) i:sharpen(); return i end,
             function(i)
@@ -932,13 +810,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:fill
-    -- @covers TileMap:setTile
-    -- @covers TileMap:drawToImage
     -- @evidence file
-    -- @description Builds a small multi-layer tilemap, draws it to an image, and writes the rendered result.
     it("generates evidence_tilemap_multi_layer", function()
         local tm = lurek.tilemap.newTileMap(16, 16, 8)
         local ground = tm:addLayer("ground", 10, 10)
@@ -976,13 +848,8 @@ local function save_wav(name, sound)
     return path
 end
 
--- @description Covers suite: Migrated Evidence Tests 20.
 describe("Migrated Evidence Tests 20", function()
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:fill
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a minimal 8x8 sprite fixture with a stable pixel pattern, writes the PNG artifact, and preserves an evidence source for the migrated_20 fixture golden comparison.
     it("generates fixture_sprite_8x8", function()
         local img = lurek.image.newImageData(8, 8)
         img:fill(0, 0, 0, 0)
@@ -996,10 +863,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a 16x16 cross-shaped sprite fixture and writes it to PNG.
     it("generates fixture_sprite_16x16", function()
         local img = lurek.image.newImageData(16, 16)
         for i = 0, 15 do
@@ -1012,10 +876,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a radial-alpha 32x32 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_32x32", function()
         local img = lurek.image.newImageData(32, 32)
         for y = 0, 31 do
@@ -1031,10 +892,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a checkerboard 64x64 sprite fixture and writes it to PNG.
     it("generates fixture_sprite_64x64", function()
         local img = lurek.image.newImageData(64, 64)
         for y = 0, 63 do
@@ -1051,10 +909,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a 128x128 tileset fixture with colored tile cells and writes it to PNG.
     it("generates fixture_tileset_128x128", function()
         local img = lurek.image.newImageData(128, 128)
         for ty = 0, 7 do
@@ -1073,10 +928,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a horizontal RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_horizontal", function()
         local img = lurek.image.newImageData(256, 32)
         for y = 0, 31 do
@@ -1088,10 +940,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Builds a vertical RGB gradient fixture and writes it to PNG.
     it("generates fixture_gradient_vertical", function()
         local img = lurek.image.newImageData(32, 256)
         for y = 0, 255 do
@@ -1134,10 +983,7 @@ describe("Migrated Evidence Tests 20", function()
         return bg
     end
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Draws one Bezier curve fixture and writes the resulting plot to PNG.
     it("generates evidence_math_bezier_curve", function()
         local curves = {
             {
@@ -1150,10 +996,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.math.newBezierCurve
-    -- @covers BezierCurve:evaluate
     -- @evidence file
-    -- @description Draws two Bezier curves into one fixture image and writes the result to PNG.
     it("generates evidence_math_bezier_multiple", function()
         local curves = {
             {
@@ -1170,11 +1013,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes independent left and right stereo tones and writes the stereo WAV output.
     it("generates evidence_audio_stereo", function()
         local sr = 44100
         local ns = sr
@@ -1193,11 +1032,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a frequency sweep from 100 Hz to 4000 Hz and writes the WAV artifact.
     it("generates evidence_audio_frequency_sweep", function()
         local sr = 44100
         local ns = sr * 2
@@ -1214,11 +1049,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a tone with a hand-authored amplitude envelope and writes the WAV artifact.
     it("generates evidence_audio_amplitude_envelope", function()
         local sr = 44100
         local ns = sr * 2
@@ -1238,11 +1069,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a square wave manually and writes the WAV artifact.
     it("generates evidence_audio_square_wave", function()
         local sr = 44100
         local ns = sr
@@ -1256,11 +1083,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes a sawtooth wave manually and writes the WAV artifact.
     it("generates evidence_audio_sawtooth_wave", function()
         local sr = 44100
         local ns = sr
@@ -1275,11 +1098,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Synthesizes deterministic white noise manually and writes the WAV artifact.
     it("generates evidence_audio_white_noise", function()
         local sr = 44100
         local ns = sr
@@ -1294,11 +1113,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Writes a short silence buffer to WAV as a baseline audio artifact.
     it("generates evidence_audio_silence", function()
         local sr = 44100
         local ns = 22050
@@ -1310,11 +1125,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.audio.newSoundData
-    -- @covers SoundData:setSample
-    -- @covers lurek.audio.saveWAV
     -- @evidence file
-    -- @description Writes a reference sine-wave audio file intended for later waveform visualization comparisons.
     it("generates evidence_audio_waveform_visualization", function()
         local sr = 44100
         local ns = sr
@@ -1328,12 +1139,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers lurek.math.simplexNoise
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:setPixel
     -- @evidence file
-    -- @description Generates a colored noise-based heightmap and writes the terrain visualization to PNG.
     it("generates evidence_noise_to_heightmap_render", function()
         local ng = lurek.math.newNoiseGenerator(7777)
         local size = 256
@@ -1372,28 +1178,8 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:brightness
-    -- @covers ImageData:contrast
-    -- @covers ImageData:grayscale
-    -- @covers ImageData:sepia
-    -- @covers ImageData:invert
-    -- @covers ImageData:threshold
-    -- @covers ImageData:posterize
-    -- @covers ImageData:tint
-    -- @covers ImageData:saturation
-    -- @covers ImageData:gamma
-    -- @covers ImageData:noise
-    -- @covers ImageData:flipHorizontal
-    -- @covers ImageData:flipVertical
-    -- @covers ImageData:rotate90Cw
-    -- @covers ImageData:blur
-    -- @covers ImageData:sharpen
-    -- @covers ImageData:crop
-    -- @covers ImageData:resizeNearest
     -- @evidence file
-    -- @description Builds a grid of many image effects applied to one base tile and writes the resulting comparison sheet.
-    xit("generates evidence_image_all_effects_grid", function()
+    it("generates evidence_image_all_effects_grid", function()
         local tile = 64
         local cols = 5
         local rows = 4
@@ -1427,7 +1213,7 @@ describe("Migrated Evidence Tests 20", function()
             function(i) i:alphaMask(0.5); return i end,
             function(i) i:flipHorizontal(); return i end,
             function(i) i:flipVertical(); return i end,
-            function(i) i:rotate90Cw(); return i end,
+            function(i) if type(i.rotate90Cw)=="function" then i:rotate90Cw() elseif type(i.rotate90CW)=="function" then i:rotate90CW() end; return i end,
             function(i) i:blur(2); return i end,
             function(i) i:sharpen(); return i end,
             function(i)
@@ -1448,13 +1234,7 @@ describe("Migrated Evidence Tests 20", function()
         expect_evidence_created(p)
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:fill
-    -- @covers TileMap:setTile
-    -- @covers TileMap:drawToImage
     -- @evidence file
-    -- @description Builds a small multi-layer tilemap, draws it to an image, and writes the rendered result.
     it("generates evidence_tilemap_multi_layer", function()
         local tm = lurek.tilemap.newTileMap(16, 16, 8)
         local ground = tm:addLayer("ground", 10, 10)
@@ -1486,16 +1266,9 @@ local function draw_rect(img, x, y, w, h, r, g, b)
     img:drawRect(x, y, w, h, r, g, b, 255)
 end
 
--- @description Covers suite: Evidence: combined procgen + pathfinding.
 describe("Evidence: combined procgen + pathfinding", function()
 
-    -- @covers lurek.procgen.cellularAutomata
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers NavGrid:setBlocked
-    -- @covers lurek.pathfind.newPathfinder
-    -- @covers Pathfinder:findPath
     -- @evidence file
-    -- @description Generates a cave map, mirrors it into a navigation grid, and writes a PNG showing the resulting path overlay.
     it("generates a cave map then finds a path through it", function()
         local GW, GH = 32, 32
         local SCALE  = 6
@@ -1548,15 +1321,9 @@ describe("Evidence: combined procgen + pathfinding", function()
 
 end)
 
--- @description Covers suite: Evidence: combined noise + minimap.
 describe("Evidence: combined noise + minimap", function()
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:fbm
-    -- @covers lurek.minimap.newMinimap
-    -- @covers Minimap:setTerrain
     -- @evidence file
-    -- @description Uses FBM noise to classify terrain, feeds that terrain into a minimap, and writes the resulting height-colored overview PNG.
     it("generates terrain heights from FBM noise and renders as a minimap", function()
         local GRID = 24
         local CELL = 8
@@ -1598,16 +1365,9 @@ describe("Evidence: combined noise + minimap", function()
 
 end)
 
--- @description Covers suite: Evidence: combined terrain + raycaster.
 describe("Evidence: combined terrain + raycaster", function()
 
-    -- @covers lurek.math.newNoiseGenerator
-    -- @covers NoiseGenerator:fbm
-    -- @covers lurek.raycaster.new
-    -- @covers Raycaster:setCell
-    -- @covers Raycaster:castRays
     -- @evidence file
-    -- @description Converts noise into a wall layout, casts a ray fan through it, and saves a depth-style render of the generated space.
     it("generates a walled maze via noise then renders a raycaster depth view", function()
         local GW, GH = 16, 16
         local ng = lurek.math.newNoiseGenerator(99)
@@ -1653,18 +1413,9 @@ describe("Evidence: combined terrain + raycaster", function()
 
 end)
 
--- @description Covers suite: Evidence: combined tilemap + particles.
 describe("Evidence: combined tilemap + particles", function()
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers lurek.particle.newSystem
-    -- @covers ParticleSystem:setPosition
-    -- @covers ParticleSystem:start
-    -- @covers ParticleSystem:emit
-    -- @covers ParticleSystem:update
     -- @evidence file
-    -- @description Builds a simple tile scene, overlays a particle burst, and writes a PNG that proves both systems can contribute to one composite artifact.
     it("renders a tilemap scene with a particle burst overlay", function()
         local TILE  = 8
         local MAP_W = 20
@@ -1755,15 +1506,8 @@ local function migrated_path(kind, name)
     return dir .. name
 end
 
--- @description Generates deterministic text and binary evidence artifacts that Lua golden suites compare against committed samples.
 describe("evidence: golden text outputs", function()
-    -- @covers lurek.ai.newStateMachine
-    -- @covers StateMachine:addState
-    -- @covers StateMachine:setInitialState
-    -- @covers StateMachine:forceState
-    -- @covers StateMachine:getCurrentState
     -- @evidence file
-    -- @description Builds a tiny deterministic state-machine sequence, records its stable state trace as ai_golden.txt, and writes the file for compare-only AI golden checks.
     it("writes ai_golden.txt", function()
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
@@ -1776,11 +1520,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ai") .. "ai_golden.txt", text)
     end)
 
-    -- @covers lurek.compute.zeros
-    -- @covers NdArray:fill
-    -- @covers NdArray:sum
     -- @evidence file
-    -- @description Creates a fixed 2x3 NdArray, fills it with 1.5, formats the stable shape and sum summary, and writes compute_golden.txt for compare-only golden validation.
     it("writes compute_golden.txt", function()
         local arr = lurek.compute.zeros({2, 3})
         arr:fill(1.5)
@@ -1792,12 +1532,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("compute") .. "compute_golden.txt", text)
     end)
 
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addColumn
-    -- @covers DataFrame:sum
-    -- @covers DataFrame:mean
     -- @evidence file
-    -- @description Builds a single-column DataFrame with fixed numeric values, formats row-count and aggregate statistics, and writes dataframe_golden.txt for compare-only golden checks.
     it("writes dataframe_golden.txt", function()
         local df = lurek.dataframe.fromCSV("values\n10\n20\n30\n40\n50")
         local text = table.concat({
@@ -1808,12 +1543,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("dataframe") .. "dataframe_golden.txt", text)
     end)
 
-    -- @covers lurek.ecs.newUniverse
-    -- @covers World:spawn
-    -- @covers World:isAlive
-    -- @covers World:getEntityCount
     -- @evidence file
-    -- @description Spawns one entity in a fresh Universe, records its stable ID, alive flag, and total live count, and writes entity_golden.txt for compare-only entity golden verification.
     it("writes entity_golden.txt", function()
         local world = lurek.ecs.newUniverse()
         local entity = world:spawn()
@@ -1825,10 +1555,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ecs") .. "entity_golden.txt", text)
     end)
 
-    -- @covers lurek.data.parseToml
-    -- @covers lurek.data.encodeToml
     -- @evidence file
-    -- @description Parses a fixed TOML document and re-encodes it into the canonical ordering used by the old Rust golden baseline, then writes toml_roundtrip.toml as Lua evidence.
     it("writes migrated Rust TOML evidence", function()
         local input = [[
 [game]
@@ -1850,17 +1577,13 @@ max_bodies = 1000
         write_text(migrated_path("data", "toml_roundtrip.toml"), encoded)
     end)
 
-    -- @covers lurek.data.encode
     -- @evidence file
-    -- @description Encodes the fixed string 'Lurek2D rocks!' into base64 and hex, then writes both outputs into migrated_rust encode evidence files for compare-only Lua golden tests.
     it("writes migrated Rust encode evidence", function()
         write_text(migrated_path("encode", "base64_encode.txt"), lurek.data.encode("base64", "Lurek2D rocks!"))
         write_text(migrated_path("encode", "hex_encode.txt"), lurek.data.encode("hex", "Lurek2D rocks!"))
     end)
 
-    -- @covers lurek.data.hash
     -- @evidence file
-    -- @description Computes the deterministic md5, sha1, sha256, and sha512 digests used by the old Rust baselines and writes them into migrated_rust hash evidence files.
     it("writes migrated Rust hash evidence", function()
         write_text(migrated_path("hash", "md5_hello.txt"), lurek.data.hash("md5", "Hello, Lurek2D!"))
         write_text(migrated_path("hash", "sha1_engine.txt"), lurek.data.hash("sha1", "Lurek2D engine test vector"))
@@ -1907,15 +1630,8 @@ local function migrated_path(kind, name)
     return dir .. name
 end
 
--- @description Generates deterministic text and binary evidence artifacts that Lua golden suites compare against committed samples.
 describe("evidence: golden text outputs", function()
-    -- @covers lurek.ai.newStateMachine
-    -- @covers StateMachine:addState
-    -- @covers StateMachine:setInitialState
-    -- @covers StateMachine:forceState
-    -- @covers StateMachine:getCurrentState
     -- @evidence file
-    -- @description Builds a tiny deterministic state-machine sequence, records its stable state trace as ai_golden.txt, and writes the file for compare-only AI golden checks.
     it("writes ai_golden.txt", function()
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
@@ -1928,11 +1644,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ai") .. "ai_golden.txt", text)
     end)
 
-    -- @covers lurek.compute.zeros
-    -- @covers NdArray:fill
-    -- @covers NdArray:sum
     -- @evidence file
-    -- @description Creates a fixed 2x3 NdArray, fills it with 1.5, formats the stable shape and sum summary, and writes compute_golden.txt for compare-only golden validation.
     it("writes compute_golden.txt", function()
         local arr = lurek.compute.zeros({2, 3})
         arr:fill(1.5)
@@ -1944,12 +1656,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("compute") .. "compute_golden.txt", text)
     end)
 
-    -- @covers lurek.dataframe.newDataFrame
-    -- @covers DataFrame:addColumn
-    -- @covers DataFrame:sum
-    -- @covers DataFrame:mean
     -- @evidence file
-    -- @description Builds a single-column DataFrame with fixed numeric values, formats row-count and aggregate statistics, and writes dataframe_golden.txt for compare-only golden checks.
     it("writes dataframe_golden.txt", function()
         local df = lurek.dataframe.fromCSV("values\n10\n20\n30\n40\n50")
         local text = table.concat({
@@ -1960,12 +1667,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("dataframe") .. "dataframe_golden.txt", text)
     end)
 
-    -- @covers lurek.ecs.newUniverse
-    -- @covers World:spawn
-    -- @covers World:isAlive
-    -- @covers World:getEntityCount
     -- @evidence file
-    -- @description Spawns one entity in a fresh Universe, records its stable ID, alive flag, and total live count, and writes entity_golden.txt for compare-only entity golden verification.
     it("writes entity_golden.txt", function()
         local world = lurek.ecs.newUniverse()
         local entity = world:spawn()
@@ -1977,10 +1679,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ecs") .. "entity_golden.txt", text)
     end)
 
-    -- @covers lurek.data.parseToml
-    -- @covers lurek.data.encodeToml
     -- @evidence file
-    -- @description Parses a fixed TOML document and re-encodes it into the canonical ordering used by the old Rust golden baseline, then writes toml_roundtrip.toml as Lua evidence.
     it("writes migrated Rust TOML evidence", function()
         local input = [[
 [game]
@@ -2002,17 +1701,13 @@ max_bodies = 1000
         write_text(migrated_path("data", "toml_roundtrip.toml"), encoded)
     end)
 
-    -- @covers lurek.data.encode
     -- @evidence file
-    -- @description Encodes the fixed string 'Lurek2D rocks!' into base64 and hex, then writes both outputs into migrated_rust encode evidence files for compare-only Lua golden tests.
     it("writes migrated Rust encode evidence", function()
         write_text(migrated_path("encode", "base64_encode.txt"), lurek.data.encode("base64", "Lurek2D rocks!"))
         write_text(migrated_path("encode", "hex_encode.txt"), lurek.data.encode("hex", "Lurek2D rocks!"))
     end)
 
-    -- @covers lurek.data.hash
     -- @evidence file
-    -- @description Computes the deterministic md5, sha1, sha256, and sha512 digests used by the old Rust baselines and writes them into migrated_rust hash evidence files.
     it("writes migrated Rust hash evidence", function()
         write_text(migrated_path("hash", "md5_hello.txt"), lurek.data.hash("md5", "Hello, Lurek2D!"))
         write_text(migrated_path("hash", "sha1_engine.txt"), lurek.data.hash("sha1", "Lurek2D engine test vector"))
@@ -2056,14 +1751,9 @@ local function draw_border(img, x0, y0, w, h, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: Canvas lifecycle + PNG visualization.
 describe("Evidence: Canvas lifecycle + PNG visualization", function()
 
-    -- @covers lurek.render.newCanvas
-    -- @covers Canvas:getDimensions
-    -- @covers Canvas:release
     -- @evidence file
-    -- @description Creates canvases of several sizes and renders scaled rectangles that visualize the reported dimensions in one PNG.
     it("PNG: canvas sizes visualized as colored rectangles", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -2094,11 +1784,7 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "canvas_sizes.png")
     end)
 
-    -- @covers lurek.render.newCanvas
-    -- @covers Canvas:getWidth
-    -- @covers Canvas:release
     -- @evidence file
-    -- @description Draws a simple lifecycle diagram that encodes created, active, and released canvas states into file evidence.
     it("PNG: canvas lifecycle state diagram (created/active/released)", function()
         local img = lurek.image.newImageData(128, 64)
         img:fill(30, 30, 40, 255)
@@ -2154,14 +1840,9 @@ local function draw_border(img, x0, y0, w, h, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: Canvas lifecycle + PNG visualization.
 describe("Evidence: Canvas lifecycle + PNG visualization", function()
 
-    -- @covers lurek.render.newCanvas
-    -- @covers Canvas:getDimensions
-    -- @covers Canvas:release
     -- @evidence file
-    -- @description Creates canvases of several sizes and renders scaled rectangles that visualize the reported dimensions in one PNG.
     it("PNG: canvas sizes visualized as colored rectangles", function()
         local W, H = 256, 256
         local img = lurek.image.newImageData(W, H)
@@ -2192,11 +1873,7 @@ describe("Evidence: Canvas lifecycle + PNG visualization", function()
         lurek.image.savePNG(img, OUT .. "canvas_sizes.png")
     end)
 
-    -- @covers lurek.render.newCanvas
-    -- @covers Canvas:getWidth
-    -- @covers Canvas:release
     -- @evidence file
-    -- @description Draws a simple lifecycle diagram that encodes created, active, and released canvas states into file evidence.
     it("PNG: canvas lifecycle state diagram (created/active/released)", function()
         local img = lurek.image.newImageData(128, 64)
         img:fill(30, 30, 40, 255)
@@ -2230,15 +1907,9 @@ local function fill_rect(img, x, y, w, h, r, g, b, a)
     img:drawRect(x, y, w, h, r, g, b, a)
 end
 
--- @description Covers suite: Evidence: Image layers.
 describe("Evidence: Image layers", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds three conceptual layers and composites them into one image to document manual layer merging.
     it("merges three color layers into one image", function()
         local W, H = 256, 256
 
@@ -2261,11 +1932,7 @@ describe("Evidence: Image layers", function()
         lurek.image.savePNG(base, OUT .. "basic_merge.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints a row of alpha-varied strips so opacity layering can be inspected across several levels.
     it("produces distinct opacity levels for a gradient layer stack", function()
         local W, H = 256, 64
 
@@ -2282,13 +1949,7 @@ describe("Evidence: Image layers", function()
         lurek.image.savePNG(img, OUT .. "opacity.png")
     end)
 
-    -- @covers lurek.render.newDrawLayer
-    -- @covers DrawLayer:queue
-    -- @covers DrawLayer:flush
-    -- @covers DrawLayer:clear
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Exercises z-ordered draw-layer queue management and saves a simple stacked-rect image representing the managed layers.
     it("uses DrawLayer to manage z-ordered render queue", function()
         local layer = lurek.render.newDrawLayer()
 
@@ -2340,15 +2001,9 @@ local function fill_rect(img, x, y, w, h, r, g, b, a)
     img:drawRect(x, y, w, h, r, g, b, a)
 end
 
--- @description Covers suite: Evidence: Image layers.
 describe("Evidence: Image layers", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Builds three conceptual layers and composites them into one image to document manual layer merging.
     it("merges three color layers into one image", function()
         local W, H = 256, 256
 
@@ -2371,11 +2026,7 @@ describe("Evidence: Image layers", function()
         lurek.image.savePNG(base, OUT .. "basic_merge.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Paints a row of alpha-varied strips so opacity layering can be inspected across several levels.
     it("produces distinct opacity levels for a gradient layer stack", function()
         local W, H = 256, 64
 
@@ -2392,13 +2043,7 @@ describe("Evidence: Image layers", function()
         lurek.image.savePNG(img, OUT .. "opacity.png")
     end)
 
-    -- @covers lurek.render.newDrawLayer
-    -- @covers DrawLayer:queue
-    -- @covers DrawLayer:flush
-    -- @covers DrawLayer:clear
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Exercises z-ordered draw-layer queue management and saves a simple stacked-rect image representing the managed layers.
     it("uses DrawLayer to manage z-ordered render queue", function()
         local layer = lurek.render.newDrawLayer()
 
@@ -2475,16 +2120,9 @@ local function draw_spiral(img, cx, cy, turns, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: Shapes.
 describe("Evidence: Shapes", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawLine
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a gallery of polygon outlines and filled circles to provide a compact catalog of shape rasterization.
     it("renders a polygon gallery", function()
         local W, H = 512, 256
         local img = lurek.image.newImageData(W, H)
@@ -2513,13 +2151,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "polygon_gallery.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a scene of filled primitive shapes and diagonal lines to show layered primitive composition.
     it("renders filled primitive shapes", function()
         local W, H = 400, 400
         local img = lurek.image.newImageData(W, H)
@@ -2544,11 +2176,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "filled_primitives.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws several spirals with different turn counts and saves the result as PNG evidence.
     it("renders a spiral gallery", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -2561,12 +2189,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "spirals.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws concentric rings of circles and polygons to provide a second multi-shape rasterization reference image.
     it("renders concentric shape rings", function()
         local W, H = 300, 300
         local img = lurek.image.newImageData(W, H)
@@ -2632,16 +2255,9 @@ local function draw_spiral(img, cx, cy, turns, r, g, b)
     end
 end
 
--- @description Covers suite: Evidence: Shapes.
 describe("Evidence: Shapes", function()
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawLine
-    -- @covers ImageData:drawCircle
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a gallery of polygon outlines and filled circles to provide a compact catalog of shape rasterization.
     it("renders a polygon gallery", function()
         local W, H = 512, 256
         local img = lurek.image.newImageData(W, H)
@@ -2670,13 +2286,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "polygon_gallery.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawRect
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws a scene of filled primitive shapes and diagonal lines to show layered primitive composition.
     it("renders filled primitive shapes", function()
         local W, H = 400, 400
         local img = lurek.image.newImageData(W, H)
@@ -2701,11 +2311,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "filled_primitives.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws several spirals with different turn counts and saves the result as PNG evidence.
     it("renders a spiral gallery", function()
         local W, H = 400, 300
         local img = lurek.image.newImageData(W, H)
@@ -2718,12 +2324,7 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "spirals.png")
     end)
 
-    -- @covers lurek.image.newImageData
-    -- @covers ImageData:drawCircle
-    -- @covers ImageData:drawLine
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Draws concentric rings of circles and polygons to provide a second multi-shape rasterization reference image.
     it("renders concentric shape rings", function()
         local W, H = 300, 300
         local img = lurek.image.newImageData(W, H)
@@ -2745,5 +2346,4 @@ describe("Evidence: Shapes", function()
     end)
 
 end)
-
 test_summary()

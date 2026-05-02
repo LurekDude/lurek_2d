@@ -1,19 +1,12 @@
 -- Evidence tests: charts module
 -- Produces PNG artifacts for each chart type (line, bar, scatter, pie, area).
--- @module charts
--- @description Evidence suite for lurek.ui chart rendering: line, bar, scatter, pie, area charts.
 
 describe("evidence: charts", function()
     before_each(function()
         ensure_evidence_dir("charts")
     end)
 
-    -- @covers lurek.ui.newLineChart
-    -- @covers LineChart:addSeries
-    -- @covers LineChart:setYMax
-    -- @covers LineChart:drawToImage
     -- @evidence file
-    -- @description Produces a line chart PNG showing a sine-wave series.
     it("produces a line chart PNG", function()
         local dir = evidence_output_dir("charts")
         local path = dir .. "line_chart.png"
@@ -32,12 +25,7 @@ describe("evidence: charts", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.ui.newBarChart
-    -- @covers BarChart:addSeries
-    -- @covers BarChart:addCategory
-    -- @covers BarChart:drawToImage
     -- @evidence file
-    -- @description Produces a bar chart PNG comparing monthly values across two series.
     it("produces a bar chart PNG", function()
         local dir = evidence_output_dir("charts")
         local path = dir .. "bar_chart.png"
@@ -55,13 +43,7 @@ describe("evidence: charts", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.ui.newScatterPlot
-    -- @covers ScatterPlot:addSeries
-    -- @covers ScatterPlot:setXRange
-    -- @covers ScatterPlot:setYRange
-    -- @covers ScatterPlot:drawToImage
     -- @evidence file
-    -- @description Produces a scatter plot PNG with a rising and a falling series.
     it("produces a scatter plot PNG", function()
         local dir = evidence_output_dir("charts")
         local path = dir .. "scatter_plot.png"
@@ -82,11 +64,7 @@ describe("evidence: charts", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.ui.newPieChart
-    -- @covers PieChart:addSegment
-    -- @covers PieChart:drawToImage
     -- @evidence file
-    -- @description Produces a pie chart PNG with four budget segments.
     it("produces a pie chart PNG", function()
         local dir = evidence_output_dir("charts")
         local path = dir .. "pie_chart.png"
@@ -102,12 +80,7 @@ describe("evidence: charts", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.ui.newAreaChart
-    -- @covers AreaChart:addLayer
-    -- @covers AreaChart:setYMax
-    -- @covers AreaChart:drawToImage
     -- @evidence file
-    -- @description Produces an area chart PNG with stacked time-series layers.
     it("produces an area chart PNG", function()
         local dir = evidence_output_dir("charts")
         local path = dir .. "area_chart.png"
@@ -122,5 +95,4 @@ describe("evidence: charts", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

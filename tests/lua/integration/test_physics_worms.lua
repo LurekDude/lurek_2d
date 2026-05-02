@@ -3,16 +3,7 @@
 -- flush the terrain, then drop a body and verify it lands rather than
 -- falling through.
 
--- @description Covers suite: worms terrain + physics integration.
 describe("worms terrain + physics integration", function()
-    -- @covers lurek.physics.newWorld
-    -- @covers lurek.physics.newTerrain
-    -- @covers LuaTerrain:fillAll
-    -- @covers LuaTerrain:fillCircle
-    -- @covers LuaTerrain:flush
-    -- @covers World:newBody
-    -- @covers World:step
-    -- @description Verifies a body dropping into a dug-out terrain cavity
     --              does not fall indefinitely (terrain colliders are present).
     it("rigid body rests on terrain after dig and flush", function()
         local world = lurek.physics.newWorld(0, 300)
@@ -35,9 +26,6 @@ describe("worms terrain + physics integration", function()
         expect_true(true)
     end)
 
-    -- @covers LuaTerrain:fillCircle
-    -- @covers LuaTerrain:flush
-    -- @description Verifies terrain isDirty after digging and clean after flush.
     it("terrain is clean after dig and flush", function()
         local world = lurek.physics.newWorld(0, 0)
         local terrain = lurek.physics.newTerrain(32, 32, 8, world)
@@ -52,5 +40,4 @@ describe("worms terrain + physics integration", function()
         expect_false(terrain:isDirty())
     end)
 end)
-
 test_summary()

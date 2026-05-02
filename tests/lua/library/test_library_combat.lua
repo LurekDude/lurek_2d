@@ -9,18 +9,7 @@ local combat = require("library.combat")
 
 --                  CollisionGroupSet
 
--- @description Tests collision group registration, symmetric collision masks, group enumeration, reset behavior, and mask computation for enabled interactions.
 describe("CollisionGroupSet", function()
-    -- @covers library.combat.newCollisionGroupSet
-    --- @covers library.combat.CollisionGroupSet:defineGroup
-    --- @covers library.combat.CollisionGroupSet:getGroupBit
-    --- @covers library.combat.CollisionGroupSet:setCollides
-    --- @covers library.combat.CollisionGroupSet:getCollides
-    --- @covers library.combat.CollisionGroupSet:computeMask
-    --- @covers library.combat.CollisionGroupSet:groupCount
-    --- @covers library.combat.CollisionGroupSet:groupNames
-    --- @covers library.combat.CollisionGroupSet:reset
-    -- @description Verifies group definitions allocate successive power-of-two bitmasks for collision filtering.
     it("defineGroup assigns power-of-2 bits", function()
         local cgs = combat.newCollisionGroupSet()
         local b1 = cgs:defineGroup("players")
@@ -31,8 +20,6 @@ describe("CollisionGroupSet", function()
         expect_equal(b3, 4)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Confirms getGroupBit returns the assigned bit for known groups and nil for missing ones.
     it("getGroupBit returns correct bit", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("a")
@@ -40,8 +27,6 @@ describe("CollisionGroupSet", function()
         expect_equal(cgs:getGroupBit("missing"), nil)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Checks collision relationships can be overridden symmetrically and queried back.
     it("setCollides and getCollides", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("friends")
@@ -51,8 +36,6 @@ describe("CollisionGroupSet", function()
         expect_equal(cgs:getCollides("friends", "foes"), true)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Verifies group counting and name enumeration reflect all defined collision groups.
     it("groupCount and groupNames", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("a")
@@ -62,8 +45,6 @@ describe("CollisionGroupSet", function()
         expect_equal(#names, 2)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Confirms reset clears all registered groups and group-bit lookups.
     it("reset clears everything", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("x")
@@ -72,8 +53,6 @@ describe("CollisionGroupSet", function()
         expect_equal(cgs:getGroupBit("x"), nil)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Checks duplicate group definitions fail cleanly instead of reassigning a bit.
     it("duplicate group returns nil", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("a")
@@ -81,8 +60,6 @@ describe("CollisionGroupSet", function()
         expect_equal(b, nil)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Verifies computeMask includes only the groups currently configured to collide with the requested group.
     it("computeMask includes colliding groups", function()
         local cgs = combat.newCollisionGroupSet()
         cgs:defineGroup("a")
@@ -97,10 +74,7 @@ end)
 
 --                  MountSlot
 
--- @description Verifies mount slot construction, default size class selection, and default full-circle firing arc values.
 describe("MountSlot", function()
-    -- @covers library.combat.newMountSlot
-    -- @description Verifies mount slots preserve id, position, and explicit size class values.
     it("creates with defaults", function()
         local s = combat.newMountSlot("turret_1", 10, 20, "large")
         expect_equal(s.id, "turret_1")
@@ -109,8 +83,6 @@ describe("MountSlot", function()
         expect_equal(s.size_class, "large")
     end)
 
-    -- @covers library.combat.newMountSlot
-    -- @description Confirms omitted size class and firing arc arguments fall back to medium and a full-circle arc.
     it("arc defaults to full circle and size_class defaults to medium", function()
         local s = combat.newMountSlot("gun", 5, -3)
         expect_equal(s.size_class, "medium")
@@ -121,18 +93,7 @@ end)
 
 --                  Chassis
 
--- @description Covers chassis durability, armor, slot registration, lethal damage, healing clamps, and per-zone armor lookup helpers.
 describe("Chassis", function()
-    -- @covers library.combat.newChassis
-    --- @covers library.combat.Chassis:addSlot
-    --- @covers library.combat.Chassis:getSlot
-    --- @covers library.combat.Chassis:getSlots
-    --- @covers library.combat.Chassis:takeDamage
-    --- @covers library.combat.Chassis:heal
-    --- @covers library.combat.Chassis:isDead
-    --- @covers library.combat.Chassis:getArmor
-    --- @covers library.combat.Chassis:setArmor
-    -- @description Verifies chassis start with matching HP and max HP and are not destroyed initially.
     it("new with max_hp", function()
         local c = combat.newChassis(1, 100)
         expect_equal(c.hp, 100)
@@ -140,8 +101,6 @@ describe("Chassis", function()
         expect_equal(c.destroyed, false)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Checks nonlethal damage subtracts HP, returns actual damage taken, and keeps the chassis alive.
     it("takeDamage reduces hp and returns actual", function()
         local c = combat.newChassis(1, 50)
         local actual = c:takeDamage(30)
@@ -150,8 +109,6 @@ describe("Chassis", function()
         expect_equal(c:isDead(), false)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Confirms lethal damage clamps HP to zero and marks the chassis destroyed.
     it("takeDamage beyond hp sets destroyed", function()
         local c = combat.newChassis(1, 10)
         local actual = c:takeDamage(25)
@@ -160,8 +117,6 @@ describe("Chassis", function()
         expect_equal(c:isDead(), true)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Verifies healing restores only missing HP up to the maximum.
     it("heal clamps to max_hp", function()
         local c = combat.newChassis(1, 100)
         c:takeDamage(60)
@@ -170,9 +125,6 @@ describe("Chassis", function()
         expect_equal(c.hp, 100)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @covers library.combat.newMountSlot
-    -- @description Checks chassis can register mount slots and retrieve them by id.
     it("addSlot and getSlot", function()
         local c = combat.newChassis(1, 100)
         c:addSlot(combat.newMountSlot("s1", 0, 0, "small"))
@@ -181,8 +133,6 @@ describe("Chassis", function()
         expect_equal(c:getSlot("missing"), nil)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Confirms armor can be stored per zone and defaults to zero for unset zones.
     it("armor get/set", function()
         local c = combat.newChassis(1, 100)
         c:setArmor("front", 50)
@@ -193,26 +143,7 @@ end)
 
 --                  Turret
 
--- @description Exercises turret targeting, arc clamping, aiming detection, angular update output, and the full getter or setter surface for turret state.
 describe("Turret", function()
-    -- @covers library.combat.newTurret
-    --- @covers library.combat.Turret:aimAtAngle
-    --- @covers library.combat.Turret:clampToArc
-    --- @covers library.combat.Turret:update
-    --- @covers library.combat.Turret:isAimed
-    --- @covers library.combat.Turret:setTurnSpeed
-    --- @covers library.combat.Turret:getTurnSpeed
-    --- @covers library.combat.Turret:setArcMin
-    --- @covers library.combat.Turret:getArcMin
-    --- @covers library.combat.Turret:setArcMax
-    --- @covers library.combat.Turret:getArcMax
-    --- @covers library.combat.Turret:setTargetAngle
-    --- @covers library.combat.Turret:getTargetAngle
-    --- @covers library.combat.Turret:setSizeClass
-    --- @covers library.combat.Turret:getSizeClass
-    --- @covers library.combat.Turret:setDestroyed
-    --- @covers library.combat.Turret:isDestroyed
-    -- @description Verifies turrets start with the supplied body and joint ids plus default speed and destroyed state.
     it("new with defaults", function()
         local t = combat.newTurret(10, 20)
         expect_equal(t.body_id, 10)
@@ -221,16 +152,12 @@ describe("Turret", function()
         expect_equal(t.destroyed, false)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Checks aimAtAngle stores the desired target angle for later updates.
     it("aimAtAngle sets target", function()
         local t = combat.newTurret(1, 2)
         t:aimAtAngle(1.5)
         expect_equal(t.target_angle, 1.5)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Verifies clampToArc constrains target angles to the configured turret arc.
     it("clampToArc clamps angle", function()
         local t = combat.newTurret(1, 2)
         t.arc_min = -1.0
@@ -240,8 +167,6 @@ describe("Turret", function()
         expect_equal(t:clampToArc(0.5), 0.5)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Confirms update returns angular velocity when the target angle exceeds the maximum turn step.
     it("update returns angular velocity", function()
         local t = combat.newTurret(1, 2)
         t.turn_speed = 2.0
@@ -251,22 +176,16 @@ describe("Turret", function()
         expect_equal(vel, 2.0)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Checks update returns nil when the turret has no target angle to turn toward.
     it("update returns nil without target", function()
         local t = combat.newTurret(1, 2)
         expect_equal(t:update(0.1, 0), nil)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Verifies turrets without a target are considered aimed already.
     it("isAimed returns true when no target set", function()
         local t = combat.newTurret(1, 2)
         expect_equal(t:isAimed(0.01), true)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Confirms isAimed returns true when the target angle lies within the allowed arc.
     it("isAimed returns true when target is within arc", function()
         local t = combat.newTurret(1, 2)
         t.arc_min = -1.0
@@ -275,8 +194,6 @@ describe("Turret", function()
         expect_equal(t:isAimed(0.01), true)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Checks isAimed reports false when the target lies outside the turret arc after clamping.
     it("isAimed returns false when target is outside arc", function()
         local t = combat.newTurret(1, 2)
         t.arc_min = -1.0
@@ -285,8 +202,6 @@ describe("Turret", function()
         expect_equal(t:isAimed(0.01), false)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Verifies the turret getter and setter surface round-trips speed, arc, target, size class, and destroyed state.
     it("Turret getters and setters", function()
         local t = combat.newTurret(5, 6)
         t:setTurnSpeed(3.0)
@@ -310,43 +225,7 @@ end)
 
 --                  Weapon
 
--- @description Validates weapon defaults, firing and cooldown flow, reload logic, burst-fire state, ammo exhaustion checks, and weapon property accessors.
 describe("Weapon", function()
-    -- @covers library.combat.newWeapon
-    --- @covers library.combat.Weapon:canFire
-    --- @covers library.combat.Weapon:fire
-    --- @covers library.combat.Weapon:updateCooldown
-    --- @covers library.combat.Weapon:reload
-    --- @covers library.combat.Weapon:isOutOfAmmo
-    --- @covers library.combat.Weapon:startFiring
-    --- @covers library.combat.Weapon:stopFiring
-    --- @covers library.combat.Weapon:isFiring
-    --- @covers library.combat.Weapon:setName
-    --- @covers library.combat.Weapon:setFireRate
-    --- @covers library.combat.Weapon:getFireRate
-    --- @covers library.combat.Weapon:setAmmo
-    --- @covers library.combat.Weapon:getAmmo
-    --- @covers library.combat.Weapon:setMaxAmmo
-    --- @covers library.combat.Weapon:getMaxAmmo
-    --- @covers library.combat.Weapon:setBurstSize
-    --- @covers library.combat.Weapon:getBurstSize
-    --- @covers library.combat.Weapon:setBurstDelay
-    --- @covers library.combat.Weapon:getBurstDelay
-    --- @covers library.combat.Weapon:setSpread
-    --- @covers library.combat.Weapon:getSpread
-    --- @covers library.combat.Weapon:setDamageAmount
-    --- @covers library.combat.Weapon:getDamageAmount
-    --- @covers library.combat.Weapon:setDamageType
-    --- @covers library.combat.Weapon:getDamageType
-    --- @covers library.combat.Weapon:setPenetration
-    --- @covers library.combat.Weapon:getPenetration
-    --- @covers library.combat.Weapon:setRange
-    --- @covers library.combat.Weapon:getRange
-    --- @covers library.combat.Weapon:setProjectileSpeed
-    --- @covers library.combat.Weapon:getProjectileSpeed
-    --- @covers library.combat.Weapon:setProjectileType
-    --- @covers library.combat.Weapon:getProjectileType
-    -- @description Verifies weapons start with the expected default name, ammo mode, and ready-to-fire state.
     it("new with defaults", function()
         local w = combat.newWeapon("Laser")
         expect_equal(w.name, "Laser")
@@ -354,8 +233,6 @@ describe("Weapon", function()
         expect_equal(w:canFire(), true)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Checks firing a weapon consumes ammo and applies a cooldown based on fire rate.
     it("fire consumes ammo and sets cooldown", function()
         local w = combat.newWeapon("Gun")
         w.ammo = 5
@@ -366,8 +243,6 @@ describe("Weapon", function()
         expect_equal(w:canFire(), false)  -- cooldown active
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Confirms weapon cooldown timers tick down and clamp at zero.
     it("updateCooldown reduces cooldown", function()
         local w = combat.newWeapon("Gun")
         w.cooldown_remaining = 0.5
@@ -377,8 +252,6 @@ describe("Weapon", function()
         expect_equal(w.cooldown_remaining, 0)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Verifies reload without an explicit amount restores ammo back to the maximum.
     it("reload refills to max", function()
         local w = combat.newWeapon("Gun")
         w.ammo = 0
@@ -387,8 +260,6 @@ describe("Weapon", function()
         expect_equal(w.ammo, 10)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Checks partial reload amounts add rounds without exceeding max ammo.
     it("reload with amount adds rounds", function()
         local w = combat.newWeapon("Gun")
         w.ammo = 3
@@ -397,15 +268,11 @@ describe("Weapon", function()
         expect_equal(w.ammo, 8)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Confirms weapons with infinite ammo never report themselves out of ammo.
     it("isOutOfAmmo with infinite ammo", function()
         local w = combat.newWeapon("Laser")
         expect_equal(w:isOutOfAmmo(), false)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Verifies finite-ammo weapons report out-of-ammo correctly at zero remaining rounds.
     it("isOutOfAmmo with finite ammo", function()
         local w = combat.newWeapon("Gun")
         w.ammo = 0
@@ -413,8 +280,6 @@ describe("Weapon", function()
         expect_equal(w:isOutOfAmmo(), true)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Checks startFiring and stopFiring toggle the active firing state.
     it("startFiring and stopFiring", function()
         local w = combat.newWeapon("Gun")
         w:startFiring()
@@ -423,8 +288,6 @@ describe("Weapon", function()
         expect_equal(w:isFiring(), false)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Confirms newly created weapons expose the documented default damage, range, and projectile speed values.
     it("defaults match Rust: damage_amount=10 range=500 projectile_speed=300", function()
         local w = combat.newWeapon("TestGun")
         expect_equal(w.damage_amount, 10.0)
@@ -432,8 +295,6 @@ describe("Weapon", function()
         expect_equal(w.projectile_speed, 300.0)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Verifies the first shot of a burst weapon seeds remaining burst shots and applies burst delay cooldown.
     it("fire with burst_size=3 sets burst_remaining and uses burst_delay", function()
         local w = combat.newWeapon("Burst")
         w.burst_size = 3
@@ -445,8 +306,6 @@ describe("Weapon", function()
         expect_near(w.cooldown_remaining, 0.1, 0.001)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Confirms stopping fire clears remaining burst state as well as the firing flag.
     it("stopFiring resets burst_remaining to 0", function()
         local w = combat.newWeapon("Burst")
         w.burst_size = 3
@@ -456,8 +315,6 @@ describe("Weapon", function()
         expect_equal(w:isFiring(), false)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Checks the weapon getter and setter surface round-trips all major weapon tuning fields and enums.
     it("Weapon getters and setters", function()
         local w = combat.newWeapon("Test")
         expect_equal(w:getName(), "Test")
@@ -492,10 +349,7 @@ end)
 
 --                  Projectile
 
--- @description Focuses on pooled projectile instances to verify reset behavior and active-update bookkeeping for lifetime and traveled distance.
 describe("Projectile", function()
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies releasing a projectile resets pooled projectile fields back to their default inactive state.
     it("reset clears all fields and restores projectile_type to Ballistic", function()
         local pool = combat.newProjectilePool(2, combat.ProjectileType.Homing)
         local idx = pool:spawn(0, 0, 0, 100, 10, "kinetic", 500)
@@ -510,8 +364,6 @@ describe("Projectile", function()
         expect_equal(p.projectile_type, combat.ProjectileType.Ballistic)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Confirms inactive projectiles ignore update calls and do not accumulate distance.
     it("update does nothing when projectile is inactive", function()
         local pool = combat.newProjectilePool(2)
         local idx = pool:spawn(0, 0, 0, 100, 10, "k", 500)
@@ -521,8 +373,6 @@ describe("Projectile", function()
         expect_equal(p.distance_traveled, 0)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Checks active projectile updates advance both lifetime and traveled distance based on speed and elapsed time.
     it("update advances lifetime and distance when active", function()
         local pool = combat.newProjectilePool(2)
         local idx = pool:spawn(0, 0, 0, 200, 10, "k", 500)
@@ -535,27 +385,13 @@ end)
 
 --                  ProjectilePool
 
--- @description Tests projectile pool allocation, exhaustion, release safety, pooled lookup, pool-size clamping, and active-slot bookkeeping.
 describe("ProjectilePool", function()
-    -- @covers library.combat.newProjectilePool
-    --- @covers library.combat.ProjectilePool:spawn
-    --- @covers library.combat.ProjectilePool:release
-    --- @covers library.combat.ProjectilePool:activeCount
-    --- @covers library.combat.ProjectilePool:freeCount
-    --- @covers library.combat.ProjectilePool:getActive
-    --- @covers library.combat.ProjectilePool:resetAll
-    --- @covers library.combat.ProjectilePool:get
-    --- @covers library.combat.Projectile:reset
-    --- @covers library.combat.Projectile:update
-    -- @description Verifies projectile pools start with all slots free and no active projectiles.
     it("new creates pool with free slots", function()
         local pool = combat.newProjectilePool(10)
         expect_equal(pool:freeCount(), 10)
         expect_equal(pool:activeCount(), 0)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Checks spawning and releasing a projectile updates active and free slot counts.
     it("spawn and release", function()
         local pool = combat.newProjectilePool(5)
         local idx = pool:spawn(0, 0, 0, 100, 10, "kinetic", 500)
@@ -567,8 +403,6 @@ describe("ProjectilePool", function()
         expect_equal(pool:freeCount(), 5)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Confirms getActive returns the indices of all currently active projectile slots.
     it("getActive returns active indices", function()
         local pool = combat.newProjectilePool(5)
         pool:spawn(0, 0, 0, 100, 10, "k", 500)
@@ -577,8 +411,6 @@ describe("ProjectilePool", function()
         expect_equal(#active, 2)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies resetAll releases every active projectile and restores full capacity.
     it("resetAll releases all", function()
         local pool = combat.newProjectilePool(5)
         pool:spawn(0, 0, 0, 100, 10, "k", 500)
@@ -588,15 +420,11 @@ describe("ProjectilePool", function()
         expect_equal(pool:freeCount(), 5)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Checks oversized pool requests clamp to the module's maximum supported pool size.
     it("pool capped at MAX_POOL_SIZE", function()
         local pool = combat.newProjectilePool(9999)
         expect_equal(pool.pool_size, 1024)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Confirms spawn returns nil once all projectile slots are exhausted.
     it("spawn returns nil when exhausted", function()
         local pool = combat.newProjectilePool(2)
         pool:spawn(0, 0, 0, 100, 10, "k", 500)
@@ -605,8 +433,6 @@ describe("ProjectilePool", function()
         expect_equal(idx, nil)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies pooled projectile lookup exposes the stored projectile speed, damage, and damage type fields.
     it("get returns projectile data", function()
         local pool = combat.newProjectilePool(5)
         local idx = pool:spawn(0, 0, 0, 200, 25, "explosive", 800)
@@ -616,8 +442,6 @@ describe("ProjectilePool", function()
         expect_equal(p.damage_type, "explosive")
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Checks releasing an already inactive slot is a harmless no-op that does not duplicate free slots.
     it("release of already-inactive slot is a no-op", function()
         local pool = combat.newProjectilePool(3)
         local idx = pool:spawn(0, 0, 0, 100, 10, "k", 500)
@@ -630,23 +454,7 @@ end)
 
 --                  CombatWorld
 
--- @description Verifies combat world aggregation of chassis, turrets, weapons, and pools together with updates, cleanup, counters, and reset behavior.
 describe("CombatWorld", function()
-    -- @covers library.combat.newCombatWorld
-    --- @covers library.combat.CombatWorld:addChassis
-    --- @covers library.combat.CombatWorld:getChassis
-    --- @covers library.combat.CombatWorld:addTurret
-    --- @covers library.combat.CombatWorld:getTurret
-    --- @covers library.combat.CombatWorld:addWeapon
-    --- @covers library.combat.CombatWorld:getWeapon
-    --- @covers library.combat.CombatWorld:addPool
-    --- @covers library.combat.CombatWorld:getPool
-    --- @covers library.combat.CombatWorld:activeChassisCount
-    --- @covers library.combat.CombatWorld:activeProjectileCount
-    --- @covers library.combat.CombatWorld:update
-    --- @covers library.combat.CombatWorld:reset
-    --- @covers library.combat.CombatWorld:cleanup
-    -- @description Verifies new combat worlds start with empty chassis, turret, weapon, and pool collections.
     it("new creates empty world", function()
         local w = combat.newCombatWorld()
         expect_equal(#w.chassis_list, 0)
@@ -654,9 +462,6 @@ describe("CombatWorld", function()
         expect_equal(#w.weapons, 0)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newChassis
-    -- @description Confirms combat worlds can add chassis and retrieve them by their assigned index.
     it("add and get chassis", function()
         local w = combat.newCombatWorld()
         local c = combat.newChassis(1, 100)
@@ -665,9 +470,6 @@ describe("CombatWorld", function()
         expect_equal(w:getChassis(1).hp, 100)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newTurret
-    -- @description Checks combat worlds can add turrets and fetch them again by index.
     it("add and get turret", function()
         local w = combat.newCombatWorld()
         local idx = w:addTurret(combat.newTurret(1, 2))
@@ -675,9 +477,6 @@ describe("CombatWorld", function()
         expect_equal(w:getTurret(1).body_id, 1)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newWeapon
-    -- @description Verifies combat worlds can add weapons and retrieve them later by index.
     it("add and get weapon", function()
         local w = combat.newCombatWorld()
         local idx = w:addWeapon(combat.newWeapon("Cannon"))
@@ -685,9 +484,6 @@ describe("CombatWorld", function()
         expect_equal(w:getWeapon(1).name, "Cannon")
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newProjectilePool
-    -- @description Confirms projectile pools can be registered in the combat world and accessed by index.
     it("add and get pool", function()
         local w = combat.newCombatWorld()
         local pool = combat.newProjectilePool(5)
@@ -696,9 +492,6 @@ describe("CombatWorld", function()
         expect_equal(w:getPool(1).pool_size, 5)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newChassis
-    -- @description Checks activeChassisCount excludes chassis that have already been destroyed.
     it("activeChassisCount excludes destroyed", function()
         local w = combat.newCombatWorld()
         w:addChassis(combat.newChassis(1, 100))
@@ -708,9 +501,6 @@ describe("CombatWorld", function()
         expect_equal(w:activeChassisCount(), 1)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies activeProjectileCount sums active projectiles across all registered pools.
     it("activeProjectileCount sums across pools", function()
         local w = combat.newCombatWorld()
         local pool = combat.newProjectilePool(10)
@@ -720,9 +510,6 @@ describe("CombatWorld", function()
         expect_equal(w:activeProjectileCount(), 2)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newWeapon
-    -- @description Confirms world updates tick weapon cooldowns for weapons stored in the world.
     it("update ticks weapon cooldowns", function()
         local w = combat.newCombatWorld()
         local wpn = combat.newWeapon("Gun")
@@ -732,8 +519,6 @@ describe("CombatWorld", function()
         expect_near(w:getWeapon(1).cooldown_remaining, 0.5, 0.001)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @description Verifies reset clears all combat-world collections back to their empty state.
     it("reset clears everything", function()
         local w = combat.newCombatWorld()
         w:addChassis(combat.newChassis(1, 100))
@@ -743,9 +528,6 @@ describe("CombatWorld", function()
         expect_equal(#w.weapons, 0)
     end)
 
-    -- @covers library.combat.newCombatWorld
-    -- @covers library.combat.newChassis
-    -- @description Checks cleanup removes destroyed chassis while preserving surviving entries.
     it("cleanup removes destroyed chassis", function()
         local w = combat.newCombatWorld()
         w:addChassis(combat.newChassis(1, 100))
@@ -760,11 +542,7 @@ end)
 
 --                  Enums
 
--- @description Confirms the combat module exports the expected projectile and armor-zone enum string constants.
 describe("Enums", function()
-    -- @covers library.combat.ProjectileType
-    -- @covers library.combat.ArmorZone
-    -- @description Confirms the projectile-type enum exports each supported projectile behavior string.
     it("ProjectileType has all variants", function()
         expect_equal(combat.ProjectileType.Ballistic, "ballistic")
         expect_equal(combat.ProjectileType.Homing, "homing")
@@ -773,8 +551,6 @@ describe("Enums", function()
         expect_equal(combat.ProjectileType.Beam, "beam")
     end)
 
-    -- @covers library.combat.ArmorZone
-    -- @description Verifies the armor-zone enum exposes the expected named zone strings.
     it("ArmorZone has all variants", function()
         expect_equal(combat.ArmorZone.Front, "front")
         expect_equal(combat.ArmorZone.Rear, "rear")
@@ -785,8 +561,6 @@ end)
 --        Bug fix: collision group overflow error message
 
 describe("CollisionGroupSet overflow", function()
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Verifies that exceeding the 16-group limit returns a descriptive error mentioning bitmask overflow.
     it("returns descriptive error when exceeding 16 groups", function()
         local cgs = combat.newCollisionGroupSet()
         for i = 1, 16 do
@@ -801,8 +575,6 @@ describe("CollisionGroupSet overflow", function()
         expect_equal(err:find("overflow") ~= nil, true)
     end)
 
-    -- @covers library.combat.newCollisionGroupSet
-    -- @description Verifies empty group name is rejected with a descriptive error.
     it("rejects empty group name", function()
         local cgs = combat.newCollisionGroupSet()
         local b, err = cgs:defineGroup("")
@@ -814,8 +586,6 @@ end)
 --        Bug fix: turret arc snapping
 
 describe("Turret arc snapping", function()
-    -- @covers library.combat.newTurret
-    -- @description Verifies turret update snaps to arc_max when target is above the arc.
     it("update snaps to arc_max when target exceeds arc", function()
         local t = combat.newTurret(1, 2)
         t.turn_speed = 10.0
@@ -829,8 +599,6 @@ describe("Turret arc snapping", function()
         expect_equal(vel, 10.0)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Verifies turret update snaps to arc_min when target is below the arc.
     it("update snaps to arc_min when target is below arc", function()
         local t = combat.newTurret(1, 2)
         t.turn_speed = 10.0
@@ -843,8 +611,6 @@ describe("Turret arc snapping", function()
         expect_equal(vel, -10.0)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description When current_angle is already at the clamped target, velocity is small (snap).
     it("update reaches clamped boundary exactly", function()
         local t = combat.newTurret(1, 2)
         t.turn_speed = 10.0
@@ -860,8 +626,6 @@ end)
 --        Bug fix: weapon burst inter-burst cooldown
 
 describe("Weapon burst cooldown", function()
-    -- @covers library.combat.newWeapon
-    -- @description After the last burst shot, cooldown should be 1/fire_rate (inter-burst), not burst_delay.
     it("last burst shot applies fire_rate cooldown, not burst_delay", function()
         local w = combat.newWeapon("BurstGun")
         w.burst_size = 3
@@ -890,8 +654,6 @@ describe("Weapon burst cooldown", function()
         expect_near(w.cooldown_remaining, 0.5, 0.001)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Single-shot weapon (burst_size=1) still uses fire_rate cooldown.
     it("burst_size=1 always uses fire_rate cooldown", function()
         local w = combat.newWeapon("SingleShot")
         w.burst_size = 1
@@ -904,51 +666,35 @@ end)
 --        Input validation
 
 describe("Input validation", function()
-    -- @covers library.combat.newWeapon
-    -- @description Verifies newWeapon rejects nil and empty names.
     it("newWeapon rejects empty name", function()
         expect_error(function() combat.newWeapon("") end)
     end)
 
-    -- @covers library.combat.newWeapon
-    -- @description Verifies newWeapon rejects nil name.
     it("newWeapon rejects nil name", function()
         expect_error(function() combat.newWeapon(nil) end)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Verifies newChassis rejects negative HP.
     it("newChassis rejects negative max_hp", function()
         expect_error(function() combat.newChassis(1, -10) end)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Verifies newChassis rejects non-number body_id.
     it("newChassis rejects non-number body_id", function()
         expect_error(function() combat.newChassis("bad", 100) end)
     end)
 
-    -- @covers library.combat.newTurret
-    -- @description Verifies newTurret rejects non-number arguments.
     it("newTurret rejects non-number body_id", function()
         expect_error(function() combat.newTurret(nil, 2) end)
     end)
 
-    -- @covers library.combat.newMountSlot
-    -- @description Verifies newMountSlot rejects empty id.
     it("newMountSlot rejects empty id", function()
         expect_error(function() combat.newMountSlot("") end)
     end)
 
-    -- @covers library.combat.newChassis
-    -- @description Verifies takeDamage rejects negative amounts.
     it("takeDamage rejects negative amount", function()
         local c = combat.newChassis(1, 100)
         expect_error(function() c:takeDamage(-5) end)
     end)
 
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies pool rejects size < 1.
     it("newProjectilePool rejects zero pool_size", function()
         expect_error(function() combat.newProjectilePool(0) end)
     end)
@@ -957,13 +703,10 @@ end)
 --        Pool exhaustion and DEFAULT_POOL_SIZE
 
 describe("ProjectilePool defaults", function()
-    -- @covers library.combat.newProjectilePool
-    -- @description Verifies DEFAULT_POOL_SIZE is exported and used when pool_size is nil.
     it("DEFAULT_POOL_SIZE is 64 and used when pool_size is nil", function()
         expect_equal(combat.DEFAULT_POOL_SIZE, 64)
         local pool = combat.newProjectilePool()
         expect_equal(pool.pool_size, 64)
     end)
 end)
-
 test_summary()

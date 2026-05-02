@@ -1,13 +1,7 @@
 -- Lurek2D Stress Test: Savegame Collect/Restore Cycles
 -- Measures serialization throughput for large game state.
 
--- @description Covers suite: stress: savegame collect cycles.
 describe("stress: savegame collect cycles", function()
-    -- @covers lurek.save.newSaveManager
-    -- @covers SaveManager:register
-    -- @covers SaveManager:collect
-    -- @stress Performs 100 savegame collection cycles over a registered 100-key snapshot handler.
-    -- @description Stresses snapshot serialization throughput by cloning a moderately sized Lua table into save data on every measured collect call.
     it("100 savegame collect cycles in <10s", function()
         local COUNT = 100
         local sm    = lurek.save.newSaveManager()
@@ -39,11 +33,6 @@ describe("stress: savegame collect cycles", function()
         expect_true(elapsed < 10.0, "savegame collect budget: " .. elapsed .. "s")
     end)
 
-    -- @covers lurek.save.newSaveManager
-    -- @covers SaveManager:setSummary
-    -- @covers SaveManager:getSummary
-    -- @stress Performs 1000 summary write-read pairs on one save manager.
-    -- @description Stresses lightweight metadata churn by repeatedly setting and immediately fetching a summary entry with randomized content.
     it("summary set/get 1000 times in <5s", function()
         local COUNT = 1000
         local sm    = lurek.save.newSaveManager()
@@ -56,5 +45,4 @@ describe("stress: savegame collect cycles", function()
         expect_true(elapsed < 5.0, "summary r/w budget: " .. elapsed .. "s")
     end)
 end)
-
 test_summary()

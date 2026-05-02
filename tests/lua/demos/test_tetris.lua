@@ -15,7 +15,7 @@ describe("tetris: game mechanics", function()
     end)
 
     it("defines tetromino shapes", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("tetromino") ~= nil or
             src:find("piece") ~= nil or
@@ -25,7 +25,7 @@ describe("tetris: game mechanics", function()
     end)
 
     it("has grid or board data structure", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("grid") ~= nil or
             src:find("board") ~= nil or
@@ -34,7 +34,7 @@ describe("tetris: game mechanics", function()
     end)
 
     it("uses gravity timer for piece fall", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("gravity") ~= nil or
             src:find("fall") ~= nil or
@@ -44,7 +44,7 @@ describe("tetris: game mechanics", function()
     end)
 
     it("has rotate action binding or logic", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("rotat") ~= nil or
             src:find('"up"') ~= nil or
@@ -54,7 +54,7 @@ describe("tetris: game mechanics", function()
     end)
 
     it("has line clear logic", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("clear") ~= nil or
             src:find("line") ~= nil or
@@ -62,5 +62,4 @@ describe("tetris: game mechanics", function()
             "No line clear logic found")
     end)
 end)
-
 test_summary()

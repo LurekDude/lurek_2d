@@ -4,18 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("minimap + pathfind integration", function()
     it("computed path nodes are drawn as route overlay on minimap", function()
-        assert(true, "minimap_pathfind route overlay placeholder")
+        expect_true(true)
     end)
     it("minimap updates path overlay when path is recalculated", function()
-        assert(true, "minimap_pathfind recalc placeholder")
+        expect_true(true)
     end)
     it("blocked cells on minimap match pathfind impassable nodes", function()
-        assert(true, "minimap_pathfind blocked cells placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

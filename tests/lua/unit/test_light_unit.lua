@@ -3,22 +3,6 @@
 -- Module-level functions
 
 describe("lurek.light module functions", function()
-    -- @covers lurek.light.advanceFlickers
-    -- @covers lurek.light.clear
-    -- @covers lurek.light.getAmbient
-    -- @covers lurek.light.getGroupCount
-    -- @covers lurek.light.getLightCount
-    -- @covers lurek.light.getMaxLights
-    -- @covers lurek.light.getOccluderCount
-    -- @covers lurek.light.isEnabled
-    -- @covers lurek.light.newLight
-    -- @covers lurek.light.newOccluder
-    -- @covers lurek.light.setAmbient
-    -- @covers lurek.light.setEnabled
-    -- @covers lurek.light.setGroupColor
-    -- @covers lurek.light.setGroupEnabled
-    -- @covers lurek.light.setGroupIntensity
-    -- @covers lurek.light.setMaxLights
     it("lurek.light is a table", function()
         expect_type("table", lurek.light)
     end)
@@ -1161,100 +1145,85 @@ end)
 
 --  Ambient Bridge & God-Ray Hints (merged from test_light_godrays.lua) 
 
-describe("lurek.light ambient bridge", function()
-    describe("API exposure", function()
-        -- @covers lurek.light.syncAmbient
-        it("exposes syncAmbient", function()
-            expect_type("function", lurek.light.syncAmbient)
-        end)
-
-        -- @covers lurek.light.getGodRayHints
-        it("exposes getGodRayHints", function()
-            expect_type("function", lurek.light.getGodRayHints)
-        end)
+describe("API exposure", function()
+    it("exposes syncAmbient", function()
+        expect_type("function", lurek.light.syncAmbient)
     end)
 
-    describe("syncAmbient()", function()
-        -- @covers lurek.light.syncAmbient
-        it("returns four numeric values", function()
-            local r, g, b, a = lurek.light.syncAmbient()
-            expect_type("number", r)
-            expect_type("number", g)
-            expect_type("number", b)
-            expect_type("number", a)
-        end)
+    it("exposes getGodRayHints", function()
+        expect_type("function", lurek.light.getGodRayHints)
+    end)
+end)
 
-        -- @covers lurek.light.syncAmbient
-        it("alpha component is in [0, 1]", function()
-            local _, _, _, a = lurek.light.syncAmbient()
-            assert(a >= 0.0 and a <= 1.0,
-                "alpha out of [0,1]: " .. tostring(a))
-        end)
-
-        -- @covers lurek.light.setAmbient
-        -- @covers lurek.light.syncAmbient
-        it("reflects setAmbient changes", function()
-            lurek.light.setAmbient(0.2, 0.4, 0.6, 0.8)
-            local r, g, b, a = lurek.light.syncAmbient()
-            expect_near(0.2, r, 0.001)
-            expect_near(0.4, g, 0.001)
-            expect_near(0.6, b, 0.001)
-            expect_near(0.8, a, 0.001)
-        end)
-
-        -- @covers lurek.light.setAmbient
-        -- @covers lurek.light.syncAmbient
-        it("matches getAmbient values", function()
-            lurek.light.setAmbient(0.1, 0.3, 0.5, 1.0)
-            local r1, g1, b1, a1 = lurek.light.getAmbient()
-            local r2, g2, b2, a2 = lurek.light.syncAmbient()
-            expect_near(r1, r2, 0.001)
-            expect_near(g1, g2, 0.001)
-            expect_near(b1, b2, 0.001)
-            expect_near(a1, a2, 0.001)
-        end)
+describe("syncAmbient()", function()
+    it("returns four numeric values", function()
+        local r, g, b, a = lurek.light.syncAmbient()
+        expect_type("number", r)
+        expect_type("number", g)
+        expect_type("number", b)
+        expect_type("number", a)
     end)
 
-    describe("getGodRayHints()", function()
-        -- @covers lurek.light.getGodRayHints
-        it("returns a table", function()
-            local hints = lurek.light.getGodRayHints()
-            expect_type("table", hints)
-        end)
+    it("alpha component is in [0, 1]", function()
+        local _, _, _, a = lurek.light.syncAmbient()
+        expect_true(a >= 0.0 and a <= 1.0,
+            "alpha out of [0,1]: " .. tostring(a))
+    end)
 
-        -- @covers lurek.light.getGodRayHints
-        it("returns empty table with no directional lights", function()
-            lurek.light.clear()
-            local hints = lurek.light.getGodRayHints()
-            expect_equal(0, #hints)
-        end)
+    it("reflects setAmbient changes", function()
+        lurek.light.setAmbient(0.2, 0.4, 0.6, 0.8)
+        local r, g, b, a = lurek.light.syncAmbient()
+        expect_near(0.2, r, 0.001)
+        expect_near(0.4, g, 0.001)
+        expect_near(0.6, b, 0.001)
+        expect_near(0.8, a, 0.001)
+    end)
 
-        -- @covers lurek.light.newLight
-        -- @covers lurek.light.getGodRayHints
-        it("each hint has x, y, angle fields", function()
-            lurek.light.clear()
-            local light = lurek.light.newLight(100, 200, 50, { type = "directional" })
-            light:setDirection(1.57)  -- near pi/2
-            light:setEnabled(true)
-            local hints = lurek.light.getGodRayHints()
-            expect_equal(1, #hints)
-            local h = hints[1]
-            expect_type("number", h.x)
-            expect_type("number", h.y)
-            expect_type("number", h.angle)
-            expect_near(100, h.x, 0.001)
-            expect_near(200, h.y, 0.001)
-            expect_near(1.57, h.angle, 0.001)
-        end)
+    it("matches getAmbient values", function()
+        lurek.light.setAmbient(0.1, 0.3, 0.5, 1.0)
+        local r1, g1, b1, a1 = lurek.light.getAmbient()
+        local r2, g2, b2, a2 = lurek.light.syncAmbient()
+        expect_near(r1, r2, 0.001)
+        expect_near(g1, g2, 0.001)
+        expect_near(b1, b2, 0.001)
+        expect_near(a1, a2, 0.001)
+    end)
+end)
 
-        -- @covers lurek.light.getGodRayHints
-        it("disabled lights are excluded", function()
-            lurek.light.clear()
-            local light = lurek.light.newLight(0, 0, 50, { type = "directional" })
-            light:setEnabled(false)
-            local hints = lurek.light.getGodRayHints()
-            expect_equal(0, #hints)
-        end)
+describe("getGodRayHints()", function()
+    it("returns a table", function()
+        local hints = lurek.light.getGodRayHints()
+        expect_type("table", hints)
+    end)
+
+    it("returns empty table with no directional lights", function()
+        lurek.light.clear()
+        local hints = lurek.light.getGodRayHints()
+        expect_equal(0, #hints)
+    end)
+
+    it("each hint has x, y, angle fields", function()
+        lurek.light.clear()
+        local light = lurek.light.newLight(100, 200, 50, { type = "directional" })
+        light:setDirection(1.57)  -- near pi/2
+        light:setEnabled(true)
+        local hints = lurek.light.getGodRayHints()
+        expect_equal(1, #hints)
+        local h = hints[1]
+        expect_type("number", h.x)
+        expect_type("number", h.y)
+        expect_type("number", h.angle)
+        expect_near(100, h.x, 0.001)
+        expect_near(200, h.y, 0.001)
+        expect_near(1.57, h.angle, 0.001)
+    end)
+
+    it("disabled lights are excluded", function()
+        lurek.light.clear()
+        local light = lurek.light.newLight(0, 0, 50, { type = "directional" })
+        light:setEnabled(false)
+        local hints = lurek.light.getGodRayHints()
+        expect_equal(0, #hints)
     end)
 end)
 
@@ -1263,7 +1232,6 @@ end)
 -- =========================================================================
 
 describe("Missing API Coverage", function()
-    -- @covers Light:addFlicker
     it("covers Light:addFlicker", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1274,7 +1242,6 @@ describe("Missing API Coverage", function()
         l:remove()
     end)
 
-    -- @covers Light:updateTransition
     it("covers Light:updateTransition", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 100)
@@ -1304,7 +1271,6 @@ describe("Missing API Coverage", function()
         l:remove()
     end)
 
-    -- @covers Light:stopTransition
     it("covers Light:stopTransition", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 20)
@@ -1314,7 +1280,6 @@ describe("Missing API Coverage", function()
         l:remove()
     end)
 
-    -- @covers Light:setCookie
     it("covers Light:setCookie", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1323,7 +1288,6 @@ describe("Missing API Coverage", function()
         l:remove()
     end)
 
-    -- @covers Light:getCookie
     it("covers Light:getCookie", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1333,7 +1297,6 @@ describe("Missing API Coverage", function()
         l:remove()
     end)
 
-    -- @covers Light:clearCookie
     it("covers Light:clearCookie", function()
         lurek.light.clear()
         local l = lurek.light.newLight(0, 0, 50)
@@ -1344,5 +1307,4 @@ describe("Missing API Coverage", function()
     end)
 
 end)
-
 test_summary()

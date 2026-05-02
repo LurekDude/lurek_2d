@@ -1,16 +1,7 @@
 -- Lurek2D Integration Test: Tilemap + Pathfinding
 -- Tests using a tilemap grid as the navigation surface for A* pathfinding.
 
--- @description Covers suite: integration: tilemap feeds into pathfinding grid.
 describe("integration: tilemap feeds into pathfinding grid", function()
-    -- @covers lurek.tilemap.Tilemap.setTile
-    -- @covers lurek.pathfind.Pathfinder.findPath
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers lurek.tilemap.Tilemap.setTile
-    -- @covers lurek.tilemap.Tilemap.getTile
-    -- @covers lurek.pathfind.newNavGrid
-    -- @covers lurek.pathfind.newPathfinder
-    -- @description Verifies tile solidity can be copied into a navgrid so pathfinding detours around blocked tilemap cells.
     it("builds navgrid from tilemap: walkable tiles passable, wall tiles blocked", function()
         local tm   = lurek.tilemap.newTileMap(16, 16)
         tm:addLayer("tiles", 10, 10)
@@ -34,9 +25,6 @@ describe("integration: tilemap feeds into pathfinding grid", function()
         expect_true(#path > 1, "path has multiple steps: got " .. tostring(#path))
     end)
 
-    -- @covers lurek.tilemap.Tilemap.setTile
-    -- @covers lurek.pathfind.Pathfinder.findPath
-    -- @description Verifies a fully blocked tilemap produces no usable route in the derived navgrid.
     it("completely blocked tilemap yields no path", function()
         local tm   = lurek.tilemap.newTileMap(16, 16)
         tm:addLayer("tiles", 5, 5)
@@ -60,9 +48,6 @@ describe("integration: tilemap feeds into pathfinding grid", function()
         expect_equal(0, len, "no path through completely blocked map")
     end)
 
-    -- @covers lurek.tilemap.Tilemap.setTile
-    -- @covers lurek.pathfind.Pathfinder.findPath
-    -- @description Verifies an open tilemap floor yields a short direct path in the generated navgrid.
     it("open tilemap floor gives short direct path", function()
         local tm   = lurek.tilemap.newTileMap(16, 16)
         tm:addLayer("tiles", 10, 10)
@@ -83,5 +68,4 @@ describe("integration: tilemap feeds into pathfinding grid", function()
         expect_true(#path <= 8, "path length reasonable (not excessive)")
     end)
 end)
-
 test_summary()

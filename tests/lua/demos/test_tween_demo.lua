@@ -15,7 +15,7 @@ describe("tween_demo: tween API usage", function()
     end)
 
     it("creates a tween (lurek.tween.new or tween())", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.tween%.new") ~= nil or
             src:find("lurek%.tween%.to") ~= nil or
@@ -24,7 +24,7 @@ describe("tween_demo: tween API usage", function()
     end)
 
     it("updates tweens or uses auto-update", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         -- Either explicit :update(dt) call or lurek.tween global update
         local has_update = src:find(":update%s*%(") ~= nil or
                            src:find("lurek%.tween%.update%s*%(") ~= nil or
@@ -33,18 +33,17 @@ describe("tween_demo: tween API usage", function()
     end)
 
     it("does not use lurek.tween.create (wrong factory)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.tween%.create%s*%(") ~= nil,
             "lurek.tween.create() is invalid     use lurek.tween.new()")
     end)
 
     it("uses an easing function or easing string", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("ease") ~= nil or src:find("linear") ~= nil or src:find("quad") ~= nil,
             "No easing reference found     tween uses no easing function")
     end)
 end)
-
 test_summary()

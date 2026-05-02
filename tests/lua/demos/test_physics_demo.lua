@@ -15,7 +15,7 @@ describe("physics_demo: physics API usage", function()
     end)
 
     it("creates physics bodies (lurek.physics.body)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.physics%.body") ~= nil or
             src:find("lurek%.physics%.new") ~= nil or
@@ -26,7 +26,7 @@ describe("physics_demo: physics API usage", function()
     end)
 
     it("uses a physics world (lurek.physics.world)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.physics%.world") ~= nil or
             src:find("lurek%.physics%.setGravity") ~= nil or
@@ -35,7 +35,7 @@ describe("physics_demo: physics API usage", function()
     end)
 
     it("has a process_physics or physics update call", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_true(
             src:find("lurek%.process_physics") ~= nil or
             src:find("function%s+lurek%.process_physics") ~= nil or
@@ -45,11 +45,10 @@ describe("physics_demo: physics API usage", function()
     end)
 
     it("does not call lurek.physics.update (wrong method)", function()
-        if not src then pending("source missing") return end
+        expect_not_nil(src, 'source missing')
         expect_false(
             src:find("lurek%.physics%.update%s*%(") ~= nil,
             "lurek.physics.update() is invalid     use the process_physics callback or :step()")
     end)
 end)
-
 test_summary()

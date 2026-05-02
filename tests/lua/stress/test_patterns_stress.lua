@@ -1,14 +1,8 @@
 -- Lurek2D Stress Test: Patterns Module Operations
 -- Measures observer, state machine, and command queue throughput.
 
--- @description Covers suite: stress: patterns observer throughput.
 describe("stress: patterns observer throughput", function()
-    -- @covers lurek.patterns.newObserver
-    -- @covers Observer:subscribe
-    -- @covers Observer:set
-    -- @stress Registers 1000 subscribers and performs 100 set broadcasts across the full listener set.
-    -- @description Stresses observer fanout throughput by accumulating many listeners and delivering repeated notifications to every callback.
-    xit("1000 observers       100 notifications: <10s", function()
+    it("1000 observers       100 notifications: <10s", function()
         local obs   = lurek.patterns.newObserver()
         local SUBS  = 1000
         local NOTIF = 100
@@ -32,14 +26,8 @@ describe("stress: patterns observer throughput", function()
     end)
 end)
 
--- @description Covers suite: stress: patterns command queue throughput.
 describe("stress: patterns command queue throughput", function()
-    -- @covers lurek.ai.newCommandQueue
-    -- @covers CommandQueue:enqueue
-    -- @covers CommandQueue:getCount
-    -- @stress Enqueues 10000 commands into the queue.
-    -- @description Stresses command-buffer throughput by building a large queue of tiny closures.
-    xit("10000 commands enqueued and executed: <10s", function()
+    it("10000 commands enqueued and executed: <10s", function()
         local queue = lurek.ai.newCommandQueue()
         local COUNT = 10000
 
@@ -56,14 +44,8 @@ describe("stress: patterns command queue throughput", function()
     end)
 end)
 
--- @description Covers suite: stress: patterns state machine throughput.
 describe("stress: patterns state machine throughput", function()
-    -- @covers lurek.ai.newStateMachine
-    -- @covers StateMachine:getCurrentState
-    -- @covers StateMachine:forceState
-    -- @stress Performs 5000 alternating state transitions on one two-state machine.
-    -- @description Stresses transition overhead by flipping between two states in a measured loop after one-time state registration.
-    xit("5000 state transitions in <10s", function()
+    it("5000 state transitions in <10s", function()
         local sm    = lurek.ai.newStateMachine()
         local COUNT = 5000
 
@@ -79,5 +61,4 @@ describe("stress: patterns state machine throughput", function()
         expect_true(elapsed < 10.0, "SM transition budget: " .. elapsed .. "s")
     end)
 end)
-
 test_summary()

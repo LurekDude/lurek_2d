@@ -6,14 +6,6 @@
 -- ===================================================================
 
 describe("lurek.patterns.newEventBus", function()
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.type
-    -- @covers lurek.patterns.EventBus.typeOf
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.newSimpleState
     it("creates an EventBus with type/typeOf", function()
         local bus = lurek.patterns.newEventBus()
         expect_equal("LEventBus", bus["type"](bus))
@@ -21,9 +13,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_true(bus["typeOf"](bus, "Object"))
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.emit
     it("on/emit fires callbacks", function()
         local bus = lurek.patterns.newEventBus()
         local received = nil
@@ -32,8 +21,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(received, 42)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
     it("on returns unique subscription IDs", function()
         local bus = lurek.patterns.newEventBus()
         local id1 = bus:on("a", function() end)
@@ -41,9 +28,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_true(id1 ~= id2)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.emit
     it("listeners fire in priority order", function()
         local bus = lurek.patterns.newEventBus()
         local order = {}
@@ -56,10 +40,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal("mid", order[3])
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.off
-    -- @covers lurek.patterns.EventBus.emit
     it("off removes a listener by ID", function()
         local bus = lurek.patterns.newEventBus()
         local count = 0
@@ -71,10 +51,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(count, 1)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.clear
-    -- @covers lurek.patterns.EventBus.getListenerCount
     it("clear removes all listeners for an event", function()
         local bus = lurek.patterns.newEventBus()
         bus:on("x", function() end)
@@ -86,10 +62,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(bus:getListenerCount("y"), 1)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.clearAll
-    -- @covers lurek.patterns.EventBus.getListenerCount
     it("clearAll removes all listeners", function()
         local bus = lurek.patterns.newEventBus()
         bus:on("a", function() end)
@@ -99,9 +71,6 @@ describe("lurek.patterns.newEventBus", function()
         expect_equal(bus:getListenerCount("b"), 0)
     end)
 
-    -- @covers lurek.patterns.newEventBus
-    -- @covers lurek.patterns.EventBus.on
-    -- @covers lurek.patterns.EventBus.getEvents
     it("getEvents lists event names with listeners", function()
         local bus = lurek.patterns.newEventBus()
         bus:on("alpha", function() end)
@@ -115,9 +84,6 @@ end)
 -- ObjectPool
 -- ===================================================================
 describe("lurek.patterns.newObjectPool", function()
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.type
-    -- @covers lurek.patterns.ObjectPool.typeOf
     it("creates an ObjectPool with correct type", function()
         local pool = lurek.patterns.newObjectPool()
         expect_equal("LObjectPool", pool["type"](pool))
@@ -125,11 +91,6 @@ describe("lurek.patterns.newObjectPool", function()
         expect_true(pool["typeOf"](pool, "Object"))
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.getAvailableCount
-    -- @covers lurek.patterns.ObjectPool.getActiveCount
     it("add/acquire round-trips objects", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add("bullet1")
@@ -141,21 +102,12 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getAvailableCount(), 1)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.getAvailableCount
-    -- @covers lurek.patterns.ObjectPool.getActiveCount
     it("fresh pool starts empty", function()
         local pool = lurek.patterns.newObjectPool()
         expect_equal(0, pool:getAvailableCount())
         expect_equal(0, pool:getActiveCount())
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.release
-    -- @covers lurek.patterns.ObjectPool.getActiveCount
-    -- @covers lurek.patterns.ObjectPool.getAvailableCount
     it("release returns object to pool", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add("item")
@@ -166,10 +118,6 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getAvailableCount(), 1)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.getTotalCount
     it("getTotalCount sums active + available", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add("a")
@@ -178,11 +126,6 @@ describe("lurek.patterns.newObjectPool", function()
         expect_equal(pool:getTotalCount(), 2)
     end)
 
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.add
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.clearAll
-    -- @covers lurek.patterns.ObjectPool.getTotalCount
     it("clearAll resets everything", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add("x")
@@ -197,9 +140,6 @@ end)
 -- CommandStack
 -- ===================================================================
 describe("lurek.patterns.newCommandStack", function()
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.type
-    -- @covers lurek.patterns.CommandStack.typeOf
     it("creates a CommandStack with correct type", function()
         local cmds = lurek.patterns.newCommandStack()
         expect_equal("LCommandStack", cmds["type"](cmds))
@@ -207,8 +147,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_true(cmds["typeOf"](cmds, "Object"))
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
     it("execute runs the command immediately", function()
         local cmds = lurek.patterns.newCommandStack()
         local x = 0
@@ -216,9 +154,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 1)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
     it("undo reverses the last command", function()
         local cmds = lurek.patterns.newCommandStack()
         local x = 0
@@ -229,10 +164,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 0)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.redo
     it("redo re-executes after undo", function()
         local cmds = lurek.patterns.newCommandStack()
         local x = 0
@@ -244,11 +175,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(x, 5)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.canUndo
-    -- @covers lurek.patterns.CommandStack.canRedo
     it("canUndo/canRedo report correctly", function()
         local cmds = lurek.patterns.newCommandStack()
         expect_false(cmds:canUndo())
@@ -261,11 +187,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_true(cmds:canRedo())
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.canRedo
-    -- @covers lurek.patterns.CommandStack.getHistorySize
     it("execute after undo truncates redo history", function()
         local cmds = lurek.patterns.newCommandStack()
         local x = 0
@@ -277,9 +198,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(cmds:getHistorySize(), 2)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.getCurrentName
     it("getCurrentName returns the last command name", function()
         local cmds = lurek.patterns.newCommandStack()
         expect_nil(cmds:getCurrentName())
@@ -287,11 +205,6 @@ describe("lurek.patterns.newCommandStack", function()
         expect_equal(cmds:getCurrentName(), "move")
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.clearAll
-    -- @covers lurek.patterns.CommandStack.getHistorySize
-    -- @covers lurek.patterns.CommandStack.canUndo
     it("clearAll resets the stack", function()
         local cmds = lurek.patterns.newCommandStack()
         cmds:execute("a", function() end, function() end)
@@ -306,9 +219,6 @@ end)
 -- ServiceLocator
 -- ===================================================================
 describe("lurek.patterns.newServiceLocator", function()
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.type
-    -- @covers lurek.patterns.ServiceLocator.typeOf
     it("creates a ServiceLocator with correct type", function()
         local sl = lurek.patterns.newServiceLocator()
         expect_equal("LServiceLocator", sl["type"](sl))
@@ -316,10 +226,6 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_true(sl["typeOf"](sl, "Object"))
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.has
-    -- @covers lurek.patterns.ServiceLocator.locate
     it("provide/locate stores and retrieves values", function()
         local sl = lurek.patterns.newServiceLocator()
         sl:provide("logger", { log = function() end })
@@ -328,18 +234,12 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_true(svc ~= nil)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.locate
     it("locate returns nil for unknown service", function()
         local sl = lurek.patterns.newServiceLocator()
         local svc = sl:locate("missing")
         expect_nil(svc)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.has
-    -- @covers lurek.patterns.ServiceLocator.remove
     it("remove deletes a service", function()
         local sl = lurek.patterns.newServiceLocator()
         sl:provide("db", "connection")
@@ -348,9 +248,6 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_false(sl:has("db"))
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.getServices
     it("getServices lists all names", function()
         local sl = lurek.patterns.newServiceLocator()
         sl:provide("a", 1)
@@ -359,10 +256,6 @@ describe("lurek.patterns.newServiceLocator", function()
         expect_equal(#names, 2)
     end)
 
-    -- @covers lurek.patterns.newServiceLocator
-    -- @covers lurek.patterns.ServiceLocator.provide
-    -- @covers lurek.patterns.ServiceLocator.clearAll
-    -- @covers lurek.patterns.ServiceLocator.has
     it("clearAll removes everything", function()
         local sl = lurek.patterns.newServiceLocator()
         sl:provide("x", 1)
@@ -377,9 +270,6 @@ end)
 -- Factory
 -- ===================================================================
 describe("lurek.patterns.newFactory", function()
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.type
-    -- @covers lurek.patterns.Factory.typeOf
     it("creates a Factory with correct type", function()
         local f = lurek.patterns.newFactory()
         expect_equal("LFactory", f["type"](f))
@@ -387,9 +277,6 @@ describe("lurek.patterns.newFactory", function()
         expect_true(f["typeOf"](f, "Object"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.create
     it("register/create builds objects", function()
         local f = lurek.patterns.newFactory()
         f:register("bullet", function(x, y)
@@ -402,9 +289,6 @@ describe("lurek.patterns.newFactory", function()
         expect_equal("bullet", b and b.kind or nil)
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.has
-    -- @covers lurek.patterns.Factory.register
     it("has checks type registration", function()
         local f = lurek.patterns.newFactory()
         expect_false(f:has("nope"))
@@ -412,9 +296,6 @@ describe("lurek.patterns.newFactory", function()
         expect_true(f:has("enemy"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.getTypes
     it("getTypes lists registered types", function()
         local f = lurek.patterns.newFactory()
         f:register("a", function() end)
@@ -423,10 +304,6 @@ describe("lurek.patterns.newFactory", function()
         expect_equal(#types, 2)
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.remove
-    -- @covers lurek.patterns.Factory.has
     it("remove unregisters a type", function()
         local f = lurek.patterns.newFactory()
         f:register("temp", function() end)
@@ -434,10 +311,6 @@ describe("lurek.patterns.newFactory", function()
         expect_false(f:has("temp"))
     end)
 
-    -- @covers lurek.patterns.newFactory
-    -- @covers lurek.patterns.Factory.register
-    -- @covers lurek.patterns.Factory.clearAll
-    -- @covers lurek.patterns.Factory.getTypes
     it("clearAll removes all types", function()
         local f = lurek.patterns.newFactory()
         f:register("a", function() end)
@@ -451,9 +324,6 @@ end)
 -- SimpleState (FSM)
 -- ===================================================================
 describe("lurek.patterns.newSimpleState", function()
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.type
-    -- @covers lurek.patterns.SimpleState.typeOf
     it("creates a SimpleState with correct type", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_equal("LSimpleState", fsm["type"](fsm))
@@ -461,10 +331,6 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(fsm["typeOf"](fsm, "Object"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.getCurrent
     it("addState/transitionTo changes state", function()
         local fsm = lurek.patterns.newSimpleState()
         fsm:addState("idle")
@@ -476,17 +342,12 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(fsm:getCurrent(), "walk")
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.transitionTo
     it("transitionTo returns false for unknown state", function()
         local fsm = lurek.patterns.newSimpleState()
         local ok = fsm:transitionTo("nonexistent")
         expect_false(ok)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
     it("enter and exit callbacks fire on transition", function()
         local fsm = lurek.patterns.newSimpleState()
         local log = {}
@@ -504,10 +365,6 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(log[3], "enter_b")
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.update
     it("update calls the current state update", function()
         local fsm = lurek.patterns.newSimpleState()
         local dt_received = nil
@@ -519,9 +376,6 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(math.abs(dt_received - 0.016) < 0.001)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.hasState
-    -- @covers lurek.patterns.SimpleState.addState
     it("hasState checks registration", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_false(fsm:hasState("jump"))
@@ -529,9 +383,6 @@ describe("lurek.patterns.newSimpleState", function()
         expect_true(fsm:hasState("jump"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.getStates
     it("getStates lists all state names", function()
         local fsm = lurek.patterns.newSimpleState()
         fsm:addState("idle")
@@ -541,12 +392,6 @@ describe("lurek.patterns.newSimpleState", function()
         expect_equal(#states, 3)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.transitionTo
-    -- @covers lurek.patterns.SimpleState.clearAll
-    -- @covers lurek.patterns.SimpleState.getCurrent
-    -- @covers lurek.patterns.SimpleState.getStates
     it("clearAll resets the FSM", function()
         local fsm = lurek.patterns.newSimpleState()
         fsm:addState("a")
@@ -559,33 +404,22 @@ describe("lurek.patterns.newSimpleState", function()
 end)
 
 describe("SimpleState extended coverage (RS parity)", function()
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.hasState
     it("hasState returns false for unregistered state", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_false(fsm:hasState("unknown"))
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.update
     it("update does not error with no current state", function()
         local fsm = lurek.patterns.newSimpleState()
         expect_no_error(function() fsm:update(0.016) end)
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.getCurrent
     it("getCurrent returns nil before any transition", function()
         local fsm = lurek.patterns.newSimpleState()
         fsm:addState("idle")
         expect_nil(fsm:getCurrent())
     end)
 
-    -- @covers lurek.patterns.newSimpleState
-    -- @covers lurek.patterns.SimpleState.addState
-    -- @covers lurek.patterns.SimpleState.clearAll
-    -- @covers lurek.patterns.SimpleState.getStates
     it("clearAll followed by addState works cleanly", function()
         local fsm = lurek.patterns.newSimpleState()
         fsm:addState("a")
@@ -596,10 +430,6 @@ describe("SimpleState extended coverage (RS parity)", function()
 end)
 
 describe("CommandStack undo/redo (RS parity)", function()
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.execute
-    -- @covers lurek.patterns.CommandStack.undo
-    -- @covers lurek.patterns.CommandStack.redo
     it("undo and redo cycle correctly", function()
         local cs = lurek.patterns.newCommandStack()
         local val = 0
@@ -611,9 +441,6 @@ describe("CommandStack undo/redo (RS parity)", function()
         expect_equal(1, val)
     end)
 
-    -- @covers lurek.patterns.newCommandStack
-    -- @covers lurek.patterns.CommandStack.getHistorySize
-    -- @covers lurek.patterns.CommandStack.execute
     it("getHistorySize reflects executed commands", function()
         local cs = lurek.patterns.newCommandStack()
         expect_equal(0, cs:getHistorySize())
@@ -625,12 +452,6 @@ end)
 --  Patterns Collections (merged from test_patterns_collections.lua) 
 
 describe("lurek.patterns.Stack", function()
-    -- @covers lurek.patterns.newStack
-    -- @covers lurek.patterns.Stack.push
-    -- @covers lurek.patterns.Stack.pop
-    -- @covers lurek.patterns.Stack.peek
-    -- @covers lurek.patterns.Stack.len
-    -- @covers lurek.patterns.Stack.isEmpty
     it("push and pop follow LIFO order", function()
         local s = lurek.patterns.newStack()
         s:push("a")
@@ -643,7 +464,6 @@ describe("lurek.patterns.Stack", function()
         expect_equal(true, s:isEmpty())
     end)
 
-    -- @covers lurek.patterns.Stack.peek
     it("peek does not remove the top item", function()
         local s = lurek.patterns.newStack()
         s:push(42)
@@ -651,14 +471,12 @@ describe("lurek.patterns.Stack", function()
         expect_equal(1, s:len())
     end)
 
-    -- @covers lurek.patterns.Stack.isFull
     it("isFull returns true at capacity", function()
         local s = lurek.patterns.newStack(3)
         s:push(1); s:push(2); s:push(3)
         expect_equal(true, s:isFull())
     end)
 
-    -- @covers lurek.patterns.Stack.toArray
     it("toArray returns all items in order", function()
         local s = lurek.patterns.newStack()
         s:push("x"); s:push("y")
@@ -666,7 +484,6 @@ describe("lurek.patterns.Stack", function()
         expect_equal(2, #arr)
     end)
 
-    -- @covers lurek.patterns.Stack.clear
     it("clear empties the stack", function()
         local s = lurek.patterns.newStack()
         s:push(1); s:push(2)
@@ -676,9 +493,6 @@ describe("lurek.patterns.Stack", function()
 end)
 
 describe("lurek.patterns.Queue", function()
-    -- @covers lurek.patterns.newQueue
-    -- @covers lurek.patterns.Queue.enqueue
-    -- @covers lurek.patterns.Queue.dequeue
     it("enqueue and dequeue follow FIFO order", function()
         local q = lurek.patterns.newQueue()
         q:enqueue("first")
@@ -688,7 +502,6 @@ describe("lurek.patterns.Queue", function()
         expect_equal("second", q:dequeue())
     end)
 
-    -- @covers lurek.patterns.Queue.front
     it("front peeks without removing", function()
         local q = lurek.patterns.newQueue()
         q:enqueue("peek_me")
@@ -696,7 +509,6 @@ describe("lurek.patterns.Queue", function()
         expect_equal(1, q:len())
     end)
 
-    -- @covers lurek.patterns.Queue.isEmpty
     it("isEmpty returns true on empty queue", function()
         local q = lurek.patterns.newQueue()
         expect_equal(true, q:isEmpty())
@@ -706,11 +518,6 @@ describe("lurek.patterns.Queue", function()
 end)
 
 describe("lurek.patterns.List", function()
-    -- @covers lurek.patterns.newList
-    -- @covers lurek.patterns.List.add
-    -- @covers lurek.patterns.List.get
-    -- @covers lurek.patterns.List.set
-    -- @covers lurek.patterns.List.remove
     it("supports indexed access and removal", function()
         local l = lurek.patterns.newList()
         l:add("alpha")
@@ -724,7 +531,6 @@ describe("lurek.patterns.List", function()
         expect_equal(2, l:len())
     end)
 
-    -- @covers lurek.patterns.List.contains
     it("contains returns true for present and false for absent values", function()
         local l = lurek.patterns.newList()
         l:add("hello")
@@ -734,10 +540,6 @@ describe("lurek.patterns.List", function()
 end)
 
 describe("lurek.patterns.Set", function()
-    -- @covers lurek.patterns.newSet
-    -- @covers lurek.patterns.Set.add
-    -- @covers lurek.patterns.Set.has
-    -- @covers lurek.patterns.Set.remove
     it("add, has, and remove work for string members", function()
         local s = lurek.patterns.newSet()
         s:add("fire")
@@ -749,7 +551,6 @@ describe("lurek.patterns.Set", function()
         expect_equal(1, s:len())
     end)
 
-    -- @covers lurek.patterns.Set.union
     it("union returns a set containing all elements of both sets", function()
         local a = lurek.patterns.newSet()
         local b = lurek.patterns.newSet()
@@ -759,7 +560,6 @@ describe("lurek.patterns.Set", function()
         expect_equal(3, u:len())
     end)
 
-    -- @covers lurek.patterns.Set.intersection
     it("intersection returns only shared elements", function()
         local a = lurek.patterns.newSet()
         local b = lurek.patterns.newSet()
@@ -769,7 +569,6 @@ describe("lurek.patterns.Set", function()
         expect_equal(2, i:len())
     end)
 
-    -- @covers lurek.patterns.Set.toArray
     it("toArray returns all set members", function()
         local s = lurek.patterns.newSet()
         s:add("one"); s:add("two"); s:add("three")
@@ -781,9 +580,6 @@ end)
 --  Patterns Mediator (merged from test_patterns_mediator.lua) 
 
 describe("lurek.patterns.Mediator", function()
-    -- @covers lurek.patterns.newMediator
-    -- @covers lurek.patterns.Mediator.on
-    -- @covers lurek.patterns.Mediator.send
     it("on registers a handler that receives send messages", function()
         local m = lurek.patterns.newMediator()
         local received = nil
@@ -794,7 +590,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal("hello", received)
     end)
 
-    -- @covers lurek.patterns.Mediator.off
     it("off removes handler by id", function()
         local m = lurek.patterns.newMediator()
         local count = 0
@@ -805,7 +600,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(1, count)
     end)
 
-    -- @covers lurek.patterns.Mediator.broadcast
     it("send only fires handler on its own channel", function()
         local m = lurek.patterns.newMediator()
         local hit = 0
@@ -815,7 +609,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(1, hit)
     end)
 
-    -- @covers lurek.patterns.Mediator.handlerCount
     it("handlerCount tracks registration and removal", function()
         local m = lurek.patterns.newMediator()
         expect_equal(0, m:handlerCount("events"))
@@ -825,7 +618,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(0, m:handlerCount("events"))
     end)
 
-    -- @covers lurek.patterns.Mediator.channels
     it("channels returns registered channel names", function()
         local m = lurek.patterns.newMediator()
         m:on("alpha", function() end)
@@ -834,7 +626,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(2, #ch)
     end)
 
-    -- @covers lurek.patterns.Mediator.removeChannel
     it("removeChannel removes all handlers on a channel", function()
         local m = lurek.patterns.newMediator()
         m:on("destroy", function() end)
@@ -844,7 +635,6 @@ describe("lurek.patterns.Mediator", function()
         expect_equal(0, m:handlerCount("destroy"))
     end)
 
-    -- @covers lurek.patterns.Mediator.clear
     it("clear removes all channels", function()
         local m = lurek.patterns.newMediator()
         m:on("a", function() end)
@@ -858,10 +648,6 @@ end)
 --  Patterns Strategy (merged from test_patterns_strategy.lua) 
 
 describe("lurek.patterns.Strategy", function()
-    -- @covers lurek.patterns.newStrategy
-    -- @covers lurek.patterns.Strategy.register
-    -- @covers lurek.patterns.Strategy.set
-    -- @covers lurek.patterns.Strategy.execute
     it("register, set, and execute calls the strategy function", function()
         local s = lurek.patterns.newStrategy()
         local called = false
@@ -871,7 +657,6 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(true, called)
     end)
 
-    -- @covers lurek.patterns.Strategy.getCurrent
     it("getCurrent returns the active strategy name", function()
         local s = lurek.patterns.newStrategy()
         s:register("patrol", function() end)
@@ -880,7 +665,6 @@ describe("lurek.patterns.Strategy", function()
         expect_equal("patrol", s:getCurrent())
     end)
 
-    -- @covers lurek.patterns.Strategy.has
     it("has returns true for registered names and false for unknown", function()
         local s = lurek.patterns.newStrategy()
         s:register("attack", function() end)
@@ -888,7 +672,6 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(false, s:has("retreat"))
     end)
 
-    -- @covers lurek.patterns.Strategy.remove
     it("remove unregisters a strategy", function()
         local s = lurek.patterns.newStrategy()
         s:register("idle", function() end)
@@ -899,7 +682,6 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(nil, s:getCurrent())
     end)
 
-    -- @covers lurek.patterns.Strategy.names
     it("names returns all registered names", function()
         local s = lurek.patterns.newStrategy()
         s:register("walk", function() end)
@@ -909,7 +691,6 @@ describe("lurek.patterns.Strategy", function()
         expect_equal(3, #names)
     end)
 
-    -- @covers lurek.patterns.Strategy.execute
     it("execute passes arguments to the strategy function", function()
         local s = lurek.patterns.newStrategy()
         local got_dt = nil
@@ -919,7 +700,6 @@ describe("lurek.patterns.Strategy", function()
         expect_near(0.016, got_dt, 1e-6)
     end)
 
-    -- @covers lurek.patterns.Strategy.clear
     it("clear removes all strategies", function()
         local s = lurek.patterns.newStrategy()
         s:register("a", function() end)
@@ -940,9 +720,6 @@ end)
 -- aborted with "already borrowed".
 
 describe("ObjectPool regression: acquire double-borrow", function()
-    -- @covers lurek.patterns.newObjectPool
-    -- @covers lurek.patterns.ObjectPool.acquire
-    -- @covers lurek.patterns.ObjectPool.release
     it("acquire -> release -> acquire cycle does not panic", function()
         local pool = lurek.patterns.newObjectPool()
         pool:add({ id = "a" })
@@ -958,10 +735,8 @@ end)
 
 
 
-describe("Strategy:set and Strategy:has (@covers)", function()
+describe("Strategy:set and Strategy:has ", function()
     it("set and has are callable on a Strategy", function()
-        -- @covers Strategy:set
-        -- @covers Strategy:has
         local s = lurek.patterns.newStrategy()
         local ok_set, _ = pcall(function()
             s:register("attack", function() return "attack" end)
@@ -973,9 +748,8 @@ describe("Strategy:set and Strategy:has (@covers)", function()
     end)
 end)
 
-describe("Stack:pop and Stack:len (@covers)", function()
+describe("Stack:pop and Stack:len ", function()
     it("pop returns the most recently pushed item", function()
-        -- @covers Stack:pop
         local st = lurek.patterns.newStack()
         st:push("first")
         st:push("second")
@@ -983,11 +757,9 @@ describe("Stack:pop and Stack:len (@covers)", function()
     end)
 
     it("len returns the current item count", function()
-        -- @covers Stack:len
         local st = lurek.patterns.newStack()
         st:push("item")
         expect_equal(1, st:len())
     end)
 end)
-
 test_summary()

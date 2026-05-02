@@ -13,11 +13,6 @@
 -- runtime, fully headless, and matches the actual on-disk payload shape
 -- that SaveManager would persist.
 --
--- @covers library.inventory.newInventory
--- @covers library.inventory.newContainer
--- @covers library.inventory.newItem
--- @covers lurek.serial.toJson
--- @covers lurek.serial.fromJson
 
 local inventory = require("library.inventory")
 
@@ -36,7 +31,6 @@ end
 
 describe("integration: library.inventory    lurek.serial", function()
 
-    -- @description Inventory snapshot survives a JSON round-trip and rebuilds equal table state.
     it("snapshot round-trips through codec.toJson/fromJson", function()
         local inv = inventory.newInventory()
         local bag = inventory.newContainer("bag", "fixed", 8, 8)
@@ -57,7 +51,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(3, decoded.containers[1].items[1].qty)
     end)
 
-    -- @description Stack quantities are preserved across the JSON round-trip.
     it("stack counts survive round-trip", function()
         local inv = inventory.newInventory()
         local box = inventory.newContainer("box", "fixed", 4, 4)
@@ -71,7 +64,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(12, back.containers[1].items[1].qty)
     end)
 
-    -- @description Container ordering is preserved across the JSON round-trip.
     it("container order is preserved across round-trip", function()
         local inv = inventory.newInventory()
         for _, name in ipairs({ "alpha", "bravo", "charlie" }) do
@@ -83,7 +75,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal("charlie", back.containers[3].name)
     end)
 
-    -- @description Loading a payload missing the "containers" field returns a sensible default
     -- instead of raising     restoration code can fall back to an empty inventory.
     it("missing containers field decodes to empty list with sensible default", function()
         local back = lurek.serial.fromJson("{}")
@@ -92,14 +83,12 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(0, #containers)
     end)
 
-    -- @description Failure path: corrupt JSON is rejected with an error.
     it("corrupt JSON raises an error when decoded", function()
         expect_error(function()
             lurek.serial.fromJson("{not valid json")
         end)
     end)
 
-    -- @description Empty inventory encodes to a valid JSON object that round-trips cleanly.
     it("empty inventory round-trips without loss", function()
         local inv = inventory.newInventory()
         local json = lurek.serial.toJson(snapshot(inv))
@@ -132,11 +121,6 @@ end)
 -- runtime, fully headless, and matches the actual on-disk payload shape
 -- that SaveManager would persist.
 --
--- @covers library.inventory.newInventory
--- @covers library.inventory.newContainer
--- @covers library.inventory.newItem
--- @covers lurek.serial.toJson
--- @covers lurek.serial.fromJson
 
 local inventory = require("library.inventory")
 
@@ -155,7 +139,6 @@ end
 
 describe("integration: library.inventory    lurek.serial", function()
 
-    -- @description Inventory snapshot survives a JSON round-trip and rebuilds equal table state.
     it("snapshot round-trips through codec.toJson/fromJson", function()
         local inv = inventory.newInventory()
         local bag = inventory.newContainer("bag", "fixed", 8, 8)
@@ -176,7 +159,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(3, decoded.containers[1].items[1].qty)
     end)
 
-    -- @description Stack quantities are preserved across the JSON round-trip.
     it("stack counts survive round-trip", function()
         local inv = inventory.newInventory()
         local box = inventory.newContainer("box", "fixed", 4, 4)
@@ -190,7 +172,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(12, back.containers[1].items[1].qty)
     end)
 
-    -- @description Container ordering is preserved across the JSON round-trip.
     it("container order is preserved across round-trip", function()
         local inv = inventory.newInventory()
         for _, name in ipairs({ "alpha", "bravo", "charlie" }) do
@@ -202,7 +183,6 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal("charlie", back.containers[3].name)
     end)
 
-    -- @description Loading a payload missing the "containers" field returns a sensible default
     -- instead of raising     restoration code can fall back to an empty inventory.
     it("missing containers field decodes to empty list with sensible default", function()
         local back = lurek.serial.fromJson("{}")
@@ -211,14 +191,12 @@ describe("integration: library.inventory    lurek.serial", function()
         expect_equal(0, #containers)
     end)
 
-    -- @description Failure path: corrupt JSON is rejected with an error.
     it("corrupt JSON raises an error when decoded", function()
         expect_error(function()
             lurek.serial.fromJson("{not valid json")
         end)
     end)
 
-    -- @description Empty inventory encodes to a valid JSON object that round-trips cleanly.
     it("empty inventory round-trips without loss", function()
         local inv = inventory.newInventory()
         local json = lurek.serial.toJson(snapshot(inv))
@@ -228,5 +206,4 @@ describe("integration: library.inventory    lurek.serial", function()
     end)
 
 end)
-
 test_summary()

@@ -9,14 +9,6 @@
 -- =============================================================================
 
 describe("lurek.image compressed API", function()
-    -- @covers lurek.image.isCompressed
-    -- @covers lurek.image.loadImage
-    -- @covers lurek.image.loadLayered
-    -- @covers lurek.image.newCompressedData
-    -- @covers lurek.image.newImageData
-    -- @covers lurek.image.newLayeredImage
-    -- @covers lurek.image.saveImage
-    -- @covers lurek.image.saveLayered
     it("lurek.image is a table", function()
         expect_type("table", lurek.image)
     end)
@@ -1096,7 +1088,6 @@ local function require_image_data(img, context)
 end
 
 describe("lurek.effect.newImageEffect construction (empty)", function()
-    -- @covers lurek.effect.newImageEffect
     it("newImageEffect is a function", function()
         expect_type("function", lurek.effect.newImageEffect)
     end)
@@ -1607,8 +1598,6 @@ end)
 -- =========================================================================
 
 describe("image palette and province coverage", function()
-    -- @covers lurek.image.newPaletteLut
-    -- @covers PaletteLUT:getColorCount
     it("newPaletteLut starts empty and counts entries", function()
         local lut = lurek.image.newPaletteLut()
         expect_equal(0, lut:getColorCount())
@@ -1618,7 +1607,6 @@ describe("image palette and province coverage", function()
         expect_equal(2, lut:getColorCount())
     end)
 
-    -- @covers mlua:applyPaletteLut
     it("applyPaletteLut replaces matching pixels", function()
         local img = lurek.image.newImageData(2, 1)
         local lut = lurek.image.newPaletteLut()
@@ -1640,13 +1628,6 @@ describe("image palette and province coverage", function()
         expect_equal(255, a2)
     end)
 
-    -- @covers lurek.image.savePNG
-    -- @covers lurek.image.newProvinceGrid
-    -- @covers ProvinceGrid:getWidth
-    -- @covers ProvinceGrid:getHeight
-    -- @covers ProvinceGrid:getAt
-    -- @covers ProvinceGrid:provinceCount
-    -- @covers ProvinceGrid:adjacencies
     it("savePNG and newProvinceGrid build a usable province map", function()
         local img = lurek.image.newImageData(4, 4)
         local path = "save/_province_grid_test.png"
@@ -1692,10 +1673,6 @@ describe("image palette and province coverage", function()
 end)
 
 describe("image remaining explicit coverage", function()
-    -- @covers CompressedImageData:getWidth
-    -- @covers CompressedImageData:getHeight
-    -- @covers CompressedImageData:getDimensions
-    -- @covers CompressedImageData:getFormat
     it("CompressedImageData metadata methods report fixture state", function()
         local compressed = lurek.image.newCompressedData("tests/fixtures/test_dxt1.dds")
         local width, height = compressed:getDimensions()
@@ -1708,7 +1685,6 @@ describe("image remaining explicit coverage", function()
         expect_true(#compressed:getFormat() > 0)
     end)
 
-    -- @covers mlua:setRawData
     it("ImageData:setRawData replaces pixel bytes", function()
         local img = lurek.image.newImageData(1, 1)
         img:setRawData(string.char(7, 8, 9, 255))
@@ -1720,7 +1696,6 @@ describe("image remaining explicit coverage", function()
         expect_equal(a, 255)
     end)
 
-    -- @covers PaletteLUT:clear
     it("PaletteLUT:clear removes all mappings", function()
         local lut = lurek.image.newPaletteLut()
         lut:setColor(1, 2, 3, 255, 4, 5, 6, 255)
@@ -1732,5 +1707,4 @@ describe("image remaining explicit coverage", function()
         expect_equal(0, lut:getColorCount())
     end)
 end)
-
 test_summary()

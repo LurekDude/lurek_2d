@@ -5,10 +5,7 @@ local lobby_mod = require("library.lobby")
 -- Room Creation
 ---------------------------------------------------------------------------
 
--- @description Covers room creation, duplicate detection, and option validation.
 describe("Room Creation", function()
-    -- @covers library.lobby.createRoom
-    -- @description Verifies a room can be created with default options and appears in listings.
     it("creates a room with defaults", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:createRoom("alpha")
@@ -17,8 +14,6 @@ describe("Room Creation", function()
         expect_equal(L:getRoomCount(), 1)
     end)
 
-    -- @covers library.lobby.createRoom
-    -- @description Verifies room options (maxPlayers, password, data) are accepted.
     it("creates a room with custom options", function()
         local L = lobby_mod.new(nil)
         local ok = L:createRoom("bravo", { maxPlayers = 4, password = "secret", data = { mode = "ranked" } })
@@ -29,8 +24,6 @@ describe("Room Creation", function()
         expect_equal(rooms[1].hasPassword, true)
     end)
 
-    -- @covers library.lobby.createRoom
-    -- @description Attempting to create a room with a duplicate name fails.
     it("rejects duplicate room name", function()
         local L = lobby_mod.new(nil)
         L:createRoom("dup")
@@ -39,8 +32,6 @@ describe("Room Creation", function()
         expect_equal(err, "room already exists")
     end)
 
-    -- @covers library.lobby.createRoom
-    -- @description Empty or non-string room names are rejected.
     it("rejects empty room name", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:createRoom("")
@@ -48,8 +39,6 @@ describe("Room Creation", function()
         expect_equal(err, "room name must be a non-empty string")
     end)
 
-    -- @covers library.lobby.createRoom
-    -- @description Non-string room name is rejected.
     it("rejects non-string room name", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:createRoom(123)
@@ -57,8 +46,6 @@ describe("Room Creation", function()
         expect_equal(err, "room name must be a non-empty string")
     end)
 
-    -- @covers library.lobby.createRoom
-    -- @description Invalid maxPlayers is rejected.
     it("rejects invalid maxPlayers", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:createRoom("bad", { maxPlayers = 0 })
@@ -75,10 +62,7 @@ end)
 -- Room Removal
 ---------------------------------------------------------------------------
 
--- @description Covers room removal and auto-removal of empty rooms.
 describe("Room Removal", function()
-    -- @covers library.lobby.removeRoom
-    -- @description Removing a room decrements count and clears from listings.
     it("removes an existing room", function()
         local L = lobby_mod.new(nil)
         L:createRoom("temp")
@@ -87,8 +71,6 @@ describe("Room Removal", function()
         expect_equal(L:getRoomCount(), 0)
     end)
 
-    -- @covers library.lobby.removeRoom
-    -- @description Removing a non-existent room is a no-op.
     it("no-op for non-existent room", function()
         local L = lobby_mod.new(nil)
         L:removeRoom("ghost")
@@ -100,10 +82,7 @@ end)
 -- Join / Leave
 ---------------------------------------------------------------------------
 
--- @description Covers joining rooms, leaving rooms, and edge cases.
 describe("Join / Leave", function()
-    -- @covers library.lobby.joinRoom
-    -- @description Local player can join a room and is tracked as peer 0.
     it("local player joins a room", function()
         local L = lobby_mod.new(nil)
         L:setPlayerName("Alice")
@@ -116,8 +95,6 @@ describe("Join / Leave", function()
         expect_equal(players[1].name, "Alice")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Remote peer joins with explicit peer_id.
     it("remote peer joins a room", function()
         local L = lobby_mod.new(nil)
         L:createRoom("room1")
@@ -129,8 +106,6 @@ describe("Join / Leave", function()
         expect_equal(players[1].name, "Bob")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Joining a non-existent room fails.
     it("rejects join to non-existent room", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:joinRoom("nowhere")
@@ -138,8 +113,6 @@ describe("Join / Leave", function()
         expect_equal(err, "room not found")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Joining a full room fails.
     it("rejects join to full room", function()
         local L = lobby_mod.new(nil)
         L:createRoom("tiny", { maxPlayers = 1 })
@@ -149,8 +122,6 @@ describe("Join / Leave", function()
         expect_equal(err, "room full")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Joining the same room twice with the same peer_id fails.
     it("rejects duplicate join", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -160,8 +131,6 @@ describe("Join / Leave", function()
         expect_equal(err, "player already in room")
     end)
 
-    -- @covers library.lobby.leaveRoom
-    -- @description Local player leaves and room tracking is cleared.
     it("local player leaves a room", function()
         local L = lobby_mod.new(nil)
         L:createRoom("room1")
@@ -171,8 +140,6 @@ describe("Join / Leave", function()
         expect_equal(L:getCurrentRoom(), nil)
     end)
 
-    -- @covers library.lobby.leaveRoom
-    -- @description Leaving with no room set returns false and an error.
     it("warns when leaving with no room", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:leaveRoom()
@@ -180,8 +147,6 @@ describe("Join / Leave", function()
         expect_equal(err, "not in a room")
     end)
 
-    -- @covers library.lobby.leaveRoom
-    -- @description Remote peer leave via peer_id.
     it("remote peer leaves a room", function()
         local L = lobby_mod.new(nil)
         L:createRoom("room1")
@@ -194,8 +159,6 @@ describe("Join / Leave", function()
         expect_equal(players[1].peer_id, 20)
     end)
 
-    -- @covers library.lobby.leaveRoom
-    -- @description Room is auto-removed when the last player leaves.
     it("auto-removes empty room after last leave", function()
         local L = lobby_mod.new(nil)
         L:createRoom("solo")
@@ -209,10 +172,7 @@ end)
 -- Password Protection
 ---------------------------------------------------------------------------
 
--- @description Covers password-protected room join validation.
 describe("Password Protection", function()
-    -- @covers library.lobby.joinRoom
-    -- @description Joining a password-protected room without a password fails.
     it("rejects join without password", function()
         local L = lobby_mod.new(nil)
         L:createRoom("vault", { password = "abc123" })
@@ -221,8 +181,6 @@ describe("Password Protection", function()
         expect_equal(err, "incorrect password")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Joining with wrong password fails.
     it("rejects join with wrong password", function()
         local L = lobby_mod.new(nil)
         L:createRoom("vault", { password = "abc123" })
@@ -231,8 +189,6 @@ describe("Password Protection", function()
         expect_equal(err, "incorrect password")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description Joining with correct password succeeds.
     it("accepts join with correct password", function()
         local L = lobby_mod.new(nil)
         L:createRoom("vault", { password = "abc123" })
@@ -241,8 +197,6 @@ describe("Password Protection", function()
         expect_equal(#L:getPlayers("vault"), 1)
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description No-password room accepts join without password arg.
     it("open room accepts join without password", function()
         local L = lobby_mod.new(nil)
         L:createRoom("open")
@@ -255,10 +209,7 @@ end)
 -- Ready State
 ---------------------------------------------------------------------------
 
--- @description Covers player ready-check toggling and room-wide readiness.
 describe("Ready State", function()
-    -- @covers library.lobby.setReady
-    -- @description Local player can toggle ready state.
     it("sets local player ready", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -268,8 +219,6 @@ describe("Ready State", function()
         expect_equal(players[1].ready, true)
     end)
 
-    -- @covers library.lobby.setReady
-    -- @description Server can set ready for a remote peer.
     it("sets remote peer ready", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -279,8 +228,6 @@ describe("Ready State", function()
         expect_equal(players[1].ready, true)
     end)
 
-    -- @covers library.lobby.setReady
-    -- @description Toggling ready back to false works.
     it("toggles ready off", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -291,8 +238,6 @@ describe("Ready State", function()
         expect_equal(players[1].ready, false)
     end)
 
-    -- @covers library.lobby.isAllReady
-    -- @description isAllReady requires at least 2 players all ready.
     it("all ready with 2+ players", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -303,8 +248,6 @@ describe("Ready State", function()
         expect_equal(L:isAllReady(), true)
     end)
 
-    -- @covers library.lobby.isAllReady
-    -- @description isAllReady returns false with only 1 player even if ready.
     it("not all ready with only 1 player", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -313,8 +256,6 @@ describe("Ready State", function()
         expect_equal(L:isAllReady(), false)
     end)
 
-    -- @covers library.lobby.isAllReady
-    -- @description isAllReady returns false when one player is not ready.
     it("not all ready when one is unready", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -330,10 +271,7 @@ end)
 -- Host Election
 ---------------------------------------------------------------------------
 
--- @description Covers deterministic host election on join/leave.
 describe("Host Election", function()
-    -- @covers library.lobby.joinRoom library.lobby.getHost
-    -- @description First player to join becomes host.
     it("first joiner becomes host", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -342,8 +280,6 @@ describe("Host Election", function()
         expect_equal(L:getHost("r"), 10)
     end)
 
-    -- @covers library.lobby.leaveRoom library.lobby.getHost
-    -- @description When host leaves, earliest remaining joiner becomes host.
     it("re-elects host deterministically on host leave", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -358,8 +294,6 @@ describe("Host Election", function()
         expect_equal(L:getHost("r"), 5)
     end)
 
-    -- @covers library.lobby.leaveRoom library.lobby.getHost
-    -- @description Non-host leaving does not change host.
     it("non-host leave does not change host", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -370,8 +304,6 @@ describe("Host Election", function()
         expect_equal(L:getHost("r"), 1)
     end)
 
-    -- @covers library.lobby.leaveRoom library.lobby.getHost
-    -- @description Host is nil after all players leave.
     it("host is nil when room empties", function()
         local L = lobby_mod.new(nil)
         L:createRoom("r")
@@ -386,10 +318,7 @@ end)
 -- Events
 ---------------------------------------------------------------------------
 
--- @description Covers event callback invocations for lobby actions.
 describe("Events", function()
-    -- @covers library.lobby.onEvent
-    -- @description Event callback fires for room creation, join, leave, ready, and host change.
     it("fires events for room lifecycle", function()
         local L = lobby_mod.new(nil)
         local events = {}
@@ -420,10 +349,7 @@ end)
 -- Listing & Querying
 ---------------------------------------------------------------------------
 
--- @description Covers listing rooms and querying player lists.
 describe("Listing", function()
-    -- @covers library.lobby.listRooms
-    -- @description listRooms returns correct info for multiple rooms.
     it("lists multiple rooms", function()
         local L = lobby_mod.new(nil)
         L:createRoom("a")
@@ -439,16 +365,12 @@ describe("Listing", function()
         expect_equal(b_room.hasPassword, true)
     end)
 
-    -- @covers library.lobby.getPlayers
-    -- @description getPlayers returns empty table for unknown room.
     it("getPlayers empty for unknown room", function()
         local L = lobby_mod.new(nil)
         local players = L:getPlayers("nonexistent")
         expect_equal(#players, 0)
     end)
 
-    -- @covers library.lobby.getRoomCount
-    -- @description getRoomCount tracks room creation and removal.
     it("getRoomCount tracks changes", function()
         local L = lobby_mod.new(nil)
         expect_equal(L:getRoomCount(), 0)
@@ -464,10 +386,7 @@ end)
 -- Player Name
 ---------------------------------------------------------------------------
 
--- @description Covers setPlayerName validation.
 describe("Player Name", function()
-    -- @covers library.lobby.setPlayerName
-    -- @description Rejects empty and non-string names.
     it("rejects empty name", function()
         local L = lobby_mod.new(nil)
         L:setPlayerName("Valid")
@@ -479,8 +398,6 @@ describe("Player Name", function()
         expect_equal(players[1].name, "Valid")
     end)
 
-    -- @covers library.lobby.setPlayerName
-    -- @description Non-string name is rejected.
     it("rejects non-string name", function()
         local L = lobby_mod.new(nil)
         L:setPlayerName("Good")
@@ -496,10 +413,7 @@ end)
 -- Input Validation
 ---------------------------------------------------------------------------
 
--- @description Covers input validation edge cases.
 describe("Input Validation", function()
-    -- @covers library.lobby.joinRoom
-    -- @description joinRoom rejects empty room name.
     it("rejects empty room name on join", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:joinRoom("")
@@ -507,8 +421,6 @@ describe("Input Validation", function()
         expect_equal(err, "room name must be a non-empty string")
     end)
 
-    -- @covers library.lobby.joinRoom
-    -- @description joinRoom rejects nil room name.
     it("rejects nil room name on join", function()
         local L = lobby_mod.new(nil)
         local ok, err = L:joinRoom(nil)
@@ -516,5 +428,4 @@ describe("Input Validation", function()
         expect_equal(err, "room name must be a non-empty string")
     end)
 end)
-
 test_summary()

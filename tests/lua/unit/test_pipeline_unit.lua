@@ -3,9 +3,6 @@
 -- =========================================================================
 -- Helper: table contains value
 -- =========================================================================
--- @covers lurek.pipeline.fromTable
--- @covers lurek.pipeline.newPipeline
--- @covers lurek.pipeline.newStep
 
 local function table_contains(t, value)
     for _, v in ipairs(t) do
@@ -488,7 +485,6 @@ describe("Pipeline serialization", function()
 end)
 
 describe("lurek.pipeline addConditional", function()
-    -- @covers lurek.pipeline.Pipeline.addConditional
     it("addConditional executes step when condition is true", function()
         local ran = false
         local p = lurek.pipeline.newPipeline("cond_test")
@@ -498,7 +494,6 @@ describe("lurek.pipeline addConditional", function()
         expect_true(table_contains(r.completed, "guarded"))
     end)
 
-    -- @covers lurek.pipeline.Pipeline.addConditional
     it("addConditional skips step when condition is false", function()
         local ran = false
         local p = lurek.pipeline.newPipeline("skip_test")
@@ -509,7 +504,6 @@ describe("lurek.pipeline addConditional", function()
 end)
 
 describe("lurek.pipeline onProgress", function()
-    -- @covers lurek.pipeline.Pipeline.onProgress
     it("onProgress is called for every step", function()
         local events = {}
         local p = lurek.pipeline.newPipeline("progress_test")
@@ -528,7 +522,6 @@ describe("lurek.pipeline onProgress", function()
 end)
 
 describe("lurek.pipeline toAscii", function()
-    -- @covers lurek.pipeline.Pipeline.toAscii
     it("toAscii returns a non-empty string", function()
         local p = lurek.pipeline.newPipeline("ascii_test")
         p:addStep(lurek.pipeline.newStep("s1", function() end))
@@ -538,7 +531,6 @@ describe("lurek.pipeline toAscii", function()
         expect_true(#diagram > 0, "toAscii must return a non-empty string")
     end)
 
-    -- @covers lurek.pipeline.Pipeline.toAscii
     it("toAscii output contains step names", function()
         local p = lurek.pipeline.newPipeline("ascii_names")
         p:addStep(lurek.pipeline.newStep("init_step", function() end))
@@ -548,11 +540,6 @@ describe("lurek.pipeline toAscii", function()
 end)
 
 describe("pipeline regression coverage", function()
-    -- @covers Step:setCallback
-    -- @covers Step:getTimeout
-    -- @covers Step:setRetryDelay
-    -- @covers Step:setOnError
-    -- @covers Step:getAttempt
     it("step retry metadata and callback replacement work together", function()
         local attempts = 0
         local step = lurek.pipeline.newStep("retry", function(ctx) return -1 end)
@@ -576,8 +563,6 @@ describe("pipeline regression coverage", function()
         expect_equal(2, step:getAttempt())
     end)
 
-    -- @covers Pipeline:runAsync
-    -- @covers Pipeline:getContext
     it("runAsync stores context and exposes async state", function()
         local step = lurek.pipeline.newStep("async_step", function(ctx)
             return ctx.seed * 2
@@ -591,10 +576,6 @@ describe("pipeline regression coverage", function()
         expect_type("boolean", pipeline:update(0.01))
     end)
 
-    -- @covers Pipeline:getResult
-    -- @covers Pipeline:setOnComplete
-    -- @covers Pipeline:setOnStepComplete
-    -- @covers Pipeline:getResult
     it("run fires completion hooks and stores the final result", function()
         local complete_result = { success = false }
         local completed_step = nil
@@ -619,9 +600,6 @@ describe("pipeline regression coverage", function()
         expect_equal(42, ctx.results.sync_step)
     end)
 
-    -- @covers Pipeline:setOnStepError
-    -- @covers Step:setOnError
-    -- @covers Pipeline:run
     it("step and pipeline error hooks fire on failure", function()
         local step_error_name = nil
         local pipeline_error_name = nil
@@ -647,6 +625,4 @@ describe("pipeline regression coverage", function()
         expect_false(pipeline:getResult().success)
     end)
 end)
-
 test_summary()
-

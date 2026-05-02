@@ -1,20 +1,7 @@
 -- Lurek2D Integration Test: Math + Physics
 -- Tests that math functions work correctly with physics bodies
 
--- @description Covers suite: math + physics integration.
 describe("math + physics integration", function()
-    -- @covers lurek.math.cos
-    -- @covers lurek.physics.newBody
-    -- @covers lurek.math.atan2
-    -- @covers lurek.math.max
-    -- @covers lurek.math.min
-    -- @covers lurek.math.pi
-    -- @covers lurek.math.sin
-    -- @covers lurek.math.sqrt
-    -- @covers lurek.physics.destroyWorld
-    -- @covers lurek.physics.newWorld
-    -- @covers lurek.physics.step
-    -- @description Verifies trig-derived offsets can be applied to a physics body position and read back accurately.
     it("Vec2 can be used for body positions", function()
         local world_id = lurek.physics.newWorld(0, 100)
         local body_id = lurek.physics.newBody(world_id, 50, 50, "dynamic")
@@ -38,9 +25,6 @@ describe("math + physics integration", function()
         lurek.physics.destroyWorld(world_id)
     end)
 
-    -- @covers lurek.math.sqrt
-    -- @covers lurek.physics.newBody
-    -- @description Verifies distance math computes the correct separation between two physics body positions.
     it("distance formula works with body positions", function()
         local world_id = lurek.physics.newWorld(0, 0)
         local b1 = lurek.physics.newBody(world_id, 0, 0, "static")
@@ -55,9 +39,6 @@ describe("math + physics integration", function()
         lurek.physics.destroyWorld(world_id)
     end)
 
-    -- @covers lurek.math
-    -- @covers lurek.physics.step
-    -- @description Verifies a timed physics step advances a dynamic body under gravity.
     it("physics step uses delta time correctly", function()
         local world_id = lurek.physics.newWorld(0, 100)
         local body_id = lurek.physics.newBody(world_id, 0, 0, "dynamic")
@@ -73,11 +54,7 @@ describe("math + physics integration", function()
     end)
 end)
 
--- @description Covers suite: math + physics collision geometry.
 describe("math + physics collision geometry", function()
-    -- @covers lurek.math.min
-    -- @covers lurek.physics
-    -- @description Verifies min/max overlap math detects an AABB collision in a physics-style geometry calculation.
     it("AABB overlap check using math", function()
         -- Two rectangles that overlap
         local ax, ay, aw, ah = 0, 0, 10, 10
@@ -94,11 +71,7 @@ describe("math + physics collision geometry", function()
     end)
 end)
 
--- @description Covers suite: math trigonometry for physics angles.
 describe("math trigonometry for physics angles", function()
-    -- @covers lurek.math.atan2
-    -- @covers lurek.physics
-    -- @description Verifies atan2 computes the expected heading angle between two physics positions.
     it("angle between two points", function()
         local x1, y1 = 0, 0
         local x2, y2 = 1, 1
@@ -107,9 +80,6 @@ describe("math trigonometry for physics angles", function()
         expect_near(lurek.math.pi / 4, angle, 0.001, "45 degree angle")
     end)
 
-    -- @covers lurek.math.sin
-    -- @covers lurek.physics
-    -- @description Verifies trig math rotates a velocity vector into the expected axis-aligned direction.
     it("rotate a velocity vector", function()
         local speed = 10
         local angle = math.rad(90)
@@ -121,5 +91,4 @@ describe("math trigonometry for physics angles", function()
         expect_near(10, vy, 0.001, "vy at 90 degrees")
     end)
 end)
-
 test_summary()

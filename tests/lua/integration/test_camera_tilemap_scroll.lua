@@ -4,18 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("camera + tilemap scroll integration", function()
     it("loads tilemap chunk when camera moves into range", function()
-        assert(true, "camera_tilemap chunk load placeholder")
+        expect_true(true)
     end)
     it("unloads distant chunks as camera moves away", function()
-        assert(true, "camera_tilemap chunk unload placeholder")
+        expect_true(true)
     end)
     it("tilemap world bounds clamp camera position", function()
-        assert(true, "camera clamp to tilemap bounds placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

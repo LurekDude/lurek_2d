@@ -2,21 +2,6 @@
 -- BDD tests for the lurek.data module
 
 describe("data.pack + data.unpack", function()
-  -- @covers lurek.data.pack
-  -- @covers lurek.data.unpack
-  -- @covers lurek.data.getPackedSize
-  -- @covers lurek.data.newDataView
-  -- @covers lurek.data.compress
-  -- @covers lurek.data.decompress
-  -- @covers lurek.data.encode
-  -- @covers lurek.data.decode
-  -- @covers lurek.data.hash
-  -- @covers lurek.data.newByteData
-  -- @covers lurek.data.parseToml
-  -- @covers lurek.data.encodeToml
-  -- @covers lurek.data.write
-  -- @covers lurek.data.read
-  -- @covers lurek.data.size
   it("round-trips f32", function()
     local b = lurek.data.pack("<f", 3.14)
     local v = lurek.data.unpack("<f", b)
@@ -210,8 +195,6 @@ end)
 -- compress / decompress
 
 describe("data.compress + data.decompress", function()
-  -- @covers lurek.data.compress
-  -- @covers lurek.data.decompress
   it("round-trips deflate", function()
     local original = "Hello, Lurek2D! Deflate compression test."
     local compressed = lurek.data.compress("deflate", original)
@@ -276,8 +259,6 @@ end)
 -- encode / decode
 
 describe("data.encode + data.decode", function()
-  -- @covers lurek.data.encode
-  -- @covers lurek.data.decode
   it("round-trips base64", function()
     local original = "Hello, Lurek2D!"
     local encoded = lurek.data.encode("base64", original)
@@ -314,7 +295,6 @@ end)
 -- hash
 
 describe("data.hash", function()
-  -- @covers lurek.data.hash
   it("md5 produces known digest", function()
     expect_equal(lurek.data.hash("md5", "hello"), "5d41402abc4b2a76b9719d911017c592")
   end)
@@ -356,7 +336,6 @@ end)
 -- newByteData
 
 describe("data.newByteData", function()
-  -- @covers lurek.data.newByteData
   it("creates zeroed buffer from size", function()
     local bd = lurek.data.newByteData(10)
     expect_equal(bd:getSize(), 10)
@@ -413,8 +392,6 @@ end)
 -- parseToml / encodeToml
 
 describe("data.parseToml + data.encodeToml", function()
-  -- @covers lurek.data.parseToml
-  -- @covers lurek.data.encodeToml
   it("parses basic types", function()
     local t = lurek.data.parseToml('name = "hello"\ncount = 42\nactive = true')
     expect_equal(t.name, "hello")
@@ -488,9 +465,6 @@ end)
 -- write / read (Binary Pack Format)
 
 describe("data.write + data.read (Binary Pack Format)", function()
-  -- @covers lurek.data.write
-  -- @covers lurek.data.read
-  -- @covers lurek.data.size
   it("round-trips u32 and f32", function()
     local b = lurek.data.write("u32 f32", 42, 3.14)
     local v1, v2 = lurek.data.read("u32 f32", b)
@@ -551,7 +525,6 @@ end)
 -- ByteData bit operations
 
 describe("data.newByteData bit operations", function()
-  -- @covers lurek.data.newByteData
   it("bytedata_setBit_and_getBit_round_trip", function()
     local bd = lurek.data.newByteData(2)
     bd:setBit(0, 3, true)
@@ -559,7 +532,6 @@ describe("data.newByteData bit operations", function()
     expect_false(bd:getBit(0, 2), "bit 2 should remain false")
   end)
 
-  -- @covers lurek.data.newByteData
   it("bytedata_setBit_clear_sets_false", function()
     local bd = lurek.data.newByteData(2)
     bd:setBit(0, 3, true)
@@ -567,7 +539,6 @@ describe("data.newByteData bit operations", function()
     expect_false(bd:getBit(0, 3), "bit should be false after clearing")
   end)
 
-  -- @covers lurek.data.newByteData
   it("bytedata_readBits_single_byte", function()
     local bd = lurek.data.newByteData(2)
     bd:setByte(0, 0xFF)
@@ -575,7 +546,6 @@ describe("data.newByteData bit operations", function()
     expect_equal(val, 255, "reading all 8 bits of 0xFF should give 255")
   end)
 
-  -- @covers lurek.data.newByteData
   it("bytedata_readBits_spanning_bytes", function()
     local bd = lurek.data.newByteData(2)
     bd:setByte(0, 0xFF)
@@ -584,7 +554,6 @@ describe("data.newByteData bit operations", function()
     expect_equal(val, 31, "spanning read of 0xFF / 0x01 from bit 4 should yield 0x1F = 31")
   end)
 
-  -- @covers lurek.data.newByteData
   it("bytedata_setBit_out_of_range_raises_error", function()
     local bd = lurek.data.newByteData(2)
     expect_error(function()
@@ -688,7 +657,6 @@ end)
 -- ring buffer (merged from test_data_ring_buffer.lua)
 
 describe("lurek.data.newRingBuffer factory", function()
-  -- @covers lurek.data.newRingBuffer
   it("newRingBuffer is a function", function()
     expect_type("function", lurek.data.newRingBuffer)
   end)
@@ -724,7 +692,6 @@ describe("lurek.data.newRingBuffer factory", function()
 end)
 
 describe("RingBuffer push/pop", function()
-  -- @covers lurek.data.newRingBuffer
   it("push returns false when space available", function()
     local rb = lurek.data.newRingBuffer(4)
     local overwrote = rb:push(42)
@@ -787,7 +754,6 @@ describe("RingBuffer push/pop", function()
 end)
 
 describe("RingBuffer peek / peekNewest", function()
-  -- @covers lurek.data.newRingBuffer
   it("peek on empty returns nil", function()
     local rb = lurek.data.newRingBuffer(4)
     expect_equal(rb:peek(), nil)
@@ -817,7 +783,6 @@ describe("RingBuffer peek / peekNewest", function()
 end)
 
 describe("RingBuffer isFull / isEmpty", function()
-  -- @covers lurek.data.newRingBuffer
   it("isFull true when capacity reached", function()
     local rb = lurek.data.newRingBuffer(3)
     rb:push(1); rb:push(2); rb:push(3)
@@ -839,7 +804,6 @@ describe("RingBuffer isFull / isEmpty", function()
 end)
 
 describe("RingBuffer clear", function()
-  -- @covers lurek.data.newRingBuffer
   it("clear resets len to 0", function()
     local rb = lurek.data.newRingBuffer(4)
     rb:push(1); rb:push(2); rb:push(3)
@@ -857,7 +821,6 @@ describe("RingBuffer clear", function()
 end)
 
 describe("RingBuffer toTable", function()
-  -- @covers lurek.data.newRingBuffer
   it("toTable on empty returns empty table", function()
     local rb = lurek.data.newRingBuffer(4)
     local t = rb:toTable()
@@ -887,7 +850,6 @@ describe("RingBuffer toTable", function()
 end)
 
 describe("RingBuffer mixed value types", function()
-  -- @covers lurek.data.newRingBuffer
   it("stores and retrieves different Lua types", function()
     local rb = lurek.data.newRingBuffer(8)
     rb:push(42)
@@ -910,28 +872,23 @@ end)
 
 -- DataWriter
 describe("lurek.data.newWriter DataWriter", function()
-  -- @covers lurek.data.newWriter
   it("newWriter returns a userdata", function()
     local w = lurek.data.newWriter()
     expect_not_nil(w)
     expect_type("userdata", w)
   end)
 
-  -- @covers lurek.data.DataWriter.len
   it("fresh writer has len 0", function()
     local w = lurek.data.newWriter()
     expect_equal(0, w:len())
   end)
 
-  -- @covers lurek.data.DataWriter.writeU8
-  -- @covers lurek.data.DataWriter.len
   it("writeU8 increments len by 1", function()
     local w = lurek.data.newWriter()
     w:writeU8(42)
     expect_equal(1, w:len())
   end)
 
-  -- @covers lurek.data.DataWriter.toBytes
   it("toBytes returns correct byte value", function()
     local w = lurek.data.newWriter()
     w:writeU8(0x41) -- ASCII 'A'
@@ -940,16 +897,12 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal("A", b)
   end)
 
-  -- @covers lurek.data.DataWriter.writeU32LE
-  -- @covers lurek.data.DataWriter.len
   it("writeU32LE writes 4 bytes", function()
     local w = lurek.data.newWriter()
     w:writeU32LE(0)
     expect_equal(4, w:len())
   end)
 
-  -- @covers lurek.data.DataWriter.writeString
-  -- @covers lurek.data.DataWriter.len
   it("writeString adds 4-byte length prefix plus content", function()
     local w = lurek.data.newWriter()
     w:writeString("hi")
@@ -957,7 +910,6 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal(6, w:len())
   end)
 
-  -- @covers lurek.data.DataWriter.writeString
   it("writeString content survives toBytes round-trip", function()
     local w = lurek.data.newWriter()
     w:writeString("AB")
@@ -967,7 +919,6 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal(string.byte("B"), string.byte(b, 6))
   end)
 
-  -- @covers lurek.data.DataWriter.tell
   it("tell advances after writes", function()
     local w = lurek.data.newWriter()
     expect_equal(0, w:tell())
@@ -977,8 +928,6 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal(2, w:tell())
   end)
 
-  -- @covers lurek.data.DataWriter.seek
-  -- @covers lurek.data.DataWriter.tell
   it("seek repositions the cursor", function()
     local w = lurek.data.newWriter()
     w:writeU8(1)
@@ -988,17 +937,12 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal(1, w:tell())
   end)
 
-  -- @covers lurek.data.DataWriter.seek
-  -- @covers lurek.data.DataWriter.len
   it("seek past end extends buffer with zeros", function()
     local w = lurek.data.newWriter()
     w:seek(4)
     expect_equal(4, w:len())
   end)
 
-  -- @covers lurek.data.DataWriter.writeU8
-  -- @covers lurek.data.DataWriter.seek
-  -- @covers lurek.data.DataWriter.toBytes
   it("seek + writeU8 overwrites at cursor", function()
     local w = lurek.data.newWriter()
     w:writeU8(0x00)
@@ -1011,7 +955,6 @@ describe("lurek.data.newWriter DataWriter", function()
     expect_equal(0x00, string.byte(b, 2))
   end)
 
-  -- @covers lurek.data.DataWriter.writeU8
   it("multiple writeU8 calls accumulate in order", function()
     local w = lurek.data.newWriter()
     w:writeU8(10)
@@ -1060,12 +1003,10 @@ describe("lurek.data crc32 checksum", function()
   end)
 end)
 
--- @covers additions for data module
 -- =========================================================================
 
-describe("RingBuffer:pop and RingBuffer:len (@covers)", function()
+describe("RingBuffer:pop and RingBuffer:len ", function()
     it("pop returns the oldest pushed value", function()
-        -- @covers RingBuffer:pop
         local rb = lurek.data.newRingBuffer(8)
         rb:push(42)
         rb:push(99)
@@ -1075,7 +1016,6 @@ describe("RingBuffer:pop and RingBuffer:len (@covers)", function()
     end)
 
     it("len returns the current item count", function()
-        -- @covers RingBuffer:len
         local rb = lurek.data.newRingBuffer(8)
         rb:push(1)
         rb:push(2)
@@ -1084,9 +1024,8 @@ describe("RingBuffer:pop and RingBuffer:len (@covers)", function()
     end)
 end)
 
-describe("DataWriter:len (@covers)", function()
+describe("DataWriter:len ", function()
     it("len returns the number of bytes written", function()
-        -- @covers DataWriter:len
         local w = lurek.data.newWriter()
         w:writeU8(0x41)
         w:writeU8(0x42)
@@ -1095,5 +1034,4 @@ describe("DataWriter:len (@covers)", function()
         expect_true(n >= 2)
     end)
 end)
-
 test_summary()

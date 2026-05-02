@@ -7,15 +7,8 @@
 
 local OUT = "tests/output/raycaster/"
 
--- @description Covers suite: Evidence: lurek.raycaster API contracts.
 describe("Evidence: lurek.raycaster API contracts", function()
-    -- @covers Raycaster:setCell
-    -- @covers Raycaster:castRaysFlat
-    -- @covers lurek.raycaster.distanceShade
-    -- @covers lurek.raycaster.projectColumn
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Casts a full ray fan across a boxed room and saves the resulting depth buffer visualization as PNG evidence.
     it("saves raycaster depth-buffer as PNG evidence", function()
         local W, H = 128, 64
         local FOV = math.pi / 2
@@ -54,8 +47,6 @@ describe("Evidence: lurek.raycaster API contracts", function()
     end)
 end)
 
--- @description Covers suite: Evidence: lurek.raycaster extended API (DoorManager/HeightMap/PointLight).
 describe("Evidence: lurek.raycaster extended API", function()
 end)
-
 test_summary()

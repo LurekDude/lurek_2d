@@ -47,25 +47,14 @@ end
 
 -- â”€â”€ tests â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
--- @description Covers camera construction and the default transform values exposed to Lua.
 describe("Evidence: lurek.camera creation and defaults", function()
 end)
 
--- @description Covers camera translation APIs, both absolute and relative.
 describe("Evidence: lurek.camera setPosition / getPosition", function()
 end)
 
--- @description Covers zoom changes and coordinate conversion helpers, including a rendered comparison image.
 describe("Evidence: lurek.camera zoom and coordinate transforms", function()
-    -- @covers Camera:setViewport
-    -- @covers Camera:setPosition
-    -- @covers Camera:setZoom
-    -- @covers Camera:toScreen
     -- @evidence file
-    -- @covers lurek.camera.newCamera
-    -- @covers Camera:getZoom
-    -- @covers Camera:toWorld
-    -- @description Renders the same world through zoom 1x and zoom 2x cameras so the viewport magnification is visible in one PNG.
     it("zoom 2x makes objects appear closer -” PNG evidence: zoom_compare", function()
         local VW, VH = 160, 120
         local WW, WH = 320, 240
@@ -105,17 +94,8 @@ describe("Evidence: lurek.camera zoom and coordinate transforms", function()
     end)
 end)
 
--- @description Covers camera rotation state and a rendered rotated viewport.
 describe("Evidence: lurek.camera rotation", function()
-    -- @covers Camera:setViewport
-    -- @covers Camera:setPosition
-    -- @covers Camera:setZoom
-    -- @covers Camera:setRotation
-    -- @covers Camera:toScreen
     -- @evidence file
-    -- @covers lurek.camera.newCamera
-    -- @covers Camera:getRotation
-    -- @description Renders a grid through a rotated camera so the rotated screen-space projection can be inspected visually.
     it("rotation 45 ° -” PNG evidence: rotation", function()
         local VW, VH = 160, 120
         local WW, WH = 320, 240
@@ -131,17 +111,9 @@ describe("Evidence: lurek.camera rotation", function()
     end)
 end)
 
--- @description Covers smooth follow behavior and world-bounds clamping.
 describe("Evidence: lurek.camera follow behaviour", function()
 
-    -- @covers Camera:setTarget
-    -- @covers Camera:setFollowSmooth
-    -- @covers Camera:update
-    -- @covers Camera:getPosition
     -- @evidence file
-    -- @covers lurek.camera.newCamera
-    -- @covers Camera:setBounds
-    -- @description Moves a synthetic target along a path and records the camera trail to show smooth follow behavior over time.
     it("setTarget causes camera to track -” PNG evidence: follow_trail", function()
         local VW, VH = 200, 80
         local img = lurek.image.newImageData(VW, VH)
@@ -172,15 +144,9 @@ describe("Evidence: lurek.camera follow behaviour", function()
     end)
 end)
 
--- @description Covers camera shake offsets by recording the shaken position across several frames.
 describe("Evidence: lurek.camera shake", function()
 
-    -- @covers Camera:shake
-    -- @covers Camera:update
-    -- @covers Camera:getPosition
     -- @evidence file
-    -- @covers lurek.camera.newCamera
-    -- @description Applies a short shake effect and plots the resulting camera offsets into a PNG trail.
     it("shake causes non-zero offset -” PNG evidence: shake_trail", function()
         local VW, VH = 200, 60
         local img = lurek.image.newImageData(VW, VH)
@@ -203,5 +169,4 @@ describe("Evidence: lurek.camera shake", function()
         lurek.image.savePNG(img, OUT .. "evidence_camera_shake_trail.png")
     end)
 end)
-
 test_summary()

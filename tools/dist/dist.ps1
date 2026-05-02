@@ -41,7 +41,7 @@ $ErrorActionPreference = 'Stop'
 $WorkspaceRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if (-not $OutDir) { $OutDir = Join-Path $WorkspaceRoot 'dist' }
 
-$Version = "0.20.0"
+$Version = "1.0.0"
 $ArchName = "lurek2d-windows-x86_64"
 $PackageDir = Join-Path $OutDir $ArchName
 $ZipPath = Join-Path $OutDir "$ArchName.zip"
@@ -75,8 +75,10 @@ if (-not $SkipBuild) {
     Write-Step "Building Lurek2D (dist -- size-optimised) -- this may take several minutes ..."
     Push-Location $WorkspaceRoot
     try {
-        python tools/dev/parallel_cargo.py build dist 2>&1 | ForEach-Object { Write-Host "    $_" }
-        if ($LASTEXITCODE -ne 0) { Write-Fail "parallel_cargo.py build dist failed." }
+        # Do NOT pipe through ForEach-Object — cargo writes to stderr and
+        # $ErrorActionPreference='Stop' would treat piped stderr as a fatal error.
+        python tools/dev/parallel_cargo.py build dist
+        if ($LASTEXITCODE -ne 0) { Write-Fail "parallel_cargo.py build dist failed (exit $LASTEXITCODE)." }
     }
     finally { Pop-Location }
     Write-OK "Build succeeded."
@@ -139,7 +141,7 @@ if (Test-Path $AssetsSource) {
 }
 
 # Copy examples
-$ExamplesSource = Join-Path $WorkspaceRoot 'examples'
+$ExamplesSource = Join-Path $WorkspaceRoot 'content\examples'
 if (Test-Path $ExamplesSource) {
     $ExamplesDest = Join-Path $PackageDir 'examples'
     if (Test-Path $ExamplesDest) { Remove-Item $ExamplesDest -Recurse -Force }
@@ -148,12 +150,12 @@ if (Test-Path $ExamplesSource) {
 }
 
 # Copy demos (playable game demos)
-$DemosSource = Join-Path $WorkspaceRoot 'demos'
+$DemosSource = Join-Path $WorkspaceRoot 'content\games'
 if (Test-Path $DemosSource) {
-    $DemosDest = Join-Path $PackageDir 'demos'
+    $DemosDest = Join-Path $PackageDir 'games'
     if (Test-Path $DemosDest) { Remove-Item $DemosDest -Recurse -Force }
     Copy-Item $DemosSource -Destination $DemosDest -Recurse -Force
-    Write-OK "Copied content/demos/"
+    Write-OK "Copied content/games/"
 }
 
 # Copy library (Lunasome pure-Lua standard libraries)
@@ -165,11 +167,11 @@ if (Test-Path $LibrarySource) {
     Write-OK "Copied library/"
 }
 
-# Copy API docs  (lua-api.md, lurek.lua LuaCATS stubs)
+# Copy API docs  (lurek.md, lurek.lua LuaCATS stubs)
 $ApiDocsDest = Join-Path $PackageDir 'docs'
 New-Item -ItemType Directory -Path $ApiDocsDest -Force | Out-Null
-foreach ($apiFile in @('lua-api.md', 'lurek.lua')) {
-    $src = Join-Path $WorkspaceRoot "docs\API\$apiFile"
+foreach ($apiFile in @('lurek.md', 'lurek.lua')) {
+    $src = Join-Path $WorkspaceRoot "docs\api\$apiFile"
     if (Test-Path $src) {
         Copy-Item $src -Destination (Join-Path $ApiDocsDest $apiFile) -Force
         Write-OK "Copied docs/$apiFile"
@@ -219,18 +221,18 @@ Lunasome standard libraries (library\)
 
 API Reference (docs\)
 ----------------------
-  docs\lua-api.md   -- lurek.* Lua API reference (Markdown)
+  docs\lurek.md     -- lurek.* Lua API reference (Markdown)
   docs\lurek.lua     -- LuaCATS type stubs for IDE autocompletion
                       (copy to your project root or configure in .luarc.json)
 
 Writing your own game
 ---------------------
   1. Create a folder, e.g. my_game\
-  2. Add a main.lua with lurek.init / lurek.process(dt) / lurek.render()
-  3. Optionally add a conf.toml for [window] title, width, height
+  2. Add a main.lua with lurek.load() / lurek.update(dt) / lurek.draw()
+  3. Optionally add a conf.lua for window title, width, height
   4. Run:  lurekc.bat my_game   (or drag the folder onto lurekc.lnk)
 
-Full docs & source:  https://github.com/yourname/lurek2d
+Full docs & source:  https://github.com/RandomBladeDude/lurek2d
 "@
 Set-Content -Path (Join-Path $PackageDir 'HOW-TO-RUN.txt') -Value $HowTo -Encoding UTF8
 Write-OK "Written HOW-TO-RUN.txt"
@@ -257,10 +259,16 @@ if (Test-Path $IcoPath) {
 Write-Step "Creating ZIP archive at '$ZipPath' ..."
 if (Test-Path $ZipPath) { Remove-Item $ZipPath -Force }
 
-# Compress-Archive requires PowerShell 5+
-Compress-Archive -Path $PackageDir -DestinationPath $ZipPath -CompressionLevel Optimal
+# Use .NET ZipFile — reads files as streams so VS Code file locks don't block it.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+[System.IO.Compression.ZipFile]::CreateFromDirectory(
+    $PackageDir,
+    $ZipPath,
+    [System.IO.Compression.CompressionLevel]::Optimal,
+    $true   # $true = include top-level dir name in entry paths
+)
 $ZipSizeKB = [math]::Round((Get-Item $ZipPath).Length / 1024)
-Write-OK "ZIP created ($ZipSizeKB KB) � $ZipPath"
+Write-OK "ZIP created ($ZipSizeKB KB) → $ZipPath"
 
 # -- 5. Summary ----------------------------------------------------------------
 Write-Host ""

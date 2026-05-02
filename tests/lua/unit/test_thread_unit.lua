@@ -3,22 +3,6 @@
 -- Tests the factory functions and Channel primitives; does not launch background VMs.
 
 describe("lurek.thread module exists", function()
-    -- @covers lurek.thread.getChannel
-    -- @covers lurek.thread.newChannel
-    -- @covers lurek.thread.newThread
-    -- @covers lurek.thread.Channel.push
-    -- @covers lurek.thread.Channel.pop
-    -- @covers lurek.thread.Channel.peek
-    -- @covers lurek.thread.Channel.demand
-    -- @covers lurek.thread.Channel.getCount
-    -- @covers lurek.thread.Channel.clear
-    -- @covers lurek.thread.Channel.supply
-    -- @covers lurek.thread.Channel.type
-    -- @covers lurek.thread.Channel.typeOf
-    -- @covers lurek.thread.Thread.isRunning
-    -- @covers lurek.thread.Thread.getError
-    -- @covers lurek.thread.Thread.type
-    -- @covers lurek.thread.Thread.typeOf
     it("lurek.thread is a table", function()
         expect_type("table", lurek.thread)
     end)
@@ -61,8 +45,6 @@ describe("Channel creation and messaging", function()
         expect_true(ch ~= nil, "found named channel via getChannel")
     end)
 
-    -- @covers lurek.thread.Channel.push
-    -- @covers lurek.thread.Channel.pop
     it("channel push and pop round-trip a string", function()
         local ch = lurek.thread.newChannel()
         ch:push("hello")
@@ -409,7 +391,6 @@ describe("Async / Promise", function()
 end)
 
 describe("Lua API coverage", function()
-    -- @covers Channel:pop
     it("covers Channel:pop", function()
         local ch = lurek.thread.newChannel()
         ch:push("queued_value")
@@ -418,5 +399,4 @@ describe("Lua API coverage", function()
     end)
 
 end)
-
 test_summary()

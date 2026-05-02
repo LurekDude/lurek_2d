@@ -1,16 +1,7 @@
 -- Lurek2D Stress Test: Large Tilemap Operations
 -- Tests creating and manipulating large tilemaps at scale
 
--- @description Covers suite: tilemap stress: large map creation.
 describe("tilemap stress: large map creation", function()
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers lurek.tilemap.newTileSet
-    -- @covers TileMap:addTileSet
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:setTile
-    -- @covers TileMap:getTile
-    -- @stress Fills a 500x500 layer cell by cell after constructing one tilemap, tileset, and layer.
-    -- @description Stresses large-map write throughput by materializing a quarter-million tiles and then spot-checking key positions.
     it("creates a 500x500 tilemap and fills it", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
         local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
@@ -30,12 +21,6 @@ describe("tilemap stress: large map creation", function()
         expect_equal(1, map:getTile(1, 250, 250), "center tile")
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers lurek.tilemap.newTileSet
-    -- @covers TileMap:setTile
-    -- @covers TileMap:getTile
-    -- @stress Writes and validates every cell of a 200x200 patterned tile layer.
-    -- @description Stresses round-trip tile storage by filling a medium map with a computed GID pattern and checking every tile for mismatches.
     it("reads back all tiles from a 200x200 map", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
         local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
@@ -63,12 +48,6 @@ describe("tilemap stress: large map creation", function()
         expect_equal(0, mismatches, "all tiles match expected pattern")
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:addLayer
-    -- @covers TileMap:setTile
-    -- @covers TileMap:getTile
-    -- @stress Populates five separate 100x100 layers and samples each one independently.
-    -- @description Stresses multilayer bookkeeping by filling multiple layers with layer-specific values and verifying no cross-layer contamination.
     it("handles multiple layers on a 100x100 map", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
         local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
@@ -95,13 +74,7 @@ describe("tilemap stress: large map creation", function()
     end)
 end)
 
--- @description Covers suite: tilemap stress: fill operations.
 describe("tilemap stress: fill operations", function()
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:fill
-    -- @covers TileMap:getTile
-    -- @stress Fills an entire 100x100 layer with one GID and samples multiple cells.
-    -- @description Stresses bulk fill-path throughput by replacing all tiles in one layer with a constant value and verifying representative positions.
     it("fills entire layer with one GID", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
         local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
@@ -115,12 +88,6 @@ describe("tilemap stress: fill operations", function()
         expect_equal(42, map:getTile(1, 50, 50), "fill center")
     end)
 
-    -- @covers lurek.tilemap.newTileMap
-    -- @covers TileMap:fill
-    -- @covers TileMap:setTile
-    -- @covers TileMap:getTile
-    -- @stress Fills a 100x100 layer once, then overwrites and verifies one hot cell.
-    -- @description Stresses interaction between bulk fill and single-cell mutation by validating that a targeted write wins over the filled background.
     it("setTile overwrites filled area", function()
         local map = lurek.tilemap.newTileMap(32, 32, 16)
         local ts = lurek.tilemap.newTileSet(1, 256, 16, 32, 32, 0, 0)
@@ -133,11 +100,6 @@ describe("tilemap stress: fill operations", function()
         expect_equal(42, map:getTile(1, 49, 49), "untouched tile")
     end)
 
-    -- @covers lurek.tilemap.newChunkMap
-    -- @covers ChunkMap:setTile
-    -- @covers ChunkMap:getTile
-    -- @stress Performs one set/get round trip on a chunk map to validate chunk-backed tile storage.
-    -- @description Exercises the chunk map path separately from full TileMap storage by writing and reading a single chunked cell.
     it("ChunkMap setTile/getTile roundtrip", function()
         -- ChunkMap: no layer param, 0-based coords
         local cm = lurek.tilemap.newChunkMap(16)
@@ -145,5 +107,4 @@ describe("tilemap stress: fill operations", function()
         expect_equal(42, cm:getTile(5, 5), "chunk tile preserved")
     end)
 end)
-
 test_summary()

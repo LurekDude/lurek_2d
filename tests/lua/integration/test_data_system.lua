@@ -1,17 +1,7 @@
 -- Lurek2D Integration Test: Data + System.
 -- Exercises data encoding, hashing, and TOML helpers alongside platform-facing system queries exposed to Lua.
 
--- @description Covers suite: data + filesystem integration.
 describe("data + filesystem integration", function()
-    -- @covers lurek.data.encode
-    -- @covers lurek.data.decode
-    -- @covers lurek.data.encodeToml
-    -- @covers lurek.data.hash
-    -- @covers lurek.data.parseToml
-    -- @covers lurek.runtime.getClipboardText
-    -- @covers lurek.runtime.getOS
-    -- @covers lurek.runtime.setClipboardText
-    -- @description Verifies the data module alone can round-trip base64 text; this file is stored under integration but this test is effectively a single-module data check.
     it("can encode and decode data", function()
         -- Test basic data operations
         if lurek.data and lurek.data.encode then
@@ -25,9 +15,6 @@ describe("data + filesystem integration", function()
         end
     end)
 
-    -- @covers lurek.data.hash
-    -- @covers lurek.data
-    -- @description Verifies deterministic hashing within the data module; despite the folder placement, this assertion does not integrate a second runtime module.
     it("can hash data", function()
         if lurek.data and lurek.data.hash then
             local hash1 = lurek.data.hash("md5", "test")
@@ -39,9 +26,6 @@ describe("data + filesystem integration", function()
         end
     end)
 
-    -- @covers lurek.data.parseToml
-    -- @covers lurek.data.encodeToml
-    -- @description Verifies TOML parsing and encoding succeed within the data module; this is a single-module contract test documented in-place.
     it("can parse and encode TOML", function()
         if lurek.data and lurek.data.parseToml and lurek.data.encodeToml then
             local decoded = lurek.data.parseToml('title = "Lurek2D"\nenabled = true\ncount = 3')
@@ -57,9 +41,6 @@ describe("data + filesystem integration", function()
         end
     end)
 
-    -- @covers lurek.data.parseToml
-    -- @covers lurek.data.encodeToml
-    -- @description Verifies invalid TOML input surfaces an error while valid hash-style TOML encoding remains callable; this still only exercises the data module.
     it("reports TOML errors with full function names", function()
         if lurek.data and lurek.data.parseToml and lurek.data.encodeToml then
             local ok_parse, parse_err = pcall(function()
@@ -80,11 +61,7 @@ describe("data + filesystem integration", function()
     end)
 end)
 
--- @description Covers suite: system info integration.
 describe("system info integration", function()
-    -- @covers lurek.runtime.getOS
-    -- @covers lurek.runtime
-    -- @description Verifies the platform module alone can report the host OS name; this file remains in integration but this test is effectively unit-scoped.
     it("system provides OS info", function()
         if lurek.runtime and lurek.runtime.getOS then
             local os_name = lurek.runtime.getOS()
@@ -93,9 +70,6 @@ describe("system info integration", function()
         end
     end)
 
-    -- @covers lurek.runtime.setClipboardText
-    -- @covers lurek.runtime.getClipboardText
-    -- @description Verifies clipboard set/get behavior when available in the platform module, documenting that it is a single-module environmental check.
     it("system clipboard operations", function()
         if lurek.runtime and lurek.runtime.setClipboardText then
             lurek.runtime.setClipboardText("Lurek2D test")
@@ -107,5 +81,4 @@ describe("system info integration", function()
         end
     end)
 end)
-
 test_summary()

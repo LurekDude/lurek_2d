@@ -35,8 +35,8 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-BINARY_DEST="$PREFIX/bin/luna"
-EXAMPLES_DEST="$PREFIX/share/lurek2d/examples"
+BINARY_DEST="$PREFIX/bin/lurek2d"
+EXAMPLES_DEST="$PREFIX/share/lurek2d/games"
 
 ok()   { echo -e "\033[32m[  OK  ]\033[0m $*"; }
 step() { echo -e "\033[36m[lurek2d]\033[0m $*"; }
@@ -77,7 +77,7 @@ step "Building Lurek2D (release) — this may take a minute..."
 (cd "$WORKSPACE_ROOT" && python tools/dev/parallel_cargo.py build release)
 ok "Build succeeded."
 
-BUILT_BINARY="$WORKSPACE_ROOT/build/release/luna"
+BUILT_BINARY="$WORKSPACE_ROOT/build/release/lurek2d"
 if [[ ! -f "$BUILT_BINARY" ]]; then
     fail "Expected binary at '$BUILT_BINARY' but it was not found."
 fi
@@ -95,7 +95,7 @@ chmod +x "$BINARY_DEST"
 ok "Binary installed."
 
 # ── Install examples ──────────────────────────────────────────────────────────
-EXAMPLES_SOURCE="$WORKSPACE_ROOT/examples"
+EXAMPLES_SOURCE="$WORKSPACE_ROOT/content/games"
 if [[ -d "$EXAMPLES_SOURCE" ]]; then
     step "Copying examples to '$EXAMPLES_DEST' ..."
     mkdir -p "$EXAMPLES_DEST"
@@ -106,7 +106,7 @@ else
 fi
 
 # ── PATH advisory ─────────────────────────────────────────────────────────────
-if ! command -v luna &>/dev/null; then
+if ! command -v lurek2d &>/dev/null; then
     echo ""
     echo "  NOTE: '$BIN_DIR' does not appear to be in your PATH."
     echo "  Add this line to your shell profile (~/.bashrc, ~/.zshrc, etc.):"
@@ -114,5 +114,5 @@ if ! command -v luna &>/dev/null; then
     echo ""
 fi
 
-ok "Lurek2D installed. Run:  luna content/demos/hello_world"
-ok "Or use examples from:   $EXAMPLES_DEST"
+ok "Lurek2D installed. Run:  lurek2d content/games/showcase/hello_world"
+ok "Or use games from:   $EXAMPLES_DEST"

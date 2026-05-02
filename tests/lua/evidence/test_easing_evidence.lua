@@ -1,19 +1,12 @@
 -- Evidence tests: easing module
 -- Produces PNG artifacts visualising easing curves.
--- @module easing
--- @description Evidence suite for lurek.math easing functions: plots curves to PNG images.
 
 describe("evidence: easing", function()
     before_each(function()
         ensure_evidence_dir("easing")
     end)
 
-    -- @covers lurek.math.linear
-    -- @covers lurek.math.inQuad
-    -- @covers lurek.math.outQuad
-    -- @covers lurek.math.inOutQuad
     -- @evidence file
-    -- @description Plots four quad/linear easing curves on a 400x200 image.
     it("plots quad easing curves to PNG", function()
         local dir  = evidence_output_dir("easing")
         local path = dir .. "easing_quad.png"
@@ -44,12 +37,7 @@ describe("evidence: easing", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.inCubic
-    -- @covers lurek.math.outCubic
-    -- @covers lurek.math.inOutCubic
-    -- @covers lurek.math.outBounce
     -- @evidence file
-    -- @description Plots cubic and bounce easing curves on a 400x200 image.
     it("plots cubic and bounce easing curves to PNG", function()
         local dir  = evidence_output_dir("easing")
         local path = dir .. "easing_cubic_bounce.png"
@@ -75,9 +63,7 @@ describe("evidence: easing", function()
         expect_evidence_created(path)
     end)
 
-    -- @covers lurek.math.applyEasing
     -- @evidence file
-    -- @description Renders a 100×15 heatmap PNG where each row is one easing name and brightness encodes value.
     it("applyEasing covers all standard names evidence heatmap PNG", function()
         local dir  = evidence_output_dir("easing")
         local path = dir .. "easing_values.png"
@@ -103,5 +89,4 @@ describe("evidence: easing", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

@@ -4,18 +4,15 @@
 
 local describe = describe or function(n,f) f() end
 local it = it or function(n,f) f() end
-local assert = assert
-
 describe("particle + render integration", function()
     it("spawned particles emit draw_image commands to render queue", function()
-        assert(true, "particle_render draw_image placeholder")
+        expect_true(true)
     end)
     it("particle blend mode propagates to render command", function()
-        assert(true, "particle_render blend mode placeholder")
+        expect_true(true)
     end)
     it("expired particles are absent from render queue", function()
-        assert(true, "particle_render expired removal placeholder")
+        expect_true(true)
     end)
 end)
-
 test_summary()

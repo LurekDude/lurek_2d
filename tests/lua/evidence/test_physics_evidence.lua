@@ -1,18 +1,8 @@
-﻿-- Evidence test: physics simulation -    body positions after stepping
+-- Evidence test: physics simulation -    body positions after stepping
 -- Produces: physics_sim.png showing colored dots at body positions
 
--- @description Covers suite: evidence: physics simulation.
 describe("evidence: physics simulation", function()
-    -- @covers lurek.physics.newWorld
-    -- @covers World:newBody
-    -- @covers lurek.physics.newRectangleShape
-    -- @covers lurek.physics.newCircleShape
-    -- @covers lurek.physics.attachShape
-    -- @covers World:step
-    -- @covers Body:getPosition
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Simulates a small physics scene for one second and saves a PNG showing the final body positions.
     it("simulates bodies and writes position evidence image", function()
         ensure_evidence_dir("physics")
         local path = evidence_output_dir("physics") .. "physics_sim.png"
@@ -90,7 +80,6 @@ end)
 -- test_evidence_physics_debug_render.lua
 -- Evidence test: lurek.physics.drawDebugGpu queues a GPU physics debug render command.
 
--- @description Covers suite: Evidence: lurek.physics.drawDebugGpu.
 describe("Evidence: lurek.physics.drawDebugGpu", function()
 end)
 
@@ -214,18 +203,11 @@ end)
 -- Produces: zone_events.txt proving that zone enter/leave events are emitted.
 -- If this module's code was deleted, the output file would contain no events.
 
--- @description Covers suite: evidence: physics zone event tracking.
 describe("evidence: physics zone event tracking", function()
-    -- @covers lurek.physics.newWorld
-    -- @covers World:addZone
-    -- @covers LuaZone:setGravityZero
-    -- @covers World:step
-    -- @covers World:getZoneEvents
     -- @evidence file
-    -- @description Creates a world with a zero-g zone, drops a rigid body into it,
     --              steps the simulation, and writes all zone events to a text
     --              file that proves the event system works.
-    xit("zone events are recorded and written to evidence file", function()
+    it("zone events are recorded and written to evidence file", function()
         ensure_evidence_dir("physics")
         local path = evidence_output_dir("physics") .. "zone_events.txt"
 
@@ -256,13 +238,6 @@ describe("evidence: physics zone event tracking", function()
         local events2 = world:getZoneEvents()
         table.insert(lines, string.format("after_destroy_event_count: %d", #events2))
 
-        -- Write to evidence file.
-        local content = table.concat(lines, "\n") .. "\n"
-        local f = io.open(path, "w")
-        expect_true(f ~= nil, "could not open evidence file for writing")
-        f:write(content)
-        f:close()
-
         -- Verify at least one enter event was produced.
         expect_true(#events >= 1, "expected at least one zone enter event")
         expect_evidence_created(path)
@@ -279,18 +254,8 @@ end)
 -- Evidence test: physics simulation -    body positions after stepping
 -- Produces: physics_sim.png showing colored dots at body positions
 
--- @description Covers suite: evidence: physics simulation.
 describe("evidence: physics simulation", function()
-    -- @covers lurek.physics.newWorld
-    -- @covers World:newBody
-    -- @covers lurek.physics.newRectangleShape
-    -- @covers lurek.physics.newCircleShape
-    -- @covers lurek.physics.attachShape
-    -- @covers World:step
-    -- @covers Body:getPosition
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Simulates a small physics scene for one second and saves a PNG showing the final body positions.
     it("simulates bodies and writes position evidence image", function()
         ensure_evidence_dir("physics")
         local path = evidence_output_dir("physics") .. "physics_sim.png"
@@ -368,7 +333,6 @@ end)
 -- test_evidence_physics_debug_gpu.lua
 -- Evidence test: lurek.physics.drawDebugGpu queues a GPU physics debug render command.
 
--- @description Covers suite: Evidence: lurek.physics.drawDebugGpu.
 describe("Evidence: lurek.physics.drawDebugGpu (2)", function()
 end)
 
@@ -492,18 +456,11 @@ end)
 -- Produces: zone_events.txt proving that zone enter/leave events are emitted.
 -- If this module's code was deleted, the output file would contain no events.
 
--- @description Covers suite: evidence: physics zone event tracking.
 describe("evidence: physics zone event tracking", function()
-    -- @covers lurek.physics.newWorld
-    -- @covers World:addZone
-    -- @covers LuaZone:setGravityZero
-    -- @covers World:step
-    -- @covers World:getZoneEvents
     -- @evidence file
-    -- @description Creates a world with a zero-g zone, drops a rigid body into it,
     --              steps the simulation, and writes all zone events to a text
     --              file that proves the event system works.
-    xit("zone events are recorded and written to evidence file", function()
+    it("zone events are recorded and written to evidence file", function()
         ensure_evidence_dir("physics")
         local path = evidence_output_dir("physics") .. "zone_events.txt"
 
@@ -534,13 +491,6 @@ describe("evidence: physics zone event tracking", function()
         local events2 = world:getZoneEvents()
         table.insert(lines, string.format("after_destroy_event_count: %d", #events2))
 
-        -- Write to evidence file.
-        local content = table.concat(lines, "\n") .. "\n"
-        local f = io.open(path, "w")
-        expect_true(f ~= nil, "could not open evidence file for writing")
-        f:write(content)
-        f:close()
-
         -- Verify at least one enter event was produced.
         expect_true(#events >= 1, "expected at least one zone enter event")
         expect_evidence_created(path)
@@ -556,15 +506,8 @@ end)
 -- Produces: cellular_sand.png showing sand particles after 50 simulation steps.
 -- Proves CellularWorld step() works: sand placed at the top migrates to the bottom.
 
--- @description Covers suite: evidence: cellular sand simulation.
 describe("evidence: cellular sand simulation", function()
-    -- @covers lurek.physics.newCellular
-    -- @covers LuaCellular:fillRect
-    -- @covers LuaCellular:stepN
-    -- @covers LuaCellular:toImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Places a layer of sand at the top of a 64x64 grid (64x64 pixels),
     --              steps 50 times, then renders and saves a PNG proving
     --              sand migrated downward (pile visible at the bottom).
     it("sand falls to the bottom and produces a visible pile image", function()
@@ -611,15 +554,8 @@ end)
 -- Produces: cellular_sand.png showing sand particles after 50 simulation steps.
 -- Proves CellularWorld step() works: sand placed at the top migrates to the bottom.
 
--- @description Covers suite: evidence: cellular sand simulation.
 describe("evidence: cellular sand simulation", function()
-    -- @covers lurek.physics.newCellular
-    -- @covers LuaCellular:fillRect
-    -- @covers LuaCellular:stepN
-    -- @covers LuaCellular:toImageData
-    -- @covers lurek.image.savePNG
     -- @evidence file
-    -- @description Places a layer of sand at the top of a 64x64 grid (64x64 pixels),
     --              steps 50 times, then renders and saves a PNG proving
     --              sand migrated downward (pile visible at the bottom).
     it("sand falls to the bottom and produces a visible pile image", function()
@@ -654,5 +590,4 @@ describe("evidence: cellular sand simulation", function()
         expect_evidence_created(path)
     end)
 end)
-
 test_summary()

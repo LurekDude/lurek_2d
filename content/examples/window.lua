@@ -331,10 +331,13 @@ end
 --@api-stub: lurek.window.showMessageBox
 -- Shows a platform-native message box dialog.
 -- Blocks the main loop — use only for fatal errors at boot or destructive confirms ("Delete save?").
+-- NOTE: wrapped in lurek.init so it does not execute at file-load time (blocks on user input).
 do  -- lurek.window.showMessageBox
-  local choice = lurek.window.showMessageBox("My Game", "Delete save slot 1?", "warning", "yesno")
-  if choice == "yes" then
-    lurek.log.info("user confirmed save deletion", "ui")
+  function lurek.init()
+    local choice = lurek.window.showMessageBox("My Game", "Delete save slot 1?", "warning", "yesno")
+    if choice == "yes" then
+      lurek.log.info("user confirmed save deletion", "ui")
+    end
   end
 end
 
