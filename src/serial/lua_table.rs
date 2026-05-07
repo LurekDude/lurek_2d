@@ -1,11 +1,13 @@
 //! `SerialValue`: shared intermediate representation for all serial format modules.
 //!
-//! All format modules (json, toml, csv, yaml) convert to/from `SerialValue`.
+//! Active format modules (json, toml, csv, msgpack, xml) convert to/from
+//! `SerialValue`.
 //! `Lua-table` is the canonical name because the primary use case is bridging
 //! between Lua tables and text serialization formats.
 
 use indexmap::IndexMap;
 use mlua::prelude::{Lua, LuaResult, LuaValue};
+use std::fmt;
 
 /// A Lurek2D serializable value — the common intermediate representation
 /// shared by all serial format modules.
@@ -34,6 +36,19 @@ pub enum SerialValue {
     Seq(Vec<SerialValue>),
     /// Ordered string-keyed map of values.
     Map(IndexMap<String, SerialValue>),
+}
+
+impl fmt::Display for SerialValue {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            SerialValue::Null => write!(f, ""),
+            SerialValue::Bool(b) => write!(f, "{b}"),
+            SerialValue::Int(n) => write!(f, "{n}"),
+            SerialValue::Float(v) => write!(f, "{v}"),
+            SerialValue::Str(s) => write!(f, "{s}"),
+            SerialValue::Seq(_) | SerialValue::Map(_) => write!(f, "[complex]"),
+        }
+    }
 }
 
 /// Converts a `SerialValue` tree into a Lua value tree.

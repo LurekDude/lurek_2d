@@ -12,7 +12,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::log_msg;
-use crate::runtime::log_messages::{MS01, MS02};
+use crate::runtime::log_messages::MS01;
 use crate::runtime::resource_keys::TextureKey;
 
 /// Drawing mode for mesh geometry. Consult the module-level documentation for the broader usage context and preconditions.
@@ -106,7 +106,7 @@ impl Mesh {
     /// # Returns
     /// `Self`.
     pub fn new(vertex_count: usize, mode: MeshDrawMode) -> Self {
-        log_msg!(debug, MS01, "{}", vertex_count);
+        log_msg!(trace, MS01, "{}", vertex_count);
         Self {
             vertices: vec![MeshVertex::default(); vertex_count],
             indices: None,
@@ -124,7 +124,6 @@ impl Mesh {
     /// # Returns
     /// `Self`.
     pub fn from_vertices(vertices: Vec<MeshVertex>, mode: MeshDrawMode) -> Self {
-        log_msg!(debug, MS02, "{}", vertices.len());
         Self {
             vertices,
             indices: None,

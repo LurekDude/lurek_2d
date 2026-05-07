@@ -380,11 +380,14 @@ def collect_class_descriptions(api_file: Path) -> Dict[str, str]:
             return type_returns[struct_name]
         if struct_name.startswith("Lua"):
             return "L" + struct_name[3:]
+        if struct_name.startswith("L"):
+            return struct_name
         return "L" + struct_name  # non-Lua-prefixed userdata gets L prefix
 
-    # Pass 1: struct LuaXxx or pub struct LuaXxx (highest priority â€” struct-level docs)
+    # Pass 1: struct LuaXxx/LXxx or pub struct LuaXxx/LXxx
+    # (highest priority: struct-level docs)
     for i, line in enumerate(lines):
-        m = re.match(r"\s*(?:pub(?:\([^)]*\))?\s+)?struct (Lua\w+)", line)
+        m = re.match(r"\s*(?:pub(?:\([^)]*\))?\s+)?struct ((?:Lua|L)\w+)", line)
         if not m:
             continue
         struct_name = m.group(1)
@@ -565,7 +568,8 @@ def _collect_module_doc(api_file: Path) -> str:
         return ""
     doc_parts: List[str] = []
     for raw in lines:
-        stripped = raw.strip()
+        # Some files may start with UTF-8 BOM; remove it before matching //!
+        stripped = raw.lstrip("\ufeff").strip()
         if stripped.startswith("//!"):
             text = stripped[3:]
             doc_parts.append(text[1:] if text.startswith(" ") else text)
@@ -696,6 +700,8 @@ def extract_lua_functions(api_file: Path) -> List[LuaFunction]:
             return type_names[struct_name]
         if struct_name.startswith("Lua"):
             return "L" + struct_name[3:]
+        if struct_name.startswith("L"):
+            return struct_name
         return "L" + struct_name  # non-Lua-prefixed userdata gets L prefix
 
     set_multiline_re = re.compile(r'(\w+)\.set\(\s*$')

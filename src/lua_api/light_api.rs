@@ -1,4 +1,4 @@
-//! `lurek.light` - 2D lighting, shadow occluders, and ambient control.
+﻿//! `lurek.light` - 2D lighting, shadow occluders, and ambient control.
 //!
 //! Manages `Light` handles (point / directional / spot) and `Occluder` handles
 //! (line-segment shadow casters) within the engine's `LightWorld`. Supports
@@ -128,6 +128,123 @@ fn invalid_occluder(method: &str) -> LuaError {
         "{}: invalid or already-removed occluder handle",
         method
     ))
+}
+
+// Parses an optional color table `{r, g, b [, a]}` from an opts table field.
+fn parse_opt_color(opts: &LuaTable, field: &str) -> LuaResult<Option<Color>> {
+    let val: LuaValue = opts.get(field)?;
+    match val {
+        LuaValue::Table(tbl) => {
+            let r: f32 = tbl.get(1i32).unwrap_or(1.0);
+            let g: f32 = tbl.get(2i32).unwrap_or(1.0);
+            let b: f32 = tbl.get(3i32).unwrap_or(1.0);
+            let a: f32 = tbl.get(4i32).unwrap_or(1.0);
+            Ok(Some(Color::new(r, g, b, a)))
+        }
+        LuaValue::Nil => Ok(None),
+        _ => Err(LuaError::RuntimeError(format!(
+            "expected color table for '{}', got {}",
+            field,
+            val.type_name()
+        ))),
+    }
+}
+
+// Applies optional settings from a Lua opts table to a `Light2D`.
+fn apply_light_opts(light: &mut Light2D, opts: &LuaTable) -> LuaResult<()> {
+    if let Ok(Some(c)) = parse_opt_color(opts, "color") {
+        light.set_color(c);
+    }
+    if let Ok(v) = opts.get::<_, f32>("intensity") {
+        light.set_intensity(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("energy") {
+        light.set_energy(v);
+    }
+    if let Ok(s) = opts.get::<_, String>("blend") {
+        light.set_blend_mode(parse_blend_mode(&s)?);
+    }
+    if let Ok(s) = opts.get::<_, String>("falloff") {
+        light.set_falloff(parse_falloff(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, bool>("shadowEnabled") {
+        light.set_shadow_enabled(v);
+    }
+    if let Ok(Some(c)) = parse_opt_color(opts, "shadowColor") {
+        light.set_shadow_color(c);
+    }
+    if let Ok(s) = opts.get::<_, String>("shadowFilter") {
+        light.set_shadow_filter(parse_shadow_filter(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, f32>("shadowSmooth") {
+        light.set_shadow_smooth(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("shadowSoftness") {
+        light.set_shadow_softness(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("lightMask") {
+        light.set_light_mask(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("shadowMask") {
+        light.set_shadow_mask(v);
+    }
+    if let Ok(v) = opts.get::<_, bool>("enabled") {
+        light.set_enabled(v);
+    }
+    if let Ok(s) = opts.get::<_, String>("type") {
+        light.set_light_type(parse_light_type(&s)?);
+    }
+    if let Ok(v) = opts.get::<_, f32>("direction") {
+        light.set_direction(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("innerAngle") {
+        light.set_inner_angle(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("outerAngle") {
+        light.set_outer_angle(v);
+    }
+    if let Ok(v) = opts.get::<_, u16>("groupId") {
+        light.set_group_id(v);
+    }
+    if let Ok(v) = opts.get::<_, bool>("volumetric") {
+        light.set_volumetric(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("flickerSpeed") {
+        light.flicker_mut().speed = v;
+        light.flicker_mut().enabled = true;
+    }
+    if let Ok(v) = opts.get::<_, f32>("flickerStrength") {
+        light.flicker_mut().strength = v;
+        light.flicker_mut().enabled = true;
+    }
+    if let Ok(path) = opts.get::<_, String>("normalMap") {
+        light.set_normal_map_path(path);
+    }
+    if let Ok(v) = opts.get::<_, f32>("normalStrength") {
+        light.set_normal_strength(v);
+    }
+    if let Ok(v) = opts.get::<_, f32>("attConstant") {
+        light.set_attenuation(Attenuation::new(
+            v,
+            light.get_attenuation().linear,
+            light.get_attenuation().quadratic,
+        ));
+    }
+    if let Ok(v) = opts.get::<_, f32>("attLinear") {
+        light.set_attenuation(Attenuation::new(
+            light.get_attenuation().constant,
+            v,
+            light.get_attenuation().quadratic,
+        ));
+    }
+    if let Ok(v) = opts.get::<_, f32>("attQuadratic") {
+        light.set_attenuation(Attenuation::new(
+            light.get_attenuation().constant,
+            light.get_attenuation().linear,
+            v,
+        ));
+    }
+    Ok(())
 }
 
 // Applies optional settings from a Lua opts table to an `Occluder`.
@@ -468,6 +585,32 @@ impl LuaUserData for LuaLight {
             Ok(light.get_shadow_smooth())
         });
 
+        // -- setShadowSoftness --
+        /// Sets the penumbra softness multiplier for shadow edges.
+        /// @param | softness | number | Penumbra softness multiplier.
+        /// @return | nil | No value is returned.
+        methods.add_method("setShadowSoftness", |_, this, softness: f32| {
+            let mut st = this.state.borrow_mut();
+            let light = st
+                .light_world
+                .get_light_mut(this.key)
+                .ok_or_else(|| invalid_light("Light:setShadowSoftness"))?;
+            light.set_shadow_softness(softness);
+            Ok(())
+        });
+
+        // -- getShadowSoftness --
+        /// Returns the penumbra softness multiplier for shadow edges.
+        /// @return | number | Penumbra softness multiplier.
+        methods.add_method("getShadowSoftness", |_, this, ()| {
+            let st = this.state.borrow();
+            let light = st
+                .light_world
+                .get_light(this.key)
+                .ok_or_else(|| invalid_light("Light:getShadowSoftness"))?;
+            Ok(light.get_shadow_softness())
+        });
+
         // -- setLightMask --
         /// Sets the light interaction bitmask.
         /// @param | mask | integer | Light interaction bitmask.
@@ -689,11 +832,14 @@ impl LuaUserData for LuaLight {
         /// @return | nil | No value is returned.
         methods.add_method("setFlicker", |_, this, (speed, strength): (f32, f32)| {
             let mut st = this.state.borrow_mut();
-            let light = st
-                .light_world
-                .get_light_mut(this.key)
-                .ok_or_else(|| invalid_light("Light:setFlicker"))?;
-            *light.flicker_mut() = FlickerConfig::new(speed, strength);
+            {
+                let light = st
+                    .light_world
+                    .get_light_mut(this.key)
+                    .ok_or_else(|| invalid_light("Light:setFlicker"))?;
+                *light.flicker_mut() = FlickerConfig::new(speed, strength);
+            }
+            st.light_world.reindex_flickers();
             Ok(())
         });
 
@@ -717,11 +863,14 @@ impl LuaUserData for LuaLight {
         /// @return | nil | No value is returned.
         methods.add_method("setFlickerEnabled", |_, this, b: bool| {
             let mut st = this.state.borrow_mut();
-            let light = st
-                .light_world
-                .get_light_mut(this.key)
-                .ok_or_else(|| invalid_light("Light:setFlickerEnabled"))?;
-            light.flicker_mut().enabled = b;
+            {
+                let light = st
+                    .light_world
+                    .get_light_mut(this.key)
+                    .ok_or_else(|| invalid_light("Light:setFlickerEnabled"))?;
+                light.flicker_mut().enabled = b;
+            }
+            st.light_world.reindex_flickers();
             Ok(())
         });
 
@@ -830,11 +979,14 @@ impl LuaUserData for LuaLight {
             let strength = ((max - min) / 2.0).abs();
             let speed = hz * std::f32::consts::TAU;
             let mut st = this.state.borrow_mut();
-            let light = st
-                .light_world
-                .get_light_mut(this.key)
-                .ok_or_else(|| invalid_light("Light:addFlicker"))?;
-            *light.flicker_mut() = FlickerConfig::new(speed, strength);
+            {
+                let light = st
+                    .light_world
+                    .get_light_mut(this.key)
+                    .ok_or_else(|| invalid_light("Light:addFlicker"))?;
+                *light.flicker_mut() = FlickerConfig::new(speed, strength);
+            }
+            st.light_world.reindex_flickers();
             Ok(())
         });
 
@@ -946,6 +1098,71 @@ impl LuaUserData for LuaLight {
         methods.add_method("clearCookie", |_, this, ()| {
             this.cookie_path.borrow_mut().take();
             Ok(())
+        });
+
+        // -- setNormalMap --
+        /// Sets the normal-map texture path hint used by plugin renderers.
+        /// @param | path | string | Normal-map texture path.
+        /// @return | nil | No value is returned.
+        methods.add_method("setNormalMap", |_, this, path: String| {
+            let mut st = this.state.borrow_mut();
+            let light = st
+                .light_world
+                .get_light_mut(this.key)
+                .ok_or_else(|| invalid_light("Light:setNormalMap"))?;
+            light.set_normal_map_path(path);
+            Ok(())
+        });
+
+        // -- getNormalMap --
+        /// Returns the normal-map texture path hint, or nil when unset.
+        /// @return | string | Normal-map texture path, or nil when unset.
+        methods.add_method("getNormalMap", |_, this, ()| {
+            let st = this.state.borrow();
+            let light = st
+                .light_world
+                .get_light(this.key)
+                .ok_or_else(|| invalid_light("Light:getNormalMap"))?;
+            Ok(light.get_normal_map_path().map(str::to_string))
+        });
+
+        // -- clearNormalMap --
+        /// Clears the normal-map texture path hint.
+        /// @return | nil | No value is returned.
+        methods.add_method("clearNormalMap", |_, this, ()| {
+            let mut st = this.state.borrow_mut();
+            let light = st
+                .light_world
+                .get_light_mut(this.key)
+                .ok_or_else(|| invalid_light("Light:clearNormalMap"))?;
+            light.clear_normal_map_path();
+            Ok(())
+        });
+
+        // -- setNormalStrength --
+        /// Sets the normal-map response strength multiplier.
+        /// @param | strength | number | Normal-map response strength.
+        /// @return | nil | No value is returned.
+        methods.add_method("setNormalStrength", |_, this, strength: f32| {
+            let mut st = this.state.borrow_mut();
+            let light = st
+                .light_world
+                .get_light_mut(this.key)
+                .ok_or_else(|| invalid_light("Light:setNormalStrength"))?;
+            light.set_normal_strength(strength);
+            Ok(())
+        });
+
+        // -- getNormalStrength --
+        /// Returns the normal-map response strength multiplier.
+        /// @return | number | Normal-map response strength.
+        methods.add_method("getNormalStrength", |_, this, ()| {
+            let st = this.state.borrow();
+            let light = st
+                .light_world
+                .get_light(this.key)
+                .ok_or_else(|| invalid_light("Light:getNormalStrength"))?;
+            Ok(light.get_normal_strength())
         });
 
         // -- type --
@@ -1185,13 +1402,16 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | opts | table? | Optional light settings table.
     /// @return | LLight | Created light handle.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newLight", lua.create_function(
             move |_, (x, y, radius, opts): (f32, f32, f32, Option<LuaTable>)| {
                 let mut light = Light2D::new(x, y, radius);
                 if let Some(ref opts) = opts {
-                    light.apply_lua_opts(opts)?;
+                    apply_light_opts(&mut light, opts)?;
                 }
-                let key = s.borrow_mut().light_world.add_light(light);
+                let mut st = s.borrow_mut();
+                let key = st.light_world.add_light(light);
+                st.light_world.reindex_flickers();
                 Ok(LuaLight {
                     state: s.clone(),
                     key,
@@ -1208,6 +1428,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | opts | table? | Optional occluder settings table.
     /// @return | LOccluder | Created occluder handle.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newOccluder", lua.create_function(move |_, (vtbl, opts): (LuaTable, Option<LuaTable>)| {
             let flat: Vec<f32> = vtbl.sequence_values::<f32>().collect::<LuaResult<_>>()?;
             let mut occ = Occluder::from_flat_coords(&flat).map_err(LuaError::RuntimeError)?;
@@ -1230,6 +1451,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | a | number? | Optional alpha channel.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setAmbient", lua.create_function(move |_, (r, g, b, a): (f32, f32, f32, Option<f32>)| {
             s.borrow_mut().light_world.ambient = Color::new(r, g, b, a.unwrap_or(1.0));
             Ok(())
@@ -1243,6 +1465,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | number | Ambient blue component.
     /// @return | number | Ambient alpha component.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getAmbient", lua.create_function(move |_, ()| {
             let c = s.borrow().light_world.ambient;
             Ok((c.r, c.g, c.b, c.a))
@@ -1254,6 +1477,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enabled | boolean | Whether the lighting system should be active.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setEnabled", lua.create_function(move |_, enabled: bool| {
             s.borrow_mut().light_world.enabled = enabled;
             Ok(())
@@ -1264,6 +1488,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether the lighting system is active.
     /// @return | boolean | True if the lighting system is active.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isEnabled", lua.create_function(move |_, ()| Ok(s.borrow().light_world.enabled))?,
     )?;
 
@@ -1271,6 +1496,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the number of lights in the world.
     /// @return | integer | Light count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getLightCount", lua.create_function(move |_, ()| Ok(s.borrow().light_world.light_count()))?,
     )?;
 
@@ -1278,6 +1504,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the number of occluders in the world.
     /// @return | integer | Occluder count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getOccluderCount", lua.create_function(move |_, ()| Ok(s.borrow().light_world.occluder_count()))?,
     )?;
 
@@ -1285,6 +1512,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the maximum number of lights processed per frame.
     /// @return | integer | Maximum per-frame light count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getMaxLights", lua.create_function(move |_, ()| Ok(s.borrow().light_world.max_lights))?,
     )?;
 
@@ -1293,6 +1521,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | n | integer | Requested per-frame light limit.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setMaxLights", lua.create_function(move |_, n: u16| {
             s.borrow_mut().light_world.max_lights = n.clamp(1, 256);
             Ok(())
@@ -1303,6 +1532,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Removes all lights and occluders, resets ambient to default.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("clear", lua.create_function(move |_, ()| {
             s.borrow_mut().light_world.clear();
             Ok(())
@@ -1315,6 +1545,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enabled | boolean | Whether the group should be enabled.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setGroupEnabled", lua.create_function(move |_, (group_id, enabled): (u16, bool)| {
             s.borrow_mut()
                 .light_world
@@ -1329,6 +1560,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | intensity | number | Group intensity multiplier.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setGroupIntensity", lua.create_function(move |_, (group_id, intensity): (u16, f32)| {
             s.borrow_mut()
                 .light_world
@@ -1346,6 +1578,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | a | number? | Optional alpha channel.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setGroupColor", lua.create_function(
             move |_, (group_id, r, g, b, a): (u16, f32, f32, f32, Option<f32>)| {
                 s.borrow_mut()
@@ -1361,6 +1594,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | groupId | integer | Group identifier.
     /// @return | integer | Number of lights in the group.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getGroupCount", lua.create_function(move |_, group_id: u16| {
             Ok(s.borrow().light_world.group_count(group_id))
         })?,
@@ -1371,6 +1605,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | dt | number | Frame delta in seconds.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("advanceFlickers", lua.create_function(move |_, dt: f32| {
             s.borrow_mut().light_world.advance_flickers(dt);
             Ok(())
@@ -1384,6 +1619,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | number | Ambient blue component snapshot.
     /// @return | number | Ambient alpha component snapshot.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("syncAmbient", lua.create_function(move |_, ()| {
             let hint = s.borrow().light_world.ambient_color_hint();
             Ok((hint[0], hint[1], hint[2], hint[3]))
@@ -1394,6 +1630,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns directional light hints for god-ray rendering.
     /// @return | table | Array of `{x, y, angle}` hint tables.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getGodRayHints", lua.create_function(move |lua, ()| {
             let hints = s.borrow().light_world.directional_light_hints();
             let tbl = lua.create_table()?;
@@ -1402,6 +1639,29 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 t.set("x", *x)?;
                 t.set("y", *y)?;
                 t.set("angle", *angle)?;
+                tbl.set(i + 1, t)?;
+            }
+            Ok(tbl)
+        })?,
+    )?;
+
+    // -- getNormalMapHints --
+    /// Returns normal-map lighting hints for plugin renderers.
+    /// @return | table | Array of `{x, y, radius, intensity, direction, normalMap, strength}` tables.
+    let s = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set("getNormalMapHints", lua.create_function(move |lua, ()| {
+            let hints = s.borrow().light_world.normal_map_light_hints();
+            let tbl = lua.create_table()?;
+            for (i, h) in hints.iter().enumerate() {
+                let t = lua.create_table()?;
+                t.set("x", h.x)?;
+                t.set("y", h.y)?;
+                t.set("radius", h.radius)?;
+                t.set("intensity", h.intensity)?;
+                t.set("direction", h.direction)?;
+                t.set("normalMap", h.path.clone())?;
+                t.set("strength", h.strength)?;
                 tbl.set(i + 1, t)?;
             }
             Ok(tbl)

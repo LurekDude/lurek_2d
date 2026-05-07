@@ -1053,32 +1053,51 @@ end
 --                          factions, and other metadata. Pass nil to skip.
 -- @treturn ProvinceMap
 function M.newFromPng(png_path, defs)
-    assert(lurek and lurek.image and lurek.image.newProvinceGrid,
-        "province_map.newFromPng requires lurek.image.newProvinceGrid (engine support)")
+    assert(lurek, "province_map.newFromPng requires lurek global")
 
-    -- Load via the Rust engine — single O(w×h) scan, zero Lua table allocations.
-    local grid = lurek.image.newProvinceGrid(png_path)
-    local w    = grid:getWidth()
-    local h    = grid:getHeight()
+    local use_province_engine = lurek.province and lurek.province.newFromPng
+    local map
 
-    -- Build the ProvinceMap shell.
-    local map = M.newProvinceMap(w, h)
+    if use_province_engine then
+        local reg_name = "province_map::" .. tostring(png_path)
+        local preg = lurek.province.newFromPng(reg_name, png_path)
+        local w = preg:getWidth()
+        local h = preg:getHeight()
+        map = M.newProvinceMap(w, h)
+        map._engine_province = preg
 
-    -- Replace pixel_lookup with an engine-backed accessor.
-    -- Existing callers of getProvinceAt / setPixel still work transparently:
-    -- getProvinceAt now delegates to the Rust grid for reads;
-    -- setPixel still writes to the legacy Lua table as a fallback.
-    map._engine_grid = grid
-    local original_getProvinceAt = ProvinceMap.getProvinceAt
-    function map:getProvinceAt(x, y)
-        return self._engine_grid:getAt(x, y)
-    end
+        function map:getProvinceAt(x, y)
+            return self._engine_province:getAt(x, y)
+        end
 
-    -- Populate adjacency edges from the engine scan (no second Lua pass needed).
-    for _, adj in ipairs(grid:adjacencies()) do
-        local edge = M.newAdjacencyEdge(adj.province_a, adj.province_b)
-        edge.border_length = adj.border_pixels
-        map:insertAdjacency(edge)
+        for _, adj in ipairs(preg:adjacencies()) do
+            local edge = M.newAdjacencyEdge(adj.province_a, adj.province_b)
+            map:insertAdjacency(edge)
+        end
+    else
+        assert(lurek.image and lurek.image.newProvinceGrid,
+            "province_map.newFromPng requires lurek.province.newFromPng or lurek.image.newProvinceGrid")
+
+        -- Load via the Rust image engine — single O(w×h) scan, zero Lua table allocations.
+        local grid = lurek.image.newProvinceGrid(png_path)
+        local w    = grid:getWidth()
+        local h    = grid:getHeight()
+
+        -- Build the ProvinceMap shell.
+        map = M.newProvinceMap(w, h)
+
+        -- Replace pixel_lookup with an engine-backed accessor.
+        map._engine_grid = grid
+        function map:getProvinceAt(x, y)
+            return self._engine_grid:getAt(x, y)
+        end
+
+        -- Populate adjacency edges from the engine scan (no second Lua pass needed).
+        for _, adj in ipairs(grid:adjacencies()) do
+            local edge = M.newAdjacencyEdge(adj.province_a, adj.province_b)
+            edge.border_length = adj.border_pixels
+            map:insertAdjacency(edge)
+        end
     end
 
     -- Attach province metadata from definitions if provided.

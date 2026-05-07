@@ -187,6 +187,10 @@ describe("lurek.input.gamepad functions", function()
         expect_type("function", lurek.input.gamepad.getGUID)
         expect_type("function", lurek.input.gamepad.getHat)
         expect_type("function", lurek.input.gamepad.setVibration)
+        expect_type("function", lurek.input.gamepad.wasPressed)
+        expect_type("function", lurek.input.gamepad.wasReleased)
+        expect_type("function", lurek.input.gamepad.wasConnected)
+        expect_type("function", lurek.input.gamepad.wasDisconnected)
     end)
 end)
 
@@ -206,6 +210,8 @@ describe("lurek.input.touch functions", function()
         expect_type("function", lurek.input.touch.getPosition)
         expect_type("function", lurek.input.touch.getPressure)
         expect_type("function", lurek.input.touch.getTouchCount)
+        expect_type("function", lurek.input.touch.wasPressed)
+        expect_type("function", lurek.input.touch.wasReleased)
     end)
 
     -- @covers lurek.input.touch
@@ -471,6 +477,15 @@ describe("lurek.input action mapping", function()
   it("wasActionPressedWithin is false for an action never pressed", function()
     expect_equal(lurek.input.wasActionPressedWithin("nosuchaction", 10), false)
   end)
+
+    -- @covers lurek.input.newMapping
+    it("newMapping returns helper table", function()
+        local mapping = lurek.input.newMapping("dash", {"shift", "gamepad:0:0"})
+        expect_type("table", mapping)
+        expect_type("function", mapping.isDown)
+        expect_type("function", mapping.wasPressed)
+        expect_type("function", mapping.wasReleased)
+    end)
 end)
 
 -- Input Combo (merged from test_input_combo.lua)
@@ -1116,6 +1131,10 @@ describe("input strict coverage sweep", function()
     -- @covers lurek.input.gamepad.getGUID
     -- @covers lurek.input.gamepad.getHat
     -- @covers lurek.input.gamepad.setVibration
+    -- @covers lurek.input.gamepad.wasPressed
+    -- @covers lurek.input.gamepad.wasReleased
+    -- @covers lurek.input.gamepad.wasConnected
+    -- @covers lurek.input.gamepad.wasDisconnected
     -- @covers lurek.input.gamepad.setBackgroundEvents
     -- @covers lurek.input.gamepad.getBackgroundEvents
     -- @covers lurek.input.gamepad.setGamepadMapping
@@ -1138,6 +1157,10 @@ describe("input strict coverage sweep", function()
         lurek.input.gamepad.getGUID(0)
         lurek.input.gamepad.getHat(0, 0)
         pcall(function() lurek.input.gamepad.setVibration(0, 0.1, 0.1, 100) end)
+        lurek.input.gamepad.wasPressed(0, 0)
+        lurek.input.gamepad.wasReleased(0, 0)
+        lurek.input.gamepad.wasConnected(0)
+        lurek.input.gamepad.wasDisconnected(0)
         lurek.input.gamepad.setBackgroundEvents(false)
         lurek.input.gamepad.getBackgroundEvents()
         lurek.input.gamepad.setGamepadMapping("guid", "guid,Pad,a:b0")
@@ -1151,11 +1174,24 @@ describe("input strict coverage sweep", function()
     -- @covers lurek.input.touch.getPosition
     -- @covers lurek.input.touch.getPressure
     -- @covers lurek.input.touch.getTouchCount
+    -- @covers lurek.input.touch.wasPressed
+    -- @covers lurek.input.touch.wasReleased
     it("touch uncovered API is callable", function()
         lurek.input.touch.getTouches()
         lurek.input.touch.getPosition(0)
         lurek.input.touch.getPressure(0)
         lurek.input.touch.getTouchCount()
+        lurek.input.touch.wasPressed(0)
+        lurek.input.touch.wasReleased(0)
+        expect_true(true)
+    end)
+
+    -- @covers lurek.input.newMapping
+    it("newMapping uncovered API is callable", function()
+        local mapping = lurek.input.newMapping("menu_accept", {"return"})
+        mapping.isDown()
+        mapping.wasPressed()
+        mapping.wasReleased()
         expect_true(true)
     end)
 

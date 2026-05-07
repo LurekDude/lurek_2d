@@ -7,6 +7,7 @@
 //! `affine2d`, `transform_points`, `gaussian_kernel`, `sobel`.
 
 use crate::compute::array::{DataType, NdArray};
+use crate::compute::spatial;
 
 // ---------------------------------------------------------------------------
 // Vector utilities
@@ -260,39 +261,20 @@ pub fn sobel(input: &NdArray) -> Result<(NdArray, NdArray), String> {
     if input.ndim() != 2 {
         return Err(format!("sobel: expected 2D array, got {}D", input.ndim()));
     }
-    let rows = input.shape()[0];
-    let cols = input.shape()[1];
 
-    // Sobel kernels
-    // Gx: [[-1,0,1],[-2,0,2],[-1,0,1]]
-    // Gy: [[-1,-2,-1],[0,0,0],[1,2,1]]
-    let kx: [[f64; 3]; 3] = [[-1.0, 0.0, 1.0], [-2.0, 0.0, 2.0], [-1.0, 0.0, 1.0]];
-    let ky: [[f64; 3]; 3] = [[-1.0, -2.0, -1.0], [0.0, 0.0, 0.0], [1.0, 2.0, 1.0]];
+    let gx_kernel = NdArray::from_slice(
+        &[-1.0, 0.0, 1.0, -2.0, 0.0, 2.0, -1.0, 0.0, 1.0],
+        &[3, 3],
+        DataType::Float64,
+    )?;
+    let gy_kernel = NdArray::from_slice(
+        &[-1.0, -2.0, -1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 1.0],
+        &[3, 3],
+        DataType::Float64,
+    )?;
 
-    let mut gx = NdArray::zeros(&[rows, cols], input.dtype())?;
-    let mut gy = NdArray::zeros(&[rows, cols], input.dtype())?;
-
-    for r in 0..rows {
-        for c in 0..cols {
-            let mut sx = 0.0_f64;
-            let mut sy = 0.0_f64;
-            for kr in 0..3_usize {
-                for kc in 0..3_usize {
-                    let row = r as isize + kr as isize - 1;
-                    let col = c as isize + kc as isize - 1;
-                    if row >= 0 && row < rows as isize && col >= 0 && col < cols as isize {
-                        let v =
-                            input.get_f64(input.flat_index(&[row as usize, col as usize]).unwrap());
-                        sx += v * kx[kr][kc];
-                        sy += v * ky[kr][kc];
-                    }
-                }
-            }
-            let flat = gx.flat_index(&[r, c]).unwrap();
-            gx.set_f64(flat, sx);
-            gy.set_f64(flat, sy);
-        }
-    }
+    let gx = spatial::convolve2d(input, &gx_kernel)?;
+    let gy = spatial::convolve2d(input, &gy_kernel)?;
     Ok((gx, gy))
 }
 

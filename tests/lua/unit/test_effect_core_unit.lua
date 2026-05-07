@@ -2198,4 +2198,61 @@ describe("effect strict: LScreenTransition color/setColor/type/typeOf", function
     end)
 end)
 
+-- @describe effect-light ambient bridge
+describe("effect-light ambient bridge", function()
+    -- @covers LOverlay:getAmbientColor
+    -- @covers LOverlay:pullAmbientFromLight
+    -- @covers lurek.effect.newOverlay
+    -- @covers lurek.light.setAmbient
+    it("pullAmbientFromLight copies light ambient into overlay", function()
+        lurek.light.setAmbient(0.12, 0.34, 0.56, 0.78)
+        local ov = lurek.effect.newOverlay()
+        ov:pullAmbientFromLight()
+        local r, g, b, a = ov:getAmbientColor()
+        expect_near(r, 0.12, 0.001)
+        expect_near(g, 0.34, 0.001)
+        expect_near(b, 0.56, 0.001)
+        expect_near(a, 0.78, 0.001)
+    end)
+
+    -- @covers LOverlay:pushAmbientToLight
+    -- @covers LOverlay:setAmbientColor
+    -- @covers lurek.effect.newOverlay
+    -- @covers lurek.light.getAmbient
+    it("pushAmbientToLight copies overlay ambient into light world", function()
+        local ov = lurek.effect.newOverlay()
+        ov:setAmbientColor(0.21, 0.22, 0.23, 0.24)
+        ov:pushAmbientToLight()
+        local r, g, b, a = lurek.light.getAmbient()
+        expect_near(r, 0.21, 0.001)
+        expect_near(g, 0.22, 0.001)
+        expect_near(b, 0.23, 0.001)
+        expect_near(a, 0.24, 0.001)
+    end)
+
+    -- @covers LOverlay:getAmbientColor
+    -- @covers LOverlay:setAmbientColor
+    -- @covers LOverlay:syncAmbientWithLight
+    -- @covers lurek.effect.newOverlay
+    -- @covers lurek.light.getAmbient
+    -- @covers lurek.light.setAmbient
+    it("syncAmbientWithLight avg resolves and writes both sides", function()
+        local ov = lurek.effect.newOverlay()
+        ov:setAmbientColor(0.2, 0.2, 0.2, 0.2)
+        lurek.light.setAmbient(0.8, 0.6, 0.4, 1.0)
+        ov:syncAmbientWithLight("avg")
+
+        local orr, org, orb, ora = ov:getAmbientColor()
+        local lr, lg, lb, la = lurek.light.getAmbient()
+        expect_near(orr, 0.5, 0.001)
+        expect_near(org, 0.4, 0.001)
+        expect_near(orb, 0.3, 0.001)
+        expect_near(ora, 0.6, 0.001)
+        expect_near(lr, 0.5, 0.001)
+        expect_near(lg, 0.4, 0.001)
+        expect_near(lb, 0.3, 0.001)
+        expect_near(la, 0.6, 0.001)
+    end)
+end)
+
 test_summary()

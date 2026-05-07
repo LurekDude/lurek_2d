@@ -11,23 +11,9 @@
 
 ## Summary
 
-## Summary
+The `sprite` module is documented from the current source tree and existing module reference data.
 
-The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types — a Feature Systems tier module sitting above the `render` command queue, offering higher-level game-graphics abstractions rather than raw draw calls. All drawing flows through `RenderCommand` entries; the sprite module adds no GPU resources of its own.
-
-**Sprite.** `Sprite` is the smallest individually controlled image quad: a `TextureKey`, `Rect` source region, world-space position, rotation in radians, per-axis scale, multiplicative tint `[f32; 4]` colour, `BlendMode`, and Z-order integer. `draw(commands)` pushes a `RenderCommand::DrawImage` into the caller-supplied command list. `Sprite` is lightweight and allocation-free in steady state — suitable for individually scripted game entities (player, enemies, projectiles) where each object manages its own sprite.
-
-**SpriteBatch.** Groups many sprites sharing one texture into a single GPU draw call, critical for efficiently rendering large numbers of similar objects (bullets, particles, crowd NPCs, map decorations). Instances are added via `add(x, y, src_rect, opts)` which accumulates `BatchEntry` records in a pre-allocated `Vec<SpriteInstance>`. The batch emits one `RenderCommand::DrawSpriteBatch` per flush, which `GpuRenderer` handles as a single instanced draw call. The instance list is cleared at the start of each frame. `buffer_size()` exposes pre-allocated capacity for sizing decisions. A batch holding 5000 sprites costs one GPU draw call, while 5000 individual `Sprite` objects would cost 5000 draw calls.
-
-**SpriteSheet.** Maps 0-based frame indices to UV rectangles within a uniform grid on a single texture. Named `FrameGroup` ranges allow game code to reference animation sequences by name (`"walk_right"`, `"idle"`) rather than raw index ranges. `DirectionLayout` describes whether directional frames are arranged row-by-row or column-by-column. Factory helpers: `from_rpgmaker()` builds RPGMaker VX/Ace-compatible 3x4 character sheets with standard four-direction groups. `from_atlas(atlas, group_map)` builds a sheet from named regions in a `SpriteAtlas`. `frame_rect(index)` returns the UV `Rect` for a zero-based frame index. `draw_to_image()` renders the sheet grid as a colour-coded debug `ImageData` with frame-boundary overlays.
-
-**SpriteAtlas.** Imports TexturePacker-format JSON exports via `parse_texturepacker_json` and Aseprite JSON exports via `parse_aseprite_json`. Each `AtlasEntry` record carries: trimmed source `Rect`, original source size, rotation flag, pivot point, and optional nine-patch flags. `get(name)` retrieves an entry by name. `get_flipped(name, h, v)` returns a copy with horizontal and/or vertical flip applied to the source bounds without modifying the atlas. Used by `animation` for per-frame sprite region lookup.
-
-**NineSlice.** Renders scalable nine-patch textures for resizable UI panels, dialog boxes, and HUD frames without visible stretch artifacts. `NineSlice::new(texture_key, src_rect, insets)` stores the source texture bounds and four pixel insets (left, right, top, bottom). `patches(dst_rect)` partitions the source texture and destination rectangle into a 3x3 grid of `Patch` (src_rect, dst_rect) tuples that the caller passes to the render queue as nine individual image draws. This produces the standard scalable-panel effect where corners are fixed pixel size and edges/centre stretch.
-
-**Lua surface.** `lurek.sprite.new(tex, x, y, opts)` creates a sprite. Methods: `draw(commands)`, `setPos(x, y)`, `setRotation(r)`, `setScale(sx, sy)`, `setTint(color)`, `setBlend(mode)`, `setDepth(z)`, `setRegion(rect)`. `lurek.sprite.newBatch(tex, capacity)`. Methods: `add(x, y, region, opts)`, `draw(commands)`, `clear()`. `lurek.sprite.newSheet(tex, fw, fh)`. Methods: `addGroup(name, from, to)`, `frameRect(i)`, `debugDraw()`. `lurek.sprite.loadAtlas(path)`. Methods: `get(name)`, `getFlipped(name, h, v)`. `lurek.sprite.newNineSlice(tex, insets)`. Methods: `draw(dst_rect, commands)`.
-
-**Scope boundary.** Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/sprite_api.rs`.
+This module primarily collaborates with `image`, `math`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -100,28 +86,34 @@ The `sprite` module provides Lurek2D's sprite and sprite-batch rendering types �
 - Namespace: `lurek.sprite`
 
 ### Module Functions
-- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w Ă— frame_h` frames.
-- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols Ă— 4 rows) with "down", "left", "right", "up" groups.
+- `lurek.sprite.newSheet`: Creates a sprite sheet with a uniform grid of `frame_w Ă- frame_h` frames.
+- `lurek.sprite.newRPGMakerSheet`: Creates an RPGMaker VX/Ace character sheet (3 cols Ă- 4 rows) with "down", "left", "right", "up" groups.
 - `lurek.sprite.parseAtlas`: Parses a TexturePacker JSON string (hash or array format) and returns a SpriteAtlas.
 - `lurek.sprite.newAtlasSheet`: Builds a SpriteSheet whose frames come from named entries in a SpriteAtlas.
-- `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON export string and returns a `SpriteAtlas`.
+- `lurek.sprite.parseAsepriteAtlas`: Parses an Aseprite JSON export string and returns a sprite atlas.
 
-### `SpriteAtlas` Methods
-- `SpriteAtlas:getEntry`: Returns the named region as a table `{name, x, y, w, h, rotated}`, or nil.
-- `SpriteAtlas:getByIndex`: Returns the region at the given 1-based insertion index, or nil.
-- `SpriteAtlas:entryCount`: Returns the total number of named regions in the atlas.
-- `SpriteAtlas:entryNames`: Returns a sequential table of all region names.
+### `LSpriteAtlas` Methods
+- `LSpriteAtlas:getEntry`: Returns the named region as a table.
+- `LSpriteAtlas:getByIndex`: Returns the region at the given 1-based insertion index.
+- `LSpriteAtlas:entryCount`: Returns the total number of named regions in the atlas.
+- `LSpriteAtlas:entryNames`: Returns a sequential table of all region names.
+- `LSpriteAtlas:getFlipped`: Returns a copy of the named region with flip flags set.
+- `LSpriteAtlas:type`: Returns the type name of this object.
+- `LSpriteAtlas:typeOf`: Returns whether this object is of the given type.
 
-### `SpriteSheet` Methods
-- `SpriteSheet:getFrame`: Returns the quad for the 0-based frame index, or nil if out of range.
-- `SpriteSheet:getFrameCount`: Returns the total number of frames in the sheet.
-- `SpriteSheet:getRow`: Returns a sequential table of quad tables for every frame in the given row.
-- `SpriteSheet:getColumn`: Returns a sequential table of quad tables for every frame in the given column.
-- `SpriteSheet:getGroupFrames`: Returns a sequential table of quad tables for the named frame group, or nil.
-- `SpriteSheet:getGroupNames`: Returns a sequential table of all defined group names.
-- `SpriteSheet:getFrameSize`: Returns the width and height of a single frame cell in pixels.
-- `SpriteSheet:getGridSize`: Returns the number of columns and rows in the grid.
-- `SpriteSheet:drawToImage`: Renders the sheet grid as a debug view into a new ImageData.
+### `LSpriteSheet` Methods
+- `LSpriteSheet:getFrame`: Returns the quad for the 0-based frame index.
+- `LSpriteSheet:getFrameCount`: Returns the total number of frames in the sheet.
+- `LSpriteSheet:getRow`: Returns a sequential table of quad tables for every frame in the given row.
+- `LSpriteSheet:getColumn`: Returns a sequential table of quad tables for every frame in the given column.
+- `LSpriteSheet:getGroupFrames`: Returns a sequential table of quad tables for the named frame group.
+- `LSpriteSheet:getGroupNames`: Returns a sequential table of all defined group names.
+- `LSpriteSheet:nameGroup`: Registers a named frame group starting at `start_frame` with `count` frames.
+- `LSpriteSheet:getFrameSize`: Returns the width and height of a single frame cell in pixels.
+- `LSpriteSheet:getGridSize`: Returns the number of columns and rows in the grid.
+- `LSpriteSheet:drawToImage`: Renders the sheet grid as a debug view into a new ImageData.
+- `LSpriteSheet:type`: Returns the type name of this object.
+- `LSpriteSheet:typeOf`: Returns whether this object is of the given type.
 
 ## References
 

@@ -79,17 +79,25 @@
         // Individual module tests are useful for targeted iteration on one system.
         {
             "label": "Test: All",
-            "detail": "🧪 Full test suite: parallel Rust targets then Lua bindings harness. Default test task (Ctrl+Shift+T).",
+            "detail": "🧪 Full test suite: full Rust targets (including slow load/smoke) then Lua harness. Default test task (Ctrl+Shift+T).",
             "dependsOrder": "sequence",
-            "dependsOn": ["Test: Rust", "Test: Lua"],
+            "dependsOn": ["Test: Rust Full", "Test: Lua"],
             "group": { "kind": "test", "isDefault": true },
             "problemMatcher": []
         },
         {
             "label": "Test: Rust",
-            "detail": "🧪 Run all non-Lua Rust test targets in parallel (bounded concurrency) via tools/dev/parallel_cargo.py.",
+            "detail": "🧪 Fast Rust suite for dev loop (excludes slow load/smoke targets).",
             "type": "shell",
             "command": "python tools/dev/parallel_cargo.py test rust",
+            "group": "test",
+            "problemMatcher": ["$rustc"]
+        },
+        {
+            "label": "Test: Rust Full",
+            "detail": "🧪 Full Rust suite including slow load/smoke targets (for full validation).",
+            "type": "shell",
+            "command": "python tools/dev/parallel_cargo.py test rust-full",
             "group": "test",
             "problemMatcher": ["$rustc"]
         },

@@ -113,3 +113,92 @@ mod lua_table_tests {
         assert!(from_lua(&val).is_err());
     }
 }
+
+mod codec_tests {
+    use lurek2d::serial::{
+        decode_bytes, decode_text, detect_format, encode, from_csv_reader, DecodeOptions,
+        EncodeOptions, EncodedValue, SerialFormat, SerialValue,
+    };
+    use std::io::Cursor;
+
+    #[test]
+    fn detect_format_finds_json() {
+        assert_eq!(detect_format("{\"name\":\"hero\"}"), Some(SerialFormat::Json));
+    }
+
+    #[test]
+    fn detect_format_finds_toml() {
+        assert_eq!(detect_format("title = \"demo\""), Some(SerialFormat::Toml));
+    }
+
+    #[test]
+    fn decode_text_auto_json() {
+        let val = decode_text("{\"hp\":10}", None, DecodeOptions::default()).unwrap();
+        match val {
+            SerialValue::Map(m) => assert!(matches!(m.get("hp"), Some(SerialValue::Int(10)))),
+            other => panic!("expected map, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn encode_decode_msgpack_round_trip() {
+        let src = SerialValue::Seq(vec![SerialValue::Int(1), SerialValue::Int(2)]);
+        let bytes = match encode(&src, SerialFormat::MsgPack, EncodeOptions::default()).unwrap() {
+            EncodedValue::Binary(b) => b,
+            EncodedValue::Text(_) => panic!("expected binary output"),
+        };
+        let back = decode_bytes(&bytes, SerialFormat::MsgPack).unwrap();
+        match back {
+            SerialValue::Seq(items) => assert_eq!(items.len(), 2),
+            other => panic!("expected seq, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn from_csv_reader_parses_rows() {
+        let data = Cursor::new("name,score\nalice,10\n");
+        let val = from_csv_reader(data, Default::default()).unwrap();
+        match val {
+            SerialValue::Seq(rows) => assert_eq!(rows.len(), 1),
+            other => panic!("expected seq, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn decode_text_ini_returns_section_map() {
+        let val = decode_text("[player]\nname=hero\n", Some(SerialFormat::Ini), DecodeOptions::default()).unwrap();
+        match val {
+            SerialValue::Map(root) => {
+                assert!(matches!(root.get("player"), Some(SerialValue::Map(_))));
+            }
+            other => panic!("expected map, got {other:?}"),
+        }
+    }
+}
+
+mod schema_defaults_tests {
+    use indexmap::IndexMap;
+    use lurek2d::serial::{apply_schema_defaults, SerialValue};
+
+    #[test]
+    fn apply_defaults_fills_missing_fields() {
+        let value = SerialValue::Map(IndexMap::new());
+
+        let mut hp_schema = IndexMap::new();
+        hp_schema.insert("type".to_string(), SerialValue::Str("number".to_string()));
+        hp_schema.insert("default".to_string(), SerialValue::Int(100));
+
+        let mut fields = IndexMap::new();
+        fields.insert("hp".to_string(), SerialValue::Map(hp_schema));
+
+        let mut schema = IndexMap::new();
+        schema.insert("type".to_string(), SerialValue::Str("table".to_string()));
+        schema.insert("fields".to_string(), SerialValue::Map(fields));
+
+        let patched = apply_schema_defaults(&value, &SerialValue::Map(schema)).unwrap();
+        match patched {
+            SerialValue::Map(m) => assert!(matches!(m.get("hp"), Some(SerialValue::Int(100)))),
+            other => panic!("expected map, got {other:?}"),
+        }
+    }
+}

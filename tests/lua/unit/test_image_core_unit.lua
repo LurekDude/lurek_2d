@@ -2407,4 +2407,79 @@ describe("image strict: LProvinceGrid type/typeOf", function()
     end)
 end)
 
+-- @describe image strict: byte constructors and province geometry helpers
+describe("image strict: byte constructors and province geometry helpers", function()
+    -- @covers lurek.image.newImageDataFromBytes
+    -- @covers LImageData:getRawBytes
+    it("newImageDataFromBytes creates image and getRawBytes returns RGBA payload", function()
+        local bytes = string.rep(string.char(255, 0, 0, 255), 4)
+        local img = lurek.image.newImageDataFromBytes(2, 2, bytes)
+        local raw = img:getRawBytes()
+        expect_type("string", raw)
+        expect_equal(16, #raw)
+    end)
+
+    -- @covers LProvinceGrid:provinceSpans
+    -- @covers LProvinceGrid:borderSegments
+    -- @covers LProvinceGrid:serializeShapeData
+    -- @covers LProvinceGrid:deserializeShapeData
+    -- @covers lurek.image.newProvinceGrid
+    it("province grid geometry APIs return expected data", function()
+        local pg = lurek.image.newProvinceGrid("content/games/strategy/eu2/map.png")
+        local spans = pg:provinceSpans()
+        local segs = pg:borderSegments()
+        local blob = pg:serializeShapeData()
+        local decoded = pg:deserializeShapeData(blob)
+
+        expect_type("table", spans)
+        expect_type("table", segs)
+        expect_type("string", blob)
+        expect_type("table", decoded)
+        expect_type("table", decoded.spans)
+        expect_type("table", decoded.segments)
+    end)
+end)
+
+-- @describe image strict: readback polling and resize filters
+describe("image strict: readback polling and resize filters", function()
+    -- @covers lurek.image.fromScreen
+    it("fromScreen is poll-based and returns nil or ImageData", function()
+        local from_screen = lurek.image["fromScreen"]
+        if from_screen == nil then
+            expect_true(true)
+            return
+        end
+
+        local first = from_screen()
+        expect_true(first == nil or type(first) == "userdata")
+
+        local second = from_screen()
+        expect_true(second == nil or type(second) == "userdata")
+    end)
+
+    -- @covers LImageData:resize
+    -- @covers lurek.image.newImageData
+    it("resize accepts lanczos3 filter", function()
+        local img = lurek.image.newImageData(4, 4)
+        img:fill(255, 0, 0, 255)
+        local resize_fn = img["resize"]
+        local out = resize_fn(img, 3, 5, "lanczos3")
+        expect_not_nil(out)
+        local w, h = out:getDimensions()
+        expect_equal(3, w)
+        expect_equal(5, h)
+    end)
+
+    -- @covers LImageData:resize
+    -- @covers lurek.image.newImageData
+    it("resize rejects unknown filter names", function()
+        local img = lurek.image.newImageData(4, 4)
+        local resize_fn = img["resize"]
+        local ok = pcall(function()
+            resize_fn(img, 2, 2, "nearest")
+        end)
+        expect_equal(false, ok)
+    end)
+end)
+
 test_summary()

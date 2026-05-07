@@ -35,11 +35,11 @@ provides raw device state, not semantic "jump"/"fire" mappings.
 
 ## 4. Gap List
 
-1. **[P2][GAP]** `Action mapping layer` — no semantic input bindings ("jump" → Space or gamepad A).
+1. **[P2][DONE]** `Action mapping layer` — semantic input bindings implemented (`bind`, `newMapping`, keyboard + `gamepad:<id>:<button>` tokens).
    - Why: every game reimplements key→action mapping in Lua; could be a standard library.
-2. **[P2][GAP]** `Gamepad rumble/vibration` — no force-feedback API.
+2. **[P2][DONE]** `Gamepad rumble/vibration` — force-feedback requests wired through `gilrs::ff` when supported.
    - Why: gamepad games expect haptic feedback; gilrs supports it.
-3. **[P3][GAP]** `Input buffering / frame-perfect detection` — `isDown` is polled; no pressed-this-frame vs held distinction in touch/gamepad.
+3. **[P3][DONE]** `Input buffering / frame-perfect detection` — added `wasPressed/wasReleased` for gamepad and touch.
    - Why: fighting games and platformers need frame-accurate input timing.
 
 ## 5. Feature Ideas
@@ -61,7 +61,7 @@ provides raw device state, not semantic "jump"/"fire" mappings.
 - **[P3][QUAL]** `Combo detector timeout units` — timeout is `f64` with no documented unit; should be explicit ms or use Duration.
   - File: `combo.rs:30`.
   - Reason: prevents silent bugs when GameDev passes seconds instead of milliseconds.
-- **[P3][QUAL]** `Recorder JSON schema versioning` — JSON format has no version field; schema changes break old recordings.
+- **[P3][DONE]** `Recorder JSON schema versioning` — JSON now includes `"version":1` with backward-compatible parser.
   - File: `recorder.rs`.
   - Reason: add `"version": 1` to serialized recordings for forward compat.
 - **[P3][PERF]** `Keyboard scancode map initialization` — rebuilds HashMap on every `clear_frame`; could keep and clear.

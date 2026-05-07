@@ -12,6 +12,7 @@
 use std::collections::{HashMap, HashSet};
 use std::f32::consts::PI;
 use std::sync::mpsc;
+use std::time::Instant;
 
 use bytemuck::{Pod, Zeroable};
 
@@ -49,6 +50,9 @@ struct TexVertex {
     position: [f32; 2],
     uv: [f32; 2],
     color: [f32; 4],
+    /// Per-vertex perspective depth. Set to 1.0 for flat/UI quads.
+    w_depth: f32,
+    _pad: [f32; 3],
 }
 
 /// Vertex for the 2D lighting pass with per-light shadow information.
@@ -60,7 +64,8 @@ struct LightVertex {
     color: [f32; 4],
     /// Normalized V coordinate into the shadow atlas (−1.0 = no shadow map).
     shadow_v: f32,
-    _pad: [f32; 3],
+    /// Shadow settings: `[filter_mode, softness, texel_size, _reserved]`.
+    shadow_params: [f32; 4],
 }
 
 /// Resolution (width) of each 1D radial shadow map.
@@ -131,6 +136,7 @@ const MAX_LIGHT_QUADS: usize = 128;
 /// - `canvas_switches` — `u32`.
 /// - `shader_switches` — `u32`.
 /// - `batched_draws` — `u32`.
+/// - `cpu_render_ms` — `f32`.
 #[derive(Debug, Default, Clone)]
 pub struct RenderStats {
     /// Number of draw calls issued this frame.
@@ -143,6 +149,8 @@ pub struct RenderStats {
     pub shader_switches: u32,
     /// Number of draw calls eliminated by coalescing.
     pub batched_draws: u32,
+    /// CPU time spent inside `render_frame` for the last frame, in milliseconds.
+    pub cpu_render_ms: f32,
 }
 
 /// Optional scissor rectangle in physical pixels: `(x, y, width, height)`.
@@ -319,6 +327,7 @@ struct VertexInput {
     @location(0) position: vec2<f32>,
     @location(1) uv:       vec2<f32>,
     @location(2) color:    vec4<f32>,
+    @location(3) w_depth:  f32,
 }
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
@@ -346,11 +355,10 @@ fn vs_main(in: VertexInput) -> VertexOutput {
         viewport.view_col2.xyz,
     );
     let cam_pos = view * vec3<f32>(in.position, 1.0);
-    out.clip_position = vec4<f32>(
-        (cam_pos.x / viewport.size.x) * 2.0 - 1.0,
-        1.0 - (cam_pos.y / viewport.size.y) * 2.0,
-        0.0, 1.0
-    );
+    let w = max(in.w_depth, 0.001);
+    let ndc_x = (cam_pos.x / viewport.size.x) * 2.0 - 1.0;
+    let ndc_y = 1.0 - (cam_pos.y / viewport.size.y) * 2.0;
+    out.clip_position = vec4<f32>(ndc_x * w, ndc_y * w, 0.0, w);
     out.uv    = in.uv;
     out.color = in.color;
     return out;
@@ -367,12 +375,14 @@ struct VertexInput {
     @location(1) uv:       vec2<f32>,
     @location(2) color:    vec4<f32>,
     @location(3) shadow_v: f32,
+    @location(4) shadow_params: vec4<f32>,
 }
 struct VertexOutput {
     @builtin(position) clip_position: vec4<f32>,
     @location(0)       uv:            vec2<f32>,
     @location(1)       color:         vec4<f32>,
     @location(2)       shadow_v:      f32,
+    @location(3)       shadow_params: vec4<f32>,
 }
 struct Viewport {
     size: vec2<f32>,
@@ -403,8 +413,44 @@ fn vs_main(in: VertexInput) -> VertexOutput {
     out.uv       = in.uv;
     out.color    = in.color;
     out.shadow_v = in.shadow_v;
+    out.shadow_params = in.shadow_params;
     return out;
 }
+
+fn sample_shadow_row(u: f32, v: f32, mode: f32, texel_size: f32) -> f32 {
+    if mode < 0.5 {
+        return textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, v)).r;
+    }
+
+    if mode < 1.5 {
+        // 5-tap PCF
+        var acc = 0.0;
+        acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 2.0 * texel_size, v)).r;
+        acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 1.0 * texel_size, v)).r;
+        acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, v)).r;
+        acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 1.0 * texel_size, v)).r;
+        acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 2.0 * texel_size, v)).r;
+        return acc / 5.0;
+    }
+
+    // 13-tap PCF
+    var acc = 0.0;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 6.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 5.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 4.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 3.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 2.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u - 1.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 1.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 2.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 3.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 4.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 5.0 * texel_size, v)).r;
+    acc += textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u + 6.0 * texel_size, v)).r;
+    return acc / 13.0;
+}
+
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     let center = vec2<f32>(0.5, 0.5);
@@ -418,11 +464,15 @@ fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
     if in.shadow_v >= 0.0 {
         let angle = atan2(delta.y, delta.x);                     // [-π, π]
         let u     = (angle + 3.14159265) / (2.0 * 3.14159265);  // [0, 1]
-        let shadow_dist = textureSample(shadow_atlas, shadow_sampler, vec2<f32>(u, in.shadow_v)).r;
+        let shadow_dist = sample_shadow_row(
+            u,
+            in.shadow_v,
+            in.shadow_params.x,
+            in.shadow_params.z,
+        );
         let frag_dist   = dist * 0.5;                            // normalised to radius
-        if frag_dist > shadow_dist {
-            shadow = 0.0;
-        }
+        let edge = max(1e-4, in.shadow_params.y * 0.05);
+        shadow = 1.0 - smoothstep(shadow_dist - edge, shadow_dist + edge, frag_dist);
     }
 
     return vec4<f32>(in.color.rgb * intensity * shadow, 1.0);
@@ -483,6 +533,10 @@ pub struct GpuRenderer {
     color_index_buffer: wgpu::Buffer,
     tex_vertex_buffer: wgpu::Buffer,
     tex_index_buffer: wgpu::Buffer,
+    color_vertex_capacity: u64,
+    color_index_capacity: u64,
+    tex_vertex_capacity: u64,
+    tex_index_capacity: u64,
 
     gpu_textures: SparseSecondaryMap<TextureKey, GpuTexture>,
 
@@ -763,6 +817,10 @@ impl GpuRenderer {
             color_index_buffer,
             tex_vertex_buffer,
             tex_index_buffer,
+            color_vertex_capacity: MAX_COLOR_VERTS,
+            color_index_capacity: MAX_COLOR_IDXS,
+            tex_vertex_capacity: MAX_TEX_VERTS,
+            tex_index_capacity: MAX_TEX_IDXS,
             gpu_textures: SparseSecondaryMap::new(),
             font_atlas_textures: SparseSecondaryMap::new(),
             canvas_gpu_textures: SparseSecondaryMap::new(),
@@ -801,6 +859,81 @@ impl GpuRenderer {
             .write_buffer(&self.viewport_buffer, 0, bytemuck::bytes_of(&data));
         self.screen_stencil_target = None;
         self.light_gpu = None;
+    }
+
+    fn grow_capacity(current: u64, needed: u64) -> u64 {
+        let mut cap = current.max(1);
+        while cap < needed {
+            cap = cap.saturating_mul(2);
+            if cap == u64::MAX {
+                break;
+            }
+        }
+        cap.max(needed)
+    }
+
+    fn ensure_geometry_buffer_capacity(
+        &mut self,
+        color_verts_needed: usize,
+        color_idxs_needed: usize,
+        tex_verts_needed: usize,
+        tex_idxs_needed: usize,
+    ) {
+        let color_v_needed = color_verts_needed as u64;
+        if color_v_needed > self.color_vertex_capacity {
+            let new_cap = Self::grow_capacity(self.color_vertex_capacity, color_v_needed);
+            self.color_vertex_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("color_vbo"),
+                size: new_cap * std::mem::size_of::<ColorVertex>() as u64,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+            self.color_vertex_capacity = new_cap;
+        }
+
+        let color_i_needed = color_idxs_needed as u64;
+        if color_i_needed > self.color_index_capacity {
+            let new_cap = Self::grow_capacity(self.color_index_capacity, color_i_needed);
+            self.color_index_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("color_ibo"),
+                size: new_cap * std::mem::size_of::<u32>() as u64,
+                usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+            self.color_index_capacity = new_cap;
+        }
+
+        let tex_v_needed = tex_verts_needed as u64;
+        if tex_v_needed > self.tex_vertex_capacity {
+            let new_cap = Self::grow_capacity(self.tex_vertex_capacity, tex_v_needed);
+            self.tex_vertex_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("tex_vbo"),
+                size: new_cap * std::mem::size_of::<TexVertex>() as u64,
+                usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+            self.tex_vertex_capacity = new_cap;
+            log::warn!(
+                "[G003] grew tex vertex buffer capacity to {} vertices",
+                self.tex_vertex_capacity
+            );
+        }
+
+        let tex_i_needed = tex_idxs_needed as u64;
+        if tex_i_needed > self.tex_index_capacity {
+            let new_cap = Self::grow_capacity(self.tex_index_capacity, tex_i_needed);
+            self.tex_index_buffer = self.device.create_buffer(&wgpu::BufferDescriptor {
+                label: Some("tex_ibo"),
+                size: new_cap * std::mem::size_of::<u32>() as u64,
+                usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
+                mapped_at_creation: false,
+            });
+            self.tex_index_capacity = new_cap;
+            log::warn!(
+                "[G003] grew tex index buffer capacity to {} indices",
+                self.tex_index_capacity
+            );
+        }
     }
 
     fn create_sampler(&self, default_filter: &(String, String, u32)) -> wgpu::Sampler {
@@ -852,6 +985,7 @@ impl GpuRenderer {
         pixels: &[u8],
         width: u32,
         height: u32,
+        color_space: crate::image::TextureColorSpace,
         default_filter: &(String, String, u32),
     ) -> GpuTexture {
         let size = wgpu::Extent3d {
@@ -865,7 +999,10 @@ impl GpuRenderer {
             mip_level_count: 1,
             sample_count: 1,
             dimension: wgpu::TextureDimension::D2,
-            format: wgpu::TextureFormat::Rgba8UnormSrgb,
+            format: match color_space {
+                crate::image::TextureColorSpace::Srgb => wgpu::TextureFormat::Rgba8UnormSrgb,
+                crate::image::TextureColorSpace::Linear => wgpu::TextureFormat::Rgba8Unorm,
+            },
             usage: wgpu::TextureUsages::TEXTURE_BINDING | wgpu::TextureUsages::COPY_DST,
             view_formats: &[],
         });
@@ -910,9 +1047,10 @@ impl GpuRenderer {
         pixels: &[u8],
         width: u32,
         height: u32,
+        color_space: crate::image::TextureColorSpace,
         default_filter: &(String, String, u32),
     ) {
-        let gt = self.create_gpu_texture_raw(pixels, width, height, default_filter);
+        let gt = self.create_gpu_texture_raw(pixels, width, height, color_space, default_filter);
         self.gpu_textures.insert(key, gt);
     }
 
@@ -926,7 +1064,13 @@ impl GpuRenderer {
         let (data, w, h) = font.atlas_data();
 
         if font.is_dirty() || !self.font_atlas_textures.contains_key(font_key) {
-            let gt = self.create_gpu_texture_raw(data, w, h, default_filter);
+            let gt = self.create_gpu_texture_raw(
+                data,
+                w,
+                h,
+                crate::image::TextureColorSpace::Srgb,
+                default_filter,
+            );
             self.font_atlas_textures.insert(font_key, gt);
             font.mark_clean();
         }
@@ -1223,7 +1367,8 @@ impl GpuRenderer {
                                 0 => Float32x2,
                                 1 => Float32x2,
                                 2 => Float32x4,
-                                3 => Float32
+                                3 => Float32,
+                                4 => Float32x4
                             ],
                         }],
                     },
@@ -1395,6 +1540,7 @@ impl GpuRenderer {
         frame_count: u64,
         capture_screenshot: bool,
     ) -> Result<Option<(u32, u32, Vec<u8>)>, wgpu::SurfaceError> {
+        let frame_start = Instant::now();
         self.prune_released_resources(textures, fonts, canvases, shaders);
 
         // Lazily upload any TextureData added since last frame.
@@ -1405,6 +1551,7 @@ impl GpuRenderer {
                     &tex_data.pixels,
                     tex_data.width,
                     tex_data.height,
+                    tex_data.color_space,
                     default_filter,
                 );
             }
@@ -2136,6 +2283,7 @@ impl GpuRenderer {
                 RenderCommand::DrawTexturedQuad {
                     corners,
                     uvs,
+                    corner_w,
                     texture_key,
                     color,
                 } => {
@@ -2143,7 +2291,15 @@ impl GpuRenderer {
                         let t = transform_stack.last().unwrap();
                         let mut verts = Vec::with_capacity(4);
                         let mut idxs = Vec::with_capacity(6);
-                        push_tex_quad_corners(&mut verts, &mut idxs, t, *color, corners, uvs);
+                        push_tex_quad_corners(
+                            &mut verts,
+                            &mut idxs,
+                            t,
+                            *color,
+                            corners,
+                            uvs,
+                            corner_w,
+                        );
                         let (target_width, target_height) =
                             self.target_dimensions(current_target, canvases);
                         append_tex_draw(
@@ -2174,10 +2330,29 @@ impl GpuRenderer {
                             let mut verts = Vec::with_capacity(batch.len() * 4);
                             let mut idxs = Vec::with_capacity(batch.len() * 6);
                             for entry in batch.entries() {
+                                let qw = if entry.quad_w > 0.0 { entry.quad_w } else { tex_w };
+                                let qh = if entry.quad_h > 0.0 { entry.quad_h } else { tex_h };
                                 let u0 = entry.quad_x / tex_w;
                                 let v0 = entry.quad_y / tex_h;
-                                let u1 = (entry.quad_x + entry.quad_w) / tex_w;
-                                let v1 = (entry.quad_y + entry.quad_h) / tex_h;
+                                let u1 = (entry.quad_x + qw) / tex_w;
+                                let v1 = (entry.quad_y + qh) / tex_h;
+
+                                // Engine-level viewport culling for batched sprites.
+                                if current_target == RenderTargetId::Screen
+                                    && !Self::aabb_visible_2d(
+                                        entry.x - entry.ox * entry.sx.abs(),
+                                        entry.y - entry.oy * entry.sy.abs(),
+                                        qw * entry.sx.abs(),
+                                        qh * entry.sy.abs(),
+                                        t,
+                                        camera_matrix,
+                                        self.width as f32,
+                                        self.height as f32,
+                                    )
+                                {
+                                    continue;
+                                }
+
                                 push_tex_quad(
                                     &mut verts,
                                     &mut idxs,
@@ -2190,8 +2365,8 @@ impl GpuRenderer {
                                     entry.sy,
                                     entry.ox,
                                     entry.oy,
-                                    entry.quad_w,
-                                    entry.quad_h,
+                                    qw,
+                                    qh,
                                     u0,
                                     v0,
                                     u1,
@@ -2471,6 +2646,8 @@ impl GpuRenderer {
                                                 mv.b * current_color[2],
                                                 mv.a * current_color[3],
                                             ],
+                                            w_depth: 1.0,
+                                            _pad: [0.0; 3],
                                         });
                                         idxs.push(base_idx + i as u32);
                                     }
@@ -2533,6 +2710,107 @@ impl GpuRenderer {
                                 idxs,
                             );
                         }
+                    }
+                }
+                RenderCommand::DrawMeshTransient {
+                    mesh,
+                    x,
+                    y,
+                    rotation,
+                    sx,
+                    sy,
+                    ox,
+                    oy,
+                } => {
+                    let cos_r = rotation.cos();
+                    let sin_r = rotation.sin();
+                    let parent = transform_stack.last().unwrap();
+                    let tri_indices = mesh.triangulate();
+
+                    if let Some(tex_key) = mesh.texture {
+                        if self.gpu_textures.contains_key(tex_key) {
+                            let mut verts = Vec::with_capacity(tri_indices.len());
+                            let mut idxs = Vec::with_capacity(tri_indices.len());
+                            let base_idx = 0u32;
+                            for (i, &vi) in tri_indices.iter().enumerate() {
+                                if let Some(mv) = mesh.vertices.get(vi) {
+                                    let lx = (mv.x - ox) * sx;
+                                    let ly = (mv.y - oy) * sy;
+                                    let rx = lx * cos_r - ly * sin_r + x;
+                                    let ry = lx * sin_r + ly * cos_r + y;
+                                    let (wx, wy) = apply(parent, rx, ry);
+                                    verts.push(TexVertex {
+                                        position: [wx, wy],
+                                        uv: [mv.u, mv.v],
+                                        color: [
+                                            mv.r * current_color[0],
+                                            mv.g * current_color[1],
+                                            mv.b * current_color[2],
+                                            mv.a * current_color[3],
+                                        ],
+                                        w_depth: 1.0,
+                                        _pad: [0.0; 3],
+                                    });
+                                    idxs.push(base_idx + i as u32);
+                                }
+                            }
+                            let (target_width, target_height) =
+                                self.target_dimensions(current_target, canvases);
+                            append_tex_draw(
+                                &mut draws,
+                                &mut all_tex_verts,
+                                &mut all_tex_idxs,
+                                current_target,
+                                TexRef::Texture(tex_key),
+                                current_blend_mode,
+                                normalize_scissor(current_scissor, target_width, target_height),
+                                color_mask_bits,
+                                active_shader.filter(|key| shaders.contains_key(*key)),
+                                stencil_mode,
+                                stencil_reference,
+                                verts,
+                                idxs,
+                            );
+                        }
+                    } else {
+                        let mut verts = Vec::with_capacity(tri_indices.len());
+                        let mut idxs = Vec::with_capacity(tri_indices.len());
+                        for &vi in &tri_indices {
+                            if let Some(mv) = mesh.vertices.get(vi) {
+                                let lx = (mv.x - ox) * sx;
+                                let ly = (mv.y - oy) * sy;
+                                let rx = lx * cos_r - ly * sin_r + x;
+                                let ry = lx * sin_r + ly * cos_r + y;
+                                let (wx, wy) = apply(parent, rx, ry);
+                                let base = verts.len() as u32;
+                                verts.push(ColorVertex {
+                                    position: [wx, wy],
+                                    color: [
+                                        mv.r * current_color[0],
+                                        mv.g * current_color[1],
+                                        mv.b * current_color[2],
+                                        mv.a * current_color[3],
+                                    ],
+                                });
+                                idxs.push(base);
+                            }
+                        }
+                        let (target_width, target_height) =
+                            self.target_dimensions(current_target, canvases);
+                        append_color_draw(
+                            &mut draws,
+                            &mut all_color_verts,
+                            &mut all_color_idxs,
+                            current_target,
+                            current_blend_mode,
+                            normalize_scissor(current_scissor, target_width, target_height),
+                            color_mask_bits,
+                            active_shader.filter(|key| shaders.contains_key(*key)),
+                            stencil_mode,
+                            stencil_reference,
+                            verts,
+                            idxs,
+                        );
                     }
                 }
                 RenderCommand::SyncMesh { .. } => {}
@@ -3328,7 +3606,15 @@ impl GpuRenderer {
                             if self.gpu_textures.contains_key(*key) {
                                 let mut tv: Vec<TexVertex> = Vec::with_capacity(4);
                                 let mut ti: Vec<u32> = Vec::with_capacity(6);
-                                push_tex_quad_corners(&mut tv, &mut ti, t, *color, corners, &full_uvs);
+                                push_tex_quad_corners(
+                                    &mut tv,
+                                    &mut ti,
+                                    t,
+                                    *color,
+                                    corners,
+                                    &full_uvs,
+                                    &[1.0, 1.0, 1.0, 1.0],
+                                );
                                 append_tex_draw(
                                     &mut draws,
                                     &mut all_tex_verts,
@@ -3540,6 +3826,7 @@ impl GpuRenderer {
                                 slot.color,
                                 &slot.corners,
                                 &slot.uvs,
+                                &[1.0, 1.0, 1.0, 1.0],
                             );
                             append_tex_draw(
                                 &mut draws,
@@ -3793,35 +4080,42 @@ impl GpuRenderer {
 
         // ── Buffer saturation diagnostics (warn at ≥90% capacity) ───────────────────────────────
         {
-            let color_v_pct = all_color_verts.len() * 100 / MAX_COLOR_VERTS as usize;
+            let color_v_pct = all_color_verts.len() * 100 / self.color_vertex_capacity as usize;
             if color_v_pct >= 90 {
                 log::warn!(
                     "[G003] color vertex buffer at {}% capacity ({}/{}) — consider reducing draw calls or increasing MAX_COLOR_VERTS",
-                    color_v_pct, all_color_verts.len(), MAX_COLOR_VERTS
+                    color_v_pct, all_color_verts.len(), self.color_vertex_capacity
                 );
             }
-            let color_i_pct = all_color_idxs.len() * 100 / MAX_COLOR_IDXS as usize;
+            let color_i_pct = all_color_idxs.len() * 100 / self.color_index_capacity as usize;
             if color_i_pct >= 90 {
                 log::warn!(
                     "[G003] color index buffer at {}% capacity ({}/{}) — consider reducing draw calls or increasing MAX_COLOR_IDXS",
-                    color_i_pct, all_color_idxs.len(), MAX_COLOR_IDXS
+                    color_i_pct, all_color_idxs.len(), self.color_index_capacity
                 );
             }
-            let tex_v_pct = all_tex_verts.len() * 100 / MAX_TEX_VERTS as usize;
+            let tex_v_pct = all_tex_verts.len() * 100 / self.tex_vertex_capacity as usize;
             if tex_v_pct >= 90 {
                 log::warn!(
                     "[G003] tex vertex buffer at {}% capacity ({}/{}) — consider reducing sprite draws or increasing MAX_TEX_VERTS",
-                    tex_v_pct, all_tex_verts.len(), MAX_TEX_VERTS
+                    tex_v_pct, all_tex_verts.len(), self.tex_vertex_capacity
                 );
             }
-            let tex_i_pct = all_tex_idxs.len() * 100 / MAX_TEX_IDXS as usize;
+            let tex_i_pct = all_tex_idxs.len() * 100 / self.tex_index_capacity as usize;
             if tex_i_pct >= 90 {
                 log::warn!(
                     "[G003] tex index buffer at {}% capacity ({}/{}) — consider reducing sprite draws or increasing MAX_TEX_IDXS",
-                    tex_i_pct, all_tex_idxs.len(), MAX_TEX_IDXS
+                    tex_i_pct, all_tex_idxs.len(), self.tex_index_capacity
                 );
             }
         }
+
+        self.ensure_geometry_buffer_capacity(
+            all_color_verts.len(),
+            all_color_idxs.len(),
+            all_tex_verts.len(),
+            all_tex_idxs.len(),
+        );
 
         // Write geometry data to GPU buffers.
         if !all_color_verts.is_empty() {
@@ -4105,6 +4399,13 @@ impl GpuRenderer {
                     Some(row) => (*row as f32 + 0.5) / atlas_height,
                     None => -1.0,
                 };
+                let filter_mode = match light.shadow_filter {
+                    crate::light::ShadowFilter::None => 0.0,
+                    crate::light::ShadowFilter::Pcf5 => 1.0,
+                    crate::light::ShadowFilter::Pcf13 => 2.0,
+                };
+                let softness = (light.shadow_smooth * light.shadow_softness).max(0.0);
+                let shadow_params = [filter_mode, softness, 1.0 / SHADOW_MAP_RES as f32, 0.0];
 
                 let base = light_verts.len() as u32;
                 light_verts.push(LightVertex {
@@ -4112,28 +4413,28 @@ impl GpuRenderer {
                     uv: [0.0, 0.0],
                     color: c,
                     shadow_v: sv,
-                    _pad: [0.0; 3],
+                    shadow_params,
                 });
                 light_verts.push(LightVertex {
                     position: [light.x + r, light.y - r],
                     uv: [1.0, 0.0],
                     color: c,
                     shadow_v: sv,
-                    _pad: [0.0; 3],
+                    shadow_params,
                 });
                 light_verts.push(LightVertex {
                     position: [light.x + r, light.y + r],
                     uv: [1.0, 1.0],
                     color: c,
                     shadow_v: sv,
-                    _pad: [0.0; 3],
+                    shadow_params,
                 });
                 light_verts.push(LightVertex {
                     position: [light.x - r, light.y + r],
                     uv: [0.0, 1.0],
                     color: c,
                     shadow_v: sv,
-                    _pad: [0.0; 3],
+                    shadow_params,
                 });
                 light_idxs.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
                 light_count += 1;
@@ -4148,28 +4449,28 @@ impl GpuRenderer {
                 uv: [0.0, 0.0],
                 color: [1.0; 4],
                 shadow_v: -1.0,
-                _pad: [0.0; 3],
+                shadow_params: [0.0; 4],
             });
             light_verts.push(LightVertex {
                 position: [sw, 0.0],
                 uv: [1.0, 0.0],
                 color: [1.0; 4],
                 shadow_v: -1.0,
-                _pad: [0.0; 3],
+                shadow_params: [0.0; 4],
             });
             light_verts.push(LightVertex {
                 position: [sw, sh],
                 uv: [1.0, 1.0],
                 color: [1.0; 4],
                 shadow_v: -1.0,
-                _pad: [0.0; 3],
+                shadow_params: [0.0; 4],
             });
             light_verts.push(LightVertex {
                 position: [0.0, sh],
                 uv: [0.0, 1.0],
                 color: [1.0; 4],
                 shadow_v: -1.0,
-                _pad: [0.0; 3],
+                shadow_params: [0.0; 4],
             });
             light_idxs.extend_from_slice(&[
                 composite_base,
@@ -4297,6 +4598,7 @@ impl GpuRenderer {
 
         self.queue.submit(std::iter::once(encoder.finish()));
         output.present();
+        self.render_stats.cpu_render_ms = frame_start.elapsed().as_secs_f32() * 1000.0;
         Ok(pending_readback.and_then(|readback| self.complete_surface_readback(readback)))
     }
 
@@ -5433,6 +5735,7 @@ struct VertexInput {{
     @location(0) position: vec2<f32>,
     @location(1) uv: vec2<f32>,
     @location(2) color: vec4<f32>,
+    @location(3) w_depth: f32,
 }}
 
 struct VertexOutput {{
@@ -5464,12 +5767,10 @@ fn vs_main(in: VertexInput) -> VertexOutput {{
         lurek.view_col2.xyz,
     );
     let cam_pos = view * vec3<f32>(in.position, 1.0);
-    out.clip_position = vec4<f32>(
-        (cam_pos.x / lurek.lurek_ScreenSize.x) * 2.0 - 1.0,
-        1.0 - (cam_pos.y / lurek.lurek_ScreenSize.y) * 2.0,
-        0.0,
-        1.0
-    );
+    let w = max(in.w_depth, 0.001);
+    let ndc_x = (cam_pos.x / lurek.lurek_ScreenSize.x) * 2.0 - 1.0;
+    let ndc_y = 1.0 - (cam_pos.y / lurek.lurek_ScreenSize.y) * 2.0;
+    out.clip_position = vec4<f32>(ndc_x * w, ndc_y * w, 0.0, w);
     out.color = in.color;
     out.uv = in.uv;
     return out;
@@ -5554,7 +5855,7 @@ fn create_render_pipeline(
                 buffers: &[wgpu::VertexBufferLayout {
                     array_stride: std::mem::size_of::<TexVertex>() as wgpu::BufferAddress,
                     step_mode: wgpu::VertexStepMode::Vertex,
-                    attributes: &wgpu::vertex_attr_array![0 => Float32x2, 1 => Float32x2, 2 => Float32x4],
+                    attributes: &wgpu::vertex_attr_array![0 => Float32x2, 1 => Float32x2, 2 => Float32x4, 3 => Float32],
                 }],
             },
             fragment: Some(wgpu::FragmentState {
@@ -5806,6 +6107,8 @@ fn push_tex_quad(
             position: [wx, wy],
             uv: [uv[i].0, uv[i].1],
             color: tint,
+            w_depth: 1.0,
+            _pad: [0.0; 3],
         });
     }
     ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);
@@ -5824,6 +6127,7 @@ fn push_tex_quad_corners(
     tint: [f32; 4],
     corners: &[crate::math::Vec2; 4],
     uvs: &[crate::math::Vec2; 4],
+    corner_w: &[f32; 4],
 ) {
     let base = tv.len() as u32;
     for i in 0..4 {
@@ -5832,6 +6136,8 @@ fn push_tex_quad_corners(
             position: [wx, wy],
             uv: [uvs[i].x, uvs[i].y],
             color: tint,
+            w_depth: corner_w[i].max(0.001),
+            _pad: [0.0; 3],
         });
     }
     ti.extend_from_slice(&[base, base + 1, base + 2, base, base + 2, base + 3]);

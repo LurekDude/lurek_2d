@@ -15,7 +15,8 @@ use super::{
     dataframe_api, debugbridge_api, devtools_api, docs_api, ecs_api, effect_api, engine_api,
     event_api, filesystem_api, globe_api, graph_api, html_api, i18n_api, image_api, input_api,
     light_api, log_api, math_api, minimap_api, mods_api, network_api, parallax_api, particle_api,
-    pathfind_api, patterns_api, physics_api, pipeline_api, procgen_api, raycaster_api, render_api,
+    pathfind_api, patterns_api, physics_api, pipeline_api, procgen_api, province_api,
+    raycaster_api, render_api,
     save_api, scene_api, serial_api, spine_api, sprite_api, system_api, terminal_api, thread_api,
     tilemap_api, timer_api, tween_api, ui_api, window_api,
 };
@@ -189,6 +190,11 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     // minimap: lurek.minimap
     if modules.minimap {
         minimap_api::register(&lua, &lurek, state.clone())?;
+    }
+
+    // province: lurek.province (engine-backed province registry)
+    if modules.image {
+        province_api::register(&lua, &lurek, state.clone())?;
     }
 
     // pathfind: lurek.pathfind

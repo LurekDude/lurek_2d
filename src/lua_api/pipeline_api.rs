@@ -1,4 +1,4 @@
-//! `lurek.pipeline` - DAG-based pipeline orchestrator for composing multi-step workflows.
+﻿//! `lurek.pipeline` - DAG-based pipeline orchestrator for composing multi-step workflows.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -26,6 +26,7 @@ pub struct LuaStep {
 
 impl LuaStep {
     // Creates a new [`LuaStep`] wrapping the given [`PipelineStep`].
+/// Auto-doc: public item.
     pub fn new(step: PipelineStep) -> Self {
         Self {
             inner: Rc::new(RefCell::new(step)),
@@ -36,6 +37,7 @@ impl LuaStep {
     }
 
     // Executes this step synchronously, handling retries and status transitions.
+/// Auto-doc: public item.
     pub(crate) fn execute_sync<'lua>(
         &self,
         lua: &'lua Lua,
@@ -374,6 +376,7 @@ pub struct LuaPipeline {
 
 impl LuaPipeline {
     // Creates a new [`LuaPipeline`] wrapping the given [`Pipeline`].
+/// Auto-doc: public item.
     pub fn new(pipeline: Pipeline) -> Self {
         Self {
             inner: Rc::new(RefCell::new(pipeline)),

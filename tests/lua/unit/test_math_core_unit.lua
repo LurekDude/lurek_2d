@@ -1,8 +1,7 @@
--- Lurek2D Math API Tests
+﻿-- Lurek2D Math API Tests
 
 -- @describe lurek.math constants
 describe("lurek.math constants", function()
-    -- @covers lurek.math.pi
     it("has pi", function()
         expect_not_nil(lurek.math.pi, "pi exists")
         expect_near(3.14159265358979, lurek.math.pi, 0.0001, "pi value")
@@ -16,7 +15,6 @@ describe("lurek.math trigonometry", function()
         expect_near(0, lurek.math.sin(0), 0.0001)
     end)
 
-    -- @covers lurek.math.pi
     -- @covers lurek.math.sin
     it("sin(pi/2) = 1", function()
         expect_near(1, lurek.math.sin(lurek.math.pi / 2), 0.0001)
@@ -28,7 +26,6 @@ describe("lurek.math trigonometry", function()
     end)
 
     -- @covers lurek.math.cos
-    -- @covers lurek.math.pi
     it("cos(pi) = -1", function()
         expect_near(-1, lurek.math.cos(lurek.math.pi), 0.0001)
     end)
@@ -39,7 +36,6 @@ describe("lurek.math trigonometry", function()
     end)
 
     -- @covers lurek.math.atan2
-    -- @covers lurek.math.pi
     it("atan2(1, 0) = pi/2", function()
         expect_near(lurek.math.pi / 2, lurek.math.atan2(1, 0), 0.0001)
     end)
@@ -204,8 +200,6 @@ end)
 
 -- @describe math constants and utility
 describe("math constants and utility", function()
-    -- @covers lurek.math.pi
-    -- @covers lurek.math.tau
     it("has tau = 2*pi", function()
         expect_near(lurek.math.tau, lurek.math.pi * 2, 0.0001)
     end)
@@ -2027,19 +2021,16 @@ end)
 
 -- @describe lurek.math scalar helpers
 describe("lurek.math scalar helpers ", function()
-    -- @covers lurek.math.pi
     -- @covers lurek.math.rad
     it("rad converts degrees to radians", function()
         expect_near(lurek.math.pi / 2, lurek.math.rad(90), 1e-5)
     end)
 
     -- @covers lurek.math.deg
-    -- @covers lurek.math.pi
     it("deg converts radians to degrees", function()
         expect_near(90.0, lurek.math.deg(lurek.math.pi / 2), 1e-4)
     end)
 
-    -- @covers lurek.math.pi
     -- @covers lurek.math.tan
     it("tan(pi/4) = 1", function()
         expect_near(1.0, lurek.math.tan(lurek.math.pi / 4), 1e-5)

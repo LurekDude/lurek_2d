@@ -11,25 +11,9 @@
 
 ## Summary
 
-## Summary
+The `timer` module is documented from the current source tree and existing module reference data.
 
-The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-event system. It is a Core Runtime tier module that owns two complementary types — `Clock` for frame pacing and elapsed-time tracking, and `Scheduler` for deferred and repeating callback execution — together with a thread-blocking `sleep` helper restricted to worker VMs.
-
-**Clock.** `Clock` is the frame-timer used by `App` to compute `dt` each frame. `Clock::tick()` measures wall-clock elapsed time since the last tick using `std::time::Instant`, clamps it to 0.1 s to prevent runaway physics on abnormally long frames (spiral-of-death protection), updates a smoothed FPS estimate using an exponential moving average over the last 60 frames, increments the frame counter, and accumulates total elapsed time. Accessors: `delta()` (current frame dt in seconds), `total()` (total accumulated time since creation), `fps()` (rolling FPS), `frame_count()` (total frame count since creation), `elapsed()` (live high-resolution elapsed time), `average_delta()` (average dt over last N frames, capped at 60). The clock does not apply time scale; time scale is applied at the `Scheduler` level.
-
-**Scheduler.** `Scheduler` manages three categories of deferred Lua callbacks. `after(delay_s, fn)` fires once after `delay_s` seconds have elapsed. `every(interval_s, fn)` fires repeatedly at every `interval_s` seconds until explicitly cancelled. `after_frames(n, fn)` fires after exactly `n` rendered frames have elapsed — frame-precise and unaffected by time scale changes or time pausing. `every_frames(n, fn)` fires every `n` frames repeatedly. Named variants (`after_named`, `every_named`) associate a string name with an event for cancel-by-name support. All callbacks execute synchronously on the main thread during `Scheduler::tick(dt)`, which advances all event timers by `dt * time_scale`. Lua errors from callbacks are caught and forwarded through the engine's Lua error channel rather than panicking. A cancellation handle (event ID) is returned from `after` and `every` for programmatic cancellation via `cancel(id)`. `cancel_named(name)` cancels by name. `cancel_all()` removes all pending events. `pause(id)` and `resume(id)` suspend and re-enable individual events without losing their accumulated time.
-
-**Time scale.** `Scheduler` has a `time_scale` multiplier that stretches or compresses perceived time for events without affecting the wall-clock `Clock`. Setting `time_scale` to 0.5 makes all time-based callbacks fire at half speed; 0.0 freezes all scheduled callbacks while the game loop continues rendering. Frame-based events ignore `time_scale` by design.
-
-**Physics step controls.** `setPhysicsMaxSteps(n)` configures the maximum number of rapier physics sub-steps the engine processes per frame. `getPhysicsMaxSteps()` retrieves the current cap. These are exposed on `lurek.timer` rather than `lurek.physics` because they govern how the physics step integrates with the frame timing budget, not the physics simulation parameters themselves. The default cap is 3.
-
-**Sleep.** `sleep(seconds)` calls `std::thread::sleep` and blocks the calling OS thread for the specified duration. It is intentionally available only within worker VM scripts launched via `lurek.thread`; calling it from the main VM blocks the engine's frame loop entirely and produces an error in debug builds.
-
-**ScheduledEvent model.** `ScheduledEvent` stores: callback function reference, accumulated remaining time, interval (if repeating), event ID, optional name, and a pause flag. `FrameEvent` is analogous but uses a remaining frame count rather than a time accumulator. The Scheduler holds two separate `Vec` collections for time events and frame events, advancing each independently each tick.
-
-**Lua surface.** Frame timing: `lurek.timer.dt()` → seconds, `lurek.timer.fps()` → float, `lurek.timer.elapsed()` → seconds, `lurek.timer.frame()` → integer. Scheduler: `lurek.timer.after(delay, fn)` → id, `lurek.timer.every(interval, fn)` → id, `lurek.timer.afterFrames(n, fn)` → id, `lurek.timer.everyFrames(n, fn)` → id, `lurek.timer.cancel(id)`, `lurek.timer.cancelNamed(name)`, `lurek.timer.cancelAll()`, `lurek.timer.pause(id)`, `lurek.timer.resume(id)`. Time scale: `lurek.timer.setTimeScale(f)`, `lurek.timer.getTimeScale()` → float. Physics: `lurek.timer.setPhysicsMaxSteps(n)`, `lurek.timer.getPhysicsMaxSteps()` → int. Worker only: `lurek.timer.sleep(seconds)`.
-
-**Scope boundary.** Core Runtime tier. Depends only on `runtime`. Lua bridge in `src/lua_api/timer_api.rs`.
+This module primarily collaborates with `runtime`. Its responsibility should stay inside the Core Runtime group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -91,51 +75,57 @@ The `timer` module provides Lurek2D's frame-timing infrastructure and scheduled-
 - Namespace: `lurek.timer`
 
 ### Module Functions
-- `lurek.timer.getDelta`: Returns the delta time in seconds for the current frame.
-- `lurek.timer.getFPS`: Returns the current frames-per-second measurement.
-- `lurek.timer.getTime`: Returns the total elapsed time since engine start in seconds.
-- `lurek.timer.getAverageDelta`: Returns the rolling-average frame delta time in seconds.
-- `lurek.timer.getFrameCount`: Returns the total number of frames rendered since engine start.
-- `lurek.timer.step`: Advances the timer by one frame, returning the delta time.
-- `lurek.timer.getMicroTime`: Returns the high-resolution elapsed time since engine start in seconds.
-- `lurek.timer.getPhysicsDelta`: Returns the fixed timestep used by `process_physics` callbacks (seconds).
-- `lurek.timer.setPhysicsDelta`: Sets the fixed timestep for `process_physics` callbacks (seconds).
-- `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics sub-steps allowed per frame.
-- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics sub-steps allowed per frame (clamped 1â€“64).
-- `lurek.timer.sleep`: Suspends execution for the given number of seconds.
-- `lurek.timer.newScheduler`: Creates a new independent Scheduler for managing timed callbacks.
-- `lurek.timer.chain`: Creates a new Scheduler loaded with a sequenced one-shot chain.
-- `lurek.timer.afterReal`: Schedules a one-shot callback that fires after `delay` wall-clock seconds,
-- `lurek.timer.tickRealTimers`: Advances all real-time timers by one tick; called automatically each frame.
-- `lurek.timer.setSmoothingFactor`: Sets the smoothing factor (alpha) for `getSmoothedDelta`. Must be in [0.01, 1.0].
-- `lurek.timer.getSmoothedDelta`: Returns the exponential moving-average of frame deltas in seconds.
+- `lurek.timer.getDelta`: Returns the time elapsed since the previous frame in seconds.
+- `lurek.timer.getFPS`: Returns the current instantaneous frames-per-second as measured by the engine clock.
+- `lurek.timer.getTime`: Returns the total wall-clock time that has elapsed since the engine was initialised, in seconds.
+- `lurek.timer.getAverageDelta`: Returns a rolling average of recent frame delta times in seconds.
+- `lurek.timer.getFrameCount`: Returns the total number of frames that have been rendered since the engine was initialised.
+- `lurek.timer.step`: Manually advances the engine timer by one frame tick and returns the resulting delta time.
+- `lurek.timer.getMicroTime`: Returns the high-resolution (microsecond-precision) elapsed time since engine start in seconds.
+- `lurek.timer.getPhysicsDelta`: Returns the fixed timestep interval used by the `process_physics` callback loop, in seconds.
+- `lurek.timer.setPhysicsDelta`: Sets the fixed timestep interval for the `process_physics` callback loop, in seconds.
+- `lurek.timer.getPhysicsMaxSteps`: Returns the maximum number of physics simulation sub-steps that the engine will perform in a single frame.
+- `lurek.timer.setPhysicsMaxSteps`: Sets the maximum number of physics simulation sub-steps allowed per frame.
+- `lurek.timer.sleep`: Blocks the current thread for the specified number of seconds using an OS-level sleep.
+- `lurek.timer.newScheduler`: Creates and returns a new independent Scheduler userdata object for managing timed and frame-based callbacks.
+- `lurek.timer.chain`: Creates a new Scheduler pre-loaded with a sequence of one-shot callbacks that fire in order with cumulative delays.
+- `lurek.timer.afterReal`: Schedules a one-shot callback that fires after `delay` wall-clock seconds, completely unaffected by the engine's time scale or pause state.
+- `lurek.timer.tickRealTimers`: Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
+- `lurek.timer.setSmoothingFactor`: Sets the exponential moving-average smoothing factor (alpha) used by `getSmoothedDelta`.
+- `lurek.timer.getSmoothedDelta`: Returns the exponentially smoothed frame delta time in seconds.
 - `lurek.timer.waitSeconds`: Yields the current Lua coroutine for at least `seconds` wall-clock seconds.
-- `lurek.timer.waitFrames`: Yields the current Lua coroutine for at least `frames` engine frames.
-- `lurek.timer.tickWaits`: Advances all `lurek.timer.wait()` coroutines by one tick; called each frame.
+- `lurek.timer.waitFrames`: Yields the current Lua coroutine until at least `frames` engine frames have elapsed.
+- `lurek.timer.tickWaits`: Resumes all coroutines waiting via `waitSeconds` or `waitFrames` whose deadline or frame target has been reached.
 
-### `Scheduler` Methods
-- `Scheduler:after`: Schedules a callback to fire once after a delay.
-- `Scheduler:afterFrames`: Schedules a callback to fire once after `n` frames.
-- `Scheduler:cancel`: Cancels a scheduled event by its numeric ID.
-- `Scheduler:cancelNamed`: Cancels a scheduled event by its string name.
-- `Scheduler:cancelAll`: Cancels all scheduled events and returns the count removed.
-- `Scheduler:pause`: Pauses a scheduled event by its ID.
-- `Scheduler:resume`: Resumes a paused event by its ID.
-- `Scheduler:isPaused`: Returns whether the given event is currently paused.
-- `Scheduler:pauseNamed`: Pauses a scheduled event by its string name.
-- `Scheduler:resumeNamed`: Resumes a paused event by its string name.
-- `Scheduler:isPausedNamed`: Returns whether the named event is currently paused.
-- `Scheduler:getRemaining`: Returns the seconds remaining until the next fire for an event, or nil.
-- `Scheduler:getInterval`: Returns the base interval in seconds for an event, or nil.
-- `Scheduler:getRepeatCount`: Returns the repeat count remaining for an event, or nil.
-- `Scheduler:getCount`: Returns the number of active scheduled events.
-- `Scheduler:isEmpty`: Returns whether the scheduler has no active events.
-- `Scheduler:setInterval`: Changes the repeat interval of an existing event.
-- `Scheduler:resetEvent`: Resets an event's remaining time back to its original interval.
-- `Scheduler:setTimeScale`: Sets a global time-scale multiplier for this scheduler.
-- `Scheduler:getTimeScale`: Returns the current time-scale multiplier.
-- `Scheduler:update`: Advances all timers by dt seconds, firing due callbacks.
-- `Scheduler:updateFrames`: Advances frame-based events by one frame, firing due callbacks.
+### `LScheduler` Methods
+- `LScheduler:after`: Schedules a callback to fire once after a delay.
+- `LScheduler:afterFrames`: Schedules a callback to fire once after `n` frames.
+- `LScheduler:afterNamed`: Schedules a named one-shot callback, replacing any existing event with the same name.
+- `LScheduler:every`: Schedules a callback to fire repeatedly at the given interval.
+- `LScheduler:everyFrames`: Schedules a callback to fire every `n` frames.
+- `LScheduler:everyNamed`: Schedules a named repeating callback, replacing any existing event with the same name.
+- `LScheduler:cancel`: Cancels a scheduled event by its numeric ID.
+- `LScheduler:cancelNamed`: Cancels and removes a previously scheduled event identified by its string name assigned via `afterNamed` or `everyNamed`.
+- `LScheduler:cancelAll`: Cancels all scheduled events and returns the count removed.
+- `LScheduler:pause`: Pauses a scheduled event by its ID.
+- `LScheduler:resume`: Resumes a paused event by its ID.
+- `LScheduler:isPaused`: Returns whether the given event is currently paused.
+- `LScheduler:pauseNamed`: Temporarily suspends the named scheduled event so it stops accumulating time.
+- `LScheduler:resumeNamed`: Resumes a previously paused named event so it continues accumulating time.
+- `LScheduler:isPausedNamed`: Checks whether the named scheduled event is currently in the paused state.
+- `LScheduler:getRemaining`: Returns whether the event exists and how many seconds remain until it fires next.
+- `LScheduler:getInterval`: Returns whether the event exists and its configured base interval in seconds.
+- `LScheduler:getRepeatCount`: Returns whether the event exists and its remaining repetition count.
+- `LScheduler:getCount`: Returns the total number of currently active (not yet completed or cancelled) events in this scheduler instance.
+- `LScheduler:isEmpty`: Returns true if this scheduler has zero active events.
+- `LScheduler:setInterval`: Modifies the repeat interval of an already-scheduled repeating event.
+- `LScheduler:resetEvent`: Resets the countdown for a scheduled event back to its full configured interval, as if it had just been created.
+- `LScheduler:setTimeScale`: Sets a time-scale multiplier that affects all events in this scheduler.
+- `LScheduler:getTimeScale`: Returns the current time-scale multiplier for this scheduler instance.
+- `LScheduler:update`: Advances all time-based events in this scheduler by `dt` seconds (scaled by the scheduler's time-scale multiplier).
+- `LScheduler:updateFrames`: Advances all frame-based events by one frame tick.
+- `LScheduler:type`: Returns the string type name of this userdata object.
+- `LScheduler:typeOf`: Checks whether this object matches the given type name.
 
 ## References
 

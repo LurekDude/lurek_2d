@@ -133,53 +133,69 @@ The `ecs` module provides Lurek2D's Entity-Component-System infrastructure — a
 ### Module Functions
 - `lurek.ecs.newUniverse`: Creates a new empty ECS universe.
 
-### `Universe` Methods
-- `Universe:spawn`: Creates a new entity and returns its packed ID.
-- `Universe:kill`: Destroys the entity with the given ID, freeing its slot for reuse.
-- `Universe:isAlive`: Returns true if the entity ID is currently alive.
-- `Universe:get`: Returns the component value for an entity, or nil if missing.
-- `Universe:has`: Returns true if the entity has the named component.
-- `Universe:remove`: Removes a component from an entity.
-- `Universe:getComponents`: Returns all component names for an entity.
-- `Universe:query`: Returns entity IDs that have all listed component names.
-- `Universe:getEntities`: Returns all alive entity IDs.
-- `Universe:getEntityCount`: Returns the number of alive entities.
-- `Universe:removeSystem`: Removes a system table from the universe.
-- `Universe:update`: Calls update(system, world, dt) on each registered system in priority order.
-- `Universe:render`: Calls render(system, world) on each registered system in priority order.
-- `Universe:emit`: Emits a named event to all systems that implement the handler, in priority order.
-- `Universe:getSystemCount`: Returns the number of registered systems.
-- `Universe:clear`: Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
-- `Universe:release`: Releases all universe state, equivalent to clear.
-- `Universe:addTag`: Attaches a string tag to an entity.
-- `Universe:removeTag`: Removes a string tag from an entity.
-- `Universe:hasTag`: Returns true if the entity carries the given tag.
-- `Universe:getTags`: Returns all string tags for an entity.
-- `Universe:getEntitiesByTag`: Returns all alive entities with the given string tag.
-- `Universe:setLayer`: Sets the layer for an entity.
-- `Universe:getLayer`: Returns the layer for an entity, defaulting to zero.
-- `Universe:getEntitiesByLayer`: Returns all alive entities on a specific layer.
-- `Universe:getEntitiesSorted`: Returns all alive entities sorted by layer then ID.
-- `Universe:defineTag`: Defines a bitmap tag name, returning its bit index.
-- `Universe:bitmapTag`: Adds a bitmap tag to an entity.
-- `Universe:bitmapUntag`: Removes a bitmap tag from an entity.
-- `Universe:hasBitmapTag`: Returns true if the entity has the given bitmap tag.
-- `Universe:queryBitmapTag`: Returns all alive entities with the given bitmap tag.
-- `Universe:queryBitmapAny`: Returns all alive entities with any of the listed bitmap tags.
-- `Universe:queryBitmapAll`: Returns all alive entities with all of the listed bitmap tags.
-- `Universe:getBitmapTagBit`: Returns the bit index for a bitmap tag name, or nil if undefined.
-- `Universe:hasBlueprint`: Returns true if a blueprint with the given name exists.
-- `Universe:removeBlueprint`: Removes a blueprint definition.
-- `Universe:listBlueprints`: Returns all defined blueprint names.
-- `Universe:getBlueprintComponents`: Returns a deep copy of a blueprint's component table, or nil.
-- `Universe:getParent`: Returns the parent entity ID, or nil if unparented.
-- `Universe:getChildren`: Returns all direct child entity IDs.
-- `Universe:killRecursive`: Kills an entity and all its descendants recursively.
-- `Universe:serialize`: Serializes all alive entities to a Lua table snapshot.
-- `Universe:deserialize`: Restores entity state from a snapshot produced by serialize().
-- `Universe:flushObservers`: Dispatches all pending component-add and component-remove events to registered callbacks.
-- `Universe:getRelated`: Returns all entity IDs reachable from `from` via the named relationship.
-- `Universe:clearRelations`: Removes all directed named relationships of type `name` from entity `from`.
+### `LUniverse` Methods
+- `LUniverse:spawn`: Creates a new entity and returns its packed ID.
+- `LUniverse:kill`: Destroys the entity with the given ID, freeing its slot for reuse.
+- `LUniverse:isAlive`: Returns true if the entity ID is currently alive.
+- `LUniverse:set`: Sets a component value on an entity.
+- `LUniverse:get`: Returns the component value for an entity, or nil if missing.
+- `LUniverse:has`: Returns true if the entity has the named component.
+- `LUniverse:remove`: Removes a component from an entity.
+- `LUniverse:getComponents`: Returns all component names for an entity.
+- `LUniverse:query`: Returns entity IDs that have all listed component names.
+- `LUniverse:each`: Calls callback(id, value) for every entity with the named component.
+- `LUniverse:getEntities`: Returns all alive entity IDs.
+- `LUniverse:getEntityCount`: Returns the number of alive entities.
+- `LUniverse:addSystem`: Adds a system table to the universe with an optional priority (lower = earlier).
+- `LUniverse:removeSystem`: Removes a system table from the universe.
+- `LUniverse:update`: Calls update(system, world, dt) on each registered system in priority order.
+- `LUniverse:render`: Calls render(system, world) on each system in priority order and falls back to draw(system, world).
+- `LUniverse:emit`: Emits a named event to all systems that implement the handler, in priority order.
+- `LUniverse:getSystemCount`: Returns the number of registered systems.
+- `LUniverse:clear`: Removes all entities, components, tags, layers, and systems. Blueprints are preserved.
+- `LUniverse:release`: Releases all universe state, equivalent to clear.
+- `LUniverse:addTag`: Attaches a string tag to an entity.
+- `LUniverse:removeTag`: Removes a string tag from an entity.
+- `LUniverse:hasTag`: Returns true if the entity carries the given tag.
+- `LUniverse:getTags`: Returns all string tags for an entity.
+- `LUniverse:getEntitiesByTag`: Returns all alive entities with the given string tag.
+- `LUniverse:setLayer`: Sets the layer for an entity.
+- `LUniverse:getLayer`: Returns the layer for an entity, defaulting to zero.
+- `LUniverse:getEntitiesByLayer`: Returns all alive entities on a specific layer.
+- `LUniverse:getEntitiesSorted`: Returns all alive entities sorted by layer then ID.
+- `LUniverse:defineTag`: Defines a bitmap tag name, returning its bit index.
+- `LUniverse:bitmapTag`: Adds a bitmap tag to an entity.
+- `LUniverse:bitmapUntag`: Removes a bitmap tag from an entity.
+- `LUniverse:hasBitmapTag`: Returns true if the entity has the given bitmap tag.
+- `LUniverse:queryBitmapTag`: Returns all alive entities with the given bitmap tag.
+- `LUniverse:queryBitmapAny`: Returns all alive entities with any of the listed bitmap tags.
+- `LUniverse:queryBitmapAll`: Returns all alive entities with all of the listed bitmap tags.
+- `LUniverse:getBitmapTagBit`: Returns the bit index for a bitmap tag name, or nil if undefined.
+- `LUniverse:defineBlueprint`: Defines a blueprint from a component table.
+- `LUniverse:extendBlueprint`: Defines a blueprint by extending a parent with overrides.
+- `LUniverse:spawnBlueprint`: Spawns an entity from a blueprint with optional overrides.
+- `LUniverse:hasBlueprint`: Returns true if a blueprint with the given name exists.
+- `LUniverse:removeBlueprint`: Removes a blueprint definition.
+- `LUniverse:listBlueprints`: Returns all defined blueprint names.
+- `LUniverse:getBlueprintComponents`: Returns a deep copy of a blueprint's component table, or nil.
+- `LUniverse:setParent`: Sets or clears the parent of an entity.
+- `LUniverse:getParent`: Returns the parent entity ID, or nil if unparented.
+- `LUniverse:getChildren`: Returns all direct child entity IDs.
+- `LUniverse:killRecursive`: Kills an entity and all its descendants recursively.
+- `LUniverse:queryNot`: Returns entity IDs that have all `with` components and none of the `without` components.
+- `LUniverse:serialize`: Serializes all alive entities to a Lua table snapshot.
+- `LUniverse:deserialize`: Restores entity state from a snapshot produced by serialize() while preserving blueprints and systems.
+- `LUniverse:onComponentAdded`: Registers a callback for component-added events that is dispatched by flushObservers().
+- `LUniverse:onComponentRemoved`: Registers a callback for component-removed events that is dispatched by flushObservers().
+- `LUniverse:flushObservers`: Dispatches all pending component-add and component-remove events to registered callbacks.
+- `LUniverse:spawnBulk`: Spawns `count` entities from a blueprint, returns an array of entity IDs.
+- `LUniverse:addRelation`: Adds a directed named relationship from entity `from` to entity `to`, ignoring duplicates.
+- `LUniverse:getRelated`: Returns all entity IDs reachable from `from` via the named relationship.
+- `LUniverse:removeRelation`: Removes the directed named relationship from entity `from` to entity `to`.
+- `LUniverse:clearRelations`: Removes all directed named relationships of type `name` from entity `from`.
+- `LUniverse:hasRelation`: Returns true if a directed named relationship from `from` to `to` exists.
+- `LUniverse:type`: Returns the type name of this object.
+- `LUniverse:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

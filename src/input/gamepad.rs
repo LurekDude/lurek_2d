@@ -11,8 +11,21 @@
 use crate::log_msg;
 use crate::runtime::log_messages::{GD01, GD02, GD03};
 use crate::runtime::EngineError;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io::{BufRead, Write};
+
+/// Haptic vibration request scheduled by Lua and consumed by the app loop.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct GamepadVibrationRequest {
+    /// Gamepad index used by the public Lua API.
+    pub id: usize,
+    /// Left/low-frequency motor intensity in `[0.0, 1.0]`.
+    pub low_freq: f32,
+    /// Right/high-frequency motor intensity in `[0.0, 1.0]`.
+    pub high_freq: f32,
+    /// Effect duration in milliseconds.
+    pub duration_ms: u32,
+}
 
 /// Holds the current button and axis state for a single gamepad identified by its id.
 ///
@@ -29,9 +42,15 @@ pub struct GamepadState {
     pub name: String,
     /// Whether this gamepad is currently connected.
     pub connected: bool,
+    /// Whether this gamepad supports force-feedback vibration.
+    pub vibration_supported: bool,
     guid: String,
     buttons: HashMap<u32, bool>,
+    buttons_pressed: HashSet<u32>,
+    buttons_released: HashSet<u32>,
     axes: HashMap<u32, f32>,
+    connected_this_frame: bool,
+    disconnected_this_frame: bool,
 }
 
 impl GamepadState {
@@ -47,11 +66,26 @@ impl GamepadState {
         GamepadState {
             id,
             name: String::from("Unknown Controller"),
-            connected: true,
+            connected: false,
+            vibration_supported: false,
             guid: String::new(),
             buttons: HashMap::new(),
+            buttons_pressed: HashSet::new(),
+            buttons_released: HashSet::new(),
             axes: HashMap::new(),
+            connected_this_frame: false,
+            disconnected_this_frame: false,
         }
+    }
+
+    /// Clears per-frame gamepad transitions.
+    ///
+    /// Call once at the start of each frame before polling gamepad events.
+    pub fn begin_frame(&mut self) {
+        self.buttons_pressed.clear();
+        self.buttons_released.clear();
+        self.connected_this_frame = false;
+        self.disconnected_this_frame = false;
     }
 
     /// Updates the pressed state for a specific button.
@@ -61,7 +95,24 @@ impl GamepadState {
     /// - `pressed` — `true` if the button is now held down; `false` if released.
     pub fn update_button(&mut self, button: u32, pressed: bool) {
         log_msg!(trace, GD02, "button={} pressed={}", button, pressed);
+        let was_pressed = self.is_button_pressed(button);
+        if !was_pressed && pressed {
+            self.buttons_pressed.insert(button);
+        }
+        if was_pressed && !pressed {
+            self.buttons_released.insert(button);
+        }
         self.buttons.insert(button, pressed);
+    }
+
+    /// Returns `true` if `button` was pressed this frame.
+    pub fn was_button_pressed(&self, button: u32) -> bool {
+        self.buttons_pressed.contains(&button)
+    }
+
+    /// Returns `true` if `button` was released this frame.
+    pub fn was_button_released(&self, button: u32) -> bool {
+        self.buttons_released.contains(&button)
     }
 
     /// Updates the value for a specific analog axis.
@@ -110,6 +161,37 @@ impl GamepadState {
     /// `bool`.
     pub fn is_connected(&self) -> bool {
         self.connected
+    }
+
+    /// Updates connection state and stores this-frame transitions.
+    pub fn set_connected(&mut self, connected: bool) {
+        if connected && !self.connected {
+            self.connected_this_frame = true;
+        }
+        if !connected && self.connected {
+            self.disconnected_this_frame = true;
+        }
+        self.connected = connected;
+    }
+
+    /// Returns whether this gamepad connected during the current frame.
+    pub fn was_connected_this_frame(&self) -> bool {
+        self.connected_this_frame
+    }
+
+    /// Returns whether this gamepad disconnected during the current frame.
+    pub fn was_disconnected_this_frame(&self) -> bool {
+        self.disconnected_this_frame
+    }
+
+    /// Sets whether the gamepad supports vibration.
+    pub fn set_vibration_supported(&mut self, supported: bool) {
+        self.vibration_supported = supported;
+    }
+
+    /// Returns whether force-feedback vibration is supported.
+    pub fn is_vibration_supported(&self) -> bool {
+        self.vibration_supported
     }
 
     /// Returns the number of distinct buttons that have been reported.
@@ -263,6 +345,25 @@ impl GamepadMappings {
         self.map.insert(guid.to_string(), mapping.to_string());
     }
 
+    /// Parses and inserts SDL2 GameControllerDB mappings from a plain text blob.
+    ///
+    /// Lines that are empty or start with `#` are skipped.
+    /// Returns the number of inserted mappings.
+    pub fn load_from_string(&mut self, source: &str) -> usize {
+        let mut count = 0usize;
+        for raw_line in source.lines() {
+            let trimmed = raw_line.trim();
+            if trimmed.is_empty() || trimmed.starts_with('#') {
+                continue;
+            }
+            if let Some(guid) = trimmed.split(',').next() {
+                self.map.insert(guid.to_string(), trimmed.to_string());
+                count += 1;
+            }
+        }
+        count
+    }
+
     /// Returns the mapping string for `guid`, or `None` if unknown.
     ///
     /// # Parameters
@@ -288,22 +389,15 @@ impl GamepadMappings {
         let file = std::fs::File::open(path)
             .map_err(|e| EngineError::FileSystemError(format!("Cannot open {}: {}", path, e)))?;
         let reader = std::io::BufReader::new(file);
-        let mut count = 0usize;
+        let mut content = String::new();
         for line in reader.lines() {
             let line = line.map_err(|e| {
                 EngineError::FileSystemError(format!("Read error in {}: {}", path, e))
             })?;
-            let trimmed = line.trim();
-            if trimmed.is_empty() || trimmed.starts_with('#') {
-                continue;
-            }
-            // Extract GUID (first comma-delimited field)
-            if let Some(guid) = trimmed.split(',').next() {
-                self.map.insert(guid.to_string(), trimmed.to_string());
-                count += 1;
-            }
+            content.push_str(&line);
+            content.push('\n');
         }
-        Ok(count)
+        Ok(self.load_from_string(&content))
     }
 
     /// Writes all stored mappings to a plain-text file, one per line.

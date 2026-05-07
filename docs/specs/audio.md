@@ -293,8 +293,8 @@ The `audio` module is Lurek2D's full-featured sound engine — a Platform Servic
 - Namespace: `lurek.audio`
 
 ### Module Functions
-- `lurek.audio.newSource`: Loads an audio file and returns a Source handle.
-- `lurek.audio.play`: Plays a source, with optional bus routing via options table.
+- `lurek.audio.newSource`: Loads an audio file and returns a source handle.
+- `lurek.audio.play`: Plays a source with optional bus routing.
 - `lurek.audio.stop`: Stops playback and resets seek position.
 - `lurek.audio.setVolume`: Sets source playback volume.
 - `lurek.audio.getVolume`: Returns the source volume.
@@ -348,7 +348,7 @@ The `audio` module is Lurek2D's full-featured sound engine — a Platform Servic
 - `lurek.audio.getDopplerScale`: Returns the current Doppler scale.
 - `lurek.audio.setDistanceModel`: Sets the distance attenuation model.
 - `lurek.audio.getDistanceModel`: Returns the current distance model name.
-- `lurek.audio.setMeter`: Sets the master peak meter level (0.0â€“1.0).
+- `lurek.audio.setMeter`: Sets the master peak meter level.
 - `lurek.audio.getMeter`: Returns the stored master peak meter level.
 - `lurek.audio.newMidiPlayer`: Creates a MIDI player, optionally loading a file.
 - `lurek.audio.newSoundData`: Creates a SoundData from a file or as a silent buffer.
@@ -369,11 +369,11 @@ The `audio` module is Lurek2D's full-featured sound engine — a Platform Servic
 - `lurek.audio.add_effect`: Adds a DSP effect to a bus.
 - `lurek.audio.remove_effect`: Removes a DSP effect from a bus.
 - `lurek.audio.set_effect_param`: Sets a parameter on a DSP effect.
-- `lurek.audio.newSineWave`: Generate a mono sine-wave SoundData buffer.
-- `lurek.audio.newSquareWave`: Generate a mono square-wave SoundData buffer.
-- `lurek.audio.newSawtoothWave`: Generate a mono sawtooth-wave SoundData buffer.
-- `lurek.audio.newTriangleWave`: Generate a mono triangle-wave SoundData buffer.
-- `lurek.audio.newWhiteNoise`: Generate a reproducible white-noise SoundData buffer.
+- `lurek.audio.newSineWave`: Generates a mono sine-wave SoundData buffer.
+- `lurek.audio.newSquareWave`: Generates a mono square-wave SoundData buffer.
+- `lurek.audio.newSawtoothWave`: Generates a mono sawtooth-wave SoundData buffer.
+- `lurek.audio.newTriangleWave`: Generates a mono triangle-wave SoundData buffer.
+- `lurek.audio.newWhiteNoise`: Generates a reproducible white-noise SoundData buffer.
 - `lurek.audio.applyLowpass`: Applies a first-order IIR low-pass filter to a SoundData in-place.
 - `lurek.audio.applyHighpass`: Applies a first-order IIR high-pass filter to a SoundData in-place.
 - `lurek.audio.applyBandpass`: Applies a bandpass filter (high-pass then low-pass) to a SoundData in-place.
@@ -393,130 +393,137 @@ The `audio` module is Lurek2D's full-featured sound engine — a Platform Servic
 - `lurek.audio.waveformToPng`: Renders the waveform of a WAV file to a PNG image.
 - `lurek.audio.spectrogramToPng`: Renders a time-frequency spectrogram of a WAV file to a PNG image.
 
-### `Bus` Methods
-- `Bus:getName`: Returns the unique name string assigned to this audio bus.
-- `Bus:setVolume`: Sets the volume for all sources on this bus.
-- `Bus:getVolume`: Returns the current volume multiplier applied to all sources on this bus.
-- `Bus:setPitch`: Sets the pitch multiplier for all sources on this bus.
-- `Bus:getPitch`: Returns the bus pitch multiplier.
-- `Bus:pause`: Pauses all sources on this bus.
-- `Bus:resume`: Resumes all sources on this bus.
-- `Bus:isPaused`: Returns true if this bus is paused.
-- `Bus:type`: Returns the type name of this object.
-- `Bus:typeOf`: Returns true if this object is of the given type.
-- `Bus:clearDuck`: Removes the ducking target from this bus, restoring the target bus
-- `Bus:getPeak`: Returns the average peak amplitude of all sources currently on this bus.
+### `LBus` Methods
+- `LBus:getName`: Returns the unique name string assigned to this audio bus.
+- `LBus:setVolume`: Sets the volume for all sources on this bus.
+- `LBus:getVolume`: Returns the current volume multiplier applied to all sources on this bus.
+- `LBus:setPitch`: Sets the pitch multiplier for all sources on this bus.
+- `LBus:getPitch`: Returns the bus pitch multiplier.
+- `LBus:pause`: Pauses all sources on this bus.
+- `LBus:resume`: Resumes all sources on this bus.
+- `LBus:isPaused`: Returns true if this bus is paused.
+- `LBus:type`: Returns the type name of this object.
+- `LBus:typeOf`: Returns true if this object is of the given type.
+- `LBus:setDuckTarget`: Configures this bus to duck another bus while it has active sources.
+- `LBus:clearDuck`: Removes the ducking target from this bus.
+- `LBus:getPeak`: Returns the average peak amplitude of all sources on this bus.
 
-### `Decoder` Methods
-- `Decoder:decode`: Decodes the next chunk of samples, or nil at EOF.
-- `Decoder:getChannelCount`: Returns the number of audio channels.
-- `Decoder:getBitDepth`: Returns the per-sample bit depth of this decoded audio stream.
-- `Decoder:getSampleRate`: Returns the sample rate in Hz.
-- `Decoder:getDuration`: Returns the total duration in seconds.
-- `Decoder:seek`: Seeks to a time offset in seconds.
-- `Decoder:rewind`: Rewinds to the beginning.
-- `Decoder:tell`: Returns the current position in seconds.
-- `Decoder:isSeekable`: Returns true if seeking is supported.
-- `Decoder:release`: Releases the decoder (no-op).
+### `LDecoder` Methods
+- `LDecoder:decode`: Decodes the next chunk of samples, or nil at EOF.
+- `LDecoder:getChannelCount`: Returns the number of audio channels.
+- `LDecoder:getBitDepth`: Returns the per-sample bit depth of this decoded audio stream.
+- `LDecoder:getSampleRate`: Returns the sample rate in Hz.
+- `LDecoder:getDuration`: Returns the total duration in seconds.
+- `LDecoder:seek`: Seeks to a time offset in seconds.
+- `LDecoder:rewind`: Rewinds to the beginning.
+- `LDecoder:tell`: Returns the current position in seconds.
+- `LDecoder:isSeekable`: Returns true if seeking is supported.
+- `LDecoder:release`: Releases the decoder (no-op).
+- `LDecoder:type`: Returns the type name of this object.
+- `LDecoder:typeOf`: Returns true if this object is of the given type.
 
-### `MidiPlayer` Methods
-- `MidiPlayer:load`: Loads a MIDI file from the given path.
-- `MidiPlayer:loadData`: Loads MIDI data from a Lua string.
-- `MidiPlayer:isLoaded`: Returns true if a MIDI sequence is loaded.
-- `MidiPlayer:getFilePath`: Returns the file path of the loaded MIDI, or nil.
-- `MidiPlayer:setSoundFont`: Loads a SoundFont file into this player (stub).
-- `MidiPlayer:getSoundFontPath`: Returns the SoundFont file path, or nil (stub).
-- `MidiPlayer:useDefaultSoundFont`: Reverts to the built-in default SoundFont (stub).
-- `MidiPlayer:play`: Starts or resumes MIDI sequence playback from the current position.
-- `MidiPlayer:pause`: Pauses the MIDI sequence at the current position; resume with `play()`.
-- `MidiPlayer:stop`: Stops MIDI playback and resets the playhead to the beginning.
-- `MidiPlayer:isPlaying`: Returns true if MIDI is currently playing.
-- `MidiPlayer:isPaused`: Returns true if MIDI playback is paused.
-- `MidiPlayer:seek`: Seeks to a time position in seconds.
-- `MidiPlayer:tell`: Returns the current playback position in seconds.
-- `MidiPlayer:getDuration`: Returns the total MIDI duration in seconds.
-- `MidiPlayer:setLooping`: Enables or disables looping.
-- `MidiPlayer:isLooping`: Returns true if looping is enabled.
-- `MidiPlayer:setVolume`: Sets MIDI playback volume.
-- `MidiPlayer:getVolume`: Returns the current MIDI volume.
-- `MidiPlayer:setBus`: Routes MIDI output through a bus (or nil to clear).
-- `MidiPlayer:getBus`: Returns the assigned bus, or nil.
-- `MidiPlayer:setTempo`: Sets playback tempo in BPM.
-- `MidiPlayer:getTempo`: Returns the current tempo in BPM.
-- `MidiPlayer:getOriginalTempo`: Returns the original MIDI file tempo in BPM.
-- `MidiPlayer:setTempoScale`: Sets the tempo scale factor (1.0 = original speed).
-- `MidiPlayer:getTempoScale`: Returns the current tempo scale factor.
-- `MidiPlayer:getTicksPerBeat`: Returns the PPQ resolution from the MIDI header.
-- `MidiPlayer:setChannelVolume`: Sets volume for a MIDI channel (1-indexed).
-- `MidiPlayer:getChannelVolume`: Returns the volume for a MIDI channel (1-indexed).
-- `MidiPlayer:setChannelMuted`: Mutes or unmutes a MIDI channel (1-indexed).
-- `MidiPlayer:isChannelMuted`: Returns true if a MIDI channel is muted (1-indexed).
-- `MidiPlayer:getChannelInstrument`: Returns the GM instrument for a MIDI channel (1-indexed).
-- `MidiPlayer:getChannelCount`: Returns the number of MIDI channels.
-- `MidiPlayer:soloChannel`: Solos a MIDI channel (1-indexed).
-- `MidiPlayer:unsoloAll`: Clears solo on all channels.
-- `MidiPlayer:getTrackCount`: Returns the number of tracks in the MIDI sequence.
-- `MidiPlayer:getTrackName`: Returns the name of a MIDI track (1-indexed), or nil.
-- `MidiPlayer:setTrackMuted`: Mutes or unmutes a track (1-indexed).
-- `MidiPlayer:isTrackMuted`: Returns true if a track is muted (1-indexed).
-- `MidiPlayer:getNoteCount`: Returns the total note count in the MIDI sequence.
-- `MidiPlayer:setOnNoteOn`: Registers a note-on callback (stub).
-- `MidiPlayer:setOnNoteOff`: Registers a note-off callback (stub).
-- `MidiPlayer:setOnEnd`: Registers a playback-end callback (stub).
-- `MidiPlayer:getSampleRate`: Returns the PCM output sample rate in Hz.
-- `MidiPlayer:setSampleRate`: Sets the PCM output sample rate in Hz (clamped 8000â€“192000).
-- `MidiPlayer:getChannels`: Returns the PCM output channel count (1 = mono, 2 = stereo).
-- `MidiPlayer:setChannels`: Sets the PCM output channel count (clamped 1â€“2).
-- `MidiPlayer:type`: Returns the type name of this object.
-- `MidiPlayer:typeOf`: Returns true if this object is of the given type.
+### `LMidiPlayer` Methods
+- `LMidiPlayer:load`: Loads a MIDI file from the given path.
+- `LMidiPlayer:loadData`: Loads MIDI data from a Lua string.
+- `LMidiPlayer:isLoaded`: Returns true if a MIDI sequence is loaded.
+- `LMidiPlayer:getFilePath`: Returns the file path of the loaded MIDI, or nil.
+- `LMidiPlayer:setSoundFont`: Loads a SoundFont file into this player (stub).
+- `LMidiPlayer:getSoundFontPath`: Returns the SoundFont file path, or nil (stub).
+- `LMidiPlayer:useDefaultSoundFont`: Reverts to the built-in default SoundFont (stub).
+- `LMidiPlayer:play`: Starts or resumes MIDI sequence playback from the current position.
+- `LMidiPlayer:pause`: Pauses the MIDI sequence at the current position; resume with `play()`.
+- `LMidiPlayer:stop`: Stops MIDI playback and resets the playhead to the beginning.
+- `LMidiPlayer:isPlaying`: Returns true if MIDI is currently playing.
+- `LMidiPlayer:isPaused`: Returns true if MIDI playback is paused.
+- `LMidiPlayer:seek`: Seeks to a time position in seconds.
+- `LMidiPlayer:tell`: Returns the current playback position in seconds.
+- `LMidiPlayer:getDuration`: Returns the total MIDI duration in seconds.
+- `LMidiPlayer:setLooping`: Enables or disables looping.
+- `LMidiPlayer:isLooping`: Returns true if looping is enabled.
+- `LMidiPlayer:setVolume`: Sets MIDI playback volume.
+- `LMidiPlayer:getVolume`: Returns the current MIDI volume.
+- `LMidiPlayer:setBus`: Routes MIDI output through a bus (or nil to clear).
+- `LMidiPlayer:getBus`: Returns the assigned bus, or nil.
+- `LMidiPlayer:setTempo`: Sets playback tempo in BPM.
+- `LMidiPlayer:getTempo`: Returns the current tempo in BPM.
+- `LMidiPlayer:getOriginalTempo`: Returns the original MIDI file tempo in BPM.
+- `LMidiPlayer:setTempoScale`: Sets the tempo scale factor (1.0 = original speed).
+- `LMidiPlayer:getTempoScale`: Returns the current tempo scale factor.
+- `LMidiPlayer:getTicksPerBeat`: Returns the PPQ resolution from the MIDI header.
+- `LMidiPlayer:setChannelVolume`: Sets volume for a MIDI channel (1-indexed).
+- `LMidiPlayer:getChannelVolume`: Returns the volume for a MIDI channel (1-indexed).
+- `LMidiPlayer:setChannelMuted`: Mutes or unmutes a MIDI channel (1-indexed).
+- `LMidiPlayer:isChannelMuted`: Returns true if a MIDI channel is muted (1-indexed).
+- `LMidiPlayer:setChannelInstrument`: Sets the GM instrument for a MIDI channel (1-indexed).
+- `LMidiPlayer:getChannelInstrument`: Returns the GM instrument for a MIDI channel (1-indexed).
+- `LMidiPlayer:getChannelCount`: Returns the number of MIDI channels.
+- `LMidiPlayer:soloChannel`: Solos a MIDI channel (1-indexed).
+- `LMidiPlayer:unsoloAll`: Clears solo on all channels.
+- `LMidiPlayer:getTrackCount`: Returns the number of tracks in the MIDI sequence.
+- `LMidiPlayer:getTrackName`: Returns the name of a MIDI track (1-indexed), or nil.
+- `LMidiPlayer:setTrackMuted`: Mutes or unmutes a track (1-indexed).
+- `LMidiPlayer:isTrackMuted`: Returns true if a track is muted (1-indexed).
+- `LMidiPlayer:getNoteCount`: Returns the total note count in the MIDI sequence.
+- `LMidiPlayer:setOnNoteOn`: Registers a note-on callback (stub).
+- `LMidiPlayer:setOnNoteOff`: Registers a note-off callback (stub).
+- `LMidiPlayer:setOnEnd`: Registers a playback-end callback (stub).
+- `LMidiPlayer:getSampleRate`: Returns the PCM output sample rate in Hz.
+- `LMidiPlayer:setSampleRate`: Sets the PCM output sample rate in Hz (clamped 8000-192000).
+- `LMidiPlayer:getChannels`: Returns the PCM output channel count (1 = mono, 2 = stereo).
+- `LMidiPlayer:setChannels`: Sets the PCM output channel count (clamped 1-2).
+- `LMidiPlayer:type`: Returns the type name of this object.
+- `LMidiPlayer:typeOf`: Returns true if this object is of the given type.
 
-### `SoundPool` Methods
-- `SoundPool:play`: Plays the next available voice and returns its SoundKey as an integer.
-- `SoundPool:stopAll`: Stops all voices in this pool.
-- `SoundPool:setVolume`: Sets the volume for all voices in this pool.
-- `SoundPool:setBus`: Routes all voices through the named bus.
-- `SoundPool:release`: Releases all voices from the mixer and invalidates this pool.
-- `SoundPool:getVoiceCount`: Returns the total number of voices in this pool.
-- `SoundPool:type`: Returns the type name of this object.
-- `SoundPool:typeOf`: Returns true if the type name matches.
+### `LSoundData` Methods
+- `LSoundData:getSampleCount`: Get the total number of samples.
+- `LSoundData:getSampleRate`: Returns the sample rate of this audio buffer in Hz (e.g. 44100 or 48000).
+- `LSoundData:getChannelCount`: Get the number of channels.
+- `LSoundData:getDuration`: Get the audio duration in seconds.
+- `LSoundData:getBitDepth`: Returns the bit depth of this audio buffer (typically 16 or 32 bits per sample).
+- `LSoundData:getSample`: Get a specific sample by index.
+- `LSoundData:drawWaveform`: Draws the waveform onto an ImageData buffer.
+- `LSoundData:setSample`: Set a specific sample by index.
 
-### `Source` Methods
-- `Source:play`: Starts or resumes playback.
-- `Source:stop`: Stops playback and resets seek position.
-- `Source:pause`: Pauses playback at the current position.
-- `Source:resume`: Resumes playback from the paused position.
-- `Source:setVolume`: Sets playback volume (0.0 = silent, 1.0 = full).
-- `Source:getVolume`: Returns the current volume multiplier.
-- `Source:setPitch`: Sets the pitch multiplier (1.0 = normal).
-- `Source:getPitch`: Returns the current pitch multiplier.
-- `Source:setLooping`: Enables or disables looping playback.
-- `Source:isLooping`: Returns true if looping is enabled.
-- `Source:isPlaying`: Returns true if currently playing.
-- `Source:isPaused`: Returns true if playback is paused.
-- `Source:isStopped`: Returns true if playback has stopped.
-- `Source:setPan`: Sets stereo panning (-1.0 left to 1.0 right).
-- `Source:getPan`: Returns the current stereo panning value.
-- `Source:clone`: Creates an independent copy of this source.
-- `Source:getType`: Returns the source type ("static" or "stream").
-- `Source:getDuration`: Returns the total duration in seconds.
-- `Source:tell`: Returns the current playback position in seconds.
-- `Source:seek`: Seeks to a time position in seconds.
-- `Source:setLowpass`: Applies a low-pass filter at the given cutoff frequency.
-- `Source:setHighpass`: Applies a high-pass filter at the given cutoff frequency.
-- `Source:getLowpass`: Returns the low-pass filter cutoff frequency.
-- `Source:getHighpass`: Returns the high-pass filter cutoff frequency.
-- `Source:clearFilter`: Removes any active filter from this source.
-- `Source:fadeIn`: Fades in from silence over the given duration in seconds.
-- `Source:getFadeIn`: Returns the current fade-in duration in seconds.
+### `LSoundPool` Methods
+- `LSoundPool:play`: Plays the next available voice and returns its SoundKey as an integer.
+- `LSoundPool:stopAll`: Stops all voices in this pool.
+- `LSoundPool:setVolume`: Sets the volume for all voices in this pool.
+- `LSoundPool:setBus`: Routes all voices through the named bus.
+- `LSoundPool:release`: Releases all voices from the mixer and invalidates this pool.
+- `LSoundPool:getVoiceCount`: Returns the total number of voices in this pool.
+- `LSoundPool:type`: Returns the type name of this object.
+- `LSoundPool:typeOf`: Returns true if the type name matches.
 
-### `mlua` Methods
-- `mlua:getSampleCount`: Get the total number of samples.
-- `mlua:getSampleRate`: Get the sample rate.
-- `mlua:getChannelCount`: Get the number of channels.
-- `mlua:getDuration`: Get the audio duration in seconds.
-- `mlua:getBitDepth`: Get the bit depth.
-- `mlua:getSample`: Get a specific sample by index.
-- `mlua:setSample`: Set a specific sample by index.
+### `LSource` Methods
+- `LSource:play`: Starts or resumes playback.
+- `LSource:stop`: Stops playback and resets seek position.
+- `LSource:pause`: Pauses playback at the current position.
+- `LSource:resume`: Resumes playback from the paused position.
+- `LSource:setVolume`: Sets playback volume (0.0 = silent, 1.0 = full).
+- `LSource:getVolume`: Returns the current volume multiplier.
+- `LSource:setPitch`: Sets the pitch multiplier (1.0 = normal).
+- `LSource:getPitch`: Returns the current pitch multiplier.
+- `LSource:setLooping`: Enables or disables looping playback.
+- `LSource:isLooping`: Returns true if looping is enabled.
+- `LSource:isPlaying`: Returns true if currently playing.
+- `LSource:isPaused`: Returns true if playback is paused.
+- `LSource:isStopped`: Returns true if playback has stopped.
+- `LSource:setPan`: Sets stereo panning (-1.0 left to 1.0 right).
+- `LSource:getPan`: Returns the current stereo panning value.
+- `LSource:clone`: Creates an independent copy of this source.
+- `LSource:getType`: Returns the source type ("static" or "stream").
+- `LSource:getDuration`: Returns the total duration in seconds.
+- `LSource:tell`: Returns the current playback position in seconds.
+- `LSource:seek`: Seeks to a time position in seconds.
+- `LSource:setLowpass`: Applies a low-pass filter at the given cutoff frequency.
+- `LSource:setHighpass`: Applies a high-pass filter at the given cutoff frequency.
+- `LSource:getLowpass`: Returns the low-pass filter cutoff frequency.
+- `LSource:getHighpass`: Returns the high-pass filter cutoff frequency.
+- `LSource:clearFilter`: Removes any active filter from this source.
+- `LSource:fadeIn`: Fades in from silence over the given duration in seconds.
+- `LSource:getFadeIn`: Returns the current fade-in duration in seconds.
+- `LSource:type`: Returns the type name of this object.
+- `LSource:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

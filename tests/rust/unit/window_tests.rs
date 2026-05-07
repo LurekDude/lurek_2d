@@ -214,6 +214,20 @@ mod management_tests {
         assert_eq!(ws.pending_position, Some((200, 100)));
     }
 
+    #[test]
+    fn set_display_stores_pending_index() {
+        let mut ws = make_ws();
+        assert!(set_display(&mut ws, 2));
+        assert_eq!(ws.pending_display_index, Some(2));
+    }
+
+    #[test]
+    fn set_display_rejects_negative_index() {
+        let mut ws = make_ws();
+        assert!(!set_display(&mut ws, -1));
+        assert_eq!(ws.pending_display_index, None);
+    }
+
     // --- Size ---
 
     #[test]
@@ -297,6 +311,13 @@ mod management_tests {
     fn request_attention_sets_pending() {
         let mut ws = make_ws();
         request_attention(&mut ws);
+        assert!(ws.pending_attention);
+    }
+
+    #[test]
+    fn flash_sets_pending_attention() {
+        let mut ws = make_ws();
+        flash(&mut ws);
         assert!(ws.pending_attention);
     }
 

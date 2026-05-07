@@ -11,23 +11,9 @@
 
 ## Summary
 
-## Summary
+The `runtime` module is documented from the current source tree and existing module reference data.
 
-The `runtime` module is the foundational layer of Lurek2D — every other Rust module imports from it. It provides central shared state, engine configuration, the error type hierarchy, resource key types, and the structured log message catalog. This module has no upstream Lurek2D dependencies; it is the dependency tree's root.
-
-**SharedState.** `SharedState` is the engine's central mutable context, passed as `Rc<RefCell<SharedState>>` to every subsystem and Lua binding. It carries: the `EventQueue` for the current frame; all input state objects (`KeyboardState`, `MouseState`, `GamepadState`, `TouchState`); the active `Camera` and `LightWorld`; audio `Mixer`; `Clock`; `GameFS`; `GuiContext`; active `ParticleSystem` and `TileMap` slot maps; and the pending `Vec<RenderCommand>` for the frame. `SharedState` also holds the drop queue: a `Vec<DropRequest>` that defers SlotMap resource cleanup to the start of the next frame, preventing use-after-free from GC-finalised Lua UserData objects.
-
-**WindowState.** Tracks window dimensions, fullscreen mode (`FullscreenType`: Borderless or Exclusive), DPI scale factor, and pending window-management commands (resize, set title, toggle fullscreen). Commands are deferred to the `winit` event loop after the Lua frame completes. `RendererStats` carries per-frame draw call counts, batch merge counts, GPU command buffer sizes, and frame time.
-
-**Config.** `Config` is loaded from `conf.toml` at boot. Nested structs: `WindowConfig` (width, height, title, vsync, fullscreen, resizable), `RenderConfig` (backend hint, power preference), `PerformanceConfig` (fps_cap, physics_tick_rate, fixed_update_tick_rate, frame_budget_warn_ms). `ModulesConfig` holds per-module feature flags that gate which `lurek.*` sub-APIs are registered in the VM. `ModulesConfig::validate_and_fix()` enforces dependency constraints — e.g. `minimap` requires `graphics`, `physics_debug` requires `physics` — ensuring a partially disabled config is never internally inconsistent. Unrecognised TOML keys produce warnings but not errors, enabling forward-compatible config files.
-
-**EngineError.** A flat enum with a `ErrorCategory` discriminant and a stable four-digit error code per variant covering: config parse failures, filesystem errors, Lua runtime errors, rendering device loss, audio device errors, physics errors, and resource limit violations. Each variant carries a human-readable description and a recovery hint. `EngineResult<T>` is `Result<T, EngineError>` — the global return type alias used across all modules. `ErrorSnapshot` is a serialisable struct used for test assertions and telemetry.
-
-**Resource keys.** All resource pools use `slotmap::DefaultKey` wrapped in newtyped structs to prevent accidental cross-pool key misuse: `TextureKey`, `FontKey`, `ShaderKey`, `MeshKey`, `CanvasKey`, `SpriteBatchKey`, `ParticleKey`, `SoundKey`, `BusKey`, `MidiPlayerKey`, `QueueableKey`, `LightKey`, `OccluderKey`, and `ShapeKey`. Newtype wrappers ensure that a `SoundKey` cannot be passed where a `TextureKey` is expected. All resource allocations return these keys; Lua UserData wraps only the key, never a raw reference.
-
-**Log messages.** `log_messages.rs` defines stable four-character log message codes (e.g. `FSOP`, `LUAE`, `WGPU`). `MessageCatalog` in `messages.rs` is an immutable TOML-backed map from code to human-readable description and severity. These codes appear in `RUST_LOG` output, enabling scripts and CI pipelines to grep for specific engine events without parsing free-form text.
-
-**Scope boundary.** Foundations tier. Imports only from external crates (`slotmap`, `log`, `serde`, `toml`, `winit`, `wgpu` surface types). Every other Lurek2D module imports from `runtime`. No `lurek.*` Lua API surface — this module has no Lua binding file; it is visible to scripts only indirectly through the state and config objects it provides.
+This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`, `input`, `light`, `parallax`, `particle`, and adjacent engine modules. Its responsibility should stay inside the Core Runtime group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -119,6 +105,7 @@ The `runtime` module is the foundational layer of Lurek2D — every other Rust m
 - `light`: Imports or references `light` from `src/light/`.
 - `parallax`: Imports or references `parallax` from `src/parallax/`.
 - `particle`: Imports or references `particle` from `src/particle/`.
+- `province`: Imports or references `src/province/`. Cross-group dependency from `Core Runtime` into `Edge/Integration`.
 - `raycaster`: Imports or references `raycaster` from `src/raycaster/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `sprite`: Imports or references `sprite` from `src/sprite/`.

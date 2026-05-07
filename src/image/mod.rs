@@ -42,8 +42,8 @@ pub mod texture;
 /// Atlas of named sub-regions within a single texture.
 pub mod texture_atlas;
 
-pub use texture::Texture;
-pub use texture_atlas::TextureAtlas;
+pub use texture::{Texture, TextureColorSpace};
+pub use texture_atlas::{NineSliceInsets, TextureAtlas};
 
 /// Province pixel grid: O(1) coordinate lookup and single-pass adjacency detection.
 pub mod province_grid;

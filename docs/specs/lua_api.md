@@ -11,25 +11,9 @@
 
 ## Summary
 
-## Summary
+The `lua_api` module is documented from the current source tree and existing module reference data.
 
-The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integration tier that connects every `lurek.*` Lua namespace to its Rust domain module. Its single responsibility is binding: collecting all sub-module registration functions, creating the `lurek` global table, sandboxing the VM environment, and gating optional modules through `ModulesConfig`. Nothing in the engine may import from `lua_api`; all traffic flows outward from this module to domain modules, never inward.
-
-**VM bootstrap.** `create_lua_vm(state, modules)` constructs a fresh LuaJIT VM (or Lua 5.4 with the `lua54` Cargo feature), opens only the safe standard libraries (`math`, `string`, `table`, restricted `io`), creates the `lurek` global table, and strips dangerous stdlib functions from the sandbox: `load`, `loadfile`, `dofile`, `debug`, `os.execute`, `os.getenv`, `io.open`, `io.popen`. This prevents game scripts from executing arbitrary system commands or escaping the GameFS sandbox. The Lua standard `require` function is replaced with a custom implementation that routes through `GameFS`, so scripts cannot load arbitrary Lua files outside the game directory.
-
-**Module registration.** Each of the approximately 45 sub-API files under `src/lua_api/` exports a `pub fn register(lua, lurek, state)` function. `create_lua_vm` calls these in sequence, each adding a named sub-table to the `lurek` global. The mandatory group — `event`, `timer`, `math`, `log` — is always registered regardless of `ModulesConfig`. Optional modules (render, physics, audio, input, filesystem, and all feature-tier modules) are skipped when the corresponding `ModulesConfig` flag is false, enabling headless server builds with `lurek.thread` and `lurek.serial` but without a GPU or audio device.
-
-**Thin Wrapper Rule (TST-03).** Every file in `src/lua_api/` strictly follows the Thin Wrapper Rule. Each file contains only: a `pub fn register()` function, Lua wrapper structs, and `impl LuaUserData` blocks with `add_method` / `add_method_mut` calls. All domain logic lives in `src/<module>/` pure-Rust code. No business logic, no non-trivial computation, no state manipulation other than passing arguments to domain functions and returning their results. `lua_types.rs` provides the `LunaType` trait and `add_type_methods` helper for consistent `UserData` type metadata and method registration patterns across the entire bridge layer, ensuring uniform behaviour for type-name queries and type-checking from Lua.
-
-**State sharing.** `SharedState` and `WindowState` from `crate::runtime` are re-exported through this module so sub-API registration code imports from `lua_api` rather than directly from `runtime`. This indirection ensures `lua_api` is the single import bottleneck for the bridge layer and makes the compile-time dependency graph manageable. Resource keys (SlotMap IDs for textures, sounds, fonts, physics bodies, etc.) are passed to Lua as opaque UserData objects holding only the key — never raw pointers or references — preventing lifetime issues across the Rust/Lua boundary. A key UserData's `Drop` impl schedules cleanup via the SharedState drop queue rather than attempting to free the resource from an arbitrary Lua GC finaliser context.
-
-**Error handling.** All bridge methods catch Rust `EngineError` and convert to Lua runtime errors via `mlua::Error::RuntimeError`. Methods that return optional values (e.g. resource not found) return Lua `nil` rather than an error to match idiomatic Lua conventions. Panics are not allowed to cross the Rust/Lua boundary — any `panic!`-reachable code in domain modules must be converted to `Result` before being exposed.
-
-**Security gates.** The sandbox strips the global `_G` access table, replaces `pcall`/`xpcall` with wrappers that prevent catching certain security errors, and limits string pattern complexity to resist algorithmic complexity attacks in string operations. These gates are validated by the dedicated `tests/lua/security/` test layer.
-
-**Test surface.** `tests/rust/ext/` holds Rust-side integration tests that construct a headless VM via `create_lua_vm`. Lua-level behaviour tests live under `tests/lua/unit/`, `tests/lua/integration/`, `tests/lua/security/`, `tests/lua/stress/`, and `tests/lua/golden/`, all driven by the harness in `tests/lua/harness.rs` per TST-01.
-
-**Scope boundary.** Edge/Integration tier. Imports from all other module groups. Nothing in the engine imports from `lua_api`. This module creates the `lurek` namespace table but exposes no Lua API surface directly — it is the registration hub, not a user-visible module.
+This module primarily collaborates with `ai`, `animation`, `audio`, `automation`, `camera`, `compute`, `data`, `dataframe`, and adjacent engine modules. Its responsibility should stay inside the Edge/Integration group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -52,6 +36,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `filesystem_api.rs`: Registers lurek.filesystem and enforces sandboxed file-system operations at the Lua boundary.
 - `globe_api.rs`: `lurek.globe` — XCOM-style Geoscape province sphere API.
 - `graph_api.rs`: Registers lurek.graph and bridges graph construction and traversal features.
+- `html_api.rs`: `lurek.html` — Lightweight pure-Rust HTML/CSS layout engine Lua bindings.
 - `i18n_api.rs`: Registers i18n APIs for translated string catalogs and language lookup.
 - `image_api.rs`: Registers lurek.image and wraps CPU-side image-data operations.
 - `input_api.rs`: Registers keyboard, mouse, gamepad, and touch input namespaces from the engine input state.
@@ -70,6 +55,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `physics_api.rs`: Registers lurek.physics and wraps physics world, bodies, shapes, joints, and queries.
 - `pipeline_api.rs`: Registers lurek.pipeline and exposes DAG workflow orchestration to Lua.
 - `procgen_api.rs`: Registers lurek.procgen and bridges procedural-generation utilities.
+- `province_api.rs`: `lurek.province` - Engine-backed province registry and snapshot API.
 - `raycaster_api.rs`: Registers lurek.raycaster and exposes retro 2.5D raycasting features.
 - `register.rs`: Lua VM factory: `create_lua_vm` and `create_test_vm`.
 - `render_api.rs`: Registers the main 2D drawing APIs and resource wrappers used for graphics, canvases, shaders, meshes, and sprite batches.
@@ -107,6 +93,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `LuaGroupedFrame` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a grouped result from [`DataFrame::group_by`].
 - `LuaDataFrame` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`DataFrame`].
 - `LuaDatabase` (`struct`, `dataframe_api.rs`): Lua-side wrapper around a shared [`Database`].
+- `LuaVecFrame` (`struct`, `dataframe_api.rs`): Thin Lua wrapper around a [`VecFrame`]: typed-column vectorized DataFrame.
 - `LuaReplConsole` (`struct`, `devtools_api.rs`): Lua-side wrapper around a [`ReplConsole`] interactive evaluator.
 - `LuaUniverse` (`struct`, `ecs_api.rs`): Lua-side wrapper around a [`Universe`] ECS world.
 - `LuaPostFxEffect` (`struct`, `effect_api.rs`): Lua-side wrapper around [`PostFxEffect`].
@@ -164,6 +151,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `LuaPhysicsShape` (`struct`, `physics_api.rs`): Lua-side standalone shape object (circle, rectangle, edge, polygon, chain).
 - `LuaStep` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a single [`PipelineStep`], plus Lua callback registry keys.
 - `LuaPipeline` (`struct`, `pipeline_api.rs`): Lua-side wrapper around a [`Pipeline`] DAG with scheduler and Lua callback registry.
+- `LuaProvinceRegistry` (`struct`, `province_api.rs`): Lua handle referencing one named engine-side province registry.
 - `LuaDoorManager` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`DoorManager`], managing sliding doors in a level.
 - `LuaHeightMap` (`struct`, `raycaster_api.rs`): Lua-side wrapper around a [`HeightMap`] for variable floor/ceiling heights.
 - `LuaPointLight` (`struct`, `raycaster_api.rs`): Lua-side value wrapper around a raycaster [`PointLight`].
@@ -179,6 +167,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `LuaShader` (`struct`, `render_api.rs`): Lua-side handle to a compiled shader stored in SharedState.
 - `LuaQuad` (`struct`, `render_api.rs`): Lua-side quad viewport into a texture.
 - `LuaShape` (`struct`, `render_api.rs`): Lua-side handle to a [`CompoundShape`] stored in [`SharedState::shapes`].
+- `LObjModel` (`struct`, `render_api.rs`): Lua-side handle to a parsed Wavefront OBJ model.
 - `LuaSaveManager` (`struct`, `save_api.rs`): Lua-side wrapper around [`SaveManager`] with per-module callback storage.
 - `LuaDepthSorter` (`struct`, `scene_api.rs`): Lua-side wrapper around a [`DepthSorter`] with registry-stored callbacks.
 - `LuaSkeleton` (`struct`, `spine_api.rs`): Lua-side wrapper around a [`Skeleton`].
@@ -227,6 +216,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `register` (`camera_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`compute_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`data_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `LuaVecFrame::new` (`dataframe_api.rs`): Create from a [`VecFrame`].
 - `register` (`dataframe_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`debugbridge_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`devtools_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -238,6 +228,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `register` (`filesystem_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`globe_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`graph_api.rs`): Registers the `lurek.window` API table with the Lua VM.
+- `register` (`html_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`i18n_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`image_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`input_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -253,13 +244,13 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `register` (`network_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`parallax_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`particle_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `ParticleConfig::from_lua_opts` (`particle_api.rs`): from_lua_opts.
+- `ParticleConfig::from_lua_opts` (`particle_api.rs`): Parses an optional Lua config table into a concrete [`ParticleConfig`].
 - `register` (`pathfind_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`patterns_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`physics_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaStep::new` (`pipeline_api.rs`): Creates a new [`LuaStep`] wrapping the given [`PipelineStep`].
-- `LuaStep::execute_sync` (`pipeline_api.rs`): Executes this step's callback synchronously, handling retries and status transitions @param crate : parameter @return LuaResult<bool>
-- `LuaPipeline::new` (`pipeline_api.rs`): Creates a new [`LuaPipeline`] wrapping the given [`Pipeline`].
+- `LuaStep::new` (`pipeline_api.rs`): Auto-doc: public item.
+- `LuaStep::execute_sync` (`pipeline_api.rs`): Auto-doc: public item.
+- `LuaPipeline::new` (`pipeline_api.rs`): Auto-doc: public item.
 - `LuaPipeline::from_parts` (`pipeline_api.rs`): Creates a [`LuaPipeline`] from pre-built pipeline and wrapper maps (used by deserialisers).
 - `pipeline_result_to_lua` (`pipeline_api.rs`): Converts a `PipelineResult` to a Lua result table for the `run` return value.
 - `cancel_remaining_steps` (`pipeline_api.rs`): Cancels all steps in `order` that are still pending.
@@ -267,8 +258,9 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `finalize_pipeline_result` (`pipeline_api.rs`): Finalises a pipeline run: collects the `PipelineResult`, converts it to a Lua table, and fires the `on_complete` callback if registered.
 - `register` (`pipeline_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`procgen_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `CellularOpts::from_lua_table` (`procgen_api.rs`): from_lua_table.
+- `CellularOpts::from_lua_table` (`procgen_api.rs`): Parses a Lua options table into [`CellularOpts`].
 - `VoronoiOpts::from_lua_table` (`procgen_api.rs`): Parses a Lua options table into [`VoronoiOpts`].
+- `register` (`province_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`raycaster_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `create_lua_vm` (`register.rs`): Creates and configures the Lua VM, registers `lurek.*` sub-APIs according to the provided module flags, and returns the ready `Lua` instance.
 - `create_test_vm` (`register.rs`): Creates a test Lua VM with the BDD test framework loaded and all available API modules registered.
@@ -290,7 +282,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `register` (`thread_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`tilemap_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`timer_api.rs`): Registers the `lurek.window` API table with the Lua VM.
-- `LuaSpring::tick_with` (`tween_api.rs`): Advances the spring by `dt` seconds, writes positions to the target table, fires the settle callback if all axes converge, and returns `true` when done.
+- `LuaSpring::tick_with` (`tween_api.rs`): Advances the spring by `dt` seconds and returns whether it settled.
 - `register` (`tween_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`ui_api.rs`): Registers the `lurek.window` API table with the Lua VM.
 - `register` (`window_api.rs`): Registers the `lurek.window` API table with the Lua VM.
@@ -318,6 +310,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `filesystem`: Imports or references `filesystem` from `src/filesystem/`.
 - `globe`: Imports or references `src/globe/`. Cross-group dependency from ``Edge/Integration`` into `Edge/Integration`.
 - `graph`: Imports or references `graph` from `src/graph/`.
+- `html`: Imports or references `src/html/`. Dependency stays inside `Edge/Integration` and should remain acyclic.
 - `i18n`: Imports or references `i18n` from `src/i18n/`.
 - `image`: Imports or references `image` from `src/image/`.
 - `input`: Imports or references `input` from `src/input/`.
@@ -334,6 +327,7 @@ The `lua_api` module is Lurek2D's scripting bridge layer — the Edge/Integratio
 - `physics`: Imports or references `physics` from `src/physics/`.
 - `pipeline`: Imports or references `pipeline` from `src/pipeline/`.
 - `procgen`: Imports or references `procgen` from `src/procgen/`.
+- `province`: Imports or references `src/province/`. Dependency stays inside `Edge/Integration` and should remain acyclic.
 - `raycaster`: Imports or references `raycaster` from `src/raycaster/`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.

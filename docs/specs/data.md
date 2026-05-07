@@ -15,7 +15,7 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 
 **`ByteData` — the core buffer.** `ByteData` is an owned, heap-allocated raw byte buffer with bounds-checked element access. It is the primary interchange type: network payloads, save-file blobs, compressed data, and hashed content all flow through `ByteData`. Key operations: `new(n)`, `from_slice`, `as_slice`, `get(i)`, `set(i, v)`, `len`, `append`, `split_at`, `concat`. Lua scripts receive `ByteData` userdata with the full method set including `toHex()`, `toBase64()`, `slice(start, len)`.
 
-**Compression.** `compress.rs` wraps deflate, gzip, zlib (via flate2), and LZ4 (via lz4_flex) behind the `CompressFormat` enum. `compress(data, format)` and `decompress(data, format)` operate on `ByteData` and are the primary interfaces. LZ4 is the default for in-memory data exchange; zlib/gzip for file interoperability.
+**Compression.** `compress.rs` wraps deflate, gzip, zlib (via flate2), and LZ4 (via lz4_flex) behind the `CompressFormat` enum. `compress(data, format)` and `decompress(data, format)` remain the primary whole-buffer interfaces. For large payload pipelines, `compress_stream` / `decompress_stream` and `compress_chunks` / `decompress_chunks` add chunked I/O paths that do not require callers to pre-concatenate input bytes.
 
 **Hashing.** `hash.rs` provides `hash(data, algorithm) → ByteData` for MD5, SHA-1, SHA-256, and SHA-512 via the `HashAlgorithm` enum. Output is a fixed-length `ByteData` digest. The Lua surface exposes `lurek.data.hash(bytes, "sha256")` returning a hex string directly.
 
@@ -43,7 +43,7 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 
 - `bin_pack.rs`: Implements the Lurek2D-native binary pack format with readable named tokens such as `u32`, `f64`, `str`, and endian modifiers.
 - `byte_data.rs`: Defines the owned byte-buffer type used to construct, mutate, clone, and expose raw bytes to Lua.
-- `compress.rs`: Provides whole-buffer compression and decompression for deflate, gzip, zlib, and LZ4 formats.
+- `compress.rs`: Provides whole-buffer, stream, and chunked compression/decompression for deflate, gzip, zlib, and LZ4 formats.
 - `data_writer.rs`: Write-cursor companion to [`DataView`](super::DataView).
 - `dataview.rs`: Implements a read-only typed cursor over shared bytes with bounds-checked little-endian accessors.
 - `encode.rs`: Handles base64 and hex encoding and decoding for binary payload transport.
@@ -58,7 +58,7 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 
 - `BinValue` (`enum`, `bin_pack.rs`): Tagged value enum used by the named-token pack format. It is the bridge between dynamically typed inputs and strongly typed binary writes and reads.
 - `ByteData` (`struct`, `byte_data.rs`): Primary owned byte buffer for Lua and Rust interop. It is the mutable container that other helpers serialize into or read from.
-- `CompressFormat` (`enum`, `compress.rs`): Supported compression backends for whole-buffer compression and decompression. It keeps format parsing and dispatch explicit rather than stringly typed deep in the implementation.
+- `CompressFormat` (`enum`, `compress.rs`): Supported compression backends for whole-buffer, stream, and chunked compression/decompression. It keeps format parsing and dispatch explicit rather than stringly typed deep in the implementation.
 - `DataWriter` (`struct`, `data_writer.rs`): A growable byte buffer with a write cursor.
 - `DataView` (`struct`, `dataview.rs`): Read-only window over shared bytes with typed accessors. It exists for cheap inspection of binary payloads without copying or mutating them.
 - `LuaDataView` (`struct`, `dataview.rs`): Lua-facing wrapper over `DataView`. Keeping it separate lets the domain type stay free of Lua-specific method registration.
@@ -86,6 +86,10 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `CompressFormat::parse_str` (`compress.rs`): Parse a format name string (case-insensitive).
 - `compress` (`compress.rs`): Compress data using the specified format and compression level (0-9).
 - `decompress` (`compress.rs`): Decompress data using the specified format.
+- `compress_stream` (`compress.rs`): Compresses data from any `Read` source into any `Write` sink.
+- `decompress_stream` (`compress.rs`): Decompresses data from any `Read` source into any `Write` sink.
+- `compress_chunks` (`compress.rs`): Compresses ordered byte chunks without pre-concatenating input.
+- `decompress_chunks` (`compress.rs`): Decompresses ordered compressed chunks back into a contiguous byte vector.
 - `DataWriter::new` (`data_writer.rs`): Creates a new empty `DataWriter`.
 - `DataWriter::with_capacity` (`data_writer.rs`): Creates a `DataWriter` pre-allocated with `capacity` bytes.
 - `DataWriter::tell` (`data_writer.rs`): Returns the current cursor position.
@@ -152,12 +156,15 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `lurek.data.pack`: Packs values into a binary byte string using the format string.
 - `lurek.data.unpack`: Unpacks values from a binary byte string, returning values followed by next offset.
 - `lurek.data.getPackedSize`: Returns the number of bytes the given format and values would occupy.
-- `lurek.data.compress`: Compresses data using the given algorithm (deflate, gzip, lz4).
-- `lurek.data.decompress`: Decompresses data using the given algorithm (deflate, gzip, lz4).
+- `lurek.data.compress`: Compresses data using the given algorithm (deflate, gzip, lz4, zlib).
+- `lurek.data.decompress`: Decompresses data using the given algorithm (deflate, gzip, lz4, zlib).
+- `lurek.data.compressChunks`: Compresses a byte string or array-like table of byte chunks using the given algorithm.
+- `lurek.data.decompressChunks`: Decompresses a compressed byte string or array-like table of compressed chunks.
 - `lurek.data.encode`: Encodes binary data using the given format (base64, hex).
 - `lurek.data.decode`: Decodes encoded text back to binary (base64, hex).
 - `lurek.data.hash`: Returns the cryptographic hash of the input (md5, sha1, sha256, sha512).
 - `lurek.data.crc32`: Returns the CRC-32 checksum of the input data as an integer.
+- `lurek.data.newByteData`: Instantiates a raw byte data container object.
 - `lurek.data.newDataView`: Creates a read-only windowed view into a byte string.
 - `lurek.data.write`: Writes values using the Lurek2D Binary Pack Format.
 - `lurek.data.read`: Reads values using the Lurek2D Binary Pack Format.
@@ -169,51 +176,61 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `lurek.data.fromMsgPack`: Deserializes a MessagePack binary string back into a Lua value.
 - `lurek.data.newWriter`: Creates a new write-cursor for building binary data.
 
-### `DataView` Methods
-- `DataView:getUInt8`: Reads an unsigned 8-bit integer at the given offset.
-- `DataView:getInt8`: Reads a signed 8-bit integer at the given offset.
-- `DataView:getInt16`: Reads a signed 16-bit integer at the given offset.
-- `DataView:getUInt16`: Reads an unsigned 16-bit integer at the given offset.
-- `DataView:getInt32`: Reads a signed 32-bit integer at the given offset.
-- `DataView:getUInt32`: Reads an unsigned 32-bit integer at the given offset.
-- `DataView:getFloat`: Reads a 32-bit float at the given offset.
-- `DataView:getDouble`: Reads a 64-bit float at the given offset.
-- `DataView:getSize`: Returns the size of this view in bytes.
+### `LByteData` Methods
+- `LByteData:getSize`: Returns the total byte length of this buffer.
+- `LByteData:getString`: Get the string representation.
+- `LByteData:getByte`: Get a byte at the specified offset.
+- `LByteData:setByte`: Set a byte at the specified offset.
+- `LByteData:clone`: Creates an independent copy of this byte buffer with identical contents.
+- `LByteData:setBit`: Sets or clears a single bit within the buffer.
+- `LByteData:getBit`: Returns the value of a single bit within the buffer.
+- `LByteData:readBits`: Reads consecutive bits and packs them into a 32-bit integer.
 
-### `DataWriter` Methods
-- `DataWriter:writeU8`: Writes an unsigned 8-bit integer.
-- `DataWriter:writeI8`: Writes a signed 8-bit integer.
-- `DataWriter:writeU16LE`: Writes an unsigned 16-bit LE integer.
-- `DataWriter:writeU16BE`: Writes an unsigned 16-bit BE integer.
-- `DataWriter:writeI16LE`: Writes a signed 16-bit LE integer.
-- `DataWriter:writeU32LE`: Writes an unsigned 32-bit LE integer.
-- `DataWriter:writeI32LE`: Writes a signed 32-bit LE integer.
-- `DataWriter:writeF32LE`: Writes a 32-bit LE float.
-- `DataWriter:writeF64LE`: Writes a 64-bit LE float.
-- `DataWriter:writeString`: Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
-- `DataWriter:writeBytes`: Writes raw bytes from a Lua string.
-- `DataWriter:seek`: Moves the write cursor to the given position.
-- `DataWriter:tell`: Returns the current write cursor position.
-- `DataWriter:len`: Returns the total buffer length.
-- `DataWriter:toBytes`: Returns the buffer contents as a Lua string.
+### `LDataView` Methods
+- `LDataView:getUInt8`: Reads an unsigned 8-bit integer at the given offset.
+- `LDataView:getInt8`: Reads a signed 8-bit integer at the given offset.
+- `LDataView:getInt16`: Reads a signed 16-bit integer at the given offset.
+- `LDataView:getUInt16`: Reads an unsigned 16-bit integer at the given offset.
+- `LDataView:getInt32`: Reads a signed 32-bit integer at the given offset.
+- `LDataView:getUInt32`: Reads an unsigned 32-bit integer at the given offset.
+- `LDataView:getFloat`: Reads a 32-bit float at the given offset.
+- `LDataView:getDouble`: Reads a 64-bit float at the given offset.
+- `LDataView:getSize`: Returns the size of this view in bytes.
+- `LDataView:type`: Returns the type name of this object.
+- `LDataView:typeOf`: Returns true if this object is of the given type.
 
-### `RingBuffer` Methods
-- `RingBuffer:push`: Pushes a value onto the ring buffer.
-- `RingBuffer:pop`: Removes and returns the oldest element, or nil if the buffer is empty.
-- `RingBuffer:peek`: Returns the oldest element without removing it, or nil if empty.
-- `RingBuffer:peekNewest`: Returns the newest element without removing it, or nil if empty.
-- `RingBuffer:len`: Returns the number of elements currently in the buffer.
-- `RingBuffer:capacity`: Returns the maximum number of elements the buffer can hold.
-- `RingBuffer:isEmpty`: Returns true if the buffer contains no elements.
-- `RingBuffer:clear`: Removes all elements from the buffer, releasing their registry entries.
-- `RingBuffer:toTable`: Returns all elements as an array table ordered oldest-first.
+### `LDataWriter` Methods
+- `LDataWriter:writeU8`: Writes an unsigned 8-bit integer.
+- `LDataWriter:writeI8`: Writes a signed 8-bit integer.
+- `LDataWriter:writeU16LE`: Writes an unsigned 16-bit LE integer.
+- `LDataWriter:writeU16BE`: Writes an unsigned 16-bit BE integer.
+- `LDataWriter:writeI16LE`: Writes a signed 16-bit LE integer.
+- `LDataWriter:writeU32LE`: Writes an unsigned 32-bit LE integer.
+- `LDataWriter:writeI32LE`: Writes a signed 32-bit LE integer.
+- `LDataWriter:writeF32LE`: Writes a 32-bit LE float.
+- `LDataWriter:writeF64LE`: Writes a 64-bit LE float.
+- `LDataWriter:writeString`: Writes a length-prefixed UTF-8 string (4-byte LE length + bytes).
+- `LDataWriter:writeBytes`: Writes raw bytes from a Lua string.
+- `LDataWriter:seek`: Moves the write cursor to the given position.
+- `LDataWriter:tell`: Returns the current write cursor position.
+- `LDataWriter:len`: Returns the total buffer length.
+- `LDataWriter:toBytes`: Returns the buffer contents as a Lua string.
+- `LDataWriter:type`: Returns the type name of this object.
+- `LDataWriter:typeOf`: Returns true if this object is of the given type.
 
-### `mlua` Methods
-- `mlua:getSize`: Get the size.
-- `mlua:getString`: Get the string representation.
-- `mlua:getByte`: Get a byte at the specified offset.
-- `mlua:setByte`: Set a byte at the specified offset.
-- `mlua:clone`: Clone the ByteData.
+### `LRingBuffer` Methods
+- `LRingBuffer:push`: Pushes a value onto the ring buffer.
+- `LRingBuffer:pop`: Removes and returns the oldest element, or nil if the buffer is empty.
+- `LRingBuffer:peek`: Returns the oldest element without removing it, or nil if empty.
+- `LRingBuffer:peekNewest`: Returns the newest element without removing it, or nil if empty.
+- `LRingBuffer:len`: Returns the number of elements currently in the buffer.
+- `LRingBuffer:capacity`: Returns the maximum number of elements the buffer can hold.
+- `LRingBuffer:isEmpty`: Returns true if the buffer contains no elements.
+- `LRingBuffer:isFull`: Returns true if the buffer has reached its capacity.
+- `LRingBuffer:clear`: Removes all elements from the buffer, releasing their registry entries.
+- `LRingBuffer:toTable`: Returns all elements as an array table ordered oldest-first.
+- `LRingBuffer:type`: Returns the type name of this object.
+- `LRingBuffer:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

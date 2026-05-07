@@ -1,4 +1,4 @@
--- Lurek2D Physics API Tests
+﻿-- Lurek2D Physics API Tests
 
 -- @describe lurek.physics module exists
 describe("lurek.physics module exists", function()
@@ -1031,34 +1031,27 @@ end)
 
 -- @describe lurek.physics cellular cell-type constants
 describe("lurek.physics cellular cell-type constants", function()
-    -- @covers lurek.physics.CELL_AIR
     it("CELL_AIR is an integer", function()
         expect_type("number", lurek.physics.CELL_AIR)
         expect_equal(0, lurek.physics.CELL_AIR)
     end)
 
-    -- @covers lurek.physics.CELL_AIR
-    -- @covers lurek.physics.CELL_SAND
     it("CELL_SAND is greater than CELL_AIR", function()
         expect_true(lurek.physics.CELL_SAND > lurek.physics.CELL_AIR)
     end)
 
-    -- @covers lurek.physics.CELL_WATER
     it("CELL_WATER is an integer", function()
         expect_type("number", lurek.physics.CELL_WATER)
     end)
 
-    -- @covers lurek.physics.CELL_ROCK
     it("CELL_ROCK is an integer", function()
         expect_type("number", lurek.physics.CELL_ROCK)
     end)
 
-    -- @covers lurek.physics.CELL_FIRE
     it("CELL_FIRE is an integer", function()
         expect_type("number", lurek.physics.CELL_FIRE)
     end)
 
-    -- @covers lurek.physics.CELL_GAS
     it("CELL_GAS is an integer", function()
         expect_type("number", lurek.physics.CELL_GAS)
     end)
@@ -1072,20 +1065,16 @@ describe("lurek.physics cellular cell access", function()
         sim = lurek.physics.newCellular(16, 16)
     end)
 
-    -- @covers lurek.physics.CELL_AIR
     it("new grid is all air", function()
         expect_equal(lurek.physics.CELL_AIR, sim:getCell(0, 0))
         expect_equal(lurek.physics.CELL_AIR, sim:getCell(8, 8))
     end)
 
-    -- @covers lurek.physics.CELL_SAND
     it("setCell changes cell type", function()
         sim:setCell(5, 5, lurek.physics.CELL_SAND)
         expect_equal(lurek.physics.CELL_SAND, sim:getCell(5, 5))
     end)
 
-    -- @covers lurek.physics.CELL_AIR
-    -- @covers lurek.physics.CELL_ROCK
     it("setting cell to AIR clears it", function()
         sim:setCell(3, 3, lurek.physics.CELL_ROCK)
         sim:setCell(3, 3, lurek.physics.CELL_AIR)
@@ -1101,8 +1090,6 @@ describe("lurek.physics cellular bulk fill", function()
         sim = lurek.physics.newCellular(32, 32)
     end)
 
-    -- @covers lurek.physics.CELL_AIR
-    -- @covers lurek.physics.CELL_ROCK
     it("fillRect fills the specified region", function()
         sim:fillRect(5, 5, 4, 4, lurek.physics.CELL_ROCK)
         expect_equal(lurek.physics.CELL_ROCK, sim:getCell(6, 6))
@@ -1110,7 +1097,6 @@ describe("lurek.physics cellular bulk fill", function()
         expect_equal(lurek.physics.CELL_AIR, sim:getCell(0, 0))
     end)
 
-    -- @covers lurek.physics.CELL_WATER
     it("fillCircle marks centre cell", function()
         sim:fillCircle(16, 16, 3, lurek.physics.CELL_WATER)
         expect_equal(lurek.physics.CELL_WATER, sim:getCell(16, 16))
@@ -1123,8 +1109,6 @@ describe("lurek.physics cellular step", function()
     -- @covers LCellular:getCell
     -- @covers LCellular:setCell
     -- @covers LCellular:step
-    -- @covers lurek.physics.CELL_AIR
-    -- @covers lurek.physics.CELL_SAND
     -- @covers lurek.physics.newCellular
     it("sand cell falls after one step", function()
         local sim = lurek.physics.newCellular(8, 8)
@@ -1141,7 +1125,6 @@ describe("lurek.physics cellular step", function()
     -- @coverage Verifies stepN is callable with n > 1.
     -- @covers LCellular:fillRect
     -- @covers LCellular:stepN
-    -- @covers lurek.physics.CELL_SAND
     -- @covers lurek.physics.newCellular
     it("stepN accepts a count without error", function()
         local sim = lurek.physics.newCellular(16, 16)
@@ -1156,7 +1139,6 @@ end)
 describe("lurek.physics cellular query", function()
     -- @covers LCellular:countCells
     -- @covers LCellular:setCell
-    -- @covers lurek.physics.CELL_ROCK
     -- @covers lurek.physics.newCellular
     it("countCells matches manually placed cells", function()
         local sim = lurek.physics.newCellular(16, 16)
@@ -1168,7 +1150,6 @@ describe("lurek.physics cellular query", function()
 
     -- @covers LCellular:findCells
     -- @covers LCellular:setCell
-    -- @covers lurek.physics.CELL_WATER
     -- @covers lurek.physics.newCellular
     it("findCells returns x/y tables for each match", function()
         local sim = lurek.physics.newCellular(16, 16)
@@ -1187,9 +1168,6 @@ describe("lurek.physics cellular serialisation", function()
     -- @covers LCellular:loadFromBytes
     -- @covers LCellular:setCell
     -- @covers LCellular:toBytes
-    -- @covers lurek.physics.CELL_AIR
-    -- @covers lurek.physics.CELL_ROCK
-    -- @covers lurek.physics.CELL_SAND
     -- @covers lurek.physics.newCellular
     it("toBytes/loadFromBytes round-trip preserves cells", function()
         local s1 = lurek.physics.newCellular(8, 8)

@@ -332,6 +332,68 @@ describe("lurek.event pushDeferred and history", function()
     expect_equal(#h2, 0)
     lurek.event.enableHistory(0)
   end)
+
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.poll
+  -- @covers lurek.event.push
+  -- @covers lurek.event.pushPriority
+  it("pushPriority high lane drains before normal lane", function()
+    lurek.event.clear()
+    lurek.event.push("normal_evt")
+    lurek.event.pushPriority("high_evt", "high")
+
+    local names = {}
+    for name in lurek.event.poll() do
+      table.insert(names, name)
+    end
+
+    expect_equal(#names, 2)
+    expect_equal(names[1], "high_evt")
+    expect_equal(names[2], "normal_evt")
+  end)
+
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.poll
+  -- @covers lurek.event.push
+  it("push supports table payload values", function()
+    lurek.event.clear()
+    lurek.event.push("table_evt", { hp = 10, alive = true, tag = "player" })
+
+    local got_name = nil
+    local got_payload = nil
+    for name, payload in lurek.event.poll() do
+      got_name = name
+      got_payload = payload
+    end
+
+    expect_equal(got_name, "table_evt")
+    expect_equal(type(got_payload), "table")
+    expect_equal(got_payload.hp, 10)
+    expect_equal(got_payload.alive, true)
+    expect_equal(got_payload.tag, "player")
+  end)
+
+  -- @covers lurek.event.clear
+  -- @covers lurek.event.flushDeferred
+  -- @covers lurek.event.poll
+  -- @covers lurek.event.pushDeferred
+  -- @covers lurek.event.pushDeferredPriority
+  it("deferred priority flush keeps lane ordering", function()
+    lurek.event.clear()
+    lurek.event.pushDeferred("normal_deferred")
+    lurek.event.pushDeferredPriority("high_deferred", "high")
+    local moved = lurek.event.flushDeferred()
+    expect_equal(moved, 2)
+
+    local names = {}
+    for name in lurek.event.poll() do
+      table.insert(names, name)
+    end
+
+    expect_equal(#names, 2)
+    expect_equal(names[1], "high_deferred")
+    expect_equal(names[2], "normal_deferred")
+  end)
 end)
 
 

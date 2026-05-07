@@ -1,4 +1,4 @@
--- Dialog API unit tests
+﻿-- Dialog API unit tests
 
 -- Guard: keep the suite green without skip status when dialog is unavailable.
 if type(lurek) ~= "table" or type(lurek.dialog) ~= "table" then
@@ -9,19 +9,16 @@ end
 
 -- @describe newSequencer
 describe("newSequencer", function()
-    -- @covers lurek.dialog.newSequencer
     it("creates a sequencer", function()
         local seq = lurek.dialog.newSequencer()
         expect_type("userdata", seq, "sequencer")
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("has type Sequencer", function()
         local seq = lurek.dialog.newSequencer()
         expect_equal("Sequencer", seq:type())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("typeOf Object", function()
         local seq = lurek.dialog.newSequencer()
         expect_equal(true, seq:typeOf("Object"))
@@ -32,19 +29,16 @@ end)
 
 -- @describe initial state
 describe("initial state", function()
-    -- @covers lurek.dialog.newSequencer
     it("starts idle", function()
         local seq = lurek.dialog.newSequencer()
         expect_equal("idle", seq:getState())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("is not active", function()
         local seq = lurek.dialog.newSequencer()
         expect_equal(false, seq:isActive())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("default speed is 30", function()
         local seq = lurek.dialog.newSequencer()
         expect_equal(30, seq:getSpeed())
@@ -53,7 +47,6 @@ end)
 
 -- @describe load and start
 describe("load and start", function()
-    -- @covers lurek.dialog.newSequencer
     it("loads a say node and starts typing", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -66,7 +59,6 @@ describe("load and start", function()
         expect_equal(true, seq:isActive())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("handles empty script gracefully", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({})
@@ -78,14 +70,12 @@ end)
 
 -- @describe setSpeed / getSpeed
 describe("setSpeed / getSpeed", function()
-    -- @covers lurek.dialog.newSequencer
     it("changes typing speed", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(60)
         expect_equal(60, seq:getSpeed())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("speed 0 means instant reveal", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -100,7 +90,6 @@ end)
 
 -- @describe advance and skip
 describe("advance and skip", function()
-    -- @covers lurek.dialog.newSequencer
     it("skip goes from typing to waiting", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -113,7 +102,6 @@ describe("advance and skip", function()
         expect_equal("Hello", seq:revealedText())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("advance from typing skips to waiting", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -124,7 +112,6 @@ describe("advance and skip", function()
         expect_equal("waiting", seq:getState())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("advance from waiting goes to next node", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -139,7 +126,6 @@ describe("advance and skip", function()
         expect_equal("waiting", seq:getState())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("advance past last node goes to done", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -155,7 +141,6 @@ end)
 
 -- @describe choice nodes
 describe("choice nodes", function()
-    -- @covers lurek.dialog.newSequencer
     it("enters choice state", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -170,7 +155,6 @@ describe("choice nodes", function()
         expect_equal("Pick one", seq:getChoiceText())
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("getChoiceLabels returns labels", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -188,7 +172,6 @@ describe("choice nodes", function()
         expect_equal("Maybe", labels[3])
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("choose selects a branch", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(0)
@@ -210,7 +193,6 @@ end)
 
 -- @describe wait nodes
 describe("wait nodes", function()
-    -- @covers lurek.dialog.newSequencer
     it("enters paused state with timer", function()
         local seq = lurek.dialog.newSequencer()
         seq:load({
@@ -223,7 +205,6 @@ end)
 
 -- @describe call nodes
 describe("call nodes", function()
-    -- @covers lurek.dialog.newSequencer
     it("invokes callback on start", function()
         local called = false
         local seq = lurek.dialog.newSequencer()
@@ -237,7 +218,6 @@ end)
 
 -- @describe events
 describe("events", function()
-    -- @covers lurek.dialog.newSequencer
     it("fires line event on say node", function()
         local event_speaker, event_text = nil, nil
         local seq = lurek.dialog.newSequencer()
@@ -253,7 +233,6 @@ describe("events", function()
         expect_equal("Hi there", event_text)
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("fires choice event", function()
         local choice_fired = false
         local seq = lurek.dialog.newSequencer()
@@ -267,7 +246,6 @@ describe("events", function()
         expect_equal(true, choice_fired)
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("fires finished event", function()
         local finished = false
         local seq = lurek.dialog.newSequencer()
@@ -281,7 +259,6 @@ describe("events", function()
         expect_equal(true, finished, "finished event should fire")
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("off removes event handler", function()
         local count = 0
         local seq = lurek.dialog.newSequencer()
@@ -302,7 +279,6 @@ end)
 
 -- @describe update with dt
 describe("update with dt", function()
-    -- @covers lurek.dialog.newSequencer
     it("reveals characters over time", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10) -- 10 chars per second
@@ -319,7 +295,6 @@ describe("update with dt", function()
         expect_equal(true, #revealed < 5, "should not reveal all chars yet")
     end)
 
-    -- @covers lurek.dialog.newSequencer
     it("transitions to waiting when fully revealed", function()
         local seq = lurek.dialog.newSequencer()
         seq:setSpeed(10)
@@ -335,7 +310,6 @@ end)
 
 -- @describe full workflow
 describe("full workflow", function()
-    -- @covers lurek.dialog.newSequencer
     it("complete dialog sequence", function()
         local events = {}
         local seq = lurek.dialog.newSequencer()

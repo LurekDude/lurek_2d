@@ -8,6 +8,7 @@ use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::Arc;
 
+use crate::lua_api::lua_types::LurekType;
 use crate::data::toml_convert;
 use crate::data::{
     self, BinValue, ByteData, CompressFormat, DataView, DataWriter, EncodeFormat, HashAlgorithm,
@@ -83,6 +84,39 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
         .collect()
 }
 
+// Converts a Lua string or array-like table of strings into byte chunks.
+fn lua_value_to_byte_chunks(value: LuaValue) -> LuaResult<Vec<Vec<u8>>> {
+    match value {
+        LuaValue::String(s) => Ok(vec![s.as_bytes().to_vec()]),
+        LuaValue::Table(t) => {
+            let mut chunks = Vec::new();
+            for (idx, value) in t.sequence_values::<LuaValue>().enumerate() {
+                let value = value?;
+                match value {
+                    LuaValue::String(s) => chunks.push(s.as_bytes().to_vec()),
+                    _ => {
+                        return Err(LuaError::RuntimeError(format!(
+                            "chunk table entry #{} must be a string",
+                            idx + 1
+                        )))
+                    }
+                }
+            }
+
+            if chunks.is_empty() {
+                return Err(LuaError::RuntimeError(
+                    "chunk table must contain at least one string".to_string(),
+                ));
+            }
+
+            Ok(chunks)
+        }
+        _ => Err(LuaError::RuntimeError(
+            "expected a string or an array-like table of strings".to_string(),
+        )),
+    }
+}
+
 // -------------------------------------------------------------------------------
 // LuaRingBuffer UserData
 // -------------------------------------------------------------------------------
@@ -98,6 +132,11 @@ fn bin_values_to_lua(lua: &Lua, vals: Vec<BinValue>) -> LuaResult<Vec<LuaValue<'
 pub struct LuaRingBuffer {
     inner: VecDeque<LuaRegistryKey>,
     capacity: usize,
+}
+
+impl LurekType for LuaRingBuffer {
+    const TYPE_NAME: &'static str = "LRingBuffer";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LRingBuffer", "Object"];
 }
 
 impl LuaUserData for LuaRingBuffer {
@@ -121,7 +160,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- pop --
         /// Removes and returns the oldest element, or nil if the buffer is empty.
-        /// @return | any | Oldest stored value, or nil when the buffer is empty.
+        /// @return | unknown | Oldest stored Lua value, or nil when the buffer is empty.
         methods.add_method_mut("pop", |lua, this, ()| match this.inner.pop_front() {
             Some(key) => {
                 let v: LuaValue = lua.registry_value(&key)?;
@@ -133,7 +172,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- peek --
         /// Returns the oldest element without removing it, or nil if empty.
-        /// @return | any | Oldest stored value, or nil when the buffer is empty.
+        /// @return | unknown | Oldest stored Lua value, or nil when the buffer is empty.
         methods.add_method("peek", |lua, this, ()| match this.inner.front() {
             Some(key) => lua.registry_value::<LuaValue>(key),
             None => Ok(LuaValue::Nil),
@@ -141,7 +180,7 @@ impl LuaUserData for LuaRingBuffer {
 
         // -- peekNewest --
         /// Returns the newest element without removing it, or nil if empty.
-        /// @return | any | Newest stored value, or nil when the buffer is empty.
+        /// @return | unknown | Newest stored Lua value, or nil when the buffer is empty.
         methods.add_method("peekNewest", |lua, this, ()| match this.inner.back() {
             Some(key) => lua.registry_value::<LuaValue>(key),
             None => Ok(LuaValue::Nil),
@@ -204,6 +243,7 @@ impl LuaUserData for LuaRingBuffer {
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LRingBuffer" || name == "Object")
         });
+
     }
 }
 
@@ -311,7 +351,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Pack format string.
     /// @param | data | string | Packed byte string to read from.
     /// @param | offset | integer? | Optional starting byte offset.
-    /// @return | any | Unpacked Lua value or values.
+    /// @return | unknown | Unpacked Lua value or values.
     /// @return | integer | Next byte offset after the unpacked values.
     tbl.set(
         "unpack",
@@ -342,7 +382,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- compress --
-    /// Compresses data using the given algorithm (deflate, gzip, lz4).
+    /// Compresses data using the given algorithm (deflate, gzip, lz4, zlib).
     /// @param | format | string | Compression format name.
     /// @param | data | string | Raw bytes to compress.
     /// @param | level | integer? | Optional compression level.
@@ -361,7 +401,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- decompress --
-    /// Decompresses data using the given algorithm (deflate, gzip, lz4).
+    /// Decompresses data using the given algorithm (deflate, gzip, lz4, zlib).
     /// @param | format | string | Compression format name.
     /// @param | data | string | Compressed bytes to decompress.
     /// @return | string | Decompressed bytes as a Lua string.
@@ -371,6 +411,44 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
             let format = CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
             let result =
                 data::decompress(compressed.as_bytes(), format).map_err(LuaError::RuntimeError)?;
+            lua.create_string(&result)
+        })?,
+    )?;
+
+    // -- compressChunks --
+    /// Compresses string chunks using the given algorithm (deflate, gzip, lz4, zlib).
+    /// @param | format | string | Compression format name.
+    /// @param | chunks | string | table | Byte string or array-like table of byte strings.
+    /// @param | level | integer? | Optional compression level.
+    /// @return | string | Compressed bytes as a Lua string.
+    tbl.set(
+        "compressChunks",
+        lua.create_function(
+            |lua, (format_str, chunks, level): (String, LuaValue, Option<u32>)| {
+                let format =
+                    CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
+                let chunks = lua_value_to_byte_chunks(chunks)?;
+                let chunk_refs: Vec<&[u8]> = chunks.iter().map(|c| c.as_slice()).collect();
+                let result = data::compress_chunks(&chunk_refs, format, level.unwrap_or(6))
+                    .map_err(LuaError::RuntimeError)?;
+                lua.create_string(&result)
+            },
+        )?,
+    )?;
+
+    // -- decompressChunks --
+    /// Decompresses compressed string chunks using the given algorithm (deflate, gzip, lz4, zlib).
+    /// @param | format | string | Compression format name.
+    /// @param | chunks | string | table | Compressed byte string or array-like table of byte strings.
+    /// @return | string | Decompressed bytes as a Lua string.
+    tbl.set(
+        "decompressChunks",
+        lua.create_function(|lua, (format_str, chunks): (String, LuaValue)| {
+            let format = CompressFormat::parse_str(&format_str).map_err(LuaError::RuntimeError)?;
+            let chunks = lua_value_to_byte_chunks(chunks)?;
+            let chunk_refs: Vec<&[u8]> = chunks.iter().map(|c| c.as_slice()).collect();
+            let result =
+                data::decompress_chunks(&chunk_refs, format).map_err(LuaError::RuntimeError)?;
             lua.create_string(&result)
         })?,
     )?;
@@ -487,7 +565,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     /// @param | format | string | Binary pack format string.
     /// @param | data | string | Packed byte string to read from.
     /// @param | offset | integer? | Optional starting byte offset.
-    /// @return | any | Decoded Lua values.
+    /// @return | unknown | Decoded Lua values.
     tbl.set(
         "read",
         lua.create_function(
@@ -572,7 +650,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     // -- fromMsgPack --
     /// Deserializes a MessagePack binary string back into a Lua value.
     /// @param | bytes | string | MessagePack bytes to decode.
-    /// @return | any | Decoded Lua value.
+    /// @return | unknown | Decoded Lua value.
     tbl.set(
         "fromMsgPack",
         lua.create_function(|lua, bytes: LuaString| {

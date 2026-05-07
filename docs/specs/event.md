@@ -13,9 +13,9 @@
 
 The `event` module is Lurek2D's centralised event queue — the single channel through which OS input, window state changes, custom Lua events, and automation-injected synthetic input flow before being dispatched to Lua callbacks. It is a Core Runtime tier module with no upstream engine dependencies. All modules that raise or consume events route through this module rather than coupling directly to each other.
 
-**EventQueue — the core FIFO.** `EventQueue` is a FIFO ring of `Event` values backed by `VecDeque`. `App` pushes events during the winit event handler; at the start of each logical-update tick the queue is drained and dispatched to registered Lua listeners. `push(event)`, `push_event(name, args)`, `poll()`, `clear()`, `is_empty()`, `len()`. The `wait(timeout_ms)` variant blocks until an event arrives or the timeout elapses, used in CI screenshot mode.
+**EventQueue — dual-lane FIFO.** `EventQueue` uses two FIFO lanes (`high`, `normal`) backed by `VecDeque`. `poll()` always drains the high lane before the normal lane while preserving FIFO order inside each lane. `push(event)`, `push_with_priority(event, priority)`, `push_event(name, args)`, `push_event_with_priority(name, args, priority)`, `poll()`, `clear()`, `is_empty()`, `len()`. The `wait(timeout_ms)` variant sleeps on a condvar-backed notifier and wakes when new events arrive or timeout expires.
 
-**Event enum.** `Event` is a flat tagged struct carrying a name string and a `Vec<EventArg>` payload. The engine internally dispatches OS events as named events with typed arguments: `"keydown"` (keycode, scancode, modifiers, repeat), `"keyup"`, `"mousemove"` (x, y), `"mousedown"` / `"mouseup"` (button, x, y), `"mousewheel"` (dx, dy), `"gamepadaxis"` (device_id, axis, value), `"gamepadbutton"` (device_id, button, pressed), `"textinput"` (Unicode string), `"resize"` (w, h), `"focus"` / `"blur"`, `"filedrop"` (path), `"touch"` (id, phase, x, y). `UserEvent` is the variant emitted by `lurek.event.emit(name, data)` for pub-sub between Lua scripts.
+**Event payload model.** `Event` carries `name: String` and `args: Vec<EventArg>`. `EventArg` supports scalar values plus `Table` for shallow-cloned Lua tables (string/number/bool keys; scalar values). This allows Lua producers to pass structured payloads without serialization.
 
 **Deferred dispatch.** The `EventBus` supports deferred batching: `push_deferred(event)` enqueues into a pending buffer; `flush()` atomically merges the buffer into the main queue; `drain()` discards the pending buffer without dispatching. This enables patterns where multiple events are committed as a group or discarded atomically — useful for undo/redo stacks and transaction-like game-state updates. Lua: `lurek.event.pushDeferred(name, data)`, `lurek.event.flush()`.
 
@@ -37,6 +37,8 @@ The `event` module is Lurek2D's centralised event queue — the single channel t
 
 ## Types
 
+- `EventPriority` (`enum`, `event_queue.rs`): Queue lane used during enqueue (`High` or `Normal`).
+- `EventTableKey` (`enum`, `event_queue.rs`): Allowed key types for table payload cloning.
 - `EventArg` (`enum`, `event_queue.rs`): Argument values that can be attached to events.
 - `Event` (`struct`, `event_queue.rs`): A single event in the event queue.
 - `EventQueue` (`struct`, `event_queue.rs`): FIFO event queue for system and custom events.
@@ -47,7 +49,9 @@ The `event` module is Lurek2D's centralised event queue — the single channel t
 
 - `EventQueue::new` (`event_queue.rs`): Create a new empty event queue.
 - `EventQueue::push` (`event_queue.rs`): Push an event onto the queue.
+- `EventQueue::push_with_priority` (`event_queue.rs`): Push an event with explicit lane selection.
 - `EventQueue::push_event` (`event_queue.rs`): Push an event by name and arguments.
+- `EventQueue::push_event_with_priority` (`event_queue.rs`): Push an event by name/args to an explicit lane.
 - `EventQueue::poll` (`event_queue.rs`): Poll the next event from the queue.
 - `EventQueue::clear` (`event_queue.rs`): Clear all events from the queue.
 - `EventQueue::is_empty` (`event_queue.rs`): Check if the queue is empty.
@@ -55,6 +59,7 @@ The `event` module is Lurek2D's centralised event queue — the single channel t
 - `EventQueue::pump` (`event_queue.rs`): Drains pending OS-level events into the queue (no-op in Lurek2D; documents as a sync point).
 - `EventQueue::wait` (`event_queue.rs`): Blocks until an event is available or `timeout_ms` milliseconds elapse.
 - `EventArg::from_lua_val` (`event_queue.rs`): Converts a [`LuaValue`] to an [`EventArg`] for event queue storage.
+- `event_arg_to_lua_value` (`event_queue.rs`): Converts an `EventArg` back to a Lua value.
 - `event_to_lua_multi` (`event_queue.rs`): Converts an [`Event`] into a Lua multi-value (name followed by args).
 - `Signal::new` (`signal.rs`): Creates a new empty signal dispatcher.
 - `Signal::subscribe` (`signal.rs`): Registers a subscription for the given event name.
@@ -74,30 +79,36 @@ The `event` module is Lurek2D's centralised event queue — the single channel t
 - Namespace: `lurek.event`
 
 ### Module Functions
-- `lurek.event.exit`: Pushes an exit event, requesting the engine to stop.
-- `lurek.event.poll`: Returns an iterator function that pops events from the queue.
-- `lurek.event.clear`: Discards all pending events in the queue.
-- `lurek.event.newSignal`: Creates a new pub-sub Signal dispatcher.
-- `lurek.event.pump`: Syncs OS-level events into the queue (no-op in Lurek2D push model).
-- `lurek.event.wait`: Blocks until the next event arrives or the optional timeout elapses.
-- `lurek.event.restart`: Requests that the engine restart at the beginning of the next frame.
-- `lurek.event.quit`: Alias for `exit()` â€” requests the engine to stop at the end of the current frame.
-- `lurek.event.pushDeferred`: Pushes a named event to the deferred buffer; it will not reach the main queue
-- `lurek.event.flushDeferred`: Moves all buffered deferred events into the main event queue and clears the buffer.
-- `lurek.event.enableHistory`: Enables event history recording, keeping the last `capacity` pushed events.
-- `lurek.event.getHistory`: Returns an array of recent events as `{name, args}` tables.
-- `lurek.event.clearHistory`: Clears all recorded event history.
-- `lurek.event.push`: Adds an event item to the end of the event queue for processing.
+- `lurek.event.exit`: Pushes an exit event onto the engine event queue, requesting a graceful shutdown at the end of the current frame.
+- `lurek.event.poll`: Returns an iterator function that pops events one at a time from the engine event queue.
+- `lurek.event.clear`: Discards every pending event in the engine event queue without processing them.
+- `lurek.event.newSignal`: Creates and returns a new independent Signal pub-sub dispatcher.
+- `lurek.event.pump`: Synchronises OS-level windowing events into the engine event queue.
+- `lurek.event.wait`: Blocks the current thread until the next engine event arrives or the optional timeout elapses.
+- `lurek.event.restart`: Requests that the engine perform a full restart at the beginning of the next frame.
+- `lurek.event.quit`: Alias for `exit()` - requests the engine to stop gracefully at the end of the current frame with exit code 0.
+- `lurek.event.pushDeferred`: Pushes a named event into the deferred buffer instead of the main queue.
+- `lurek.event.pushDeferredPriority`: Pushes a named deferred event with explicit queue lane priority.
+- `lurek.event.flushDeferred`: Moves all events from the deferred buffer into the main engine event queue and clears the buffer.
+- `lurek.event.enableHistory`: Enables event history recording, keeping a ring buffer of the last `capacity` events pushed via `push()`.
+- `lurek.event.getHistory`: Returns an array of recently pushed events as tables.
+- `lurek.event.clearHistory`: Clears all recorded event history entries from the ring buffer.
+- `lurek.event.push`: Pushes a custom named event onto the main engine event queue with optional payload arguments.
+- `lurek.event.pushPriority`: Pushes a custom named event onto an explicit queue lane (`high` or `normal`).
 
-### `Signal` Methods
-- `Signal:emit`: Emits the named event, calling all registered callbacks with extra arguments.
-- `Signal:remove`: Removes a subscription by handle ID.
-- `Signal:clear`: Removes all callbacks for the named event.
-- `Signal:clearAll`: Removes all callbacks across all events.
-- `Signal:getCount`: Returns the callback count for the named event.
-- `Signal:getTotalCount`: Returns the total callback count across all events.
-- `Signal:type`: Returns the type name of this object.
-- `Signal:typeOf`: Returns true if the given type name matches this object's type or any parent type.
+### `LSignal` Methods
+- `LSignal:register`: Registers a Lua callback function for the named event and returns a numeric handle ID.
+- `LSignal:emit`: Fires all callbacks registered for the named event, passing any extra arguments to each callback function.
+- `LSignal:remove`: Removes a previously registered subscription identified by its numeric handle.
+- `LSignal:clear`: Removes every callback registered for the specified event name and releases their Lua registry entries.
+- `LSignal:clearAll`: Removes every callback across all event names in this Signal instance, effectively resetting it to an empty state.
+- `LSignal:getCount`: Returns the number of callbacks currently registered for the specified event name.
+- `LSignal:getTotalCount`: Returns the total number of callbacks registered across all event names in this Signal instance.
+- `LSignal:once`: Registers a one-shot callback that fires at most once for the named event and then automatically removes itself.
+- `LSignal:registerWithFilter`: Registers a callback with an associated filter predicate function.
+- `LSignal:connect`: Subscribes to an event name or wildcard glob pattern and returns a handle.
+- `LSignal:type`: Returns the string type name of this userdata object.
+- `LSignal:typeOf`: Returns true if the given type name matches this object's type or any parent type.
 
 ## References
 

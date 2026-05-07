@@ -99,9 +99,62 @@ mod light_world_tests {
         let key = world.add_light(Light2D::new(0.0, 0.0, 50.0));
         world.get_light_mut(key).unwrap().flicker_mut().enabled = true;
         world.get_light_mut(key).unwrap().flicker_mut().speed = 2.0;
+        world.reindex_flickers();
 
         world.advance_flickers(0.5);
 
         assert!(world.get_light(key).unwrap().flicker().phase > 0.0);
+    }
+
+    #[test]
+    fn normal_map_hints_include_only_enabled_mapped_lights() {
+        let mut world = LightWorld::new();
+
+        let a = world.add_light(Light2D::new(10.0, 20.0, 30.0));
+        {
+            let la = world.get_light_mut(a).unwrap();
+            la.set_normal_map_path("assets/textures/normals/brick.png".to_string());
+            la.set_normal_strength(1.7);
+        }
+
+        let b = world.add_light(Light2D::new(40.0, 50.0, 60.0));
+        world.get_light_mut(b).unwrap().set_enabled(false);
+        world
+            .get_light_mut(b)
+            .unwrap()
+            .set_normal_map_path("assets/textures/normals/off.png".to_string());
+
+        let hints = world.normal_map_light_hints();
+        assert_eq!(hints.len(), 1);
+        assert_eq!(hints[0].x, 10.0);
+        assert_eq!(hints[0].y, 20.0);
+        assert_eq!(hints[0].path, "assets/textures/normals/brick.png");
+        assert!((hints[0].strength - 1.7).abs() < 1e-6);
+    }
+}
+
+mod light_data_tests {
+    use super::*;
+
+    #[test]
+    fn shadow_softness_round_trip() {
+        let mut light = Light2D::new(0.0, 0.0, 10.0);
+        light.set_shadow_softness(2.25);
+        assert!((light.get_shadow_softness() - 2.25).abs() < 1e-6);
+    }
+
+    #[test]
+    fn normal_map_path_and_strength_round_trip() {
+        let mut light = Light2D::new(0.0, 0.0, 10.0);
+        assert!(light.get_normal_map_path().is_none());
+
+        light.set_normal_map_path("assets/textures/normals/torch.png".to_string());
+        light.set_normal_strength(0.85);
+
+        assert_eq!(light.get_normal_map_path(), Some("assets/textures/normals/torch.png"));
+        assert!((light.get_normal_strength() - 0.85).abs() < 1e-6);
+
+        light.clear_normal_map_path();
+        assert!(light.get_normal_map_path().is_none());
     }
 }

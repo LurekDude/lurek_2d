@@ -230,3 +230,67 @@ pub fn validate(value: &SerialValue, schema: &SerialValue) -> Result<(), String>
         }
     }
 }
+
+/// Apply schema defaults to a value tree.
+///
+/// The schema may provide a `default` key at any node. When the current value
+/// is `Null`, that default value is used. For table fields and sequence items,
+/// defaults are applied recursively.
+pub fn apply_defaults(value: &SerialValue, schema: &SerialValue) -> Result<SerialValue, String> {
+    apply_defaults_at(value, schema)
+}
+
+fn apply_defaults_at(value: &SerialValue, schema: &SerialValue) -> Result<SerialValue, String> {
+    let schema_map = match schema {
+        SerialValue::Map(m) => m,
+        _ => return Err("schema must be a table".to_string()),
+    };
+
+    if matches!(value, SerialValue::Null) {
+        if let Some(default) = schema_map.get("default") {
+            return Ok(default.clone());
+        }
+        return Ok(SerialValue::Null);
+    }
+
+    let mut current = value.clone();
+
+    if let Some(SerialValue::Map(field_schemas)) = schema_map.get("fields") {
+        let mut merged = match &current {
+            SerialValue::Map(m) => m.clone(),
+            _ => {
+                return Err("schema 'fields' requires a table value".to_string());
+            }
+        };
+
+        for (field_name, field_schema) in field_schemas {
+            let existing = merged.get(field_name).cloned().unwrap_or(SerialValue::Null);
+            let patched = apply_defaults_at(&existing, field_schema)?;
+            if !matches!(patched, SerialValue::Null) {
+                merged.insert(field_name.clone(), patched);
+            }
+        }
+
+        current = SerialValue::Map(merged);
+    }
+
+    if let Some(item_schema) = schema_map.get("items") {
+        match &current {
+            SerialValue::Seq(items) => {
+                let mut out = Vec::with_capacity(items.len());
+                for item in items {
+                    out.push(apply_defaults_at(item, item_schema)?);
+                }
+                current = SerialValue::Seq(out);
+            }
+            SerialValue::Map(m) if m.is_empty() => {
+                current = SerialValue::Seq(Vec::new());
+            }
+            _ => {
+                return Err("schema 'items' requires a sequence (array) value".to_string());
+            }
+        }
+    }
+
+    Ok(current)
+}

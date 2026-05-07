@@ -11,23 +11,9 @@
 
 ## Summary
 
-## Summary
+The `mods` module is documented from the current source tree and existing module reference data.
 
-The `mods` module provides Lurek2D's mod-loading framework — the system by which user-created content packages extend or replace a base game without modifying its source. It is a Feature Systems tier module that integrates with `filesystem` for virtual filesystem mounting and with `runtime` for configuration.
-
-**ModManager lifecycle.** `ModManager` handles the complete mod lifecycle: scanning configured mod search paths for `mod.toml` manifest files; parsing manifests into `ModInfo` records (unique string ID, display name, semantic version, author, description, dependency list); resolving load order via topological sort over the dependency graph; detecting circular dependencies and missing dependencies as distinct error cases; enabling and disabling individual mods at runtime; mounting enabled mod folders into `GameFS` as overlay `MountLayer` entries so game code sees a unified virtual filesystem; and polling mtime for hot-reload detection.
-
-**Mod manifest format.** Each mod folder must contain a `mod.toml` with at minimum `id`, `name`, and `version` fields. Optional fields include `author`, `description`, and `dependencies` (a list of mod ID strings). Assets in a mod folder override base game assets at the same virtual path. New assets not in the base game are simply added to the virtual filesystem. Dependency ordering ensures that if mod B depends on mod A, mod A's assets are mounted first so mod B's overrides take precedence — the last-mounted asset wins.
-
-**Load order.** By default `ModManager` resolves load order via `load_order()` which performs a topological sort respecting declared dependencies, then sorts within each tier by a numeric `priority` field from the manifest. `set_load_order(ids)` overrides this with an explicit sequence; `clear_load_order()` reverts to automatic sorting. `validate_dependencies()` returns a list of mod IDs whose declared dependencies are not registered, and `has_circular_dependencies()` detects cycles.
-
-**Hot-reload.** `mark_for_reload(id)` places a mod in the pending reload queue. On the next `tick()` call the manager fans out reload events to Lua callbacks registered via `lurek.mods.onReload(fn)`. The Lua callback receives the mod ID and the reload reason. Game code can then re-execute the mod's Lua init scripts or notify subsystems that depend on mod-provided data.
-
-**ModRegistry.** `registry.rs` introduces `ModRegistry`, a typed name-to-value store for mod-contributed content: custom item definitions, ability descriptors, configuration overrides, or any serialisable data table. Lua scripts access it through the `lurek.mods.registry.*` namespace. A mod calls `lurek.mods.registry.register(name, data)` at init time; other mods and the base game discover contributions via `lurek.mods.registry.get(name)` or `lurek.mods.registry.list(prefix)`. This allows loose coupling between mods — no mod needs to import from another, only from the shared registry.
-
-**Lua surface.** `lurek.mods.scan(path)`, `lurek.mods.list()` → array of mod info tables, `lurek.mods.enable(id)`, `lurek.mods.disable(id)`, `lurek.mods.isEnabled(id)`, `lurek.mods.loadOrder()`, `lurek.mods.validateDeps()`, `lurek.mods.onReload(fn)`. Registry: `lurek.mods.registry.register(key, data)`, `lurek.mods.registry.get(key)`, `lurek.mods.registry.list(prefix)`, `lurek.mods.registry.unregister(key)`.
-
-**Scope boundary.** Feature Systems tier. Depends on `filesystem` (MountLayer, GameFS), `runtime` (config, SharedState). Lua bridge in `src/lua_api/mods_api.rs`.
+This module primarily collaborates with `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -73,53 +59,60 @@ The `mods` module provides Lurek2D's mod-loading framework — the system by whi
 - `lurek.mods.newRegistry`: Creates a new empty ContentRegistry for mod-contributed assets.
 - `lurek.mods.checkApiVersion`: Checks whether a mod's required `api_version` is compatible with the given `host_version`.
 
-### `ContentRegistry` Methods
-- `ContentRegistry:registerType`: Register a new content type.
-- `ContentRegistry:register`: Register a content entry.
-- `ContentRegistry:get`: Retrieve a content entry.
-- `ContentRegistry:getAll`: Get all entries for a type.
-- `ContentRegistry:getTypes`: Get all registered type names.
+### `LContentRegistry` Methods
+- `LContentRegistry:registerType`: Registers a new content type.
+- `LContentRegistry:register`: Registers a content entry.
+- `LContentRegistry:get`: Retrieves a content entry.
+- `LContentRegistry:getAll`: Returns all entries for a type.
+- `LContentRegistry:getTypes`: Returns all registered type names.
+- `LContentRegistry:type`: Returns the type name of this object.
+- `LContentRegistry:typeOf`: Returns true if this object is of the given type.
 
-### `Mod` Methods
-- `Mod:getId`: Returns the unique mod identifier
-- `Mod:getName`: Returns the localized or human-readable display name of the mod.
-- `Mod:getVersion`: Returns the version string
-- `Mod:getAuthor`: Returns the author name string from this mod's metadata manifest
-- `Mod:getDescription`: Returns the mod description
-- `Mod:getDependencies`: Returns the list of required mod IDs
-- `Mod:getPriority`: Returns the load-order priority
-- `Mod:isEnabled`: Returns whether the mod is enabled
-- `Mod:setEnabled`: Enables or disables this mod; disabled mods are skipped during loading
-- `Mod:isLoaded`: Returns whether the mod has been loaded
-- `Mod:getApiVersion`: Returns the required engine API version string, or nil if not set
-- `Mod:setApiVersion`: Sets the required engine API version string
-- `Mod:getCapabilities`: Returns an array of declared capability flags
-- `Mod:setCapabilities`: Replaces the capability list with the given array of strings
-- `Mod:getConfigSchema`: Returns the config schema as an array of `{key, type, default}` tables.
-- `Mod:setConfigSchema`: Replaces the config schema with the given array of `{key, type, default}` tables.
-- `Mod:getHook`: Returns the hook function for the given name, or nil
-- `Mod:hasHook`: Returns whether a hook with the given name exists
-- `Mod:getHookNames`: Returns an array of registered hook names
-- `Mod:setConfig`: Stores an arbitrary config value for this mod
-- `Mod:getConfig`: Returns the stored config value, or nil
-- `Mod:releaseRefs`: Releases all hook and config registry references
+### `LMod` Methods
+- `LMod:getId`: Returns the unique mod identifier.
+- `LMod:getName`: Returns the localized or human-readable display name of the mod.
+- `LMod:getVersion`: Returns the version string.
+- `LMod:getAuthor`: Returns the author name string from this mod's metadata manifest.
+- `LMod:getDescription`: Returns the mod description.
+- `LMod:getDependencies`: Returns the list of required mod IDs.
+- `LMod:getPriority`: Returns the load-order priority.
+- `LMod:isEnabled`: Returns whether the mod is enabled.
+- `LMod:setEnabled`: Enables or disables this mod.
+- `LMod:isLoaded`: Returns whether the mod has been loaded.
+- `LMod:getApiVersion`: Returns the required engine API version string when one is set.
+- `LMod:setApiVersion`: Sets the required engine API version string.
+- `LMod:getCapabilities`: Returns an array of declared capability flags.
+- `LMod:setCapabilities`: Replaces the capability list with the given array of strings.
+- `LMod:getConfigSchema`: Returns the config schema as an array of `{key, type, default}` tables.
+- `LMod:setConfigSchema`: Replaces the config schema with the given array of `{key, type, default}` tables.
+- `LMod:setHook`: Registers a named hook callback, replacing any existing one.
+- `LMod:getHook`: Returns the hook function for the given name.
+- `LMod:hasHook`: Returns whether a hook with the given name exists.
+- `LMod:getHookNames`: Returns an array of registered hook names.
+- `LMod:setConfig`: Stores an arbitrary config value for this mod.
+- `LMod:getConfig`: Returns the stored config value.
+- `LMod:releaseRefs`: Releases all hook and config registry references.
+- `LMod:type`: Returns the type name of this object.
+- `LMod:typeOf`: Returns true if this object is of the given type.
 
-### `ModManager` Methods
-- `ModManager:registerMod`: Registers a mod from its Mod userdata
-- `ModManager:unregisterMod`: Removes a mod by ID and returns whether it was found
-- `ModManager:hasMod`: Returns whether a mod with the given ID is registered
-- `ModManager:getModCount`: Returns the number of registered mods
-- `ModManager:getAllMods`: Returns an array of info tables for all registered mods
-- `ModManager:getLoadOrder`: Returns an array of info tables in effective load order
-- `ModManager:validateDependencies`: Returns an array of mod IDs with missing dependencies
-- `ModManager:hasCircularDependencies`: Returns whether any circular dependency cycles exist
-- `ModManager:setLoadOrder`: Sets an explicit load order from an array of mod ID strings
-- `ModManager:clearLoadOrder`: Clears the custom load order, reverting to priority-based sorting
-- `ModManager:scanFolder`: Scans a directory for mods with mod.toml and registers them
-- `ModManager:getModPath`: Returns the filesystem path of a registered mod, or nil
-- `ModManager:markForReload`: Marks a registered mod for hot-reload
-- `ModManager:getReloadQueue`: Returns the array of mod IDs pending hot-reload
-- `ModManager:clearReloadQueue`: Clears the reload queue without reloading
+### `LModManager` Methods
+- `LModManager:registerMod`: Registers a mod from its mod userdata.
+- `LModManager:unregisterMod`: Removes a mod by ID and returns whether it was found.
+- `LModManager:hasMod`: Returns whether a mod with the given ID is registered.
+- `LModManager:getModCount`: Returns the number of registered mods.
+- `LModManager:getAllMods`: Returns an array of info tables for all registered mods.
+- `LModManager:getLoadOrder`: Returns an array of info tables in effective load order.
+- `LModManager:validateDependencies`: Returns an array of mod IDs with missing dependencies.
+- `LModManager:hasCircularDependencies`: Returns whether any circular dependency cycles exist.
+- `LModManager:setLoadOrder`: Sets an explicit load order from an array of mod ID strings.
+- `LModManager:clearLoadOrder`: Clears the custom load order.
+- `LModManager:scanFolder`: Scans a directory for mods with `mod.toml` and registers them.
+- `LModManager:getModPath`: Returns the filesystem path of a registered mod.
+- `LModManager:markForReload`: Marks a registered mod for hot-reload.
+- `LModManager:getReloadQueue`: Returns the array of mod IDs pending hot-reload.
+- `LModManager:clearReloadQueue`: Clears the reload queue without reloading.
+- `LModManager:type`: Returns the type name of this object.
+- `LModManager:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

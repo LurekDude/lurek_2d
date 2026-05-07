@@ -11,23 +11,9 @@
 
 ## Summary
 
-## Summary
+The `log` module is documented from the current source tree and existing module reference data.
 
-The `log` module is Lurek2D's logging facade for Lua game scripts — a Foundations tier module that routes `lurek.log.*` calls through the Rust `log` crate so game-script output appears alongside engine diagnostics in the unified log stream, filtered by the same `RUST_LOG` environment variable mechanism used by the engine itself.
-
-**Level management.** `set_level(level)`, `get_level()`, and `enabled_for(level)` delegate to the shared log configuration, giving Lua scripts a single knob for the global filter. `enabled_for` allows cheap pre-checks before building an expensive log message string. Four severity helper functions — `debug(msg)`, `info(msg)`, `warn(msg)`, `error(msg)` — emit through the standard `log` macro chain and fan out to all registered sinks.
-
-**Structured logging.** `log_structured(level, msg, fields)` emits a record in `msg { key1=val1, key2=val2, ... }` format using a `LogFields` sorted map. `debug_fields`, `info_fields`, `warn_fields`, and `error_fields` are Lua shorthand helpers that combine level selection and field emission in a single call. Structured output is machine-parseable, making it suitable for analytics pipelines, automated test assertions, and telemetry collection.
-
-**Sink routing layer.** The `sinks` submodule adds a configurable routing layer running in parallel with the standard `log` crate output. A `Sink` pairs a `SinkKind` backend with an independent `SinkLevel` minimum threshold, allowing separate capture policies per destination. Three sink kinds are supported: `File` (append-mode; one record per line), `RotatingFile` (byte-count rotation with configurable backup file count — e.g. five 1 MB files), and `Memory` (bounded ring buffer of `MemoryEntry` records capped at a configurable max size). A `File` sink at `debug` level captures the full trace for post-mortem analysis; a `Memory` sink at `warn` level drives an in-game notification panel — both active at the same time via `SinkRegistry`.
-
-**SinkRegistry.** `SinkRegistry` maintains a per-VM ordered list of sinks. `add(sink)` returns a numeric `SinkId` for later management: `remove(id)`, `flush(id)` (force file flush), `read_memory(id, drain)` (return buffered `MemoryEntry` records, optionally clearing the buffer). `dispatch(level, msg)` and `dispatch_structured(level, msg, fields)` fan out each emitted record to all registered sinks whose `min_level` threshold is satisfied. The level check is done per-sink, so a single `dispatch` call feeds only the sinks that opted into that level.
-
-**In-game log viewers.** `read_memory(id, drain)` is designed for real-time UI consumption: pass `drain = false` to read without clearing (for a scrollable log panel), `drain = true` to pop and process (for a notification queue that clears after display). `MemoryEntry` carries timestamp, level, and message. `listSinks()` in Lua returns a descriptive table for each registered sink so developer overlays can show which log destinations are currently active.
-
-**Lua surface.** `lurek.log.debug(msg)`, `info(msg)`, `warn(msg)`, `error(msg)`. `lurek.log.setLevel(level)`, `getLevel()`, `isEnabled(level)`. `lurek.log.structured(level, msg, fields)` (convenience variants: `debugFields`, `infoFields`, `warnFields`, `errorFields`). Sinks: `lurek.log.addSink(spec)` → id, `removeSink(id)`, `flushSink(id)`, `readMemory(id, drain)`, `listSinks()`.
-
-**Scope boundary.** Foundations tier. Depends on `runtime` for shared log state access. Lua bridge in `src/lua_api/log_api.rs`.
+This module primarily collaborates with `runtime`. Its responsibility should stay inside the Foundations group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -79,24 +65,24 @@ The `log` module is Lurek2D's logging facade for Lua game scripts — a Foundati
 - Namespace: `lurek.log`
 
 ### Module Functions
-- `lurek.log.debug`: Emits a debug-severity log message. Also dispatches to configured sinks.
-- `lurek.log.info`: Emits an info-severity log message. Also dispatches to configured sinks.
-- `lurek.log.warn`: Emits a warn-severity log message. Also dispatches to configured sinks.
-- `lurek.log.error`: Emits an error-severity log message. Also dispatches to configured sinks.
-- `lurek.log.print`: Emits a log message at the specified level. Also dispatches to sinks.
-- `lurek.log.setLevel`: Sets the minimum severity level for the default log channel.
-- `lurek.log.getLevel`: Returns the name of the currently active minimum log level.
-- `lurek.log.addSink`: Registers a new output sink. Returns its numeric id.
-- `lurek.log.removeSink`: Removes a sink by id. Returns true if one was removed.
-- `lurek.log.clearSinks`: Removes all registered sinks (the default stderr channel is unaffected).
-- `lurek.log.listSinks`: Returns a table describing all registered sinks.
-- `lurek.log.readMemory`: Reads entries from a memory sink. If drain=true the buffer is cleared.
-- `lurek.log.flushFile`: Flushes the OS write buffer for a file sink.
-- `lurek.log.struct`: Emits a structured log message with key-value fields.
-- `lurek.log.debug_fields`: Emits a debug structured log message. Shorthand for `struct("debug", ...)`.
-- `lurek.log.info_fields`: Emits an info structured log message. Shorthand for `struct("info", ...)`.
-- `lurek.log.warn_fields`: Emits a warn structured log message. Shorthand for `struct("warn", ...)`.
-- `lurek.log.error_fields`: Emits an error structured log message. Shorthand for `struct("error", ...)`.
+- `lurek.log.debug`: Emits a message at debug severity to the engine log and all registered sinks.
+- `lurek.log.info`: Emits a message at info severity to the engine log and all registered sinks.
+- `lurek.log.warn`: Emits a message at warning severity to the engine log and all registered sinks.
+- `lurek.log.error`: Emits a message at error severity to the engine log and all registered sinks.
+- `lurek.log.print`: Emits a log message at an arbitrary severity level specified as a string.
+- `lurek.log.setLevel`: Sets the global minimum severity threshold for the engine log backend.
+- `lurek.log.getLevel`: Returns the name of the current global minimum severity threshold as a lowercase string (e.g.
+- `lurek.log.addSink`: Creates and registers a new log output sink from the given configuration table.
+- `lurek.log.removeSink`: Removes a previously registered log sink by its numeric identifier.
+- `lurek.log.clearSinks`: Removes every registered log sink, returning the logging system to its default state where messages go only to the engine log backend (stderr).
+- `lurek.log.listSinks`: Returns an array-like table where each entry is a table describing one registered sink.
+- `lurek.log.readMemory`: Reads log entries stored in a memory-type sink.
+- `lurek.log.flushFile`: Forces the operating system to write any buffered data for a file-type sink to disk.
+- `lurek.log.struct`: Emits a structured log message that includes arbitrary key-value metadata alongside the human-readable text.
+- `lurek.log.debug_fields`: Emits a structured log message at debug severity with key-value metadata.
+- `lurek.log.info_fields`: Emits a structured log message at info severity with key-value metadata.
+- `lurek.log.warn_fields`: Emits a structured log message at warning severity with key-value metadata.
+- `lurek.log.error_fields`: Emits a structured log message at error severity with key-value metadata.
 
 ## References
 

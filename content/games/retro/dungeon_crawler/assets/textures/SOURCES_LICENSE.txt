@@ -1,0 +1,20 @@
+Dungeon Crawler - Texture Sources and License
+
+Files in this folder:
+- stone_bricks.png
+- cobble_dark.png
+- grass_block.png
+- dirt_top.png
+- sandstone.png
+- wood_planks.png
+
+Source:
+- Original textures created for Lurek2D demo content (no external logos, no game branding).
+
+License:
+- Dedicated to CC0 1.0 (Public Domain Dedication).
+- CC0 legal text: https://creativecommons.org/publicdomain/zero/1.0/
+
+Notes:
+- Textures are square (128x128), pixel-art block style intended for Minecraft-like visual language.
+- Generated and stored only under content-side demo assets.

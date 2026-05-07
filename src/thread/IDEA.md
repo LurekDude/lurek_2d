@@ -8,7 +8,7 @@
 
 - **Module**: `thread`
 - **Owner module path**: `src/thread/`
-- **Last reviewed**: 2026-04-18 (UTC)
+- **Last reviewed**: 2026-05-07 (UTC)
 - **Reviewer agent**: `developer` · Session: `src-module-review-20260418`
 - **Plugin tier candidacy**: `CORE-KEEP`
 - **LOC (rust only)**: ~790 · **Public Lua surface**: `lurek.thread` — 12 fns / 3 userdata (Channel, Thread, Promise)
@@ -53,10 +53,10 @@ The `thread` module provides Lurek2D's background-thread system: `Channel` (MPMC
 
 ## 7. Test Coverage Gaps
 
-- **[P2][TEST-RUST]** Add multi-threaded stress test for `Channel` (N producers, M consumers, verify all values delivered).
-- **[P2][TEST-LUA]** Add Lua BDD test for `lurek.thread.newThread` + channel round-trip.
-- **[DONE][TEST-RUST]** `pool.rs` — added 4 inline tests: pool size, submit/collect roundtrip, collect empty, channel access.
-- **[DONE][TEST-RUST]** `worker.rs` — added 7 inline tests: pending state, start/complete lifecycle, double-start error, Lua error capture, arg passing, unstarted wait, ThreadState variants.
+- **[P2][TEST-RUST]** Extend stress coverage for `Channel` with high-contention producer/consumer permutations (N producers, M consumers, mixed timeouts).
+- **[P3][TEST-LUA]** Add worker-availability contract test that verifies documented worker-safe `lurek.*` subset.
+- **[DONE][TEST-RUST]** Core thread behavior is covered in `tests/rust/unit/thread_tests.rs` (channel semantics, pool lifecycle, worker lifecycle, promise states).
+- **[DONE][TEST-LUA]** Lua surface is covered in `tests/lua/unit/test_thread_core_unit.lua` (newThread/channel/promise round-trips).
 
 ## 8. TODO(dedup): Cross-Module Overlap
 
@@ -77,7 +77,7 @@ TODO(plugin): CORE-KEEP — threading is a foundational service; asset loaders, 
 ## 11. References
 
 - Module spec: [docs/specs/thread.md](../../docs/specs/thread.md)
-- Lua API reference: [docs/API/lua-api.md#thread](../../docs/API/lua-api.md)
+- Lua API reference: [docs/api/lurek.md](../../docs/api/lurek.md)
 - Plugin doc tier table: [plugins.md §5](../../docs/architecture/plugins.md#5-candidate-modules)
 - Competitor links cited above: https://defold.com/manuals/animation/
 - Authoring guide: [IDEA_AUTHORING.md](../../work/src-module-review-20260418/reports/IDEA_AUTHORING.md)

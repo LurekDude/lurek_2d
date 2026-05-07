@@ -29,8 +29,8 @@ The `data` module provides Lurek2D's binary-data toolkit: byte buffers with type
 
 ## 4. Gap List
 
-1. **[P2][GAP]** No streaming compression — `compress()` takes the entire `&[u8]` at once; large assets cause a full copy.
-   - Why: Compressing a 50 MB save file doubles peak memory.
+1. ~~**[P2][GAP]** No streaming compression — `compress()` takes the entire `&[u8]` at once; large assets cause a full copy.~~ ✅ **DONE** — Added `compress_stream`, `decompress_stream`, `compress_chunks`, and `decompress_chunks` in `src/data/compress.rs`, plus Lua `lurek.data.compressChunks` and `lurek.data.decompressChunks`.
+   - ~~Why: Compressing a 50 MB save file doubles peak memory.~~
 2. **[P3][GAP]** `DataView` has no write cursor — read-only sequential access; building binary messages requires manual offset math on `ByteData`.
    - Why: GameDev sending binary network packets must track write offsets manually.
 
@@ -40,9 +40,9 @@ The `data` module provides Lurek2D's binary-data toolkit: byte buffers with type
    - ~~Rationale: Symmetric read/write API simplifies binary protocol work for GameDev.~~
    - ~~Effort: M · Risk: low.~~
    - ~~Competitor inspiration: [love2d: "love.data.ByteData with string.pack for binary protocols" — https://love2d.org/wiki/ByteData]~~
-2. **[P3][FEAT]** Streaming compress/decompress via reader/writer wrappers — chunk-based for large data.
-   - Rationale: Prevents 2x peak memory for large files.
-   - Effort: M · Risk: low.
+2. ~~**[P3][FEAT]** Streaming compress/decompress via reader/writer wrappers — chunk-based for large data.~~ ✅ **DONE** — Implemented reader/writer stream APIs and chunk-based helpers in Rust core; exposed chunked API in Lua.
+   - ~~Rationale: Prevents 2x peak memory for large files.~~
+   - ~~Effort: M · Risk: low.~~
 
 ## 6. Performance / Reliability / Quality Ideas
 

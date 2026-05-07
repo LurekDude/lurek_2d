@@ -246,7 +246,7 @@ The `physics` module provides Lurek2D's rigid-body physics simulation backed by 
 ### Module Functions
 - `lurek.physics.newWorld`: Creates a new physics world with the given gravity vector.
 - `lurek.physics.step`: Advances the physics world by dt seconds.
-- `lurek.physics.destroyWorld`: Marks a physics world for destruction. Subsequent operations on the world
+- `lurek.physics.destroyWorld`: Marks a physics world for destruction.
 - `lurek.physics.newBody`: Creates a new rectangular body in the given world.
 - `lurek.physics.getBody`: Returns the position and velocity of a body (x, y, vx, vy).
 - `lurek.physics.setBodyVelocity`: Sets the velocity of a body.
@@ -260,7 +260,7 @@ The `physics` module provides Lurek2D's rigid-body physics simulation backed by 
 - `lurek.physics.attachShape`: Attaches a standalone shape to a body as an additional fixture.
 - `lurek.physics.getCollisions`: Returns all collision events from the last simulation step.
 - `lurek.physics.debugDraw`: Enables or disables the physics debug overlay (AABB boxes and velocity vectors).
-- `lurek.physics.drawDebugGpu`: Extracts collider geometry from a World and queues a GPU physics debug
+- `lurek.physics.drawDebugGpu`: Queues a GPU physics debug draw command for the current frame.
 - `lurek.physics.newTerrain`: Creates a destructible terrain grid.
 - `lurek.physics.newCellular`: Creates a falling-sand cellular automaton grid.
 - `lurek.physics.testAABB`: Returns true when two axis-aligned bounding boxes overlap.
@@ -268,145 +268,199 @@ The `physics` module provides Lurek2D's rigid-body physics simulation backed by 
 - `lurek.physics.testPoint`: Returns true when point (px, py) lies inside the AABB.
 - `lurek.physics.testCircleAABB`: Returns true when a circle overlaps an AABB.
 
-### `Body` Methods
-- `Body:getId`: Returns the body's integer ID.
-- `Body:getPosition`: Returns the body position (x, y).
-- `Body:setPosition`: Teleports the body to the given world-space position, bypassing collision.
-- `Body:getX`: Returns the body X position.
-- `Body:getY`: Returns the body Y position.
-- `Body:getVelocity`: Returns the body velocity (vx, vy).
-- `Body:setVelocity`: Sets the body's linear velocity in world units per second.
-- `Body:getAngle`: Returns the body angle in radians.
-- `Body:setAngle`: Sets the body angle in radians.
-- `Body:getAngularVelocity`: Returns the angular velocity in radians/s.
-- `Body:setAngularVelocity`: Sets the angular velocity.
-- `Body:getMass`: Returns the body mass in kilograms used for force and impulse calculations.
-- `Body:setMass`: Sets the body mass; affects how forces and impulses change velocity.
-- `Body:getType`: Returns the body type as a string.
-- `Body:setType`: Changes the body type: `"dynamic"`, `"static"`, or `"kinematic"`.
-- `Body:getWidth`: Returns the width of this body's primary collider shape in world units.
-- `Body:getHeight`: Returns the height of this body's primary collider shape in world units.
-- `Body:getFriction`: Returns the body friction coefficient.
-- `Body:setFriction`: Sets the body friction coefficient.
-- `Body:getRestitution`: Returns the body restitution (bounciness).
-- `Body:setRestitution`: Sets the body restitution (bounciness).
-- `Body:getLayer`: Returns the collision layer bitmask.
-- `Body:setLayer`: Sets the collision layer bitmask.
-- `Body:getMask`: Returns the collision mask bitmask.
-- `Body:setMask`: Sets the collision mask bitmask.
-- `Body:applyImpulse`: Applies a linear impulse to the body.
-- `Body:applyForce`: Applies a continuous force to the body.
-- `Body:applyTorque`: Applies a torque (rotational force).
-- `Body:applyAngularImpulse`: Applies an angular impulse.
-- `Body:getGravityScale`: Returns the per-body gravity multiplier.
-- `Body:setGravityScale`: Sets the per-body gravity multiplier.
-- `Body:isFixedRotation`: Returns whether rotation is locked.
-- `Body:setFixedRotation`: Locks or unlocks rotation.
-- `Body:getLinearDamping`: Returns the linear damping coefficient.
-- `Body:setLinearDamping`: Sets the linear damping coefficient.
-- `Body:getAngularDamping`: Returns the angular damping coefficient.
-- `Body:setAngularDamping`: Sets the angular damping coefficient.
-- `Body:isBullet`: Returns whether CCD is enabled.
-- `Body:setBullet`: Enables or disables continuous collision detection (CCD) for fast-moving bodies.
-- `Body:isSleepingAllowed`: Returns whether the body can sleep.
-- `Body:setSleepingAllowed`: Sets whether the body can sleep.
-- `Body:destroy`: Removes this body from the world.
-- `Body:isSleeping`: Returns true if this body is currently sleeping (inactive).
-- `Body:wakeUp`: Forcibly wakes up this body.
-- `Body:sleep`: Puts this body to sleep immediately.
+### `LBody` Methods
+- `LBody:getId`: Returns the body's integer ID.
+- `LBody:getPosition`: Returns the body position (x, y).
+- `LBody:setPosition`: Teleports the body to the given world-space position, bypassing collision.
+- `LBody:getX`: Returns the body X position.
+- `LBody:getY`: Returns the body Y position.
+- `LBody:getVelocity`: Returns the body velocity (vx, vy).
+- `LBody:setVelocity`: Sets the body's linear velocity in world units per second.
+- `LBody:getAngle`: Returns the body angle in radians.
+- `LBody:setAngle`: Sets the body angle in radians.
+- `LBody:getAngularVelocity`: Returns the angular velocity in radians/s.
+- `LBody:setAngularVelocity`: Sets the angular velocity.
+- `LBody:getMass`: Returns the body mass in kilograms used for force and impulse calculations.
+- `LBody:setMass`: Sets the body mass; affects how forces and impulses change velocity.
+- `LBody:getType`: Returns the body type as a string.
+- `LBody:setType`: Changes the body type: `"dynamic"`, `"static"`, or `"kinematic"`.
+- `LBody:getWidth`: Returns the width of this body's primary collider shape in world units.
+- `LBody:getHeight`: Returns the height of this body's primary collider shape in world units.
+- `LBody:getFriction`: Returns the body friction coefficient.
+- `LBody:setFriction`: Sets the body friction coefficient.
+- `LBody:getRestitution`: Returns the body restitution (bounciness).
+- `LBody:setRestitution`: Sets the body restitution (bounciness).
+- `LBody:getLayer`: Returns the collision layer bitmask.
+- `LBody:setLayer`: Sets the collision layer bitmask.
+- `LBody:getMask`: Returns the collision mask bitmask.
+- `LBody:setMask`: Sets the collision mask bitmask.
+- `LBody:applyImpulse`: Applies a linear impulse to the body.
+- `LBody:applyForce`: Applies a continuous force to the body.
+- `LBody:applyTorque`: Applies a torque (rotational force).
+- `LBody:applyForceAtPoint`: Applies a force at a specific world-space point.
+- `LBody:applyAngularImpulse`: Applies an angular impulse.
+- `LBody:getGravityScale`: Returns the per-body gravity multiplier.
+- `LBody:setGravityScale`: Sets the per-body gravity multiplier.
+- `LBody:isFixedRotation`: Returns whether rotation is locked.
+- `LBody:setFixedRotation`: Locks or unlocks rotation.
+- `LBody:getLinearDamping`: Returns the linear damping coefficient.
+- `LBody:setLinearDamping`: Sets the linear damping coefficient.
+- `LBody:getAngularDamping`: Returns the angular damping coefficient.
+- `LBody:setAngularDamping`: Sets the angular damping coefficient.
+- `LBody:isBullet`: Returns whether CCD is enabled.
+- `LBody:setBullet`: Enables or disables continuous collision detection (CCD) for fast-moving bodies.
+- `LBody:isSleepingAllowed`: Returns whether the body can sleep.
+- `LBody:setSleepingAllowed`: Sets whether the body can sleep.
+- `LBody:destroy`: Removes this body from the world.
+- `LBody:isSleeping`: Returns true if this body is currently sleeping (inactive).
+- `LBody:wakeUp`: Forcibly wakes up this body.
+- `LBody:sleep`: Puts this body to sleep immediately.
+- `LBody:type`: Returns the type name of this object.
+- `LBody:typeOf`: Returns true if this object is of the given type.
 
-### `Cellular` Methods
-- `Cellular:setCell`: Sets the material of a cell.
-- `Cellular:getCell`: Returns the material at `(cx, cy)` as an integer constant.
-- `Cellular:step`: Advances the simulation by one tick.
-- `Cellular:stepN`: Advances the simulation by `n` ticks.
-- `Cellular:toImageData`: Returns the full grid as an RGBA byte string using the default colour palette.
-- `Cellular:countCells`: Counts cells of the given material type.
-- `Cellular:findCells`: Returns positions of all cells of the given material as an array of `{x, y}` tables.
-- `Cellular:toBytes`: Serialises the grid to a byte string.
-- `Cellular:loadFromBytes`: Loads grid data from bytes produced by `toBytes`.
+### `LCellular` Methods
+- `LCellular:setCell`: Sets the material of a cell.
+- `LCellular:getCell`: Returns the material at `(cx, cy)` as an integer constant.
+- `LCellular:fillRect`: Fills a rectangular region of cells with the given material.
+- `LCellular:fillCircle`: Fills a circle of cells with the given material.
+- `LCellular:step`: Advances the simulation by one tick.
+- `LCellular:stepN`: Advances the simulation by `n` ticks.
+- `LCellular:toImageData`: Returns the full grid as an RGBA byte string using the default colour palette.
+- `LCellular:toImageDataRegion`: Returns a sub-region as an RGBA byte string.
+- `LCellular:countCells`: Counts cells of the given material type.
+- `LCellular:findCells`: Returns positions of all cells of the given material as an array of `{x, y}` tables.
+- `LCellular:toBytes`: Serialises the grid to a byte string.
+- `LCellular:loadFromBytes`: Loads grid data from bytes produced by `toBytes`.
+- `LCellular:type`: Returns the type name of this object.
+- `LCellular:typeOf`: Returns true if this object is of the given type.
 
-### `PhysicsShape` Methods
-- `PhysicsShape:getType`: Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain".
-- `PhysicsShape:getRadius`: Returns the radius. Only valid for circle shapes.
-- `PhysicsShape:getBoundingBox`: Returns the axis-aligned bounding box (x1, y1, x2, y2).
-- `PhysicsShape:setDensity`: Sets the density for this shape (used when attaching to a body).
-- `PhysicsShape:setFriction`: Sets the friction coefficient.
-- `PhysicsShape:setRestitution`: Sets the restitution (bounciness) coefficient.
-- `PhysicsShape:setSensor`: Sets whether this shape is a sensor (non-colliding trigger).
-- `PhysicsShape:destroy`: Releases this shape handle (GC handles cleanup).
+### `LPhysicsShape` Methods
+- `LPhysicsShape:getType`: Returns the shape type string: "circle", "rectangle", "polygon", "edge", or "chain".
+- `LPhysicsShape:getRadius`: Returns the radius. Only valid for circle shapes.
+- `LPhysicsShape:getBoundingBox`: Returns the axis-aligned bounding box (x1, y1, x2, y2).
+- `LPhysicsShape:setDensity`: Sets the density for this shape (used when attaching to a body).
+- `LPhysicsShape:setFriction`: Sets the friction coefficient.
+- `LPhysicsShape:setRestitution`: Sets the restitution (bounciness) coefficient.
+- `LPhysicsShape:setSensor`: Sets whether this shape is a sensor (non-colliding trigger).
+- `LPhysicsShape:destroy`: Releases this shape handle (GC handles cleanup).
+- `LPhysicsShape:type`: Returns the type name of this object.
+- `LPhysicsShape:typeOf`: Returns true if this object is of the given type.
 
-### `Terrain` Methods
-- `Terrain:setCell`: Sets a single terrain cell to solid or empty.
-- `Terrain:getCell`: Returns whether a cell is solid.
-- `Terrain:fillAll`: Sets every cell in the grid to `solid`.
-- `Terrain:flush`: Rebuilds physics bodies for all dirty chunks.
-- `Terrain:isDirty`: Returns `true` when at least one chunk needs flushing.
-- `Terrain:collapseColumns`: Removes unsupported cells, returning the number of cells that fell.
-- `Terrain:solidPositions`: Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
-- `Terrain:toBytes`: Serialises the terrain grid to a byte string for save/load.
-- `Terrain:loadFromBytes`: Loads terrain cell data from bytes produced by `toBytes`.
+### `LTerrain` Methods
+- `LTerrain:setCell`: Sets a single terrain cell to solid or empty.
+- `LTerrain:getCell`: Returns whether a cell is solid.
+- `LTerrain:fillCircle`: Fills a circle of cells centred at world position `(wx, wy)`.
+- `LTerrain:fillRect`: Fills a rectangular region of cells.
+- `LTerrain:fillAll`: Sets every cell in the grid to `solid`.
+- `LTerrain:flush`: Rebuilds physics bodies for all dirty chunks.
+- `LTerrain:isDirty`: Returns `true` when at least one chunk needs flushing.
+- `LTerrain:collapseColumns`: Removes unsupported cells, returning the number of cells that fell.
+- `LTerrain:solidPositions`: Returns the world-space centres of all solid cells as an array of `{x, y}` tables.
+- `LTerrain:spawnDebris`: Spawns dynamic debris bodies at the given positions.
+- `LTerrain:toImageData`: Returns the terrain as an RGBA byte string.
+- `LTerrain:toBytes`: Serialises the terrain grid to a byte string for save/load.
+- `LTerrain:loadFromBytes`: Loads terrain cell data from bytes produced by `toBytes`.
+- `LTerrain:type`: Returns the type name of this object.
+- `LTerrain:typeOf`: Returns true if this object is of the given type.
 
-### `World` Methods
-- `World:step`: Advances the physics simulation by dt seconds, firing onBeginContact /
-- `World:clear`: Resets the world, removing all bodies and joints.
-- `World:getGravity`: Returns the gravity vector (gx, gy).
-- `World:setGravity`: Sets the world gravity vector; default is `(0, 9.81)` (downward).
-- `World:setMeter`: Sets the pixels-per-meter scaling factor.
-- `World:getMeter`: Returns the pixels-per-meter scaling factor.
-- `World:toPhysics`: Converts a pixel value to physics units.
-- `World:toPixels`: Converts a physics-unit value to pixels.
-- `World:getBodyCount`: Returns the total number of bodies in the world.
-- `World:getBodyIds`: Returns all body IDs in the world.
-- `World:destroyBody`: Removes a body from the world.
-- `World:newBody`: Creates a new rectangular body and adds it to the world.
-- `World:fixtureCount`: Returns the number of fixtures on a body.
-- `World:jointCount`: Returns the total number of joints.
-- `World:getJointIds`: Returns a table of integer IDs for every joint attached to this world.
-- `World:getJointBodies`: Returns the two body IDs connected by a joint.
-- `World:destroyJoint`: Removes a joint from the world.
-- `World:getJointType`: Returns the type name of a joint.
-- `World:getJointMotorSpeed`: Returns the motor speed on a joint's angular axis.
-- `World:getJointLimits`: Returns the angular limits on a joint.
-- `World:getBodyAtPoint`: Returns the body ID at a world-space point, or nil.
-- `World:getCollisionEvents`: Returns collision events from the last step.
-- `World:getBeginContactEvents`: Returns begin-contact events from the last step.
-- `World:getEndContactEvents`: Returns end-contact events from the last step.
-- `World:getContacts`: Returns all contact pairs from the narrow phase.
-- `World:getBodyContacts`: Returns contacts involving a specific body.
-- `World:setBodyType`: Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
-- `World:getBodyType`: Returns the body type as a string.
-- `World:setBeginContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
-- `World:clearBeginContact`: Removes the begin-contact callback.
-- `World:setEndContact`: Registers a Lua function called with (bodyIdA, bodyIdB) when two
-- `World:clearEndContact`: Removes the end-contact callback.
-- `World:getBodyData`: Returns the Lua data previously attached to a body, or nil if none is set.
-- `World:clearBodyData`: Removes the Lua data attached to a body.
-- `World:setBodyCCD`: Enables or disables Continuous Collision Detection for a body.
-- `World:getBodyCCD`: Returns whether CCD is enabled for a body.
-- `World:clearBodyOneWay`: Removes the one-way platform flag from a body.
-- `World:getBodyOneWay`: Returns the one-way normal for a body, or nil if not configured.
-- `World:setJointBreakForce`: Sets the relative-velocity threshold above which a joint breaks.
-- `World:getJointBreakForce`: Returns the break threshold for a joint, or nil if not set.
-- `World:isBodySleeping`: Returns true if a body is currently sleeping (inactive).
-- `World:wakeUpBody`: Forcibly wakes up a sleeping body.
-- `World:sleepBody`: Puts a body to sleep immediately.
-- `World:setSolverIterations`: Sets the number of constraint solver iterations per step.
-- `World:getSolverIterations`: Returns the current number of solver iterations per step.
-- `World:newBodies`: Creates multiple bodies in one call.
-- `World:addZone`: Creates a rectangular gravity/damping zone and returns a LuaZone handle.
-- `World:getZoneEvents`: Returns zone enter/leave events produced by the most recent step.
+### `LWorld` Methods
+- `LWorld:drawDebug`: Draws physics objects into an image for debugging.
+- `LWorld:step`: Advances the physics simulation by `dt` seconds.
+- `LWorld:clear`: Resets the world, removing all bodies and joints.
+- `LWorld:getGravity`: Returns the gravity vector (gx, gy).
+- `LWorld:setGravity`: Sets the world gravity vector; default is `(0, 9.81)` (downward).
+- `LWorld:setMeter`: Sets the pixels-per-meter scaling factor.
+- `LWorld:getMeter`: Returns the pixels-per-meter scaling factor.
+- `LWorld:toPhysics`: Converts a pixel value to physics units.
+- `LWorld:toPixels`: Converts a physics-unit value to pixels.
+- `LWorld:getBodyCount`: Returns the total number of bodies in the world.
+- `LWorld:getBodyIds`: Returns all body IDs in the world.
+- `LWorld:destroyBody`: Removes a body from the world.
+- `LWorld:newBody`: Creates a new rectangular body and adds it to the world.
+- `LWorld:newCircleBody`: Creates a new circular body and adds it to the world.
+- `LWorld:newPolygonBody`: Creates a new polygon body from a flat vertex table and adds it to the world.
+- `LWorld:newEdgeBody`: Creates a new edge (line segment) body and adds it to the world.
+- `LWorld:newChainBody`: Creates a new chain body from a flat vertex table and adds it to the world.
+- `LWorld:addFixture`: Adds an extra fixture (collider) to a body.
+- `LWorld:fixtureCount`: Returns the number of fixtures on a body.
+- `LWorld:setFixtureFriction`: Sets friction on a fixture by index.
+- `LWorld:setFixtureRestitution`: Sets restitution on a fixture by index.
+- `LWorld:setFixtureSensor`: Sets whether a fixture is a sensor.
+- `LWorld:addRevoluteJoint`: Creates a revolute (pin) joint between two bodies.
+- `LWorld:addDistanceJoint`: Creates a distance joint between two bodies.
+- `LWorld:addPrismaticJoint`: Creates a prismatic (slider) joint between two bodies.
+- `LWorld:addWeldJoint`: Creates a weld (rigid) joint between two bodies.
+- `LWorld:addRopeJoint`: Creates a rope joint with a maximum distance.
+- `LWorld:addWheelJoint`: Creates a wheel joint (prismatic + rotation).
+- `LWorld:addFrictionJoint`: Creates a friction joint that resists relative motion.
+- `LWorld:addMotorJoint`: Creates a motor joint that drives body_b toward body_a.
+- `LWorld:addMouseJoint`: Creates a mouse joint connecting a body to a target point.
+- `LWorld:addPulleyJoint`: Creates a pulley joint (stub - falls back to weld joint).
+- `LWorld:addGearJoint`: Creates a gear joint (stub - falls back to weld joint).
+- `LWorld:jointCount`: Returns the total number of joints.
+- `LWorld:getJointIds`: Returns a table of integer IDs for every joint attached to this world.
+- `LWorld:getJointBodies`: Returns the two body IDs connected by a joint.
+- `LWorld:destroyJoint`: Removes a joint from the world.
+- `LWorld:getJointType`: Returns the type name of a joint.
+- `LWorld:setJointMotorSpeed`: Sets the motor speed on a joint's angular axis.
+- `LWorld:getJointMotorSpeed`: Returns the motor speed on a joint's angular axis.
+- `LWorld:setJointLimitsEnabled`: Enables or disables angular limits on a joint.
+- `LWorld:setJointLimits`: Sets the angular limits on a joint.
+- `LWorld:getJointLimits`: Returns the angular limits on a joint.
+- `LWorld:setMouseJointTarget`: Updates the target position of a mouse joint.
+- `LWorld:raycast`: Casts a ray and returns the nearest hit, or nil.
+- `LWorld:raycastClosest`: Casts a ray and returns the closest hit using the query pipeline.
+- `LWorld:raycastAll`: Casts a ray and returns all hits.
+- `LWorld:queryAABB`: Returns body IDs within an axis-aligned bounding box.
+- `LWorld:getBodyAtPoint`: Returns the body ID at a world-space point, or nil.
+- `LWorld:getCollisionEvents`: Returns collision events from the last step.
+- `LWorld:getBeginContactEvents`: Returns begin-contact events from the last step.
+- `LWorld:getEndContactEvents`: Returns end-contact events from the last step.
+- `LWorld:getContacts`: Returns all contact pairs from the narrow phase.
+- `LWorld:getBodyContacts`: Returns contacts involving a specific body.
+- `LWorld:setBodyType`: Changes the simulation type of the body: `"dynamic"`, `"static"`, or `"kinematic"`.
+- `LWorld:getBodyType`: Returns the body type as a string.
+- `LWorld:setBeginContact`: Registers a callback fired when two bodies begin touching.
+- `LWorld:clearBeginContact`: Removes the begin-contact callback.
+- `LWorld:setEndContact`: Registers a callback fired when two bodies stop touching.
+- `LWorld:clearEndContact`: Removes the end-contact callback.
+- `LWorld:setBodyData`: Attaches arbitrary Lua data to a body for later retrieval.
+- `LWorld:getBodyData`: Returns the Lua data previously attached to a body, or nil if none is set.
+- `LWorld:clearBodyData`: Removes the Lua data attached to a body.
+- `LWorld:setBodyCCD`: Enables or disables Continuous Collision Detection for a body.
+- `LWorld:getBodyCCD`: Returns whether CCD is enabled for a body.
+- `LWorld:setBodyOneWay`: Marks a body as a one-way platform.
+- `LWorld:clearBodyOneWay`: Removes the one-way platform flag from a body.
+- `LWorld:getBodyOneWay`: Returns the one-way normal for a body, or nil if not configured.
+- `LWorld:setJointBreakForce`: Sets the relative-velocity threshold above which a joint breaks.
+- `LWorld:getJointBreakForce`: Returns the break threshold for a joint, or nil if not set.
+- `LWorld:isBodySleeping`: Returns true if a body is currently sleeping (inactive).
+- `LWorld:wakeUpBody`: Forcibly wakes up a sleeping body.
+- `LWorld:sleepBody`: Puts a body to sleep immediately.
+- `LWorld:setSolverIterations`: Sets the number of constraint solver iterations per step.
+- `LWorld:getSolverIterations`: Returns the current number of solver iterations per step.
+- `LWorld:newBodies`: Creates multiple bodies in one call.
+- `LWorld:stepFixed`: Steps the world using a fixed sub-step size to consume accumulated time.
+- `LWorld:addZone`: Creates a rectangular gravity or damping zone.
+- `LWorld:getZoneEvents`: Returns zone enter and leave events from the most recent step.
+- `LWorld:type`: Returns the type name of this object.
+- `LWorld:typeOf`: Returns true if this object is of the given type.
 
-### `Zone` Methods
-- `Zone:getId`: Returns the zone's integer ID.
-- `Zone:setEnabled`: Enables or disables the zone.
-- `Zone:setPriority`: Sets the zone priority; higher values win over lower when zones overlap.
-- `Zone:setLayerMask`: Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
-- `Zone:setCircle`: Replaces the zone boundary with a circle.
-- `Zone:setGravityDirectional`: Sets directional gravity inside the zone.
-- `Zone:setGravityZero`: Suppresses gravity inside the zone (zero-g pocket).
-- `Zone:setLinearDampingOverride`: Sets an optional linear damping override for bodies inside the zone.
-- `Zone:destroy`: Removes the zone from the world.
+### `LZone` Methods
+- `LZone:getId`: Returns the zone's integer ID.
+- `LZone:setEnabled`: Enables or disables the zone.
+- `LZone:setPriority`: Sets the zone priority; higher values win over lower when zones overlap.
+- `LZone:setLayerMask`: Sets the layer bitmask; only bodies whose `layer & mask != 0` are affected.
+- `LZone:setCircle`: Replaces the zone boundary with a circle.
+- `LZone:setGravityDirectional`: Sets directional gravity inside the zone.
+- `LZone:setGravityPoint`: Sets point-attractor gravity inside the zone.
+- `LZone:setGravityRepulsor`: Sets point-repulsor gravity inside the zone.
+- `LZone:setGravityZero`: Suppresses gravity inside the zone (zero-g pocket).
+- `LZone:setLinearDampingOverride`: Sets an optional linear damping override for bodies inside the zone.
+- `LZone:setAngularDampingOverride`: Sets an optional angular damping override for bodies inside the zone.
+- `LZone:destroy`: Removes the zone from the world.
+- `LZone:type`: Returns the type name of this object.
+- `LZone:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

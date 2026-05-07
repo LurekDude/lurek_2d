@@ -5,6 +5,7 @@
 //! sprite) is a textured quad with per-polygon lighting — no column-strip rendering.
 
 use crate::math::Vec2;
+use crate::render::mesh::Mesh;
 use crate::runtime::resource_keys::TextureKey;
 
 // ── WallQuad ─────────────────────────────────────────────────────────────────
@@ -33,6 +34,8 @@ pub struct WallQuad {
     pub light: [f32; 4],
     /// Distance from camera for depth sorting.
     pub depth: f32,
+    /// Per-corner perspective depth for perspective-correct UV (matches corners order).
+    pub corner_w: [f32; 4],
     /// Map cell value for multi-texture lookup.
     pub cell_value: u32,
 }
@@ -59,6 +62,8 @@ pub struct FloorQuad {
     pub light: [f32; 4],
     /// Distance from camera for depth sorting.
     pub depth: f32,
+    /// Per-corner perspective depth for perspective-correct UV.
+    pub corner_w: [f32; 4],
 }
 
 // ── CeilingQuad ──────────────────────────────────────────────────────────────
@@ -85,6 +90,8 @@ pub struct CeilingQuad {
     pub light: [f32; 4],
     /// Distance from camera for depth sorting.
     pub depth: f32,
+    /// Per-corner perspective depth for perspective-correct UV.
+    pub corner_w: [f32; 4],
 }
 
 // ── BillboardSprite ──────────────────────────────────────────────────────────
@@ -114,6 +121,15 @@ pub struct BillboardSprite {
     pub depth: f32,
 }
 
+/// A projected 3D model instance stored as a screen-space mesh.
+#[derive(Debug, Clone)]
+pub struct ModelMesh {
+    /// Screen-space mesh vertices (typically triangles).
+    pub mesh: Mesh,
+    /// Distance from camera for depth sorting.
+    pub depth: f32,
+}
+
 // ── RaycasterScene ───────────────────────────────────────────────────────────
 
 /// Complete raycaster scene ready for rendering as textured quads.
@@ -139,6 +155,8 @@ pub struct RaycasterScene {
     pub ceilings: Vec<CeilingQuad>,
     /// Billboard sprites sorted back-to-front by depth.
     pub sprites: Vec<BillboardSprite>,
+    /// Screen-space model meshes sorted with the scene.
+    pub models: Vec<ModelMesh>,
     /// Screen width used for projection.
     pub screen_width: f32,
     /// Screen height used for projection.
@@ -160,6 +178,7 @@ impl RaycasterScene {
             floors: Vec::new(),
             ceilings: Vec::new(),
             sprites: Vec::new(),
+            models: Vec::new(),
             screen_width,
             screen_height,
         }
@@ -170,7 +189,11 @@ impl RaycasterScene {
     /// # Returns
     /// `usize`.
     pub fn quad_count(&self) -> usize {
-        self.walls.len() + self.floors.len() + self.ceilings.len() + self.sprites.len()
+        self.walls.len()
+            + self.floors.len()
+            + self.ceilings.len()
+            + self.sprites.len()
+            + self.models.len()
     }
 
     /// Returns `true` when the scene has no visible geometry.

@@ -11,32 +11,9 @@
 
 ## Summary
 
-## Summary
+The `save` module is documented from the current source tree and existing module reference data.
 
-The `save` module is Lurek2D's game save/load orchestration system — a Feature Systems tier module whose responsibility is lifecycle management: coordinating when and what to save, handling schema versioning, running migrations, and driving auto-save. Byte-level serialisation belongs to `serial`; file I/O belongs to `filesystem`. The `save` module calls both.
-
-**SaveManager lifecycle.** `SaveManager` is the central coordinator. It maintains a registry of named collector modules, a current schema version integer, a dirty flag, optional auto-save configuration, and an ordered list of migration version checkpoints. Game code calls `register(name, gather_fn, restore_fn)` to install a named collector whose `gather()` callback returns a Lua table of game state and whose `restore(data)` callback reloads it. Multiple collectors can be registered for the same save slot (player state, world state, inventory, settings), each saving independently under their name key.
-
-**Save flow.** `collect()` calls every registered `gather()` in registration order and assembles results into a slot data table with `SlotMeta` metadata: slot name, Unix timestamp, schema version integer, and a free-text summary string (e.g. "Chapter 2 – Forest of Shadows, 3h 42m"). This table is then passed to `serial` for TOML or Lua serialisation and to `filesystem` for write. `SaveValue` (nil, bool, number, string, table) is the Lua-serialisable value enum for Rust-side serialisation. `serialize_table` and `serialize_value` produce valid Lua return-statement strings from `SaveValue` trees, written to disk as `.lua` data files directly loadable with the Lua interpreter. `SaveValue::from_lua` converts `mlua::Value` to `SaveValue` for Rust-side processing before serialisation.
-
-**Load and migration.** `restore(data)` reads the saved schema version from `SlotMeta`, determines which ordered migration checkpoints fall between the saved version and the current version, runs them in sequence (each migration receives the raw data table and returns a transformed copy), then calls every registered `restore()` callback. This migration chain transparently upgrades save files from older schema versions at load time without requiring external tooling. `register_migration(from_version, to_version, fn)` registers a migration step. Migrations are applied in version-ascending order.
-
-**Dirty flag.** `mark_dirty()` signals that unsaved state exists. `is_dirty()` lets game code conditionally show a save indicator in the UI. The flag is cleared after a successful `write()`. Combined with auto-save, this prevents unnecessary writes when nothing has changed since the last save.
-
-**Auto-save.** `enable_auto_save(interval_secs, slot_name)` activates timer-based background saves. `update(dt)` advances the timer each frame and returns `Some(slot_name)` when a save should fire — the caller (typically `app::GameLoop`) performs the actual write. `disable_auto_save()` stops background saves without affecting manual `write()` calls. Multiple save slots (e.g. three numbered slots plus an autosave slot) coexist under different names.
-
-**Compression.** `compress_save_content(data, codec)` and `decompress_save_content(bytes, codec)` wrap the raw serialised string with a configurable compression codec (default: zstd), reducing disk usage for large save files with many registered collectors. The codec is stored in the file header so the correct decompressor is always used regardless of future codec changes.
-
-**Slot introspection.** `list_slots(path)` scans a directory for save files and returns a list of `SlotMeta` tables without loading the full save data — used for save/load menus. `delete_slot(name)` removes a save file from disk. `slot_exists(name)` tests for existence without I/O.
-
-**Note on dead code.** `save_data.rs` is present in the source tree but not declared in `mod.rs` and is dead code — it contains an older parallel copy of the same types. The canonical implementation lives entirely in `save_manager.rs`.
-
-**Lua surface.** `lurek.save.register(name, gather_fn, restore_fn)`, `lurek.save.write(slot)`, `lurek.save.load(slot)`, `lurek.save.delete(slot)`, `lurek.save.exists(slot)` → bool, `lurek.save.list(dir)` → array of slot meta tables, `lurek.save.isDirty()`, `lurek.save.markDirty()`, `lurek.save.enableAutoSave(interval, slot)`, `lurek.save.disableAutoSave()`, `lurek.save.registerMigration(from, to, fn)`.
-
-**Scope boundary.** Feature Systems tier. Depends on `filesystem` (file read/write), `serial` (serialisation), `runtime` (SharedState). Lua bridge in `src/lua_api/save_api.rs`.
-
-**Scope boundary**: Feature Systems tier. Depends on `filesystem`, `runtime`,
-`serial`. Lua bridge in `src/lua_api/save_api.rs` as `lurek.save.*`.
+This module primarily collaborates with `data`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -105,28 +82,34 @@ The `save` module is Lurek2D's game save/load orchestration system — a Feature
 ### Module Functions
 - `lurek.save.newSaveManager`: Creates a new SaveManager for slot-based save/load operations.
 
-### `SaveManager` Methods
-- `SaveManager:unregister`: Removes a named module and its callbacks
-- `SaveManager:setSchemaVersion`: Sets the current schema version for new saves
-- `SaveManager:getSchemaVersion`: Returns the current schema version
-- `SaveManager:collect`: Collects data from all registered collectors into a table with metadata
-- `SaveManager:restore`: Restores data from a table, applying migrations and calling restorers
-- `SaveManager:markDirty`: Marks data as modified since the last save or load
-- `SaveManager:isDirty`: Returns whether data has been modified since the last save or load
-- `SaveManager:disableAutoSave`: Disables automatic periodic saving; manual `write()` calls still work.
-- `SaveManager:update`: Advances the auto-save timer, returning the slot name if a save should trigger
-- `SaveManager:setSummary`: Sets the summary string included in save metadata
-- `SaveManager:getSummary`: Returns the current summary string
-- `SaveManager:reset`: Resets all state, removing callbacks and clearing the manager
-- `SaveManager:setCompress`: Enables or disables LZ4 compression for saved data
-- `SaveManager:isCompressed`: Returns whether compression is currently enabled.
-- `SaveManager:onBeforeSave`: Registers a callback that fires before every save operation.
-- `SaveManager:onAfterLoad`: Registers a callback that fires after every successful load operation.
-- `SaveManager:save`: Collects data and writes it to a slot file.
-- `SaveManager:load`: Loads data from a slot file, applies migrations, and restores.
-- `SaveManager:delete`: Deletes a save file for the given slot.
-- `SaveManager:getSlots`: Returns a list of all save slots with metadata.
-- `SaveManager:getSlotInfo`: Returns metadata for a single slot, or nil if not found.
+### `LSaveManager` Methods
+- `LSaveManager:register`: Registers a named module with collector and restorer callbacks.
+- `LSaveManager:unregister`: Removes a named module and its callbacks.
+- `LSaveManager:setSchemaVersion`: Sets the current schema version for new saves.
+- `LSaveManager:getSchemaVersion`: Returns the current schema version.
+- `LSaveManager:addMigration`: Registers a migration function for upgrading from a schema version.
+- `LSaveManager:collect`: Collects data from all registered collectors into a table with metadata.
+- `LSaveManager:restore`: Restores data from a table, applying migrations and calling restorers.
+- `LSaveManager:markDirty`: Marks data as modified since the last save or load.
+- `LSaveManager:isDirty`: Returns whether data has been modified since the last save or load.
+- `LSaveManager:enableAutoSave`: Enables auto-save with a given interval and target slot.
+- `LSaveManager:disableAutoSave`: Disables automatic periodic saving; manual `write()` calls still work.
+- `LSaveManager:update`: Advances the auto-save timer and returns the slot name when a save should trigger.
+- `LSaveManager:setSummary`: Sets the summary string included in save metadata.
+- `LSaveManager:getSummary`: Returns the current summary string.
+- `LSaveManager:reset`: Resets all state, removing callbacks and clearing the manager.
+- `LSaveManager:setCompress`: Enables or disables LZ4 compression for saved data.
+- `LSaveManager:isCompressed`: Returns whether compression is currently enabled.
+- `LSaveManager:onBeforeSave`: Registers a callback that fires before every save operation.
+- `LSaveManager:onAfterLoad`: Registers a callback that fires after every successful load operation.
+- `LSaveManager:save`: Collects data and writes it to a slot file.
+- `LSaveManager:load`: Loads data from a slot file, applies migrations, and restores.
+- `LSaveManager:delete`: Deletes a save file for the given slot.
+- `LSaveManager:exists`: Returns whether a save file exists for the given slot.
+- `LSaveManager:getSlots`: Returns a list of all save slots with metadata.
+- `LSaveManager:getSlotInfo`: Returns metadata for a single slot, or nil if not found.
+- `LSaveManager:type`: Returns the type name of this object.
+- `LSaveManager:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

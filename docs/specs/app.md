@@ -5,7 +5,7 @@
 - Module group: `Edge/Integration`
 - Source path: `src/app/`
 - Lua API path(s): None direct
-- Primary Lua namespace: None direct
+- Primary Lua namespace: `lurek.input`
 - Rust test path(s): tests/rust/unit/engine_tests.rs; tests/rust/ext/graphics_runtime_smoke_tests.rs
 - Lua test path(s): None dedicated
 
@@ -76,7 +76,7 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 
 ## Lua API Reference
 
-- No dedicated direct `lurek.*` namespace is exposed by this module.
+- Namespace: `lurek.input`
 
 ## References
 

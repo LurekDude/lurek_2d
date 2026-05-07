@@ -1,4 +1,4 @@
-//! `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
+﻿//! `lurek.timer` - Frame timing, FPS tracking, and scheduled Lua callbacks.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -381,6 +381,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the time elapsed since the previous frame in seconds.
     /// @return | number | Delta time in seconds for the current frame
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getDelta", lua.create_function(move |_, ()| Ok(s.borrow().delta_time))?,
     )?;
 
@@ -388,6 +389,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the current instantaneous frames-per-second as measured by the engine clock.
     /// @return | number | The current FPS value
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getFPS", lua.create_function(move |_, ()| Ok(s.borrow().fps))?,
     )?;
 
@@ -395,6 +397,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the total wall-clock time that has elapsed since the engine was initialised, in seconds.
     /// @return | number | Total elapsed seconds since engine start
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getTime", lua.create_function(move |_, ()| Ok(s.borrow().total_time))?,
     )?;
 
@@ -402,6 +405,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns a rolling average of recent frame delta times in seconds.
     /// @return | number | Rolling average delta time in seconds
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getAverageDelta", lua.create_function(move |_, ()| Ok(s.borrow().clock.average_delta()))?,
     )?;
 
@@ -409,6 +413,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the total number of frames that have been rendered since the engine was initialised.
     /// @return | integer | Total frame count since engine start
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getFrameCount", lua.create_function(move |_, ()| Ok(s.borrow().clock.frame_count()))?,
     )?;
 
@@ -416,6 +421,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Manually advances the engine timer by one frame tick and returns the resulting delta time.
     /// @return | number | The delta time for the stepped frame
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("step", lua.create_function(move |_, ()| Ok(s.borrow_mut().step_timer()))?,
     )?;
 
@@ -423,6 +429,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the high-resolution (microsecond-precision) elapsed time since engine start in seconds.
     /// @return | number | High-resolution elapsed seconds
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getMicroTime", lua.create_function(move |_, ()| Ok(s.borrow().clock.elapsed()))?,
     )?;
 
@@ -430,6 +437,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the fixed timestep interval used by the `process_physics` callback loop, in seconds.
     /// @return | number | The fixed physics timestep in seconds
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getPhysicsDelta", lua.create_function(move |_, ()| Ok(s.borrow().physics_fixed_dt))?,
     )?;
 
@@ -438,6 +446,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | dt | number | The desired fixed timestep in seconds
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setPhysicsDelta", lua.create_function(move |_, dt: f64| {
             let clamped = dt.clamp(1.0 / 240.0, 1.0 / 10.0);
             s.borrow_mut().physics_fixed_dt = clamped;
@@ -449,6 +458,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the maximum number of physics simulation sub-steps that the engine will perform in a single frame.
     /// @return | integer | The maximum physics sub-steps per frame
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getPhysicsMaxSteps", lua.create_function(move |_, ()| Ok(s.borrow().physics_max_steps))?,
     )?;
 
@@ -457,6 +467,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | n | integer | The desired maximum sub-step count (clamped to 1-64)
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setPhysicsMaxSteps", lua.create_function(move |_, n: u32| {
             s.borrow_mut().physics_max_steps = n.clamp(1, 64);
             Ok(())
@@ -512,6 +523,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | func | function | The Lua function to call when the deadline arrives
     /// @return | nil | No return value.
     let rt = real_timers.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("afterReal", lua.create_function(move |lua, (delay, func): (f64, LuaFunction)| {
             let deadline =
                 std::time::Instant::now() + std::time::Duration::from_secs_f64(delay.max(0.0));
@@ -525,6 +537,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Checks all registered real-time timers and fires any whose wall-clock deadline has passed.
     /// @return | integer | The number of real-time callbacks that fired
     let rt = real_timers;
+    // Auto-doc: Lua API binding.
     tbl.set("tickRealTimers", lua.create_function(move |lua, ()| {
             let now = std::time::Instant::now();
             let mut timers = rt.borrow_mut();
@@ -555,6 +568,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | alpha | number | Smoothing factor between 0.01 (very smooth) and 1.0 (raw)
     /// @return | nil | No return value.
     let sa = smooth_alpha.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setSmoothingFactor", lua.create_function(move |_, alpha: f64| {
             *sa.borrow_mut() = alpha.clamp(0.01, 1.0);
             Ok(())
@@ -567,6 +581,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     let smoothed_ref = smoothed.clone();
     let alpha_ref = smooth_alpha.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getSmoothedDelta", lua.create_function(move |_, ()| {
             let dt = s.borrow().delta_time;
             let alpha = *alpha_ref.borrow();
@@ -594,6 +609,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | seconds | number | Minimum wall-clock seconds to wait
     /// @return | nil | No return value.
     let ws = wait_secs.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("waitSeconds", lua.create_function(move |lua, seconds: f64| {
             let deadline =
                 std::time::Instant::now() + std::time::Duration::from_secs_f64(seconds.max(0.0));
@@ -619,6 +635,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | nil | No return value.
     let wf = wait_frames.clone();
     let s_wf = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("waitFrames", lua.create_function(move |lua, frames: u64| {
             let target = s_wf.borrow().clock.frame_count() + frames;
             let co_tbl: LuaTable = lua.globals().get("coroutine")?;
@@ -643,6 +660,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let ws_tick = wait_secs;
     let wf_tick = wait_frames;
     let s_tick = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("tickWaits", lua.create_function(move |lua, ()| {
             let now = std::time::Instant::now();
             let current_frame = s_tick.borrow().clock.frame_count();

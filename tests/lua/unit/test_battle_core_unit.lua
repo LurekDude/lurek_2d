@@ -1,4 +1,4 @@
--- Lurek2D battle API tests
+﻿-- Lurek2D battle API tests
 
 if not lurek.turnbattle then
     -- @describe fallback when turnbattle is unavailable
@@ -10,7 +10,6 @@ if not lurek.turnbattle then
 else
     -- @describe turnbattle module table checks
     describe("lurek.turnbattle module exists", function()
-        -- @covers lurek.turnbattle
         it("is a table", function()
             expect_type("table", lurek.turnbattle)
         end)
@@ -18,7 +17,6 @@ else
 
     -- @describe newCombatant factory behavior
     describe("lurek.turnbattle.newCombatant", function()
-        -- @covers lurek.turnbattle.newCombatant
         it("creates a combatant with basic accessors", function()
             local c = lurek.turnbattle.newCombatant("hero")
             expect_not_nil(c)
@@ -29,9 +27,6 @@ else
 
     -- @describe battle creation and attack flow
     describe("lurek.turnbattle.newBattle", function()
-        -- @covers lurek.turnbattle.newAction
-        -- @covers lurek.turnbattle.newBattle
-        -- @covers lurek.turnbattle.newCombatant
         it("creates a battle and resolves a simple attack", function()
             local battle = lurek.turnbattle.newBattle("arena")
             local hero = lurek.turnbattle.newCombatant("hero")

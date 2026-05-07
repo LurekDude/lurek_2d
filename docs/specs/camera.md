@@ -159,43 +159,56 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 
 ### Module Functions
 - `lurek.camera.new`: Creates a new Camera2D with the given viewport dimensions.
+- `lurek.camera.newCamera`: Creates a new 2D camera with the given viewport dimensions.
 
-### `Camera2D` Methods
-- `Camera2D:setPosition`: Sets the camera's world-space position.
-- `Camera2D:getPosition`: Returns the camera's world-space position as x, y.
-- `Camera2D:setZoom`: Sets the uniform zoom factor (1.0 = natural size).
-- `Camera2D:getZoom`: Returns the current zoom factor.
-- `Camera2D:setRotation`: Sets the rotation in radians.
-- `Camera2D:getRotation`: Returns the rotation in radians.
-- `Camera2D:getViewport`: Returns the current viewport as x, y, w, h.
-- `Camera2D:removeBounds`: Removes previously set world-space bounds.
-- `Camera2D:setTarget`: Sets the follow target position.
-- `Camera2D:clearTarget`: Clears the follow target so the camera stops tracking.
-- `Camera2D:setFollowSmooth`: Sets the follow smooth interpolation speed (0.0 = instant snap).
-- `Camera2D:setDeadZone`: Sets the dead zone half-extents for camera follow.
-- `Camera2D:setLookAhead`: Sets the look-ahead multiplier for follow prediction.
-- `Camera2D:shake`: Starts a screen-shake effect.
-- `Camera2D:update`: Advances the camera simulation by dt seconds.
-- `Camera2D:toWorld`: Converts screen coordinates to world coordinates.
-- `Camera2D:toScreen`: Converts world coordinates to screen coordinates.
-- `Camera2D:getVisibleArea`: Returns the visible world area as x, y, w, h.
-- `Camera2D:lookAt`: Instantly moves the camera to look at the given position.
-- `Camera2D:move`: Translates the camera by dx, dy in world space.
-- `Camera2D:stopPath`: Cancels the active camera path animation.
-- `Camera2D:updatePath`: Advances the path animation by `dt` seconds and applies the
-- `Camera2D:pathProgress`: Returns the fractional progress `[0, 1]` of the active path, or
-- `Camera2D:zoomTo`: Smoothly tweens the camera zoom from its current level to
-- `Camera2D:stopZoom`: Cancels the active zoom tween.
-- `Camera2D:updateZoom`: Advances the zoom tween by `dt` seconds and applies the resulting
-- `Camera2D:getParallaxFactor`: Returns the parallax factor for the named layer, or `1.0` if unset.
-- `Camera2D:clearParallaxFactors`: Removes all parallax factor overrides.
-- `Camera2D:zoomPulse`: Triggers a momentary zoom-in that decays back via a sine envelope.
-- `Camera2D:stopSway`: Stops the active sway effect immediately.
-- `Camera2D:isSway`: Returns true if the sway effect is currently active.
-- `Camera2D:stopBreathing`: Stops the active breathing effect.
-- `Camera2D:isBreathing`: Returns true if the breathing effect is currently active.
-- `Camera2D:getEffectiveZoom`: Returns the current zoom level including zoom pulse and breathing deltas.
-- `Camera2D:getEffectOffset`: Returns the current sway x, y world-space offset.
+### `LCamera` Methods
+- `LCamera:setPosition`: Sets the camera's world-space position to the given coordinates.
+- `LCamera:getPosition`: Returns the camera's current world-space position as two values.
+- `LCamera:setZoom`: Sets the camera's uniform zoom factor.
+- `LCamera:getZoom`: Returns the camera's current base zoom factor (before any pulse or breathing effect is applied).
+- `LCamera:setRotation`: Sets the camera rotation angle in radians.
+- `LCamera:getRotation`: Returns the camera's current rotation angle in radians.
+- `LCamera:setViewport`: Sets the screen-space viewport rectangle in pixels.
+- `LCamera:getViewport`: Returns the current screen-space viewport rectangle as four values.
+- `LCamera:setBounds`: Sets world-space rectangular bounds that clamp the camera position.
+- `LCamera:removeBounds`: Removes previously set world-space bounds, allowing the camera to move freely in any direction without clamping.
+- `LCamera:setTarget`: Sets the follow target position in world space.
+- `LCamera:clearTarget`: Clears the follow target so the camera stops tracking any position.
+- `LCamera:setFollowSmooth`: Sets the follow interpolation speed for smooth camera tracking.
+- `LCamera:setDeadZone`: Sets the dead zone half-extents for camera follow.
+- `LCamera:setLookAhead`: Sets the look-ahead multiplier for predictive camera follow.
+- `LCamera:shake`: Starts a screen-shake effect with the given intensity and duration.
+- `LCamera:update`: Advances the camera simulation by `dt` seconds.
+- `LCamera:toWorld`: Converts screen-space pixel coordinates to world-space coordinates accounting for the camera's position, zoom, rotation, and viewport.
+- `LCamera:toScreen`: Converts world-space coordinates to screen-space pixel coordinates accounting for the camera's position, zoom, rotation, and viewport.
+- `LCamera:getVisibleArea`: Returns the axis-aligned bounding rectangle of the currently visible world area as four values.
+- `LCamera:lookAt`: Instantly snaps the camera to look at the given world-space position.
+- `LCamera:move`: Translates the camera by the given delta in world space.
+- `LCamera:followPath`: Animates the camera along a sequence of world-space waypoints over the given duration (seconds).
+- `LCamera:stopPath`: Cancels the active camera path animation immediately, leaving the camera at its current position along the path.
+- `LCamera:updatePath`: Advances the path animation by `dt` seconds and applies the resulting position to the camera.
+- `LCamera:pathProgress`: Returns the fractional progress `[0, 1]` of the active path, or `1` if no path is running.
+- `LCamera:zoomTo`: Smoothly tweens the camera zoom from its current level to `target_zoom` over `duration` seconds.
+- `LCamera:stopZoom`: Cancels the active smooth zoom tween immediately, leaving the camera at its current zoom level.
+- `LCamera:updateZoom`: Advances the zoom tween by `dt` seconds and applies the resulting zoom level to the camera.
+- `LCamera:setParallaxFactor`: Sets the parallax scroll factor for the named render layer.
+- `LCamera:getParallaxFactor`: Returns the parallax scroll factor for the named render layer.
+- `LCamera:clearParallaxFactors`: Removes all parallax factor overrides, resetting every layer to the default factor of 1.0 (no parallax).
+- `LCamera:apply`: Applies this camera's transform to the render stack.
+- `LCamera:reset`: Pops the camera transform from the render stack.
+- `LCamera:attach`: Alias for `apply()` that queues this camera's transform onto the render command stack.
+- `LCamera:detach`: Alias for `reset()` that removes this camera's transform from the render command stack.
+- `LCamera:zoomPulse`: Triggers a momentary zoom-in effect that decays back to the base zoom level via a sine envelope.
+- `LCamera:startSway`: Starts a sinusoidal x/y offset oscillation for ambient camera motion (e.g.
+- `LCamera:stopSway`: Stops the active sway oscillation effect immediately, resetting the camera's offset back to zero.
+- `LCamera:isSway`: Returns true if the sway oscillation effect is currently running.
+- `LCamera:startBreathing`: Starts a subtle periodic zoom oscillation that gives the camera a "living" feel, as if the viewport is gently breathing.
+- `LCamera:stopBreathing`: Stops the active breathing zoom oscillation effect immediately.
+- `LCamera:isBreathing`: Returns true if the breathing zoom oscillation is currently active.
+- `LCamera:getEffectiveZoom`: Returns the current zoom level including contributions from zoom pulse and breathing effects on top of the base zoom factor.
+- `LCamera:getEffectOffset`: Returns the current world-space x/y offset contributed by the sway and shake effects.
+- `LCamera:type`: Returns the string type name of this userdata object.
+- `LCamera:typeOf`: Checks whether this object matches the given type name.
 
 ## References
 

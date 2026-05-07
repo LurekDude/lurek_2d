@@ -602,6 +602,25 @@ pub enum RenderCommand {
         mesh_key: MeshKey,
         mesh: Mesh,
     },
+    /// Draw a transient mesh payload without storing it in SharedState::meshes.
+    DrawMeshTransient {
+        /// Mesh payload for this frame only.
+        mesh: Mesh,
+        /// Destination X position.
+        x: f32,
+        /// Destination Y position.
+        y: f32,
+        /// Rotation in radians.
+        rotation: f32,
+        /// Horizontal scale.
+        sx: f32,
+        /// Vertical scale.
+        sy: f32,
+        /// Origin X offset.
+        ox: f32,
+        /// Origin Y offset.
+        oy: f32,
+    },
     /// Draw a nine-slice (9-patch) image stretched to fit a rectangle,
     /// preserving corner and edge proportions.
     DrawNineSlice {
@@ -699,6 +718,7 @@ pub enum RenderCommand {
     /// # Fields
     /// - `corners` — `[Vec2; 4]`. Screen-space corner positions in order: top-left, top-right, bottom-right, bottom-left.
     /// - `uvs` — `[Vec2; 4]`. Normalized UV coordinates `[0.0, 1.0]` for each corner in the same order.
+    /// - `corner_w` — `[f32; 4]`. Per-corner perspective depth (`w`) used for perspective-correct UV interpolation.
     /// - `texture_key` — `TextureKey`. Texture to sample.
     /// - `color` — `[f32; 4]`. Per-quad RGBA tint multiplied against the sampled colour.
     DrawTexturedQuad {
@@ -706,6 +726,8 @@ pub enum RenderCommand {
         corners: [Vec2; 4],
         /// Normalized UV coordinates `[0.0, 1.0]` for each corner in the same order as `corners`.
         uvs: [Vec2; 4],
+        /// Per-corner perspective depth (`w`) used for perspective-correct UV interpolation.
+        corner_w: [f32; 4],
         /// Texture to sample.
         texture_key: TextureKey,
         /// Per-quad RGBA tint multiplied against the sampled colour.
@@ -1039,6 +1061,7 @@ pub struct TextureData {
     pub pixels: Vec<u8>,
     pub width: u32,
     pub height: u32,
+    pub color_space: crate::image::TextureColorSpace,
 }
 
 /// Geometric shape used when rendering a single untextured particle via `DrawParticleSystem`.

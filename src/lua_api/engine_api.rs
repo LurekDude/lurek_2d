@@ -1,4 +1,4 @@
-//! `lurek.runtime` - Runtime engine metadata and introspection.
+﻿//! `lurek.runtime` - Runtime engine metadata and introspection.
 //!
 //! Exposes read-only properties about the running engine: version, target
 //! frame budget, memory usage, host platform, and total uptime.
@@ -19,7 +19,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- getFrameBudget --
-    /// Returns the target frame budget in milliseconds (default: 1000 / 60 ~ 16.667 ms).
+    /// Returns the target frame budget in milliseconds (default: 1000 / 60 ~Â 16.667 ms).
     /// @return | number | Target frame budget in milliseconds.
     tbl.set("getFrameBudget", lua.create_function(|_, ()| Ok(1000.0_f64 / 60.0_f64))?,
     )?;
@@ -57,6 +57,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the total engine uptime in seconds (sum of all processed deltas).
     /// @return | number | Total engine uptime in seconds.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("uptime", lua.create_function(move |_, ()| Ok(s.borrow().total_time))?,
     )?;
 
@@ -70,6 +71,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the total number of frames processed since engine start.
     /// @return | integer | Total processed frame count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("frameCount", lua.create_function(move |_, ()| Ok(s.borrow().clock.frame_count()))?,
     )?;
 
@@ -84,6 +86,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | budget_bytes | integer | Maximum texture memory budget in bytes, or 0 for unlimited.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setResourceBudget", lua.create_function(move |_, budget_bytes: u64| {
             s.borrow_mut().resource_budget_bytes = budget_bytes;
             Ok(())
@@ -94,6 +97,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns a table with resident resource memory statistics.
     /// @return | table | Table with `texture_bytes`, `budget_bytes`, and `texture_count` fields.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getResourceStats", lua.create_function(move |lua, ()| {
             let st = s.borrow();
             let (tex_bytes, budget) = st.resource_memory_stats();

@@ -32,13 +32,14 @@ Run before every pull request:
 ```bash
 python tools/dev/parallel_cargo.py fmt check
 python tools/dev/parallel_cargo.py clippy --deny-warnings
-python tools/dev/parallel_cargo.py test rust
+python tools/dev/parallel_cargo.py test rust-full
 ```
 
 During development, prefer scoped commands to avoid saturating CPU:
 
 ```bash
 python tools/dev/parallel_cargo.py check   # type-check only (~2–5 s incremental)
+python tools/dev/parallel_cargo.py test rust                    # fast Rust suite (excludes slow load/smoke)
 python tools/dev/parallel_cargo.py test target <module>_tests  # one Rust test suite
 python tools/dev/parallel_cargo.py test lua                     # Lua test suite
 python tools/dev/parallel_cargo.py clippy --deny-warnings       # strict lint

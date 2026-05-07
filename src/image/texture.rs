@@ -17,6 +17,15 @@ use crate::runtime::resource_keys::TextureKey;
 use slotmap::SlotMap;
 use std::path::Path;
 
+/// CPU-side color space hint used when uploading texture pixels to the GPU.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum TextureColorSpace {
+    /// Treat the texture as gamma-encoded color data (`Rgba8UnormSrgb`).
+    Srgb,
+    /// Treat the texture as linear data (`Rgba8Unorm`).
+    Linear,
+}
+
 /// A loaded image asset referenced by its index into the renderer's texture list.
 ///
 /// `Texture` is a lightweight handle; the actual pixel data lives in `TextureData`
@@ -33,6 +42,17 @@ pub struct Texture {
 }
 
 impl Texture {
+    /// Parse a Lua/string-facing texture color-space label.
+    ///
+    /// Accepted values: `"srgb"` and `"linear"` (case-insensitive).
+    pub fn parse_color_space(value: &str) -> Option<TextureColorSpace> {
+        match value.to_ascii_lowercase().as_str() {
+            "srgb" => Some(TextureColorSpace::Srgb),
+            "linear" => Some(TextureColorSpace::Linear),
+            _ => None,
+        }
+    }
+
     /// Loads an image from `path`, premultiplies alpha, and appends it to `textures`.
     ///
     /// Supports PNG, JPEG, BMP, and any format handled by the `image` crate.
@@ -48,6 +68,15 @@ impl Texture {
     pub fn load<P: AsRef<Path>>(
         path: P,
         textures: &mut SlotMap<TextureKey, TextureData>,
+    ) -> EngineResult<Self> {
+        Self::load_with_color_space(path, textures, TextureColorSpace::Srgb)
+    }
+
+    /// Loads an image from `path` and stores it with an explicit GPU color-space hint.
+    pub fn load_with_color_space<P: AsRef<Path>>(
+        path: P,
+        textures: &mut SlotMap<TextureKey, TextureData>,
+        color_space: TextureColorSpace,
     ) -> EngineResult<Self> {
         let img = ::image::open(&path).map_err(|e| {
             let path_str = path.as_ref().display().to_string();
@@ -74,6 +103,7 @@ impl Texture {
             pixels,
             width,
             height,
+            color_space,
         });
 
         log_msg!(debug, TX01_TEX_DECODED, "{}x{}", width, height);
@@ -95,8 +125,25 @@ impl Texture {
     pub fn from_rgba(
         width: u32,
         height: u32,
+        pixels: Vec<u8>,
+        textures: &mut SlotMap<TextureKey, TextureData>,
+    ) -> EngineResult<Self> {
+        Self::from_rgba_with_color_space(
+            width,
+            height,
+            pixels,
+            textures,
+            TextureColorSpace::Srgb,
+        )
+    }
+
+    /// Creates a texture from raw RGBA pixel data with an explicit GPU color-space hint.
+    pub fn from_rgba_with_color_space(
+        width: u32,
+        height: u32,
         mut pixels: Vec<u8>,
         textures: &mut SlotMap<TextureKey, TextureData>,
+        color_space: TextureColorSpace,
     ) -> EngineResult<Self> {
         let expected = (width * height * 4) as usize;
         if pixels.len() != expected {
@@ -118,6 +165,7 @@ impl Texture {
             pixels,
             width,
             height,
+            color_space,
         });
         Ok(Texture { key, width, height })
     }

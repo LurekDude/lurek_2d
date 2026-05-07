@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 /// Snapshot of one active touch point with its screen-space position and pressure.
 ///
@@ -37,6 +37,10 @@ pub struct TouchPoint {
 pub struct TouchState {
     /// Currently active touch points, keyed by touch ID.
     touches: HashMap<u64, TouchPoint>,
+    /// Touch IDs that began this frame.
+    touches_pressed: HashSet<u64>,
+    /// Touch IDs that ended this frame.
+    touches_released: HashSet<u64>,
 }
 
 impl TouchState {
@@ -48,6 +52,14 @@ impl TouchState {
         Self::default()
     }
 
+    /// Clears per-frame touch transition flags.
+    ///
+    /// Call once at the start of each frame before processing touch events.
+    pub fn begin_frame(&mut self) {
+        self.touches_pressed.clear();
+        self.touches_released.clear();
+    }
+
     /// Inserts a new touch start or updates the position and pressure of an ongoing touch.
     ///
     /// # Parameters
@@ -56,6 +68,7 @@ impl TouchState {
     /// - `y` — `f64`.
     /// - `pressure` — `f64`.
     pub fn touch_start(&mut self, id: u64, x: f64, y: f64, pressure: f64) {
+        self.touches_pressed.insert(id);
         self.touches.insert(id, TouchPoint { id, x, y, pressure });
     }
 
@@ -79,7 +92,18 @@ impl TouchState {
     /// # Parameters
     /// - `id` — `u64`.
     pub fn touch_end(&mut self, id: u64) {
+        self.touches_released.insert(id);
         self.touches.remove(&id);
+    }
+
+    /// Returns whether a touch with `id` started this frame.
+    pub fn was_pressed(&self, id: u64) -> bool {
+        self.touches_pressed.contains(&id)
+    }
+
+    /// Returns whether a touch with `id` ended this frame.
+    pub fn was_released(&self, id: u64) -> bool {
+        self.touches_released.contains(&id)
     }
 
     /// Returns all active touch points. This accessor incurs no allocation; call it freely in hot paths.

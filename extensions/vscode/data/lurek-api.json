@@ -1,6 +1,6 @@
 {
   "version": "auto-generated",
-  "generated": "2026-05-04",
+  "generated": "2026-05-07",
   "modules": [
     {
       "name": "ai",
@@ -3649,8 +3649,8 @@
               "optional": true
             }
           ],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": false,
           "objectType": null
         },
@@ -3682,7 +3682,7 @@
           "name": "compress",
           "fullPath": "lurek.data.compress",
           "signature": "(format_str, raw_data, [level])",
-          "description": "Compresses data using the given algorithm (deflate, gzip, lz4).",
+          "description": "Compresses data using the given algorithm (deflate, gzip, lz4, zlib).",
           "parameters": [
             {
               "name": "format",
@@ -3712,7 +3712,7 @@
           "name": "decompress",
           "fullPath": "lurek.data.decompress",
           "signature": "(format_str, compressed)",
-          "description": "Decompresses data using the given algorithm (deflate, gzip, lz4).",
+          "description": "Decompresses data using the given algorithm (deflate, gzip, lz4, zlib).",
           "parameters": [
             {
               "name": "format",
@@ -3724,6 +3724,60 @@
               "name": "data",
               "type": "string",
               "description": "Compressed bytes to decompress.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "compressChunks",
+          "fullPath": "lurek.data.compressChunks",
+          "signature": "(format_str, chunks, [level])",
+          "description": "Compresses string chunks using the given algorithm (deflate, gzip, lz4, zlib).",
+          "parameters": [
+            {
+              "name": "format",
+              "type": "string",
+              "description": "Compression format name.",
+              "optional": false
+            },
+            {
+              "name": "chunks",
+              "type": "string|table",
+              "description": "Byte string or array-like table of byte strings.",
+              "optional": false
+            },
+            {
+              "name": "level",
+              "type": "integer",
+              "description": "Optional compression level.",
+              "optional": true
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "decompressChunks",
+          "fullPath": "lurek.data.decompressChunks",
+          "signature": "(format_str, chunks)",
+          "description": "Decompresses compressed string chunks using the given algorithm (deflate, gzip, lz4, zlib).",
+          "parameters": [
+            {
+              "name": "format",
+              "type": "string",
+              "description": "Compression format name.",
+              "optional": false
+            },
+            {
+              "name": "chunks",
+              "type": "string|table",
+              "description": "Compressed byte string or array-like table of byte strings.",
               "optional": false
             }
           ],
@@ -3919,8 +3973,8 @@
               "optional": true
             }
           ],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": false,
           "objectType": null
         },
@@ -4027,8 +4081,8 @@
               "optional": false
             }
           ],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": false,
           "objectType": null
         },
@@ -4082,6 +4136,30 @@
               "name": "rows",
               "type": "table",
               "description": "Array of row tables keyed by column name.",
+              "optional": false
+            }
+          ],
+          "returns": "LDataFrame",
+          "returnType": "LDataFrame",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "fromRows",
+          "fullPath": "lurek.dataframe.fromRows",
+          "signature": "(columns_tbl, rows_tbl)",
+          "description": "Creates a DataFrame from explicit columns plus row-major data.",
+          "parameters": [
+            {
+              "name": "columns",
+              "type": "table",
+              "description": "Array of column names.",
+              "optional": false
+            },
+            {
+              "name": "rows",
+              "type": "table",
+              "description": "Array of row arrays in the same order as columns.",
               "optional": false
             }
           ],
@@ -5944,7 +6022,7 @@
           "name": "getFrameBudget",
           "fullPath": "lurek.engine.getFrameBudget",
           "signature": "()",
-          "description": "Returns the target frame budget in milliseconds (default: 1000 / 60 ~ 16.667 ms).",
+          "description": "Returns the target frame budget in milliseconds (default: 1000 / 60 ~Â 16.667 ms).",
           "parameters": [],
           "returns": "number",
           "returnType": "number",
@@ -6174,6 +6252,24 @@
           "objectType": null
         },
         {
+          "name": "pushDeferredPriority",
+          "fullPath": "lurek.event.pushDeferredPriority",
+          "signature": "(...)",
+          "description": "Pushes a named event into the deferred buffer with explicit queue priority.",
+          "parameters": [
+            {
+              "name": "...",
+              "type": "string",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "flushDeferred",
           "fullPath": "lurek.event.flushDeferred",
           "signature": "()",
@@ -6229,6 +6325,24 @@
           "fullPath": "lurek.event.push",
           "signature": "(...)",
           "description": "Pushes a custom named event onto the main engine event queue with optional payload arguments.",
+          "parameters": [
+            {
+              "name": "...",
+              "type": "string",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "pushPriority",
+          "fullPath": "lurek.event.pushPriority",
+          "signature": "(...)",
+          "description": "Pushes a custom named event onto a selected queue lane.",
           "parameters": [
             {
               "name": "...",
@@ -6354,6 +6468,48 @@
               "name": "data",
               "type": "string",
               "description": "Text to write.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "readBytes",
+          "fullPath": "lurek.filesystem.readBytes",
+          "signature": "(path)",
+          "description": "Reads a file as raw bytes and returns a binary Lua string.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Virtual path to the file.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "writeBytes",
+          "fullPath": "lurek.filesystem.writeBytes",
+          "signature": "(path, data)",
+          "description": "Writes a binary Lua string to a file in the save directory.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Save path to write.",
+              "optional": false
+            },
+            {
+              "name": "data",
+              "type": "string",
+              "description": "Binary payload.",
               "optional": false
             }
           ],
@@ -6655,6 +6811,48 @@
               "name": "handle",
               "type": "integer",
               "description": "Async load handle returned by `readAsync`.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "writeAsync",
+          "fullPath": "lurek.filesystem.writeAsync",
+          "signature": "(path, data)",
+          "description": "Starts writing binary data to a file in the save sandbox and returns an opaque handle.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Destination path inside `save/`.",
+              "optional": false
+            },
+            {
+              "name": "data",
+              "type": "string",
+              "description": "Binary payload to write.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "pollAsyncWrite",
+          "fullPath": "lurek.filesystem.pollAsyncWrite",
+          "signature": "(handle_id)",
+          "description": "Polls an async write handle, returning status and optional payload.",
+          "parameters": [
+            {
+              "name": "handle",
+              "type": "integer",
+              "description": "Async write handle returned by `writeAsync`.",
               "optional": false
             }
           ],
@@ -7818,6 +8016,36 @@
           "objectType": null
         },
         {
+          "name": "newImageDataFromBytes",
+          "fullPath": "lurek.image.newImageDataFromBytes",
+          "signature": "(w, h, bytes)",
+          "description": "Creates an ImageData from a raw RGBA8 byte string. Width Ă— height Ă— 4 bytes required.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Image width in pixels.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Image height in pixels.",
+              "optional": false
+            },
+            {
+              "name": "bytes",
+              "type": "string",
+              "description": "Raw RGBA8 pixel data (width Ă— height Ă— 4 bytes).",
+              "optional": false
+            }
+          ],
+          "returns": "ImageData",
+          "returnType": "ImageData",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "newCompressedData",
           "fullPath": "lurek.image.newCompressedData",
           "signature": "(filename)",
@@ -7987,6 +8215,17 @@
           ],
           "returns": "ProvinceGrid",
           "returnType": "ProvinceGrid",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "fromScreen",
+          "fullPath": "lurek.image.fromScreen",
+          "signature": "()",
+          "description": "Returns a screen capture `ImageData` when ready; otherwise queues capture for next frame and returns nil.",
+          "parameters": [],
+          "returns": "ImageData",
+          "returnType": "ImageData",
           "isMethod": false,
           "objectType": null
         }
@@ -8688,13 +8927,115 @@
         {
           "name": "setVibration",
           "fullPath": "lurek.input.gamepad.setVibration",
-          "signature": "(...)",
+          "signature": "(id, low_freq, high_freq, duration_ms)",
           "description": "Triggers haptic rumble (currently a no-op stub).",
           "parameters": [
             {
-              "name": "...",
+              "name": "args",
+              "type": "any",
+              "description": "Raw vibration arguments.",
+              "optional": false
+            },
+            {
+              "name": "low_freq",
               "type": "any",
               "description": "",
+              "optional": false
+            },
+            {
+              "name": "high_freq",
+              "type": "any",
+              "description": "",
+              "optional": false
+            },
+            {
+              "name": "duration_ms",
+              "type": "any",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasPressed",
+          "fullPath": "lurek.input.gamepad.wasPressed",
+          "signature": "(id, button)",
+          "description": "Returns whether a gamepad button was pressed this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Gamepad ID.",
+              "optional": false
+            },
+            {
+              "name": "button",
+              "type": "integer",
+              "description": "Button index.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasReleased",
+          "fullPath": "lurek.input.gamepad.wasReleased",
+          "signature": "(id, button)",
+          "description": "Returns whether a gamepad button was released this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Gamepad ID.",
+              "optional": false
+            },
+            {
+              "name": "button",
+              "type": "integer",
+              "description": "Button index.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasConnected",
+          "fullPath": "lurek.input.gamepad.wasConnected",
+          "signature": "(id)",
+          "description": "Returns whether the gamepad connected this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Gamepad ID.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasDisconnected",
+          "fullPath": "lurek.input.gamepad.wasDisconnected",
+          "signature": "(id)",
+          "description": "Returns whether the gamepad disconnected this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Gamepad ID.",
               "optional": false
             }
           ],
@@ -8869,6 +9210,42 @@
           "objectType": null
         },
         {
+          "name": "wasPressed",
+          "fullPath": "lurek.input.touch.wasPressed",
+          "signature": "(id)",
+          "description": "Returns whether a touch with the given ID started this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Touch identifier.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasReleased",
+          "fullPath": "lurek.input.touch.wasReleased",
+          "signature": "(id)",
+          "description": "Returns whether a touch with the given ID ended this frame.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Touch identifier.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "bind",
           "fullPath": "lurek.input.bind",
           "signature": "(action, keys)",
@@ -8887,6 +9264,63 @@
               "optional": false
             }
           ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newMapping",
+          "fullPath": "lurek.input.newMapping",
+          "signature": "(name, keys)",
+          "description": "Creates and binds an action mapping object with query helpers.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Action name to create.",
+              "optional": false
+            },
+            {
+              "name": "keys",
+              "type": "any",
+              "description": "One key binding or an array of key bindings.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "isDown",
+          "fullPath": "lurek.input.isDown",
+          "signature": "()",
+          "description": "",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasPressed",
+          "fullPath": "lurek.input.wasPressed",
+          "signature": "()",
+          "description": "",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "wasReleased",
+          "fullPath": "lurek.input.wasReleased",
+          "signature": "()",
+          "description": "",
+          "parameters": [],
           "returns": "nil",
           "returnType": "nil",
           "isMethod": false,
@@ -9487,6 +9921,17 @@
           "fullPath": "lurek.light.getGodRayHints",
           "signature": "()",
           "description": "Returns directional light hints for god-ray rendering.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getNormalMapHints",
+          "fullPath": "lurek.light.getNormalMapHints",
+          "signature": "()",
+          "description": "Returns normal-map lighting hints for plugin renderers.",
           "parameters": [],
           "returns": "table",
           "returnType": "table",
@@ -14844,8 +15289,200 @@
       "methods": []
     },
     {
+      "name": "province",
+      "description": "`lurek.province` - Engine-backed province registry and snapshot API.\n\nThis API keeps heavy province processing in Rust and exposes a thin Lua\ncontrol/query surface (create, mutate style, fetch snapshot, read changes).",
+      "functions": [
+        {
+          "name": "newFromPng",
+          "fullPath": "lurek.province.newFromPng",
+          "signature": "(name, png_path)",
+          "description": "Creates and stores a named province registry from a PNG map.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Registry unique name.",
+              "optional": false
+            },
+            {
+              "name": "png_path",
+              "type": "string",
+              "description": "PNG path relative to game dir or absolute path.",
+              "optional": false
+            }
+          ],
+          "returns": "ProvinceRegistry",
+          "returnType": "ProvinceRegistry",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "sanitizeMarkedPng",
+          "fullPath": "lurek.province.sanitizeMarkedPng",
+          "signature": "(input_png, output_png, [opts])",
+          "description": "Sanitizes a marker-rich province map by replacing marker pixels with nearby owner colors.",
+          "parameters": [
+            {
+              "name": "input_png",
+              "type": "string",
+              "description": "Marker-rich source PNG path.",
+              "optional": false
+            },
+            {
+              "name": "output_png",
+              "type": "string",
+              "description": "Sanitized output PNG path.",
+              "optional": false
+            },
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Marker thresholds/options.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "get",
+          "fullPath": "lurek.province.get",
+          "signature": "(name)",
+          "description": "Gets a named province registry handle.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Registry name.",
+              "optional": false
+            }
+          ],
+          "returns": "ProvinceRegistry",
+          "returnType": "ProvinceRegistry",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "exists",
+          "fullPath": "lurek.province.exists",
+          "signature": "(name)",
+          "description": "Checks whether a named registry exists.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Registry name.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "remove",
+          "fullPath": "lurek.province.remove",
+          "signature": "(name)",
+          "description": "Removes a named registry.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Registry name.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "setActive",
+          "fullPath": "lurek.province.setActive",
+          "signature": "(name)",
+          "description": "Sets active registry name.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Existing registry name.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getActive",
+          "fullPath": "lurek.province.getActive",
+          "signature": "()",
+          "description": "Returns active registry handle.",
+          "parameters": [],
+          "returns": "ProvinceRegistry",
+          "returnType": "ProvinceRegistry",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "zoomCameraAt",
+          "fullPath": "lurek.province.zoomCameraAt",
+          "signature": "(anchor_x, anchor_y, cam_x, cam_y, old_zoom, new_zoom)",
+          "description": "Recomputes camera x/y so zooming stays anchored under the same screen point.",
+          "parameters": [
+            {
+              "name": "anchor_x",
+              "type": "number",
+              "description": "Anchor x in screen pixels.",
+              "optional": false
+            },
+            {
+              "name": "anchor_y",
+              "type": "number",
+              "description": "Anchor y in screen pixels.",
+              "optional": false
+            },
+            {
+              "name": "cam_x",
+              "type": "number",
+              "description": "Current camera x.",
+              "optional": false
+            },
+            {
+              "name": "cam_y",
+              "type": "number",
+              "description": "Current camera y.",
+              "optional": false
+            },
+            {
+              "name": "old_zoom",
+              "type": "number",
+              "description": "Previous zoom.",
+              "optional": false
+            },
+            {
+              "name": "new_zoom",
+              "type": "number",
+              "description": "New zoom.",
+              "optional": false
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": false,
+          "objectType": null
+        }
+      ],
+      "methods": []
+    },
+    {
       "name": "raycaster",
-      "description": "`lurek.raycaster` - DDA grid raycasting for retro FPS and dungeon-crawler games.",
+      "description": "`lurek.raycaster` -- DDA grid raycasting for retro FPS and dungeon-crawler games.",
       "functions": [
         {
           "name": "new",
@@ -15529,6 +16166,66 @@
           "objectType": null
         },
         {
+          "name": "drawMany",
+          "fullPath": "lurek.render.drawMany",
+          "signature": "(list)",
+          "description": "Draws a list of images in a single call. Each entry is a table: {image, x, y} or",
+          "parameters": [
+            {
+              "name": "list",
+              "type": "table",
+              "description": "Array of draw entries.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "printRotated",
+          "fullPath": "lurek.render.printRotated",
+          "signature": "(text, x, y, angle, [scale])",
+          "description": "Draws text at the given position with rotation. Rotates the entire string as a block",
+          "parameters": [
+            {
+              "name": "text",
+              "type": "string",
+              "description": "Text to draw.",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Draw x position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Draw y position.",
+              "optional": false
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "description": "Rotation in radians.",
+              "optional": false
+            },
+            {
+              "name": "scale",
+              "type": "number",
+              "description": "Text scale, defaulting to 1.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "print",
           "fullPath": "lurek.render.print",
           "signature": "(text, [x], [y], [scale])",
@@ -15994,13 +16691,13 @@
         {
           "name": "newImage",
           "fullPath": "lurek.render.newImage",
-          "signature": "(arg)",
+          "signature": "(...)",
           "description": "Loads an image from a file path or creates one from ImageData.",
           "parameters": [
             {
-              "name": "path_or_data",
+              "name": "...",
               "type": "any",
-              "description": "Image file path or image data object.",
+              "description": "",
               "optional": false
             }
           ],
@@ -17933,6 +18630,42 @@
           "returnType": "nil",
           "isMethod": false,
           "objectType": null
+        },
+        {
+          "name": "loadObj",
+          "fullPath": "lurek.render.loadObj",
+          "signature": "(path)",
+          "description": "Loads a Wavefront OBJ file (relative to game dir) and returns an LObjModel.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Relative path, e.g. \"assets/models/tank.obj\".",
+              "optional": false
+            }
+          ],
+          "returns": "LObjModel",
+          "returnType": "LObjModel",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "loadModel",
+          "fullPath": "lurek.render.loadModel",
+          "signature": "(path)",
+          "description": "Alias for `loadObj`; loads a Wavefront OBJ file and returns an `LObjModel`.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Relative path to an `.obj` asset file.",
+              "optional": false
+            }
+          ],
+          "returns": "LObjModel",
+          "returnType": "LObjModel",
+          "isMethod": false,
+          "objectType": null
         }
       ],
       "methods": []
@@ -18850,6 +19583,24 @@
           "objectType": null
         },
         {
+          "name": "fromIni",
+          "fullPath": "lurek.serial.fromIni",
+          "signature": "(s)",
+          "description": "Parses an INI string and returns a Lua table.",
+          "parameters": [
+            {
+              "name": "s",
+              "type": "string",
+              "description": "INI source text to parse.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "toToml",
           "fullPath": "lurek.serial.toToml",
           "signature": "(value)",
@@ -19002,6 +19753,108 @@
           ],
           "returns": "boolean",
           "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "detectFormat",
+          "fullPath": "lurek.serial.detectFormat",
+          "signature": "(s)",
+          "description": "Detects input text format (`json`, `toml`, `csv`, or `xml`).",
+          "parameters": [
+            {
+              "name": "s",
+              "type": "string",
+              "description": "UTF-8 text payload to inspect.",
+              "optional": false
+            }
+          ],
+          "returns": "string?",
+          "returnType": "string?",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "decode",
+          "fullPath": "lurek.serial.decode",
+          "signature": "(payload, [format], [opts])",
+          "description": "Decodes input payload with explicit or auto-detected format.",
+          "parameters": [
+            {
+              "name": "payload",
+              "type": "string",
+              "description": "UTF-8 text (json/toml/csv/xml) or binary bytes for msgpack.",
+              "optional": false
+            },
+            {
+              "name": "format",
+              "type": "string",
+              "description": "Optional format: `json`, `toml`, `csv`, `xml`, `ini`, `msgpack`. Nil enables auto-detect (text only).",
+              "optional": true
+            },
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional options table: `delimiter`, `has_headers` (CSV).",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "encode",
+          "fullPath": "lurek.serial.encode",
+          "signature": "(value, format, [opts])",
+          "description": "Encodes a Lua value using the selected format.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Lua value to encode.",
+              "optional": false
+            },
+            {
+              "name": "format",
+              "type": "string",
+              "description": "Format: `json`, `toml`, `csv`, or `msgpack`.",
+              "optional": false
+            },
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional options table: `pretty` (JSON), `delimiter` and `has_headers` (CSV).",
+              "optional": true
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "applyDefaults",
+          "fullPath": "lurek.serial.applyDefaults",
+          "signature": "(value, schema)",
+          "description": "Applies schema `default` values recursively to a Lua value tree.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Lua value to patch.",
+              "optional": false
+            },
+            {
+              "name": "schema",
+              "type": "table",
+              "description": "Schema table that may include `default`, `fields`, and `items`.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": false,
           "objectType": null
         }
@@ -23212,11 +24065,58 @@
           "objectType": null
         },
         {
+          "name": "getDisplays",
+          "fullPath": "lurek.window.getDisplays",
+          "signature": "()",
+          "description": "Returns an array with metadata for each connected display.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getCurrentDisplay",
+          "fullPath": "lurek.window.getCurrentDisplay",
+          "signature": "()",
+          "description": "Returns the zero-based index of the monitor the window is currently on.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "setDisplay",
+          "fullPath": "lurek.window.setDisplay",
+          "signature": "(display)",
+          "description": "Moves the window to the given display index.",
+          "parameters": [
+            {
+              "name": "display",
+              "type": "integer",
+              "description": "Zero-based display index",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "getDesktopDimensions",
           "fullPath": "lurek.window.getDesktopDimensions",
-          "signature": "()",
-          "description": "Returns the full desktop resolution of the current monitor as two values (width, height) in physical pixels.",
-          "parameters": [],
+          "signature": "([display])",
+          "description": "Returns the desktop resolution of a monitor as two values (width, height) in physical pixels.",
+          "parameters": [
+            {
+              "name": "display",
+              "type": "integer",
+              "description": "Zero-based display index; omit for current display",
+              "optional": true
+            }
+          ],
           "returns": "integer",
           "returnType": "integer",
           "isMethod": false,
@@ -23344,6 +24244,17 @@
           "fullPath": "lurek.window.requestAttention",
           "signature": "()",
           "description": "Flashes the window icon in the operating system taskbar or dock to attract the user's attention.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "flash",
+          "fullPath": "lurek.window.flash",
+          "signature": "()",
+          "description": "Alias for `requestAttention`.",
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
@@ -27368,6 +28279,78 @@
               "name": "val",
               "type": "number",
               "description": "Fill value.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "addInplace",
+          "fullPath": "LArray:addInplace",
+          "signature": "(other)",
+          "description": "In-place element-wise addition with another Array.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "Array",
+              "description": "Right-hand operand array.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "subInplace",
+          "fullPath": "LArray:subInplace",
+          "signature": "(other)",
+          "description": "In-place element-wise subtraction with another Array.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "Array",
+              "description": "Right-hand operand array.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "mulInplace",
+          "fullPath": "LArray:mulInplace",
+          "signature": "(other)",
+          "description": "In-place element-wise multiplication with another Array.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "Array",
+              "description": "Right-hand operand array.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LArray"
+        },
+        {
+          "name": "divInplace",
+          "fullPath": "LArray:divInplace",
+          "signature": "(other)",
+          "description": "In-place element-wise division with another Array.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "Array",
+              "description": "Right-hand operand array.",
               "optional": false
             }
           ],
@@ -51918,6 +52901,17 @@
       "description": "Lua-side handle to a loaded GPU texture stored in the engine's texture pool.",
       "methods": [
         {
+          "name": "getId",
+          "fullPath": "LImage:getId",
+          "signature": "()",
+          "description": "Returns the internal numeric texture handle used by low-level render systems.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LImage"
+        },
+        {
           "name": "getWidth",
           "fullPath": "LImage:getWidth",
           "signature": "()",
@@ -52689,19 +53683,13 @@
         {
           "name": "resize",
           "fullPath": "LImageData:resize",
-          "signature": "(w, h)",
+          "signature": "(...)",
           "description": "Returns a bilinear-interpolated copy of the image at the given dimensions.",
           "parameters": [
             {
-              "name": "width",
-              "type": "integer",
-              "description": "Width in pixels.",
-              "optional": false
-            },
-            {
-              "name": "height",
-              "type": "integer",
-              "description": "Height in pixels.",
+              "name": "...",
+              "type": "integer|string",
+              "description": "",
               "optional": false
             }
           ],
@@ -52773,6 +53761,17 @@
           ],
           "returns": "ImageData",
           "returnType": "ImageData",
+          "isMethod": true,
+          "objectType": "LImageData"
+        },
+        {
+          "name": "getRawBytes",
+          "fullPath": "LImageData:getRawBytes",
+          "signature": "()",
+          "description": "Returns the raw RGBA8 pixel data as a Lua string (width Ă— height Ă— 4 bytes).",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
           "isMethod": true,
           "objectType": "LImageData"
         },
@@ -58264,6 +59263,35 @@
           "objectType": "LLight"
         },
         {
+          "name": "setShadowSoftness",
+          "fullPath": "LLight:setShadowSoftness",
+          "signature": "(softness)",
+          "description": "Sets the penumbra softness multiplier for shadow edges.",
+          "parameters": [
+            {
+              "name": "softness",
+              "type": "number",
+              "description": "Penumbra softness multiplier.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "getShadowSoftness",
+          "fullPath": "LLight:getShadowSoftness",
+          "signature": "()",
+          "description": "Returns the penumbra softness multiplier for shadow edges.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
           "name": "setLightMask",
           "fullPath": "LLight:setLightMask",
           "signature": "(mask)",
@@ -58782,6 +59810,75 @@
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "setNormalMap",
+          "fullPath": "LLight:setNormalMap",
+          "signature": "(path)",
+          "description": "Sets the normal-map texture path hint used by plugin renderers.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Normal-map texture path.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "getNormalMap",
+          "fullPath": "LLight:getNormalMap",
+          "signature": "()",
+          "description": "Returns the normal-map texture path hint, or nil when unset.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "clearNormalMap",
+          "fullPath": "LLight:clearNormalMap",
+          "signature": "()",
+          "description": "Clears the normal-map texture path hint.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "setNormalStrength",
+          "fullPath": "LLight:setNormalStrength",
+          "signature": "(strength)",
+          "description": "Sets the normal-map response strength multiplier.",
+          "parameters": [
+            {
+              "name": "strength",
+              "type": "number",
+              "description": "Normal-map response strength.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLight"
+        },
+        {
+          "name": "getNormalStrength",
+          "fullPath": "LLight:getNormalStrength",
+          "signature": "()",
+          "description": "Returns the normal-map response strength multiplier.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
           "isMethod": true,
           "objectType": "LLight"
         },
@@ -69148,6 +70245,116 @@
       ]
     },
     {
+      "name": "LObjModel",
+      "description": "Lua-side handle to a parsed Wavefront OBJ model.",
+      "methods": [
+        {
+          "name": "getVertexCount",
+          "fullPath": "LObjModel:getVertexCount",
+          "signature": "()",
+          "description": "Returns the number of position vertices stored in this model.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        },
+        {
+          "name": "getFaceCount",
+          "fullPath": "LObjModel:getFaceCount",
+          "signature": "()",
+          "description": "Returns the number of triangulated faces available in this model.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        },
+        {
+          "name": "getUvCount",
+          "fullPath": "LObjModel:getUvCount",
+          "signature": "()",
+          "description": "Returns the number of UV coordinates loaded from the OBJ file.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        },
+        {
+          "name": "getNormalCount",
+          "fullPath": "LObjModel:getNormalCount",
+          "signature": "()",
+          "description": "Returns the number of normal vectors stored in this model.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        },
+        {
+          "name": "renderToImage",
+          "fullPath": "LObjModel:renderToImage",
+          "signature": "(width, height, [rotation])",
+          "description": "Rasterizes the model into a cached sprite image using material colors from the MTL.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Output sprite width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Output sprite height.",
+              "optional": false
+            },
+            {
+              "name": "rotation",
+              "type": "integer",
+              "description": "Quarter-turn rotation: 0,1,2,3.",
+              "optional": true
+            }
+          ],
+          "returns": "LImage",
+          "returnType": "LImage",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        },
+        {
+          "name": "projectToMesh",
+          "fullPath": "LObjModel:projectToMesh",
+          "signature": "(cam_tbl, screen_w, screen_h)",
+          "description": "Projects the 3-D model to a flat 2-D vertex table.",
+          "parameters": [
+            {
+              "name": "camera",
+              "type": "table",
+              "description": "Camera parameters.",
+              "optional": false
+            },
+            {
+              "name": "screen_w",
+              "type": "number",
+              "description": "Output width in pixels.",
+              "optional": false
+            },
+            {
+              "name": "screen_h",
+              "type": "number",
+              "description": "Output height in pixels.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LObjModel"
+        }
+      ]
+    },
+    {
       "name": "LObjectPool",
       "description": "Lua wrapper for the ObjectPool pattern.",
       "methods": [
@@ -69885,6 +71092,46 @@
           "parameters": [],
           "returns": "number",
           "returnType": "number",
+          "isMethod": true,
+          "objectType": "LOverlay"
+        },
+        {
+          "name": "pullAmbientFromLight",
+          "fullPath": "LOverlay:pullAmbientFromLight",
+          "signature": "()",
+          "description": "Copies ambient colour from `lurek.light` world state into this overlay.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LOverlay"
+        },
+        {
+          "name": "pushAmbientToLight",
+          "fullPath": "LOverlay:pushAmbientToLight",
+          "signature": "()",
+          "description": "Copies this overlay ambient colour into `lurek.light` world state.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LOverlay"
+        },
+        {
+          "name": "syncAmbientWithLight",
+          "fullPath": "LOverlay:syncAmbientWithLight",
+          "signature": "(mode)",
+          "description": "Resolves ambient ownership between overlay and light world, then writes both sides.",
+          "parameters": [
+            {
+              "name": "mode",
+              "type": "string",
+              "description": "Resolution mode: `\"light\"`, `\"overlay\"`, `\"avg\"`, `\"max\"`, or `\"min\"`.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": true,
           "objectType": "LOverlay"
         },
@@ -77451,6 +78698,28 @@
           "objectType": "LProvinceGrid"
         },
         {
+          "name": "provinceSpans",
+          "fullPath": "LProvinceGrid:provinceSpans",
+          "signature": "()",
+          "description": "Returns province fill spans as { province_id, y, x0, x1 } records (x1 exclusive).",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "borderSegments",
+          "fullPath": "LProvinceGrid:borderSegments",
+          "signature": "()",
+          "description": "Returns merged border segments as",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
           "name": "type",
           "fullPath": "LProvinceGrid:type",
           "signature": "()",
@@ -77478,6 +78747,727 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "serializeShapeData",
+          "fullPath": "LProvinceGrid:serializeShapeData",
+          "signature": "()",
+          "description": "Serializes province geometry (spans and borders) to raw bytes.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "deserializeShapeData",
+          "fullPath": "LProvinceGrid:deserializeShapeData",
+          "signature": "(bytes)",
+          "description": "Deserializes province geometry from raw bytes produced by serializeShapeData.",
+          "parameters": [
+            {
+              "name": "bytes",
+              "type": "string",
+              "description": "Binary blob previously returned by serializeShapeData.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        }
+      ]
+    },
+    {
+      "name": "LProvinceRegistry",
+      "description": "Lua handle referencing one named engine-side province registry.",
+      "methods": [
+        {
+          "name": "getName",
+          "fullPath": "LProvinceRegistry:getName",
+          "signature": "()",
+          "description": "Returns the unique registry identifier used to store this province dataset.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getWidth",
+          "fullPath": "LProvinceRegistry:getWidth",
+          "signature": "()",
+          "description": "Returns source map width in pixels.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getHeight",
+          "fullPath": "LProvinceRegistry:getHeight",
+          "signature": "()",
+          "description": "Returns source map height in pixels.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getAt",
+          "fullPath": "LProvinceRegistry:getAt",
+          "signature": "(x, y)",
+          "description": "Returns province id at pixel coordinate.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "0-based map x.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "0-based map y.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "fitCamera",
+          "fullPath": "LProvinceRegistry:fitCamera",
+          "signature": "(screen_w, screen_h, [pixel_size])",
+          "description": "Computes camera x/y/zoom that fits the full map in the given screen.",
+          "parameters": [
+            {
+              "name": "screen_w",
+              "type": "number",
+              "description": "Screen width in pixels.",
+              "optional": false
+            },
+            {
+              "name": "screen_h",
+              "type": "number",
+              "description": "Screen height in pixels.",
+              "optional": false
+            },
+            {
+              "name": "pixel_size",
+              "type": "number",
+              "description": "Size of one map pixel in world units (default 1.0).",
+              "optional": true
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "screenToMap",
+          "fullPath": "LProvinceRegistry:screenToMap",
+          "signature": "(screen_x, screen_y, cam_x, cam_y, zoom, [pixel_size])",
+          "description": "Converts screen-space coordinates to map-space coordinates.",
+          "parameters": [
+            {
+              "name": "screen_x",
+              "type": "number",
+              "description": "Screen x in pixels.",
+              "optional": false
+            },
+            {
+              "name": "screen_y",
+              "type": "number",
+              "description": "Screen y in pixels.",
+              "optional": false
+            },
+            {
+              "name": "cam_x",
+              "type": "number",
+              "description": "Camera x offset.",
+              "optional": false
+            },
+            {
+              "name": "cam_y",
+              "type": "number",
+              "description": "Camera y offset.",
+              "optional": false
+            },
+            {
+              "name": "zoom",
+              "type": "number",
+              "description": "Camera zoom scalar.",
+              "optional": false
+            },
+            {
+              "name": "pixel_size",
+              "type": "number",
+              "description": "Size of one map pixel in world units (default 1.0).",
+              "optional": true
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "screenToProvince",
+          "fullPath": "LProvinceRegistry:screenToProvince",
+          "signature": "(screen_x, screen_y, cam_x, cam_y, zoom, [pixel_size])",
+          "description": "Returns province id under a screen-space position.",
+          "parameters": [
+            {
+              "name": "screen_x",
+              "type": "number",
+              "description": "Screen x in pixels.",
+              "optional": false
+            },
+            {
+              "name": "screen_y",
+              "type": "number",
+              "description": "Screen y in pixels.",
+              "optional": false
+            },
+            {
+              "name": "cam_x",
+              "type": "number",
+              "description": "Camera x offset.",
+              "optional": false
+            },
+            {
+              "name": "cam_y",
+              "type": "number",
+              "description": "Camera y offset.",
+              "optional": false
+            },
+            {
+              "name": "zoom",
+              "type": "number",
+              "description": "Camera zoom scalar.",
+              "optional": false
+            },
+            {
+              "name": "pixel_size",
+              "type": "number",
+              "description": "Size of one map pixel in world units (default 1.0).",
+              "optional": true
+            }
+          ],
+          "returns": "integer|nil",
+          "returnType": "integer|nil",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "provinceCount",
+          "fullPath": "LProvinceRegistry:provinceCount",
+          "signature": "()",
+          "description": "Returns number of provinces.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "provinceIds",
+          "fullPath": "LProvinceRegistry:provinceIds",
+          "signature": "()",
+          "description": "Returns sorted province ids.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "adjacencies",
+          "fullPath": "LProvinceRegistry:adjacencies",
+          "signature": "()",
+          "description": "Returns adjacency pairs as records `{ province_a, province_b }`.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "provinceSpans",
+          "fullPath": "LProvinceRegistry:provinceSpans",
+          "signature": "()",
+          "description": "Returns span geometry records `{ province_id, y, x0, x1 }`.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "borderSegments",
+          "fullPath": "LProvinceRegistry:borderSegments",
+          "signature": "()",
+          "description": "Returns border segment geometry records `{ province_a, province_b, x0, y0, x1, y1 }`.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getRevision",
+          "fullPath": "LProvinceRegistry:getRevision",
+          "signature": "()",
+          "description": "Returns registry revision counter.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getProvince",
+          "fullPath": "LProvinceRegistry:getProvince",
+          "signature": "(id)",
+          "description": "Returns province snapshot table or nil.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getNeighbors",
+          "fullPath": "LProvinceRegistry:getNeighbors",
+          "signature": "(id)",
+          "description": "Returns neighbor ids for a province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getBorderClass",
+          "fullPath": "LProvinceRegistry:getBorderClass",
+          "signature": "(a, b)",
+          "description": "Returns border class token between provinces or nil.",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "integer",
+              "description": "Province A.",
+              "optional": false
+            },
+            {
+              "name": "b",
+              "type": "integer",
+              "description": "Province B.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setBorderClass",
+          "fullPath": "LProvinceRegistry:setBorderClass",
+          "signature": "(a, b, class)",
+          "description": "Sets border class between provinces.",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "integer",
+              "description": "Province A.",
+              "optional": false
+            },
+            {
+              "name": "b",
+              "type": "integer",
+              "description": "Province B.",
+              "optional": false
+            },
+            {
+              "name": "class",
+              "type": "string",
+              "description": "One of: land_land, coast, sea_sea, special.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setPoliticalColor",
+          "fullPath": "LProvinceRegistry:setPoliticalColor",
+          "signature": "(id, r, g, b, [a])",
+          "description": "Sets political color for one province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "r",
+              "type": "number",
+              "description": "Red (0..1).",
+              "optional": false
+            },
+            {
+              "name": "g",
+              "type": "number",
+              "description": "Green (0..1).",
+              "optional": false
+            },
+            {
+              "name": "b",
+              "type": "number",
+              "description": "Blue (0..1).",
+              "optional": false
+            },
+            {
+              "name": "a",
+              "type": "number",
+              "description": "Alpha (0..1).",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setTerrainType",
+          "fullPath": "LProvinceRegistry:setTerrainType",
+          "signature": "(id, terrain_type)",
+          "description": "Sets terrain type for one province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "terrain_type",
+              "type": "integer",
+              "description": "Terrain type id.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setBorderStyle",
+          "fullPath": "LProvinceRegistry:setBorderStyle",
+          "signature": "(id, border_style)",
+          "description": "Sets border style id for one province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "border_style",
+              "type": "integer",
+              "description": "Border style id.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setFogState",
+          "fullPath": "LProvinceRegistry:setFogState",
+          "signature": "(id, fog_state)",
+          "description": "Sets fog state byte for one province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "fog_state",
+              "type": "integer",
+              "description": "Fog state byte.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setVisibilityState",
+          "fullPath": "LProvinceRegistry:setVisibilityState",
+          "signature": "(id, visibility_state)",
+          "description": "Sets visibility byte for one province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "visibility_state",
+              "type": "integer",
+              "description": "Visibility byte.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setAttr",
+          "fullPath": "LProvinceRegistry:setAttr",
+          "signature": "(id, key, value)",
+          "description": "Sets freeform attribute on a province.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Attribute key.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "string",
+              "description": "Attribute value.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setCapital",
+          "fullPath": "LProvinceRegistry:setCapital",
+          "signature": "(id, x, y)",
+          "description": "Sets province capital marker position.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Map-space x coordinate.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Map-space y coordinate.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setLabelLine",
+          "fullPath": "LProvinceRegistry:setLabelLine",
+          "signature": "(id, ax, ay, bx, by)",
+          "description": "Sets province label guide line from two points.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "ax",
+              "type": "number",
+              "description": "First point x.",
+              "optional": false
+            },
+            {
+              "name": "ay",
+              "type": "number",
+              "description": "First point y.",
+              "optional": false
+            },
+            {
+              "name": "bx",
+              "type": "number",
+              "description": "Second point x.",
+              "optional": false
+            },
+            {
+              "name": "by",
+              "type": "number",
+              "description": "Second point y.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "setLabelText",
+          "fullPath": "LProvinceRegistry:setLabelText",
+          "signature": "(id, text)",
+          "description": "Sets province display label text.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Province id.",
+              "optional": false
+            },
+            {
+              "name": "text",
+              "type": "string",
+              "description": "Label text.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "importMetadataFromFiles",
+          "fullPath": "LProvinceRegistry:importMetadataFromFiles",
+          "signature": "(opts)",
+          "description": "Imports province metadata from sanitized color map, marker map, and CSV/TOML files.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Import options table.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "render",
+          "fullPath": "LProvinceRegistry:render",
+          "signature": "([opts])",
+          "description": "Enqueues Rust-generated GPU draw commands for province rendering.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Render options.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "getChangesSince",
+          "fullPath": "LProvinceRegistry:getChangesSince",
+          "signature": "(revision)",
+          "description": "Returns revisioned change records for incremental sync.",
+          "parameters": [
+            {
+              "name": "revision",
+              "type": "integer",
+              "description": "Last consumed revision.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "type",
+          "fullPath": "LProvinceRegistry:type",
+          "signature": "()",
+          "description": "Returns the Lua userdata type token for this province registry handle.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "LProvinceRegistry:typeOf",
+          "signature": "(name)",
+          "description": "Returns true when type token matches this userdata.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type token.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProvinceRegistry"
         }
       ]
     },
@@ -79441,6 +81431,270 @@
           "objectType": "LRaycaster"
         },
         {
+          "name": "setFloorTextureCell",
+          "fullPath": "LRaycaster:setFloorTextureCell",
+          "signature": "(x, y, texture)",
+          "description": "Sets or clears a floor texture override for a map cell.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            },
+            {
+              "name": "texture",
+              "type": "integer|LImage|nil",
+              "description": "Texture handle id, `lurek.render.newImage()` userdata, or nil to clear override.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "getFloorTextureCell",
+          "fullPath": "LRaycaster:getFloorTextureCell",
+          "signature": "(x, y)",
+          "description": "Returns floor texture override id for a map cell, or nil when unset.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            }
+          ],
+          "returns": "integer|nil",
+          "returnType": "integer|nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "setCeilingTextureCell",
+          "fullPath": "LRaycaster:setCeilingTextureCell",
+          "signature": "(x, y, texture)",
+          "description": "Sets or clears a ceiling texture override for a map cell.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            },
+            {
+              "name": "texture",
+              "type": "integer|LImage|nil",
+              "description": "Texture handle id, `lurek.render.newImage()` userdata, or nil to clear override.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "getCeilingTextureCell",
+          "fullPath": "LRaycaster:getCeilingTextureCell",
+          "signature": "(x, y)",
+          "description": "Returns ceiling texture override id for a map cell, or nil when unset.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            }
+          ],
+          "returns": "integer|nil",
+          "returnType": "integer|nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "setLoweredFloorCell",
+          "fullPath": "LRaycaster:setLoweredFloorCell",
+          "signature": "(x, y, opts)",
+          "description": "Sets or clears a lowered floor cell such as water or lava.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            },
+            {
+              "name": "opts",
+              "type": "table|nil",
+              "description": "Lowered-floor options or nil to clear.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "getLoweredFloorCell",
+          "fullPath": "LRaycaster:getLoweredFloorCell",
+          "signature": "(x, y)",
+          "description": "Returns lowered floor cell config for a map cell, or nil when unset.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            }
+          ],
+          "returns": "table|nil",
+          "returnType": "table|nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "isWalkBlocked",
+          "fullPath": "LRaycaster:isWalkBlocked",
+          "signature": "(x, y)",
+          "description": "Returns true if the cell cannot be entered because of a wall or a blocked lowered floor cell.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Cell X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Cell Y position.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "tryMove",
+          "fullPath": "LRaycaster:tryMove",
+          "signature": "(px, py, dx, dy)",
+          "description": "Attempts to move by (dx, dy) in world space while respecting map and lowered-floor blocking.",
+          "parameters": [
+            {
+              "name": "px",
+              "type": "number",
+              "description": "Current world x.",
+              "optional": false
+            },
+            {
+              "name": "py",
+              "type": "number",
+              "description": "Current world y.",
+              "optional": false
+            },
+            {
+              "name": "dx",
+              "type": "number",
+              "description": "Delta x.",
+              "optional": false
+            },
+            {
+              "name": "dy",
+              "type": "number",
+              "description": "Delta y.",
+              "optional": false
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "gridMove",
+          "fullPath": "LRaycaster:gridMove",
+          "signature": "(px, py, dir, action, step)",
+          "description": "Attempts a 4-direction movement action (`forward`, `back`, `left`, `right`) from dir 1..4.",
+          "parameters": [
+            {
+              "name": "px",
+              "type": "number",
+              "description": "Current world x.",
+              "optional": false
+            },
+            {
+              "name": "py",
+              "type": "number",
+              "description": "Current world y.",
+              "optional": false
+            },
+            {
+              "name": "dir",
+              "type": "integer",
+              "description": "Direction index (1=+X, 2=+Y, 3=-X, 4=-Y).",
+              "optional": false
+            },
+            {
+              "name": "action",
+              "type": "string",
+              "description": "Movement token: `forward`, `back`, `left`, `right`.",
+              "optional": false
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "description": "Step length.",
+              "optional": false
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
           "name": "castRay",
           "fullPath": "LRaycaster:castRay",
           "signature": "(ox, oy, angle, max_dist)",
@@ -79605,6 +81859,138 @@
           ],
           "returns": "boolean",
           "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "revealCellsFromRays",
+          "fullPath": "LRaycaster:revealCellsFromRays",
+          "signature": "(ox, oy, angle, fov, count, max_dist, [step])",
+          "description": "Traces multiple rays and returns unique grid cells crossed by those rays.",
+          "parameters": [
+            {
+              "name": "ox",
+              "type": "number",
+              "description": "Origin world X.",
+              "optional": false
+            },
+            {
+              "name": "oy",
+              "type": "number",
+              "description": "Origin world Y.",
+              "optional": false
+            },
+            {
+              "name": "angle",
+              "type": "number",
+              "description": "Camera facing angle in radians.",
+              "optional": false
+            },
+            {
+              "name": "fov",
+              "type": "number",
+              "description": "Field of view in radians.",
+              "optional": false
+            },
+            {
+              "name": "count",
+              "type": "integer",
+              "description": "Ray count.",
+              "optional": false
+            },
+            {
+              "name": "max_dist",
+              "type": "number",
+              "description": "Maximum ray distance.",
+              "optional": false
+            },
+            {
+              "name": "step",
+              "type": "number",
+              "description": "Sampling step along each ray, default 0.2.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "computeTileLight",
+          "fullPath": "LRaycaster:computeTileLight",
+          "signature": "(x, y, ambient, lights_tbl)",
+          "description": "Computes light color for a tile center using ambient + point lights.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "integer",
+              "description": "Tile X (zero-based).",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "integer",
+              "description": "Tile Y (zero-based).",
+              "optional": false
+            },
+            {
+              "name": "ambient",
+              "type": "number",
+              "description": "Ambient light in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "lights",
+              "type": "table|nil",
+              "description": "Array of `{x,y,radius,r,g,b,intensity}`.",
+              "optional": false
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "buildMinimapWindow",
+          "fullPath": "LRaycaster:buildMinimapWindow",
+          "signature": "(center_x, center_y, radius, ambient, lights_tbl)",
+          "description": "Builds tile samples for a minimap window around a world-space center.",
+          "parameters": [
+            {
+              "name": "center_x",
+              "type": "number",
+              "description": "World center X.",
+              "optional": false
+            },
+            {
+              "name": "center_y",
+              "type": "number",
+              "description": "World center Y.",
+              "optional": false
+            },
+            {
+              "name": "radius",
+              "type": "integer",
+              "description": "Window radius in tiles.",
+              "optional": false
+            },
+            {
+              "name": "ambient",
+              "type": "number",
+              "description": "Ambient light in [0, 1].",
+              "optional": false
+            },
+            {
+              "name": "lights",
+              "type": "table|nil",
+              "description": "Array of `{x,y,radius,r,g,b,intensity}`.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": true,
           "objectType": "LRaycaster"
         },
@@ -80067,18 +82453,60 @@
             {
               "name": "sprites",
               "type": "table|nil",
-              "description": "- array of { x, y, texture, size }.",
+              "description": "- array of { x, y, texture, size } where texture is integer id or LImage.",
               "optional": false
             },
             {
               "name": "wall_textures",
               "type": "table|nil",
-              "description": "- { [cell_value] = TextureKey }.",
+              "description": "- { [cell_value] = texture } where texture is integer id or LImage.",
               "optional": false
             }
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRaycaster"
+        },
+        {
+          "name": "buildSceneWithModels",
+          "fullPath": "LRaycaster:buildSceneWithModels",
+          "signature": "LRaycaster:buildSceneWithModels(params, lights, sprites, wall_textures, models)",
+          "description": "Builds a raycaster scene and appends projected OBJ model meshes.",
+          "parameters": [
+            {
+              "name": "params",
+              "type": "table",
+              "description": "Same as buildScene.",
+              "optional": false
+            },
+            {
+              "name": "lights",
+              "type": "table|nil",
+              "description": "Same as buildScene.",
+              "optional": false
+            },
+            {
+              "name": "sprites",
+              "type": "table|nil",
+              "description": "Billboard sprites (feature 1).",
+              "optional": false
+            },
+            {
+              "name": "wall_textures",
+              "type": "table|nil",
+              "description": "Same as buildScene.",
+              "optional": false
+            },
+            {
+              "name": "models",
+              "type": "table|nil",
+              "description": "array of { x, y, model, rotation?, scale? }.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": true,
           "objectType": "LRaycaster"
         },
@@ -80584,8 +83012,8 @@
           "signature": "()",
           "description": "Removes and returns the oldest element, or nil if the buffer is empty.",
           "parameters": [],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": true,
           "objectType": "LRingBuffer"
         },
@@ -80595,8 +83023,8 @@
           "signature": "()",
           "description": "Returns the oldest element without removing it, or nil if empty.",
           "parameters": [],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": true,
           "objectType": "LRingBuffer"
         },
@@ -80606,8 +83034,8 @@
           "signature": "()",
           "description": "Returns the newest element without removing it, or nil if empty.",
           "parameters": [],
-          "returns": "any",
-          "returnType": "any",
+          "returns": "unknown",
+          "returnType": "unknown",
           "isMethod": true,
           "objectType": "LRingBuffer"
         },

@@ -412,13 +412,10 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `lurek.math.pow`: Returns x raised to the power y.
 - `lurek.math.min`: Returns the smallest of the supplied numbers.
 - `lurek.math.max`: Returns the largest of the supplied numbers.
-- `lurek.math.clamp`: Returns x clamped to [lo, hi].
-- `lurek.math.sign`: Returns -1, 0, or 1 depending on the sign of x.
 - `lurek.math.fmod`: Returns the remainder of x / y (fmod).
-- `lurek.math.lerp`: Linear interpolation between a and b by fraction t.
 - `lurek.math.distance`: Returns the Euclidean distance between (x1,y1) and (x2,y2).
 - `lurek.math.distanceSq`: Returns the squared Euclidean distance between (x1,y1) and (x2,y2) (avoids sqrt).
-- `lurek.math.random`: Returns a pseudo-random number in [0,1) with no args,
+- `lurek.math.random`: Returns a pseudo-random number using Lua's built-in `math.random` behavior.
 - `lurek.math.randomInt`: Returns a pseudo-random integer in [lo, hi] (inclusive).
 - `lurek.math.simplexNoise`: Returns a simplex noise value in [-1, 1] for 2D or 3D coordinates.
 - `lurek.math.vec2`: Creates a 2D vector with x and y components.
@@ -441,132 +438,177 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `lurek.math.polygonClip`: Clips a polygon against a single half-plane using the Sutherland-Hodgman algorithm.
 - `lurek.math.aabbTree`: Creates a new empty AABB tree for efficient broad-phase overlap queries.
 - `lurek.math.newCircle`: Creates a new Circle value type with the given centre and radius.
-- `lurek.math.polygonIntersection`: Computes the intersection of two convex polygons using the Sutherland-Hodgman
-- `lurek.math.polygonUnion`: Computes the approximate union of two convex polygons as the convex hull of
-- `lurek.math.polygonDifference`: Computes the approximate difference `A - B` (the part of A not covered by B).
+- `lurek.math.polygonIntersection`: Computes the intersection of two convex polygons.
+- `lurek.math.polygonUnion`: Computes the approximate union of two convex polygons as a convex hull.
+- `lurek.math.polygonDifference`: Computes the approximate difference `A - B` for convex polygon inputs.
 - `lurek.math.voronoi`: Computes the Voronoi diagram for a list of 2-D seed points.
 
-### `AabbTree` Methods
-- `AabbTree:remove`: Removes the entry with the given id.
-- `AabbTree:queryPoint`: Returns the ids of all entries whose AABBs contain the given point.
-- `AabbTree:contains`: Returns true if an entry with the given id exists in the tree.
-- `AabbTree:len`: Returns the number of entries in the tree.
-- `AabbTree:isEmpty`: Returns true if the tree contains no entries.
-- `AabbTree:clear`: Removes all entries from the tree.
+### `LAabbTree` Methods
+- `LAabbTree:insert`: Inserts an entry with the given AABB into the tree.
+- `LAabbTree:remove`: Removes the entry with the given id.
+- `LAabbTree:query`: Returns the ids of all entries whose AABBs overlap the query rectangle.
+- `LAabbTree:queryPoint`: Returns the ids of all entries whose AABBs contain the given point.
+- `LAabbTree:update`: Updates the AABB for an existing entry.
+- `LAabbTree:contains`: Returns true if an entry with the given id exists in the tree.
+- `LAabbTree:len`: Returns the number of entries in the tree.
+- `LAabbTree:isEmpty`: Returns true if the tree contains no entries.
+- `LAabbTree:clear`: Removes all entries from the tree.
+- `LAabbTree:type`: Returns the type name of this object.
+- `LAabbTree:typeOf`: Returns true if this object is of the given type.
 
-### `BezierCurve` Methods
-- `BezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
-- `BezierCurve:render`: Renders the curve as a polyline with the given number of segments.
-- `BezierCurve:getDerivative`: Returns a new BezierCurve representing the first derivative.
-- `BezierCurve:getControlPoint`: Returns the control point at 1-based index as (x, y), or nil.
-- `BezierCurve:removeControlPoint`: Removes a control point at 1-based index.
-- `BezierCurve:getControlPointCount`: Returns the number of control points.
-- `BezierCurve:length`: Returns the approximate arc length of the curve.
-- `BezierCurve:translate`: Translates all control points by (dx, dy).
-- `BezierCurve:rotate`: Rotates all control points around a pivot by angle radians.
-- `BezierCurve:scale`: Scales all control points around a pivot by factor s.
+### `LBezierCurve` Methods
+- `LBezierCurve:evaluate`: Evaluates the curve at parameter t, returning (x, y).
+- `LBezierCurve:render`: Renders the curve as a polyline with the given number of segments.
+- `LBezierCurve:getDerivative`: Returns a new BezierCurve representing the first derivative.
+- `LBezierCurve:getControlPoint`: Returns the control point at 1-based index as (x, y), or nil.
+- `LBezierCurve:setControlPoint`: Sets the control point at 1-based index.
+- `LBezierCurve:insertControlPoint`: Inserts a control point. If index is given (1-based), inserts at that position.
+- `LBezierCurve:removeControlPoint`: Removes a control point at 1-based index.
+- `LBezierCurve:getControlPointCount`: Returns the number of control points.
+- `LBezierCurve:length`: Returns the approximate arc length of the curve.
+- `LBezierCurve:translate`: Translates all control points by (dx, dy).
+- `LBezierCurve:rotate`: Rotates all control points around a pivot by angle radians.
+- `LBezierCurve:scale`: Scales all control points around a pivot by factor s.
+- `LBezierCurve:type`: Returns the type name of this object.
+- `LBezierCurve:typeOf`: Returns true if this object is of the given type.
 
-### `CatmullRom` Methods
-- `CatmullRom:sample`: Samples the spline at global parameter `t` in `[0, 1]` and returns `(x, y)`.
-- `CatmullRom:sampleSegment`: Samples one segment at local parameter `t` in `[0, 1]` and returns `(x, y)`.
-- `CatmullRom:len`: Number of control points.
-- `CatmullRom:addPoint`: Appends a control point to the spline.
-- `CatmullRom:removePoint`: Removes the control point at `index` (0-based) and returns it.
+### `LCatmullRom` Methods
+- `LCatmullRom:sample`: Samples the spline at global parameter `t` in `[0, 1]`.
+- `LCatmullRom:sampleSegment`: Samples one segment at local parameter `t` in `[0, 1]`.
+- `LCatmullRom:len`: Number of control points.
+- `LCatmullRom:addPoint`: Appends a control point to the spline.
+- `LCatmullRom:removePoint`: Removes the control point at `index` (0-based) and returns it.
+- `LCatmullRom:type`: Returns the type name of this object.
+- `LCatmullRom:typeOf`: Returns true if this object is of the given type.
 
-### `Circle` Methods
-- `Circle:area`: Returns the area of the circle (π r²).
-- `Circle:perimeter`: Returns the circumference of the circle (2 π r).
-- `Circle:contains`: Returns true if the point (px, py) lies inside or on the boundary.
-- `Circle:intersects`: Returns true if this circle overlaps another circle.
-- `Circle:aabb`: Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
-- `Circle:x`: Returns the circle centre X.
-- `Circle:y`: Returns the circle centre Y.
-- `Circle:radius`: Returns the circle radius.
+### `LCircle` Methods
+- `LCircle:area`: Returns the area of the circle (π r²).
+- `LCircle:perimeter`: Returns the circumference of the circle (2 π r).
+- `LCircle:contains`: Returns true if the point (px, py) lies inside or on the boundary.
+- `LCircle:intersects`: Returns true if this circle overlaps another circle.
+- `LCircle:aabb`: Returns the axis-aligned bounding box as (min_x, min_y, max_x, max_y).
+- `LCircle:x`: Returns the circle centre X.
+- `LCircle:y`: Returns the circle centre Y.
+- `LCircle:radius`: Returns the circle radius.
+- `LCircle:type`: Returns the type name of this object.
+- `LCircle:typeOf`: Returns true if this object is of the given type.
 
-### `Hermite` Methods
-- `Hermite:sample`: Samples the spline at parameter `t` in `[0, 1]` and returns `(x, y)`.
+### `LHermite` Methods
+- `LHermite:sample`: Samples the spline at parameter `t` in `[0, 1]`.
+- `LHermite:type`: Returns the type name of this object.
+- `LHermite:typeOf`: Returns true if this object is of the given type.
 
-### `NoiseGenerator` Methods
-- `NoiseGenerator:perlin1d`: Returns 1D Perlin noise at x.
-- `NoiseGenerator:perlin2d`: Returns 2D Perlin noise at (x, y).
-- `NoiseGenerator:perlin3d`: Returns 3D Perlin noise at (x, y, z).
-- `NoiseGenerator:perlin4d`: Returns 4D Perlin noise at (x, y, z, w).
-- `NoiseGenerator:simplex1d`: Returns 1D Simplex noise at x.
-- `NoiseGenerator:simplex2d`: Returns 2D Simplex noise at (x, y).
-- `NoiseGenerator:simplex3d`: Returns 3D Simplex noise at (x, y, z).
-- `NoiseGenerator:getSeed`: Returns the current seed.
-- `NoiseGenerator:setSeed`: Sets the seed and rebuilds the permutation table.
+### `LNoiseGenerator` Methods
+- `LNoiseGenerator:perlin1d`: Returns 1D Perlin noise at x.
+- `LNoiseGenerator:perlin2d`: Returns 2D Perlin noise at (x, y).
+- `LNoiseGenerator:perlin3d`: Returns 3D Perlin noise at (x, y, z).
+- `LNoiseGenerator:perlin4d`: Returns 4D Perlin noise at (x, y, z, w).
+- `LNoiseGenerator:simplex1d`: Returns 1D Simplex noise at x.
+- `LNoiseGenerator:simplex2d`: Returns 2D Simplex noise at (x, y).
+- `LNoiseGenerator:simplex3d`: Returns 3D Simplex noise at (x, y, z).
+- `LNoiseGenerator:worley2d`: Returns 2D Worley (cellular) noise at (x, y).
+- `LNoiseGenerator:worley3d`: Returns 3D Worley (cellular) noise at (x, y, z).
+- `LNoiseGenerator:fbm`: Returns fractal Brownian motion noise at (x, y).
+- `LNoiseGenerator:ridged`: Returns ridged multi-fractal noise at (x, y).
+- `LNoiseGenerator:turbulence`: Returns turbulence noise at (x, y).
+- `LNoiseGenerator:warpDomain`: Applies domain warping, returning offset (x, y).
+- `LNoiseGenerator:generateMap`: Generates a 2D noise map as a flat table (row-major).
+- `LNoiseGenerator:getSeed`: Returns the current seed.
+- `LNoiseGenerator:setSeed`: Sets the seed and rebuilds the permutation table.
+- `LNoiseGenerator:type`: Returns the type name of this object.
+- `LNoiseGenerator:typeOf`: Returns true if this object is of the given type.
 
-### `RandomGenerator` Methods
-- `RandomGenerator:random`: Returns a uniform random number in [0, 1).
-- `RandomGenerator:randomFloat`: Returns a uniform random float in [min, max).
-- `RandomGenerator:randomInt`: Returns a uniform random integer in [min, max].
-- `RandomGenerator:getSeed`: Returns the seed used to initialise this generator.
-- `RandomGenerator:setSeed`: Sets the seed, fully resetting the generator state.
-- `RandomGenerator:getState`: Serialises the generator state as a string for later restoration.
-- `RandomGenerator:setState`: Restores the generator state from a previously serialised string.
+### `LRandomGenerator` Methods
+- `LRandomGenerator:random`: Returns a uniform random number in [0, 1).
+- `LRandomGenerator:randomFloat`: Returns a uniform random float in [min, max).
+- `LRandomGenerator:randomInt`: Returns a uniform random integer in [min, max].
+- `LRandomGenerator:randomNormal`: Returns a random number from a normal (Gaussian) distribution.
+- `LRandomGenerator:getSeed`: Returns the seed used to initialise this generator.
+- `LRandomGenerator:setSeed`: Sets the seed, fully resetting the generator state.
+- `LRandomGenerator:getState`: Serialises the generator state as a string for later restoration.
+- `LRandomGenerator:setState`: Restores the generator state from a previously serialised string.
+- `LRandomGenerator:type`: Returns the type name of this object.
+- `LRandomGenerator:typeOf`: Returns true if this object is of the given type.
 
-### `SpatialHash` Methods
-- `SpatialHash:remove`: Removes an item by its ID.
-- `SpatialHash:clear`: Removes all registered items from this spatial hash, leaving it empty.
-- `SpatialHash:getCellSize`: Returns the cell size used to partition the spatial hash grid.
-- `SpatialHash:getItemCount`: Returns the number of items in the hash.
+### `LSpatialHash` Methods
+- `LSpatialHash:insert`: Inserts an item with the given AABB.
+- `LSpatialHash:update`: Updates an existing item's AABB.
+- `LSpatialHash:remove`: Removes an item by its ID.
+- `LSpatialHash:clear`: Removes all registered items from this spatial hash, leaving it empty.
+- `LSpatialHash:queryRect`: Returns IDs of items overlapping the query rectangle.
+- `LSpatialHash:queryCircle`: Returns IDs of items overlapping the query circle.
+- `LSpatialHash:querySegment`: Returns IDs of items whose AABBs are intersected by the line segment.
+- `LSpatialHash:getCellSize`: Returns the cell size used to partition the spatial hash grid.
+- `LSpatialHash:getItemCount`: Returns the number of items in the hash.
+- `LSpatialHash:type`: Returns the type name of this object.
+- `LSpatialHash:typeOf`: Returns true if this object is of the given type.
 
-### `Transform` Methods
-- `Transform:translate`: Applies translation to the transform.
-- `Transform:rotate`: Applies a rotation in radians.
-- `Transform:scale`: Applies non-uniform scaling.
-- `Transform:shear`: Applies horizontal and vertical shear factors to this transform matrix.
-- `Transform:reset`: Resets the transform to identity.
-- `Transform:transformPoint`: Transforms a point from local space to world space.
-- `Transform:inverseTransformPoint`: Transforms a point from world space back to local space.
-- `Transform:inverse`: Returns a new Transform that undoes this transform.
-- `Transform:clone`: Returns a copy of this transform.
-- `Transform:getMatrix`: Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
-- `Transform:decompose`: Decomposes this transform into translation, rotation, and scale.
+### `LTransform` Methods
+- `LTransform:translate`: Applies translation to the transform.
+- `LTransform:rotate`: Applies a rotation in radians.
+- `LTransform:scale`: Applies non-uniform scaling.
+- `LTransform:shear`: Applies horizontal and vertical shear factors to this transform matrix.
+- `LTransform:reset`: Resets the transform to identity.
+- `LTransform:setTransformation`: Replaces the transform with full transformation parameters.
+- `LTransform:transformPoint`: Transforms a point from local space to world space.
+- `LTransform:inverseTransformPoint`: Transforms a point from world space back to local space.
+- `LTransform:inverse`: Returns a new Transform that undoes this transform.
+- `LTransform:clone`: Returns a copy of this transform.
+- `LTransform:getMatrix`: Returns the 3x3 matrix as a flat table of 9 numbers (row-major).
+- `LTransform:decompose`: Decomposes this transform into translation, rotation, and scale.
+- `LTransform:type`: Returns the type name of this object.
+- `LTransform:typeOf`: Returns true if this object is of the given type.
 
-### `Tween` Methods
-- `Tween:update`: Advances the clock by dt seconds. Returns true when complete.
-- `Tween:reset`: Resets the tween elapsed time to zero, restarting the animation.
-- `Tween:getValue`: Returns the interpolated value at 1-based index, or all values as a
-- `Tween:getAllValues`: Returns all interpolated values as a table.
-- `Tween:isComplete`: Returns true if the tween has finished.
-- `Tween:getValueCount`: Returns the number of values in this tween.
-- `Tween:getEasingName`: Returns the easing function name.
-- `Tween:getDuration`: Returns the tween duration in seconds.
-- `Tween:getTime`: Returns the current clock time.
-- `Tween:getClock`: Alias for getTime(). Returns the current clock time.
-- `Tween:setTime`: Sets the clock to a specific time, clamped to [0, duration].
-- `Tween:set`: Alias for setTime(). Sets the clock to t, clamped to [0, duration].
-- `Tween:addValue`: Adds a start/target value pair. Returns the 1-based index.
+### `LTween` Methods
+- `LTween:update`: Advances the clock by dt seconds. Returns true when complete.
+- `LTween:reset`: Resets the tween elapsed time to zero, restarting the animation.
+- `LTween:getValue`: Returns the interpolated value at 1-based index, or all values when no index is given.
+- `LTween:getAllValues`: Returns all interpolated values as a table.
+- `LTween:isComplete`: Returns true if the tween has finished.
+- `LTween:getValueCount`: Returns the number of values in this tween.
+- `LTween:getEasingName`: Returns the easing function name.
+- `LTween:getDuration`: Returns the tween duration in seconds.
+- `LTween:getTime`: Returns the current clock time.
+- `LTween:getClock`: Alias for getTime(). Returns the current clock time.
+- `LTween:setTime`: Sets the clock to a specific time, clamped to [0, duration].
+- `LTween:set`: Alias for setTime(). Sets the clock to t, clamped to [0, duration].
+- `LTween:addValue`: Adds a start/target value pair. Returns the 1-based index.
+- `LTween:type`: Returns the type name of this object.
+- `LTween:typeOf`: Returns true if this object is of the given type.
 
-### `Vec2` Methods
-- `Vec2:dot`: Returns the dot product with another vector.
-- `Vec2:length`: Returns the Euclidean length of the vector.
-- `Vec2:x`: Returns the horizontal component of the vector.
-- `Vec2:y`: Returns the vertical component of the vector.
-- `Vec2:lengthSquared`: Returns the squared length of the vector (faster than length).
-- `Vec2:normalize`: Returns a unit-length copy of this vector. Returns zero if length is zero.
-- `Vec2:normalized`: Compatibility alias for `normalize`.
-- `Vec2:lerp`: Returns a linearly interpolated vector between this and other at parameter t.
-- `Vec2:distance`: Returns the Euclidean distance from this vector to another.
-- `Vec2:angle`: Returns the angle of this vector in radians (atan2(y, x)).
-- `Vec2:rotate`: Returns a new vector rotated by the given angle in radians.
-- `Vec2:perpendicular`: Returns the perpendicular vector (-y, x).
-- `Vec2:cross`: Returns the 2D cross product (scalar) with another vector.
-- `Vec2:reflect`: Reflects this vector off a surface with the given normal.
+### `LVec2` Methods
+- `LVec2:dot`: Returns the dot product with another vector.
+- `LVec2:length`: Returns the Euclidean length of the vector.
+- `LVec2:x`: Returns the horizontal component of the vector.
+- `LVec2:y`: Returns the vertical component of the vector.
+- `LVec2:lengthSquared`: Returns the squared length of the vector (faster than length).
+- `LVec2:normalize`: Returns a unit-length copy of this vector. Returns zero if length is zero.
+- `LVec2:normalized`: Compatibility alias for `normalize`.
+- `LVec2:lerp`: Returns a linearly interpolated vector between this and other at parameter t.
+- `LVec2:distance`: Returns the Euclidean distance from this vector to another.
+- `LVec2:angle`: Returns the angle of this vector in radians (atan2(y, x)).
+- `LVec2:rotate`: Returns a new vector rotated by the given angle in radians.
+- `LVec2:perpendicular`: Returns the perpendicular vector (-y, x).
+- `LVec2:cross`: Returns the 2D cross product (scalar) with another vector.
+- `LVec2:fromAngle`: Creates a unit vector from an angle in radians.
+- `LVec2:reflect`: Reflects this vector off a surface with the given normal.
+- `LVec2:type`: Returns the type name of this object.
+- `LVec2:typeOf`: Returns true if this object is of the given type.
 
-### `Vec3` Methods
-- `Vec3:length`: Returns the Euclidean length of the vector.
-- `Vec3:lengthSquared`: Returns the squared Euclidean length (avoids sqrt).
-- `Vec3:normalize`: Returns a unit-length version of this vector.
-- `Vec3:dot`: Dot product with another Vec3.
-- `Vec3:cross`: Cross product with another Vec3.
-- `Vec3:lerp`: Linear interpolation towards another Vec3.
-- `Vec3:distance`: Euclidean distance to another Vec3.
-- `Vec3:add`: Add another Vec3 and return the result.
-- `Vec3:sub`: Subtract another Vec3 and return the result.
-- `Vec3:scale`: Scale this vector by a scalar and return the result.
+### `LVec3` Methods
+- `LVec3:length`: Returns the Euclidean length of the vector.
+- `LVec3:lengthSquared`: Returns the squared Euclidean length (avoids sqrt).
+- `LVec3:normalize`: Returns a unit-length version of this vector.
+- `LVec3:dot`: Dot product with another Vec3.
+- `LVec3:cross`: Cross product with another Vec3.
+- `LVec3:lerp`: Linear interpolation towards another Vec3.
+- `LVec3:distance`: Euclidean distance to another Vec3.
+- `LVec3:add`: Add another Vec3 and return the result.
+- `LVec3:sub`: Subtract another Vec3 and return the result.
+- `LVec3:scale`: Scale this vector by a scalar and return the result.
+- `LVec3:splat`: Creates a Vec3 with all components set to `v`.
+- `LVec3:type`: Returns the type name of this object.
+- `LVec3:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

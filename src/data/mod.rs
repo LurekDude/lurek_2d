@@ -32,7 +32,10 @@ pub use bin_pack::{
     measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue,
 };
 pub use byte_data::ByteData;
-pub use compress::{compress, decompress, CompressFormat};
+pub use compress::{
+    compress, compress_chunks, compress_stream, decompress, decompress_chunks, decompress_stream,
+    CompressFormat,
+};
 pub use data_writer::DataWriter;
 pub use dataview::{DataView, LuaDataView};
 pub use encode::{decode, encode, EncodeFormat};

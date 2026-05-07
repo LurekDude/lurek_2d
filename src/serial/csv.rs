@@ -5,12 +5,14 @@
 
 use super::lua_table::SerialValue;
 use indexmap::IndexMap;
+use std::io::Read;
 
 /// Options for CSV parsing and serialization.
 ///
 /// # Fields
 /// - `delimiter` — `u8`. Field separator byte (default `b','`).
 /// - `has_headers` — `bool`. Whether the first row is a header row (default `true`).
+#[derive(Debug, Clone, Copy)]
 pub struct CsvOptions {
     /// Field separator byte.
     pub delimiter: u8,
@@ -40,10 +42,18 @@ impl Default for CsvOptions {
 /// # Returns
 /// `Result<SerialValue, String>`.
 pub fn from_csv(s: &str, opts: CsvOptions) -> Result<SerialValue, String> {
+    from_csv_reader(s.as_bytes(), opts)
+}
+
+/// Parse CSV bytes from any reader into a `SerialValue`.
+///
+/// This is the streaming-friendly variant of `from_csv` for callers that
+/// already have a reader and want to avoid pre-building an intermediate string.
+pub fn from_csv_reader<R: Read>(reader: R, opts: CsvOptions) -> Result<SerialValue, String> {
     let mut reader = csv::ReaderBuilder::new()
         .delimiter(opts.delimiter)
         .has_headers(opts.has_headers)
-        .from_reader(s.as_bytes());
+        .from_reader(reader);
 
     if opts.has_headers {
         let headers: Vec<String> = reader
@@ -117,13 +127,13 @@ pub fn to_csv(val: &SerialValue, opts: CsvOptions) -> Result<String, String> {
     for row in rows {
         match row {
             SerialValue::Map(map) => {
-                let values: Vec<String> = map.values().map(serial_value_to_csv_field).collect();
+                let values: Vec<String> = map.values().map(ToString::to_string).collect();
                 writer
                     .write_record(&values)
                     .map_err(|e| format!("CSV encode error: {e}"))?;
             }
             SerialValue::Seq(fields) => {
-                let values: Vec<String> = fields.iter().map(serial_value_to_csv_field).collect();
+                let values: Vec<String> = fields.iter().map(ToString::to_string).collect();
                 writer
                     .write_record(&values)
                     .map_err(|e| format!("CSV encode error: {e}"))?;
@@ -137,16 +147,4 @@ pub fn to_csv(val: &SerialValue, opts: CsvOptions) -> Result<String, String> {
         .map_err(|e| format!("CSV encode error: {e}"))?;
     drop(writer);
     String::from_utf8(out).map_err(|e| format!("CSV encode error: {e}"))
-}
-
-/// Convert a `SerialValue` to a CSV field string.
-fn serial_value_to_csv_field(val: &SerialValue) -> String {
-    match val {
-        SerialValue::Null => String::new(),
-        SerialValue::Bool(b) => b.to_string(),
-        SerialValue::Int(n) => n.to_string(),
-        SerialValue::Float(f) => f.to_string(),
-        SerialValue::Str(s) => s.clone(),
-        SerialValue::Seq(_) | SerialValue::Map(_) => "[complex]".to_string(),
-    }
 }

@@ -216,5 +216,7 @@
 		"*.toml": "toml",
 		"Cargo.lock": "toml",
 		"rust-toolchain.toml": "toml"
-	}
+	},
+	"github.copilot.chat.otel.enabled": true,
+	"chat.editMode.hidden": false
 }

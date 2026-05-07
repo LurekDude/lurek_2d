@@ -2,6 +2,577 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.46] - 2026-05-07
+
+### feat(serial): implement codec dispatch, schema defaults, and serial module coverage sync
+
+- Extended `src/serial/` with unified codec dispatch:
+  - added `src/serial/codec.rs` with `SerialFormat`, `detect_format`, `decode_text`, `decode_bytes`, and `encode`.
+  - added codec option types `DecodeOptions` and `EncodeOptions` plus `EncodedValue` output enum.
+- Added read-only INI driver:
+  - added `src/serial/ini.rs` with `from_ini(...)`,
+  - wired `ini` into codec detection and `lurek.serial.decode(..., "ini")`.
+- Extended schema behavior in `src/serial/schema.rs`:
+  - added `apply_schema_defaults(...)` (re-exported from `mod.rs`) for recursive schema default patching via `default`, `fields`, and `items`.
+- Extended CSV support in `src/serial/csv.rs`:
+  - added `from_csv_reader(...)` streaming-friendly parse entry point,
+  - kept `from_csv(...)` as convenience wrapper,
+  - derived `Debug + Clone + Copy` for `CsvOptions`,
+  - consolidated CSV field stringification through `Display` on `SerialValue`.
+- Cleaned dead YAML footprint:
+  - removed `src/serial/yaml.rs`,
+  - updated serial docs/comments to TOML-first contract (B-05).
+- Extended Lua serial API in `src/lua_api/serial_api.rs`:
+  - added `lurek.serial.detectFormat`,
+  - added unified `lurek.serial.decode(payload, format?, opts?)`,
+  - added unified `lurek.serial.encode(value, format, opts?)`,
+  - added `lurek.serial.applyDefaults(value, schema)`.
+- Expanded coverage and docs sync:
+  - Rust tests: `tests/rust/unit/serial_tests.rs`,
+  - Lua tests: `tests/lua/unit/test_serial_core_unit.lua`,
+  - examples: `content/examples/serial.lua`,
+  - spec: `docs/specs/serial.md`.
+
+### feat(window): implement monitor enumeration/switching, grouped API aliases, and coverage sync
+
+- Extended `WindowState` in `src/runtime/shared_state.rs`:
+  - added deferred monitor-switch field `pending_display_index`.
+- Extended window management in `src/window/management.rs`:
+  - added `set_display(...)` scheduler,
+  - added `flash(...)` alias for `request_attention(...)`.
+- Replaced `src/window/event_loop.rs` placeholder with monitor helpers:
+  - `get_displays`, `current_display_index`, `desktop_dimensions_for_display`,
+  - `display_name_for_display`, `move_window_to_display`,
+  - `select_startup_monitor`, `center_window_on_monitor`.
+- Updated `src/app/app.rs` to consume monitor helpers from `window::event_loop` and apply pending monitor moves.
+- Extended `src/lua_api/window_api.rs`:
+  - added `lurek.window.getDisplays`, `lurek.window.getCurrentDisplay`, `lurek.window.setDisplay`, `lurek.window.flash`,
+  - upgraded `getDesktopDimensions(display?)` and `getDisplayName(display?)` to respect optional monitor index,
+  - added non-breaking grouped aliases: `lurek.window.display`, `lurek.window.mode`, `lurek.window.cursor`.
+- Expanded tests and examples:
+  - Rust tests in `tests/rust/unit/window_tests.rs`,
+  - Lua tests in `tests/lua/unit/test_window_core_unit.lua`,
+  - API examples in `content/examples/window.lua`.
+- Synced module spec: `docs/specs/window.md`.
+
+## [1.0.9-fix.44] - 2026-05-07
+
+### feat(event): implement priority lanes, table payload support, and module coverage sync
+
+- Extended `src/event/event_queue.rs`:
+  - added queue lane enum `EventPriority` (`high` / `normal`),
+  - split queue storage into high + normal lanes with high-first draining,
+  - added `push_with_priority(...)` and `push_event_with_priority(...)`,
+  - added shallow table payload support via `EventArg::Table` + `EventTableKey`,
+  - replaced `wait()` spin-sleep loop with condvar-backed wake/sleep path.
+- Extended `src/lua_api/event_api.rs`:
+  - added `lurek.event.pushPriority(name, priority, ...)`,
+  - added `lurek.event.pushDeferredPriority(name, priority, ...)`,
+  - upgraded event payload Lua conversion paths (`wait`, history, poll) to support table payload values.
+- Added Rust coverage target in `tests/rust/unit/event_tests.rs` and registered `event_tests` in `Cargo.toml`.
+- Extended Lua coverage in `tests/lua/unit/test_event_core_unit.lua` for:
+  - priority lane ordering,
+  - table payload roundtrip,
+  - deferred priority flush ordering.
+- Synced docs/examples:
+  - `docs/specs/event.md`,
+  - `content/examples/event.lua`.
+
+### feat(input): implement input module IDEA gaps (rumble, frame-edge queries, mapping helper, recorder schema versioning)
+
+- Extended gamepad core state in `src/input/gamepad.rs`:
+  - added per-frame transitions (`was_button_pressed`, `was_button_released`),
+  - added connect/disconnect edge tracking,
+  - added vibration support flag,
+  - added `GamepadMappings::load_from_string(...)`.
+- Extended touch core state in `src/input/touch.rs`:
+  - added per-frame touch edge tracking (`was_pressed`, `was_released`) and `begin_frame()`.
+- Extended recorder data contract in `src/input/recorder.rs`:
+  - JSON now serializes with envelope `{"version":1,...}`,
+  - parser supports both versioned and legacy non-versioned payloads.
+- Added runtime rumble execution path:
+  - queued `GamepadVibrationRequest` in `src/runtime/shared_state.rs`,
+  - frame processing + `gilrs::ff` effect playback in `src/app/app.rs`.
+- Extended Lua input API in `src/lua_api/input_api.rs`:
+  - gamepad: `wasPressed`, `wasReleased`, `wasConnected`, `wasDisconnected`,
+  - touch: `wasPressed`, `wasReleased`,
+  - action helper: `lurek.input.newMapping(name, keys)` with object methods,
+  - `vibrate` / `setVibration` now queue real FF requests when supported,
+  - action bindings now support `gamepad:<id>:<button>` tokens.
+- Expanded coverage and examples:
+  - Rust tests: `tests/rust/unit/input_tests.rs`,
+  - Lua tests: `tests/lua/unit/test_input_core_unit.lua`,
+  - API examples: `content/examples/input.lua`.
+
+## [1.0.9-fix.45] - 2026-05-07
+
+### feat(light+effect): implement IDEA gaps with soft shadows, ambient bridge, normal-map hints, and coverage sync
+
+- Extended `src/light/light2d.rs` with new data-only lighting controls:
+  - `shadow_softness` (penumbra multiplier),
+  - `normal_map_path` / `normal_strength` plugin hints,
+  - new getters/setters for these fields.
+- Refactored thin-wrapper boundary:
+  - moved Lua option parsing/application out of `src/light/light2d.rs` into `src/lua_api/light_api.rs`.
+- Extended `src/light/light_world.rs`:
+  - added indexed flicker stepping via `flicker_keys` + `reindex_flickers()`,
+  - added `normal_map_light_hints()` export and `NormalMapLightHint` type.
+- Extended `src/lua_api/light_api.rs`:
+  - new `LLight` methods: `set/getShadowSoftness`, `set/get/clearNormalMap`, `set/getNormalStrength`,
+  - new module function: `lurek.light.getNormalMapHints()`,
+  - flicker index re-sync on flicker mutators.
+- Extended `src/lua_api/effect_api.rs` with ambient reconciliation bridge:
+  - `LOverlay:pullAmbientFromLight()`,
+  - `LOverlay:pushAmbientToLight()`,
+  - `LOverlay:syncAmbientWithLight(mode)` with explicit priority mode.
+- Upgraded soft-shadow rendering in `src/render/gpu_renderer.rs`:
+  - per-light shadow params in `LightVertex`,
+  - shader-side PCF sampling (`none`, `pcf5`, `pcf13`) and smooth penumbra edge.
+- Added/updated coverage artifacts:
+  - Rust: `tests/rust/unit/light_tests.rs`,
+  - Lua: `tests/lua/unit/test_light_core_unit.lua`, `tests/lua/unit/test_effect_core_unit.lua`,
+  - examples/spec sync: `content/examples/light.lua`, `docs/specs/light.md`.
+
+## [1.0.9-fix.43] - 2026-05-07
+
+### feat(filesystem): implement remaining IDEA enhancements with async write API, VFS dedup, and coverage sync
+
+- Extended async filesystem backend in `src/filesystem/async_loader.rs`:
+  - added write request path `AsyncLoader::request_write(...)`,
+  - added write polling path `AsyncLoader::poll_write(...)`,
+  - added `WriteResult` and `WriteStatus` result enums.
+- Added runtime bridge methods in `src/runtime/shared_state.rs`:
+  - `request_async_write(path, data)` and `poll_async_write(handle)`.
+- Extended Lua filesystem API in `src/lua_api/filesystem_api.rs`:
+  - `lurek.filesystem.writeAsync(path, data)`,
+  - `lurek.filesystem.pollAsyncWrite(handle)`.
+- Applied VFS quality/perf cleanup in `src/filesystem/vfs.rs`:
+  - `read_string` and `read_bytes` now reuse `resolve_read_path`,
+  - `write_string` and `append_string` now reuse `resolve_save_path`,
+  - removed duplicated traversal/canonicalization logic from call sites.
+- Expanded Rust coverage in `tests/rust/unit/filesystem_tests.rs` for:
+  - explicit read-path traversal rejection,
+  - `FileHandle` write/append/read mode roundtrip,
+  - async write completion and bytes-written verification.
+- Expanded Lua coverage in `tests/lua/unit/test_filesystem_core_unit.lua` for:
+  - `writeAsync` handle creation,
+  - `pollAsyncWrite` completion path,
+  - save-sandbox rejection for async write outside `save/`.
+- Synced docs/examples:
+  - `docs/specs/filesystem.md`,
+  - `content/examples/filesystem.lua`,
+  - `src/filesystem/IDEA.md` (remaining IDEA enhancement items marked done).
+
+## [1.0.9-fix.42] - 2026-05-07
+
+### feat(dataframe): close module gaps with shared RNG, row-major constructor, and coverage sync
+
+- Removed duplicated PRNG implementations by extracting shared `Xorshift64` into `src/dataframe/rng.rs` and reusing it from:
+  - `src/dataframe/frame.rs` (`DataFrame::random`),
+  - `src/dataframe/query.rs` (`DataFrame::sample`).
+- Added row-major Rust constructor:
+  - `DataFrame::from_rows(column_names, rows) -> Result<DataFrame, String>` in `src/dataframe/frame.rs`.
+- Extended Lua API in `src/lua_api/dataframe_api.rs`:
+  - `lurek.dataframe.fromRows(columns, rows)`.
+- Expanded Rust dataframe unit coverage in `tests/rust/unit/dataframe_tests.rs` for:
+  - `from_rows` success + validation failure,
+  - random seed edge case parity (`seed = 0` vs default),
+  - `with_eval`, `pivot_table`, `rolling_mean`, `rank_column`,
+  - multi-table SQL join through `query_sql_database`.
+- Expanded Lua unit coverage in `tests/lua/unit/test_dataframe_core_unit.lua` for:
+  - `lurek.dataframe.fromRows` factory and validation behavior.
+- Synced docs/examples:
+  - `docs/specs/dataframe.md` (new Rust+Lua constructor entries),
+  - `content/examples/dataframe.lua` (`--@api-stub: lurek.dataframe.fromRows`).
+
+## [1.0.9-fix.41] - 2026-05-07
+
+### feat(compute): add row-broadcast arithmetic, in-place array ops, and expanded coverage/docs sync
+
+- Extended `NdArray` in `src/compute/array.rs`:
+  - shape validation now accepts N-dimensional arrays (minimum 1 dimension),
+  - added `NdArray::fill`, `NdArray::map`, and `NdArray::iter_f64` helpers.
+- Enhanced compute ops in `src/compute/ops.rs`:
+  - added shared parallel dispatch helper for element-wise operations,
+  - added 2D<->1D row-broadcast support for binary arithmetic/comparison operation paths,
+  - added in-place arithmetic APIs: `add_inplace`, `sub_inplace`, `mul_inplace`, `div_inplace`.
+- Reduced duplication in linear algebra:
+  - `src/compute/linalg.rs` Sobel implementation now delegates 2D kernel sliding to `spatial::convolve2d`.
+- Extended Lua API in `src/lua_api/compute_api.rs`:
+  - added `LArray:addInplace`, `LArray:subInplace`, `LArray:mulInplace`, `LArray:divInplace`.
+- Added Rust unit coverage in `tests/rust/unit/compute_tests.rs` for:
+  - `from_slice` shape mismatch, `range` zero-step error,
+  - 4D shape support,
+  - `fill`/`map`/`iter_f64` helpers,
+  - row-broadcast arithmetic and in-place arithmetic,
+  - histogram out-of-range behavior,
+  - non-square `convolve2d`, singular LU error, and 3x3 eigenvalue convergence.
+- Added Lua unit coverage updates in `tests/lua/unit/test_compute_core_unit.lua` for:
+  - 4D construction,
+  - row-broadcast `add`,
+  - in-place arithmetic methods.
+- Synced docs/examples:
+  - updated `docs/specs/compute.md` for N-dimensional support, broadcasting, and in-place APIs,
+  - replaced remaining arithmetic/comparison stub blocks in `content/examples/compute.lua` with concrete scenarios.
+
+## [1.0.9-fix.40] - 2026-05-07
+
+### feat(data): implement chunked streaming compression/decompression paths and full coverage sync
+
+- Added streaming compression APIs in `src/data/compress.rs`:
+  - `compress_stream(reader, writer, format, level)`
+  - `decompress_stream(reader, writer, format)`
+- Added chunk-based helpers in `src/data/compress.rs`:
+  - `compress_chunks(chunks, format, level)`
+  - `decompress_chunks(chunks, format)`
+- Re-exported new compression helpers from `src/data/mod.rs`.
+- Extended `lurek.data` Lua surface in `src/lua_api/data_api.rs`:
+  - `lurek.data.compressChunks(format, chunks[, level])`
+  - `lurek.data.decompressChunks(format, chunks)`
+  - plus updated compression docstrings to include `zlib`.
+- Added Rust unit coverage in `tests/rust/unit/data_tests.rs` for:
+  - stream round-trip (all 4 formats),
+  - chunk helper round-trip (all 4 formats),
+  - compression-level clamping behavior in stream path.
+- Added Lua unit coverage in `tests/lua/unit/test_data_core_unit.lua` for:
+  - chunk-table and string input round-trip,
+  - invalid chunk entry handling,
+  - empty chunk-table validation.
+- Updated examples and spec:
+  - `content/examples/data.lua` with `compressChunks` and `decompressChunks` API stubs.
+  - `docs/specs/data.md` to document stream/chunk compression functions and Lua API entries.
+
+## [1.0.9-fix.39] - 2026-05-06
+
+### feat(image+render): implement image module gaps and enhancements (readback, filters, atlas metadata, texture color-space)
+
+- Added async screen readback API: `lurek.image.fromScreen()`.
+  - First call queues GPU readback for the next rendered frame and returns `nil`.
+  - Later call returns captured `ImageData` once ready.
+- Added high-quality resize filter support:
+  - `ImageData::resize_with_filter(...)` now supports `lanczos3`.
+  - Lua `LImageData:resize(width, height, [filter])` accepts `"bilinear"` (default) and `"lanczos3"`.
+- Added per-texture color-space negotiation for GPU upload:
+  - `Texture::load_with_color_space(...)`
+  - `Texture::from_rgba_with_color_space(...)`
+  - `lurek.graphic.newImage(...)` now accepts optional color space string: `"srgb"` or `"linear"`.
+  - Renderer upload path now maps texture metadata to `Rgba8UnormSrgb` or `Rgba8Unorm`.
+- Added nine-slice metadata support in image atlas packing:
+  - `NineSliceInsets` struct.
+  - `TextureAtlas::pack_with_nine_slice(...)` and `TextureAtlas::set_nine_slice(...)`.
+- Performance improvements:
+  - `PaletteLUT::apply(...)` now uses a hash lookup for larger palettes.
+  - `ImageData::blit(...)` now uses an opaque-source fast path with row copy.
+- Added/updated Rust unit tests in `tests/rust/unit/image_tests.rs` for Lanczos resize, opaque blit behavior, palette apply, and nine-slice atlas metadata.
+- Added Lua API coverage for the new image/render behavior:
+  - `tests/lua/unit/test_image_core_unit.lua`: poll-based `lurek.image.fromScreen`, `LImageData:resize(..., "lanczos3")`, and invalid-filter guard.
+  - `tests/lua/unit/test_render_core_unit.lua`: `lurek.render.newImage(path, "srgb"|"linear")` plus unsupported-mode rejection.
+- Updated examples and specs to reflect the new APIs:
+  - `content/examples/image.lua`: added real scenarios for `newImageDataFromBytes`, `getRawBytes`, `fromScreen`, and province-geometry helpers.
+  - `docs/specs/image.md`: refreshed Lua surface + coverage references for image/readback/color-space paths.
+- Refreshed generated Lua API artifacts after source updates (via docs generators).
+
+## [1.0.9-fix.38] - 2026-05-06
+
+### feat(raycaster): add generic engine-level reveal/minimap helpers and migrate dungeon crawler
+
+- Added reusable raycaster core helpers in `src/raycaster/minimap_overlay.rs`:
+  - `reveal_cells_from_rays(...)`
+  - `compute_tile_light(...)`
+  - `build_minimap_tile_window(...)`
+- Exposed new Lua API on `LRaycaster` in `src/lua_api/raycaster_api.rs`:
+  - `revealCellsFromRays(ox, oy, angle, fov, count, max_dist, step?)`
+  - `computeTileLight(x, y, ambient, lights?)`
+  - `buildMinimapWindow(center_x, center_y, radius, ambient, lights?)`
+- Migrated `content/games/retro/dungeon_crawler/main.lua` to use new engine helpers
+  for fog-of-war reveal and minimap tile lighting, removing Lua-side duplicated LOS/lighting loops.
+- Added tests:
+  - Rust: `tests/rust/unit/raycaster_tests.rs`
+  - Lua: `tests/lua/unit/test_raycaster_core_unit.lua`
+- Updated reference/example artifacts:
+  - `docs/specs/raycaster.md`
+  - `content/examples/raycaster.lua`
+
+## [1.0.9-fix.37] - 2026-05-06
+
+### feat(province+eu2): standardize province map preprocessing and metadata import in engine Rust
+
+- Added `src/province/import.rs` with reusable province ingestion helpers:
+  - `sanitize_marked_png(...)` for marker cleanup (capital/label marker replacement).
+  - `import_metadata_from_files(...)` for bulk CSV/TOML/image metadata ingest.
+- Exposed new Lua API in `src/lua_api/province_api.rs`:
+  - `lurek.province.sanitizeMarkedPng(input_png, output_png, opts?)`
+  - `LProvinceRegistry:importMetadataFromFiles(opts)`
+- Migrated `content/games/strategy/eu2/main.lua` to use the new engine pipeline,
+  removing Lua-side per-pixel sanitation and metadata loops.
+- Added tests for the new behavior:
+  - Rust: `tests/rust/unit/province_tests.rs`
+  - Lua: `tests/lua/unit/test_province_core_unit.lua`
+- Added example usage snippet in `content/examples/province.lua`.
+
+## [1.0.9-fix.36] - 2026-05-06
+
+### fix(coverage-gaps): resolve Rust→Lua, Rust docstring, and Lua docstring audit gaps
+
+- Updated `tools/audit/gen_coverage_gaps.py` internal-module allowlist for intentional province/minimap/globe/raycaster helper modules that are not Lua-facing APIs.
+- Fixed Lua module-doc extraction in `tools/docs/gen_lua_api.py` to handle UTF-8 BOM-prefixed files.
+- Fixed Lua userdata display-name normalization in `tools/docs/gen_lua_api.py` to avoid double-`L` class names (e.g. `LLObjModel`).
+- Added/expanded Rust doc comments for:
+  - `raycaster::build_scene::LoweredFloorCell`
+  - `render::obj_loader::{Vec2, Vec3, ObjLoader}`
+- Expanded Lua binding doc comments for:
+  - `lurek.province` methods `getName` and `type`
+  - `lurek.render.loadModel` and `LObjModel` count-query methods.
+- Regenerated API data and gap report:
+  - `python tools/docs/gen_lua_api_data.py`
+  - `python tools/docs/gen_rust_api_data.py`
+  - `python tools/audit/gen_coverage_gaps.py`
+- Final result in `logs/reports/coverage_gaps.md`: all three sections now report `0 items`.
+
+## [1.0.9-fix.35] - 2026-05-06
+
+### fix(test-coverage): remove orphaned Lua @covers markers and clean report output
+
+- Updated `tools/audit/lua_api_test_coverage.py` marker matching to reduce false orphan reports:
+  - accepts namespace/prefix markers as valid grouping markers,
+  - resolves `lurek.<module>.<method>` shorthand to canonical userdata methods.
+- Removed stale orphaned `@covers` markers (exact matches from coverage JSON) from affected Lua unit test files.
+- Regenerated Lua API test coverage report:
+  - `python tools/audit/lua_api_test_coverage.py --report --output logs/reports/lua_test_coverage.md`
+- Final verification:
+  - `python tools/audit/lua_api_test_coverage.py --orphans` now returns `No orphaned markers found.`
+
+## [1.0.9-fix.34] - 2026-05-06
+
+### fix(docs+audit): fully repair Lua spec coverage gaps and regenerate module specs
+
+- Re-ran full docs/report generation and refreshed coverage artifacts.
+- Regenerated merged module specs with current Lua API sections:
+  - `python tools/docs/gen_module_specs.py`
+- Fixed `tools/audit/lua_spec_coverage.py` to read canonical bindings from `logs/data/lua_api_data.json` instead of only `tbl.set(...)` regex fallback.
+- Updated spec Lua API name extraction to parse bullet labels only, preventing false stale matches from prose code spans.
+- Rebuilt report:
+  - `python tools/audit/lua_spec_coverage.py --output logs/reports/lua_spec_coverage.md`
+- Final result: `logs/reports/lua_spec_coverage.md` shows 100.0% coverage with zero missing/stale gaps across all modules with bindings.
+
+## [1.0.9-fix.33] - 2026-05-06
+
+### docs(specs+reports): regenerate doc coverage outputs and refresh globe/raycaster/province/render specs
+
+- Re-ran docs/report generators:
+  - `python tools/gen_all_docs.py`
+  - `python tools/audit/lua_spec_coverage.py`
+- Refreshed Lua API sections in module specs:
+  - `docs/specs/globe.md`
+  - `docs/specs/raycaster.md`
+  - `docs/specs/province.md`
+  - `docs/specs/render.md`
+- Normalized spec entries for parser-compatible function signatures in `globe` and `raycaster`.
+- Removed false-positive stale captures in `province` by formatting method bullets as plain text.
+- Added missing `render` spec entries for `drawMany`, `printRotated`, `loadObj`/`loadModel`, and `LObjModel` methods.
+
+## [1.0.9-fix.32] - 2026-05-06
+
+### feat(province+raycaster+games): migrate shared EU2 and dungeon movement/camera helpers to engine-level Rust APIs
+
+- Added engine-side province view transform helpers in `src/province/view_transform.rs` and exposed new Lua API:
+  - `LProvinceRegistry:fitCamera(screen_w, screen_h, pixel_size?)`
+  - `LProvinceRegistry:screenToMap(...)`
+  - `LProvinceRegistry:screenToProvince(...)`
+  - `lurek.province.zoomCameraAt(...)`
+- Added engine-side raycaster grid movement helpers in `src/raycaster/grid_motion.rs` and exposed new Lua API:
+  - `LRaycaster:tryMove(px, py, dx, dy)`
+  - `LRaycaster:gridMove(px, py, dir, action, step)`
+- Updated demos to consume engine APIs:
+  - `content/games/strategy/eu2/main.lua` now uses province camera fit/picking/zoom-anchor helpers.
+  - `content/games/retro/dungeon_crawler/main.lua` now uses `raycaster:gridMove` for forward/back/strafe movement.
+- Added Lua API coverage tests for the new methods in:
+  - `tests/lua/unit/test_province_core_unit.lua`
+  - `tests/lua/unit/test_raycaster_core_unit.lua`
+- Synced module specs in:
+  - `docs/specs/province.md`
+  - `docs/specs/raycaster.md`
+
+## [1.0.9-fix.31] - 2026-05-06
+
+### chore(testing): split fast Rust dev loop from full Rust validation suite
+
+- Updated `tools/dev/parallel_cargo.py` test orchestration:
+  - `test rust` now runs a fast Rust subset by default (excludes slow load/smoke targets).
+  - Added `test rust-full` command to run the complete non-Lua Rust suite.
+  - `test all` now always runs full Rust coverage (`include_slow=True`) before Lua tests.
+- Added explicit slow-target filter set for local iteration speed:
+  - `demo_smoke_tests`, `engine_tests`, `examples_load_test`, `games_load_test`, `golden_tests`.
+- Updated VS Code tasks in `.vscode/tasks.json`:
+  - `Test: Rust` now maps to the fast subset.
+  - Added `Test: Rust Full`.
+  - `Test: All` now depends on `Test: Rust Full` + `Test: Lua`.
+- Synced contributor docs:
+  - `CONTRIBUTING.md` quality gate now references `test rust-full`.
+  - `docs/handbook.md` task table now documents fast vs full Rust test modes.
+
+## [1.0.9-fix.30] - 2026-05-06
+
+### feat(province+lua+integration): engine-native province module with Lua bridge and adapters
+
+- Added new `src/province/` module (engine-side province runtime):
+  - `types.rs` (`ProvinceSnapshot`, `ProvinceStyle`, `BorderClass`)
+  - `topology.rs` (`ProvinceGraph` adjacency model)
+  - `registry.rs` (`ProvinceRegistry` with revisioned change tracking)
+  - `events.rs`, `cache.rs`, `map_modes.rs`, `borders.rs`, `labels.rs`, `gpu_bridge.rs`
+- Exposed new Lua namespace `lurek.province` in `src/lua_api/province_api.rs` and VM registration:
+  - Create registry from PNG (`newFromPng`), global registry management (`get/exists/remove/setActive/getActive`)
+  - Registry queries (`getProvince`, `getNeighbors`, `provinceSpans`, `borderSegments`, `getChangesSince`)
+  - Runtime updates (`setPoliticalColor`, `setTerrainType`, `setBorderStyle`, `setFogState`, `setVisibilityState`, `setBorderClass`)
+- Added engine storage for province registries in `SharedState` (`province_registries`, `active_province_registry`).
+- Added optional integration adapters:
+  - `src/globe/province_adapter.rs` (province -> globe colors/fog)
+  - `src/minimap/province_adapter.rs` (province -> minimap terrain/fog/palette)
+- Updated `library/province_map/init.lua` to prefer engine-backed mode (`lurek.province`) with legacy fallback (`lurek.image.newProvinceGrid`).
+- Added tests:
+  - `tests/rust/unit/province_tests.rs`
+  - `tests/lua/unit/test_province_core_unit.lua`
+  - harness/target registration in `tests/lua/harness.rs` and `Cargo.toml`
+- Added spec: `docs/specs/province.md` and indexed it in `docs/specs/README.md`.
+
+### fix(strategy/eu2+province): move EU2 province rendering to Rust GPU path
+
+- Added `src/province/render.rs` with Rust-side province draw command generation for:
+  - province interior fills by map mode,
+  - border rendering by border class,
+  - capital markers,
+  - label text anchored by two-point label guides,
+  - hover and selected province highlight overlays.
+- Extended `src/province/registry.rs` with render-facing metadata and accessors:
+  - grouped spans per province,
+  - bbox lookup per province,
+  - `set_capital`, `set_label_line`, `set_label_text`.
+- Extended `src/lua_api/province_api.rs` with thin bridge methods:
+  - `setCapital`, `setLabelLine`, `setLabelText`,
+  - `render(opts)` to enqueue Rust-generated render commands.
+- Updated `src/province/map_modes.rs` terrain mode colors to explicit land/sea palette.
+- Replaced `content/games/strategy/eu2/main.lua` with logic/input-only flow:
+  - PNG map sanitize + province metadata prep,
+  - province click/hover handling,
+  - map mode toggles,
+  - rendering delegated to `lurek.province:render(...)`.
+
+## [1.0.9-fix.29] - 2026-05-05
+
+### feat(raycaster+dungeon_crawler): lowered floor cells for water/lava and shared-corner block-face rendering
+
+- `src/raycaster/build_scene.rs`:
+  - Switched scene generation to a shared projected-corner grid for floor, ceiling, and exposed wall faces so neighbouring block faces land on identical screen-space edges.
+  - Added `LoweredFloorCell` support for engine-level lowered top surfaces rendered below the normal floor plane.
+  - Lowered cells now emit exposed side faces on edges where adjacent walkable cells are higher, enabling water/lava/trench visuals on a flat 2D map.
+- `src/lua_api/raycaster_api.rs`:
+  - Added `setLoweredFloorCell(x, y, opts|nil)` / `getLoweredFloorCell(x, y)`.
+  - Added `isWalkBlocked(x, y)` so Lua movement can treat lowered hazardous cells as non-walkable.
+- `content/games/retro/dungeon_crawler/main.lua`:
+  - Configured lowered water and lava cells through the new raycaster Lua API.
+  - Movement now checks `isWalkBlocked` so liquid hazard cells cannot be entered.
+  - Minimap and scene lighting now recognise liquid cells, including lava glow.
+- Added demo liquid textures:
+  - `assets/textures/ray_water.png`
+  - `assets/textures/ray_lava.png`
+  - `content/games/retro/dungeon_crawler/assets/textures/ray_water.png`
+  - `content/games/retro/dungeon_crawler/assets/textures/ray_lava.png`
+- Synced module spec in `docs/specs/raycaster.md` and example usage in `content/examples/raycaster.lua`.
+
+### feat(image+strategy/eu2): complete shape-based rendering path with geometry cache and border classification
+
+- Added ProvinceGrid serialization in `src/image/province_grid.rs`:
+  - `serialize_shape_data()` -> binary cache format (SHAP magic + spans + segments)
+  - `deserialize_shape_data()` -> restore geometry from binary cache
+- Exposed shape cache methods to Lua in `src/lua_api/image_api.rs`:
+  - `ProvinceGrid:saveShapeCache(filename)` -> write binary geometry cache
+  - `ProvinceGrid:loadShapeCache(filename)` -> read binary cache and return (spans, segments)
+- EU2 demo (`content/games/strategy/eu2/main.lua`) now fully separates render modes:
+  - Default: tile cache path (bitmap-based, cached in cache.map)
+  - Shape mode (`--shape-render`): geometry cache path (polygon-based, cached in save/eu2_shape_cache.bin)
+  - Each mode manages its own lifecycle: build → cache save → load → render
+- Border segment classification by geography in shape mode:
+  - `land-land`: Province-to-province boundaries on dry terrain
+  - `coast`: Land-to-sea transitions
+  - `sea-sea`: Water-to-water boundaries
+  - Classification stored in `shape_segments_by_class[]` for visual differentiation
+
+## [1.0.9-fix.28] - 2026-05-05
+
+### feat(image+strategy/eu2): shape-based province rendering path and geometry extraction API
+
+- Added ProvinceGrid geometry extraction in `src/image/province_grid.rs`:
+  - `province_spans()` -> horizontal fill spans `(province_id, y, x0, x1)`
+  - `border_segments()` -> merged border segments `(province_a, province_b, x0, y0, x1, y1)`
+- Exposed these methods to Lua in `src/lua_api/image_api.rs`:
+  - `ProvinceGrid:provinceSpans()`
+  - `ProvinceGrid:borderSegments()`
+- Added raw-image Lua bridge in `src/lua_api/image_api.rs`:
+  - `lurek.image.newImageDataFromBytes(width, height, bytes)`
+  - `ImageData:getRawBytes()`
+- EU2 demo (`content/games/strategy/eu2/main.lua`) now includes a second render mechanism selectable with `--shape-render`:
+  - province fill rendered from span geometry (rectangles)
+  - province borders rendered from merged border segments
+
+## [1.0.9-fix.27] - 2026-05-04
+
+### feat(strategy/eu2): new province-map demo with adjacency, border classes, zoom/pan, and binary cache
+
+- Added new demo files:
+  - `content/games/strategy/eu2/conf.toml`
+  - `content/games/strategy/eu2/main.lua`
+  - `content/games/strategy/eu2/test.lua`
+  - `content/games/strategy/eu2/README.md`
+- Demo behavior:
+  - Loads `map.png` through `lurek.image.newProvinceGrid`.
+  - Resolves province IDs via `prov_cols.csv` RGB mapping.
+  - Loads province metadata from `province.toml`.
+  - Builds adjacency graph using `library.province_map`.
+  - Classifies borders by neighbor water/land types (blue/gray/yellow).
+  - Supports mouse drag pan, wheel zoom, hover ID readout, and click selection with neighbor highlight.
+  - Uses 8:1 pixel render scale (`1 map pixel = 8 screen pixels` at zoom 1.0).
+  - Writes and reuses binary geometry cache at `save/eu2/cache.bin` via `lurek.data.pack`.
+
+## [1.0.9-fix.26] - 2026-05-04
+
+### fix(raycaster+dungeon_crawler): stable texture binding, buildScene fallback, UV cleanup, and demo rewrite
+
+- `src/lua_api/raycaster_api.rs`:
+  - Added texture parsing that accepts both legacy numeric ids and `LImage` userdata for:
+    - `setFloorTextureCell` / `setCeilingTextureCell`
+    - `buildScene` wall texture map values
+    - `buildScene` sprite texture values
+  - Kept backward-compatible numeric-id reads for `getFloorTextureCell` / `getCeilingTextureCell`.
+- `src/raycaster/build_scene.rs`:
+  - Added robust wall UV orientation correction per ray direction to reduce mirrored walls.
+  - Switched wall UV generation from degenerate single-column UVs to a tiny horizontal span for more stable interpolation.
+  - Applied explicit floor/ceiling color fallback tinting from `SceneBuildParams` when per-cell textures are missing.
+- Updated tests and examples:
+  - `tests/rust/unit/raycaster_tests.rs`
+  - `tests/lua/unit/test_raycaster_core_unit.lua`
+  - `content/examples/raycaster.lua`
+  to cover/illustrate `LImage` texture inputs and fallback semantics.
+- Rebuilt `content/games/retro/dungeon_crawler/main.lua` end-to-end:
+  - no splash/start click flow
+  - continuous `dt`-based movement (no tile-step hopping)
+  - larger ~3x map footprint with more open space
+  - six PNG textures used directly (no logo assets)
+  - dynamic point lights + distance dimming through `buildScene`
+  - minimap reveal driven by raycast/FOV coverage instead of one-cell reveal.
+- Synced demo docs in `content/games/retro/dungeon_crawler/README.md` and module spec in `docs/specs/raycaster.md`.
+
+## [1.0.9-fix.25] - 2026-05-04
+
+### feat(raycaster+lua): per-cell floor and ceiling texture overrides with fallback
+
+- Added new Lua API on `LRaycaster` in `src/lua_api/raycaster_api.rs`:
+  - `setFloorTextureCell(x, y, texture|nil)` / `getFloorTextureCell(x, y)`
+  - `setCeilingTextureCell(x, y, texture|nil)` / `getCeilingTextureCell(x, y)`
+- `nil` now explicitly clears per-cell overrides, preserving fallback behavior to shaded floor/ceiling colors when no texture is set.
+- Extended `RaycasterScene::build` in `src/raycaster/build_scene.rs` with minimal binding-side engine integration for floor/ceiling per-cell texture lookup while keeping existing wall texture lookup flow unchanged.
+- Added Lua contract coverage in `tests/lua/unit/test_raycaster_core_unit.lua` for round-trip set/get and nil-clear fallback semantics, and updated Rust unit coverage in `tests/rust/unit/raycaster_tests.rs` for per-cell lookup application.
+- Synced API usage docs/snippets in `content/examples/raycaster.lua` and module spec in `docs/specs/raycaster.md`.
+
 ## [1.0.9-fix.24] - 2026-05-03
 
 ### feat(content): rewrite EU2 province map demo core with per-province and border-pair runtime objects

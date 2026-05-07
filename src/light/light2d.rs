@@ -17,7 +17,6 @@ use crate::light::shadow::ShadowFilter;
 use crate::log_msg;
 use crate::math::Color;
 use crate::runtime::log_messages::{LT01, LT02, LT03};
-use mlua::prelude::{LuaError, LuaResult, LuaTable, LuaValue};
 
 /// 2D point light with position, radius, color, intensity, and shadow settings.
 ///
@@ -35,6 +34,7 @@ use mlua::prelude::{LuaError, LuaResult, LuaTable, LuaValue};
 /// - `shadow_color` — `Color`.
 /// - `shadow_filter` — `ShadowFilter`.
 /// - `shadow_smooth` — `f32`.
+/// - `shadow_softness` — `f32`.
 /// - `light_mask` — `u16`.
 /// - `shadow_mask` — `u16`.
 /// - `light_type` — `LightType`.
@@ -45,6 +45,8 @@ use mlua::prelude::{LuaError, LuaResult, LuaTable, LuaValue};
 /// - `flicker` — `FlickerConfig`.
 /// - `group_id` — `u16`.
 /// - `volumetric` — `bool`.
+/// - `normal_map_path` — `Option<String>`.
+/// - `normal_strength` — `f32`.
 ///
 /// Stores all parameters needed to describe a circular light source
 /// in 2D space: position, reach, tint, brightness, and on/off state,
@@ -77,6 +79,8 @@ pub struct Light2D {
     pub shadow_filter: ShadowFilter,
     /// Smoothing factor for shadow edges (default 1.0).
     pub shadow_smooth: f32,
+    /// Penumbra softness multiplier for shadow edges (default 1.0).
+    pub shadow_softness: f32,
     /// Bitmask controlling which occluders this light illuminates.
     pub light_mask: u16,
     /// Bitmask controlling which occluders cast shadows from this light.
@@ -97,6 +101,10 @@ pub struct Light2D {
     pub group_id: u16,
     /// Whether this light hints at volumetric scattering.
     pub volumetric: bool,
+    /// Optional normal-map texture path hint for plugin renderers.
+    pub normal_map_path: Option<String>,
+    /// Strength multiplier used when applying normal-map response.
+    pub normal_strength: f32,
 }
 
 impl Light2D {
@@ -127,6 +135,7 @@ impl Light2D {
             shadow_color: Color::BLACK,
             shadow_filter: ShadowFilter::default(),
             shadow_smooth: 1.0,
+            shadow_softness: 1.0,
             light_mask: 0xFFFF,
             shadow_mask: 0xFFFF,
             light_type: LightType::default(),
@@ -137,6 +146,8 @@ impl Light2D {
             flicker: FlickerConfig::default(),
             group_id: 0,
             volumetric: false,
+            normal_map_path: None,
+            normal_strength: 1.0,
         }
     }
 
@@ -336,6 +347,22 @@ impl Light2D {
         self.shadow_smooth
     }
 
+    /// Sets the penumbra softness multiplier for shadow edges.
+    ///
+    /// # Parameters
+    /// - `softness` — `f32`.
+    pub fn set_shadow_softness(&mut self, softness: f32) {
+        self.shadow_softness = softness;
+    }
+
+    /// Returns the penumbra softness multiplier for shadow edges.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_shadow_softness(&self) -> f32 {
+        self.shadow_softness
+    }
+
     /// Sets the light interaction bitmask.
     ///
     /// # Parameters
@@ -495,174 +522,45 @@ impl Light2D {
     pub fn is_volumetric(&self) -> bool {
         self.volumetric
     }
-}
 
-/// Parses a blend mode string into `LightBlendMode`.
-fn parse_blend_mode(s: &str) -> LuaResult<LightBlendMode> {
-    match s {
-        "add" => Ok(LightBlendMode::Add),
-        "sub" => Ok(LightBlendMode::Sub),
-        "mix" => Ok(LightBlendMode::Mix),
-        _ => Err(LuaError::RuntimeError(format!(
-            "invalid blend mode '{}', expected 'add', 'sub', or 'mix'",
-            s
-        ))),
-    }
-}
-
-/// Parses a falloff mode string into `FalloffMode`.
-fn parse_falloff(s: &str) -> LuaResult<FalloffMode> {
-    match s {
-        "linear" => Ok(FalloffMode::Linear),
-        "smooth" => Ok(FalloffMode::Smooth),
-        "constant" => Ok(FalloffMode::Constant),
-        _ => Err(LuaError::RuntimeError(format!(
-            "invalid falloff '{}', expected 'linear', 'smooth', or 'constant'",
-            s
-        ))),
-    }
-}
-
-/// Parses a shadow filter string into `ShadowFilter`.
-fn parse_shadow_filter(s: &str) -> LuaResult<ShadowFilter> {
-    match s {
-        "none" => Ok(ShadowFilter::None),
-        "pcf5" => Ok(ShadowFilter::Pcf5),
-        "pcf13" => Ok(ShadowFilter::Pcf13),
-        _ => Err(LuaError::RuntimeError(format!(
-            "invalid shadow filter '{}', expected 'none', 'pcf5', or 'pcf13'",
-            s
-        ))),
-    }
-}
-
-/// Parses a light type string into `LightType`.
-fn parse_light_type(s: &str) -> LuaResult<LightType> {
-    match s {
-        "point" => Ok(LightType::Point),
-        "directional" => Ok(LightType::Directional),
-        "spot" => Ok(LightType::Spot),
-        _ => Err(LuaError::RuntimeError(format!(
-            "invalid light type '{}', expected 'point', 'directional', or 'spot'",
-            s
-        ))),
-    }
-}
-
-/// Parses an optional color table `{r, g, b [, a]}` from an opts table field.
-fn parse_opt_color(opts: &LuaTable, field: &str) -> LuaResult<Option<Color>> {
-    let val: LuaValue = opts.get(field)?;
-    match val {
-        LuaValue::Table(tbl) => {
-            let r: f32 = tbl.get(1i32).unwrap_or(1.0);
-            let g: f32 = tbl.get(2i32).unwrap_or(1.0);
-            let b: f32 = tbl.get(3i32).unwrap_or(1.0);
-            let a: f32 = tbl.get(4i32).unwrap_or(1.0);
-            Ok(Some(Color::new(r, g, b, a)))
-        }
-        LuaValue::Nil => Ok(None),
-        _ => Err(LuaError::RuntimeError(format!(
-            "expected color table for '{}', got {}",
-            field,
-            val.type_name()
-        ))),
-    }
-}
-
-impl Light2D {
-    /// Applies configuration fields from a Lua options table to this `Light2D`.
+    /// Sets or replaces the optional normal-map texture path hint.
     ///
     /// # Parameters
-    /// - `opts` — `&LuaTable`. The Lua options table.
+    /// - `path` — `String`.
+    pub fn set_normal_map_path(&mut self, path: String) {
+        self.normal_map_path = Some(path);
+    }
+
+    /// Clears the optional normal-map texture path hint.
+    pub fn clear_normal_map_path(&mut self) {
+        self.normal_map_path = None;
+    }
+
+    /// Returns the optional normal-map texture path hint.
     ///
     /// # Returns
-    /// `LuaResult<()>`.
-    pub fn apply_lua_opts(&mut self, opts: &LuaTable) -> LuaResult<()> {
-        if let Ok(Some(c)) = parse_opt_color(opts, "color") {
-            self.set_color(c);
-        }
-        if let Ok(v) = opts.get::<_, f32>("intensity") {
-            self.set_intensity(v);
-        }
-        if let Ok(v) = opts.get::<_, f32>("energy") {
-            self.set_energy(v);
-        }
-        if let Ok(s) = opts.get::<_, String>("blend") {
-            self.set_blend_mode(parse_blend_mode(&s)?);
-        }
-        if let Ok(s) = opts.get::<_, String>("falloff") {
-            self.set_falloff(parse_falloff(&s)?);
-        }
-        if let Ok(v) = opts.get::<_, bool>("shadowEnabled") {
-            self.set_shadow_enabled(v);
-        }
-        if let Ok(Some(c)) = parse_opt_color(opts, "shadowColor") {
-            self.set_shadow_color(c);
-        }
-        if let Ok(s) = opts.get::<_, String>("shadowFilter") {
-            self.set_shadow_filter(parse_shadow_filter(&s)?);
-        }
-        if let Ok(v) = opts.get::<_, f32>("shadowSmooth") {
-            self.set_shadow_smooth(v);
-        }
-        if let Ok(v) = opts.get::<_, u16>("lightMask") {
-            self.set_light_mask(v);
-        }
-        if let Ok(v) = opts.get::<_, u16>("shadowMask") {
-            self.set_shadow_mask(v);
-        }
-        if let Ok(v) = opts.get::<_, bool>("enabled") {
-            self.set_enabled(v);
-        }
-        if let Ok(s) = opts.get::<_, String>("type") {
-            self.set_light_type(parse_light_type(&s)?);
-        }
-        if let Ok(v) = opts.get::<_, f32>("direction") {
-            self.set_direction(v);
-        }
-        if let Ok(v) = opts.get::<_, f32>("innerAngle") {
-            self.set_inner_angle(v);
-        }
-        if let Ok(v) = opts.get::<_, f32>("outerAngle") {
-            self.set_outer_angle(v);
-        }
-        if let Ok(v) = opts.get::<_, u16>("groupId") {
-            self.set_group_id(v);
-        }
-        if let Ok(v) = opts.get::<_, bool>("volumetric") {
-            self.set_volumetric(v);
-        }
-        if let Ok(v) = opts.get::<_, f32>("flickerSpeed") {
-            self.flicker_mut().speed = v;
-            self.flicker_mut().enabled = true;
-        }
-        if let Ok(v) = opts.get::<_, f32>("flickerStrength") {
-            self.flicker_mut().strength = v;
-            self.flicker_mut().enabled = true;
-        }
-        if let Ok(v) = opts.get::<_, f32>("attConstant") {
-            self.set_attenuation(Attenuation::new(
-                v,
-                self.get_attenuation().linear,
-                self.get_attenuation().quadratic,
-            ));
-        }
-        if let Ok(v) = opts.get::<_, f32>("attLinear") {
-            self.set_attenuation(Attenuation::new(
-                self.get_attenuation().constant,
-                v,
-                self.get_attenuation().quadratic,
-            ));
-        }
-        if let Ok(v) = opts.get::<_, f32>("attQuadratic") {
-            self.set_attenuation(Attenuation::new(
-                self.get_attenuation().constant,
-                self.get_attenuation().linear,
-                v,
-            ));
-        }
-        Ok(())
+    /// `Option<&str>`.
+    pub fn get_normal_map_path(&self) -> Option<&str> {
+        self.normal_map_path.as_deref()
     }
+
+    /// Sets the normal-map response strength multiplier.
+    ///
+    /// # Parameters
+    /// - `strength` — `f32`.
+    pub fn set_normal_strength(&mut self, strength: f32) {
+        self.normal_strength = strength;
+    }
+
+    /// Returns the normal-map response strength multiplier.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_normal_strength(&self) -> f32 {
+        self.normal_strength
+    }
+}
+impl Light2D {
     /// Draw a side-by-side comparison of falloff modes as radial gradients.
     ///
     /// # Parameters

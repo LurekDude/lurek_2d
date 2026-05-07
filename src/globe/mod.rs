@@ -47,6 +47,8 @@ pub mod marker;
 pub mod picking;
 /// 3D spherical rendering pipeline mapping.
 pub mod projection;
+/// Optional adapter translating province snapshots into globe state.
+pub mod province_adapter;
 /// Storage and instantiation of individual globes.
 pub mod registry;
 /// Mathematical neighborhood graph of connected regions.

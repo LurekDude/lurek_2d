@@ -125,6 +125,7 @@ mod scene_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 2.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
             cell_value: 1,
         });
         scene.floors.push(FloorQuad {
@@ -133,6 +134,7 @@ mod scene_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 2.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
         });
         scene.ceilings.push(CeilingQuad {
             corners: unit_corners(0.0, 0.0, 1.0, 50.0),
@@ -140,6 +142,7 @@ mod scene_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 2.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
         });
         assert_eq!(scene.quad_count(), 3);
         assert!(!scene.is_empty());
@@ -204,6 +207,7 @@ mod render_tests {
             texture_key: Some(tk),
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 3.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
             cell_value: 1,
         });
         let cmds = scene.generate_render_commands();
@@ -223,6 +227,7 @@ mod render_tests {
             texture_key: None,
             light: [0.8, 0.6, 0.4, 1.0],
             depth: 3.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
             cell_value: 1,
         });
         let cmds = scene.generate_render_commands();
@@ -241,6 +246,7 @@ mod render_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 3.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
         });
         let cmds = scene.generate_render_commands();
         assert!(cmds.len() >= 2);
@@ -255,6 +261,7 @@ mod render_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 3.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
         });
         scene.walls.push(WallQuad {
             corners: make_corners(0.0, 50.0, 32.0, 100.0),
@@ -262,6 +269,7 @@ mod render_tests {
             texture_key: None,
             light: [1.0, 1.0, 1.0, 1.0],
             depth: 3.0,
+            corner_w: [1.0, 1.0, 1.0, 1.0],
             cell_value: 1,
         });
         let cmds = scene.generate_render_commands();
@@ -355,7 +363,7 @@ mod lighting_tests {
 
     #[test]
     fn test_ambient_only() {
-        let result = compute_lighting(0.0, 0.0, 0.3, &[]);
+        let result = compute_lighting(0.0, 0.0, 0.3, &[], &|_, _| false);
         assert!((result[0] - 0.3).abs() < 1e-5);
         assert!((result[1] - 0.3).abs() < 1e-5);
         assert!((result[2] - 0.3).abs() < 1e-5);
@@ -367,10 +375,10 @@ mod lighting_tests {
             x: 5.0,
             y: 5.0,
             radius: 10.0,
-            intensity: 1.0,
+            intensity: 16.0,
             color: [1.0, 1.0, 1.0],
         }];
-        let result = compute_lighting(5.0, 5.0, 0.0, &lights);
+        let result = compute_lighting(5.0, 5.0, 0.0, &lights, &|_, _| false);
         // At distance 0, attenuation = 1.0 * 1.0 = 1.0
         assert!((result[0] - 1.0).abs() < 1e-5);
     }
@@ -384,7 +392,7 @@ mod lighting_tests {
             intensity: 1.0,
             color: [1.0, 1.0, 1.0],
         }];
-        let result = compute_lighting(10.0, 10.0, 0.1, &lights);
+        let result = compute_lighting(10.0, 10.0, 0.1, &lights, &|_, _| false);
         assert!((result[0] - 0.1).abs() < 1e-5);
     }
 
@@ -578,6 +586,8 @@ mod build_scene_tests {
             shade_distance: 15.0,
             floor_color: Color::new(0.2, 0.2, 0.2, 1.0),
             ceiling_color: Color::new(0.1, 0.1, 0.15, 1.0),
+            camera_height: 2.0 / 3.0,
+            horizon_offset: 0.0,
         }
     }
 
@@ -585,7 +595,16 @@ mod build_scene_tests {
     fn empty_grid_produces_only_floor_ceiling() {
         let rc = Raycaster2D::new(10, 10);
         let params = default_params();
-        let scene = RaycasterScene::build(&rc, &params, &[], &[], &|_| None);
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &[],
+            &[],
+            &|_| None,
+            &|_, _| None,
+            &|_, _| None,
+            &|_, _| None,
+        );
 
         assert!(scene.walls.is_empty(), "No walls in empty grid");
         assert!(!scene.floors.is_empty(), "Floor quads should exist");
@@ -598,11 +617,32 @@ mod build_scene_tests {
         // Place a wall directly in front of the player
         rc.set_cell(7, 5, 1);
         let params = default_params();
-        let scene = RaycasterScene::build(&rc, &params, &[], &[], &|_| None);
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &[],
+            &[],
+            &|_| None,
+            &|_, _| None,
+            &|_, _| None,
+            &|_, _| None,
+        );
 
         assert!(!scene.walls.is_empty(), "Should have wall quads");
         for wall in &scene.walls {
             assert!(wall.depth > 0.0, "Wall depth should be positive");
+            assert!(
+                wall.uvs[0].x >= 0.0 && wall.uvs[0].x <= 1.0,
+                "wall u0 should be in [0,1]"
+            );
+            assert!(
+                wall.uvs[1].x >= 0.0 && wall.uvs[1].x <= 1.0,
+                "wall u1 should be in [0,1]"
+            );
+            assert!(
+                (wall.uvs[1].x - wall.uvs[0].x).abs() > 0.0,
+                "wall UV span should not be degenerate"
+            );
             // corners[3].y - corners[0].y = height
             let wall_h = wall.corners[3].y - wall.corners[0].y;
             assert!(wall_h > 0.0, "Wall height should be positive");
@@ -625,6 +665,8 @@ mod build_scene_tests {
             shade_distance: 15.0,
             floor_color: Color::BLACK,
             ceiling_color: Color::BLACK,
+            camera_height: 2.0 / 3.0,
+            horizon_offset: 0.0,
         };
 
         let tk = TextureKey::from(KeyData::from_ffi(1));
@@ -644,7 +686,16 @@ mod build_scene_tests {
             },
         ];
 
-        let scene = RaycasterScene::build(&rc, &params, &[], &sprites, &|_| None);
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &[],
+            &sprites,
+            &|_| None,
+            &|_, _| None,
+            &|_, _| None,
+            &|_, _| None,
+        );
         if scene.sprites.len() >= 2 {
             assert!(
                 scene.sprites[0].depth >= scene.sprites[1].depth,
@@ -667,10 +718,132 @@ mod build_scene_tests {
             color: [1.0, 0.5, 0.0],
         }];
 
-        let scene = RaycasterScene::build(&rc, &params, &lights, &[], &|_| None);
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &lights,
+            &[],
+            &|_| None,
+            &|_, _| None,
+            &|_, _| None,
+            &|_, _| None,
+        );
         if let Some(wall) = scene.walls.first() {
             // With an orange light nearby, red channel should be higher than blue
             assert!(wall.light[0] > 0.0, "Wall should receive some light");
         }
+    }
+
+    #[test]
+    fn floor_and_ceiling_texture_lookup_applies_per_cell_override() {
+        let mut rc = Raycaster2D::new(10, 10);
+        rc.set_cell(7, 5, 1);
+
+        let params = default_params();
+        let floor_key = TextureKey::from(KeyData::from_ffi(101));
+        let ceiling_key = TextureKey::from(KeyData::from_ffi(202));
+
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &[],
+            &[],
+            &|_| None,
+            &|_, _| Some(floor_key),
+            &|_, _| Some(ceiling_key),
+            &|_, _| None,
+        );
+
+        assert!(
+            scene.floors.iter().any(|f| f.texture_key == Some(floor_key)),
+            "Expected at least one floor quad to use floor texture override"
+        );
+        assert!(
+            scene
+                .ceilings
+                .iter()
+                .any(|c| c.texture_key == Some(ceiling_key)),
+            "Expected at least one ceiling quad to use ceiling texture override"
+        );
+    }
+
+    #[test]
+    fn floor_and_ceiling_without_override_keep_color_fallback() {
+        let mut rc = Raycaster2D::new(10, 10);
+        rc.set_cell(7, 5, 1);
+
+        let params = default_params();
+        let scene = RaycasterScene::build(
+            &rc,
+            &params,
+            &[],
+            &[],
+            &|_| None,
+            &|_, _| None,
+            &|_, _| None,
+            &|_, _| None,
+        );
+
+        assert!(
+            scene.floors.iter().any(|f| f.texture_key.is_none()),
+            "Expected some floor quads to remain untextured for color fallback"
+        );
+        assert!(
+            scene.ceilings.iter().any(|c| c.texture_key.is_none()),
+            "Expected some ceiling quads to remain untextured for color fallback"
+        );
+    }
+}
+
+// ── generic minimap/reveal helpers ───────────────────────────────────
+
+mod generic_minimap_tests {
+    use super::*;
+
+    #[test]
+    fn compute_tile_light_returns_values_in_range() {
+        let rc = Raycaster2D::new(8, 8);
+        let lights = vec![PointLight {
+            x: 3.5,
+            y: 3.5,
+            radius: 4.0,
+            intensity: 8.0,
+            color: [1.0, 0.8, 0.5],
+        }];
+        let rgb = compute_tile_light(&rc, 3, 3, 0.2, &lights);
+        assert!((0.0..=1.0).contains(&rgb[0]));
+        assert!((0.0..=1.0).contains(&rgb[1]));
+        assert!((0.0..=1.0).contains(&rgb[2]));
+    }
+
+    #[test]
+    fn build_minimap_tile_window_returns_samples() {
+        let mut rc = Raycaster2D::new(10, 10);
+        rc.set_cell(4, 4, 1);
+        let samples = build_minimap_tile_window(&rc, 5.5, 5.5, 3, 0.2, &[]);
+        assert!(!samples.is_empty());
+        assert!(samples.iter().any(|s| s.blocked));
+        assert!(samples.iter().all(|s| s.x < 10 && s.y < 10));
+    }
+
+    #[test]
+    fn reveal_cells_from_rays_returns_unique_cells() {
+        let rc = Raycaster2D::new(16, 16);
+        let cells = reveal_cells_from_rays(
+            &rc,
+            8.5,
+            8.5,
+            0.0,
+            std::f32::consts::FRAC_PI_3,
+            16,
+            8.0,
+            0.25,
+        );
+        assert!(!cells.is_empty());
+        let mut uniq = std::collections::HashSet::new();
+        for c in &cells {
+            uniq.insert(*c);
+        }
+        assert_eq!(cells.len(), uniq.len());
     }
 }

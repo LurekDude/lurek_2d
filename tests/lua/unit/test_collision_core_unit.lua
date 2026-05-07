@@ -1,8 +1,7 @@
--- test_collision_unit.lua
+﻿-- test_collision_unit.lua
 
 -- @describe lurek.collision module checks
 describe("lurek.collision", function()
- -- @covers lurek.collision
 	it("module table exists", function()
 		if lurek.collision == nil then
 			expect_true(true)

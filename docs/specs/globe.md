@@ -47,6 +47,7 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `mod.rs`: Globe module — XCOM-style Geoscape / Europa Universalis sphere.
 - `picking.rs`: Screen-to-province hit-test for the globe module.
 - `projection.rs`: Orthographic sphere projection and orbit camera for the globe module.
+- `province_adapter.rs`: Globe ↔ province adapter (optional coupling layer).
 - `registry.rs`: Globe registry — per-named-globe container and multi-globe manager.
 - `topology.rs`: Province adjacency graph for the globe module.
 - `types.rs`: Core value types for the globe module.
@@ -158,6 +159,8 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `project_point_with_z` (`projection.rs`): Project a lat/lon point to screen and also return the camera-space Z (for picking).
 - `screen_delta_to_pan` (`projection.rs`): Convert a screen delta `(dx, dy)` in pixels to a globe pan `(delta_lat, delta_lon)`.
 - `normalize_v3` (`projection.rs`): Normalize a `Vec3` (returns zero vector if near-zero length).
+- `apply_political_colors` (`province_adapter.rs`): Applies political colors from a province registry onto matching globe provinces.
+- `apply_visibility_to_viewer` (`province_adapter.rs`): Applies fog visibility from province registry to one globe viewer mask.
 - `Globe::new` (`registry.rs`): Create a new globe with the given name and spec.
 - `Globe::add_province` (`registry.rs`): Add a province.
 - `Globe::remove_province` (`registry.rs`): Remove a province by ID.
@@ -210,52 +213,66 @@ The `globe` module provides an XCOM Geoscape-style 2D strategic globe view — a
 - `lurek.globe.greatCirclePath`: Great-circle path as a table of {lat, lon} pairs.
 - `lurek.globe.latLonToUnit`: Convert lat/lon (degrees) to a unit-sphere Cartesian vector {x, y, z}.
 
-### `Globe` Methods
-- `Globe:addProvince`: Adds a province from a table {id, centroid={lat,lon}, vertices={{lat,lon},...},
-- `Globe:removeProvince`: Removes a province by ID. Returns true if it existed.
-- `Globe:provinceCount`: Returns the number of provinces.
-- `Globe:getNeighbors`: Returns the neighbor IDs of a province.
-- `Globe:getProvinceAttr`: Gets a string attribute from a province.
-- `Globe:pan`: Pan the orbit camera by delta-latitude and delta-longitude (degrees).
-- `Globe:zoom`: Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
-- `Globe:setCamera`: Set the camera position directly.
-- `Globe:getCamera`: Get the current camera (lat, lon, zoom).
-- `Globe:getLod`: Returns the current LOD tier as a string: "far", "mid", or "near".
-- `Globe:pick`: Returns the province ID under screen coordinates, or nil.
-- `Globe:pickLatLon`: Returns (lat, lon) of the screen point on the globe surface, or nil.
-- `Globe:setActiveViewer`: Set the faction/viewer whose fog mask filters rendering.
-- `Globe:revealProvince`: Reveal a province for a viewer.
-- `Globe:hideProvince`: Hide a province for a viewer.
-- `Globe:isVisible`: Returns true if the province is visible to the viewer.
-- `Globe:revealAll`: Reveal all provinces for a viewer.
-- `Globe:removeMarker`: Removes a marker from the globe map by its unique string identifier.
-- `Globe:moveMarker`: Move a marker to a new lat/lon.
-- `Globe:setMarkerVisible`: Sets whether this specific marker is visible on the globe.
-- `Globe:getMarkerAttr`: Get a string attribute from a marker.
-- `Globe:setLabelText`: Updates the visible text content of an existing globe label.
-- `Globe:setLabelVisible`: Sets whether this specific label is visible on the globe.
-- `Globe:removeLabel`: Removes a text label from the globe map by its unique string identifier.
-- `Globe:removeLayer`: Removes a texture layer from the globe map by its unique string identifier.
-- `Globe:setLayerVisible`: Sets whether this specific texture layer is visible on the globe.
-- `Globe:setLayerAlpha`: Set layer opacity (0.0–1.0).
-- `Globe:setTimeOfDay`: Set time of day (0.0–24.0 hours).
-- `Globe:getTimeOfDay`: Gets the current simulated time of day for daylight computation.
-- `Globe:setRotation`: Set planet rotation (degrees).
-- `Globe:update`: Advance globe simulation by dt seconds.
-- `Globe:setBorders`: Enable or disable province border rendering.
-- `Globe:findPath`: Find the shortest province path from `from_id` to `to_id`.
-- `Globe:removeArc`: Removes an arc from the globe map by its unique string identifier.
-- `Globe:getName`: Returns the string identifier name assigned to this globe instance.
+### `LGlobe` Methods
+- `LGlobe:addProvince`: Adds a province from a table with id, centroid, vertices, neighbors, and base_color fields.
+- `LGlobe:removeProvince`: Removes a province by ID. Returns true if it existed.
+- `LGlobe:provinceCount`: Returns the number of provinces.
+- `LGlobe:getNeighbors`: Returns the neighbor IDs of a province.
+- `LGlobe:setProvinceAttr`: Sets a string attribute on a province.
+- `LGlobe:getProvinceAttr`: Gets a string attribute from a province.
+- `LGlobe:pan`: Pan the orbit camera by delta-latitude and delta-longitude (degrees).
+- `LGlobe:zoom`: Zoom the camera by a multiplier (>1 zooms in, <1 zooms out).
+- `LGlobe:setCamera`: Set the camera position directly.
+- `LGlobe:getCamera`: Get the current camera (lat, lon, zoom).
+- `LGlobe:getLod`: Returns the current LOD tier as a string: "far", "mid", or "near".
+- `LGlobe:pick`: Returns the province ID under screen coordinates, or nil.
+- `LGlobe:pickLatLon`: Returns (lat, lon) of the screen point on the globe surface, or nil.
+- `LGlobe:setActiveViewer`: Set the faction/viewer whose fog mask filters rendering.
+- `LGlobe:revealProvince`: Reveal a province for a viewer.
+- `LGlobe:hideProvince`: Hide a province for a viewer.
+- `LGlobe:isVisible`: Returns true if the province is visible to the viewer.
+- `LGlobe:revealAll`: Reveal all provinces for a viewer.
+- `LGlobe:addMarker`: Add a marker. Returns marker ID.
+- `LGlobe:removeMarker`: Removes a marker from the globe map by its unique string identifier.
+- `LGlobe:moveMarker`: Move a marker to a new lat/lon.
+- `LGlobe:setMarkerVisible`: Sets whether this specific marker is visible on the globe.
+- `LGlobe:setMarkerAttr`: Set a string attribute on a marker.
+- `LGlobe:getMarkerAttr`: Get a string attribute from a marker.
+- `LGlobe:addLabel`: Add a text label. Returns label ID.
+- `LGlobe:setLabelText`: Updates the visible text content of an existing globe label.
+- `LGlobe:setLabelVisible`: Sets whether this specific label is visible on the globe.
+- `LGlobe:removeLabel`: Removes a text label from the globe map by its unique string identifier.
+- `LGlobe:addLayer`: Add or replace a named thematic layer.
+- `LGlobe:removeLayer`: Removes a texture layer from the globe map by its unique string identifier.
+- `LGlobe:setLayerColor`: Set a per-province color override on a layer.
+- `LGlobe:setLayerVisible`: Sets whether this specific texture layer is visible on the globe.
+- `LGlobe:setLayerAlpha`: Set layer opacity (0.0–1.0).
+- `LGlobe:setTimeOfDay`: Set time of day (0.0–24.0 hours).
+- `LGlobe:getTimeOfDay`: Gets the current simulated time of day for daylight computation.
+- `LGlobe:setRotation`: Set planet rotation (degrees).
+- `LGlobe:update`: Advance globe simulation by dt seconds.
+- `LGlobe:setBorders`: Enable or disable province border rendering.
+- `LGlobe:findPath`: Find the shortest province path from `from_id` to `to_id`.
+- `LGlobe:reachable`: Return all provinces reachable within `max_cost` steps from `start_id`.
+- `LGlobe:addArc`: Add an arc (great-circle path between two lat/lon points).
+- `LGlobe:removeArc`: Removes an arc from the globe map by its unique string identifier.
+- `LGlobe:getName`: Returns the string identifier name assigned to this globe instance.
+- `LGlobe:type`: Returns the type name of this object.
+- `LGlobe:typeOf`: Returns true if this object is of the given type.
 
-### `GlobeRegistry` Methods
-- `GlobeRegistry:get`: Get an existing globe by name, or nil.
-- `GlobeRegistry:remove`: Removes a globe from the central registry by its string name.
-- `GlobeRegistry:names`: Returns a table of all globe names.
+### `LGlobeRegistry` Methods
+- `LGlobeRegistry:new`: Create a globe with the given name and optional spec table.
+- `LGlobeRegistry:get`: Get an existing globe by name, or nil.
+- `LGlobeRegistry:remove`: Removes a globe from the central registry by its string name.
+- `LGlobeRegistry:names`: Returns a table of all globe names.
+- `LGlobeRegistry:type`: Returns the type name of this object.
+- `LGlobeRegistry:typeOf`: Returns true if this object is of the given type.
 
 ## References
 
 - `math`: Imports or references `src/math/`. Cross-group dependency from `Edge/Integration` into `Foundations`.
 - `pathfind`: Imports or references `src/pathfind/`. Cross-group dependency from `Edge/Integration` into `Feature Systems`.
+- `province`: Imports or references `src/province/`. Cross-group dependency from `Feature Systems` into `Edge/Integration`.
 - `render`: Imports or references `src/render/`. Cross-group dependency from `Edge/Integration` into `Platform Services`.
 - `runtime`: Imports or references `src/runtime/`. Cross-group dependency from `Edge/Integration` into `Core Runtime`.
 

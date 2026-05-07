@@ -190,6 +190,18 @@ def build_marker_coverage(
                     alias_map[base + ":" + meth] = lua_name # Foo:bar
                     alias_map[base + "." + meth] = lua_name # Foo.bar
 
+    # Module-level helpers for resolving shorthand markers like
+    # `lurek.particle.isActive` to canonical userdata methods.
+    module_method_index: Dict[str, Dict[str, str]] = {}
+    for fn in api_functions:
+        if fn["kind"] != "method":
+            continue
+        mod = fn["module"]
+        method = fn["name"]
+        canonical = fn["lua_name"]
+        module_method_index.setdefault(mod, {})
+        module_method_index[mod].setdefault(method, canonical)
+
     covered_names: Set[str] = set()
     coverage_map: Dict[str, List[str]] = {}
     orphans: List[Dict] = []
@@ -225,10 +237,35 @@ def build_marker_coverage(
                             resolved = alias_map[l_dot_alias]
                         elif cls_dot_alias in alias_map:
                             resolved = alias_map[cls_dot_alias]
+                    else:
+                        # Try shorthand `lurek.<module>.<method>` for userdata methods
+                        # when tests intentionally omit concrete owner type.
+                        mod = parts[1] if len(parts) >= 2 else ""
+                        member = parts[-1] if parts else ""
+                        canonical_method = module_method_index.get(mod, {}).get(member)
+                        if canonical_method:
+                            resolved = canonical_method
+
+                    # Treat namespace/prefix markers as valid (non-orphan), e.g.:
+                    # - lurek.render
+                    # - lurek.input.mouse
+                    if resolved == marker:
+                        prefix_dot = marker + "."
+                        prefix_colon = marker + ":"
+                        if any(
+                            name.startswith(prefix_dot) or name.startswith(prefix_colon)
+                            for name in canonical_names
+                        ):
+                            # Valid namespace marker used for grouping in tests.
+                            resolved = "__namespace__"
 
             if resolved in canonical_names:
                 covered_names.add(resolved)
                 coverage_map.setdefault(resolved, []).append(test_file)
+            elif resolved == "__namespace__":
+                # Keep namespace markers out of orphan list, but they do not map to
+                # a specific canonical function.
+                continue
             else:
                 orphans.append({
                     "file": test_file,

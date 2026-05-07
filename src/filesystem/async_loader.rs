@@ -42,11 +42,48 @@ pub enum LoadStatus {
     Done(LoadResult),
 }
 
+/// Outcome of a completed async write request.
+///
+/// # Variants
+/// - `Written` — Number of bytes successfully written.
+/// - `Error` — An error occurred while writing.
+#[derive(Debug, Clone)]
+pub enum WriteResult {
+    /// Write completed successfully.
+    Written(u64),
+    /// An error occurred during writing.
+    Error(String),
+}
+
+/// Status returned by [`AsyncLoader::poll_write`].
+///
+/// # Variants
+/// - `Pending` — Pending variant.
+/// - `Done` — Done variant.
+#[derive(Debug, Clone)]
+pub enum WriteStatus {
+    /// The request is still being processed.
+    Pending,
+    /// The write completed (success or failure).
+    Done(WriteResult),
+}
+
 /// Internal request sent to the worker thread.
-struct LoadRequest {
-    handle: LoadHandle,
-    /// Fully-resolved, sandbox-validated absolute path.
-    resolved_path: PathBuf,
+enum AsyncRequest {
+    /// Read request for a resolved file path.
+    Read {
+        handle: LoadHandle,
+        /// Fully-resolved, sandbox-validated absolute path.
+        resolved_path: PathBuf,
+    },
+    /// Write request for a resolved file path.
+    Write {
+        handle: LoadHandle,
+        /// Fully-resolved, sandbox-validated absolute path.
+        resolved_path: PathBuf,
+        /// Bytes to write.
+        bytes: Vec<u8>,
+    },
 }
 
 /// Maximum number of requests that can be queued before `request_load` blocks.
@@ -63,8 +100,9 @@ const QUEUE_CAPACITY: usize = 64;
 /// - `worker` — `Option<thread::JoinHandle<()>>`.
 pub struct AsyncLoader {
     next_id: AtomicU64,
-    tx: Option<mpsc::SyncSender<LoadRequest>>,
+    tx: Option<mpsc::SyncSender<AsyncRequest>>,
     results: Arc<Mutex<HashMap<u64, LoadResult>>>,
+    write_results: Arc<Mutex<HashMap<u64, WriteResult>>>,
     worker: Option<thread::JoinHandle<()>>,
 }
 
@@ -74,14 +112,17 @@ impl AsyncLoader {
     /// # Returns
     /// `Self`.
     pub fn new() -> Self {
-        let (tx, rx) = mpsc::sync_channel::<LoadRequest>(QUEUE_CAPACITY);
+        let (tx, rx) = mpsc::sync_channel::<AsyncRequest>(QUEUE_CAPACITY);
         let results: Arc<Mutex<HashMap<u64, LoadResult>>> = Arc::new(Mutex::new(HashMap::new()));
+        let write_results: Arc<Mutex<HashMap<u64, WriteResult>>> =
+            Arc::new(Mutex::new(HashMap::new()));
         let results_clone = Arc::clone(&results);
+        let write_results_clone = Arc::clone(&write_results);
 
         let worker = thread::Builder::new()
             .name("lurek-async-loader".into())
             .spawn(move || {
-                Self::worker_loop(rx, results_clone);
+                Self::worker_loop(rx, results_clone, write_results_clone);
             })
             .expect("failed to spawn async-loader thread");
 
@@ -89,6 +130,7 @@ impl AsyncLoader {
             next_id: AtomicU64::new(1),
             tx: Some(tx),
             results,
+            write_results,
             worker: Some(worker),
         }
     }
@@ -113,7 +155,7 @@ impl AsyncLoader {
         if let Some(ref tx) = self.tx {
             // try_send avoids blocking the main thread if the queue is full.
             if tx
-                .try_send(LoadRequest {
+                .try_send(AsyncRequest::Read {
                     handle,
                     resolved_path: resolved_path.clone(),
                 })
@@ -126,6 +168,40 @@ impl AsyncLoader {
                 );
                 if let Ok(mut map) = self.results.lock() {
                     map.insert(id, LoadResult::Error("Async load queue is full".into()));
+                }
+            }
+        }
+        handle
+    }
+
+    /// Submit a file-write request.
+    ///
+    /// # Parameters
+    /// - `resolved_path` — `PathBuf`.
+    /// - `bytes` — `Vec<u8>` payload to write.
+    ///
+    /// # Returns
+    /// `LoadHandle` used by [`poll_write`](Self::poll_write).
+    pub fn request_write(&self, resolved_path: PathBuf, bytes: Vec<u8>) -> LoadHandle {
+        let id = self.next_id.fetch_add(1, Ordering::Relaxed);
+        let handle = LoadHandle(id);
+
+        if let Some(ref tx) = self.tx {
+            // try_send avoids blocking the main thread if the queue is full.
+            if tx
+                .try_send(AsyncRequest::Write {
+                    handle,
+                    resolved_path: resolved_path.clone(),
+                    bytes,
+                })
+                .is_err()
+            {
+                log::warn!(
+                    "Async write queue full; request dropped for '{}'",
+                    resolved_path.display()
+                );
+                if let Ok(mut map) = self.write_results.lock() {
+                    map.insert(id, WriteResult::Error("Async write queue is full".into()));
                 }
             }
         }
@@ -159,19 +235,77 @@ impl AsyncLoader {
         self.results.lock().map(|m| m.len()).unwrap_or(0)
     }
 
+    /// Check the status of a previously-requested write.
+    ///
+    /// # Parameters
+    /// - `handle` — `LoadHandle` returned by [`request_write`](Self::request_write).
+    ///
+    /// # Returns
+    /// `WriteStatus`.
+    pub fn poll_write(&self, handle: LoadHandle) -> WriteStatus {
+        if let Ok(mut map) = self.write_results.lock() {
+            if let Some(result) = map.remove(&handle.0) {
+                return WriteStatus::Done(result);
+            }
+        }
+        WriteStatus::Pending
+    }
+
     /// Worker thread main loop — reads files and stores results.
-    fn worker_loop(rx: mpsc::Receiver<LoadRequest>, results: Arc<Mutex<HashMap<u64, LoadResult>>>) {
+    fn worker_loop(
+        rx: mpsc::Receiver<AsyncRequest>,
+        results: Arc<Mutex<HashMap<u64, LoadResult>>>,
+        write_results: Arc<Mutex<HashMap<u64, WriteResult>>>,
+    ) {
         for req in rx.iter() {
-            let result = match std::fs::read(&req.resolved_path) {
-                Ok(bytes) => LoadResult::Ready(bytes),
-                Err(e) => LoadResult::Error(format!(
-                    "Failed to read '{}': {}",
-                    req.resolved_path.display(),
-                    e
-                )),
-            };
-            if let Ok(mut map) = results.lock() {
-                map.insert(req.handle.0, result);
+            match req {
+                AsyncRequest::Read {
+                    handle,
+                    resolved_path,
+                } => {
+                    let result = match std::fs::read(&resolved_path) {
+                        Ok(bytes) => LoadResult::Ready(bytes),
+                        Err(e) => LoadResult::Error(format!(
+                            "Failed to read '{}': {}",
+                            resolved_path.display(),
+                            e
+                        )),
+                    };
+                    if let Ok(mut map) = results.lock() {
+                        map.insert(handle.0, result);
+                    }
+                }
+                AsyncRequest::Write {
+                    handle,
+                    resolved_path,
+                    bytes,
+                } => {
+                    let result = if let Some(parent) = resolved_path.parent() {
+                        match std::fs::create_dir_all(parent) {
+                            Ok(()) => match std::fs::write(&resolved_path, &bytes) {
+                                Ok(()) => WriteResult::Written(bytes.len() as u64),
+                                Err(e) => WriteResult::Error(format!(
+                                    "Failed to write '{}': {}",
+                                    resolved_path.display(),
+                                    e
+                                )),
+                            },
+                            Err(e) => WriteResult::Error(format!(
+                                "Failed to create parent dir for '{}': {}",
+                                resolved_path.display(),
+                                e
+                            )),
+                        }
+                    } else {
+                        WriteResult::Error(format!(
+                            "Failed to resolve parent directory for '{}'",
+                            resolved_path.display()
+                        ))
+                    };
+                    if let Ok(mut map) = write_results.lock() {
+                        map.insert(handle.0, result);
+                    }
+                }
             }
         }
         // Channel closed — worker exits cleanly.

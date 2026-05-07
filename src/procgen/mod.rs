@@ -20,8 +20,6 @@ pub mod lsystem;
 pub mod namegen;
 /// Procedural noise functions and generators: Perlin, Simplex, Worley, fractal combinators.
 pub mod noise;
-/// Periodic Perlin noise for tileable textures.
-pub mod noise_ext;
 /// Poisson disk sampling for point distribution.
 pub mod poisson;
 /// Procedural generation visualization: `NoiseGrid`.
@@ -42,10 +40,10 @@ pub use heightmap::{Heightmap, HeightmapOpts};
 pub use lsystem::LSystem;
 pub use namegen::NameGen;
 pub use noise::{
-    fbm, generate_noise_map_parallel, perlin2d, perlin3d, perlin4d, simplex2d, simplex_noise_2d,
-    simplex_noise_3d, DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind,
+    fbm, generate_noise_map_parallel, perlin2d, perlin3d, perlin4d, perlin_noise_periodic,
+    simplex2d, simplex_noise_2d, simplex_noise_3d, DistType, FractalType, MapGenOptions,
+    NoiseGenerator, NoiseKind,
 };
-pub use noise_ext::perlin_noise_periodic;
 pub use poisson::poisson_disk;
 pub use render::NoiseGrid;
 pub use rooms::{rooms_dungeon, Room, RoomsDungeon, RoomsOpts};

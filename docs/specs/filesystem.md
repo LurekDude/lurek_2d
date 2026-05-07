@@ -6,8 +6,8 @@
 - Source path: `src/filesystem/`
 - Lua API path(s): `src/lua_api/filesystem_api.rs`
 - Primary Lua namespace: `lurek.filesystem`
-- Rust test path(s): tests/rust/unit/filesystem_tests.rs, plus inline unit coverage in src/filesystem/async_loader.rs
-- Lua test path(s): tests/lua/unit/test_fileapp.lua, tests/lua/stress/test_filesystem_stress.lua, tests/lua/integration/test_data_fileapp.lua
+- Rust test path(s): tests/rust/unit/filesystem_tests.rs
+- Lua test path(s): tests/lua/unit/test_filesystem_core_unit.lua, tests/lua/stress/test_filesystem_stress.lua
 
 ## Summary
 
@@ -21,7 +21,7 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 
 **FileInfo.** `FileInfo` carries: `file_type` (`File`, `Directory`, `Symlink`, `Other`), `size` (bytes), `mod_time` (Unix timestamp), `read_only` flag. Returned by `lurek.filesystem.getInfo(path)`.
 
-**AsyncLoader.** `AsyncLoader` provides a background worker thread for non-blocking file reads with bounded-channel back-pressure. `load(path) → LoadHandle`; `poll(handle) → LoadStatus` (Pending, Ready(FileData), Error). Used by the asset pipeline to load textures, audio, and scripts without blocking the main thread. Lua: `lurek.filesystem.loadAsync(path)` → handle; `lurek.filesystem.pollLoad(handle)`.
+**AsyncLoader.** `AsyncLoader` provides a background worker thread for non-blocking file reads and writes with bounded-channel back-pressure. Read path: `request_load(path) → LoadHandle` then `poll(handle) → LoadStatus`. Write path: `request_write(path, bytes) → LoadHandle` then `poll_write(handle) → WriteStatus`. Lua: `lurek.filesystem.readAsync(path)` / `pollAsync(handle)` and `lurek.filesystem.writeAsync(path, data)` / `pollAsyncWrite(handle)`.
 
 **FileWatcher.** `FileWatcher` is a polling-based change detector that tracks file modification times. `watch(path)`, `check()` → changed paths, `unwatch(path)`. Designed for development hot-reload: Lua scripts watch their own assets and reload on change. Lua: `lurek.filesystem.newWatcher()` → `FileWatcher` userdata.
 
@@ -29,7 +29,7 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 
 **Mount points.** `MountLayer` provides a read-only virtual filesystem overlay for archive and mod content packages. The `mods` module uses `MountLayer` to overlay mod `.lurek` archives over the base game directory, giving mod content transparent access through the same `GameFS` API.
 
-**Lua surface.** `lurek.filesystem.read(path)`, `write(path, content)`, `append(path, content)`, `exists(path)`, `list(path)`, `getInfo(path)`, `mkdir(path)`, `remove(path)`, `copy(src, dst)`, `move(src, dst)`, `glob(pattern)`, `open(path, mode)` → `FileHandle`, `loadAsync(path)` → handle, `pollLoad(handle)`, `newWatcher()` → `FileWatcher`, `newZip(path)` → `ZipArchive`.
+**Lua surface.** `lurek.filesystem.read(path)`, `write(path, content)`, `append(path, content)`, `exists(path)`, `list(path)`, `getInfo(path)`, `mkdir(path)`, `remove(path)`, `copy(src, dst)`, `move(src, dst)`, `glob(pattern)`, `open(path, mode)` → `FileHandle`, `readAsync(path)` → handle, `pollAsync(handle)`, `writeAsync(path, data)` → handle, `pollAsyncWrite(handle)`, `newWatcher()` → `FileWatcher`, `mountZip(path, prefix)` → `LZipMount`.
 
 **Scope boundary.** Core Runtime tier. Depends on `runtime` for error types. Lua bridge in `src/lua_api/filesystem_api.rs`.
 
@@ -48,6 +48,8 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 - `LoadHandle` (`struct`, `async_loader.rs`): Opaque handle returned to callers (and to Lua) that identifies a pending load.
 - `LoadResult` (`enum`, `async_loader.rs`): Outcome of a completed load request.
 - `LoadStatus` (`enum`, `async_loader.rs`): Status returned by [`AsyncLoader::poll`].
+- `WriteResult` (`enum`, `async_loader.rs`): Outcome of a completed write request.
+- `WriteStatus` (`enum`, `async_loader.rs`): Status returned by [`AsyncLoader::poll_write`].
 - `AsyncLoader` (`struct`, `async_loader.rs`): A single-threaded background file reader.
 - `FileData` (`struct`, `file_data.rs`): Raw bytes loaded from the virtual filesystem.
 - `FileMode` (`enum`, `file_handle.rs`): File access mode.
@@ -64,6 +66,8 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 - `AsyncLoader::new` (`async_loader.rs`): Spawns the background worker thread.
 - `AsyncLoader::request_load` (`async_loader.rs`): Submit a file-read request.
 - `AsyncLoader::poll` (`async_loader.rs`): Check the status of a previously-requested load.
+- `AsyncLoader::request_write` (`async_loader.rs`): Submit a file-write request.
+- `AsyncLoader::poll_write` (`async_loader.rs`): Check the status of a previously-requested write.
 - `AsyncLoader::pending_results` (`async_loader.rs`): Returns the number of completed but un-polled results.
 - `FileData::new` (`file_data.rs`): Creates a new `FileData` with the given path and content.
 - `FileData::len` (`file_data.rs`): Returns the number of bytes in this buffer.
@@ -141,12 +145,14 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 - Namespace: `lurek.filesystem`
 
 ### Module Functions
-- `lurek.filesystem.mountZip`: Mounts a ZIP archive at a virtual path prefix, making its contents readable
+- `lurek.filesystem.mountZip`: Mounts a ZIP archive at a virtual path prefix and returns a mount handle.
 - `lurek.filesystem.watchPath`: Adds `path` to the polled file-watch list.
 - `lurek.filesystem.unwatchPath`: Removes `path` from the polled file-watch list.  No-op if not watched.
-- `lurek.filesystem.pollWatchers`: Polls all watched paths and returns an array of paths that changed since the
+- `lurek.filesystem.pollWatchers`: Polls watched paths and returns the ones that changed since the last poll.
 - `lurek.filesystem.read`: Reads a text file and returns its contents as a string.
 - `lurek.filesystem.write`: Writes a string to a file in the save directory.
+- `lurek.filesystem.readBytes`: Reads a file as raw bytes and returns a binary Lua string.
+- `lurek.filesystem.writeBytes`: Writes a binary Lua string to a file in the save directory.
 - `lurek.filesystem.exists`: Returns whether the given file or directory exists.
 - `lurek.filesystem.append`: Opens the file in append mode and writes the given string at the end.
 - `lurek.filesystem.openFile`: Opens a file and returns a readable/writable file handle.
@@ -165,42 +171,50 @@ The `filesystem` module is Lurek2D's sandboxed virtual filesystem abstraction �
 - `lurek.filesystem.lines`: Returns an iterator function over the lines of a text file.
 - `lurek.filesystem.readAsync`: Starts loading a file in the background and returns an opaque handle.
 - `lurek.filesystem.pollAsync`: Polls an async load handle, returning status and optional data.
+- `lurek.filesystem.writeAsync`: Starts writing a binary payload in the background and returns an opaque handle.
+- `lurek.filesystem.pollAsyncWrite`: Polls an async write handle, returning status and optional payload.
 - `lurek.filesystem.mount`: Mounts a directory at a virtual path inside the game filesystem.
 - `lurek.filesystem.unmount`: Removes a virtual mount layer by mountpoint.
 - `lurek.filesystem.load`: Loads and compiles a Lua file from the VFS, returning it as a callable function.
 - `lurek.filesystem.newFileData`: Loads a file from the VFS into a FileData buffer.
-- `lurek.filesystem.copy`: Copies a file within the sandbox.
-- `lurek.filesystem.move`: Moves (renames) a file within the `save/` directory.
+- `lurek.filesystem.copy`: Copies a file within the sandbox from the game root into `save/`.
+- `lurek.filesystem.move`: Moves or renames a file within the `save/` directory.
 - `lurek.filesystem.removeDir`: Recursively deletes a directory and all its contents within `save/`.
 - `lurek.filesystem.glob`: Returns a sorted list of paths matching a simple wildcard pattern.
 - `lurek.filesystem.listRecursive`: Returns a sorted list of all files under `path`, recursively.
 - `lurek.filesystem.stat`: Returns lightweight file statistics for the given path.
-- `lurek.filesystem.createTempFile`: Creates an empty temporary file in the `save/` sandbox and returns its
-- `lurek.filesystem.mkdir`: Creates a directory (and any missing parents) relative to the game root.
-- `lurek.filesystem.toAbsolutePath`: Resolves a path relative to the game root to an absolute OS path string.
+- `lurek.filesystem.createTempFile`: Creates an empty temporary file in the `save/` sandbox and returns its relative path.
+- `lurek.filesystem.mkdir`: Creates a directory and any missing parents relative to the game root.
+- `lurek.filesystem.toAbsolutePath`: Resolves a relative game path to an absolute OS path string.
 
-### `FileData` Methods
-- `FileData:getSize`: Returns the file size in bytes.
-- `FileData:getString`: Returns the file content as a Lua string.
-- `FileData:getFilename`: Returns the virtual path this data was loaded from.
+### `LFileData` Methods
+- `LFileData:getSize`: Returns the file size in bytes.
+- `LFileData:getString`: Returns the file content as a Lua string.
+- `LFileData:getFilename`: Returns the virtual path this data was loaded from.
+- `LFileData:type`: Returns the type name of this object.
+- `LFileData:typeOf`: Returns true if this object is of the given type.
 
-### `FileHandle` Methods
-- `FileHandle:read`: Reads bytes from the file, returning them as a string.
-- `FileHandle:readLine`: Reads the next line from the file without the trailing newline.
-- `FileHandle:write`: Writes a string to the file and returns the number of bytes written.
-- `FileHandle:seek`: Seeks the file position to the given byte offset from the start.
-- `FileHandle:tell`: Returns the current read/write byte offset from the start of the file.
-- `FileHandle:getSize`: Returns the size of the open file in bytes.
-- `FileHandle:getMode`: Returns the access mode the file was opened with.
-- `FileHandle:flush`: Flushes all buffered writes to disk without closing the handle.
-- `FileHandle:close`: Flushes any pending writes and closes the file handle.
-- `FileHandle:isEOF`: Returns whether the read cursor has reached the end of the file.
+### `LFileHandle` Methods
+- `LFileHandle:read`: Reads bytes from the file, returning them as a string.
+- `LFileHandle:readLine`: Reads the next line from the file without the trailing newline.
+- `LFileHandle:write`: Writes a string to the file and returns the number of bytes written.
+- `LFileHandle:seek`: Seeks the file position to the given byte offset from the start.
+- `LFileHandle:tell`: Returns the current read/write byte offset from the start of the file.
+- `LFileHandle:getSize`: Returns the size of the open file in bytes.
+- `LFileHandle:getMode`: Returns the access mode the file was opened with.
+- `LFileHandle:flush`: Flushes all buffered writes to disk without closing the handle.
+- `LFileHandle:close`: Flushes any pending writes and closes the file handle.
+- `LFileHandle:isEOF`: Returns whether the read cursor has reached the end of the file.
+- `LFileHandle:type`: Returns the type name of this object.
+- `LFileHandle:typeOf`: Returns true if this object is of the given type.
 
-### `ZipMount` Methods
-- `ZipMount:readFile`: Reads a file from the ZIP and returns it as a string of bytes.
-- `ZipMount:contains`: Returns true if `virtual_path` exists inside this ZIP mount.
-- `ZipMount:listFiles`: Returns a sorted array of all virtual paths exposed by this ZIP mount.
-- `ZipMount:prefix`: Returns the virtual path prefix this archive was mounted under.
+### `LZipMount` Methods
+- `LZipMount:readFile`: Reads a file from the ZIP and returns it as a string of bytes.
+- `LZipMount:contains`: Returns true if `virtual_path` exists inside this ZIP mount.
+- `LZipMount:listFiles`: Returns a sorted array of all virtual paths exposed by this ZIP mount.
+- `LZipMount:prefix`: Returns the virtual path prefix this archive was mounted under.
+- `LZipMount:type`: Returns the type name of this object.
+- `LZipMount:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

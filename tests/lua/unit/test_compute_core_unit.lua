@@ -177,14 +177,15 @@ describe("construction", function()
     -- @covers LArray:getShape
     -- @covers LArray:getSize
     -- @covers lurek.compute.zeros
-    it("3D array construction", function()
-        local a = lurek.compute.zeros({2, 3, 4})
-        expect_equal(3, a:getDimensions())
-        expect_equal(24, a:getSize())
+    it("4D array construction", function()
+        local a = lurek.compute.zeros({2, 3, 4, 5})
+        expect_equal(4, a:getDimensions())
+        expect_equal(120, a:getSize())
         local s = a:getShape()
         expect_equal(2, s[1])
         expect_equal(3, s[2])
         expect_equal(4, s[3])
+        expect_equal(5, s[4])
     end)
 end)
 
@@ -387,6 +388,55 @@ describe("arithmetic", function()
         expect_near(6.0, c:get(1), 1e-5)
         expect_near(9.0, c:get(2), 1e-5)
         expect_near(12.0, c:get(3), 1e-5)
+    end)
+
+    -- @covers LArray:add
+    -- @covers lurek.compute.fromTable
+    it("add supports 2D + 1D row broadcast", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 10, 20, 30}, {2, 3})
+        local b = lurek.compute.fromTable({100, 200, 300}, {3})
+        local c = a:add(b)
+        expect_near(101.0, c:get(1, 1), 1e-5)
+        expect_near(202.0, c:get(1, 2), 1e-5)
+        expect_near(303.0, c:get(1, 3), 1e-5)
+        expect_near(110.0, c:get(2, 1), 1e-5)
+        expect_near(220.0, c:get(2, 2), 1e-5)
+        expect_near(330.0, c:get(2, 3), 1e-5)
+    end)
+
+    -- @covers LArray:addInplace
+    -- @covers lurek.compute.fromTable
+    it("addInplace mutates array with row broadcast", function()
+        local a = lurek.compute.fromTable({1, 2, 3, 4, 5, 6}, {2, 3})
+        local b = lurek.compute.fromTable({10, 20, 30}, {3})
+        a:addInplace(b)
+        expect_near(11.0, a:get(1, 1), 1e-5)
+        expect_near(22.0, a:get(1, 2), 1e-5)
+        expect_near(33.0, a:get(1, 3), 1e-5)
+        expect_near(14.0, a:get(2, 1), 1e-5)
+        expect_near(25.0, a:get(2, 2), 1e-5)
+        expect_near(36.0, a:get(2, 3), 1e-5)
+    end)
+
+    -- @covers LArray:subInplace
+    -- @covers LArray:mulInplace
+    -- @covers LArray:divInplace
+    -- @covers lurek.compute.fromTable
+    it("subInplace, mulInplace and divInplace work", function()
+        local a = lurek.compute.fromTable({8, 10, 12}, {3})
+        local b = lurek.compute.fromTable({2, 5, 3}, {3})
+        a:subInplace(b)
+        expect_near(6.0, a:get(1), 1e-5)
+        expect_near(5.0, a:get(2), 1e-5)
+        expect_near(9.0, a:get(3), 1e-5)
+        a:mulInplace(b)
+        expect_near(12.0, a:get(1), 1e-5)
+        expect_near(25.0, a:get(2), 1e-5)
+        expect_near(27.0, a:get(3), 1e-5)
+        a:divInplace(b)
+        expect_near(6.0, a:get(1), 1e-5)
+        expect_near(5.0, a:get(2), 1e-5)
+        expect_near(9.0, a:get(3), 1e-5)
     end)
 
     -- @covers LArray:div
@@ -1104,10 +1154,11 @@ describe("error cases", function()
         expect_false(ok, "negative shape should error")
     end)
 
+    -- @covers LArray:getDimensions
     -- @covers lurek.compute.zeros
-    it("shape with more than three dimensions errors", function()
-        local ok = pcall(function() lurek.compute.zeros({1, 2, 3, 4}) end)
-        expect_false(ok, "4D shape should error")
+    it("shape with four dimensions is supported", function()
+        local a = lurek.compute.zeros({1, 2, 3, 4})
+        expect_equal(4, a:getDimensions())
     end)
 
     -- @covers LArray:transpose

@@ -169,6 +169,17 @@ _INTERNAL_MODULES = {
     # Terminal syntax highlighter — highlight_spans is called inside
     # lurek.terminal.highlight in terminal_api.rs; not a standalone Lua function
     "terminal::highlighter",
+    # Province integration/helpers are internal Rust building blocks used by
+    # higher-level Lua APIs (lurek.province / minimap / globe adapters).
+    "globe::province_adapter",
+    "minimap::province_adapter",
+    "province::borders",
+    "province::gpu_bridge",
+    "province::labels",
+    "province::map_modes",
+    "province::render",
+    "province::view_transform",
+    "raycaster::grid_motion",
 }
 
 # Minimum description length to be considered "documented"

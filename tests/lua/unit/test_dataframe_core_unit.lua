@@ -54,6 +54,11 @@ describe("lurek.dataframe module exists", function()
         expect_type("function", lurek.dataframe.fromTable)
     end)
 
+    -- @covers lurek.dataframe.fromRows
+    it("has fromRows factory", function()
+        expect_type("function", lurek.dataframe.fromRows)
+    end)
+
     -- @covers lurek.dataframe.fromCSV
     it("has fromCSV factory", function()
         expect_type("function", lurek.dataframe.fromCSV)
@@ -131,6 +136,30 @@ describe("construction", function()
         })
         expect_equal(2, df:nrows())
         expect_equal(2, df:ncols())
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:ncols
+    -- @covers LDataFrame:nrows
+    -- @covers lurek.dataframe.fromRows
+    it("fromRows creates DataFrame from explicit columns and row-major values", function()
+        local df = lurek.dataframe.fromRows(
+            { "id", "name", "score" },
+            {
+                { 1, "Alice", 10 },
+                { 2, "Bob", 20 },
+            }
+        )
+        expect_equal(2, df:nrows())
+        expect_equal(3, df:ncols())
+        expect_equal("Bob", df:getValue(2, "name"))
+    end)
+
+    -- @covers lurek.dataframe.fromRows
+    it("fromRows validates row width against declared columns", function()
+        expect_error(function()
+            lurek.dataframe.fromRows({ "x", "y" }, { { 1 } })
+        end)
     end)
 
     -- @covers LDataFrame:nrows
@@ -3306,6 +3335,129 @@ describe("dataframe strict: LGroupedFrame type/typeOf", function()
         else
             expect_true(true)
         end
+    end)
+end)
+
+-- @describe dataframe dedicated: advanced transforms and SQL join
+describe("dataframe dedicated: advanced transforms and SQL join", function()
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:withEval
+    -- @covers lurek.dataframe.fromRows
+    it("withEval computes expression column", function()
+        local df = lurek.dataframe.fromRows(
+            { "x", "y" },
+            {
+                { 2, 3 },
+                { 5, 7 },
+            }
+        )
+        local out = df:withEval("z", "x + y")
+        expect_near(5.0, out:getValue(1, "z"), 0.001)
+        expect_near(12.0, out:getValue(2, "z"), 0.001)
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:pivotTable
+    -- @covers lurek.dataframe.fromRows
+    it("pivotTable builds wide shape with sum agg", function()
+        local df = lurek.dataframe.fromRows(
+            { "team", "kind", "score" },
+            {
+                { "red", "a", 2 },
+                { "red", "b", 4 },
+                { "blue", "a", 6 },
+                { "blue", "b", 1 },
+            }
+        )
+        local out = df:pivotTable("team", "kind", "score", "sum")
+        expect_equal(2, out:nrows())
+        expect_near(2.0, out:getValue(1, "a"), 0.001)
+        expect_near(4.0, out:getValue(1, "b"), 0.001)
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:rollingMean
+    -- @covers lurek.dataframe.fromRows
+    it("rollingMean computes trailing means", function()
+        local df = lurek.dataframe.fromRows(
+            { "v" },
+            {
+                { 2 },
+                { 4 },
+                { 8 },
+            }
+        )
+        local out = df:rollingMean("v", 2, "v_rm")
+        expect_near(3.0, out:getValue(2, "v_rm"), 0.001)
+        expect_near(6.0, out:getValue(3, "v_rm"), 0.001)
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:rollingSum
+    -- @covers lurek.dataframe.fromRows
+    it("rollingSum computes trailing sums", function()
+        local df = lurek.dataframe.fromRows(
+            { "v" },
+            {
+                { 2 },
+                { 4 },
+                { 8 },
+            }
+        )
+        local out = df:rollingSum("v", 2, "v_rs")
+        expect_near(6.0, out:getValue(2, "v_rs"), 0.001)
+        expect_near(12.0, out:getValue(3, "v_rs"), 0.001)
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:rank
+    -- @covers lurek.dataframe.fromRows
+    it("rank desc assigns rank 1 to highest", function()
+        local df = lurek.dataframe.fromRows(
+            { "name", "score" },
+            {
+                { "A", 10 },
+                { "B", 30 },
+                { "C", 20 },
+            }
+        )
+        local out = df:rank("score", "desc", "rk")
+        expect_near(3.0, out:getValue(1, "rk"), 0.001)
+        expect_near(1.0, out:getValue(2, "rk"), 0.001)
+        expect_near(2.0, out:getValue(3, "rk"), 0.001)
+    end)
+
+    -- @covers LDataFrame:getValue
+    -- @covers LDatabase:addTable
+    -- @covers LDatabase:query
+    -- @covers lurek.dataframe.fromRows
+    -- @covers lurek.dataframe.newDatabase
+    it("Database query supports multi-table join", function()
+        local players = lurek.dataframe.fromRows(
+            { "id", "name" },
+            {
+                { 1, "Alice" },
+                { 2, "Bob" },
+            }
+        )
+        local scores = lurek.dataframe.fromRows(
+            { "player_id", "score" },
+            {
+                { 1, 100 },
+                { 2, 200 },
+            }
+        )
+
+        local db = lurek.dataframe.newDatabase()
+        db:addTable("players", players)
+        db:addTable("scores", scores)
+
+        local out = db:query(
+            "SELECT name, score FROM players JOIN scores ON players.id = scores.player_id ORDER BY score DESC"
+        )
+        expect_equal(2, out:nrows())
+        expect_equal("Bob", out:getValue(1, "name"))
+        expect_near(200.0, out:getValue(1, "score"), 0.001)
     end)
 end)
 

@@ -4,16 +4,18 @@ Per-module reference: each module under `src/<module>/` has a matching `docs/spe
 
 ## Table of Contents
 
-- [How specs are produced](#how-specs-are-produced)
-- [Module index](#module-index)
-  - [Foundations](#foundations)
-  - [Core Runtime](#core-runtime)
-  - [Platform Services](#platform-services)
-  - [Feature Systems](#feature-systems)
-  - [Edge / Integration](#edge--integration)
-- [How to add a new module spec](#how-to-add-a-new-module-spec)
-- [Cross-references](#cross-references)
-- [References](#references)
+- [`docs/specs/` — Lurek2D Module Reference Index](#docsspecs--lurek2d-module-reference-index)
+	- [Table of Contents](#table-of-contents)
+	- [How specs are produced](#how-specs-are-produced)
+	- [Module index](#module-index)
+		- [Foundations](#foundations)
+		- [Core Runtime](#core-runtime)
+		- [Platform Services](#platform-services)
+		- [Feature Systems](#feature-systems)
+		- [Edge / Integration](#edge--integration)
+	- [How to add a new module spec](#how-to-add-a-new-module-spec)
+	- [Cross-references](#cross-references)
+	- [References](#references)
 
 ---
 
@@ -113,6 +115,7 @@ Game-domain services. Imports Foundations + Core Runtime + Platform Services.
 | `particle`   | [particle.md](particle.md)     | Emitter-based 2D particle systems with bounded pools and Euler integration.                            | `CORE-KEEP`     |
 | `pathfind`   | [pathfind.md](pathfind.md)     | Grid / hex / iso / hierarchical / flow-field pathfinding. CPU-only, headless. Couples to `ai`.         | —               |
 | `pipeline`   | [pipeline.md](pipeline.md)     | DAG-based workflow orchestration: analytics, test sequences, asset / mod processing.                   | —               |
+| `province`   | [province.md](province.md)     | Engine-native province runtime: topology, style state, revisioned deltas, geometry cache, Lua bridge.  | `CORE-KEEP`     |
 | `raycaster`  | [raycaster.md](raycaster.md)   | Wolfenstein-style 2D grid raycaster: textured walls, billboard sprites, doors, lighting.               | `TIER-1-PLUGIN` |
 | `save`       | [save.md](save.md)             | Save / load lifecycle: schema versioning, migrations, auto-save. Bytes belong to `serial`.             | —               |
 | `scene`      | [scene.md](scene.md)           | Named, stackable scenes with transitions for menu / gameplay / pause / cutscene state changes.         | —               |

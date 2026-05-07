@@ -1,26 +1,34 @@
-[2026-05-04T07:40:12.571Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
-[2026-05-04T07:40:12.572Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
-[2026-05-04T07:40:12.572Z] INFO  [L080] Game directory: content/games/retro/dungeon_crawler
-[2026-05-04T07:40:12.683Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
-[2026-05-04T07:40:12.684Z] WARN  GENERAL [Loader Message (0x0)]
+[2026-05-06T16:05:55.455Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
+[2026-05-06T16:05:55.456Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-05-06T16:05:55.456Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\retro\dungeon_crawler
+[2026-05-06T16:05:57.162Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-05-06T16:05:57.163Z] WARN  GENERAL [Loader Message (0x0)]
 	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
-[2026-05-04T07:40:12.684Z] WARN  	objects: (type: INSTANCE, hndl: 0x27450239de0, name: ?)
-[2026-05-04T07:40:12.752Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
-[2026-05-04T07:40:12.752Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
-[2026-05-04T07:40:12.762Z] WARN  Unrecognized present mode 1000361000
-[2026-05-04T07:40:13.025Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
-[2026-05-04T07:40:13.060Z] WARN  Unrecognized present mode 1000361000
-[2026-05-04T07:40:13.060Z] INFO  [L034] GPU texture dimension limit: 2048
-[2026-05-04T07:40:13.061Z] WARN  Unrecognized present mode 1000361000
-[2026-05-04T07:40:13.355Z] INFO  [L035] GPU initialised: 769ms (format=Bgra8UnormSrgb, present=Fifo, 800x600)
-[2026-05-04T07:40:13.356Z] DEBUG Loaded 846 mappings.
-[2026-05-04T07:40:13.381Z] WARN  Unrecognized present mode 1000361000
-[2026-05-04T07:40:13.385Z] WARN  Unrecognized present mode 1000361000
-[2026-05-04T07:40:13.406Z] DEBUG [FS01] GameFS initialised
-[2026-05-04T07:40:13.423Z] DEBUG [AT01] Simulator created
-[2026-05-04T07:40:13.423Z] DEBUG [SC01] SC01
-[2026-05-04T07:40:13.424Z] DEBUG [GU01] GuiContext created
-[2026-05-04T07:40:13.424Z] INFO  [L003] Game loaded: content/games/retro/dungeon_crawler\main.lua
-[2026-05-04T07:40:13.425Z] DEBUG [RC01] RayCastMap created: 12x12
-[2026-05-04T07:45:09.477Z] INFO  [L039] Window close requested
-[2026-05-04T07:45:09.478Z] INFO  [L002] Lurek2D Engine stopped
+[2026-05-06T16:05:57.163Z] WARN  	objects: (type: INSTANCE, hndl: 0x1e646fa9a20, name: ?)
+[2026-05-06T16:05:57.230Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-05-06T16:05:57.230Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-05-06T16:05:57.241Z] WARN  Unrecognized present mode 1000361000
+[2026-05-06T16:05:57.572Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-05-06T16:05:57.792Z] WARN  Unrecognized present mode 1000361000
+[2026-05-06T16:05:57.792Z] INFO  [L034] GPU texture dimension limit: 32768
+[2026-05-06T16:05:57.793Z] WARN  Unrecognized present mode 1000361000
+[2026-05-06T16:05:58.061Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-05-06T16:05:58.062Z] DEBUG Loaded 846 mappings.
+[2026-05-06T16:05:58.087Z] WARN  Unrecognized present mode 1000361000
+[2026-05-06T16:05:58.092Z] WARN  Unrecognized present mode 1000361000
+[2026-05-06T16:05:58.095Z] DEBUG [FS01] GameFS initialised
+[2026-05-06T16:05:58.655Z] DEBUG [AT01] Simulator created
+[2026-05-06T16:05:58.655Z] DEBUG [SC01] SC01
+[2026-05-06T16:05:58.656Z] DEBUG [GU01] GuiContext created
+[2026-05-06T16:05:58.656Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\retro\dungeon_crawler\main.lua
+[2026-05-06T16:05:58.658Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.659Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.659Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.661Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.661Z] DEBUG [TX01] texture decoded: 64x64
+[2026-05-06T16:05:58.663Z] DEBUG [RC01] RayCastMap created: 80x80
+[2026-05-06T16:08:23.140Z] INFO  [L039] Window close requested
+[2026-05-06T16:08:23.141Z] INFO  [L002] Lurek2D Engine stopped

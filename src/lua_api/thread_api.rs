@@ -1,4 +1,4 @@
-//! `lurek.thread` - Background threads and inter-thread channel communication.
+﻿//! `lurek.thread` - Background threads and inter-thread channel communication.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -226,6 +226,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | code | string | Worker Lua source code.
     /// @return | LThread | New thread handle.
     let ch = named_channels.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newThread", lua.create_function(move |_, code: String| {
             Ok(LuaThreadHandle {
                 inner: Arc::new(Mutex::new(LuaThread::new(code, ch.clone()))),
@@ -248,6 +249,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Channel name.
     /// @return | LChannel | Named channel handle.
     let ch = named_channels.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getChannel", lua.create_function(move |_, name: String| {
             let mut channels = ch.lock().unwrap();
             let channel = channels

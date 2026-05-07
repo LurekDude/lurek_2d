@@ -11,32 +11,15 @@
 
 ## Summary
 
-## Summary
+The `minimap` module is documented from the current source tree and existing module reference data.
 
-The `minimap` module provides a grid-based minimap data model for overhead map displays — a Feature Systems tier module that is pure CPU code producing `RenderCommand` entries for the renderer each frame. It has no direct GPU dependencies and can operate independently of the main camera and scene rendering pipelines.
-
-**Core data model.** `Minimap` is the main data container: a 2D grid of cells where each cell stores a terrain type ID (as a `u8` index into a registered terrain colour palette). Fog of war is tracked per-cell via a `FogLevel` enum (`Hidden` / `Explored` / `Visible`). `ColorMode` controls whether cells are rendered by terrain type or by owner faction (political mode falls back to terrain colours when per-cell owner is not stored). The grid supports multiple layers via `LayerData` for split-level maps — dungeon floors, underground passages, or altitude bands.
-
-**Tracked game objects.** `MinimapObject` entries represent tracked game entities projected onto the minimap. Each carries a grid position, a `type_index` into the registered `MinimapObjectType` array (which stores a display colour and visibility toggle per type), and an `owner` identifier for faction colouring. `set_object(id, x, y, type_index, owner)` creates or updates tracked entities; a `HashMap<u32, MinimapObject>` manages the pool keyed by user-assigned IDs. `remove_object(id)` and `clear_objects()` manage the pool. Objects outside the currently revealed fog area are suppressed automatically.
-
-**Pings and markers.** `MinimapPing` provides temporary pulsing markers at grid positions for events like alerts or waypoints. Pings have a configurable pulse duration and colour and are removed automatically after expiry. `MinimapMarker` adds persistent named icons for points of interest; each marker carries a label, optional icon index, and a `MarkerAnimation` for visual emphasis (static, pulsing, rotating). Markers can be queried by region via `markers_in_rect(rect)`.
-
-**Viewport overlay.** A viewport rectangle overlay uses the current `Camera` bounds from `SharedState` to compute which portion of the world grid is currently visible on screen and draws a framed rectangle on the minimap accordingly. This gives the player spatial awareness of their current view within the larger map.
-
-**Overlay shapes and paths.** `OverlayShape` is a custom geometric shape drawn in grid space on top of the minimap (circle, rectangle, polygon). `OverlayPath` represents a sequence of grid points for displaying pathfinding routes, patrol paths, or territory borders. `add_overlay_shape(id, shape)`, `remove_overlay_shape(id)`, `add_overlay_path(id, path)`, and `remove_overlay_path(id)` are the management API. These allow game code to annotate the minimap with dynamic information without custom rendering logic.
-
-**Coordinate system.** `world_to_minimap(world_pos)` converts a world-space `Vec2` to minimap display pixels. `minimap_to_world(px, py)` does the inverse. Both account for zoom factor and pan offset. `set_zoom(factor)` and `set_pan(dx, dy)` control the view transformation applied to the minimap display.
-
-**Rendering.** The `render` submodule converts `Minimap` state into `RenderCommand::DrawShape` and `RenderCommand::DrawImage` entries each frame. Cells are drawn as coloured quads batched per-colour to minimise render commands. Fog cells use an alpha overlay. Objects, pings, markers, viewport rectangle, and overlay shapes are drawn in layered order on top.
-
-**Lua surface.** `lurek.minimap.new(gw, gh, dw, dh)` creates a minimap. Methods on the returned userdata: `setTerrain`, `setFog`, `setColorMode`, `setTerrainColor`, `setObject`, `removeObject`, `clearObjects`, `addPing`, `addMarker`, `setViewportVisible`, `addOverlayShape`, `addOverlayPath`, `worldToMinimap`, `minimapToWorld`, `setZoom`, `setPan`, `render(commands)`.
-
-**Scope boundary.** Feature Systems tier. Depends on `render` (RenderCommand types), `math`, `runtime`. Lua bridge in `src/lua_api/minimap_api.rs`.
+This module primarily collaborates with `image`, `province`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
 - `minimap.rs`: Implements the main `Minimap` state container, including terrain cells, fog, tracked objects, markers, pings, zoom, pan, and coordinate transforms.
 - `mod.rs`: Declares the minimap submodules and re-exports the core minimap and support types.
+- `province_adapter.rs`: Minimap ↔ province adapter (optional coupling layer).
 - `render.rs`: Generates render commands for the minimap background, cells, viewport rectangle, and animated pings.
 - `types.rs`: Defines shared enums and data records such as fog levels, color modes, objects, pings, and markers.
 
@@ -134,6 +117,9 @@ The `minimap` module provides a grid-based minimap data model for overhead map d
 - `Minimap::update` (`minimap.rs`): Advance time-based effects: decrement ping timers and remove expired pings, and advance animation phases on all animated markers.
 - `Minimap::draw_to_image` (`minimap.rs`): Renders the minimap to an `ImageData` for evidence/testing.
 - `Minimap::build_render_commands` (`minimap.rs`): Generates GPU `RenderCommand`s for the minimap at the given screen position.
+- `apply_terrain` (`province_adapter.rs`): Projects province terrain IDs into minimap terrain grid.
+- `apply_visibility` (`province_adapter.rs`): Projects province visibility state into minimap fog cells.
+- `apply_terrain_palette` (`province_adapter.rs`): Pushes terrain-type color palette inferred from province styles.
 - `Minimap::generate_render_commands` (`render.rs`): Generate render commands to draw the minimap overlay at the given screen position.
 - `ColorMode::parse_mode` (`types.rs`): Parse a color mode from its string name.
 - `ColorMode::as_str` (`types.rs`): Return the string name of this color mode.
@@ -147,66 +133,87 @@ The `minimap` module provides a grid-based minimap data model for overhead map d
 ### Module Functions
 - `lurek.minimap.newMinimap`: Creates a new grid-based minimap.
 
-### `Minimap` Methods
-- `Minimap:getGridWidth`: Returns the grid width in cells.
-- `Minimap:getGridHeight`: Returns the grid height in cells.
-- `Minimap:getGridSize`: Returns the grid width and height as two values.
-- `Minimap:getDisplayWidth`: Returns the display width in pixels.
-- `Minimap:getDisplayHeight`: Returns the display height in pixels.
-- `Minimap:getDisplaySize`: Returns the display width and height as two values.
-- `Minimap:setDisplaySize`: Sets the display size in pixels.
-- `Minimap:getTerrain`: Returns the terrain type at a 1-based grid position.
-- `Minimap:setTerrainData`: Sets terrain types from a flat 1-based Lua table of integers (row-major).
-- `Minimap:getTerrainColor`: Returns the display color for a terrain type as r, g, b, a.
-- `Minimap:getTileDescription`: Returns the hover tooltip string for a terrain type ID, or nil.
-- `Minimap:setFogEnabled`: Enables or disables fog of war.
-- `Minimap:isFogEnabled`: Returns whether fog of war is enabled.
-- `Minimap:setFogLevel`: Sets the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
-- `Minimap:getFogLevel`: Returns the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
-- `Minimap:getFogColor`: Returns the fog overlay color as r, g, b, a.
-- `Minimap:setFogData`: Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
-- `Minimap:isObjectTypeVisible`: Returns whether an object type (1-based index) is visible.
-- `Minimap:getObjectTypeCount`: Returns the number of registered object types.
-- `Minimap:removeObject`: Removes a tracked object by ID.
-- `Minimap:clearObjects`: Removes all tracked objects.
-- `Minimap:getObjectCount`: Returns the number of tracked objects.
-- `Minimap:getOwnerColor`: Returns the display color for an owner/faction as r, g, b, a.
-- `Minimap:setColorMode`: Sets the color mode ("terrain" or "political").
-- `Minimap:getColorMode`: Returns the current color mode as a string.
-- `Minimap:setZoom`: Sets the zoom level (minimum 0.1).
-- `Minimap:getZoom`: Returns the current zoom level.
-- `Minimap:setCenter`: Sets the center of the minimap view in grid coordinates.
-- `Minimap:getCenter`: Returns the center coordinates as x, y.
-- `Minimap:getCenterX`: Returns the center X coordinate.
-- `Minimap:getCenterY`: Returns the center Y coordinate.
-- `Minimap:clearViewportRect`: Clears the viewport rectangle overlay.
-- `Minimap:getViewportRect`: Returns the viewport rectangle as x, y, w, h or nil if not set.
-- `Minimap:setViewportVisible`: Sets whether the viewport rectangle is visible.
-- `Minimap:isViewportVisible`: Returns whether the viewport rectangle is visible.
-- `Minimap:getViewportColor`: Returns the viewport rectangle color as r, g, b, a.
-- `Minimap:getPingCount`: Returns the number of active pings.
-- `Minimap:removeMarker`: Removes the minimap marker with the given integer ID, if present.
-- `Minimap:hasMarker`: Returns whether a marker with the given ID exists.
-- `Minimap:getMarkerDescription`: Returns the description of a marker, or nil.
-- `Minimap:getMarkerCount`: Returns the number of markers.
-- `Minimap:clearMarkerAnimation`: Removes the animation from a marker, reverting it to static.
-- `Minimap:clearOverlay`: Removes all custom geometry from the minimap overlay.
-- `Minimap:clearPath`: Removes a displayed path. If id is nil, all paths are removed.
-- `Minimap:setLayer`: Switches the minimap's active render layer (0-based index).
-- `Minimap:getLayer`: Returns the index of the currently active render layer.
-- `Minimap:setAntiAlias`: Sets whether anti-aliasing is enabled.
-- `Minimap:isAntiAlias`: Returns whether anti-aliasing is enabled.
-- `Minimap:setClickable`: Sets whether this minimap responds to click hit-testing.
-- `Minimap:isClickable`: Returns whether this minimap responds to click hit-testing.
-- `Minimap:update`: Advances time-based effects by dt seconds (expires pings).
-- `Minimap:type`: Returns the type name of this object.
-- `Minimap:typeOf`: Returns true if this object is of the given type.
-- `Minimap:render`: Renders the minimap to the screen at the given position.
-- `Minimap:drawToImage`: Renders the minimap grid to a CPU ImageData.
+### `LMinimap` Methods
+- `LMinimap:getGridWidth`: Returns the grid width in cells.
+- `LMinimap:getGridHeight`: Returns the grid height in cells.
+- `LMinimap:getGridSize`: Returns the grid width and height as two values.
+- `LMinimap:getDisplayWidth`: Returns the display width in pixels.
+- `LMinimap:getDisplayHeight`: Returns the display height in pixels.
+- `LMinimap:getDisplaySize`: Returns the display width and height as two values.
+- `LMinimap:setDisplaySize`: Sets the display size in pixels.
+- `LMinimap:setTerrain`: Sets the terrain type at a 1-based grid position.
+- `LMinimap:getTerrain`: Returns the terrain type at a 1-based grid position.
+- `LMinimap:setTerrainData`: Sets terrain types from a flat 1-based Lua table of integers (row-major).
+- `LMinimap:setTerrainColor`: Sets the display color for a terrain type.
+- `LMinimap:getTerrainColor`: Returns the display color for a terrain type as r, g, b, a.
+- `LMinimap:setTileDescription`: Sets a hover tooltip string for a terrain type ID.
+- `LMinimap:getTileDescription`: Returns the hover tooltip string for a terrain type ID, or nil.
+- `LMinimap:setFogEnabled`: Enables or disables fog of war.
+- `LMinimap:isFogEnabled`: Returns whether fog of war is enabled.
+- `LMinimap:setFogLevel`: Sets the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
+- `LMinimap:getFogLevel`: Returns the fog level at a 1-based grid position (0=hidden, 1=explored, 2=visible).
+- `LMinimap:setFogColor`: Sets the fog overlay color.
+- `LMinimap:getFogColor`: Returns the fog overlay color as r, g, b, a.
+- `LMinimap:setFogData`: Sets the entire fog grid from a flat 1-based table (0=hidden, 1=explored, 2=visible).
+- `LMinimap:addObjectType`: Registers a new object type and returns its 1-based index.
+- `LMinimap:setObjectTypeVisible`: Sets whether an object type (1-based index) is visible.
+- `LMinimap:isObjectTypeVisible`: Returns whether an object type (1-based index) is visible.
+- `LMinimap:getObjectTypeCount`: Returns the number of registered object types.
+- `LMinimap:setObject`: Sets or updates a tracked object on the minimap.
+- `LMinimap:removeObject`: Removes a tracked object by ID.
+- `LMinimap:clearObjects`: Removes all tracked objects.
+- `LMinimap:getObjectCount`: Returns the number of tracked objects.
+- `LMinimap:setOwnerColor`: Sets the display color for an owner/faction.
+- `LMinimap:getOwnerColor`: Returns the display color for an owner/faction as r, g, b, a.
+- `LMinimap:setColorMode`: Sets the color mode ("terrain" or "political").
+- `LMinimap:getColorMode`: Returns the current color mode as a string.
+- `LMinimap:setZoom`: Sets the zoom level (minimum 0.1).
+- `LMinimap:getZoom`: Returns the current zoom level.
+- `LMinimap:setCenter`: Sets the center of the minimap view in grid coordinates.
+- `LMinimap:getCenter`: Returns the center coordinates as x, y.
+- `LMinimap:getCenterX`: Returns the center X coordinate.
+- `LMinimap:getCenterY`: Returns the center Y coordinate.
+- `LMinimap:setViewportRect`: Sets the viewport rectangle overlay in grid coordinates.
+- `LMinimap:clearViewportRect`: Clears the viewport rectangle overlay.
+- `LMinimap:getViewportRect`: Returns the viewport rectangle as x, y, w, h or nil if not set.
+- `LMinimap:setViewportVisible`: Sets whether the viewport rectangle is visible.
+- `LMinimap:isViewportVisible`: Returns whether the viewport rectangle is visible.
+- `LMinimap:setViewportColor`: Sets the viewport rectangle color.
+- `LMinimap:getViewportColor`: Returns the viewport rectangle color as r, g, b, a.
+- `LMinimap:addPing`: Adds an animated ping at grid coordinates with a duration and optional color.
+- `LMinimap:getPingCount`: Returns the number of active pings.
+- `LMinimap:addMarker`: Adds a persistent marker and returns its auto-assigned ID.
+- `LMinimap:removeMarker`: Removes the minimap marker with the given integer ID, if present.
+- `LMinimap:hasMarker`: Returns whether a marker with the given ID exists.
+- `LMinimap:getMarkerDescription`: Returns the description of a marker, or nil.
+- `LMinimap:getMarkerCount`: Returns the number of markers.
+- `LMinimap:setMarkerAnimation`: Attaches an animation to a marker. Does nothing if the ID does not exist.
+- `LMinimap:clearMarkerAnimation`: Removes the animation from a marker, reverting it to static.
+- `LMinimap:drawLine`: Draws a custom line segment on the minimap overlay.
+- `LMinimap:drawRect`: Draws a custom rectangle on the minimap overlay.
+- `LMinimap:clearOverlay`: Removes all custom geometry from the minimap overlay.
+- `LMinimap:showPath`: Displays a pathfinding route on the minimap and returns its path ID.
+- `LMinimap:clearPath`: Removes a displayed path. If id is nil, all paths are removed.
+- `LMinimap:setLayer`: Switches the minimap's active render layer (0-based index).
+- `LMinimap:getLayer`: Returns the index of the currently active render layer.
+- `LMinimap:setLayerData`: Stores tile data for a specific layer index.
+- `LMinimap:setAntiAlias`: Sets whether anti-aliasing is enabled.
+- `LMinimap:isAntiAlias`: Returns whether anti-aliasing is enabled.
+- `LMinimap:setClickable`: Sets whether this minimap responds to click hit-testing.
+- `LMinimap:isClickable`: Returns whether this minimap responds to click hit-testing.
+- `LMinimap:getHoverInfo`: Returns hover tooltip text for the element under screen coordinates, or nil.
+- `LMinimap:screenToGrid`: Converts screen coordinates to grid coordinates.
+- `LMinimap:gridToScreen`: Converts grid coordinates to screen coordinates.
+- `LMinimap:update`: Advances time-based effects by dt seconds (expires pings).
+- `LMinimap:type`: Returns the type name of this object.
+- `LMinimap:typeOf`: Returns true if this object is of the given type.
+- `LMinimap:render`: Renders the minimap to the screen at the given position.
+- `LMinimap:drawToImage`: Renders the minimap grid to a CPU ImageData.
 
 ## References
 
 - `image`: Imports or references `image` from `src/image/`.
+- `province`: Imports or references `src/province/`. Cross-group dependency from `Feature Systems` into `Edge/Integration`.
 - `render`: Imports or references `render` from `src/render/`.
 - `runtime`: Imports or references `runtime` from `src/runtime/`.
 

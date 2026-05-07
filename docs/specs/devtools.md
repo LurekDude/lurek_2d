@@ -92,6 +92,12 @@ The `devtools` module is Lurek2D's in-process developer toolbox — a Feature Sy
 
 ### Module Functions
 - `lurek.devtools.log`: Logs a message at the given level.
+- `lurek.devtools.trace`: Logs a message at TRACE level.
+- `lurek.devtools.debug`: Logs a message at DEBUG level.
+- `lurek.devtools.info`: Logs a message at INFO level.
+- `lurek.devtools.warn`: Logs a message at WARN level.
+- `lurek.devtools.error`: Logs a message at ERROR level.
+- `lurek.devtools.fatal`: Logs a message at FATAL level.
 - `lurek.devtools.setLogLevel`: Sets the minimum log level.
 - `lurek.devtools.getLogLevel`: Returns the current minimum log level.
 - `lurek.devtools.setLogConsole`: Enables or disables console log output.
@@ -132,17 +138,21 @@ The `devtools` module is Lurek2D's in-process developer toolbox — a Feature Sy
 - `lurek.devtools.newFileWatcher`: Creates a standalone per-path file watcher. Call `:check()` once per frame
 - `lurek.devtools.newRepl`: Creates an interactive Lua REPL console with a bounded history buffer.
 
-### `FileWatcher` Methods
-- `FileWatcher:onChanged`: Registers a callback invoked (with no arguments) when the watched path changes.
-- `FileWatcher:check`: Polls the watcher. If the file has changed since the last call, fires the
-- `FileWatcher:getPath`: Returns the watched path string.
-- `FileWatcher:cancel`: Removes the stored `onChanged` callback and stops future notifications.
+### `LFileWatcher` Methods
+- `LFileWatcher:onChanged`: Registers a callback invoked (with no arguments) when the watched path changes.
+- `LFileWatcher:check`: Polls the watcher. If the file has changed since the last call, fires the
+- `LFileWatcher:getPath`: Returns the watched path string.
+- `LFileWatcher:cancel`: Removes the stored `onChanged` callback and stops future notifications.
+- `LFileWatcher:type`: Returns the type name of this object.
+- `LFileWatcher:typeOf`: Returns true if this object is of the given type.
 
-### `ReplConsole` Methods
-- `ReplConsole:eval`: Evaluates a Lua snippet and records the input in history.
-- `ReplConsole:history`: Returns an ordered array of past inputs (oldest first).
-- `ReplConsole:clear`: Clears the REPL history buffer.
-- `ReplConsole:len`: Returns the number of history entries.
+### `LReplConsole` Methods
+- `LReplConsole:eval`: Evaluates a Lua snippet and records the input in history.
+- `LReplConsole:history`: Returns an ordered array of past inputs (oldest first).
+- `LReplConsole:clear`: Clears the REPL history buffer.
+- `LReplConsole:len`: Returns the number of history entries.
+- `LReplConsole:type`: Returns the type name of this object.
+- `LReplConsole:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

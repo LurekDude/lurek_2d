@@ -1,4 +1,4 @@
--- Lurek2D Tilemap API Tests
+﻿-- Lurek2D Tilemap API Tests
 -- Covers lurek.tilemap module: factory functions, TileSet, TileMap,
 -- coordinate helpers, autotile, chunk map, iso map, map generation, and TMX.
 -- NOTE: This test runs in headless mode (no GPU/window). drawLayer and
@@ -75,10 +75,6 @@ describe("lurek.tilemap module exists", function()
         expect_type("function", lurek.tilemap.loadTMX)
     end)
 
-    -- @covers lurek.tilemap.FLOOR
-    -- @covers lurek.tilemap.NORTH_WALL
-    -- @covers lurek.tilemap.OBJECT
-    -- @covers lurek.tilemap.WEST_WALL
     it("exposes IsoMap tile-part constants", function()
         expect_equal(1, lurek.tilemap.FLOOR)
         expect_equal(2, lurek.tilemap.NORTH_WALL)
@@ -1243,7 +1239,6 @@ describe("lurek.tilemap.newIsoMap", function()
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:getTilePart
     -- @covers LIsoMap:setTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("setTilePart and getTilePart round-trip for floor part", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)
@@ -1254,7 +1249,6 @@ describe("lurek.tilemap.newIsoMap", function()
 
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:setTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("setTilePart rejects index 0 for level", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)
@@ -2021,7 +2015,6 @@ end)
 describe("IsoMap regression: zero index", function()
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:setTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("setTilePart rejects z=0 without panicking", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)
@@ -2033,7 +2026,6 @@ describe("IsoMap regression: zero index", function()
 
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:getTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("getTilePart rejects z=0 without panicking", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)
@@ -2067,7 +2059,6 @@ end)
 describe("IsoMap regression: zero index", function()
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:setTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("setTilePart rejects z=0 without panicking", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)
@@ -2079,7 +2070,6 @@ describe("IsoMap regression: zero index", function()
 
     -- @covers LIsoMap:addLevel
     -- @covers LIsoMap:getTilePart
-    -- @covers lurek.tilemap.FLOOR
     -- @covers lurek.tilemap.newIsoMap
     it("getTilePart rejects z=0 without panicking", function()
         local iso = lurek.tilemap.newIsoMap(5, 5, 64, 32, 24)

@@ -33,6 +33,22 @@ pub struct LightWorld {
     pub enabled: bool,
     /// Maximum number of lights processed per frame.
     pub max_lights: u16,
+    /// Keys of lights that currently have flicker enabled.
+    flicker_keys: Vec<LightKey>,
+    /// Marks whether `flicker_keys` should be rebuilt before use.
+    flicker_index_dirty: bool,
+}
+
+/// Renderer/plugin hint row for normal-map aware 2D lighting.
+#[derive(Debug, Clone)]
+pub struct NormalMapLightHint {
+    pub x: f32,
+    pub y: f32,
+    pub radius: f32,
+    pub intensity: f32,
+    pub direction: f32,
+    pub path: String,
+    pub strength: f32,
 }
 
 impl LightWorld {
@@ -53,6 +69,8 @@ impl LightWorld {
             ambient: Color::new(0.1, 0.1, 0.1, 1.0),
             enabled: false,
             max_lights: 64,
+            flicker_keys: Vec::new(),
+            flicker_index_dirty: true,
         }
     }
 
@@ -68,7 +86,9 @@ impl LightWorld {
         if !self.enabled {
             self.enabled = true;
         }
-        self.lights.insert(light)
+        let key = self.lights.insert(light);
+        self.flicker_index_dirty = true;
+        key
     }
 
     /// Inserts an occluder and returns its key.
@@ -90,6 +110,7 @@ impl LightWorld {
     /// # Returns
     /// `Option<Light2D>`.
     pub fn remove_light(&mut self, key: LightKey) -> Option<Light2D> {
+        self.flicker_keys.retain(|k| *k != key);
         self.lights.remove(key)
     }
 
@@ -169,6 +190,8 @@ impl LightWorld {
         self.lights.clear();
         self.occluders.clear();
         self.ambient = Color::new(0.1, 0.1, 0.1, 1.0);
+        self.flicker_keys.clear();
+        self.flicker_index_dirty = false;
     }
 
     /// Returns `true` if any light in the world is enabled.
@@ -237,9 +260,35 @@ impl LightWorld {
     /// # Parameters
     /// - `dt` — `f32`.
     pub fn advance_flickers(&mut self, dt: f32) {
-        for light in self.lights.values_mut() {
-            light.flicker.advance(dt);
+        if self.flicker_index_dirty {
+            self.reindex_flickers();
         }
+
+        let mut stale = false;
+        for key in self.flicker_keys.iter().copied() {
+            if let Some(light) = self.lights.get_mut(key) {
+                if light.flicker.enabled {
+                    light.flicker.advance(dt);
+                }
+            } else {
+                stale = true;
+            }
+        }
+
+        if stale {
+            self.flicker_keys.retain(|k| self.lights.contains_key(*k));
+        }
+    }
+
+    /// Rebuilds the secondary index of flicker-enabled lights.
+    pub fn reindex_flickers(&mut self) {
+        self.flicker_keys.clear();
+        for (key, light) in self.lights.iter() {
+            if light.flicker.enabled {
+                self.flicker_keys.push(key);
+            }
+        }
+        self.flicker_index_dirty = false;
     }
 
     /// Render the accumulated lightmap to an image.
@@ -360,6 +409,27 @@ impl LightWorld {
             .values()
             .filter(|l| l.enabled && l.light_type == LightType::Directional)
             .map(|l| (l.x, l.y, l.direction))
+            .collect()
+    }
+
+    /// Returns hints for normal-map aware plugin light passes.
+    ///
+    /// Only enabled lights with a normal-map path are returned.
+    pub fn normal_map_light_hints(&self) -> Vec<NormalMapLightHint> {
+        self.lights
+            .values()
+            .filter(|l| l.enabled)
+            .filter_map(|l| {
+                l.get_normal_map_path().map(|path| NormalMapLightHint {
+                    x: l.x,
+                    y: l.y,
+                    radius: l.radius,
+                    intensity: l.intensity,
+                    direction: l.direction,
+                    path: path.to_string(),
+                    strength: l.normal_strength,
+                })
+            })
             .collect()
     }
 }

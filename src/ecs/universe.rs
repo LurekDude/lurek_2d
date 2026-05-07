@@ -20,16 +20,23 @@ const MAX_BITMAP_TAGS: usize = 63;
 /// A self-contained ECS world. Consult the module-level documentation for the broader usage context and preconditions.
 ///
 /// Manages entities (u32 IDs with recycling), components (stored in Lua registry tables),
-/// string and bitmap tags, layers, blueprints, and systems.
+/// string and bitmap tags, layers, blueprints, systems, and system phases.
+///
+/// # System phases
+/// Systems can be assigned a named phase when added (`addSystem` `opts.phase`).
+/// Built-in phase order: `"pre_update"` → `"update"` → `"post_update"`.
+/// Call `world:update(dt)` to run the `"update"` phase.
+/// Call `world:updatePhase(phase, dt)` to run any specific phase.
+/// Unknown custom phases run after the built-in three if dispatched directly.
 ///
 /// # Fields
 /// - `next_id` — `u32`.
 /// - `free_list` — `Vec<u32>`.
 /// - `alive` — `HashSet<u32>`.
-/// - `string_tags` — `HashMap<u32`.
+/// - `string_tags` — `HashMap<u32, Vec<String>>`.
 /// - `bitmap_tag_names` — `Vec<String>`.
-/// - `bitmap_masks` — `HashMap<u32`.
-/// - `layers` — `HashMap<u32`.
+/// - `bitmap_masks` — `HashMap<u32, u64>`.
+/// - `layers` — `HashMap<u32, i32>`.
 /// - `generations` — `HashMap<u32, u8>`: per-slot generation counter.
 /// - `tag_index` — `HashMap<String, Vec<u32>>`: inverted tag → packed entity IDs.
 /// - `parents` — `HashMap<u32, u32>`: child slot → parent slot.
@@ -37,6 +44,7 @@ const MAX_BITMAP_TAGS: usize = 63;
 /// - `component_store` — `Option<RegistryKey>`.
 /// - `blueprint_store` — `Option<RegistryKey>`.
 /// - `system_store` — `Option<RegistryKey>`.
+/// - `dirty_set` — `HashSet<u32>`: packed IDs of entities whose components changed since the last `flushObservers`.
 pub struct Universe {
     next_id: u32,
     free_list: Vec<u32>,
@@ -57,10 +65,14 @@ pub struct Universe {
     system_store: Option<RegistryKey>,
     /// Priority values parallel to the system_store table (1-based indices).
     system_priorities: Vec<i32>,
+    /// Phase name parallel to the system_store table.  Empty string means `"update"`.
+    system_phases: Vec<String>,
     /// Pending component-added events for observer dispatch.
     add_events: Vec<(u32, String)>,
     /// Pending component-removed events for observer dispatch.
     remove_events: Vec<(u32, String)>,
+    /// Packed entity IDs whose components changed since the last `take_component_events` call.
+    dirty_set: HashSet<u32>,
     /// Directed named relationship links between entities.
     pub relationships: RelationshipManager,
 }
@@ -88,8 +100,10 @@ impl Universe {
             blueprint_store: None,
             system_store: None,
             system_priorities: Vec::new(),
+            system_phases: Vec::new(),
             add_events: Vec::new(),
             remove_events: Vec::new(),
+            dirty_set: HashSet::new(),
             relationships: RelationshipManager::new(),
         }
     }
@@ -417,6 +431,7 @@ impl Universe {
         };
         entity_table.set(name, value.clone())?;
         self.add_events.push((id, name.to_string()));
+        self.dirty_set.insert(id);
         Ok(())
     }
 
@@ -490,6 +505,7 @@ impl Universe {
                 if !had.is_nil() {
                     entity_table.set(name, LuaValue::Nil)?;
                     self.remove_events.push((id, name.to_string()));
+                    self.dirty_set.insert(id);
                 }
             }
         }
@@ -1077,29 +1093,57 @@ impl Universe {
 
     /// Adds a system (Lua table) to the system list at the given priority (lower = first).
     ///
+    /// The optional `phase` string assigns the system to a named execution phase.
+    /// An empty string is treated as `"update"`.
+    ///
     /// # Parameters
     /// - `lua` — `&Lua`.
     /// - `system` — `Table`.
     /// - `priority` — `i32`.
+    /// - `phase` — `String`: phase name (`""` means `"update"`).
     ///
     /// # Returns
     /// `LuaResult<()>`.
-    pub fn add_system(&mut self, lua: &Lua, system: Table, priority: i32) -> LuaResult<()> {
+    pub fn add_system(&mut self, lua: &Lua, system: Table, priority: i32, phase: String) -> LuaResult<()> {
         self.ensure_stores(lua)?;
         let store = self.get_system_store(lua)?;
         let len = store.raw_len();
         store.set(len + 1, system)?;
         self.system_priorities.push(priority);
+        self.system_phases.push(phase);
         Ok(())
     }
 
-    /// Returns 1-based system store indices sorted by ascending priority.
+    /// Returns all 1-based system store indices sorted by ascending priority across all phases.
+    /// Used by `emit` which broadcasts to every registered system regardless of phase.
     ///
     /// # Returns
     /// `Vec<usize>`.
-    pub fn get_sorted_system_indices(&self) -> Vec<usize> {
+    pub fn get_sorted_system_indices_all(&self) -> Vec<usize> {
         let count = self.system_priorities.len();
         let mut order: Vec<usize> = (1..=count).collect();
+        order.sort_by_key(|&i| self.system_priorities[i - 1]);
+        order
+    }
+
+    /// Returns 1-based system store indices sorted by ascending priority, filtered to the given phase.
+    /// An empty `phase` string matches systems assigned to `"update"` (the default phase).
+    ///
+    /// # Parameters
+    /// - `phase` — `&str`: empty string matches `"update"`.
+    ///
+    /// # Returns
+    /// `Vec<usize>`.
+    pub fn get_sorted_system_indices_for_phase(&self, phase: &str) -> Vec<usize> {
+        let target = if phase.is_empty() { "update" } else { phase };
+        let count = self.system_priorities.len();
+        let mut order: Vec<usize> = (1..=count)
+            .filter(|&i| {
+                let p = &self.system_phases[i - 1];
+                let effective = if p.is_empty() { "update" } else { p.as_str() };
+                effective == target
+            })
+            .collect();
         order.sort_by_key(|&i| self.system_priorities[i - 1]);
         order
     }
@@ -1126,9 +1170,12 @@ impl Universe {
                     store.set(j, next)?;
                 }
                 store.set(len, LuaValue::Nil)?;
-                // Remove the parallel priority entry (i is 1-based, vec is 0-based)
+                // Remove the parallel priority + phase entries (i is 1-based, vec is 0-based)
                 if i <= self.system_priorities.len() {
                     self.system_priorities.remove(i - 1);
+                }
+                if i <= self.system_phases.len() {
+                    self.system_phases.remove(i - 1);
                 }
                 return Ok(());
             }
@@ -1173,8 +1220,10 @@ impl Universe {
         self.parents.clear();
         self.children.clear();
         self.system_priorities.clear();
+        self.system_phases.clear();
         self.add_events.clear();
         self.remove_events.clear();
+        self.dirty_set.clear();
         // Clear component store
         if let Some(ref key) = self.component_store {
             let store: Table = lua.registry_value(key)?;
@@ -1202,6 +1251,7 @@ impl Universe {
     // === Observer Events ===
 
     /// Takes and clears all pending component-add and component-remove events.
+    /// Also drains the dirty-entity set so callers receive the full change batch.
     ///
     /// # Returns
     /// `(Vec<(u32, String)>, Vec<(u32, String)>)` — (add_events, remove_events).
@@ -1209,7 +1259,20 @@ impl Universe {
     pub fn take_component_events(&mut self) -> (Vec<(u32, String)>, Vec<(u32, String)>) {
         let adds = std::mem::take(&mut self.add_events);
         let removes = std::mem::take(&mut self.remove_events);
+        self.dirty_set.clear();
         (adds, removes)
+    }
+
+    /// Returns all entity IDs whose components changed since the last `take_component_events` call.
+    ///
+    /// Entities are returned sorted. The set is cleared by `take_component_events` (or `flushObservers`).
+    ///
+    /// # Returns
+    /// `Vec<u32>`.
+    pub fn get_dirty_entities(&self) -> Vec<u32> {
+        let mut ids: Vec<u32> = self.dirty_set.iter().copied().collect();
+        ids.sort();
+        ids
     }
 
     // === Query Extensions ===
@@ -1267,6 +1330,52 @@ impl Universe {
         }
         result.sort();
         Ok(result)
+    }
+
+    /// Calls `callback(id, comp1, comp2, …)` for every alive entity that has ALL listed components.
+    ///
+    /// This is a zero-allocation alternative to `query` when you also need the component values in
+    /// the same loop.  The callback receives the entity ID followed by each component value in the
+    /// order the names were supplied.
+    ///
+    /// # Parameters
+    /// - `lua` — `&Lua`.
+    /// - `names` — `&[String]`: component names that must all be present.
+    /// - `callback` — `Function`: called as `callback(id, val1, val2, …)`.
+    ///
+    /// # Returns
+    /// `LuaResult<()>`.
+    pub fn query_multi(&self, lua: &Lua, names: &[String], callback: Function) -> LuaResult<()> {
+        if names.is_empty() {
+            return Ok(());
+        }
+        if let Some(ref key) = self.component_store {
+            let store: Table = lua.registry_value(key)?;
+            let mut slots: Vec<u32> = self.alive.iter().copied().collect();
+            slots.sort();
+            for slot in slots {
+                if let Ok(entity_table) = store.get::<_, Table>(slot) {
+                    let mut vals: Vec<LuaValue> = Vec::with_capacity(names.len());
+                    let mut all = true;
+                    for name in names {
+                        let v: LuaValue = entity_table.get(name.as_str())?;
+                        if v.is_nil() {
+                            all = false;
+                            break;
+                        }
+                        vals.push(v);
+                    }
+                    if all {
+                        let id = Self::pack_id(slot, self.current_gen(slot));
+                        let mut args = Vec::with_capacity(1 + vals.len());
+                        args.push(LuaValue::Integer(id as i64));
+                        args.extend(vals);
+                        callback.call::<_, ()>(mlua::MultiValue::from_vec(args))?;
+                    }
+                }
+            }
+        }
+        Ok(())
     }
 
     // === Bulk Spawning ===

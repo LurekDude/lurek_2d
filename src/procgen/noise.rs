@@ -1298,3 +1298,59 @@ impl NoiseGenerator {
         map
     }
 }
+
+    // ── Periodic Perlin noise ──────────────────────────────────────────────────
+
+    /// Periodic Perlin noise that tiles seamlessly over period `(px, py)`.
+    ///
+    /// # Parameters
+    /// - `x` — `f64`.
+    /// - `y` — `f64`.
+    /// - `px` — `f64` — Horizontal tile period (clamped to ≥ 1).
+    /// - `py` — `f64` — Vertical tile period (clamped to ≥ 1).
+    ///
+    /// # Returns
+    /// `f64` roughly in `[-1.0, 1.0]`.
+    pub fn perlin_noise_periodic(x: f64, y: f64, px: f64, py: f64) -> f64 {
+        let px = px.max(1.0) as i64;
+        let py = py.max(1.0) as i64;
+
+        let xi = x.floor() as i64;
+        let yi = y.floor() as i64;
+        let xf = x - x.floor();
+        let yf = y - y.floor();
+
+        let fade = |t: f64| t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+        let u = fade(xf);
+        let v = fade(yf);
+
+        let wrap_x = |i: i64| ((i % px) + px) % px;
+        let wrap_y = |i: i64| ((i % py) + py) % py;
+
+        let grad = |hash: i64, gx: f64, gy: f64| -> f64 {
+            match hash & 3 {
+                0 => gx + gy,
+                1 => -gx + gy,
+                2 => gx - gy,
+                3 => -gx - gy,
+                _ => 0.0,
+            }
+        };
+
+        let perm_hash = |ix: i64, iy: i64| -> i64 {
+            let h = (wrap_x(ix).wrapping_mul(374761393) as u64)
+                .wrapping_add(wrap_y(iy).wrapping_mul(668265263) as u64);
+            let h = h.wrapping_mul(h).wrapping_mul(h).wrapping_mul(60493);
+            (h >> 13) as i64
+        };
+
+        let n00 = grad(perm_hash(xi, yi), xf, yf);
+        let n10 = grad(perm_hash(xi + 1, yi), xf - 1.0, yf);
+        let n01 = grad(perm_hash(xi, yi + 1), xf, yf - 1.0);
+        let n11 = grad(perm_hash(xi + 1, yi + 1), xf - 1.0, yf - 1.0);
+
+        let lerp = |t: f64, a: f64, b: f64| a + t * (b - a);
+        let x1 = lerp(u, n00, n10);
+        let x2 = lerp(u, n01, n11);
+        lerp(v, x1, x2)
+    }

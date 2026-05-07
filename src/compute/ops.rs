@@ -17,6 +17,15 @@ const PAR_THRESHOLD: usize = 10_000;
 // Helpers
 // ---------------------------------------------------------------------------
 
+/// Run an index-based operation either serially or with Rayon.
+fn dispatch_parallel(size: usize, op: impl Fn(usize) -> f64 + Sync + Send) -> Vec<f64> {
+    if size > PAR_THRESHOLD {
+        (0..size).into_par_iter().map(op).collect()
+    } else {
+        (0..size).map(op).collect()
+    }
+}
+
 /// Validate two arrays have the same shape and dtype for element-wise ops.
 fn check_same_shape_dtype(a: &NdArray, b: &NdArray) -> Result<(), String> {
     if a.shape() != b.shape() {
@@ -42,39 +51,67 @@ fn elementwise_binary(
     b: &NdArray,
     op: fn(f64, f64) -> f64,
 ) -> Result<NdArray, String> {
-    check_same_shape_dtype(a, b)?;
-    let mut out = NdArray::zeros(a.shape(), a.dtype())?;
-    if a.size() > PAR_THRESHOLD {
-        let vals: Vec<f64> = (0..a.size())
-            .into_par_iter()
-            .map(|i| op(a.get_f64(i), b.get_f64(i)))
-            .collect();
+    if a.dtype() != b.dtype() {
+        return Err(format!(
+            "dtype mismatch: {} vs {}",
+            a.dtype().name(),
+            b.dtype().name()
+        ));
+    }
+
+    // Fast path: identical shape.
+    if a.shape() == b.shape() {
+        let mut out = NdArray::zeros(a.shape(), a.dtype())?;
+        let vals = dispatch_parallel(a.size(), |i| op(a.get_f64(i), b.get_f64(i)));
         for (i, v) in vals.into_iter().enumerate() {
             out.set_f64(i, v);
         }
-    } else {
-        for i in 0..a.size() {
-            out.set_f64(i, op(a.get_f64(i), b.get_f64(i)));
-        }
+        return Ok(out);
     }
-    Ok(out)
+
+    // Row broadcast: [rows, cols] OP [cols].
+    if a.ndim() == 2 && b.ndim() == 1 && a.shape()[1] == b.shape()[0] {
+        let rows = a.shape()[0];
+        let cols = a.shape()[1];
+        let mut out = NdArray::zeros(a.shape(), a.dtype())?;
+        for r in 0..rows {
+            for c in 0..cols {
+                let af = a.flat_index(&[r, c]).expect("index in bounds");
+                let of = out.flat_index(&[r, c]).expect("index in bounds");
+                out.set_f64(of, op(a.get_f64(af), b.get_f64(c)));
+            }
+        }
+        return Ok(out);
+    }
+
+    // Row broadcast: [cols] OP [rows, cols].
+    if a.ndim() == 1 && b.ndim() == 2 && a.shape()[0] == b.shape()[1] {
+        let rows = b.shape()[0];
+        let cols = b.shape()[1];
+        let mut out = NdArray::zeros(b.shape(), b.dtype())?;
+        for r in 0..rows {
+            for c in 0..cols {
+                let bf = b.flat_index(&[r, c]).expect("index in bounds");
+                let of = out.flat_index(&[r, c]).expect("index in bounds");
+                out.set_f64(of, op(a.get_f64(c), b.get_f64(bf)));
+            }
+        }
+        return Ok(out);
+    }
+
+    Err(format!(
+        "shape mismatch: {:?} vs {:?}; expected equal shapes or 2D<->1D row broadcast",
+        a.shape(),
+        b.shape()
+    ))
 }
 
 /// Apply an element-wise unary op → new array.
 fn elementwise_unary(a: &NdArray, op: fn(f64) -> f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
-    if a.size() > PAR_THRESHOLD {
-        let vals: Vec<f64> = (0..a.size())
-            .into_par_iter()
-            .map(|i| op(a.get_f64(i)))
-            .collect();
-        for (i, v) in vals.into_iter().enumerate() {
-            out.set_f64(i, v);
-        }
-    } else {
-        for i in 0..a.size() {
-            out.set_f64(i, op(a.get_f64(i)));
-        }
+    let vals = dispatch_parallel(a.size(), |i| op(a.get_f64(i)));
+    for (i, v) in vals.into_iter().enumerate() {
+        out.set_f64(i, v);
     }
     Ok(out)
 }
@@ -82,20 +119,53 @@ fn elementwise_unary(a: &NdArray, op: fn(f64) -> f64) -> Result<NdArray, String>
 /// Apply an element-wise (element, scalar) op → new array.
 fn elementwise_scalar(a: &NdArray, s: f64, op: fn(f64, f64) -> f64) -> Result<NdArray, String> {
     let mut out = NdArray::zeros(a.shape(), a.dtype())?;
-    if a.size() > PAR_THRESHOLD {
-        let vals: Vec<f64> = (0..a.size())
-            .into_par_iter()
-            .map(|i| op(a.get_f64(i), s))
-            .collect();
-        for (i, v) in vals.into_iter().enumerate() {
-            out.set_f64(i, v);
-        }
-    } else {
-        for i in 0..a.size() {
-            out.set_f64(i, op(a.get_f64(i), s));
-        }
+    let vals = dispatch_parallel(a.size(), |i| op(a.get_f64(i), s));
+    for (i, v) in vals.into_iter().enumerate() {
+        out.set_f64(i, v);
     }
     Ok(out)
+}
+
+/// Apply an element-wise op in place on `a` using `b`.
+///
+/// Supports equal-shape arrays and [rows, cols] OP [cols] row broadcasting.
+fn elementwise_binary_inplace(
+    a: &mut NdArray,
+    b: &NdArray,
+    op: fn(f64, f64) -> f64,
+) -> Result<(), String> {
+    if a.dtype() != b.dtype() {
+        return Err(format!(
+            "dtype mismatch: {} vs {}",
+            a.dtype().name(),
+            b.dtype().name()
+        ));
+    }
+
+    if a.shape() == b.shape() {
+        for i in 0..a.size() {
+            a.set_f64(i, op(a.get_f64(i), b.get_f64(i)));
+        }
+        return Ok(());
+    }
+
+    if a.ndim() == 2 && b.ndim() == 1 && a.shape()[1] == b.shape()[0] {
+        let rows = a.shape()[0];
+        let cols = a.shape()[1];
+        for r in 0..rows {
+            for c in 0..cols {
+                let af = a.flat_index(&[r, c]).expect("index in bounds");
+                a.set_f64(af, op(a.get_f64(af), b.get_f64(c)));
+            }
+        }
+        return Ok(());
+    }
+
+    Err(format!(
+        "shape mismatch: {:?} vs {:?}; expected equal shapes or [rows, cols] OP [cols]",
+        a.shape(),
+        b.shape()
+    ))
 }
 
 /// Validate that axis is within the array's ndim.
@@ -953,8 +1023,8 @@ pub fn reshape(a: &NdArray, new_shape: &[usize]) -> Result<NdArray, String> {
             new_total,
         ));
     }
-    if new_shape.is_empty() || new_shape.len() > 3 {
-        return Err(format!("ndim must be 1, 2, or 3, got {}", new_shape.len()));
+    if new_shape.is_empty() {
+        return Err("ndim must be >= 1".to_string());
     }
     let mut out = a.clone();
     let strides = NdArray::compute_strides(new_shape);
@@ -995,9 +1065,35 @@ pub fn transpose_2d(a: &NdArray) -> Result<NdArray, String> {
 /// - `a` — `&mut NdArray`.
 /// - `val` — `f64`.
 pub fn fill(a: &mut NdArray, val: f64) {
-    for i in 0..a.size() {
-        a.set_f64(i, val);
-    }
+    a.fill(val);
+}
+
+/// In-place element-wise addition.
+///
+/// Supports equal-shape arrays and [rows, cols] + [cols] row broadcasting.
+pub fn add_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
+    elementwise_binary_inplace(a, b, |x, y| x + y)
+}
+
+/// In-place element-wise subtraction.
+///
+/// Supports equal-shape arrays and [rows, cols] - [cols] row broadcasting.
+pub fn sub_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
+    elementwise_binary_inplace(a, b, |x, y| x - y)
+}
+
+/// In-place element-wise multiplication.
+///
+/// Supports equal-shape arrays and [rows, cols] * [cols] row broadcasting.
+pub fn mul_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
+    elementwise_binary_inplace(a, b, |x, y| x * y)
+}
+
+/// In-place element-wise division.
+///
+/// Supports equal-shape arrays and [rows, cols] / [cols] row broadcasting.
+pub fn div_inplace(a: &mut NdArray, b: &NdArray) -> Result<(), String> {
+    elementwise_binary_inplace(a, b, |x, y| x / y)
 }
 
 /// Clone an array (convenience wrapper).

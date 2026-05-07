@@ -35,12 +35,49 @@ REPO = Path(__file__).resolve().parent.parent.parent
 LUA_API_DIR = REPO / "src" / "lua_api"
 SPECS_DIR = REPO / "docs" / "specs"
 
-# Pattern: tbl.set("function_name", ...)
+# Pattern: fallback extraction for direct Lua table registration in *_api.rs.
 _TBLSET_RE = re.compile(r'tbl\.set\(\s*"([A-Za-z_][A-Za-z0-9_]*)"\s*,')
-# Pattern: function name appearing in spec Lua API section as `lurek.module.name(`
-_SPEC_FN_RE = re.compile(r"`lurek\.\w+\.(\w+)\s*\(")
-# Pattern: method name as `ClassName:name(` or `lurek.module.ClassName:name(`
-_SPEC_METHOD_RE = re.compile(r"`(?:[\w.]+:)?(\w+)\s*\(")
+# Parse only bullet labels in spec `## Lua API Reference` to avoid matching
+# code spans used in descriptions.
+_BULLET_LABEL_RE = re.compile(r"^\s*-\s*`([^`]+)`")
+
+_LUA_API_DATA_FILE = REPO / "logs" / "data" / "lua_api_data.json"
+_LUA_API_BINDINGS_CACHE: Dict[str, List[str]] = {}
+
+
+def _load_lua_api_bindings() -> Dict[str, List[str]]:
+    """Load module -> [Lua function/method names] from lua_api_data.json."""
+    global _LUA_API_BINDINGS_CACHE
+    if _LUA_API_BINDINGS_CACHE:
+        return _LUA_API_BINDINGS_CACHE
+
+    if not _LUA_API_DATA_FILE.exists():
+        _LUA_API_BINDINGS_CACHE = {}
+        return _LUA_API_BINDINGS_CACHE
+
+    try:
+        data = json.loads(_LUA_API_DATA_FILE.read_text(encoding="utf-8", errors="replace"))
+    except Exception:
+        _LUA_API_BINDINGS_CACHE = {}
+        return _LUA_API_BINDINGS_CACHE
+
+    modules = data.get("lua_api", {}).get("modules", {})
+    out: Dict[str, List[str]] = {}
+    for module, payload in modules.items():
+        names: List[str] = []
+        for fn in payload.get("functions", []):
+            name = fn.get("name")
+            if isinstance(name, str) and name:
+                names.append(name)
+        for cls in payload.get("classes", {}).values():
+            for method in cls.get("methods", []):
+                name = method.get("name")
+                if isinstance(name, str) and name:
+                    names.append(name)
+        out[module] = names
+
+    _LUA_API_BINDINGS_CACHE = out
+    return _LUA_API_BINDINGS_CACHE
 
 
 def _find_modules() -> List[str]:
@@ -53,7 +90,16 @@ def _find_modules() -> List[str]:
 
 
 def _bound_functions(api_rs: Path) -> List[str]:
-    """Return all function names registered via tbl.set() in an _api.rs file."""
+    """Return all bound Lua API names for a module.
+
+    Preferred source is logs/data/lua_api_data.json (generator output used by docs).
+    Fallback is legacy tbl.set() extraction for direct module-level bindings.
+    """
+    module = api_rs.stem[: -len("_api")] if api_rs.stem.endswith("_api") else api_rs.stem
+    bindings = _load_lua_api_bindings().get(module)
+    if bindings is not None:
+        return bindings
+
     text = api_rs.read_text(encoding="utf-8", errors="replace")
     return _TBLSET_RE.findall(text)
 
@@ -69,10 +115,29 @@ def _spec_api_names(spec_path: Path) -> set[str]:
         return set()
     section = m.group(1)
     names: set[str] = set()
-    for fn_name in _SPEC_FN_RE.findall(section):
-        names.add(fn_name)
-    for fn_name in _SPEC_METHOD_RE.findall(section):
-        names.add(fn_name)
+    for line in section.splitlines():
+        m_label = _BULLET_LABEL_RE.match(line)
+        if not m_label:
+            continue
+        label = m_label.group(1).strip()
+
+        # Drop call signature if present, e.g. foo(bar) -> foo
+        label = label.split("(", 1)[0].strip()
+
+        if ":" in label:
+            # Method style: Class:method or lurek.module.Class:method
+            names.add(label.rsplit(":", 1)[1])
+            continue
+
+        if "." in label:
+            # Function style: lurek.module.fn or other dotted identifiers.
+            names.add(label.rsplit(".", 1)[1])
+            continue
+
+        # Fallback: plain function label.
+        if label:
+            names.add(label)
+
     return names
 
 

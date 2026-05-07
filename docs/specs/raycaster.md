@@ -7,35 +7,13 @@
 - Lua API path(s): `src/lua_api/raycaster_api.rs`
 - Primary Lua namespace: `lurek.raycaster`
 - Rust test path(s): tests/rust/unit/raycaster_tests.rs
-- Lua test path(s): tests/lua/unit/test_raycaster.lua, tests/lua/evidence/test_evidence_raycaster.lua
+- Lua test path(s): tests/lua/unit/test_raycaster_core_unit.lua, tests/lua/evidence/test_raycaster_evidence.lua
 
 ## Summary
 
-## Summary
+The `raycaster` module is documented from the current source tree and existing module reference data.
 
-The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenstein-style first-person dungeon-crawler and retro FPS games. It is a Feature Systems tier module providing DDA grid traversal, textured wall columns, billboard sprites, dynamic lighting, doors, floor/ceiling variation, and screen-space visibility. All rendering produces `RenderCommand` output consumed by the standard wgpu renderer.
-
-**DDA traversal.** `Raycaster2D` is the core Digital Differential Analyzer type. Given a player position, direction, camera plane width, and a 2D grid of tile IDs, it casts a horizontal array of rays — one per screen column — returning a `Vec<RayHit>`. Each `RayHit` carries the grid cell coordinates, struck face (North/South/East/West), hit offset along the face (for texture U coordinate), perpendicular distance from the camera plane, and the tile ID.
-
-**Projection and depth.** `project_column(dist, height)` converts perpendicular distance to a projected wall column pixel height. `distance_shade(dist, max_dist)` produces a linear fog factor. `DepthBuffer` records perpendicular depth per screen column for sprite occlusion testing. `ColumnBatch` assembles per-column draw data into instanced quad render commands for a single GPU draw call.
-
-**Floor and ceiling.** `cast_floor_row(y, player, plane)` computes floor and ceiling UV texture coordinates for a screen row, enabling fully textured floor and ceiling surfaces. Each cell can have independent floor and ceiling tile IDs. This completes the Wolfenstein-style visual feature set where floor and ceiling textures are as important as wall textures.
-
-**Sprites.** `SpriteProjection` projects billboarded sprites into screen space with depth buffer clipping and scale calculation. `SpriteManager` manages a batch of world-space sprites with depth-sorted rendering. Sprites render in front of walls at the correct depth using the perpendicular depth buffer from the wall pass.
-
-**Doors.** `DoorManager` manages sliding door states (open, closed, opening, closing) for grid-blocking interactive geometry. `DoorDirection` describes how a door slides (horizontal, vertical). `DoorState` tracks animation progress. Doors occupy grid cells and are included in the DDA traversal as special half-blocked cells.
-
-**Height variation.** `HeightMap` adds variable floor and ceiling heights for stepped or multi-level environments. Per-cell height offsets are applied during column projection.
-
-**Lighting.** `lighting.rs` defines point lights and computes influence values for projected wall geometry. Point lights contribute a shading multiplier per wall column based on distance and angle. Used for torch effects, coloured ambient zones, and dynamic scene lighting without GPU deferred passes.
-
-**Visibility.** `visibility.rs` computes a 2D visibility polygon via endpoint raycasting for field-of-view shadows. The segment raycaster in `segment.rs` provides `cast_ray_2d` line-segment intersection for non-grid geometry.
-
-**Scene model.** `RaycasterScene` is the high-level scene representation: map, floor/ceiling tile atlas, sprite list, lights, and door states. `build_scene.rs` constructs a scene from these inputs. `render.rs` converts the scene to `RenderCommand` sequences for textured-quad rendering.
-
-**Lua surface.** `lurek.raycaster.new(map, screen_w, screen_h)` creates a raycaster. Methods: `setPlayer(x, y, angle, fov)`, `cast()` → hit array, `render(tex_atlas, commands)`, `setFloor(x, y, tile_id)`, `setCeiling(x, y, tile_id)`, `addSprite(id, x, y, tex)`, `addLight(x, y, radius, color)`, `addDoor(x, y, dir)`, `openDoor(id)`, `closeDoor(id)`, `update(dt)`, `floorRow(y)` → UV table, `visibility(segments)` → polygon.
-
-**Scope boundary.** Feature Systems tier. Depends on `render`, `math`, `runtime`. Plugin candidacy under proposed constraint A-05 (see `docs/architecture/plugins.md`). Lua bridge in `src/lua_api/raycaster_api.rs`.
+This module primarily collaborates with `image`, `math`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -45,6 +23,7 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 - `depth_buffer.rs`: Stores per-column depth values for sprite occlusion and front-to-back visibility checks.
 - `doors.rs`: Manages door state, orientation, and sliding animation timing for grid-based raycast worlds.
 - `draw.rs`: Provides CPU-side image drawing for `RaycasterScene`, useful for software rendering or headless verification.
+- `grid_motion.rs`: Provides shared 4-direction movement helpers (`forward/back/left/right`) and collision-aware movement stepping.
 - `heightmap.rs`: Tracks per-cell floor and ceiling height variation for stepped or multi-height raycast spaces.
 - `lighting.rs`: Defines point lights and computes light influence or lit shading values for projected geometry.
 - `minimap_overlay.rs`: Extracts minimap-friendly data and player-arrow overlays from raycast world state.
@@ -61,9 +40,11 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 
 ## Types
 
+- `LoweredFloorCell` (`struct`, `build_scene.rs`): Auto-doc: public item.
 - `SceneBuildParams` (`struct`, `build_scene.rs`): Parameters for building a raycaster scene.
 - `WorldSprite` (`struct`, `build_scene.rs`): A world-space sprite for scene building.
 - `TextureLookup` (`type`, `build_scene.rs`): Texture lookup function type.
+- `CellTextureLookup` (`type`, `build_scene.rs`): Per-cell texture lookup function type.
 - `ColumnData` (`struct`, `column_batch.rs`): One projected column entry inside a `ColumnBatch`.
 - `ColumnBatch` (`struct`, `column_batch.rs`): Column-oriented wall rendering payload for strip-based outputs.
 - `Raycaster2D` (`struct`, `dda.rs`): The main DDA grid raycaster over integer world cells. It answers ray hits, multi-ray sweeps, and line-of-sight checks.
@@ -72,13 +53,16 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 - `DoorState` (`enum`, `doors.rs`): Encodes whether a door is closed, opening, open, or closing.
 - `Door` (`struct`, `doors.rs`): One animated door in a raycast map.
 - `DoorManager` (`struct`, `doors.rs`): Owns door records and their animation state over time.
+- `GridMoveAction` (`enum`, `grid_motion.rs`): Camera-relative movement action for 4-directional movement.
 - `HeightMap` (`struct`, `heightmap.rs`): Per-cell floor and ceiling height data for non-flat raycast worlds.
 - `PointLight` (`struct`, `lighting.rs`): A point light source used by the optional lighting helpers.
+- `MinimapTileSample` (`struct`, `minimap_overlay.rs`): One sampled minimap tile with blocked/visible/light fields.
 - `RayHit` (`struct`, `ray_hit.rs`): A single cast result describing hit distance, impacted cell, hit side, texture coordinate, and hit position.
 - `WallQuad` (`struct`, `scene.rs`): One textured wall polygon in a built raycaster scene.
 - `FloorQuad` (`struct`, `scene.rs`): One projected floor polygon in a built raycaster scene.
 - `CeilingQuad` (`struct`, `scene.rs`): One projected ceiling polygon in a built raycaster scene.
 - `BillboardSprite` (`struct`, `scene.rs`): A sprite projected into the raycast view that still faces the camera.
+- `ModelMesh` (`struct`, `scene.rs`): A projected 3D model instance stored as a screen-space mesh.
 - `RaycasterScene` (`struct`, `scene.rs`): A render-ready scene assembled from raycast results, carrying quads for walls, floors, ceilings, and sprites.
 - `Segment` (`struct`, `segment.rs`): A line segment for raycasting.
 - `WorldSprite` (`struct`, `sprite_manager.rs`): A world-space sprite for scene building.
@@ -130,6 +114,9 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 - `DoorManager::get_door_at` (`doors.rs`): Finds a door at grid position (x, y), if any.
 - `DoorManager::doors` (`doors.rs`): Returns a slice of all managed doors.
 - `RaycasterScene::draw_to_image` (`draw.rs`): Renders the scene to a CPU image for headless testing and screenshots.
+- `GridMoveAction::parse` (`grid_motion.rs`): Parses Lua-facing action token.
+- `dir4_delta` (`grid_motion.rs`): Returns movement delta for direction index `1..4` and action token (`forward/back/left/right`).
+- `try_move` (`grid_motion.rs`): Applies a movement delta with bounds and collision checks.
 - `HeightMap::new` (`heightmap.rs`): Creates a new height map with default values (floor=0.0, ceiling=1.0).
 - `HeightMap::set_floor` (`heightmap.rs`): Sets the floor height at (x, y).
 - `HeightMap::set_ceiling` (`heightmap.rs`): Sets the ceiling height at (x, y).
@@ -141,6 +128,9 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 - `apply_lit_shade` (`lighting.rs`): Applies lighting to a distance-shaded base brightness.
 - `extract_minimap` (`minimap_overlay.rs`): Extracts a top-down minimap from a Raycaster2D grid.
 - `draw_player_arrow` (`minimap_overlay.rs`): Renders a simple directional arrow for the player on the minimap.
+- `compute_tile_light` (`minimap_overlay.rs`): Computes LOS-aware ambient + point-light color for a tile center.
+- `build_minimap_tile_window` (`minimap_overlay.rs`): Returns sampled minimap tile records around a world-space center.
+- `reveal_cells_from_rays` (`minimap_overlay.rs`): Traces multiple rays and returns unique crossed grid cells.
 - `project_column` (`projection.rs`): Projects a wall column distance to screen-space drawing parameters.
 - `distance_shade` (`projection.rs`): Distance-based shading.
 - `RaycasterScene::generate_render_commands` (`render.rs`): Converts the entire scene into render commands.
@@ -178,49 +168,81 @@ The `raycaster` module implements a grid-based 2D raycasting engine for Wolfenst
 - `lurek.raycaster.newPointLight`: Creates a point light for use in raycaster scene lighting.
 - `lurek.raycaster.newSpriteManager`: Creates a new empty batch sprite manager for depth-sorted projection.
 
-### `DoorManager` Methods
-- `DoorManager:openDoor`: Begins opening the door at the given index.
-- `DoorManager:closeDoor`: Begins closing the door at the given index.
-- `DoorManager:update`: Advances all door animations by dt seconds.
-- `DoorManager:getDoor`: Returns the state table for door at index, or nil if out of range.
-- `DoorManager:count`: Returns the number of registered doors.
-- `DoorManager:type`: Returns the type string "DoorManager".
-- `DoorManager:typeOf`: Returns the type string "DoorManager".
+### `LDoorManager` Methods
+- `LDoorManager:addDoor`: Registers a door at grid position (x, y).
+- `LDoorManager:openDoor`: Begins opening the door at the given index.
+- `LDoorManager:closeDoor`: Begins closing the door at the given index.
+- `LDoorManager:update`: Advances all door animations by dt seconds.
+- `LDoorManager:getDoor`: Returns the state table for door at index, or nil if out of range.
+- `LDoorManager:count`: Returns the number of registered doors.
+- `LDoorManager:type`: Returns the Lua type name for this userdata.
+- `LDoorManager:typeOf`: Returns true if this object is of the given type.
 
-### `HeightMap` Methods
-- `HeightMap:setFloor`: Sets the floor height at (x, y).
-- `HeightMap:setCeiling`: Sets the ceiling height at (x, y).
-- `HeightMap:floorAt`: Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
-- `HeightMap:ceilingAt`: Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
-- `HeightMap:type`: Returns the type string "HeightMap".
-- `HeightMap:typeOf`: Returns the type string "HeightMap".
+### `LHeightMap` Methods
+- `LHeightMap:setFloor`: Sets the floor height at (x, y).
+- `LHeightMap:setCeiling`: Sets the ceiling height at (x, y).
+- `LHeightMap:floorAt`: Returns the floor height at (x, y). Returns 0.0 for out-of-bounds.
+- `LHeightMap:ceilingAt`: Returns the ceiling height at (x, y). Returns 1.0 for out-of-bounds.
+- `LHeightMap:type`: Returns the type string "HeightMap".
+- `LHeightMap:typeOf`: Returns true if this object is of the given type.
 
-### `PointLight` Methods
-- `PointLight:x`: Returns the world-space X position.
-- `PointLight:y`: Returns the world-space Y position.
-- `PointLight:radius`: Returns the illumination radius.
-- `PointLight:intensity`: Returns the intensity multiplier.
-- `PointLight:color`: Returns the RGB color as three separate values.
-- `PointLight:type`: Returns the type string "PointLight".
-- `PointLight:typeOf`: Returns the type string "PointLight".
+### `LPointLight` Methods
+- `LPointLight:x`: Returns the world-space X position.
+- `LPointLight:y`: Returns the world-space Y position.
+- `LPointLight:radius`: Returns the illumination radius.
+- `LPointLight:intensity`: Returns the intensity multiplier.
+- `LPointLight:color`: Returns the RGB color as three separate values.
+- `LPointLight:set`: Updates all light properties at once.
+- `LPointLight:type`: Returns the type string "PointLight".
+- `LPointLight:typeOf`: Returns true if this object is of the given type.
 
-### `Raycaster` Methods
-- `Raycaster:setCell`: Sets the cell value at grid position (x, y).
-- `Raycaster:getCell`: Returns the cell value at (x, y).
-- `Raycaster:setCells`: Replaces all grid cells from a flat array of values in row-major order.
-- `Raycaster:isBlocked`: Returns true when the cell at (x, y) is a wall (value > 0).
-- `Raycaster:width`: Returns the grid width in cells.
-- `Raycaster:height`: Returns the grid height in cells.
-- `Raycaster:setWallAlpha`: Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
-- `Raycaster:getWallAlpha`: Returns the opacity for a wall tile type. Returns 1.0 if not set.
+### `LRaycaster` Methods
+- `LRaycaster:setCell`: Sets the cell value at grid position (x, y).
+- `LRaycaster:getCell`: Returns the cell value at (x, y).
+- `LRaycaster:setCells`: Replaces all grid cells from a flat array of values in row-major order.
+- `LRaycaster:isBlocked`: Returns true when the cell at (x, y) is a wall (value > 0).
+- `LRaycaster:width`: Returns the grid width in cells.
+- `LRaycaster:height`: Returns the grid height in cells.
+- `LRaycaster:setFloorTextureCell`: Sets or clears a floor texture override for a map cell.
+- `LRaycaster:getFloorTextureCell`: Returns floor texture override id for a map cell, or nil when unset.
+- `LRaycaster:setCeilingTextureCell`: Sets or clears a ceiling texture override for a map cell.
+- `LRaycaster:getCeilingTextureCell`: Returns ceiling texture override id for a map cell, or nil when unset.
+- `LRaycaster:setLoweredFloorCell`: Sets or clears a lowered floor cell such as water or lava.
+- `LRaycaster:getLoweredFloorCell`: Returns lowered floor cell config for a map cell, or nil when unset.
+- `LRaycaster:isWalkBlocked`: Returns true if the cell cannot be entered because of a wall or a blocked lowered floor cell.
+- `LRaycaster:tryMove`: Attempts to move by (dx, dy) in world space while respecting map and lowered-floor blocking.
+- `LRaycaster:gridMove`: Attempts a 4-direction movement action (`forward`, `back`, `left`, `right`) from dir 1..4.
+- `LRaycaster:castRay`: Casts a single ray and returns a hit table, or nil if nothing was hit.
+- `LRaycaster:castRays`: Casts multiple rays across a field of view, returns an array of hit tables.
+- `LRaycaster:castRaysFlat`: Casts multiple rays and returns a flat array of 5 floats per ray.
+- `LRaycaster:lineOfSight`: Checks line of sight between two points using DDA traversal.
+- `LRaycaster:revealCellsFromRays`: Traces multiple rays and returns unique crossed cells for fog-of-war reveal.
+- `LRaycaster:computeTileLight`: Computes LOS-aware tile lighting from ambient and point lights.
+- `LRaycaster:buildMinimapWindow`: Builds sampled minimap tile records around a world-space center.
+- `LRaycaster:setWallAlpha`: Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
+- `LRaycaster:getWallAlpha`: Returns the opacity for a wall tile type. Returns 1.0 if not set.
+- `LRaycaster:castRayMulti`: Casts a ray collecting up to max_hits wall layers, continuing through
+- `LRaycaster:castFloorRow`: Computes floor (or ceiling) texture UV coordinates for one horizontal screen row.
+- `LRaycaster:projectSprite`: Projects a world-space sprite onto screen space.
+- `LRaycaster:drawTopDown`: Renders a top-down grid view with player marker to an ImageData.
+- `LRaycaster:drawView`: Renders a first-person column view to an ImageData.
+- `LRaycaster:drawDepthMap`: Renders a depth-map column view to an ImageData.
+- `LRaycaster:drawLineOfSight`: Renders a line-of-sight test between two points to an ImageData.
+- `LRaycaster:drawCameraSweep`: Renders a mosaic of first-person views from evenly spaced angles to an ImageData.
+- `LRaycaster:buildScene`: Builds a raycaster scene and stores it in SharedState for GPU rendering.
+- `LRaycaster:buildSceneWithModels`: Builds a raycaster scene and appends projected OBJ model meshes.
+- `LRaycaster:type`: Returns the type name of this object.
+- `LRaycaster:typeOf`: Returns true if this object is of the given type.
 
-### `SpriteManager` Methods
-- `SpriteManager:remove`: Removes the sprite with the given id. No-op if not found.
-- `SpriteManager:setPosition`: Moves the sprite with the given id to world (x, y).
-- `SpriteManager:setVisible`: Shows or hides the sprite with the given id.
-- `SpriteManager:clear`: Removes all sprites from the manager.
-- `SpriteManager:type`: Returns the type string "SpriteManager".
-- `SpriteManager:typeOf`: Returns the type string "SpriteManager".
+### `LSpriteManager` Methods
+- `LSpriteManager:add`: Adds a sprite at world position (x, y) and returns its unique id.
+- `LSpriteManager:remove`: Removes the sprite with the given id. No-op if not found.
+- `LSpriteManager:setPosition`: Moves the sprite with the given id to world (x, y).
+- `LSpriteManager:setVisible`: Shows or hides the sprite with the given id.
+- `LSpriteManager:clear`: Removes all sprites from the manager.
+- `LSpriteManager:sortAndProject`: Returns an array of visible sprites sorted back-to-front from camera position.
+- `LSpriteManager:type`: Returns the type string "SpriteManager".
+- `LSpriteManager:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

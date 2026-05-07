@@ -1,4 +1,4 @@
-//! `lurek.tween` - Property tweening, sequencing, and spring animation helpers.
+﻿//! `lurek.tween` - Property tweening, sequencing, and spring animation helpers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -175,6 +175,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | easing | string? | Optional easing name; defaults to `linear`.
     /// @return | LTween | New tween handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("tween", lua.create_function(
             move |lua,
                   (duration, target, fields_tbl, easing): (
@@ -204,6 +205,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates an empty tween sequence handle.
     /// @return | LTweenSequence | New sequence handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("sequence", lua.create_function(move |lua, ()| {
             let seq = LuaTweenSequence::new();
             let ud = lua.create_userdata(seq)?;
@@ -218,6 +220,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates an empty parallel tween handle.
     /// @return | LTweenParallel | New parallel handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("parallel", lua.create_function(move |lua, ()| {
             let par = LuaTweenParallel::new();
             let ud = lua.create_userdata(par)?;
@@ -233,6 +236,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fn | function? | Optional callback to run after the delay.
     /// @return | LTweenSequence | Started sequence handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("delay", lua.create_function(move |lua, (seconds, cb): (f64, Option<LuaFunction>)| {
             use crate::tween::SequenceStep;
             let callback = if let Some(f) = cb {
@@ -258,6 +262,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Cancels all active tweens, sequences, parallels, and springs immediately.
     /// @return | nil | No value is returned.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("cancelAll", lua.create_function(move |lua, ()| {
             TweenEngine::cancel_all(&s, lua)?;
             let spring_keys = std::mem::take(&mut s.borrow_mut().active_springs);
@@ -280,6 +285,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the number of currently active tween objects.
     /// @return | integer | Count of active tweens, sequences, parallels, and springs.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getActiveCount", lua.create_function(move |_, ()| Ok(s.borrow().active_count()))?,
     )?;
 
@@ -289,6 +295,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fn | function | Callback that maps progress from 0..1 to 0..1.
     /// @return | nil | No value is returned.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("registerEasing", lua.create_function(move |lua, (name, f): (String, LuaFunction)| {
             let mut state = s.borrow_mut();
             if let Some(old) = state.custom_easings.remove(&name) {
@@ -304,6 +311,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns all available built-in and custom easing names.
     /// @return | table | Array-style table of easing names.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getEasingNames", lua.create_function(move |lua, ()| {
             let out = lua.create_table()?;
             let state = s.borrow();
@@ -340,6 +348,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | easing | string? | Optional easing name; defaults to `linear`.
     /// @return | LTween | New tween handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("to", lua.create_function(
             move |lua,
                   (target, fields_tbl, duration, easing): (
@@ -372,6 +381,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | opts | table? | Optional stiffness, damping, and precision settings.
     /// @return | LSpring | New spring handle.
     let s = engine.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("spring", lua.create_function(
             move |lua, (target_tbl, fields_tbl, opts): (LuaTable, LuaTable, Option<LuaTable>)| {
                 let stiffness: f32 = opts

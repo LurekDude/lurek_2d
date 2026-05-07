@@ -1,4 +1,4 @@
-//! `lurek.graphic` - 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
+﻿//! `lurek.graphic` - 2D drawing, images, fonts, canvases, meshes, shaders and sprite batches.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -7,6 +7,7 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::image::ImageData;
+use crate::image::TextureColorSpace;
 use crate::image::Texture;
 use crate::math::Rect;
 use crate::render::renderer::{BevelStyle, GradientDirection, HexOrientation, PathSegment};
@@ -1969,6 +1970,103 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         )?,
     )?;
 
+    // -- drawMany --
+    /// Draws a list of images in a single call. Each entry is a table: {image, x, y} or
+    /// {image, x, y, r, sx, sy, ox, oy}. Engine-level viewport culling is applied per entry.
+    /// @param | list | table | Array of draw entries.
+    /// @return | nil | No return value.
+    let s = state.clone();
+    graphics.set(
+        "drawMany",
+        lua.create_function(move |_, list: LuaTable| {
+            let mut st = s.borrow_mut();
+            let len = list.raw_len();
+            for i in 1..=len {
+                let entry: LuaTable = match list.raw_get(i) {
+                    Ok(LuaValue::Table(t)) => t,
+                    _ => continue,
+                };
+                let img_val: LuaValue = entry.raw_get(1).unwrap_or(LuaValue::Nil);
+                let x: f32 = entry.raw_get::<_, Option<f32>>(2).unwrap_or(None).unwrap_or(0.0);
+                let y: f32 = entry.raw_get::<_, Option<f32>>(3).unwrap_or(None).unwrap_or(0.0);
+                let r: f32 = entry.raw_get::<_, Option<f32>>(4).unwrap_or(None).unwrap_or(0.0);
+                let sx: f32 = entry.raw_get::<_, Option<f32>>(5).unwrap_or(None).unwrap_or(1.0);
+                let sy: f32 = entry.raw_get::<_, Option<f32>>(6).unwrap_or(None).unwrap_or(1.0);
+                let ox: f32 = entry.raw_get::<_, Option<f32>>(7).unwrap_or(None).unwrap_or(0.0);
+                let oy: f32 = entry.raw_get::<_, Option<f32>>(8).unwrap_or(None).unwrap_or(0.0);
+                if let LuaValue::UserData(ud) = img_val {
+                    if let Ok(img) = ud.borrow::<LuaImage>() {
+                        let key = img.key;
+                        drop(img);
+                        if !st.textures.contains_key(key) {
+                            continue;
+                        }
+                        let has_transform = r != 0.0 || sx != 1.0 || sy != 1.0 || ox != 0.0 || oy != 0.0;
+                        if has_transform {
+                            st.render_commands.push(RenderCommand::DrawImageEx {
+                                texture_key: key,
+                                x, y, rotation: r, sx, sy, ox, oy,
+                                effect: None,
+                            });
+                        } else {
+                            st.render_commands.push(RenderCommand::DrawImage {
+                                texture_key: key,
+                                x, y,
+                                effect: None,
+                            });
+                        }
+                    }
+                }
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- printRotated --
+    /// Draws text at the given position with rotation. Rotates the entire string as a block
+    /// around point (x, y). Engine-level transform stack is used â€” no per-glyph math in Lua.
+    /// @param | text | string | Text to draw.
+    /// @param | x | number | Draw x position.
+    /// @param | y | number | Draw y position.
+    /// @param | angle | number | Rotation in radians.
+    /// @param | scale | number? | Text scale, defaulting to 1.
+    /// @return | nil | No return value.
+    let s = state.clone();
+    graphics.set(
+        "printRotated",
+        lua.create_function(
+            move |_, (text, x, y, angle, scale): (String, f32, f32, f32, Option<f32>)| {
+                let scale = scale.unwrap_or(1.0);
+                let (font_key, origin_x, origin_y) = {
+                    let st = s.borrow();
+                    let font_key = st.active_font.or(st.default_font);
+                    let Some(font_key) = font_key else {
+                        return Ok(());
+                    };
+                    let Some(font) = st.fonts.get(font_key) else {
+                        return Ok(());
+                    };
+                    let origin_x = -font.text_width(&text) * scale * 0.5;
+                    let origin_y = -font.line_height() * scale * 0.5;
+                    (font_key, origin_x, origin_y)
+                };
+                let st = &mut s.borrow_mut().render_commands;
+                st.push(RenderCommand::PushTransform);
+                st.push(RenderCommand::Translate { x, y });
+                st.push(RenderCommand::Rotate { angle });
+                st.push(RenderCommand::Print {
+                    font_key,
+                    text,
+                    x: origin_x,
+                    y: origin_y,
+                    scale,
+                });
+                st.push(RenderCommand::PopTransform);
+                Ok(())
+            },
+        )?,
+    )?;
+
     // -- Text -------------------------------------------------
 
     // -- print --
@@ -2556,14 +2654,45 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     let s = state.clone();
     graphics.set(
         "newImage",
-        lua.create_function(move |_, arg: LuaValue| match arg {
+        lua.create_function(move |_, args: LuaMultiValue| {
+            let mut iter = args.into_iter();
+            let arg = iter.next().ok_or_else(|| {
+                LuaError::RuntimeError(
+                    "lurek.graphic.newImage: expected a file path string or ImageData".into(),
+                )
+            })?;
+            let color_space = match iter.next() {
+                Some(LuaValue::String(mode)) => {
+                    let mode = mode.to_str().map_err(|e| {
+                        LuaError::RuntimeError(format!(
+                            "lurek.graphic.newImage: invalid color space string: {}",
+                            e
+                        ))
+                    })?;
+                    Texture::parse_color_space(mode).ok_or_else(|| {
+                        LuaError::RuntimeError(format!(
+                            "lurek.graphic.newImage: invalid color space '{}', expected 'srgb' or 'linear'",
+                            mode
+                        ))
+                    })?
+                }
+                Some(other) => {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.graphic.newImage: second argument must be color space string, got {}",
+                        other.type_name()
+                    )));
+                }
+                None => TextureColorSpace::Srgb,
+            };
+
+            match arg {
             LuaValue::String(path_str) => {
                 let path = path_str.to_str().map_err(|e| {
                     LuaError::RuntimeError(format!("lurek.graphic.newImage: invalid path: {}", e))
                 })?;
                 let mut st = s.borrow_mut();
                 let full_path = st.game_dir.join(path);
-                match Texture::load(&full_path, &mut st.textures) {
+                match Texture::load_with_color_space(&full_path, &mut st.textures, color_space) {
                     Ok(tex) => {
                         st.released_texture_handles.remove(&tex.key.data().as_ffi());
                         Ok(LuaImage {
@@ -2582,7 +2711,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let pixels = img_data.as_bytes().to_vec();
                 let (w, h) = img_data.dimensions();
                 let mut st = s.borrow_mut();
-                match Texture::from_rgba(w, h, pixels, &mut st.textures) {
+                match Texture::from_rgba_with_color_space(
+                    w,
+                    h,
+                    pixels,
+                    &mut st.textures,
+                    color_space,
+                ) {
                     Ok(tex) => {
                         st.released_texture_handles.remove(&tex.key.data().as_ffi());
                         Ok(LuaImage {
@@ -2599,6 +2734,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             _ => Err(LuaError::RuntimeError(
                 "lurek.graphic.newImage: expected a file path string or ImageData".into(),
             )),
+        }
         })?,
     )?;
 
@@ -3461,6 +3597,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             stats.set("texture_switches", st.render_stats.texture_switches)?;
             stats.set("canvas_switches", st.render_stats.canvas_switches)?;
             stats.set("shader_switches", st.render_stats.shader_switches)?;
+            stats.set("cpu_render_ms", st.render_stats.cpu_render_ms)?;
             Ok(stats)
         })?,
     )?;
@@ -3605,7 +3742,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
-    // -- BĂ©zier Curves -------------------------------------------------
+    // -- BÄ‚Â©zier Curves -------------------------------------------------
 
     // -- drawQuadBezier --
     // -- drawQuadBezier --
@@ -3619,6 +3756,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | segments | integer? | Segment count, defaulting to 16.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     graphics.set("drawQuadBezier", lua.create_function(
             move |_,
                   (x1, y1, cx, cy, x2, y2, segs): (
@@ -3828,6 +3966,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mode | string? | Draw mode, defaulting to fill.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     graphics.set("drawColoredPolygon", lua.create_function(
             move |_, (vertices, colors, mode): (LuaTable, LuaTable, Option<String>)| {
                 let draw_mode = match mode.as_deref().unwrap_or("fill") {
@@ -4424,6 +4563,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mode | string? | Draw mode, defaulting to fill.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     graphics.set("drawColoredPolygon", lua.create_function(
             move |_, (vertices, colors, mode): (LuaTable, LuaTable, Option<String>)| {
                 let draw_mode = parse_draw_mode(mode.as_deref().unwrap_or("fill"))?;
@@ -4878,7 +5018,167 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             Ok(())
         })?,
     )?;
+    // -- loadObj --
+    /// Loads a Wavefront OBJ file (relative to game dir) and returns an LObjModel.
+    /// @param | path | string | Relative path, e.g. "assets/models/tank.obj".
+    /// @return | LObjModel | Loaded model with projectToMesh method.
+    let state_for_obj = state.clone();
+    graphics.set(
+        "loadObj",
+        lua.create_function(move |_, path: String| {
+            let full_path = {
+                let st = state_for_obj.borrow();
+                st.game_dir.join(&path)
+            };
+            let model = crate::render::obj_loader::ObjLoader::load_file(&full_path)
+                .map_err(|e| LuaError::RuntimeError(format!("loadObj '{}': {}", path, e)))?;
+            Ok(LObjModel {
+                state: state_for_obj.clone(),
+                model,
+                sprite_cache: std::collections::HashMap::new(),
+            })
+        })?,
+    )?;
+
+    let state_for_model = state.clone();
+    // -- loadModel --
+    /// Alias for `loadObj`; loads a Wavefront OBJ file and returns an `LObjModel`.
+    /// @param | path | string | Relative path to an `.obj` asset file.
+    /// @return | LObjModel | Loaded model userdata.
+    graphics.set(
+        "loadModel",
+        lua.create_function(move |_, path: String| {
+            let full_path = {
+                let st = state_for_model.borrow();
+                st.game_dir.join(&path)
+            };
+            let model = crate::render::obj_loader::ObjLoader::load_file(&full_path)
+                .map_err(|e| LuaError::RuntimeError(format!("loadModel '{}': {}", path, e)))?;
+            Ok(LObjModel {
+                state: state_for_model.clone(),
+                model,
+                sprite_cache: std::collections::HashMap::new(),
+            })
+        })?,
+    )?;
 
     lurek.set("render", graphics)?;
     Ok(())
+}
+
+// ── OBJ loader Lua userdata ───────────────────────────────────────────────────
+
+use crate::render::obj_loader::{ObjCamera, ObjModel};
+
+/// Lua-side handle to a parsed Wavefront OBJ model.
+pub struct LObjModel {
+    pub(crate) state: Rc<RefCell<SharedState>>,
+    pub(crate) model: ObjModel,
+    pub(crate) sprite_cache: std::collections::HashMap<String, TextureKey>,
+}
+
+impl LuaUserData for LObjModel {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- getVertexCount --
+        /// Returns the number of position vertices stored in this model.
+        /// @return | integer | Number of position vertices.
+        methods.add_method("getVertexCount", |_, this, ()| Ok(this.model.vertex_count()));
+
+        // -- getFaceCount --
+        /// Returns the number of triangulated faces available in this model.
+        /// @return | integer | Number of triangles.
+        methods.add_method("getFaceCount", |_, this, ()| Ok(this.model.face_count()));
+
+        // -- getUvCount --
+        /// Returns the number of UV coordinates loaded from the OBJ file.
+        /// @return | integer | Number of UV coordinates.
+        methods.add_method("getUvCount", |_, this, ()| Ok(this.model.uv_count()));
+
+        // -- getNormalCount --
+        /// Returns the number of normal vectors stored in this model.
+        /// @return | integer | Number of normal vectors.
+        methods.add_method("getNormalCount", |_, this, ()| Ok(this.model.normal_count()));
+
+        // -- renderToImage --
+        /// Rasterizes the model into a cached sprite image using material colors from the MTL.
+        /// The output is cached by `(width,height,rotation)` and returned as `LImage`.
+        ///
+        /// @param | width | integer | Output sprite width.
+        /// @param | height | integer | Output sprite height.
+        /// @param | rotation | integer? | Quarter-turn rotation: 0,1,2,3.
+        /// @return | LImage | Cached rendered sprite.
+        methods.add_method_mut(
+            "renderToImage",
+            |_, this, (width, height, rotation): (u32, u32, Option<u8>)| {
+                let rotation = rotation.unwrap_or(0) % 4;
+                let cache_key = format!("{}x{}:{}", width, height, rotation);
+
+                if let Some(tex_key) = this.sprite_cache.get(&cache_key).copied() {
+                    let st = this.state.borrow();
+                    if st.textures.contains_key(tex_key) {
+                        drop(st);
+                        return Ok(LuaImage {
+                            state: this.state.clone(),
+                            key: tex_key,
+                        });
+                    }
+                }
+
+                let image = this.model.render_to_image(width, height, rotation);
+                let pixels = image.as_bytes().to_vec();
+                let mut st = this.state.borrow_mut();
+                let tex = Texture::from_rgba(width, height, pixels, &mut st.textures)
+                    .map_err(|e| LuaError::RuntimeError(format!("renderToImage: {}", e)))?;
+                st.released_texture_handles.remove(&tex.key.data().as_ffi());
+                this.sprite_cache.insert(cache_key, tex.key);
+                Ok(LuaImage {
+                    state: this.state.clone(),
+                    key: tex.key,
+                })
+            },
+        );
+
+        // -- projectToMesh --
+        /// Projects the 3-D model to a flat 2-D vertex table.
+        /// Lua then calls lurek.render.newMesh(vertices) to create a drawable mesh.
+        ///
+        /// Camera table keys: x, y, z (position), tx, ty, tz (look-at), fov (degrees).
+        ///
+        /// @param | camera | table | Camera parameters.
+        /// @param | screen_w | number | Output width in pixels.
+        /// @param | screen_h | number | Output height in pixels.
+        /// @return | table | Array of vertex rows: each row is { x, y, u, v, r, g, b, a }.
+        methods.add_method(
+            "projectToMesh",
+            |lua, this, (cam_tbl, screen_w, screen_h): (LuaTable, f32, f32)| {
+                let cam = ObjCamera::new(
+                    cam_tbl.get::<_, f32>("x").unwrap_or(0.0),
+                    cam_tbl.get::<_, f32>("y").unwrap_or(0.0),
+                    cam_tbl.get::<_, f32>("z").unwrap_or(5.0),
+                    cam_tbl.get::<_, f32>("tx").unwrap_or(0.0),
+                    cam_tbl.get::<_, f32>("ty").unwrap_or(0.0),
+                    cam_tbl.get::<_, f32>("tz").unwrap_or(0.0),
+                    cam_tbl.get::<_, f32>("fov").unwrap_or(60.0),
+                );
+                let (cam_pos, cam_tgt, fov_y) = cam.to_vecs();
+                let mesh = this.model.project_to_mesh(cam_pos, cam_tgt, fov_y, screen_w, screen_h, None);
+
+                // Convert mesh vertices to a Lua table of rows
+                let out = lua.create_table()?;
+                for (i, v) in mesh.vertices.iter().enumerate() {
+                    let row = lua.create_table()?;
+                    row.set(1, v.x)?;
+                    row.set(2, v.y)?;
+                    row.set(3, v.u)?;
+                    row.set(4, v.v)?;
+                    row.set(5, v.r)?;
+                    row.set(6, v.g)?;
+                    row.set(7, v.b)?;
+                    row.set(8, v.a)?;
+                    out.set(i + 1, row)?;
+                }
+                Ok(out)
+            },
+        );
+    }
 }

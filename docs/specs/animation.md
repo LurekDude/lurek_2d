@@ -151,61 +151,78 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 
 ### Module Functions
 - `lurek.animation.new`: Creates a new, empty Animation controller.
-- `lurek.animation.fromAseprite`: Parses an Aseprite JSON export string and builds an Animation with clips and frames.
+- `lurek.animation.fromAseprite`: Parses an Aseprite JSON export string and builds an animation.
 - `lurek.animation.newStateMachine`: Creates an animation FSM from an Animation controller and an initial state name.
-- `lurek.animation.newCurve`: Creates a new empty [`AnimCurve`] with linear interpolation.
-- `lurek.animation.newSyncGroup`: Creates a new empty [`AnimSyncGroup`].
-- `lurek.animation.newBlendLayerSet`: Creates a new empty [`BlendLayerSet`] for compositing multiple animation clips.
+- `lurek.animation.newCurve`: Creates a new empty animation curve with linear interpolation.
+- `lurek.animation.newSyncGroup`: Creates a new empty animation sync group.
+- `lurek.animation.newBlendLayerSet`: Creates a new empty blend layer set for compositing multiple animation clips.
 
-### `AnimCurve` Methods
-- `AnimCurve:addKeyframe`: Inserts a keyframe at the given time. If a keyframe at the same time already
-- `AnimCurve:eval`: Returns the interpolated value at the given time using the curve's easing.
-- `AnimCurve:setEasing`: Sets the easing kind applied between all keyframe segments.
-- `AnimCurve:keyframeCount`: Returns the number of keyframes currently stored.
-- `AnimCurve:setCustomEasing`: Set a custom Lua easing function for this curve.
-- `AnimCurve:clear`: Removes all keyframes from this animation curve, resetting it to empty.
+### `LAnimCurve` Methods
+- `LAnimCurve:addKeyframe`: Inserts or replaces a keyframe at the given time.
+- `LAnimCurve:eval`: Returns the interpolated curve value at the given time.
+- `LAnimCurve:setEasing`: Sets the easing kind applied between all keyframe segments.
+- `LAnimCurve:keyframeCount`: Returns the number of keyframes currently stored.
+- `LAnimCurve:setCustomEasing`: Sets or clears a custom Lua easing function for this curve.
+- `LAnimCurve:clear`: Removes all keyframes from this animation curve, resetting it to empty.
+- `LAnimCurve:type`: Returns the type name of this object.
+- `LAnimCurve:typeOf`: Returns true if this object is of the given type.
 
-### `AnimStateMachine` Methods
-- `AnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
-- `AnimStateMachine:getState`: Returns the name of the currently active state.
-- `AnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
-- `AnimStateMachine:setParam`: Sets an FSM parameter value (number, boolean, or integer supported).
-- `AnimStateMachine:getQuad`: Returns the source quad for the current animation frame, or nil.
+### `LAnimStateMachine` Methods
+- `LAnimStateMachine:update`: Advances the FSM by `dt` seconds, evaluating transitions.
+- `LAnimStateMachine:getState`: Returns the name of the currently active state.
+- `LAnimStateMachine:forceState`: Immediately jumps to the named state, bypassing transition conditions.
+- `LAnimStateMachine:addState`: Registers a new named state that plays a clip from the embedded animation.
+- `LAnimStateMachine:addTransition`: Adds a conditional transition between two states using a condition string like "speed > 0.5".
+- `LAnimStateMachine:setParam`: Sets an FSM parameter value (number, boolean, or integer supported).
+- `LAnimStateMachine:getQuad`: Returns the source quad for the current animation frame.
+- `LAnimStateMachine:type`: Returns the type name of this object.
+- `LAnimStateMachine:typeOf`: Returns true if this object is of the given type.
 
-### `AnimSyncGroup` Methods
-- `AnimSyncGroup:add`: Adds an animation handle to the group.
-- `AnimSyncGroup:remove`: Removes an animation handle from the group.
-- `AnimSyncGroup:clear`: Removes all animation handles from the group.
-- `AnimSyncGroup:memberCount`: Returns the number of animations currently in the group.
+### `LAnimSyncGroup` Methods
+- `LAnimSyncGroup:add`: Adds an animation handle to the group.
+- `LAnimSyncGroup:remove`: Removes an animation handle from the group.
+- `LAnimSyncGroup:clear`: Removes all animation handles from the group.
+- `LAnimSyncGroup:memberCount`: Returns the number of animations currently in the group.
+- `LAnimSyncGroup:type`: Returns the type name of this object.
+- `LAnimSyncGroup:typeOf`: Returns true if this object is of the given type.
 
-### `Animation` Methods
-- `Animation:addFrame`: Adds a single frame to the frame pool by source rectangle.
-- `Animation:play`: Starts playback of the named clip.
-- `Animation:stop`: Stops playback and resets to frame 0.
-- `Animation:pause`: Pauses playback at the current frame.
-- `Animation:resume`: Resumes playback from the current frame.
-- `Animation:update`: Advances the animation by dt seconds.
-- `Animation:getQuad`: Returns the source quad (x, y, w, h) for the current frame, or nil.
-- `Animation:pollEvents`: Drains and returns all pending animation events as a table.
-- `Animation:isPlaying`: Returns true if a clip is currently playing.
-- `Animation:isLooping`: Returns true if the current clip is set to loop.
-- `Animation:getClip`: Returns the name of the currently playing clip, or nil.
-- `Animation:getSpeed`: Returns the playback speed multiplier.
-- `Animation:setSpeed`: Sets the playback speed multiplier.
-- `Animation:getFrameCount`: Returns the total number of frames in the frame pool.
-- `Animation:getClipCount`: Returns the number of registered clips.
-- `Animation:getCurrentFrame`: Returns the current position within the active clip (0-based).
-- `Animation:setFrame`: Sets the playback position within the current clip.
-- `Animation:getBlendState`: Returns the two quads and blend factor during a crossfade, or nil when not blending.
-- `Animation:drawToImage`: Renders the current animation frame into a new ImageData (white bg, blue frame rect).
+### `LAnimation` Methods
+- `LAnimation:addFrame`: Adds a single frame to the frame pool by source rectangle.
+- `LAnimation:addFramesFromGrid`: Slices a sprite-sheet grid into frames and appends them.
+- `LAnimation:addClip`: Adds a named clip from explicit frame indices.
+- `LAnimation:addClipFromGrid`: Adds a named clip sliced from a sprite-sheet grid.
+- `LAnimation:play`: Starts playback of the named clip.
+- `LAnimation:stop`: Stops playback and resets to frame 0.
+- `LAnimation:pause`: Pauses playback at the current frame.
+- `LAnimation:resume`: Resumes playback from the current frame.
+- `LAnimation:update`: Advances the animation by dt seconds.
+- `LAnimation:getQuad`: Returns the source quad for the current frame.
+- `LAnimation:pollEvents`: Drains and returns all pending animation events as a table.
+- `LAnimation:isPlaying`: Returns true if a clip is currently playing.
+- `LAnimation:isLooping`: Returns true if the current clip is set to loop.
+- `LAnimation:getClip`: Returns the name of the currently playing clip.
+- `LAnimation:getSpeed`: Returns the playback speed multiplier.
+- `LAnimation:setSpeed`: Sets the playback speed multiplier.
+- `LAnimation:getFrameCount`: Returns the total number of frames in the frame pool.
+- `LAnimation:getClipCount`: Returns the number of registered clips.
+- `LAnimation:getCurrentFrame`: Returns the current position within the active clip (0-based).
+- `LAnimation:setFrame`: Sets the playback position within the current clip.
+- `LAnimation:crossfade`: Begins a smooth crossfade from the current clip to a new named clip.
+- `LAnimation:getBlendState`: Returns the active crossfade state.
+- `LAnimation:drawToImage`: Renders the current animation frame into a new ImageData (white bg, blue frame rect).
+- `LAnimation:type`: Returns the type name of this object.
+- `LAnimation:typeOf`: Returns true if this object is of the given type.
 
-### `BlendLayerSet` Methods
-- `BlendLayerSet:removeLayer`: Removes a blend layer by name.
-- `BlendLayerSet:setWeight`: Sets the blend weight of a named layer (clamped to [0, 1]).
-- `BlendLayerSet:getWeight`: Returns the blend weight of a named layer, or nil if not found.
-- `BlendLayerSet:setMask`: Replaces the bone mask of a layer.
-- `BlendLayerSet:listLayers`: Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
-- `BlendLayerSet:len`: Returns the number of blend layers.
+### `LBlendLayerSet` Methods
+- `LBlendLayerSet:addLayer`: Appends a new blend layer.
+- `LBlendLayerSet:removeLayer`: Removes a blend layer by name.
+- `LBlendLayerSet:setWeight`: Sets the blend weight of a named layer (clamped to [0, 1]).
+- `LBlendLayerSet:getWeight`: Returns the blend weight of a named layer.
+- `LBlendLayerSet:setMask`: Replaces the bone mask of a layer.
+- `LBlendLayerSet:listLayers`: Returns an ordered array of layer info tables: {name, clip_name, weight, bones}.
+- `LBlendLayerSet:len`: Returns the number of blend layers.
+- `LBlendLayerSet:type`: Returns the type name of this object.
+- `LBlendLayerSet:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

@@ -135,15 +135,20 @@ impl LuaUserData for LuaUniverse {
         });
 
         // -- addSystem --
-        /// Adds a system table to the universe with an optional priority (lower = earlier).
+        /// Adds a system table to the universe with an optional priority (lower = earlier) and phase.
         /// @param | system | table | System table to register.
-        /// @param | opts | table? | Optional table with a `priority` integer field.
+        /// @param | opts | table? | Optional table with `priority` integer and `phase` string fields.
         /// @return | nil | No value is returned.
         methods.add_method("addSystem", |lua, this, (system, opts): (LuaTable, Option<LuaTable>)| {
                 let priority = opts
+                    .as_ref()
                     .and_then(|o| o.get::<_, i32>("priority").ok())
                     .unwrap_or(0);
-                this.inner.borrow_mut().add_system(lua, system, priority)
+                let phase = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, String>("phase").ok())
+                    .unwrap_or_default();
+                this.inner.borrow_mut().add_system(lua, system, priority, phase)
             },
         );
 
@@ -156,7 +161,7 @@ impl LuaUserData for LuaUniverse {
         });
 
         // -- update --
-        /// Calls update(system, world, dt) on each registered system in priority order.
+        /// Calls update(system, world, dt) on each system in the "update" phase in priority order.
         /// @param | dt | number | Delta time in seconds.
         /// @return | nil | No value is returned.
         methods.add_method("update", |lua, this, dt: f64| {
@@ -164,7 +169,7 @@ impl LuaUserData for LuaUniverse {
             if count == 0 {
                 return Ok(());
             }
-            let order = this.inner.borrow().get_sorted_system_indices();
+            let order = this.inner.borrow().get_sorted_system_indices_for_phase("update");
             let store = this.inner.borrow().get_system_store(lua)?;
             let world = this.clone();
             for i in order {
@@ -177,14 +182,14 @@ impl LuaUserData for LuaUniverse {
         });
 
         // -- render --
-        /// Calls render(system, world) on each system in priority order and falls back to draw(system, world).
+        /// Calls render(system, world) on each system in the "render" phase in priority order; falls back to draw(system, world).
         /// @return | nil | No value is returned.
         methods.add_method("render", |lua, this, ()| {
             let count = this.inner.borrow().get_system_count(lua)?;
             if count == 0 {
                 return Ok(());
             }
-            let order = this.inner.borrow().get_sorted_system_indices();
+            let order = this.inner.borrow().get_sorted_system_indices_for_phase("render");
             let store = this.inner.borrow().get_system_store(lua)?;
             let world = this.clone();
             for i in order {
@@ -218,7 +223,7 @@ impl LuaUserData for LuaUniverse {
             if count == 0 {
                 return Ok(());
             }
-            let order = this.inner.borrow().get_sorted_system_indices();
+            let order = this.inner.borrow().get_sorted_system_indices_all();
             let store = this.inner.borrow().get_system_store(lua)?;
             let world = this.clone();
             for i in order {
@@ -239,6 +244,92 @@ impl LuaUserData for LuaUniverse {
         /// @return | integer | Number of registered systems.
         methods.add_method("getSystemCount", |lua, this, ()| {
             this.inner.borrow().get_system_count(lua)
+        });
+
+        // -- updatePhase --
+        /// Calls the named lifecycle method on each system that belongs to the given phase, in priority order.
+        ///
+        /// The handler name defaults to `"update"`.  The world is passed as the second argument after the
+        /// system table itself, followed by `dt`.
+        ///
+        /// @param | phase | string | Phase name, e.g. `"pre_update"`, `"update"`, `"post_update"` or any custom name.
+        /// @param | dt | number | Delta time in seconds.
+        /// @return | nil | No value is returned.
+        methods.add_method("updatePhase", |lua, this, (phase, dt): (String, f64)| {
+            let count = this.inner.borrow().get_system_count(lua)?;
+            if count == 0 {
+                return Ok(());
+            }
+            let order = this
+                .inner
+                .borrow()
+                .get_sorted_system_indices_for_phase(&phase);
+            let store = this.inner.borrow().get_system_store(lua)?;
+            let world = this.clone();
+            for i in order {
+                let system: LuaTable = store.get(i)?;
+                if let Ok(func) = system.get::<_, LuaFunction>("update") {
+                    func.call::<_, ()>((system.clone(), world.clone(), dt))?;
+                }
+            }
+            Ok(())
+        });
+
+        // -- getDirtyEntities --
+        /// Returns entity IDs whose components changed since the last flushObservers / takeObserverEvents call.
+        ///
+        /// The returned list is sorted.  The set is automatically cleared by `flushObservers` and
+        /// `takeObserverEvents`.
+        ///
+        /// @return | table | Array of entity IDs (integers).
+        methods.add_method("getDirtyEntities", |lua, this, ()| {
+            let ids = this.inner.borrow().get_dirty_entities();
+            let t = lua.create_table()?;
+            for (i, id) in ids.iter().enumerate() {
+                t.set(i + 1, *id)?;
+            }
+            Ok(LuaValue::Table(t))
+        });
+
+        // -- queryMulti --
+        /// Iterates every alive entity that has ALL the listed components and calls the callback with
+        /// `callback(id, comp1, comp2, …)` in the same order as the `names` table.
+        ///
+        /// This avoids a second `getComponent` lookup inside the loop compared to a plain `query`.
+        ///
+        /// @param | names | table | Array of component name strings.
+        /// @param | callback | function | Called as `callback(id, val1, val2, …)` for each matching entity.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "queryMulti",
+            |lua, this, (names_table, callback): (LuaTable, LuaFunction)| {
+                let mut names: Vec<String> = Vec::new();
+                for pair in names_table.sequence_values::<String>() {
+                    names.push(pair?);
+                }
+                this.inner.borrow().query_multi(lua, &names, callback)
+            },
+        );
+
+        // -- snapshot --
+        /// Serializes the entire universe state to a Lua table.  Alias for serialize.
+        ///
+        /// The snapshot can be restored with applySnapshot.
+        ///
+        /// @return | table | Snapshot table.
+        methods.add_method("snapshot", |lua, this, ()| {
+            this.inner.borrow().serialize_to_table(lua)
+        });
+
+        // -- applySnapshot --
+        /// Restores the universe from a snapshot table produced by snapshot.  Alias for deserialize.
+        ///
+        /// All current state is replaced by the snapshot.
+        ///
+        /// @param | snapshot | table | Snapshot table previously returned by snapshot.
+        /// @return | nil | No value is returned.
+        methods.add_method("applySnapshot", |lua, this, snapshot: LuaTable| {
+            this.inner.borrow_mut().deserialize_from_table(lua, snapshot)
         });
 
         // -- clear --

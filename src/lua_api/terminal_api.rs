@@ -1,4 +1,4 @@
-//! `lurek.terminal` - Grid-based character-cell terminal emulator and widget toolkit.
+﻿//! `lurek.terminal` - Grid-based character-cell terminal emulator and widget toolkit.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -1306,6 +1306,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | rows | integer? | Row count.
     /// @return | Terminal | New terminal grid with the given dimensions.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newTerminal", lua.create_function(move |lua, (cols, rows): (Option<usize>, Option<usize>)| {
             let binding = Rc::new(TerminalBinding {
                 terminal: Rc::new(RefCell::new(Terminal::new(
@@ -1447,6 +1448,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     /// @param | line | string | Line value.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("pushScrollback", lua.create_function(move |_, (term_ud, line): (LuaAnyUserData, String)| {
             let term_ref = term_ud.borrow_mut::<LuaTerminal>()?;
             let _ = s.borrow();
@@ -1612,7 +1614,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
                 "nord" => (236, 239, 244, 46, 52, 64),
                 other => {
                     return Err(LuaError::RuntimeError(format!(
-                        "unknown theme '{other}' — available: solarized_dark, solarized_light, monokai, dracula, nord"
+                        "unknown theme '{other}' â€” available: solarized_dark, solarized_light, monokai, dracula, nord"
                     )));
                 }
             };

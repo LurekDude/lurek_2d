@@ -5,7 +5,7 @@
 //! for a CPU `ImageData` snapshot.
 
 use crate::image::ImageData;
-use crate::procgen::noise_ext::perlin_noise_periodic;
+use crate::procgen::noise::perlin_noise_periodic;
 use crate::render::renderer::{DrawMode, RenderCommand};
 
 /// A precomputed 2-D noise grid sampled from periodic Perlin noise.

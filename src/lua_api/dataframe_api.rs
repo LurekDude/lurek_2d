@@ -1652,6 +1652,32 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- fromRows --
+    /// Creates a DataFrame from explicit columns plus row-major data.
+    /// @param | columns | table | Array of column names.
+    /// @param | rows | table | Array of row arrays in the same order as columns.
+    /// @return | LDataFrame | Dataframe built from row-major input.
+    tbl.set("fromRows", lua.create_function(|_, (columns_tbl, rows_tbl): (LuaTable, LuaTable)| {
+            let mut columns: Vec<String> = Vec::new();
+            for name in columns_tbl.sequence_values::<String>() {
+                columns.push(name?);
+            }
+
+            let mut rows: Vec<Vec<CellValue>> = Vec::new();
+            for row_value in rows_tbl.sequence_values::<LuaTable>() {
+                let row_tbl = row_value?;
+                let mut row_cells: Vec<CellValue> = Vec::new();
+                for cell_value in row_tbl.sequence_values::<LuaValue>() {
+                    row_cells.push(lua_to_cell(cell_value?));
+                }
+                rows.push(row_cells);
+            }
+
+            let df = DataFrame::from_rows(columns, rows).map_err(LuaError::RuntimeError)?;
+            Ok(LuaDataFrame::new(df))
+        })?,
+    )?;
+
     // -- fromCSV --
     /// Parses a CSV string into a DataFrame.
     /// @param | s | string | CSV text to parse.

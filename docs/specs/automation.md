@@ -100,26 +100,26 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 - `lurek.automation.stop`: Stops playback and resets the simulator to idle.
 - `lurek.automation.pause`: Pauses playback at the current step position.
 - `lurek.automation.resume`: Resumes playback from a paused position.
-- `lurek.automation.update`: Advances the playback clock by `dt` seconds, dispatching due steps.
+- `lurek.automation.update`: Advances the playback clock by `dt` seconds.
 - `lurek.automation.isRunning`: Returns true if the simulator is actively playing a script.
 - `lurek.automation.isPaused`: Returns true if playback is currently paused.
 - `lurek.automation.isComplete`: Returns true if all steps in the active script have been dispatched.
 - `lurek.automation.getCurrentStep`: Returns the index of the next step to be dispatched.
 - `lurek.automation.getStepCount`: Returns the total number of steps in the active script.
-- `lurek.automation.getCurrentScript`: Returns the name of the active script, or nil if idle.
+- `lurek.automation.getCurrentScript`: Returns the name of the active script.
 - `lurek.automation.getElapsedTime`: Returns seconds elapsed since playback started.
 - `lurek.automation.loadFromToml`: Parses a TOML string and registers it as a named script.
-- `lurek.automation.getStepLimit`: Returns the step limit for the named script, or nil if not found.
-- `lurek.automation.setStepLimit`: Sets the step limit for the named script (clamped to 1..MAX_STEPS).
-- `lurek.automation.saveMacro`: Saves a currently-loaded script under a macro name for fast replay.
+- `lurek.automation.getStepLimit`: Returns the step limit for the named script.
+- `lurek.automation.setStepLimit`: Sets the step limit for the named script.
+- `lurek.automation.saveMacro`: Saves a loaded script under a macro name for fast replay.
 - `lurek.automation.playMacro`: Loads and starts playback of a previously saved macro.
 - `lurek.automation.hasMacro`: Returns true if a macro with the given name has been saved.
 - `lurek.automation.listMacros`: Returns an array of all saved macro names.
-- `lurek.automation.setPlaybackSpeed`: Sets the dt multiplier for script playback (0.5 = half speed, 2.0 = double).
+- `lurek.automation.setPlaybackSpeed`: Sets the playback speed multiplier.
 - `lurek.automation.getPlaybackSpeed`: Returns the current playback speed multiplier (default 1.0).
 - `lurek.automation.setHighlightMode`: Enables or disables the highlight overlay hint.
 - `lurek.automation.isHighlightMode`: Returns whether the highlight overlay hint is active.
-- `lurek.automation.waitUntil`: Pauses playback advancement until predicate() returns true or timeout seconds elapse.
+- `lurek.automation.waitUntil`: Pauses playback advancement until a predicate returns true or a timeout expires.
 
 ## References
 

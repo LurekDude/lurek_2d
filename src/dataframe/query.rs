@@ -8,36 +8,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
-
-// ---------------------------------------------------------------------------
-// Simple xorshift64 RNG (duplicated here to avoid coupling to frame module)
-// ---------------------------------------------------------------------------
-
-/// Minimal xorshift64 PRNG for sample shuffling.
-struct Xorshift64 {
-    state: u64,
-}
-
-impl Xorshift64 {
-    fn new(seed: u64) -> Self {
-        Self {
-            state: if seed == 0 { 1 } else { seed },
-        }
-    }
-
-    fn next_u64(&mut self) -> u64 {
-        let mut x = self.state;
-        x ^= x << 13;
-        x ^= x >> 7;
-        x ^= x << 17;
-        self.state = x;
-        x
-    }
-
-    fn next_usize(&mut self, max: usize) -> usize {
-        (self.next_u64() % max as u64) as usize
-    }
-}
+use crate::dataframe::rng::Xorshift64;
 
 // ---------------------------------------------------------------------------
 // Query methods

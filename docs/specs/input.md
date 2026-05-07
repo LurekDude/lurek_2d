@@ -11,25 +11,9 @@
 
 ## Summary
 
-## Summary
+The `input` module is documented from the current source tree and existing module reference data.
 
-The `input` module is Lurek2D's hardware input abstraction layer — a Platform Services tier module that translates raw `Event` values received from winit via the `EventQueue` into structured, per-frame query-friendly state objects. Lua scripts and engine systems poll these each frame instead of subscribing to raw events.
-
-**KeyboardState.** `KeyboardState` maintains three `HashSet<KeyCode>` collections updated at frame start: `pressed` (keys that went down this exact frame), `released` (keys that went up this frame), and `held` (all currently depressed keys). Physical scancode-based variants mirror the logical key sets but identify keys by hardware position, making them robust to non-QWERTY layouts and useful for game rebinding UIs. `winit_scancode_to_string(scancode)` converts raw hardware scancodes to stable short name strings.
-
-**MouseState.** `MouseState` tracks: cursor screen-space position, world-space position (computed via the active camera inverse-transform), frame-delta movement, scroll wheel delta X/Y, and per-button flags for up to eight buttons following the same pressed/held/released model. `CursorHandle` manages the OS cursor shape with `CursorKind` variants: named `SystemCursor` icons (Default, Hand, Crosshair, Text, ResizeNS, ResizeEW, NotAllowed) or a custom `CursorHandle` with user-supplied pixel data for game-specific cursors.
-
-**GamepadState.** `GamepadState` wraps the gilrs gamepad state for a single physical device identified by device ID. Each axis value has dead-zone filtering applied before exposure (default 0.10 threshold). Button state follows the same pressed/held/released flag model as keyboard. `GamepadMappings` parses SDL2 GameControllerDB-format mapping strings keyed by GUID, enabling correct button labelling for non-standard controllers. Hat direction (D-pad as directional) is synthesised from D-pad button state. Multi-controller support: separate `GamepadState` per device ID, collected in a `HashMap` on `SharedState`.
-
-**TouchState.** `TouchState` tracks per-finger `TouchPoint` records (winit finger ID, screen X/Y, pressure 0–1, `TouchPhase`). Phase progression follows the standard began/moved/ended/cancelled model. Up to 10 simultaneous touch points are tracked. Multi-touch pinch and rotation gestures are extracted by comparing pairs of active touch points and are exposed as scalar values via `TouchState::pinch_scale_delta()` and `TouchState::rotation_delta_rad()`.
-
-**Combo detection.** `ComboDetector` recognises ordered multi-step key/button input sequences within configurable per-step time windows. A sequence is defined as an ordered list of `ComboStep` entries, each specifying the input name and a maximum time since the previous step. `advance(input_name) → ComboProgress` returns `None` (no match yet), `Partial(steps_completed)`, or `Complete`. Reset occurs on timeout or a non-matching input. Useful for fighting-game-style special moves and cheat code detection. Lua: `lurek.input.newCombo(steps)` → `ComboDetector` userdata.
-
-**Input recorder.** `InputRecorder` records all input events per frame into a `RecordedFrame` list, serialises to JSON via `InputRecording`, and replays deterministically. `record()` starts a recording session; `stop()` returns the completed `InputRecording`; `play(recording, callback)` feeds each frame's events back through the `EventQueue` on the main thread. Used for automated regression testing: a developer records a session and the test runner replays it headlessly, verifying output. Lua: `lurek.input.newRecorder()` → `InputRecorder`.
-
-**Lua surface.** `lurek.input.keyboard.*`: `isDown(key)`, `isUp(key)`, `wasPressed(key)`, `wasReleased(key)`, `pressedKeys()`, `heldKeys()`. `lurek.input.mouse.*`: `getPosition()`, `getWorldPosition()`, `getDelta()`, `getScroll()`, `isDown(button)`, `wasPressed(button)`, `setCursor(kind)`. `lurek.input.gamepad(device_id).*`: `getAxis(axis)`, `isDown(button)`, `wasPressed(button)`. `lurek.input.touch.*`: `points()`, `pinchDelta()`, `rotationDelta()`. `lurek.input.newCombo(steps)`. `lurek.input.newRecorder()`.
-
-**Scope boundary.** Platform Services tier. Depends on `event`, `runtime`, `math`. Lua bridge in `src/lua_api/input_api.rs`.
+This module primarily collaborates with `runtime`. Its responsibility should stay inside the Platform Services group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -161,92 +145,99 @@ The `input` module is Lurek2D's hardware input abstraction layer — a Platform 
 - Namespace: `lurek.input.keyboard`
 
 ### Module Functions
-- `lurek.input.isDown`: Returns true if any of the given keys is currently held down.
-- `lurek.input.isScancodeDown`: Returns whether the key with the given scancode is held.
-- `lurek.input.setKeyRepeat`: Enables or disables key-repeat events.
-- `lurek.input.hasKeyRepeat`: Returns whether key-repeat is currently enabled.
-- `lurek.input.setTextInput`: Enables or disables Unicode text input mode.
-- `lurek.input.hasTextInput`: Returns whether text input mode is currently active.
-- `lurek.input.getScancodeFromKey`: Returns the hardware scancode for the given key name.
-- `lurek.input.getKeyFromScancode`: Returns the key name for the given hardware scancode.
-- `lurek.input.isModifierActive`: Returns whether the named modifier key is currently held.
-- `lurek.input.getPosition`: Returns the current cursor position as (x, y).
-- `lurek.input.getX`: Returns the current mouse X position in window coordinates.
-- `lurek.input.getY`: Returns the current mouse Y position in window coordinates.
-- `lurek.input.isDown`: Returns whether the given mouse button is currently held down.
-- `lurek.input.setVisible`: Shows or hides the operating-system mouse cursor.
-- `lurek.input.isVisible`: Returns whether the mouse cursor is currently visible.
-- `lurek.input.setGrabbed`: Locks or unlocks the mouse cursor to the window.
-- `lurek.input.isGrabbed`: Returns whether the mouse cursor is locked to the window.
-- `lurek.input.setRelativeMode`: Enables or disables raw relative mouse motion mode.
-- `lurek.input.getRelativeMode`: Returns whether relative mouse mode is active.
-- `lurek.input.setPosition`: Moves the mouse cursor to the given window-space position.
-- `lurek.input.setCursor`: Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
-- `lurek.input.newCursor`: Creates a custom mouse cursor from RGBA pixel data.
-- `lurek.input.getSystemCursor`: Returns a system cursor object for the named cursor shape.
-- `lurek.input.isCursorSupported`: Returns whether cursor customisation is supported on this platform.
-- `lurek.input.getCursor`: Returns the name of the currently active system cursor.
-- `lurek.input.getWheelDelta`: Returns the mouse scroll wheel delta (dx, dy) since last frame.
-- `lurek.input.getCount`: Returns the number of connected gamepads.
-- `lurek.input.getJoystickCount`: Returns the number of tracked gamepad slots.
-- `lurek.input.getJoysticks`: Returns a list of connected gamepad IDs.
-- `lurek.input.isConnected`: Returns whether the gamepad with the given ID is connected.
-- `lurek.input.getName`: Returns the human-readable name of a gamepad.
-- `lurek.input.isGamepad`: Returns whether the joystick at the given slot is a recognized gamepad.
-- `lurek.input.getButtonCount`: Returns the total number of buttons on the gamepad.
-- `lurek.input.getAxisCount`: Returns the total number of analog axes on the gamepad.
-- `lurek.input.isDown`: Returns whether the given button on the gamepad is currently held.
-- `lurek.input.getAxis`: Returns the current value (-1 to 1) of a gamepad analog axis.
-- `lurek.input.isVibrationSupported`: Returns whether the gamepad supports haptic vibration.
-- `lurek.input.vibrate`: Requests haptic vibration on a gamepad.
-- `lurek.input.getGUID`: Returns the hardware GUID string of the gamepad.
-- `lurek.input.getHat`: Returns the direction string of a hat switch on the gamepad.
-- `lurek.input.setVibration`: Triggers haptic rumble (currently a no-op stub).
-- `lurek.input.setBackgroundEvents`: Enable or disable receiving gamepad events when the window is not focused.
-- `lurek.input.getBackgroundEvents`: Returns whether background gamepad events are enabled.
-- `lurek.input.setGamepadMapping`: Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
-- `lurek.input.getGamepadMappingString`: Returns the stored mapping string for the given GUID, or nil.
-- `lurek.input.loadGamepadMappings`: Loads SDL2 GameControllerDB-format mappings from a file.
-- `lurek.input.saveGamepadMappings`: Saves all stored gamepad mappings to a plain-text file.
-- `lurek.input.getTouches`: Returns a table of active touch points with id, x, y, and pressure fields.
-- `lurek.input.getPosition`: Returns the position (x, y) of the touch with the given ID.
-- `lurek.input.getPressure`: Returns the pressure (0-1) of the touch with the given ID.
-- `lurek.input.getTouchCount`: Returns the number of currently active touch points.
-- `lurek.input.bind`: Maps an action name to one or more key/button names.
+- `lurek.input.keyboard.isDown`: Returns true if any of the given keys is currently held down.
+- `lurek.input.keyboard.isScancodeDown`: Returns whether the key with the given scancode is held.
+- `lurek.input.keyboard.setKeyRepeat`: Enables or disables key-repeat events.
+- `lurek.input.keyboard.hasKeyRepeat`: Returns whether key-repeat is currently enabled.
+- `lurek.input.keyboard.setTextInput`: Enables or disables Unicode text input mode.
+- `lurek.input.keyboard.hasTextInput`: Returns whether text input mode is currently active.
+- `lurek.input.keyboard.getScancodeFromKey`: Returns the hardware scancode for the given key name.
+- `lurek.input.keyboard.getKeyFromScancode`: Returns the key name for the given hardware scancode.
+- `lurek.input.keyboard.isModifierActive`: Returns whether the named modifier key is currently held.
+- `lurek.input.mouse.getPosition`: Returns the current cursor position as (x, y).
+- `lurek.input.mouse.getX`: Returns the current mouse X position in window coordinates.
+- `lurek.input.mouse.getY`: Returns the current mouse Y position in window coordinates.
+- `lurek.input.mouse.isDown`: Returns whether the given mouse button is currently held down.
+- `lurek.input.mouse.setVisible`: Shows or hides the operating-system mouse cursor.
+- `lurek.input.mouse.isVisible`: Returns whether the mouse cursor is currently visible.
+- `lurek.input.mouse.setGrabbed`: Locks or unlocks the mouse cursor to the window.
+- `lurek.input.mouse.isGrabbed`: Returns whether the mouse cursor is locked to the window.
+- `lurek.input.mouse.setRelativeMode`: Enables or disables raw relative mouse motion mode.
+- `lurek.input.mouse.getRelativeMode`: Returns whether relative mouse mode is active.
+- `lurek.input.mouse.setPosition`: Moves the mouse cursor to the given window-space position.
+- `lurek.input.mouse.setCursor`: Sets the active mouse cursor from a Cursor handle, name string, or nil to reset.
+- `lurek.input.mouse.newCursor`: Creates a custom mouse cursor from RGBA pixel data.
+- `lurek.input.mouse.getSystemCursor`: Returns a system cursor object for the named cursor shape.
+- `lurek.input.mouse.isCursorSupported`: Returns whether cursor customisation is supported on this platform.
+- `lurek.input.mouse.getCursor`: Returns the name of the currently active system cursor.
+- `lurek.input.mouse.getWheelDelta`: Returns the mouse scroll wheel delta (dx, dy) since last frame.
+- `lurek.input.gamepad.getCount`: Returns the number of connected gamepads.
+- `lurek.input.gamepad.getJoystickCount`: Returns the number of tracked gamepad slots.
+- `lurek.input.gamepad.getJoysticks`: Returns a list of connected gamepad IDs.
+- `lurek.input.gamepad.isConnected`: Returns whether the gamepad with the given ID is connected.
+- `lurek.input.gamepad.getName`: Returns the human-readable name of a gamepad.
+- `lurek.input.gamepad.isGamepad`: Returns whether the joystick at the given slot is a recognized gamepad.
+- `lurek.input.gamepad.getButtonCount`: Returns the total number of buttons on the gamepad.
+- `lurek.input.gamepad.getAxisCount`: Returns the total number of analog axes on the gamepad.
+- `lurek.input.gamepad.isDown`: Returns whether the given button on the gamepad is currently held.
+- `lurek.input.gamepad.getAxis`: Returns the current value (-1 to 1) of a gamepad analog axis.
+- `lurek.input.gamepad.isVibrationSupported`: Returns whether the gamepad supports haptic vibration.
+- `lurek.input.gamepad.vibrate`: Requests haptic vibration on a gamepad.
+- `lurek.input.gamepad.getGUID`: Returns the hardware GUID string of the gamepad.
+- `lurek.input.gamepad.getHat`: Returns the direction string of a hat switch on the gamepad.
+- `lurek.input.gamepad.setVibration`: Triggers haptic rumble (currently a no-op stub).
+- `lurek.input.gamepad.setBackgroundEvents`: Enable or disable receiving gamepad events when the window is not focused.
+- `lurek.input.gamepad.getBackgroundEvents`: Returns whether background gamepad events are enabled.
+- `lurek.input.gamepad.setGamepadMapping`: Stores or replaces the SDL2 GameControllerDB mapping string for the given GUID.
+- `lurek.input.gamepad.getGamepadMappingString`: Returns the stored mapping string for the given GUID, or nil.
+- `lurek.input.gamepad.loadGamepadMappings`: Loads SDL2 GameControllerDB-format mappings from a file.
+- `lurek.input.gamepad.saveGamepadMappings`: Saves all stored gamepad mappings to a plain-text file.
+- `lurek.input.touch.getTouches`: Returns a table of active touch points with id, x, y, and pressure fields.
+- `lurek.input.touch.getPosition`: Returns the position (x, y) of the touch with the given ID.
+- `lurek.input.touch.getPressure`: Returns the pressure (0-1) of the touch with the given ID.
+- `lurek.input.touch.getTouchCount`: Returns the number of currently active touch points.
+- `lurek.input.bind`: Maps an action name to one or more key or button names.
 - `lurek.input.unbind`: Removes all key bindings for the given action name.
 - `lurek.input.clearBindings`: Removes all action bindings.
 - `lurek.input.getBindings`: Returns a table mapping each action name to its bound keys.
 - `lurek.input.isActionDown`: Returns true if any key bound to the action is currently held down.
 - `lurek.input.wasActionPressed`: Returns true if any key bound to the action was pressed this frame.
 - `lurek.input.wasActionReleased`: Returns true if any key bound to the action was released this frame.
-- `lurek.input.wasActionPressedWithin`: Was action pressed within.
+- `lurek.input.wasActionPressedWithin`: Returns true if the action was pressed within the last frame window.
 - `lurek.input.newCombo`: Creates a new combo detector from an ordered list of steps.
-- `lurek.input.startRecording`: Starts capturing input events frame-by-frame.  Clears any previous recording.
-- `lurek.input.stopRecording`: Stops recording and returns an `InputRecording` userdata, or nil if not recording.
+- `lurek.input.startRecording`: Starts capturing input events frame by frame.
+- `lurek.input.stopRecording`: Stops recording and returns the captured recording handle.
 - `lurek.input.loadRecording`: Loads a JSON-encoded recording string for playback.
 - `lurek.input.startPlayback`: Starts playback from the beginning of the loaded recording.
 - `lurek.input.stopPlayback`: Stops playback immediately.
 - `lurek.input.isRecording`: Returns true if input recording is currently active.
 - `lurek.input.isPlayingBack`: Returns true if input playback is currently active.
-- `lurek.input.getPlaybackFrame`: Returns the current playback frame index (0-based).  Returns 0 when not playing.
-- `lurek.input.advancePlayback`: Advances playback by one frame and returns an array of key/button events for that
+- `lurek.input.getPlaybackFrame`: Returns the current playback frame index.
+- `lurek.input.advancePlayback`: Advances playback by one frame and returns that frame's input events.
 
-### `Combo` Methods
-- `Combo:feed`: Feed a key-press event into the combo detector.
-- `Combo:tick`: Advance the internal clock by `dt` seconds and check for timeouts.
-- `Combo:reset`: Reset the detector to its initial idle state, cancelling any in-progress sequence.
-- `Combo:totalSteps`: Returns the total number of steps in the combo sequence.
-- `Combo:isInProgress`: Returns true if the detector is currently mid-sequence.
-- `Combo:getStep`: Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
+### `LCombo` Methods
+- `LCombo:feed`: Feeds a key-press event into the combo detector.
+- `LCombo:tick`: Advances the combo clock and checks for timeouts.
+- `LCombo:reset`: Reset the detector to its initial idle state, cancelling any in-progress sequence.
+- `LCombo:progress`: Returns the number of steps matched so far (0 when idle).
+- `LCombo:totalSteps`: Returns the total number of steps in the combo sequence.
+- `LCombo:isInProgress`: Returns true if the detector is currently mid-sequence.
+- `LCombo:getStep`: Returns the step at the given 1-based index as `{key=..., gap_ms=...}`.
+- `LCombo:type`: Returns the type name of this object.
+- `LCombo:typeOf`: Returns true if this object is of the given type.
 
-### `Cursor` Methods
-- `Cursor:release`: Releases the cursor resource (no-op on desktop).
-- `Cursor:getType`: Returns the cursor type as "system" or "custom".
+### `LCursor` Methods
+- `LCursor:release`: Releases the cursor resource (no-op on desktop).
+- `LCursor:getType`: Returns the cursor type as "system" or "custom".
+- `LCursor:type`: Returns the type name of this object.
+- `LCursor:typeOf`: Returns true if this object is of the given type.
 
-### `InputRecording` Methods
-- `InputRecording:toJson`: Serializes this recording to a JSON string for saving to disk.
-- `InputRecording:totalFrames`: Returns the total frame count when recording was stopped.
-- `InputRecording:frameCount`: Returns the number of sparse event frames stored in this recording.
+### `LInputRecording` Methods
+- `LInputRecording:toJson`: Serializes this recording to a JSON string for saving to disk.
+- `LInputRecording:totalFrames`: Returns the total frame count when recording was stopped.
+- `LInputRecording:frameCount`: Returns the number of sparse event frames stored in this recording.
+- `LInputRecording:type`: Returns the type name of this object.
+- `LInputRecording:typeOf`: Returns true if this object is of the given type.
 
 ## References
 
@@ -257,6 +248,18 @@ The `input` module is Lurek2D's hardware input abstraction layer — a Platform 
 - Keep this module reference synchronized with `src/input/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
 
-### New in 0.14.1
+### New in 1.0.9-fix.44
 
-- `lurek.input.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` — haptics stub. `low_freq` and `high_freq` clamped to `[0, 1]`, `duration_ms` clamped to `[0, ∞)`. Returns `false` (winit 0.30 has no haptics; ready for future support).
+- `lurek.input.gamepad.vibrate(id, low_freq, high_freq, duration_ms)` and `lurek.input.gamepad.setVibration(...)` now queue real rumble requests via `gilrs::ff` when force-feedback is supported.
+- Added frame-perfect gamepad edge queries:
+	- `lurek.input.gamepad.wasPressed(id, button)`
+	- `lurek.input.gamepad.wasReleased(id, button)`
+	- `lurek.input.gamepad.wasConnected(id)`
+	- `lurek.input.gamepad.wasDisconnected(id)`
+- Added frame-perfect touch edge queries:
+	- `lurek.input.touch.wasPressed(id)`
+	- `lurek.input.touch.wasReleased(id)`
+- Added `lurek.input.newMapping(name, keys)` convenience constructor returning a mapping object with `isDown()`, `wasPressed()`, and `wasReleased()`.
+- Action mappings now accept gamepad button bindings in `gamepad:<id>:<button>` format.
+- Input recording JSON now includes a schema envelope field: `"version": 1`.
+	- `InputRecording::from_json` remains backward-compatible with legacy payloads that omit `version`.

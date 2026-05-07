@@ -22,10 +22,14 @@ use crate::audio::Mixer;
 use crate::camera::Camera;
 use crate::event::EventQueue;
 use crate::filesystem::GameFS;
-use crate::input::{GamepadMappings, GamepadState, KeyboardState, MouseState, TouchState};
+use crate::input::{
+    GamepadMappings, GamepadState, GamepadVibrationRequest, KeyboardState, MouseState,
+    TouchState,
+};
 use crate::light::LightWorld;
 use crate::parallax::ParallaxLayer;
 use crate::particle::ParticleSystem;
+use crate::province::registry::ProvinceRegistry;
 use crate::raycaster::RaycasterScene;
 use crate::render::gpu_renderer::RenderStats;
 use crate::render::renderer::{BlendMode, DepthMode, RenderCommand, StencilMode, TextureData};
@@ -65,6 +69,7 @@ pub enum FullscreenType {
 /// - `pending_fullscreen` — `Option<bool>`.
 /// - `pending_fullscreen_type` — `FullscreenType`.
 /// - `pending_position` — `Option<(i32, i32)>`.
+/// - `pending_display_index` — `Option<usize>`.
 /// - `pending_size` — `Option<(u32, u32)>`.
 /// - `pending_minimize` — `bool`.
 /// - `pending_maximize` — `bool`.
@@ -117,6 +122,8 @@ pub struct WindowState {
     pub pending_fullscreen_type: FullscreenType,
     /// Pending window position change.
     pub pending_position: Option<(i32, i32)>,
+    /// Pending display index request for monitor move.
+    pub pending_display_index: Option<usize>,
     /// Pending window size change.
     pub pending_size: Option<(u32, u32)>,
     /// Whether to minimize the window next frame.
@@ -174,6 +181,7 @@ impl Default for WindowState {
             pending_fullscreen: None,
             pending_fullscreen_type: FullscreenType::Desktop,
             pending_position: None,
+            pending_display_index: None,
             pending_size: None,
             pending_minimize: false,
             pending_maximize: false,
@@ -301,6 +309,8 @@ pub struct SharedState {
     pub gamepad_background_events: bool,
     /// Stored SDL2 GameControllerDB-format mapping strings keyed by GUID.
     pub gamepad_mappings: GamepadMappings,
+    /// Pending vibration requests queued from Lua and consumed by the app loop.
+    pub gamepad_vibration_requests: Vec<GamepadVibrationRequest>,
     /// 2D camera controlling the world-to-screen view transform.
     pub camera: Camera,
     /// Visual size of drawn points in pixels.
@@ -355,6 +365,14 @@ pub struct SharedState {
     ///
     /// Set by `lurek.graphic.saveScreenshot` and consumed after a successful render.
     pub pending_screenshot: Option<ScreenshotRequest>,
+    /// Requests a one-shot CPU readback of the next rendered frame.
+    ///
+    /// Set by `lurek.image.fromScreen()` when no capture is available yet.
+    pub pending_screen_capture: bool,
+    /// Most recently captured screen pixels converted to `ImageData`.
+    ///
+    /// Consumed by `lurek.image.fromScreen()` on the next Lua tick.
+    pub captured_screen_image: Option<crate::image::ImageData>,
     /// Active stencil mode — written by `lurek.graphic.setStencilMode`, read at render time.
     pub stencil_mode: StencilMode,
     /// Active depth test mode and write-enable flag — written by `lurek.graphic.setDepthMode`.
@@ -415,6 +433,12 @@ pub struct SharedState {
     /// Updated by the render loop whenever a texture command is submitted.
     /// Used by `evict_lru_resources` to find the oldest unused textures.
     pub texture_last_used: HashMap<TextureKey, u64>,
+    /// Engine-backed province registries indexed by name.
+    ///
+    /// Used by `lurek.province.*` and optional adapters (`province_map`, `globe`, `minimap`).
+    pub province_registries: HashMap<String, ProvinceRegistry>,
+    /// Optional active province registry name.
+    pub active_province_registry: Option<String>,
 }
 
 impl SharedState {
@@ -464,6 +488,7 @@ impl SharedState {
             gamepads: Vec::new(),
             gamepad_background_events: false,
             gamepad_mappings: GamepadMappings::new(),
+            gamepad_vibration_requests: Vec::new(),
             camera: Camera::default(),
             point_size: 1.0,
             transform_stack_depth: 1,
@@ -490,6 +515,8 @@ impl SharedState {
             fs,
             midi_state: MidiState::new(),
             pending_screenshot: None,
+            pending_screen_capture: false,
+            captured_screen_image: None,
             stencil_mode: StencilMode::default(),
             depth_mode: (DepthMode::Always, false),
             light_world: LightWorld::new(),
@@ -504,6 +531,8 @@ impl SharedState {
             resource_budget_bytes: 0,
             frame_counter: 0,
             texture_last_used: HashMap::new(),
+            province_registries: HashMap::new(),
+            active_province_registry: None,
         }
     }
 
@@ -616,6 +645,31 @@ impl SharedState {
         Ok(handle.0)
     }
 
+    /// Submits a background file-write request, lazily creating the async loader.
+    ///
+    /// # Parameters
+    /// - `path` — Relative destination path inside `save/`.
+    /// - `data` — Payload to write.
+    ///
+    /// # Returns
+    /// `u64` — An opaque handle ID used to poll the write result.
+    pub fn request_async_write(
+        &mut self,
+        path: &str,
+        data: Vec<u8>,
+    ) -> crate::runtime::error::EngineResult<u64> {
+        let resolved = self.fs.resolve_save_path(path)?;
+        if self.async_loader.is_none() {
+            self.async_loader = Some(crate::filesystem::AsyncLoader::new());
+        }
+        let handle = self
+            .async_loader
+            .as_ref()
+            .expect("async_loader initialized above")
+            .request_write(resolved, data);
+        Ok(handle.0)
+    }
+
     /// Loads all 6 embedded bitmap fonts into `fonts` and stores their keys in `default_fonts`.
     ///
     /// Index 3 (14px) becomes `default_font` and `active_font`.
@@ -653,6 +707,29 @@ impl SharedState {
                     Some(String::from_utf8_lossy(&bytes).to_string()),
                 ),
                 LoadStatus::Done(LoadResult::Error(msg)) => ("error".to_string(), Some(msg)),
+            }
+        } else {
+            ("error".to_string(), None)
+        }
+    }
+
+    /// Polls a pending async write and returns the status and optional result payload.
+    ///
+    /// # Parameters
+    /// - `handle_id` — The opaque handle returned by `request_async_write`.
+    ///
+    /// # Returns
+    /// `(String, Option<String>)` — Status (`"pending"`, `"done"`, or `"error"`) and payload.
+    /// On success the payload is the number of bytes written as a decimal string.
+    pub fn poll_async_write(&self, handle_id: u64) -> (String, Option<String>) {
+        use crate::filesystem::{LoadHandle, WriteResult, WriteStatus};
+        if let Some(ref loader) = self.async_loader {
+            match loader.poll_write(LoadHandle(handle_id)) {
+                WriteStatus::Pending => ("pending".to_string(), None),
+                WriteStatus::Done(WriteResult::Written(bytes)) => {
+                    ("done".to_string(), Some(bytes.to_string()))
+                }
+                WriteStatus::Done(WriteResult::Error(msg)) => ("error".to_string(), Some(msg)),
             }
         } else {
             ("error".to_string(), None)

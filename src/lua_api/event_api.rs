@@ -6,7 +6,7 @@ use std::cell::RefCell;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::rc::Rc;
 
-use crate::event::{event_to_lua_multi, EventArg, Signal};
+use crate::event::{event_arg_to_lua_value, event_to_lua_multi, EventArg, EventPriority, Signal};
 
 // ---------------------------------------------------------------------------
 // LuaSignal UserData
@@ -244,6 +244,27 @@ impl LuaUserData for LuaSignal {
 pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let tbl = lua.create_table()?;
 
+    fn parse_priority(value: &LuaValue) -> LuaResult<EventPriority> {
+        match value {
+            LuaValue::String(s) => {
+                let name = s
+                    .to_str()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                    .to_ascii_lowercase();
+                match name.as_str() {
+                    "high" => Ok(EventPriority::High),
+                    "normal" => Ok(EventPriority::Normal),
+                    _ => Err(LuaError::RuntimeError(
+                        "event priority must be 'high' or 'normal'".into(),
+                    )),
+                }
+            }
+            _ => Err(LuaError::RuntimeError(
+                "event priority must be a string ('high' or 'normal')".into(),
+            )),
+        }
+    }
+
     // -- exit --
     /// Pushes an exit event onto the engine event queue, requesting a graceful shutdown at the end of the current frame.
     /// @param | code | integer? | Optional OS exit code (default 0)
@@ -328,12 +349,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 Some(event) => {
                     let args_tbl = lua.create_table()?;
                     for (index, arg) in event.args.iter().enumerate() {
-                        let value = match arg {
-                            EventArg::Str(s) => LuaValue::String(lua.create_string(s)?),
-                            EventArg::Num(n) => LuaValue::Number(*n),
-                            EventArg::Bool(b) => LuaValue::Boolean(*b),
-                            EventArg::Nil => LuaValue::Nil,
-                        };
+                        let value = event_arg_to_lua_value(lua, arg)?;
                         args_tbl.set(index + 1, value)?;
                     }
                     Ok(LuaMultiValue::from_vec(vec![
@@ -382,7 +398,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // Deferred event queue " events pushed via pushDeferred are batched and
     // only dispatched to the main queue when flushDeferred is called.
-    let deferred_queue: Rc<RefCell<Vec<(String, Vec<EventArg>)>>> =
+    let deferred_queue: Rc<RefCell<Vec<(String, Vec<EventArg>, EventPriority)>>> =
         Rc::new(RefCell::new(Vec::new()));
 
     // -- pushDeferred --
@@ -409,7 +425,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             for val in iter {
                 event_args.push(EventArg::from_lua_val(&val)?);
             }
-            deferred.borrow_mut().push((name, event_args));
+            deferred
+                .borrow_mut()
+                .push((name, event_args, EventPriority::Normal));
+            Ok(())
+        })?,
+    )?;
+
+    // -- pushDeferredPriority --
+    /// Pushes a named event into the deferred buffer with explicit queue priority.
+    /// @param | name | string | The event name to defer
+    /// @param | priority | string | Queue lane: "high" or "normal"
+    /// @return | nil | No return value.
+    let deferred = deferred_queue.clone();
+    tbl.set(
+        "pushDeferredPriority",
+        lua.create_function(move |_, args: LuaMultiValue| {
+            let mut iter = args.into_iter();
+            let name: String = match iter.next() {
+                Some(LuaValue::String(s)) => s
+                    .to_str()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                    .to_string(),
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "event.pushDeferredPriority requires a string event name as first argument"
+                            .into(),
+                    ))
+                }
+            };
+            let priority = match iter.next() {
+                Some(value) => parse_priority(&value)?,
+                None => {
+                    return Err(LuaError::RuntimeError(
+                        "event.pushDeferredPriority requires a priority as second argument"
+                            .into(),
+                    ))
+                }
+            };
+
+            let mut event_args = Vec::new();
+            for val in iter {
+                event_args.push(EventArg::from_lua_val(&val)?);
+            }
+            deferred.borrow_mut().push((name, event_args, priority));
             Ok(())
         })?,
     )?;
@@ -425,8 +484,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let mut buf = deferred.borrow_mut();
             let count = buf.len() as u32;
             let mut st = s.borrow_mut();
-            for (name, args) in buf.drain(..) {
-                st.event_queue.push_event(&name, args);
+            for (name, args, priority) in buf.drain(..) {
+                st.event_queue.push_event_with_priority(&name, args, priority);
             }
             Ok(count)
         })?,
@@ -469,12 +528,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 entry.set("name", name.clone())?;
                 let args_tbl = lua.create_table()?;
                 for (j, arg) in args.iter().enumerate() {
-                    let v = match arg {
-                        EventArg::Nil => LuaValue::Nil,
-                        EventArg::Bool(b) => LuaValue::Boolean(*b),
-                        EventArg::Num(n) => LuaValue::Number(*n),
-                        EventArg::Str(s) => LuaValue::String(lua.create_string(s)?),
-                    };
+                    let v = event_arg_to_lua_value(lua, arg)?;
                     args_tbl.set(j + 1, v)?;
                 }
                 entry.set("args", args_tbl)?;
@@ -501,8 +555,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | name | string | The event name to push (case-sensitive)
     /// @return | nil | No return value.
     let s = state.clone();
-    let hist_p = history_buf;
-    let cap_p = history_cap;
+    let hist_p = history_buf.clone();
+    let cap_p = history_cap.clone();
     tbl.set(
         "push",
         lua.create_function(move |_, args: LuaMultiValue| {
@@ -525,6 +579,60 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             s.borrow_mut()
                 .event_queue
                 .push_event(&name, event_args.clone());
+            let cap_val = *cap_p.borrow();
+            if cap_val > 0 {
+                let mut buf = hist_p.borrow_mut();
+                buf.push_back((name, event_args));
+                while buf.len() > cap_val {
+                    buf.pop_front();
+                }
+            }
+            Ok(())
+        })?,
+    )?;
+
+    // -- pushPriority --
+    /// Pushes a custom named event onto a selected queue lane.
+    /// @param | name | string | The event name to push (case-sensitive)
+    /// @param | priority | string | Queue lane: "high" or "normal"
+    /// @return | nil | No return value.
+    let s = state.clone();
+    let hist_p = history_buf.clone();
+    let cap_p = history_cap.clone();
+    tbl.set(
+        "pushPriority",
+        lua.create_function(move |_, args: LuaMultiValue| {
+            let mut iter = args.into_iter();
+            let name: String = match iter.next() {
+                Some(LuaValue::String(s)) => s
+                    .to_str()
+                    .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                    .to_string(),
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "event.pushPriority requires a string event name as first argument"
+                            .into(),
+                    ))
+                }
+            };
+            let priority = match iter.next() {
+                Some(value) => parse_priority(&value)?,
+                None => {
+                    return Err(LuaError::RuntimeError(
+                        "event.pushPriority requires a priority as second argument".into(),
+                    ))
+                }
+            };
+
+            let mut event_args = Vec::new();
+            for val in iter {
+                event_args.push(EventArg::from_lua_val(&val)?);
+            }
+
+            s.borrow_mut()
+                .event_queue
+                .push_event_with_priority(&name, event_args.clone(), priority);
+
             let cap_val = *cap_p.borrow();
             if cap_val > 0 {
                 let mut buf = hist_p.borrow_mut();

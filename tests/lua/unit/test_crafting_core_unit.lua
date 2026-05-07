@@ -1,4 +1,4 @@
--- Lua BDD tests for lurek.crafting.*
+﻿-- Lua BDD tests for lurek.crafting.*
 
 if not lurek.crafting then
     -- @describe lurek.crafting
@@ -12,7 +12,6 @@ end
 
 -- @describe lurek.crafting.Recipe
 describe("lurek.crafting.Recipe", function()
-    -- @covers lurek.crafting.newRecipe
     it("creates a recipe with id and type", function()
         local r = lurek.crafting.newRecipe("sword", "shaped")
         expect_equal(r:getId(), "sword")
@@ -22,7 +21,6 @@ describe("lurek.crafting.Recipe", function()
 
     -- @covers LGraphEdge:getCooldown
     -- @covers LGraphEdge:setCooldown
-    -- @covers lurek.crafting.newRecipe
     it("supports category, cooldown, hand_craftable", function()
         local r = lurek.crafting.newRecipe("potion")
         expect_equal(r:getCategory(), "")
@@ -38,7 +36,6 @@ describe("lurek.crafting.Recipe", function()
         expect_equal(r:isHandCraftable(), false)
     end)
 
-    -- @covers lurek.crafting.newRecipe
     it("can add and clear ingredients", function()
         local r = lurek.crafting.newRecipe("test")
         r:addIngredient("iron", 3)
@@ -48,7 +45,6 @@ describe("lurek.crafting.Recipe", function()
         expect_equal(#r:getIngredients(), 0)
     end)
 
-    -- @covers lurek.crafting.newRecipe
     it("can add and clear outputs", function()
         local r = lurek.crafting.newRecipe("test")
         r:addOutput("sword", 1)
@@ -58,7 +54,6 @@ describe("lurek.crafting.Recipe", function()
         expect_equal(#r:getOutputs(), 0)
     end)
 
-    -- @covers lurek.crafting.newRecipe
     it("supports tags", function()
         local r = lurek.crafting.newRecipe("test")
         r:addTag("weapon")
@@ -68,7 +63,6 @@ describe("lurek.crafting.Recipe", function()
         expect_equal(#r:getTags(), 2)
     end)
 
-    -- @covers lurek.crafting.newRecipe
     it("supports byproducts conditions and progression metadata", function()
         local r = lurek.crafting.newRecipe("elixir")
         r:addOutput("elixir", 1, "excellent")
@@ -102,8 +96,6 @@ end)
 describe("lurek.crafting.RecipeRegistry", function()
     -- @covers LContentRegistry:getAll
     -- @covers LSaveManager:unregister
-    -- @covers lurek.crafting.newRecipe
-    -- @covers lurek.crafting.newRegistry
     it("supports register unregister and query helpers", function()
         local reg = lurek.crafting.newRegistry()
 
@@ -140,7 +132,6 @@ end)
 -- @describe lurek.crafting.Station
 describe("lurek.crafting.Station", function()
     -- @covers LRelationshipManager:getLevel
-    -- @covers lurek.crafting.newStation
     it("creates with type and level", function()
         local s = lurek.crafting.newStation("forge", 2)
         expect_equal(s:getType(), "forge")
@@ -149,7 +140,6 @@ describe("lurek.crafting.Station", function()
     end)
 
     -- @covers LRelationshipManager:getLevel
-    -- @covers lurek.crafting.newStation
     it("supports upgrade with max level", function()
         local s = lurek.crafting.newStation("forge", 1)
         s:setMaxLevel(3)
@@ -160,7 +150,6 @@ describe("lurek.crafting.Station", function()
         expect_equal(s:getLevel(), 3)
     end)
 
-    -- @covers lurek.crafting.newStation
     it("supports position and proximity", function()
         local s = lurek.crafting.newStation("anvil", 1)
         s:setPosition(50, 50)
@@ -172,7 +161,6 @@ describe("lurek.crafting.Station", function()
         expect_equal(s:isInRange(100, 100), false)
     end)
 
-    -- @covers lurek.crafting.newStation
     it("supports fuel", function()
         local s = lurek.crafting.newStation("furnace", 1)
         s:setFuelCapacity(80)
@@ -186,7 +174,6 @@ describe("lurek.crafting.Station", function()
         expect_equal(s:consumeFuel(60), false) -- insufficient
     end)
 
-    -- @covers lurek.crafting.newStation
     it("supports quality bonus and output multiplier", function()
         local s = lurek.crafting.newStation("bench", 1)
         s:setQualityBonus(0.25)
@@ -195,7 +182,6 @@ describe("lurek.crafting.Station", function()
         expect_near(s:getOutputMultiplier(), 2.0, 0.001)
     end)
 
-    -- @covers lurek.crafting.newStation
     it("supports metadata", function()
         local s = lurek.crafting.newStation("kiln", 1)
         expect_equal(s:getMetadata("color"), nil)
@@ -206,14 +192,12 @@ end)
 
 -- @describe lurek.crafting.RecipeKnowledge
 describe("lurek.crafting.RecipeKnowledge", function()
-    -- @covers lurek.crafting.newRecipeKnowledge
     it("creates empty", function()
         local k = lurek.crafting.newRecipeKnowledge()
         expect_equal(k:type(), "RecipeKnowledge")
         expect_equal(k:count(), 0)
     end)
 
-    -- @covers lurek.crafting.newRecipeKnowledge
     it("discovers and forgets recipes", function()
         local k = lurek.crafting.newRecipeKnowledge()
         k:discover("sword", "scroll")
@@ -224,7 +208,6 @@ describe("lurek.crafting.RecipeKnowledge", function()
         expect_equal(k:isKnown("sword"), false)
     end)
 
-    -- @covers lurek.crafting.newRecipeKnowledge
     it("supports auto discover", function()
         local k = lurek.crafting.newRecipeKnowledge()
         k:setAutoDiscover(true)
@@ -233,7 +216,6 @@ describe("lurek.crafting.RecipeKnowledge", function()
         expect_equal(k:isKnown("anything"), false)
     end)
 
-    -- @covers lurek.crafting.newRecipeKnowledge
     it("clears all knowledge", function()
         local k = lurek.crafting.newRecipeKnowledge()
         k:discover("a")
@@ -242,7 +224,6 @@ describe("lurek.crafting.RecipeKnowledge", function()
         expect_equal(k:count(), 0)
     end)
 
-    -- @covers lurek.crafting.newRecipeKnowledge
     it("supports prototype and research helpers", function()
         local k = lurek.crafting.newRecipeKnowledge()
         expect_equal(true, k:prototype("campfire"))
@@ -262,14 +243,12 @@ end)
 
 -- @describe lurek.crafting.RecipeGroup
 describe("lurek.crafting.RecipeGroup", function()
-    -- @covers lurek.crafting.newRecipeGroup
     it("creates with name", function()
         local g = lurek.crafting.newRecipeGroup("Weapons")
         expect_equal(g:type(), "RecipeGroup")
         expect_equal(g:getName(), "Weapons")
     end)
 
-    -- @covers lurek.crafting.newRecipeGroup
     it("adds and removes recipes", function()
         local g = lurek.crafting.newRecipeGroup("Swords")
         g:addRecipe("iron_sword")
@@ -281,7 +260,6 @@ describe("lurek.crafting.RecipeGroup", function()
         expect_equal(g:contains("iron_sword"), false)
     end)
 
-    -- @covers lurek.crafting.newRecipeGroup
     it("manages icon and order", function()
         local g = lurek.crafting.newRecipeGroup("Armor")
         g:setIcon("shield.png")
@@ -293,7 +271,6 @@ end)
 
 -- @describe lurek.crafting.CraftQueue
 describe("lurek.crafting.CraftQueue", function()
-    -- @covers lurek.crafting.newCraftQueue
     it("enqueues, updates, and collects completed jobs", function()
         local q = lurek.crafting.newCraftQueue(5)
         local id = q:enqueue("plank", 2.0, 1)
@@ -305,7 +282,6 @@ describe("lurek.crafting.CraftQueue", function()
         expect_equal(q:count(), 0)
     end)
 
-    -- @covers lurek.crafting.newCraftQueue
     it("supports pausing jobs and listing queue state", function()
         local q = lurek.crafting.newCraftQueue(3)
         local id = q:enqueue("ingot", 2.0, 2)
@@ -335,7 +311,6 @@ end)
 -- @describe lurek.crafting.CraftSkill
 describe("lurek.crafting.CraftSkill", function()
     -- @covers LRelationshipManager:getLevel
-    -- @covers lurek.crafting.newCraftSkill
     it("tracks xp and levels up", function()
         local s = lurek.crafting.newCraftSkill("smithing")
         expect_equal(s:getName(), "smithing")
@@ -345,8 +320,6 @@ describe("lurek.crafting.CraftSkill", function()
     end)
 
     -- @covers LRelationshipManager:setLevel
-    -- @covers lurek.crafting.newCraftSkill
-    -- @covers lurek.crafting.newRecipe
     it("supports specializations perks bonuses and recipe helpers", function()
         local s = lurek.crafting.newCraftSkill("smithing")
         s:addSpecialization("armorsmith")
@@ -385,7 +358,6 @@ end)
 -- @describe lurek.crafting.UpgradeTree
 describe("lurek.crafting.UpgradeTree", function()
     -- @covers LGraph:addNode
-    -- @covers lurek.crafting.newUpgradeTree
     it("manages nodes and prerequisites", function()
         local tree = lurek.crafting.newUpgradeTree("weapons")
         tree:addNode("basic", "Basic Forge")
@@ -401,7 +373,6 @@ describe("lurek.crafting.UpgradeTree", function()
     -- @covers LGraph:addNode
     -- @covers LUniverse:getChildren
     -- @covers LUniverse:getParent
-    -- @covers lurek.crafting.newUpgradeTree
     it("supports graph queries and node listing", function()
         local tree = lurek.crafting.newUpgradeTree("weapons")
         tree:addNode("basic", "Basic Forge")
@@ -435,7 +406,6 @@ end)
 -- @describe lurek.crafting.ModifierPool
 describe("lurek.crafting.ModifierPool", function()
     -- @covers LTraitProfile:addModifier
-    -- @covers lurek.crafting.newModifierPool
     it("tracks modifiers and rolls deterministically", function()
         local pool = lurek.crafting.newModifierPool("rare_affixes")
         pool:addModifier("keen", 2.0, {critChance = 0.1})

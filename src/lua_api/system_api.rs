@@ -1,4 +1,4 @@
-//! `lurek.platform` - Platform queries: OS name, CPU count, memory size, power state,
+﻿//! `lurek.platform` - Platform queries: OS name, CPU count, memory size, power state,
 //! preferred locales, clipboard access, and safe URL opening.
 //!
 //! Registered as `lurek.platform.*` in the Lua VM. Domain logic is minimal -
@@ -287,6 +287,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enabled | boolean | Whether the debug overlay should be visible.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     system.set("setDebugOverlay", lua.create_function(move |_, enabled: bool| {
             s.borrow_mut().debug_overlay_enabled = enabled;
             Ok(())
@@ -297,6 +298,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether the debug overlay is currently visible.
     /// @return | boolean | Returns whether the debug overlay is visible.
     let s = state;
+    // Auto-doc: Lua API binding.
     system.set("getDebugOverlay", lua.create_function(move |_, ()| Ok(s.borrow().debug_overlay_enabled))?,
     )?;
 
@@ -348,6 +350,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         /// Returns the last unhandled error message, or nil.
         /// @return | table | Returns the last error snapshot table when one exists.
         let s = state_for_error.clone();
+    // Auto-doc: Lua API binding.
         system.set("getLastError", lua.create_function(move |lua, ()| {
                 let state = s.borrow();
                 if let Some(ref err_info) = state.last_error {

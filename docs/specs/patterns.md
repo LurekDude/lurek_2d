@@ -11,31 +11,9 @@
 
 ## Summary
 
-## Summary
+The `patterns` module is documented from the current source tree and existing module reference data.
 
-The `patterns` module provides twelve classic game-programming design patterns as ready-to-use Rust types exposed to Lua via `lurek.patterns.*`. It is a Feature Systems tier module. All pattern types hold only pure-Rust state; callbacks are stored in the Lua API layer (`src/lua_api/patterns_api.rs`), not in the domain types.
-
-**Publish-subscribe patterns.** `EventBus` is a named-event publish-subscribe bus with priority-ordered listeners, one-shot subscriptions, and subscription management (cancel by ID). Used for decoupled system communication where any number of subscribers can react to a named event without the publisher knowing the listeners. `Mediator` provides named-channel message routing between components — a centralised broker variant where all messages pass through a known hub.
-
-**Object lifecycle.** `ObjectPool` tracks recyclable object slots to reduce GC churn. The Lua layer stores actual values; the Rust type tracks which slots are active, idle, and available. `acquire()` returns the next idle slot ID; `release(id)` marks it idle. `Factory` is a constructor-name registry with optional alias resolution for data-driven object creation: `register(name, fn)`, `create(name, args)`.
-
-**Command and undo.** `CommandStack` provides undo/redo history with batch grouping for atomic multi-step operations. `push(label)`, `undo()`, `redo()`, `beginBatch()`, `endBatch()`. The Lua layer holds the actual do/undo callbacks keyed by the command ID returned by `push`.
-
-**State machines.** `StateMachine` is a full FSM with registered states, explicit guarded transition rules, entry/exit callbacks, and state history. `addState(name)`, `addTransition(from, to, guard)`, `transition(target)`, `currentState()`, `history()`. `SimpleState` is the lightweight variant for games that need named states without a validated transition graph.
-
-**Shared knowledge.** `Blackboard` is a hierarchical typed key-value store for AI and game system coordination. `BlackboardValue` enum carries `Nil`, `Bool`, `Int`, `Float`, `String`, `Vec2`, and `Table` variants. `set(key, value)`, `get(key)` → value, `watch(key, fn)` (fires on change), `revision()` (monotone update counter). Multiple systems share a `Blackboard` userdata without tight coupling. `Observer` provides reactive per-key subscriptions on any watched table with the same change-fire semantics.
-
-**Rate limiting.** `Throttle` implements leading-edge rate limiting: the first event in a window fires immediately; subsequent events within the cooldown are dropped. `Debounce` is trailing-edge delay: every new event restarts a timer; only the event after the quiet period fires. Both are useful for input handling, network request throttling, and animation trigger debouncing.
-
-**Scheduling.** `PriorityQueue` is a stable highest-priority-first queue for turn-based scheduling and agenda management. `push(priority, item)`, `pop()` → item, `peek()` → item, `reprioritize(id, new_priority)`. `Ring` is a fixed-capacity circular history buffer for time-series data and recent-event queries.
-
-**Data structures.** `Funnel` is a time-windowed event aggregator: `add(event)`, `flush()` → batch (fires when window expires or is manually drained). `BiMap` is a bidirectional hash map with bijection enforcement. `Trie` is a string-key prefix index with `prefixSearch(prefix)` and ordered iteration. `ServiceLocator` is a singleton-style named-service registry for global access without dependency injection.
-
-**Extended scripting surface.** `StateMachine`, `EventBus`, `Blackboard`, and `PriorityQueue` each have additional accessor and mutation methods on the Lua bridge for state introspection, conditional subscriber management, typed blackboard iteration, and priority re-ordering that previously required game-side workarounds.
-
-**Lua surface.** `lurek.patterns.newEventBus()`, `newObjectPool(capacity)`, `newCommandStack(limit)`, `newServiceLocator()`, `newFactory()`, `newStateMachine()`, `newBlackboard()`, `newObserver()`, `newThrottle(interval)`, `newDebounce(delay)`, `newPriorityQueue()`, `newRing(capacity)`, `newFunnel(window_ms)`, `newBiMap()`, `newTrie()`, `newMediator()`.
-
-**Scope boundary.** Feature Systems tier. Depends on `runtime` (SharedState for timer access). Lua bridge in `src/lua_api/patterns_api.rs`.
+This module is mostly self-contained inside the Foundations group. Cross-module behavior should stay in the referenced Rust source files and Lua bindings rather than being duplicated here.
 
 ## Files
 
@@ -272,7 +250,7 @@ The `patterns` module provides twelve classic game-programming design patterns a
 - `lurek.patterns.newDebounce`: Creates a trailing-edge debounce that fires after the input stream is idle for wait seconds.
 - `lurek.patterns.newPriorityQueue`: Creates a stable priority-ordered task queue.
 - `lurek.patterns.newRing`: Creates a fixed-capacity circular history buffer.
-- `lurek.patterns.newFunnel`: Creates a time-windowed event aggregator. window=0 means flush on every push.
+- `lurek.patterns.newFunnel`: Creates a time-windowed event aggregator that flushes on every push when `window` is `0`.
 - `lurek.patterns.newRelationshipManager`: Creates a new entity relationship manager.
 - `lurek.patterns.newMediator`: Creates a new named-channel message broker.
 - `lurek.patterns.newStrategy`: Creates a new strategy registry.
@@ -281,195 +259,195 @@ The `patterns` module provides twelve classic game-programming design patterns a
 - `lurek.patterns.newList`: Creates an ordered, resizable list.
 - `lurek.patterns.newSet`: Creates an unordered set that rejects duplicate values (by string key).
 
-### `Blackboard` Methods
-- `Blackboard:set`: Sets a fact on the blackboard. Accepts boolean, number, or string values.
-- `Blackboard:get`: Gets a fact from the blackboard. Returns nil if not set.
-- `Blackboard:has`: Returns true when the key has a non-nil value.
-- `Blackboard:clear`: Removes a fact from the blackboard.
-- `Blackboard:keys`: Returns all set fact keys as a table.
-- `Blackboard:watch`: Subscribes to changes on a specific key (or "*" for all changes).
-- `Blackboard:unwatch`: Removes a watcher subscription by id.
-- `Blackboard:getRevision`: Returns the monotonic revision counter (incremented on every write).
-- `Blackboard:snapshot`: Returns all facts as a flat keyâ†’value table.
-- `Blackboard:clearAll`: Clears all facts from the blackboard.
+### `LBlackboard` Methods
+- `LBlackboard:set`: Sets a fact on the blackboard.
+- `LBlackboard:get`: Gets a fact from the blackboard.
+- `LBlackboard:has`: Returns true when the key has a non-nil value.
+- `LBlackboard:clear`: Removes a fact from the blackboard.
+- `LBlackboard:keys`: Returns all set fact keys as a table.
+- `LBlackboard:watch`: Subscribes to changes on a specific key (or "*" for all changes).
+- `LBlackboard:unwatch`: Removes a watcher subscription by id.
+- `LBlackboard:getRevision`: Returns the monotonic revision counter (incremented on every write).
+- `LBlackboard:snapshot`: Returns all facts as a flat key-value table.
+- `LBlackboard:clearAll`: Clears all facts from the blackboard.
 
-### `CommandStack` Methods
-- `CommandStack:execute`: Executes a named command and records it in undo/redo history.
-- `CommandStack:undo`: Undoes the most recent command. Returns true if successful.
-- `CommandStack:redo`: Re-executes the next undone command. Returns true if successful.
-- `CommandStack:canUndo`: Returns true if the most recent command can be undone.
-- `CommandStack:canRedo`: Returns true if there is a command available to redo.
-- `CommandStack:getHistorySize`: Returns the total number of recorded commands (undo + redo).
-- `CommandStack:getCurrentName`: Returns the name of the most recently executed command, or nil.
-- `CommandStack:clearAll`: Clears all command history, releasing Lua registry values.
+### `LCommandStack` Methods
+- `LCommandStack:execute`: Executes a named command and records it in undo/redo history.
+- `LCommandStack:undo`: Undoes the most recent command and returns whether it succeeded.
+- `LCommandStack:redo`: Re-executes the next undone command and returns whether it succeeded.
+- `LCommandStack:canUndo`: Returns true if the most recent command can be undone.
+- `LCommandStack:canRedo`: Returns true if there is a command available to redo.
+- `LCommandStack:getHistorySize`: Returns the total number of recorded commands (undo + redo).
+- `LCommandStack:getCurrentName`: Returns the name of the most recently executed command.
+- `LCommandStack:clearAll`: Clears all command history, releasing Lua registry values.
 
-### `Debounce` Methods
-- `Debounce:onFire`: Sets the callback invoked when the debounce fires.
-- `Debounce:trigger`: Records an input event, resetting the idle timer.
-- `Debounce:update`: Advances the idle timer by dt seconds; fires the callback if idle wait expired.
-- `Debounce:cancel`: Cancels the pending trigger without firing.
-- `Debounce:isPending`: Returns true when a trigger is pending.
-- `Debounce:getFireCount`: Returns the total number of times this debounce has fired.
+### `LDebounce` Methods
+- `LDebounce:onFire`: Sets the callback invoked when the debounce fires.
+- `LDebounce:trigger`: Records an input event, resetting the idle timer.
+- `LDebounce:update`: Advances the idle timer by dt seconds; fires the callback if idle wait expired.
+- `LDebounce:cancel`: Cancels the pending trigger without firing.
+- `LDebounce:isPending`: Returns true when a trigger is pending.
+- `LDebounce:getFireCount`: Returns the total number of times this debounce has fired.
 
-### `EventBus` Methods
-- `EventBus:on`: Registers a listener callback for an event.
-- `EventBus:off`: Removes a previously registered event listener by subscription ID.
-- `EventBus:emit`: Dispatches an event, calling all registered listeners in priority order.
-- `EventBus:clear`: Removes all listeners for a specific event.
-- `EventBus:clearAll`: Removes all listeners on this EventBus.
-- `EventBus:getListenerCount`: Returns the number of listeners registered for an event.
-- `EventBus:getEvents`: Returns all event names that have at least one listener.
+### `LEventBus` Methods
+- `LEventBus:on`: Registers a listener callback for an event.
+- `LEventBus:off`: Removes a previously registered event listener by subscription ID.
+- `LEventBus:emit`: Dispatches an event, calling all registered listeners in priority order.
+- `LEventBus:clear`: Removes all listeners for a specific event.
+- `LEventBus:clearAll`: Removes all listeners on this EventBus.
+- `LEventBus:getListenerCount`: Returns the number of listeners registered for an event.
+- `LEventBus:getEvents`: Returns all event names that have at least one listener.
 
-### `Factory` Methods
-- `Factory:register`: Registers a named type constructor function.
-- `Factory:create`: Creates an instance of the named type by invoking its constructor.
-- `Factory:has`: Returns true if the named type (or alias) is registered.
-- `Factory:alias`: Registers an alias pointing to an existing canonical type name.
-- `Factory:getTypes`: Returns a table of all registered type names.
-- `Factory:remove`: Unregisters a type constructor (and any aliases pointing to it).
-- `Factory:clearAll`: Removes all registered type constructors and aliases.
+### `LFactory` Methods
+- `LFactory:register`: Registers a named type constructor function.
+- `LFactory:create`: Creates an instance of the named type by invoking its constructor.
+- `LFactory:has`: Returns true if the named type (or alias) is registered.
+- `LFactory:alias`: Registers an alias pointing to an existing canonical type name.
+- `LFactory:getTypes`: Returns a table of all registered type names.
+- `LFactory:remove`: Unregisters a type constructor (and any aliases pointing to it).
+- `LFactory:clearAll`: Removes all registered type constructors and aliases.
 
-### `Funnel` Methods
-- `Funnel:onFlush`: Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries.
-- `Funnel:push`: Adds an event to the funnel. Immediately flushes if max_entries reached or window is 0.
-- `Funnel:update`: Advances the window timer by dt seconds; flushes when window expires.
-- `Funnel:flush`: Manually flushes all pending entries, invoking the onFlush callback.
-- `Funnel:discard`: Discards all buffered entries without flushing.
-- `Funnel:pendingCount`: Returns the number of buffered entries not yet flushed.
-- `Funnel:getFlushCount`: Returns the total number of flushes performed.
+### `LFunnel` Methods
+- `LFunnel:onFlush`: Sets a callback invoked when the funnel flushes. Receives a table of {tag, value} entries.
+- `LFunnel:push`: Adds an event to the funnel, flushing immediately when `max_entries` is reached or `window` is `0`.
+- `LFunnel:update`: Advances the window timer by dt seconds; flushes when window expires.
+- `LFunnel:flush`: Manually flushes all pending entries, invoking the onFlush callback.
+- `LFunnel:discard`: Discards all buffered entries without flushing.
+- `LFunnel:pendingCount`: Returns the number of buffered entries not yet flushed.
+- `LFunnel:getFlushCount`: Returns the total number of flushes performed.
 
-### `List` Methods
-- `List:add`: Appends a value to the end of the list.
-- `List:get`: Returns the value at a 1-based index, or nil.
-- `List:set`: Replaces the value at a 1-based index.
-- `List:remove`: Removes and returns the value at a 1-based index.
-- `List:len`: Returns the number of items in the list.
-- `List:isEmpty`: Returns true if the list is empty.
-- `List:contains`: Returns true if the list contains a value equal to the given Lua value (string/number/boolean).
-- `List:clear`: Removes all values from the list.
-- `List:toArray`: Returns all items as a Lua table.
+### `LList` Methods
+- `LList:add`: Appends a value to the end of the list.
+- `LList:get`: Returns the value at a 1-based index.
+- `LList:set`: Replaces the value at a 1-based index.
+- `LList:remove`: Removes and returns the value at a 1-based index.
+- `LList:len`: Returns the number of items in the list.
+- `LList:isEmpty`: Returns true if the list is empty.
+- `LList:contains`: Returns true if the list contains a value equal to the given Lua value (string/number/boolean).
+- `LList:clear`: Removes all values from the list.
+- `LList:toArray`: Returns all items as a Lua table.
 
-### `Mediator` Methods
-- `Mediator:on`: Registers a handler callback on a channel; returns handler ID.
-- `Mediator:off`: Unregisters a handler by ID.
-- `Mediator:send`: Dispatches a message to all handlers on a channel.
-- `Mediator:broadcast`: Dispatches a message to all handlers across all channels.
-- `Mediator:handlerCount`: Returns the number of handlers on a channel.
-- `Mediator:channels`: Returns all registered channel names.
-- `Mediator:removeChannel`: Removes a channel and all its handlers.
-- `Mediator:clear`: Removes all channels and handlers.
+### `LMediator` Methods
+- `LMediator:on`: Registers a handler callback on a channel and returns its handler ID.
+- `LMediator:off`: Unregisters a handler by ID.
+- `LMediator:send`: Dispatches a message to all handlers on a channel.
+- `LMediator:broadcast`: Dispatches a message to all handlers across all channels.
+- `LMediator:handlerCount`: Returns the number of handlers on a channel.
+- `LMediator:channels`: Returns all registered channel names.
+- `LMediator:removeChannel`: Removes a channel and all its handlers.
+- `LMediator:clear`: Removes all channels and handlers.
 
-### `ObjectPool` Methods
-- `ObjectPool:add`: Inserts a pre-built object into the available pool.
-- `ObjectPool:acquire`: Acquires an available object from the pool; returns nil if empty.
-- `ObjectPool:release`: Returns an object to the available pool.
-- `ObjectPool:getActiveCount`: Returns the number of currently active (acquired) objects.
-- `ObjectPool:getAvailableCount`: Returns the number of available (idle) objects in the pool.
-- `ObjectPool:getTotalCount`: Returns the total number of tracked objects (active + available).
-- `ObjectPool:clearAll`: Clears all objects from the pool, releasing Lua registry values.
+### `LObjectPool` Methods
+- `LObjectPool:add`: Inserts a pre-built object into the available pool.
+- `LObjectPool:acquire`: Acquires an available object from the pool.
+- `LObjectPool:release`: Returns an object to the available pool.
+- `LObjectPool:getActiveCount`: Returns the number of currently active (acquired) objects.
+- `LObjectPool:getAvailableCount`: Returns the number of available (idle) objects in the pool.
+- `LObjectPool:getTotalCount`: Returns the total number of tracked objects (active + available).
+- `LObjectPool:clearAll`: Clears all objects from the pool, releasing Lua registry values.
 
-### `Observer` Methods
-- `Observer:set`: Sets a property value and fires subscribed watchers.
-- `Observer:get`: Gets a property value, or nil if not set.
-- `Observer:subscribe`: Subscribes to changes on a property key (or "*" for all).
-- `Observer:unsubscribe`: Removes a subscription by id.
-- `Observer:getCount`: Returns the total number of active subscriptions.
+### `LObserver` Methods
+- `LObserver:set`: Sets a property value and fires subscribed watchers.
+- `LObserver:get`: Returns the current stored property value for the given observer key, or nil if it has not been set.
+- `LObserver:subscribe`: Subscribes to changes on a property key (or "*" for all).
+- `LObserver:unsubscribe`: Removes a subscription by id.
+- `LObserver:getCount`: Returns the total number of active subscriptions.
 
-### `PriorityQueue` Methods
-- `PriorityQueue:push`: Inserts an item with a priority. Higher priorities are dequeued first.
-- `PriorityQueue:pop`: Removes and returns the highest-priority item, or nil if empty.
-- `PriorityQueue:peek`: Returns the highest-priority item without removing it, or nil if empty.
-- `PriorityQueue:len`: Returns the number of items in the queue.
-- `PriorityQueue:isEmpty`: Returns true when the queue has no items.
-- `PriorityQueue:clearAll`: Removes all items from the queue.
+### `LPriorityQueue` Methods
+- `LPriorityQueue:push`: Inserts an item with a priority. Higher priorities are dequeued first.
+- `LPriorityQueue:pop`: Removes and returns the highest-priority item.
+- `LPriorityQueue:peek`: Returns the highest-priority item without removing it.
+- `LPriorityQueue:len`: Returns the number of items in the queue.
+- `LPriorityQueue:isEmpty`: Returns true when the queue has no items.
+- `LPriorityQueue:clearAll`: Removes all items from the queue.
 
-### `Queue` Methods
-- `Queue:enqueue`: Adds a value to the back of the queue. Returns false if capacity is full.
-- `Queue:dequeue`: Removes and returns the front value, or nil if empty.
-- `Queue:front`: Returns the front value without removing it, or nil if empty.
-- `Queue:len`: Returns the number of items in the queue.
-- `Queue:isEmpty`: Returns true if the queue is empty.
-- `Queue:isFull`: Returns true if the queue is at its capacity limit.
-- `Queue:clear`: Removes all values from the queue.
-- `Queue:toArray`: Returns all items as a Lua table (front to back).
+### `LQueue` Methods
+- `LQueue:enqueue`: Adds a value to the back of the queue.
+- `LQueue:dequeue`: Removes and returns the front value.
+- `LQueue:front`: Returns the front value without removing it.
+- `LQueue:len`: Returns the number of items in the queue.
+- `LQueue:isEmpty`: Returns true if the queue is empty.
+- `LQueue:isFull`: Returns true if the queue is at its capacity limit.
+- `LQueue:clear`: Removes all values from the queue.
+- `LQueue:toArray`: Returns all items as a Lua table (front to back).
 
-### `RelationshipManager` Methods
-- `RelationshipManager:defineType`: Defines a relationship type with ordered levels.
-- `RelationshipManager:removeType`: Removes a relationship type definition.
-- `RelationshipManager:typeNames`: Returns all defined relationship type names.
-- `RelationshipManager:setValue`: Sets the numeric relationship value between two entities.
-- `RelationshipManager:getValue`: Returns the numeric relationship value between two entities (default 0.0).
-- `RelationshipManager:adjustValue`: Adjusts the numeric relationship value by a delta.
-- `RelationshipManager:setLevel`: Sets a named level for a typed relationship between two entities.
-- `RelationshipManager:getLevel`: Returns the named level for a typed relationship, or nil.
-- `RelationshipManager:removePair`: Removes all relationship data between two entities.
-- `RelationshipManager:pairCount`: Returns the total number of stored relationship pairs.
+### `LRelationshipManager` Methods
+- `LRelationshipManager:defineType`: Defines a relationship type with ordered levels.
+- `LRelationshipManager:removeType`: Removes a relationship type definition.
+- `LRelationshipManager:typeNames`: Returns all defined relationship type names.
+- `LRelationshipManager:setValue`: Sets the numeric relationship value between two entities.
+- `LRelationshipManager:getValue`: Returns the numeric relationship value between two entities (default 0.0).
+- `LRelationshipManager:adjustValue`: Adjusts the numeric relationship value by a delta.
+- `LRelationshipManager:setLevel`: Sets a named level for a typed relationship between two entities.
+- `LRelationshipManager:getLevel`: Returns the named level for a typed relationship.
+- `LRelationshipManager:removePair`: Removes all relationship data between two entities.
+- `LRelationshipManager:pairCount`: Returns the total number of stored relationship pairs.
 
-### `Ring` Methods
-- `Ring:push`: Pushes a value (number or string) with an optional tag. Overwrites oldest on overflow.
-- `Ring:latest`: Returns the most recently pushed entry, or nil.
-- `Ring:toArray`: Returns all entries (oldest first) as an array of {id, tag, value?, text?} tables.
-- `Ring:sum`: Returns the sum of all numeric values in the ring.
-- `Ring:average`: Returns the average of all numeric values, or 0 if empty.
-- `Ring:len`: Returns the number of entries currently in the ring.
-- `Ring:isFull`: Returns true when the ring is at capacity.
-- `Ring:clear`: Removes all entries from the ring.
+### `LRing` Methods
+- `LRing:push`: Pushes a number or string value with an optional tag, overwriting the oldest entry on overflow.
+- `LRing:latest`: Returns the most recently pushed entry.
+- `LRing:toArray`: Returns all entries (oldest first) as an array of {id, tag, value?, text?} tables.
+- `LRing:sum`: Returns the sum of all numeric values in the ring.
+- `LRing:average`: Returns the average of all numeric values, or 0 if empty.
+- `LRing:len`: Returns the number of entries currently in the ring.
+- `LRing:isFull`: Returns true when the ring is at capacity.
+- `LRing:clear`: Removes all entries from the ring.
 
-### `ServiceLocator` Methods
-- `ServiceLocator:provide`: Registers a named service with an associated Lua value.
-- `ServiceLocator:locate`: Retrieves a registered service by name; returns nil if not found.
-- `ServiceLocator:has`: Returns true if a service with the given name is registered.
-- `ServiceLocator:remove`: Unregisters and removes a named service.
-- `ServiceLocator:getServices`: Returns a table of all registered service names.
-- `ServiceLocator:clearAll`: Removes all registered services.
+### `LServiceLocator` Methods
+- `LServiceLocator:provide`: Registers a named service with an associated Lua value.
+- `LServiceLocator:locate`: Retrieves a registered service by name.
+- `LServiceLocator:has`: Returns true if a service with the given name is registered.
+- `LServiceLocator:remove`: Unregisters and removes a named service.
+- `LServiceLocator:getServices`: Returns a table of all registered service names.
+- `LServiceLocator:clearAll`: Removes all registered services.
 
-### `Set` Methods
-- `Set:add`: Adds a string key to the set. Returns true if it was not already present.
-- `Set:remove`: Removes a key from the set. Returns true if it was present.
-- `Set:has`: Returns true if the key is in the set.
-- `Set:len`: Returns the number of distinct keys in the set.
-- `Set:isEmpty`: Returns true if the set is empty.
-- `Set:toArray`: Returns all keys as a Lua table (unordered).
-- `Set:clear`: Removes all keys from the set.
-- `Set:union`: Returns the union of this set and another as a new Set.
-- `Set:intersection`: Returns the intersection of this set and another as a new Set.
+### `LSet` Methods
+- `LSet:add`: Adds a string key to the set.
+- `LSet:remove`: Removes a key from the set.
+- `LSet:has`: Returns true if the key is in the set.
+- `LSet:len`: Returns the number of distinct keys in the set.
+- `LSet:isEmpty`: Returns true if the set is empty.
+- `LSet:toArray`: Returns all keys as a Lua table (unordered).
+- `LSet:clear`: Removes all keys from the set.
+- `LSet:union`: Returns the union of this set and another as a new Set.
+- `LSet:intersection`: Returns the intersection of this set and another as a new Set.
 
-### `SimpleState` Methods
-- `SimpleState:addState`: Registers a named state with optional enter, exit, and update callbacks.
-- `SimpleState:transitionTo`: Transitions to a named state, calling exit/enter callbacks as needed.
-- `SimpleState:update`: Calls the update callback of the current state with the given delta time.
-- `SimpleState:getCurrent`: Returns the name of the current state, or nil if none is active.
-- `SimpleState:hasState`: Returns true if a state with the given name is registered.
-- `SimpleState:getStates`: Returns a table of all registered state names.
-- `SimpleState:clearAll`: Removes all states and callbacks from this state machine.
+### `LSimpleState` Methods
+- `LSimpleState:addState`: Registers a named state with optional enter, exit, and update callbacks.
+- `LSimpleState:transitionTo`: Transitions to a named state, calling exit/enter callbacks as needed.
+- `LSimpleState:update`: Calls the update callback of the current state with the given delta time.
+- `LSimpleState:getCurrent`: Returns the name of the current state.
+- `LSimpleState:hasState`: Returns true if a state with the given name is registered.
+- `LSimpleState:getStates`: Returns a table of all registered state names.
+- `LSimpleState:clearAll`: Removes all states and callbacks from this state machine.
 
-### `Stack` Methods
-- `Stack:push`: Pushes a value onto the stack. Returns false if capacity is full.
-- `Stack:pop`: Removes and returns the top value, or nil if empty.
-- `Stack:peek`: Returns the top value without removing it, or nil if empty.
-- `Stack:len`: Returns the number of items on the stack.
-- `Stack:isEmpty`: Returns true if the stack is empty.
-- `Stack:isFull`: Returns true if the stack is at its capacity limit.
-- `Stack:clear`: Removes all values from the stack.
-- `Stack:toArray`: Returns all items as a Lua table (bottom to top).
+### `LStack` Methods
+- `LStack:push`: Pushes a value onto the stack.
+- `LStack:pop`: Removes and returns the top value.
+- `LStack:peek`: Returns the top value without removing it.
+- `LStack:len`: Returns the number of items on the stack.
+- `LStack:isEmpty`: Returns true if the stack is empty.
+- `LStack:isFull`: Returns true if the stack is at its capacity limit.
+- `LStack:clear`: Removes all values from the stack.
+- `LStack:toArray`: Returns all items as a Lua table (bottom to top).
 
-### `Strategy` Methods
-- `Strategy:register`: Registers a named strategy function.
-- `Strategy:set`: Sets the active strategy by name. Returns false if not registered.
-- `Strategy:execute`: Calls the currently active strategy function with the given arguments.
-- `Strategy:getCurrent`: Returns the name of the active strategy, or nil.
-- `Strategy:has`: Returns true if a strategy with this name is registered.
-- `Strategy:remove`: Removes a strategy by name.
-- `Strategy:names`: Returns all registered strategy names.
-- `Strategy:clear`: Removes all strategies and clears the active selection.
+### `LStrategy` Methods
+- `LStrategy:register`: Registers a named strategy function.
+- `LStrategy:set`: Sets the active strategy by name.
+- `LStrategy:execute`: Calls the currently active strategy function with the given arguments.
+- `LStrategy:getCurrent`: Returns the name of the active strategy.
+- `LStrategy:has`: Returns true if a strategy with this name is registered.
+- `LStrategy:remove`: Removes a strategy by name.
+- `LStrategy:names`: Returns all registered strategy names.
+- `LStrategy:clear`: Removes all strategies and clears the active selection.
 
-### `Throttle` Methods
-- `Throttle:onFire`: Sets the callback invoked when the throttle fires.
-- `Throttle:update`: Advances the timer by dt seconds; fires the callback if the interval elapsed.
-- `Throttle:reset`: Resets the elapsed counter without firing.
-- `Throttle:getProgress`: Returns the normalised progress through the current interval [0, 1].
-- `Throttle:getFireCount`: Returns the total number of times this throttle has fired.
-- `Throttle:setEnabled`: Enables or disables the throttle.
+### `LThrottle` Methods
+- `LThrottle:onFire`: Sets the callback invoked when the throttle fires.
+- `LThrottle:update`: Advances the timer by dt seconds; fires the callback if the interval elapsed.
+- `LThrottle:reset`: Resets the elapsed counter without firing.
+- `LThrottle:getProgress`: Returns the normalised progress through the current interval [0, 1].
+- `LThrottle:getFireCount`: Returns the total number of times this throttle has fired.
+- `LThrottle:setEnabled`: Enables or disables the throttle.
 
 ## References
 

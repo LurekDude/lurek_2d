@@ -1431,4 +1431,71 @@ describe("render strict: LShape methods", function()
     end)
 end)
 
+-- @describe render strict: batch text and OBJ APIs
+describe("render strict: batch text and OBJ APIs", function()
+    -- @covers lurek.render.drawMany
+    -- @covers lurek.render.newImage
+    it("drawMany accepts batched draw entries", function()
+        local img = lurek.render.newImage("assets/icon.png")
+        local ok = pcall(function()
+            lurek.render.drawMany({
+                { img, 0, 0 },
+                { img, 10, 8, 0.0, 1.0, 1.0, 0.0, 0.0 },
+            })
+        end)
+        expect_true(ok)
+    end)
+
+    -- @covers lurek.render.printRotated
+    it("printRotated is callable", function()
+        local ok = pcall(function()
+            lurek.render.printRotated("rot", 20, 20, 0.25, 1.0)
+        end)
+        expect_true(ok)
+    end)
+
+    -- @covers lurek.render.newImage
+    it("newImage accepts optional color-space mode", function()
+        local ok_srgb, img_srgb = pcall(function()
+            return lurek.render.newImage("assets/icon.png", "srgb")
+        end)
+        local ok_linear, img_linear = pcall(function()
+            return lurek.render.newImage("assets/icon.png", "linear")
+        end)
+
+        expect_true(ok_srgb)
+        expect_true(ok_linear)
+        expect_type("userdata", img_srgb)
+        expect_type("userdata", img_linear)
+    end)
+
+    -- @covers lurek.render.newImage
+    it("newImage rejects unsupported color-space mode", function()
+        local ok = pcall(function()
+            lurek.render.newImage("assets/icon.png", "gamma")
+        end)
+        expect_equal(false, ok)
+    end)
+
+    -- @covers lurek.render.loadObj
+    -- @covers lurek.render.loadModel
+    -- @covers LLObjModel:getFaceCount
+    -- @covers LLObjModel:getUvCount
+    -- @covers LLObjModel:getNormalCount
+    -- @covers LLObjModel:projectToMesh
+    it("loads OBJ model and exposes mesh projection methods", function()
+        local obj = lurek.render.loadObj("content/games/retro/dungeon_crawler/assets/models/tank.obj")
+        local mdl = lurek.render.loadModel("content/games/retro/dungeon_crawler/assets/models/tank.obj")
+
+        expect_type("userdata", obj)
+        expect_type("userdata", mdl)
+        expect_true(obj:getFaceCount() >= 0)
+        expect_true(obj:getUvCount() >= 0)
+        expect_true(obj:getNormalCount() >= 0)
+
+        local verts = obj:projectToMesh({ x = 0, y = 4, z = 8, tx = 0, ty = 0, tz = 0, fov = 60 }, 320, 180)
+        expect_type("table", verts)
+    end)
+end)
+
 test_summary()

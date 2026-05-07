@@ -1,0 +1,9 @@
+# Low-poly Sectoid-inspired materials
+newmtl sectoid_skin
+Kd 0.62 0.74 0.64
+
+newmtl sectoid_suit
+Kd 0.18 0.23 0.30
+
+newmtl sectoid_eye
+Kd 0.95 0.18 0.16

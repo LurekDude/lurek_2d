@@ -59,13 +59,29 @@ pub struct InputRecording {
     pub total_frames: u64,
 }
 
+/// Current JSON schema version for [`InputRecording`] serialization.
+const INPUT_RECORDING_SCHEMA_VERSION: u32 = 1;
+
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
+struct RecordingEnvelope {
+    version: u32,
+    frames: Vec<RecordedFrame>,
+    total_frames: u64,
+}
+
 impl InputRecording {
     /// Serializes this recording to a JSON string.
     ///
     /// # Returns
     /// `Result<String, String>` — JSON text or an error description.
     pub fn to_json(&self) -> Result<String, String> {
-        serde_json::to_string(self).map_err(|e| format!("InputRecording serialize error: {e}"))
+        let envelope = RecordingEnvelope {
+            version: INPUT_RECORDING_SCHEMA_VERSION,
+            frames: self.frames.clone(),
+            total_frames: self.total_frames,
+        };
+        serde_json::to_string(&envelope)
+            .map_err(|e| format!("InputRecording serialize error: {e}"))
     }
 
     /// Deserializes an [`InputRecording`] from a JSON string.
@@ -76,6 +92,20 @@ impl InputRecording {
     /// # Returns
     /// `Result<InputRecording, String>` — Parsed recording or an error description.
     pub fn from_json(json: &str) -> Result<Self, String> {
+        if let Ok(envelope) = serde_json::from_str::<RecordingEnvelope>(json) {
+            if envelope.version != INPUT_RECORDING_SCHEMA_VERSION {
+                return Err(format!(
+                    "InputRecording parse error: unsupported version {}",
+                    envelope.version
+                ));
+            }
+            return Ok(Self {
+                frames: envelope.frames,
+                total_frames: envelope.total_frames,
+            });
+        }
+
+        // Backward-compatibility path for legacy payloads without a `version` field.
         serde_json::from_str(json).map_err(|e| format!("InputRecording parse error: {e}"))
     }
 }

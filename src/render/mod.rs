@@ -35,6 +35,8 @@ pub mod gpu_renderer;
 pub mod image_effect;
 /// Custom geometry mesh with per-vertex position, UV, and color data.
 pub mod mesh;
+/// Custom OBJ loader for importing 3D models.
+pub mod obj_loader;
 /// GPU pipeline for post-processing effects: capture, ping-pong shader passes, and compositing.
 pub mod postfx_pipeline;
 /// RenderCommand queue, draw enums, and texture data types.

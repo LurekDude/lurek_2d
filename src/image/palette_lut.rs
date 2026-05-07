@@ -11,6 +11,7 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use crate::math::Color;
+use std::collections::HashMap;
 
 /// Color palette lookup table mapping source colors to target colors.
 ///
@@ -105,28 +106,63 @@ impl PaletteLUT {
     /// # Parameters
     /// - `img` — `&mut ImageData` — image modified in place.
     pub fn apply(&self, img: &mut crate::image::image_data::ImageData) {
+        if self.from_colors.is_empty() {
+            return;
+        }
+
+        let to_rgba_key = |c: &Color| -> u32 {
+            let r = (c.r * 255.0).round() as u8;
+            let g = (c.g * 255.0).round() as u8;
+            let b = (c.b * 255.0).round() as u8;
+            let a = (c.a * 255.0).round() as u8;
+            (u32::from(r) << 24) | (u32::from(g) << 16) | (u32::from(b) << 8) | u32::from(a)
+        };
+
+        let to_rgba = |c: &Color| -> [u8; 4] {
+            [
+                (c.r * 255.0).round() as u8,
+                (c.g * 255.0).round() as u8,
+                (c.b * 255.0).round() as u8,
+                (c.a * 255.0).round() as u8,
+            ]
+        };
+
+        let use_hash = self.from_colors.len() > 16;
+        let map = if use_hash {
+            let mut m = HashMap::with_capacity(self.from_colors.len());
+            for (i, from) in self.from_colors.iter().enumerate() {
+                m.entry(to_rgba_key(from)).or_insert(i);
+            }
+            Some(m)
+        } else {
+            None
+        };
+
         let w = img.width();
         let h = img.height();
         for y in 0..h {
             for x in 0..w {
                 if let Some((r, g, b, a)) = img.get_pixel(x, y) {
-                    for (i, from) in self.from_colors.iter().enumerate() {
-                        let fr = (from.r * 255.0).round() as u8;
-                        let fg = (from.g * 255.0).round() as u8;
-                        let fb = (from.b * 255.0).round() as u8;
-                        let fa = (from.a * 255.0).round() as u8;
-                        if r == fr && g == fg && b == fb && a == fa {
-                            let to = &self.to_colors[i];
-                            img.set_pixel(
-                                x,
-                                y,
-                                (to.r * 255.0).round() as u8,
-                                (to.g * 255.0).round() as u8,
-                                (to.b * 255.0).round() as u8,
-                                (to.a * 255.0).round() as u8,
-                            );
-                            break;
+                    let index = if let Some(m) = &map {
+                        let key =
+                            (u32::from(r) << 24) | (u32::from(g) << 16) | (u32::from(b) << 8) | u32::from(a);
+                        m.get(&key).copied()
+                    } else {
+                        let mut idx = None;
+                        for (i, from) in self.from_colors.iter().enumerate() {
+                            let [fr, fg, fb, fa] = to_rgba(from);
+                            if r == fr && g == fg && b == fb && a == fa {
+                                idx = Some(i);
+                                break;
+                            }
                         }
+                        idx
+                    };
+
+                    if let Some(i) = index {
+                        let to = &self.to_colors[i];
+                        let [tr, tg, tb, ta] = to_rgba(to);
+                        img.set_pixel(x, y, tr, tg, tb, ta);
                     }
                 }
             }

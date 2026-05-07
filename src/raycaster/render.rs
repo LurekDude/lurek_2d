@@ -35,6 +35,7 @@ impl RaycasterScene {
                     cmds.push(RenderCommand::DrawTexturedQuad {
                         corners: ceil.corners,
                         uvs: ceil.uvs,
+                        corner_w: ceil.corner_w,
                         texture_key: tex,
                         color: ceil.light,
                     });
@@ -60,6 +61,7 @@ impl RaycasterScene {
                     cmds.push(RenderCommand::DrawTexturedQuad {
                         corners: floor.corners,
                         uvs: floor.uvs,
+                        corner_w: floor.corner_w,
                         texture_key: tex,
                         color: floor.light,
                     });
@@ -85,6 +87,7 @@ impl RaycasterScene {
                     cmds.push(RenderCommand::DrawTexturedQuad {
                         corners: wall.corners,
                         uvs: wall.uvs,
+                        corner_w: wall.corner_w,
                         texture_key: tex,
                         color: wall.light,
                     });
@@ -108,6 +111,7 @@ impl RaycasterScene {
             cmds.push(RenderCommand::DrawTexturedQuad {
                 corners: sprite.corners,
                 uvs: sprite.uvs,
+                corner_w: [1.0, 1.0, 1.0, 1.0],
                 texture_key: sprite.texture_key,
                 color: sprite.light,
             });

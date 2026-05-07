@@ -142,21 +142,8 @@ impl GameFS {
     /// # Returns
     /// `Ok(String)` — The UTF-8 file contents. `Err(EngineError)` — I/O or traversal error.
     pub fn read_string(&self, path: &str) -> EngineResult<String> {
-        let full = self.base_dir.join(path);
-        // Prevent path traversal
-        let canonical = full.canonicalize().map_err(|e| {
-            EngineError::FileSystemError(format!("Cannot resolve '{}': {}", path, e))
-        })?;
-        let base_canonical = self
-            .base_dir
-            .canonicalize()
-            .map_err(|e| EngineError::FileSystemError(format!("Cannot resolve base dir: {}", e)))?;
-        if !canonical.starts_with(&base_canonical) {
-            return Err(EngineError::FileSystemError(
-                "Access denied: path traversal detected".into(),
-            ));
-        }
-        std::fs::read_to_string(&canonical)
+        let resolved = self.resolve_read_path(path)?;
+        std::fs::read_to_string(&resolved)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to read '{}': {}", path, e)))
     }
 
@@ -170,20 +157,8 @@ impl GameFS {
     /// # Returns
     /// `Ok(Vec<u8>)` — The raw file bytes. `Err(EngineError)` — I/O or traversal error.
     pub fn read_bytes(&self, path: &str) -> EngineResult<Vec<u8>> {
-        let full = self.base_dir.join(path);
-        let canonical = full.canonicalize().map_err(|e| {
-            EngineError::FileSystemError(format!("Cannot resolve '{}': {}", path, e))
-        })?;
-        let base_canonical = self
-            .base_dir
-            .canonicalize()
-            .map_err(|e| EngineError::FileSystemError(format!("Cannot resolve base dir: {}", e)))?;
-        if !canonical.starts_with(&base_canonical) {
-            return Err(EngineError::FileSystemError(
-                "Access denied: path traversal detected".into(),
-            ));
-        }
-        std::fs::read(&canonical)
+        let resolved = self.resolve_read_path(path)?;
+        std::fs::read(&resolved)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to read '{}': {}", path, e)))
     }
 
@@ -199,21 +174,13 @@ impl GameFS {
     /// # Returns
     /// `Ok(())` on success. `Err(EngineError)` if the path is outside `save/` or an I/O error occurs.
     pub fn write_string(&self, path: &str, content: &str) -> EngineResult<()> {
-        let full = self.base_dir.join(path);
-        // Only allow writing within save/ subdirectory
-        let save_dir = self.base_dir.join("save");
-        if !full.starts_with(&save_dir) {
-            return Err(EngineError::FileSystemError(
-                "Write access restricted to save/ directory".into(),
-            ));
-        }
-        Self::reject_traversal(path)?;
-        if let Some(parent) = full.parent() {
+        let resolved = self.resolve_save_path(path)?;
+        if let Some(parent) = resolved.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 EngineError::FileSystemError(format!("Failed to create directories: {}", e))
             })?;
         }
-        std::fs::write(&full, content)
+        std::fs::write(&resolved, content)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to write '{}': {}", path, e)))
     }
 
@@ -444,15 +411,8 @@ impl GameFS {
     /// # Returns
     /// `Ok(())` on success, or an `EngineError` on I/O failure or path violation.
     pub fn append_string(&self, path: &str, content: &str) -> EngineResult<()> {
-        let full = self.base_dir.join(path);
-        let save_dir = self.base_dir.join("save");
-        if !full.starts_with(&save_dir) {
-            return Err(EngineError::FileSystemError(
-                "Write access restricted to save/ directory".into(),
-            ));
-        }
-        Self::reject_traversal(path)?;
-        if let Some(parent) = full.parent() {
+        let resolved = self.resolve_save_path(path)?;
+        if let Some(parent) = resolved.parent() {
             std::fs::create_dir_all(parent).map_err(|e| {
                 EngineError::FileSystemError(format!("Failed to create directories: {}", e))
             })?;
@@ -461,7 +421,7 @@ impl GameFS {
         let mut file = std::fs::OpenOptions::new()
             .create(true)
             .append(true)
-            .open(&full)
+            .open(&resolved)
             .map_err(|e| {
                 EngineError::FileSystemError(format!("Failed to open '{}' for append: {}", path, e))
             })?;
@@ -864,7 +824,7 @@ impl GameFS {
         let search_dir = if dir_part == "." {
             self.base_dir.clone()
         } else {
-            
+
             self.resolve_read_path(dir_part)?
         };
         if !search_dir.is_dir() {

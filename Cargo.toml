@@ -143,13 +143,14 @@ zip = { version = "2", default-features = false, features = ["deflate"] }
 
 # Temporary directory management (used for .lurek extraction at runtime)
 tempfile = "3"
+tobj = "4"
 
 [dev-dependencies]
 
 [target.'cfg(windows)'.dependencies]
 # Windows message box for panic handler
 # Using 0.61 to match tempfile/winapi-util — reduces duplication in the windows-sys tree.
-windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging"] }
+windows-sys = { version = "0.61", features = ["Win32_UI_WindowsAndMessaging", "Win32_Media"] }
 # DX12 only — native Windows graphics API, best driver support for low-end/iGPU on Windows 10+.
 # Removing metal and vulkan-portability drops unused backend code from the Windows binary.
 wgpu = { version = "22", default-features = false, features = ["wgsl", "dx12"] }
@@ -269,6 +270,10 @@ name = "data_tests"
 path = "tests/rust/unit/data_tests.rs"
 
 [[test]]
+name = "dataframe_tests"
+path = "tests/rust/unit/dataframe_tests.rs"
+
+[[test]]
 name = "debugbridge_tests"
 path = "tests/rust/unit/debugbridge_tests.rs"
 
@@ -279,6 +284,10 @@ path = "tests/rust/unit/ecs_tests.rs"
 [[test]]
 name = "effect_tests"
 path = "tests/rust/unit/effect_tests.rs"
+
+[[test]]
+name = "event_tests"
+path = "tests/rust/unit/event_tests.rs"
 
 [[test]]
 name = "filesystem_tests"
@@ -335,6 +344,10 @@ path = "tests/rust/unit/pipeline_tests.rs"
 [[test]]
 name = "procgen_tests"
 path = "tests/rust/unit/procgen_tests.rs"
+
+[[test]]
+name = "province_tests"
+path = "tests/rust/unit/province_tests.rs"
 
 [[test]]
 name = "raycaster_tests"

@@ -11,33 +11,9 @@
 
 ## Summary
 
-## Summary
+The `ui` module is documented from the current source tree and existing module reference data.
 
-The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game developers to build full user interfaces from a rich library of composed widgets without writing draw calls manually. It is a Feature Systems tier module whose rendering path entirely defers to `RenderCommand` — no direct wgpu calls are made from UI code.
-
-**GuiContext and widget tree.** `GuiContext` is the root container. It owns the widget pool (a `SlotMap<WidgetId, WidgetKind>`), the parent–child tree structure as `Vec<WidgetId>` child lists, a focus stack, a toast notification queue, and the event buffer for the current frame. All mutations go through `GuiContext` methods rather than direct widget mutation; this ensures Z-order and layout constraints remain coherent. `GuiEvent` enum carries interactions: `Clicked(id)`, `TextChanged(id, str)`, `FocusGained(id)`, `FocusLost(id)`, `SliderChanged(id, f32)`, `SelectionChanged(id, idx)`, `Toggled(id, bool)`, `Closed(id)`, `DragMoved(id, dx, dy)`.
-
-**WidgetBase and layout.** Every widget struct embeds `WidgetBase` storing position, size, visibility, enabled state, Z-order, padding, margin, anchor constraints, and flexbox alignment properties (direction, justify-content, align-items, grow factor). The layout engine runs top-down, computing child positions from parent constraints and flex rules before the render pass.
-
-**Container widgets.** `Panel` is the generic layout container for grouping children. `Layout` provides horizontal, vertical, and grid composition via `LayoutDirection` enum. `ScrollPanel` wraps content larger than its bounds with automatic scrollbars. `GUIWindow` is a moveable, closeable, optionally resizable dialog frame with a title bar and close button. `SplitPanel` divides its space into two resizable regions split by a draggable divider. `DockPanel` docks children to Left, Right, Top, Bottom, or Center regions. `NinePatch` defines scalable panel borders via a nine-slice source rectangle.
-
-**Interactive controls.** `Button` with optional icon; `Label` (static text with optional wrapping); `TextInput` with placeholder, cursor position, selection range, password masking, and character limit; `CheckBox`; `RadioButton` (grouped, mutually exclusive); `Slider` (horizontal or vertical float [0,1] or range); `ProgressBar` (display-only, determinate or indeterminate); `ComboBox` (drop-down list); `ListBox` (scrollable multi-select list); `TabBar` with tab add/remove; `SpinBox` (integer or float with increment step); `Switch` (toggle with animated thumb); `ScrollBar` (standalone).
-
-**Extras and overlays.** `Toast` is an auto-dismissing notification banner queued through `GuiContext::show_toast(message, duration_s)`. `TreeView` and `TreeNode` provide a collapsible hierarchy for file or scene trees. `Dialog` is a modal dialog with configurable button row and `on_button` callback. `MenuBar` and `MenuItem` provide top-bar dropdown menus. `ColorPicker` shows a hue-saturation-value wheel plus hex input. `Badge` is a count overlay on another widget. `Accordion` provides collapsible sections for settings panels. `Toolbar` is a horizontal strip of icon buttons. `StatusBar` is a bottom strip of status segments. `Tooltip` is a hover-triggered floating overlay with configurable delay and anchor. `GUITable` is an editable data grid with column headers, sorting, and cell editing. `ImageWidget` displays a texture atlas frame.
-
-**Chart widget.** `chart.rs` implements CPU-rendered chart generators: `LineChart`, `BarChart`, `ScatterPlot`, `PieChart`, `AreaChart`. Each takes a `ChartConfig` (title, axis labels, series, margins, grid lines) and produces an `ImageData` buffer that can be uploaded as a texture. `ChartWidget` integrates a chart directly as a retained widget node in the `GuiContext` tree, responding to layout constraints like other widgets.
-
-**Rich text.** `rich_text.rs` introduces `RichText`, a text widget supporting inline colour (`[color=#rrggbb]`), bold, italic, underline, and icon spans via BBCode-style markup. `RichText::parse(markup_str)` produces a `Vec<StyledSpan>` for rendering. Accessible via `lurek.ui.newRichText()`.
-
-**Theme.** `Theme` maps `(WidgetType, WidgetState)` pairs to `WidgetStyle` records: background colour, foreground colour, font key, font size, border colour, corner radius, padding. `WidgetState` covers `Normal`, `Hovered`, `Pressed`, `Focused`, `Disabled`. The current theme is set on `GuiContext` and applies to all widgets unless overridden with per-widget style overrides.
-
-**Layout loader.** `layout_loader.rs` parses TOML layout definition files (`WidgetDef` trees) from `content/layouts/*.layout.toml` and hydrates a `GuiContext` from the definition. A headless software rasteriser produces PNG evidence images for layout tests without requiring a GPU.
-
-**Lua surface.** `lurek.ui.new()` → context. Widget factories: `ctx:panel(opts)`, `ctx:button(label, opts)`, `ctx:label(text, opts)`, `ctx:textInput(opts)`, `ctx:slider(opts)`, `ctx:checkbox(label, opts)`, `ctx:window(title, opts)`, `ctx:scrollPanel(opts)`, `ctx:listBox(items, opts)`, `ctx:comboBox(items, opts)`, `ctx:tabBar(tabs, opts)`, `ctx:toast(msg, opts)`, `ctx:dialog(title, buttons, opts)`, `ctx:richText(markup, opts)`, `ctx:chart(config, opts)`, `ctx:tooltip(target_id, text, opts)`. Operations: `ctx:update(dt)`, `ctx:render(commands)`, `ctx:events()` → table of events, `ctx:setTheme(theme_tbl)`, `ctx:load(layout_path)`, `ctx:getElementById(id)` → widget_id or nil. Widget methods: `widget:setText(s)`, `widget:getValue()`, `widget:setEnabled(bool)`, `widget:setVisible(bool)`, `widget:addCallback(event_name, fn)`.
-
-**HTML/CSS layout engine.** The HTML/CSS layout engine is now a standalone top-level module at `lurek.html` (see [html.md](html.md)). It is independent of `lurek.ui` — games may use either, both, or neither.
-
-**Scope boundary.** Feature Systems tier. Depends on `render`, `math`, `runtime`. Lua bridge in `src/lua_api/ui_api.rs`.
+This module primarily collaborates with `image`, `math`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -347,448 +323,468 @@ The `ui` module provides Lurek2D's retained-mode widget UI system, enabling game
 - Namespace: `lurek.ui`
 
 ### Module Functions
-- `lurek.ui.setPosition`: Sets the widget position.
-- `lurek.ui.getPosition`: Returns the widget position.
-- `lurek.ui.setSize`: Sets the width and height of the widget in UI pixels.
-- `lurek.ui.getSize`: Returns the current width and height of the widget in UI pixels.
-- `lurek.ui.getRect`: Returns the computed screen-space rectangle after layout.
-- `lurek.ui.setVisible`: Shows or hides the widget; hidden widgets are not rendered or interactive.
-- `lurek.ui.isVisible`: Returns whether the widget is visible.
-- `lurek.ui.setEnabled`: Sets whether the widget is enabled.
-- `lurek.ui.isEnabled`: Returns whether the widget is enabled.
-- `lurek.ui.setId`: Sets the widget string identifier.
-- `lurek.ui.getId`: Returns the widget string identifier.
-- `lurek.ui.setTooltip`: Sets the widget tooltip text.
-- `lurek.ui.getTooltip`: Returns the widget tooltip text.
-- `lurek.ui.getState`: Returns the widget interaction state name.
-- `lurek.ui.addChild`: Adds a child widget to this container.
-- `lurek.ui.removeChild`: Removes a child widget from this container.
-- `lurek.ui.getChildCount`: Returns the number of children in this container.
-- `lurek.ui.getChildren`: Returns this container's children as widget-handle tables.
-- `lurek.ui.findById`: Recursively searches for a widget by id starting from this widget.
-- `lurek.ui.setOnClick`: Registers a callback invoked when this widget is clicked.
-- `lurek.ui.setOnChange`: Registers a callback invoked when this widget's value changes.
-- `lurek.ui.setOnDraw`: Stores a custom draw callback for later invocation.
-- `lurek.ui.containsPoint`: Returns whether (x, y) is inside this widget.
-- `lurek.ui.setPadding`: Sets widget padding (CSS-like: top, right?, bottom?, left?).
-- `lurek.ui.getPadding`: Returns the widget padding (top, right, bottom, left).
-- `lurek.ui.setMargin`: Sets widget margin (CSS-like: top, right?, bottom?, left?).
-- `lurek.ui.getMargin`: Returns the widget margin (top, right, bottom, left).
-- `lurek.ui.setZOrder`: Sets the widget z-order for draw sorting.
-- `lurek.ui.getZOrder`: Returns the widget z-order.
-- `lurek.ui.setMinSize`: Sets the minimum widget size.
-- `lurek.ui.getMinSize`: Returns the minimum widget size.
-- `lurek.ui.setMaxSize`: Sets the maximum widget size.
-- `lurek.ui.getMaxSize`: Returns the maximum widget size.
-- `lurek.ui.setAnchor`: Sets anchor edges (left, top, right, bottom).
-- `lurek.ui.setAnchorCenter`: Sets center anchor offsets.
-- `lurek.ui.clearAnchor`: Removes all anchor constraints.
-- `lurek.ui.setFlexGrow`: Sets the flex-grow factor.
-- `lurek.ui.getFlexGrow`: Returns the flex-grow factor.
-- `lurek.ui.setFlexShrink`: Sets the flex-shrink factor.
-- `lurek.ui.getFlexShrink`: Returns the flex-shrink factor.
-- `lurek.ui.bind`: Registers a data-binding key on this widget.
-- `lurek.ui.unbind`: Removes the data-binding key from this widget.
-- `lurek.ui.setAlpha`: Sets the widget's alpha transparency (`0.0` fully transparent, `1.0` opaque).
-- `lurek.ui.getAlpha`: Returns the widget's current alpha transparency.
-- `lurek.ui.fadeIn`: Instantly fades the widget in (sets alpha to `1.0`).
-- `lurek.ui.fadeOut`: Instantly fades the widget out (sets alpha to `0.0` and hides it).
-- `lurek.ui.slideIn`: Instantly moves the widget to `(x, y)` and makes it visible.
-- `lurek.ui.slideOut`: Instantly moves the widget to the off-screen position `(x, y)` and hides it.
-- `lurek.ui.attachToEntity`: Anchors this widget to a world-space entity by its numeric ID.
-- `lurek.ui.detachFromEntity`: Removes the entity anchor from this widget, restoring normal layout positioning.
+- `lurek.ui.newButton`: Creates and returns a new interactive button widget as a child of this widget.
+- `lurek.ui.newLabel`: Creates a text label widget.
+- `lurek.ui.newTextInput`: Creates a text input widget.
+- `lurek.ui.newCheckbox`: Creates a checkbox widget.
+- `lurek.ui.newSlider`: Creates a value slider widget.
+- `lurek.ui.newProgressBar`: Creates a progress bar widget.
+- `lurek.ui.newComboBox`: Creates a dropdown combo box widget.
+- `lurek.ui.newList`: Creates a selectable list widget.
+- `lurek.ui.newPanel`: Creates a container panel widget.
+- `lurek.ui.newLayout`: Creates a flexbox layout container.
+- `lurek.ui.newScrollPanel`: Creates a scrollable panel widget.
+- `lurek.ui.newNinePatch`: Creates a 9-patch slicer widget.
+- `lurek.ui.newTabBar`: Creates a tab bar widget.
+- `lurek.ui.newSeparator`: Creates a separator line.
+- `lurek.ui.newSpacer`: Creates a spacing filler widget.
+- `lurek.ui.newToast`: Creates a toast notification widget.
+- `lurek.ui.newTreeView`: Creates a collapsible tree view widget.
+- `lurek.ui.newRadioButton`: Creates a grouped radio button widget.
+- `lurek.ui.newScrollBar`: Creates a scroll bar widget.
+- `lurek.ui.newWindow`: Creates a draggable window widget.
+- `lurek.ui.newSplitPanel`: Creates a resizable split panel.
+- `lurek.ui.newDockPanel`: Creates and returns a new docking panel that arranges children along its edges.
+- `lurek.ui.newToolbar`: Creates a toolbar widget.
+- `lurek.ui.newMenuBar`: Creates a menu bar widget.
+- `lurek.ui.newMenuItem`: Creates a menu item widget.
+- `lurek.ui.newDialog`: Creates a modal dialog widget.
+- `lurek.ui.newStatusBar`: Creates a status bar widget.
+- `lurek.ui.newAccordion`: Creates a collapsible accordion widget.
+- `lurek.ui.newTooltipPanel`: Creates a tooltip panel widget.
+- `lurek.ui.newColorPicker`: Creates a color picker widget.
+- `lurek.ui.newTable`: Creates a data table widget.
+- `lurek.ui.newImageWidget`: Creates an image display widget.
+- `lurek.ui.newTheme`: Creates a new theme instance.
+- `lurek.ui.setTheme`: Sets the active GUI theme.
+- `lurek.ui.getTheme`: Returns whether a theme is set.
+- `lurek.ui.getRoot`: Returns the root panel widget table.
+- `lurek.ui.setFocus`: Sets keyboard focus to a widget or clears it.
+- `lurek.ui.getFocus`: Returns the focused widget index or nil.
+- `lurek.ui.focusNext`: Moves focus to the next focusable widget.
+- `lurek.ui.focusPrev`: Moves focus to the previous focusable widget.
+- `lurek.ui.clearFocus`: Removes keyboard focus from this widget so key events go to the next focusable.
+- `lurek.ui.addToast`: Queues a toast notification from a table.
+- `lurek.ui.getToastCount`: Returns the number of active toasts.
+- `lurek.ui.mousepressed`: Forwards a mouse press event to the GUI.
+- `lurek.ui.mousereleased`: Forwards a mouse release event to the GUI.
+- `lurek.ui.mousemoved`: Forwards a mouse move event to the GUI.
+- `lurek.ui.keypressed`: Forwards a key press event to the GUI.
+- `lurek.ui.textinput`: Forwards text input to the focused text input widget.
+- `lurek.ui.wheelmoved`: Forwards a mouse wheel event to the GUI.
+- `lurek.ui.update`: Advances toast timers, removes expired toasts, and dispatches pending GUI events.
+- `lurek.ui.draw`: Invokes all registered `on_draw` callbacks with a screen-space rect table.
+- `lurek.ui.newCustomWidget`: Creates a new widget with custom Lua-driven rendering.
+- `lurek.ui.getWidgetCount`: Returns the total widget count in the context.
+- `lurek.ui.drawToImage`: Renders the UI widget tree to a CPU ImageData at the given resolution.
+- `lurek.ui.newLineChart`: Creates a new line chart.
+- `lurek.ui.newBarChart`: Creates and returns a new bar chart widget attached to this image widget.
+- `lurek.ui.newScatterPlot`: Creates a new scatter plot.
+- `lurek.ui.newPieChart`: Creates and returns a new pie chart widget attached to this image widget.
+- `lurek.ui.newAreaChart`: Creates a new stacked-area chart.
+- `lurek.ui.parseWidgetState`: Parses a widget state string and returns its canonical form.
+- `lurek.ui.newSpinBox`: Creates a numeric spin box widget with increment and decrement buttons.
+- `lurek.ui.newSwitch`: Creates a toggle switch widget.
+- `lurek.ui.newBadge`: Creates a badge widget displaying a numeric count.
+- `lurek.ui.setDefaultTheme`: Installs the built-in dark theme as the active GUI theme.
+- `lurek.ui.setViewport`: Sets the viewport dimensions used for anchor constraints and layout.
+- `lurek.ui.flushCache`: Returns true if the widget tree changed since the last call, then resets the flag.
+- `lurek.ui.update_bindings`: Updates widgets whose bound keys match values in the provided data table.
+- `lurek.ui.loadLayout`: Loads a widget tree from a Lua definition table and attaches it to the UI root.
+- `lurek.ui.loadLayoutFile`: Loads a widget tree from a TOML layout file and attaches it to the UI root.
+- `lurek.ui.renderToImage`: Renders the current UI widget tree to a PNG file for testing.
 
-### `Accordion` Methods
-- `Accordion:addSection`: Adds a section entry to this Accordion widget.
-- `Accordion:getSectionCount`: Returns the section count of this Accordion widget.
-- `Accordion:toggleSection`: Toggles the expanded/collapsed status of an Accordion section.
-- `Accordion:isSectionExpanded`: Returns true if section expanded is enabled for this Accordion widget.
-- `Accordion:isExclusive`: Returns true if exclusive is enabled for this Accordion widget.
-- `Accordion:setExclusive`: Sets the exclusive for this Accordion widget.
-- `Accordion:getSectionTitle`: Returns the section title of this Accordion widget.
+### `LAccordion` Methods
+- `LAccordion:addSection`: Adds a section entry to this Accordion widget.
+- `LAccordion:getSectionCount`: Returns the section count of this Accordion widget.
+- `LAccordion:toggleSection`: Toggles the expanded/collapsed status of an Accordion section.
+- `LAccordion:isSectionExpanded`: Returns true if section expanded is enabled for this Accordion widget.
+- `LAccordion:isExclusive`: Returns true if exclusive is enabled for this Accordion widget.
+- `LAccordion:setExclusive`: Sets the exclusive for this Accordion widget.
+- `LAccordion:getSectionTitle`: Returns the section title of this Accordion widget.
 
-### `AreaChart` Methods
-- `AreaChart:setYMax`: Sets the maximum Y value for axis scaling.
-- `AreaChart:drawToImage`: Renders the area chart into an existing ImageData.
+### `LAreaChart` Methods
+- `LAreaChart:addLayer`: Adds a stacked layer with values and colour.
+- `LAreaChart:setYMax`: Sets the maximum Y value for axis scaling.
+- `LAreaChart:drawToImage`: Renders the area chart into an existing ImageData.
+- `LAreaChart:type`: Returns the type name of this object.
+- `LAreaChart:typeOf`: Returns true if this object is of the given type.
 
-### `Badge` Methods
-- `Badge:setCount`: Sets the count displayed on this Badge widget.
-- `Badge:getCount`: Returns the raw count of this Badge widget.
-- `Badge:getDisplayText`: Returns the display text of this Badge widget, e.g. "99+" when over the max.
+### `LBadge` Methods
+- `LBadge:setCount`: Sets the count displayed on this Badge widget.
+- `LBadge:getCount`: Returns the raw count of this Badge widget.
+- `LBadge:getDisplayText`: Returns the display text of this Badge widget, e.g. "99+" when over the max.
 
-### `BarChart` Methods
-- `BarChart:drawToImage`: Renders the bar chart into an existing ImageData.
+### `LBarChart` Methods
+- `LBarChart:addSeries`: Adds a bar series with a name and colour.
+- `LBarChart:addCategory`: Adds a category group with per-series values.
+- `LBarChart:drawToImage`: Renders the bar chart into an existing ImageData.
+- `LBarChart:type`: Returns the type name of this object.
+- `LBarChart:typeOf`: Returns true if this object is of the given type.
 
-### `Button` Methods
-- `Button:setText`: Sets the text for this Button widget.
-- `Button:getText`: Returns the text of this Button widget.
+### `LButton` Methods
+- `LButton:setText`: Sets the text for this Button widget.
+- `LButton:getText`: Returns the text of this Button widget.
 
-### `Checkbox` Methods
-- `Checkbox:setChecked`: Sets the checked for this Checkbox widget.
-- `Checkbox:isChecked`: Returns true if checked is enabled for this Checkbox widget.
-- `Checkbox:setText`: Sets the text for this Checkbox widget.
-- `Checkbox:getText`: Returns the text of this Checkbox widget.
+### `LCheckbox` Methods
+- `LCheckbox:setChecked`: Sets the checked for this Checkbox widget.
+- `LCheckbox:isChecked`: Returns true if checked is enabled for this Checkbox widget.
+- `LCheckbox:setText`: Sets the text for this Checkbox widget.
+- `LCheckbox:getText`: Returns the text of this Checkbox widget.
 
-### `Color_Picker` Methods
-- `Color_Picker:getColor`: Returns the color of this Color_Picker widget.
-- `Color_Picker:setColor`: Sets the color for this Color_Picker widget.
-- `Color_Picker:getShowAlpha`: Returns the show alpha of this Color_Picker widget.
-- `Color_Picker:setShowAlpha`: Sets the show alpha for this Color_Picker widget.
-- `Color_Picker:getColorMode`: Returns the color mode of this Color_Picker widget.
-- `Color_Picker:setColorMode`: Sets the color mode for this Color_Picker widget.
-- `Color_Picker:setOnChange`: Registers a callback invoked when this widget's value changes.
+### `LColorPicker` Methods
+- `LColorPicker:getColor`: Returns the color of this Color_Picker widget.
+- `LColorPicker:setColor`: Sets the color for this Color_Picker widget.
+- `LColorPicker:getShowAlpha`: Returns the show alpha of this Color_Picker widget.
+- `LColorPicker:setShowAlpha`: Sets the show alpha for this Color_Picker widget.
+- `LColorPicker:getColorMode`: Returns the color mode of this Color_Picker widget.
+- `LColorPicker:setColorMode`: Sets the color mode for this Color_Picker widget.
+- `LColorPicker:setOnChange`: Registers a callback invoked when this widget's value changes.
 
-### `Combo_Box` Methods
-- `Combo_Box:addItem`: Adds a item entry to this Combo_Box widget.
-- `Combo_Box:removeItem`: Removes the item from this Combo_Box widget.
-- `Combo_Box:clearItems`: Clears all items entries from this Combo_Box widget.
-- `Combo_Box:getItemCount`: Returns the item count of this Combo_Box widget.
-- `Combo_Box:getItem`: Returns the item of this Combo_Box widget.
-- `Combo_Box:setSelectedIndex`: Sets the selected index for this Combo_Box widget.
-- `Combo_Box:getSelectedIndex`: Returns the selected index of this Combo_Box widget.
-- `Combo_Box:getSelectedItem`: Returns the selected item of this Combo_Box widget.
+### `LComboBox` Methods
+- `LComboBox:addItem`: Adds a item entry to this Combo_Box widget.
+- `LComboBox:removeItem`: Removes the item from this Combo_Box widget.
+- `LComboBox:clearItems`: Clears all items entries from this Combo_Box widget.
+- `LComboBox:getItemCount`: Returns the item count of this Combo_Box widget.
+- `LComboBox:getItem`: Returns the item of this Combo_Box widget.
+- `LComboBox:setSelectedIndex`: Sets the selected index for this Combo_Box widget.
+- `LComboBox:getSelectedIndex`: Returns the selected index of this Combo_Box widget.
+- `LComboBox:getSelectedItem`: Returns the selected item of this Combo_Box widget.
 
-### `Dialog` Methods
-- `Dialog:getTitle`: Returns the title of this Dialog widget.
-- `Dialog:setTitle`: Sets the title for this Dialog widget.
-- `Dialog:isModal`: Returns true if modal is enabled for this Dialog widget.
-- `Dialog:setModal`: Sets the modal for this Dialog widget.
-- `Dialog:isOpen`: Returns true if open is enabled for this Dialog widget.
-- `Dialog:open`: Performs the open operation on this Dialog widget.
-- `Dialog:close`: Closes and removes this dialog from the screen.
-- `Dialog:setOnClose`: Registers a callback invoked when this dialog is closed.
-- `Dialog:setContent`: Sets the content for this Dialog widget.
-- `Dialog:getContent`: Returns the content of this Dialog widget.
-- `Dialog:addButton`: Adds a button entry to this Dialog widget.
+### `LDialog` Methods
+- `LDialog:getTitle`: Returns the title of this Dialog widget.
+- `LDialog:setTitle`: Sets the title for this Dialog widget.
+- `LDialog:isModal`: Returns true if modal is enabled for this Dialog widget.
+- `LDialog:setModal`: Sets the modal for this Dialog widget.
+- `LDialog:isOpen`: Returns true if open is enabled for this Dialog widget.
+- `LDialog:open`: Performs the open operation on this Dialog widget.
+- `LDialog:close`: Closes and removes this dialog from the screen.
+- `LDialog:setOnClose`: Registers a callback invoked when this dialog is closed.
+- `LDialog:setContent`: Sets the content for this Dialog widget.
+- `LDialog:getContent`: Returns the content of this Dialog widget.
+- `LDialog:addButton`: Adds a button entry to this Dialog widget.
 
-### `Dock_Panel` Methods
-- `Dock_Panel:dock`: Performs the dock operation on this Dock_Panel widget.
-- `Dock_Panel:undock`: Performs the undock operation on this Dock_Panel widget.
-- `Dock_Panel:getDockedCount`: Returns the docked count of this Dock_Panel widget.
-- `Dock_Panel:setSplitSize`: Sets the split size for this Dock_Panel widget.
-- `Dock_Panel:getSplitSize`: Returns the split size of this Dock_Panel widget.
+### `LDockPanel` Methods
+- `LDockPanel:dock`: Performs the dock operation on this Dock_Panel widget.
+- `LDockPanel:undock`: Performs the undock operation on this Dock_Panel widget.
+- `LDockPanel:getDockedCount`: Returns the docked count of this Dock_Panel widget.
+- `LDockPanel:setSplitSize`: Sets the split size for this Dock_Panel widget.
+- `LDockPanel:getSplitSize`: Returns the split size of this Dock_Panel widget.
 
-### `Gui_Table` Methods
-- `Gui_Table:addColumn`: Adds a column entry to this Gui_Table widget.
-- `Gui_Table:getColumnCount`: Returns the column count of this Gui_Table widget.
-- `Gui_Table:addRow`: Adds a row entry to this Gui_Table widget.
-- `Gui_Table:getRowCount`: Returns the row count of this Gui_Table widget.
-- `Gui_Table:getCell`: Returns the cell of this Gui_Table widget.
-- `Gui_Table:setCell`: Sets the cell for this Gui_Table widget.
-- `Gui_Table:getSelectedRow`: Returns the selected row of this Gui_Table widget.
-- `Gui_Table:setSelectedRow`: Sets the selected row for this Gui_Table widget.
-- `Gui_Table:isSortable`: Returns true if sortable is enabled for this Gui_Table widget.
-- `Gui_Table:setSortable`: Sets the sortable for this Gui_Table widget.
-- `Gui_Table:setOnSelect`: Registers a callback invoked when a table row is selected.
+### `LGuiTable` Methods
+- `LGuiTable:addColumn`: Adds a column entry to this Gui_Table widget.
+- `LGuiTable:getColumnCount`: Returns the column count of this Gui_Table widget.
+- `LGuiTable:addRow`: Adds a row entry to this Gui_Table widget.
+- `LGuiTable:getRowCount`: Returns the row count of this Gui_Table widget.
+- `LGuiTable:getCell`: Returns the cell of this Gui_Table widget.
+- `LGuiTable:setCell`: Sets the cell for this Gui_Table widget.
+- `LGuiTable:getSelectedRow`: Returns the selected row of this Gui_Table widget.
+- `LGuiTable:setSelectedRow`: Sets the selected row for this Gui_Table widget.
+- `LGuiTable:isSortable`: Returns true if sortable is enabled for this Gui_Table widget.
+- `LGuiTable:setSortable`: Sets the sortable for this Gui_Table widget.
+- `LGuiTable:setOnSelect`: Registers a callback invoked when a table row is selected.
 
-### `Gui_Window` Methods
-- `Gui_Window:getTitle`: Returns the title of this Gui_Window widget.
-- `Gui_Window:setTitle`: Sets the title for this Gui_Window widget.
-- `Gui_Window:isCloseable`: Returns true if closeable is enabled for this Gui_Window widget.
-- `Gui_Window:setCloseable`: Sets the closeable for this Gui_Window widget.
-- `Gui_Window:isDraggable`: Returns true if draggable is enabled for this Gui_Window widget.
-- `Gui_Window:setDraggable`: Sets the draggable for this Gui_Window widget.
-- `Gui_Window:isResizable`: Returns true if resizable is enabled for this Gui_Window widget.
-- `Gui_Window:setResizable`: Sets the resizable for this Gui_Window widget.
-- `Gui_Window:setOnClose`: Registers a callback invoked when this window is closed.
+### `LGuiWindow` Methods
+- `LGuiWindow:getTitle`: Returns the title of this Gui_Window widget.
+- `LGuiWindow:setTitle`: Sets the title for this Gui_Window widget.
+- `LGuiWindow:isCloseable`: Returns true if closeable is enabled for this Gui_Window widget.
+- `LGuiWindow:setCloseable`: Sets the closeable for this Gui_Window widget.
+- `LGuiWindow:isDraggable`: Returns true if draggable is enabled for this Gui_Window widget.
+- `LGuiWindow:setDraggable`: Sets the draggable for this Gui_Window widget.
+- `LGuiWindow:isResizable`: Returns true if resizable is enabled for this Gui_Window widget.
+- `LGuiWindow:setResizable`: Sets the resizable for this Gui_Window widget.
+- `LGuiWindow:setOnClose`: Registers a callback invoked when this window is closed.
 
-### `Image_Widget` Methods
-- `Image_Widget:getScaleMode`: Returns the scale mode of this Image_Widget widget.
-- `Image_Widget:setScaleMode`: Sets the scale mode for this Image_Widget widget.
-- `Image_Widget:getTint`: Returns the tint of this Image_Widget widget.
-- `Image_Widget:setTint`: Sets the tint for this Image_Widget widget.
-- `Image_Widget:newButton`: Creates and returns a new interactive button widget as a child of this widget.
-- `Image_Widget:newLabel`: Creates a text label widget.
-- `Image_Widget:newTextInput`: Creates a text input widget.
-- `Image_Widget:newCheckbox`: Creates a checkbox widget.
-- `Image_Widget:newSlider`: Creates a value slider widget.
-- `Image_Widget:newProgressBar`: Creates a progress bar widget.
-- `Image_Widget:newComboBox`: Creates a dropdown combo box widget.
-- `Image_Widget:newList`: Creates a selectable list widget.
-- `Image_Widget:newPanel`: Creates a container panel widget.
-- `Image_Widget:newLayout`: Creates a flexbox layout container.
-- `Image_Widget:newScrollPanel`: Creates a scrollable panel widget.
-- `Image_Widget:newNinePatch`: Creates a 9-patch slicer widget.
-- `Image_Widget:newTabBar`: Creates a tab bar widget.
-- `Image_Widget:newSeparator`: Creates a separator line.
-- `Image_Widget:newSpacer`: Creates a spacing filler widget.
-- `Image_Widget:newToast`: Creates a toast notification widget.
-- `Image_Widget:newTreeView`: Creates a collapsible tree view widget.
-- `Image_Widget:newRadioButton`: Creates a grouped radio button widget.
-- `Image_Widget:newScrollBar`: Creates a scroll bar widget.
-- `Image_Widget:newWindow`: Creates a draggable window widget.
-- `Image_Widget:newSplitPanel`: Creates a resizable split panel.
-- `Image_Widget:newDockPanel`: Creates and returns a new docking panel that arranges children along its edges.
-- `Image_Widget:newToolbar`: Creates a toolbar widget.
-- `Image_Widget:newMenuBar`: Creates a menu bar widget.
-- `Image_Widget:newMenuItem`: Creates a menu item widget.
-- `Image_Widget:newDialog`: Creates a modal dialog widget.
-- `Image_Widget:newStatusBar`: Creates a status bar widget.
-- `Image_Widget:newAccordion`: Creates a collapsible accordion widget.
-- `Image_Widget:newTooltipPanel`: Creates a tooltip panel widget.
-- `Image_Widget:newColorPicker`: Creates a color picker widget.
-- `Image_Widget:newTable`: Creates a data table widget.
-- `Image_Widget:newImageWidget`: Creates an image display widget.
-- `Image_Widget:newTheme`: Creates a new theme instance.
-- `Image_Widget:setTheme`: Sets the active GUI theme.
-- `Image_Widget:getTheme`: Returns whether a theme is set.
-- `Image_Widget:getRoot`: Returns the root panel widget table.
-- `Image_Widget:setFocus`: Sets keyboard focus to a widget or clears it.
-- `Image_Widget:getFocus`: Returns the focused widget index or nil.
-- `Image_Widget:focusNext`: Moves focus to the next focusable widget.
-- `Image_Widget:focusPrev`: Moves focus to the previous focusable widget.
-- `Image_Widget:clearFocus`: Removes keyboard focus from this widget so key events go to the next focusable.
-- `Image_Widget:addToast`: Queues a toast notification from a table.
-- `Image_Widget:getToastCount`: Returns the number of active toasts.
-- `Image_Widget:mousepressed`: Forwards a mouse press event to the GUI.
-- `Image_Widget:mousereleased`: Forwards a mouse release event to the GUI.
-- `Image_Widget:mousemoved`: Forwards a mouse move event to the GUI.
-- `Image_Widget:keypressed`: Forwards a key press event to the GUI.
-- `Image_Widget:textinput`: Forwards text input to the focused text input widget.
-- `Image_Widget:wheelmoved`: Forwards a mouse wheel event to the GUI.
-- `Image_Widget:update`: Advances toast timers, removes expired toasts, and dispatches pending GUI events.
-- `Image_Widget:draw`: Invokes all registered on_draw callbacks, each receiving the widget's
-- `Image_Widget:newCustomWidget`: Creates a new widget with custom Lua-driven rendering.
-- `Image_Widget:getWidgetCount`: Returns the total widget count in the context.
-- `Image_Widget:drawToImage`: Renders the UI widget tree to a CPU ImageData at the given resolution.
-- `Image_Widget:newLineChart`: Creates a new line chart.
-- `Image_Widget:newBarChart`: Creates and returns a new bar chart widget attached to this image widget.
-- `Image_Widget:newScatterPlot`: Creates a new scatter plot.
-- `Image_Widget:newPieChart`: Creates and returns a new pie chart widget attached to this image widget.
-- `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
-- `Image_Widget:newLineChart`: Creates a new line chart.
-- `Image_Widget:newBarChart`: Creates and returns a new bar chart widget attached to this image widget.
-- `Image_Widget:newScatterPlot`: Creates a new scatter plot.
-- `Image_Widget:newPieChart`: Creates and returns a new pie chart widget attached to this image widget.
-- `Image_Widget:newAreaChart`: Creates a new stacked-area chart.
-- `Image_Widget:parseWidgetState`: Parses a widget state string, returning the canonical form or nil if invalid.
-- `Image_Widget:newSpinBox`: Creates a numeric spin box widget with increment and decrement buttons.
-- `Image_Widget:newSwitch`: Creates a toggle switch widget.
-- `Image_Widget:newBadge`: Creates a badge widget displaying a numeric count.
-- `Image_Widget:setDefaultTheme`: Installs the built-in dark theme as the active GUI theme.
-- `Image_Widget:setViewport`: Sets the viewport dimensions used for anchor constraints and layout.
-- `Image_Widget:flushCache`: Returns true if the widget tree changed since the last call, then resets the flag.
-- `Image_Widget:update_bindings`: Updates all widgets that have a data-binding key registered via `:bind(key)`.
-- `Image_Widget:loadLayout`: Load a widget tree from a Lua table definition and attach it to the UI
-- `Image_Widget:loadLayoutFile`: Load a widget tree from a TOML layout file and attach it to the UI root.
-- `Image_Widget:renderToImage`: Render the current UI widget tree to a PNG file for testing purposes.
+### `LImageWidget` Methods
+- `LImageWidget:getScaleMode`: Returns the scale mode of this Image_Widget widget.
+- `LImageWidget:setScaleMode`: Sets the scale mode for this Image_Widget widget.
+- `LImageWidget:getTint`: Returns the tint of this Image_Widget widget.
+- `LImageWidget:setTint`: Sets the tint for this Image_Widget widget.
 
-### `Label` Methods
-- `Label:setText`: Sets the text for this Label widget.
-- `Label:getText`: Returns the text of this Label widget.
+### `LLabel` Methods
+- `LLabel:setText`: Sets the text for this Label widget.
+- `LLabel:getText`: Returns the text of this Label widget.
 
-### `Layout` Methods
-- `Layout:setDirection`: Sets the direction for this Layout widget.
-- `Layout:getDirection`: Returns the direction of this Layout widget.
-- `Layout:setSpacing`: Sets the spacing for this Layout widget.
-- `Layout:getSpacing`: Returns the spacing of this Layout widget.
-- `Layout:setColumns`: Sets the columns for this Layout widget.
-- `Layout:setWrap`: Sets the wrap for this Layout widget.
-- `Layout:getWrap`: Returns the wrap of this Layout widget.
-- `Layout:setAlign`: Sets the align for this Layout widget.
-- `Layout:getAlign`: Returns the align of this Layout widget.
-- `Layout:setJustify`: Sets the justify for this Layout widget.
-- `Layout:getJustify`: Returns the justify of this Layout widget.
+### `LLayout` Methods
+- `LLayout:setDirection`: Sets the direction for this Layout widget.
+- `LLayout:getDirection`: Returns the direction of this Layout widget.
+- `LLayout:setSpacing`: Sets the spacing for this Layout widget.
+- `LLayout:getSpacing`: Returns the spacing of this Layout widget.
+- `LLayout:setColumns`: Sets the columns for this Layout widget.
+- `LLayout:setWrap`: Sets the wrap for this Layout widget.
+- `LLayout:getWrap`: Returns the wrap of this Layout widget.
+- `LLayout:setAlign`: Sets the align for this Layout widget.
+- `LLayout:getAlign`: Returns the align of this Layout widget.
+- `LLayout:setJustify`: Sets the justify for this Layout widget.
+- `LLayout:getJustify`: Returns the justify of this Layout widget.
 
-### `LineChart` Methods
-- `LineChart:setYMax`: Sets the maximum Y value for axis scaling.
-- `LineChart:setXMax`: Sets the maximum X value for axis scaling.
-- `LineChart:drawToImage`: Renders the line chart into an existing ImageData.
+### `LLineChart` Methods
+- `LLineChart:addSeries`: Adds a named data series to the chart.
+- `LLineChart:setYMax`: Sets the maximum Y value for axis scaling.
+- `LLineChart:setXMax`: Sets the maximum X value for axis scaling.
+- `LLineChart:drawToImage`: Renders the line chart into an existing ImageData.
+- `LLineChart:type`: Returns the type name of this object.
+- `LLineChart:typeOf`: Returns true if this object is of the given type.
 
-### `List_Box` Methods
-- `List_Box:addItem`: Adds a item entry to this List_Box widget.
-- `List_Box:removeItem`: Removes the item from this List_Box widget.
-- `List_Box:clearItems`: Clears all items entries from this List_Box widget.
-- `List_Box:getItemCount`: Returns the item count of this List_Box widget.
-- `List_Box:getItem`: Returns the item of this List_Box widget.
-- `List_Box:setSelectedIndex`: Sets the selected index for this List_Box widget.
-- `List_Box:getSelectedIndex`: Returns the selected index of this List_Box widget.
-- `List_Box:setItemHeight`: Sets the item height for this List_Box widget.
+### `LListBox` Methods
+- `LListBox:addItem`: Adds a item entry to this List_Box widget.
+- `LListBox:removeItem`: Removes the item from this List_Box widget.
+- `LListBox:clearItems`: Clears all items entries from this List_Box widget.
+- `LListBox:getItemCount`: Returns the item count of this List_Box widget.
+- `LListBox:getItem`: Returns the item of this List_Box widget.
+- `LListBox:setSelectedIndex`: Sets the selected index for this List_Box widget.
+- `LListBox:getSelectedIndex`: Returns the selected index of this List_Box widget.
+- `LListBox:setItemHeight`: Sets the item height for this List_Box widget.
 
-### `Menu_Bar` Methods
-- `Menu_Bar:addMenu`: Adds a menu entry to this Menu_Bar widget.
-- `Menu_Bar:removeMenu`: Removes the menu from this Menu_Bar widget.
-- `Menu_Bar:getMenus`: Returns the menus of this Menu_Bar widget.
-- `Menu_Bar:getMenuCount`: Returns the menu count of this Menu_Bar widget.
+### `LMenuBar` Methods
+- `LMenuBar:addMenu`: Adds a menu entry to this Menu_Bar widget.
+- `LMenuBar:removeMenu`: Removes the menu from this Menu_Bar widget.
+- `LMenuBar:getMenus`: Returns the menus of this Menu_Bar widget.
+- `LMenuBar:getMenuCount`: Returns the menu count of this Menu_Bar widget.
 
-### `Menu_Item` Methods
-- `Menu_Item:getText`: Returns the text of this Menu_Item widget.
-- `Menu_Item:setText`: Sets the text for this Menu_Item widget.
-- `Menu_Item:getShortcut`: Returns the shortcut of this Menu_Item widget.
-- `Menu_Item:setShortcut`: Sets the shortcut for this Menu_Item widget.
-- `Menu_Item:isChecked`: Returns true if checked is enabled for this Menu_Item widget.
-- `Menu_Item:setChecked`: Sets the checked for this Menu_Item widget.
-- `Menu_Item:addSubItem`: Adds a sub item entry to this Menu_Item widget.
-- `Menu_Item:getSubItems`: Returns the sub items of this Menu_Item widget.
-- `Menu_Item:setOnClick`: Registers a callback invoked when this menu item is clicked.
+### `LMenuItem` Methods
+- `LMenuItem:getText`: Returns the text of this Menu_Item widget.
+- `LMenuItem:setText`: Sets the text for this Menu_Item widget.
+- `LMenuItem:getShortcut`: Returns the shortcut of this Menu_Item widget.
+- `LMenuItem:setShortcut`: Sets the shortcut for this Menu_Item widget.
+- `LMenuItem:isChecked`: Returns true if checked is enabled for this Menu_Item widget.
+- `LMenuItem:setChecked`: Sets the checked for this Menu_Item widget.
+- `LMenuItem:addSubItem`: Adds a sub item entry to this Menu_Item widget.
+- `LMenuItem:getSubItems`: Returns the sub items of this Menu_Item widget.
+- `LMenuItem:setOnClick`: Registers a callback invoked when this menu item is clicked.
 
-### `Nine_Patch` Methods
-- `Nine_Patch:setInsets`: Sets the insets for this Nine_Patch widget.
-- `Nine_Patch:getInsets`: Returns the insets of this Nine_Patch widget.
-- `Nine_Patch:setImageDimensions`: Sets the image dimensions for this Nine_Patch widget.
-- `Nine_Patch:getImageDimensions`: Returns the image dimensions of this Nine_Patch widget.
-- `Nine_Patch:getSlices`: Returns the slices of this Nine_Patch widget.
+### `LNinePatch` Methods
+- `LNinePatch:setInsets`: Sets the insets for this Nine_Patch widget.
+- `LNinePatch:getInsets`: Returns the insets of this Nine_Patch widget.
+- `LNinePatch:setImageDimensions`: Sets the image dimensions for this Nine_Patch widget.
+- `LNinePatch:getImageDimensions`: Returns the image dimensions of this Nine_Patch widget.
+- `LNinePatch:getSlices`: Returns the slices of this Nine_Patch widget.
 
-### `Panel` Methods
-- `Panel:setTitle`: Sets the title for this Panel widget.
-- `Panel:getTitle`: Returns the title of this Panel widget.
-- `Panel:setScrollable`: Sets the scrollable for this Panel widget.
+### `LPanel` Methods
+- `LPanel:setTitle`: Sets the title for this Panel widget.
+- `LPanel:getTitle`: Returns the title of this Panel widget.
+- `LPanel:setScrollable`: Sets the scrollable for this Panel widget.
 
-### `PieChart` Methods
-- `PieChart:drawToImage`: Renders the pie chart into an existing ImageData.
+### `LPieChart` Methods
+- `LPieChart:addSegment`: Adds a labelled pie segment.
+- `LPieChart:drawToImage`: Renders the pie chart into an existing ImageData.
+- `LPieChart:type`: Returns the type name of this object.
+- `LPieChart:typeOf`: Returns true if this object is of the given type.
 
-### `Progress_Bar` Methods
-- `Progress_Bar:setValue`: Sets the value for this Progress_Bar widget.
-- `Progress_Bar:getValue`: Returns the value of this Progress_Bar widget.
-- `Progress_Bar:getProgress`: Returns the progress of this Progress_Bar widget.
-- `Progress_Bar:setRange`: Sets the range for this Progress_Bar widget.
-- `Progress_Bar:getMin`: Returns the min of this Progress_Bar widget.
-- `Progress_Bar:getMax`: Returns the max of this Progress_Bar widget.
+### `LProgressBar` Methods
+- `LProgressBar:setValue`: Sets the value for this Progress_Bar widget.
+- `LProgressBar:getValue`: Returns the value of this Progress_Bar widget.
+- `LProgressBar:getProgress`: Returns the progress of this Progress_Bar widget.
+- `LProgressBar:setRange`: Sets the range for this Progress_Bar widget.
+- `LProgressBar:getMin`: Returns the min of this Progress_Bar widget.
+- `LProgressBar:getMax`: Returns the max of this Progress_Bar widget.
 
-### `Radio_Button` Methods
-- `Radio_Button:getText`: Returns the text of this Radio_Button widget.
-- `Radio_Button:setText`: Sets the text for this Radio_Button widget.
-- `Radio_Button:isSelected`: Returns true if selected is enabled for this Radio_Button widget.
-- `Radio_Button:setSelected`: Sets the selected for this Radio_Button widget.
-- `Radio_Button:getGroup`: Returns the group of this Radio_Button widget.
-- `Radio_Button:setGroup`: Sets the group for this Radio_Button widget.
-- `Radio_Button:setOnChange`: Registers a callback invoked when this widget's value changes.
+### `LRadioButton` Methods
+- `LRadioButton:getText`: Returns the text of this Radio_Button widget.
+- `LRadioButton:setText`: Sets the text for this Radio_Button widget.
+- `LRadioButton:isSelected`: Returns true if selected is enabled for this Radio_Button widget.
+- `LRadioButton:setSelected`: Sets the selected for this Radio_Button widget.
+- `LRadioButton:getGroup`: Returns the group of this Radio_Button widget.
+- `LRadioButton:setGroup`: Sets the group for this Radio_Button widget.
+- `LRadioButton:setOnChange`: Registers a callback invoked when this widget's value changes.
 
-### `ScatterPlot` Methods
-- `ScatterPlot:setXRange`: Sets the X-axis data range.
-- `ScatterPlot:setYRange`: Sets the Y-axis data range.
-- `ScatterPlot:drawToImage`: Renders the scatter plot into an existing ImageData.
+### `LScatterPlot` Methods
+- `LScatterPlot:addSeries`: Adds a named data series.
+- `LScatterPlot:setXRange`: Sets the X-axis data range.
+- `LScatterPlot:setYRange`: Sets the Y-axis data range.
+- `LScatterPlot:drawToImage`: Renders the scatter plot into an existing ImageData.
+- `LScatterPlot:type`: Returns the type name of this object.
+- `LScatterPlot:typeOf`: Returns true if this object is of the given type.
 
-### `Scroll_Bar` Methods
-- `Scroll_Bar:getScrollPosition`: Returns the scroll position of this Scroll_Bar widget.
-- `Scroll_Bar:setScrollPosition`: Sets the scroll position for this Scroll_Bar widget.
-- `Scroll_Bar:getContentSize`: Returns the content size of this Scroll_Bar widget.
-- `Scroll_Bar:setContentSize`: Sets the content size for this Scroll_Bar widget.
-- `Scroll_Bar:getViewSize`: Returns the view size of this Scroll_Bar widget.
-- `Scroll_Bar:setViewSize`: Sets the view size for this Scroll_Bar widget.
-- `Scroll_Bar:isVertical`: Returns true if vertical is enabled for this Scroll_Bar widget.
-- `Scroll_Bar:setOnChange`: Registers a callback invoked when this widget's value changes.
+### `LScrollBar` Methods
+- `LScrollBar:getScrollPosition`: Returns the scroll position of this Scroll_Bar widget.
+- `LScrollBar:setScrollPosition`: Sets the scroll position for this Scroll_Bar widget.
+- `LScrollBar:getContentSize`: Returns the content size of this Scroll_Bar widget.
+- `LScrollBar:setContentSize`: Sets the content size for this Scroll_Bar widget.
+- `LScrollBar:getViewSize`: Returns the view size of this Scroll_Bar widget.
+- `LScrollBar:setViewSize`: Sets the view size for this Scroll_Bar widget.
+- `LScrollBar:isVertical`: Returns true if vertical is enabled for this Scroll_Bar widget.
+- `LScrollBar:setOnChange`: Registers a callback invoked when this widget's value changes.
 
-### `Scroll_Panel` Methods
-- `Scroll_Panel:setContentSize`: Sets the content size for this Scroll_Panel widget.
-- `Scroll_Panel:getContentSize`: Returns the content size of this Scroll_Panel widget.
-- `Scroll_Panel:setScrollPosition`: Sets the scroll position for this Scroll_Panel widget.
-- `Scroll_Panel:getScrollPosition`: Returns the scroll position of this Scroll_Panel widget.
-- `Scroll_Panel:getMaxScroll`: Returns the max scroll of this Scroll_Panel widget.
-- `Scroll_Panel:setScrollSpeed`: Sets the scroll speed for this Scroll_Panel widget.
-- `Scroll_Panel:getScrollSpeed`: Returns the scroll speed of this Scroll_Panel widget.
+### `LScrollPanel` Methods
+- `LScrollPanel:setContentSize`: Sets the content size for this Scroll_Panel widget.
+- `LScrollPanel:getContentSize`: Returns the content size of this Scroll_Panel widget.
+- `LScrollPanel:setScrollPosition`: Sets the scroll position for this Scroll_Panel widget.
+- `LScrollPanel:getScrollPosition`: Returns the scroll position of this Scroll_Panel widget.
+- `LScrollPanel:getMaxScroll`: Returns the max scroll of this Scroll_Panel widget.
+- `LScrollPanel:setScrollSpeed`: Sets the scroll speed for this Scroll_Panel widget.
+- `LScrollPanel:getScrollSpeed`: Returns the scroll speed of this Scroll_Panel widget.
 
-### `Separator` Methods
-- `Separator:setVertical`: Sets the vertical for this Separator widget.
-- `Separator:isVertical`: Returns true if vertical is enabled for this Separator widget.
-- `Separator:setThickness`: Sets the thickness for this Separator widget.
-- `Separator:getThickness`: Returns the thickness of this Separator widget.
+### `LSeparator` Methods
+- `LSeparator:setVertical`: Sets the vertical for this Separator widget.
+- `LSeparator:isVertical`: Returns true if vertical is enabled for this Separator widget.
+- `LSeparator:setThickness`: Sets the thickness for this Separator widget.
+- `LSeparator:getThickness`: Returns the thickness of this Separator widget.
 
-### `Slider` Methods
-- `Slider:setValue`: Sets the value for this Slider widget.
-- `Slider:getValue`: Returns the value of this Slider widget.
-- `Slider:setRange`: Sets the range for this Slider widget.
-- `Slider:setStep`: Sets the step for this Slider widget.
-- `Slider:getMin`: Returns the min of this Slider widget.
-- `Slider:getMax`: Returns the max of this Slider widget.
+### `LSlider` Methods
+- `LSlider:setValue`: Sets the value for this Slider widget.
+- `LSlider:getValue`: Returns the value of this Slider widget.
+- `LSlider:setRange`: Sets the range for this Slider widget.
+- `LSlider:setStep`: Sets the step for this Slider widget.
+- `LSlider:getMin`: Returns the min of this Slider widget.
+- `LSlider:getMax`: Returns the max of this Slider widget.
 
-### `Spin_Box` Methods
-- `Spin_Box:setValue`: Sets the value for this SpinBox widget.
-- `Spin_Box:getValue`: Returns the current value of this SpinBox widget.
-- `Spin_Box:increment`: Increments the value by one step.
-- `Spin_Box:decrement`: Decrements the value by one step.
-- `Spin_Box:setRange`: Sets the valid range for this SpinBox widget.
-- `Spin_Box:setStep`: Sets the increment step for this SpinBox widget.
+### `LSpinBox` Methods
+- `LSpinBox:setValue`: Sets the value for this SpinBox widget.
+- `LSpinBox:getValue`: Returns the current value of this SpinBox widget.
+- `LSpinBox:increment`: Increments the value by one step.
+- `LSpinBox:decrement`: Decrements the value by one step.
+- `LSpinBox:setRange`: Sets the valid range for this SpinBox widget.
+- `LSpinBox:setStep`: Sets the increment step for this SpinBox widget.
 
-### `Split_Panel` Methods
-- `Split_Panel:getOrientation`: Returns the orientation of this Split_Panel widget.
-- `Split_Panel:setOrientation`: Sets the orientation for this Split_Panel widget.
-- `Split_Panel:getSplitPosition`: Returns the split position of this Split_Panel widget.
-- `Split_Panel:setSplitPosition`: Sets the split position for this Split_Panel widget.
-- `Split_Panel:getMinPanelSize`: Returns the min panel size of this Split_Panel widget.
-- `Split_Panel:setMinPanelSize`: Sets the min panel size for this Split_Panel widget.
-- `Split_Panel:setFirstChild`: Sets the first child for this Split_Panel widget.
-- `Split_Panel:setSecondChild`: Sets the second child for this Split_Panel widget.
-- `Split_Panel:getFirstChild`: Returns the first child of this Split_Panel widget.
-- `Split_Panel:getSecondChild`: Returns the second child of this Split_Panel widget.
+### `LSplitPanel` Methods
+- `LSplitPanel:getOrientation`: Returns the orientation of this Split_Panel widget.
+- `LSplitPanel:setOrientation`: Sets the orientation for this Split_Panel widget.
+- `LSplitPanel:getSplitPosition`: Returns the split position of this Split_Panel widget.
+- `LSplitPanel:setSplitPosition`: Sets the split position for this Split_Panel widget.
+- `LSplitPanel:getMinPanelSize`: Returns the min panel size of this Split_Panel widget.
+- `LSplitPanel:setMinPanelSize`: Sets the min panel size for this Split_Panel widget.
+- `LSplitPanel:setFirstChild`: Sets the first child for this Split_Panel widget.
+- `LSplitPanel:setSecondChild`: Sets the second child for this Split_Panel widget.
+- `LSplitPanel:getFirstChild`: Returns the first child of this Split_Panel widget.
+- `LSplitPanel:getSecondChild`: Returns the second child of this Split_Panel widget.
 
-### `Status_Bar` Methods
-- `Status_Bar:addSection`: Adds a section entry to this Status_Bar widget.
-- `Status_Bar:setSectionText`: Sets the section text for this Status_Bar widget.
-- `Status_Bar:getSectionText`: Returns the section text of this Status_Bar widget.
-- `Status_Bar:getSectionCount`: Returns the section count of this Status_Bar widget.
-- `Status_Bar:setSectionCount`: Resizes the section list for this Status_Bar widget.
-- `Status_Bar:setSectionWidget`: Compatibility shim for assigning a widget to a section.
+### `LStatusBar` Methods
+- `LStatusBar:addSection`: Adds a section entry to this Status_Bar widget.
+- `LStatusBar:setSectionText`: Sets the section text for this Status_Bar widget.
+- `LStatusBar:getSectionText`: Returns the section text of this Status_Bar widget.
+- `LStatusBar:getSectionCount`: Returns the section count of this Status_Bar widget.
+- `LStatusBar:setSectionCount`: Resizes the section list for this Status_Bar widget.
+- `LStatusBar:setSectionWidget`: Compatibility shim for assigning a widget to a section.
 
-### `Switch` Methods
-- `Switch:setOn`: Sets the on/off state of this Switch widget.
-- `Switch:isOn`: Returns the on/off state of this Switch widget.
-- `Switch:toggle`: Toggles the on/off state of this Switch widget.
+### `LSwitch` Methods
+- `LSwitch:setOn`: Sets the on/off state of this Switch widget.
+- `LSwitch:isOn`: Returns the on/off state of this Switch widget.
+- `LSwitch:toggle`: Toggles the on/off state of this Switch widget.
 
-### `Tab_Bar` Methods
-- `Tab_Bar:addTab`: Adds a tab entry to this Tab_Bar widget.
-- `Tab_Bar:removeTab`: Removes the tab from this Tab_Bar widget.
-- `Tab_Bar:getTab`: Returns the tab of this Tab_Bar widget.
-- `Tab_Bar:getTabCount`: Returns the tab count of this Tab_Bar widget.
-- `Tab_Bar:setActiveTab`: Sets the active tab for this Tab_Bar widget.
-- `Tab_Bar:getActiveTab`: Returns the active tab of this Tab_Bar widget.
+### `LTabBar` Methods
+- `LTabBar:addTab`: Adds a tab entry to this Tab_Bar widget.
+- `LTabBar:removeTab`: Removes the tab from this Tab_Bar widget.
+- `LTabBar:getTab`: Returns the tab of this Tab_Bar widget.
+- `LTabBar:getTabCount`: Returns the tab count of this Tab_Bar widget.
+- `LTabBar:setActiveTab`: Sets the active tab for this Tab_Bar widget.
+- `LTabBar:getActiveTab`: Returns the active tab of this Tab_Bar widget.
 
-### `Text_Input` Methods
-- `Text_Input:setText`: Sets the text for this Text_Input widget.
-- `Text_Input:getText`: Returns the text of this Text_Input widget.
-- `Text_Input:setPlaceholder`: Sets the placeholder for this Text_Input widget.
-- `Text_Input:getPlaceholder`: Returns the placeholder of this Text_Input widget.
-- `Text_Input:setMaxLength`: Sets the max length for this Text_Input widget.
-- `Text_Input:isFocused`: Returns true if focused is enabled for this Text_Input widget.
-- `Text_Input:getCursorPosition`: Returns the cursor position of this Text_Input widget.
+### `LTextInput` Methods
+- `LTextInput:setText`: Sets the text for this Text_Input widget.
+- `LTextInput:getText`: Returns the text of this Text_Input widget.
+- `LTextInput:setPlaceholder`: Sets the placeholder for this Text_Input widget.
+- `LTextInput:getPlaceholder`: Returns the placeholder of this Text_Input widget.
+- `LTextInput:setMaxLength`: Sets the max length for this Text_Input widget.
+- `LTextInput:isFocused`: Returns true if focused is enabled for this Text_Input widget.
+- `LTextInput:getCursorPosition`: Returns the cursor position of this Text_Input widget.
 
-### `Toast` Methods
-- `Toast:setMessage`: Sets the message for this Toast widget.
-- `Toast:getMessage`: Returns the message of this Toast widget.
-- `Toast:setDuration`: Sets the duration for this Toast widget.
-- `Toast:getDuration`: Returns the duration of this Toast widget.
-- `Toast:getProgress`: Returns the progress of this Toast widget.
-- `Toast:isExpired`: Returns true if expired is enabled for this Toast widget.
+### `LTheme` Methods
+- `LTheme:setStyle`: Sets a style for a (widget_type, state) pair.
+- `LTheme:type`: Returns the type name of this object.
+- `LTheme:typeOf`: Returns true if this object is of the given type.
 
-### `Toolbar` Methods
-- `Toolbar:getOrientation`: Returns the orientation of this Toolbar widget.
-- `Toolbar:setOrientation`: Sets the orientation for this Toolbar widget.
-- `Toolbar:addButton`: Adds a button entry to this Toolbar widget.
-- `Toolbar:addSeparator`: Adds a separator entry to this Toolbar widget.
-- `Toolbar:addSpacer`: Adds a spacer entry to this Toolbar widget.
-- `Toolbar:getButton`: Returns the button of this Toolbar widget.
-- `Toolbar:setButtonEnabled`: Sets the button enabled for this Toolbar widget.
-- `Toolbar:setButtonToggled`: Sets the button toggled for this Toolbar widget.
-- `Toolbar:isButtonToggled`: Returns true if button toggled is enabled for this Toolbar widget.
+### `LToast` Methods
+- `LToast:setMessage`: Sets the message for this Toast widget.
+- `LToast:getMessage`: Returns the message of this Toast widget.
+- `LToast:setDuration`: Sets the duration for this Toast widget.
+- `LToast:getDuration`: Returns the duration of this Toast widget.
+- `LToast:getProgress`: Returns the progress of this Toast widget.
+- `LToast:isExpired`: Returns true if expired is enabled for this Toast widget.
 
-### `Tooltip_Panel` Methods
-- `Tooltip_Panel:getText`: Returns the text of this Tooltip_Panel widget.
-- `Tooltip_Panel:setText`: Sets the text for this Tooltip_Panel widget.
-- `Tooltip_Panel:getDelay`: Returns the delay of this Tooltip_Panel widget.
-- `Tooltip_Panel:setDelay`: Sets the delay for this Tooltip_Panel widget.
-- `Tooltip_Panel:getTarget`: Returns the target of this Tooltip_Panel widget.
-- `Tooltip_Panel:setTarget`: Sets the target for this Tooltip_Panel widget.
+### `LToolbar` Methods
+- `LToolbar:getOrientation`: Returns the orientation of this Toolbar widget.
+- `LToolbar:setOrientation`: Sets the orientation for this Toolbar widget.
+- `LToolbar:addButton`: Adds a button entry to this Toolbar widget.
+- `LToolbar:addSeparator`: Adds a separator entry to this Toolbar widget.
+- `LToolbar:addSpacer`: Adds a spacer entry to this Toolbar widget.
+- `LToolbar:getButton`: Returns the button of this Toolbar widget.
+- `LToolbar:setButtonEnabled`: Sets the button enabled for this Toolbar widget.
+- `LToolbar:setButtonToggled`: Sets the button toggled for this Toolbar widget.
+- `LToolbar:isButtonToggled`: Returns true if button toggled is enabled for this Toolbar widget.
 
-### `Tree_View` Methods
-- `Tree_View:addNode`: Adds a node entry to this Tree_View widget.
-- `Tree_View:toggleNode`: Toggles the expanded/collapsed status of a Tree_View node.
-- `Tree_View:isExpanded`: Returns true if expanded is enabled for this Tree_View widget.
-- `Tree_View:getNodeCount`: Returns the node count of this Tree_View widget.
-- `Tree_View:removeNode`: Removes the node from this Tree_View widget.
-- `Tree_View:clearNodes`: Clears all nodes entries from this Tree_View widget.
-- `Tree_View:getNodeText`: Returns the node text of this Tree_View widget.
-- `Tree_View:setNodeText`: Sets the node text for this Tree_View widget.
-- `Tree_View:setNodeIcon`: Sets the node icon for this Tree_View widget.
-- `Tree_View:expandNode`: Performs the expand node operation on this Tree_View widget.
-- `Tree_View:collapseNode`: Performs the collapse node operation on this Tree_View widget.
-- `Tree_View:isNodeExpanded`: Returns true if node expanded is enabled for this Tree_View widget.
-- `Tree_View:expandAll`: Performs the expand all operation on this Tree_View widget.
-- `Tree_View:collapseAll`: Performs the collapse all operation on this Tree_View widget.
-- `Tree_View:setSelectedNode`: Sets the selected node for this Tree_View widget.
-- `Tree_View:getSelectedNode`: Returns the selected node of this Tree_View widget.
-- `Tree_View:getChildNodes`: Returns the child nodes of this Tree_View widget.
-- `Tree_View:getParentNode`: Returns the parent node of this Tree_View widget.
-- `Tree_View:getNodeDepth`: Returns the node depth of this Tree_View widget.
+### `LTooltipPanel` Methods
+- `LTooltipPanel:getText`: Returns the text of this Tooltip_Panel widget.
+- `LTooltipPanel:setText`: Sets the text for this Tooltip_Panel widget.
+- `LTooltipPanel:getDelay`: Returns the delay of this Tooltip_Panel widget.
+- `LTooltipPanel:setDelay`: Sets the delay for this Tooltip_Panel widget.
+- `LTooltipPanel:getTarget`: Returns the target of this Tooltip_Panel widget.
+- `LTooltipPanel:setTarget`: Sets the target for this Tooltip_Panel widget.
+
+### `LTreeView` Methods
+- `LTreeView:addNode`: Adds a node entry to this Tree_View widget.
+- `LTreeView:toggleNode`: Toggles the expanded/collapsed status of a Tree_View node.
+- `LTreeView:isExpanded`: Returns true if expanded is enabled for this Tree_View widget.
+- `LTreeView:getNodeCount`: Returns the node count of this Tree_View widget.
+- `LTreeView:removeNode`: Removes the node from this Tree_View widget.
+- `LTreeView:clearNodes`: Clears all nodes entries from this Tree_View widget.
+- `LTreeView:getNodeText`: Returns the node text of this Tree_View widget.
+- `LTreeView:setNodeText`: Sets the node text for this Tree_View widget.
+- `LTreeView:setNodeIcon`: Sets the node icon for this Tree_View widget.
+- `LTreeView:expandNode`: Performs the expand node operation on this Tree_View widget.
+- `LTreeView:collapseNode`: Performs the collapse node operation on this Tree_View widget.
+- `LTreeView:isNodeExpanded`: Returns true if node expanded is enabled for this Tree_View widget.
+- `LTreeView:expandAll`: Performs the expand all operation on this Tree_View widget.
+- `LTreeView:collapseAll`: Performs the collapse all operation on this Tree_View widget.
+- `LTreeView:setSelectedNode`: Sets the selected node for this Tree_View widget.
+- `LTreeView:getSelectedNode`: Returns the selected node of this Tree_View widget.
+- `LTreeView:getChildNodes`: Returns the child nodes of this Tree_View widget.
+- `LTreeView:getParentNode`: Returns the parent node of this Tree_View widget.
+- `LTreeView:getNodeDepth`: Returns the node depth of this Tree_View widget.
+
+### `LUiWidget` Methods
+- `LUiWidget:type`: Returns the Lua type name of this widget (e.g. "LButton").
+- `LUiWidget:typeOf`: Returns true if this widget is of the given type, "LWidget", or "Object".
+- `LUiWidget:setPosition`: Sets the widget position.
+- `LUiWidget:getPosition`: Returns the widget position.
+- `LUiWidget:setSize`: Sets the width and height of the widget in UI pixels.
+- `LUiWidget:getSize`: Returns the current width and height of the widget in UI pixels.
+- `LUiWidget:getRect`: Returns the computed screen-space rectangle after layout.
+- `LUiWidget:setVisible`: Shows or hides the widget; hidden widgets are not rendered or interactive.
+- `LUiWidget:isVisible`: Returns whether the widget is visible.
+- `LUiWidget:setEnabled`: Sets whether the widget is enabled.
+- `LUiWidget:isEnabled`: Returns whether the widget is enabled.
+- `LUiWidget:setId`: Sets the widget string identifier.
+- `LUiWidget:getId`: Returns the widget string identifier.
+- `LUiWidget:setTooltip`: Sets the widget tooltip text.
+- `LUiWidget:getTooltip`: Returns the widget tooltip text.
+- `LUiWidget:getState`: Returns the widget interaction state name.
+- `LUiWidget:addChild`: Adds a child widget to this container.
+- `LUiWidget:removeChild`: Removes a child widget from this container.
+- `LUiWidget:getChildCount`: Returns the number of children in this container.
+- `LUiWidget:getChildren`: Returns this container's children as widget-handle tables.
+- `LUiWidget:findById`: Recursively searches for a widget by id starting from this widget.
+- `LUiWidget:setOnClick`: Registers a callback invoked when this widget is clicked.
+- `LUiWidget:setOnChange`: Registers a callback invoked when this widget's value changes.
+- `LUiWidget:setOnDraw`: Stores a custom draw callback for later invocation.
+- `LUiWidget:containsPoint`: Returns whether (x, y) is inside this widget.
+- `LUiWidget:setPadding`: Sets widget padding (CSS-like: top, right?, bottom?, left?).
+- `LUiWidget:getPadding`: Returns the widget padding (top, right, bottom, left).
+- `LUiWidget:setMargin`: Sets widget margin (CSS-like: top, right?, bottom?, left?).
+- `LUiWidget:getMargin`: Returns the widget margin (top, right, bottom, left).
+- `LUiWidget:setZOrder`: Sets the widget z-order for draw sorting.
+- `LUiWidget:getZOrder`: Returns the widget z-order.
+- `LUiWidget:setMinSize`: Sets the minimum widget size.
+- `LUiWidget:getMinSize`: Returns the minimum widget size.
+- `LUiWidget:setMaxSize`: Sets the maximum widget size.
+- `LUiWidget:getMaxSize`: Returns the maximum widget size.
+- `LUiWidget:setAnchor`: Sets anchor edges (left, top, right, bottom).
+- `LUiWidget:setAnchorCenter`: Sets center anchor offsets.
+- `LUiWidget:clearAnchor`: Removes all anchor constraints.
+- `LUiWidget:setFlexGrow`: Sets the flex-grow factor.
+- `LUiWidget:getFlexGrow`: Returns the flex-grow factor.
+- `LUiWidget:setFlexShrink`: Sets the flex-shrink factor.
+- `LUiWidget:getFlexShrink`: Returns the flex-shrink factor.
+- `LUiWidget:bind`: Registers a data-binding key on this widget.
+- `LUiWidget:unbind`: Removes the data-binding key from this widget.
+- `LUiWidget:setAlpha`: Sets the widget's alpha transparency (`0.0` fully transparent, `1.0` opaque).
+- `LUiWidget:getAlpha`: Returns the widget's current alpha transparency.
+- `LUiWidget:fadeIn`: Instantly fades the widget in (sets alpha to `1.0`).
+- `LUiWidget:fadeOut`: Instantly fades the widget out (sets alpha to `0.0` and hides it).
+- `LUiWidget:slideIn`: Instantly moves the widget to `(x, y)` and makes it visible.
+- `LUiWidget:slideOut`: Instantly moves the widget to the off-screen position `(x, y)` and hides it.
+- `LUiWidget:attachToEntity`: Anchors this widget to a world-space entity by its numeric ID.
+- `LUiWidget:detachFromEntity`: Removes the entity anchor from this widget, restoring normal layout positioning.
 
 ## References
 

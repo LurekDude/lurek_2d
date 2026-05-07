@@ -1,4 +1,4 @@
-//! `lurek.filesystem` - Sandboxed file I/O, directory queries, and async asset loading.
+﻿//! `lurek.filesystem` - Sandboxed file I/O, directory queries, and async asset loading.
 //!
 //! All paths are resolved through the game's [`GameFS`] sandbox. Supports file
 //! read/write via `FileHandle`, bulk-data via `FileData`, ZIP archive mounting,
@@ -295,6 +295,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to the text file.
     /// @return | string | File contents.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("read", lua.create_function(move |_, path: String| {
             s.borrow().fs.read_string(&path).map_err(LuaError::external)
         })?,
@@ -306,10 +307,38 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | data | string | Text to write.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("write", lua.create_function(move |_, (path, data): (String, String)| {
             s.borrow()
                 .fs
                 .write_string(&path, &data)
+                .map_err(LuaError::external)
+        })?,
+    )?;
+
+    // -- readBytes --
+    /// Reads a file as raw bytes and returns a binary Lua string.
+    /// @param | path | string | Virtual path to the file.
+    /// @return | string | Raw file bytes as a binary Lua string.
+    let s = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set("readBytes", lua.create_function(move |lua, path: String| {
+            let bytes = s.borrow().fs.read_bytes(&path).map_err(LuaError::external)?;
+            lua.create_string(&bytes)
+        })?,
+    )?;
+
+    // -- writeBytes --
+    /// Writes a binary Lua string to a file in the save directory.
+    /// @param | path | string | Save path to write.
+    /// @param | data | string | Binary payload.
+    /// @return | nil | No return value.
+    let s = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set("writeBytes", lua.create_function(move |_, (path, data): (String, LuaString)| {
+            s.borrow()
+                .fs
+                .write_bytes(&path, data.as_bytes().as_ref())
                 .map_err(LuaError::external)
         })?,
     )?;
@@ -319,6 +348,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to check.
     /// @return | boolean | True when the path exists.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("exists", lua.create_function(move |_, path: String| Ok(s.borrow().fs.exists(&path)))?,
     )?;
 
@@ -328,6 +358,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | data | string | Text to append.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("append", lua.create_function(move |_, (path, data): (String, String)| {
             s.borrow()
                 .fs
@@ -342,6 +373,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mode | string | File access mode.
     /// @return | LFileHandle | Open file handle.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("openFile", lua.create_function(move |_, (path, mode): (String, String)| {
             let handle = s
                 .borrow()
@@ -359,6 +391,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Directory path to list.
     /// @return | table | Array of entry names.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getDirectoryItems", lua.create_function(move |_, path: String| {
             s.borrow()
                 .fs
@@ -372,6 +405,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to check.
     /// @return | boolean | True when the path is a regular file.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isFile", lua.create_function(move |_, path: String| Ok(s.borrow().fs.is_file(&path)))?,
     )?;
 
@@ -380,6 +414,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to check.
     /// @return | boolean | True when the path is a directory.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isDirectory", lua.create_function(move |_, path: String| Ok(s.borrow().fs.is_directory(&path)))?,
     )?;
 
@@ -388,6 +423,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Save directory path to create.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("createDirectory", lua.create_function(move |_, path: String| {
             s.borrow()
                 .fs
@@ -401,6 +437,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Save path to remove.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("remove", lua.create_function(move |_, path: String| {
             s.borrow().fs.remove(&path).map_err(LuaError::external)
         })?,
@@ -411,6 +448,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to inspect.
     /// @return | table | Metadata table, or nil if the path does not exist.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getInfo", lua.create_function(
             move |lua, path: String| match s.borrow().fs.get_info(&path) {
                 Ok(info) => {
@@ -430,6 +468,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the absolute path of the directory the game was loaded from.
     /// @return | string | Absolute source directory path.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getSource", lua.create_function(move |_, ()| Ok(s.borrow().fs.get_source()))?,
     )?;
 
@@ -437,6 +476,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the sandboxed save data directory path.
     /// @return | string | Absolute save directory path.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getSaveDirectory", lua.create_function(move |_, ()| {
             Ok(s.borrow()
                 .fs
@@ -464,6 +504,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the identity string used to locate the game's save directory.
     /// @return | string | Filesystem identity string.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getIdentity", lua.create_function(move |_, ()| Ok(s.borrow().filesystem_identity.clone()))?,
     )?;
 
@@ -472,6 +513,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | name | string | New filesystem identity string.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setIdentity", lua.create_function(move |_, name: String| {
             s.borrow_mut().filesystem_identity = name;
             Ok(())
@@ -483,6 +525,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to the text file.
     /// @return | function | Iterator function that returns the next line, or nil at end of file.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("lines", lua.create_function(move |lua, path: String| {
             let lines = s
                 .borrow()
@@ -500,6 +543,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to load asynchronously.
     /// @return | integer | Async load handle.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("readAsync", lua.create_function(move |_, path: String| {
             s.borrow_mut()
                 .request_async_load(&path)
@@ -513,7 +557,34 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | string | Current async load status.
     /// @return | string | Loaded payload when the async read completes.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("pollAsync", lua.create_function(move |_, handle_id: u64| Ok(s.borrow().poll_async_load(handle_id)))?,
+    )?;
+
+    // -- writeAsync --
+    /// Starts writing binary data to a file in the save sandbox and returns an opaque handle.
+    /// @param | path | string | Destination path inside `save/`.
+    /// @param | data | string | Binary payload to write.
+    /// @return | integer | Async write handle.
+    let s = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set("writeAsync", lua.create_function(move |_, (path, data): (String, LuaString)| {
+            s.borrow_mut()
+                .request_async_write(&path, data.as_bytes().to_vec())
+                .map_err(LuaError::external)
+        })?,
+    )?;
+
+    // -- pollAsyncWrite --
+    /// Polls an async write handle, returning status and optional payload.
+    /// @param | handle | integer | Async write handle returned by `writeAsync`.
+    /// @return | string | Current async write status.
+    /// @return | string | Bytes-written string when done, or error message when status is `error`.
+    let s = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "pollAsyncWrite",
+        lua.create_function(move |_, handle_id: u64| Ok(s.borrow().poll_async_write(handle_id)))?,
     )?;
 
     // -- mount --
@@ -522,6 +593,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mountpoint | string | Virtual mount point.
     /// @return | boolean | True when the mount succeeds.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("mount", lua.create_function(move |_, (src, mp): (String, String)| {
             s.borrow_mut()
                 .fs
@@ -536,6 +608,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mountpoint | string | Virtual mount point to remove.
     /// @return | boolean | True when a mount was removed.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("unmount", lua.create_function(move |_, mp: String| Ok(s.borrow_mut().fs.unmount(&mp)))?,
     )?;
 
@@ -544,6 +617,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to the Lua chunk.
     /// @return | function | Compiled Lua function.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("load", lua.create_function(move |ctx, path: String| {
             let bytes = s
                 .borrow()
@@ -559,6 +633,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to load.
     /// @return | LFileData | Loaded file data buffer.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newFileData", lua.create_function(move |_, path: String| {
             let bytes = s
                 .borrow()
@@ -577,6 +652,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | dst | string | Destination path inside `save/`.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("copy", lua.create_function(move |_, (src, dst): (String, String)| {
             s.borrow()
                 .fs
@@ -591,6 +667,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | dst | string | Destination path inside `save/`.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("move", lua.create_function(move |_, (src, dst): (String, String)| {
             s.borrow()
                 .fs
@@ -604,6 +681,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Directory path inside `save/`.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("removeDir", lua.create_function(move |_, path: String| {
             s.borrow().fs.remove_dir(&path).map_err(LuaError::external)
         })?,
@@ -614,6 +692,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | pattern | string | Relative pattern where `*` matches many characters and `?` matches one character.
     /// @return | table | Array of matching relative paths.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("glob", lua.create_function(move |lua, pattern: String| {
             let paths = s.borrow().fs.glob(&pattern).map_err(LuaError::external)?;
             let tbl = lua.create_table()?;
@@ -629,6 +708,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Root path to scan recursively.
     /// @return | table | Array of relative file paths using `/` separators.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("listRecursive", lua.create_function(move |lua, path: String| {
             let paths = s
                 .borrow()
@@ -648,6 +728,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Virtual path to inspect.
     /// @return | table | Table with `size`, `isFile`, and `isDir` fields.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("stat", lua.create_function(move |lua, path: String| {
             let (size, is_file, is_dir) = s.borrow().fs.stat(&path).map_err(LuaError::external)?;
             let t = lua.create_table()?;
@@ -663,6 +744,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | prefix | string | Name prefix, or nil to use `tmp`.
     /// @return | string | Relative path of the created temp file.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("createTempFile", lua.create_function(move |_, prefix: Option<String>| {
             let prefix = prefix.as_deref().unwrap_or("tmp");
             s.borrow()
@@ -677,6 +759,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Relative directory path to create.
     /// @return | nil | No return value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("mkdir", lua.create_function(move |_, path: String| {
             let abs = s.borrow().fs.base_dir().join(&path);
             std::fs::create_dir_all(&abs).map_err(|e| {
@@ -690,6 +773,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Relative path to resolve.
     /// @return | string | Absolute OS path string.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("toAbsolutePath", lua.create_function(move |_, path: String| {
             let abs = s.borrow().fs.base_dir().join(&path);
             Ok(abs.to_string_lossy().to_string())

@@ -5,6 +5,15 @@
 
 use std::collections::HashMap;
 
+/// Insets describing stretchable borders for nine-slice rendering.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct NineSliceInsets {
+    pub left: u32,
+    pub right: u32,
+    pub top: u32,
+    pub bottom: u32,
+}
+
 /// A named rectangular region packed into the atlas.
 ///
 /// # Fields
@@ -25,6 +34,8 @@ pub struct AtlasRegion {
     pub w: u32,
     /// Height of the region (pixels).
     pub h: u32,
+    /// Optional nine-slice insets for this region.
+    pub nine_slice: Option<NineSliceInsets>,
 }
 
 /// Internal shelf for the packing algorithm.
@@ -93,6 +104,25 @@ impl TextureAtlas {
     /// Returns `true` if the region was placed successfully, or `false` if
     /// the atlas does not have enough remaining space.
     pub fn pack(&mut self, name: &str, w: u32, h: u32) -> bool {
+        self.pack_with_nine_slice(name, w, h, None)
+    }
+
+    /// Packs a named region and optional nine-slice inset metadata.
+    ///
+    /// Returns `true` if placement succeeds, `false` if the region does not fit.
+    pub fn pack_with_nine_slice(
+        &mut self,
+        name: &str,
+        w: u32,
+        h: u32,
+        nine_slice: Option<NineSliceInsets>,
+    ) -> bool {
+        if let Some(insets) = nine_slice {
+            if insets.left + insets.right > w || insets.top + insets.bottom > h {
+                return false;
+            }
+        }
+
         let padded_w = w + self.padding;
         let padded_h = h + self.padding;
 
@@ -105,6 +135,7 @@ impl TextureAtlas {
                     y: shelf.y + self.padding,
                     w,
                     h,
+                    nine_slice,
                 };
                 shelf.x_used += padded_w;
                 self.regions.insert(name.to_string(), region);
@@ -133,6 +164,7 @@ impl TextureAtlas {
             y: shelf_y + self.padding,
             w,
             h,
+            nine_slice,
         };
 
         self.shelves.push(Shelf {
@@ -142,6 +174,24 @@ impl TextureAtlas {
         });
 
         self.regions.insert(name.to_string(), region);
+        true
+    }
+
+    /// Updates the nine-slice metadata for an already packed region.
+    ///
+    /// Returns `false` when the region is missing or the insets exceed region bounds.
+    pub fn set_nine_slice(&mut self, name: &str, nine_slice: Option<NineSliceInsets>) -> bool {
+        let Some(region) = self.regions.get_mut(name) else {
+            return false;
+        };
+
+        if let Some(insets) = nine_slice {
+            if insets.left + insets.right > region.w || insets.top + insets.bottom > region.h {
+                return false;
+            }
+        }
+
+        region.nine_slice = nine_slice;
         true
     }
 

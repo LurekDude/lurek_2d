@@ -40,6 +40,16 @@ ROOT = Path(__file__).resolve().parents[2]
 CARGO_TOML = ROOT / "Cargo.toml"
 TESTS_DIR = ROOT / "tests"
 
+# Slow integration/load/smoke binaries are excluded from default `test rust`
+# so local Rust test iteration stays fast. Use `test rust-full` for complete runs.
+SLOW_RUST_TEST_TARGETS = {
+    "demo_smoke_tests",
+    "engine_tests",
+    "examples_load_test",
+    "games_load_test",
+    "golden_tests",
+}
+
 
 @dataclass(frozen=True)
 class CommandResult:
@@ -123,11 +133,14 @@ def discover_top_level_test_targets() -> list[str]:
     return sorted(path.stem for path in TESTS_DIR.glob("*.rs"))
 
 
-def discover_rust_test_targets() -> list[str]:
+def discover_rust_test_targets(include_slow: bool = False) -> list[str]:
     explicit_targets = parse_cargo_test_targets()
     top_level_targets = discover_top_level_test_targets()
     targets = stable_unique(explicit_targets + top_level_targets)
-    return [target for target in targets if target != "lua_tests"]
+    rust_targets = [target for target in targets if target != "lua_tests"]
+    if include_slow:
+        return rust_targets
+    return [target for target in rust_targets if target not in SLOW_RUST_TEST_TARGETS]
 
 
 def default_outer_jobs(cpu_count: int, target_count: int) -> int:
@@ -388,7 +401,7 @@ def run_test_target(args: argparse.Namespace) -> int:
 def run_test_all(args: argparse.Namespace) -> int:
     cpu_count = logical_cpu_count()
     jobs = default_jobs(args.jobs)
-    outer_jobs = max(1, args.outer_jobs or default_outer_jobs(cpu_count, len(discover_rust_test_targets())))
+    outer_jobs = max(1, args.outer_jobs or default_outer_jobs(cpu_count, len(discover_rust_test_targets(include_slow=True))))
     inner_threads = args.test_threads or default_inner_test_threads(cpu_count, outer_jobs)
     steps: list[tuple[str, Sequence[str]]] = []
     if args.warm_build:
@@ -413,6 +426,7 @@ def run_test_all(args: argparse.Namespace) -> int:
         _ = results
 
     rust_args = argparse.Namespace(
+        include_slow=True,
         dry_run=args.dry_run,
         failure_tail_lines=args.failure_tail_lines,
         nocapture=args.nocapture,
@@ -429,7 +443,8 @@ def run_test_all(args: argparse.Namespace) -> int:
 
 def run_test_rust(args: argparse.Namespace) -> int:
     cpu_count = logical_cpu_count()
-    targets = discover_rust_test_targets()
+    include_slow = bool(getattr(args, "include_slow", False))
+    targets = discover_rust_test_targets(include_slow=include_slow)
 
     if not targets:
         print("No Rust test targets were discovered.")
@@ -438,7 +453,8 @@ def run_test_rust(args: argparse.Namespace) -> int:
     outer_jobs = max(1, min(len(targets), args.outer_jobs or default_outer_jobs(cpu_count, len(targets))))
     inner_threads = args.test_threads or default_inner_test_threads(cpu_count, outer_jobs)
 
-    print(f"Discovered {len(targets)} Rust test targets.")
+    mode = "full" if include_slow else "fast"
+    print(f"Discovered {len(targets)} Rust test targets (mode={mode}).")
     print(
         "Heuristic: "
         f"cpu_count={cpu_count}, outer_jobs={outer_jobs}, inner_test_threads={inner_threads}, cargo_jobs_per_process=1"
@@ -576,7 +592,36 @@ def parse_args() -> argparse.Namespace:
         default=40,
         help="Number of lines to print from failed subprocess output.",
     )
-    test_rust_parser.set_defaults(handler=run_test_rust)
+    test_rust_parser.set_defaults(handler=run_test_rust, include_slow=False)
+
+    test_rust_full_parser = test_subparsers.add_parser(
+        "rust-full",
+        help="Fan out full non-Lua Rust suite, including slow load/smoke targets.",
+    )
+    add_common_flags(test_rust_full_parser, jobs=False)
+    test_rust_full_parser.add_argument("--nocapture", action="store_true", help="Forward --nocapture to every test binary.")
+    test_rust_full_parser.add_argument(
+        "--outer-jobs",
+        type=int,
+        help="Maximum number of concurrent cargo test subprocesses.",
+    )
+    test_rust_full_parser.add_argument(
+        "--test-threads",
+        type=int,
+        help="Override libtest --test-threads for each subprocess.",
+    )
+    test_rust_full_parser.add_argument(
+        "--warm-build",
+        action="store_true",
+        help="Run cargo test --tests --no-run before fan-out.",
+    )
+    test_rust_full_parser.add_argument(
+        "--failure-tail-lines",
+        type=int,
+        default=40,
+        help="Number of lines to print from failed subprocess output.",
+    )
+    test_rust_full_parser.set_defaults(handler=run_test_rust, include_slow=True)
 
     test_target_parser = test_subparsers.add_parser("target", help="Run one explicit Rust test binary.")
     add_common_flags(test_target_parser)

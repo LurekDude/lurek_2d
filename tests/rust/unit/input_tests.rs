@@ -45,6 +45,17 @@ mod touch_tests {
     }
 
     #[test]
+    fn touch_frame_transitions() {
+        let mut ts = TouchState::new();
+        ts.touch_start(1, 10.0, 20.0, 1.0);
+        assert!(ts.was_pressed(1));
+        ts.begin_frame();
+        assert!(!ts.was_pressed(1));
+        ts.touch_end(1);
+        assert!(ts.was_released(1));
+    }
+
+    #[test]
     fn move_nonexistent_touch_is_noop() {
         let mut ts = TouchState::new();
         ts.touch_move(99, 10.0, 20.0, 1.0);
@@ -103,8 +114,17 @@ mod recorder_tests {
             total_frames: 1,
         };
         let json = recording.to_json().unwrap();
+        assert!(json.contains("\"version\":1"));
         let parsed = InputRecording::from_json(&json).unwrap();
         assert_eq!(parsed, recording);
+    }
+
+    #[test]
+    fn json_backward_compatible_without_version() {
+        let legacy = r#"{"frames":[{"frame":0,"key_events":[{"kind":"down","name":"a"}],"mouse_x":null,"mouse_y":null}],"total_frames":1}"#;
+        let parsed = InputRecording::from_json(legacy).unwrap();
+        assert_eq!(parsed.total_frames, 1);
+        assert_eq!(parsed.frames.len(), 1);
     }
 }
 
@@ -327,7 +347,8 @@ mod gamepad_tests {
         let gs = GamepadState::new(0);
         assert_eq!(gs.id, 0);
         assert_eq!(gs.get_name(), "Unknown Controller");
-        assert!(gs.is_connected());
+        assert!(!gs.is_connected());
+        assert!(!gs.is_vibration_supported());
     }
 
     #[test]
@@ -335,9 +356,31 @@ mod gamepad_tests {
         let mut gs = GamepadState::new(1);
         gs.update_button(0, true);
         assert!(gs.is_button_pressed(0));
+        assert!(gs.was_button_pressed(0));
         assert!(!gs.is_button_pressed(1));
         gs.update_button(0, false);
         assert!(!gs.is_button_pressed(0));
+        assert!(gs.was_button_released(0));
+    }
+
+    #[test]
+    fn begin_frame_clears_button_transitions() {
+        let mut gs = GamepadState::new(1);
+        gs.update_button(0, true);
+        assert!(gs.was_button_pressed(0));
+        gs.begin_frame();
+        assert!(!gs.was_button_pressed(0));
+        assert!(!gs.was_button_released(0));
+    }
+
+    #[test]
+    fn connection_transitions_are_tracked() {
+        let mut gs = GamepadState::new(2);
+        gs.set_connected(true);
+        assert!(gs.was_connected_this_frame());
+        gs.begin_frame();
+        gs.set_connected(false);
+        assert!(gs.was_disconnected_this_frame());
     }
 
     #[test]
@@ -384,6 +427,18 @@ mod gamepad_tests {
             Some("abc123,Xbox,a:b0,b:b1")
         );
         assert!(m.get_mapping_string("unknown").is_none());
+    }
+
+    #[test]
+    fn mappings_load_from_string_skips_comments() {
+        let mut m = GamepadMappings::new();
+        let count = m.load_from_string(
+            "# comment\n\n03000000123456780000000000000000,PadA,a:b0\n04000000123456780000000000000000,PadB,a:b1\n",
+        );
+        assert_eq!(count, 2);
+        assert!(m
+            .get_mapping_string("03000000123456780000000000000000")
+            .is_some());
     }
 
     #[test]

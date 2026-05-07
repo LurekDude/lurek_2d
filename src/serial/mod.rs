@@ -5,8 +5,12 @@
 //! callers supply strings and receive strings back.
 //! YAML has been removed — use TOML for human-authored config (design-assumption B-05).
 
+/// Unified dispatch API for encode/decode and format auto-detection.
+pub mod codec;
 /// CSV parsing and serialization via the csv crate.
 pub mod csv;
+/// INI parsing (read-only).
+pub mod ini;
 /// JSON parsing and serialization via serde_json.
 pub mod json;
 /// `SerialValue` type definition and Lua↔`SerialValue` bidirectional conversion.
@@ -21,10 +25,15 @@ pub mod toml;
 pub mod xml;
 // pub mod yaml; // YAML removed: use TOML instead (design-assumption B-05). serde_yml dep dropped.
 
-pub use csv::{from_csv, to_csv, CsvOptions};
+pub use csv::{from_csv, from_csv_reader, to_csv, CsvOptions};
+pub use ini::from_ini;
+pub use codec::{
+	decode_bytes, decode_text, detect_format, encode, DecodeOptions, EncodeOptions, EncodedValue,
+	SerialFormat,
+};
 pub use json::{from_json, to_json};
 pub use lua_table::SerialValue;
 pub use msgpack::{decode as from_msgpack, encode as to_msgpack};
-pub use schema::validate as validate_schema;
+pub use schema::{apply_defaults as apply_schema_defaults, validate as validate_schema};
 pub use toml::{from_toml, to_toml};
 pub use xml::decode as from_xml;

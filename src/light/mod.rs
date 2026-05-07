@@ -43,6 +43,6 @@ pub use falloff::FalloffMode;
 pub use flicker::FlickerConfig;
 pub use light2d::Light2D;
 pub use light_type::LightType;
-pub use light_world::LightWorld;
+pub use light_world::{LightWorld, NormalMapLightHint};
 pub use occluder::Occluder;
 pub use shadow::ShadowFilter;

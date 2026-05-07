@@ -81,6 +81,15 @@ mod vfs_tests {
     }
 
     #[test]
+    fn resolve_read_path_rejects_dotdot() {
+        let dir = make_temp_game("read_dotdot");
+        let fs = GameFS::new(&dir);
+        let result = fs.resolve_read_path("save/../../outside.txt");
+        assert!(result.is_err());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
     fn write_bytes_to_save_dir() {
         let dir = make_temp_game("write_bytes");
         let fs = GameFS::new(&dir);
@@ -158,6 +167,25 @@ mod file_handle_tests {
         std::fs::write(dir.join("p.txt"), "x").unwrap();
         let fh = FileHandle::open(&fs, "p.txt", FileMode::Read).unwrap();
         assert_eq!(fh.get_path(), "p.txt");
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn open_write_append_and_read_roundtrip() {
+        let (dir, fs) = make_temp_game("rw_append_roundtrip");
+
+        let mut writer = FileHandle::open(&fs, "save/mode_roundtrip.txt", FileMode::Write).unwrap();
+        writer.write(b"abc").unwrap();
+        writer.close().unwrap();
+
+        let mut appender = FileHandle::open(&fs, "save/mode_roundtrip.txt", FileMode::Append).unwrap();
+        appender.write(b"def").unwrap();
+        appender.close().unwrap();
+
+        let mut reader = FileHandle::open(&fs, "save/mode_roundtrip.txt", FileMode::Read).unwrap();
+        let bytes = reader.read(None).unwrap();
+        assert_eq!(bytes, b"abcdef");
+
         let _ = std::fs::remove_dir_all(&dir);
     }
 }
@@ -275,6 +303,34 @@ mod async_loader_tests {
         }
 
         std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn write_file_async_then_read_back() {
+        let dir = std::env::temp_dir().join("luna_async_test_write");
+        std::fs::create_dir_all(&dir).unwrap();
+        let file = dir.join("write.txt");
+
+        let loader = AsyncLoader::new();
+        let handle = loader.request_write(file.clone(), b"async write".to_vec());
+
+        for _ in 0..1000 {
+            if let WriteStatus::Done(result) = loader.poll_write(handle) {
+                match result {
+                    WriteResult::Written(bytes) => {
+                        assert_eq!(bytes, 11);
+                        let on_disk = std::fs::read(&file).unwrap();
+                        assert_eq!(on_disk, b"async write");
+                        std::fs::remove_dir_all(&dir).ok();
+                        return;
+                    }
+                    WriteResult::Error(e) => panic!("unexpected write error: {}", e),
+                }
+            }
+            std::thread::sleep(std::time::Duration::from_millis(1));
+        }
+
+        panic!("async write did not complete within timeout");
     }
 }
 

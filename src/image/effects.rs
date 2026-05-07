@@ -23,6 +23,46 @@
 
 use super::image_data::ImageData;
 
+/// Resampling filter used by [`ImageData::resize_with_filter`].
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ResizeFilter {
+    /// Bilinear interpolation.
+    Bilinear,
+    /// Lanczos filter with `a = 3` support radius.
+    Lanczos3,
+}
+
+impl ResizeFilter {
+    /// Parse a filter label used by Lua bindings.
+    ///
+    /// Accepted values: `"bilinear"`, `"linear"`, and `"lanczos3"`.
+    pub fn parse(value: &str) -> Option<Self> {
+        match value.to_ascii_lowercase().as_str() {
+            "bilinear" | "linear" => Some(Self::Bilinear),
+            "lanczos3" => Some(Self::Lanczos3),
+            _ => None,
+        }
+    }
+}
+
+fn sinc(x: f32) -> f32 {
+    if x.abs() < f32::EPSILON {
+        1.0
+    } else {
+        let px = std::f32::consts::PI * x;
+        px.sin() / px
+    }
+}
+
+fn lanczos_weight(x: f32, a: f32) -> f32 {
+    let ax = x.abs();
+    if ax >= a {
+        0.0
+    } else {
+        sinc(x) * sinc(x / a)
+    }
+}
+
 impl ImageData {
     // ── Color / Tone ────────────────────────────────────────────────────────
 
@@ -486,9 +526,28 @@ impl ImageData {
     /// # Returns
     /// `Option<ImageData>` — `None` if `new_w == 0 || new_h == 0`.
     pub fn resize(&self, new_w: u32, new_h: u32) -> Option<ImageData> {
+        self.resize_with_filter(new_w, new_h, ResizeFilter::Bilinear)
+    }
+
+    /// Scale the image to new dimensions using the selected resampling filter.
+    ///
+    /// Returns `None` when either target dimension is zero.
+    pub fn resize_with_filter(
+        &self,
+        new_w: u32,
+        new_h: u32,
+        filter: ResizeFilter,
+    ) -> Option<ImageData> {
         if new_w == 0 || new_h == 0 {
             return None;
         }
+        match filter {
+            ResizeFilter::Bilinear => self.resize_bilinear(new_w, new_h),
+            ResizeFilter::Lanczos3 => Some(self.resize_lanczos3(new_w, new_h)),
+        }
+    }
+
+    fn resize_bilinear(&self, new_w: u32, new_h: u32) -> Option<ImageData> {
         let src_w = self.width as f32;
         let src_h = self.height as f32;
         let mut out = ImageData::new(new_w, new_h);
@@ -527,6 +586,62 @@ impl ImageData {
         Some(out)
     }
 
+    fn resize_lanczos3(&self, new_w: u32, new_h: u32) -> ImageData {
+        let a = 3.0f32;
+        let src_w = self.width as i32;
+        let src_h = self.height as i32;
+        let scale_x = self.width as f32 / new_w as f32;
+        let scale_y = self.height as f32 / new_h as f32;
+        let mut out = ImageData::new(new_w, new_h);
+
+        for dy in 0..new_h {
+            let sy = (dy as f32 + 0.5) * scale_y - 0.5;
+            let y0 = sy.floor() as i32;
+            for dx in 0..new_w {
+                let sx = (dx as f32 + 0.5) * scale_x - 0.5;
+                let x0 = sx.floor() as i32;
+
+                let mut accum = [0.0f32; 4];
+                let mut total_w = 0.0f32;
+
+                for ky in (y0 - 2)..=(y0 + 3) {
+                    let cy = ky.clamp(0, src_h - 1) as u32;
+                    let wy = lanczos_weight(sy - ky as f32, a);
+                    if wy.abs() < 1.0e-6 {
+                        continue;
+                    }
+                    for kx in (x0 - 2)..=(x0 + 3) {
+                        let cx = kx.clamp(0, src_w - 1) as u32;
+                        let wx = lanczos_weight(sx - kx as f32, a);
+                        let w = wx * wy;
+                        if w.abs() < 1.0e-6 {
+                            continue;
+                        }
+                        let si = ((cy * self.width + cx) * 4) as usize;
+                        for (c, channel) in accum.iter_mut().enumerate() {
+                            *channel += self.pixels[si + c] as f32 * w;
+                        }
+                        total_w += w;
+                    }
+                }
+
+                let di = ((dy * new_w + dx) * 4) as usize;
+                if total_w.abs() > 1.0e-6 {
+                    for (c, channel) in accum.iter().enumerate() {
+                        out.pixels[di + c] = (*channel / total_w).round().clamp(0.0, 255.0) as u8;
+                    }
+                } else {
+                    let sxn = sx.round().clamp(0.0, self.width as f32 - 1.0) as u32;
+                    let syn = sy.round().clamp(0.0, self.height as f32 - 1.0) as u32;
+                    let si = ((syn * self.width + sxn) * 4) as usize;
+                    out.pixels[di..di + 4].copy_from_slice(&self.pixels[si..si + 4]);
+                }
+            }
+        }
+
+        out
+    }
+
     /// Blit (composite) `src` onto this image at `(dst_x, dst_y)` using Porter-Duff *over*.
     ///
     /// Pixels that fall outside the image boundaries are silently clipped. If
@@ -542,6 +657,37 @@ impl ImageData {
         let dh = self.height as i32;
         let sw = src.width as i32;
         let sh = src.height as i32;
+
+        let fully_opaque = src
+            .pixels
+            .chunks_exact(4)
+            .all(|px| px[3] == 255);
+
+        if fully_opaque {
+            for sy in 0..sh {
+                let dy = dst_y + sy;
+                if dy < 0 || dy >= dh {
+                    continue;
+                }
+
+                let mut sx0 = 0;
+                let mut dx0 = dst_x;
+                if dx0 < 0 {
+                    sx0 = -dx0;
+                    dx0 = 0;
+                }
+                let row_len = (sw - sx0).min(dw - dx0);
+                if row_len <= 0 {
+                    continue;
+                }
+
+                let si = ((sy * sw + sx0) * 4) as usize;
+                let di = ((dy * dw + dx0) * 4) as usize;
+                let bytes = (row_len as usize) * 4;
+                self.pixels[di..di + bytes].copy_from_slice(&src.pixels[si..si + bytes]);
+            }
+            return;
+        }
 
         for sy in 0..sh {
             let dy = dst_y + sy;

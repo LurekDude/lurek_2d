@@ -73,8 +73,8 @@ impl DataType {
 
 /// Dense N-dimensional numerical array with row-major strides.
 ///
-/// Data is stored as a contiguous `Vec<u8>` byte buffer. Shapes are limited
-/// to 1D, 2D, or 3D with a hard cap of 268,435,456 elements.
+/// Data is stored as a contiguous `Vec<u8>` byte buffer with a hard cap
+/// of 268,435,456 elements.
 ///
 /// # Fields
 /// - `shape` — `Vec<usize>`.
@@ -331,7 +331,7 @@ impl NdArray {
         Self::element_count(&self.shape)
     }
 
-    /// Returns the number of dimensions (1, 2, or 3).
+    /// Returns the number of dimensions.
     ///
     /// # Returns
     /// `usize`.
@@ -390,10 +390,10 @@ impl NdArray {
         strides
     }
 
-    /// Validate shape constraints (1-3 dims, element count within limits).
+    /// Validate shape constraints (at least 1 dim, element count within limits).
     fn validate_shape(shape: &[usize]) -> Result<(), String> {
-        if shape.is_empty() || shape.len() > 3 {
-            return Err(format!("ndim must be 1, 2, or 3, got {}", shape.len()));
+        if shape.is_empty() {
+            return Err("ndim must be >= 1".to_string());
         }
         let total = Self::element_count(shape);
         if total > MAX_ELEMENTS {
@@ -444,6 +444,39 @@ impl NdArray {
     /// `Vec<f64>`.
     pub fn to_f64_vec(&self) -> Vec<f64> {
         (0..self.size()).map(|i| self.get_f64(i)).collect()
+    }
+
+    /// Fill all elements with the same value, in place.
+    ///
+    /// # Parameters
+    /// - `val` - `f64` value written to every element.
+    pub fn fill(&mut self, val: f64) {
+        for i in 0..self.size() {
+            self.set_f64(i, val);
+        }
+    }
+
+    /// Map each element through `f` and return a new array.
+    ///
+    /// # Parameters
+    /// - `f` - function called once per element.
+    ///
+    /// # Returns
+    /// `Result<NdArray, String>`.
+    pub fn map(&self, f: fn(f64) -> f64) -> Result<Self, String> {
+        let mut out = Self::zeros(self.shape(), self.dtype())?;
+        for i in 0..self.size() {
+            out.set_f64(i, f(self.get_f64(i)));
+        }
+        Ok(out)
+    }
+
+    /// Iterate over values converted to f64.
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = f64> + '_`.
+    pub fn iter_f64(&self) -> impl Iterator<Item = f64> + '_ {
+        (0..self.size()).map(|i| self.get_f64(i))
     }
 
     /// Return a human-readable summary string for debugging.

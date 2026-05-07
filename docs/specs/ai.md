@@ -451,7 +451,7 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - `lurek.ai.newSucceeder`: Creates a BT succeeder decorator.
 - `lurek.ai.newAction`: Creates a BT action leaf with a Lua callback.
 - `lurek.ai.newCondition`: Creates a BT condition leaf with a Lua predicate.
-- `lurek.ai.newGuard`: Creates a BT Guard decorator. The predicate is evaluated before each tick;
+- `lurek.ai.newGuard`: Creates a BT guard decorator.
 - `lurek.ai.newSteeringManager`: Creates a new steering behavior manager.
 - `lurek.ai.newQLearner`: Creates a tabular Q-learner.
 - `lurek.ai.newUtilityAI`: Creates a new utility AI evaluator.
@@ -475,266 +475,348 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - `lurek.ai.newStrategyAI`: Creates a new throttled strategy AI.
 - `lurek.ai.newAILod`: Creates a new AI LOD controller with default 3-tier config.
 
-### `AIDirector` Methods
-- `AIDirector:pushEvent`: Pushes a gameplay event with the given intensity to the director for awareness analysis.
-- `AIDirector:update`: Advances the simulation by one time step.
-- `AIDirector:tension`: Returns or performs tension.
-- `AIDirector:phase`: Returns or performs phase.
-- `AIDirector:spawnRateFactor`: Returns or performs spawn rate factor.
-- `AIDirector:lootFactor`: Returns or performs loot factor.
-- `AIDirector:ambientIntensity`: Returns or performs ambient intensity.
-- `AIDirector:setTension`: Sets the global narrative tension level (0â€“1 scale).
-- `AIDirector:reset`: Resets or clears the state.
+### `LAIBlackboard` Methods
+- `LAIBlackboard:setNumber`: Stores a number under the given key.
+- `LAIBlackboard:getNumber`: Returns the number for the given key, or default.
+- `LAIBlackboard:setBool`: Stores a boolean under the given key.
+- `LAIBlackboard:getBool`: Returns the boolean for the given key, or default.
+- `LAIBlackboard:setString`: Stores a string under the given key.
+- `LAIBlackboard:getString`: Returns the string for the given key, or default.
+- `LAIBlackboard:has`: Returns true if a value exists under the key.
+- `LAIBlackboard:remove`: Removes the entry at key.
+- `LAIBlackboard:clear`: Removes all local entries.
+- `LAIBlackboard:getKeys`: Returns all local keys as a table.
+- `LAIBlackboard:getSize`: Returns the number of local entries.
+- `LAIBlackboard:type`: Returns the type name of this object.
+- `LAIBlackboard:typeOf`: Returns true if this object is of the given type.
 
-### `AILod` Methods
-- `AILod:shouldUpdate`: Returns or performs should update.
-- `AILod:tierCount`: Returns or performs tier count.
-- `AILod:tierName`: Returns or performs tier name.
+### `LAIDirector` Methods
+- `LAIDirector:pushEvent`: Pushes a gameplay event with the given intensity to the director for awareness analysis.
+- `LAIDirector:update`: Advances the simulation by one time step.
+- `LAIDirector:tension`: Returns the current director tension value.
+- `LAIDirector:phase`: Returns the current pacing phase name.
+- `LAIDirector:spawnRateFactor`: Returns the current spawn rate factor.
+- `LAIDirector:lootFactor`: Returns the current loot factor.
+- `LAIDirector:ambientIntensity`: Returns the current ambient intensity value.
+- `LAIDirector:setTension`: Sets the global narrative tension level (0-1 scale).
+- `LAIDirector:reset`: Resets the director state.
+- `LAIDirector:type`: Returns the type name of this object.
+- `LAIDirector:typeOf`: Returns true if this object is of the given type.
 
-### `AIWorld` Methods
-- `AIWorld:addAgent`: Registers a new named agent and returns its handle.
-- `AIWorld:getAgent`: Returns the agent handle for the given name, or nil.
-- `AIWorld:removeAgent`: Removes an agent by its userdata handle.
-- `AIWorld:getAgentCount`: Returns the number of registered agents.
-- `AIWorld:getGlobalBlackboard`: Returns a snapshot of the world-level blackboard.
-- `AIWorld:update`: Advances all agents by dt seconds, then invokes any custom-model callbacks.
-- `AIWorld:type`: Returns the type name of this object.
-- `AIWorld:typeOf`: Returns true if this object is of the given type.
+### `LAILod` Methods
+- `LAILod:tierFor`: Returns the LOD tier for an agent relative to a reference position.
+- `LAILod:shouldUpdate`: Returns whether a tier should update on a frame.
+- `LAILod:tierCount`: Returns the number of LOD tiers.
+- `LAILod:tierName`: Returns the name of a tier.
+- `LAILod:type`: Returns the type name of this object.
+- `LAILod:typeOf`: Returns true if this object is of the given type.
 
-### `Agent` Methods
-- `Agent:getName`: Returns the agent's registered name.
-- `Agent:setPosition`: Sets the agent's world-space position.
-- `Agent:getPosition`: Returns the agent's current position.
-- `Agent:setVelocity`: Sets the agent's velocity vector.
-- `Agent:getVelocity`: Returns the agent's current velocity.
-- `Agent:setMaxSpeed`: Sets the maximum speed cap.
-- `Agent:getMaxSpeed`: Returns the maximum speed cap.
-- `Agent:setMaxForce`: Sets the maximum steering force cap.
-- `Agent:getMaxForce`: Returns the maximum steering force cap.
-- `Agent:setPriority`: Sets the scheduling priority (higher = earlier).
-- `Agent:getPriority`: Returns the agent's scheduling priority.
-- `Agent:setDecisionModel`: Sets the active decision model.
-- `Agent:getDecisionModel`: Returns the name of the current decision model.
-- `Agent:setCustomModel`: Installs a Lua-driven decision model on this agent.
-- `Agent:addTag`: Adds a tag to this agent.
-- `Agent:removeTag`: Removes a tag from this agent.
-- `Agent:hasTag`: Returns true if the agent has the given tag.
-- `Agent:getBlackboard`: Returns the agent's local blackboard.
-- `Agent:type`: Returns the type name of this object.
-- `Agent:typeOf`: Returns true if this object is of the given type.
+### `LAIWorld` Methods
+- `LAIWorld:addAgent`: Registers a new named agent and returns its handle.
+- `LAIWorld:getAgent`: Returns the agent handle for the given name, or nil if it does not exist.
+- `LAIWorld:removeAgent`: Removes an agent by its userdata handle.
+- `LAIWorld:getAgentCount`: Returns the number of registered agents.
+- `LAIWorld:getGlobalBlackboard`: Returns a snapshot of the world-level blackboard.
+- `LAIWorld:update`: Advances all agents by dt seconds, then invokes any custom-model callbacks.
+- `LAIWorld:type`: Returns the type name of this object.
+- `LAIWorld:typeOf`: Returns true if this object is of the given type.
 
-### `BTNode` Methods
-- `BTNode:addChild`: Adds a child node (Selector, Sequence, or Parallel only).
-- `BTNode:getChildCount`: Returns the number of direct children.
-- `BTNode:reset`: Resets all running-child memos and repeater counters.
-- `BTNode:setChild`: Sets the single child of a decorator node.
-- `BTNode:setCount`: Sets the repeat count for a Repeater node.
-- `BTNode:getCount`: Returns the repeat count, or 0 if not a Repeater.
-- `BTNode:setSuccessPolicy`: Sets the success policy for a Parallel node.
-- `BTNode:setFailurePolicy`: Sets the failure policy for a Parallel node.
-- `BTNode:getNodeType`: Returns the node type as a string.
-- `BTNode:type`: Returns the type name of this object.
-- `BTNode:typeOf`: Returns true if this object is of the given type.
+### `LAgent` Methods
+- `LAgent:getName`: Returns the agent's registered name.
+- `LAgent:setPosition`: Sets the agent's world-space position.
+- `LAgent:getPosition`: Returns the agent's current position.
+- `LAgent:setVelocity`: Sets the agent's velocity vector.
+- `LAgent:getVelocity`: Returns the agent's current velocity.
+- `LAgent:setMaxSpeed`: Sets the maximum speed cap.
+- `LAgent:getMaxSpeed`: Returns the maximum speed cap.
+- `LAgent:setMaxForce`: Sets the maximum steering force cap.
+- `LAgent:getMaxForce`: Returns the maximum steering force cap.
+- `LAgent:setPriority`: Sets the scheduling priority (higher = earlier).
+- `LAgent:getPriority`: Returns the agent's scheduling priority.
+- `LAgent:setDecisionModel`: Sets the active decision model.
+- `LAgent:getDecisionModel`: Returns the name of the current decision model.
+- `LAgent:setCustomModel`: Installs a Lua-driven decision model on this agent.
+- `LAgent:addTag`: Adds a tag to this agent.
+- `LAgent:removeTag`: Removes a tag from this agent.
+- `LAgent:hasTag`: Returns true if the agent has the given tag.
+- `LAgent:getBlackboard`: Returns the agent's local blackboard.
+- `LAgent:type`: Returns the type name of this object.
+- `LAgent:typeOf`: Returns true if this object is of the given type.
 
-### `Bandit` Methods
-- `Bandit:select`: Returns or performs select.
-- `Bandit:update`: Advances the simulation by one time step.
-- `Bandit:bestArm`: Returns or performs best arm.
-- `Bandit:reset`: Resets or clears the state.
-- `Bandit:armCount`: Returns or performs arm count.
-- `Bandit:totalPulls`: Returns or performs total pulls.
+### `LBTNode` Methods
+- `LBTNode:addChild`: Adds a child node (Selector, Sequence, or Parallel only).
+- `LBTNode:getChildCount`: Returns the number of direct children.
+- `LBTNode:reset`: Resets all running-child memos and repeater counters.
+- `LBTNode:setChild`: Sets the single child of a decorator node.
+- `LBTNode:setCount`: Sets the repeat count for a Repeater node.
+- `LBTNode:getCount`: Returns the repeat count, or 0 if not a Repeater.
+- `LBTNode:setSuccessPolicy`: Sets the success policy for a Parallel node.
+- `LBTNode:setFailurePolicy`: Sets the failure policy for a Parallel node.
+- `LBTNode:getNodeType`: Returns the node type as a string.
+- `LBTNode:type`: Returns the type name of this object.
+- `LBTNode:typeOf`: Returns true if this object is of the given type.
 
-### `BehaviorTree` Methods
-- `BehaviorTree:setRoot`: Sets the root node of this behavior tree.
-- `BehaviorTree:getLastStatus`: Returns the status from the last tick.
-- `BehaviorTree:getDebugState`: Returns a diagnostic snapshot of this behavior tree.
-- `BehaviorTree:type`: Returns the type name of this object.
-- `BehaviorTree:typeOf`: Returns true if this object is of the given type.
+### `LBandit` Methods
+- `LBandit:select`: Selects an arm index using the current bandit strategy.
+- `LBandit:update`: Advances the simulation by one time step.
+- `LBandit:bestArm`: Returns the best arm index.
+- `LBandit:reset`: Resets learned rewards, pull counts, and strategy state so the bandit behaves like a fresh instance.
+- `LBandit:armCount`: Returns the number of arms.
+- `LBandit:totalPulls`: Returns the total number of pulls.
+- `LBandit:type`: Returns the type name of this object.
+- `LBandit:typeOf`: Returns true if this object is of the given type.
 
-### `Blackboard` Methods
-- `Blackboard:setNumber`: Stores a number under the given key.
-- `Blackboard:setBool`: Stores a boolean under the given key.
-- `Blackboard:setString`: Stores a string under the given key.
-- `Blackboard:has`: Returns true if a value exists under the key.
-- `Blackboard:remove`: Removes the entry at key.
-- `Blackboard:clear`: Removes all local entries.
-- `Blackboard:getKeys`: Returns all local keys as a table.
-- `Blackboard:getSize`: Returns the number of local entries.
-- `Blackboard:type`: Returns the type name of this object.
-- `Blackboard:typeOf`: Returns true if this object is of the given type.
+### `LBehaviorTree` Methods
+- `LBehaviorTree:setRoot`: Sets the root node of this behavior tree.
+- `LBehaviorTree:getLastStatus`: Returns the status from the last tick.
+- `LBehaviorTree:getDebugState`: Returns a diagnostic snapshot of this behavior tree.
+- `LBehaviorTree:type`: Returns the type name of this object.
+- `LBehaviorTree:typeOf`: Returns true if this object is of the given type.
 
-### `CommandQueue` Methods
-- `CommandQueue:cancelCurrent`: Cancels the front command if it is interruptible.
-- `CommandQueue:clear`: Discards all queued commands.
-- `CommandQueue:getCount`: Returns the number of queued commands.
-- `CommandQueue:isEmpty`: Returns true if there are no queued commands.
-- `CommandQueue:getCurrentType`: Returns the kind of the front command, or nil.
-- `CommandQueue:getCurrentTarget`: Returns the target coordinates of the front command.
-- `CommandQueue:type`: Returns the type name of this object.
-- `CommandQueue:typeOf`: Returns true if this object is of the given type.
+### `LCommandQueue` Methods
+- `LCommandQueue:enqueue`: Appends a command to the back of the queue.
+- `LCommandQueue:pushFront`: Inserts a command at the front, interrupting the current one.
+- `LCommandQueue:replace`: Clears the queue and enqueues one new command.
+- `LCommandQueue:cancelCurrent`: Cancels the front command if it is interruptible.
+- `LCommandQueue:clear`: Discards all queued commands.
+- `LCommandQueue:getCount`: Returns the number of queued commands.
+- `LCommandQueue:isEmpty`: Returns true if there are no queued commands.
+- `LCommandQueue:getCurrentType`: Returns the kind of the front command, or nil if the queue is empty.
+- `LCommandQueue:getCurrentTarget`: Returns the target coordinates of the front command.
+- `LCommandQueue:type`: Returns the type name of this object.
+- `LCommandQueue:typeOf`: Returns true if this object is of the given type.
 
-### `ContextSteering` Methods
-- `ContextSteering:addWander`: Adds a wander behavior with jitter and weight to the context steering evaluator.
-- `ContextSteering:addAvoidBounds`: Registers a rectangular region this agent must avoid.
-- `ContextSteering:clearBehaviors`: Resets or clears the behaviors.
-- `ContextSteering:chosenMagnitude`: Returns or performs chosen magnitude.
-- `ContextSteering:slotCount`: Returns or performs slot count.
+### `LContextSteering` Methods
+- `LContextSteering:addSeekTarget`: Adds a world-space target that this agent steers towards.
+- `LContextSteering:addWander`: Adds a wander behavior with jitter and weight to the context steering evaluator.
+- `LContextSteering:addAvoidPoint`: Adds a world-space point that this agent steers away from.
+- `LContextSteering:addAvoidBounds`: Registers a rectangular region this agent must avoid.
+- `LContextSteering:clearBehaviors`: Clears all registered context steering behaviors.
+- `LContextSteering:evaluate`: Evaluates the steering context and returns the chosen direction.
+- `LContextSteering:chosenMagnitude`: Returns the magnitude of the last chosen steering direction.
+- `LContextSteering:slotCount`: Returns the number of steering slots.
+- `LContextSteering:type`: Returns the type name of this object.
+- `LContextSteering:typeOf`: Returns true if this object is of the given type.
 
-### `EmotionModel` Methods
-- `EmotionModel:trigger`: Returns or performs trigger.
-- `EmotionModel:get`: Returns the current float value of this emotion dimension.
-- `EmotionModel:dominant`: Returns or performs dominant.
-- `EmotionModel:isActive`: Returns `true` if the emotion dimension is currently active and above threshold.
-- `EmotionModel:update`: Advances the simulation by one time step.
-- `EmotionModel:reset`: Resets or clears the state.
+### `LEmotionModel` Methods
+- `LEmotionModel:add`: Adds an emotion category with the given name and initial intensity to the model.
+- `LEmotionModel:trigger`: Triggers a named emotion by the given amount.
+- `LEmotionModel:get`: Returns the current float value of this emotion dimension.
+- `LEmotionModel:dominant`: Returns the dominant emotion name, or nil if there is none.
+- `LEmotionModel:isActive`: Returns `true` if the emotion dimension is currently active and above threshold.
+- `LEmotionModel:update`: Advances the simulation by one time step.
+- `LEmotionModel:reset`: Resets the emotion model state.
+- `LEmotionModel:type`: Returns the type name of this object.
+- `LEmotionModel:typeOf`: Returns true if this object is of the given type.
 
-### `GOAPPlanner` Methods
-- `GOAPPlanner:getActionCount`: Returns the number of registered actions.
-- `GOAPPlanner:getGoalCount`: Returns the number of registered goals.
-- `GOAPPlanner:getMaxIterations`: Returns the maximum A* planning iterations.
-- `GOAPPlanner:setMaxIterations`: Sets the maximum A* planning iterations (0 = unlimited).
-- `GOAPPlanner:type`: Returns the type name of this object.
-- `GOAPPlanner:typeOf`: Returns true if this object is of the given type.
+### `LGOAPPlanner` Methods
+- `LGOAPPlanner:addAction`: Adds a GOAP action with optional cost and callback.
+- `LGOAPPlanner:setPrecondition`: Sets a boolean precondition on an action.
+- `LGOAPPlanner:setEffect`: Sets a boolean effect on an action.
+- `LGOAPPlanner:addGoal`: Adds a planning goal with optional priority.
+- `LGOAPPlanner:setGoalState`: Sets a boolean condition on a goal.
+- `LGOAPPlanner:plan`: Runs A* planning and returns an action sequence table.
+- `LGOAPPlanner:getActionCount`: Returns the number of registered actions.
+- `LGOAPPlanner:getGoalCount`: Returns the number of registered goals.
+- `LGOAPPlanner:getMaxIterations`: Returns the maximum A* planning iterations.
+- `LGOAPPlanner:setMaxIterations`: Sets the maximum A* planning iterations (0 = unlimited).
+- `LGOAPPlanner:type`: Returns the type name of this object.
+- `LGOAPPlanner:typeOf`: Returns true if this object is of the given type.
 
-### `GeneticAlgorithm` Methods
-- `GeneticAlgorithm:evolve`: Runs one generation of the evolutionary algorithm.
-- `GeneticAlgorithm:generation`: Returns or performs generation.
-- `GeneticAlgorithm:popSize`: Returns or performs pop size.
-- `GeneticAlgorithm:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
-- `GeneticAlgorithm:getGenes`: Returns the chromosome as an ordered table of gene values.
-- `GeneticAlgorithm:bestGenes`: Returns or performs best genes.
+### `LGeneticAlgorithm` Methods
+- `LGeneticAlgorithm:evolve`: Runs one generation of the evolutionary algorithm.
+- `LGeneticAlgorithm:generation`: Returns the current generation number.
+- `LGeneticAlgorithm:popSize`: Returns the population size.
+- `LGeneticAlgorithm:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
+- `LGeneticAlgorithm:getGenes`: Returns the chromosome as an ordered table of gene values.
+- `LGeneticAlgorithm:bestGenes`: Returns the genes from the best chromosome.
+- `LGeneticAlgorithm:type`: Returns the type name of this object.
+- `LGeneticAlgorithm:typeOf`: Returns true if this object is of the given type.
 
-### `HTNDomain` Methods
-- `HTNDomain:addPrimitive`: Registers a primitive HTN task with a direct operator function.
-- `HTNDomain:taskCount`: Returns or performs task count.
+### `LHTNDomain` Methods
+- `LHTNDomain:addPrimitive`: Registers a primitive HTN task with a direct operator function.
+- `LHTNDomain:addCompound`: Registers a compound HTN task that decomposes into sub-tasks.
+- `LHTNDomain:plan`: Runs planning and returns the resulting action sequence, or nil if no plan is found.
+- `LHTNDomain:taskCount`: Returns the number of registered tasks.
+- `LHTNDomain:type`: Returns the type name of this object.
+- `LHTNDomain:typeOf`: Returns true if this object is of the given type.
 
-### `InfluenceMap` Methods
-- `InfluenceMap:addLayer`: Adds a named influence layer.
-- `InfluenceMap:hasLayer`: Returns true if the named layer exists.
-- `InfluenceMap:decay`: Multiplies all influences by a decay factor.
-- `InfluenceMap:clearLayer`: Clears all influence in a layer.
-- `InfluenceMap:clearAll`: Removes all influence values from every layer in the map.
-- `InfluenceMap:getMaxPosition`: Returns the world-space position of the maximum value.
-- `InfluenceMap:getMinPosition`: Returns the world-space position of the minimum value.
-- `InfluenceMap:getWidth`: Returns the influence map width in grid cells.
-- `InfluenceMap:getHeight`: Returns the influence map height in grid cells.
-- `InfluenceMap:getCellSize`: Returns the cell size in world units.
-- `InfluenceMap:type`: Returns the type name of this object.
-- `InfluenceMap:typeOf`: Returns true if this object is of the given type.
+### `LInfluenceMap` Methods
+- `LInfluenceMap:addLayer`: Adds a named influence layer.
+- `LInfluenceMap:hasLayer`: Returns true if the named layer exists.
+- `LInfluenceMap:setInfluence`: Sets the influence value at a cell (1-based).
+- `LInfluenceMap:getInfluence`: Returns the influence value at a cell (1-based).
+- `LInfluenceMap:stampInfluence`: Stamps influence in a radial area.
+- `LInfluenceMap:propagate`: Propagates influence values with momentum.
+- `LInfluenceMap:decay`: Multiplies all influences by a decay factor.
+- `LInfluenceMap:clearLayer`: Clears all influence in a layer.
+- `LInfluenceMap:clearAll`: Removes all influence values from every layer in the map.
+- `LInfluenceMap:getMaxPosition`: Returns the world-space position of the maximum value.
+- `LInfluenceMap:getMinPosition`: Returns the world-space position of the minimum value.
+- `LInfluenceMap:queryRect`: Returns the summed influence in a world-space rectangle.
+- `LInfluenceMap:blend`: Blends two layers into a destination layer.
+- `LInfluenceMap:getWidth`: Returns the influence map width in grid cells.
+- `LInfluenceMap:getHeight`: Returns the influence map height in grid cells.
+- `LInfluenceMap:getCellSize`: Returns the cell size in world units.
+- `LInfluenceMap:type`: Returns the type name of this object.
+- `LInfluenceMap:typeOf`: Returns true if this object is of the given type.
 
-### `NeedSystem` Methods
-- `NeedSystem:addNeed`: Registers a new need with the specified name, urgency, and decay rate in the system.
-- `NeedSystem:update`: Advances the simulation by one time step.
-- `NeedSystem:mostUrgent`: Returns or performs most urgent.
-- `NeedSystem:satisfy`: Returns or performs satisfy.
-- `NeedSystem:valueOf`: Returns or performs value of.
+### `LMCTSEngine` Methods
+- `LMCTSEngine:search`: Uses Lua closures for game logic. All closures receive/return integer states.
+- `LMCTSEngine:type`: Returns the type name of this object.
+- `LMCTSEngine:typeOf`: Returns true if this object is of the given type.
 
-### `NeuralNet` Methods
-- `NeuralNet:forward`: Returns or performs forward.
-- `NeuralNet:setWeights`: Overwrites all connection weights with values from a flat table.
-- `NeuralNet:getWeights`: Returns a flat table of all connection weight values in the network.
-- `NeuralNet:paramCount`: Returns or performs param count.
-- `NeuralNet:layerCount`: Returns or performs layer count.
+### `LNeedSystem` Methods
+- `LNeedSystem:addNeed`: Registers a new need with the specified name, urgency, and decay rate in the system.
+- `LNeedSystem:update`: Advances the simulation by one time step.
+- `LNeedSystem:mostUrgent`: Returns the most urgent need name, or nil if no need is urgent.
+- `LNeedSystem:satisfy`: Satisfies part of a named need.
+- `LNeedSystem:valueOf`: Returns the current value of a named need.
+- `LNeedSystem:type`: Returns the type name of this object.
+- `LNeedSystem:typeOf`: Returns true if this object is of the given type.
 
-### `Neuroevolution` Methods
-- `Neuroevolution:evolve`: Runs one generation of the evolutionary algorithm.
-- `Neuroevolution:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
-- `Neuroevolution:chromosomeToNet`: Returns or performs chromosome to net.
-- `Neuroevolution:bestNetwork`: Returns or performs best network.
-- `Neuroevolution:bestFitness`: Returns or performs best fitness.
-- `Neuroevolution:popSize`: Returns or performs pop size.
-- `Neuroevolution:generation`: Returns or performs generation.
+### `LNeuralNet` Methods
+- `LNeuralNet:addLayer`: Adds a neural network layer with inputs, outputs, and an activation function.
+- `LNeuralNet:forward`: Runs a forward pass through the network.
+- `LNeuralNet:setWeights`: Overwrites all connection weights with values from a flat table.
+- `LNeuralNet:getWeights`: Returns a flat table of all connection weight values in the network.
+- `LNeuralNet:paramCount`: Returns the number of network parameters.
+- `LNeuralNet:layerCount`: Returns the number of network layers.
+- `LNeuralNet:type`: Returns the type name of this object.
+- `LNeuralNet:typeOf`: Returns true if this object is of the given type.
 
-### `ORCASolver` Methods
-- `ORCASolver:setPosition`: Sets the agent's current world-space position for ORCA velocity computation.
-- `ORCASolver:compute`: Computes and returns the result.
-- `ORCASolver:getSafeVelocity`: Returns the safe velocity.
-- `ORCASolver:agentCount`: Returns or performs agent count.
+### `LNeuroevolution` Methods
+- `LNeuroevolution:evolve`: Runs one generation of the evolutionary algorithm.
+- `LNeuroevolution:setFitness`: Sets the fitness score used by the genetic algorithm selection step.
+- `LNeuroevolution:chromosomeToNet`: Returns the neural network built from a chromosome, or nil if the index is invalid.
+- `LNeuroevolution:bestNetwork`: Returns the best neural network, or nil if no network is available.
+- `LNeuroevolution:bestFitness`: Returns the best fitness score.
+- `LNeuroevolution:popSize`: Returns the population size.
+- `LNeuroevolution:generation`: Returns the current generation number.
+- `LNeuroevolution:type`: Returns the type name of this object.
+- `LNeuroevolution:typeOf`: Returns true if this object is of the given type.
 
-### `QLearner` Methods
-- `QLearner:chooseAction`: Selects an action using epsilon-greedy policy (1-based).
-- `QLearner:bestAction`: Returns the greedy-best action for the state (1-based).
-- `QLearner:getQValue`: Returns the Q-value for a state-action pair (1-based).
-- `QLearner:endEpisode`: Ends the current episode, applying epsilon decay.
-- `QLearner:getEpisodeCount`: Returns the number of completed episodes.
-- `QLearner:getStateCount`: Returns the number of discrete states.
-- `QLearner:getActionCount`: Returns the number of discrete actions.
-- `QLearner:setLearningRate`: Sets the learning rate alpha.
-- `QLearner:getLearningRate`: Returns the current learning rate.
-- `QLearner:setDiscountFactor`: Sets the discount factor gamma.
-- `QLearner:getDiscountFactor`: Returns the current discount factor.
-- `QLearner:setExplorationRate`: Sets the exploration rate epsilon.
-- `QLearner:getExplorationRate`: Returns the current exploration rate.
-- `QLearner:setExplorationDecay`: Sets the epsilon decay multiplier.
-- `QLearner:getExplorationDecay`: Returns the epsilon decay multiplier.
-- `QLearner:serialize`: Serializes the Q-table to a JSON string.
-- `QLearner:deserialize`: Restores the Q-table from a JSON string.
-- `QLearner:type`: Returns the type name of this object.
-- `QLearner:typeOf`: Returns true if this object is of the given type.
+### `LORCASolver` Methods
+- `LORCASolver:addAgent`: Adds an ORCA agent at the given position with radius and max speed to the solver.
+- `LORCASolver:setPreferredVelocity`: Sets the preferred velocity.
+- `LORCASolver:setPosition`: Sets the agent's current world-space position for ORCA velocity computation.
+- `LORCASolver:compute`: Computes safe velocities for all registered agents.
+- `LORCASolver:getSafeVelocity`: Returns the safe velocity for an agent.
+- `LORCASolver:agentCount`: Returns the number of registered ORCA agents.
+- `LORCASolver:type`: Returns the type name of this object.
+- `LORCASolver:typeOf`: Returns true if this object is of the given type.
 
-### `Squad` Methods
-- `Squad:getName`: Returns the unique name string assigned to this squad.
-- `Squad:addMember`: Adds an agent by name to this squad.
-- `Squad:removeMember`: Removes an agent by name from this squad.
-- `Squad:getMemberCount`: Returns the number of squad members.
-- `Squad:getMembers`: Returns the member names as a table.
-- `Squad:setLeader`: Sets the squad leader by name.
-- `Squad:getLeader`: Returns the leader name, or nil.
-- `Squad:getFormation`: Returns the current formation type name.
-- `Squad:getFormationSpacing`: Returns the formation spacing in world units.
-- `Squad:getBlackboard`: Returns the squad's shared blackboard.
-- `Squad:type`: Returns the type name of this object.
-- `Squad:typeOf`: Returns true if this object is of the given type.
+### `LQLearner` Methods
+- `LQLearner:chooseAction`: Selects an action using epsilon-greedy policy (1-based).
+- `LQLearner:bestAction`: Returns the greedy-best action for the state (1-based).
+- `LQLearner:learn`: Performs one Bellman Q-learning update (1-based indices).
+- `LQLearner:getQValue`: Returns the Q-value for a state-action pair (1-based).
+- `LQLearner:setQValue`: Overwrites the Q-value for a state-action pair (1-based).
+- `LQLearner:endEpisode`: Ends the current episode, applying epsilon decay.
+- `LQLearner:getEpisodeCount`: Returns the number of completed episodes.
+- `LQLearner:getStateCount`: Returns the number of discrete states.
+- `LQLearner:getActionCount`: Returns the number of discrete actions.
+- `LQLearner:setLearningRate`: Sets the learning rate alpha.
+- `LQLearner:getLearningRate`: Returns the current learning rate.
+- `LQLearner:setDiscountFactor`: Sets the discount factor gamma.
+- `LQLearner:getDiscountFactor`: Returns the current discount factor.
+- `LQLearner:setExplorationRate`: Sets the exploration rate epsilon.
+- `LQLearner:getExplorationRate`: Returns the current exploration rate.
+- `LQLearner:setExplorationDecay`: Sets the epsilon decay multiplier.
+- `LQLearner:getExplorationDecay`: Returns the epsilon decay multiplier.
+- `LQLearner:serialize`: Serializes the Q-table to a JSON string.
+- `LQLearner:deserialize`: Restores the Q-table from a JSON string.
+- `LQLearner:type`: Returns the type name of this object.
+- `LQLearner:typeOf`: Returns true if this object is of the given type.
 
-### `StateMachine` Methods
-- `StateMachine:addState`: Registers a named state with optional lifecycle callbacks.
-- `StateMachine:setInitialState`: Sets the FSM's initial state; must be called before the first update.
-- `StateMachine:getCurrentState`: Returns the current state name, or nil.
-- `StateMachine:forceState`: Forces a transition to the named state.
-- `StateMachine:getTimeInState`: Returns seconds spent in the current state.
-- `StateMachine:type`: Returns the type name of this object.
-- `StateMachine:typeOf`: Returns true if this object is of the given type.
+### `LSquad` Methods
+- `LSquad:getName`: Returns the unique name string assigned to this squad.
+- `LSquad:addMember`: Adds an agent by name to this squad.
+- `LSquad:removeMember`: Removes an agent by name from this squad.
+- `LSquad:getMemberCount`: Returns the number of squad members.
+- `LSquad:getMembers`: Returns the member names as a table.
+- `LSquad:setLeader`: Sets the squad leader by name.
+- `LSquad:getLeader`: Returns the leader name, or nil if no leader is set.
+- `LSquad:setFormation`: Sets the formation type and optional spacing.
+- `LSquad:getFormation`: Returns the current formation type name.
+- `LSquad:getFormationSpacing`: Returns the formation spacing in world units.
+- `LSquad:getFormationPosition`: Computes the world-space position for a member index (1-based).
+- `LSquad:getBlackboard`: Returns the squad's shared blackboard.
+- `LSquad:type`: Returns the type name of this object.
+- `LSquad:typeOf`: Returns true if this object is of the given type.
 
-### `SteeringManager` Methods
-- `SteeringManager:getBehaviorCount`: Returns the number of active behaviors.
-- `SteeringManager:setCombineMode`: Sets the force combination mode.
-- `SteeringManager:getCombineMode`: Returns the current combination mode.
-- `SteeringManager:getLastSteering`: Returns the last computed steering force.
-- `SteeringManager:type`: Returns the type name of this object.
-- `SteeringManager:typeOf`: Returns true if this object is of the given type.
-- `SteeringManager:setSpatialHashCellSize`: Sets the cell size used by the spatial-hash neighbourhood search.
-- `SteeringManager:enableSpatialHash`: Enables or disables spatial-hash bucketing for neighbourhood queries.
+### `LStateMachine` Methods
+- `LStateMachine:addState`: Registers a named state with optional lifecycle callbacks.
+- `LStateMachine:addTransition`: Adds a guarded transition between states.
+- `LStateMachine:setInitialState`: Sets the FSM's initial state; must be called before the first update.
+- `LStateMachine:getCurrentState`: Returns the current state name, or nil if no state is active.
+- `LStateMachine:forceState`: Forces a transition to the named state.
+- `LStateMachine:getTimeInState`: Returns seconds spent in the current state.
+- `LStateMachine:type`: Returns the type name of this object.
+- `LStateMachine:typeOf`: Returns true if this object is of the given type.
 
-### `StimulusWorld` Methods
-- `StimulusWorld:remove`: Removes the specified item.
-- `StimulusWorld:update`: Advances the simulation by one time step.
-- `StimulusWorld:clear`: Resets or clears the state.
+### `LSteeringManager` Methods
+- `LSteeringManager:addSeek`: Adds a Seek behavior toward the target.
+- `LSteeringManager:addFlee`: Adds a Flee behavior away from the target.
+- `LSteeringManager:addArrive`: Adds an Arrive behavior with deceleration.
+- `LSteeringManager:addWander`: Adds a Wander behavior for random meandering.
+- `LSteeringManager:addPursue`: Adds a Pursue behavior targeting a named agent.
+- `LSteeringManager:addEvade`: Adds an Evade behavior fleeing from a named agent.
+- `LSteeringManager:addFlock`: Adds a Flock behavior for group movement.
+- `LSteeringManager:getBehaviorCount`: Returns the number of active behaviors.
+- `LSteeringManager:setCombineMode`: Sets the force combination mode.
+- `LSteeringManager:getCombineMode`: Returns the current combination mode.
+- `LSteeringManager:getLastSteering`: Returns the last computed steering force.
+- `LSteeringManager:calculate`: Computes the combined steering force for the given agent state.
+- `LSteeringManager:type`: Returns the type name of this object.
+- `LSteeringManager:typeOf`: Returns true if this object is of the given type.
+- `LSteeringManager:setSpatialHashCellSize`: Sets the cell size used by the spatial-hash neighborhood search.
+- `LSteeringManager:enableSpatialHash`: Enables or disables spatial-hash bucketing for neighbourhood queries.
+- `LSteeringManager:addCustomBehavior`: Registers a Lua callback as a custom steering behavior.
+- `LSteeringManager:applyCustomSteering`: Invokes all registered custom steering callbacks and returns the combined force.
 
-### `StrategyAI` Methods
-- `StrategyAI:addGoal`: Adds a strategic goal with priority score to the planner for future evaluation.
-- `StrategyAI:addTag`: Adds a string tag to the strategy AI instance for goal filtering and categorization.
-- `StrategyAI:removeTag`: Removes the specified tag.
-- `StrategyAI:update`: Advances the simulation by one time step.
-- `StrategyAI:forceEvaluate`: Returns or performs force evaluate.
-- `StrategyAI:activeGoal`: Returns or performs active goal.
-- `StrategyAI:timeUntilNext`: Returns or performs time until next.
+### `LStimulusWorld` Methods
+- `LStimulusWorld:addVisual`: Adds a visual stimulus at the specified world position with radius and intensity.
+- `LStimulusWorld:addAuditory`: Registers an auditory stimulus at a world-space position.
+- `LStimulusWorld:remove`: Removes the specified item.
+- `LStimulusWorld:update`: Advances the simulation by one time step.
+- `LStimulusWorld:count`: Returns the number of active stimuli.
+- `LStimulusWorld:clear`: Clears all stimuli from the world.
+- `LStimulusWorld:type`: Returns the type name of this object.
+- `LStimulusWorld:typeOf`: Returns true if this object is of the given type.
 
-### `TraitProfile` Methods
-- `TraitProfile:set`: Sets the base value of this trait, replacing any previous base.
-- `TraitProfile:get`: Returns the current float value of this emotion dimension.
-- `TraitProfile:getBase`: Returns the unmodified base value of this trait before modifiers.
-- `TraitProfile:removeModifiers`: Removes the specified modifiers.
-- `TraitProfile:update`: Advances the simulation by one time step.
-- `TraitProfile:has`: Returns true if a item is present.
-- `TraitProfile:traitCount`: Returns or performs trait count.
-- `TraitProfile:archetype`: Returns or performs archetype.
+### `LStrategyAI` Methods
+- `LStrategyAI:addGoal`: Adds a strategic goal with priority score to the planner for future evaluation.
+- `LStrategyAI:addTag`: Adds a string tag to the strategy AI instance for goal filtering and categorization.
+- `LStrategyAI:removeTag`: Removes the specified tag.
+- `LStrategyAI:update`: Advances the simulation by one time step.
+- `LStrategyAI:forceEvaluate`: Forces an immediate strategy evaluation.
+- `LStrategyAI:activeGoal`: Returns the active goal name, or nil if no goal is active.
+- `LStrategyAI:timeUntilNext`: Returns the time until the next scheduled evaluation.
+- `LStrategyAI:type`: Returns the type name of this object.
+- `LStrategyAI:typeOf`: Returns true if this object is of the given type.
 
-### `UtilityAI` Methods
-- `UtilityAI:evaluate`: Evaluates all actions and returns the best action name, or nil.
-- `UtilityAI:getActionCount`: Returns the number of registered actions.
-- `UtilityAI:getLastAction`: Returns the name of the last chosen action, or nil.
-- `UtilityAI:type`: Returns the type name of this object.
-- `UtilityAI:typeOf`: Returns true if this object is of the given type.
+### `LTraitProfile` Methods
+- `LTraitProfile:set`: Sets the base value of this trait, replacing any previous base.
+- `LTraitProfile:get`: Returns the current float value of this emotion dimension.
+- `LTraitProfile:getBase`: Returns the unmodified base value of this trait before modifiers.
+- `LTraitProfile:addModifier`: Adds a named modifier that adjusts the trait value by a delta.
+- `LTraitProfile:removeModifiers`: Removes the specified modifiers.
+- `LTraitProfile:update`: Advances the simulation by one time step.
+- `LTraitProfile:has`: Returns true if a item is present.
+- `LTraitProfile:traitCount`: Returns the number of tracked traits.
+- `LTraitProfile:archetype`: Returns the current archetype name, or nil if none is set.
+- `LTraitProfile:type`: Returns the type name of this object.
+- `LTraitProfile:typeOf`: Returns true if this object is of the given type.
+
+### `LUtilityAI` Methods
+- `LUtilityAI:addAction`: Adds a scored action with optional momentum weight.
+- `LUtilityAI:evaluate`: Evaluates all actions and returns the best action name, or nil if none is chosen.
+- `LUtilityAI:getActionCount`: Returns the number of registered actions.
+- `LUtilityAI:getLastAction`: Returns the name of the last chosen action, or nil if none has been chosen.
+- `LUtilityAI:addConsideration`: Adds a multi-axis consideration to a named action.
+- `LUtilityAI:type`: Returns the type name of this object.
+- `LUtilityAI:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

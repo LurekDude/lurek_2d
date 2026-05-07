@@ -52,6 +52,8 @@ LSpacer = {}
 
 ---@alias ProvinceGrid LProvinceGrid
 
+---@alias ProvinceRegistry LProvinceRegistry
+
 ---@alias Raycaster LRaycaster
 
 ---@alias ReplConsole LReplConsole
@@ -3884,6 +3886,11 @@ function LArray:abs() end
 ---@return Array Sum array.
 function LArray:add(other) end
 
+--- In-place element-wise addition with another Array.
+---@param other Array Right-hand operand array.
+---@return nil No value is returned.
+function LArray:addInplace(other) end
+
 --- Returns true if all elements are nonzero.
 ---@return boolean True if all elements are nonzero.
 function LArray:all() end
@@ -3986,6 +3993,11 @@ function LArray:dilate(radius) end
 ---@param other LuaValue Array or scalar operand.
 ---@return Array Quotient array.
 function LArray:div(other) end
+
+--- In-place element-wise division with another Array.
+---@param other Array Right-hand operand array.
+---@return nil No value is returned.
+function LArray:divInplace(other) end
 
 --- Dot product of two 1D arrays.
 ---@param other Array Right-hand operand array.
@@ -4124,6 +4136,11 @@ function LArray:min(axis) end
 ---@return Array Product array.
 function LArray:mul(other) end
 
+--- In-place element-wise multiplication with another Array.
+---@param other Array Right-hand operand array.
+---@return nil No value is returned.
+function LArray:mulInplace(other) end
+
 --- Returns a new Array with every element negated (multiplied by -1).
 ---@return Array Negated array.
 function LArray:neg() end
@@ -4204,6 +4221,11 @@ function LArray:sqrt() end
 ---@param other LuaValue Array or scalar operand.
 ---@return Array Difference array.
 function LArray:sub(other) end
+
+--- In-place element-wise subtraction with another Array.
+---@param other Array Right-hand operand array.
+---@return nil No value is returned.
+function LArray:subInplace(other) end
 
 --- Sum of all elements, or along an axis (1-based).
 ---@param axis? integer Optional one-based axis.
@@ -4532,15 +4554,15 @@ function LRingBuffer:isFull() end
 function LRingBuffer:len() end
 
 --- Returns the oldest element without removing it, or nil if empty.
----@return LuaValue Oldest stored value, or nil when the buffer is empty.
+---@return LuaValue Oldest stored Lua value, or nil when the buffer is empty.
 function LRingBuffer:peek() end
 
 --- Returns the newest element without removing it, or nil if empty.
----@return LuaValue Newest stored value, or nil when the buffer is empty.
+---@return LuaValue Newest stored Lua value, or nil when the buffer is empty.
 function LRingBuffer:peekNewest() end
 
 --- Removes and returns the oldest element, or nil if the buffer is empty.
----@return LuaValue Oldest stored value, or nil when the buffer is empty.
+---@return LuaValue Oldest stored Lua value, or nil when the buffer is empty.
 function LRingBuffer:pop() end
 
 --- Pushes a value onto the ring buffer.
@@ -4561,12 +4583,19 @@ function LRingBuffer:type() end
 ---@return boolean True when the object matches the requested type.
 function LRingBuffer:typeOf(name) end
 
---- Compresses data using the given algorithm (deflate, gzip, lz4).
+--- Compresses data using the given algorithm (deflate, gzip, lz4, zlib).
 ---@param format string Compression format name.
 ---@param data string Raw bytes to compress.
 ---@param level? integer Optional compression level.
 ---@return string Compressed bytes as a Lua string.
 lurek.data.compress = function(format, data, level) end
+
+--- Compresses string chunks using the given algorithm (deflate, gzip, lz4, zlib).
+---@param format string Compression format name.
+---@param chunks string|table Byte string or array-like table of byte strings.
+---@param level? integer Optional compression level.
+---@return string Compressed bytes as a Lua string.
+lurek.data.compressChunks = function(format, chunks, level) end
 
 --- Returns the CRC-32 checksum of the input data as an integer.
 ---@param data string Input bytes to checksum.
@@ -4579,11 +4608,17 @@ lurek.data.crc32 = function(data) end
 ---@return string Decoded raw bytes as a Lua string.
 lurek.data.decode = function(format, encoded) end
 
---- Decompresses data using the given algorithm (deflate, gzip, lz4).
+--- Decompresses data using the given algorithm (deflate, gzip, lz4, zlib).
 ---@param format string Compression format name.
 ---@param data string Compressed bytes to decompress.
 ---@return string Decompressed bytes as a Lua string.
 lurek.data.decompress = function(format, data) end
+
+--- Decompresses compressed string chunks using the given algorithm (deflate, gzip, lz4, zlib).
+---@param format string Compression format name.
+---@param chunks string|table Compressed byte string or array-like table of byte strings.
+---@return string Decompressed bytes as a Lua string.
+lurek.data.decompressChunks = function(format, chunks) end
 
 --- Encodes binary data using the given format (base64, hex).
 ---@param format string Encoding format name.
@@ -5296,6 +5331,12 @@ lurek.dataframe.fromCSV = function(s) end
 ---@param s string JSON text to parse.
 ---@return LDataFrame Dataframe parsed from the JSON text.
 lurek.dataframe.fromJSON = function(s) end
+
+--- Creates a DataFrame from explicit columns plus row-major data.
+---@param columns table Array of column names.
+---@param rows table Array of row arrays in the same order as columns.
+---@return LDataFrame Dataframe built from row-major input.
+lurek.dataframe.fromRows = function(columns, rows) end
 
 --- Creates a DataFrame from an array of row tables.
 ---@param rows table Array of row tables keyed by column name.
@@ -6679,6 +6720,14 @@ function LOverlay:isVignetteEnabled() end
 ---@return boolean True when weather is active.
 function LOverlay:isWeatherEnabled() end
 
+--- Copies ambient colour from `lurek.light` world state into this overlay.
+---@return nil No return value.
+function LOverlay:pullAmbientFromLight() end
+
+--- Copies this overlay ambient colour into `lurek.light` world state.
+---@return nil No return value.
+function LOverlay:pushAmbientToLight() end
+
 --- Emits GPU render commands for all active overlay effects.
 ---@return nil No return value.
 function LOverlay:render() end
@@ -6838,6 +6887,11 @@ function LOverlay:setWindSpeed(speed) end
 ---@param duration? number Optional shake duration in seconds.
 ---@return nil No return value.
 function LOverlay:shake(intensity, duration) end
+
+--- Resolves ambient ownership between overlay and light world, then writes both sides.
+---@param mode string Resolution mode: `"light"`, `"overlay"`, `"avg"`, `"max"`, or `"min"`.
+---@return nil No return value.
+function LOverlay:syncAmbientWithLight(mode) end
 
 --- Triggers a screen fade effect to the given colour and alpha.
 ---@param r number Red channel.
@@ -7238,7 +7292,7 @@ lurek.engine.fps = function() end
 ---@return integer Total processed frame count.
 lurek.engine.frameCount = function() end
 
---- Returns the target frame budget in milliseconds (default: 1000 / 60 ~ 16.667 ms).
+--- Returns the target frame budget in milliseconds (default: 1000 / 60 ~Â 16.667 ms).
 ---@return number Target frame budget in milliseconds.
 lurek.engine.getFrameBudget = function() end
 
@@ -7387,6 +7441,16 @@ lurek.event.push = function(...) end
 ---@param ... string
 ---@return nil No return value.
 lurek.event.pushDeferred = function(...) end
+
+--- Pushes a named event into the deferred buffer with explicit queue priority.
+---@param ... string
+---@return nil No return value.
+lurek.event.pushDeferredPriority = function(...) end
+
+--- Pushes a custom named event onto a selected queue lane.
+---@param ... string
+---@return nil No return value.
+lurek.event.pushPriority = function(...) end
 
 --- Alias for `exit()` - requests the engine to stop gracefully at the end of the current frame with exit code 0.
 ---@return nil No return value.
@@ -7645,6 +7709,12 @@ lurek.filesystem.openFile = function(path, mode) end
 ---@return string Loaded payload when the async read completes.
 lurek.filesystem.pollAsync = function(handle) end
 
+--- Polls an async write handle, returning status and optional payload.
+---@param handle integer Async write handle returned by `writeAsync`.
+---@return string Current async write status.
+---@return string Bytes-written string when done, or error message when status is `error`.
+lurek.filesystem.pollAsyncWrite = function(handle) end
+
 --- Polls watched paths and returns the ones that changed since the last poll.
 ---@return table Array of changed path strings.
 lurek.filesystem.pollWatchers = function() end
@@ -7658,6 +7728,11 @@ lurek.filesystem.read = function(path) end
 ---@param path string Virtual path to load asynchronously.
 ---@return integer Async load handle.
 lurek.filesystem.readAsync = function(path) end
+
+--- Reads a file as raw bytes and returns a binary Lua string.
+---@param path string Virtual path to the file.
+---@return string Raw file bytes as a binary Lua string.
+lurek.filesystem.readBytes = function(path) end
 
 --- Permanently deletes a file or empty directory from the save directory.
 ---@param path string Save path to remove.
@@ -7704,6 +7779,18 @@ lurek.filesystem.watchPath = function(path) end
 ---@param data string Text to write.
 ---@return nil No return value.
 lurek.filesystem.write = function(path, data) end
+
+--- Starts writing binary data to a file in the save sandbox and returns an opaque handle.
+---@param path string Destination path inside `save/`.
+---@param data string Binary payload to write.
+---@return integer Async write handle.
+lurek.filesystem.writeAsync = function(path, data) end
+
+--- Writes a binary Lua string to a file in the save directory.
+---@param path string Save path to write.
+---@param data string Binary payload.
+---@return nil No return value.
+lurek.filesystem.writeBytes = function(path, data) end
 
 ---@class lurek.globe
 ---@field MAX_PROVINCES integer  Maximum number of provinces the globe supports.
@@ -9292,6 +9379,10 @@ function LImageData:getHeight() end
 ---@return integer Alpha channel value.
 function LImageData:getPixel(x, y) end
 
+--- Returns the raw RGBA8 pixel data as a Lua string (width Ă— height Ă— 4 bytes).
+---@return string Raw RGBA8 pixel bytes in row-major order.
+function LImageData:getRawBytes() end
+
 --- Returns a copy of the rectangular sub-region as a new ImageData.
 ---@param x integer X position.
 ---@param y integer Y position.
@@ -9344,10 +9435,9 @@ function LImageData:paste(source, dx, dy) end
 function LImageData:posterize(levels) end
 
 --- Returns a bilinear-interpolated copy of the image at the given dimensions.
----@param width integer Width in pixels.
----@param height integer Height in pixels.
+---@param ... integer|string
 ---@return ImageData Bilinear-interpolated copy of the image at the given dimensions.
-function LImageData:resize(width, height) end
+function LImageData:resize(...) end
 
 --- Returns a new ImageData scaled to (new_w, new_h) using nearest-neighbour interpolation.
 ---@param new_w integer New width in pixels.
@@ -9550,6 +9640,15 @@ LProvinceGrid = {}
 ---@return table Adjacency records between neighboring provinces.
 function LProvinceGrid:adjacencies() end
 
+--- Returns merged border segments as
+---@return table Border-segment records.
+function LProvinceGrid:borderSegments() end
+
+--- Deserializes province geometry from raw bytes produced by serializeShapeData.
+---@param bytes string Binary blob previously returned by serializeShapeData.
+---@return table { spans, segments } or nil if bytes are invalid.
+function LProvinceGrid:deserializeShapeData(bytes) end
+
 --- Returns the province ID at pixel coordinates (x, y). Returns 0 for background or out-of-bounds.
 ---@param x integer Zero-based pixel x coordinate.
 ---@param y integer Zero-based pixel y coordinate.
@@ -9568,6 +9667,14 @@ function LProvinceGrid:getWidth() end
 ---@return integer Number of unique non-zero province IDs.
 function LProvinceGrid:provinceCount() end
 
+--- Returns province fill spans as { province_id, y, x0, x1 } records (x1 exclusive).
+---@return table Province fill-span records.
+function LProvinceGrid:provinceSpans() end
+
+--- Serializes province geometry (spans and borders) to raw bytes.
+---@return string Binary blob (SHAP format) suitable for writeBytes.
+function LProvinceGrid:serializeShapeData() end
+
 --- Returns the type name of this object.
 ---@return string Lua-visible type name.
 function LProvinceGrid:type() end
@@ -9576,6 +9683,11 @@ function LProvinceGrid:type() end
 ---@param name string Type name to compare.
 ---@return boolean True if the type name matches LProvinceGrid or Object.
 function LProvinceGrid:typeOf(name) end
+
+--- Returns a screen capture `ImageData` when ready; otherwise queues capture for next frame and returns nil.
+---@return ImageData Captured screen image when ready.
+---@return nil Returned when capture is pending; call again on a later frame.
+lurek.image.fromScreen = function() end
 
 --- Returns true if the file at the given path is a DDS file.
 ---@param filename string File path to test.
@@ -9601,6 +9713,13 @@ lurek.image.newCompressedData = function(filename) end
 ---@param ... integer|string|integer
 ---@return ImageData New or loaded image data.
 lurek.image.newImageData = function(...) end
+
+--- Creates an ImageData from a raw RGBA8 byte string. Width Ă— height Ă— 4 bytes required.
+---@param width integer Image width in pixels.
+---@param height integer Image height in pixels.
+---@param bytes string Raw RGBA8 pixel data (width Ă— height Ă— 4 bytes).
+---@return ImageData New image data backed by the provided bytes.
+lurek.image.newImageDataFromBytes = function(width, height, bytes) end
 
 --- Creates a new empty LayeredImage canvas with no layers.
 ---@param width integer Canvas width in pixels.
@@ -9907,6 +10026,8 @@ lurek.input.mouse.isDown = function(button) end
 ---@return boolean True if the button is down.
 lurek.input.gamepad.isDown = function(id, button) end
 
+lurek.input.isDown = function() end
+
 --- Returns whether the joystick at the given slot is a recognized gamepad.
 ---@param id integer Gamepad slot ID.
 ---@return boolean True if the slot is a recognized gamepad.
@@ -9968,6 +10089,12 @@ lurek.input.newCombo = function(steps, opts) end
 ---@return LCursor Created cursor handle.
 lurek.input.mouse.newCursor = function(pixels, width, height, hotx, hoty) end
 
+--- Creates and binds an action mapping object with query helpers.
+---@param name string Action name to create.
+---@param keys LuaValue One key binding or an array of key bindings.
+---@return table Mapping object with `isDown`, `wasPressed`, and `wasReleased` methods.
+lurek.input.newMapping = function(name, keys) end
+
 --- Saves all stored gamepad mappings to a plain-text file.
 ---@param path string Destination file path.
 ---@return nil No value is returned.
@@ -10016,9 +10143,12 @@ lurek.input.mouse.setRelativeMode = function(relative) end
 lurek.input.keyboard.setTextInput = function(enabled) end
 
 --- Triggers haptic rumble (currently a no-op stub).
----@param ... LuaValue
+---@param args LuaValue Raw vibration arguments.
+---@param low_freq LuaValue
+---@param high_freq LuaValue
+---@param duration_ms LuaValue
 ---@return boolean Always false on the current backend.
-lurek.input.gamepad.setVibration = function(...) end
+lurek.input.gamepad.setVibration = function(args, low_freq, high_freq, duration_ms) end
 
 --- Shows or hides the operating-system mouse cursor.
 ---@param visible boolean Whether the cursor should be visible.
@@ -10070,6 +10200,42 @@ lurek.input.wasActionPressedWithin = function(action, frames) end
 ---@return boolean True if the action was released this frame.
 lurek.input.wasActionReleased = function(action) end
 
+--- Returns whether the gamepad connected this frame.
+---@param id integer Gamepad ID.
+---@return boolean True if the gamepad connected this frame.
+lurek.input.gamepad.wasConnected = function(id) end
+
+--- Returns whether the gamepad disconnected this frame.
+---@param id integer Gamepad ID.
+---@return boolean True if the gamepad disconnected this frame.
+lurek.input.gamepad.wasDisconnected = function(id) end
+
+--- Returns whether a gamepad button was pressed this frame.
+---@param id integer Gamepad ID.
+---@param button integer Button index.
+---@return boolean True if the button was pressed this frame.
+lurek.input.gamepad.wasPressed = function(id, button) end
+
+--- Returns whether a touch with the given ID started this frame.
+---@param id integer Touch identifier.
+---@return boolean True if the touch started this frame.
+lurek.input.touch.wasPressed = function(id) end
+
+lurek.input.wasPressed = function() end
+
+--- Returns whether a gamepad button was released this frame.
+---@param id integer Gamepad ID.
+---@param button integer Button index.
+---@return boolean True if the button was released this frame.
+lurek.input.gamepad.wasReleased = function(id, button) end
+
+--- Returns whether a touch with the given ID ended this frame.
+---@param id integer Touch identifier.
+---@return boolean True if the touch ended this frame.
+lurek.input.touch.wasReleased = function(id) end
+
+lurek.input.wasReleased = function() end
+
 ---@class lurek.light
 lurek.light = {}
 
@@ -10087,6 +10253,10 @@ function LLight:addFlicker(min, max, hz) end
 --- Removes the cookie texture assignment.
 ---@return nil No value is returned.
 function LLight:clearCookie() end
+
+--- Clears the normal-map texture path hint.
+---@return nil No value is returned.
+function LLight:clearNormalMap() end
 
 --- Returns the custom attenuation coefficients as (constant, linear, quadratic).
 ---@return number Constant attenuation factor.
@@ -10146,6 +10316,14 @@ function LLight:getLightMask() end
 ---@return string Light type name.
 function LLight:getLightType() end
 
+--- Returns the normal-map texture path hint, or nil when unset.
+---@return string Normal-map texture path, or nil when unset.
+function LLight:getNormalMap() end
+
+--- Returns the normal-map response strength multiplier.
+---@return number Normal-map response strength.
+function LLight:getNormalStrength() end
+
 --- Returns the outer cone angle in radians.
 ---@return number Outer cone angle in radians.
 function LLight:getOuterAngle() end
@@ -10177,6 +10355,10 @@ function LLight:getShadowMask() end
 --- Returns the shadow edge smoothing factor.
 ---@return number Shadow smoothing factor.
 function LLight:getShadowSmooth() end
+
+--- Returns the penumbra softness multiplier for shadow edges.
+---@return number Penumbra softness multiplier.
+function LLight:getShadowSoftness() end
 
 --- Returns whether this light is active.
 ---@return boolean True if the light is active.
@@ -10283,6 +10465,16 @@ function LLight:setLightMask(mask) end
 ---@return nil No value is returned.
 function LLight:setLightType(t) end
 
+--- Sets the normal-map texture path hint used by plugin renderers.
+---@param path string Normal-map texture path.
+---@return nil No value is returned.
+function LLight:setNormalMap(path) end
+
+--- Sets the normal-map response strength multiplier.
+---@param strength number Normal-map response strength.
+---@return nil No value is returned.
+function LLight:setNormalStrength(strength) end
+
 --- Sets the outer cone angle in radians for spot lights.
 ---@param angle number Outer cone angle in radians.
 ---@return nil No value is returned.
@@ -10326,6 +10518,11 @@ function LLight:setShadowMask(mask) end
 ---@param smooth number Shadow smoothing factor.
 ---@return nil No value is returned.
 function LLight:setShadowSmooth(smooth) end
+
+--- Sets the penumbra softness multiplier for shadow edges.
+---@param softness number Penumbra softness multiplier.
+---@return nil No value is returned.
+function LLight:setShadowSoftness(softness) end
 
 --- Sets whether this light hints at volumetric scattering.
 ---@param enabled boolean Whether volumetric scattering should be enabled.
@@ -10460,6 +10657,10 @@ lurek.light.getLightCount = function() end
 --- Returns the maximum number of lights processed per frame.
 ---@return integer Maximum per-frame light count.
 lurek.light.getMaxLights = function() end
+
+--- Returns normal-map lighting hints for plugin renderers.
+---@return table Array of `{x, y, radius, intensity, direction, normalMap, strength}` tables.
+lurek.light.getNormalMapHints = function() end
 
 --- Returns the number of occluders in the world.
 ---@return integer Occluder count.
@@ -17056,6 +17257,242 @@ lurek.procgen.wfcGenerate = function(opts) end
 ---@return table Generated world graph data.
 lurek.procgen.worldGraph = function(width, height, region_count, seed) end
 
+---@class lurek.province
+lurek.province = {}
+
+--- Lua handle referencing one named engine-side province registry.
+---@class LProvinceRegistry
+LProvinceRegistry = {}
+
+--- Returns adjacency pairs as records `{ province_a, province_b }`.
+---@return table Adjacency records.
+function LProvinceRegistry:adjacencies() end
+
+--- Returns border segment geometry records `{ province_a, province_b, x0, y0, x1, y1 }`.
+---@return table Border segments.
+function LProvinceRegistry:borderSegments() end
+
+--- Computes camera x/y/zoom that fits the full map in the given screen.
+---@param screen_w number Screen width in pixels.
+---@param screen_h number Screen height in pixels.
+---@param pixel_size? number Size of one map pixel in world units (default 1.0).
+---@return number Camera X.
+---@return number Camera Y.
+---@return number Zoom scalar.
+function LProvinceRegistry:fitCamera(screen_w, screen_h, pixel_size) end
+
+--- Returns province id at pixel coordinate.
+---@param x integer 0-based map x.
+---@param y integer 0-based map y.
+---@return integer Province id at that coordinate, or 0 outside map.
+function LProvinceRegistry:getAt(x, y) end
+
+--- Returns border class token between provinces or nil.
+---@param a integer Province A.
+---@param b integer Province B.
+---@return string Border class token when set.
+function LProvinceRegistry:getBorderClass(a, b) end
+
+--- Returns revisioned change records for incremental sync.
+---@param revision integer Last consumed revision.
+---@return table Change records.
+function LProvinceRegistry:getChangesSince(revision) end
+
+--- Returns source map height in pixels.
+---@return integer Map height.
+function LProvinceRegistry:getHeight() end
+
+--- Returns the unique registry identifier used to store this province dataset.
+---@return string Stable registry identifier string.
+function LProvinceRegistry:getName() end
+
+--- Returns neighbor ids for a province.
+---@param id integer Province id.
+---@return table Array of neighbor IDs.
+function LProvinceRegistry:getNeighbors(id) end
+
+--- Returns province snapshot table or nil.
+---@param id integer Province id.
+---@return table Snapshot table when province exists.
+function LProvinceRegistry:getProvince(id) end
+
+--- Returns registry revision counter.
+---@return integer Monotonic revision value.
+function LProvinceRegistry:getRevision() end
+
+--- Returns source map width in pixels.
+---@return integer Map width.
+function LProvinceRegistry:getWidth() end
+
+--- Imports province metadata from sanitized color map, marker map, and CSV/TOML files.
+---@param opts table Import options table.
+---@return table Summary table `{ mapped_provinces, capitals_set, label_lines_set, labels_set }`.
+function LProvinceRegistry:importMetadataFromFiles(opts) end
+
+--- Returns number of provinces.
+---@return integer Province count.
+function LProvinceRegistry:provinceCount() end
+
+--- Returns sorted province ids.
+---@return table Array of province IDs.
+function LProvinceRegistry:provinceIds() end
+
+--- Returns span geometry records `{ province_id, y, x0, x1 }`.
+---@return table Span rows.
+function LProvinceRegistry:provinceSpans() end
+
+--- Enqueues Rust-generated GPU draw commands for province rendering.
+---@param opts? table Render options.
+---@return nil No value is returned.
+function LProvinceRegistry:render(opts) end
+
+--- Converts screen-space coordinates to map-space coordinates.
+---@param screen_x number Screen x in pixels.
+---@param screen_y number Screen y in pixels.
+---@param cam_x number Camera x offset.
+---@param cam_y number Camera y offset.
+---@param zoom number Camera zoom scalar.
+---@param pixel_size? number Size of one map pixel in world units (default 1.0).
+---@return number Map x.
+---@return number Map y.
+function LProvinceRegistry:screenToMap(screen_x, screen_y, cam_x, cam_y, zoom, pixel_size) end
+
+--- Returns province id under a screen-space position.
+---@param screen_x number Screen x in pixels.
+---@param screen_y number Screen y in pixels.
+---@param cam_x number Camera x offset.
+---@param cam_y number Camera y offset.
+---@param zoom number Camera zoom scalar.
+---@param pixel_size? number Size of one map pixel in world units (default 1.0).
+---@return integer nil | Province id, or nil if outside map bounds.
+function LProvinceRegistry:screenToProvince(screen_x, screen_y, cam_x, cam_y, zoom, pixel_size) end
+
+--- Sets freeform attribute on a province.
+---@param id integer Province id.
+---@param key string Attribute key.
+---@param value string Attribute value.
+---@return boolean True when province exists.
+function LProvinceRegistry:setAttr(id, key, value) end
+
+--- Sets border class between provinces.
+---@param a integer Province A.
+---@param b integer Province B.
+---@param class string One of: land_land, coast, sea_sea, special.
+---@return nil No value is returned.
+function LProvinceRegistry:setBorderClass(a, b, class) end
+
+--- Sets border style id for one province.
+---@param id integer Province id.
+---@param border_style integer Border style id.
+---@return boolean True when province exists.
+function LProvinceRegistry:setBorderStyle(id, border_style) end
+
+--- Sets province capital marker position.
+---@param id integer Province id.
+---@param x number Map-space x coordinate.
+---@param y number Map-space y coordinate.
+---@return boolean True when province exists.
+function LProvinceRegistry:setCapital(id, x, y) end
+
+--- Sets fog state byte for one province.
+---@param id integer Province id.
+---@param fog_state integer Fog state byte.
+---@return boolean True when province exists.
+function LProvinceRegistry:setFogState(id, fog_state) end
+
+--- Sets province label guide line from two points.
+---@param id integer Province id.
+---@param ax number First point x.
+---@param ay number First point y.
+---@param bx number Second point x.
+---@param by number Second point y.
+---@return boolean True when province exists.
+function LProvinceRegistry:setLabelLine(id, ax, ay, bx, by) end
+
+--- Sets province display label text.
+---@param id integer Province id.
+---@param text string Label text.
+---@return boolean True when province exists.
+function LProvinceRegistry:setLabelText(id, text) end
+
+--- Sets political color for one province.
+---@param id integer Province id.
+---@param r number Red (0..1).
+---@param g number Green (0..1).
+---@param b number Blue (0..1).
+---@param a? number Alpha (0..1).
+---@return boolean True when province exists.
+function LProvinceRegistry:setPoliticalColor(id, r, g, b, a) end
+
+--- Sets terrain type for one province.
+---@param id integer Province id.
+---@param terrain_type integer Terrain type id.
+---@return boolean True when province exists.
+function LProvinceRegistry:setTerrainType(id, terrain_type) end
+
+--- Sets visibility byte for one province.
+---@param id integer Province id.
+---@param visibility_state integer Visibility byte.
+---@return boolean True when province exists.
+function LProvinceRegistry:setVisibilityState(id, visibility_state) end
+
+--- Returns the Lua userdata type token for this province registry handle.
+---@return string Userdata type token (`LProvinceRegistry`).
+function LProvinceRegistry:type() end
+
+--- Returns true when type token matches this userdata.
+---@param name string Type token.
+---@return boolean Type check result.
+function LProvinceRegistry:typeOf(name) end
+
+--- Checks whether a named registry exists.
+---@param name string Registry name.
+---@return boolean True when exists.
+lurek.province.exists = function(name) end
+
+--- Gets a named province registry handle.
+---@param name string Registry name.
+---@return ProvinceRegistry Registry userdata, or nil when not found.
+lurek.province.get = function(name) end
+
+--- Returns active registry handle.
+---@return ProvinceRegistry Active registry userdata, or nil.
+lurek.province.getActive = function() end
+
+--- Creates and stores a named province registry from a PNG map.
+---@param name string Registry unique name.
+---@param png_path string PNG path relative to game dir or absolute path.
+---@return ProvinceRegistry Engine-backed province registry handle.
+lurek.province.newFromPng = function(name, png_path) end
+
+--- Removes a named registry.
+---@param name string Registry name.
+---@return boolean True when removed.
+lurek.province.remove = function(name) end
+
+--- Sanitizes a marker-rich province map by replacing marker pixels with nearby owner colors.
+---@param input_png string Marker-rich source PNG path.
+---@param output_png string Sanitized output PNG path.
+---@param opts? table Marker thresholds/options.
+---@return table Summary table `{ replaced_pixels, unresolved_pixels }`.
+lurek.province.sanitizeMarkedPng = function(input_png, output_png, opts) end
+
+--- Sets active registry name.
+---@param name string Existing registry name.
+---@return boolean True when set.
+lurek.province.setActive = function(name) end
+
+--- Recomputes camera x/y so zooming stays anchored under the same screen point.
+---@param anchor_x number Anchor x in screen pixels.
+---@param anchor_y number Anchor y in screen pixels.
+---@param cam_x number Current camera x.
+---@param cam_y number Current camera y.
+---@param old_zoom number Previous zoom.
+---@param new_zoom number New zoom.
+---@return number New camera x.
+---@return number New camera y.
+lurek.province.zoomCameraAt = function(anchor_x, anchor_y, cam_x, cam_y, old_zoom, new_zoom) end
+
 ---@class lurek.raycaster
 lurek.raycaster = {}
 
@@ -17193,13 +17630,31 @@ function LPointLight:y() end
 ---@class LRaycaster
 LRaycaster = {}
 
+--- Builds tile samples for a minimap window around a world-space center.
+---@param center_x number World center X.
+---@param center_y number World center Y.
+---@param radius integer Window radius in tiles.
+---@param ambient number Ambient light in [0, 1].
+---@param lights table|nil Array of `{x,y,radius,r,g,b,intensity}`.
+---@return table Array of sampled minimap tile records.
+function LRaycaster:buildMinimapWindow(center_x, center_y, radius, ambient, lights) end
+
 --- Builds a raycaster scene and stores it in SharedState for GPU rendering.
 ---@param params table - { px, py, angle, fov, rays, max_dist, screen_w, screen_h, ambient?, shade_dist?, floor_color?, ceiling_color? }.
 ---@param lights table|nil - array of { x, y, radius, r, g, b, intensity }.
----@param sprites table|nil - array of { x, y, texture, size }.
----@param wall_textures table|nil - { [cell_value] = TextureKey }.
+---@param sprites table|nil - array of { x, y, texture, size } where texture is integer id or LImage.
+---@param wall_textures table|nil - { [cell_value] = texture } where texture is integer id or LImage.
 ---@return nil No value is returned.
 function LRaycaster:buildScene(params, lights, sprites, wall_textures) end
+
+--- Builds a raycaster scene and appends projected OBJ model meshes.
+---@param params table Same as buildScene.
+---@param lights table|nil Same as buildScene.
+---@param sprites table|nil Billboard sprites (feature 1).
+---@param wall_textures table|nil Same as buildScene.
+---@param models table|nil array of { x, y, model, rotation?, scale? }.
+---@return integer Combined quad+model count.
+function LRaycaster:buildSceneWithModels(params, lights, sprites, wall_textures, models) end
 
 --- Computes floor (or ceiling) texture UV coordinates for one horizontal screen row.
 ---@param cam_x number Camera X position.
@@ -17248,6 +17703,17 @@ function LRaycaster:castRays(ox, oy, angle, fov, count, max_dist) end
 ---@param max_dist number Maximum distance.
 ---@return table Flat array with five values per ray.
 function LRaycaster:castRaysFlat(ox, oy, angle, fov, count, max_dist) end
+
+--- Computes light color for a tile center using ambient + point lights.
+---@param x integer Tile X (zero-based).
+---@param y integer Tile Y (zero-based).
+---@param ambient number Ambient light in [0, 1].
+---@param lights table|nil Array of `{x,y,radius,r,g,b,intensity}`.
+---@return number Red in [0, 1].
+---@return number Green in [0, 1].
+---@return number Blue in [0, 1].
+---@return number Luma in [0, 1].
+function LRaycaster:computeTileLight(x, y, ambient, lights) end
 
 --- Renders a mosaic of first-person views from evenly spaced angles to an ImageData.
 ---@param x number X position.
@@ -17300,16 +17766,45 @@ function LRaycaster:drawTopDown(px, py, angle, scale) end
 ---@return ImageData Image data object.
 function LRaycaster:drawView(px, py, angle, fov, width, height, max_dist) end
 
+--- Returns ceiling texture override id for a map cell, or nil when unset.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@return integer nil | Texture handle id, or nil when no override exists.
+function LRaycaster:getCeilingTextureCell(x, y) end
+
 --- Returns the cell value at (x, y).
 ---@param x integer X position.
 ---@param y integer Y position.
 ---@return integer Cell value at the grid position.
 function LRaycaster:getCell(x, y) end
 
+--- Returns floor texture override id for a map cell, or nil when unset.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@return integer nil | Texture handle id, or nil when no override exists.
+function LRaycaster:getFloorTextureCell(x, y) end
+
+--- Returns lowered floor cell config for a map cell, or nil when unset.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@return table nil | { texture, depth, r, g, b, blocked } or nil.
+function LRaycaster:getLoweredFloorCell(x, y) end
+
 --- Returns the opacity for a wall tile type. Returns 1.0 if not set.
 ---@param tile_type integer Tile type id.
 ---@return number Wall opacity for the tile type. Returns 1.0 if unset.
 function LRaycaster:getWallAlpha(tile_type) end
+
+--- Attempts a 4-direction movement action (`forward`, `back`, `left`, `right`) from dir 1..4.
+---@param px number Current world x.
+---@param py number Current world y.
+---@param dir integer Direction index (1=+X, 2=+Y, 3=-X, 4=-Y).
+---@param action string Movement token: `forward`, `back`, `left`, `right`.
+---@param step number Step length.
+---@return number New world x.
+---@return number New world y.
+---@return boolean True when movement succeeded.
+function LRaycaster:gridMove(px, py, dir, action, step) end
 
 --- Returns the grid height in cells.
 ---@return integer Grid height in cells.
@@ -17320,6 +17815,12 @@ function LRaycaster:height() end
 ---@param y integer Y position.
 ---@return boolean Whether the cell at the grid position is blocked.
 function LRaycaster:isBlocked(x, y) end
+
+--- Returns true if the cell cannot be entered because of a wall or a blocked lowered floor cell.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@return boolean Whether movement should be blocked.
+function LRaycaster:isWalkBlocked(x, y) end
 
 --- Checks line of sight between two points using DDA traversal.
 ---@param x1 number End X position.
@@ -17340,6 +17841,24 @@ function LRaycaster:lineOfSight(x1, y1, x2, y2) end
 ---@return table Table with screen_x, scale, distance, and visible fields.
 function LRaycaster:projectSprite(sx, sy, px, py, pa, fov, screen_w) end
 
+--- Traces multiple rays and returns unique grid cells crossed by those rays.
+---@param ox number Origin world X.
+---@param oy number Origin world Y.
+---@param angle number Camera facing angle in radians.
+---@param fov number Field of view in radians.
+---@param count integer Ray count.
+---@param max_dist number Maximum ray distance.
+---@param step? number Sampling step along each ray, default 0.2.
+---@return table Array of `{x, y}` cell records (zero-based).
+function LRaycaster:revealCellsFromRays(ox, oy, angle, fov, count, max_dist, step) end
+
+--- Sets or clears a ceiling texture override for a map cell.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@param texture integer|LImage|nil Texture handle id, `lurek.render.newImage()` userdata, or nil to clear override.
+---@return nil No value is returned.
+function LRaycaster:setCeilingTextureCell(x, y, texture) end
+
 --- Sets the cell value at grid position (x, y).
 ---@param x integer X position.
 ---@param y integer Y position.
@@ -17352,11 +17871,35 @@ function LRaycaster:setCell(x, y, val) end
 ---@return nil No value is returned.
 function LRaycaster:setCells(cells) end
 
+--- Sets or clears a floor texture override for a map cell.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@param texture integer|LImage|nil Texture handle id, `lurek.render.newImage()` userdata, or nil to clear override.
+---@return nil No value is returned.
+function LRaycaster:setFloorTextureCell(x, y, texture) end
+
+--- Sets or clears a lowered floor cell such as water or lava.
+---@param x integer Cell X position.
+---@param y integer Cell Y position.
+---@param opts table|nil Lowered-floor options or nil to clear.
+---@return nil No value is returned.
+function LRaycaster:setLoweredFloorCell(x, y, opts) end
+
 --- Sets the opacity for a wall tile type. Alpha is clamped to [0, 1].
 ---@param tile_type integer Tile type id.
 ---@param alpha number Alpha value.
 ---@return nil No value is returned.
 function LRaycaster:setWallAlpha(tile_type, alpha) end
+
+--- Attempts to move by (dx, dy) in world space while respecting map and lowered-floor blocking.
+---@param px number Current world x.
+---@param py number Current world y.
+---@param dx number Delta x.
+---@param dy number Delta y.
+---@return number New world x.
+---@return number New world y.
+---@return boolean True when movement succeeded.
+function LRaycaster:tryMove(px, py, dx, dy) end
 
 --- Returns the type name of this object.
 ---@return string Always "LRaycaster".
@@ -17598,6 +18141,10 @@ function LImage:getDimensions() end
 ---@return integer Image height in pixels.
 function LImage:getHeight() end
 
+--- Returns the internal numeric texture handle used by low-level render systems.
+---@return integer Opaque texture handle id.
+function LImage:getId() end
+
 --- Returns the width of this image in pixels.
 ---@return integer Image width in pixels.
 function LImage:getWidth() end
@@ -17733,6 +18280,40 @@ function LNineSlice:type() end
 ---@param name string Type name to test.
 ---@return boolean True when the name matches this type or a parent type.
 function LNineSlice:typeOf(name) end
+
+--- Lua-side handle to a parsed Wavefront OBJ model.
+---@class LObjModel
+LObjModel = {}
+
+--- Returns the number of triangulated faces available in this model.
+---@return integer Number of triangles.
+function LObjModel:getFaceCount() end
+
+--- Returns the number of normal vectors stored in this model.
+---@return integer Number of normal vectors.
+function LObjModel:getNormalCount() end
+
+--- Returns the number of UV coordinates loaded from the OBJ file.
+---@return integer Number of UV coordinates.
+function LObjModel:getUvCount() end
+
+--- Returns the number of position vertices stored in this model.
+---@return integer Number of position vertices.
+function LObjModel:getVertexCount() end
+
+--- Projects the 3-D model to a flat 2-D vertex table.
+---@param camera table Camera parameters.
+---@param screen_w number Output width in pixels.
+---@param screen_h number Output height in pixels.
+---@return table Array of vertex rows: each row is { x, y, u, v, r, g, b, a }.
+function LObjModel:projectToMesh(camera, screen_w, screen_h) end
+
+--- Rasterizes the model into a cached sprite image using material colors from the MTL.
+---@param width integer Output sprite width.
+---@param height integer Output sprite height.
+---@param rotation? integer Quarter-turn rotation: 0,1,2,3.
+---@return LImage Cached rendered sprite.
+function LObjModel:renderToImage(width, height, rotation) end
 
 --- Lua-side quad viewport into a texture.
 ---@class LQuad
@@ -18134,6 +18715,11 @@ lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 ---@return nil No return value.
 lurek.render.drawIsoCubeTile = function(sx, sy, halfW, halfH, opts) end
 
+--- Draws a list of images in a single call. Each entry is a table: {image, x, y} or
+---@param list table Array of draw entries.
+---@return nil No return value.
+lurek.render.drawMany = function(list) end
+
 --- Queues a 9-slice draw call inside lurek.draw / lurek.draw_ui.
 ---@param slice LNineSlice Nine-slice descriptor to draw.
 ---@param x number Draw x position.
@@ -18377,6 +18963,16 @@ lurek.render.isWireframe = function() end
 ---@return nil No return value.
 lurek.render.line = function(...) end
 
+--- Alias for `loadObj`; loads a Wavefront OBJ file and returns an `LObjModel`.
+---@param path string Relative path to an `.obj` asset file.
+---@return LObjModel Loaded model userdata.
+lurek.render.loadModel = function(path) end
+
+--- Loads a Wavefront OBJ file (relative to game dir) and returns an LObjModel.
+---@param path string Relative path, e.g. "assets/models/tank.obj".
+---@return LObjModel Loaded model with projectToMesh method.
+lurek.render.loadObj = function(path) end
+
 --- Creates an off-screen render canvas.
 ---@param width integer Canvas width in pixels.
 ---@param height integer Canvas height in pixels.
@@ -18393,9 +18989,9 @@ lurek.render.newDrawLayer = function() end
 lurek.render.newFont = function(...) end
 
 --- Loads an image from a file path or creates one from ImageData.
----@param path_or_data LuaValue Image file path or image data object.
+---@param ... LuaValue
 ---@return LImage Loaded image handle.
-lurek.render.newImage = function(path_or_data) end
+lurek.render.newImage = function(...) end
 
 --- Registers a named render layer.
 ---@param name string Layer name.
@@ -18486,6 +19082,15 @@ lurek.render.print = function(text, x, y, scale) end
 ---@param y number Draw y position.
 ---@return nil No return value.
 lurek.render.printRich = function(spans, x, y) end
+
+--- Draws text at the given position with rotation. Rotates the entire string as a block
+---@param text string Text to draw.
+---@param x number Draw x position.
+---@param y number Draw y position.
+---@param angle number Rotation in radians.
+---@param scale? number Text scale, defaulting to 1.
+---@return nil No return value.
+lurek.render.printRotated = function(text, x, y, angle, scale) end
 
 --- Draws word-wrapped text within a given width.
 ---@param text string Text to draw.
@@ -19115,6 +19720,19 @@ lurek.scene.wipe = function(duration) end
 ---@class lurek.serial
 lurek.serial = {}
 
+--- Applies schema `default` values recursively to a Lua value tree.
+---@param value LuaValue Lua value to patch.
+---@param schema table Schema table that may include `default`, `fields`, and `items`.
+---@return table Patched value tree with defaults applied.
+lurek.serial.applyDefaults = function(value, schema) end
+
+--- Decodes input payload with explicit or auto-detected format.
+---@param payload string UTF-8 text (json/toml/csv/xml) or binary bytes for msgpack.
+---@param format? string Optional format: `json`, `toml`, `csv`, `xml`, `ini`, `msgpack`. Nil enables auto-detect (text only).
+---@param opts? table Optional options table: `delimiter`, `has_headers` (CSV).
+---@return table Decoded Lua value tree.
+lurek.serial.decode = function(payload, format, opts) end
+
 --- Decodes a binary MessagePack string into a Lua table.
 ---@param bytes string Binary MessagePack payload.
 ---@return table Decoded Lua table.
@@ -19124,6 +19742,18 @@ lurek.serial.decodeMsgPack = function(bytes) end
 ---@param s string XML source text to parse into nested element tables.
 ---@return table Parsed XML tree with tag, attrs, text, and children fields.
 lurek.serial.decodeXml = function(s) end
+
+--- Detects input text format (`json`, `toml`, `csv`, or `xml`).
+---@param s string UTF-8 text payload to inspect.
+---@return string? Detected format name or nil when unknown.
+lurek.serial.detectFormat = function(s) end
+
+--- Encodes a Lua value using the selected format.
+---@param value LuaValue Lua value to encode.
+---@param format string Format: `json`, `toml`, `csv`, or `msgpack`.
+---@param opts? table Optional options table: `pretty` (JSON), `delimiter` and `has_headers` (CSV).
+---@return string Encoded UTF-8 text or binary bytes string for msgpack.
+lurek.serial.encode = function(value, format, opts) end
 
 --- Encodes a Lua table to a binary MessagePack string.
 ---@param value table Lua table to encode.
@@ -19136,6 +19766,11 @@ lurek.serial.encodeMsgPack = function(value) end
 ---@param has_headers? boolean Whether the first row should be treated as headers.
 ---@return table Parsed sequence of row tables.
 lurek.serial.fromCsv = function(s, delimiter, has_headers) end
+
+--- Parses an INI string and returns a Lua table.
+---@param s string INI source text to parse.
+---@return table Parsed Lua table representation.
+lurek.serial.fromIni = function(s) end
 
 --- Parses a JSON string and returns a Lua table.
 ---@param s string JSON source text to parse.
@@ -24012,6 +24647,10 @@ lurek.window = {}
 ---@return nil No return value.
 lurek.window.close = function() end
 
+--- Alias for `requestAttention`.
+---@return nil No return value.
+lurek.window.flash = function() end
+
 --- Requests the window manager to bring the window to the foreground.
 ---@return nil No value is returned.
 lurek.window.focus = function() end
@@ -24021,14 +24660,19 @@ lurek.window.focus = function() end
 ---@return number The corresponding logical coordinate value
 lurek.window.fromPixels = function(value) end
 
+--- Returns the zero-based index of the monitor the window is currently on.
+---@return integer Current display index
+lurek.window.getCurrentDisplay = function() end
+
 --- Returns the current DPI scaling factor for the window as a number.
 ---@return number The DPI scale factor (1.0 = standard density)
 lurek.window.getDPIScale = function() end
 
---- Returns the full desktop resolution of the current monitor as two values (width, height) in physical pixels.
+--- Returns the desktop resolution of a monitor as two values (width, height) in physical pixels.
+---@param display? integer Zero-based display index; omit for current display
 ---@return integer Desktop width in pixels.
 ---@return integer Desktop height in pixels.
-lurek.window.getDesktopDimensions = function() end
+lurek.window.getDesktopDimensions = function(display) end
 
 --- Returns the window dimensions as two values (width, height) in logical pixels.
 ---@return integer Window width in logical pixels.
@@ -24047,6 +24691,10 @@ lurek.window.getDisplayName = function(display) end
 --- Returns the current display orientation.
 ---@return string Display orientation name: `landscape` or `portrait`.
 lurek.window.getDisplayOrientation = function() end
+
+--- Returns an array with metadata for each connected display.
+---@return table Array of display tables with index, name, x, y, width, height, scale, refreshRate, and primary fields
+lurek.window.getDisplays = function() end
 
 --- Returns the current fullscreen state as two values: a boolean indicating whether fullscreen is active, and a string describing the type ("desktop" or "exclusive").
 ---@return boolean True when fullscreen is active.
@@ -24185,6 +24833,11 @@ lurek.window.requestAttention = function() end
 --- Restores the window to its previous size and position after a `minimize` or `maximize` call.
 ---@return nil No value is returned.
 lurek.window.restore = function() end
+
+--- Moves the window to the given display index.
+---@param display integer Zero-based display index
+---@return nil No value is returned.
+lurek.window.setDisplay = function(display) end
 
 --- Enables or disables fullscreen mode.
 ---@param enabled boolean True to enter fullscreen, false to exit

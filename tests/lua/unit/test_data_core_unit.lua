@@ -339,6 +339,41 @@ describe("data.compress + data.decompress", function()
   end)
 end)
 
+-- @describe data.compressChunks + data.decompressChunks
+describe("data.compressChunks + data.decompressChunks", function()
+  -- @covers lurek.data.compressChunks
+  -- @covers lurek.data.decompressChunks
+  it("round-trips chunk table with zlib", function()
+    local chunks = { "chunk-1:", string.rep("A", 200), ":chunk-3" }
+    local compressed = lurek.data.compressChunks("zlib", chunks)
+    local restored = lurek.data.decompressChunks("zlib", compressed)
+    expect_equal(restored, table.concat(chunks, ""))
+  end)
+
+  -- @covers lurek.data.compressChunks
+  -- @covers lurek.data.decompressChunks
+  it("accepts single-string input for chunk helpers", function()
+    local payload = "single payload"
+    local compressed = lurek.data.compressChunks("gzip", payload)
+    local restored = lurek.data.decompressChunks("gzip", compressed)
+    expect_equal(restored, payload)
+  end)
+
+  -- @covers lurek.data.compressChunks
+  it("rejects non-string chunk entries", function()
+    expect_error(function()
+      lurek.data.compressChunks("deflate", { "ok", 123 })
+    end)
+  end)
+
+  -- @covers lurek.data.decompressChunks
+  it("rejects empty chunk table", function()
+    expect_error(function()
+      lurek.data.decompressChunks("deflate", {})
+    end)
+  end)
+end)
+
 -- encode / decode
 
 -- @describe data.encode + data.decode

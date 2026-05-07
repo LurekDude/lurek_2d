@@ -132,6 +132,9 @@ pub mod math_api;
 /// Registers the `lurek.physics.*` rigid-body physics API.
 pub mod physics_api;
 
+/// Registers the `lurek.province.*` province runtime API.
+pub mod province_api;
+
 /// Registers the `lurek.render.*` rendering and drawing API.
 pub mod render_api;
 

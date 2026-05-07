@@ -11,6 +11,8 @@
 /// Core Minimap data model holding region bounds, markers, and camera viewport.
 #[allow(clippy::module_inception)]
 pub mod minimap;
+/// Optional adapter translating province snapshots into minimap layers.
+pub mod province_adapter;
 /// GPU render-command generation for the minimap overlay.
 pub mod render;
 /// Supporting type definitions: enums and plain data structs.

@@ -1,4 +1,4 @@
-//! `lurek.scene` - Scene stack management, transitions, registry, and depth-sorted rendering.
+﻿//! `lurek.scene` - Scene stack management, transitions, registry, and depth-sorted rendering.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -210,6 +210,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | params | table? | Optional `enter` parameters.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("push", lua.create_function(
             move |lua,
                   (scene, transition, duration, easing, params): (
@@ -260,6 +261,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | easing | string? | Easing curve name.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("pop", lua.create_function(
             move |lua, (transition, duration, easing): (Option<String>, Option<f32>, Option<String>)| {
                 let trans = transition
@@ -301,6 +303,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | params | table? | Optional `enter` parameters.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("switchTo", lua.create_function(
             move |lua,
                   (scene, transition, duration, easing, params): (
@@ -348,6 +351,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Clears all scenes from the stack, calling leave on each.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("clear", lua.create_function(move |lua, ()| {
             let mut s = st.borrow_mut();
             let removed = s.stack.clear();
@@ -367,6 +371,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Registered scene name to reveal.
     /// @return | boolean | True if the named scene was found and revealed.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("popTo", lua.create_function(move |lua, name: String| {
             let mut s = st.borrow_mut();
             let target_id = match s.stack.pop_to(&name) {
@@ -396,6 +401,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | dt | number | Delta time in seconds.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("update", lua.create_function(move |lua, dt: f32| {
             let mut s = st.borrow_mut();
             s.stack.update_transition(dt);
@@ -416,6 +422,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | dt | number | Delta time in seconds.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("process", lua.create_function(move |lua, dt: f64| {
             let mut s = st.borrow_mut();
             let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
@@ -439,6 +446,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | dt | number | Fixed-step delta time in seconds.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("processPhysics", lua.create_function(move |lua, dt: f64| {
             let s = st.borrow();
             let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
@@ -457,6 +465,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | dt | number | Delta time in seconds.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("processLate", lua.create_function(move |lua, dt: f64| {
             let s = st.borrow();
             let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
@@ -474,6 +483,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Calls `scene:draw()` on every scene in the stack.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("draw", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             let all_ids: Vec<SceneId> = s.stack.get_all().to_vec();
@@ -493,6 +503,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Calls `scene:render(self)` on every scene. Preferred over `draw`.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("render", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             let all_ids: Vec<SceneId> = s.stack.get_all().to_vec();
@@ -512,6 +523,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Calls `scene:render_ui(self)` on every scene in the stack.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("renderUi", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             let all_ids: Vec<SceneId> = s.stack.get_all().to_vec();
@@ -532,6 +544,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the number of scenes on the stack.
     /// @return | integer | Number of scenes on the stack.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getStackSize", lua.create_function(move |_, ()| Ok(st.borrow().stack.get_stack_size()))?,
     )?;
 
@@ -539,6 +552,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the number of scenes on the stack; alias for `getStackSize`.
     /// @return | integer | Number of scenes on the stack.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("depth", lua.create_function(move |_, ()| Ok(st.borrow().stack.get_stack_size()))?,
     )?;
 
@@ -546,6 +560,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns true if the scene stack is empty.
     /// @return | boolean | True when the scene stack has no scenes.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isEmpty", lua.create_function(move |_, ()| Ok(st.borrow().stack.is_empty()))?,
     )?;
 
@@ -553,6 +568,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the current top scene table, or nil if the stack is empty.
     /// @return | table | Current top scene table, or nil if the stack is empty.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getCurrent", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             if let Some(top_id) = s.stack.get_current() {
@@ -571,6 +587,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns true if a scene transition is currently active.
     /// @return | boolean | True when a scene transition is active.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isTransitioning", lua.create_function(move |_, ()| Ok(st.borrow().stack.is_transitioning()))?,
     )?;
 
@@ -578,6 +595,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the transition progress from 0.0 to 1.0.
     /// @return | number | Transition progress in the range 0.0 to 1.0.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getTransitionProgress", lua.create_function(move |_, ()| Ok(st.borrow().stack.get_transition_progress()))?,
     )?;
 
@@ -589,6 +607,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | scene | table | Scene table to register.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("registerScene", lua.create_function(move |lua, (name, scene): (String, LuaTable)| {
             let mut s = st.borrow_mut();
             let scene_id = s.stack.next_scene_id();
@@ -604,6 +623,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Registered scene name.
     /// @return | table | Registered scene table, or nil if not found.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getRegistered", lua.create_function(move |lua, name: String| {
             let s = st.borrow();
             if let Some(scene_id) = s.stack.get_registered(&name) {
@@ -621,6 +641,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Registered scene name.
     /// @return | boolean | True when a scene is registered under the name.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("hasRegistered", lua.create_function(move |_, name: String| Ok(st.borrow().stack.has_registered(&name)))?,
     )?;
 
@@ -629,6 +650,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Registered scene name to remove.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("unregisterScene", lua.create_function(move |_, name: String| {
             st.borrow_mut().stack.unregister_scene(&name);
             Ok(())
@@ -639,6 +661,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns a list of all registered scene names.
     /// @return | table | Array of registered scene names.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getRegisteredNames", lua.create_function(move |_, ()| Ok(st.borrow().stack.get_registered_names()))?,
     )?;
 
@@ -650,6 +673,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | value | any | Value to store.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("setData", lua.create_function(move |lua, (key, value): (String, LuaValue)| {
             let mut s = st.borrow_mut();
             let value_id = s.stack.next_scene_id();
@@ -665,6 +689,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | key | string | Data-store key.
     /// @return | table | Stored value when present, or nil when unavailable.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getData", lua.create_function(move |lua, key: String| {
             let s = st.borrow();
             if let Some(reg_key) = s.data_refs.get(&key) {
@@ -680,6 +705,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | key | string | Data-store key.
     /// @return | boolean | True when the data-store key exists.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("hasData", lua.create_function(move |_, key: String| Ok(st.borrow().stack.has_data(&key)))?,
     )?;
 
@@ -688,6 +714,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | key | string | Data-store key to remove.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("removeData", lua.create_function(move |_, key: String| {
             let mut s = st.borrow_mut();
             s.stack.remove_data(&key);
@@ -777,6 +804,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns the easing-adjusted transition progress from 0.0 to 1.0.
     /// @return | number | Easing-adjusted transition progress in the range 0.0 to 1.0.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getTransitionProgressEased", lua.create_function(move |_, ()| Ok(st.borrow().stack.get_transition_progress_eased()))?,
     )?;
 
@@ -792,6 +820,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | params | table? | Optional parameter table.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("pushOverlay", lua.create_function(
             move |lua,
                   (scene, transition, duration, easing, params): (
@@ -835,6 +864,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns true if the current top scene was pushed as an overlay.
     /// @return | boolean | True when the current top scene is an overlay.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isOverlay", lua.create_function(move |_, ()| {
             let s = st.borrow();
             let is_ov = s
@@ -851,6 +881,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// When overlays are present, all scenes in the stack are included.
     /// @return | table | Array of active scene tables.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("getActiveScenes", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
@@ -875,6 +906,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | loader | function | Loader callback for that scene.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("preload", lua.create_function(move |lua, (name, loader): (String, LuaFunction)| {
             let mut s = st.borrow_mut();
             let key = lua.create_registry_value(loader)?;
@@ -888,6 +920,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | name | string | Scene name to query.
     /// @return | boolean | True when the scene name has been preloaded.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isPreloaded", lua.create_function(move |_, name: String| {
             Ok(st.borrow().preloaded_names.contains(&name))
         })?,
@@ -902,6 +935,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | params | table? | Optional parameter table.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("pushPreloaded", lua.create_function(
             move |lua,
                   (name, transition, duration, easing, params): (
@@ -997,6 +1031,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Returns a snapshot of the scene stack as a Lua table: { stack=[name...], data={key=val} }.
     /// @return | table | Snapshot table containing stack and data fields.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("serializeScene", lua.create_function(move |lua, ()| {
             let s = st.borrow();
             let snap = lua.create_table()?;
@@ -1036,6 +1071,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | snapshot | table | Snapshot value.
     /// @return | nil | No value is returned.
     let st = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("deserializeScene", lua.create_function(move |lua, snapshot: LuaTable| {
             let mut s = st.borrow_mut();
 

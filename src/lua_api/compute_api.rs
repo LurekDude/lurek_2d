@@ -217,8 +217,48 @@ impl LuaUserData for LuaArray {
         /// @param | val | number | Fill value.
         /// @return | nil | No value is returned.
         methods.add_method_mut("fill", |_, this, val: f64| {
-            ops::fill(&mut this.inner, val);
+            this.inner.fill(val);
             Ok(())
+        });
+
+        // -- addInplace --
+        /// In-place element-wise addition with another Array.
+        /// Supports equal shape and [rows, cols] + [cols] row broadcasting.
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("addInplace", |_, this, other: LuaAnyUserData| {
+            let other_arr = other.borrow::<LuaArray>()?;
+            ops::add_inplace(&mut this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)
+        });
+
+        // -- subInplace --
+        /// In-place element-wise subtraction with another Array.
+        /// Supports equal shape and [rows, cols] - [cols] row broadcasting.
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("subInplace", |_, this, other: LuaAnyUserData| {
+            let other_arr = other.borrow::<LuaArray>()?;
+            ops::sub_inplace(&mut this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)
+        });
+
+        // -- mulInplace --
+        /// In-place element-wise multiplication with another Array.
+        /// Supports equal shape and [rows, cols] * [cols] row broadcasting.
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("mulInplace", |_, this, other: LuaAnyUserData| {
+            let other_arr = other.borrow::<LuaArray>()?;
+            ops::mul_inplace(&mut this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)
+        });
+
+        // -- divInplace --
+        /// In-place element-wise division with another Array.
+        /// Supports equal shape and [rows, cols] / [cols] row broadcasting.
+        /// @param | other | Array | Right-hand operand array.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("divInplace", |_, this, other: LuaAnyUserData| {
+            let other_arr = other.borrow::<LuaArray>()?;
+            ops::div_inplace(&mut this.inner, &other_arr.inner).map_err(LuaError::RuntimeError)
         });
 
         // -- add --
@@ -380,7 +420,9 @@ impl LuaUserData for LuaArray {
         /// @param | mask | Array | Mask array.
         /// @param | other | Array | Fallback array.
         /// @return | Array | Selected result array.
-        methods.add_method("where", |lua, this, (mask, other): (LuaAnyUserData, LuaAnyUserData)| {
+        methods.add_method(
+            "where",
+            |lua, this, (mask, other): (LuaAnyUserData, LuaAnyUserData)| {
                 let mask_arr = mask.borrow::<LuaArray>()?;
                 let other_arr = other.borrow::<LuaArray>()?;
                 let result = ops::where_mask(&mask_arr.inner, &this.inner, &other_arr.inner)
@@ -592,7 +634,9 @@ impl LuaUserData for LuaArray {
         /// @param | col | integer | One-based column index.
         /// @param | val | number | Fill value.
         /// @return | Array | Flood-filled result array.
-        methods.add_method("floodFill", |lua, this, (row, col, val): (usize, usize, f64)| {
+        methods.add_method(
+            "floodFill",
+            |lua, this, (row, col, val): (usize, usize, f64)| {
                 let result = spatial::flood_fill(&this.inner, row - 1, col - 1, val)
                     .map_err(LuaError::RuntimeError)?;
                 lua.create_userdata(LuaArray { inner: result })
@@ -606,7 +650,9 @@ impl LuaUserData for LuaArray {
         /// @param | rows | integer | Region row count.
         /// @param | cols | integer | Region column count.
         /// @return | Array | Extracted region array.
-        methods.add_method("getRegion", |lua, this, (row, col, rows, cols): (usize, usize, usize, usize)| {
+        methods.add_method(
+            "getRegion",
+            |lua, this, (row, col, rows, cols): (usize, usize, usize, usize)| {
                 let result = spatial::get_region(&this.inner, row - 1, col - 1, rows, cols)
                     .map_err(LuaError::RuntimeError)?;
                 lua.create_userdata(LuaArray { inner: result })
@@ -619,7 +665,9 @@ impl LuaUserData for LuaArray {
         /// @param | col | integer | One-based destination column.
         /// @param | source | Array | Source region array.
         /// @return | nil | No value is returned.
-        methods.add_method_mut("setRegion", |_, this, (row, col, source): (usize, usize, LuaAnyUserData)| {
+        methods.add_method_mut(
+            "setRegion",
+            |_, this, (row, col, source): (usize, usize, LuaAnyUserData)| {
                 let src = source.borrow::<LuaArray>()?;
                 spatial::set_region(&mut this.inner, row - 1, col - 1, &src.inner)
                     .map_err(LuaError::RuntimeError)?;
@@ -660,7 +708,9 @@ impl LuaUserData for LuaArray {
         /// @param | lo | number? | Optional lower bound.
         /// @param | hi | number? | Optional upper bound.
         /// @return | table | Array of histogram bin tables.
-        methods.add_method("histogram", |lua, this, (bins, lo, hi): (usize, Option<f64>, Option<f64>)| {
+        methods.add_method(
+            "histogram",
+            |lua, this, (bins, lo, hi): (usize, Option<f64>, Option<f64>)| {
                 let bins_data = analytics::histogram(&this.inner, bins, lo, hi)
                     .map_err(LuaError::RuntimeError)?;
                 let out = lua.create_table()?;
@@ -765,7 +815,7 @@ impl LuaUserData for LuaArray {
         // -- cross2d --
         /// Signed 2D cross product with another length-2 array.
         /// @param | other | Array | Other input value.
-            /// @return | number | Signed 2D cross product.
+        /// @return | number | Signed 2D cross product.
         methods.add_method("cross2d", |_, this, other: LuaAnyUserData| {
             let other = other.borrow::<LuaArray>()?;
             linalg::cross2d(&this.inner, &other.inner).map_err(LuaError::RuntimeError)
@@ -784,7 +834,7 @@ impl LuaUserData for LuaArray {
 
         // -- sobel --
         /// Apply Sobel edge detection to a 2D array. Returns {gx=Array, gy=Array}.
-            /// @return | table | Table with gx and gy gradient arrays.
+        /// @return | table | Table with gx and gy gradient arrays.
         methods.add_method("sobel", |lua, this, ()| {
             let (gx, gy) = linalg::sobel(&this.inner).map_err(LuaError::RuntimeError)?;
             let t = lua.create_table()?;
@@ -838,7 +888,9 @@ impl LuaUserData for LuaArray {
         /// @param | max_iter | int? | (default 1000).
         /// @param | tol | number? | (default 1e-10).
         /// @return | table | Table with the dominant eigenvalue and eigenvector.
-        methods.add_method("eigenPower", |lua, this, (max_iter, tol): (Option<u32>, Option<f64>)| {
+        methods.add_method(
+            "eigenPower",
+            |lua, this, (max_iter, tol): (Option<u32>, Option<f64>)| {
                 let (eigenvalue, vec) = crate::compute::linalg::eigenvalue_power(
                     &this.inner,
                     max_iter.unwrap_or(0),
@@ -938,12 +990,12 @@ impl LuaUserData for LuaArray {
 
         // -- type --
         /// Returns the type name "Array".
-            /// @return | string | Lua-visible type name.
+        /// @return | string | Lua-visible type name.
         methods.add_method("type", |_, _, ()| Ok("LArray"));
         // -- typeOf --
         /// Returns true when the given name matches "Array" or a parent type.
         /// @param | name | string | Name string.
-            /// @return | boolean | True if the type name matches Array or Object.
+        /// @return | boolean | True if the type name matches Array or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LArray" || name == "Array" || name == "Object")
         });
@@ -968,7 +1020,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | shape | table | Shape table.
     /// @param | dtype | string? | Element data type.
     /// @return | Array | New zero-initialized array with the given shape and optional dtype.
-    tbl.set("newArray", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
+    tbl.set(
+        "newArray",
+        lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
             let arr = NdArray::zeros(&s, dt).map_err(LuaError::RuntimeError)?;
@@ -981,7 +1035,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | shape | table | Shape table.
     /// @param | dtype | string? | Element data type.
     /// @return | Array | New zero-filled array with the given shape and optional dtype.
-    tbl.set("zeros", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
+    tbl.set(
+        "zeros",
+        lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
             let arr = NdArray::zeros(&s, dt).map_err(LuaError::RuntimeError)?;
@@ -994,7 +1050,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | shape | table | Shape table.
     /// @param | dtype | string? | Element data type.
     /// @return | Array | New one-filled array with the given shape and optional dtype.
-    tbl.set("ones", lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
+    tbl.set(
+        "ones",
+        lua.create_function(|lua, (shape, dtype): (LuaValue, Option<String>)| {
             let s = parse_shape(shape)?;
             let dt = parse_dtype(dtype)?;
             let arr = NdArray::ones(&s, dt).map_err(LuaError::RuntimeError)?;
@@ -1009,7 +1067,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | step | number? | Step value.
     /// @param | dtype | string? | Element data type.
     /// @return | Array | New 1D array from start to stop with optional step and dtype.
-    tbl.set("range", lua.create_function(
+    tbl.set(
+        "range",
+        lua.create_function(
             |lua, (start, stop, step, dtype): (f64, f64, Option<f64>, Option<String>)| {
                 let st = step.unwrap_or(1.0);
                 let dt = parse_dtype(dtype)?;
@@ -1025,7 +1085,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | shape | table? | Shape table.
     /// @param | dtype | string? | Element data type.
     /// @return | Array | New an array from a Lua table of numbers with optional shape and dtype.
-    tbl.set("fromTable", lua.create_function(
+    tbl.set(
+        "fromTable",
+        lua.create_function(
             |lua, (data, shape, dtype): (LuaTable, Option<LuaValue>, Option<String>)| {
                 let mut values = Vec::new();
                 for i in 1..=data.len()? {
@@ -1048,7 +1110,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | size | integer | Requested size.
     /// @param | sigma | number | Gaussian sigma value.
     /// @return | Array | New sizeĂ-size Gaussian kernel array.
-    tbl.set("gaussianKernel", lua.create_function(|lua, (size, sigma): (usize, f64)| {
+    tbl.set(
+        "gaussianKernel",
+        lua.create_function(|lua, (size, sigma): (usize, f64)| {
             let k = linalg::gaussian_kernel(size, sigma).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: k })
         })?,
@@ -1058,7 +1122,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// Creates a 2Ă-2 rotation matrix for the given angle in radians.
     /// @param | angle_rad | number | Angle in radians.
     /// @return | Array | New 2Ă-2 rotation matrix for the given angle in radians.
-    tbl.set("rotate2dMatrix", lua.create_function(|lua, angle_rad: f64| {
+    tbl.set(
+        "rotate2dMatrix",
+        lua.create_function(|lua, angle_rad: f64| {
             let m = linalg::rotate2d_matrix(angle_rad).map_err(LuaError::RuntimeError)?;
             lua.create_userdata(LuaArray { inner: m })
         })?,
@@ -1072,7 +1138,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | sx | number | Scale factor on the X axis.
     /// @param | sy | number | Scale factor on the Y axis.
     /// @return | Array | New 3Ă-3 homogeneous affine matrix.
-    tbl.set("affine2d", lua.create_function(
+    tbl.set(
+        "affine2d",
+        lua.create_function(
             |lua, (tx, ty, angle_rad, sx, sy): (f64, f64, f64, f64, f64)| {
                 let m =
                     linalg::affine2d(tx, ty, angle_rad, sx, sy).map_err(LuaError::RuntimeError)?;
@@ -1088,8 +1156,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// `{re = number, im = number}` tables - one per frequency bin.
     ///
     /// @param | samples | table | Sample list.
-        /// @return | table | Complex frequency bins as {re, im} tables.
-    tbl.set("fft", lua.create_function(|lua, samples: LuaTable| {
+    /// @return | table | Complex frequency bins as {re, im} tables.
+    tbl.set(
+        "fft",
+        lua.create_function(|lua, samples: LuaTable| {
             let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
             let output = crate::compute::fft::fft(&data);
             let t = lua.create_table()?;
@@ -1110,8 +1180,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// `lurek.compute.fft`) and returns the reconstructed real-valued time-domain samples.
     ///
     /// @param | freqs | table | Frequency list.
-        /// @return | table | Reconstructed real-valued samples.
-    tbl.set("ifft", lua.create_function(|lua, freqs: LuaTable| {
+    /// @return | table | Reconstructed real-valued samples.
+    tbl.set(
+        "ifft",
+        lua.create_function(|lua, freqs: LuaTable| {
             let pairs: Vec<(f64, f64)> = freqs
                 .sequence_values::<LuaTable>()
                 .flatten()
@@ -1137,8 +1209,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// coefficient. Useful for audio-amplitude analysis.
     ///
     /// @param | samples | table | Sample list.
-        /// @return | table | Magnitude values for each frequency bin.
-    tbl.set("fftMagnitude", lua.create_function(|lua, samples: LuaTable| {
+    /// @return | table | Magnitude values for each frequency bin.
+    tbl.set(
+        "fftMagnitude",
+        lua.create_function(|lua, samples: LuaTable| {
             let data: Vec<f64> = samples.sequence_values::<f64>().flatten().collect();
             let mag = crate::compute::fft::fft_magnitude(&data);
             let t = lua.create_table()?;

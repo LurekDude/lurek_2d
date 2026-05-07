@@ -117,69 +117,79 @@ These outputs are consumed by the VS Code extension at extension activation time
 - `lurek.docs.exportAll`: Export completions.json, hover.json, and signatures.json to a directory.
 - `lurek.docs.exportMarkdown`: Export a Markdown API reference file.
 - `lurek.docs.exportCheatsheet`: Export a one-line-per-function plain-text cheatsheet.
-- `lurek.docs.schema`: Creates a Schema validator from a rules table.
-- `lurek.docs.reflectLive`: Walks the live lurek.* Lua table and returns a structured reflection of all
-- `lurek.docs.reflectTable`: Reflects any Lua table, returning a structure describing its keys,
+- `lurek.docs.schema`: Creates a schema validator from a rules table.
+- `lurek.docs.reflectLive`: Walks the live lurek.* Lua table and returns a structured reflection table.
+- `lurek.docs.reflectTable`: Reflects any Lua table and returns a structure describing its keys and value types.
 
-### `ApiCatalog` Methods
-- `ApiCatalog:getModules`: Returns a sorted list of module names present in the catalog.
-- `ApiCatalog:getEntries`: Returns all entries, optionally filtered to a single module.
-- `ApiCatalog:getEntry`: Returns a single entry by qualified name, or nil.
-- `ApiCatalog:getTypes`: Returns the names of all entries with kind "type" in the given module.
-- `ApiCatalog:getTypeMethods`: Returns entries that are methods of the given type qualified name.
-- `ApiCatalog:entryCount`: Returns the number of entries, optionally scoped to a module.
-- `ApiCatalog:merge`: Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
-- `ApiCatalog:filter`: Returns a new catalog containing only entries for which predicate returns true.
-- `ApiCatalog:search`: Returns a table of entries whose name, qualified name, or description contains query.
-- `ApiCatalog:toTable`: Converts the catalog to a plain Lua table array.
-- `ApiCatalog:toJSON`: Serialises the catalog to a pretty-printed JSON string.
+### `LApiCatalog` Methods
+- `LApiCatalog:getModules`: Returns a sorted list of module names present in the catalog.
+- `LApiCatalog:getEntries`: Returns all entries, optionally filtered to a single module.
+- `LApiCatalog:getEntry`: Returns a single entry by qualified name, or nil.
+- `LApiCatalog:getTypes`: Returns the names of all entries with kind "type" in the given module.
+- `LApiCatalog:getTypeMethods`: Returns entries that are methods of the given type qualified name.
+- `LApiCatalog:entryCount`: Returns the number of entries, optionally scoped to a module.
+- `LApiCatalog:merge`: Returns a new catalog that is the union of this and another catalog, with other overriding duplicates.
+- `LApiCatalog:filter`: Returns a new catalog containing only entries for which predicate returns true.
+- `LApiCatalog:search`: Returns a table of entries whose name, qualified name, or description contains query.
+- `LApiCatalog:toTable`: Converts the catalog to a plain Lua table array.
+- `LApiCatalog:toJSON`: Serialises the catalog to a pretty-printed JSON string.
+- `LApiCatalog:type`: Returns the type name of this object.
+- `LApiCatalog:typeOf`: Returns true if this object is of the given type.
 
-### `DocEntry` Methods
-- `DocEntry:getName`: Returns the symbol name for this documentation entry.
-- `DocEntry:getQualifiedName`: Returns the qualified name.
-- `DocEntry:getModule`: Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
-- `DocEntry:getKind`: Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
-- `DocEntry:getDescription`: Returns the human-readable description text for this documentation entry.
-- `DocEntry:getParameters`: Returns the parameters as a table of `{name, type, description, optional, default?}` records.
-- `DocEntry:getReturns`: Returns the return values as a table of `{type, description}` records.
-- `DocEntry:getExample`: Returns the example snippet, or nil.
-- `DocEntry:getSince`: Returns the since version string, or nil.
-- `DocEntry:getDeprecated`: Returns the deprecation message, or nil.
-- `DocEntry:getScore`: Returns the quality score in [0,1].
-- `DocEntry:hasDescription`: Returns true when the entry has a non-empty description.
-- `DocEntry:hasParameters`: Returns true when the entry has at least one parameter.
-- `DocEntry:hasReturnType`: Returns true when the entry declares at least one return type.
-- `DocEntry:hasExample`: Returns true when the entry has an example snippet.
+### `LDocEntry` Methods
+- `LDocEntry:getName`: Returns the symbol name for this documentation entry.
+- `LDocEntry:getQualifiedName`: Returns the qualified name.
+- `LDocEntry:getModule`: Returns the Lua module name this entry belongs to (e.g. `'lurek.math'`).
+- `LDocEntry:getKind`: Returns the kind tag for this entry (e.g. `'function'`, `'method'`, `'class'`).
+- `LDocEntry:getDescription`: Returns the human-readable description text for this documentation entry.
+- `LDocEntry:getParameters`: Returns the parameters as a table of `{name, type, description, optional, default?}` records.
+- `LDocEntry:getReturns`: Returns the return values as a table of `{type, description}` records.
+- `LDocEntry:getExample`: Returns the example snippet, or nil.
+- `LDocEntry:getSince`: Returns the since version string, or nil.
+- `LDocEntry:getDeprecated`: Returns the deprecation message, or nil.
+- `LDocEntry:getScore`: Returns the quality score in [0,1].
+- `LDocEntry:hasDescription`: Returns true when the entry has a non-empty description.
+- `LDocEntry:hasParameters`: Returns true when the entry has at least one parameter.
+- `LDocEntry:hasReturnType`: Returns true when the entry declares at least one return type.
+- `LDocEntry:hasExample`: Returns true when the entry has an example snippet.
+- `LDocEntry:type`: Returns the type name of this object.
+- `LDocEntry:typeOf`: Returns true if this object is of the given type.
 
-### `QualityReport` Methods
-- `QualityReport:getOverallScore`: Returns the overall quality score in [0,1].
-- `QualityReport:getGrade`: Returns the letter grade for the overall score.
-- `QualityReport:getModuleScores`: Returns a table mapping module name to its average quality score.
-- `QualityReport:getWorst`: Returns up to count entries with the lowest quality scores.
-- `QualityReport:getBest`: Returns up to count entries with the highest quality scores.
-- `QualityReport:getByGrade`: Returns entries whose grade exactly matches the given letter grade.
-- `QualityReport:getSummary`: Returns a multi-line human-readable summary of quality by module.
-- `QualityReport:toTable`: Converts the quality report to a plain Lua table.
-- `QualityReport:toJSON`: Serialises the quality report to a pretty-printed JSON string.
+### `LQualityReport` Methods
+- `LQualityReport:getOverallScore`: Returns the overall quality score in [0,1].
+- `LQualityReport:getGrade`: Returns the letter grade for the overall score.
+- `LQualityReport:getModuleScores`: Returns a table mapping module name to its average quality score.
+- `LQualityReport:getWorst`: Returns up to count entries with the lowest quality scores.
+- `LQualityReport:getBest`: Returns up to count entries with the highest quality scores.
+- `LQualityReport:getByGrade`: Returns entries whose grade exactly matches the given letter grade.
+- `LQualityReport:getSummary`: Returns a multi-line human-readable summary of quality by module.
+- `LQualityReport:toTable`: Converts the quality report to a plain Lua table.
+- `LQualityReport:toJSON`: Serialises the quality report to a pretty-printed JSON string.
+- `LQualityReport:type`: Returns the type name of this object.
+- `LQualityReport:typeOf`: Returns true if this object is of the given type.
 
-### `Schema` Methods
-- `Schema:validate`: Validates a Lua table against the schema.
-- `Schema:check`: Returns true when the data passes all schema rules.
-- `Schema:assert`: Validates data and throws a Lua error on failure with all error messages joined.
-- `Schema:getName`: Returns the name identifier of this API schema group.
-- `Schema:getFields`: Returns a table of declared field names.
+### `LSchema` Methods
+- `LSchema:validate`: Validates a Lua table against the schema.
+- `LSchema:check`: Returns true when the data passes all schema rules.
+- `LSchema:assert`: Validates data and throws a Lua error on failure with all error messages joined.
+- `LSchema:getName`: Returns the name identifier of this API schema group.
+- `LSchema:getFields`: Returns a table of declared field names.
+- `LSchema:type`: Returns the type name of this object.
+- `LSchema:typeOf`: Returns true if this object is of the given type.
 
-### `ValidationReport` Methods
-- `ValidationReport:isValid`: Returns true when the report has no missing entries.
-- `ValidationReport:getMissing`: Returns the list of qualified names present in the live API but missing from the catalog.
-- `ValidationReport:getPhantom`: Returns the list of qualified names in the catalog that are not present in the live API.
-- `ValidationReport:getIncomplete`: Returns the list of qualified names whose catalog entry is incomplete.
-- `ValidationReport:missingCount`: Returns the count of missing entries.
-- `ValidationReport:phantomCount`: Returns the count of phantom entries.
-- `ValidationReport:incompleteCount`: Returns the count of incomplete entries.
-- `ValidationReport:getSummary`: Returns a single-line summary of the validation results.
-- `ValidationReport:toTable`: Converts the report to a plain Lua table.
-- `ValidationReport:toJSON`: Serialises the report to a pretty-printed JSON string.
+### `LValidationReport` Methods
+- `LValidationReport:isValid`: Returns true when the report has no missing entries.
+- `LValidationReport:getMissing`: Returns the list of qualified names present in the live API but missing from the catalog.
+- `LValidationReport:getPhantom`: Returns the list of qualified names in the catalog that are not present in the live API.
+- `LValidationReport:getIncomplete`: Returns the list of qualified names whose catalog entry is incomplete.
+- `LValidationReport:missingCount`: Returns the count of missing entries.
+- `LValidationReport:phantomCount`: Returns the count of phantom entries.
+- `LValidationReport:incompleteCount`: Returns the count of incomplete entries.
+- `LValidationReport:getSummary`: Returns a single-line summary of the validation results.
+- `LValidationReport:toTable`: Converts the report to a plain Lua table.
+- `LValidationReport:toJSON`: Serialises the report to a pretty-printed JSON string.
+- `LValidationReport:type`: Returns the type name of this object.
+- `LValidationReport:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

@@ -14,6 +14,8 @@ pub mod serial;
 pub mod sql;
 /// Typed columnar storage and vectorized bulk operations.
 pub mod vectorized;
+/// Shared deterministic pseudo-random generator.
+pub mod rng;
 
 pub use frame::{CellValue, ColRef, DataFrame, Database};
 pub use vectorized::{BinaryOp, CmpOp, ColumnStore, ReduceOp, ScalarOp, VecFrame};

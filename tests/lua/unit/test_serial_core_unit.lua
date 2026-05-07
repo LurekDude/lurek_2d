@@ -124,6 +124,14 @@ describe("TOML round-trip", function()
     end)
 end)
 
+describe("INI decode", function()
+  -- @covers lurek.serial.fromIni
+  it("fromIni parses sectioned ini text", function()
+    local cfg = lurek.serial.fromIni("[player]\nname=hero\n")
+    expect_equal("hero", cfg.player.name)
+  end)
+end)
+
 -- @describe CSV round-trip
 describe("CSV round-trip", function()
     -- @covers lurek.serial.fromCsv
@@ -610,6 +618,68 @@ describe("lurek.serial regression coverage", function()
     })
     expect_equal(false, ok)
     expect_not_nil(err)
+  end)
+end)
+
+describe("lurek.serial unified codec API", function()
+  -- @covers lurek.serial.detectFormat
+  it("detectFormat identifies json", function()
+    expect_equal("json", lurek.serial.detectFormat('{"name":"hero"}'))
+  end)
+
+  -- @covers lurek.serial.detectFormat
+  it("detectFormat returns nil for unknown text", function()
+    expect_equal(nil, lurek.serial.detectFormat("hello world"))
+  end)
+
+  -- @covers lurek.serial.decode
+  it("decode auto-detect parses toml", function()
+    local tbl = lurek.serial.decode("title = \"demo\"")
+    expect_equal("demo", tbl.title)
+  end)
+
+  -- @covers lurek.serial.decode
+  it("decode explicit ini parses ini text", function()
+    local tbl = lurek.serial.decode("[player]\nname=hero\n", "ini")
+    expect_equal("hero", tbl.player.name)
+  end)
+
+  -- @covers lurek.serial.decode
+  it("decode explicit msgpack parses binary bytes", function()
+    local bytes = lurek.serial.encodeMsgPack({ hp = 10 })
+    local tbl = lurek.serial.decode(bytes, "msgpack")
+    expect_equal(10, tbl.hp)
+  end)
+
+  -- @covers lurek.serial.encode
+  it("encode supports json pretty option", function()
+    local s = lurek.serial.encode({ a = 1 }, "json", { pretty = true })
+    expect_equal("string", type(s))
+    expect_true(#s > 0)
+  end)
+
+  -- @covers lurek.serial.encode
+  it("encode supports csv options", function()
+    local rows = {
+      { name = "ada", score = "10" },
+      { name = "lin", score = "20" },
+    }
+    local csv = lurek.serial.encode(rows, "csv", { delimiter = ";", has_headers = true })
+    expect_true(string.find(csv, ";") ~= nil)
+  end)
+
+  -- @covers lurek.serial.applyDefaults
+  it("applyDefaults fills missing fields", function()
+    local schema = {
+      type = "table",
+      fields = {
+        hp = { type = "number", default = 100 },
+        name = { type = "string", default = "hero" },
+      },
+    }
+    local patched = lurek.serial.applyDefaults({}, schema)
+    expect_equal(100, patched.hp)
+    expect_equal("hero", patched.name)
   end)
 end)
 test_summary()

@@ -48,10 +48,10 @@ creation, no arbitrary path access, no network filesystem support.
    - ~~Rationale: scripts checking sizes in loops pay for unnecessary `modified_time` + `readonly` lookups.~~
    - ~~Effort: S · Risk: low.~~
    - ~~Competitor inspiration: [Godot: FileAccess.get_length — docs.godotengine.org/en/stable/classes/class_FileAccess.html].~~
-2. **[P3][FEAT]** `Async write support` — extend AsyncLoader to support background writes.
-   - Rationale: large save files or screenshots can stall the main thread.
-   - Effort: M · Risk: med (write ordering guarantees needed).
-   - Competitor inspiration: [Solar2D: system.pathForFile + async callbacks — docs.coronalabs.com/api/library/system/pathForFile.html].
+2. ~~**[P3][FEAT]** `Async write support` — extend AsyncLoader to support background writes.~~ ✅ **DONE** — Added `AsyncLoader::request_write` + `AsyncLoader::poll_write`, runtime bridge (`request_async_write` / `poll_async_write`), and Lua API `lurek.filesystem.writeAsync(path, data)` + `lurek.filesystem.pollAsyncWrite(handle)`.
+   - ~~Rationale: large save files or screenshots can stall the main thread.~~
+   - ~~Effort: M · Risk: med (write ordering guarantees needed).~~
+   - ~~Competitor inspiration: [Solar2D: system.pathForFile + async callbacks — docs.coronalabs.com/api/library/system/pathForFile.html].~~
 3. ~~**[P3][FEAT]** `lurek.filesystem.listRecursive(path)` — Recursive directory listing.~~ ✅ **DONE** — Implemented as `VirtualFs::list_recursive` + `lurek.filesystem.listRecursive`.
    - ~~Rationale: asset discovery without manual recursion in Lua.~~
    - ~~Effort: S · Risk: low.~~
@@ -59,15 +59,15 @@ creation, no arbitrary path access, no network filesystem support.
 
 ## 6. Performance / Reliability / Quality Ideas
 
-- **[P2][PERF]** `Reduce redundant canonicalization` — `resolve_read_path` and `read_string` both canonicalize; internal calls could share the result.
-  - Hot path: `vfs.rs:120-170`.
-  - Verification: benchmark with 1000 sequential reads.
+- ~~**[P2][PERF]** `Reduce redundant canonicalization` — `resolve_read_path` and `read_string` both canonicalize; internal calls could share the result.~~ ✅ **DONE** — `read_string` and `read_bytes` now delegate to `resolve_read_path`; `write_string` and `append_string` delegate to `resolve_save_path`.
+   - ~~Hot path: `vfs.rs:120-170`.~~
+   - Verification: benchmark with 1000 sequential reads.
 - **[P3][REL]** `Async loader queue-full handling` — currently returns error silently. Should log a warning.
   - Files: `async_loader.rs:112-116`.
   - Suggested fix: add `log::warn!` when `try_send` fails.
-- **[P3][QUAL]** `Deduplicate path-traversal checks` — the `..` component check is repeated across write/append/resolve.
-  - File: `vfs.rs`.
-  - Reason: extract a shared `reject_traversal(path)` helper.
+- ~~**[P3][QUAL]** `Deduplicate path-traversal checks` — the `..` component check is repeated across write/append/resolve.~~ ✅ **DONE** — write/append now share `resolve_save_path`, which centralizes traversal rejection.
+   - File: `vfs.rs`.
+   - ~~Reason: extract a shared `reject_traversal(path)` helper.~~
 
 ## 7. Test Coverage Gaps
 

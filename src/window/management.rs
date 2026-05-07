@@ -116,6 +116,24 @@ pub fn set_position(ws: &mut WindowState, x: i32, y: i32) {
     ws.pending_position = Some((x, y));
 }
 
+/// Schedules moving the window to the given display index.
+///
+/// Returns `true` when the index is valid (`>= 0`) and was queued.
+///
+/// # Parameters
+/// - `ws` — `&mut WindowState`.
+/// - `display_index` — `i32`.
+///
+/// # Returns
+/// `bool`.
+pub fn set_display(ws: &mut WindowState, display_index: i32) -> bool {
+    if display_index < 0 {
+        return false;
+    }
+    ws.pending_display_index = Some(display_index as usize);
+    true
+}
+
 /// Schedules a window minimize (iconify) operation.
 ///
 /// # Parameters
@@ -179,6 +197,14 @@ pub fn has_focus(ws: &WindowState) -> bool {
 /// - `ws` — `&mut WindowState`.
 pub fn request_attention(ws: &mut WindowState) {
     ws.pending_attention = true;
+}
+
+/// Alias for [`request_attention`] that matches common engine naming.
+///
+/// # Parameters
+/// - `ws` — `&mut WindowState`.
+pub fn flash(ws: &mut WindowState) {
+    request_attention(ws);
 }
 
 /// Schedules window closure on the next frame, exiting the game loop.

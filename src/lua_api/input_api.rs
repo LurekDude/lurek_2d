@@ -1,4 +1,4 @@
-//! `lurek.input` - Input state queries and cursor management.
+﻿//! `lurek.input` - Input state queries and cursor management.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -10,6 +10,47 @@ use std::rc::Rc;
 use crate::input::combo::{ComboDetector, ComboStep};
 use crate::input::keyboard::{get_key_from_scancode, get_scancode_from_key};
 use crate::input::mouse::{is_cursor_supported, CursorKind, SystemCursor};
+
+fn parse_gamepad_binding(binding: &str) -> Option<(usize, u32)> {
+    let mut parts = binding.split(':');
+    let prefix = parts.next()?;
+    if prefix != "gamepad" {
+        return None;
+    }
+    let id = parts.next()?.parse::<usize>().ok()?;
+    let button = parts.next()?.parse::<u32>().ok()?;
+    Some((id, button))
+}
+
+fn binding_is_down(st: &SharedState, binding: &str) -> bool {
+    if let Some((id, button)) = parse_gamepad_binding(binding) {
+        return st
+            .gamepads
+            .get(id)
+            .is_some_and(|gp| gp.is_button_pressed(button));
+    }
+    st.keyboard.is_down(binding)
+}
+
+fn binding_was_pressed(st: &SharedState, binding: &str) -> bool {
+    if let Some((id, button)) = parse_gamepad_binding(binding) {
+        return st
+            .gamepads
+            .get(id)
+            .is_some_and(|gp| gp.was_button_pressed(button));
+    }
+    st.keyboard.get_pressed().iter().any(|k| k == binding)
+}
+
+fn binding_was_released(st: &SharedState, binding: &str) -> bool {
+    if let Some((id, button)) = parse_gamepad_binding(binding) {
+        return st
+            .gamepads
+            .get(id)
+            .is_some_and(|gp| gp.was_button_released(button));
+    }
+    st.keyboard.get_released().iter().any(|k| k == binding)
+}
 
 // -------------------------------------------------------------------------------
 // LuaCursor UserData
@@ -225,6 +266,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | ... | string | Key names to test.
     /// @return | boolean | True if any listed key is down.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("isDown", lua.create_function(move |_, args: Variadic<String>| {
             Ok(s.borrow().keyboard.is_any_down(&args))
         })?,
@@ -235,6 +277,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | scancode | string | Hardware scancode name.
     /// @return | boolean | True if the scancode is down.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("isScancodeDown", lua.create_function(move |_, scancode: String| {
             Ok(s.borrow().keyboard.is_scancode_down(&scancode))
         })?,
@@ -245,6 +288,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enabled | boolean | Whether key repeat should be enabled.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("setKeyRepeat", lua.create_function(move |_, enabled: bool| {
             s.borrow_mut().keyboard.set_key_repeat(enabled);
             Ok(())
@@ -255,6 +299,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether key-repeat is currently enabled.
     /// @return | boolean | True if key repeat is enabled.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("hasKeyRepeat", lua.create_function(move |_, ()| Ok(s.borrow().keyboard.has_key_repeat()))?,
     )?;
 
@@ -263,6 +308,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enabled | boolean | Whether text input mode should be enabled.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("setTextInput", lua.create_function(move |_, enabled: bool| {
             s.borrow_mut().keyboard.set_text_input(enabled);
             Ok(())
@@ -273,6 +319,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether text input mode is currently active.
     /// @return | boolean | True if text input mode is active.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("hasTextInput", lua.create_function(move |_, ()| Ok(s.borrow().keyboard.has_text_input()))?,
     )?;
 
@@ -295,6 +342,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | modifier | string | Modifier name to test.
     /// @return | boolean | True if the modifier is active.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     keyboard.set("isModifierActive", lua.create_function(move |_, modifier: String| {
             Ok(s.borrow().keyboard.is_modifier_active(&modifier))
         })?,
@@ -311,6 +359,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | number | Cursor X position.
     /// @return | number | Cursor Y position.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getPosition", lua.create_function(move |_, ()| {
             let st = s.borrow();
             Ok((st.mouse.x, st.mouse.y))
@@ -321,6 +370,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the current mouse X position in window coordinates.
     /// @return | number | Cursor X position.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getX", lua.create_function(move |_, ()| Ok(s.borrow().mouse.x))?,
     )?;
 
@@ -328,6 +378,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the current mouse Y position in window coordinates.
     /// @return | number | Cursor Y position.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getY", lua.create_function(move |_, ()| Ok(s.borrow().mouse.y))?,
     )?;
 
@@ -336,6 +387,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | button | integer | One-based mouse button index.
     /// @return | boolean | True if the button is down.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("isDown", lua.create_function(move |_, button: usize| {
             Ok(s.borrow().mouse.is_down(button.saturating_sub(1)))
         })?,
@@ -346,6 +398,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | visible | boolean | Whether the cursor should be visible.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("setVisible", lua.create_function(move |_, visible: bool| {
             s.borrow_mut().mouse.set_visible(visible);
             Ok(())
@@ -356,6 +409,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether the mouse cursor is currently visible.
     /// @return | boolean | True if the cursor is visible.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("isVisible", lua.create_function(move |_, ()| Ok(s.borrow().mouse.is_visible()))?,
     )?;
 
@@ -364,6 +418,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | grabbed | boolean | Whether the cursor should be locked.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("setGrabbed", lua.create_function(move |_, grabbed: bool| {
             s.borrow_mut().mouse.set_grabbed(grabbed);
             Ok(())
@@ -374,6 +429,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether the mouse cursor is locked to the window.
     /// @return | boolean | True if the cursor is locked.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("isGrabbed", lua.create_function(move |_, ()| Ok(s.borrow().mouse.is_grabbed()))?,
     )?;
 
@@ -382,6 +438,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | relative | boolean | Whether relative mode should be enabled.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("setRelativeMode", lua.create_function(move |_, relative: bool| {
             s.borrow_mut().mouse.set_relative_mode(relative);
             Ok(())
@@ -392,6 +449,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether relative mouse mode is active.
     /// @return | boolean | True if relative mouse mode is active.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getRelativeMode", lua.create_function(move |_, ()| Ok(s.borrow().mouse.get_relative_mode()))?,
     )?;
 
@@ -401,6 +459,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | y | number | Target Y position.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("setPosition", lua.create_function(move |_, (x, y): (f32, f32)| {
             s.borrow_mut().mouse.request_position(x, y);
             Ok(())
@@ -412,6 +471,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | cursor | any | Cursor handle, cursor name, or nil to reset.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("setCursor", lua.create_function(move |_, cursor_val: LuaValue| {
             let mut st = s.borrow_mut();
             match cursor_val {
@@ -490,6 +550,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the name of the currently active system cursor.
     /// @return | string | Active system cursor name.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getCursor", lua.create_function(move |_, ()| Ok(s.borrow().mouse.get_cursor().as_str().to_string()))?,
     )?;
 
@@ -498,6 +559,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | number | Horizontal scroll delta.
     /// @return | number | Vertical scroll delta.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     mouse.set("getWheelDelta", lua.create_function(move |_, ()| Ok(s.borrow().mouse.get_scroll()))?,
     )?;
 
@@ -511,6 +573,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the number of connected gamepads.
     /// @return | integer | Connected gamepad count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getCount", lua.create_function(move |_, ()| Ok(s.borrow().gamepads.len()))?,
     )?;
 
@@ -518,6 +581,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the number of tracked gamepad slots.
     /// @return | integer | Tracked gamepad slot count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getJoystickCount", lua.create_function(move |_, ()| Ok(s.borrow().gamepads.len()))?,
     )?;
 
@@ -525,6 +589,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns a list of connected gamepad IDs.
     /// @return | table | Array of connected gamepad IDs.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getJoysticks", lua.create_function(move |lua, ()| {
             let st = s.borrow();
             let tbl = lua.create_table()?;
@@ -542,6 +607,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad ID.
     /// @return | boolean | True if the gamepad is connected.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("isConnected", lua.create_function(move |_, id: usize| {
             Ok(s.borrow().gamepads.get(id).is_some_and(|gp| gp.connected))
         })?,
@@ -552,6 +618,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad ID.
     /// @return | string | Gamepad display name.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getName", lua.create_function(move |_, id: usize| {
             let st = s.borrow();
             Ok(st
@@ -566,6 +633,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad slot ID.
     /// @return | boolean | True if the slot is a recognized gamepad.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("isGamepad", lua.create_function(move |_, id: usize| {
             Ok(s.borrow().gamepads.get(id).is_some_and(|gp| gp.connected))
         })?,
@@ -576,6 +644,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad ID.
     /// @return | integer | Total button count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getButtonCount", lua.create_function(move |_, id: usize| {
             Ok(s.borrow()
                 .gamepads
@@ -589,6 +658,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad ID.
     /// @return | integer | Total axis count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getAxisCount", lua.create_function(move |_, id: usize| {
             Ok(s.borrow()
                 .gamepads
@@ -603,6 +673,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | button | integer | Button index.
     /// @return | boolean | True if the button is down.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("isDown", lua.create_function(move |_, (id, button): (usize, u32)| {
             Ok(s.borrow()
                 .gamepads
@@ -617,6 +688,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | axis | integer | Axis index.
     /// @return | number | Current axis value.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getAxis", lua.create_function(move |_, (id, axis): (usize, u32)| {
             Ok(s.borrow()
                 .gamepads
@@ -629,7 +701,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether the gamepad supports haptic vibration.
     /// @param | id | integer | Gamepad ID.
     /// @return | boolean | Always false on the current backend.
-    gamepad.set("isVibrationSupported", lua.create_function(move |_, _id: usize| Ok(false))?,
+    let s = state.clone();
+    gamepad.set("isVibrationSupported", lua.create_function(move |_, id: usize| {
+            Ok(s.borrow()
+                .gamepads
+                .get(id)
+                .is_some_and(|gp| gp.is_vibration_supported()))
+        })?,
     )?;
 
     // -- vibrate --
@@ -639,17 +717,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | high_freq | number | High-frequency motor intensity from 0.0 to 1.0.
     /// @param | duration_ms | number | Vibration duration in milliseconds.
     /// @return | boolean | Always false on the current backend.
+    let s = state.clone();
     gamepad.set("vibrate", lua.create_function(
             move |_, (id, low_freq, high_freq, duration_ms): (usize, f32, f32, f32)| {
+                let mut st = s.borrow_mut();
                 let low_freq = low_freq.clamp(0.0, 1.0);
                 let high_freq = high_freq.clamp(0.0, 1.0);
-                let duration_ms = duration_ms.max(0.0);
-                log::debug!(
-                    "gamepad::vibrate id={id} low_freq={low_freq:.3} \
-                     high_freq={high_freq:.3} duration_ms={duration_ms:.1} \
-                     (platform stub - winit 0.30 has no haptics API)"
-                );
-                Ok(false)
+                let duration_ms = duration_ms.max(0.0).round() as u32;
+                let supported = st
+                    .gamepads
+                    .get(id)
+                    .is_some_and(|gp| gp.is_vibration_supported());
+                if supported {
+                    st.gamepad_vibration_requests
+                        .push(crate::input::GamepadVibrationRequest {
+                            id,
+                            low_freq,
+                            high_freq,
+                            duration_ms,
+                        });
+                }
+                Ok(supported)
             },
         )?,
     )?;
@@ -659,6 +747,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Gamepad ID.
     /// @return | string | Hardware GUID string.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getGUID", lua.create_function(move |_, id: usize| {
             let st = s.borrow();
             Ok(st
@@ -674,6 +763,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | hat | integer | Hat switch index.
     /// @return | string | Hat direction string.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getHat", lua.create_function(move |_, (id, hat): (usize, u32)| {
             let st = s.borrow();
             Ok(st
@@ -687,7 +777,83 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Triggers haptic rumble (currently a no-op stub).
     /// @param | args | any | Raw vibration arguments.
     /// @return | boolean | Always false on the current backend.
-    gamepad.set("setVibration", lua.create_function(move |_, _args: LuaMultiValue| Ok(false))?,
+    let s = state.clone();
+    gamepad.set("setVibration", lua.create_function(
+            move |_, (id, low_freq, high_freq, duration_ms): (usize, f32, f32, f32)| {
+                let mut st = s.borrow_mut();
+                let low_freq = low_freq.clamp(0.0, 1.0);
+                let high_freq = high_freq.clamp(0.0, 1.0);
+                let duration_ms = duration_ms.max(0.0).round() as u32;
+                let supported = st
+                    .gamepads
+                    .get(id)
+                    .is_some_and(|gp| gp.is_vibration_supported());
+                if supported {
+                    st.gamepad_vibration_requests
+                        .push(crate::input::GamepadVibrationRequest {
+                            id,
+                            low_freq,
+                            high_freq,
+                            duration_ms,
+                        });
+                }
+                Ok(supported)
+            },
+        )?,
+    )?;
+
+    // -- wasPressed --
+    /// Returns whether a gamepad button was pressed this frame.
+    /// @param | id | integer | Gamepad ID.
+    /// @param | button | integer | Button index.
+    /// @return | boolean | True if the button was pressed this frame.
+    let s = state.clone();
+    gamepad.set("wasPressed", lua.create_function(move |_, (id, button): (usize, u32)| {
+            Ok(s.borrow()
+                .gamepads
+                .get(id)
+                .is_some_and(|gp| gp.was_button_pressed(button)))
+        })?,
+    )?;
+
+    // -- wasReleased --
+    /// Returns whether a gamepad button was released this frame.
+    /// @param | id | integer | Gamepad ID.
+    /// @param | button | integer | Button index.
+    /// @return | boolean | True if the button was released this frame.
+    let s = state.clone();
+    gamepad.set("wasReleased", lua.create_function(move |_, (id, button): (usize, u32)| {
+            Ok(s.borrow()
+                .gamepads
+                .get(id)
+                .is_some_and(|gp| gp.was_button_released(button)))
+        })?,
+    )?;
+
+    // -- wasConnected --
+    /// Returns whether the gamepad connected this frame.
+    /// @param | id | integer | Gamepad ID.
+    /// @return | boolean | True if the gamepad connected this frame.
+    let s = state.clone();
+    gamepad.set("wasConnected", lua.create_function(move |_, id: usize| {
+            Ok(s.borrow()
+                .gamepads
+                .get(id)
+                .is_some_and(|gp| gp.was_connected_this_frame()))
+        })?,
+    )?;
+
+    // -- wasDisconnected --
+    /// Returns whether the gamepad disconnected this frame.
+    /// @param | id | integer | Gamepad ID.
+    /// @return | boolean | True if the gamepad disconnected this frame.
+    let s = state.clone();
+    gamepad.set("wasDisconnected", lua.create_function(move |_, id: usize| {
+            Ok(s.borrow()
+                .gamepads
+                .get(id)
+                .is_some_and(|gp| gp.was_disconnected_this_frame()))
+        })?,
     )?;
 
     // -- setBackgroundEvents --
@@ -695,6 +861,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | enable | boolean | Whether background events should be enabled.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("setBackgroundEvents", lua.create_function(move |_, enable: bool| {
             s.borrow_mut().gamepad_background_events = enable;
             Ok(())
@@ -705,6 +872,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns whether background gamepad events are enabled.
     /// @return | boolean | True if background events are enabled.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getBackgroundEvents", lua.create_function(move |_, ()| Ok(s.borrow().gamepad_background_events))?,
     )?;
 
@@ -714,6 +882,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | mapping | string | SDL2 mapping string.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("setGamepadMapping", lua.create_function(move |_, (guid, mapping): (String, String)| {
             s.borrow_mut().gamepad_mappings.set_mapping(&guid, &mapping);
             Ok(())
@@ -725,6 +894,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | guid | string | Controller GUID string.
     /// @return | string | Stored mapping string, or nil if no mapping exists.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("getGamepadMappingString", lua.create_function(move |_, guid: String| {
             Ok(s.borrow()
                 .gamepad_mappings
@@ -738,6 +908,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Source file path.
     /// @return | integer | Number of loaded mappings.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("loadGamepadMappings", lua.create_function(move |_, path: String| {
             s.borrow_mut()
                 .gamepad_mappings
@@ -751,6 +922,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Destination file path.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     gamepad.set("saveGamepadMappings", lua.create_function(move |_, path: String| {
             s.borrow()
                 .gamepad_mappings
@@ -770,6 +942,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns a table of active touch points with id, x, y, and pressure fields.
     /// @return | table | Array of active touch point tables.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     touch.set("getTouches", lua.create_function(move |lua, ()| {
             let st = s.borrow();
             let touches = st.touch.get_touches();
@@ -792,6 +965,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | number | Touch X position.
     /// @return | number | Touch Y position.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     touch.set("getPosition", lua.create_function(move |_, id: u64| {
             let st = s.borrow();
             let (x, y) = st.touch.get_touch(id).map_or((0.0, 0.0), |tp| (tp.x, tp.y));
@@ -804,6 +978,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | id | integer | Touch identifier.
     /// @return | number | Touch pressure.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     touch.set("getPressure", lua.create_function(move |_, id: u64| {
             Ok(s.borrow().touch.get_touch(id).map_or(0.0, |tp| tp.pressure))
         })?,
@@ -813,7 +988,28 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// Returns the number of currently active touch points.
     /// @return | integer | Active touch count.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     touch.set("getTouchCount", lua.create_function(move |_, ()| Ok(s.borrow().touch.get_touch_count()))?,
+    )?;
+
+    // -- wasPressed --
+    /// Returns whether a touch with the given ID started this frame.
+    /// @param | id | integer | Touch identifier.
+    /// @return | boolean | True if the touch started this frame.
+    let s = state.clone();
+    touch.set("wasPressed", lua.create_function(move |_, id: u64| {
+            Ok(s.borrow().touch.was_pressed(id))
+        })?,
+    )?;
+
+    // -- wasReleased --
+    /// Returns whether a touch with the given ID ended this frame.
+    /// @param | id | integer | Touch identifier.
+    /// @return | boolean | True if the touch ended this frame.
+    let s = state.clone();
+    touch.set("wasReleased", lua.create_function(move |_, id: u64| {
+            Ok(s.borrow().touch.was_released(id))
+        })?,
     )?;
 
     input_tbl.set("touch", touch)?;
@@ -866,6 +1062,89 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- newMapping --
+    /// Creates and binds an action mapping object with query helpers.
+    /// @param | name | string | Action name to create.
+    /// @param | keys | any | One key binding or an array of key bindings.
+    /// @return | table | Mapping object with `isDown`, `wasPressed`, and `wasReleased` methods.
+    let am = action_map.clone();
+    let s = state.clone();
+    input_tbl.set("newMapping", lua.create_function(move |lua, (name, keys): (String, LuaValue)| {
+            {
+                let mut map = am.borrow_mut();
+                let entry = map.entry(name.clone()).or_default();
+                match keys {
+                    LuaValue::String(s) => {
+                        let k = s
+                            .to_str()
+                            .map_err(|e| LuaError::RuntimeError(e.to_string()))?
+                            .to_string();
+                        if !entry.contains(&k) {
+                            entry.push(k);
+                        }
+                    }
+                    LuaValue::Table(t) => {
+                        for pair in t.sequence_values::<String>() {
+                            let k = pair?;
+                            if !entry.contains(&k) {
+                                entry.push(k);
+                            }
+                        }
+                    }
+                    _ => {
+                        return Err(LuaError::RuntimeError(
+                            "input.newMapping: keys must be a string or array of strings".into(),
+                        ))
+                    }
+                }
+            }
+
+            let mapping = lua.create_table()?;
+            mapping.set("name", name.clone())?;
+
+            let action = name.clone();
+            let am_is_down = am.clone();
+            let s_is_down = s.clone();
+            mapping.set("isDown", lua.create_function(move |_, ()| {
+                    let map = am_is_down.borrow();
+                    if let Some(keys) = map.get(&action) {
+                        let st = s_is_down.borrow();
+                        return Ok(keys.iter().any(|k| binding_is_down(&st, k)));
+                    }
+                    Ok(false)
+                })?,
+            )?;
+
+            let action = name.clone();
+            let am_pressed = am.clone();
+            let s_pressed = s.clone();
+            mapping.set("wasPressed", lua.create_function(move |_, ()| {
+                    let map = am_pressed.borrow();
+                    if let Some(keys) = map.get(&action) {
+                        let st = s_pressed.borrow();
+                        return Ok(keys.iter().any(|k| binding_was_pressed(&st, k)));
+                    }
+                    Ok(false)
+                })?,
+            )?;
+
+            let action = name.clone();
+            let am_released = am.clone();
+            let s_released = s.clone();
+            mapping.set("wasReleased", lua.create_function(move |_, ()| {
+                    let map = am_released.borrow();
+                    if let Some(keys) = map.get(&action) {
+                        let st = s_released.borrow();
+                        return Ok(keys.iter().any(|k| binding_was_released(&st, k)));
+                    }
+                    Ok(false)
+                })?,
+            )?;
+
+            Ok(mapping)
+        })?,
+    )?;
+
     // -- unbind --
     /// Removes all key bindings for the given action name.
     /// @param | action | string | Action name to remove.
@@ -914,11 +1193,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let map = am.borrow();
             if let Some(keys) = map.get(&action) {
                 let st = s.borrow();
-                for k in keys {
-                    if st.keyboard.is_down(k) {
-                        return Ok(true);
-                    }
-                }
+                return Ok(keys.iter().any(|k| binding_is_down(&st, k)));
             }
             Ok(false)
         })?,
@@ -935,7 +1210,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let map = am.borrow();
             if let Some(keys) = map.get(&action) {
                 let st = s.borrow();
-                let was_pressed = keys.iter().any(|k| st.keyboard.get_pressed().contains(k));
+                let was_pressed = keys.iter().any(|k| binding_was_pressed(&st, k));
                 if was_pressed {
                     let frame = st.clock.frame_count();
                     lpf.borrow_mut().insert(action, frame);
@@ -956,7 +1231,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             let map = am.borrow();
             if let Some(keys) = map.get(&action) {
                 let st = s.borrow();
-                return Ok(keys.iter().any(|k| st.keyboard.get_released().contains(k)));
+                return Ok(keys.iter().any(|k| binding_was_released(&st, k)));
             }
             Ok(false)
         })?,

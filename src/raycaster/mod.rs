@@ -18,6 +18,8 @@ pub mod doors;
 pub mod draw;
 /// Floor and ceiling height variations for stepped or multi-level environments.
 pub mod heightmap;
+/// Grid movement helpers for 4-direction dungeon movement.
+pub mod grid_motion;
 /// Static and dynamic point lighting for raycaster worlds.
 pub mod lighting;
 /// Top-down minimap extraction from a raycaster grid.
@@ -47,12 +49,16 @@ pub use column_batch::{ColumnBatch, ColumnData};
 pub use dda::Raycaster2D;
 pub use depth_buffer::DepthBuffer;
 pub use doors::{Door, DoorDirection, DoorManager, DoorState};
+pub use grid_motion::{dir4_delta, try_move, GridMoveAction};
 pub use heightmap::HeightMap;
 pub use lighting::{apply_lit_shade, compute_lighting, PointLight};
-pub use minimap_overlay::{draw_player_arrow, extract_minimap};
+pub use minimap_overlay::{
+	build_minimap_tile_window, compute_tile_light, draw_player_arrow, extract_minimap,
+	reveal_cells_from_rays, MinimapTileSample,
+};
 pub use projection::{distance_shade, project_column};
 pub use ray_hit::RayHit;
-pub use scene::{BillboardSprite, CeilingQuad, FloorQuad, RaycasterScene, WallQuad};
+pub use scene::{BillboardSprite, CeilingQuad, FloorQuad, ModelMesh, RaycasterScene, WallQuad};
 pub use segment::{cast_ray_2d, Segment};
 pub use sprite_manager::{SpriteManager, WorldSprite as ManagedSprite};
 pub use sprite_projection::SpriteProjection;

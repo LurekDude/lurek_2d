@@ -127,6 +127,92 @@ mod texture_atlas_tests {
         let all = atlas.get_regions();
         assert_eq!(all.len(), 2);
     }
+
+    #[test]
+    fn pack_with_nine_slice_stores_insets() {
+        let mut atlas = TextureAtlas::new(128, 128, 0);
+        let insets = NineSliceInsets {
+            left: 4,
+            right: 4,
+            top: 2,
+            bottom: 2,
+        };
+        assert!(atlas.pack_with_nine_slice("panel", 32, 16, Some(insets)));
+        let region = atlas.get_region("panel").unwrap();
+        assert_eq!(region.nine_slice, Some(insets));
+    }
+
+    #[test]
+    fn set_nine_slice_rejects_invalid_insets() {
+        let mut atlas = TextureAtlas::new(128, 128, 0);
+        assert!(atlas.pack("panel", 10, 10));
+        let ok = atlas.set_nine_slice(
+            "panel",
+            Some(NineSliceInsets {
+                left: 3,
+                right: 3,
+                top: 2,
+                bottom: 2,
+            }),
+        );
+        assert!(ok);
+        let bad = atlas.set_nine_slice(
+            "panel",
+            Some(NineSliceInsets {
+                left: 8,
+                right: 8,
+                top: 1,
+                bottom: 1,
+            }),
+        );
+        assert!(!bad);
+    }
+}
+
+mod effects_and_lut_tests {
+    use super::*;
+    use lurek2d::image::effects::ResizeFilter;
+    use lurek2d::math::Color;
+
+    #[test]
+    fn resize_with_lanczos3_returns_expected_dimensions() {
+        let mut img = ImageData::new(8, 8);
+        img.set_pixel(4, 4, 255, 0, 0, 255);
+        let resized = img
+            .resize_with_filter(3, 5, ResizeFilter::Lanczos3)
+            .expect("resize should produce image");
+        assert_eq!(resized.dimensions(), (3, 5));
+    }
+
+    #[test]
+    fn blit_opaque_source_overwrites_destination() {
+        let mut dst = ImageData::new(4, 1);
+        dst.fill(1, 2, 3, 255);
+        let mut src = ImageData::new(2, 1);
+        src.fill(200, 100, 50, 255);
+        dst.blit(&src, 1, 0);
+        assert_eq!(dst.get_pixel(0, 0), Some((1, 2, 3, 255)));
+        assert_eq!(dst.get_pixel(1, 0), Some((200, 100, 50, 255)));
+        assert_eq!(dst.get_pixel(2, 0), Some((200, 100, 50, 255)));
+    }
+
+    #[test]
+    fn palette_lut_apply_replaces_matching_pixels() {
+        let mut img = ImageData::new(2, 1);
+        img.set_pixel(0, 0, 255, 0, 0, 255);
+        img.set_pixel(1, 0, 0, 255, 0, 255);
+
+        let mut lut = PaletteLUT::new();
+        lut.set_color(
+            0,
+            Color::new(1.0, 0.0, 0.0, 1.0),
+            Color::new(0.0, 0.0, 1.0, 1.0),
+        );
+        lut.apply(&mut img);
+
+        assert_eq!(img.get_pixel(0, 0), Some((0, 0, 255, 255)));
+        assert_eq!(img.get_pixel(1, 0), Some((0, 255, 0, 255)));
+    }
 }
 
 mod visualization_tests {

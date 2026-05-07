@@ -604,6 +604,11 @@ fn lua_unit_minimap_unit() {
 }
 
 #[test]
+fn lua_unit_province_unit() {
+    run_lua_test("unit/test_province_core_unit.lua");
+}
+
+#[test]
 fn lua_unit_mods_unit() {
     run_lua_test("unit/test_mods_core_unit.lua");
 }

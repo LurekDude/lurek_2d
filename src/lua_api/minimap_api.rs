@@ -1,4 +1,4 @@
-//! `lurek.minimap` - Grid-based minimap with terrain, fog of war, objects, pings, and markers.
+﻿//! `lurek.minimap` - Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
 use super::SharedState;
 use mlua::prelude::*;
@@ -951,6 +951,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | display_h | integer? | Display height in pixels.
     /// @return | Minimap | New grid-based minimap.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newMinimap", lua.create_function(
             move |_, (grid_w, grid_h, display_w, display_h): (u32, u32, Option<u32>, Option<u32>)| {
                 let dw = display_w.unwrap_or(200);

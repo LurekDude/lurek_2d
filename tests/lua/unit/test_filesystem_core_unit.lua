@@ -22,7 +22,7 @@ describe("lurek.filesystem module", function()
             "getDirectoryItems", "isFile", "isDirectory", "createDirectory",
             "getInfo", "getSource", "getSaveDirectory", "getWorkingDirectory",
             "getUserDirectory", "getIdentity", "setIdentity",
-            "lines", "readAsync", "pollAsync",
+            "lines", "readAsync", "pollAsync", "writeAsync", "pollAsyncWrite",
             "mount", "unmount", "load",
         }
         for _, name in ipairs(fns) do
@@ -627,6 +627,48 @@ describe("lurek.filesystem.readAsync / pollAsync", function()
     end)
 end)
 
+-- async write
+
+-- @describe lurek.filesystem.writeAsync / pollAsyncWrite
+describe("lurek.filesystem.writeAsync / pollAsyncWrite", function()
+    -- @covers lurek.filesystem.writeAsync
+    it("writeAsync returns a handle (non-nil)", function()
+        local handle = lurek.filesystem.writeAsync(TMP .. "async_write_handle.txt", "hello")
+        expect_true(handle ~= nil, "async write handle is not nil")
+    end)
+
+    -- @covers lurek.filesystem.pollAsyncWrite
+    -- @covers lurek.filesystem.writeAsync
+    -- @covers lurek.filesystem.read
+    it("pollAsyncWrite reaches done or pending and writes bytes when done", function()
+        local path = TMP .. "async_write_poll.txt"
+        local payload = "async_write_data"
+        local handle = lurek.filesystem.writeAsync(path, payload)
+
+        local status, info
+        for _ = 1, 1000 do
+            status, info = lurek.filesystem.pollAsyncWrite(handle)
+            if status ~= "pending" then break end
+        end
+
+        expect_type("string", status)
+        expect_true(status == "done" or status == "pending",
+            "status must be 'done' or 'pending', got: " .. tostring(status))
+
+        if status == "done" then
+            expect_equal(tostring(#payload), info)
+            expect_equal(payload, lurek.filesystem.read(path))
+        end
+    end)
+
+    -- @covers lurek.filesystem.writeAsync
+    it("writeAsync rejects paths outside save", function()
+        expect_error(function()
+            lurek.filesystem.writeAsync("outside_async_write.txt", "x")
+        end)
+    end)
+end)
+
 -- mount / unmount / load
 
 -- @describe lurek.filesystem.mount / unmount / load
@@ -1022,6 +1064,18 @@ describe("filesystem strict: LZipMount contains / prefix / type / typeOf", funct
         else
             expect_true(true)
         end
+    end)
+end)
+
+-- @describe filesystem strict: binary reads
+describe("filesystem strict: binary reads", function()
+    -- @covers lurek.filesystem.readBytes
+    -- @covers lurek.filesystem.write
+    it("readBytes returns a binary string", function()
+        lurek.filesystem.write(TMP .. "read_bytes.txt", "abc")
+        local bytes = lurek.filesystem.readBytes(TMP .. "read_bytes.txt")
+        expect_type("string", bytes)
+        expect_true(#bytes >= 3)
     end)
 end)
 

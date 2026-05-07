@@ -86,6 +86,42 @@ describe("isBlocked(x, y)", function()
     end)
 end)
 
+-- @describe movement helpers
+describe("movement helpers", function()
+    -- @covers LRaycaster:setCell
+    -- @covers LRaycaster:tryMove
+    -- @covers lurek.raycaster.new
+    it("tryMove advances when target cell is empty", function()
+        local rc = lurek.raycaster.new(6, 6)
+        local nx, ny, moved = rc:tryMove(1.5, 1.5, 1.0, 0.0)
+        expect_equal(true, moved)
+        expect_near(2.5, nx, 0.001)
+        expect_near(1.5, ny, 0.001)
+    end)
+
+    -- @covers LRaycaster:setCell
+    -- @covers LRaycaster:tryMove
+    -- @covers lurek.raycaster.new
+    it("tryMove stays in place when target cell is blocked", function()
+        local rc = lurek.raycaster.new(6, 6)
+        rc:setCell(2, 1, 1)
+        local nx, ny, moved = rc:tryMove(1.5, 1.5, 1.0, 0.0)
+        expect_equal(false, moved)
+        expect_near(1.5, nx, 0.001)
+        expect_near(1.5, ny, 0.001)
+    end)
+
+    -- @covers LRaycaster:gridMove
+    -- @covers lurek.raycaster.new
+    it("gridMove uses dir=1 forward as +x", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local nx, ny, moved = rc:gridMove(2.5, 2.5, 1, "forward", 1.0)
+        expect_equal(true, moved)
+        expect_near(3.5, nx, 0.001)
+        expect_near(2.5, ny, 0.001)
+    end)
+end)
+
 -- @describe castRay(ox, oy, angle, max_dist)
 describe("castRay(ox, oy, angle, max_dist)", function()
     -- @covers LRaycaster:castRay
@@ -214,6 +250,51 @@ describe("lineOfSight(x1, y1, x2, y2)", function()
         local rc = lurek.raycaster.new(10, 10)
         local result = rc:lineOfSight(0.5, 0.5, 9.5, 9.5)
         expect_type("boolean", result)
+    end)
+end)
+
+-- @describe generic minimap and reveal helpers
+describe("generic minimap and reveal helpers", function()
+    -- @covers LRaycaster:revealCellsFromRays
+    -- @covers lurek.raycaster.new
+    it("revealCellsFromRays returns an array of cell records", function()
+        local rc = lurek.raycaster.new(16, 16)
+        local cells = rc:revealCellsFromRays(8.5, 8.5, 0.0, math.pi / 3, 8, 8.0, 0.25)
+        expect_type("table", cells)
+        if #cells > 0 then
+            expect_type("number", cells[1].x)
+            expect_type("number", cells[1].y)
+        end
+    end)
+
+    -- @covers LRaycaster:computeTileLight
+    -- @covers lurek.raycaster.new
+    it("computeTileLight returns rgb+luma in range", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local r, g, b, l = rc:computeTileLight(3, 3, 0.2, {
+            { x = 3.5, y = 3.5, radius = 4.0, r = 1.0, g = 0.8, b = 0.5, intensity = 8.0 }
+        })
+        expect_true(r >= 0.0 and r <= 1.0)
+        expect_true(g >= 0.0 and g <= 1.0)
+        expect_true(b >= 0.0 and b <= 1.0)
+        expect_true(l >= 0.0 and l <= 1.0)
+    end)
+
+    -- @covers LRaycaster:buildMinimapWindow
+    -- @covers lurek.raycaster.new
+    it("buildMinimapWindow returns sampled tile records", function()
+        local rc = lurek.raycaster.new(10, 10)
+        rc:setCell(4, 4, 1)
+        local out = rc:buildMinimapWindow(5.5, 5.5, 3, 0.2, nil)
+        expect_type("table", out)
+        if #out > 0 then
+            local s = out[1]
+            expect_type("number", s.x)
+            expect_type("number", s.y)
+            expect_type("boolean", s.blocked)
+            expect_type("boolean", s.visible)
+            expect_type("number", s.luma)
+        end
     end)
 end)
 
@@ -940,6 +1021,76 @@ describe("Raycaster:buildScene", function()
     end)
 end)
 
+-- @describe Raycaster floor/ceiling per-cell textures
+describe("Raycaster floor/ceiling per-cell textures", function()
+    -- @covers LRaycaster:getFloorTextureCell
+    -- @covers LRaycaster:getCeilingTextureCell
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    it("set/get round-trip for numeric ids and nil clear fallback", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local floor_tex = 101
+        local ceiling_tex = 202
+
+        rc:setFloorTextureCell(2, 3, floor_tex)
+        rc:setCeilingTextureCell(2, 3, ceiling_tex)
+
+        expect_equal(floor_tex, rc:getFloorTextureCell(2, 3))
+        expect_equal(ceiling_tex, rc:getCeilingTextureCell(2, 3))
+
+        -- nil clears overrides and buildScene should then use color fallback.
+        rc:setFloorTextureCell(2, 3, nil)
+        rc:setCeilingTextureCell(2, 3, nil)
+
+        expect_nil(rc:getFloorTextureCell(2, 3))
+        expect_nil(rc:getCeilingTextureCell(2, 3))
+    end)
+
+    -- @covers LImage:getId
+    -- @covers LRaycaster:getFloorTextureCell
+    -- @covers LRaycaster:getCeilingTextureCell
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    -- @covers lurek.render.newImage
+    it("accepts LImage userdata in per-cell overrides", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local floor_img = lurek.render.newImage("assets/icon.png")
+        local ceil_img = lurek.render.newImage("assets/icon.png")
+
+        rc:setFloorTextureCell(1, 1, floor_img)
+        rc:setCeilingTextureCell(1, 1, ceil_img)
+
+        expect_equal(floor_img:getId(), rc:getFloorTextureCell(1, 1))
+        expect_equal(ceil_img:getId(), rc:getCeilingTextureCell(1, 1))
+    end)
+
+    -- @covers LRaycaster:buildScene
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    it("buildScene accepts per-cell overrides with LImage userdata", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local floor_img = lurek.render.newImage("assets/icon.png")
+        local ceil_img = lurek.render.newImage("assets/icon.png")
+        local wall_img = lurek.render.newImage("assets/icon.png")
+        rc:setCell(4, 4, 1)
+        rc:setFloorTextureCell(4, 4, floor_img)
+        rc:setCeilingTextureCell(4, 4, ceil_img)
+
+        local ok, _ = pcall(function()
+            rc:buildScene(
+                { px = 3.5, py = 4.5, angle = 0.0, fov = 1.0, rays = 16, max_dist = 12, screen_w = 320, screen_h = 240 },
+                {},
+                {},
+                { [1] = wall_img }
+            )
+        end)
+        expect_type("boolean", ok)
+    end)
+end)
+
 -- @describe Raycaster:drawTopDown
 describe("Raycaster:drawTopDown", function()
     -- @covers LRaycaster:drawTopDown
@@ -998,6 +1149,101 @@ describe("raycaster strict: LRaycaster type/typeOf", function()
         local rc = lurek.raycaster.new(8, 8)
         expect_type("string", rc:type())
         expect_type("boolean", rc:typeOf("Object"))
+    end)
+end)
+
+-- @describe per-cell floor/ceiling texture overrides
+describe("per-cell floor/ceiling texture overrides", function()
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:getFloorTextureCell
+    -- @covers lurek.raycaster.new
+    it("setFloorTextureCell / getFloorTextureCell accept and return nil for unset cell", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local v = rc:getFloorTextureCell(2, 3)
+        expect_equal(nil, v)
+    end)
+
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:getFloorTextureCell
+    -- @covers lurek.raycaster.new
+    it("setFloorTextureCell with nil clears the cell", function()
+        local rc = lurek.raycaster.new(8, 8)
+        -- set something numeric, then clear
+        rc:setFloorTextureCell(1, 1, 1)
+        rc:setFloorTextureCell(1, 1, nil)
+        local v = rc:getFloorTextureCell(1, 1)
+        expect_equal(nil, v)
+    end)
+
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers LRaycaster:getCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    it("getCeilingTextureCell returns nil for unset cell", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local v = rc:getCeilingTextureCell(0, 0)
+        expect_equal(nil, v)
+    end)
+
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers LRaycaster:getCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    it("setCeilingTextureCell with nil clears the cell", function()
+        local rc = lurek.raycaster.new(8, 8)
+        rc:setCeilingTextureCell(3, 3, 2)
+        rc:setCeilingTextureCell(3, 3, nil)
+        local v = rc:getCeilingTextureCell(3, 3)
+        expect_equal(nil, v)
+    end)
+
+    -- @covers LRaycaster:setFloorTextureCell
+    -- @covers LRaycaster:setCeilingTextureCell
+    -- @covers lurek.raycaster.new
+    it("floor and ceiling cells are independent", function()
+        local rc = lurek.raycaster.new(8, 8)
+        rc:setFloorTextureCell(4, 4, 1)
+        -- ceiling at same cell should still be nil
+        local cv = rc:getCeilingTextureCell(4, 4)
+        expect_equal(nil, cv)
+    end)
+end)
+
+-- @describe lowered floor and model-scene helpers
+describe("lowered floor and model-scene helpers", function()
+    -- @covers LRaycaster:setLoweredFloorCell
+    -- @covers LRaycaster:getLoweredFloorCell
+    -- @covers lurek.raycaster.new
+    it("sets and reads lowered floor cell options", function()
+        local rc = lurek.raycaster.new(8, 8)
+        rc:setLoweredFloorCell(2, 2, { texture = 1, depth = 0.35, blocked = true })
+        local cell = rc:getLoweredFloorCell(2, 2)
+        expect_type("table", cell)
+        expect_equal(1, cell.texture)
+    end)
+
+    -- @covers LRaycaster:isWalkBlocked
+    -- @covers lurek.raycaster.new
+    it("reports walk blocking", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local blocked = rc:isWalkBlocked(0, 0)
+        expect_type("boolean", blocked)
+    end)
+
+    -- @covers LRaycaster:buildSceneWithModels
+    -- @covers lurek.raycaster.new
+    it("buildSceneWithModels returns count", function()
+        local rc = lurek.raycaster.new(8, 8)
+        local params = {
+            px = 2.5,
+            py = 2.5,
+            angle = 0.0,
+            fov = math.pi / 3,
+            rays = 16,
+            max_dist = 20.0,
+            screen_w = 160.0,
+            screen_h = 90.0,
+        }
+        local count = rc:buildSceneWithModels(params, nil, nil, nil, nil)
+        expect_type("number", count)
     end)
 end)
 

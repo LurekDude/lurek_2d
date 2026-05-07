@@ -119,7 +119,9 @@ Common workspace tasks (see [.vscode/tasks.json](../.vscode/tasks.json)) — inv
 | `Build: Release`                   | `python tools/dev/parallel_cargo.py build release`                                  |
 | `▶ Run: Debug (no rebuild)`        | Launch `build/debug/lurek2d` without rebuilding                                     |
 | `▶ Run: Release (no rebuild)`      | Launch `build/release/lurek2d` without rebuilding                                   |
-| `Test: All`                        | `python tools/dev/parallel_cargo.py test rust` then `test lua`                      |
+| `Test: All`                        | `python tools/dev/parallel_cargo.py test rust-full` then `test lua`                 |
+| `Test: Rust`                       | `python tools/dev/parallel_cargo.py test rust` (fast suite, excludes slow targets)  |
+| `Test: Rust Full`                  | `python tools/dev/parallel_cargo.py test rust-full` (includes slow load/smoke)      |
 | `Test: Math / Physics / Graphics …`| `python tools/dev/parallel_cargo.py test target <module>_tests`                     |
 | `Quality: Clippy`                  | `python tools/dev/parallel_cargo.py clippy --deny-warnings`                         |
 | `Quality: Format Check`            | `python tools/dev/parallel_cargo.py fmt check`                                      |

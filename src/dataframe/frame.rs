@@ -11,6 +11,8 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
+use crate::dataframe::rng::Xorshift64;
+
 /// A single cell value in a DataFrame column.
 ///
 /// # Variants
@@ -153,44 +155,6 @@ pub struct DataFrame {
 /// - `tables` — `HashMap<String`.
 pub struct Database {
     tables: HashMap<String, DataFrame>,
-}
-
-// ---------------------------------------------------------------------------
-// Simple xorshift64 RNG for deterministic random data generation
-// ---------------------------------------------------------------------------
-
-/// Minimal xorshift64 PRNG for deterministic data generation.
-struct Xorshift64 {
-    state: u64,
-}
-
-impl Xorshift64 {
-    /// Create a new RNG with the given seed. Seed of 0 is replaced with 1.
-    fn new(seed: u64) -> Self {
-        Self {
-            state: if seed == 0 { 1 } else { seed },
-        }
-    }
-
-    /// Return the next pseudo-random u64.
-    fn next_u64(&mut self) -> u64 {
-        let mut x = self.state;
-        x ^= x << 13;
-        x ^= x >> 7;
-        x ^= x << 17;
-        self.state = x;
-        x
-    }
-
-    /// Return a random f64 in [0, 1).
-    fn next_f64(&mut self) -> f64 {
-        (self.next_u64() & 0x001F_FFFF_FFFF_FFFF) as f64 / (1u64 << 53) as f64
-    }
-
-    /// Return a random usize in [0, max).
-    fn next_usize(&mut self, max: usize) -> usize {
-        (self.next_u64() % max as u64) as usize
-    }
 }
 
 // ---------------------------------------------------------------------------
@@ -480,6 +444,44 @@ impl DataFrame {
     /// matching lengths, and all column vectors must have the same length.
     pub fn from_raw(column_names: Vec<String>, data: Vec<Vec<CellValue>>) -> Self {
         Self { column_names, data }
+    }
+
+    /// Create a DataFrame from row-major values using explicit column names.
+    ///
+    /// # Parameters
+    /// - `column_names` — `Vec<String>`.
+    /// - `rows` — `Vec<Vec<CellValue>>`.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
+    ///
+    /// All rows must have exactly `column_names.len()` cells.
+    pub fn from_rows(column_names: Vec<String>, rows: Vec<Vec<CellValue>>) -> Result<Self, String> {
+        if column_names.is_empty() {
+            if rows.is_empty() {
+                return Ok(Self::new());
+            }
+            return Err("from_rows: column_names cannot be empty when rows are provided".to_string());
+        }
+
+        for (i, row) in rows.iter().enumerate() {
+            if row.len() != column_names.len() {
+                return Err(format!(
+                    "from_rows: row {i} has {} values but expected {}",
+                    row.len(),
+                    column_names.len()
+                ));
+            }
+        }
+
+        let mut data = vec![Vec::with_capacity(rows.len()); column_names.len()];
+        for row in rows {
+            for (ci, cell) in row.into_iter().enumerate() {
+                data[ci].push(cell);
+            }
+        }
+
+        Ok(Self::from_raw(column_names, data))
     }
 
     /// Get a reference to the underlying column-major data.

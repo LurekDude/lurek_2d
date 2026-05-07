@@ -11,29 +11,9 @@
 
 ## Summary
 
-## Summary
+The `pathfind` module is documented from the current source tree and existing module reference data.
 
-The `pathfind` module is Lurek2D's comprehensive pathfinding library — a Feature Systems tier module providing grid-based, hex-based, isometric, hierarchical, flow-field, and abstract graph pathfinding for games of any scale and topology. All computation is CPU-only and fully headless for testing.
-
-**Navigation grids.** `NavGrid` is a 2D walkability and cost grid with per-cell integer weights and four configurable diagonal movement modes (none, always, no-corner-cut, only-corner-cut). A\* search is implemented in `astar.rs` via `astar(grid, start, end)` returning a `Vec<(i32, i32)>` optimal path using an octile heuristic. Jump Point Search (JPS) in `jps.rs` provides near-equivalent results on uniform-cost grids with drastically fewer node expansions. `PathGrid` in `pathgrid.rs` offers an alternative float-cost grid with caching and built-in path operations.
-
-**Flow fields.** `flow_field(grid, target)` in `flow_field.rs` precomputes a per-cell direction vector grid toward a target position using Dijkstra propagation. `FlowField` results are shared across many agents: each agent queries only its current cell for a steering direction, eliminating per-agent path costs for crowds. `ai_flow_field.rs` provides a simplified BFS-style variant for lightweight AI movement support. The `ai` module re-exports these types through `lurek.ai.*` so the crowd steering API has a single Lua-facing surface.
-
-**Range and influence maps.** `RangeMap` in `range_map.rs` computes all cells reachable within a movement budget (Dijkstra with cost accumulation), powering turn-based movement previews and skill ranges. `InfluenceMap` in `influence_map.rs` is a multi-layer spatial float grid for strategic area analysis: threat maps, resource maps, contested zone pressure, and unit visibility heatmaps. Multiple named layers share the same grid dimensions and are queried independently.
-
-**Hierarchical pathfinding.** `hpa.rs` clusters the navigation grid into rectangular `Chunk` regions with pre-computed `AbstractNode` entrance points and `AbstractEdge` inter-cluster weights. `AbstractGraph` enables HPA* planning: first an abstract path is found in the cluster graph (fast), then each abstract segment is refined locally with standard A\* (precise). This scales to maps of 1000x1000 cells without per-frame full-grid searches.
-
-**Non-grid navigation.** `graph_path.rs` runs A\* and Dijkstra range queries on abstract `Graph<N, f32>` instances for province-level and world-map navigation. `ProvincePath` and `ProvinceCostFn` provide a typed wrapper. Hex pathfinding is in `hex_grid.rs` (axial coordinates, configurable cost, LOS, FOV, and range-of-movement). Isometric pathfinding is in `iso_grid.rs` (diamond topology, 4-directional, walkability mask).
-
-**Bidirectional search.** `bidir.rs` introduces `BidirSearch`, a bidirectional A\* that searches simultaneously from start and goal, halving the effective search space on large navigation grids. Particularly effective when start and goal are far apart and the grid is dense.
-
-**Unit pathfinder.** `UnitPathfinder` in `unit_pathfinder.rs` wraps pathfinding for unit-sized actors with caching, partial path reuse, and nearest-walkable recovery when the exact goal is unwalkable. Designed for game-code use where the caller wants a single `findPath(start, goal)` call without managing grid details.
-
-**Background pathfinding.** `PathThreadPool` in `async_pool.rs` dispatches `NavGrid` path queries to a worker pool, returning futures polled via `poll()`. This keeps heavy pathfinding off the main Lua thread for large scenes.
-
-**Lua surface.** `lurek.pathfind.newGrid(w, h)` creates a `NavGrid`. Methods: `setWalkable(x, y, bool)`, `setCost(x, y, cost)`, `findPath(sx, sy, gx, gy, opts)` → path array, `flowField(tx, ty)` → FlowField userdata, `rangeMap(sx, sy, budget)` → RangeMap userdata. Path filtering via `opts.avoid`, `opts.prefer`. Influence: `lurek.pathfind.newInfluenceMap(layers, w, h)`. Hex: `lurek.pathfind.newHexGrid(w, h, layout)`. Graph: `lurek.pathfind.newGraph()` with `addNode`, `addEdge`, `findPath`.
-
-**Scope boundary.** Feature Systems tier. Depends on `math`, `graph`, `runtime`. The `ai` module re-exports `FlowField`, `Cell`, and `PathGrid` from here. Lua bridge in `src/lua_api/pathfind_api.rs`.
+This module primarily collaborates with `graph`, `image`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -249,73 +229,102 @@ The `pathfind` module is Lurek2D's comprehensive pathfinding library — a Featu
 - `lurek.pathfind.newJpsGrid`: Creates a uniform-cost grid optimised for Jump Point Search (orthogonal + diagonal).
 - `lurek.pathfind.rangeMap`: Computes a Dijkstra range-of-movement map from an origin within a movement budget.
 
-### `AiFlowField` Methods
-- `AiFlowField:getWidth`: Returns the flow field grid width in cells.
-- `AiFlowField:getHeight`: Returns the flow field grid height in cells.
-- `AiFlowField:hasGoal`: Returns true if a goal has been set.
-- `AiFlowField:setGoal`: Sets the goal cell and triggers BFS recomputation (1-based coordinates).
-- `AiFlowField:getDirection`: Returns the normalised direction toward the goal (1-based coordinates).
-- `AiFlowField:getDistance`: Returns the BFS distance to the goal (1-based coordinates).
-- `AiFlowField:type`: Returns the type name of this object.
-- `AiFlowField:typeOf`: Returns true if this object is of the given type.
+### `LAIFlowField` Methods
+- `LAIFlowField:getWidth`: Returns the flow field grid width in cells.
+- `LAIFlowField:getHeight`: Returns the flow field grid height in cells.
+- `LAIFlowField:hasGoal`: Returns true if a goal has been set.
+- `LAIFlowField:setGoal`: Sets the goal cell and triggers BFS recomputation (1-based coordinates).
+- `LAIFlowField:getGoal`: Returns the goal cell (1-based coordinates) or nil if unset.
+- `LAIFlowField:getDirection`: Returns the normalised direction toward the goal (1-based coordinates).
+- `LAIFlowField:getDistance`: Returns the BFS distance to the goal (1-based coordinates).
+- `LAIFlowField:type`: Returns the type name of this object.
+- `LAIFlowField:typeOf`: Returns true if this object is of the given type.
 
-### `FlowField` Methods
-- `FlowField:getDirection`: Returns the normalised direction vector at a cell (1-based coordinates).
-- `FlowField:getDirectionAngle`: Returns the flow direction as an angle in radians (1-based coordinates).
-- `FlowField:getCostToTarget`: Returns the integrated cost to the nearest target (1-based coordinates).
-- `FlowField:isCalculated`: Returns true if the flow field has been computed at least once.
-- `FlowField:getTargets`: Returns the target cells from the most recent computation (1-based coordinates).
-- `FlowField:type`: Returns the type name of this object.
-- `FlowField:typeOf`: Returns true if this object is of the given type.
+### `LFlowField` Methods
+- `LFlowField:calculate`: Computes the flow field toward a single target (1-based coordinates).
+- `LFlowField:calculateMulti`: Computes the flow field toward multiple targets (1-based coordinates).
+- `LFlowField:getDirection`: Returns the normalised direction vector at a cell (1-based coordinates).
+- `LFlowField:getDirectionAngle`: Returns the flow direction as an angle in radians (1-based coordinates).
+- `LFlowField:getCostToTarget`: Returns the integrated cost to the nearest target (1-based coordinates).
+- `LFlowField:isCalculated`: Returns true if the flow field has been computed at least once.
+- `LFlowField:getTargets`: Returns the target cells from the most recent computation (1-based coordinates).
+- `LFlowField:steer`: Converts a world-space position into a velocity vector via the flow field.
+- `LFlowField:type`: Returns the type name of this object.
+- `LFlowField:typeOf`: Returns true if this object is of the given type.
 
-### `HexGrid` Methods
-- `HexGrid:setCost`: Set movement cost for a cell (1-based coordinates).
-- `HexGrid:isBlocked`: Returns true if a cell is blocked (1-based coordinates).
+### `LHexGrid` Methods
+- `LHexGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
+- `LHexGrid:setCost`: Set movement cost for a cell (1-based coordinates).
+- `LHexGrid:isBlocked`: Returns true if a cell is blocked (1-based coordinates).
+- `LHexGrid:findPath`: Find A* path between two cells (1-based coordinates).
+- `LHexGrid:lineOfSight`: Returns true if there is an unobstructed line between two cells (1-based).
+- `LHexGrid:fieldOfView`: Returns all cells visible from origin within max_range (1-based coordinates).
+- `LHexGrid:rangeOfMovement`: Returns all cells reachable from origin within movement budget (1-based).
+- `LHexGrid:distance`: Hex-distance between two cells.
+- `LHexGrid:type`: Returns the type name of this object.
+- `LHexGrid:typeOf`: Returns true if this object is of the given type.
 
-### `JpsGrid` Methods
-- `JpsGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
+### `LJpsGrid` Methods
+- `LJpsGrid:setBlocked`: Mark/unmark a cell as blocked (1-based coordinates).
+- `LJpsGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
+- `LJpsGrid:findPath`: Find a JPS path between two cells (1-based coordinates).
+- `LJpsGrid:type`: Returns the type name of this object.
+- `LJpsGrid:typeOf`: Returns true if this object is of the given type.
 
-### `NavGrid` Methods
-- `NavGrid:getWidth`: Returns the grid width in cells.
-- `NavGrid:getHeight`: Returns the grid height in cells.
-- `NavGrid:getDimensions`: Returns the grid dimensions as width, height.
-- `NavGrid:setCost`: Sets the traversal cost of a cell (1-based coordinates).
-- `NavGrid:getCost`: Returns the traversal cost of a cell (1-based coordinates).
-- `NavGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
-- `NavGrid:fill`: Sets every cell to the given cost.
-- `NavGrid:loadFromString`: Overwrites the grid from a raw byte string (row-major, one byte per cell).
-- `NavGrid:saveToString`: Exports the cost grid as a byte string (row-major, one byte per cell).
-- `NavGrid:setChunkSize`: Sets the HPA★ chunk size.
-- `NavGrid:getChunkSize`: Returns the current HPA★ chunk size.
-- `NavGrid:rebuildAbstract`: Rebuilds the HPA★ abstract graph from the current grid state.
-- `NavGrid:setDirty`: Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
-- `NavGrid:clearDirty`: Clears all pending dirty rectangles.
-- `NavGrid:setDiagonalMode`: Sets the diagonal movement mode.
-- `NavGrid:getDiagonalMode`: Returns the current diagonal movement mode as a string.
-- `NavGrid:type`: Returns the type name of this object.
-- `NavGrid:typeOf`: Returns true if this object is of the given type.
+### `LNavGrid` Methods
+- `LNavGrid:getWidth`: Returns the grid width in cells.
+- `LNavGrid:getHeight`: Returns the grid height in cells.
+- `LNavGrid:getDimensions`: Returns the grid dimensions as width, height.
+- `LNavGrid:setCost`: Sets the traversal cost of a cell (1-based coordinates).
+- `LNavGrid:getCost`: Returns the traversal cost of a cell (1-based coordinates).
+- `LNavGrid:setBlocked`: Marks a cell as blocked or unblocked (1-based coordinates).
+- `LNavGrid:isBlocked`: Returns true if the cell is blocked (1-based coordinates).
+- `LNavGrid:isWalkable`: Returns true if a unit footprint is fully walkable (1-based coordinates).
+- `LNavGrid:fill`: Sets every cell to the given cost.
+- `LNavGrid:fillRect`: Sets all cells in a rectangle to the given cost (1-based coordinates).
+- `LNavGrid:loadFromString`: Overwrites the grid from a raw byte string (row-major, one byte per cell).
+- `LNavGrid:saveToString`: Exports the cost grid as a byte string (row-major, one byte per cell).
+- `LNavGrid:setChunkSize`: Sets the HPA★ chunk size.
+- `LNavGrid:getChunkSize`: Returns the current HPA★ chunk size.
+- `LNavGrid:rebuildAbstract`: Rebuilds the HPA★ abstract graph from the current grid state.
+- `LNavGrid:setDirty`: Records a dirty rectangle for incremental HPA★ updates (1-based coordinates).
+- `LNavGrid:clearDirty`: Clears all pending dirty rectangles.
+- `LNavGrid:setDiagonalMode`: Sets the diagonal movement mode.
+- `LNavGrid:getDiagonalMode`: Returns the current diagonal movement mode as a string.
+- `LNavGrid:type`: Returns the type name of this object.
+- `LNavGrid:typeOf`: Returns true if this object is of the given type.
 
-### `PathGrid` Methods
-- `PathGrid:getWidth`: Returns the grid width in cells.
-- `PathGrid:getHeight`: Returns the grid height in cells.
-- `PathGrid:getCellSize`: Returns the world-space size of each cell.
-- `PathGrid:setWalkable`: Sets the walkability of a cell (1-based coordinates).
-- `PathGrid:isWalkable`: Returns true if a cell is walkable (1-based coordinates).
-- `PathGrid:setCost`: Sets the cost multiplier for a cell (1-based coordinates).
-- `PathGrid:getCost`: Returns the cost multiplier for a cell (1-based coordinates).
-- `PathGrid:type`: Returns the type name of this object.
-- `PathGrid:typeOf`: Returns true if this object is of the given type.
+### `LPathGrid` Methods
+- `LPathGrid:getWidth`: Returns the grid width in cells.
+- `LPathGrid:getHeight`: Returns the grid height in cells.
+- `LPathGrid:getCellSize`: Returns the world-space size of each cell.
+- `LPathGrid:setWalkable`: Sets the walkability of a cell (1-based coordinates).
+- `LPathGrid:isWalkable`: Returns true if a cell is walkable (1-based coordinates).
+- `LPathGrid:setCost`: Sets the cost multiplier for a cell (1-based coordinates).
+- `LPathGrid:getCost`: Returns the cost multiplier for a cell (1-based coordinates).
+- `LPathGrid:findPath`: Finds an A★ path returning world-space waypoints (1-based coordinates).
+- `LPathGrid:findPathSmoothed`: Finds a smoothed A★ path with string-pulling (1-based coordinates).
+- `LPathGrid:type`: Returns the type name of this object.
+- `LPathGrid:typeOf`: Returns true if this object is of the given type.
 
-### `UnitPathfinder` Methods
-- `UnitPathfinder:getPathLength`: Returns the euclidean length of a path table.
-- `UnitPathfinder:getPathCost`: Returns the sum of grid traversal costs along a path.
-- `UnitPathfinder:setCacheEnabled`: Enables or disables path result caching.
-- `UnitPathfinder:isCacheEnabled`: Returns true if path result caching is enabled.
-- `UnitPathfinder:clearCache`: Removes all cached path results.
-- `UnitPathfinder:getCacheSize`: Returns the number of entries in the path cache.
-- `UnitPathfinder:setCacheMaxSize`: Sets the maximum number of cached path entries.
-- `UnitPathfinder:type`: Returns the type name of this object.
-- `UnitPathfinder:typeOf`: Returns true if this object is of the given type.
+### `LUnitPathfinder` Methods
+- `LUnitPathfinder:findPath`: Finds an A★ path between two cells (1-based coordinates).
+- `LUnitPathfinder:findPathSmooth`: Finds a Theta★ smoothed path between two cells (1-based coordinates).
+- `LUnitPathfinder:findPathBidirectional`: Finds a path with bidirectional A★ between two cells.
+- `LUnitPathfinder:getPathLength`: Returns the euclidean length of a path table.
+- `LUnitPathfinder:getPathCost`: Returns the sum of grid traversal costs along a path.
+- `LUnitPathfinder:findPartialPath`: Finds a partial path with a node expansion limit (1-based coordinates).
+- `LUnitPathfinder:findNearestWalkable`: Finds the nearest walkable cell within a radius (1-based coordinates).
+- `LUnitPathfinder:isReachable`: Returns true if a path exists between two cells (1-based coordinates).
+- `LUnitPathfinder:heuristicDistance`: Returns the octile heuristic distance between two cells (1-based coordinates).
+- `LUnitPathfinder:lineOfSight`: Returns true if there is a clear line of sight between two cells (1-based coordinates).
+- `LUnitPathfinder:setCacheEnabled`: Enables or disables path result caching.
+- `LUnitPathfinder:isCacheEnabled`: Returns true if path result caching is enabled.
+- `LUnitPathfinder:clearCache`: Removes all cached path results.
+- `LUnitPathfinder:getCacheSize`: Returns the number of entries in the path cache.
+- `LUnitPathfinder:setCacheMaxSize`: Sets the maximum number of cached path entries.
+- `LUnitPathfinder:type`: Returns the type name of this object.
+- `LUnitPathfinder:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

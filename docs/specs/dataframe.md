@@ -50,8 +50,8 @@ The `dataframe` module is Lurek2D's in-memory column-major tabular data system â
 - `mod.rs`: Declares the dataframe submodules and re-exports the main table and database types, plus `VecFrame` and its op enums.
 - `query.rs`: Implements most table-manipulation behavior such as filtering, sorting, slicing, projection, grouping, joins, sampling, nil handling, and numeric summary statistics.
 - `serial.rs`: Handles DataFrame serialization and parsing for CSV, JSON, LVDF binary, and printable string-table output.
-- `vectorized.rs`: Provides `VecFrame` (typed flat-buffer columns), `ColumnStore`, and the scalar/binary/reduce/cmp op enums for bulk vectorized processing.
 - `sql.rs`: Implements the hand-written SQL tokenizer, parser, expression evaluator, and execution engine for single-table and multi-table queries.
+- `vectorized.rs`: Provides `VecFrame` (typed flat-buffer columns), `ColumnStore`, and the scalar/binary/reduce/cmp op enums for bulk vectorized processing.
 
 ## Types
 
@@ -60,6 +60,12 @@ The `dataframe` module is Lurek2D's in-memory column-major tabular data system â
 - `DataFrame` (`struct`, `frame.rs`): Core column-major table type with named columns and query methods. Most module behavior is expressed as methods on this type.
 - `Database` (`struct`, `frame.rs`): Named collection of DataFrames used for multi-table workflows and SQL joins. It is deliberately small and acts as a query catalog rather than a storage engine.
 - `AggFn` (`enum`, `frame.rs`): Aggregation function variants for group-by and pivot operations.
+- `ColumnStore` (`enum`, `vectorized.rs`): Typed flat-buffer column with an optional null/validity bitmap.
+- `ScalarOp` (`enum`, `vectorized.rs`): Scalar arithmetic operation applied element-wise to an entire column.
+- `BinaryOp` (`enum`, `vectorized.rs`): Element-wise binary operation between two Float64 columns.
+- `ReduceOp` (`enum`, `vectorized.rs`): Column-level reduction operations.
+- `CmpOp` (`enum`, `vectorized.rs`): Comparison operator used in `VecFrame::filter_mask`.
+- `VecFrame` (`struct`, `vectorized.rs`): Typed-column vectorized DataFrame.
 
 ## Functions
 
@@ -86,6 +92,7 @@ The `dataframe` module is Lurek2D's in-memory column-major tabular data system â
 - `DataFrame::clone_df` (`frame.rs`): Deep-clone this DataFrame.
 - `DataFrame::column_data_mut` (`frame.rs`): Return a mutable reference to a column's cell data, resolved by `ColRef`.
 - `DataFrame::from_raw` (`frame.rs`): Create a DataFrame from raw column names and column-major data.
+- `DataFrame::from_rows` (`frame.rs`): Create a DataFrame from explicit column names plus row-major values.
 - `DataFrame::raw_data` (`frame.rs`): Get a reference to the underlying column-major data.
 - `DataFrame::random` (`frame.rs`): Generate a DataFrame with random data.
 - `DataFrame::with_eval` (`frame.rs`): Creates a new `DataFrame` with an extra computed column.
@@ -156,6 +163,32 @@ The `dataframe` module is Lurek2D's in-memory column-major tabular data system â
 - `Database::to_json` (`serial.rs`): Serialize all tables to a JSON object string.
 - `query_sql` (`sql.rs`): Execute a SQL query on a single DataFrame.
 - `query_sql_database` (`sql.rs`): Execute a SQL query on a Database (supports FROM and JOIN).
+- `ColumnStore::dtype_name` (`vectorized.rs`): Return the dtype name as a static string slice.
+- `ColumnStore::len` (`vectorized.rs`): Return the number of rows in this column.
+- `ColumnStore::is_empty` (`vectorized.rs`): Return `true` if the column has zero rows.
+- `ColumnStore::is_valid` (`vectorized.rs`): Return `true` if row `i` is valid (not null).
+- `ColumnStore::valid_f64s` (`vectorized.rs`): Collect valid (non-null) f64 values from a Float64 column.
+- `ColumnStore::filter` (`vectorized.rs`): Filter rows by a boolean mask, returning a new `ColumnStore`.
+- `ScalarOp::parse` (`vectorized.rs`): Parse a string into a `ScalarOp`.
+- `BinaryOp::parse` (`vectorized.rs`): Parse a string into a `BinaryOp`.
+- `ReduceOp::parse` (`vectorized.rs`): Parse a string into a `ReduceOp`.
+- `CmpOp::parse` (`vectorized.rs`): Parse a string into a `CmpOp`.
+- `VecFrame::new` (`vectorized.rs`): Create an empty `VecFrame` with no columns.
+- `VecFrame::nrows` (`vectorized.rs`): Return the number of rows.
+- `VecFrame::ncols` (`vectorized.rs`): Return the number of columns.
+- `VecFrame::columns` (`vectorized.rs`): Return a slice of column names.
+- `VecFrame::col_type` (`vectorized.rs`): Return the dtype name for a column, or `None` if the column is not found.
+- `VecFrame::from_dataframe` (`vectorized.rs`): Convert a [`DataFrame`] into a `VecFrame`.
+- `VecFrame::to_dataframe` (`vectorized.rs`): Convert this `VecFrame` back to a [`DataFrame`].
+- `VecFrame::col_scalar_op` (`vectorized.rs`): Apply a scalar operation to every element of a Float64 column in-place.
+- `VecFrame::col_clamp` (`vectorized.rs`): Clamp every element of a Float64 column to `[min_val, max_val]` in-place.
+- `VecFrame::col_binary_op` (`vectorized.rs`): Compute `out_col[i] = left_col[i] op right_col[i]` for every row, storing the result in a new column named `out_col`.
+- `VecFrame::col_reduce` (`vectorized.rs`): Reduce an entire Float64 column to a single scalar.
+- `VecFrame::filter_mask` (`vectorized.rs`): Build a boolean row mask for `col[i] op val`.
+- `VecFrame::apply_mask` (`vectorized.rs`): Return a new `VecFrame` containing only the rows where `mask[i]` is `true`.
+- `VecFrame::col_cast` (`vectorized.rs`): Cast a column to a new type.
+- `VecFrame::par_reduce` (`vectorized.rs`): Reduce multiple columns in parallel using `rayon`, returning a map of column name â†’ result.
+- `VecFrame::par_scalar_op` (`vectorized.rs`): Apply a scalar operation in parallel to multiple Float64 columns.
 
 ## Lua API Reference
 
@@ -166,75 +199,130 @@ The `dataframe` module is Lurek2D's in-memory column-major tabular data system â
 - `lurek.dataframe.newDataFrame`: Creates a new empty DataFrame.
 - `lurek.dataframe.newDatabase`: Creates a new empty Database.
 - `lurek.dataframe.fromTable`: Creates a DataFrame from an array of row tables.
+- `lurek.dataframe.fromRows`: Creates a DataFrame from explicit columns and row-major arrays.
 - `lurek.dataframe.fromCSV`: Parses a CSV string into a DataFrame.
 - `lurek.dataframe.fromJSON`: Parses a JSON string into a DataFrame.
 - `lurek.dataframe.fromBinary`: Deserializes a binary LVDF string into a DataFrame.
 - `lurek.dataframe.random`: Generates a DataFrame with random data from column definitions.
+- `lurek.dataframe.toVec`: Converts a DataFrame to a VecFrame for vectorized column operations.
+- `lurek.dataframe.fromVec`: Converts a VecFrame back to a DataFrame.
 
-### `DataFrame` Methods
-- `DataFrame:nrows`: Returns the number of rows.
-- `DataFrame:ncols`: Returns the number of columns.
-- `DataFrame:columns`: Returns a table of column names.
-- `DataFrame:count`: Returns the row count (alias for nrows).
-- `DataFrame:removeColumn`: Removes a column by name or index.
-- `DataFrame:rename`: Renames the column `old_name` to `new_name` in this DataFrame.
-- `DataFrame:getColumn`: Returns all values in a column as a table.
-- `DataFrame:addRow`: Adds a row from an optional table of name-value pairs, returns 1-based index.
-- `DataFrame:removeRow`: Removes a row by 1-based index.
-- `DataFrame:getRow`: Returns a row as a table of name-value pairs.
-- `DataFrame:getValue`: Returns a single cell value.
-- `DataFrame:head`: Returns the first n rows (default 5).
-- `DataFrame:tail`: Returns the last n rows (default 5).
-- `DataFrame:slice`: Returns rows from start to end (1-based, inclusive).
-- `DataFrame:select`: Selects a subset of columns, returns a new DataFrame.
-- `DataFrame:unique`: Returns unique values in a column as a table.
-- `DataFrame:groupBy`: Groups rows by column value, returns a table of DataFrames keyed by value.
-- `DataFrame:groupByObj`: Groups rows by column value, returns a GroupedFrame object supporting aggregate().
-- `DataFrame:merge`: Appends rows from another DataFrame in-place.
-- `DataFrame:countBy`: Counts distinct values in a column, returns a DataFrame with value and count columns.
-- `DataFrame:dropNil`: Removes rows where the given column is nil, returns a new DataFrame.
-- `DataFrame:sample`: Returns a random sample of n rows.
-- `DataFrame:describe`: Returns descriptive statistics for all numeric columns.
-- `DataFrame:sum`: Returns the sum of numeric values in a column.
-- `DataFrame:mean`: Returns the mean of numeric values in a column.
-- `DataFrame:min`: Returns the minimum numeric value in a column.
-- `DataFrame:max`: Returns the maximum numeric value in a column.
-- `DataFrame:median`: Returns the median of numeric values in a column.
-- `DataFrame:stddev`: Returns the population standard deviation of numeric values in a column.
-- `DataFrame:variance`: Returns the population variance of numeric values in a column.
-- `DataFrame:fillNil`: Replaces nil values in a column with the given value.
-- `DataFrame:toCSV`: Serializes this DataFrame to a CSV string.
-- `DataFrame:toJSON`: Serializes this DataFrame to a JSON string.
-- `DataFrame:toBinary`: Serializes this DataFrame to a binary LVDF string.
-- `DataFrame:toTable`: Converts this DataFrame to a Lua table of row tables.
-- `DataFrame:toString`: Returns a formatted string table representation.
-- `DataFrame:query`: Executes a SQL query against this DataFrame.
-- `DataFrame:clone`: Returns a deep copy of this DataFrame.
-- `DataFrame:correlationMatrix`: Compute a correlation matrix for all numeric columns.
-- `DataFrame:modeVal`: Return the most frequent value in a column (nil if empty).
-- `DataFrame:entropy`: Shannon entropy (bits) of the value distribution in a column.
-- `DataFrame:addRowBatch`: Add multiple rows at once from a table of row tables.
-- `DataFrame:getColumnAsF64`: Return a numeric column as a Lua array of numbers (nils â†’ 0/nan).
-- `DataFrame:setColumnFromF64`: Set a numeric column from a Lua array of numbers.
-- `DataFrame:type`: Returns the type name of this object.
-- `DataFrame:typeOf`: Returns true if this object is of the given type.
-- `DataFrame:withEval`: Returns a new DataFrame with an additional computed column named `col_name`.
+### `LDataFrame` Methods
+- `LDataFrame:nrows`: Returns the number of rows.
+- `LDataFrame:ncols`: Returns the number of columns.
+- `LDataFrame:columns`: Returns a table of column names.
+- `LDataFrame:count`: Returns the row count (alias for nrows).
+- `LDataFrame:addColumn`: Adds a new column with an optional default value.
+- `LDataFrame:removeColumn`: Removes a column by name or index.
+- `LDataFrame:rename`: Renames the column `old_name` to `new_name` in this DataFrame.
+- `LDataFrame:getColumn`: Returns all values in a column as a table.
+- `LDataFrame:addRow`: Adds a row from an optional table of name-value pairs, returns 1-based index.
+- `LDataFrame:removeRow`: Removes a row by 1-based index.
+- `LDataFrame:getRow`: Returns a row as a table of name-value pairs.
+- `LDataFrame:getValue`: Returns a single cell value.
+- `LDataFrame:setValue`: Sets a single cell value.
+- `LDataFrame:filter`: Filters rows where column matches a condition, returns a new DataFrame.
+- `LDataFrame:sort`: Sorts by column, returns a new DataFrame.
+- `LDataFrame:head`: Returns the first n rows (default 5).
+- `LDataFrame:tail`: Returns the last n rows (default 5).
+- `LDataFrame:slice`: Returns rows from start to end (1-based, inclusive).
+- `LDataFrame:select`: Selects a subset of columns, returns a new DataFrame.
+- `LDataFrame:unique`: Returns unique values in a column as a table.
+- `LDataFrame:groupBy`: Groups rows by column value, returns a table of DataFrames keyed by value.
+- `LDataFrame:groupByObj`: Groups rows by column value, returns a GroupedFrame object supporting aggregate().
+- `LDataFrame:join`: Joins with another DataFrame on matching columns.
+- `LDataFrame:merge`: Appends rows from another DataFrame in-place.
+- `LDataFrame:countBy`: Counts distinct values in a column, returns a DataFrame with value and count columns.
+- `LDataFrame:dropNil`: Removes rows where the given column is nil, returns a new DataFrame.
+- `LDataFrame:sample`: Returns a random sample of n rows.
+- `LDataFrame:describe`: Returns descriptive statistics for all numeric columns.
+- `LDataFrame:sum`: Returns the sum of numeric values in a column.
+- `LDataFrame:mean`: Returns the mean of numeric values in a column.
+- `LDataFrame:min`: Returns the minimum numeric value in a column.
+- `LDataFrame:max`: Returns the maximum numeric value in a column.
+- `LDataFrame:median`: Returns the median of numeric values in a column.
+- `LDataFrame:stddev`: Returns the population standard deviation of numeric values in a column.
+- `LDataFrame:variance`: Returns the population variance of numeric values in a column.
+- `LDataFrame:fillNil`: Replaces nil values in a column with the given value.
+- `LDataFrame:apply`: Applies a function to each value in a column, replacing cells with results.
+- `LDataFrame:toCSV`: Serializes this DataFrame to a CSV string.
+- `LDataFrame:toJSON`: Serializes this DataFrame to a JSON string.
+- `LDataFrame:toBinary`: Serializes this DataFrame to a binary LVDF string.
+- `LDataFrame:toTable`: Converts this DataFrame to a Lua table of row tables.
+- `LDataFrame:toString`: Returns a formatted string table representation.
+- `LDataFrame:query`: Executes a SQL query against this DataFrame.
+- `LDataFrame:clone`: Returns a deep copy of this DataFrame.
+- `LDataFrame:withRollingMean`: Add a rolling mean column. Rows with insufficient history get nil.
+- `LDataFrame:withRollingSum`: Add a rolling sum column.
+- `LDataFrame:withRollingMin`: Add a rolling minimum column.
+- `LDataFrame:withRollingMax`: Add a rolling maximum column.
+- `LDataFrame:withRank`: Add a rank column (1-based, ties averaged).
+- `LDataFrame:withPctChange`: Add a percent-change-from-previous-row column.
+- `LDataFrame:withCumsum`: Add a cumulative-sum column.
+- `LDataFrame:groupAgg`: Aggregate agg_col grouped by group_col using the named function.
+- `LDataFrame:pivot`: Creates a wide pivot table by reshaping rows into columns.
+- `LDataFrame:corr`: Pearson correlation coefficient between two numeric columns.
+- `LDataFrame:correlationMatrix`: Compute a correlation matrix for all numeric columns.
+- `LDataFrame:zscoreCol`: Add a z-score column for the given numeric column.
+- `LDataFrame:normalizeCol`: Add a min-max normalized column scaled to [out_min, out_max].
+- `LDataFrame:outliers`: Return a new DataFrame with only outlier rows (|z-score| > threshold).
+- `LDataFrame:modeVal`: Return the most frequent value in a column (nil if empty).
+- `LDataFrame:entropy`: Shannon entropy (bits) of the value distribution in a column.
+- `LDataFrame:addRowBatch`: Add multiple rows at once from a table of row tables.
+- `LDataFrame:getColumnAsF64`: Return a numeric column as a Lua array of numbers (nils -> 0/nan).
+- `LDataFrame:setColumnFromF64`: Set a numeric column from a Lua array of numbers.
+- `LDataFrame:type`: Returns the type name of this object.
+- `LDataFrame:typeOf`: Returns true if this object is of the given type.
+- `LDataFrame:withEval`: Returns a new DataFrame with an additional computed column named `col_name`.
+- `LDataFrame:pivotTable`: Reshapes a long-format DataFrame into wide format.
+- `LDataFrame:rollingMean`: Returns a new DataFrame with a rolling mean column appended.
+- `LDataFrame:rollingSum`: Returns a new DataFrame with a rolling sum column appended.
+- `LDataFrame:rank`: Returns a new DataFrame with a dense-rank column appended.
 
-### `Database` Methods
-- `Database:getTable`: Returns a copy of a table by name, or nil if not found.
-- `Database:removeTable`: Drops the named table from this in-memory database if it exists.
-- `Database:hasTable`: Returns true if a table with the given name exists.
-- `Database:listTables`: Returns a table of all table names.
-- `Database:tableCount`: Returns the number of tables.
-- `Database:clear`: Drops every table from this in-memory database, leaving it empty.
-- `Database:merge`: Merges all tables from another Database into this one.
-- `Database:toJSON`: Serializes all tables to a JSON object string.
-- `Database:query`: Executes a SQL query against the database tables.
-- `Database:type`: Returns the type name of this object.
-- `Database:typeOf`: Returns true if this object is of the given type.
+### `LDatabase` Methods
+- `LDatabase:addTable`: Adds or replaces a table by cloning the given DataFrame.
+- `LDatabase:getTable`: Returns a copy of a table by name, or nil if not found.
+- `LDatabase:removeTable`: Drops the named table from this in-memory database if it exists.
+- `LDatabase:hasTable`: Returns true if a table with the given name exists.
+- `LDatabase:listTables`: Returns a table of all table names.
+- `LDatabase:tableCount`: Returns the number of tables.
+- `LDatabase:clear`: Drops every table from this in-memory database, leaving it empty.
+- `LDatabase:merge`: Merges all tables from another Database into this one.
+- `LDatabase:toJSON`: Serializes all tables to a JSON object string.
+- `LDatabase:query`: Executes a SQL query against the database tables.
+- `LDatabase:type`: Returns the type name of this object.
+- `LDatabase:typeOf`: Returns true if this object is of the given type.
 
-### `GroupedFrame` Methods
-- `GroupedFrame:aggregate`: Apply a Lua function to aggregate a column's values per group.
+### `LGroupedFrame` Methods
+- `LGroupedFrame:aggregate`: Apply a Lua function to aggregate a column's values per group.
+- `LGroupedFrame:type`: Returns the type name of this object.
+- `LGroupedFrame:typeOf`: Returns true if this object is of the given type.
+
+### `LVecFrame` Methods
+- `LVecFrame:colAdd`: Add a scalar to every element of a Float64 column.
+- `LVecFrame:colSub`: Subtract a scalar from every element of a Float64 column.
+- `LVecFrame:colMul`: Multiply every element of a Float64 column by a scalar.
+- `LVecFrame:colDiv`: Divide every element of a Float64 column by a scalar.
+- `LVecFrame:colAbs`: Apply absolute value to every element of a Float64 column.
+- `LVecFrame:colSqrt`: Apply square root to every element of a Float64 column.
+- `LVecFrame:colFloor`: Apply floor to every element of a Float64 column.
+- `LVecFrame:colCeil`: Apply ceiling to every element of a Float64 column.
+- `LVecFrame:colNeg`: Negate every element of a Float64 column.
+- `LVecFrame:colClamp`: Clamp every element of a Float64 column to [min, max].
+- `LVecFrame:colOp`: Compute out[i] = left[i] op right[i] for every row.
+- `LVecFrame:reduce`: Reduce an entire numeric column to a single value.
+- `LVecFrame:filterMask`: Build a boolean row mask: mask[i] = col[i] cmp_op val.
+- `LVecFrame:applyMask`: Return a new VecFrame containing only the rows where mask[i] is true.
+- `LVecFrame:colType`: Return the dtype name of a column: "float64", "int64", "bool", or "text".
+- `LVecFrame:colCast`: Cast a column to a new dtype: "float64", "int64", or "text".
+- `LVecFrame:nrows`: Return the number of rows.
+- `LVecFrame:ncols`: Return the number of columns.
+- `LVecFrame:columns`: Return a table of column names.
+- `LVecFrame:parReduce`: Reduce multiple columns in parallel, returning {col -> value} table.
+- `LVecFrame:parScalarOp`: Apply a scalar op in parallel to multiple Float64 columns.
+- `LVecFrame:toDataFrame`: Convert this VecFrame back to a DataFrame.
+- `LVecFrame:type`: Returns the type name of this object.
+- `LVecFrame:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

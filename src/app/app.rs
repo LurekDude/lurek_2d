@@ -4,6 +4,7 @@
 //! The game loop structure (callbacks, SharedState, Lua VM) follows the standard pattern.
 
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -28,11 +29,13 @@ use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
 };
 use crate::runtime::{FullscreenType, SharedState};
+use crate::window::{center_window_on_monitor, move_window_to_display, select_startup_monitor};
 use slotmap::SlotMap;
 
 use gilrs::{
+    ff::{BaseEffect, BaseEffectType, Effect, EffectBuilder, Envelope, Repeat, Replay, Ticks},
     Axis as GilrsAxis, Button as GilrsButton, Event as GilrsEvent, EventType as GilrsEventType,
-    Gilrs,
+    GamepadId as GilrsGamepadId, Gilrs,
 };
 
 #[allow(unused_imports)]
@@ -43,7 +46,7 @@ use crate::runtime::log_messages::{
     L016_LUA_VM_INIT_FAIL, L017_MAIN_LUA_READ_FAIL, L021_CLIPBOARD_FAIL, L023_GPU_TEX_TOO_SMALL,
     L024_SURFACE_LOST, L033_GPU_ADAPTER, L034_GPU_TEX_DIM, L035_GPU_INIT, L036_GAMEPAD_CONNECTED,
     L037_GAMEPAD_DISCONNECTED, L038_GILRS_UNAVAILABLE, L039_WINDOW_CLOSE, L040_ICON_LOAD_FAIL,
-    L041_ICON_CONV_FAIL, L042_DISPLAY_INDEX_UNAVAIL, L043_DROP_FILE, L044_DROP_GAME,
+    L041_ICON_CONV_FAIL, L043_DROP_FILE, L044_DROP_GAME,
     L070_SURFACE_NO_READBACK, L071_CURSOR_GRAB_FAIL, L072_CURSOR_GRAB_LOCK_FAIL,
     L073_CURSOR_POS_FAIL, L074_SCREENSHOT_NO_READBACK, L075_SCREENSHOT_SAVE_FAIL,
     L076_SCREENSHOT_ENCODE_FAIL, L077_DRAG_HOVER, L078_DRAG_HOVER_CANCEL, L079_DRAG_DROP_IGNORED,
@@ -192,6 +195,8 @@ pub struct LurekApp {
 
     // Gamepad hardware polling via gilrs.
     gilrs: Option<Gilrs>,
+    /// Active force-feedback effects keyed by Lua-visible gamepad id.
+    gamepad_effects: HashMap<usize, Effect>,
 
     /// Current engine run state (normal, error, or restarting).
     pub run_state: RunState,
@@ -258,6 +263,14 @@ pub struct LurekApp {
     /// `TempDir` deletes the directory when dropped; this field extends its lifetime to match
     /// the running game session.  Replaced on every new drag-drop load.
     lurek_temp_dir: Option<tempfile::TempDir>,
+
+    // Lightweight frame-stage profiler (reported once per second in logs).
+    perf_report_started: Instant,
+    perf_frames: u32,
+    perf_tick_ms_acc: f64,
+    perf_update_ms_acc: f64,
+    perf_render_ms_acc: f64,
+    perf_log_enabled: bool,
 }
 
 impl LurekApp {
@@ -297,6 +310,7 @@ impl LurekApp {
             mouse_x: 0.0,
             mouse_y: 0.0,
             gilrs: None,
+            gamepad_effects: HashMap::new(),
             run_state: RunState::Running,
             debug_overlay: DebugOverlay::new(),
             conf_error,
@@ -318,7 +332,45 @@ impl LurekApp {
             auto_screenshot_start: None,
             window_pos,
             lurek_temp_dir: None,
+            perf_report_started: Instant::now(),
+            perf_frames: 0,
+            perf_tick_ms_acc: 0.0,
+            perf_update_ms_acc: 0.0,
+            perf_render_ms_acc: 0.0,
+            perf_log_enabled: std::env::var("LUREK_PERF_LOG").ok().as_deref() == Some("1"),
         }
+    }
+
+    fn perf_record_frame(&mut self, tick_ms: f64, update_ms: f64, render_ms: f64) {
+        if !self.perf_log_enabled {
+            return;
+        }
+
+        self.perf_frames += 1;
+        self.perf_tick_ms_acc += tick_ms;
+        self.perf_update_ms_acc += update_ms;
+        self.perf_render_ms_acc += render_ms;
+
+        let elapsed = self.perf_report_started.elapsed().as_secs_f64();
+        if elapsed < 1.0 {
+            return;
+        }
+
+        let n = (self.perf_frames as f64).max(1.0);
+        log::info!(
+            "PERF frame_cpu_ms avg: tick={:.3}, update={:.3}, render={:.3}, total={:.3}, fps_est={:.1}",
+            self.perf_tick_ms_acc / n,
+            self.perf_update_ms_acc / n,
+            self.perf_render_ms_acc / n,
+            (self.perf_tick_ms_acc + self.perf_update_ms_acc + self.perf_render_ms_acc) / n,
+            n / elapsed,
+        );
+
+        self.perf_report_started = Instant::now();
+        self.perf_frames = 0;
+        self.perf_tick_ms_acc = 0.0;
+        self.perf_update_ms_acc = 0.0;
+        self.perf_render_ms_acc = 0.0;
     }
 
     fn wants_splash_screen(&self) -> bool {
@@ -477,7 +529,16 @@ impl LurekApp {
             &wgpu::DeviceDescriptor {
                 label: Some("Lurek2D Device"),
                 required_features: wgpu::Features::empty(),
-                required_limits: wgpu::Limits::downlevel_defaults(),
+                required_limits: {
+                    // Start from the safe downlevel baseline but raise the texture-dimension
+                    // ceiling to whatever the adapter actually supports (RTX 4060: 32768).
+                    let mut limits = wgpu::Limits::downlevel_defaults();
+                    limits.max_texture_dimension_2d = adapter
+                        .limits()
+                        .max_texture_dimension_2d
+                        .max(limits.max_texture_dimension_2d);
+                    limits
+                },
                 memory_hints: Default::default(),
             },
             None,
@@ -659,6 +720,10 @@ impl LurekApp {
             st.fps = st.clock.fps();
             st.keyboard.begin_frame();
             st.mouse.begin_frame();
+            st.touch.begin_frame();
+            for gp in &mut st.gamepads {
+                gp.begin_frame();
+            }
 
             // Sync debug overlay state from Lua.
             self.debug_overlay.enabled = st.debug_overlay_enabled;
@@ -683,6 +748,7 @@ impl LurekApp {
             pending_fullscreen,
             pending_fullscreen_type,
             pending_position,
+            pending_display_index,
             pending_size,
             pending_minimize,
             pending_maximize,
@@ -705,6 +771,7 @@ impl LurekApp {
                 st.window_state.pending_fullscreen.take(),
                 st.window_state.pending_fullscreen_type,
                 st.window_state.pending_position.take(),
+                st.window_state.pending_display_index.take(),
                 st.window_state.pending_size.take(),
                 std::mem::take(&mut st.window_state.pending_minimize),
                 std::mem::take(&mut st.window_state.pending_maximize),
@@ -756,6 +823,13 @@ impl LurekApp {
         // Apply pending position
         if let Some((x, y)) = pending_position {
             window.set_outer_position(winit::dpi::PhysicalPosition::new(x, y));
+        }
+
+        // Apply pending display switch by centering the current window on that monitor.
+        if let Some(display_index) = pending_display_index {
+            if !move_window_to_display(window.as_ref(), display_index) {
+                log::warn!("Requested display index {} is not available", display_index);
+            }
         }
 
         // Apply pending size
@@ -990,74 +1064,109 @@ impl LurekApp {
         {
             let scene_opt = state.borrow_mut().raycaster_output.take();
             if let Some(scene) = scene_opt {
-                // Collect all quads with a depth value for back-to-front sorting.
+                #[derive(Clone)]
                 struct DepthQuad {
                     corners: [crate::math::Vec2; 4],
                     uvs: [crate::math::Vec2; 4],
+                    corner_w: [f32; 4],
                     texture_key: TextureKey,
                     color: [f32; 4],
                     depth: f32,
                 }
-                let mut depth_quads: Vec<DepthQuad> = Vec::with_capacity(scene.quad_count());
+                enum DepthItem {
+                    Quad(DepthQuad),
+                    Model(crate::render::Mesh, f32),
+                }
+
+                let mut depth_items: Vec<DepthItem> = Vec::with_capacity(scene.quad_count());
 
                 for wall in &scene.walls {
                     if let Some(key) = wall.texture_key {
-                        depth_quads.push(DepthQuad {
+                        depth_items.push(DepthItem::Quad(DepthQuad {
                             corners: wall.corners,
                             uvs: wall.uvs,
+                            corner_w: wall.corner_w,
                             texture_key: key,
                             color: wall.light,
                             depth: wall.depth,
-                        });
+                        }));
                     }
                 }
                 for floor in &scene.floors {
                     if let Some(key) = floor.texture_key {
-                        depth_quads.push(DepthQuad {
+                        depth_items.push(DepthItem::Quad(DepthQuad {
                             corners: floor.corners,
                             uvs: floor.uvs,
+                            corner_w: floor.corner_w,
                             texture_key: key,
                             color: floor.light,
                             depth: floor.depth,
-                        });
+                        }));
                     }
                 }
                 for ceil in &scene.ceilings {
                     if let Some(key) = ceil.texture_key {
-                        depth_quads.push(DepthQuad {
+                        depth_items.push(DepthItem::Quad(DepthQuad {
                             corners: ceil.corners,
                             uvs: ceil.uvs,
+                            corner_w: ceil.corner_w,
                             texture_key: key,
                             color: ceil.light,
                             depth: ceil.depth,
-                        });
+                        }));
                     }
                 }
                 for sprite in &scene.sprites {
-                    depth_quads.push(DepthQuad {
+                    depth_items.push(DepthItem::Quad(DepthQuad {
                         corners: sprite.corners,
                         uvs: sprite.uvs,
+                        corner_w: [1.0, 1.0, 1.0, 1.0],
                         texture_key: sprite.texture_key,
                         color: sprite.light,
                         depth: sprite.depth,
-                    });
+                    }));
+                }
+                for model in &scene.models {
+                    depth_items.push(DepthItem::Model(model.mesh.clone(), model.depth));
                 }
 
-                // Sort back-to-front (largest depth first).
-                depth_quads.sort_by(|a, b| {
-                    b.depth
-                        .partial_cmp(&a.depth)
-                        .unwrap_or(std::cmp::Ordering::Equal)
+                depth_items.sort_by(|a, b| {
+                    let ad = match a {
+                        DepthItem::Quad(q) => q.depth,
+                        DepthItem::Model(_, d) => *d,
+                    };
+                    let bd = match b {
+                        DepthItem::Quad(q) => q.depth,
+                        DepthItem::Model(_, d) => *d,
+                    };
+                    bd.partial_cmp(&ad).unwrap_or(std::cmp::Ordering::Equal)
                 });
 
                 let mut s = state.borrow_mut();
-                for dq in depth_quads {
-                    s.render_commands.push(RenderCommand::DrawTexturedQuad {
-                        corners: dq.corners,
-                        uvs: dq.uvs,
-                        texture_key: dq.texture_key,
-                        color: dq.color,
-                    });
+                for item in depth_items {
+                    match item {
+                        DepthItem::Quad(dq) => {
+                            s.render_commands.push(RenderCommand::DrawTexturedQuad {
+                                corners: dq.corners,
+                                uvs: dq.uvs,
+                                corner_w: dq.corner_w,
+                                texture_key: dq.texture_key,
+                                color: dq.color,
+                            });
+                        }
+                        DepthItem::Model(mesh, _) => {
+                            s.render_commands.push(RenderCommand::DrawMeshTransient {
+                                mesh,
+                                x: 0.0,
+                                y: 0.0,
+                                rotation: 0.0,
+                                sx: 1.0,
+                                sy: 1.0,
+                                ox: 0.0,
+                                oy: 0.0,
+                            });
+                        }
+                    }
                 }
             }
         }
@@ -1118,8 +1227,6 @@ impl LurekApp {
 
         let (
             commands,
-            textures,
-            shaders,
             default_filter,
             bg,
             cam_matrix,
@@ -1133,12 +1240,17 @@ impl LurekApp {
             game_w,
             game_h,
             screenshot_request,
+            screen_capture_requested,
+            textures,
+            shaders,
+            canvases,
+            meshes,
+            sprite_batches,
+            mut fonts,
         ) = {
-            let st = state.borrow();
+            let mut st = state.borrow_mut();
             (
-                st.render_commands.clone(),
-                st.textures.clone(),
-                st.shaders.clone(),
+                std::mem::take(&mut st.render_commands),
                 st.default_filter.clone(),
                 st.background_color,
                 st.camera.view_matrix(),
@@ -1151,7 +1263,14 @@ impl LurekApp {
                 st.window_state.scale_mode_str.clone(),
                 st.window_state.game_width,
                 st.window_state.game_height,
-                st.pending_screenshot.clone(),
+                st.pending_screenshot.take(),
+                std::mem::replace(&mut st.pending_screen_capture, false),
+                std::mem::take(&mut st.textures),
+                std::mem::take(&mut st.shaders),
+                std::mem::take(&mut st.canvases),
+                std::mem::take(&mut st.meshes),
+                std::mem::take(&mut st.sprite_batches),
+                std::mem::take(&mut st.fonts),
             )
         };
 
@@ -1190,13 +1309,9 @@ impl LurekApp {
             &commands
         };
 
-        // Temporarily take fonts out of SharedState for mutable access during rendering.
-        let mut fonts = std::mem::take(&mut state.borrow_mut().fonts);
-        let sprite_batches = std::mem::take(&mut state.borrow_mut().sprite_batches);
-        let canvases = state.borrow().canvases.clone();
-        let meshes = state.borrow().meshes.clone();
         let screenshot_supported = self.surface_usage.contains(wgpu::TextureUsages::COPY_SRC);
         let capture_screenshot = screenshot_request.is_some() && screenshot_supported;
+        let capture_screen_image = screen_capture_requested && screenshot_supported;
 
         // Auto-screenshot: capture pixels this frame once enough frames/time have elapsed.
         // When --screenshot-time is set, use wall-clock elapsed; otherwise use frame count.
@@ -1231,7 +1346,7 @@ impl LurekApp {
                 &cam_matrix,
                 frame_time,
                 frame_count,
-                capture_screenshot || should_auto_capture,
+                capture_screenshot || should_auto_capture || capture_screen_image,
             )
         };
         let screenshot_pixels = match screenshot_pixels {
@@ -1239,8 +1354,17 @@ impl LurekApp {
             Err(e) => {
                 if e == wgpu::SurfaceError::Lost || e == wgpu::SurfaceError::Outdated {
                     log_msg!(warn, L024_SURFACE_LOST);
-                    state.borrow_mut().fonts = fonts;
-                    state.borrow_mut().sprite_batches = sprite_batches;
+                    {
+                        let mut st = state.borrow_mut();
+                        st.fonts = fonts;
+                        st.sprite_batches = sprite_batches;
+                        st.textures = textures;
+                        st.shaders = shaders;
+                        st.canvases = canvases;
+                        st.meshes = meshes;
+                        st.pending_screenshot = screenshot_request;
+                        st.pending_screen_capture = screen_capture_requested;
+                    }
                     self.reconfigure_surface();
                     return;
                 } else {
@@ -1250,9 +1374,23 @@ impl LurekApp {
             }
         };
 
-        // Put fonts and sprite batches back.
-        state.borrow_mut().fonts = fonts;
-        state.borrow_mut().sprite_batches = sprite_batches;
+        // Put moved resources back into SharedState.
+        {
+            let mut st = state.borrow_mut();
+            st.fonts = fonts;
+            st.sprite_batches = sprite_batches;
+            st.textures = textures;
+            st.shaders = shaders;
+            st.canvases = canvases;
+            st.meshes = meshes;
+            if capture_screen_image {
+                st.captured_screen_image = screenshot_pixels
+                    .as_ref()
+                    .and_then(|(width, height, pixels)| {
+                        crate::image::ImageData::from_bytes(*width, *height, pixels.clone()).ok()
+                    });
+            }
+        }
 
         // Copy render stats to SharedState for Lua access.
         state.borrow_mut().render_stats = renderer.render_stats.clone();
@@ -1626,7 +1764,7 @@ impl LurekApp {
                     {
                         let mut st = state.borrow_mut();
                         let gamepad = ensure_gamepad_slot(&mut st.gamepads, id_usize);
-                        gamepad.connected = true;
+                        gamepad.set_connected(true);
                         gamepad.update_button(btn_idx, true);
                     }
                     if has_game {
@@ -1641,7 +1779,7 @@ impl LurekApp {
                     {
                         let mut st = state.borrow_mut();
                         let gamepad = ensure_gamepad_slot(&mut st.gamepads, id_usize);
-                        gamepad.connected = true;
+                        gamepad.set_connected(true);
                         gamepad.update_button(btn_idx, false);
                     }
                     if has_game {
@@ -1656,7 +1794,7 @@ impl LurekApp {
                     {
                         let mut st = state.borrow_mut();
                         let gamepad = ensure_gamepad_slot(&mut st.gamepads, id_usize);
-                        gamepad.connected = true;
+                        gamepad.set_connected(true);
                         gamepad.update_axis(axis_idx, value);
                     }
                     if has_game {
@@ -1669,10 +1807,12 @@ impl LurekApp {
                     let gamepad = gilrs.gamepad(id);
                     let name = gamepad.name().to_string();
                     let guid = format_gilrs_uuid(gamepad.uuid());
+                    let ff_supported = gamepad.is_ff_supported();
                     {
                         let mut st = state.borrow_mut();
                         let entry = ensure_gamepad_slot(&mut st.gamepads, id_usize);
-                        entry.connected = true;
+                        entry.set_connected(true);
+                        entry.set_vibration_supported(ff_supported);
                         entry.name = name;
                         entry.set_guid(guid);
                     }
@@ -1684,10 +1824,13 @@ impl LurekApp {
                     }
                 }
                 GilrsEventType::Disconnected => {
+                    if let Some(effect) = self.gamepad_effects.remove(&id_usize) {
+                        let _ = effect.stop();
+                    }
                     {
                         let mut st = state.borrow_mut();
                         let gamepad = ensure_gamepad_slot(&mut st.gamepads, id_usize);
-                        gamepad.connected = false;
+                        gamepad.set_connected(false);
                     }
                     log_msg!(info, L037_GAMEPAD_DISCONNECTED, "id={}", id_usize);
                     if has_game {
@@ -1699,6 +1842,77 @@ impl LurekApp {
                 _ => {}
             }
         }
+
+        self.process_pending_gamepad_vibration();
+    }
+
+    fn process_pending_gamepad_vibration(&mut self) {
+        let Some(gilrs) = &mut self.gilrs else { return };
+        let Some(state) = &self.state else { return };
+
+        let requests = {
+            let mut st = state.borrow_mut();
+            std::mem::take(&mut st.gamepad_vibration_requests)
+        };
+
+        for req in requests {
+            if let Some(effect) = Self::build_gamepad_vibration_effect(gilrs, req) {
+                if effect.play().is_ok() {
+                    self.gamepad_effects.insert(req.id, effect);
+                }
+            }
+        }
+    }
+
+    fn build_gamepad_vibration_effect(
+        gilrs: &mut Gilrs,
+        request: crate::input::GamepadVibrationRequest,
+    ) -> Option<Effect> {
+        let mut target_id: Option<GilrsGamepadId> = None;
+        let mut ff_supported = false;
+        for (id, gamepad) in gilrs.gamepads() {
+            if usize::from(id) == request.id {
+                target_id = Some(id);
+                ff_supported = gamepad.is_ff_supported();
+                break;
+            }
+        }
+
+        let Some(target_id) = target_id else {
+            return None;
+        };
+        if !ff_supported {
+            return None;
+        }
+
+        let low_mag = (request.low_freq.clamp(0.0, 1.0) * u16::MAX as f32) as u16;
+        let high_mag = (request.high_freq.clamp(0.0, 1.0) * u16::MAX as f32) as u16;
+        let play_for = Ticks::from_ms(request.duration_ms.max(1));
+
+        let scheduling = Replay {
+            after: Ticks::from_ms(0),
+            play_for,
+            with_delay: Ticks::from_ms(0),
+        };
+
+        let mut builder = EffectBuilder::new();
+        builder
+            .gamepads(&[target_id])
+            .repeat(Repeat::For(play_for))
+            .add_effect(BaseEffect {
+                kind: BaseEffectType::Strong {
+                    magnitude: high_mag,
+                },
+                scheduling,
+                envelope: Envelope::default(),
+            })
+            .add_effect(BaseEffect {
+                kind: BaseEffectType::Weak { magnitude: low_mag },
+                scheduling,
+                envelope: Envelope::default(),
+            });
+
+        builder.finish(gilrs).ok()
     }
 }
 
@@ -1789,8 +2003,10 @@ fn system_cursor_to_winit_cursor(cursor: SystemCursor) -> CursorIcon {
 /// Used as the default window icon when the game's `conf.toml` does not supply a
 /// custom icon path. Returns `None` if the embedded bytes cannot be decoded.
 fn load_embedded_icon() -> Option<winit::window::Icon> {
-    static ICON_BYTES: &[u8] = include_bytes!("../../assets/icon.png");
-    let image = match ::image::load_from_memory(ICON_BYTES) {
+    let image = match ::image::load_from_memory(std::include_bytes!(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/assets/icon.png"
+    ))) {
         Ok(img) => img,
         Err(e) => {
             log_msg!(warn, L040_ICON_LOAD_FAIL, "embedded icon: {}", e);
@@ -1849,93 +2065,83 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
     }
 }
 
-fn load_embedded_splash_texture(
-    bytes: &[u8],
-    asset_name: &str,
-    textures: &mut SlotMap<TextureKey, TextureData>,
-) -> Option<SplashTexture> {
-    let image = match ::image::load_from_memory(bytes) {
-        Ok(image) => image,
-        Err(error) => {
-            log::warn!(
-                "Failed to decode embedded splash texture '{}': {}",
-                asset_name,
-                error
-            );
-            return None;
+fn load_splash_branding() -> Option<SplashBranding> {
+    let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
+    let large_icon = {
+        let image = match ::image::load_from_memory(std::include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/icon-large.png"
+        ))) {
+            Ok(image) => image,
+            Err(error) => {
+                log::warn!(
+                    "Failed to decode embedded splash texture '{}': {}",
+                    "assets/svg/large_icon.png",
+                    error
+                );
+                return None;
+            }
+        };
+
+        let rgba = image.to_rgba8();
+        let (width, height) = rgba.dimensions();
+        match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
+            Ok(texture) => SplashTexture {
+                texture_key: texture.key,
+                width: texture.width,
+                height: texture.height,
+            },
+            Err(error) => {
+                log::warn!(
+                    "Failed to prepare embedded splash texture '{}': {}",
+                    "assets/svg/large_icon.png",
+                    error
+                );
+                return None;
+            }
         }
     };
 
-    let rgba = image.to_rgba8();
-    let (width, height) = rgba.dimensions();
-    match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), textures) {
-        Ok(texture) => Some(SplashTexture {
-            texture_key: texture.key,
-            width: texture.width,
-            height: texture.height,
-        }),
-        Err(error) => {
-            log::warn!(
-                "Failed to prepare embedded splash texture '{}': {}",
-                asset_name,
-                error
-            );
-            None
+    let banner = {
+        let image = match ::image::load_from_memory(std::include_bytes!(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/assets/banner.png"
+        ))) {
+            Ok(image) => image,
+            Err(error) => {
+                log::warn!(
+                    "Failed to decode embedded splash texture '{}': {}",
+                    "assets/svg/banner.png",
+                    error
+                );
+                return None;
+            }
+        };
+
+        let rgba = image.to_rgba8();
+        let (width, height) = rgba.dimensions();
+        match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
+            Ok(texture) => SplashTexture {
+                texture_key: texture.key,
+                width: texture.width,
+                height: texture.height,
+            },
+            Err(error) => {
+                log::warn!(
+                    "Failed to prepare embedded splash texture '{}': {}",
+                    "assets/svg/banner.png",
+                    error
+                );
+                return None;
+            }
         }
-    }
-}
-
-fn load_splash_branding() -> Option<SplashBranding> {
-    static LARGE_ICON_BYTES: &[u8] = include_bytes!("../../assets/icon-large.png");
-    static BANNER_BYTES: &[u8] = include_bytes!("../../assets/banner.png");
-
-    let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
-    let large_icon =
-        load_embedded_splash_texture(LARGE_ICON_BYTES, "assets/svg/large_icon.png", &mut textures)?;
-    let banner =
-        load_embedded_splash_texture(BANNER_BYTES, "assets/svg/banner.png", &mut textures)?;
+    };
 
     Some(SplashBranding {
         textures,
         large_icon,
         banner,
     })
-}
-
-fn select_startup_monitor(
-    event_loop: &ActiveEventLoop,
-    display_index: u32,
-) -> Option<winit::monitor::MonitorHandle> {
-    let primary = event_loop
-        .primary_monitor()
-        .or_else(|| event_loop.available_monitors().next());
-    if display_index == 0 {
-        return primary;
-    }
-
-    let monitor = event_loop.available_monitors().nth(display_index as usize);
-    if monitor.is_none() {
-        log_msg!(
-            warn,
-            L042_DISPLAY_INDEX_UNAVAIL,
-            "index {}, falling back to primary",
-            display_index
-        );
-    }
-    monitor.or(primary)
-}
-
-fn center_window_on_monitor(
-    window: &Window,
-    monitor: &winit::monitor::MonitorHandle,
-    width: u32,
-    height: u32,
-) {
-    let monitor_size = monitor.size();
-    let monitor_position = monitor.position();
-    let x = monitor_position.x + ((monitor_size.width as i32 - width as i32).max(0) / 2);
-    let y = monitor_position.y + ((monitor_size.height as i32 - height as i32).max(0) / 2);
-    window.set_outer_position(winit::dpi::PhysicalPosition::new(x, y));
 }
 
 impl ApplicationHandler for LurekApp {
@@ -2333,11 +2539,11 @@ impl ApplicationHandler for LurekApp {
 
             WindowEvent::RedrawRequested => {
                 // --- First-frame Lua init -------------------------------------
-                // On the very first redraw, show the splash and then call
-                // init_lua(). The splash frame is submitted to the GPU before
-                // init_lua blocks, so the user sees it during loading.
+                // On the very first redraw, initialise Lua and jump directly
+                // into game rendering. We intentionally skip splash rendering
+                // here to avoid any stale splash texture bindings leaking into
+                // the first game frame.
                 if !self.lua_initialized {
-                    self.render_splash();
                     if let Some(win) = &self.window {
                         win.set_visible(true);
                     }
@@ -2376,14 +2582,21 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
 
+                let tick_start = Instant::now();
                 self.poll_gamepads();
                 self.tick_frame();
+                let tick_ms = tick_start.elapsed().as_secs_f64() * 1000.0;
+
+                let mut update_ms = 0.0;
+                let mut render_ms = 0.0;
 
                 // Temporarily take run_state to avoid borrow issues with render_error.
                 let run_state = std::mem::replace(&mut self.run_state, RunState::Running);
                 match run_state {
                     RunState::Error(ref screen) => {
+                        let render_start = Instant::now();
                         self.render_error(screen);
+                        render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
                         self.run_state = run_state;
                         // In screenshot mode quit immediately instead of waiting for user input.
                         if self.auto_screenshot_path.is_some() {
@@ -2396,16 +2609,25 @@ impl ApplicationHandler for LurekApp {
                     }
                     RunState::Running => {
                         if self.has_game {
+                            let update_start = Instant::now();
                             self.game_update();
+                            update_ms = update_start.elapsed().as_secs_f64() * 1000.0;
+
+                            let render_start = Instant::now();
                             self.render();
+                            render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
                         } else {
+                            let render_start = Instant::now();
                             self.render_splash();
+                            render_ms = render_start.elapsed().as_secs_f64() * 1000.0;
                         }
                     }
                     RunState::Restarting => {
                         // Handled above; should not reach here.
                     }
                 }
+
+                self.perf_record_frame(tick_ms, update_ms, render_ms);
             }
 
             WindowEvent::Touch(touch) => {
@@ -2588,12 +2810,27 @@ impl ApplicationHandler for LurekApp {
             if let Some(win) = &self.window {
                 win.request_redraw();
             }
+            // Stay in Poll so we re-enter about_to_wait immediately after RedrawRequested.
+            event_loop.set_control_flow(ControlFlow::Poll);
         } else {
-            // Sleep until the next frame deadline so the event loop doesn't
-            // spin at 100% CPU while waiting. Input events still wake the
-            // thread immediately (WaitUntil is a *maximum* sleep duration).
-            let next = Instant::now() + (target - elapsed);
-            event_loop.set_control_flow(ControlFlow::WaitUntil(next));
+            let remaining = target - elapsed;
+            // On Windows, WaitUntil granularity is ~15 ms even with timeBeginPeriod(1),
+            // which causes the event loop to oversleep and caps frame rate at ~7 fps.
+            // Use a hybrid: sleep most of the budget with std::thread::sleep (which is
+            // accurate to ~1 ms when timeBeginPeriod(1) is active), then spin the last
+            // fraction to hit the deadline precisely without burning 100% CPU.
+            #[cfg(target_os = "windows")]
+            {
+                if remaining > Duration::from_micros(1500) {
+                    std::thread::sleep(remaining - Duration::from_micros(1000));
+                }
+                event_loop.set_control_flow(ControlFlow::Poll);
+            }
+            #[cfg(not(target_os = "windows"))]
+            {
+                let next = Instant::now() + remaining;
+                event_loop.set_control_flow(ControlFlow::WaitUntil(next));
+            }
         }
     }
 }

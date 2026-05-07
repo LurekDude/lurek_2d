@@ -1916,6 +1916,82 @@ describe("Missing API Coverage", function()
 
 end)
 
+-- @describe light enhancements: soft shadows and normal-map hints
+describe("light enhancements: soft shadows and normal-map hints", function()
+    -- @covers LLight:getShadowSoftness
+    -- @covers LLight:remove
+    -- @covers LLight:setShadowSoftness
+    -- @covers lurek.light.clear
+    -- @covers lurek.light.newLight
+    it("setShadowSoftness / getShadowSoftness", function()
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:setShadowSoftness(1.75)
+        expect_near(l:getShadowSoftness(), 1.75, 0.001)
+        l:remove()
+    end)
+
+    -- @covers LLight:getNormalMap
+    -- @covers LLight:getNormalStrength
+    -- @covers LLight:remove
+    -- @covers LLight:setNormalMap
+    -- @covers LLight:setNormalStrength
+    -- @covers lurek.light.clear
+    -- @covers lurek.light.newLight
+    it("setNormalMap / getNormalMap and setNormalStrength / getNormalStrength", function()
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:setNormalMap("assets/textures/normals/torch.png")
+        l:setNormalStrength(0.65)
+        expect_equal(l:getNormalMap(), "assets/textures/normals/torch.png")
+        expect_near(l:getNormalStrength(), 0.65, 0.001)
+        l:remove()
+    end)
+
+    -- @covers LLight:clearNormalMap
+    -- @covers LLight:getNormalMap
+    -- @covers LLight:remove
+    -- @covers LLight:setNormalMap
+    -- @covers lurek.light.clear
+    -- @covers lurek.light.newLight
+    it("clearNormalMap resets path to nil", function()
+        lurek.light.clear()
+        local l = lurek.light.newLight(0, 0, 50)
+        l:setNormalMap("assets/textures/normals/clear_me.png")
+        l:clearNormalMap()
+        expect_equal(l:getNormalMap(), nil)
+        l:remove()
+    end)
+
+    -- @covers LLight:remove
+    -- @covers LLight:setNormalMap
+    -- @covers LLight:setNormalStrength
+    -- @covers lurek.light.clear
+    -- @covers lurek.light.getNormalMapHints
+    -- @covers lurek.light.newLight
+    it("getNormalMapHints returns mapped enabled lights", function()
+        lurek.light.clear()
+        local l1 = lurek.light.newLight(10, 20, 30)
+        l1:setNormalMap("assets/textures/normals/brick.png")
+        l1:setNormalStrength(1.2)
+
+        local l2 = lurek.light.newLight(40, 50, 60)
+        l2:setNormalMap("assets/textures/normals/disabled.png")
+        l2:setEnabled(false)
+
+        local hints = lurek.light.getNormalMapHints()
+        expect_type("table", hints)
+        expect_equal(#hints, 1)
+        expect_equal(hints[1].normalMap, "assets/textures/normals/brick.png")
+        expect_near(hints[1].x, 10, 0.001)
+        expect_near(hints[1].y, 20, 0.001)
+        expect_near(hints[1].strength, 1.2, 0.001)
+
+        l1:remove()
+        l2:remove()
+    end)
+end)
+
 -- @describe light strict: LLight type/typeOf
 describe("light strict: LLight type/typeOf", function()
     -- @covers LLight:type

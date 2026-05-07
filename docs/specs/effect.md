@@ -187,155 +187,168 @@ The `effect` module owns Lurek2D's post-processing and image-effect pipeline —
 - `lurek.effect.newPresetStack`: Creates a pre-configured effect stack from a named preset.
 - `lurek.effect.newPass`: Creates a custom-shader post-processing effect (alias for newCustomEffect).
 - `lurek.effect.getEffectTypes`: Returns the list of all built-in effect type names.
-- `lurek.effect.newImageEffect`: Creates a new per-image effect chain. Accepts:
+- `lurek.effect.newImageEffect`: Creates a new per-image effect chain.
 - `lurek.effect.newOverlay`: Creates a new screen overlay controller for weather, flash, shake, and fade effects.
-- `lurek.effect.newTransition`: Creates a new screen-transition controller. `kind` is one of:
-- `lurek.effect.setShaderErrorDisplay`: Enables or disables the effect that renders shader compile errors as red text
+- `lurek.effect.newTransition`: Creates a new screen-transition controller.
+- `lurek.effect.setShaderErrorDisplay`: Enables or disables on-screen shader error display.
 - `lurek.effect.getShaderErrorDisplay`: Returns whether shader error display is currently enabled.
 
-### `ImageEffect` Methods
-- `ImageEffect:addEffect`: Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
-- `ImageEffect:getEffect`: Returns the effect at the given 1-based index or with the given type name.
-- `ImageEffect:removeEffect`: Removes the effect at the given 1-based index or with the given type name.
-- `ImageEffect:clearEffects`: Removes all effects from the chain.
-- `ImageEffect:clear`: Removes all effects from the chain (alias for clearEffects).
-- `ImageEffect:effectCount`: Returns the number of effects in the chain.
-- `ImageEffect:getEffectCount`: Returns the number of effects in the chain (alias for effectCount).
-- `ImageEffect:clone`: Returns a deep copy of this ImageEffect chain.
-- `ImageEffect:save`: Stub: no-op serialisation placeholder.
-- `ImageEffect:type`: Returns the type name "ImageEffect".
-- `ImageEffect:typeOf`: Returns true when the given name matches "ImageEffect" or a parent type.
-- `ImageEffect:removeByIndex`: Removes the effect at the given 0-based index from the chain.
-- `ImageEffect:removeByName`: Removes the first effect matching the given type name.
+### `LImageEffect` Methods
+- `LImageEffect:addEffect`: Creates a new effect by type name, appends it, and returns the shared PostFxEffect.
+- `LImageEffect:getEffect`: Returns the effect at the given 1-based index or with the given type name.
+- `LImageEffect:removeEffect`: Removes the effect at the given 1-based index or with the given type name.
+- `LImageEffect:clearEffects`: Removes all effects from the chain.
+- `LImageEffect:clear`: Removes all effects from the chain (alias for clearEffects).
+- `LImageEffect:effectCount`: Returns the number of effects in the chain.
+- `LImageEffect:getEffectCount`: Returns the number of effects in the chain (alias for effectCount).
+- `LImageEffect:clone`: Returns a deep copy of this ImageEffect chain.
+- `LImageEffect:save`: Stub: no-op serialisation placeholder.
+- `LImageEffect:type`: Returns the type name of this object.
+- `LImageEffect:typeOf`: Returns true when the given name matches this object or a parent type.
+- `LImageEffect:removeByIndex`: Removes the effect at the given 0-based index from the chain.
+- `LImageEffect:removeByName`: Removes the first effect matching the given type name.
 
-### `Overlay` Methods
-- `Overlay:update`: Advances all effect subsystems by the given delta time.
-- `Overlay:triggerLightning`: Triggers a lightning flash effect.
-- `Overlay:getShakeOffset`: Returns the current shake displacement as x, y.
-- `Overlay:isActive`: Returns true if any effect subsystem is currently active.
-- `Overlay:clear`: Resets all effect subsystems to their default inactive state.
-- `Overlay:resize`: Resizes the effect to match new window dimensions.
-- `Overlay:getWidth`: Returns the effect width.
-- `Overlay:getHeight`: Returns the effect height.
-- `Overlay:getDimensions`: Returns the effect width and height.
-- `Overlay:getFlashAlpha`: Returns the current flash overlay alpha value.
-- `Overlay:getLightningAlpha`: Returns the current lightning overlay alpha value.
-- `Overlay:setAmbientEnabled`: Enables or disables the ambient light layer.
-- `Overlay:isAmbientEnabled`: Returns whether the ambient light layer is active.
-- `Overlay:getAmbientColor`: Returns the current ambient tint as r, g, b, a components.
-- `Overlay:setTimeOfDay`: Sets the simulated time-of-day (0â€“24) which drives ambient colour.
-- `Overlay:getTimeOfDay`: Returns the current simulated time-of-day (0â€“24).
-- `Overlay:setFogEnabled`: Enables or disables the fog layer.
-- `Overlay:isFogEnabled`: Returns whether the fog layer is active.
-- `Overlay:setFogDensity`: Sets the fog density (0.0 = clear, 1.0 = fully opaque).
-- `Overlay:getFogDensity`: Returns the current fog density.
-- `Overlay:getFogColor`: Returns the current fog tint as r, g, b, a components.
-- `Overlay:setHeatHazeEnabled`: Enables or disables the heat-haze distortion layer.
-- `Overlay:isHeatHazeEnabled`: Returns whether the heat-haze layer is active.
-- `Overlay:setHeatHazeIntensity`: Sets the heat-haze distortion intensity (0.0â€“1.0).
-- `Overlay:getHeatHazeIntensity`: Returns the current heat-haze distortion intensity.
-- `Overlay:setVignetteEnabled`: Enables or disables the screen-edge vignette layer.
-- `Overlay:isVignetteEnabled`: Returns whether the vignette layer is active.
-- `Overlay:setVignetteStrength`: Sets the vignette darkening strength (0.0â€“1.0).
-- `Overlay:getVignetteStrength`: Returns the current vignette strength.
-- `Overlay:setFilmGrainEnabled`: Enables or disables the film-grain noise layer.
-- `Overlay:isFilmGrainEnabled`: Returns whether the film-grain layer is active.
-- `Overlay:setFilmGrainIntensity`: Sets the film-grain noise intensity (0.0â€“1.0).
-- `Overlay:getFilmGrainIntensity`: Returns the current film-grain intensity.
-- `Overlay:setCloudShadows`: Enables or disables scrolling cloud-shadow projection.
-- `Overlay:isCloudShadowsEnabled`: Returns whether cloud shadows are active.
-- `Overlay:setCloudCount`: Sets the number of cloud shadow instances to render.
-- `Overlay:getCloudCount`: Returns the current cloud shadow instance count.
-- `Overlay:setCloudSpeed`: Sets the horizontal scroll speed of cloud shadows in pixels per second.
-- `Overlay:getCloudSpeed`: Returns the current cloud shadow scroll speed.
-- `Overlay:setCloudScale`: Sets the scale multiplier applied to each cloud shadow.
-- `Overlay:getCloudScale`: Returns the current cloud shadow scale.
-- `Overlay:setCloudOpacity`: Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
-- `Overlay:getCloudOpacity`: Returns the current cloud shadow opacity.
-- `Overlay:setWeatherEnabled`: Enables or disables the weather particle system.
-- `Overlay:isWeatherEnabled`: Returns whether the weather particle system is active.
-- `Overlay:setWeather`: Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
-- `Overlay:getWeather`: Returns the name of the current weather type.
-- `Overlay:setWeatherIntensity`: Sets the particle spawn rate multiplier (0.0â€“1.0).
-- `Overlay:getWeatherIntensity`: Returns the current weather intensity.
-- `Overlay:setWindDirection`: Sets the wind direction in radians (0 = right, Ď€/2 = down).
-- `Overlay:getWindDirection`: Returns the current wind direction in radians.
-- `Overlay:setWindSpeed`: Sets the wind speed applied to weather particles in units per second.
-- `Overlay:getWindSpeed`: Returns the current wind speed.
-- `Overlay:getLightningColor`: Returns the lightning flash tint as r, g, b, a components.
-- `Overlay:isFlashing`: Returns true while a flash effect is in progress.
-- `Overlay:shake`: Triggers a camera shake; duration defaults to 0.5 s.
-- `Overlay:isShaking`: Returns true while a shake effect is in progress.
-- `Overlay:isFading`: Returns true while a fade effect is in progress.
-- `Overlay:render`: Emits GPU render commands for all active overlay effects (flash, fade, lightning, vignette).
-- `Overlay:drawToImage`: Renders the effect state (flash, fade, effects) to a CPU ImageData.
-- `Overlay:setCustomShader`: Assigns a custom shader name to the effect, or clears it when `nil` is passed.
-- `Overlay:getWater`: Returns a table describing the current water overlay state.
-- `Overlay:type`: Returns the type name of this object ("Overlay").
-- `Overlay:typeOf`: Returns true if this object is of the given type ("Object" or "Overlay").
+### `LOverlay` Methods
+- `LOverlay:update`: Advances all effect subsystems by the given delta time.
+- `LOverlay:triggerFlash`: Triggers a screen-wide colour flash effect.
+- `LOverlay:triggerShake`: Triggers a screen shake effect with the given intensity and duration.
+- `LOverlay:triggerFade`: Triggers a screen fade effect to the given colour and alpha.
+- `LOverlay:triggerLightning`: Triggers a lightning flash effect.
+- `LOverlay:getShakeOffset`: Returns the current shake displacement as x, y.
+- `LOverlay:isActive`: Returns true if any effect subsystem is currently active.
+- `LOverlay:clear`: Resets all effect subsystems to their default inactive state.
+- `LOverlay:resize`: Resizes the effect to match new window dimensions.
+- `LOverlay:getWidth`: Returns the effect width.
+- `LOverlay:getHeight`: Returns the effect height.
+- `LOverlay:getDimensions`: Returns the effect width and height.
+- `LOverlay:getFlashAlpha`: Returns the current flash overlay alpha value.
+- `LOverlay:getLightningAlpha`: Returns the current lightning overlay alpha value.
+- `LOverlay:setAmbientEnabled`: Enables or disables the ambient light layer.
+- `LOverlay:isAmbientEnabled`: Returns whether the ambient light layer is active.
+- `LOverlay:setAmbientColor`: Sets the ambient light tint colour; alpha defaults to 1.0.
+- `LOverlay:getAmbientColor`: Returns the current ambient tint as r, g, b, a components.
+- `LOverlay:setTimeOfDay`: Sets the simulated time-of-day (0-24) which drives ambient colour.
+- `LOverlay:getTimeOfDay`: Returns the current simulated time-of-day (0-24).
+- `LOverlay:setFogEnabled`: Enables or disables the fog layer.
+- `LOverlay:isFogEnabled`: Returns whether the fog layer is active.
+- `LOverlay:setFogDensity`: Sets the fog density (0.0 = clear, 1.0 = fully opaque).
+- `LOverlay:getFogDensity`: Returns the current fog density.
+- `LOverlay:setFogColor`: Sets the fog tint colour; alpha defaults to 1.0.
+- `LOverlay:getFogColor`: Returns the current fog tint as r, g, b, a components.
+- `LOverlay:setHeatHazeEnabled`: Enables or disables the heat-haze distortion layer.
+- `LOverlay:isHeatHazeEnabled`: Returns whether the heat-haze layer is active.
+- `LOverlay:setHeatHazeIntensity`: Sets the heat-haze distortion intensity (0.0-1.0).
+- `LOverlay:getHeatHazeIntensity`: Returns the current heat-haze distortion intensity.
+- `LOverlay:setVignetteEnabled`: Enables or disables the screen-edge vignette layer.
+- `LOverlay:isVignetteEnabled`: Returns whether the vignette layer is active.
+- `LOverlay:setVignetteStrength`: Sets the vignette darkening strength (0.0-1.0).
+- `LOverlay:getVignetteStrength`: Returns the current vignette strength.
+- `LOverlay:setFilmGrainEnabled`: Enables or disables the film-grain noise layer.
+- `LOverlay:isFilmGrainEnabled`: Returns whether the film-grain layer is active.
+- `LOverlay:setFilmGrainIntensity`: Sets the film-grain noise intensity (0.0-1.0).
+- `LOverlay:getFilmGrainIntensity`: Returns the current film-grain intensity.
+- `LOverlay:setCloudShadows`: Enables or disables scrolling cloud-shadow projection.
+- `LOverlay:isCloudShadowsEnabled`: Returns whether cloud shadows are active.
+- `LOverlay:setCloudCount`: Sets the number of cloud shadow instances to render.
+- `LOverlay:getCloudCount`: Returns the current cloud shadow instance count.
+- `LOverlay:setCloudSpeed`: Sets the horizontal scroll speed of cloud shadows in pixels per second.
+- `LOverlay:getCloudSpeed`: Returns the current cloud shadow scroll speed.
+- `LOverlay:setCloudScale`: Sets the scale multiplier applied to each cloud shadow.
+- `LOverlay:getCloudScale`: Returns the current cloud shadow scale.
+- `LOverlay:setCloudOpacity`: Sets the opacity of cloud shadows (0.0 = invisible, 1.0 = fully dark).
+- `LOverlay:getCloudOpacity`: Returns the current cloud shadow opacity.
+- `LOverlay:setWeatherEnabled`: Enables or disables the weather particle system.
+- `LOverlay:isWeatherEnabled`: Returns whether the weather particle system is active.
+- `LOverlay:setWeather`: Sets the active weather type by name ("none", "rain", "snow", "hail", "dust", "leaves", "ash", "pollen").
+- `LOverlay:getWeather`: Returns the name of the current weather type.
+- `LOverlay:setWeatherIntensity`: Sets the particle spawn rate multiplier (0.0-1.0).
+- `LOverlay:getWeatherIntensity`: Returns the current weather intensity.
+- `LOverlay:setWindDirection`: Sets the wind direction in radians (0 = right, Ď€/2 = down).
+- `LOverlay:getWindDirection`: Returns the current wind direction in radians.
+- `LOverlay:setWindSpeed`: Sets the wind speed applied to weather particles in units per second.
+- `LOverlay:getWindSpeed`: Returns the current wind speed.
+- `LOverlay:setLightningColor`: Sets the lightning flash tint colour; alpha defaults to 1.0.
+- `LOverlay:getLightningColor`: Returns the lightning flash tint as r, g, b, a components.
+- `LOverlay:flash`: Triggers a full-screen colour flash; alpha defaults to 1.0, duration to 0.2 s.
+- `LOverlay:isFlashing`: Returns true while a flash effect is in progress.
+- `LOverlay:shake`: Triggers a camera shake; duration defaults to 0.5 s.
+- `LOverlay:isShaking`: Returns true while a shake effect is in progress.
+- `LOverlay:fade`: Animates a full-screen colour fade; alpha defaults to 1.0, duration to 1.0 s.
+- `LOverlay:isFading`: Returns true while a fade effect is in progress.
+- `LOverlay:render`: Emits GPU render commands for all active overlay effects.
+- `LOverlay:drawToImage`: Renders the effect state (flash, fade, effects) to a CPU ImageData.
+- `LOverlay:setWater`: Enables the water overlay and sets its wave parameters.
+- `LOverlay:setWaterTint`: Sets the water tint colour and blend strength.
+- `LOverlay:setCustomShader`: Assigns a custom shader name to the effect.
+- `LOverlay:getWater`: Returns a table describing the current water overlay state.
+- `LOverlay:type`: Returns the type name of this object.
+- `LOverlay:typeOf`: Returns true if this object is of the given type.
 
-### `PostFxEffect` Methods
-- `PostFxEffect:getTypeName`: Returns the display name of this effect type.
-- `PostFxEffect:isBuiltIn`: Returns true if this is a built-in effect, false if custom.
-- `PostFxEffect:isEnabled`: Returns whether this effect is currently active.
-- `PostFxEffect:setEnabled`: Enables or disables this effect.
-- `PostFxEffect:setParameter`: Sets a named float parameter on this effect.
-- `PostFxEffect:hasParameter`: Returns true if the named parameter exists on this effect.
-- `PostFxEffect:getParameterNames`: Returns a list of all parameter names on this effect.
-- `PostFxEffect:getEffectType`: Returns the type name of this effect (alias for getTypeName).
-- `PostFxEffect:getType`: Returns the type name of this effect (alias for getTypeName).
-- `PostFxEffect:type`: Returns the type name "PostFxEffect".
-- `PostFxEffect:typeOf`: Returns true when the given name matches "PostFxEffect" or a parent type.
-- `PostFxEffect:setThreshold`: Sets the threshold parameter of this effect.
-- `PostFxEffect:setIntensity`: Sets the intensity parameter of this effect.
-- `PostFxEffect:setRadius`: Sets the radius parameter of this effect.
-- `PostFxEffect:setStrength`: Sets the strength parameter of this effect.
-- `PostFxEffect:setScanlineStrength`: Sets the scanline strength parameter of this effect.
-- `PostFxEffect:setOffset`: Sets the offset parameter of this effect.
-- `PostFxEffect:setBrightness`: Sets the brightness parameter of this effect.
-- `PostFxEffect:setContrast`: Sets the contrast parameter of this effect.
-- `PostFxEffect:setSaturation`: Sets the saturation parameter of this effect.
-- `PostFxEffect:enableAutoUniforms`: Enables auto-injection of common uniforms into shader slot p[3] each frame.
-- `PostFxEffect:disableAutoUniforms`: Disables auto-injection of common uniforms into shader slot p[3].
-- `PostFxEffect:isAutoUniforms`: Returns whether auto-uniform injection is enabled for this effect.
+### `LPostFxEffect` Methods
+- `LPostFxEffect:getTypeName`: Returns the display name of this effect type.
+- `LPostFxEffect:isBuiltIn`: Returns true if this is a built-in effect, false if custom.
+- `LPostFxEffect:isEnabled`: Returns whether this effect is currently active.
+- `LPostFxEffect:setEnabled`: Enables or disables this effect.
+- `LPostFxEffect:setParameter`: Sets a named float parameter on this effect.
+- `LPostFxEffect:getParameter`: Returns a named parameter value, or the default if not set.
+- `LPostFxEffect:hasParameter`: Returns true if the named parameter exists on this effect.
+- `LPostFxEffect:getParameterNames`: Returns a list of all parameter names on this effect.
+- `LPostFxEffect:getEffectType`: Returns the type name of this effect (alias for getTypeName).
+- `LPostFxEffect:getType`: Returns the type name of this effect (alias for getTypeName).
+- `LPostFxEffect:type`: Returns the type name of this object.
+- `LPostFxEffect:typeOf`: Returns true when the given name matches this object or a parent type.
+- `LPostFxEffect:setThreshold`: Sets the threshold parameter of this effect.
+- `LPostFxEffect:setIntensity`: Sets the intensity parameter of this effect.
+- `LPostFxEffect:setRadius`: Sets the radius parameter of this effect.
+- `LPostFxEffect:setStrength`: Sets the strength parameter of this effect.
+- `LPostFxEffect:setScanlineStrength`: Sets the scanline strength parameter of this effect.
+- `LPostFxEffect:setOffset`: Sets the offset parameter of this effect.
+- `LPostFxEffect:setBrightness`: Sets the brightness parameter of this effect.
+- `LPostFxEffect:setContrast`: Sets the contrast parameter of this effect.
+- `LPostFxEffect:setSaturation`: Sets the saturation parameter of this effect.
+- `LPostFxEffect:enableAutoUniforms`: Enables auto-injection of common uniforms into shader slot p[3] each frame.
+- `LPostFxEffect:disableAutoUniforms`: Disables auto-injection of common uniforms into shader slot p[3].
+- `LPostFxEffect:isAutoUniforms`: Returns whether auto-uniform injection is enabled for this effect.
 
-### `PostFxStack` Methods
-- `PostFxStack:add`: Appends a PostFxEffect to the end of the pipeline.
-- `PostFxStack:remove`: Removes the given PostFxEffect from the pipeline.
-- `PostFxStack:isEnabled`: Returns whether the effect at the given 1-based position is enabled.
-- `PostFxStack:getEffectCount`: Returns the number of effects in the pipeline.
-- `PostFxStack:getEffect`: Returns the effect at the given 1-based position, or nil.
-- `PostFxStack:getEnabledEffects`: Returns a list of currently enabled effect objects.
-- `PostFxStack:getWidth`: Returns the width of the render target.
-- `PostFxStack:getHeight`: Returns the height of the render target.
-- `PostFxStack:getDimensions`: Returns width and height of the render target.
-- `PostFxStack:resize`: Resizes the render target to the given dimensions.
-- `PostFxStack:len`: Returns the total number of effect slots in the pipeline.
-- `PostFxStack:isEmpty`: Returns true if the pipeline has no effect slots.
-- `PostFxStack:clear`: Removes all effects from the pipeline.
-- `PostFxStack:dedup`: Removes duplicate effects from the pipeline, keeping the first occurrence
-- `PostFxStack:isCapturing`: Returns whether the stack is currently capturing the scene.
-- `PostFxStack:beginCapture`: Begins capturing the scene for post-processing.
-- `PostFxStack:endCapture`: Ends scene capture for post-processing.
-- `PostFxStack:apply`: Applies all enabled effects in the stack and composites the result to screen.
-- `PostFxStack:type`: Returns the type name "PostFxStack".
-- `PostFxStack:typeOf`: Returns true when the given name matches "PostFxStack" or a parent type.
-- `PostFxStack:setFeedback`: Sets the feedback loop intensity. At `0.0` (default) there is no
-- `PostFxStack:getFeedback`: Returns the current feedback loop intensity `[0.0, 1.0]`.
-- `PostFxStack:clearFeedback`: Resets the feedback intensity to `0.0` (disables feedback).
+### `LPostFxStack` Methods
+- `LPostFxStack:add`: Appends a PostFxEffect to the end of the pipeline.
+- `LPostFxStack:remove`: Removes the given PostFxEffect from the pipeline.
+- `LPostFxStack:insert`: Inserts a PostFxEffect at a specific 1-based position in the pipeline.
+- `LPostFxStack:setEnabled`: Enables or disables the effect at the given 1-based position.
+- `LPostFxStack:isEnabled`: Returns whether the effect at the given 1-based position is enabled.
+- `LPostFxStack:getEffectCount`: Returns the number of effects in the pipeline.
+- `LPostFxStack:getEffect`: Returns the effect at the given 1-based position, or nil.
+- `LPostFxStack:getEnabledEffects`: Returns a list of currently enabled effect objects.
+- `LPostFxStack:getWidth`: Returns the width of the render target.
+- `LPostFxStack:getHeight`: Returns the height of the render target.
+- `LPostFxStack:getDimensions`: Returns width and height of the render target.
+- `LPostFxStack:resize`: Resizes the render target to the given dimensions.
+- `LPostFxStack:len`: Returns the total number of effect slots in the pipeline.
+- `LPostFxStack:isEmpty`: Returns true if the pipeline has no effect slots.
+- `LPostFxStack:clear`: Removes all effects from the pipeline.
+- `LPostFxStack:dedup`: Removes duplicate effects from the pipeline.
+- `LPostFxStack:isCapturing`: Returns whether the stack is currently capturing the scene.
+- `LPostFxStack:beginCapture`: Begins capturing the scene for post-processing.
+- `LPostFxStack:endCapture`: Ends scene capture for post-processing.
+- `LPostFxStack:apply`: Applies all enabled effects in the stack and composites the result to the screen.
+- `LPostFxStack:type`: Returns the type name of this object.
+- `LPostFxStack:typeOf`: Returns true when the given name matches this object or a parent type.
+- `LPostFxStack:setFeedback`: Sets the feedback loop intensity between `0.0` and `1.0`.
+- `LPostFxStack:getFeedback`: Returns the current feedback loop intensity `[0.0, 1.0]`.
+- `LPostFxStack:clearFeedback`: Resets the feedback intensity to `0.0` (disables feedback).
 
-### `mlua` Methods
-- `mlua:play`: Starts the transition playing forward (scene fades/wipes out).
-- `mlua:reverse`: Starts the transition in reverse (scene fades/wipes in).
-- `mlua:update`: Advances the transition by `dt` seconds. Returns `true` while
-- `mlua:progress`: Returns the fractional progress `[0, 1]` of the transition, taking
-- `mlua:isActive`: Returns `true` while the transition is running.
-- `mlua:isDone`: Returns `true` after the transition has completed.
-- `mlua:kind`: Returns the transition kind name (`"fade"`, `"wipe"`, `"iris_wipe"`,
-- `mlua:color`: Returns the fill color as four numbers: `r, g, b, a`.
-- `mlua:setColor`: Updates the fill color from `{r, g, b, a?}`.
-- `mlua:type`: Type.
-- `mlua:typeOf`: Type of.
+### `LScreenTransition` Methods
+- `LScreenTransition:play`: Starts the transition playing forward (scene fades/wipes out).
+- `LScreenTransition:reverse`: Starts the transition in reverse (scene fades/wipes in).
+- `LScreenTransition:update`: Advances the transition by `dt` seconds.
+- `LScreenTransition:progress`: Returns the fractional progress of the transition.
+- `LScreenTransition:isActive`: Returns true while the transition is running.
+- `LScreenTransition:isDone`: Returns true after the transition has completed.
+- `LScreenTransition:kind`: Returns the transition kind name.
+- `LScreenTransition:color`: Returns the fill color as four numbers: `r, g, b, a`.
+- `LScreenTransition:setColor`: Updates the fill color from `{r, g, b, a?}`.
+- `LScreenTransition:type`: Returns the type name of this object.
+- `LScreenTransition:typeOf`: Returns true if this object is of the given type name or a parent type.
 
 ## References
 

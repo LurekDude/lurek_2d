@@ -4,6 +4,176 @@
 //! grid, including player position and directional arrow rendering.
 
 use super::dda::Raycaster2D;
+use super::lighting::{compute_lighting, PointLight};
+use std::collections::HashSet;
+
+/// One minimap tile sample produced by [`build_minimap_tile_window`].
+#[derive(Debug, Clone)]
+pub struct MinimapTileSample {
+    /// Grid X coordinate.
+    pub x: u32,
+    /// Grid Y coordinate.
+    pub y: u32,
+    /// Whether this tile is blocked by a wall.
+    pub blocked: bool,
+    /// Whether the tile has line-of-sight from the center tile.
+    pub visible: bool,
+    /// Lit RGB values in range [0, 1].
+    pub light: [f32; 3],
+    /// Convenience luma value from the light vector.
+    pub luma: f32,
+}
+
+fn tile_line_of_sight(raycaster: &Raycaster2D, x0: i32, y0: i32, x1: i32, y1: i32) -> bool {
+    let mut x = x0;
+    let mut y = y0;
+    let dx = (x1 - x0).abs();
+    let dy = (y1 - y0).abs();
+    let sx = if x0 < x1 { 1 } else { -1 };
+    let sy = if y0 < y1 { 1 } else { -1 };
+    let mut err = dx - dy;
+
+    while !(x == x1 && y == y1) {
+        let e2 = 2 * err;
+        if e2 > -dy {
+            err -= dy;
+            x += sx;
+        }
+        if e2 < dx {
+            err += dx;
+            y += sy;
+        }
+
+        if (x != x1 || y != y1)
+            && (x < 0
+                || y < 0
+                || raycaster.get_cell(x as u32, y as u32) > 0)
+        {
+            return false;
+        }
+    }
+
+    true
+}
+
+/// Computes tile lighting for one grid cell using the raycaster wall map.
+///
+/// The light sample position is taken at tile center `(x+0.5, y+0.5)`.
+/// Out-of-bounds tiles return `[ambient, ambient, ambient]`.
+pub fn compute_tile_light(
+    raycaster: &Raycaster2D,
+    x: u32,
+    y: u32,
+    ambient: f32,
+    lights: &[PointLight],
+) -> [f32; 3] {
+    if x >= raycaster.width() || y >= raycaster.height() {
+        let a = ambient.clamp(0.0, 1.0);
+        return [a, a, a];
+    }
+
+    let wx = x as f32 + 0.5;
+    let wy = y as f32 + 0.5;
+    let wall_at = |cx: i32, cy: i32| -> bool {
+        cx < 0 || cy < 0 || raycaster.get_cell(cx as u32, cy as u32) > 0
+    };
+    compute_lighting(wx, wy, ambient, lights, &wall_at)
+}
+
+/// Builds minimap tile samples around a world-space center.
+///
+/// Returns one sample per in-bounds tile inside the square window
+/// `[(cx-radius)..(cx+radius)] x [(cy-radius)..(cy+radius)]`.
+pub fn build_minimap_tile_window(
+    raycaster: &Raycaster2D,
+    center_x: f32,
+    center_y: f32,
+    radius: u32,
+    ambient: f32,
+    lights: &[PointLight],
+) -> Vec<MinimapTileSample> {
+    let cx = center_x.floor() as i32;
+    let cy = center_y.floor() as i32;
+    let r = radius as i32;
+    let mut out = Vec::new();
+
+    for gy in (cy - r)..=(cy + r) {
+        for gx in (cx - r)..=(cx + r) {
+            if gx < 0 || gy < 0 {
+                continue;
+            }
+
+            let ux = gx as u32;
+            let uy = gy as u32;
+            if ux >= raycaster.width() || uy >= raycaster.height() {
+                continue;
+            }
+
+            let blocked = raycaster.get_cell(ux, uy) > 0;
+            let visible = tile_line_of_sight(raycaster, cx, cy, gx, gy);
+            let light = compute_tile_light(raycaster, ux, uy, ambient, lights);
+            let luma = ((light[0] + light[1] + light[2]) / 3.0).clamp(0.0, 1.0);
+
+            out.push(MinimapTileSample {
+                x: ux,
+                y: uy,
+                blocked,
+                visible,
+                light,
+                luma,
+            });
+        }
+    }
+
+    out
+}
+
+/// Traces multiple rays and returns unique grid cells crossed by those rays.
+///
+/// The output can drive fog-of-war reveal logic without Lua-side per-ray loops.
+pub fn reveal_cells_from_rays(
+    raycaster: &Raycaster2D,
+    ox: f32,
+    oy: f32,
+    angle: f32,
+    fov: f32,
+    count: u32,
+    max_dist: f32,
+    step: f32,
+) -> Vec<(u32, u32)> {
+    let step = step.max(0.05);
+    let mut visited: HashSet<(u32, u32)> = HashSet::new();
+    let mut cells = Vec::new();
+
+    let add_cell = |visited: &mut HashSet<(u32, u32)>, cells: &mut Vec<(u32, u32)>, x: f32, y: f32| {
+        if x.is_finite() && y.is_finite() && x >= 0.0 && y >= 0.0 {
+            let gx = x.floor() as u32;
+            let gy = y.floor() as u32;
+            if gx < raycaster.width() && gy < raycaster.height() && visited.insert((gx, gy)) {
+                cells.push((gx, gy));
+            }
+        }
+    };
+
+    add_cell(&mut visited, &mut cells, ox, oy);
+    let hits = raycaster.cast_rays(ox, oy, angle, fov, count, max_dist);
+
+    for hit in hits {
+        let hx = if hit.hit { hit.hit_x } else { ox + angle.cos() * max_dist };
+        let hy = if hit.hit { hit.hit_y } else { oy + angle.sin() * max_dist };
+        let dx = hx - ox;
+        let dy = hy - oy;
+        let dist = (dx * dx + dy * dy).sqrt();
+        let steps = (dist / step).max(1.0).floor() as u32;
+
+        for i in 0..=steps {
+            let t = i as f32 / steps as f32;
+            add_cell(&mut visited, &mut cells, ox + dx * t, oy + dy * t);
+        }
+    }
+
+    cells
+}
 
 /// Extracts a top-down minimap from a Raycaster2D grid.
 ///

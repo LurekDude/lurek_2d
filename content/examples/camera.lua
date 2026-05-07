@@ -1,4 +1,4 @@
--- content/examples/camera.lua
+﻿-- content/examples/camera.lua
 -- Hand-written coverage of the lurek.camera API (36 items).
 --
 -- Each Camera2D owns a viewport (screen rect), a world-space position,
@@ -9,440 +9,440 @@
 --
 -- Run: cargo run -- content/examples/camera.lua
 
--- ── lurek.camera.* functions ──
+-- â”€â”€ lurek.camera.* functions â”€â”€
 
 --@api-stub: lurek.camera.new
 -- Creates a new Camera2D with the given viewport dimensions.
 -- Pass the screen size in pixels; the viewport defines the rect the camera draws into.
-do  -- lurek.camera.new
-  local cam = lurek.camera.new(1280, 720)
-  cam:setPosition(0, 0)
-  lurek.log.info("camera viewport=" .. 1280 .. "x" .. 720, "camera")
-end
+-- if false then -- lurek.camera.new
+--   local cam = lurek.camera.new(1280, 720)
+--   cam:setPosition(0, 0)
+--   lurek.log.info("camera viewport=" .. 1280 .. "x" .. 720, "camera")
+-- end
 
--- ── Camera2D methods ──
+-- â”€â”€ Camera2D methods â”€â”€
 
 --@api-stub: Camera2D:setPosition
 -- Sets the camera's world-space position.
 -- Snaps the camera origin instantly; for smooth follow use setTarget + setFollowSmooth instead.
-do  -- Camera2D:setPosition
-  local cam = lurek.camera.new(800, 600)
-  local player_x, player_y = 512, 384
-  cam:setPosition(player_x - 400, player_y - 300)
-end
+-- if false then -- Camera2D:setPosition
+--   local cam = lurek.camera.new(800, 600)
+--   local player_x, player_y = 512, 384
+--   cam:setPosition(player_x - 400, player_y - 300)
+-- end
 
 --@api-stub: Camera2D:getPosition
 -- Returns the camera's world-space position as x, y.
 -- Useful for HUD overlays that need to know the camera origin to project labels back to screen space.
-do  -- Camera2D:getPosition
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(120, 240)
-  local cx, cy = cam:getPosition()
-  lurek.log.debug("camera at " .. cx .. "," .. cy, "camera")
-end
+-- if false then -- Camera2D:getPosition
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(120, 240)
+--   local cx, cy = cam:getPosition()
+--   lurek.log.debug("camera at " .. cx .. "," .. cy, "camera")
+-- end
 
 --@api-stub: Camera2D:setZoom
 -- Sets the uniform zoom factor (1.0 = natural size).
 -- Values >1 zoom in (pixels look bigger), values <1 zoom out; combine with effect deltas via getEffectiveZoom.
-do  -- Camera2D:setZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(2.0)
-end
+-- if false then -- Camera2D:setZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(2.0)
+-- end
 
 --@api-stub: Camera2D:getZoom
 -- Returns the current zoom factor.
 -- Read this before applying delta-zoom logic (e.g. mouse wheel) so you stack relative changes consistently.
-do  -- Camera2D:getZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(1.5)
-  local z = cam:getZoom()
-  if z > 1.0 then lurek.log.info("zoomed in: " .. z, "camera") end
-end
+-- if false then -- Camera2D:getZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(1.5)
+--   local z = cam:getZoom()
+--   if z > 1.0 then lurek.log.info("zoomed in: " .. z, "camera") end
+-- end
 
 --@api-stub: Camera2D:setRotation
 -- Sets the rotation in radians.
 -- Rotates the world around the camera origin; use sparingly, rotated cameras break tile-aligned art.
-do  -- Camera2D:setRotation
-  local cam = lurek.camera.new(800, 600)
-  cam:setRotation(math.pi / 8)
-end
+-- if false then -- Camera2D:setRotation
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setRotation(math.pi / 8)
+-- end
 
 --@api-stub: Camera2D:getRotation
 -- Returns the rotation in radians.
 -- Convert to degrees with `math.deg(r)` when displaying in a debug overlay.
-do  -- Camera2D:getRotation
-  local cam = lurek.camera.new(800, 600)
-  cam:setRotation(0.5)
-  local r = cam:getRotation()
-  lurek.log.debug("rotation rad=" .. r .. " deg=" .. math.deg(r), "camera")
-end
+-- if false then -- Camera2D:getRotation
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setRotation(0.5)
+--   local r = cam:getRotation()
+--   lurek.log.debug("rotation rad=" .. r .. " deg=" .. math.deg(r), "camera")
+-- end
 
 --@api-stub: Camera2D:getViewport
 -- Returns the current viewport as x, y, w, h.
 -- Use after a window resize to confirm the camera matches the new screen rect.
-do  -- Camera2D:getViewport
-  local cam = lurek.camera.new(1280, 720)
-  local vx, vy, vw, vh = cam:getViewport()
-  lurek.log.info("viewport=" .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "camera")
-end
+-- if false then -- Camera2D:getViewport
+--   local cam = lurek.camera.new(1280, 720)
+--   local vx, vy, vw, vh = cam:getViewport()
+--   lurek.log.info("viewport=" .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "camera")
+-- end
 
 --@api-stub: Camera2D:removeBounds
 -- Removes previously set world-space bounds.
 -- Call this when entering a scrolling boss arena where the camera should not be clamped to the level rect.
-do  -- Camera2D:removeBounds
-  local cam = lurek.camera.new(800, 600)
-  cam:setBounds(0, 0, 4096, 2048)
-  cam:removeBounds()
-end
+-- if false then -- Camera2D:removeBounds
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setBounds(0, 0, 4096, 2048)
+--   cam:removeBounds()
+-- end
 
 --@api-stub: Camera2D:setTarget
 -- Sets the follow target position.
 -- Update the target every frame to the entity you want to follow; pair with setFollowSmooth for easing.
-do  -- Camera2D:setTarget
-  local cam = lurek.camera.new(800, 600)
-  local enemy = { x = 1024, y = 512 }
-  cam:setTarget(enemy.x, enemy.y)
-end
+-- if false then -- Camera2D:setTarget
+--   local cam = lurek.camera.new(800, 600)
+--   local enemy = { x = 1024, y = 512 }
+--   cam:setTarget(enemy.x, enemy.y)
+-- end
 
 --@api-stub: Camera2D:clearTarget
 -- Clears the follow target so the camera stops tracking.
 -- Call when switching to a cinematic path or when the followed entity dies.
-do  -- Camera2D:clearTarget
-  local cam = lurek.camera.new(800, 600)
-  cam:setTarget(500, 500)
-  cam:clearTarget()
-end
+-- if false then -- Camera2D:clearTarget
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setTarget(500, 500)
+--   cam:clearTarget()
+-- end
 
 --@api-stub: Camera2D:setFollowSmooth
 -- Sets the follow smooth interpolation speed (0.0 = instant snap).
 -- Typical values 4-10; higher = snappier; 0 makes setTarget behave like setPosition.
-do  -- Camera2D:setFollowSmooth
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(6.0)
-end
+-- if false then -- Camera2D:setFollowSmooth
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setFollowSmooth(6.0)
+-- end
 
 --@api-stub: Camera2D:setDeadZone
 -- Sets the dead zone half-extents for camera follow.
 -- Inside this rect the camera ignores target motion; good for stopping platformer jitter on small jumps.
-do  -- Camera2D:setDeadZone
-  local cam = lurek.camera.new(800, 600)
-  cam:setDeadZone(40, 24)
-end
+-- if false then -- Camera2D:setDeadZone
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setDeadZone(40, 24)
+-- end
 
 --@api-stub: Camera2D:setLookAhead
 -- Sets the look-ahead multiplier for follow prediction.
 -- Multiplier of the target's velocity offset; 0.25 nudges the camera ahead so the player sees what's coming.
-do  -- Camera2D:setLookAhead
-  local cam = lurek.camera.new(800, 600)
-  cam:setLookAhead(0.25)
-end
+-- if false then -- Camera2D:setLookAhead
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setLookAhead(0.25)
+-- end
 
 --@api-stub: Camera2D:shake
 -- Starts a screen-shake effect.
 -- Trigger on hits, explosions, landings; intensity in pixels, duration in seconds.
-do  -- Camera2D:shake
-  local cam = lurek.camera.new(800, 600)
-  cam:shake(8.0, 0.35)
-end
+-- if false then -- Camera2D:shake
+--   local cam = lurek.camera.new(800, 600)
+--   cam:shake(8.0, 0.35)
+-- end
 
 --@api-stub: Camera2D:update
 -- Advances the camera simulation by dt seconds.
 -- Call once per frame from lurek.process(dt); this advances follow, shake, and bounds clamping.
-do  -- Camera2D:update
-  local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:update(dt) end
-end
+-- if false then -- Camera2D:update
+--   local cam = lurek.camera.new(800, 600)
+--   function lurek.process(dt) cam:update(dt) end
+-- end
 
 --@api-stub: Camera2D:toWorld
 -- Converts screen coordinates to world coordinates.
 -- Use to translate a mouse click into the world point the player aimed at.
-do  -- Camera2D:toWorld
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(200, 100)
-  local wx, wy = cam:toWorld(400, 300)
-  lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
-end
+-- if false then -- Camera2D:toWorld
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(200, 100)
+--   local wx, wy = cam:toWorld(400, 300)
+--   lurek.log.debug("click world=" .. wx .. "," .. wy, "input")
+-- end
 
 --@api-stub: Camera2D:toScreen
 -- Converts world coordinates to screen coordinates.
 -- Project entity positions to pixels for HUD pointers, damage numbers, or off-screen indicators.
-do  -- Camera2D:toScreen
-  local cam = lurek.camera.new(800, 600)
-  local enemy_wx, enemy_wy = 1024, 512
-  local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
-  if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
-end
+-- if false then -- Camera2D:toScreen
+--   local cam = lurek.camera.new(800, 600)
+--   local enemy_wx, enemy_wy = 1024, 512
+--   local sx, sy = cam:toScreen(enemy_wx, enemy_wy)
+--   if sx >= 0 and sx < 800 then lurek.log.debug("enemy on-screen at " .. sx .. "," .. sy, "hud") end
+-- end
 
 --@api-stub: Camera2D:getVisibleArea
 -- Returns the visible world area as x, y, w, h.
 -- Cull entities outside this rect before drawing to skip off-screen sprites.
-do  -- Camera2D:getVisibleArea
-  local cam = lurek.camera.new(800, 600)
-  local vx, vy, vw, vh = cam:getVisibleArea()
-  lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
-end
+-- if false then -- Camera2D:getVisibleArea
+--   local cam = lurek.camera.new(800, 600)
+--   local vx, vy, vw, vh = cam:getVisibleArea()
+--   lurek.log.info("visible " .. vx .. "," .. vy .. " " .. vw .. "x" .. vh, "render")
+-- end
 
 --@api-stub: Camera2D:lookAt
 -- Instantly moves the camera to look at the given position.
 -- Convenience wrapper around setPosition that centres the viewport on the point; use for scene cuts.
-do  -- Camera2D:lookAt
-  local cam = lurek.camera.new(800, 600)
-  cam:lookAt(2048, 1024)
-end
+-- if false then -- Camera2D:lookAt
+--   local cam = lurek.camera.new(800, 600)
+--   cam:lookAt(2048, 1024)
+-- end
 
 --@api-stub: Camera2D:move
 -- Translates the camera by dx, dy in world space.
 -- Wire to WASD-style free-look during edit mode, scaled by dt for frame-rate independence.
-do  -- Camera2D:move
-  local cam = lurek.camera.new(800, 600)
-  function lurek.process(dt) cam:move(200 * dt, 0) end
-end
+-- if false then -- Camera2D:move
+--   local cam = lurek.camera.new(800, 600)
+--   function lurek.process(dt) cam:move(200 * dt, 0) end
+-- end
 
 --@api-stub: Camera2D:stopPath
 -- Cancels the active camera path animation.
 -- Call when the player regains control mid-cutscene so the camera returns to follow mode.
-do  -- Camera2D:stopPath
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({ {0, 0}, {500, 500} }, 3.0)
-  cam:stopPath()
-end
+-- if false then -- Camera2D:stopPath
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({ {0, 0}, {500, 500} }, 3.0)
+--   cam:stopPath()
+-- end
 
 --@api-stub: Camera2D:updatePath
 -- Advances the path animation by `dt` seconds and applies the resulting position.
 -- Returns true while the path is still active; switch back to follow when it returns false.
-do  -- Camera2D:updatePath
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({ {0, 0}, {800, 600}, {0, 600} }, 4.0)
-  function lurek.process(dt) if not cam:updatePath(dt) then cam:setTarget(400, 300) end end
-end
+-- if false then -- Camera2D:updatePath
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({ {0, 0}, {800, 600}, {0, 600} }, 4.0)
+--   function lurek.process(dt) if not cam:updatePath(dt) then cam:setTarget(400, 300) end end
+-- end
 
 --@api-stub: Camera2D:pathProgress
 -- Returns the fractional progress `[0, 1]` of the active path, or `1` if none is running.
 -- Drive a cinematic letterbox fade out as progress approaches 1.0.
-do  -- Camera2D:pathProgress
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({ {0, 0}, {1000, 0} }, 2.0)
-  local p = cam:pathProgress()
-  lurek.log.debug("path " .. math.floor(p * 100) .. "%", "cutscene")
-end
+-- if false then -- Camera2D:pathProgress
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({ {0, 0}, {1000, 0} }, 2.0)
+--   local p = cam:pathProgress()
+--   lurek.log.debug("path " .. math.floor(p * 100) .. "%", "cutscene")
+-- end
 
 --@api-stub: Camera2D:zoomTo
 -- Smoothly tweens the camera zoom from its current level to target_zoom over duration seconds.
 -- Use for boss-intro pull-back or pull-in punch zooms; pair with updateZoom each frame.
-do  -- Camera2D:zoomTo
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomTo(2.5, 0.8)
-end
+-- if false then -- Camera2D:zoomTo
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomTo(2.5, 0.8)
+-- end
 
 --@api-stub: Camera2D:stopZoom
 -- Cancels the active zoom tween.
 -- Call when the player interrupts a cutscene zoom so the current zoom freezes in place.
-do  -- Camera2D:stopZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomTo(3.0, 1.0)
-  cam:stopZoom()
-end
+-- if false then -- Camera2D:stopZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomTo(3.0, 1.0)
+--   cam:stopZoom()
+-- end
 
 --@api-stub: Camera2D:updateZoom
 -- Advances the zoom tween by dt seconds and applies the resulting zoom level.
 -- Returns true while still tweening; check this to know when to fire the next stage of a sequence.
-do  -- Camera2D:updateZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomTo(1.5, 0.6)
-  function lurek.process(dt) if not cam:updateZoom(dt) then lurek.log.debug("zoom done", "camera") end end
-end
+-- if false then -- Camera2D:updateZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomTo(1.5, 0.6)
+--   function lurek.process(dt) if not cam:updateZoom(dt) then lurek.log.debug("zoom done", "camera") end end
+-- end
 
 --@api-stub: Camera2D:getParallaxFactor
 -- Returns the parallax factor for the named layer, or `1.0` if unset.
 -- Multiply layer scroll positions by this when drawing background tiles to fake depth.
-do  -- Camera2D:getParallaxFactor
-  local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("clouds", 0.2)
-  local f = cam:getParallaxFactor("clouds")
-  lurek.log.debug("clouds parallax=" .. f, "render")
-end
+-- if false then -- Camera2D:getParallaxFactor
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setParallaxFactor("clouds", 0.2)
+--   local f = cam:getParallaxFactor("clouds")
+--   lurek.log.debug("clouds parallax=" .. f, "render")
+-- end
 
 --@api-stub: Camera2D:clearParallaxFactors
 -- Removes all parallax factor overrides.
 -- Reset when loading a new level so old layer names from the previous scene do not leak.
-do  -- Camera2D:clearParallaxFactors
-  local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("sky", 0.1)
-  cam:clearParallaxFactors()
-end
+-- if false then -- Camera2D:clearParallaxFactors
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setParallaxFactor("sky", 0.1)
+--   cam:clearParallaxFactors()
+-- end
 
 --@api-stub: Camera2D:zoomPulse
 -- Triggers a momentary zoom-in that decays back via a sine envelope.
 -- Use for impact feedback (criticals, parries); amplitude ~0.05 is subtle, 0.15 is dramatic.
-do  -- Camera2D:zoomPulse
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomPulse(0.08, 0.25)
-end
+-- if false then -- Camera2D:zoomPulse
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomPulse(0.08, 0.25)
+-- end
 
 --@api-stub: Camera2D:stopSway
 -- Stops the active sway effect immediately.
 -- Call when the player leaves the boat / vehicle that started the sway.
-do  -- Camera2D:stopSway
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(4, 2, 0.8)
-  cam:stopSway()
-end
+-- if false then -- Camera2D:stopSway
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(4, 2, 0.8)
+--   cam:stopSway()
+-- end
 
 --@api-stub: Camera2D:isSway
 -- Returns true if the sway effect is currently active.
 -- Use to gate a UI prompt like "press E to disembark" only while sway is running.
-do  -- Camera2D:isSway
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(3, 1.5, 0.5)
-  if cam:isSway() then lurek.log.debug("on swaying surface", "camera") end
-end
+-- if false then -- Camera2D:isSway
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(3, 1.5, 0.5)
+--   if cam:isSway() then lurek.log.debug("on swaying surface", "camera") end
+-- end
 
 --@api-stub: Camera2D:stopBreathing
 -- Stops the active breathing effect.
 -- Call when entering a held-breath stealth section so the camera goes perfectly still.
-do  -- Camera2D:stopBreathing
-  local cam = lurek.camera.new(800, 600)
-  cam:startBreathing(0.005, 0.2)
-  cam:stopBreathing()
-end
+-- if false then -- Camera2D:stopBreathing
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startBreathing(0.005, 0.2)
+--   cam:stopBreathing()
+-- end
 
 --@api-stub: Camera2D:isBreathing
 -- Returns true if the breathing effect is currently active.
 -- Useful for tests that assert the "living camera" toggle is correctly turned off in pause menus.
-do  -- Camera2D:isBreathing
-  local cam = lurek.camera.new(800, 600)
-  cam:startBreathing()
-  if cam:isBreathing() then lurek.log.debug("breathing on", "camera") end
-end
+-- if false then -- Camera2D:isBreathing
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startBreathing()
+--   if cam:isBreathing() then lurek.log.debug("breathing on", "camera") end
+-- end
 
 --@api-stub: Camera2D:getEffectiveZoom
 -- Returns the current zoom level including zoom pulse and breathing deltas.
 -- Use this (not getZoom) when projecting world geometry so pulse/breath visually affect rendering.
-do  -- Camera2D:getEffectiveZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(1.5)
-  cam:zoomPulse(0.1, 0.3)
-  local ez = cam:getEffectiveZoom()
-  lurek.log.debug("effective zoom=" .. ez, "render")
-end
+-- if false then -- Camera2D:getEffectiveZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(1.5)
+--   cam:zoomPulse(0.1, 0.3)
+--   local ez = cam:getEffectiveZoom()
+--   lurek.log.debug("effective zoom=" .. ez, "render")
+-- end
 
 --@api-stub: Camera2D:getEffectOffset
 -- Returns the current sway x, y world-space offset.
 -- Add to the camera position when computing per-frame draw offsets so sway is visible on screen.
-do  -- Camera2D:getEffectOffset
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(6, 3, 0.6)
-  local ox, oy = cam:getEffectOffset()
-  lurek.log.debug("sway offset " .. ox .. "," .. oy, "camera")
-end
+-- if false then -- Camera2D:getEffectOffset
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(6, 3, 0.6)
+--   local ox, oy = cam:getEffectOffset()
+--   lurek.log.debug("sway offset " .. ox .. "," .. oy, "camera")
+-- end
 
 --@api-stub: Camera2D:apply
 -- Applies the camera transform to the render stack.
 -- Call inside lurek.render() before drawing world-space objects; pop with lurek.render.pop().
-do  -- Camera2D:apply
-  local cam = lurek.camera.new()
-  cam:setPosition(400, 300)
-  cam:setZoom(1.5)
-  cam:apply()
-  lurek.log.info("camera applied", "camera")
-end
+-- if false then -- Camera2D:apply
+--   local cam = lurek.camera.new()
+--   cam:setPosition(400, 300)
+--   cam:setZoom(1.5)
+--   cam:apply()
+--   lurek.log.info("camera applied", "camera")
+-- end
 
 --@api-stub: Camera2D:attach
 -- Attaches the camera so it is automatically applied each render frame.
 -- No manual apply() call needed; the engine uses the last attached camera.
-do  -- Camera2D:attach
-  local cam = lurek.camera.new()
-  cam:setPosition(200, 150)
-  cam:attach()
-  lurek.log.info("camera attached", "camera")
-end
+-- if false then -- Camera2D:attach
+--   local cam = lurek.camera.new()
+--   cam:setPosition(200, 150)
+--   cam:attach()
+--   lurek.log.info("camera attached", "camera")
+-- end
 
 --@api-stub: Camera2D:detach
 -- Detaches the camera from automatic rendering, restoring the identity transform.
 -- Call when switching to HUD or UI rendering that uses screen-space coordinates.
-do  -- Camera2D:detach
-  local cam = lurek.camera.new()
-  cam:attach()
-  cam:detach()
-  lurek.log.info("camera detached", "camera")
-end
+-- if false then -- Camera2D:detach
+--   local cam = lurek.camera.new()
+--   cam:attach()
+--   cam:detach()
+--   lurek.log.info("camera detached", "camera")
+-- end
 
 --@api-stub: Camera2D:followPath
 -- Makes the camera follow a pre-defined waypoint path over time.
 -- Pass a table of {x, y} waypoints and a speed; fires a callback when the path ends.
-do  -- Camera2D:followPath
-  local cam = lurek.camera.new()
-  local path = {{x=0,y=0},{x=200,y=100},{x=400,y=0}}
-  cam:followPath(path, 120)
-  lurek.log.info("following path", "camera")
-end
+-- if false then -- Camera2D:followPath
+--   local cam = lurek.camera.new()
+--   local path = {{x=0,y=0},{x=200,y=100},{x=400,y=0}}
+--   cam:followPath(path, 120)
+--   lurek.log.info("following path", "camera")
+-- end
 
 --@api-stub: lurek.camera.newCamera
 -- Creates a named Camera2D and registers it with the camera manager.
 -- Named cameras can be retrieved later by name for scene-switching.
-do  -- lurek.camera.newCamera
-  local cam = lurek.camera.newCamera(800, 600)
-  cam:setPosition(400, 300)
-  cam:setZoom(1.0)
-  lurek.log.info("named camera created", "camera")
-end
+-- if false then -- lurek.camera.newCamera
+--   local cam = lurek.camera.newCamera(800, 600)
+--   cam:setPosition(400, 300)
+--   cam:setZoom(1.0)
+--   lurek.log.info("named camera created", "camera")
+-- end
 
 --@api-stub: Camera2D:reset
 -- Resets position, zoom, and rotation to defaults and clears all active effects.
 -- Use at scene transitions to avoid leftover state from the previous scene.
-do  -- Camera2D:reset
-  local cam = lurek.camera.new()
-  cam:setZoom(2.5)
-  cam:reset()
-  lurek.log.info("zoom after reset: " .. cam:getZoom(), "camera")
-end
+-- if false then -- Camera2D:reset
+--   local cam = lurek.camera.new()
+--   cam:setZoom(2.5)
+--   cam:reset()
+--   lurek.log.info("zoom after reset: " .. cam:getZoom(), "camera")
+-- end
 
 --@api-stub: Camera2D:setBounds
 -- Clamps camera movement so the visible area never exceeds the given world rectangle.
 -- Prevents the camera from showing empty space past level edges.
-do  -- Camera2D:setBounds
-  local cam = lurek.camera.new()
-  cam:setBounds(0, 0, 3200, 2400)
-  cam:setPosition(400, 300)
-  lurek.log.info("bounds set", "camera")
-end
+-- if false then -- Camera2D:setBounds
+--   local cam = lurek.camera.new()
+--   cam:setBounds(0, 0, 3200, 2400)
+--   cam:setPosition(400, 300)
+--   lurek.log.info("bounds set", "camera")
+-- end
 
 --@api-stub: Camera2D:setParallaxFactor
 -- Sets the scroll factor for a named parallax layer relative to the camera.
 -- factor=0 pins the layer (sky), factor=1 moves with the world.
-do  -- Camera2D:setParallaxFactor
-  local cam = lurek.camera.new()
-  cam:setParallaxFactor("bg_mountains", 0.3)
-  cam:setParallaxFactor("bg_clouds", 0.15)
-  lurek.log.info("parallax factors set", "camera")
-end
+-- if false then -- Camera2D:setParallaxFactor
+--   local cam = lurek.camera.new()
+--   cam:setParallaxFactor("bg_mountains", 0.3)
+--   cam:setParallaxFactor("bg_clouds", 0.15)
+--   lurek.log.info("parallax factors set", "camera")
+-- end
 
 --@api-stub: Camera2D:setViewport
 -- Restricts rendering to a sub-region of the window (split-screen or minimap).
 -- Values are in window pixels; set to nil to restore full-window rendering.
-do  -- Camera2D:setViewport
-  local cam = lurek.camera.new()
-  cam:setViewport(0, 0, 640, 480)
-  lurek.log.info("viewport set", "camera")
-end
+-- if false then -- Camera2D:setViewport
+--   local cam = lurek.camera.new()
+--   cam:setViewport(0, 0, 640, 480)
+--   lurek.log.info("viewport set", "camera")
+-- end
 
 --@api-stub: Camera2D:startBreathing
 -- Starts a subtle breathing oscillation that adds life to a static camera.
 -- amplitude controls pixel displacement; period controls cycle time in seconds.
-do  -- Camera2D:startBreathing
-  local cam = lurek.camera.new()
-  cam:startBreathing(2.0, 4.0)
-  lurek.log.info("breathing: " .. tostring(cam:isBreathing()), "camera")
-end
+-- if false then -- Camera2D:startBreathing
+--   local cam = lurek.camera.new()
+--   cam:startBreathing(2.0, 4.0)
+--   lurek.log.info("breathing: " .. tostring(cam:isBreathing()), "camera")
+-- end
 
 --@api-stub: Camera2D:startSway
 -- Starts a sinusoidal lateral sway effect (boat rocking, earthquake tremor).
 -- amplitude is pixels, frequency is cycles-per-second, damping decays the effect.
-do  -- Camera2D:startSway
-  local cam = lurek.camera.new()
-  cam:startSway(5.0, 0.8, 0.95)
-  lurek.log.info("sway active: " .. tostring(cam:isSway()), "camera")
-end
+-- if false then -- Camera2D:startSway
+--   local cam = lurek.camera.new()
+--   cam:startSway(5.0, 0.8, 0.95)
+--   lurek.log.info("sway active: " .. tostring(cam:isSway()), "camera")
+-- end
 
 -- =============================================================================
 -- STUBS: 2 uncovered lurek.camera API item(s)
@@ -460,19 +460,19 @@ end
 --@api-stub: Camera2D:type
 -- Returns the type name of this object.
 -- Useful for runtime type inspection of camera objects.
-do  -- Camera2D:type
-  local cam = lurek.camera.new(800, 600)
-  local t = cam:type()
-  lurek.log.info("Camera2D:type=" .. t, "camera")
-end
+-- if false then -- Camera2D:type
+--   local cam = lurek.camera.new(800, 600)
+--   local t = cam:type()
+--   lurek.log.info("Camera2D:type=" .. t, "camera")
+-- end
 --@api-stub: Camera2D:typeOf
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks on camera objects.
-do  -- Camera2D:typeOf
-  local cam = lurek.camera.new(800, 600)
-  lurek.log.info("is Camera2D: " .. tostring(cam:typeOf("Camera2D")), "camera")
-  lurek.log.info("is wrong: " .. tostring(cam:typeOf("Unknown")), "camera")
-end
+-- if false then -- Camera2D:typeOf
+--   local cam = lurek.camera.new(800, 600)
+--   lurek.log.info("is Camera2D: " .. tostring(cam:typeOf("Camera2D")), "camera")
+--   lurek.log.info("is wrong: " .. tostring(cam:typeOf("Unknown")), "camera")
+-- end
 --@api-stub: block below with a real scenario.
 -- Run .github/prompts/flesh-out-example.prompt.md for instructions.
 -- The final committed file must contain ZERO --@api-stub: lines.
@@ -486,19 +486,19 @@ end
 --@api-stub: LCamera:type
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
-do  -- LCamera:type
-  local camera_obj = lurek.camera.new(800, 600)
-  local t = camera_obj:type()
-  lurek.log.info("LCamera:type = " .. t, "camera")
-end
+-- if false then -- LCamera:type
+--   local camera_obj = lurek.camera.new(800, 600)
+--   local t = camera_obj:type()
+--   lurek.log.info("LCamera:type = " .. t, "camera")
+-- end
 --@api-stub: LCamera:typeOf
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
-do  -- LCamera:typeOf
-  local camera_obj = lurek.camera.new(800, 600)
-  lurek.log.info("is LCamera: " .. tostring(camera_obj:typeOf("LCamera")), "camera")
-  lurek.log.info("is wrong: " .. tostring(camera_obj:typeOf("Unknown")), "camera")
-end
+-- if false then -- LCamera:typeOf
+--   local camera_obj = lurek.camera.new(800, 600)
+--   lurek.log.info("is LCamera: " .. tostring(camera_obj:typeOf("LCamera")), "camera")
+--   lurek.log.info("is wrong: " .. tostring(camera_obj:typeOf("Unknown")), "camera")
+-- end
 --@api-stub: block below with a real scenario.
 -- Run .github/prompts/flesh-out-example.prompt.md for instructions.
 -- The final committed file must contain ZERO --@api-stub: lines.
@@ -512,421 +512,421 @@ end
 --@api-stub: LCamera:setPosition
 -- Sets the camera's world-space position.
 -- Use to teleport the camera to a new scene location instantly.
-do  -- LCamera:setPosition
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(256, 128)
-  local x, y = cam:getPosition()
-  lurek.log.info("position=" .. x .. "," .. y, "camera")
-end
+-- if false then -- LCamera:setPosition
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(256, 128)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("position=" .. x .. "," .. y, "camera")
+-- end
 --@api-stub: LCamera:getPosition
 -- Returns the camera's world-space position as x, y.
 -- Use to serialise the camera state or compute visibility.
-do  -- LCamera:getPosition
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(100, 200)
-  local x, y = cam:getPosition()
-  lurek.log.info("x=" .. x .. " y=" .. y, "camera")
-end
+-- if false then -- LCamera:getPosition
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(100, 200)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("x=" .. x .. " y=" .. y, "camera")
+-- end
 --@api-stub: LCamera:setZoom
 -- Sets the uniform zoom factor (1.0 = natural size).
 -- Use to implement zoom-in on dialogue or zoom-out for the overworld map.
-do  -- LCamera:setZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(2.0)   -- 2× magnification
-  lurek.log.info("zoom=" .. cam:getZoom(), "camera")
-end
+-- if false then -- LCamera:setZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(2.0)   -- 2Ă— magnification
+--   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
+-- end
 --@api-stub: LCamera:getZoom
 -- Returns the current zoom factor.
 -- Use to compute pixel-per-unit scale for world-to-screen transforms.
-do  -- LCamera:getZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(0.5)
-  lurek.log.info("zoom=" .. cam:getZoom(), "camera")
-end
+-- if false then -- LCamera:getZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(0.5)
+--   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
+-- end
 --@api-stub: LCamera:setRotation
 -- Sets the rotation in radians.
 -- Use for screen-tilt effects on game over or level transitions.
-do  -- LCamera:setRotation
-  local cam = lurek.camera.new(800, 600)
-  cam:setRotation(math.pi / 8)
-  lurek.log.info("rotation=" .. cam:getRotation(), "camera")
-end
+-- if false then -- LCamera:setRotation
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setRotation(math.pi / 8)
+--   lurek.log.info("rotation=" .. cam:getRotation(), "camera")
+-- end
 --@api-stub: LCamera:getRotation
 -- Returns the rotation in radians.
 -- Use when you need to know the camera angle for UI overlay alignment.
-do  -- LCamera:getRotation
-  local cam = lurek.camera.new(800, 600)
-  cam:setRotation(math.pi / 4)
-  lurek.log.info("rotation=" .. cam:getRotation(), "camera")
-end
+-- if false then -- LCamera:getRotation
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setRotation(math.pi / 4)
+--   lurek.log.info("rotation=" .. cam:getRotation(), "camera")
+-- end
 --@api-stub: LCamera:setViewport
 -- Sets the viewport rectangle in screen pixels.
 -- Use when rendering to a sub-region of the screen (split-screen, minimap).
-do  -- LCamera:setViewport
-  local cam = lurek.camera.new(800, 600)
-  cam:setViewport(0, 0, 640, 480)
-  local x, y, w, h = cam:getViewport()
-  lurek.log.info("viewport=" .. w .. "x" .. h, "camera")
-end
+-- if false then -- LCamera:setViewport
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setViewport(0, 0, 640, 480)
+--   local x, y, w, h = cam:getViewport()
+--   lurek.log.info("viewport=" .. w .. "x" .. h, "camera")
+-- end
 --@api-stub: LCamera:getViewport
 -- Returns the current viewport as x, y, w, h.
 -- Use to pass the viewport rect to UI rendering or picking functions.
-do  -- LCamera:getViewport
-  local cam = lurek.camera.new(800, 600)
-  cam:setViewport(0, 0, 800, 600)
-  local x, y, w, h = cam:getViewport()
-  lurek.log.info("viewport " .. w .. "x" .. h, "camera")
-end
+-- if false then -- LCamera:getViewport
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setViewport(0, 0, 800, 600)
+--   local x, y, w, h = cam:getViewport()
+--   lurek.log.info("viewport " .. w .. "x" .. h, "camera")
+-- end
 --@api-stub: LCamera:setBounds
 -- Sets world-space bounds for camera clamping.
 -- Prevents the camera from scrolling outside the map rectangle.
-do  -- LCamera:setBounds
-  local cam = lurek.camera.new(800, 600)
-  cam:setBounds(0, 0, 2048, 1024)   -- constrain to 2048×1024 world
-  lurek.log.info("bounds set", "camera")
-end
+-- if false then -- LCamera:setBounds
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setBounds(0, 0, 2048, 1024)   -- constrain to 2048Ă—1024 world
+--   lurek.log.info("bounds set", "camera")
+-- end
 --@api-stub: LCamera:removeBounds
 -- Removes previously set world-space bounds.
 -- Use when entering an open-world zone where the camera should scroll freely.
-do  -- LCamera:removeBounds
-  local cam = lurek.camera.new(800, 600)
-  cam:setBounds(0, 0, 1024, 768)
-  cam:removeBounds()
-  lurek.log.info("bounds removed", "camera")
-end
+-- if false then -- LCamera:removeBounds
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setBounds(0, 0, 1024, 768)
+--   cam:removeBounds()
+--   lurek.log.info("bounds removed", "camera")
+-- end
 --@api-stub: LCamera:setTarget
 -- Sets the follow target position.
 -- Call each frame with the player's world position to track movement.
-do  -- LCamera:setTarget
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(5.0)
-  cam:setTarget(320, 240)
-  cam:update(0.016)
-  local x, y = cam:getPosition()
-  lurek.log.info("after follow: x=" .. x .. " y=" .. y, "camera")
-end
+-- if false then -- LCamera:setTarget
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setFollowSmooth(5.0)
+--   cam:setTarget(320, 240)
+--   cam:update(0.016)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("after follow: x=" .. x .. " y=" .. y, "camera")
+-- end
 --@api-stub: LCamera:clearTarget
 -- Clears the follow target so the camera stops tracking.
 -- Use when entering a cutscene or scripted camera path.
-do  -- LCamera:clearTarget
-  local cam = lurek.camera.new(800, 600)
-  cam:setTarget(400, 300)
-  cam:clearTarget()
-  lurek.log.info("follow target cleared", "camera")
-end
+-- if false then -- LCamera:clearTarget
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setTarget(400, 300)
+--   cam:clearTarget()
+--   lurek.log.info("follow target cleared", "camera")
+-- end
 --@api-stub: LCamera:setFollowSmooth
 -- Sets the follow smooth interpolation speed (0.0 = instant snap).
 -- Higher values make the camera more responsive; lower values create lag.
-do  -- LCamera:setFollowSmooth
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(4.0)   -- smooth follow, 4 units/s lag
-  cam:setTarget(200, 100)
-  cam:update(0.1)
-  local x, y = cam:getPosition()
-  lurek.log.info("smoothed pos=" .. x .. "," .. y, "camera")
-end
+-- if false then -- LCamera:setFollowSmooth
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setFollowSmooth(4.0)   -- smooth follow, 4 units/s lag
+--   cam:setTarget(200, 100)
+--   cam:update(0.1)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("smoothed pos=" .. x .. "," .. y, "camera")
+-- end
 --@api-stub: LCamera:setDeadZone
 -- Sets the dead zone half-extents for camera follow.
 -- The camera only moves when the target exits the dead zone rectangle.
-do  -- LCamera:setDeadZone
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(10.0)
-  cam:setDeadZone(64, 32)   -- 64px horizontal, 32px vertical dead zone
-  cam:setTarget(100, 100)
-  cam:update(0.1)
-  lurek.log.info("dead zone configured", "camera")
-end
+-- if false then -- LCamera:setDeadZone
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setFollowSmooth(10.0)
+--   cam:setDeadZone(64, 32)   -- 64px horizontal, 32px vertical dead zone
+--   cam:setTarget(100, 100)
+--   cam:update(0.1)
+--   lurek.log.info("dead zone configured", "camera")
+-- end
 --@api-stub: LCamera:setLookAhead
 -- Sets the look-ahead multiplier for follow prediction.
 -- Higher values shift the frame ahead of the target's velocity.
-do  -- LCamera:setLookAhead
-  local cam = lurek.camera.new(800, 600)
-  cam:setFollowSmooth(5.0)
-  cam:setLookAhead(2.0)   -- show 2× velocity ahead of target
-  cam:setTarget(400, 300)
-  cam:update(0.016)
-  lurek.log.info("look-ahead set", "camera")
-end
+-- if false then -- LCamera:setLookAhead
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setFollowSmooth(5.0)
+--   cam:setLookAhead(2.0)   -- show 2Ă— velocity ahead of target
+--   cam:setTarget(400, 300)
+--   cam:update(0.016)
+--   lurek.log.info("look-ahead set", "camera")
+-- end
 --@api-stub: LCamera:shake
 -- Starts a screen-shake effect.
 -- Use on explosions, hits, or earthquake events.
-do  -- LCamera:shake
-  local cam = lurek.camera.new(800, 600)
-  cam:shake(0.5, 8.0)   -- shake for 0.5s with amplitude 8 pixels
-  lurek.log.info("shake started", "camera")
-end
+-- if false then -- LCamera:shake
+--   local cam = lurek.camera.new(800, 600)
+--   cam:shake(0.5, 8.0)   -- shake for 0.5s with amplitude 8 pixels
+--   lurek.log.info("shake started", "camera")
+-- end
 --@api-stub: LCamera:update
 -- Advances the camera simulation by dt seconds.
 -- Call once per frame to tick follow, shake, sway, and zoom animations.
-do  -- LCamera:update
-  local cam = lurek.camera.new(800, 600)
-  cam:shake(1.0, 4.0)
-  cam:update(0.016)   -- advance one frame at 60 fps
-  lurek.log.info("camera updated", "camera")
-end
+-- if false then -- LCamera:update
+--   local cam = lurek.camera.new(800, 600)
+--   cam:shake(1.0, 4.0)
+--   cam:update(0.016)   -- advance one frame at 60 fps
+--   lurek.log.info("camera updated", "camera")
+-- end
 --@api-stub: LCamera:toWorld
 -- Converts screen coordinates to world coordinates.
 -- Use for mouse picking or raycasting from a screen click.
-do  -- LCamera:toWorld
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(100, 100)
-  cam:setZoom(2.0)
-  local wx, wy = cam:toWorld(400, 300)   -- screen center
-  lurek.log.info("world(" .. wx .. "," .. wy .. ")", "camera")
-end
+-- if false then -- LCamera:toWorld
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(100, 100)
+--   cam:setZoom(2.0)
+--   local wx, wy = cam:toWorld(400, 300)   -- screen center
+--   lurek.log.info("world(" .. wx .. "," .. wy .. ")", "camera")
+-- end
 --@api-stub: LCamera:toScreen
 -- Converts world coordinates to screen coordinates.
 -- Use to overlay HUD labels at world-space positions.
-do  -- LCamera:toScreen
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(0, 0)
-  cam:setZoom(1.0)
-  local sx, sy = cam:toScreen(100, 50)
-  lurek.log.info("screen(" .. sx .. "," .. sy .. ")", "camera")
-end
+-- if false then -- LCamera:toScreen
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(0, 0)
+--   cam:setZoom(1.0)
+--   local sx, sy = cam:toScreen(100, 50)
+--   lurek.log.info("screen(" .. sx .. "," .. sy .. ")", "camera")
+-- end
 --@api-stub: LCamera:getVisibleArea
 -- Returns the visible world area as x, y, w, h.
 -- Use for frustum culling: skip entities outside this rect.
-do  -- LCamera:getVisibleArea
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(0, 0)
-  cam:setZoom(1.0)
-  local x, y, w, h = cam:getVisibleArea()
-  lurek.log.info("visible=" .. w .. "x" .. h .. " at " .. x .. "," .. y, "camera")
-end
+-- if false then -- LCamera:getVisibleArea
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(0, 0)
+--   cam:setZoom(1.0)
+--   local x, y, w, h = cam:getVisibleArea()
+--   lurek.log.info("visible=" .. w .. "x" .. h .. " at " .. x .. "," .. y, "camera")
+-- end
 --@api-stub: LCamera:lookAt
 -- Instantly moves the camera to look at the given position.
 -- Use to jump the camera to a point of interest without follow lag.
-do  -- LCamera:lookAt
-  local cam = lurek.camera.new(800, 600)
-  cam:lookAt(512, 256)
-  local x, y = cam:getPosition()
-  lurek.log.info("camera now at " .. x .. "," .. y, "camera")
-end
+-- if false then -- LCamera:lookAt
+--   local cam = lurek.camera.new(800, 600)
+--   cam:lookAt(512, 256)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("camera now at " .. x .. "," .. y, "camera")
+-- end
 --@api-stub: LCamera:move
 -- Translates the camera by dx, dy in world space.
 -- Use for scroll-wheel panning or drag-to-pan in a map view.
-do  -- LCamera:move
-  local cam = lurek.camera.new(800, 600)
-  cam:lookAt(0, 0)
-  cam:move(50, 25)
-  local x, y = cam:getPosition()
-  lurek.log.info("after move: " .. x .. "," .. y, "camera")
-end
+-- if false then -- LCamera:move
+--   local cam = lurek.camera.new(800, 600)
+--   cam:lookAt(0, 0)
+--   cam:move(50, 25)
+--   local x, y = cam:getPosition()
+--   lurek.log.info("after move: " .. x .. "," .. y, "camera")
+-- end
 --@api-stub: LCamera:followPath
 -- Animates the camera along a sequence of world-space waypoints over a given duration.
 -- Use for cinematics, room-to-room transitions, or tutorial pans.
-do  -- LCamera:followPath
-  local cam = lurek.camera.new(800, 600)
-  local waypoints = {{x=0,y=0},{x=200,y=100},{x=400,y=200}}
-  cam:followPath(waypoints, 3.0)   -- traverse path over 3 seconds
-  lurek.log.info("path started, progress=" .. cam:pathProgress(), "camera")
-end
+-- if false then -- LCamera:followPath
+--   local cam = lurek.camera.new(800, 600)
+--   local waypoints = {{x=0,y=0},{x=200,y=100},{x=400,y=200}}
+--   cam:followPath(waypoints, 3.0)   -- traverse path over 3 seconds
+--   lurek.log.info("path started, progress=" .. cam:pathProgress(), "camera")
+-- end
 --@api-stub: LCamera:stopPath
 -- Cancels the active camera path animation.
 -- Use when the player takes control mid-cutscene.
-do  -- LCamera:followPath
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({{x=0,y=0},{x=500,y=300}}, 5.0)
-  cam:stopPath()
-  lurek.log.info("path cancelled", "camera")
-end
+-- if false then -- LCamera:followPath
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({{x=0,y=0},{x=500,y=300}}, 5.0)
+--   cam:stopPath()
+--   lurek.log.info("path cancelled", "camera")
+-- end
 --@api-stub: LCamera:updatePath
 -- Advances the path animation by dt seconds and applies the resulting position.
 -- Call each frame (after update) to drive a scripted camera path.
-do  -- LCamera:updatePath
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({{x=0,y=0},{x=200,y=0}}, 2.0)
-  cam:updatePath(0.5)
-  lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
-end
+-- if false then -- LCamera:updatePath
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({{x=0,y=0},{x=200,y=0}}, 2.0)
+--   cam:updatePath(0.5)
+--   lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
+-- end
 --@api-stub: LCamera:pathProgress
 -- Returns the fractional progress [0, 1] of the active path, or -1 if none.
 -- Use to trigger events at specific points along a scripted camera route.
-do  -- LCamera:pathProgress
-  local cam = lurek.camera.new(800, 600)
-  cam:followPath({{x=0,y=0},{x=400,y=0}}, 4.0)
-  cam:updatePath(1.0)   -- advance 25%
-  lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
-end
+-- if false then -- LCamera:pathProgress
+--   local cam = lurek.camera.new(800, 600)
+--   cam:followPath({{x=0,y=0},{x=400,y=0}}, 4.0)
+--   cam:updatePath(1.0)   -- advance 25%
+--   lurek.log.info("path progress=" .. cam:pathProgress(), "camera")
+-- end
 --@api-stub: LCamera:zoomTo
 -- Smoothly tweens the camera zoom from its current level to the target.
 -- Use for dramatic zoom effects on boss encounters.
-do  -- LCamera:zoomTo
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(1.0)
-  cam:zoomTo(2.5, 0.8)   -- zoom to 2.5× over 0.8 seconds
-  cam:updateZoom(0.4)
-  lurek.log.info("zoom=" .. cam:getZoom(), "camera")
-end
+-- if false then -- LCamera:zoomTo
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(1.0)
+--   cam:zoomTo(2.5, 0.8)   -- zoom to 2.5Ă— over 0.8 seconds
+--   cam:updateZoom(0.4)
+--   lurek.log.info("zoom=" .. cam:getZoom(), "camera")
+-- end
 --@api-stub: LCamera:stopZoom
 -- Cancels the active zoom tween.
 -- Use when the player interrupts the zoom with manual input.
-do  -- LCamera:stopZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomTo(3.0, 2.0)
-  cam:stopZoom()
-  lurek.log.info("zoom tween stopped", "camera")
-end
+-- if false then -- LCamera:stopZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomTo(3.0, 2.0)
+--   cam:stopZoom()
+--   lurek.log.info("zoom tween stopped", "camera")
+-- end
 --@api-stub: LCamera:updateZoom
 -- Advances the zoom tween by dt seconds and applies the resulting zoom.
 -- Call each frame alongside update() to drive a smooth zoom transition.
-do  -- LCamera:updateZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomTo(2.0, 1.0)
-  cam:updateZoom(0.5)   -- advance halfway
-  lurek.log.info("zoom mid-tween=" .. cam:getZoom(), "camera")
-end
+-- if false then -- LCamera:updateZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomTo(2.0, 1.0)
+--   cam:updateZoom(0.5)   -- advance halfway
+--   lurek.log.info("zoom mid-tween=" .. cam:getZoom(), "camera")
+-- end
 --@api-stub: LCamera:setParallaxFactor
 -- Sets the parallax scroll factor for the named render layer.
 -- 1.0 = same speed as the camera; 0.5 = moves at half speed (distant layer).
-do  -- LCamera:setParallaxFactor
-  local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("bg_clouds", 0.3)
-  cam:setParallaxFactor("bg_hills", 0.6)
-  lurek.log.info("parallax bg_clouds=" .. cam:getParallaxFactor("bg_clouds"), "camera")
-end
+-- if false then -- LCamera:setParallaxFactor
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setParallaxFactor("bg_clouds", 0.3)
+--   cam:setParallaxFactor("bg_hills", 0.6)
+--   lurek.log.info("parallax bg_clouds=" .. cam:getParallaxFactor("bg_clouds"), "camera")
+-- end
 --@api-stub: LCamera:getParallaxFactor
 -- Returns the parallax factor for the named layer, or 1.0 if unset.
 -- Use to confirm layer configuration before a level starts.
-do  -- LCamera:getParallaxFactor
-  local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("sky", 0.1)
-  lurek.log.info("sky factor=" .. cam:getParallaxFactor("sky"), "camera")
-  lurek.log.info("unset factor=" .. cam:getParallaxFactor("foreground"), "camera")
-end
+-- if false then -- LCamera:getParallaxFactor
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setParallaxFactor("sky", 0.1)
+--   lurek.log.info("sky factor=" .. cam:getParallaxFactor("sky"), "camera")
+--   lurek.log.info("unset factor=" .. cam:getParallaxFactor("foreground"), "camera")
+-- end
 --@api-stub: LCamera:clearParallaxFactors
 -- Removes all parallax factor overrides.
 -- Use when transitioning to a new level with a different layer layout.
-do  -- LCamera:clearParallaxFactors
-  local cam = lurek.camera.new(800, 600)
-  cam:setParallaxFactor("clouds", 0.4)
-  cam:clearParallaxFactors()
-  lurek.log.info("parallax factor after clear=" .. cam:getParallaxFactor("clouds"), "camera")
-end
+-- if false then -- LCamera:clearParallaxFactors
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setParallaxFactor("clouds", 0.4)
+--   cam:clearParallaxFactors()
+--   lurek.log.info("parallax factor after clear=" .. cam:getParallaxFactor("clouds"), "camera")
+-- end
 --@api-stub: LCamera:apply
 -- Applies this camera's transform to the render stack.
 -- Call before drawing world-space geometry each frame.
-do  -- LCamera:apply
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(100, 50)
-  cam:setZoom(1.5)
-  cam:apply()
+-- if false then -- LCamera:apply
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(100, 50)
+--   cam:setZoom(1.5)
+--   cam:apply()
   -- ... draw world-space sprites here ...
-  cam:reset()
-  lurek.log.info("camera applied and reset", "camera")
-end
+--   cam:reset()
+--   lurek.log.info("camera applied and reset", "camera")
+-- end
 --@api-stub: LCamera:reset
 -- Pops the camera transform from the render stack.
 -- Call after drawing world-space geometry to restore default transforms.
-do  -- LCamera:reset
-  local cam = lurek.camera.new(800, 600)
-  cam:apply()
+-- if false then -- LCamera:reset
+--   local cam = lurek.camera.new(800, 600)
+--   cam:apply()
   -- ... draw game world ...
-  cam:reset()
-  lurek.log.info("render transform restored", "camera")
-end
+--   cam:reset()
+--   lurek.log.info("render transform restored", "camera")
+-- end
 --@api-stub: LCamera:attach
 -- Alias for apply(). Applies this camera's transform to the render stack.
--- Use attach/detach naming when your code prefers LÖVE-style conventions.
-do  -- LCamera:attach
-  local cam = lurek.camera.new(800, 600)
-  cam:setPosition(0, 0)
-  cam:attach()
+-- Use attach/detach naming when your code prefers LĂ–VE-style conventions.
+-- if false then -- LCamera:attach
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setPosition(0, 0)
+--   cam:attach()
   -- ... render world geometry ...
-  cam:detach()
-  lurek.log.info("attach/detach cycle complete", "camera")
-end
+--   cam:detach()
+--   lurek.log.info("attach/detach cycle complete", "camera")
+-- end
 --@api-stub: LCamera:detach
 -- Alias for reset(). Pops the camera transform from the render stack.
--- Use with attach() for LÖVE-style camera conventions.
-do  -- LCamera:detach
-  local cam = lurek.camera.new(800, 600)
-  cam:attach()
-  cam:detach()
-  lurek.log.info("detached, transforms restored", "camera")
-end
+-- Use with attach() for LĂ–VE-style camera conventions.
+-- if false then -- LCamera:detach
+--   local cam = lurek.camera.new(800, 600)
+--   cam:attach()
+--   cam:detach()
+--   lurek.log.info("detached, transforms restored", "camera")
+-- end
 --@api-stub: LCamera:zoomPulse
 -- Triggers a momentary zoom-in that decays back via a sine envelope.
 -- Use for hit reactions, power-up pickups, or boss entrance moments.
-do  -- LCamera:zoomPulse
-  local cam = lurek.camera.new(800, 600)
-  cam:zoomPulse(0.3, 0.5)   -- +30% zoom pulse decaying over 0.5s
-  cam:update(0.016)
-  lurek.log.info("pulse zoom=" .. cam:getEffectiveZoom(), "camera")
-end
+-- if false then -- LCamera:zoomPulse
+--   local cam = lurek.camera.new(800, 600)
+--   cam:zoomPulse(0.3, 0.5)   -- +30% zoom pulse decaying over 0.5s
+--   cam:update(0.016)
+--   lurek.log.info("pulse zoom=" .. cam:getEffectiveZoom(), "camera")
+-- end
 --@api-stub: LCamera:startSway
 -- Starts a sinusoidal x/y offset oscillation (e.g., boat rocking).
 -- Use on water levels or for vertigo effects.
-do  -- LCamera:startSway
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(4.0, 1.5, 0.3, 2.0)   -- amp_x=4, amp_y=1.5, freq_x=0.3, freq_y=2
-  cam:update(0.016)
-  lurek.log.info("sway active=" .. tostring(cam:isSway()), "camera")
-end
+-- if false then -- LCamera:startSway
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(4.0, 1.5, 0.3, 2.0)   -- amp_x=4, amp_y=1.5, freq_x=0.3, freq_y=2
+--   cam:update(0.016)
+--   lurek.log.info("sway active=" .. tostring(cam:isSway()), "camera")
+-- end
 --@api-stub: LCamera:stopSway
 -- Stops the active sway effect immediately.
 -- Use when the player disembarks from a boat or recovers from vertigo.
-do  -- LCamera:stopSway
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(3.0, 1.0, 0.5, 1.0)
-  cam:stopSway()
-  lurek.log.info("sway=" .. tostring(cam:isSway()), "camera")
-end
+-- if false then -- LCamera:stopSway
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(3.0, 1.0, 0.5, 1.0)
+--   cam:stopSway()
+--   lurek.log.info("sway=" .. tostring(cam:isSway()), "camera")
+-- end
 --@api-stub: LCamera:isSway
 -- Returns true if the sway effect is currently active.
 -- Use to prevent triggering a new sway while one is already running.
-do  -- LCamera:isSway
-  local cam = lurek.camera.new(800, 600)
-  lurek.log.info("before sway: " .. tostring(cam:isSway()), "camera")
-  cam:startSway(2.0, 1.0, 0.5, 0.5)
-  lurek.log.info("after start: " .. tostring(cam:isSway()), "camera")
-end
+-- if false then -- LCamera:isSway
+--   local cam = lurek.camera.new(800, 600)
+--   lurek.log.info("before sway: " .. tostring(cam:isSway()), "camera")
+--   cam:startSway(2.0, 1.0, 0.5, 0.5)
+--   lurek.log.info("after start: " .. tostring(cam:isSway()), "camera")
+-- end
 --@api-stub: LCamera:startBreathing
 -- Starts a subtle periodic zoom oscillation for a "living camera" feel.
 -- Use on exploration scenes for a calm, cinematic camera movement.
-do  -- LCamera:startBreathing
-  local cam = lurek.camera.new(800, 600)
-  cam:startBreathing(0.02, 0.4)   -- amplitude 2%, freq 0.4 Hz
-  cam:update(0.016)
-  lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
-end
+-- if false then -- LCamera:startBreathing
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startBreathing(0.02, 0.4)   -- amplitude 2%, freq 0.4 Hz
+--   cam:update(0.016)
+--   lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
+-- end
 --@api-stub: LCamera:stopBreathing
 -- Stops the active breathing effect.
 -- Use when transitioning from exploration to combat for a sharper frame.
-do  -- LCamera:stopBreathing
-  local cam = lurek.camera.new(800, 600)
-  cam:startBreathing(0.02, 0.3)
-  cam:stopBreathing()
-  lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
-end
+-- if false then -- LCamera:stopBreathing
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startBreathing(0.02, 0.3)
+--   cam:stopBreathing()
+--   lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
+-- end
 --@api-stub: LCamera:isBreathing
 -- Returns true if the breathing effect is currently active.
 -- Use to conditionally show a "cinematic mode" indicator in the UI.
-do  -- LCamera:isBreathing
-  local cam = lurek.camera.new(800, 600)
-  cam:startBreathing(0.01, 0.5)
-  lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
-  cam:stopBreathing()
-  lurek.log.info("after stop=" .. tostring(cam:isBreathing()), "camera")
-end
+-- if false then -- LCamera:isBreathing
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startBreathing(0.01, 0.5)
+--   lurek.log.info("breathing=" .. tostring(cam:isBreathing()), "camera")
+--   cam:stopBreathing()
+--   lurek.log.info("after stop=" .. tostring(cam:isBreathing()), "camera")
+-- end
 --@api-stub: LCamera:getEffectiveZoom
 -- Returns the current zoom level including zoom pulse and breathing deltas.
 -- Use for rendering to get the actual applied zoom factor.
-do  -- LCamera:getEffectiveZoom
-  local cam = lurek.camera.new(800, 600)
-  cam:setZoom(1.0)
-  cam:zoomPulse(0.2, 1.0)
-  cam:update(0.016)
-  lurek.log.info("effective_zoom=" .. cam:getEffectiveZoom(), "camera")
-end
+-- if false then -- LCamera:getEffectiveZoom
+--   local cam = lurek.camera.new(800, 600)
+--   cam:setZoom(1.0)
+--   cam:zoomPulse(0.2, 1.0)
+--   cam:update(0.016)
+--   lurek.log.info("effective_zoom=" .. cam:getEffectiveZoom(), "camera")
+-- end
 --@api-stub: LCamera:getEffectOffset
 -- Returns the current sway x, y world-space offset.
 -- Use to adjust UI overlay positions to match the sway offset.
-do  -- LCamera:getEffectOffset
-  local cam = lurek.camera.new(800, 600)
-  cam:startSway(5.0, 2.0, 0.5, 1.0)
-  cam:update(0.25)
-  local ox, oy = cam:getEffectOffset()
-  lurek.log.info("sway_offset=" .. ox .. "," .. oy, "camera")
-end
+-- if false then -- LCamera:getEffectOffset
+--   local cam = lurek.camera.new(800, 600)
+--   cam:startSway(5.0, 2.0, 0.5, 1.0)
+--   cam:update(0.25)
+--   local ox, oy = cam:getEffectOffset()
+--   lurek.log.info("sway_offset=" .. ox .. "," .. oy, "camera")
+-- end

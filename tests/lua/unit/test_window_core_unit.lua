@@ -212,6 +212,45 @@ describe("lurek.window position", function()
         expect_true(n >= 1, "at least 1 display")
     end)
 
+    -- @covers lurek.window.getDisplays
+    it("getDisplays returns a table array", function()
+        local displays = lurek.window["getDisplays"]()
+        expect_type("table", displays)
+        expect_not_nil(displays[1])
+        expect_type("table", displays[1])
+    end)
+
+    -- @covers lurek.window.getDisplays
+    it("getDisplays entries include expected fields", function()
+        local first = lurek.window["getDisplays"]()[1]
+        expect_type("number", first.index)
+        expect_type("string", first.name)
+        expect_type("number", first.width)
+        expect_type("number", first.height)
+        expect_type("boolean", first.primary)
+    end)
+
+    -- @covers lurek.window.getCurrentDisplay
+    it("getCurrentDisplay returns a number", function()
+        local idx = lurek.window["getCurrentDisplay"]()
+        expect_type("number", idx)
+        expect_true(idx >= 0, "display index should be >= 0")
+    end)
+
+    -- @covers lurek.window.setDisplay
+    it("setDisplay accepts index zero", function()
+        expect_no_error(function()
+            lurek.window["setDisplay"](0)
+        end)
+    end)
+
+    -- @covers lurek.window.setDisplay
+    it("setDisplay rejects negative index", function()
+        expect_error(function()
+            lurek.window["setDisplay"](-1)
+        end)
+    end)
+
     -- @covers lurek.window.getDesktopDimensions
     it("getDesktopDimensions returns two numbers", function()
         local w, h = lurek.window.getDesktopDimensions()
@@ -308,6 +347,79 @@ describe("lurek.window close and attention", function()
     -- @covers lurek.window.requestAttention
     it("requestAttention is a function", function()
         expect_type("function", lurek.window.requestAttention)
+    end)
+
+    -- @covers lurek.window.flash
+    it("flash is a function", function()
+        expect_type("function", lurek.window["flash"])
+    end)
+
+    -- @covers lurek.window.flash
+    it("flash can be called without error", function()
+        expect_no_error(function()
+            lurek.window["flash"]()
+        end)
+    end)
+end)
+
+-- @describe lurek.window grouped subtables
+describe("lurek.window grouped subtables", function()
+    -- @covers lurek.window.display
+    it("display subtable exists", function()
+        expect_type("table", lurek.window["display"])
+    end)
+
+    -- @covers lurek.window.display
+    -- @covers lurek.window.display.getCount
+    it("display.getCount returns number", function()
+        expect_type("number", lurek.window["display"]["getCount"]())
+    end)
+
+    -- @covers lurek.window.display
+    -- @covers lurek.window.display.getDisplays
+    it("display.getDisplays returns table", function()
+        expect_type("table", lurek.window["display"]["getDisplays"]())
+    end)
+
+    -- @covers lurek.window.display
+    -- @covers lurek.window.display.setCurrent
+    it("display.setCurrent accepts index zero", function()
+        expect_no_error(function()
+            lurek.window["display"]["setCurrent"](0)
+        end)
+    end)
+
+    -- @covers lurek.window.mode
+    it("mode subtable exists", function()
+        expect_type("table", lurek.window["mode"])
+    end)
+
+    -- @covers lurek.window.mode
+    -- @covers lurek.window.mode.get
+    it("mode.get returns width height flags", function()
+        local w, h, flags = lurek.window["mode"]["get"]()
+        expect_type("number", w)
+        expect_type("number", h)
+        expect_type("table", flags)
+    end)
+
+    -- @covers lurek.window.mode
+    -- @covers lurek.window.mode.flash
+    it("mode.flash can be called", function()
+        expect_no_error(function()
+            lurek.window["mode"]["flash"]()
+        end)
+    end)
+
+    -- @covers lurek.window.cursor
+    it("cursor subtable exists", function()
+        expect_type("table", lurek.window["cursor"])
+    end)
+
+    -- @covers lurek.window.cursor
+    -- @covers lurek.window.cursor.hasFocus
+    it("cursor.hasFocus returns boolean", function()
+        expect_type("boolean", lurek.window["cursor"]["hasFocus"]())
     end)
 end)
 

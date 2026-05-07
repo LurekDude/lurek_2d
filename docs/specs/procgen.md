@@ -167,17 +167,6 @@ The `procgen` module is Lurek2D's procedural content generation library — a Fo
 - `lurek.procgen.worldGraph`: Generates a world graph with scattered regions and edges.
 - `lurek.procgen.noiseMap`: Generates a noise map using the configurable NoiseGenerator.
 - `lurek.procgen.noiseMapParallel`: Generates a noise map using rayon parallel processing.
-- `lurek.procgen.bspDungeon`: Generates a dungeon using Binary Space Partitioning.
-- `lurek.procgen.roomsDungeon`: Generates a rooms-and-corridors dungeon.
-- `lurek.procgen.heightmap`: Generates a heightmap using fractal noise.
-- `lurek.procgen.wfcGenerate`: Generates a tile grid using Wave Function Collapse.
-- `lurek.procgen.lsystem`: Generates an L-system string.
-- `lurek.procgen.lsystemSegments`: Generates L-system line segments for rendering.
-- `lurek.procgen.generateName`: Generates a single procedural name using a Markov chain.
-- `lurek.procgen.generateNames`: Generates N procedural names using a Markov chain.
-- `lurek.procgen.worldGraph`: Generates a world graph with scattered regions and edges.
-- `lurek.procgen.noiseMap`: Generates a noise map using the configurable NoiseGenerator.
-- `lurek.procgen.noiseMapParallel`: Generates a noise map using rayon parallel processing.
 - `lurek.procgen.simplex2d`: Returns a single Simplex noise value at the given 2-D coordinate.
 - `lurek.procgen.simplex3d`: Returns a single Simplex noise value at the given 3-D coordinate.
 

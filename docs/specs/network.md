@@ -11,25 +11,9 @@
 
 ## Summary
 
-## Summary
+The `network` module is documented from the current source tree and existing module reference data.
 
-The `network` module provides Lurek2D's multiplayer networking stack, covering four distinct transport layers: ENet reliable-UDP for peer-to-peer game traffic, raw TCP for custom protocols, asynchronous HTTP for REST APIs and leaderboards, and WebSocket for live chat and event streaming. It is a Core Runtime tier module — no Feature Systems imports — and a strong plugin candidacy candidate given its heavy dependency footprint.
-
-**ENet transport.** `NetworkHost` wraps `rusty_enet::Host<UdpSocket>` and can act as server, client, or peer-to-peer host simultaneously via `HostRole`. Binding to a port enables incoming connections; `connect(addr)` creates outgoing ones. A single `service(timeout)` call drives all UDP I/O — processing queued packets, firing `NetworkEvent::Connect` / `Disconnect` / `Receive` events, and sending outgoing data. ENet provides three delivery modes per packet: ordered reliable, sequenced unreliable, and unsequenced unreliable.
-
-**HTTP, TCP, and WebSocket.** These three transports run on a `NetworkRuntime` background OS thread via `mpsc` request/response channels. The main engine thread submits `NetworkRequest` variants (non-blocking) and polls completed `NetworkResponse` entries once per frame, keeping all transport I/O fully non-blocking from the Lua VM's perspective. HTTP uses `ureq` with configurable timeout. TCP is managed by `TcpConnectionManager` with non-blocking multi-connection support. WebSocket is managed by `WebSocketManager` with per-connection send/receive queues.
-
-**Message serialisation.** `message.rs` implements MessagePack encoding for compact binary network transport. `encode_table(lua_table)` converts a Lua table to a byte vector via the `NetValue` intermediate enum. `decode_table(bytes, lua)` reconstructs a Lua table. `pack` and `unpack` are the lower-level primitive variants. MessagePack is the recommended format for all application-level game messages; raw strings are also supported for interoperability with non-Lurek2D servers.
-
-**LAN lobby discovery.** `lobby.rs` introduces `NetworkLobby`, a LAN lobby discovery type using UDP broadcast to advertise and enumerate local game sessions. `LobbyInfo` carries session name, current player count, maximum capacity, and host address. Lua scripts access the full lobby API through `lurek.network.lobby.*`, enabling game menus to list nearby sessions and join them without a dedicated matchmaking server.
-
-**Constants and error model.** `constants.rs` defines compile-time limits: `MAX_PEERS=4096`, `DEFAULT_PEERS=16`, `DEFAULT_CHANNELS=2`, `HTTP_TIMEOUT_SECS=30`, `TCP_BUFFER_SIZE=65536`, `WS_BUFFER_SIZE=65536`. `NetworkError` variants: `ConnectionFailed`, `SendFailed`, `InvalidPeer`, `InvalidAddress`, `Http`, `WebSocket`, `Tcp`, `Serialization`, `Thread`. All Lua-facing methods map errors to named string values.
-
-**Per-peer diagnostics.** `PeerStats` carries a per-peer statistics snapshot (round-trip time, packet loss, send/receive rates). `lurek.network.peerStats(peer_id)` returns the current snapshot. These are used by client-side network quality indicators and server-side load balancing.
-
-**Lua surface.** `lurek.network.newHost(role, port, peers)` creates a host. Methods: `connect(addr)`, `disconnect(peer)`, `send(peer, channel, data, mode)`, `broadcast(channel, data, mode)`, `service(dt)` → events table. HTTP: `lurek.network.get(url, cb)`, `post(url, body, cb)`. WebSocket: `lurek.network.wsConnect(url)` → id, `wsSend(id, data)`, `wsClose(id)`, `wsPoll()` → events. TCP: `lurek.network.tcpConnect(addr)` → id, `tcpSend(id, data)`, `tcpClose(id)`, `tcpPoll()` → events. Lobby: `lurek.network.lobby.advertise(info)`, `scan(timeout_ms)` → array, `stopAdvertise()`.
-
-**Scope boundary.** Core Runtime tier. No Platform Services or Feature Systems imports. Crate dependencies: `rusty_enet`, `ureq`, `tungstenite`, `rmp-serde`, `rustls`. Plugin candidacy: strong candidate for the plugin tier under proposed constraint A-05 (see `docs/architecture/plugins.md`). Lua bridge in `src/lua_api/network_api.rs`.
+This module primarily collaborates with `runtime`. Its responsibility should stay inside the Core Runtime group rather than absorb behavior owned by those neighbors.
 
 ## Files
 
@@ -147,38 +131,51 @@ The `network` module provides Lurek2D's multiplayer networking stack, covering f
 - `lurek.network.discoverLobbies`: Listens for LAN lobby announcements for `timeout_ms` milliseconds (default 500).
 - `lurek.network.syncEntity`: Convenience helper: packs an entity snapshot and broadcasts it to all peers.
 
-### `NetworkHost` Methods
-- `NetworkHost:service`: Polls the network for one event, returning an event table or nil.
-- `NetworkHost:flush`: Flushes all pending sends immediately.
-- `NetworkHost:resetPeer`: Resets a peer connection immediately without notifying the remote side.
-- `NetworkHost:ping`: Sends a ping to a peer to measure round-trip time.
-- `NetworkHost:getRoundTripTime`: Returns the round-trip time estimate for a peer in milliseconds.
-- `NetworkHost:getPeerState`: Returns the connection state of a peer as a string.
-- `NetworkHost:getPeerAddress`: Returns the remote address of a peer, or nil if unavailable.
-- `NetworkHost:getAddress`: Returns the local bind address as a string.
-- `NetworkHost:getPeerLimit`: Returns the maximum number of peer slots.
-- `NetworkHost:getChannelLimit`: Returns the maximum number of channels per connection.
-- `NetworkHost:setChannelLimit`: Sets the channel limit for future connections.
-- `NetworkHost:getBandwidthLimit`: Returns the bandwidth limits as a table with incoming and outgoing fields.
-- `NetworkHost:getConnectedPeerCount`: Returns the number of currently connected peers.
-- `NetworkHost:getConnectedPeerIds`: Returns a table of connected peer IDs.
-- `NetworkHost:getPeerStats`: Returns a statistics table for a peer.
-- `NetworkHost:destroy`: Destroys the host, closing the underlying socket.
-- `NetworkHost:isDestroyed`: Returns true if the host has been destroyed.
-- `NetworkHost:getRole`: Returns the multiplayer role of this host ("server", "client", or "host").
-- `NetworkHost:isServer`: Returns true if this host was created as a server.
-- `NetworkHost:isClient`: Returns true if this host was created as a client.
+### `LNetworkHost` Methods
+- `LNetworkHost:service`: Polls the network for one event, returning an event table or nil.
+- `LNetworkHost:connect`: Initiates a connection to a remote host, returning the peer ID.
+- `LNetworkHost:send`: Sends data to a specific peer on a channel.
+- `LNetworkHost:broadcast`: Broadcasts data to all connected peers on a channel.
+- `LNetworkHost:flush`: Flushes all pending sends immediately.
+- `LNetworkHost:disconnect`: Gracefully disconnects a peer.
+- `LNetworkHost:disconnectNow`: Immediately disconnects a peer without handshake.
+- `LNetworkHost:disconnectLater`: Disconnects a peer after all queued packets have been sent.
+- `LNetworkHost:resetPeer`: Resets a peer connection immediately without notifying the remote side.
+- `LNetworkHost:ping`: Sends a ping to a peer to measure round-trip time.
+- `LNetworkHost:getRoundTripTime`: Returns the round-trip time estimate for a peer in milliseconds.
+- `LNetworkHost:getPeerState`: Returns the connection state of a peer as a string.
+- `LNetworkHost:getPeerAddress`: Returns the remote address of a peer, or nil if unavailable.
+- `LNetworkHost:getAddress`: Returns the local bind address as a string.
+- `LNetworkHost:getPeerLimit`: Returns the maximum number of peer slots.
+- `LNetworkHost:getChannelLimit`: Returns the maximum number of channels per connection.
+- `LNetworkHost:setChannelLimit`: Sets the channel limit for future connections.
+- `LNetworkHost:getBandwidthLimit`: Returns the bandwidth limits as a table with incoming and outgoing fields.
+- `LNetworkHost:setBandwidthLimit`: Sets the bandwidth limits in bytes per second.
+- `LNetworkHost:getConnectedPeerCount`: Returns the number of currently connected peers.
+- `LNetworkHost:getConnectedPeerIds`: Returns a table of connected peer IDs.
+- `LNetworkHost:getPeerStats`: Returns a statistics table for a peer.
+- `LNetworkHost:destroy`: Destroys the host, closing the underlying socket.
+- `LNetworkHost:isDestroyed`: Returns true if the host has been destroyed.
+- `LNetworkHost:getRole`: Returns the multiplayer role of this host ("server", "client", or "host").
+- `LNetworkHost:isServer`: Returns true if this host was created as a server.
+- `LNetworkHost:isClient`: Returns true if this host was created as a client.
+- `LNetworkHost:type`: Returns the type name of this object.
+- `LNetworkHost:typeOf`: Returns true if this object is of the given type.
 
-### `NetworkRuntime` Methods
-- `NetworkRuntime:httpRequest`: Sends an HTTP request asynchronously. Poll with `poll()` for the response.
-- `NetworkRuntime:tcpConnect`: Opens a TCP connection to a remote address.
-- `NetworkRuntime:tcpSend`: Sends data over a TCP connection.
-- `NetworkRuntime:tcpClose`: Closes the TCP connection identified by the given connection handle.
-- `NetworkRuntime:wsConnect`: Opens a WebSocket connection.
-- `NetworkRuntime:wsSend`: Sends a text message over a WebSocket connection.
-- `NetworkRuntime:wsClose`: Closes a WebSocket connection.
-- `NetworkRuntime:poll`: Polls for completed async responses (HTTP, TCP events, WebSocket events).
-- `NetworkRuntime:shutdown`: Shuts down the background network thread.
+### `LNetworkRuntime` Methods
+- `LNetworkRuntime:httpRequest`: Sends an HTTP request asynchronously. Poll with `poll()` for the response.
+- `LNetworkRuntime:httpGet`: Convenience: sends an HTTP GET request.
+- `LNetworkRuntime:httpPost`: Convenience: sends an HTTP POST request.
+- `LNetworkRuntime:tcpConnect`: Opens a TCP connection to a remote address.
+- `LNetworkRuntime:tcpSend`: Sends data over a TCP connection.
+- `LNetworkRuntime:tcpClose`: Closes the TCP connection identified by the given connection handle.
+- `LNetworkRuntime:wsConnect`: Opens a WebSocket connection.
+- `LNetworkRuntime:wsSend`: Sends a text message over a WebSocket connection.
+- `LNetworkRuntime:wsClose`: Closes a WebSocket connection.
+- `LNetworkRuntime:poll`: Polls for completed async responses (HTTP, TCP events, WebSocket events).
+- `LNetworkRuntime:shutdown`: Shuts down the background network thread.
+- `LNetworkRuntime:type`: Returns the type name of this object.
+- `LNetworkRuntime:typeOf`: Returns true if this object is of the given type.
 
 ## References
 

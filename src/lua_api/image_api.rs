@@ -1,4 +1,4 @@
-//! `lurek.image` - CPU-side pixel-level image manipulation.
+﻿//! `lurek.image` - CPU-side pixel-level image manipulation.
 //!
 //! Exposes `ImageData` (RGBA pixel buffers), `CompressedImageData` (DXT/BC/ETC),
 //! `LayeredImage` (multi-layer compositing), `ProvinceGrid` (colour-keyed region maps),
@@ -65,6 +65,42 @@ impl LuaUserData for LuaProvinceGrid {
             Ok(t)
         });
 
+        // -- provinceSpans --
+        /// Returns province fill spans as { province_id, y, x0, x1 } records (x1 exclusive).
+        /// Useful for rectangle-based shape rendering without per-province bitmaps.
+        /// @return | table | Province fill-span records.
+        methods.add_method("provinceSpans", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (id, y, x0, x1)) in this.inner.province_spans().into_iter().enumerate() {
+                let row = lua.create_table()?;
+                row.set("province_id", id)?;
+                row.set("y", y)?;
+                row.set("x0", x0)?;
+                row.set("x1", x1)?;
+                t.set(i + 1, row)?;
+            }
+            Ok(t)
+        });
+
+        // -- borderSegments --
+        /// Returns merged border segments as
+        /// { province_a, province_b, x0, y0, x1, y1 } records.
+        /// @return | table | Border-segment records.
+        methods.add_method("borderSegments", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, (a, b, x0, y0, x1, y1)) in this.inner.border_segments().into_iter().enumerate() {
+                let seg = lua.create_table()?;
+                seg.set("province_a", a)?;
+                seg.set("province_b", b)?;
+                seg.set("x0", x0)?;
+                seg.set("y0", y0)?;
+                seg.set("x1", x1)?;
+                seg.set("y1", y1)?;
+                t.set(i + 1, seg)?;
+            }
+            Ok(t)
+        });
+
         // -- type --
         /// Returns the type name of this object.
             /// @return | string | Lua-visible type name.
@@ -76,6 +112,55 @@ impl LuaUserData for LuaProvinceGrid {
             /// @return | boolean | True if the type name matches LProvinceGrid or Object.
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LProvinceGrid" || name == "Object")
+        });
+
+        // -- saveShapeCache --
+        // -- serializeShapeData --
+        /// Serializes province geometry (spans and borders) to raw bytes.
+        /// Use lurek.filesystem.writeBytes() to persist. Does NOT write any file.
+            /// @return | string | Binary blob (SHAP format) suitable for writeBytes.
+        methods.add_method("serializeShapeData", |lua, this, ()| {
+            let data = this.inner.serialize_shape_data();
+            lua.create_string(&data)
+        });
+
+        // -- deserializeShapeData --
+        /// Deserializes province geometry from raw bytes produced by serializeShapeData.
+        /// @param | bytes | string | Binary blob previously returned by serializeShapeData.
+            /// @return | table | { spans, segments } or nil if bytes are invalid.
+        methods.add_method("deserializeShapeData", |lua, _, bytes: LuaString| {
+            let data = bytes.as_bytes();
+            if let Some((spans, segs)) = ProvinceGrid::deserialize_shape_data(data) {
+                let result = lua.create_table()?;
+
+                let spans_tbl = lua.create_table()?;
+                for (i, (id, y, x0, x1)) in spans.into_iter().enumerate() {
+                    let row = lua.create_table()?;
+                    row.set("province_id", id)?;
+                    row.set("y", y)?;
+                    row.set("x0", x0)?;
+                    row.set("x1", x1)?;
+                    spans_tbl.set(i + 1, row)?;
+                }
+                result.set("spans", spans_tbl)?;
+
+                let segs_tbl = lua.create_table()?;
+                for (i, (a, b, x0, y0, x1, y1)) in segs.into_iter().enumerate() {
+                    let seg = lua.create_table()?;
+                    seg.set("province_a", a)?;
+                    seg.set("province_b", b)?;
+                    seg.set("x0", x0)?;
+                    seg.set("y0", y0)?;
+                    seg.set("x1", x1)?;
+                    seg.set("y1", y1)?;
+                    segs_tbl.set(i + 1, seg)?;
+                }
+                result.set("segments", segs_tbl)?;
+
+                Ok(LuaValue::Table(result))
+            } else {
+                Ok(LuaValue::Nil)
+            }
         });
     }
 }
@@ -362,6 +447,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | height | integer? | Image height when creating a blank image.
     /// @return | ImageData | New or loaded image data.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newImageData", lua.create_function(move |lua, args: LuaMultiValue| {
             let mut iter = args.into_iter();
             let first = iter.next().ok_or_else(|| {
@@ -398,11 +484,25 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- newImageDataFromBytes --
+    /// Creates an ImageData from a raw RGBA8 byte string. Width Ă— height Ă— 4 bytes required.
+    /// @param | width | integer | Image width in pixels.
+    /// @param | height | integer | Image height in pixels.
+    /// @param | bytes | string | Raw RGBA8 pixel data (width Ă— height Ă— 4 bytes).
+    /// @return | ImageData | New image data backed by the provided bytes.
+    tbl.set("newImageDataFromBytes", lua.create_function(move |lua, (w, h, bytes): (u32, u32, LuaString)| {
+            let raw = bytes.as_bytes().to_vec();
+            let img = ImageData::from_bytes(w, h, raw).map_err(LuaError::RuntimeError)?;
+            lua.create_userdata(img)
+        })?,
+    )?;
+
     // -- newCompressedData --
     /// Loads compressed texture data from a DDS file.
     /// @param | filename | string | DDS file path relative to the game directory.
     /// @return | CompressedImageData | Loaded compressed texture data.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newCompressedData", lua.create_function(move |lua, filename: String| {
             let path = s.borrow().game_dir.join(&filename);
             let path_str = path
@@ -418,6 +518,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | filename | string | File path to test.
         /// @return | boolean | True if the file is a DDS image.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("isCompressed", lua.create_function(move |_, filename: String| {
             let path = s.borrow().game_dir.join(&filename);
             Ok(CompressedImageData::is_dds_file(
@@ -444,6 +545,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Output file path relative to the game directory.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("saveImage", lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
             let path_str = path
@@ -462,6 +564,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Output PNG path relative to the game directory.
     /// @return | nil | No value is returned.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("savePNG", lua.create_function(move |_, (img_ud, filename): (LuaAnyUserData, String)| {
             let path = s.borrow().game_dir.join(&filename);
             let raw = img_ud
@@ -480,6 +583,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Input LIMG path relative to the game directory.
     /// @return | ImageData | Loaded image data.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("loadImage", lua.create_function(move |lua, filename: String| {
             let path = s.borrow().game_dir.join(&filename);
             let path_str = path
@@ -495,6 +599,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | path | string | Input layered image path relative to the game directory.
     /// @return | LayeredImage | Loaded layered image.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("loadLayered", lua.create_function(move |lua, filename: String| {
             let path = s.borrow().game_dir.join(&filename);
             let path_str = path
@@ -522,6 +627,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @param | filename | string | Province map PNG path relative to the game directory.
     /// @return | ProvinceGrid | Loaded province grid with adjacency data.
     let s = state.clone();
+    // Auto-doc: Lua API binding.
     tbl.set("newProvinceGrid", lua.create_function(move |lua, filename: String| {
             let path = s.borrow().game_dir.join(&filename);
             let path_str = path
@@ -531,6 +637,29 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             lua.create_userdata(LuaProvinceGrid { inner: grid })
         })?,
     )?;
+
+    // -- fromScreen --
+    /// Returns a screen capture `ImageData` when ready; otherwise queues capture for next frame and returns nil.
+    ///
+    /// This is an async poll API: the first call typically returns nil, then a later call
+    /// returns the captured pixels after the renderer completes a readback.
+    ///
+    /// @return | ImageData | Captured screen image when ready.
+    /// @return | nil | Returned when capture is pending; call again on a later frame.
+    let s = state.clone();
+    tbl.set(
+        "fromScreen",
+        lua.create_function(move |lua, ()| {
+            let mut st = s.borrow_mut();
+            if let Some(img) = st.captured_screen_image.take() {
+                Ok(LuaValue::UserData(lua.create_userdata(img)?))
+            } else {
+                st.pending_screen_capture = true;
+                Ok(LuaValue::Nil)
+            }
+        })?,
+    )?;
+
     lurek.set("image", tbl)?;
     Ok(())
 }
@@ -888,9 +1017,49 @@ impl mlua::UserData for ImageData {
         ///
         /// @param | width | integer | Width in pixels.
         /// @param | height | integer | Height in pixels.
+        /// @param | filter | string? | Optional filter: "bilinear" (default) or "lanczos3".
         /// @return | ImageData | Bilinear-interpolated copy of the image at the given dimensions.
-        methods.add_method("resize", |lua, this, (w, h): (u32, u32)| {
-            match this.resize(w, h) {
+        methods.add_method("resize", |lua, this, args: LuaMultiValue| {
+            let mut it = args.into_iter();
+            let w = match it.next() {
+                Some(LuaValue::Integer(v)) => v as u32,
+                Some(LuaValue::Number(v)) => v as u32,
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "resize(width, height, [filter]): width must be numeric".into(),
+                    ));
+                }
+            };
+            let h = match it.next() {
+                Some(LuaValue::Integer(v)) => v as u32,
+                Some(LuaValue::Number(v)) => v as u32,
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "resize(width, height, [filter]): height must be numeric".into(),
+                    ));
+                }
+            };
+            let filter = match it.next() {
+                Some(LuaValue::String(name)) => {
+                    let name = name
+                        .to_str()
+                        .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+                    crate::image::effects::ResizeFilter::parse(name).ok_or_else(|| {
+                        LuaError::RuntimeError(format!(
+                            "resize: invalid filter '{}', expected 'bilinear' or 'lanczos3'",
+                            name
+                        ))
+                    })?
+                }
+                Some(_) => {
+                    return Err(LuaError::RuntimeError(
+                        "resize(width, height, [filter]): filter must be a string".into(),
+                    ));
+                }
+                None => crate::image::effects::ResizeFilter::Bilinear,
+            };
+
+            match this.resize_with_filter(w, h, filter) {
                 Some(img) => Ok(LuaValue::UserData(lua.create_userdata(img)?)),
                 None => Ok(LuaValue::Nil),
             }
@@ -927,6 +1096,13 @@ impl mlua::UserData for ImageData {
                 None => Ok(LuaValue::Nil),
             },
         );
+
+            // -- getRawBytes --
+            /// Returns the raw RGBA8 pixel data as a Lua string (width Ă— height Ă— 4 bytes).
+            /// @return | string | Raw RGBA8 pixel bytes in row-major order.
+            methods.add_method("getRawBytes", |lua, this, ()| {
+                  lua.create_string(this.as_bytes())
+            });
 
         // -- diff --
         /// Returns the sum of absolute per-channel pixel differences with another ImageData.

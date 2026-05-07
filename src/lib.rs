@@ -87,7 +87,7 @@ pub mod data;
 pub mod dataframe;
 /// Structured logger, hierarchical profiler, frame stats counter, and filesystem watcher for in-engine developer diagnostics.
 pub mod devtools;
-/// Format-agnostic serialization: JSON, TOML, CSV, and YAML via shared SerialValue.
+/// Format-agnostic serialization: JSON, TOML, CSV, MessagePack, XML, and schema tools via shared SerialValue.
 pub mod serial;
 // migration-state: pub mod dialog; â€” now library/dialog/init.lua
 // migration-state: pub mod economy; â€” now library/economy/init.lua
@@ -155,6 +155,8 @@ pub mod patterns;
 pub mod physics;
 /// DAG-based pipeline orchestrator for composing multi-step workflows.
 pub mod pipeline;
+/// Province runtime engine: map-state snapshots, topology, border classes, and GPU bridge data.
+pub mod province;
 /// (Deprecated â€” use `fx::post` instead.) Post-processing effects data model.
 // pub mod postfx; â€” superseded by fx::post
 /// Procedural world generation: cellular automata, Voronoi, flood fill, Poisson disk, periodic noise.
