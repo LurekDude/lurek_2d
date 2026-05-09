@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: AI + Entity + Scene (3-way)
--- Tests AI FSM controlling entities within a scene
-
--- @describe ai + entity + scene integration
+-- Integration: AI FSM + ECS universe + scene (3-way)
 describe("ai + entity + scene integration", function()
     -- @integration LStateMachine:addState
     -- @integration LStateMachine:addTransition
@@ -51,7 +48,7 @@ describe("ai + entity + scene integration", function()
         fsm:forceState("patrol")
         expect_equal("patrol", fsm:getCurrentState(), "enemy starts patrolling")
 
-        -- Simulate player detection          chase
+        -- Simulate player detection -> chase
         fsm:forceState("chase")
         expect_equal("chase", fsm:getCurrentState(), "enemy chases player")
         universe:set(enemy, "ai_state", "chase")

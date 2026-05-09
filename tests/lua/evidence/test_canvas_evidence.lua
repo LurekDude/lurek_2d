@@ -32,6 +32,7 @@ describe("evidence: canvas", function()
         expect_evidence_created(path)
     end)
 
+    -- @evidence file
     it("canvas dimension accessors return correct values", function()
         if type(io) ~= "table" or type(io.open) ~= "function" then
             expect_true(type(io) ~= "table" or type(io.open) ~= "function")
@@ -68,6 +69,7 @@ describe("evidence: canvas", function()
         expect_evidence_created(path)
     end)
 
+    -- @evidence file
     it("canvas renders a scene to texture (requires GPU)", function()
         if type(lurek.render.newCanvas) ~= "function" or type(lurek.render.setCanvas) ~= "function" then
             expect_true(type(lurek.render.newCanvas) ~= "function" or type(lurek.render.setCanvas) ~= "function")

@@ -6,6 +6,7 @@
 
 -- @describe lurek.mods module exists
 describe("lurek.mods module exists", function()
+    -- @covers lurek.mods
     it("lurek.mods is a table", function()
         expect_type("table", lurek.mods)
     end)
@@ -611,26 +612,32 @@ describe("Mod core accessors", function()
         })
     end
 
+    -- @covers LMod:getId
     it("getId returns the mod id", function()
         expect_equal("accessor_mod", make_mod():getId())
     end)
 
+    -- @covers LMod:getName
     it("getName returns the mod name", function()
         expect_equal("Accessor Mod", make_mod():getName())
     end)
 
+    -- @covers LMod:getVersion
     it("getVersion returns the version string", function()
         expect_equal("1.2.3", make_mod():getVersion())
     end)
 
+    -- @covers LMod:getAuthor
     it("getAuthor returns the author string", function()
         expect_equal("TestAuthor", make_mod():getAuthor())
     end)
 
+    -- @covers LMod:getDescription
     it("getDescription returns the description string", function()
         expect_equal("A test mod", make_mod():getDescription())
     end)
 
+    -- @covers LMod:getDependencies
     it("getDependencies returns the dependency array", function()
         local deps = make_mod():getDependencies()
         expect_type("table", deps)
@@ -639,6 +646,7 @@ describe("Mod core accessors", function()
         expect_equal("dep_b", deps[2])
     end)
 
+    -- @covers LMod:getPriority
     it("getPriority returns the priority integer", function()
         expect_equal(7, make_mod():getPriority())
     end)
@@ -653,6 +661,7 @@ describe("Mod core accessors", function()
         expect_equal(true, m:isEnabled())
     end)
 
+    -- @covers LMod:isLoaded
     it("isLoaded returns false for a new mod", function()
         expect_equal(false, make_mod():isLoaded())
     end)

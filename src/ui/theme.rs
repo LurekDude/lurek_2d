@@ -710,6 +710,411 @@ impl Theme {
             ),
         );
 
+        // ── ScrollPanel / NinePatch ───────────────────────────────────────
+        t.set_style(
+            WidgetType::ScrollPanel,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 0.96],
+                [0.86, 0.88, 0.92, 1.0],
+                [0.24, 0.24, 0.30, 1.0],
+                1.0,
+                0.0,
+                14.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::NinePatch,
+            WidgetState::Normal,
+            mk(
+                [0.17, 0.17, 0.22, 0.96],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.30, 0.30, 0.36, 1.0],
+                1.0,
+                4.0,
+                14.0,
+                drop_shadow,
+                [1.0, 1.0],
+                0.08,
+                Some([0.12, 0.12, 0.18, 0.96]),
+                "left",
+            ),
+        );
+
+        // ── Toast / Separator / Spacer ────────────────────────────────────
+        t.set_style(
+            WidgetType::Toast,
+            WidgetState::Normal,
+            mk(
+                [0.14, 0.14, 0.18, 0.98],
+                [0.92, 0.94, 0.98, 1.0],
+                [0.28, 0.34, 0.55, 1.0],
+                1.0,
+                6.0,
+                14.0,
+                drop_shadow,
+                [2.0, 2.0],
+                0.08,
+                Some([0.11, 0.11, 0.16, 0.98]),
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::Separator,
+            WidgetState::Normal,
+            mk(
+                [0.0, 0.0, 0.0, 0.0],
+                [0.30, 0.32, 0.38, 1.0],
+                [0.30, 0.32, 0.38, 1.0],
+                0.0,
+                0.0,
+                1.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::Spacer,
+            WidgetState::Normal,
+            mk(
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0],
+                [0.0, 0.0, 0.0, 0.0],
+                0.0,
+                0.0,
+                1.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+
+        // ── Tree / ScrollBar ───────────────────────────────────────────────
+        t.set_style(
+            WidgetType::TreeView,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.86, 0.88, 0.92, 1.0],
+                [0.28, 0.28, 0.34, 1.0],
+                1.0,
+                2.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::ScrollBar,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.46, 0.52, 0.64, 1.0],
+                [0.20, 0.20, 0.26, 1.0],
+                1.0,
+                6.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "center",
+            ),
+        );
+        t.set_style(
+            WidgetType::ScrollBar,
+            WidgetState::Hovered,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.58, 0.66, 0.82, 1.0],
+                [0.24, 0.30, 0.42, 1.0],
+                1.0,
+                6.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "center",
+            ),
+        );
+
+        // ── Windows / Docking ──────────────────────────────────────────────
+        t.set_style(
+            WidgetType::GUIWindow,
+            WidgetState::Normal,
+            mk(
+                [0.14, 0.15, 0.19, 0.98],
+                [0.90, 0.93, 0.98, 1.0],
+                [0.28, 0.30, 0.38, 1.0],
+                1.0,
+                6.0,
+                14.0,
+                drop_shadow,
+                [3.0, 3.0],
+                0.10,
+                Some([0.10, 0.11, 0.15, 0.98]),
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::SplitPanel,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 0.90],
+                [0.86, 0.88, 0.92, 1.0],
+                [0.26, 0.28, 0.34, 1.0],
+                1.0,
+                0.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::DockPanel,
+            WidgetState::Normal,
+            mk(
+                [0.13, 0.13, 0.17, 0.92],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.26, 0.28, 0.34, 1.0],
+                1.0,
+                0.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::Dialog,
+            WidgetState::Normal,
+            mk(
+                [0.15, 0.16, 0.20, 0.99],
+                [0.92, 0.94, 0.98, 1.0],
+                [0.30, 0.32, 0.40, 1.0],
+                1.0,
+                8.0,
+                14.0,
+                drop_shadow,
+                [4.0, 4.0],
+                0.10,
+                Some([0.11, 0.12, 0.16, 0.99]),
+                "left",
+            ),
+        );
+
+        // ── Bars / Menus / Tooling ─────────────────────────────────────────
+        t.set_style(
+            WidgetType::Toolbar,
+            WidgetState::Normal,
+            mk(
+                [0.16, 0.17, 0.22, 1.0],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.26, 0.28, 0.36, 1.0],
+                1.0,
+                0.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.06,
+                Some([0.13, 0.14, 0.18, 1.0]),
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::MenuBar,
+            WidgetState::Normal,
+            mk(
+                [0.16, 0.17, 0.22, 1.0],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.24, 0.26, 0.32, 1.0],
+                1.0,
+                0.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.08,
+                Some([0.12, 0.13, 0.17, 1.0]),
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::MenuItem,
+            WidgetState::Normal,
+            mk(
+                [0.0, 0.0, 0.0, 0.0],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.0, 0.0, 0.0, 0.0],
+                0.0,
+                2.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::MenuItem,
+            WidgetState::Hovered,
+            mk(
+                [0.22, 0.33, 0.52, 0.85],
+                [1.0, 1.0, 1.0, 1.0],
+                [0.0, 0.0, 0.0, 0.0],
+                0.0,
+                2.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::StatusBar,
+            WidgetState::Normal,
+            mk(
+                [0.15, 0.16, 0.20, 1.0],
+                [0.80, 0.84, 0.90, 1.0],
+                [0.24, 0.26, 0.32, 1.0],
+                1.0,
+                0.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+
+        // ── Accordion / Tooltip ───────────────────────────────────────────
+        t.set_style(
+            WidgetType::Accordion,
+            WidgetState::Normal,
+            mk(
+                [0.13, 0.13, 0.18, 0.96],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.26, 0.28, 0.34, 1.0],
+                1.0,
+                4.0,
+                13.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::TooltipPanel,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 0.98],
+                [0.96, 0.94, 0.86, 1.0],
+                [0.64, 0.54, 0.22, 1.0],
+                1.0,
+                4.0,
+                12.0,
+                drop_shadow,
+                [1.0, 1.0],
+                0.06,
+                Some([0.16, 0.14, 0.10, 0.98]),
+                "left",
+            ),
+        );
+
+        // ── Data widgets ───────────────────────────────────────────────────
+        t.set_style(
+            WidgetType::ColorPicker,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.28, 0.28, 0.34, 1.0],
+                1.0,
+                4.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::GUITable,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.86, 0.88, 0.92, 1.0],
+                [0.28, 0.28, 0.34, 1.0],
+                1.0,
+                2.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+        t.set_style(
+            WidgetType::ImageWidget,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 1.0],
+                [0.70, 0.74, 0.82, 1.0],
+                [0.30, 0.32, 0.38, 1.0],
+                1.0,
+                2.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "center",
+            ),
+        );
+        t.set_style(
+            WidgetType::Custom,
+            WidgetState::Normal,
+            mk(
+                [0.12, 0.12, 0.16, 0.65],
+                [0.88, 0.90, 0.94, 1.0],
+                [0.24, 0.26, 0.32, 1.0],
+                1.0,
+                2.0,
+                12.0,
+                none_shadow,
+                [0.0, 0.0],
+                0.0,
+                None,
+                "left",
+            ),
+        );
+
         t
     }
 }

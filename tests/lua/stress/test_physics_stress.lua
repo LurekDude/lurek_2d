@@ -231,6 +231,29 @@ describe("physics stress: determinism", function()
         expect_near(x1, x2, 0.001, "x position deterministic")
         expect_near(y1, y2, 0.001, "y position deterministic")
     end)
+
+    -- @stress lurek.physics.getBody
+    -- @stress lurek.physics.newBody
+    -- @stress lurek.physics.newWorld
+    -- @stress lurek.physics.step
+    it("deterministic results stay stable across 10 repeated runs", function()
+        local function run_once()
+            local world = lurek.physics.newWorld(0, 100)
+            local body = lurek.physics.newBody(world, 50, 0, "dynamic")
+            for _ = 1, 120 do
+                lurek.physics.step(world, 1.0 / 60.0)
+            end
+            local x, y = lurek.physics.getBody(world, body)
+            return x, y
+        end
+
+        local base_x, base_y = run_once()
+        for _ = 1, 9 do
+            local x, y = run_once()
+            expect_near(base_x, x, 0.001, "x deterministic across repeated runs")
+            expect_near(base_y, y, 0.001, "y deterministic across repeated runs")
+        end
+    end)
 end)
 
 
@@ -503,3 +526,5 @@ describe("stress: physics zones throughput", function()
     end)
 end)
 test_summary()
+
+

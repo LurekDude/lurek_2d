@@ -141,6 +141,84 @@ fn draw_grid_and_axes(
     (left, right, top, bottom)
 }
 
+fn to_rgb(color: Color) -> (u8, u8, u8) {
+    (
+        (color.r * 255.0) as u8,
+        (color.g * 255.0) as u8,
+        (color.b * 255.0) as u8,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn draw_numeric_axes(
+    img: &mut ImageData,
+    cfg: &ChartConfig,
+    left: i32,
+    right: i32,
+    top: i32,
+    bottom: i32,
+    x_ticks: u32,
+    y_ticks: u32,
+    x_min: f32,
+    x_max: f32,
+    y_min: f32,
+    y_max: f32,
+) {
+    let x_ticks = x_ticks.max(1);
+    let y_ticks = y_ticks.max(1);
+    let chart_w = (right - left) as f32;
+    let chart_h = (bottom - top) as f32;
+    let (lr, lg, lb) = cfg.label_color;
+
+    for i in 0..=x_ticks {
+        let x = left + (i as f32 * chart_w / x_ticks as f32) as i32;
+        let v = x_min + (x_max - x_min) * (i as f32 / x_ticks as f32);
+        img.draw_line(x, bottom, x, bottom + 4, lr, lg, lb, 255);
+        img.draw_label(&format!("{v:.1}"), x - 10, bottom + 8, lr, lg, lb);
+    }
+
+    for i in 0..=y_ticks {
+        let y = bottom - (i as f32 * chart_h / y_ticks as f32) as i32;
+        let v = y_min + (y_max - y_min) * (i as f32 / y_ticks as f32);
+        img.draw_line(left - 4, y, left, y, lr, lg, lb, 255);
+        img.draw_label(&format!("{v:.1}"), 4, y - 3, lr, lg, lb);
+    }
+
+    img.draw_label("X", right + 6, bottom - 4, lr, lg, lb);
+    img.draw_label("Y", left - 12, top - 14, lr, lg, lb);
+}
+
+fn draw_series_legend(
+    img: &mut ImageData,
+    cfg: &ChartConfig,
+    right: i32,
+    top: i32,
+    entries: &[(&str, Color)],
+) {
+    if entries.is_empty() {
+        return;
+    }
+
+    let panel_w = 116i32;
+    let panel_h = (entries.len() as i32 * 14 + 10).max(22);
+    let panel_x = right - panel_w;
+    let panel_y = top + 6;
+
+    img.draw_rect(panel_x, panel_y, panel_w as u32, panel_h as u32, 250, 250, 252, 230);
+    img.draw_rect(panel_x, panel_y, panel_w as u32, 1, 170, 176, 188, 255);
+    img.draw_rect(panel_x, panel_y + panel_h - 1, panel_w as u32, 1, 170, 176, 188, 255);
+    img.draw_rect(panel_x, panel_y, 1, panel_h as u32, 170, 176, 188, 255);
+    img.draw_rect(panel_x + panel_w - 1, panel_y, 1, panel_h as u32, 170, 176, 188, 255);
+
+    let (lr, lg, lb) = cfg.label_color;
+    for (idx, (name, color)) in entries.iter().enumerate() {
+        let y = panel_y + 6 + idx as i32 * 14;
+        let (cr, cg, cb) = to_rgb(*color);
+        img.draw_rect(panel_x + 6, y, 10, 8, cr, cg, cb, 255);
+        img.draw_label(name, panel_x + 20, y + 1, lr, lg, lb);
+    }
+}
+
 /// Helper to draw a filled circle safely (no out-of-bounds panics).
 #[allow(clippy::too_many_arguments)]
 fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
@@ -234,17 +312,32 @@ impl LineChart {
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
 
-        // Draw title
+        draw_numeric_axes(
+            img,
+            cfg,
+            left,
+            right,
+            top,
+            bottom,
+            x_div.max(1),
+            5,
+            0.0,
+            self.x_max,
+            0.0,
+            self.y_max,
+        );
+
         if let Some(ref title) = cfg.title {
             let (lr, lg, lb) = cfg.label_color;
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
 
-        // Plot each series
+        let legend_entries: Vec<(&str, Color)> =
+            self.series.iter().map(|s| (s.name.as_str(), s.color)).collect();
+        draw_series_legend(img, cfg, right, top, &legend_entries);
+
         for s in &self.series {
-            let cr = (s.color.r * 255.0) as u8;
-            let cg = (s.color.g * 255.0) as u8;
-            let cb = (s.color.b * 255.0) as u8;
+            let (cr, cg, cb) = to_rgb(s.color);
 
             for i in 1..s.values.len() {
                 let x0 = left + (s.values[i - 1].0 / self.x_max * chart_w) as i32;
@@ -360,9 +453,32 @@ impl BarChart {
         let chart_h = (bottom - top) as f32;
         let (lr, lg, lb) = cfg.label_color;
 
+        draw_numeric_axes(
+            img,
+            cfg,
+            left,
+            right,
+            top,
+            bottom,
+            self.categories.len() as u32,
+            5,
+            0.0,
+            self.categories.len().max(1) as f32,
+            0.0,
+            self.y_max,
+        );
+
         if let Some(ref title) = cfg.title {
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
+
+        let legend_entries: Vec<(&str, Color)> = self
+            .series_names
+            .iter()
+            .zip(self.series_colors.iter().copied())
+            .map(|(name, c)| (name.as_str(), c))
+            .collect();
+        draw_series_legend(img, cfg, right, top, &legend_entries);
 
         let n_series = self.series_colors.len().max(1);
         let n_cats = self.categories.len().max(1);
@@ -373,9 +489,7 @@ impl BarChart {
             let group_x = left + ci as i32 * group_w;
             for (si, &val) in cat.values.iter().enumerate() {
                 let c = self.series_colors.get(si).copied().unwrap_or(Color::WHITE);
-                let cr = (c.r * 255.0) as u8;
-                let cg = (c.g * 255.0) as u8;
-                let cb = (c.b * 255.0) as u8;
+                let (cr, cg, cb) = to_rgb(c);
                 let bh = (val / self.y_max * chart_h) as i32;
                 let bx = group_x + 10 + si as i32 * (bar_w + 2);
                 img.draw_rect(bx, bottom - bh, bar_w as u32, bh as u32, cr, cg, cb, 255);
@@ -464,17 +578,34 @@ impl ScatterPlot {
         let chart_h = (bottom - top) as f32;
         let (lr, lg, lb) = cfg.label_color;
 
+        draw_numeric_axes(
+            img,
+            cfg,
+            left,
+            right,
+            top,
+            bottom,
+            5,
+            5,
+            self.x_range.0,
+            self.x_range.1,
+            self.y_range.0,
+            self.y_range.1,
+        );
+
         if let Some(ref title) = cfg.title {
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
+
+        let legend_entries: Vec<(&str, Color)> =
+            self.series.iter().map(|s| (s.name.as_str(), s.color)).collect();
+        draw_series_legend(img, cfg, right, top, &legend_entries);
 
         let x_span = (self.x_range.1 - self.x_range.0).max(f32::EPSILON);
         let y_span = (self.y_range.1 - self.y_range.0).max(f32::EPSILON);
 
         for s in &self.series {
-            let cr = (s.color.r * 255.0) as u8;
-            let cg = (s.color.g * 255.0) as u8;
-            let cb = (s.color.b * 255.0) as u8;
+            let (cr, cg, cb) = to_rgb(s.color);
             for &(x, y) in &s.values {
                 let px = left + ((x - self.x_range.0) / x_span * chart_w) as i32;
                 let py = bottom - ((y - self.y_range.0) / y_span * chart_h) as i32;
@@ -629,16 +760,26 @@ impl PieChart {
             angle += sweep;
         }
 
-        // Legend on the right
-        let mut label_y = 60i32;
         let (lr, lg, lb) = cfg.label_color;
+        let legend_entries: Vec<(&str, Color)> = self
+            .segments
+            .iter()
+            .map(|seg| (seg.label.as_str(), seg.color))
+            .collect();
+        draw_series_legend(img, cfg, w as i32 - 10, 40, &legend_entries);
+
+        let mut label_y = 44i32;
+        let legend_x = (w as f32 * 0.72) as i32;
         for seg in &self.segments {
-            let cr = (seg.color.r * 255.0) as u8;
-            let cg = (seg.color.g * 255.0) as u8;
-            let cb = (seg.color.b * 255.0) as u8;
-            let legend_x = (w as f32 * 0.8) as i32;
-            img.draw_rect(legend_x, label_y, 12, 8, cr, cg, cb, 255);
-            img.draw_label(&seg.label, legend_x + 16, label_y + 2, lr, lg, lb);
+            let pct = seg.value / total * 100.0;
+            img.draw_label(
+                &format!("{pct:.1}%"),
+                legend_x + 76,
+                label_y,
+                lr,
+                lg,
+                lb,
+            );
             label_y += 14;
         }
 
@@ -735,6 +876,20 @@ impl AreaChart {
         }
 
         let n = self.layers[0].values.len().max(2);
+        draw_numeric_axes(
+            img,
+            cfg,
+            left,
+            right,
+            top,
+            bottom,
+            (n as u32).min(8),
+            4,
+            0.0,
+            (n - 1) as f32,
+            0.0,
+            self.y_max,
+        );
 
         // For each x pixel, compute cumulative stack
         for x_px in left..right {
@@ -764,16 +919,10 @@ impl AreaChart {
             }
         }
 
-        // Legend
         let (lr, lg, lb) = cfg.label_color;
-        for (i, layer) in self.layers.iter().enumerate() {
-            let ly = 10 + i as i32 * 10;
-            let cr = (layer.color.r * 255.0) as u8;
-            let cg = (layer.color.g * 255.0) as u8;
-            let cb = (layer.color.b * 255.0) as u8;
-            img.draw_rect(right - 90, ly, 10, 6, cr, cg, cb, 255);
-            img.draw_label(&layer.name, right - 76, ly + 1, lr, lg, lb);
-        }
+        let legend_entries: Vec<(&str, Color)> =
+            self.layers.iter().map(|l| (l.name.as_str(), l.color)).collect();
+        draw_series_legend(img, cfg, right, top, &legend_entries);
 
         if let Some(ref title) = cfg.title {
             img.draw_label(title, left + 10, 10, lr, lg, lb);

@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Entity + Physics
--- Tests physics bodies attached to entities and position sync.
-
--- @describe integration: entity + physics body lifecycle
+-- Integration: ECS entity positions synced with physics body state
 describe("integration: entity + physics body lifecycle", function()
     -- @integration LUniverse:get
     -- @integration LUniverse:set

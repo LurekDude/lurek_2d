@@ -9,6 +9,7 @@
 -- @describe lurek.globe module exists
 describe("lurek.globe module exists", function()
 
+    -- @covers lurek.globe
     it("lurek.globe is a table", function()
         expect_type("table", lurek.globe)
     end)
@@ -654,6 +655,7 @@ end
 -- =========================================================================
 -- @describe globe_demo: file loads
 describe("globe_demo: file loads", function()
+    -- @covers dofile
     it("dofile does not raise", function()
         if not HAS_DOFILE then
             expect_true(true)
@@ -672,6 +674,7 @@ describe("globe_demo: lurek.init()", function()
 
     local init_ok, init_err
 
+    -- @covers lurek.init
     it("lurek.init callback is registered as a function", function()
         if not HAS_DOFILE then
             expect_true(true)
@@ -682,6 +685,7 @@ describe("globe_demo: lurek.init()", function()
         expect_type("function", lurek.init)
     end)
 
+    -- @covers lurek.init
     it("lurek.init() runs without error", function()
         if type(lurek.init) ~= "function" then
             expect_true(true)
@@ -772,6 +776,7 @@ end)
 -- @describe globe_demo: lurek.process(dt)
 describe("globe_demo: lurek.process(dt)", function()
 
+    -- @covers lurek.process
     it("lurek.process callback is registered as a function", function()
         if not HAS_DOFILE then
             expect_true(true)
@@ -781,6 +786,7 @@ describe("globe_demo: lurek.process(dt)", function()
         expect_type("function", lurek.process)
     end)
 
+    -- @covers lurek.process
     it("lurek.process(1/60) runs without error", function()
         if type(lurek.process) ~= "function" then
             expect_true(true)
@@ -790,6 +796,7 @@ describe("globe_demo: lurek.process(dt)", function()
         expect_true(ok, "lurek.process(dt) raised: " .. tostring(err))
     end)
 
+    -- @covers lurek.process
     it("lurek.process(1.0) with a full second does not crash", function()
         if type(lurek.process) ~= "function" then
             expect_true(true)
@@ -809,17 +816,20 @@ describe("globe_demo: callback name guards", function()
     -- lurek.load / lurek.update / lurek.draw instead of
     -- lurek.init  / lurek.process / lurek.render.
 
+    -- @covers lurek.load
     it("lurek.load is NOT set (wrong callback name)", function()
         -- If this fails the game silently shows a black screen on startup
         expect_nil(lurek.load,
             "lurek.load is set  callback should be lurek.init not lurek.load")
     end)
 
+    -- @covers lurek.update
     it("lurek.update is NOT set (wrong callback name)", function()
         expect_nil(lurek.update,
             "lurek.update is set  callback should be lurek.process not lurek.update")
     end)
 
+    -- @covers lurek.draw
     it("lurek.draw alias (if present) is callable", function()
         if lurek.draw == nil then
             expect_true(true)

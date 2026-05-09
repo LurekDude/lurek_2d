@@ -30,20 +30,20 @@ Own the testing strategy, file layout, assertion patterns, and coverage tooling 
 - Determinism checklist: fixed random seed (pass seed to lurek.math.random if used), fixed `dt` value (headless tests use `dt = 1/60`), no filesystem reads outside `tests/fixtures/`, no wall-clock time, no window.
 - Test granularity: one failing reason per test. `test_body_position_after_one_step()` tests exactly that. `test_physics_all()` is not a valid test name — it makes regression attribution impossible.
 - Evidence strength: prefer state-readback assertions over side-effect checks. `assert_equal(body.position.x, 5.0)` is stronger than `assert_true(on_contact_called)`. Use screenshot evidence only when pixel output is the only available signal.
-- After adding tests, run `python tools/audit/test_coverage.py` and `python tools/audit/lua_api_test_coverage.py` to confirm that the new test registers as covering the target behavior. A test that covers behavior but has no `@covers` marker is invisible to coverage reports.
-- `@covers` marker rules (enforced by `python tools/audit/lua_test_structure_audit.py`):
-  - Each `-- @covers lurek.module.method` or `-- @covers Type:method` must sit **directly above** the `it()` it annotates — no blank lines between the last `@covers` and `it()`.
-  - The `-- @covers` line must be **indented exactly as many spaces as the `it()` call** it precedes. If `it()` has 4 spaces, `@covers` must also have 4 spaces.
-  - `@covers` means **tested behavior**, not mere usage. A symbol may be marked only when the `it()` contains at least one assertion proving that symbol's contract (return value, state change, error behavior, output payload, or side effect).
-  - Do **not** mark a symbol if it is only setup plumbing. Example: calling `lurek.module.newX()` only to get an object is not enough by itself unless the test asserts constructor contract (type, fields, defaults, or creation invariants).
-  - If a symbol is called but no assertion in the same `it()` validates it, remove that symbol from markers.
-  - Do not annotate a symbol that `it()` never calls — e.g. a namespace-existence check should only list the namespace, not every method of the type.
-  - `-- @tests` is **forbidden**. Remove all `-- @tests` lines. Use `-- @covers` exclusively.
-  - `@covers` must never appear inside a `describe()` block header above all `it()` calls; it belongs directly above each individual `it()`.
+- After adding tests, run `python tools/audit/test_coverage.py` and `python tools/audit/lua_api_test_coverage.py` to confirm that coverage registration matches the touched suite.
+- Folder marker rules (enforced by `python tools/audit/lua_test_structure_audit.py`):
+  - `tests/lua/unit/` -> `-- @covers ...`
+  - `tests/lua/security/` -> `-- @security ...`
+  - `tests/lua/integration/` -> `-- @integration ...`
+  - `tests/lua/stress/` -> `-- @stress ...`
+  - `tests/lua/evidence/` -> `-- @evidence ...`
+  - Marker lines must sit directly above the `it()` they annotate and be indented exactly like that `it()`.
+  - For `@covers` in unit tests: mark only symbols that are called and assertion-backed in that same `it()`.
+  - `-- @tests` is **forbidden**.
 - Manual cleanup workflow for existing suites:
   - Work in batches of **max 3 Lua files**.
   - Read each file fully before editing.
-  - Apply **manual** @covers corrections (no bulk repo-wide rewrite pass).
+  - Apply **manual** marker corrections (no bulk repo-wide rewrite pass).
   - After each 3-file batch, run `python tools/audit/lua_test_structure_audit.py --path <file>` for each touched file and proceed only if all pass.
   - Use helper scripts only for detection/reporting, not for blind mass edits.
 - Demo tests go in `tests/lua/content/games/test_<name>.lua` and `tests/demo_smoke_tests.rs` — not in `tests/lua/unit/`. Mixing demo tests with unit tests defeats the purpose of both suites.
@@ -104,6 +104,7 @@ Each Lua test family has a distinct goal, marker set, and acceptance rule. Do no
 - Marker choice:
   - Use one primary family marker by file family (`@covers`, `@integration`, `@security`, `@stress`, `@evidence`).
   - Do not mix family markers in one `it()` unless explicitly required by a validator rule.
+  - Never do blind cross-family marker rewrites (for example repo-wide `@security -> @covers` or `@covers -> @security`). Any migration must be scoped per folder and validated per file.
 
 - Symbol accuracy:
   - Marker symbols must correspond to calls made in that `it()` body.

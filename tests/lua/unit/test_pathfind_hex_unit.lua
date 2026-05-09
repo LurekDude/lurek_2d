@@ -3,9 +3,9 @@
 -- Namespaces: lurek.pathfind
 
 
---                                                                                                                                        
+--
 -- Hex Grid
---                                                                                                                                        
+--
 -- @describe pathfinding.newHexGrid
 describe("pathfinding.newHexGrid", function()
 
@@ -29,7 +29,6 @@ describe("pathfinding.newHexGrid", function()
 
     -- @covers LHexGrid:isBlocked
     -- @covers LHexGrid:setBlocked
-    -- @covers lurek.pathfind.newHexGrid
     it("setBlocked and isBlocked round-trip", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         g:setBlocked(3, 3, true)
@@ -40,7 +39,6 @@ describe("pathfinding.newHexGrid", function()
 
     -- @covers LHexGrid:findPath
     -- @covers LHexGrid:setBlocked
-    -- @covers lurek.pathfind.newHexGrid
     it("findPath returns nil when blocked", function()
         local g = lurek.pathfind.newHexGrid(6, 6)
         -- Block every path from (1,1) to (6,6)
@@ -54,7 +52,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:findPath
-    -- @covers lurek.pathfind.newHexGrid
     it("findPath returns a path on an open grid", function()
         local g = lurek.pathfind.newHexGrid(10, 10)
         local path = g:findPath(1, 1, 5, 5)
@@ -63,7 +60,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:findPath
-    -- @covers lurek.pathfind.newHexGrid
     it("path cells have col and row fields", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         local path = g:findPath(1, 1, 4, 4)
@@ -76,7 +72,6 @@ describe("pathfinding.newHexGrid", function()
 
     -- @covers LHexGrid:lineOfSight
     -- @covers LHexGrid:setBlocked
-    -- @covers lurek.pathfind.newHexGrid
     it("lineOfSight returns false through a blocked wall", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         for row = 1, 8 do
@@ -87,7 +82,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:lineOfSight
-    -- @covers lurek.pathfind.newHexGrid
     it("lineOfSight returns true in open space", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         local los = g:lineOfSight(1, 1, 2, 2)
@@ -95,7 +89,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:fieldOfView
-    -- @covers lurek.pathfind.newHexGrid
     it("fieldOfView returns cells within radius", function()
         local g = lurek.pathfind.newHexGrid(10, 10)
         local fov = g:fieldOfView(5, 5, 2)
@@ -108,7 +101,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:rangeOfMovement
-    -- @covers lurek.pathfind.newHexGrid
     it("rangeOfMovement returns cells within budget", function()
         local g = lurek.pathfind.newHexGrid(10, 10)
         local cells = g:rangeOfMovement(5, 5, 3.0)
@@ -118,7 +110,6 @@ describe("pathfinding.newHexGrid", function()
 
     -- @covers LHexGrid:rangeOfMovement
     -- @covers LHexGrid:setBlocked
-    -- @covers lurek.pathfind.newHexGrid
     it("rangeOfMovement limited by walls", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         -- Completely surround origin
@@ -135,7 +126,6 @@ describe("pathfinding.newHexGrid", function()
     end)
 
     -- @covers LHexGrid:distance
-    -- @covers lurek.pathfind.newHexGrid
     it("distance between adjacent cells is 1", function()
         local g = lurek.pathfind.newHexGrid(8, 8)
         local d = g:distance(3, 3, 4, 3)
@@ -143,9 +133,9 @@ describe("pathfinding.newHexGrid", function()
     end)
 end)
 
---                                                                                                                                        
+--
 -- Range Map
---                                                                                                                                        
+--
 -- @describe pathfinding.rangeMap
 describe("pathfinding.rangeMap", function()
 

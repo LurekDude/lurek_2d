@@ -6,10 +6,12 @@
 -- Module presence
 -- @describe lurek.log module
 describe("lurek.log module", function()
+    -- @covers lurek.log
     it("lurek.log is a table", function()
         expect_type("table", lurek.log)
     end)
 
+    -- @covers lurek.log
     it("all expected functions are present", function()
         local fns = {
             "debug", "info", "warn", "error", "print",

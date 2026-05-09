@@ -1,10 +1,7 @@
--- tests/lua/integration/test_automation_event.lua
--- Integration: lurek.automation <-> lurek.event
+-- Integration: automation script replay + event queue
 
----@type any
 local automation = lurek.automation
 
--- @describe automation + event integration
 describe("automation + event integration", function()
     -- @integration lurek.automation.load
     -- @integration lurek.automation.start

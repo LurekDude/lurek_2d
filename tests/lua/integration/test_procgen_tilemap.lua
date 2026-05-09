@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Procgen + Tilemap
--- Tests procedural generation feeding tilemap placement
-
--- @describe procgen + tilemap integration
+-- Integration: procedural generation output placed into tilemap layers
 describe("procgen + tilemap integration", function()
     -- @integration LTileMap:addLayer
     -- @integration LTileMap:getTile
@@ -55,7 +52,7 @@ describe("procgen + tilemap integration", function()
         local map1 = generate_map(42.0)
         local map2 = generate_map(42.0)
 
-        -- Same seed                     same tiles
+        -- Same seed -> same tiles
         for y = 0, 7 do
             for x = 0, 7 do
                 local t1 = map1:getTile(1, x + 1, y + 1)
@@ -67,8 +64,4 @@ describe("procgen + tilemap integration", function()
 
 end)
 
---                                                                                                                                                                                                                                                                                                                                                                         
--- BSP Dungeon          Tilemap passability
---                                                                                                                                                                                                                                                                                                                                                                         
--- @describe bspDungeon          tilemap grid passability
 test_summary()

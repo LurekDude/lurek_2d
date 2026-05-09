@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Pathfinding + Entity
--- Tests pathfinding results driving entity positioning
-
--- @describe pathfinding + entity integration
+-- Integration: pathfinding results driving entity positioning via ECS
 describe("pathfinding + entity integration", function()
     -- @integration LUnitPathfinder:findPath
     -- @integration LUniverse:get

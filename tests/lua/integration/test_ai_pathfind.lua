@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: AI + Pathfinding
--- Tests AI agents requesting and following A* paths.
-
--- @describe integration: AI agent uses pathfinding to navigate
+-- Integration: AI state machine + pathfinding A*
 describe("integration: AI agent uses pathfinding to navigate", function()
     -- @integration LStateMachine:addState
     -- @integration LStateMachine:addTransition
@@ -22,7 +19,7 @@ describe("integration: AI agent uses pathfinding to navigate", function()
         local path_len = #path
         expect_true(path_len > 0, "path has at least one step")
 
-        -- Simulate AI state machine: IDLE          MOVING
+        -- Simulate AI state machine: IDLE -> MOVING
         local sm = lurek.ai.newStateMachine()
         sm:addState("IDLE",   { onUpdate = function() end })
         sm:addState("MOVING", { onUpdate = function() end })
@@ -30,7 +27,7 @@ describe("integration: AI agent uses pathfinding to navigate", function()
         sm:forceState("IDLE")
         expect_equal("IDLE", sm:getCurrentState(), "started in IDLE")
 
-        -- Simulate: found path          transition to MOVING
+        -- Simulate: found path -> transition to MOVING
         if path_len > 0 then
             sm:forceState("MOVING")
         end
@@ -67,7 +64,7 @@ describe("integration: AI agent uses pathfinding to navigate", function()
     -- @integration lurek.pathfind.newPathfinder
     it("AI requests path around wall, gets detour", function()
         local grid = lurek.pathfind.newNavGrid(10, 10)
-        -- Place vertical wall at column 5 (rows 2..8, 1-based)     uses setBlocked
+        -- Place vertical wall at column 5, rows 2..8
         for y = 2, 8 do
             grid:setBlocked(5, y, true)
         end

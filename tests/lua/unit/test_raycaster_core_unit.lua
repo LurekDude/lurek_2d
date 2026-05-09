@@ -394,6 +394,7 @@ end
 
 -- @describe API exposure
 describe("API exposure", function()
+    -- @covers LRaycaster:castFloorRow
     it("castFloorRow is a function on raycaster", function()
         local rc = make_raycaster()
         expect_type("function", rc.castFloorRow)

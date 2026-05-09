@@ -1,16 +1,6 @@
--- tests/lua/integration/test_pathfind_graph.lua
--- Integration: lurek.pathfind jpsGrid + graph_astar from procgen world graph
--- Namespaces: lurek.pathfind + lurek.procgen
+-- Integration: JPS grid pathfinding with procgen world graphs
 
---
--- JPS Grid
---
--- @describe pathfinding.newJpsGrid
-
---
 -- JPS Grid + WorldGraph produced by procgen
---
--- @describe procgen worldGraph + JPS grid integration
 describe("procgen worldGraph + JPS grid integration", function()
 
     -- @integration LJpsGrid:findPath
@@ -24,7 +14,7 @@ describe("procgen worldGraph + JPS grid integration", function()
         for y = 1, d.height do
             for x = 1, d.width do
                 local idx = (y - 1) * d.width + x
-                -- False = wall     blocked
+                -- False = wall -> blocked
                 if not d.grid[idx] then
                     g:setBlocked(x, y, true)
                 end

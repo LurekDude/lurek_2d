@@ -224,10 +224,12 @@ end)
 -- ============================================================
 -- @describe lurek.effect module
 describe("lurek.effect module", function()
+    -- @covers lurek.effect
     it("is a table", function()
         expect_type("table", lurek.effect)
     end)
 
+    -- @covers lurek.effect
     it("lurek.effect aliases the same table", function()
         -- Both namespaces point to the same module table
         expect_type("table", lurek.effect)
@@ -498,6 +500,7 @@ end)
 
 -- @describe lurek.effect module exists
 describe("lurek.effect module exists", function()
+    -- @covers lurek.effect
     it("lurek.effect is a table", function()
         expect_type("table", lurek.effect)
     end)

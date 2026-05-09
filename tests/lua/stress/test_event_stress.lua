@@ -74,5 +74,27 @@ describe("stress: signal emit to many listeners", function()
         expect_true(elapsed < 10.0, "multi-signal budget: " .. elapsed .. "s")
         expect_equal(N_SIGS * N_LISTEN * N_EMITS, total, "all dispatches fired")
     end)
+
+    -- @stress LSignal:connect
+    -- @stress LSignal:emit
+    -- @stress lurek.event.newSignal
+    it("payload forwarding stays consistent across 5000 emits", function()
+        local sig = lurek.event.newSignal()
+        local count = 0
+        local checksum = 0
+
+        sig:connect("payload", function(v)
+            count = count + 1
+            checksum = checksum + v
+        end)
+
+        for i = 1, 5000 do
+            sig:emit("payload", i)
+        end
+
+        local expected_sum = (5000 * 5001) / 2
+        expect_equal(5000, count, "all payload emits reached listener")
+        expect_equal(expected_sum, checksum, "payload values preserved under load")
+    end)
 end)
 test_summary()

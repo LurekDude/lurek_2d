@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Tilemap + Physics
--- Tests using tilemap solid tiles to create physics collision boundaries
-
--- @describe integration: tilemap solid tiles as physics boundaries
+-- Integration: tilemap solid tiles generating physics collision boundaries
 describe("integration: tilemap solid tiles as physics boundaries", function()
     -- @integration LBody:getPosition
     -- @integration LTileMap:addLayer

@@ -1233,6 +1233,27 @@ end)
 
 -- @describe unit: migrated from integration/test_cardgame_tween_integration.lua
 describe("unit: migrated from integration/test_cardgame_tween_integration.lua", function()
+        local function fresh_card()
+            local card = {
+                tile_x = 0,
+                tile_y = 0,
+                _tags = {},
+            }
+            function card:setTilePosition(x, y)
+                self.tile_x = x
+                self.tile_y = y
+            end
+            function card:getTilePosition()
+                return self.tile_x, self.tile_y
+            end
+            function card:addTag(tag)
+                self._tags[tag] = true
+            end
+            function card:hasTag(tag)
+                return self._tags[tag] == true
+            end
+            return card
+        end
         -- @covers lurek.tween.cancelAll
         -- @covers lurek.tween.tween
         -- @covers lurek.tween.update
@@ -1242,14 +1263,14 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
             lurek.tween.cancelAll()
             local card = fresh_card()
             card:setTilePosition(0, 0)
-    
+
             lurek.tween.tween(2.0, card, { tile_x = 10 }, "linear")
             lurek.tween.update(0.5)
             local x_quarter = card.tile_x
             lurek.tween.update(0.5)
             local x_half = card.tile_x
             lurek.tween.update(1.0)
-    
+
             expect_near(2.5, x_quarter, 0.5)
             expect_near(5.0, x_half, 0.5)
             expect_near(10.0, card.tile_x, 1e-5)
@@ -1264,7 +1285,7 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
             lurek.tween.cancelAll()
             local card = fresh_card()
             card:setTilePosition(0, 0)
-    
+
             local fired = 0
             local tw = lurek.tween.tween(1.0, card, { tile_x = 5 }, "linear")
             tw:onComplete(function()
@@ -1272,7 +1293,7 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
                 card:addTag("arrived")
             end)
             lurek.tween.update(1.5)
-    
+
             expect_equal(1, fired)
             expect_true(card:hasTag("arrived"))
             expect_near(5.0, card.tile_x, 1e-5)
@@ -1286,11 +1307,11 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
             lurek.tween.cancelAll()
             local card = fresh_card()
             card:setTilePosition(0, 0)
-    
+
             lurek.tween.tween(1.0, card, { tile_x = 4 }, "linear")
             lurek.tween.update(1.0)
             expect_near(4.0, card.tile_x, 0.5)
-    
+
             lurek.tween.cancelAll()
             lurek.tween.tween(1.0, card, { tile_x = 10 }, "linear")
             lurek.tween.update(1.0)
@@ -1304,7 +1325,7 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
             lurek.tween.cancelAll()
             local card = fresh_card()
             card:setTilePosition(0, 0)
-    
+
             lurek.tween.tween(2.0, card, { tile_x = 1.0 }, "inOutQuad")
             lurek.tween.update(1.0)
             expect_near(0.5, card.tile_x, 1e-5)
@@ -1318,7 +1339,7 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
             lurek.tween.cancelAll()
             local card = fresh_card()
             card:setTilePosition(0, 0)
-    
+
             lurek.tween.tween(1.0, card, { tile_x = 3, tile_y = 6 }, "linear")
             lurek.tween.update(1.0)
             local x, y = card:getTilePosition()
@@ -1331,8 +1352,10 @@ describe("unit: migrated from integration/test_cardgame_tween_integration.lua", 
         it("tween rejects non-numeric duration", function()
             lurek.tween.cancelAll()
             local card = fresh_card()
+            ---@type any
+            local bad_duration = "oops"
             expect_error(function()
-                lurek.tween.tween("oops", card, { tile_x = 1 })
+                lurek.tween.tween(bad_duration, card, { tile_x = 1 })
             end)
         end)
 
@@ -1347,14 +1370,14 @@ describe("unit: migrated from integration/test_tween_ecs.lua", function()
             local from_val, to_val = 0.0, 100.0
             local st_linear  = lurek.tween.newState(1.0, "linear")
             local st_ease_in = lurek.tween.newState(1.0, "quadIn")
-    
+
             -- Advance both to 10% of their duration
             st_linear:tick(0.1)
             st_ease_in:tick(0.1)
-    
+
             local v_linear  = st_linear:lerp(from_val, to_val)
             local v_ease_in = st_ease_in:lerp(from_val, to_val)
-    
+
             -- At t=0.1, linear = ~10, quadIn should be less (slow start)
             expect_near(10, v_linear, 2.0, "linear at 10%     10")
             expect_true(v_ease_in < v_linear, "ease-in slower than linear at 10%")

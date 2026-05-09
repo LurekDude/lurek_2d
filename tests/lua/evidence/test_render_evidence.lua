@@ -1522,6 +1522,7 @@ end
 
 -- @describe evidence: golden text outputs
 describe("evidence: golden text outputs", function()
+    -- @evidence file
     it("writes ai_golden.txt", function()
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
@@ -1534,6 +1535,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ai") .. "ai_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes compute_golden.txt", function()
         local arr = lurek.compute.zeros({2, 3})
         arr:fill(1.5)
@@ -1545,6 +1547,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("compute") .. "compute_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes dataframe_golden.txt", function()
         local df = lurek.dataframe.fromCSV("values\n10\n20\n30\n40\n50")
         local text = table.concat({
@@ -1555,6 +1558,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("dataframe") .. "dataframe_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes entity_golden.txt", function()
         local world = lurek.ecs.newUniverse()
         local entity = world:spawn()
@@ -1566,6 +1570,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ecs") .. "entity_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes migrated Rust TOML evidence", function()
         local input = [[
 [game]
@@ -1587,11 +1592,13 @@ max_bodies = 1000
         write_text(migrated_path("data", "toml_roundtrip.toml"), encoded)
     end)
 
+    -- @evidence file
     it("writes migrated Rust encode evidence", function()
         write_text(migrated_path("encode", "base64_encode.txt"), lurek.data.encode("base64", "Lurek2D rocks!"))
         write_text(migrated_path("encode", "hex_encode.txt"), lurek.data.encode("hex", "Lurek2D rocks!"))
     end)
 
+    -- @evidence file
     it("writes migrated Rust hash evidence", function()
         write_text(migrated_path("hash", "md5_hello.txt"), lurek.data.hash("md5", "Hello, Lurek2D!"))
         write_text(migrated_path("hash", "sha1_engine.txt"), lurek.data.hash("sha1", "Lurek2D engine test vector"))
@@ -1640,6 +1647,7 @@ end
 
 -- @describe evidence: golden text outputs
 describe("evidence: golden text outputs", function()
+    -- @evidence file
     it("writes ai_golden.txt", function()
         local fsm = lurek.ai.newStateMachine()
         fsm:addState("idle", {})
@@ -1652,6 +1660,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ai") .. "ai_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes compute_golden.txt", function()
         local arr = lurek.compute.zeros({2, 3})
         arr:fill(1.5)
@@ -1663,6 +1672,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("compute") .. "compute_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes dataframe_golden.txt", function()
         local df = lurek.dataframe.fromCSV("values\n10\n20\n30\n40\n50")
         local text = table.concat({
@@ -1673,6 +1683,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("dataframe") .. "dataframe_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes entity_golden.txt", function()
         local world = lurek.ecs.newUniverse()
         local entity = world:spawn()
@@ -1684,6 +1695,7 @@ describe("evidence: golden text outputs", function()
         write_text(text_output_dir("ecs") .. "entity_golden.txt", text)
     end)
 
+    -- @evidence file
     it("writes migrated Rust TOML evidence", function()
         local input = [[
 [game]
@@ -1705,11 +1717,13 @@ max_bodies = 1000
         write_text(migrated_path("data", "toml_roundtrip.toml"), encoded)
     end)
 
+    -- @evidence file
     it("writes migrated Rust encode evidence", function()
         write_text(migrated_path("encode", "base64_encode.txt"), lurek.data.encode("base64", "Lurek2D rocks!"))
         write_text(migrated_path("encode", "hex_encode.txt"), lurek.data.encode("hex", "Lurek2D rocks!"))
     end)
 
+    -- @evidence file
     it("writes migrated Rust hash evidence", function()
         write_text(migrated_path("hash", "md5_hello.txt"), lurek.data.hash("md5", "Hello, Lurek2D!"))
         write_text(migrated_path("hash", "sha1_engine.txt"), lurek.data.hash("sha1", "Lurek2D engine test vector"))
@@ -2353,5 +2367,35 @@ describe("Evidence: Shapes", function()
         lurek.image.savePNG(img, OUT .. "concentric_rings.png")
     end)
 
+end)
+
+-- @describe evidence: render summary dashboard
+describe("evidence: render summary dashboard", function()
+    before_each(function()
+        ensure_evidence_dir("render")
+    end)
+
+    -- @evidence file
+    it("writes render_summary_dashboard.png", function()
+        local W, H = 320, 180
+        local img = lurek.image.newImageData(W, H)
+        img:fill(14, 16, 22, 255)
+
+        for x = 0, W - 1, 16 do
+            img:drawLine(x, 0, x, H - 1, 28, 32, 44, 255)
+        end
+        for y = 0, H - 1, 16 do
+            img:drawLine(0, y, W - 1, y, 28, 32, 44, 255)
+        end
+
+        img:drawRect(16, 16, 88, 48, 180, 70, 70, 255)
+        img:drawCircle(160, 42, 22, 70, 170, 230, 255)
+        img:drawLine(224, 16, 300, 64, 255, 230, 80, 255)
+        img:drawRect(16, 96, 288, 64, 40, 45, 60, 255)
+
+        local path = evidence_output_dir("render") .. "render_summary_dashboard.png"
+        lurek.image.savePNG(img, path)
+        expect_evidence_created(path)
+    end)
 end)
 test_summary()

@@ -246,15 +246,20 @@ An integration test must exercise at least two distinct `lurek.*` module namespa
 Three comment layers — do not mix them:
 
 1. **File header** — plain `-- ...` prose at top. Explains coverage and headless constraints. No `@description`.
-2. **Suite description** — one `-- @description <text>` line immediately above each `describe()` block.
-3. **Case description** — one `-- @description <text>` line immediately above each `it()` block.
+2. **Suite description** — one `-- @describe <text>` line immediately above each `describe()` block.
+3. **Case description** — optional plain comment lines above each `it()` block when needed for clarity.
 
 **Rules:**
 - File header uses plain comments only — no `-- @description`, no `-- @category:`.
 - `-- @category: ...` markers are forbidden everywhere.
 - `test_summary()` must be the last non-empty line in every file.
 - `return test_summary()` is forbidden — use bare `test_summary()`.
-- Marker annotations (`@covers`, `@evidence`, `@golden`) belong on `it()` blocks.
+- Marker annotations belong on `it()` blocks and are folder-specific:
+    - `tests/lua/unit/` -> `@covers`
+    - `tests/lua/security/` -> `@security`
+    - `tests/lua/integration/` -> `@integration`
+    - `tests/lua/stress/` -> `@stress`
+    - `tests/lua/evidence/` -> `@evidence`
 - Max two levels of nested `describe()`.
 
 **Standard template:**
@@ -264,12 +269,12 @@ Three comment layers — do not mix them:
 -- Exercises lurek.modulename constructors, error handling, and edge cases.
 -- Headless-safe: no window, GPU, or audio required.
 
--- @description Groups namespace-level checks for lurek.modulename.
+-- @describe Groups namespace-level checks for lurek.modulename.
 describe("lurek.modulename", function()
-    -- @description Covers constructor behavior and default object state.
+    -- @describe Covers constructor behavior and default object state.
     describe("new()", function()
         -- @covers lurek.modulename.new
-        -- @description Verifies new() returns a userdata object.
+        -- Verifies new() returns a userdata object.
         it("returns a userdata object", function()
             local value = lurek.modulename.new()
             expect_not_nil(value)

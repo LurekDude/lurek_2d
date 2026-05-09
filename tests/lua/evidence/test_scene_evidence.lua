@@ -13,6 +13,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
 
     --   order, and writes the call order to a text file. If the sort is wrong the
     --   file will differ from its golden sample.
+    -- @evidence file
     it("depth_sort_order.txt: items sorted ascending by depth", function()
         local ds = lurek.scene.newDepthSorter()
 
@@ -45,6 +46,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
     end)
 
     --   and flushes. Stable mode must preserve insertion order for equal depths.
+    -- @evidence file
     it("stable_sort_order.txt: equal depths preserve insertion order", function()
         local ds = lurek.scene.newDepthSorter()
         ds:setStable(true)
@@ -67,6 +69,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
         expect_equal(call_order[3], "C")
     end)
 
+    -- @evidence file
     it("object entries flush in depth order", function()
         local ds = lurek.scene.newDepthSorter()
 
@@ -114,6 +117,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
 
     --   order, and writes the call order to a text file. If the sort is wrong the
     --   file will differ from its golden sample.
+    -- @evidence file
     it("depth_sort_order.txt: items sorted ascending by depth", function()
         local ds = lurek.scene.newDepthSorter()
 
@@ -146,6 +150,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
     end)
 
     --   and flushes. Stable mode must preserve insertion order for equal depths.
+    -- @evidence file
     it("stable_sort_order.txt: equal depths preserve insertion order", function()
         local ds = lurek.scene.newDepthSorter()
         ds:setStable(true)
@@ -168,6 +173,7 @@ describe("Evidence: lurek.scene DepthSorter sort order", function()
         expect_equal(call_order[3], "C")
     end)
 
+    -- @evidence file
     it("object entries flush in depth order", function()
         local ds = lurek.scene.newDepthSorter()
 

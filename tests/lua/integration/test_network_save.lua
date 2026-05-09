@@ -1,10 +1,4 @@
--- tests/lua/integration/test_network_save.lua
--- Integration: lurek.network <-> lurek.save
--- Tests that save data can be serialised and sent over the network channel.
-
-local describe = describe or function(n,f) f() end
-local it = it or function(n,f) f() end
--- @describe network + save integration
+-- Integration: save manager snapshots serialized and sent as network packets
 describe("network + save integration", function()
     -- @integration LSaveManager:collect
     -- @integration LSaveManager:register

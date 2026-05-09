@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Entity + Graphics
--- Tests entity position syncing to draw commands.
-
--- @describe integration: entity position drives draw coordinates
+-- Integration: ECS entity positions used as draw coordinates
 describe("integration: entity position drives draw coordinates", function()
     -- @integration LUniverse:get
     -- @integration LUniverse:set

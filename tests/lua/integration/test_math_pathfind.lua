@@ -1,31 +1,6 @@
--- tests/lua/integration/test_math_pathfind.lua
--- Integration: lurek.math Vec3/spline/lerp/remap used alongside pathfinding data.
--- Namespaces: lurek.math + lurek.pathfind
+-- Integration: lurek.math Vec3/spline/lerp/remap combined with pathfinding costs
 
---                                                                                                                                        
--- Vec3
---                                                                                                                                        
--- @describe math.vec3
-
---                                                                                                                                        
--- Catmull-Rom Spline
---                                                                                                                                        
--- @describe math.catmullRom
-
---                                                                                                                                        
--- Hermite Spline
---                                                                                                                                        
--- @describe math.hermite
-
---                                                                                                                                        
--- lerp / remap free functions
---                                                                                                                                        
--- @describe math.lerp / math.remap
-
---                                                                                                                                        
 -- Vec3 heuristic applied to pathfinding costs
---                                                                                                                                        
--- @describe vec3 + pathfinding heuristic integration
 describe("vec3 + pathfinding heuristic integration", function()
 
     -- @integration LJpsGrid:findPath

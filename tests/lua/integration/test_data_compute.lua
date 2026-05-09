@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Data + Compute
--- Tests data encoding/decoding with compute processing
-
--- @describe data + compute integration
+-- Integration: serial encoding/decoding with compute array processing
 describe("data + compute integration", function()
     -- @integration lurek.serial.fromJson
     -- @integration lurek.compute.fromTable

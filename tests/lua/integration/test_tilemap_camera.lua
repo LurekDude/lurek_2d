@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Tilemap + Camera
--- Tests camera position affecting which tiles are in view.
-
--- @describe integration: tilemap visibility through camera
+-- Integration: camera position determining which tilemap tiles are in view
 describe("integration: tilemap visibility through camera", function()
     -- @integration LCamera:getPosition
     -- @integration LCamera:setPosition

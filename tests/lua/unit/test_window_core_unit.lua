@@ -2,6 +2,7 @@
 
 -- @describe lurek.window module exists
 describe("lurek.window module exists", function()
+    -- @covers lurek.window
     it("lurek.window is a table", function()
         expect_type("table", lurek.window)
     end)

@@ -3,6 +3,7 @@
 
 -- @describe lurek.net availability
 describe("lurek.net availability", function()
+  -- @covers lurek.net
   it("module may be absent in some builds", function()
     local t = type(lurek.net)
     expect_true(t == "nil" or t == "table")
@@ -13,6 +14,7 @@ end)
 if lurek.net then
   -- @describe lurek.net
   describe("lurek.net", function()
+    -- @covers lurek.net
     it("is a table", function()
       expect_equal(type(lurek.net), "table")
     end)
@@ -140,14 +142,17 @@ local global_env = _G
 if global_env.enet then
   -- @describe enet global alias
   describe("enet global alias", function()
+    -- @covers enet
     it("enet is a table", function()
       expect_equal(type(global_env.enet), "table")
     end)
 
+    -- @covers enet.host_create
     it("enet.host_create is a function", function()
       expect_equal(type(global_env.enet.host_create), "function")
     end)
 
+    -- @covers enet.linked_version
     it("enet.linked_version returns a string", function()
       expect_equal(type(global_env.enet.linked_version()), "string")
     end)

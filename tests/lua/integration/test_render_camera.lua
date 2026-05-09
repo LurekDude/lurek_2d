@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Graphics + Camera
--- Tests graphics rendering commands with camera transforms
-
--- @describe graphics + camera integration
+-- Integration: render draw commands combined with camera transform state
 describe("graphics + camera integration", function()
     -- @integration LCamera:getPosition
     -- @integration LCamera:setPosition

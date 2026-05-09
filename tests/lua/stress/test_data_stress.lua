@@ -3,6 +3,7 @@
 
 -- @describe data stress: large tables
 describe("data stress: large tables", function()
+    -- @stress table.insert
     it("creates table with 10000 entries", function()
         local t = {}
         for i = 1, 10000 do
@@ -32,6 +33,7 @@ describe("data stress: large tables", function()
         expect_true(sorted, "table is sorted")
     end)
 
+    -- @stress table.lookup
     it("hash table with 5000 string keys", function()
         local t = {}
         for i = 1, 5000 do
@@ -47,6 +49,7 @@ end)
 
 -- @describe data stress: string operations
 describe("data stress: string operations", function()
+    -- @stress table.concat
     it("builds 1000 strings", function()
         local parts = {}
         for i = 1, 1000 do
@@ -56,6 +59,7 @@ describe("data stress: string operations", function()
         expect_true(#result > 8000, "concatenated string is long")
     end)
 
+    -- @stress string.find
     it("pattern matching 1000 times", function()
         local count = 0
         local text = "Lurek2D game engine version 0.4.0 built with Rust"
@@ -70,6 +74,7 @@ end)
 
 -- @describe data stress: nested structures
 describe("data stress: nested structures", function()
+    -- @stress table.nested
     it("10 levels of nesting", function()
         local root = {}
         local current = root

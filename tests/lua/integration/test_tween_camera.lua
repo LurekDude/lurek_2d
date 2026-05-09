@@ -1,8 +1,4 @@
--- Lurek2D Integration Test: Tween + Camera
--- Tests smooth camera pan and zoom via tweens.
--- Rewritten to use lurek.tween.newState(duration, easing) API.
-
--- @describe integration: tween drives camera position and zoom
+-- Integration: tween state driving smooth camera position and zoom transitions
 describe("integration: tween drives camera position and zoom", function()
     -- @integration LCamera:getPosition
     -- @integration LCamera:setPosition

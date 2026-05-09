@@ -5,6 +5,7 @@
 if not lurek.turnbattle then
     -- @describe fallback when turnbattle is unavailable
     describe("lurek.turnbattle", function()
+        -- @covers lurek.turnbattle
         it("module is unavailable in this runtime build", function()
             expect_type("table", lurek)
             expect_nil(lurek.turnbattle)
@@ -13,6 +14,7 @@ if not lurek.turnbattle then
 else
     -- @describe turnbattle module table checks
     describe("lurek.turnbattle module exists", function()
+        -- @covers lurek.turnbattle
         it("is a table", function()
             expect_type("table", lurek.turnbattle)
         end)

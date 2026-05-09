@@ -7,6 +7,7 @@
 
 -- @describe lurek.html module table exists
 describe("lurek.html module table exists", function()
+    -- @covers lurek.html
     it("lurek.html is a table", function()
         expect_type("table", lurek.html, "lurek.html must be a table")
     end)
@@ -184,16 +185,19 @@ describe("HtmlDocument element access API", function()
         local el = doc:getElementById("nonexistent_id_xyz")
         expect_nil(el, "getElementById must return nil for a missing id")
     end)
+    -- @covers LHtmlDocument:query
     it("query('#id') returns the element", function()
         local doc = make_doc_with_content()
         local el = doc:query("#label")
         expect_not_nil(el, "query('#label') must find the element")
     end)
+    -- @covers LHtmlDocument:queryAll
     it("queryAll('.class') returns a table", function()
         local doc = make_doc_with_content()
         local results = doc:queryAll(".text")
         expect_type("table", results, "queryAll must return a table")
     end)
+    -- @covers LHtmlDocument:queryAll
     it("queryAll('.class') finds all matching elements", function()
         local doc = make_doc_with_content()
         local results = doc:queryAll(".text")
@@ -233,26 +237,32 @@ describe("HtmlDocument event and input API", function()
         local ok, err = pcall(function() doc:off(handle) end)
         expect_true(ok, "off(handle) must not error: " .. tostring(err))
     end)
+    -- @covers LHtmlDocument:mousepressed
     it("mousepressed returns a boolean", function()
         local result = make_doc():mousepressed(100, 100, 1)
         expect_type("boolean", result, "mousepressed must return boolean")
     end)
+    -- @covers LHtmlDocument:mousereleased
     it("mousereleased returns a boolean", function()
         local result = make_doc():mousereleased(100, 100, 1)
         expect_type("boolean", result, "mousereleased must return boolean")
     end)
+    -- @covers LHtmlDocument:mousemoved
     it("mousemoved returns a boolean", function()
         local result = make_doc():mousemoved(200, 150)
         expect_type("boolean", result, "mousemoved must return boolean")
     end)
+    -- @covers LHtmlDocument:wheelmoved
     it("wheelmoved returns a boolean", function()
         local result = make_doc():wheelmoved(0, -1)
         expect_type("boolean", result, "wheelmoved must return boolean")
     end)
+    -- @covers LHtmlDocument:keypressed
     it("keypressed returns a boolean", function()
         local result = make_doc():keypressed("return")
         expect_type("boolean", result, "keypressed must return boolean")
     end)
+    -- @covers LHtmlDocument:textinput
     it("textinput returns a boolean", function()
         local result = make_doc():textinput("a")
         expect_type("boolean", result, "textinput must return boolean")
@@ -277,6 +287,7 @@ describe("HtmlElement DOM manipulation API", function()
         local el = make_el()
         expect_type("string", el:getTagName(), "getTagName must return a string")
     end)
+    -- @covers LHtmlElement:getId
     it("getId returns the element's id", function()
         local el = make_el()
         expect_equal(el:getId(), "para", "getId must return 'para'")

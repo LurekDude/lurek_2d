@@ -206,6 +206,7 @@ describe("math constants and utility", function()
         expect_near(lurek.math.tau, lurek.math.pi * 2, 0.0001)
     end)
 
+    -- @covers lurek.math.huge
     it("has huge", function()
         ---@type { huge: number }
         local lurek_math = lurek.math
@@ -2009,10 +2010,12 @@ end)
 
 -- @describe lurek.math AabbTree querySegment
 describe("lurek.math AabbTree querySegment", function()
+    -- @covers lurek.math
     it("querySegment returns ids crossed by segment", function()
         -- Rust-only helper: AabbTree querySegment is not exposed in the Lua API.
     end)
 
+    -- @covers lurek.math
     it("querySegment misses non-intersecting AABB", function()
         -- Rust-only helper: AabbTree querySegment is not exposed in the Lua API.
     end)
@@ -2564,6 +2567,12 @@ end)
 
 -- @describe unit: migrated from integration/test_math_pathfind.lua
 describe("unit: migrated from integration/test_math_pathfind.lua", function()
+        local pts = {
+            { x = 0, y = 0 },
+            { x = 1, y = 0 },
+            { x = 0.5, y = 1 },
+            { x = 0.5, y = 0.5 },
+        }
         -- @covers lurek.math.vec3
         it("creates a Vec3 with correct components", function()
             local v = lurek.math.vec3(1, 2, 3)
@@ -2844,11 +2853,11 @@ describe("unit: migrated from integration/test_math_physics.lua", function()
             -- Two rectangles that overlap
             local ax, ay, aw, ah = 0, 0, 10, 10
             local bx, by, bw, bh = 5, 5, 10, 10
-    
+
             -- Manual AABB overlap check using math
             local overlap_x = lurek.math.min(ax + aw, bx + bw) - lurek.math.max(ax, bx)
             local overlap_y = lurek.math.min(ay + ah, by + bh) - lurek.math.max(ay, by)
-    
+
             expect_true(overlap_x > 0, "x overlap exists")
             expect_true(overlap_y > 0, "y overlap exists")
             expect_near(5, overlap_x, 0.001, "x overlap = 5")
@@ -2860,7 +2869,7 @@ describe("unit: migrated from integration/test_math_physics.lua", function()
         it("angle between two points", function()
             local x1, y1 = 0, 0
             local x2, y2 = 1, 1
-    
+
             local angle = lurek.math.atan2(y2 - y1, x2 - x1)
             expect_near(lurek.math.pi / 4, angle, 0.001, "45 degree angle")
         end)
@@ -2870,10 +2879,10 @@ describe("unit: migrated from integration/test_math_physics.lua", function()
         it("rotate a velocity vector", function()
             local speed = 10
             local angle = math.rad(90)
-    
+
             local vx = speed * lurek.math.cos(angle)
             local vy = speed * lurek.math.sin(angle)
-    
+
             expect_near(0, vx, 0.001, "vx at 90 degrees")
             expect_near(10, vy, 0.001, "vy at 90 degrees")
         end)
@@ -2888,7 +2897,7 @@ describe("unit: migrated from integration/test_timer_math.lua", function()
             -- Simulate oscillating value: sin(time * frequency)
             local frequency = 2.0
             local time = lurek.math.pi / (2 * frequency)
-    
+
             local value = lurek.math.sin(time * frequency)
             expect_near(1.0, value, 0.001, "sin peak at quarter period")
         end)

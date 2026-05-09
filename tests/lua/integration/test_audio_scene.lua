@@ -1,16 +1,10 @@
--- tests/lua/integration/test_audio_scene.lua
--- Integration: lurek.audio <-> lurek.scene
--- Tests that scene transitions correctly start/stop audio sources.
-
-local describe = describe or function(n,f) f() end
-local it = it or function(n,f) f() end
+-- Integration: audio state driven by scene enter/leave/resume hooks
 
 local function reset_scene_audio_state()
     lurek.scene.clear()
     lurek.audio.setMasterVolume(1.0)
 end
 
--- @describe audio + scene integration
 describe("audio + scene integration", function()
     -- @integration lurek.audio.getMasterVolume
     -- @integration lurek.audio.setMasterVolume

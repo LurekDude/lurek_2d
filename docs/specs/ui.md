@@ -25,8 +25,8 @@ This module primarily collaborates with `image`, `math`, `render`, `runtime`. It
 - `extras.rs`: Defines secondary widgets and utility components such as menus, toolbars, dialogs, tables, tree views, tooltips, accordions, image widgets, and toasts.
 - `layout_loader.rs`: Implements pure-Rust layout definition loading (`WidgetDef` / TOML) and a headless software PNG rasteriser for test evidence generation.
 - `mod.rs`: Declares the UI submodules and re-exports the widget, context, theme, container, control, and chart-facing types.
-- `render.rs`: Walks UI state and theme data to produce render commands or CPU-side image output.
-- `theme.rs`: Stores theme style maps, widget visual state, and fallback behavior for widget styling.
+- `render.rs`: Walks UI state and theme data to produce runtime render commands for every built-in widget and a CPU-side `drawToImage()` helper used by evidence tests.
+- `theme.rs`: Stores theme style maps, widget visual state, and the built-in `Theme::default_dark()` skin that covers every built-in widget type.
 - `widget.rs`: Defines shared widget metadata and the broad widget-type and widget-state enums used across the module.
 
 ## Types

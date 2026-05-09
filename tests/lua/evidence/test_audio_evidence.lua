@@ -271,6 +271,7 @@ end
 
 -- @describe Evidence: lurek.audio applyLowpass
 describe("Evidence: lurek.audio applyLowpass", function()
+    -- @evidence file
     it("PNG evidence: low-pass filter before vs after", function()
         local raw = lurek.audio.newSineWave(4000, 0.05, SR, 0.8)
         -- Clone via saveWAV round-trip is not available headlessly;
@@ -287,6 +288,7 @@ end)
 
 -- @describe Evidence: lurek.audio applyHighpass
 describe("Evidence: lurek.audio applyHighpass", function()
+    -- @evidence file
     it("PNG evidence: high-pass filter before vs after", function()
         local raw  = lurek.audio.newSineWave(300, 0.05, SR, 0.8)
         local raw2 = lurek.audio.newSineWave(300, 0.05, SR, 0.8)
@@ -301,6 +303,7 @@ end)
 
 -- @describe Evidence: lurek.audio applyBandpass
 describe("Evidence: lurek.audio applyBandpass", function()
+    -- @evidence file
     it("PNG evidence: bandpass filter on white noise", function()
         local raw  = lurek.audio.newWhiteNoise(0.05, SR, 0.8, 42)
         local raw2 = lurek.audio.newWhiteNoise(0.05, SR, 0.8, 42)
@@ -321,6 +324,7 @@ end)
 
 -- @describe Evidence: lurek.audio mixInto
 describe("Evidence: lurek.audio mixInto", function()
+    -- @evidence file
     it("PNG evidence: two sine waves mixed together", function()
         local a = lurek.audio.newSineWave(440,  0.05, SR, 0.5)
         local b = lurek.audio.newSineWave(880,  0.05, SR, 0.5)

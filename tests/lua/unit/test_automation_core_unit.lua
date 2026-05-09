@@ -5,6 +5,7 @@ local automation = lurek.automation
 
 -- @describe lurek.automation - namespace
 describe("lurek.automation - namespace", function()
+    -- @covers lurek.automation
     it("should exist as a table", function()
         expect_type("table", lurek.automation)
     end)

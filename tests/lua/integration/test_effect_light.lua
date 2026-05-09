@@ -1,7 +1,4 @@
--- tests/lua/integration/test_effect_light.lua
--- Integration: lurek.effect <-> lurek.light ambient bridge.
-
--- @describe effect + light ambient bridge
+-- Integration: effect overlay ambient state bridged to light world
 describe("effect + light ambient bridge", function()
     -- @integration LOverlay:getAmbientColor
     -- @integration LOverlay:pullAmbientFromLight

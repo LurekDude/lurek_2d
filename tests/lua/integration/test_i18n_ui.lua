@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Localization + UI
--- Tests localized text flowing into UI elements.
-
--- @describe integration: localized strings in UI labels
+-- Integration: localized strings flowing into UI labels
 describe("integration: localized strings in UI labels", function()
     -- @integration lurek.i18n.loadTable
     -- @integration lurek.i18n.setLanguage

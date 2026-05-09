@@ -341,7 +341,7 @@ impl GuiContext {
             widgets: vec![WidgetKind::Panel(root)],
             focused_widget: None,
             toasts: Vec::new(),
-            theme: None,
+            theme: Some(crate::ui::theme::Theme::default_dark()),
             pending_events: Vec::new(),
             dirty: true,
             viewport_w: 0.0,

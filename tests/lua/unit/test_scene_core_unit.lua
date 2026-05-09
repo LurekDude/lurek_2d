@@ -1394,68 +1394,82 @@ local scene_transitions = scene_api.transitions
 
 -- @describe lurek.scene.transitions
 describe("lurek.scene.transitions", function()
+    -- @covers lurek.scene.transitions
     it("transitions table exists", function()
         expect_equal(type(scene_transitions), "table")
     end)
 
+    -- @covers lurek.scene.transitions.fade
     it("fade transition exists as a function", function()
         expect_equal(type(scene_transitions.fade), "function")
     end)
 
+    -- @covers lurek.scene.transitions.slide
     it("slide transition exists as a function", function()
         expect_equal(type(scene_transitions.slide), "function")
     end)
 
+    -- @covers lurek.scene.transitions.wipe
     it("wipe transition exists as a function", function()
         expect_equal(type(scene_transitions.wipe), "function")
     end)
 
+    -- @covers lurek.scene.transitions.iris
     it("iris transition exists as a function", function()
         expect_equal(type(scene_transitions.iris), "function")
     end)
 
+    -- @covers lurek.scene.transitions.fade
     it("fade() returns a table with type=fade", function()
         local t = scene_transitions.fade()
         expect_equal(t.type, "fade")
     end)
 
+    -- @covers lurek.scene.transitions.fade
     it("fade() returns default duration 0.5", function()
         local t = scene_transitions.fade()
         expect_near(t.duration, 0.5, 0.001)
     end)
 
+    -- @covers lurek.scene.transitions.fade
     it("fade(1.0) returns duration=1.0", function()
         local t = scene_transitions.fade(1.0)
         expect_near(t.duration, 1.0, 0.001)
     end)
 
+    -- @covers lurek.scene.transitions.slide
     it("slide() returns type=left by default", function()
         local t = scene_transitions.slide()
         expect_equal(t.type, "left")
     end)
 
+    -- @covers lurek.scene.transitions.slide
     it("slide(\"right\") returns type=right", function()
         local t = scene_transitions.slide("right")
         expect_equal(t.type, "right")
     end)
 
+    -- @covers lurek.scene.transitions.slide
     it("slide() returns default duration 0.4", function()
         local t = scene_transitions.slide()
         expect_near(t.duration, 0.4, 0.001)
     end)
 
+    -- @covers lurek.scene.transitions.wipe
     it("wipe() returns type=wipe with default duration", function()
         local t = scene_transitions.wipe()
         expect_equal(t.type, "wipe")
         expect_near(t.duration, 0.5, 0.001)
     end)
 
+    -- @covers lurek.scene.transitions.iris
     it("iris() returns type=iris with default duration", function()
         local t = scene_transitions.iris()
         expect_equal(t.type, "iris")
         expect_near(t.duration, 0.6, 0.001)
     end)
 
+    -- @covers lurek.scene.transitions.fade
     it("each factory call returns a fresh table", function()
         local a = scene_transitions.fade()
         local b = scene_transitions.fade()
@@ -1536,6 +1550,7 @@ describe("lurek.scene transition helper aliases", function()
         return transitions[name]
     end
 
+    -- @covers lurek.scene.fade
     it("fade returns a fade transition table", function()
         local fade = get_helper("fade")
         expect_equal("function", type(fade))
@@ -1544,6 +1559,7 @@ describe("lurek.scene transition helper aliases", function()
         expect_near(1.0, t.duration, 0.001)
     end)
 
+    -- @covers lurek.scene.slide
     it("slide returns a directional slide transition table", function()
         local slide = get_helper("slide")
         expect_equal("function", type(slide))
@@ -1552,6 +1568,7 @@ describe("lurek.scene transition helper aliases", function()
         expect_near(0.75, t.duration, 0.001)
     end)
 
+    -- @covers lurek.scene.wipe
     it("wipe returns a wipe transition table", function()
         local wipe = get_helper("wipe")
         expect_equal("function", type(wipe))
@@ -1560,6 +1577,7 @@ describe("lurek.scene transition helper aliases", function()
         expect_near(0.25, t.duration, 0.001)
     end)
 
+    -- @covers lurek.scene.iris
     it("iris returns an iris transition table", function()
         local iris = get_helper("iris")
         expect_equal("function", type(iris))

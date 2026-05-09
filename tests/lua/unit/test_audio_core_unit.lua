@@ -2,6 +2,7 @@
 
 -- @describe lurek.audio module exists
 describe("lurek.audio module exists", function()
+    -- @covers lurek.audio
     it("lurek.audio is a table", function()
         expect_type("table", lurek.audio)
     end)

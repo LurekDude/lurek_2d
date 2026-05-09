@@ -1,7 +1,4 @@
--- tests/lua/integration/test_timer_event.lua
--- Integration: lurek.timer scheduler callbacks interact with lurek.event signals.
-
--- @describe timer + event integration
+-- Integration: timer scheduler callbacks emitting event signals
 describe("timer + event integration", function()
 
     -- @integration LScheduler:after

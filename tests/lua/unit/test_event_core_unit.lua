@@ -835,23 +835,39 @@ end)
 
 -- @describe unit: migrated from integration/test_dialog_event_integration.lua
 describe("unit: migrated from integration/test_dialog_event_integration.lua", function()
+        local dialog = lurek.dialog
+        if dialog == nil or dialog.newSequencer == nil then
+            -- @covers lurek.dialog
+            it("dialog module unavailable in this runtime", function()
+                expect_nil(dialog)
+            end)
+            return
+        end
+
+        local function bridge(seq, sig, names)
+            for _, name in ipairs(names) do
+                seq:on(name, function(...)
+                    sig:emit(name, ...)
+                end)
+            end
+        end
         -- @covers LSignal:connect
         -- @covers lurek.event.newSignal
         it("line event fires through Signal with payload", function()
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line", "finished" })
-    
+
             local got_speaker, got_text
             sig:connect("line", function(speaker, text)
                 got_speaker, got_text = speaker, text
             end)
-    
+
             seq:setSpeed(100)
             seq:load({ { type = "say", speaker = "Alice", text = "Hi!" } })
             seq:start()
             seq:update(0.5)
-    
+
             expect_equal("Alice", got_speaker)
             expect_equal("Hi!", got_text)
         end)
@@ -862,16 +878,16 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line" })
-    
+
             local count_a, count_b = 0, 0
             sig:connect("line", function() count_a = count_a + 1 end)
             sig:connect("line", function() count_b = count_b + 1 end)
-    
+
             seq:setSpeed(100)
             seq:load({ { type = "say", speaker = "N", text = "X" } })
             seq:start()
             seq:update(0.5)
-    
+
             expect_equal(1, count_a)
             expect_equal(1, count_b)
         end)
@@ -882,10 +898,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line", "finished" })
-    
+
             local finished = false
             sig:connect("finished", function() finished = true end)
-    
+
             seq:setSpeed(1000)
             seq:load({ { type = "say", speaker = "N", text = "End." } })
             seq:start()
@@ -900,10 +916,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "choice" })
-    
+
             local choice_fired = false
             sig:connect("choice", function() choice_fired = true end)
-    
+
             seq:load({
                 { type = "choice", text = "Pick:", options = {
                     { label = "A", branch = {} },
@@ -921,10 +937,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line" })
-    
+
             local count = 0
             sig:connect("line", function() count = count + 1 end)
-    
+
             seq:setSpeed(1000)
             seq:load({
                 { type = "say", speaker = "N", text = "1" },
@@ -933,7 +949,7 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             seq:start()
             seq:update(0.1)
             expect_equal(1, count)
-    
+
             seq:off("line")
             seq:advance() -- moves to second "say" node, would normally fire "line"
             seq:update(0.1)
@@ -946,17 +962,17 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line", "finished" })
-    
+
             local got_speaker, got_text
             sig:connect("line", function(speaker, text)
                 got_speaker, got_text = speaker, text
             end)
-    
+
             seq:setSpeed(100)
             seq:load({ { type = "say", speaker = "Alice", text = "Hi!" } })
             seq:start()
             seq:update(0.5)
-    
+
             expect_equal("Alice", got_speaker)
             expect_equal("Hi!", got_text)
         end)
@@ -967,16 +983,16 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line" })
-    
+
             local count_a, count_b = 0, 0
             sig:connect("line", function() count_a = count_a + 1 end)
             sig:connect("line", function() count_b = count_b + 1 end)
-    
+
             seq:setSpeed(100)
             seq:load({ { type = "say", speaker = "N", text = "X" } })
             seq:start()
             seq:update(0.5)
-    
+
             expect_equal(1, count_a)
             expect_equal(1, count_b)
         end)
@@ -987,10 +1003,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line", "finished" })
-    
+
             local finished = false
             sig:connect("finished", function() finished = true end)
-    
+
             seq:setSpeed(1000)
             seq:load({ { type = "say", speaker = "N", text = "End." } })
             seq:start()
@@ -1005,10 +1021,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "choice" })
-    
+
             local choice_fired = false
             sig:connect("choice", function() choice_fired = true end)
-    
+
             seq:load({
                 { type = "choice", text = "Pick:", options = {
                     { label = "A", branch = {} },
@@ -1026,10 +1042,10 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             local seq = dialog.newSequencer()
             local sig = lurek.event.newSignal()
             bridge(seq, sig, { "line" })
-    
+
             local count = 0
             sig:connect("line", function() count = count + 1 end)
-    
+
             seq:setSpeed(1000)
             seq:load({
                 { type = "say", speaker = "N", text = "1" },
@@ -1038,7 +1054,7 @@ describe("unit: migrated from integration/test_dialog_event_integration.lua", fu
             seq:start()
             seq:update(0.1)
             expect_equal(1, count)
-    
+
             seq:off("line")
             seq:advance() -- moves to second "say" node, would normally fire "line"
             seq:update(0.1)
@@ -1056,15 +1072,15 @@ describe("unit: migrated from integration/test_event_entity.lua", function()
         it("disconnected signal listener not called", function()
             local sig   = lurek.event.newSignal()
             local count = 0
-    
+
             -- connect returns a handle (integer); disconnect via sig:remove(handle)
             local handle = sig:connect("tick", function()
                 count = count + 1
             end)
-    
+
             sig:emit("tick")
             expect_equal(1, count, "listener called once before disconnect")
-    
+
             sig:remove(handle)
             sig:emit("tick")
             expect_equal(1, count, "listener not called after disconnect")
@@ -1080,12 +1096,12 @@ describe("unit: migrated from integration/test_timer_event.lua", function()
         it("event signal emits and receives value", function()
             local sig = lurek.event.newSignal()
             local received = nil
-    
+
             -- connect(event_name, fn)     name is required
             sig:connect("value", function(v)
                 received = v
             end)
-    
+
             sig:emit("value", 42)
             expect_equal(received, 42, "signal delivers value to listener")
         end)

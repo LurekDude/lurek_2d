@@ -2,6 +2,7 @@
 
 -- @describe lurek.render module exists
 describe("lurek.render module exists", function()
+    -- @covers lurek.render
     it("lurek.render is a table", function()
         expect_type("table", lurek.render)
     end)

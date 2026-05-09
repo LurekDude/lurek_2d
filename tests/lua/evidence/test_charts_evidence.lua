@@ -95,5 +95,31 @@ describe("evidence: charts", function()
         lurek.image.savePNG(img, path)
         expect_evidence_created(path)
     end)
+
+    -- @evidence file
+    it("produces a dual-series trend line PNG", function()
+        local dir = evidence_output_dir("charts")
+        local path = dir .. "trend_dual_series.png"
+        local img = lurek.image.newImageData(480, 300)
+        img:fill(238, 242, 250, 255)
+        local chart = lurek.ui.newLineChart({ width = 480, height = 300, title = "Quarterly Trend" })
+        chart:setYMax(140)
+        chart:setXMax(7)
+        chart:addSeries("Revenue", {
+            {0, 22}, {1, 34}, {2, 44}, {3, 52},
+            {4, 68}, {5, 79}, {6, 95}, {7, 118},
+        }, 0.15, 0.45, 0.85)
+        chart:addSeries("Cost", {
+            {0, 18}, {1, 29}, {2, 38}, {3, 50},
+            {4, 58}, {5, 74}, {6, 80}, {7, 92},
+        }, 0.85, 0.35, 0.2)
+        chart:addSeries("Forecast", {
+            {0, 20}, {1, 31}, {2, 40}, {3, 55},
+            {4, 72}, {5, 86}, {6, 103}, {7, 126},
+        }, 0.25, 0.65, 0.35)
+        chart:drawToImage(img)
+        lurek.image.savePNG(img, path)
+        expect_evidence_created(path)
+    end)
 end)
 test_summary()

@@ -15,6 +15,7 @@ end
 -- =========================================================================
 -- @describe lurek.graph module exists
 describe("lurek.graph module exists", function()
+    -- @covers lurek.graph
     it("lurek.graph is a table", function()
         expect_type("table", lurek.graph)
     end)
@@ -44,6 +45,7 @@ describe("Graph construction", function()
         expect_type("userdata", n)
     end)
 
+    -- @covers LGraph:addEdge
     it("addEdge returns an edge handle", function()
         local g, n1, n2, e = make_simple_graph()
         expect_type("userdata", e)

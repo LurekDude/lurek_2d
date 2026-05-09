@@ -1,11 +1,6 @@
--- tests/lua/integration/test_graph_pathfind.lua
--- Integration: lurek.graph MST and A* with lurek.pathfind.
--- Namespaces: lurek.graph + lurek.pathfind
+-- Integration: graph MST and A* combined with pathfinding
 
---
 -- Graph MST (Minimum Spanning Tree)
---
--- @describe graph.mst
 describe("graph.mst", function()
 
     local function build_simple_graph()
@@ -33,7 +28,7 @@ describe("graph.mst", function()
     it("mst has N-1 edges for N nodes", function()
         local g = build_simple_graph()
         local tree = g:mst()
-        -- 4 nodes     3 MST edges
+        -- 4 nodes -> 3 MST edges
         expect_equal(3, #tree)
     end)
 
@@ -48,10 +43,7 @@ describe("graph.mst", function()
 
 end)
 
---
 -- Graph A* (astar)
---
--- @describe graph.astar
 describe("graph.astar", function()
 
     local function build_chain(n)
@@ -84,10 +76,7 @@ describe("graph.astar", function()
 
 end)
 
---
 -- Graph + pathfinding integration
---
--- @describe graph + JPS integration
 describe("graph + JPS integration", function()
 
     -- @integration LGraph:addEdge

@@ -1,8 +1,4 @@
--- Lurek2D Integration Test: Audio + Event System
--- Tests audio playback triggered by event dispatching.
--- Rewritten: lurek.event.newDispatcher does not exist; uses newSignal instead.
-
--- @describe audio + event integration
+-- Integration: audio volume controlled via event signals
 describe("audio + event integration", function()
     -- @integration LSignal:connect
     -- @integration LSignal:emit

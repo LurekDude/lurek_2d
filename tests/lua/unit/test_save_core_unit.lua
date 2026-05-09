@@ -6,6 +6,7 @@
 
 -- @describe lurek.save module exists
 describe("lurek.save module exists", function()
+    -- @covers lurek.save
     it("lurek.save is a table", function()
         expect_type("table", lurek.save)
     end)

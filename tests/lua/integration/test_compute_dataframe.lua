@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Compute + DataFrame
--- Tests NdArray statistical operations feeding into DataFrame reports
-
--- @describe integration: compute statistics to dataframe
+-- Integration: compute statistics fed into dataframe reports
 describe("integration: compute statistics to dataframe", function()
     -- @integration LDataFrame:addColumn
     -- @integration LDataFrame:addRow
@@ -56,7 +53,6 @@ describe("integration: compute statistics to dataframe", function()
     end)
 end)
 
--- @describe integration: image data to compute array
 describe("integration: image data to compute array", function()
     -- @integration LArray:getSize
     -- @integration LArray:max
@@ -96,5 +92,4 @@ describe("integration: image data to compute array", function()
     end)
 end)
 
--- @describe integration: data encoding pipeline
 test_summary()

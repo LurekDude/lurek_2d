@@ -35,6 +35,7 @@ end
 -- =========================================================================
 -- @describe lurek.dataframe module exists
 describe("lurek.dataframe module exists", function()
+    -- @covers lurek.dataframe
     it("lurek.dataframe is a table", function()
         expect_type("table", lurek.dataframe)
     end)
@@ -215,11 +216,13 @@ end)
 -- =========================================================================
 -- @describe schema
 describe("schema", function()
+    -- @covers LVecFrame:nrows
     it("nrows returns row count", function()
         local df = make_test_df()
         expect_equal(3, df:nrows())
     end)
 
+    -- @covers LVecFrame:ncols
     it("ncols returns column count", function()
         local df = make_test_df()
         expect_equal(3, df:ncols())
@@ -245,12 +248,16 @@ end)
 -- =========================================================================
 -- @describe column operations
 describe("column operations", function()
+    -- @covers LDataFrame:addColumn
+    -- @covers LDataFrame:ncols
     it("addColumn increases ncols", function()
         local df = make_test_df()
         df_add_column(df, "grade")
         expect_equal(4, df:ncols())
     end)
 
+    -- @covers LDataFrame:addColumn
+    -- @covers LDataFrame:getValue
     it("addColumn with default fills all rows", function()
         local df = make_test_df()
         df_add_column(df, "pass", true)
@@ -259,12 +266,16 @@ describe("column operations", function()
         end
     end)
 
+    -- @covers LDataFrame:ncols
+    -- @covers LDataFrame:removeColumn
     it("removeColumn by name decreases ncols", function()
         local df = make_test_df()
         df_remove_column(df, "age")
         expect_equal(2, df:ncols())
     end)
 
+    -- @covers LDataFrame:ncols
+    -- @covers LDataFrame:removeColumn
     it("removeColumn by index decreases ncols", function()
         local df = make_test_df()
         df_remove_column(df, 2)
@@ -347,6 +358,7 @@ describe("row operations", function()
         expect_equal("Bob", df:getValue(1, "name"))
     end)
 
+    -- @covers LDataFrame:getRow
     it("getRow returns row as table", function()
         local df = make_test_df()
         local row = df:getRow(1)
@@ -355,6 +367,7 @@ describe("row operations", function()
         expect_near(90, row.score, 1e-5)
     end)
 
+    -- @covers LDataFrame:getRow
     it("getRow with last row index works", function()
         local df = make_test_df()
         local row = df:getRow(3)
@@ -367,28 +380,36 @@ end)
 -- =========================================================================
 -- @describe cell access
 describe("cell access", function()
+    -- @covers LDataFrame:getValue
     it("getValue by column name", function()
         local df = make_test_df()
         expect_equal("Alice", df:getValue(1, "name"))
     end)
 
+    -- @covers LDataFrame:getValue
     it("getValue by column index", function()
         local df = make_test_df()
         expect_equal("Alice", df:getValue(1, 1))
     end)
 
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:setValue
     it("setValue changes cell value", function()
         local df = make_test_df()
         df_set_value(df, 1, "name", "Alicia")
         expect_equal("Alicia", df:getValue(1, "name"))
     end)
 
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:setValue
     it("setValue by column index", function()
         local df = make_test_df()
         df_set_value(df, 2, 2, 99)
         expect_near(99, df:getValue(2, "age"), 1e-5)
     end)
 
+    -- @covers LDataFrame:getValue
+    -- @covers LDataFrame:setValue
     it("setValue to nil clears cell", function()
         local df = make_test_df()
         df_set_value(df, 1, "name", nil)
@@ -439,18 +460,21 @@ describe("filter", function()
         expect_equal(2, result:nrows())
     end)
 
+    -- @covers LDataFrame:filter
     it("filter >= includes boundary", function()
         local df = make_test_df()
         local result = df:filter("age", ">=", 30)
         expect_equal(2, result:nrows())
     end)
 
+    -- @covers LDataFrame:filter
     it("filter with no matches returns empty DataFrame", function()
         local df = make_test_df()
         local result = df:filter("age", ">", 100)
         expect_equal(0, result:nrows())
     end)
 
+    -- @covers LDataFrame:filter
     it("filter contains matches substrings", function()
         local df = make_test_df()
         local result = df:filter("name", "contains", "li")
@@ -459,6 +483,7 @@ describe("filter", function()
         expect_equal("Charlie", result:getValue(2, "name"))
     end)
 
+    -- @covers LDataFrame:filter
     it("filter with unsupported operator errors", function()
         local df = make_test_df()
         local bad_op = string.char(126)
@@ -609,6 +634,7 @@ end)
 -- =========================================================================
 -- @describe select
 describe("select", function()
+    -- @covers LDataFrame:select
     it("select by column name", function()
         local df = make_test_df()
         local s = df:select("name", "score")
@@ -617,12 +643,14 @@ describe("select", function()
         expect_equal("Alice", s:getValue(1, "name"))
     end)
 
+    -- @covers LDataFrame:select
     it("select by column index", function()
         local df = make_test_df()
         local s = df:select(1, 3)
         expect_equal(2, s:ncols())
     end)
 
+    -- @covers LDataFrame:select
     it("select single column", function()
         local df = make_test_df()
         local s = df:select("name")
@@ -2275,14 +2303,17 @@ describe("DataFrame shape accessors", function()
         return lurek.dataframe.fromCSV("name,age,score\nAlice,30,90\nBob,25,85\nCharlie,35,92")
     end
 
+    -- @covers LDataFrame:nrows
     it("nrows returns row count", function()
         expect_equal(3, csv3x3():nrows())
     end)
 
+    -- @covers LDataFrame:ncols
     it("ncols returns column count", function()
         expect_equal(3, csv3x3():ncols())
     end)
 
+    -- @covers LDataFrame:columns
     it("columns returns an array of column name strings", function()
         local cols = csv3x3():columns()
         expect_type("table", cols)
@@ -2302,6 +2333,8 @@ describe("DataFrame column/row mutation", function()
         return lurek.dataframe.fromCSV("a,b\n1,4\n2,5\n3,6")
     end
 
+    -- @covers LDataFrame:ncols
+    -- @covers LDataFrame:removeColumn
     it("removeColumn removes a column", function()
         local df = make_df()
         df_remove_column(df, "b")
@@ -2318,6 +2351,7 @@ describe("DataFrame column/row mutation", function()
         expect_equal(true, found)
     end)
 
+    -- @covers LDataFrame:getColumn
     it("getColumn returns an array of values", function()
         local df = make_df()
         local col = df:getColumn("a")
@@ -2339,6 +2373,7 @@ describe("DataFrame column/row mutation", function()
         expect_equal(2, df:nrows())
     end)
 
+    -- @covers LDataFrame:getRow
     it("getRow returns a table with column keys", function()
         local df = make_df()
         local row = df:getRow(1)
@@ -2346,6 +2381,7 @@ describe("DataFrame column/row mutation", function()
         expect_equal(1, row.a)
     end)
 
+    -- @covers LDataFrame:getValue
     it("getValue returns the cell value at (row, col)", function()
         local df = make_df()
         expect_equal(2, df:getValue(2, "a"))
@@ -2359,18 +2395,21 @@ describe("DataFrame slicing and filtering", function()
         return lurek.dataframe.fromCSV("v\n10\n20\n30\n40\n50")
     end
 
+    -- @covers LDataFrame:head
     it("head(2) returns first 2 rows", function()
         local h = nums_df():head(2)
         expect_equal(2, h:nrows())
         expect_equal(10, h:getValue(1, "v"))
     end)
 
+    -- @covers LDataFrame:tail
     it("tail(2) returns last 2 rows", function()
         local t = nums_df():tail(2)
         expect_equal(2, t:nrows())
         expect_equal(50, t:getValue(2, "v"))
     end)
 
+    -- @covers LDataFrame:slice
     it("slice(2,4) returns rows 2 to 4", function()
         local s = nums_df():slice(2, 4)
         expect_equal(3, s:nrows())
@@ -2435,6 +2474,7 @@ describe("DataFrame slicing and filtering", function()
         expect_equal(2, out:nrows())
     end)
 
+    -- @covers LDataFrame:sample
     it("sample(2) returns exactly 2 rows", function()
         local out = nums_df():sample(2)
         expect_equal(2, out:nrows())
@@ -2484,16 +2524,19 @@ describe("VecFrame shape queries", function()
         return lurek.dataframe.toVec(df)
     end
 
+    -- @covers LVecFrame:nrows
     it("nrows returns correct row count", function()
         local vf = make_vf()
         expect_true(vf:nrows() == 3, "expected nrows=3, got " .. tostring(vf:nrows()))
     end)
 
+    -- @covers LVecFrame:ncols
     it("ncols returns correct column count", function()
         local vf = make_vf()
         expect_true(vf:ncols() == 2, "expected ncols=2, got " .. tostring(vf:ncols()))
     end)
 
+    -- @covers LVecFrame:columns
     it("columns returns table of column names", function()
         local vf = make_vf()
         local cols = vf:columns()
@@ -2926,6 +2969,7 @@ describe("DataFrame statistics", function()
         return lurek.dataframe.fromCSV("v\n10\n20\n30\n40")
     end
 
+    -- @covers LDataFrame:describe
     it("describe returns a DataFrame with descriptive statistics", function()
         local d = num_df():describe()
         expect_not_nil(d)
@@ -2933,24 +2977,29 @@ describe("DataFrame statistics", function()
         expect_true(d:nrows() > 0, "describe must return at least one row")
     end)
 
+    -- @covers LDataFrame:sum
     it("sum of {10,20,30,40} = 100", function()
         expect_equal(100, num_df():sum("v"))
     end)
 
+    -- @covers LDataFrame:mean
     it("mean of {10,20,30,40} = 25", function()
         expect_equal(25, num_df():mean("v"))
     end)
 
+    -- @covers LDataFrame:median
     it("median returns a number", function()
         expect_type("number", num_df():median("v"))
     end)
 
+    -- @covers LDataFrame:stddev
     it("stddev returns a non-negative number", function()
         local s = num_df():stddev("v")
         expect_type("number", s)
         expect_true(s >= 0, "stddev must be non-negative")
     end)
 
+    -- @covers LDataFrame:variance
     it("variance returns a non-negative number", function()
         local v = num_df():variance("v")
         expect_type("number", v)
@@ -3006,24 +3055,28 @@ describe("DataFrame serialization", function()
         return lurek.dataframe.fromCSV("name,val\nAlice,1\nBob,2")
     end
 
+    -- @covers LDataFrame:toCSV
     it("toCSV returns a non-empty string", function()
         local csv = alpha_df():toCSV()
         expect_type("string", csv)
         expect_true(#csv > 5, "CSV output must not be empty")
     end)
 
+    -- @covers LDataFrame:toJSON
     it("toJSON returns a non-empty string", function()
         local json = alpha_df():toJSON()
         expect_type("string", json)
         expect_true(#json > 2, "JSON output must not be empty")
     end)
 
+    -- @covers LDataFrame:toBinary
     it("toBinary returns a non-empty string", function()
         local bin = alpha_df():toBinary()
         expect_type("string", bin)
         expect_true(#bin > 0, "binary output must not be empty")
     end)
 
+    -- @covers LDataFrame:toTable
     it("toTable returns a Lua array of row tables", function()
         local rows = alpha_df():toTable()
         expect_type("table", rows)
@@ -3031,6 +3084,7 @@ describe("DataFrame serialization", function()
         expect_equal("Alice", rows[1].name)
     end)
 
+    -- @covers LDataFrame:toString
     it("toString returns a non-empty string", function()
         local s = alpha_df():toString()
         expect_type("string", s)
@@ -3150,6 +3204,7 @@ describe("Database operations", function()
         expect_equal("test", names[1])
     end)
 
+    -- @covers LDatabase:tableCount
     it("tableCount returns 1 after addTable", function()
         expect_equal(1, make_db():tableCount())
     end)
@@ -3173,12 +3228,14 @@ describe("Database operations", function()
         expect_equal(2, db1:tableCount())
     end)
 
+    -- @covers LDatabase:toJSON
     it("toJSON returns a non-empty string", function()
         local json = make_db():toJSON()
         expect_type("string", json)
         expect_true(#json > 2, "JSON must not be empty")
     end)
 
+    -- @covers LDatabase:query
     it("query returns a DataFrame from a SQL-like expression", function()
         local db = make_db()
         local result = db:query("SELECT * FROM test WHERE x > 1")

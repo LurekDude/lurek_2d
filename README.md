@@ -3,20 +3,40 @@
 </p>
 
 <p align="center">
-  <strong>A ~10 MB 2D game engine.</strong> Rust core Â· Lua scripting Â· wgpu GPU rendering Â· AI-first design.
+        <strong>A small desktop 2D runtime for Lua games.</strong> Rust core - Lua scripting - GPU rendering - AI-first tooling.
 </p>
 
 ---
 
-One binary. One scripting language. Drop `lurek2d` next to `main.lua` â€” your game runs. No installer, no DLLs, no months-long learning curve.
+One binary. One scripting language. Put `lurek2d` next to `main.lua` and run your game. No installer, no DLLs, no editor lock-in.
+
+---
+
+## Table of Contents
+
+1. [Quick Start](#quick-start)
+2. [Architecture Overview](#architecture-overview)
+3. [What Ships](#what-ships)
+4. [Tech Stack](#tech-stack)
+5. [Project Identity](#project-identity)
+6. [License](#license)
+
+### Architecture Contents
+
+1. [Runtime Modules (described)](#runtime-modules-described)
+2. [Full Lua API Surface](#full-lua-api-surface)
+3. [Example Games Categories](#example-games-categories)
+4. [Use Cases (where to use Lurek2D)](#use-cases-where-to-use-lurek2d)
+5. [AI-First Engineering (how AI is used)](#ai-first-engineering-how-ai-is-used)
+6. [Key Architecture Notes](#key-architecture-notes)
 
 ---
 
 ## Quick Start
 
 ```bash
-cargo run                                # Splash screen (no game)
-cargo run -- content/demos/hello_world   # Run a demo
+cargo run                               # Splash screen (no game)
+cargo run -- content/examples/render.lua # Run an API example
 ```
 
 Create `main.lua` anywhere:
@@ -35,132 +55,161 @@ end
 cargo run -- path/to/your/game   # No project files. No config required.
 ```
 
-An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen â€” drag-and-drop a folder onto the window to load it.
+An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen - drag and drop a folder onto the window to load it.
 
 ---
+## Architecture Overview
 
-## Engine Subsystems
+Lurek2D is a small desktop runtime for 2D Lua games. You write `main.lua`, call `lurek.*`, and the Rust engine handles rendering, physics, audio, files, threads, and platform integration underneath.
 
-Lurek2D ships 46 Rust modules organized in four tiers. All are MIT-licensed first-party code.
+The runtime is intentionally separate from IDE tooling. The VS Code extension is optional and lives outside the engine binary.
 
-### Baseline
+### Runtime Modules (described)
 
-| Module | Description |
-|---|---|
-| `engine` | App lifecycle, `Config`, `SharedState`, `EngineError`, typed resource pools (`SlotMap`) |
-| `math` | `Vec2` / `Mat3` / `Rect`, easing (22 functions), noise (Perlin/simplex/fBm), Bezier, triangulation |
+Below is the full runtime module set from `src/lib.rs`, grouped by responsibility.
 
-### Tier 1 â€” Core Subsystems
+#### Foundations
 
 | Module | Description |
 |---|---|
-| `render` | GPU rendering via wgpu (Vulkan / DX12 / Metal): sprites, batches, meshes, canvases, WGSL shaders, blend modes, stencils, transform stack |
-| `audio` | Sound loading and playback (WAV / OGG / MP3 / FLAC), streaming, buses, volume / pitch / pan |
-| `sound` | Audio source types and lifecycle management |
-| `physics` | 2D rigid-body simulation via rapier2d: bodies, shapes, 11 joint types, raycasting, collision events |
-| `input` | Keyboard, mouse, gamepad (gilrs), touch â€” state queries and event callbacks |
-| `camera` | 2D camera with viewport, zoom, screenâ†”world transforms |
-| `animation` | Keyframe animation, sprite-sheet playback |
-| `image` | Image loading, pixel manipulation, format conversion |
-| `timer` | Frame clock, delta-time, fixed-step ticker |
-| `window` | Display management, DPI scaling, multi-monitor info |
-| `filesystem` | Sandboxed game I/O, virtual FS, archive mounting |
-| `data` | Binary buffers, compression (deflate / gzip / lz4 / zlib), hashing (MD5 / SHA-1 / SHA-256), encoding (base64 / hex) |
-| `serial` | Serialization to TOML, JSON, and binary formats |
-| `event` | Typed event queue and signal bus |
-| `ecs` | Lightweight ECS: bitmap-tag queries, blueprint instantiation |
-| `thread` | Background Rust workers, typed MPMC channels, isolated per-thread Lua VMs |
-| `compute` | GPU compute shaders via wgpu |
-| `automation` | Lua-scriptable task runners and build automation |
-| `log` | Structured engine logging facade |
+| `math` | Provides core math primitives like vectors, matrices, and rectangles used across the engine. It also ships helpers for interpolation, easing, geometry, and general numeric operations needed by gameplay code. |
+| `data` | Implements low-level binary data buffers and transformation helpers. It supports compression, hashing, and encoding utilities used by save systems, assets, and tooling paths. |
+| `serial` | Exposes format-agnostic serialization built around shared value representations. It handles JSON, TOML, CSV, MessagePack, XML, and conversion flows between them. |
+| `graph` | Provides graph structures and traversal utilities for directed and undirected relationships. It is used for dependency-like flows, path-style queries, and simulation-style data propagation. |
+| `dataframe` | Implements in-memory tabular data with column-oriented access patterns. It is useful for game analytics, AI tuning tables, and structured datasets loaded by scripts. |
+| `procgen` | Contains procedural generation utilities for maps, layouts, and noise-driven content. It provides reusable algorithms so generation logic stays consistent across modules. |
+| `patterns` | Hosts reusable gameplay and architecture patterns like state machines and command-style flows. It reduces per-project boilerplate by shipping tested building blocks. |
+| `i18n` | Manages localization catalogs, key lookup, and language switching at runtime. It also handles pluralization and formatting rules so script code can stay locale-agnostic. |
 
-### Tier 2 â€” Engine Extensions
+#### Core Runtime
 
 | Module | Description |
 |---|---|
-| `particle` | Configurable emitter system: 35+ parameters, keyframed size / color |
-| `tilemap` | Tile layers, tilesets, procedural map generation, coordinate helpers |
-| `scene` | Scene stack with push / pop / replace and transition hooks |
-| `save` | Slot-based save / load with versioning |
-| `mods` | Mod loader with sandboxed per-mod Lua VMs |
-| `graph` | General graph data structures and traversal algorithms |
-| `pathfind` | Navigation grids, Aâ…, HPAâ…, flow fields |
-| `ai` | FSMs, behaviour trees, GOAP planner, steering behaviours, influence maps, shared blackboard |
-| `dataframe` | Tabular data structure, CSV I/O, column-oriented query API |
-| `ui` | Immediate-mode UI widget toolkit |
-| `minimap` | Minimap rendering from world state |
-| `effect` | Screen-space HUD layer |
-| `fx` | Pre-built visual effects (trails, screen-shake, flash) |
-| `postfx` | Full-screen post-processing: bloom, blur, colour-grade, distortion, CRT |
-| `light` | Dynamic 2D lighting and shadow casting |
-| `pipeline` | Custom multi-pass render pipeline builder |
-| `raycaster` | Raycasting-based pseudo-3D renderer |
-| `spine` | Spine 2D skeletal animation runtime |
-| `network` | Networking via ENet: UDP sessions, channels, packet types |
-| `procgen` | Procedural content generation (dungeons, noise maps, L-systems) |
-| `patterns` | Reusable game-design pattern implementations |
-| `i18n` | String-table i18n with plural rules and locale detection |
-| `tween` | Tween / timeline system: chained, parallel, and looping sequences |
-| `terminal` | In-game developer console / REPL with widget toolkit |
-| `devtools` | In-engine performance overlay and inspector |
-| `debugbridge` | Remote debug bridge for external tooling |
-| `docs` | In-engine interactive documentation viewer |
+| `app` | Owns the top-level application lifecycle and main run loop orchestration. It wires initialization, frame updates, and shutdown flow around the configured runtime. |
+| `runtime` | Defines core runtime contracts like configuration, shared state, and error surfaces. It is the central coordination layer used by other modules to stay consistent. |
+| `event` | Provides the internal event queue and dispatch primitives. It supports polling and message-driven integration between systems without tight coupling. |
+| `thread` | Implements worker-thread integration and typed inter-thread channels. It enables background workloads while keeping Lua VM state isolated and safe. |
+| `timer` | Provides frame-time tracking and scheduled callback primitives. It supports both immediate loop timing and delayed/repeating tasks. |
+| `log` | Exposes runtime logging utilities and level-based output control. It gives scripts and engine internals a unified diagnostics path. |
 
-### Lua API
+#### Platform Services
 
-All bindings live under `lurek.*`:
+| Module | Description |
+|---|---|
+| `render` | Owns the GPU rendering pipeline, command processing, and draw pass execution. It is responsible for translating script draw intent into backend GPU operations. |
+| `audio` | Handles sound source loading, mixing, and playback routing. It provides runtime controls like volume, bus grouping, and stream management. |
+| `input` | Tracks keyboard, mouse, gamepad, and touch state across frames. It normalizes platform-specific signals into stable queryable runtime state. |
+| `window` | Wraps window lifecycle and platform event loop integration. It controls size, mode, and other host-window level behavior required by runtime startup. |
+| `filesystem` | Implements sandboxed game IO and path-safe file access. It provides read/write primitives used by assets, save data, and script tooling. |
+| `image` | Provides CPU-side image and pixel manipulation helpers. It supports loading, transforming, and preparing image data used by rendering paths. |
+| `physics` | Implements rigid-body simulation, collision queries, and event reporting. It gives scripts deterministic motion and contact behavior for 2D games. |
+| `camera` | Manages view transforms between world space and screen space. It supports panning, zoom, and viewport logic used by rendering and gameplay systems. |
+| `compute` | Exposes compute-oriented operations and data processing utilities. It supports heavier numerical workloads that do not fit simple script loops. |
 
-```
-lurek.render       lurek.audio      lurek.sound     lurek.physics    lurek.input
-lurek.input.keyboard  lurek.input.mouse      lurek.input.gamepad   lurek.input.touch      lurek.camera
-lurek.anim      lurek.particle   lurek.tilemap   lurek.scene      lurek.ai
-lurek.path      lurek.ecs     lurek.thread    lurek.event      lurek.event
-lurek.filesystem        lurek.data       lurek.serial    lurek.image        lurek.compute
-lurek.math      lurek.timer       lurek.window    lurek.tween      lurek.ui
-lurek.terminal  lurek.effect    lurek.light     lurek.effect     lurek.fx
-lurek.minimap   lurek.network    lurek.mods   lurek.save   lurek.procgen
-lurek.runtime  lurek.locale     lurek.patterns  lurek.devtools   lurek.log
-```
+#### Feature Systems
 
-Every callback is optional. An empty `main.lua` is a valid Lurek2D program.
+| Module | Description |
+|---|---|
+| `ai` | Provides gameplay AI tooling such as behavior control structures and planning helpers. It enables scripted agents to use reusable decision logic instead of ad-hoc code. |
+| `animation` | Manages timeline and clip-based animation playback for entities and visuals. It coordinates frame progression, playback states, and transitions. |
+| `tween` | Handles eased interpolation of values over time. It is used for UI motion, gameplay transitions, and smooth scripted state changes. |
+| `sprite` | Provides sprite-level handling including frames, sheets, and batching helpers. It is a core 2D visual layer on top of the render backend. |
+| `ui` | Implements retained-mode widget structures and interaction logic. It supports common controls and layout behavior needed for in-game interfaces. |
+| `effect` | Hosts visual effect composition layers used for atmosphere and presentation. It allows game-level overlays and style-driven rendering passes. |
+| `light` | Manages 2D lighting data and shadow-relevant scene state. It supports dynamic light setups for richer 2D scenes. |
+| `minimap` | Generates minimap views from world and camera-related data. It provides compact spatial feedback systems for larger maps. |
+| `scene` | Owns scene stack management, transitions, and active scene switching. It provides structured lifecycle control for game states and screens. |
+| `tilemap` | Provides tile-based map structures, utilities, and traversal helpers. It is used by top-down, side-scroller, and grid-driven gameplay. |
+| `particle` | Implements emitter-driven particle behavior and update flows. It is used for effects like smoke, sparks, trails, and impact feedback. |
+| `pathfind` | Provides pathfinding algorithms and navigation helpers for grid-like spaces. It allows AI and scripted agents to move using reusable route logic. |
+| `network` | Exposes multiplayer/network transport integration for runtime sessions. It handles packet-oriented communication surfaces used by game logic. |
+| `save` | Implements save/load primitives with slot and format support. It keeps gameplay persistence separated from scene and script code. |
+| `mods` | Manages mod discovery, metadata, and integration hooks. It enables controlled extension of game behavior by external content. |
+| `raycaster` | Implements pseudo-3D raycast-style rendering on top of 2D runtime concepts. It supports retro FPS and dungeon-style visual pipelines. |
+| `spine` | Integrates skeletal animation data and runtime state for Spine assets. It handles pose updates and animation playback control. |
+| `parallax` | Manages layered scrolling backgrounds with depth illusion. It is used to create richer camera motion perception in 2D scenes. |
+| `province` | Provides province-level world structures and spatial grouping logic. It supports map-scale gameplay where regions are first-class entities. |
+| `globe` | Implements globe-like world representation and interaction helpers. It is aimed at strategy-style views and region navigation scenarios. |
+| `ecs` | Provides entity-component data organization and iteration patterns. It helps structure gameplay state with explicit component ownership. |
+| `terminal` | Implements in-game terminal-style UI and command interaction layers. It is useful for debug views, script consoles, and text-heavy tools. |
+| `pipeline` | Provides orchestration for multi-step runtime processing flows. It helps compose feature behavior into predictable ordered execution paths. |
+
+#### Edge And Integration
+
+| Module | Description |
+|---|---|
+| `lua_api` | Registers and exposes the `lurek.*` API surface to Lua scripts. It is intentionally thin and delegates business logic to domain modules. |
+| `automation` | Provides automation hooks for scripted workflows and repetitive tasks. It is primarily used for tooling and validation scenarios around runtime behavior. |
+| `devtools` | Exposes developer diagnostics like overlays, counters, and runtime inspection helpers. It improves visibility while tuning performance and correctness. |
+| `debugbridge` | Provides bridge endpoints for external debug and inspection tooling. It allows remote or attached tools to query runtime state safely. |
+| `docs` | Hosts runtime-facing documentation metadata and discovery helpers. It supports documentation-aware workflows from inside the development environment. |
+| `html` | Implements lightweight HTML/CSS-based layout integration for runtime UI flows. It allows document-like composition where widget APIs are not enough. |
+
+### Full Lua API Surface
+
+All game-facing scripting lives under `lurek.*`. A minimal game can be as small as this:
 
 ```lua
--- Core callbacks (all optional)
-function lurek.init()        end  -- once at startup
-function lurek.ready()       end  -- after first frame is ready
-function lurek.process(dt)   end  -- every frame (game logic)
-function lurek.draw()        end  -- every frame (draw calls)
-function lurek.draw_ui()     end  -- every frame (HUD layer)
--- Input, physics, window, and error callbacks also available (22 total)
+function lurek.init()
+  lurek.render.setBackgroundColor(0.1, 0.1, 0.2)
+end
+
+function lurek.draw()
+  lurek.render.print("Hello, Lurek2D!", 100, 100)
+end
 ```
 
----
+Every callback is optional. For full API details:
 
-## Architecture
+- Lua API reference: [docs/api/lurek.md](docs/api/lurek.md)
+- API examples: [content/examples/README.md](content/examples/README.md)
+- Architecture docs: [docs/architecture/philosophy.md](docs/architecture/philosophy.md)
 
-```
-Lua game scripts
-        â–Ľ
-library/   â† Tier 3: Lunasome â€” pure-Lua game mechanics (no Rust internals)
-        â–Ľ
-src/lua_api/       â† Bridge: registers the lurek.* namespace
-        â–Ľ
-Tier 2 extensions  â† particle, tilemap, scene, ai, pathfinding, gui, â€¦
-        â–Ľ
-Tier 1 core        â† graphics, audio, physics, input, timer, filesystem, â€¦
-        â–Ľ
-Baseline           â† math (leaf, no deps) Â· engine (lifecycle, SharedState)
-```
+### Example Games Categories
 
-**Rules**: tiers only import downward. No cross-imports within the same tier. Domain modules never import `lua_api`. See [docs/architecture/engine-architecture.md](docs/architecture/engine-architecture.md) for the full spec.
+`content/games/` is organized into these categories:
 
-**Rendering**: `RenderCommand` variants are pushed into a queue during `lurek.render()` and `lurek.render_ui()`. After the callback returns, `GpuRenderer` processes the queue in wgpu render passes â€” no GPU calls inside Lua closures.
+- `action` - combat-heavy and fast-paced gameplay
+- `arcade` - score-driven classic loops
+- `retro` - old-school mechanics and presentation
+- `rpg` - progression, quests, dialog, systems
+- `simulation` - economy, systems, management flows
+- `strategy` - tactical and planning-driven gameplay
+- `sports` - competitive and score/rules-based gameplay
+- `showcase` - feature demos and cross-system examples
 
-**State**: Resources (textures, fonts, meshes, canvases, â€¦) live in typed `SlotMap` pools in `SharedState`. Keys are opaque typed handles â€” no string lookups at runtime.
+Use the full catalog here: [content/games/README.md](content/games/README.md)
 
-**Boot**: `conf.lua` â†’ `Config` â†’ winit window + wgpu device + rodio mixer â†’ LuaJIT VM â†’ `main.lua` â†’ event loop.
+### Use Cases (where to use Lurek2D)
 
-**AI-first contributor workflow**: this repo is built by humans prompting agents. The CAG layer (`.github/`) defines the agents, skills, and prompts that drive that work â€” see [docs/architecture/cag-system.md](docs/architecture/cag-system.md) for the full reference.
+- Indie 2D game development with Lua-first workflow
+- Rapid gameplay prototyping without editor lock-in
+- Mod-friendly games with script-level extensibility
+- Educational projects for Lua and game architecture
+- AI-assisted development with docs/tests/examples in one repo
+- Building game-adjacent tools: UI apps, simulation tools, scripting sandboxes
+
+### AI-First Engineering (how AI is used)
+
+Lurek2D is AI-first not only in marketing, but in repository workflow and architecture rules.
+
+- **Engine development runs on CAG in `.github/`**. The CAG layer (agents, skills, prompts, validators) is the contract used to build and evolve the engine itself. The architecture docs explicitly describe the engine as built by humans prompting agents.
+- **AI engineering is part of how the engine was created**. `docs/architecture/cag-system.md` states that games, levels, scripts, assets, tests, and engine source are produced in an agent-assisted workflow.
+- **The binary is exposed to agents through MCP tooling**. The VS Code extension starts an MCP server and exposes tools like run example, API lookup, build check, test runner, logs, and example listing, so agents can operate against real runtime behavior.
+- **API docs are treated as AI input surface**. The API docs are generated from source and kept in sync through the docs pipeline, so agents can use `lurek.*` from authoritative references instead of inferred behavior.
+- **Examples and demos are part of agent workflow**. The repository keeps both API-level examples and full games as runnable context that agents use when generating or validating code.
+- **Test coverage is built in an agent-driven process**. The testing architecture is Lua-first for `lurek.*`, and coverage audits are part of the standard quality pipeline used in AI-assisted sessions.
+- **The VS Code extension ships separate game-dev CAG**. The extension contains a bundled `cag/game-dev/` layer focused on making games with Lurek2D, while the root repository CAG covers engine engineering.
+
+AI-first in Lurek2D means three things at once: the engine is developed with agents, the tooling exposes runtime operations to agents, and the docs/tests/examples are structured so agents can execute end-to-end work predictably.
+
+### Key Architecture Notes
+
+- `src/lua_api/` is a thin bridge. Domain modules do not depend on bindings.
+- Rendering stays queued: Lua records draw commands, Rust executes GPU passes.
+- Runtime resources use typed pools instead of ad-hoc string lookups.
+- `library/` stays pure Lua and consumes only public `lurek.*` APIs.
+- The VS Code extension is optional and separate from the engine binary.
 
 ---
 
@@ -168,13 +217,13 @@ Baseline           â† math (leaf, no deps) Â· engine (lifecycle, SharedSt
 
 | Component | Location | Description |
 |---|---|---|
-| **Engine binary** | `src/` | The `lurek2d` executable â€” the entire runtime |
+| **Engine binary** | `src/` | The `lurek2d` executable - the runtime itself |
 | **Lua API reference** | `docs/api/lurek.md` | Full `lurek.*` function signatures and descriptions |
 | **Rust API reference** | `docs/api/rust.md` | Engine internals for contributors |
 | **VS Code extension** | `extensions/vscode/` | IntelliSense, MCP server, CAG tooling, debug workflows |
-| **Demos** | `content/demos/` | Playable examples across 8 genres (action, arcade, RPG, strategy, â€¦) |
+| **Games** | `content/games/` | Playable projects across action, arcade, retro, RPG, simulation, sports, and strategy |
 | **API examples** | `content/examples/` | Single-file scripts demonstrating one `lurek.*` module each |
-| **Lua libraries** | `library/` | Pure-Lua game-mechanics modules: inventory, quest, dialog, combat, economy, â€¦ |
+| **Lua libraries** | `library/` | Pure-Lua game-mechanics modules for inventory, quest, dialog, combat, economy, and more |
 | **Plugins** | `content/plugins/` | In-progress third-party plugin layer (future) |
 | **CAG system** | `.github/` | 20 Copilot agents, 30 skills, and prompts for AI-assisted development |
 
@@ -188,7 +237,7 @@ Baseline           â† math (leaf, no deps) Â· engine (lifecycle, SharedSt
 
 ### Lua Libraries (Lunasome)
 
-`library/` ships production-ready pure-Lua modules â€” no Rust required:
+`library/` ships production-ready pure-Lua modules - no Rust required:
 
 | Library | Description |
 |---|---|
@@ -205,12 +254,12 @@ Baseline           â† math (leaf, no deps) Â· engine (lifecycle, SharedSt
 | `quest` | Quest tracker with objectives, stages, and rewards |
 | `stats` | Attribute and derived-stat system |
 
-### CAG â€” AI-First Development
+### CAG - AI-First Development
 
 Lurek2D's `.github/` layer is a complete Copilot Agent Graph (CAG):
 
 - **20 agents** cover every role: Manager, Developer, Renderer, Physicist, Audio-Eng, Tester, Reviewer, Doc-Writer, Security, and more
-- **30+ skills** provide domain knowledge: GPU programming, Lua API design, physics, audio, threading, testing, â€¦
+- **30+ skills** provide domain knowledge: GPU programming, Lua API design, physics, audio, threading, testing, and more
 - **Prompts and instructions** ensure every agent uses the engine correctly without clarifying questions
 
 If you develop with GitHub Copilot, the CAG turns your AI assistant into a specialized Lurek2D co-developer.
@@ -221,7 +270,7 @@ If you develop with GitHub Copilot, the CAG turns your AI assistant into a speci
 
 | Component | Library | Version |
 |---|---|---|
-| Language | Rust stable | â‰Ą 1.78 |
+| Language | Rust stable | >= 1.78 |
 | Scripting | LuaJIT via mlua | 0.9 |
 | Rendering | wgpu | 22 |
 | Windowing + input | winit | 0.30 |
@@ -233,6 +282,17 @@ If you develop with GitHub Copilot, the CAG turns your AI assistant into a speci
 
 ---
 
+## Project Identity
+
+Lurek2D's visual identity tells a story:
+
+- **Moon** - Lua means "moon" in Portuguese. The crescent represents the scripting layer.
+- **Gear** - The Rust engine core. Industrial strength and memory safe.
+- **Open circular mark** - The engine consumes scripts and turns them into a running game.
+- **Cube** - The project positions itself against larger industry stacks without copying them.
+
+---
+
 ## License
 
 Lurek2D is **MIT-licensed**. All first-party code, docs, demos, examples, and tools are covered by the root [LICENSE](LICENSE).
@@ -241,7 +301,7 @@ Lurek2D is **MIT-licensed**. All first-party code, docs, demos, examples, and to
 |---|---|
 | Engine (`src/`) | MIT |
 | Lua libraries (`library/`) | MIT |
-| Demos and examples (`content/demos/`, `content/examples/`) | MIT |
+| Games and examples (`content/games/`, `content/examples/`) | MIT |
 | VS Code extension (`extensions/vscode/`) | MIT |
 | Tools and docs (`tools/`, `docs/`) | MIT |
 
@@ -296,17 +356,6 @@ All direct Cargo dependencies are permissive (MIT, Apache-2.0, Zlib, or Unlicens
 
 ---
 
-## Project Identity
-
-Lurek2D's visual identity tells a story:
-
-- **đźŚ™ Moon** â€” Lua means "moon" in Portuguese. The crescent represents the scripting layer.
-- **âš™ď¸Ź Gear** â€” The Rust engine core. Industrial-strength, memory-safe.
-- **đźźˇ Pacman shape** â€” The gear eats game scripts and runs them.
-- **đź§Š Cube** â€” The industry giants orbit Lurek2D, not the reverse.
-
----
-
-[Contributing](CONTRIBUTING.md) Â· [Security](SECURITY.md) Â· [License](LICENSE)
+[Contributing](CONTRIBUTING.md) - [Security](SECURITY.md) - [License](LICENSE)
 
 

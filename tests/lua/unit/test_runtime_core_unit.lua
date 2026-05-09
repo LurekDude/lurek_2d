@@ -12,6 +12,7 @@
 -- ============================================================
 -- @describe lurek.runtime module
 describe("lurek.runtime module", function()
+    -- @covers lurek.runtime
     it("is a table", function()
         expect_type("table", lurek.runtime)
     end)

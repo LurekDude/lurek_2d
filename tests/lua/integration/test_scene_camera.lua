@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Scene + Camera
--- Tests camera viewport transformations over a scene.
-
--- @describe integration: scene camera viewport operations
+-- Integration: camera viewport tracking entity positions via ECS
 describe("integration: scene camera viewport operations", function()
     -- @integration LCamera:getPosition
     -- @integration LCamera:setPosition

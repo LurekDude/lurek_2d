@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Savegame + Tilemap
--- Tests saving and restoring tilemap state via savegame.
-
--- @describe integration: savegame collects and restores tilemap state
+-- Integration: save manager collecting and restoring tilemap tile data
 describe("integration: savegame collects and restores tilemap state", function()
     -- @integration LSaveManager:collect
     -- @integration LSaveManager:register

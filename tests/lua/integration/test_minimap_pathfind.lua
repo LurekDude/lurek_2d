@@ -1,9 +1,4 @@
--- tests/lua/integration/test_minimap_pathfind.lua
--- Integration: lurek.minimap <-> lurek.pathfind
--- Tests that pathfinding results are correctly reflected on the minimap.
-
-local describe = describe or function(n,f) f() end
-local it = it or function(n,f) f() end
+-- Integration: pathfinding results reflected on minimap overlays
 
 local function path_to_points(path)
     local points = {}
@@ -41,7 +36,7 @@ local function assert_path_valid(path, sx, sy, ex, ey)
     expect_equal(ey, path[#path].y)
 end
 
--- @describe minimap + pathfind integration
+
 describe("minimap + pathfind integration", function()
     -- @integration LUnitPathfinder:findPath
     -- @integration LMinimap:showPath

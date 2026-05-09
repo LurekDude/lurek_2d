@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Math + Physics
--- Tests that math functions work correctly with physics bodies
-
--- @describe math + physics integration
+-- Integration: math utility functions used alongside physics body state
 describe("math + physics integration", function()
     -- @integration LBody:getPosition
     -- @integration LBody:setPosition
@@ -54,7 +51,4 @@ describe("math + physics integration", function()
 
 end)
 
--- @describe math + physics collision geometry
-
--- @describe math trigonometry for physics angles
 test_summary()

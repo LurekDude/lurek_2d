@@ -539,5 +539,336 @@ describe("Evidence: lurek.ui widgets via drawToImage", function()
         root.removeChild(panel)
     end)
 
+    -- @evidence file
+    it("PNG: controls_layout.png -- complex controls panel (max 5 widgets)", function()
+        lurek.ui.setDefaultTheme()
+        local root = lurek.ui.getRoot()
+        local W, H = 360, 220
+
+        -- Max 5 widgets: panel + textinput + slider + progressbar + switch
+        local panel = lurek.ui.newPanel()
+        panel.setPosition(10, 10)
+        panel.setSize(340, 200)
+        root.addChild(panel)
+
+        local ti = lurek.ui.newTextInput()
+        ti.setPosition(16, 22)
+        ti.setSize(220, 28)
+        panel.addChild(ti)
+
+        local slider = lurek.ui.newSlider(0, 100)
+        slider.setPosition(16, 66)
+        slider.setSize(300, 24)
+        slider.setValue(68)
+        panel.addChild(slider)
+
+        local pb = lurek.ui.newProgressBar(0, 100)
+        pb.setPosition(16, 100)
+        pb.setSize(300, 20)
+        pb.setValue(68)
+        panel.addChild(pb)
+
+        local sw = lurek.ui.newSwitch()
+        sw.setPosition(16, 136)
+        sw.setSize(76, 28)
+        sw.setOn(true)
+        panel.addChild(sw)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "controls_layout.png")
+        expect_evidence_created(OUT .. "controls_layout.png")
+        root.removeChild(panel)
+    end)
+
+    -- @evidence file
+    it("PNG: selection_widgets.png -- complex selection widgets (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 420, 240
+
+        -- Max 5 widgets: combobox + listbox + tabbar + scrollbar + badge
+        local combo = lurek.ui.newComboBox()
+        combo.addItem("Option A")
+        combo.addItem("Option B")
+        combo.addItem("Option C")
+        combo.setSelectedIndex(1)
+        combo.setPosition(12, 12)
+        combo.setSize(220, 28)
+        root.addChild(combo)
+
+        local lb = lurek.ui.newList()
+        lb.addItem("Resolution: 1920x1080")
+        lb.addItem("VSync: On")
+        lb.addItem("AA: 4x")
+        lb.addItem("Shadows: High")
+        lb.setSelectedIndex(2)
+        lb.setPosition(12, 50)
+        lb.setSize(260, 126)
+        root.addChild(lb)
+
+        local tabs = lurek.ui.newTabBar()
+        tabs.addTab("Graphics")
+        tabs.addTab("Audio")
+        tabs.addTab("Input")
+        tabs.setActiveTab(1)
+        tabs.setPosition(244, 12)
+        tabs.setSize(164, 30)
+        root.addChild(tabs)
+
+        local sb = lurek.ui.newScrollBar(true)
+        sb.setContentSize(540)
+        sb.setViewSize(126)
+        sb.setPosition(278, 50)
+        sb.setSize(16, 126)
+        root.addChild(sb)
+
+        local badge = lurek.ui.newBadge(12)
+        badge.setPosition(380, 12)
+        badge.setSize(28, 20)
+        root.addChild(badge)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "selection_widgets.png")
+        expect_evidence_created(OUT .. "selection_widgets.png")
+
+        root.removeChild(badge)
+        root.removeChild(sb)
+        root.removeChild(tabs)
+        root.removeChild(lb)
+        root.removeChild(combo)
+    end)
+    -- @evidence file
+    it("PNG: chrome_widgets.png -- complex chrome widgets (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 480, 320
+
+        -- Max 5 widgets: window + dialog + statusbar + accordion + tooltip
+        local win = lurek.ui.newWindow("My Window")
+        win.setCloseable(true)
+        win.setPosition(10, 10)
+        win.setSize(220, 130)
+        root.addChild(win)
+
+        local dlg = lurek.ui.newDialog("Confirm Action")
+        dlg.addButton("OK")
+        dlg.addButton("Cancel")
+        dlg.setPosition(240, 10)
+        dlg.setSize(230, 130)
+        root.addChild(dlg)
+
+        local sbar = lurek.ui.newStatusBar()
+        sbar.addSection("Ready", 140)
+        sbar.addSection("row 42, col 8", 150)
+        sbar.setPosition(10, 150)
+        sbar.setSize(460, 20)
+        root.addChild(sbar)
+
+        local acc = lurek.ui.newAccordion()
+        acc.addSection("Physics")
+        acc.addSection("Rendering")
+        acc.toggleSection(2)
+        acc.addSection("Audio")
+        acc.setPosition(10, 178)
+        acc.setSize(300, 130)
+        root.addChild(acc)
+
+        local ttp = lurek.ui.newTooltipPanel("UI refresh: 16.6 ms")
+        ttp.setPosition(320, 178)
+        ttp.setSize(150, 44)
+        root.addChild(ttp)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "chrome_widgets.png")
+        expect_evidence_created(OUT .. "chrome_widgets.png")
+
+        root.removeChild(ttp)
+        root.removeChild(acc)
+        root.removeChild(sbar)
+        root.removeChild(dlg)
+        root.removeChild(win)
+    end)
+
+    -- @evidence file
+    it("PNG: data_widgets.png -- complex data widgets (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 480, 300
+
+        -- Max 5 widgets: table + treeview + colorpicker + imagewidget + separator
+        local tbl = lurek.ui.newTable()
+        tbl.addColumn("Name", 120)
+        tbl.addColumn("Value", 80)
+        tbl.addColumn("Type", 80)
+        tbl.addRow({"position", "3.14", "float"})
+        tbl.addRow({"velocity", "1.0", "float"})
+        tbl.addRow({"alive", "true", "bool"})
+        tbl.setSelectedRow(1)
+        tbl.setPosition(10, 10)
+        tbl.setSize(290, 120)
+        root.addChild(tbl)
+
+        local tv = lurek.ui.newTreeView()
+        local n1 = tv.addNode("Scene")
+        local n2 = tv.addNode("Player", n1)
+        tv.addNode("Camera", n1)
+        tv.expandNode(n1)
+        tv.setSelectedNode(n2)
+        tv.setPosition(310, 10)
+        tv.setSize(160, 120)
+        root.addChild(tv)
+
+        local cp = lurek.ui.newColorPicker()
+        cp.setColor(0.28, 0.58, 0.92)
+        cp.setPosition(10, 142)
+        cp.setSize(170, 148)
+        root.addChild(cp)
+
+        local iw = lurek.ui.newImageWidget()
+        iw.setPosition(190, 152)
+        iw.setSize(90, 90)
+        root.addChild(iw)
+
+        local sep = lurek.ui.newSeparator(false)
+        sep.setPosition(190, 248)
+        sep.setSize(280, 8)
+        root.addChild(sep)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "data_widgets.png")
+        expect_evidence_created(OUT .. "data_widgets.png")
+
+        root.removeChild(sep)
+        root.removeChild(iw)
+        root.removeChild(cp)
+        root.removeChild(tv)
+        root.removeChild(tbl)
+    end)
+
+    -- @evidence file
+    it("PNG: toolbar_menu_tooltip.png -- complex toolbar/menu scene (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 480, 200
+
+        -- Max 5 widgets: menubar + menuitem + toolbar + splitpanel + toast
+        local mbar = lurek.ui.newMenuBar()
+        local m1 = lurek.ui.newMenuItem("File")
+        m1.setChecked(true)
+        mbar.setPosition(0, 0)
+        mbar.setSize(W, 24)
+        mbar.addMenu(m1._idx)
+        root.addChild(mbar)
+
+        local tb = lurek.ui.newToolbar("horizontal")
+        tb.addButton("new", "New file")
+        tb.addButton("open", "Open")
+        tb.addButton("save", "Save")
+        tb.setButtonToggled("save", true)
+        tb.setPosition(0, 28)
+        tb.setSize(W, 32)
+        root.addChild(tb)
+
+        local split = lurek.ui.newSplitPanel("horizontal")
+        split.setSplitPosition(0.62)
+        split.setPosition(10, 74)
+        split.setSize(460, 84)
+        root.addChild(split)
+
+        local toast = lurek.ui.newToast("Settings saved!", 3.0)
+        toast.setPosition(10, 164)
+        toast.setSize(300, 28)
+        root.addChild(toast)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "toolbar_menu_tooltip.png")
+        expect_evidence_created(OUT .. "toolbar_menu_tooltip.png")
+
+        root.removeChild(toast)
+        root.removeChild(split)
+        root.removeChild(tb)
+        root.removeChild(mbar)
+    end)
+
+    -- @evidence file
+    it("PNG: form_missing_widgets.png -- checkbox/radio/spin/custom (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 360, 200
+
+        -- Max 5 widgets: panel + checkbox + radio + spinbox + custom
+        local panel = lurek.ui.newPanel()
+        panel.setPosition(10, 10)
+        panel.setSize(340, 180)
+        root.addChild(panel)
+
+        local cb = lurek.ui.newCheckbox("Enable shadows")
+        cb.setChecked(true)
+        cb.setPosition(18, 20)
+        cb.setSize(170, 24)
+        panel.addChild(cb)
+
+        local rb = lurek.ui.newRadioButton("Quality High", "gfx")
+        rb.setSelected(true)
+        rb.setPosition(18, 54)
+        rb.setSize(170, 24)
+        panel.addChild(rb)
+
+        local sb = lurek.ui.newSpinBox(0, 16)
+        sb.setValue(4)
+        sb.setPosition(18, 88)
+        sb.setSize(130, 28)
+        panel.addChild(sb)
+
+        local custom = lurek.ui.newCustomWidget({
+            x = 190,
+            y = 20,
+            width = 132,
+            height = 96,
+        })
+        panel.addChild(custom)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "form_missing_widgets.png")
+        expect_evidence_created(OUT .. "form_missing_widgets.png")
+
+        root.removeChild(panel)
+    end)
+
+    -- @evidence file
+    it("PNG: containers_missing_widgets.png -- layout/scroll/ninepatch/spacer/dock (max 5 widgets)", function()
+        local root = lurek.ui.getRoot()
+        local W, H = 520, 220
+
+        -- Max 5 widgets: layout + scrollpanel + ninepatch + spacer + dockpanel
+        local layout = lurek.ui.newLayout("horizontal")
+        layout.setPosition(10, 10)
+        layout.setSize(500, 200)
+        root.addChild(layout)
+
+        local scroll = lurek.ui.newScrollPanel()
+        scroll.setPosition(20, 24)
+        scroll.setSize(140, 160)
+        root.addChild(scroll)
+
+        local nine = lurek.ui.newNinePatch()
+        nine.setPosition(174, 24)
+        nine.setSize(140, 160)
+        root.addChild(nine)
+
+        local spacer = lurek.ui.newSpacer(24, 160)
+        root.addChild(spacer)
+
+        local dock = lurek.ui.newDockPanel()
+        dock.setPosition(366, 24)
+        dock.setSize(140, 160)
+        root.addChild(dock)
+
+        local img = lurek.ui.drawToImage(W, H)
+        lurek.image.savePNG(img, OUT .. "containers_missing_widgets.png")
+        expect_evidence_created(OUT .. "containers_missing_widgets.png")
+
+        root.removeChild(dock)
+        root.removeChild(spacer)
+        root.removeChild(nine)
+        root.removeChild(scroll)
+        root.removeChild(layout)
+    end)
+
 end)
 test_summary()

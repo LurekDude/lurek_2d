@@ -1,10 +1,4 @@
--- tests/lua/integration/test_terminal_input.lua
--- Integration: lurek.terminal <-> lurek.input
--- Tests that the in-game terminal captures and processes key input.
-
-local describe = describe or function(n,f) f() end
-local it = it or function(n,f) f() end
--- @describe terminal + input integration
+-- Integration: in-game terminal widget capturing keyboard text input
 describe("terminal + input integration", function()
     -- @integration lurek.input.keyboard.hasTextInput
     -- @integration lurek.input.keyboard.setTextInput

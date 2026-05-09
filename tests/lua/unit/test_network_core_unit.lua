@@ -6,6 +6,7 @@ require("tests/lua/init")
 
 -- @describe lurek.network
 describe("lurek.network", function()
+  -- @covers lurek.network
   it("is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
@@ -156,42 +157,52 @@ end)
 
 -- @describe lurek.network constants
 describe("lurek.network constants", function()
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 4096", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 166", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
+  -- @covers lurek.network
   it("DEFAULT_PEERS is less than or equal to MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
+  -- @covers lurek.network
   it("DEFAULT_CHANNELS is less than or equal to MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)
@@ -201,46 +212,57 @@ end)
 
 -- @describe lurek.network constants
 describe("lurek.network constants", function()
+  -- @covers lurek.network
   it("lurek.network is a table", function()
     expect_equal(type(lurek.network), "table")
   end)
 
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS is a number", function()
     expect_type("number", network_consts.MAX_PEERS)
   end)
 
+  -- @covers lurek.network.MAX_PEERS
   it("MAX_PEERS equals 8", function()
     expect_equal(network_consts.MAX_PEERS, 4096)
   end)
 
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS is a number", function()
     expect_type("number", network_consts.DEFAULT_PEERS)
   end)
 
+  -- @covers lurek.network.DEFAULT_PEERS
   it("DEFAULT_PEERS equals 4", function()
     expect_equal(network_consts.DEFAULT_PEERS, 166)
   end)
 
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS is a number", function()
     expect_type("number", network_consts.MAX_CHANNELS)
   end)
 
+  -- @covers lurek.network.MAX_CHANNELS
   it("MAX_CHANNELS equals 255", function()
     expect_equal(network_consts.MAX_CHANNELS, 255)
   end)
 
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS is a number", function()
     expect_type("number", network_consts.DEFAULT_CHANNELS)
   end)
 
+  -- @covers lurek.network.DEFAULT_CHANNELS
   it("DEFAULT_CHANNELS equals 1", function()
     expect_equal(network_consts.DEFAULT_CHANNELS, 2)
   end)
 
+  -- @covers lurek.network
   it("DEFAULT_PEERS does not exceed MAX_PEERS", function()
     expect_true(network_consts.DEFAULT_PEERS <= network_consts.MAX_PEERS)
   end)
 
+  -- @covers lurek.network
   it("DEFAULT_CHANNELS does not exceed MAX_CHANNELS", function()
     expect_true(network_consts.DEFAULT_CHANNELS <= network_consts.MAX_CHANNELS)
   end)

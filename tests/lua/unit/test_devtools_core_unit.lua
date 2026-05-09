@@ -7,6 +7,7 @@
 
 -- @describe lurek.devtools logger
 describe("lurek.devtools logger", function()
+    -- @covers lurek.devtools
     it("exists as a table", function()
         expect_not_nil(lurek.devtools)
     end)

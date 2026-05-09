@@ -881,6 +881,16 @@ end)
 
 -- @describe unit: migrated from integration/test_camera_tilemap_scroll.lua
 describe("unit: migrated from integration/test_camera_tilemap_scroll.lua", function()
+        local function build_scroll_map()
+            local tm = lurek.tilemap.newTileMap(16, 16, 8)
+            tm:addLayer("ground", 32, 8)
+            for y = 1, 8 do
+                for x = 1, 32 do
+                    tm:setTile(1, x, y, x)
+                end
+            end
+            return tm
+        end
         -- @covers LCamera:getPosition
         -- @covers LCamera:setPosition
         -- @covers LTileMap:addLayer
@@ -892,15 +902,15 @@ describe("unit: migrated from integration/test_camera_tilemap_scroll.lua", funct
         it("loads tilemap chunk when camera moves into range", function()
             local cam = lurek.camera.newCamera()
             local tm = build_scroll_map()
-    
+
             cam:setPosition(0, 0)
             local x0, y0 = cam:getPosition()
             local tx0, ty0 = tm:worldToTile(x0, y0)
-    
+
             cam:setPosition(48, 0)
             local x1, y1 = cam:getPosition()
             local tx1, ty1 = tm:worldToTile(x1, y1)
-    
+
             expect_type("number", tx0)
             expect_type("number", ty0)
             expect_type("number", tx1)
@@ -920,7 +930,7 @@ describe("unit: migrated from integration/test_camera_tilemap_scroll.lua", funct
         it("unloads distant chunks as camera moves away", function()
             local cam = lurek.camera.newCamera()
             local tm = build_scroll_map()
-    
+
             cam:setViewport(0, 0, 64, 48)
             cam:setPosition(16, 0)
             local _, _, viewport_w, viewport_h = cam:getViewport()
@@ -928,11 +938,11 @@ describe("unit: migrated from integration/test_camera_tilemap_scroll.lua", funct
             local right_tx = tm:worldToTile(16 + viewport_w - 1, viewport_h - 1)
             local first_visible = tm:getTile(1, left_tx + 1, top_ty + 1)
             local last_visible = tm:getTile(1, right_tx + 1, top_ty + 1)
-    
+
             cam:setPosition(160, 0)
             local new_left_tx = tm:worldToTile(160, 0)
             local new_first_visible = tm:getTile(1, new_left_tx + 1, top_ty + 1)
-    
+
             expect_type("number", first_visible)
             expect_type("number", last_visible)
             expect_type("number", new_first_visible)
@@ -953,12 +963,12 @@ describe("unit: migrated from integration/test_input_camera.lua", function()
             local cam = lurek.camera.newCamera()
             cam:setPosition(0, 0)
             cam:setZoom(1.0)
-    
+
             -- With camera at origin, zoom 1.0          world pos equals screen pos
             local screen_x, screen_y = 320.0, 240.0
             local cx, cy = cam:getPosition()
             local zoom   = cam:getZoom()
-    
+
             -- Manual screen-to-world formula: world = screen / zoom + cam_pos - screen_center/zoom
             -- Here we just verify zoom is 1.0 and cam is at origin
             expect_near(1.0, zoom,   0.001, "zoom is 1")
@@ -980,14 +990,14 @@ describe("unit: migrated from integration/test_input_camera.lua", function()
             local cam = lurek.camera.newCamera()
             cam:setPosition(100, 50)
             cam:setZoom(1.0)
-    
+
             local screen_x, screen_y = 0.0, 0.0
             local cx, cy = cam:getPosition()
             local zoom   = cam:getZoom()
-    
+
             local world_x = screen_x / zoom + cx
             local world_y = screen_y / zoom + cy
-    
+
             expect_near(100.0, world_x, 0.001, "world x offset by cam pan")
             expect_near(50.0,  world_y, 0.001, "world y offset by cam pan")
         end)
@@ -1000,11 +1010,11 @@ describe("unit: migrated from integration/test_input_camera.lua", function()
             local cam = lurek.camera.newCamera()
             cam:setPosition(0, 0)
             cam:setZoom(2.0)
-    
+
             local screen_x = 200.0
             local zoom     = cam:getZoom()
             local world_x  = screen_x / zoom
-    
+
             expect_near(100.0, world_x, 0.001, "zoom 2x halves screen x to world x")
         end)
 

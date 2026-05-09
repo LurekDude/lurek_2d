@@ -1,7 +1,4 @@
--- tests/lua/integration/test_mods_filesystem.lua
--- Integration: lurek.mods <-> lurek.filesystem
-
--- @describe mods + filesystem integration
+-- Integration: mod discovery via ModManager combined with filesystem operations
 describe("mods + filesystem integration", function()
     -- @integration LModManager:hasMod
     -- @integration LModManager:scanFolder

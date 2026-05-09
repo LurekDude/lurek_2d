@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: SaveGame + Entity + Scene (3-way)
--- Tests save/load cycle preserving entity state across scene boundaries
-
--- @describe savegame + entity + scene integration
+-- Integration: save/load cycle preserving entity state across scene transitions
 describe("savegame + entity + scene integration", function()
     -- @integration LSaveManager:collect
     -- @integration LSaveManager:register

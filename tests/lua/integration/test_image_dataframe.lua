@@ -1,7 +1,4 @@
--- tests/lua/integration/test_image_dataframe.lua
--- Integration: lurek.image pixel data and lurek.dataframe tabular analysis combined.
-
--- @describe image + dataframe integration
+-- Integration: image pixel data analyzed via dataframe columns
 describe("image + dataframe integration", function()
     -- @integration LDataFrame:addColumn
     -- @integration LDataFrame:addRow

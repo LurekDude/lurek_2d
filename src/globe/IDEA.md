@@ -1,45 +1,18 @@
-# Globe Module — Ideas & Future Work
-
-## Inspiration
-XCOM UFO Defense 1994 Geoscape + Europa Universalis — a projection-correct 2D view of a sphere divided into
-named, navigable provinces with fog of war, markers, and great-circle paths.
-
-## Implemented
-- Province topology (adjacency, path-finding, custom attrs)
-- Orbit camera + orthographic-style projection (unit sphere → screen space)
-- Day/night lighting with soft terminator
-- Per-faction fog-of-war (bit-vector, zero-copy Lua serialization)
-- Markers, labels, layers (thematic color overlays)
-- Arc rendering (great-circle routes, range rings)
-- TOML province map loader + PNG stub
-- Lua API (`lurek.globe.*`)
-
-## Near-term ideas
-- [ ] Province texture support (texture atlas, UV coordinates from TOML)
-- [ ] Atmosphere halo (additive ring around hemisphere silhouette)
-- [ ] Heat-map layer (gradient color from float attribute)
-- [ ] Animated markers (pulsing, rotating icons)
-- [ ] Fog-of-war partial visibility (scouted vs. fully visible)
-- [ ] Sector / strategic-zone grouping (aggregate multiple provinces)
-- [ ] Province border smoothing (bezier interpolation)
-- [ ] Fog of war mask serialization helpers (base64 compact form)
-
-## Medium-term ideas
-- [ ] PNG province map loader (flood-fill ID extraction, color-table mapping)
-- [ ] Voronoi province generation (procedural, from seed points)
-- [ ] Animated globe rotation (auto-spin spec field)
-- [ ] Multi-globe views (split-screen tactical + strategic)
-- [ ] Province outline font rasterization (labels that follow curves)
-- [ ] Strategic AI hooks (reachability maps cached per faction)
-
-## Long-term / plugin candidates
-- [ ] 3D raycasted globe mode (raycaster + sphere intersection, A-03 compliant)
-- [ ] Live texture streaming from game assets
-- [ ] Networked shared globe state (B-04 Channel-based sync)
-- [ ] Province mesh export for procedural game content
-
-## Architecture notes
-- A-03: 2D draw calls only — DrawConvexFan + Polyline + Circle. No wgpu 3D pipeline.
-- B-04: GlobeRegistry is not Send. For multi-VM access, serialize via Channel.
-- B-05: Province maps use TOML; JSON export is fine for external interop.
-- MAX_PROVINCES = 8192 (soft cap, extend by bumping FogMask::WORD_COUNT if needed).
+- TODO: Add province texture support with atlas-backed UVs instead of leaving globe draw commands with empty UV data.
+- TODO: Add an atmosphere halo around the visible hemisphere.
+- TODO: Add a real heat-map layer pipeline driven by float province attributes.
+- TODO: Add animated markers such as pulsing or rotating icons.
+- TODO: Add partial fog-of-war states beyond the current visible or hidden bitmask.
+- TODO: Add sector or strategic-zone grouping across multiple provinces.
+- TODO: Add border smoothing for province outlines.
+- TODO: Add compact fog-mask serialization helpers such as base64 encoding.
+- TODO: Replace the PNG province loader stub with a real flood-fill or color-table implementation.
+- TODO: Add Voronoi-based procedural province generation.
+- TODO: Make globe auto-rotation configurable through spec data instead of only the current hardcoded update step.
+- TODO: Add true multi-globe view composition such as split-screen tactical and strategic rendering.
+- TODO: Add curved or outline-aware label rendering for province text.
+- TODO: Add strategic AI hooks such as cached reachability per faction.
+- TODO: Add a raycast-style globe interaction mode that stays within the 2D draw-call constraint.
+- TODO: Add live texture streaming for globe assets.
+- TODO: Add Channel-based shared globe state synchronization for networked or multi-VM use.
+- TODO: Add province mesh export for procedural tooling or content generation.

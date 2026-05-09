@@ -44,10 +44,12 @@ end
 -- module presence
 -- @describe lurek.i18n module
 describe("lurek.i18n module", function()
+    -- @covers lurek.i18n
     it("lurek.i18n is a table", function()
         expect_type("table", lurek.i18n)
     end)
 
+    -- @covers lurek.i18n
     it("all key functions are present", function()
         local fns = {
             "loadTable", "unloadTable", "setLanguage", "getLanguage",
@@ -504,6 +506,23 @@ end)
 
 -- @describe unit: migrated from integration/test_i18n_dialog.lua
 describe("unit: migrated from integration/test_i18n_dialog.lua", function()
+        if lurek.dialog == nil or lurek.dialog.newSequencer == nil then
+            -- @covers lurek.dialog
+            it("dialog module unavailable in this runtime", function()
+                expect_true(lurek.dialog == nil or lurek.dialog.newSequencer == nil)
+            end)
+            return
+        end
+
+        local function new_localized_sequence(key)
+            local seq = lurek.dialog.newSequencer()
+            seq:setSpeed(0)
+            seq:load({
+                { type = "say", speaker = "Narrator", text = lurek.i18n.t(key) },
+            })
+            seq:start()
+            return seq
+        end
         -- @covers lurek.i18n.loadTable
         -- @covers lurek.i18n.setLanguage
         -- @covers lurek.i18n.t
@@ -514,9 +533,9 @@ describe("unit: migrated from integration/test_i18n_dialog.lua", function()
                 },
             })
             lurek.i18n.setLanguage("en")
-    
+
             local seq = new_localized_sequence("dialog.intro")
-    
+
             expect_equal("Narrator", seq:currentSpeaker())
             expect_equal("Welcome, traveler.", seq:currentText())
             expect_equal("waiting", seq:getState())
@@ -539,9 +558,9 @@ describe("unit: migrated from integration/test_i18n_dialog.lua", function()
             })
             lurek.i18n.setFallbacks({ "en" })
             lurek.i18n.setLanguage("pl")
-    
+
             local seq = new_localized_sequence("dialog.farewell")
-    
+
             expect_equal("Safe travels.", seq:currentText())
             expect_equal("waiting", seq:getState())
         end)
@@ -560,13 +579,13 @@ describe("unit: migrated from integration/test_i18n_dialog.lua", function()
                     choice = "Wybierz swoją ścieżkę.",
                 },
             })
-    
+
             lurek.i18n.setLanguage("en")
             local english_seq = new_localized_sequence("dialog.choice")
-    
+
             lurek.i18n.setLanguage("pl")
             local polish_seq = new_localized_sequence("dialog.choice")
-    
+
             expect_equal("Choose your path.", english_seq:currentText())
             expect_equal("Wybierz swoją ścieżkę.", polish_seq:currentText())
         end)

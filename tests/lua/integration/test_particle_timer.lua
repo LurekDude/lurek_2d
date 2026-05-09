@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Particle + Timer
--- Tests time-based particle emission control.
-
--- @describe integration: particle emitter driven by timer
+-- Integration: particle emitter controlled by timer bursts
 describe("integration: particle emitter driven by timer", function()
 
     -- @integration LParticleSystem:emit

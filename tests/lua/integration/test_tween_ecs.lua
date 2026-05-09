@@ -1,8 +1,4 @@
--- Lurek2D Integration Test: Tween + Entity
--- Tests tweening entity position and rotation properties.
--- Rewritten to use lurek.tween.newState(duration, easing) API.
-
--- @describe integration: tween drives entity transform
+-- Integration: tween state animating entity component properties via ECS
 describe("integration: tween drives entity transform", function()
     -- @integration LTweenState:lerp
     -- @integration LTweenState:tick

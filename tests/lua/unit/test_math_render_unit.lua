@@ -15,6 +15,7 @@ describe("math for graphics transformations", function()
         expect_near(1, sin_a, 0.001, "sin(90)")
     end)
 
+    -- @covers lurek.math
     it("scale + translate point", function()
         -- Apply scale then translate
         local x, y = 10, 20
@@ -28,6 +29,7 @@ describe("math for graphics transformations", function()
         expect_near(260, result_y, 0.001, "scaled + translated y")
     end)
 
+    -- @covers lurek.math
     it("screen to world coordinates", function()
         -- Camera at (100, 200), screen point at (400, 300), zoom 2x
         local cam_x, cam_y = 100, 200
@@ -42,6 +44,7 @@ describe("math for graphics transformations", function()
         expect_near(200, world_y, 0.001, "world y at center")
     end)
 
+    -- @covers lurek.math
     it("world to screen coordinates", function()
         local cam_x, cam_y = 100, 200
         local world_x, world_y = 100, 200
@@ -58,6 +61,7 @@ end)
 
 -- @describe math color operations
 describe("math color operations", function()
+    -- @covers lurek.math
     it("lerp between colors", function()
         local r1, g1, b1 = 1.0, 0.0, 0.0  -- red
         local r2, g2, b2 = 0.0, 0.0, 1.0  -- blue
@@ -100,6 +104,7 @@ end)
 
 -- @describe math geometry utilities
 describe("math geometry utilities", function()
+    -- @covers lurek.math
     it("point inside rectangle", function()
         local px, py = 5, 5
         local rx, ry, rw, rh = 0, 0, 10, 10
@@ -112,6 +117,7 @@ describe("math geometry utilities", function()
         expect_false(outside, "point is outside rect")
     end)
 
+    -- @covers lurek.math
     it("point inside circle", function()
         local px, py = 3, 4
         local cx, cy, cr = 0, 0, 6

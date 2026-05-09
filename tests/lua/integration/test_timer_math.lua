@@ -1,65 +1,59 @@
--- Lurek2D Integration Test: Timer + Math.
--- Covers game-loop style scenarios where timer deltas and math helpers are consumed together from the Lua runtime.
+-- Integration: lurek.tween.newState easing output cross-checked against lurek.math easing functions
 
--- @describe timer + math integration
-describe("timer + math integration", function()
+-- @integration lurek.tween.newState
+-- @integration LTweenState:tick
+-- @integration LTweenState:lerp
+-- @integration lurek.math.inQuad
+describe("timer + tween easing integration", function()
 
-    it("time-based interpolation with math", function()
-        -- Simulate lerp between two values over time
-        local start_val = 0
-        local end_val = 100
-        local t = 0.5
-
-        -- Linear interpolation using math
-        local result = start_val + (end_val - start_val) * t
-        expect_near(50, result, 0.001, "lerp at t=0.5")
-
-        -- Smoothstep interpolation
-        local smooth_t = t * t * (3 - 2 * t)
-        local smooth_result = start_val + (end_val - start_val) * smooth_t
-        expect_near(50, smooth_result, 0.001, "smoothstep at t=0.5")
+    it("tween inQuad output matches lurek.math.inQuad at t=0.5", function()
+        local tw = lurek.tween.newState(1.0, "quadIn")
+        tw:tick(0.5)
+        -- tw:lerp(0,1) returns the eased value; tw:t() returns raw linear progress
+        local engine_eased = tw:lerp(0.0, 1.0)
+        local math_eased   = lurek.math.inQuad(0.5)
+        expect_near(math_eased, engine_eased, 0.001, "tween quadIn == lurek.math.inQuad at 0.5")
     end)
 
-    it("frame-rate independent movement", function()
-        -- Simulate movement: position += speed * dt
-        local x = 100
-        local speed = 200
-        local dt = 0.016 -- ~60fps
-
-        local new_x = x + speed * dt
-        expect_near(103.2, new_x, 0.001, "moved by speed * dt")
-
-        -- Same total movement with half dt, twice
-        local x2 = 100
-        x2 = x2 + speed * (dt / 2)
-        x2 = x2 + speed * (dt / 2)
-        expect_near(new_x, x2, 0.001, "two half-steps = one full step")
-    end)
-end)
-
--- @describe timer + math easing
-describe("timer + math easing", function()
-    it("ease-in quadratic", function()
-        local t = 0.5
-        local eased = t * t
-        expect_near(0.25, eased, 0.001, "ease-in at t=0.5")
+    -- @integration LTweenState:tick
+    -- @integration LTweenState:lerp
+    -- @integration lurek.math.outQuad
+    it("tween outQuad output matches lurek.math.outQuad at t=0.5", function()
+        local tw = lurek.tween.newState(1.0, "quadOut")
+        tw:tick(0.5)
+        local engine_eased = tw:lerp(0.0, 1.0)
+        local math_eased   = lurek.math.outQuad(0.5)
+        expect_near(math_eased, engine_eased, 0.001, "tween quadOut == lurek.math.outQuad at 0.5")
     end)
 
-    it("ease-out quadratic", function()
-        local t = 0.5
-        local eased = 1 - (1 - t) * (1 - t)
-        expect_near(0.75, eased, 0.001, "ease-out at t=0.5")
+    -- @integration LTweenState:tick
+    -- @integration LTweenState:lerp
+    -- @integration lurek.math.inOutCubic
+    it("tween inOutCubic output matches lurek.math.inOutCubic at midpoint", function()
+        local tw = lurek.tween.newState(1.0, "cubicInOut")
+        tw:tick(0.5)
+        local engine_eased = tw:lerp(0.0, 1.0)
+        local math_eased   = lurek.math.inOutCubic(0.5)
+        expect_near(math_eased, engine_eased, 0.001, "tween cubicInOut == lurek.math.inOutCubic at 0.5")
     end)
 
-    it("ease-in-out cubic", function()
-        local t = 0.5
-        local eased
-        if t < 0.5 then
-            eased = 4 * t * t * t
-        else
-            eased = 1 - (-2 * t + 2)^3 / 2
-        end
-        expect_near(0.5, eased, 0.001, "ease-in-out at midpoint")
+    -- @integration LTweenState:tick
+    -- @integration LTweenState:isComplete
+    -- @integration LTweenState:lerp
+    -- @integration lurek.math.distance
+    it("tween lerp drives a position tracked by lurek.math.distance", function()
+        local tw = lurek.tween.newState(1.0, "linear")
+        local start_x, end_x = 0.0, 100.0
+        tw:tick(0.5)
+        local pos_x = tw:lerp(start_x, end_x)
+        -- Distance from origin to current position should be ~50
+        local dist = lurek.math.distance(0, 0, pos_x, 0)
+        expect_near(50.0, dist, 0.1, "tween lerp + math.distance agree at t=0.5")
+        expect_false(tw:isComplete(), "tween not complete at t=0.5")
+
+        tw:tick(0.5)
+        expect_true(tw:isComplete(), "tween complete after full duration")
     end)
+
 end)
 test_summary()

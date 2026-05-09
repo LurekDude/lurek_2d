@@ -6,6 +6,7 @@
 
 -- @describe lurek.collision - not a standalone module
 describe("lurek.collision - not a standalone module", function()
+    -- @covers lurek.collision
     it("lurek.collision is nil (no separate collision module)", function()
         expect_nil(lurek.collision)
     end)
@@ -17,6 +18,12 @@ describe("collision surface available via lurek.physics", function()
     it("lurek.physics is a table with newWorld", function()
         expect_type("table", lurek.physics)
         expect_type("function", lurek.physics.newWorld)
+    end)
+
+    -- @covers lurek.physics.newWorld
+    it("newWorld returns userdata instance", function()
+        local world = lurek.physics.newWorld(0, 9.81)
+        expect_type("userdata", world)
     end)
 
     -- @covers LWorld:getCollisionEvents

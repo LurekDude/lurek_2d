@@ -97,5 +97,17 @@ describe("compute stress: reductions", function()
         local mean = arr:mean()
         expect_near(1.0, mean, 0.001, "mean of ones")
     end)
+
+    -- @stress LArray:getSize
+    -- @stress LArray:sum
+    -- @stress lurek.compute.range
+    it("sum of 20000-element arithmetic sequence", function()
+        local arr = lurek.compute.range(1, 20001, 1, "float32")
+        expect_equal(20000, arr:getSize(), "range size matches")
+
+        local sum = arr:sum()
+        local expected = (20000 * 20001) / 2
+        expect_near(expected, sum, expected * 0.001, "arithmetic sum is stable at scale")
+    end)
 end)
 test_summary()

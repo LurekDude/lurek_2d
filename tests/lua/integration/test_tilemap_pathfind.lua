@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Tilemap + Pathfinding
--- Tests using a tilemap grid as the navigation surface for A* pathfinding.
-
--- @describe integration: tilemap feeds into pathfinding grid
+-- Integration: tilemap tile data converted to a pathfinding navgrid
 describe("integration: tilemap feeds into pathfinding grid", function()
     -- @integration LNavGrid:setBlocked
     -- @integration LTileMap:addLayer

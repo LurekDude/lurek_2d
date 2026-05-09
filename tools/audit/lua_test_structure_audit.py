@@ -8,11 +8,16 @@ Audited rules:
 - Every Lua test file must start with a plain prose header comment block.
 - Every describe() must have a preceding -- @describe line.
 - Every describe() docstring block may contain only -- @describe.
-- Every it() that executes lurek API calls must have a preceding -- @covers line.
-- Each -- @covers line must be indented to the same level as the it() it precedes.
-  Example: if it() is indented 4 spaces, the @covers must also be indented 4 spaces.
-- -- @covers must only list API symbols actually called inside the it() body.
-- -- @tests is a forbidden marker; remove it (use @covers only).
+- Primary marker is folder-specific and must be used above each it() block:
+    - tests/lua/unit -> -- @covers
+    - tests/lua/security -> -- @security
+    - tests/lua/integration -> -- @integration
+    - tests/lua/stress -> -- @stress
+    - tests/lua/evidence -> -- @evidence
+- Primary marker lines must be indented to the same level as the it() they precede.
+    Example: if it() is indented 4 spaces, the marker must also be indented 4 spaces.
+- For unit tests only, -- @covers symbols may be validated against calls inside it().
+- -- @tests is a forbidden marker; remove it.
 - Legacy -- @description and -- @description: syntax is forbidden; use -- @describe <text>.
 - Legacy -- @category: markers are forbidden.
 - test_summary() must appear exactly once and be the last non-empty line.
@@ -22,7 +27,7 @@ Safe auto-fixes provided by --fix:
 - Normalize -- @description: -> -- @describe
 - Remove -- @category: lines
 - Remove -- @tests lines
-- Fix indentation of -- @covers lines to match the following it() call
+- Fix indentation of the primary marker line to match the following it() call
 - Remove stray inline UTF-8 BOM characters
 - Normalize / dedupe / move test_summary() to the file end
 
@@ -71,6 +76,16 @@ ALIAS_RE = re.compile(r'^---@alias\s+(?P<alias>[A-Za-z][A-Za-z0-9_]*)\s+(?P<targ
 FUNC_LUREK_RE = re.compile(r'^function\s+(?P<name>lurek\.[A-Za-z0-9_\.]+)\s*\(')
 MODULE_RE = re.compile(r'^(?P<name>lurek\.[A-Za-z0-9_]+)\s*=\s*\{\}\s*$')
 FUNC_CLASS_RE = re.compile(r'^function\s+(?P<class>L[A-Za-z][A-Za-z0-9_]*)[:\.]' + r'(?P<method>[A-Za-z][A-Za-z0-9_]*)\s*\(')
+
+PRIMARY_MARKERS_BY_FOLDER = {
+    "unit": "covers",
+    "security": "security",
+    "integration": "integration",
+    "stress": "stress",
+    "evidence": "evidence",
+}
+
+FAMILY_MARKERS = set(PRIMARY_MARKERS_BY_FOLDER.values())
 
 
 def parse_api_stub() -> tuple[set[str], dict[str, str], set[str]]:
@@ -281,6 +296,27 @@ def has_covers_before(lines: List[str], index: int) -> bool:
     return False
 
 
+def marker_line_regex(marker_name: str) -> re.Pattern[str]:
+    return re.compile(rf'^(?P<indent>\s*)--\s*@{re.escape(marker_name)}\b')
+
+
+def has_marker_before(lines: List[str], index: int, marker_name: str) -> bool:
+    marker_re = marker_line_regex(marker_name)
+    cursor = index - 1
+    while cursor >= 0:
+        line = lines[cursor]
+        if not line.strip():
+            cursor -= 1
+            continue
+        if line.lstrip().startswith("--"):
+            if marker_re.search(line):
+                return True
+            cursor -= 1
+            continue
+        break
+    return False
+
+
 def get_preceding_cover_symbols(lines: List[str], index: int) -> set[str]:
     symbols: set[str] = set()
     cursor = index - 1
@@ -299,6 +335,13 @@ def get_preceding_cover_symbols(lines: List[str], index: int) -> set[str]:
             continue
         break
     return symbols
+
+
+def detect_primary_marker(path: Path) -> str | None:
+    for folder, marker in PRIMARY_MARKERS_BY_FOLDER.items():
+        if (TESTS_ROOT / folder) in path.parents:
+            return marker
+    return None
 
 
 def infer_factory_alias_from_call(call_symbol: str) -> str | None:
@@ -519,10 +562,8 @@ def audit_file(
     if path.name == "init.lua":
         return findings
 
-    # Determine whether this file must have @covers on every it() that calls lurek.*.
-    # Only unit/ tests are required to have @covers markers; other folders
-    # (library/, stress/, integration/, security/) use folder-specific markers.
-    is_unit_test = (TESTS_ROOT / "unit") in path.parents
+    primary_marker = detect_primary_marker(path)
+    is_unit_test = primary_marker == "covers"
 
     if raw.startswith(UTF8_BOM):
         findings.append(Finding(path, 1, "utf8-bom", "Remove the UTF-8 BOM; Lua test files must be plain UTF-8."))
@@ -532,7 +573,7 @@ def audit_file(
         findings.append(Finding(path, first_inline_bom, "inline-bom", "Remove stray inline UTF-8 BOM characters from the file header or comments."))
 
     if not has_plain_file_header(lines):
-        findings.append(Finding(path, 1, "missing-file-header", "Add a plain prose file-level header comment before any @covers, @description, or test blocks."))
+        findings.append(Finding(path, 1, "missing-file-header", "Add a plain prose file-level header comment before markers or test blocks."))
 
     summary_lines: List[int] = []
 
@@ -547,7 +588,10 @@ def audit_file(
             findings.append(Finding(path, index, "legacy-description", "Use '-- @describe <text>' instead of legacy '-- @description'."))
 
         if TESTS_MARKER_RE.match(line):
-            findings.append(Finding(path, index, "forbidden-tests-marker", "Remove '-- @tests' marker; use '-- @covers <lurek.module.method>' only."))
+            if primary_marker:
+                findings.append(Finding(path, index, "forbidden-tests-marker", f"Remove '-- @tests' marker; use '-- @{primary_marker} ...' for this suite."))
+            else:
+                findings.append(Finding(path, index, "forbidden-tests-marker", "Remove '-- @tests' marker; use the suite primary marker."))
 
         if SUMMARY_RE.match(line) or RETURN_SUMMARY_RE.match(line):
             summary_lines.append(index)
@@ -569,20 +613,19 @@ def audit_file(
                 )
             )
 
-        if kind == "it" and it_block_uses_lurek(lines, index) and not has_covers_before(lines, index):
-            if is_unit_test:
-                findings.append(
-                    Finding(
-                        path,
-                        index + 1,
-                        "missing-it-covers",
-                        f"Add -- @covers directly above it(\"{label}\", ...) because this case calls lurek.* API.",
-                    )
+        if kind == "it" and primary_marker and not has_marker_before(lines, index, primary_marker):
+            findings.append(
+                Finding(
+                    path,
+                    index + 1,
+                    "missing-it-primary-marker",
+                    f"Add -- @{primary_marker} directly above it(\"{label}\", ...) for this suite.",
                 )
+            )
 
         if kind == "it":
-            cover_symbols = get_preceding_cover_symbols(lines, index)
-            required_symbols = collect_it_required_symbols(lines, index) if validate_cover_symbols else set()
+            cover_symbols = get_preceding_cover_symbols(lines, index) if is_unit_test else set()
+            required_symbols = collect_it_required_symbols(lines, index) if (validate_cover_symbols and is_unit_test) else set()
 
             cover_by_canonical: dict[str, set[str]] = {}
             for sym in cover_symbols:
@@ -595,23 +638,24 @@ def audit_file(
                 required_by_canonical.setdefault(can, set()).add(sym)
 
             it_indent = len(block.group("indent"))
-            # Walk backwards to find any @covers markers preceding this it()
+            # Walk backwards to find any primary marker lines preceding this it()
+            primary_marker_re = marker_line_regex(primary_marker) if primary_marker else None
             cursor = index - 1
             while cursor >= 0:
                 prev = lines[cursor]
                 if not prev.strip():
                     cursor -= 1
                     continue
-                cov_match = COVERS_LINE_RE.match(prev)
-                if cov_match:
-                    covers_indent = len(cov_match.group("indent"))
-                    if covers_indent != it_indent:
+                marker_match = primary_marker_re.match(prev) if primary_marker_re else None
+                if marker_match:
+                    marker_indent = len(marker_match.group("indent"))
+                    if marker_indent != it_indent:
                         findings.append(
                             Finding(
                                 path,
                                 cursor + 1,
-                                "covers-indent-mismatch",
-                                f"-- @covers must be indented {it_indent} spaces (same as it()); found {covers_indent} spaces.",
+                                "marker-indent-mismatch",
+                                f"-- @{primary_marker} must be indented {it_indent} spaces (same as it()); found {marker_indent} spaces.",
                             )
                         )
                     cursor -= 1
@@ -621,7 +665,7 @@ def audit_file(
                     continue
                 break
 
-            if validate_cover_symbols and required_symbols:
+            if validate_cover_symbols and is_unit_test and required_symbols:
                 missing_canonicals = sorted(set(required_by_canonical.keys()) - set(cover_by_canonical.keys()))
                 for canonical in missing_canonicals:
                     symbol = sorted(required_by_canonical[canonical])[0]
@@ -643,6 +687,23 @@ def audit_file(
                             index + 1,
                             "extra-it-cover-symbol",
                             f"Remove -- @covers {symbol} from this it() block because the symbol is not called here.",
+                        )
+                    )
+
+            if primary_marker:
+                markers = get_preceding_markers(lines, index)
+                wrong_markers = [
+                    (line_no, marker_name)
+                    for line_no, marker_name in markers
+                    if marker_name in FAMILY_MARKERS and marker_name != primary_marker
+                ]
+                for line_no, marker_name in wrong_markers:
+                    findings.append(
+                        Finding(
+                            path,
+                            line_no,
+                            "wrong-family-marker",
+                            f"Use -- @{primary_marker} in this suite; -- @{marker_name} belongs to a different test family.",
                         )
                     )
 
@@ -707,9 +768,11 @@ def fix_file(path: Path) -> bool:
         if m and m.group("kind") == "it":
             it_indent_map[i] = len(m.group("indent"))
 
-    # Build a map: for each @covers line index -> expected indentation
-    # Walk each it() backwards to find its preceding @covers block
-    covers_target_indent: dict[int, int] = {}
+    primary_marker = detect_primary_marker(path)
+    primary_marker_re = marker_line_regex(primary_marker) if primary_marker else None
+
+    # Build a map: for each primary marker line index -> expected indentation.
+    marker_target_indent: dict[int, int] = {}
     for it_idx, it_ind in it_indent_map.items():
         cursor = it_idx - 1
         while cursor >= 0:
@@ -717,8 +780,8 @@ def fix_file(path: Path) -> bool:
             if not prev.strip():
                 cursor -= 1
                 continue
-            if COVERS_LINE_RE.match(prev):
-                covers_target_indent[cursor] = it_ind
+            if primary_marker_re and primary_marker_re.match(prev):
+                marker_target_indent[cursor] = it_ind
                 cursor -= 1
                 continue
             if prev.lstrip().startswith("--"):
@@ -744,14 +807,12 @@ def fix_file(path: Path) -> bool:
             continue
         if RETURN_SUMMARY_RE.match(line) or SUMMARY_RE.match(line):
             continue
-        # Fix @covers indentation if needed
-        if i in covers_target_indent:
-            cov_match = COVERS_LINE_RE.match(line)
-            if cov_match:
-                target_ind = covers_target_indent[i]
-                rest = line.lstrip()
-                fixed.append(" " * target_ind + rest)
-                continue
+        # Fix primary marker indentation if needed.
+        if i in marker_target_indent and primary_marker_re and primary_marker_re.match(line):
+            target_ind = marker_target_indent[i]
+            rest = line.lstrip()
+            fixed.append(" " * target_ind + rest)
+            continue
         fixed.append(line)
 
     while fixed and not fixed[-1].strip():
@@ -786,7 +847,7 @@ def main() -> int:
     parser.add_argument("--path", help="File or directory to audit relative to repo root.")
     parser.add_argument("--fix", action="store_true", help="Apply safe structural fixes (category markers, description colon form, test_summary placement).")
     parser.add_argument("--allow-legacy-describe-markers", action="store_true", help="Temporarily relax the default rule that describe() docstring blocks may contain only @describe.")
-    parser.add_argument("--validate-cover-symbols", action="store_true", help="Enable strict per-symbol @covers validation (may report false positives on dynamic calls).")
+    parser.add_argument("--validate-cover-symbols", action="store_true", help="Enable strict per-symbol @covers validation for unit tests only (may report false positives on dynamic calls).")
     parser.add_argument("--json", action="store_true", help="Print findings as JSON.")
     args = parser.parse_args()
 

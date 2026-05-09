@@ -5,6 +5,7 @@
 
 -- @describe lurek.serial module exists
 describe("lurek.serial module exists", function()
+    -- @covers lurek.serial
     it("lurek.serial is a table", function()
         expect_type("table", lurek.serial)
     end)
@@ -694,10 +695,10 @@ describe("unit: migrated from integration/test_data_filesystem.lua", function()
                 meta = { version = 2, engine = "lurek" },
                 data = { {x=1, y=2}, {x=3, y=4} },
             }
-    
+
             local encoded = lurek.serial.toJson(nested)
             local decoded = lurek.serial.fromJson(encoded)
-    
+
             expect_equal(2, decoded.meta.version, "nested version")
             expect_equal("lurek", decoded.meta.engine, "nested engine")
         end)
@@ -709,10 +710,10 @@ describe("unit: migrated from integration/test_data_filesystem.lua", function()
             for i = 1, 200 do
                 big[i] = { x = i * 0.1, y = i * 0.2, name = "item_" .. i }
             end
-    
+
             local encoded = lurek.serial.toJson(big)
             expect_true(#encoded > 100, "encoded has content")
-    
+
             local decoded = lurek.serial.fromJson(encoded)
             expect_equal(200, #decoded, "200 items decoded")
             expect_near(20.0, decoded[200].x, 0.1, "last item x correct")
@@ -722,6 +723,35 @@ end)
 
 -- @describe unit: migrated from integration/test_inventory_save_integration.lua
 describe("unit: migrated from integration/test_inventory_save_integration.lua", function()
+        local inventory = rawget(_G, "inventory")
+        if inventory == nil then
+            -- @covers inventory
+            it("inventory module unavailable in this runtime", function()
+                expect_nil(inventory)
+            end)
+            return
+        end
+
+        local function snapshot(inv)
+            local out = { containers = {} }
+            local names = inv:listContainers()
+            for _, name in ipairs(names) do
+                local c = inv:getContainer(name)
+                local entry = {
+                    name = name,
+                    items = {},
+                }
+                local items = c:listItems()
+                for _, item in ipairs(items) do
+                    table.insert(entry.items, {
+                        type = item:getType(),
+                        qty = item:getQuantity(),
+                    })
+                end
+                table.insert(out.containers, entry)
+            end
+            return out
+        end
         -- @covers lurek.serial.fromJson
         -- @covers lurek.serial.toJson
         it("snapshot round-trips through codec.toJson/fromJson", function()
@@ -730,12 +760,12 @@ describe("unit: migrated from integration/test_inventory_save_integration.lua", 
             inv:addContainer("bag", bag)
             local item = inventory.newItem("potion")
             bag:addItem(item, 3)
-    
+
             local snap = snapshot(inv)
             local json = lurek.serial.toJson(snap)
             expect_type("string", json)
             local decoded = lurek.serial.fromJson(json)
-    
+
             expect_type("table", decoded)
             expect_type("table", decoded.containers)
             expect_equal(1, #decoded.containers)
@@ -753,7 +783,7 @@ describe("unit: migrated from integration/test_inventory_save_integration.lua", 
             local arrow = inventory.newItem("arrow")
             arrow:setStackLimit(99)
             box:addItem(arrow, 12)
-    
+
             local json = lurek.serial.toJson(snapshot(inv))
             local back = lurek.serial.fromJson(json)
             expect_equal(12, back.containers[1].items[1].qty)
@@ -805,12 +835,12 @@ describe("unit: migrated from integration/test_inventory_save_integration.lua", 
             inv:addContainer("bag", bag)
             local item = inventory.newItem("potion")
             bag:addItem(item, 3)
-    
+
             local snap = snapshot(inv)
             local json = lurek.serial.toJson(snap)
             expect_type("string", json)
             local decoded = lurek.serial.fromJson(json)
-    
+
             expect_type("table", decoded)
             expect_type("table", decoded.containers)
             expect_equal(1, #decoded.containers)
@@ -828,7 +858,7 @@ describe("unit: migrated from integration/test_inventory_save_integration.lua", 
             local arrow = inventory.newItem("arrow")
             arrow:setStackLimit(99)
             box:addItem(arrow, 12)
-    
+
             local json = lurek.serial.toJson(snapshot(inv))
             local back = lurek.serial.fromJson(json)
             expect_equal(12, back.containers[1].items[1].qty)

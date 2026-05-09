@@ -1,7 +1,4 @@
--- tests/lua/integration/test_animation_tween.lua
--- Integration: lurek.animation frame logic combined with lurek.tween interpolation.
-
--- @describe animation + tween integration
+-- Integration: animation frame stepping + tween interpolation
 describe("animation + tween integration", function()
     -- @integration LAnimation:addClip
     -- @integration LAnimation:addFramesFromGrid
@@ -74,7 +71,7 @@ describe("animation + tween integration", function()
     -- @integration lurek.tween.update
     it("animation addFrame and tween compose without error", function()
         local anim = lurek.animation.new()
-        -- addFrame(x, y, w, h)     no duration param
+        -- addFrame(x, y, w, h)
         anim:addFrame(1, 1, 16, 16)
         anim:addFrame(17, 1, 16, 16)
         anim:addClip("single", {0, 1}, 10.0, false)

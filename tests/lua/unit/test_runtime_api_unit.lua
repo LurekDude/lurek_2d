@@ -3,6 +3,7 @@
 
 -- @describe lurek.runtime module exists
 describe("lurek.runtime module exists", function()
+    -- @covers lurek.runtime
     it("lurek.runtime is a table", function()
         expect_type("table", lurek.runtime)
     end)

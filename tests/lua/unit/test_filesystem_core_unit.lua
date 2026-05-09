@@ -11,10 +11,12 @@ local TMP = "save/_fs_tests/"
 
 -- @describe lurek.filesystem module
 describe("lurek.filesystem module", function()
+    -- @covers lurek.filesystem
     it("lurek.filesystem is a table", function()
         expect_type("table", lurek.filesystem)
     end)
 
+    -- @covers lurek.filesystem
     it("all expected functions are present", function()
         local fns = {
             "read", "write", "exists", "append", "remove",
@@ -1084,7 +1086,7 @@ describe("unit: migrated from integration/test_serial_filesystem.lua", function(
         -- @covers lurek.filesystem.exists
         -- @covers lurek.filesystem.write
         it("filesystem.exists returns true after write", function()
-            local path = tmp .. "exists_check.txt"
+            local path = TMP .. "exists_check.txt"
             lurek.filesystem.write(path, "ping")
             expect_true(lurek.filesystem.exists(path), "exists after write")
         end)

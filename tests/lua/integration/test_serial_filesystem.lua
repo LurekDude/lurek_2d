@@ -1,7 +1,4 @@
--- tests/lua/integration/test_serial_fileapp.lua
--- Integration: lurek.serial (JSON/TOML/CSV) used alongside lurek.filesystem for round-trip persistence.
-
--- @describe serial + filesystem integration
+-- Integration: lurek.serial JSON/TOML/CSV round-trip via lurek.filesystem
 describe("serial + filesystem integration", function()
     local tmp = "save/integration_serial_fs/"
 

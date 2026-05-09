@@ -45,6 +45,43 @@ describe("Evidence: lurek.raycaster API contracts", function()
         end
 
         lurek.image.savePNG(img, OUT .. "raycaster_depth.png")
+        expect_evidence_created(OUT .. "raycaster_depth.png")
+    end)
+
+    -- @evidence file
+    it("saves top-down occupancy map as PNG evidence", function()
+        local W, H = 128, 128
+        local rc = lurek.raycaster.new(16, 16)
+
+        for x = 0, 15 do
+            rc:setCell(x, 0, 1)
+            rc:setCell(x, 15, 1)
+        end
+        for y = 0, 15 do
+            rc:setCell(0, y, 1)
+            rc:setCell(15, y, 1)
+        end
+        for i = 3, 12 do
+            rc:setCell(i, 8, 1)
+        end
+
+        local img = lurek.image.newImageData(W, H)
+        img:fill(22, 24, 30, 255)
+        local cell = 8
+        for y = 0, 15 do
+            for x = 0, 15 do
+                local v = rc:getCell(x, y)
+                local r, g, b = 30, 34, 44
+                if v ~= 0 then
+                    r, g, b = 220, 220, 230
+                end
+                img:drawRect(x * cell, y * cell, cell - 1, cell - 1, r, g, b, 255)
+            end
+        end
+
+        local path = OUT .. "raycaster_topdown.png"
+        lurek.image.savePNG(img, path)
+        expect_evidence_created(path)
     end)
 end)
 

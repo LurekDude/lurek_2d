@@ -114,5 +114,21 @@ describe("validation: TOML edge cases", function()
             lurek.data.encodeToml("not a table")
         end, "string input should error")
     end)
+
+    -- @security lurek.data.encodeToml
+    it("encodeToml rejects function values", function()
+        expect_error(function()
+            lurek.data.encodeToml({ cb = function() end })
+        end)
+    end)
+
+    -- @security lurek.data.parseToml
+    it("parseToml rejects malformed quoted key payload", function()
+        expect_error(function()
+            lurek.data.parseToml('["../../escape" = "x"')
+        end)
+    end)
 end)
 test_summary()
+
+

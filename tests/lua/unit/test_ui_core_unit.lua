@@ -1484,6 +1484,7 @@ end)
 -- =========================================================================
 -- @describe lurek.ui module exists
 describe("lurek.ui module exists", function()
+    -- @covers lurek.ui
     it("lurek.ui is a table", function()
         expect_type("table", lurek.ui)
     end)

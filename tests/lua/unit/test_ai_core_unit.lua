@@ -6,6 +6,7 @@
 
 -- @describe lurek.ai module exists
 describe("lurek.ai module exists", function()
+    -- @covers lurek.ai
     it("lurek.ai is a table", function()
         expect_type("table", lurek.ai)
     end)

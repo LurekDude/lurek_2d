@@ -16,6 +16,7 @@ end
 -- =========================================================================
 -- @describe lurek.pipeline module exists
 describe("lurek.pipeline module exists", function()
+    -- @covers lurek.pipeline
     it("lurek.pipeline is a table", function()
         expect_type("table", lurek.pipeline)
     end)

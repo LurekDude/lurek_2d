@@ -66,6 +66,20 @@ describe("lurek.network security", function()
         end)
     end)
 
+    -- @security lurek.network.newServer
+    it("should reject negative server port", function()
+        expect_error(function()
+            lurek.network.newServer({ port = -1 })
+        end)
+    end)
+
+    -- @security lurek.network.newServer
+    it("should reject port above max uint16", function()
+        expect_error(function()
+            lurek.network.newServer({ port = 70000 })
+        end)
+    end)
+
     -- @security LNetworkHost:destroy
     -- @security LNetworkHost:isDestroyed
     -- @security LNetworkHost:service
@@ -121,5 +135,18 @@ describe("lurek.network security", function()
         expect_equal(unpacked.value, 1)
         expect_equal(unpacked.child.value, 2)
     end)
+
+    -- @security lurek.network.pack
+    -- @security lurek.network.unpack
+    it("should reject truncated payload", function()
+        local payload = lurek.network.pack({ ok = true, count = 3 })
+        local truncated = string.sub(payload, 1, math.max(1, #payload - 1))
+        expect_error(function()
+            lurek.network.unpack(truncated)
+        end)
+    end)
+
 end)
 test_summary()
+
+

@@ -159,5 +159,24 @@ describe("lurek.ecs.spawnBulk", function()
         expect_equal(0, #ids)
         expect_equal(0, w:getEntityCount())
     end)
+
+    -- @stress LUniverse:defineBlueprint
+    -- @stress LUniverse:getEntityCount
+    -- @stress LUniverse:kill
+    -- @stress LUniverse:spawnBulk
+    -- @stress lurek.ecs.newUniverse
+    it("spawnBulk then mass kill keeps entity count consistent", function()
+        local w = lurek.ecs.newUniverse()
+        w:defineBlueprint("Heavy", {hp = 200, armor = 10})
+        local ids = w:spawnBulk("Heavy", 2000)
+
+        for i = 1, 1000 do
+            w:kill(ids[i])
+        end
+
+        expect_equal(1000, w:getEntityCount())
+    end)
 end)
 test_summary()
+
+

@@ -7,6 +7,7 @@
 
 -- @describe lurek.compute module exists
 describe("lurek.compute module exists", function()
+    -- @covers lurek.compute
     it("lurek.compute is a table", function()
         expect_type("table", lurek.compute)
     end)

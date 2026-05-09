@@ -5,35 +5,49 @@
 -- Verifies that dangerous Lua globals and standard libraries are blocked
 -- in the engine sandbox. Mirrors tests from tests/rust/security/security_tests.rs.
 
-local aa = {}
-aa.__index = aa
-aa.toemk = 10
-
 -- @describe sandbox: blocked globals
 describe("sandbox: blocked globals", function()
+    -- @security sandbox.os.execute
     it("os.execute is not accessible", function()
         local result = (os == nil) or (os.execute == nil)
         expect_equal(result, true)
     end)
 
+    -- @security sandbox.io.open
     it("io.open is not accessible", function()
         local result = (io == nil) or (io.open == nil)
         expect_equal(result, true)
     end)
 
+    -- @security sandbox.load
     it("load() is not accessible", function()
         local result = (load == nil)
         expect_equal(result, true)
     end)
 
+    -- @security sandbox.debug
     it("debug library is not accessible", function()
         local result = (debug == nil)
         expect_equal(result, true)
+    end)
+
+    -- @security sandbox.dofile
+    it("dofile is unavailable or denied", function()
+        if dofile == nil then
+            expect_true(true)
+            return
+        end
+
+        local ok = pcall(function()
+            dofile("definitely_missing_file.lua")
+        end)
+        expect_equal(ok, false)
     end)
 end)
 
 -- @describe sandbox: restricted require
 describe("sandbox: restricted require", function()
+    -- @security sandbox.require.socket
     it("require('socket') fails gracefully", function()
         -- External network libraries must be blocked or absent in the sandbox.
         -- Either require is nil, or it returns nil, or it throws an error.
@@ -48,10 +62,24 @@ describe("sandbox: restricted require", function()
             )
         end
     end)
+
+    -- @security sandbox.package.loadlib
+    it("package.loadlib is unavailable or denied", function()
+        if package == nil or package.loadlib == nil then
+            expect_true(true)
+            return
+        end
+
+        local ok = pcall(function()
+            package.loadlib("nonexistent.dll", "luaopen_x")
+        end)
+        expect_equal(ok, false)
+    end)
 end)
 
 -- @describe sandbox: runtime safety
 describe("sandbox: runtime safety", function()
+    -- @security sandbox.pcall
     it("pcall catches errors without crashing the VM", function()
         -- Verify pcall can catch errors (VM is stable under error conditions)
         local ok, err = pcall(function()
@@ -61,6 +89,7 @@ describe("sandbox: runtime safety", function()
         expect_true(type(err) == "string")
     end)
 
+    -- @security sandbox.table.concat
     it("large string concat completes without crash", function()
         local t = {}
         for i = 1, 1000 do
@@ -70,6 +99,7 @@ describe("sandbox: runtime safety", function()
         expect_equal(result, 1000)
     end)
 
+    -- @security sandbox.loop
     it("basic arithmetic loop runs without error", function()
         local n = 0
         for i = 1, 1000 do
@@ -107,5 +137,25 @@ describe("filesystem security: mount traversal", function()
         expect_equal(false, ok)
         expect_true(err ~= nil)
     end)
+
+    -- @security lurek.filesystem.read
+    it("rejects traversal read path", function()
+        local ok, err = pcall(function()
+            lurek.filesystem.read("../../outside.txt")
+        end)
+        expect_equal(false, ok)
+        expect_true(err ~= nil)
+    end)
+
+    -- @security lurek.filesystem.write
+    it("rejects traversal write path", function()
+        local ok, err = pcall(function()
+            lurek.filesystem.write("../../outside.txt", "x")
+        end)
+        expect_equal(false, ok)
+        expect_true(err ~= nil)
+    end)
 end)
 test_summary()
+
+

@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Animation driving Render output
--- Tests cross-module behavior: animation frame progression controls sprite drawing
-
--- @describe animation + render integration
+-- Integration: animation frame progression controlling sprite draw coordinates
 describe("animation + render integration", function()
     -- @integration lurek.animation.new
     -- @integration LAnimation:addFramesFromGrid

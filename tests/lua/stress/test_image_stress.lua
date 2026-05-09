@@ -14,6 +14,7 @@ describe("stress: image creation throughput", function()
         return nil
     end
 
+    -- @stress lurek.image.newImageData
     it("create 100 images (64     64) without error: <10s", function()
         local COUNT  = 100
         local images = {}

@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Thread + Data
--- Tests passing data between threads via Channel.
-
--- @describe integration: thread channel with serialized data
+-- Integration: typed Channel passing JSON-serialized data between thread contexts
 describe("integration: thread channel with serialized data", function()
 
     -- @integration LChannel:pop

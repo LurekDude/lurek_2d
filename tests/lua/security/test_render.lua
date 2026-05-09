@@ -30,7 +30,7 @@ describe("fuzz: nil arguments to core APIs", function()
 
     -- @security lurek.render.line
     it("lurek.render.line with nil args is silently ignored", function()
-        -- Should not error — nil coords are filtered out, the draw call is just skipped
+        -- Should not error; nil coords are filtered out and draw call is skipped.
         lurek.render.line(nil, nil, nil, nil)
     end)
 end)
@@ -258,9 +258,12 @@ end)
 
 -- @describe sandbox boundary fuzzing
 describe("sandbox boundary fuzzing", function()
+    -- @security fuzz.random.api_inputs
     it("handles random inputs without crashing the engine", function()
+        math.randomseed(1337)
+
         -- Extract a few engine API tables
-        local namespaces = {lurek.math, lurek.renders, lurek.physics}
+        local namespaces = {lurek.math, lurek.render, lurek.physics}
 
         -- Generate random Lua types
         local garbage = {
@@ -529,3 +532,5 @@ describe("validation: tilemap invalid operations", function()
     end)
 end)
 test_summary()
+
+

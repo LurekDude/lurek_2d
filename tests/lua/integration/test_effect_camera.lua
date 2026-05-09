@@ -1,10 +1,4 @@
--- tests/lua/integration/test_effect_camera.lua
--- Integration: lurek.effect <-> lurek.camera
--- Tests that post-processing effects use current camera viewport correctly.
-
-local describe = describe or function(n,f) f() end
-local it = it or function(n,f) f() end
--- @describe effect + camera integration
+-- Integration: post-processing effects using camera viewport state
 describe("effect + camera integration", function()
     -- @integration LCamera:getViewport
     -- @integration LCamera:setViewport

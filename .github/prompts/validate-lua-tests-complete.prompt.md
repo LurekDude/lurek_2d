@@ -53,10 +53,10 @@ For each test file:
 2. **Validate Structure (First Audit)**
    - Run `python tools/audit/lua_test_structure_audit.py` scoped to this file (or batch by feature)
    - Check results for:
-     - Missing or misplaced `@covers` markers
+     - Missing or misplaced suite markers (`@covers/@security/@integration/@stress/@evidence`)
      - Indentation errors (markers must align with their `it()`)
-     - Forbidden `@tests` markers (removed; use `@covers` only)
-     - `describe()` blocks with grouped `@covers` at top (invalid; move markers down)
+     - Forbidden `@tests` markers
+     - `describe()` blocks with grouped markers at top (invalid; move markers down)
      - Determinism issues: no timestamps, no random seeds, no flaky waits
    - **If problems found**: Fix them using the audit's diagnostic output—do NOT ask permission
 
@@ -66,12 +66,12 @@ For each test file:
      - Identify which symbols are missing coverage
      - Check if existing tests can be extended (prefer)
      - Or write new `it()` blocks to cover missing behavior
-     - Ensure every new `it()` has a `@covers` marker above it (same indentation as the `it()` itself)
+     - Ensure every new `it()` has the correct suite marker above it (same indentation as the `it()` itself)
    - Repeat until coverage ≥ 100% for the targeted API surface or file is justified as non-covering (e.g., smoke test, edge case only)
 
 4. **Execute Test Run (Scoped)**
    - Run the test target for this file:
-     - If registered in `tests/harness.rs`: `cargo test --test harness -- <test_name> --nocapture`
+    - If registered in `tests/lua/harness.rs`: `cargo test --test harness -- <test_name> --nocapture`
      - Or directly: `cargo test --test <file_name> -- --nocapture`
    - Capture output: exit code, test count, any errors or panics
    - **If test fails**:
@@ -92,7 +92,7 @@ For each test file:
 
 ## Batch & Session Management
 - **Session artifact**: Save progress in `work/<session-name>/lua_validation_log.txt` as you complete each file (append one line per file: status, any notes)
-- **Harness update**: If a new Lua test file is created, ensure `tests/harness.rs` includes its module registration
+- **Harness update**: If a new Lua test file is created, ensure `tests/lua/harness.rs` includes its module registration
 - **Final validation**: After all files in target folder are validated, run full test suite:
   ```bash
   cargo test --test harness -- --nocapture
@@ -106,15 +106,21 @@ For each test file:
   - INVALID: `local anim = lurek.animation.new()` with NO assertion on anim. Remove `lurek.animation.new` from marker.
   - VALID: `local anim = lurek.animation.new()` AND `expect_type("userdata", anim)`. Keep marker.
   - Setup calls without assertions are invisible to markers — do NOT mark them.
-- **@covers markers required (unit & security)**: Every `it()` must have a `-- @covers symbol1, symbol2` on the line immediately above it, at the same indentation level. List only symbols actually called AND tested inside the `it()` body.
+- **Suite markers required**:
+  - `tests/lua/unit/` -> `@covers`
+  - `tests/lua/security/` -> `@security`
+  - `tests/lua/integration/` -> `@integration`
+  - `tests/lua/stress/` -> `@stress`
+  - `tests/lua/evidence/` -> `@evidence`
+  Every `it()` must have the correct marker on the line immediately above it, at the same indentation level.
 - **@integration markers required (integration)**: Every `it()` in `tests/lua/integration/` must have one or more `-- @integration` lines immediately above it.
   - Multiple `-- @integration` lines are valid and expected when a test validates multiple symbols.
   - Every listed integration symbol must be called and assertion-backed in the same `it()`.
   - The test must prove cross-module behavior — if it tests only a single module, move it to `tests/lua/unit/`.
   - INVALID: test calls `lurek.animation.new()` + methods but asserts animation frame counter only (zero interaction with other modules).
   - VALID: test calls animation + render, proves that animation frame drives sprite output on screen.
-- **No grouped @covers**: Do NOT place multiple `@covers` above a `describe()`. Each `it()` owns its own marker.
-- **No @tests marker**: The old `-- @tests` syntax is forbidden. Use `-- @covers` or `-- @integration` only.
+- **No grouped markers**: Do NOT place suite markers above a `describe()`. Each `it()` owns its own marker.
+- **No @tests marker**: The old `-- @tests` syntax is forbidden. Use suite markers only.
 - **Determinism**: Tests must not depend on order, random state, or filesystem timing. Use fixtures or mocks.
 - **One probe per attack**: Adversarial tests dedicate one file/script per hypothesis (e.g., `test_raycaster_overflow_probe.lua`). This keeps attribution clear.
 - **Test layer separation**: Lua-reachable lurek.* behavior is tested here. Pure Rust internals go to `tests/rust/unit/<module>_tests.rs`. Do not duplicate or skip one layer to avoid writing the other.

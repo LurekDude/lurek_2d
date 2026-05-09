@@ -10,6 +10,7 @@
 
 -- @describe lurek.image compressed API
 describe("lurek.image compressed API", function()
+    -- @covers lurek.image
     it("lurek.image is a table", function()
         expect_type("table", lurek.image)
     end)
@@ -67,82 +68,102 @@ describe("ImageData effect method existence", function()
         img = lurek.image.newImageData(4, 4)
     end)
 
+    -- @covers LImageData:brightness
     it("brightness is a function", function()
         expect_type("function", img.brightness)
     end)
 
+    -- @covers LImageData:contrast
     it("contrast is a function", function()
         expect_type("function", img.contrast)
     end)
 
+    -- @covers LImageData:saturation
     it("saturation is a function", function()
         expect_type("function", img.saturation)
     end)
 
+    -- @covers LImageData:gamma
     it("gamma is a function", function()
         expect_type("function", img.gamma)
     end)
 
+    -- @covers LImageData:tint
     it("tint is a function", function()
         expect_type("function", img.tint)
     end)
 
+    -- @covers LImageData:grayscale
     it("grayscale is a function", function()
         expect_type("function", img.grayscale)
     end)
 
+    -- @covers LImageData:sepia
     it("sepia is a function", function()
         expect_type("function", img.sepia)
     end)
 
+    -- @covers LImageData:invert
     it("invert is a function", function()
         expect_type("function", img.invert)
     end)
 
+    -- @covers LImageData:threshold
     it("threshold is a function", function()
         expect_type("function", img.threshold)
     end)
 
+    -- @covers LImageData:posterize
     it("posterize is a function", function()
         expect_type("function", img.posterize)
     end)
 
+    -- @covers LImageData:fill
     it("fill is a function", function()
         expect_type("function", img.fill)
     end)
 
+    -- @covers LImageData:noise
     it("noise is a function", function()
         expect_type("function", img.noise)
     end)
 
+    -- @covers LImageData:alphaMask
     it("alphaMask is a function", function()
         expect_type("function", img.alphaMask)
     end)
 
+    -- @covers LImageData:flipHorizontal
     it("flipHorizontal is a function", function()
         expect_type("function", img.flipHorizontal)
     end)
 
+    -- @covers LImageData:flipVertical
     it("flipVertical is a function", function()
         expect_type("function", img.flipVertical)
     end)
 
+    -- @covers LImageData:rotate90cw
     it("rotate90cw is a function", function()
         expect_type("function", img.rotate90cw)
     end)
 
+    -- @covers LImageData:crop
     it("crop is a function", function()
         expect_type("function", img.crop)
     end)
 
+    -- @covers LImageData:resizeNearest
     it("resizeNearest is a function", function()
         expect_type("function", img.resizeNearest)
     end)
 
+    -- @covers LImageData:blur
     it("blur is a function", function()
         expect_type("function", img.blur)
     end)
 
+    -- @covers LImageData:sharpen
     it("sharpen is a function", function()
         expect_type("function", img.sharpen)
     end)

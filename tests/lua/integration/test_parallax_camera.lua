@@ -1,6 +1,4 @@
--- Lurek2D Parallax + Camera Integration Tests
--- Verifies cross-module behavior between lurek.camera and lurek.parallax.
--- Headless-safe: all checks use deterministic camera coordinates and pcall guards.
+-- Integration: camera position driving parallax layer rendering
 
 local function load_image()
     return lurek.render.newImage("assets/icon.png")
@@ -12,7 +10,7 @@ local function expect_cam_xy(cam, x, y, msg)
     expect_near(y, cy, 1e-5, msg .. " y")
 end
 
--- @describe camera coordinates drive parallax rendering behavior
+
 describe("camera + parallax integration", function()
     -- @integration LCamera:getPosition
     -- @integration LCamera:setPosition

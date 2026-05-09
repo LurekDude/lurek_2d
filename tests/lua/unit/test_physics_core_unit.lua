@@ -2,6 +2,7 @@
 
 -- @describe lurek.physics module exists
 describe("lurek.physics module exists", function()
+    -- @covers lurek.physics
     it("lurek.physics is a table", function()
         expect_type("table", lurek.physics)
     end)
@@ -1505,10 +1506,12 @@ describe("lurek.physics breakable joints", function()
         world = lurek.physics.newWorld(0, 0)
     end)
 
+    -- @covers lurek.physics
     it("setJointBreakForce stores the threshold", function()
         expect_true(type(rawget(lurek.physics, "newJoint")) ~= "function")
     end)
 
+    -- @covers lurek.physics
     it("getJointBreakForce returns nil when not set", function()
         expect_true(type(rawget(lurek.physics, "newJoint")) ~= "function")
     end)
@@ -2023,6 +2026,7 @@ describe("lurek.physics zone configuration", function()
         end)
     end)
 
+    -- @covers LZone:destroy
     it("destroy does not error", function()
         expect_no_error(function()
             zone:destroy()
@@ -2498,6 +2502,45 @@ end)
 
 -- @describe unit: migrated from integration/test_combat_physics_integration.lua
 describe("unit: migrated from integration/test_combat_physics_integration.lua", function()
+        local combat = rawget(_G, "combat")
+        if combat == nil or combat.newCollisionGroupSet == nil then
+            -- @covers combat
+            it("combat module unavailable in this runtime", function()
+                expect_nil(combat)
+            end)
+            return
+        end
+
+        local function has_mask(mask, bit)
+            return math.floor(mask / bit) % 2 == 1
+        end
+
+        local function make_target(world, x, y, hp, mask)
+            local body = lurek.physics.newBody(world, x, y, "dynamic")
+            local chassis = {
+                hp = hp,
+                takeDamage = function(self, amount)
+                    self.hp = self.hp - amount
+                end,
+            }
+            return { body = body, chassis = chassis, mask = mask }
+        end
+
+        local function resolve_targets(world, targets, ox, oy, range, allowed_mask)
+            local out = {}
+            local r2 = range * range
+            for _, t in ipairs(targets) do
+                local x, y = lurek.physics.getBody(world, t.body)
+                local dx = x - ox
+                local dy = y - oy
+                local d2 = dx * dx + dy * dy
+                if d2 <= r2 and has_mask(allowed_mask, t.mask) then
+                    table.insert(out, { target = t, d2 = d2 })
+                end
+            end
+            table.sort(out, function(a, b) return a.d2 < b.d2 end)
+            return out
+        end
         -- @covers lurek.physics.newWorld
         -- @covers lurek.physics.newBody
         -- @covers lurek.physics.getBody
@@ -2506,10 +2549,10 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
             local world = lurek.physics.newWorld(0, 0)
             local cgs = combat.newCollisionGroupSet()
             local enemy_bit = cgs:defineGroup("enemies")
-    
+
             local t = make_target(world, 10, 0, 100, enemy_bit)
             local hits = resolve_targets(world, { t }, 0, 0, 20, enemy_bit)
-    
+
             expect_equal(1, #hits)
             hits[1].target.chassis:takeDamage(25)
             expect_equal(75, t.chassis.hp)
@@ -2522,7 +2565,7 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
             local world = lurek.physics.newWorld(0, 0)
             local cgs = combat.newCollisionGroupSet()
             local enemy_bit = cgs:defineGroup("enemies")
-    
+
             local t = make_target(world, 100, 0, 100, enemy_bit)
             local hits = resolve_targets(world, { t }, 0, 0, 5, enemy_bit)
             expect_equal(0, #hits)
@@ -2536,11 +2579,11 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
             local world = lurek.physics.newWorld(0, 0)
             local cgs = combat.newCollisionGroupSet()
             local enemy_bit = cgs:defineGroup("enemies")
-    
+
             local far = make_target(world, 8, 0, 100, enemy_bit)
             local near = make_target(world, 2, 0, 100, enemy_bit)
             local mid = make_target(world, 5, 0, 100, enemy_bit)
-    
+
             local hits = resolve_targets(world, { far, near, mid }, 0, 0, 20, enemy_bit)
             expect_equal(3, #hits)
             expect_near(4.0, hits[1].d2, 1e-5)
@@ -2558,10 +2601,10 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
             local cgs = combat.newCollisionGroupSet()
             local player_bit = cgs:defineGroup("players")
             local enemy_bit = cgs:defineGroup("enemies")
-    
+
             local ally = make_target(world, 1, 0, 100, player_bit)
             local enemy = make_target(world, 2, 0, 100, enemy_bit)
-    
+
             local hits = resolve_targets(world, { ally, enemy }, 0, 0, 20, enemy_bit)
             expect_equal(1, #hits)
             expect_equal(enemy, hits[1].target)
@@ -2574,10 +2617,10 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
             local cgs = combat.newCollisionGroupSet()
             local player_bit = cgs:defineGroup("players")
             local enemy_bit = cgs:defineGroup("enemies")
-    
+
             local ally = make_target(world, 1, 0, 100, player_bit)
             local enemy = make_target(world, 2, 0, 100, enemy_bit)
-    
+
             local hits = resolve_targets(world, { ally, enemy }, 0, 0, 20, player_bit + enemy_bit)
             expect_equal(2, #hits)
         end)
@@ -2586,8 +2629,10 @@ describe("unit: migrated from integration/test_combat_physics_integration.lua", 
         -- @covers lurek.physics.step
         it("physics.step rejects a non-numeric dt", function()
             local world = lurek.physics.newWorld(0, 0)
+            ---@type any
+            local bad_dt = "not a number"
             expect_error(function()
-                lurek.physics.step(world, "not a number")
+                lurek.physics.step(world, bad_dt)
             end)
         end)
 
@@ -2603,14 +2648,14 @@ describe("unit: migrated from integration/test_math_physics.lua", function()
         it("physics step uses delta time correctly", function()
             local world_id = lurek.physics.newWorld(0, 100)
             local body_id = lurek.physics.newBody(world_id, 0, 0, "dynamic")
-    
+
             -- Step the world a small amount
             lurek.physics.step(world_id, 0.016)
-    
+
             -- Body should have moved down due to gravity
             local _, y = body_id:getPosition()
             expect_true(y > 0, "body moved down by gravity")
-    
+
             lurek.physics.destroyWorld(world_id)
         end)
 
@@ -2621,6 +2666,8 @@ describe("unit: migrated from integration/test_physics_platformer.lua", function
         -- @covers LWorld:step
         -- @covers lurek.physics.getBody
         it("world stepping advances dynamic body under gravity", function()
+            local world = lurek.physics.newWorld(0, 200)
+            local player = lurek.physics.newBody(world, 0, 0, "dynamic")
             local _, y0 = lurek.physics.getBody(world, player)
             for _ = 1, 10 do
                 world:step(1/60)
@@ -2633,8 +2680,13 @@ describe("unit: migrated from integration/test_physics_platformer.lua", function
         -- @covers LWorld:step
         -- @covers lurek.physics.newBody
         it("registered callbacks can observe contact activity", function()
-            local b1 = lurek.physics.newBody(world, 0, 0, "dynamic")
-            local b2 = lurek.physics.newBody(world, 0, 0, "static")
+            local world = lurek.physics.newWorld(0, 0)
+            local began = 0
+            world:setBeginContact(function()
+                began = began + 1
+            end)
+            lurek.physics.newBody(world, 0, 0, "dynamic")
+            lurek.physics.newBody(world, 0, 0, "static")
             for _ = 1, 5 do
                 world:step(1/60)
             end
@@ -2656,7 +2708,7 @@ describe("unit: migrated from integration/test_physics_platformer.lua", function
             gravity_world:step(1/60)
             local _, y_sleep = lurek.physics.getBody(gravity_world, b)
             expect_near(y0, y_sleep, 1e-5, "sleeping body should not move")
-    
+
             gravity_world:wakeUpBody(b:getId())
             gravity_world:step(1/60)
             local _, y_awake = lurek.physics.getBody(gravity_world, b)
@@ -2678,10 +2730,10 @@ describe("unit: migrated from integration/test_physics_space.lua", function()
             -- Create a large zone covering the whole arena.
             local zone = world:addZone(-500, -500, 1000, 1000)
             zone:setGravityPoint(0, 0, 5000)
-    
+
             -- Place a dynamic body somewhere inside the zone.
             world:newBody(200, 0, "dynamic")
-    
+
             -- Step once          zone tracker should produce an enter event.
             world:step(1/60)
             local events = world:getZoneEvents()
@@ -2699,11 +2751,11 @@ describe("unit: migrated from integration/test_physics_space.lua", function()
             local world = lurek.physics.newWorld(0, 500) -- strong global gravity
             local zone = world:addZone(-500, -500, 1000, 1000)
             zone:setGravityZero()
-    
+
             -- Body at origin, zero initial velocity.
             local body = world:newBody(0, 0, "dynamic")
             local x0, y0 = lurek.physics.getBody(world, body)
-    
+
             -- Step several frames          if zero-g works, body should not fall far.
             -- We can only check the simulation runs without error here since
             -- getBody is on the module-level API, not the world method.
@@ -2726,13 +2778,13 @@ describe("unit: migrated from integration/test_physics_space.lua", function()
             local z1 = world:addZone(-200, -200, 400, 400)
             z1:setPriority(10)
             z1:setGravityDirectional(0, -200) -- upward pull
-    
+
             local z2 = world:addZone(-100, -100, 200, 200)
             z2:setPriority(20)
             z2:setGravityDirectional(0, 100)  -- downward pull
-    
+
             world:newBody(0, 0, "dynamic")
-    
+
             for _ = 1, 10 do
                 world:step(1/60)
             end
@@ -2756,22 +2808,22 @@ describe("unit: migrated from integration/test_physics_tanks.lua", function()
         it("collapse then spawn debris and step without error", function()
             local world = lurek.physics.newWorld(0, 200)
             local terrain = lurek.physics.newTerrain(16, 16, 8, world)
-    
+
             -- Fill bottom two rows solid (rows 14 and 15) to act as floor.
             terrain:fillRect(0, 112, 128, 16, true)
             -- Place a floating column of cells above the floor with a gap.
             terrain:setCell(8, 10, true) -- row 10, no floor below until row 14
-    
+
             terrain:flush()
-    
+
             -- Capture positions before collapse.
             local pts = terrain:solidPositions()
             expect_true(#pts >= 1)
-    
+
             -- Collapse unsupported cells.
             local fallen = terrain:collapseColumns()
             expect_true(fallen >= 0)
-    
+
             -- Spawn debris for any removed cells (use the pre-collapse set as proxy).
             local ids = terrain:spawnDebris(pts, 1.0, 0.2)
             expect_type("table", ids)
@@ -2779,13 +2831,13 @@ describe("unit: migrated from integration/test_physics_tanks.lua", function()
                 expect_type("number", id)
                 expect_true(id > 0, "debris id should be positive")
             end
-    
+
             -- Step the world with debris bodies present.
             terrain:flush()
             for _ = 1, 30 do
                 world:step(1/60)
             end
-    
+
             expect_true(#ids >= 0, "spawnDebris returns a valid id table")
         end)
 

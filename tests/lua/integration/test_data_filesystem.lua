@@ -1,8 +1,4 @@
--- Lurek2D Integration Test: Data + Filesystem
--- Tests saving JSON data to a file and reading it back.
--- Uses lurek.serial.toJson/fromJson (not lurek.data.encode which is binary-only).
-
--- @describe integration: data serialization with filesystem I/O
+-- Integration: JSON serialization round-trip via filesystem I/O
 describe("integration: data serialization with filesystem I/O", function()
     local TMP_PATH = "save/test_data_fs_tmp.json"
 

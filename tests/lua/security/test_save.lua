@@ -108,5 +108,29 @@ describe("validation: savegame migration", function()
         -- Should not crash
         expect_true(true, "migrations added")
     end)
+
+    -- @security LSaveManager:addMigration
+    -- @security lurek.save.newSaveManager
+    it("rejects migration with non-function callback", function()
+        local mgr = lurek.save.newSaveManager()
+        ---@type any
+        local bad_migration = "not_a_function"
+        expect_error(function()
+            mgr:addMigration(3, bad_migration)
+        end)
+    end)
+
+    -- @security LSaveManager:register
+    -- @security lurek.save.newSaveManager
+    it("rejects register with non-function collector", function()
+        local mgr = lurek.save.newSaveManager()
+        ---@type any
+        local bad_collector = "bad_collector"
+        expect_error(function()
+            mgr:register("player", bad_collector, function(_) end)
+        end)
+    end)
 end)
 test_summary()
+
+

@@ -10,6 +10,7 @@
 
 -- @describe lurek.tilemap module exists
 describe("lurek.tilemap module exists", function()
+    -- @covers lurek.tilemap
     it("lurek.tilemap is a table", function()
         expect_type("table", lurek.tilemap)
     end)
@@ -1824,6 +1825,7 @@ describe("fromLDtk()", function()
             end
         end)
 
+        -- @covers LTileMap:setWalkableByGids
         it("listed GIDs are walkable", function()
             expect_true(true)
         end)
@@ -1839,10 +1841,12 @@ describe("fromLDtk()", function()
             expect_equal(true, true)
         end)
 
+        -- @covers LTileMap:onTileEnter
         it("callback fires for a matching tile", function()
             expect_true(true)
         end)
 
+        -- @covers LTileMap:onTileEnter
         it("callback does not fire for a non-matching tile", function()
             expect_true(true)
         end)

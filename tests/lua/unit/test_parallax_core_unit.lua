@@ -12,6 +12,7 @@ end
 
 -- @describe lurek.parallax module exists
 describe("lurek.parallax module exists", function()
+    -- @covers lurek.parallax
     it("lurek.parallax is a table", function()
         expect_type("table", lurek.parallax)
     end)
@@ -649,52 +650,68 @@ end
 
 -- @describe parallax blend modes
 describe("parallax blend modes", function()
+    -- @covers LParallaxLayer:getBlendMode
     it("default blend mode is 'normal'", function()
         local layer = make_layer()
         expect_equal("normal", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("setBlendMode 'additive' works", function()
         local layer = make_layer()
         layer:setBlendMode("additive")
         expect_equal("additive", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("setBlendMode 'multiply' works", function()
         local layer = make_layer()
         layer:setBlendMode("multiply")
         expect_equal("multiply", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("setBlendMode 'screen' works", function()
         local layer = make_layer()
         layer:setBlendMode("screen")
         expect_equal("screen", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("setBlendMode 'replace' works", function()
         local layer = make_layer()
         layer:setBlendMode("replace")
         expect_equal("replace", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("legacy alias 'alpha' maps to 'normal'", function()
         local layer = make_layer()
         layer:setBlendMode("alpha")
         expect_equal("normal", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("legacy alias 'add' maps to 'additive'", function()
         local layer = make_layer()
         layer:setBlendMode("add")
         expect_equal("additive", layer:getBlendMode())
     end)
 
+    -- @covers LParallaxLayer:setBlendMode
     it("invalid blend mode 'glow' raises an error", function()
         local layer = make_layer()
         expect_error(function() layer:setBlendMode("glow") end)
     end)
 
+    -- @covers LParallaxLayer:getBlendMode
+    -- @covers LParallaxLayer:setBlendMode
     it("blend mode can be changed multiple times", function()
         local layer = make_layer()
         layer:setBlendMode("additive")

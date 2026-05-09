@@ -1,7 +1,4 @@
--- tests/lua/integration/test_raycaster_render.lua
--- Integration: lurek.raycaster <-> lurek.render
-
--- @describe raycaster + render integration
+-- Integration: raycaster per-cell texture overrides and render image userdata
 describe("raycaster + render integration", function()
     -- @integration LImage:getId
     -- @integration LRaycaster:getFloorTextureCell

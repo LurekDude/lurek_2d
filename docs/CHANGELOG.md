@@ -2,6 +2,141 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.57] - 2026-05-09
+
+### docs(readme): add architecture overview section and ecosystem visualization
+
+- Added new "Architecture Overview" section to `README.md` describing the three-layer design (Lua game layer, Rust runtime layer, AI & dev tools).
+- Created `assets/architecture-overview.svg` — a comprehensive visual summary of the entire Lurek2D platform:
+  - User layer: Lua game scripts + VS Code extension
+  - Bridge layer: mlua bindings and typed channels
+  - Core runtime: GPU rendering, physics, audio, threading, resources, storage
+  - Feature systems: 2D rendering, data structures, AI, game logic, networking
+  - AI-first ecosystem: 20+ agents, 30+ skills, 200+ example games, 100% doc/test/example coverage
+  - Deployment targets: cloud AI agents (Copilot, Claude), local AI (Bielik, Llama), indie devs, modders, educators
+- Updated README to emphasize unique aspects:
+  - <10 MB single binary, no DLLs or installer
+  - LuaJIT primary with Lua 5.4 fallback
+  - Full MCP server for AI agent support
+  - 200+ playable games + 100+ single-file examples
+  - 30+ pure-Lua game-mechanics libraries
+  - VS Code extension with 30+ editors and full LSP
+  - 100% spec + example + test coverage as AI training data
+- Refined the SVG layout to a narrower, taller single-column composition so labels no longer overlap when rendered inside the root README.
+- Reworked the README to remove duplicated architecture detail, fix broken symbol rendering, replace the exhaustive module dump with a compact module map, and keep the SVG focused on the 15-second product explanation.
+- Removed architecture SVG from the root README and moved the architecture explanation fully into text sections: runtime module map, example game categories, and practical use cases.
+- Expanded README architecture section to a full per-module catalog grouped by responsibility, with dedicated descriptions for each active runtime module.
+- Added a dedicated AI-First Engineering section in README describing CAG-based engine workflow, MCP tool exposure, agent-assisted examples/tests flow, and the extension's separate game-dev CAG layer.
+- Added a root README table of contents and adjusted section order for readability (Project Identity now appears before License, with all content preserved).
+
+### feat(ui,charts): improve default evidence rendering quality in engine
+
+- Improved chart renderer quality in `src/ui/chart.rs` at engine level (no test-only paths):
+  - added numeric axis ticks/labels for line, bar, scatter, and area charts,
+  - added reusable legend panel rendering for multi-series charts,
+  - improved pie chart legend with percentage labels,
+  - preserved existing Lua API while upgrading visual output.
+- Improved GUI CPU evidence renderer in `src/ui/render.rs`:
+  - switched from flat fills to themed rendering with shadow, gradient body, border, highlight, text alignment, and per-control glyphs (slider thumb, progress fill, checkbox mark, combo arrow, radio dot),
+  - switched rendering to computed layout rects for accurate nested placement.
+- Completed engine-side UI coverage in runtime and defaults:
+  - `Theme::default_dark()` now provides built-in styles for all widget types, including windows, dialogs, menus, toolbars, tree views, tables, split panels, scroll panels, tooltips, color pickers, image widgets, and custom containers,
+  - `src/ui/render.rs` runtime draw-command generation now renders all built-in widgets instead of only a small subset,
+  - child traversal now includes widget-owned links beyond generic container children (menu bars, dialog content, accordion sections, split panels, dock panels, and nested menu items),
+  - `drawToImage()` remains an evidence helper; the same default skin now exists in the engine runtime path.
+- UI evidence scenes were reworked to enforce `max 5 widgets per PNG` while keeping compositions more complex and representative of real UI groupings.
+- GUI evidence outputs are now regenerated from a clean slate (`tests/output/gui/*.png` and `tests/output/ui_layout/*.png` removed before run) to avoid stale artifacts.
+- `tests/lua/evidence/test_ui_evidence.lua` now covers all built-in widget constructors (36/36) across dedicated evidence scenes, with each new scene respecting the 5-widget cap.
+- Expanded module evidence coverage:
+  - `tests/lua/evidence/test_light_evidence.lua` was deduplicated and expanded to cover `19/19` documented `lurek.light.*` functions while generating fresh PNG artifacts,
+  - `tests/lua/evidence/test_procgen_evidence.lua` was deduplicated and expanded to cover `16/18` documented `lurek.procgen.*` functions (well above the half-API target) with additional PNG outputs.
+- Enabled richer default theme behavior by defaulting `GuiContext` theme to `Theme::default_dark()` in `src/ui/context.rs`.
+- Updated evidence scripts for better visual content:
+  - `tests/lua/evidence/test_charts_evidence.lua` now includes richer multi-series trend evidence,
+  - `tests/lua/evidence/test_ui_evidence.lua` uses default theme and renders a fuller controls panel.
+- Validation:
+  - `python tools/audit/lua_test_structure_audit.py --path tests/lua/evidence` -> PASS,
+  - `python tools/dev/parallel_cargo.py test lua` -> PASS.
+
+### test(evidence): clean output legacy artifacts and expand light/physics/math PNG coverage
+
+- Cleaned `tests/output/` by removing files not referenced by current `tests/lua/evidence/*.lua` scripts, including stale migrated and old audio artifacts.
+- Rebuilt `tests/lua/evidence/test_physics_evidence.lua` into a clean visual suite with five unique PNG outputs:
+  - `physics_gravity_drop.png`
+  - `physics_velocity_tracks.png`
+  - `physics_collision_bands.png`
+  - `physics_query_map.png`
+  - `physics_sleep_flags.png`
+- Rebuilt `tests/lua/evidence/test_math_evidence.lua` into a PNG-only suite with ten unique outputs:
+  - `math_vec2_unit_circle.png`
+  - `math_distance_heatmap.png`
+  - `math_perlin2d_map.png`
+  - `math_simplex2d_map.png`
+  - `math_fbm_terrain.png`
+  - `math_easing_curves.png`
+  - `math_segment_intersections.png`
+  - `math_polygon_metrics.png`
+  - `math_hsl_gradient.png`
+  - `math_bresenham_rays.png`
+- Expanded `tests/lua/evidence/test_light_evidence.lua` with additional occluder-focused evidence:
+  - `occluder_corridor.png`
+  - `light_flicker_timeline.png`
+- Validation:
+  - `python tools/dev/parallel_cargo.py test lua` -> PASS
+  - `python tools/audit/lua_test_structure_audit.py --path tests/lua/evidence` -> PASS
+
+## [1.0.9-fix.56] - 2026-05-09
+
+### test(lua): normalize evidence outputs, fix evidence markers, and extend visual evidence coverage
+
+- Enforced evidence output policy to a single canonical helper path (`tests/output/<category>/`) by removing tracked legacy artifacts under deprecated `tests/evidence_out/` and `tests/output/evidence_out/`.
+- Fixed missing primary suite markers in evidence files to satisfy structure audit rules:
+  - `tests/lua/evidence/test_audio_evidence.lua`
+  - `tests/lua/evidence/test_canvas_evidence.lua`
+  - `tests/lua/evidence/test_math_evidence.lua`
+  - `tests/lua/evidence/test_scene_evidence.lua`
+  - `tests/lua/evidence/test_render_evidence.lua`
+- Added new evidence outputs focused on requested areas:
+  - render: `render_summary_dashboard.png` in `tests/lua/evidence/test_render_evidence.lua`
+  - charts: `trend_dual_series.png` in `tests/lua/evidence/test_charts_evidence.lua`
+  - ui: `controls_layout.png` in `tests/lua/evidence/test_ui_evidence.lua`
+  - raycaster: `raycaster_topdown.png` in `tests/lua/evidence/test_raycaster_evidence.lua`
+- Validation:
+  - `python tools/audit/lua_test_structure_audit.py --path tests/lua/evidence` -> PASS
+  - `python tools/dev/parallel_cargo.py test lua` -> PASS
+
+## [1.0.9-fix.55] - 2026-05-09
+
+### fix(testing): align Lua marker policy across framework docs, CAG, tools, and stress suites
+
+- Standardized Lua marker mapping across core artifacts:
+  - `tests/lua/unit/` -> `@covers`
+  - `tests/lua/security/` -> `@security`
+  - `tests/lua/integration/` -> `@integration`
+  - `tests/lua/stress/` -> `@stress`
+  - `tests/lua/evidence/` -> `@evidence`
+- Updated framework docs in `docs/architecture/test-framework.md` to reflect suite-specific markers and `@describe` wording.
+- Updated CAG files to remove `@covers-only` guidance and enforce suite-specific marker rules:
+  - `.github/agents/tester.agent.md`
+  - `.github/skills/testing-rust/SKILL.md`
+  - `.github/prompts/create-test-suite.prompt.md`
+  - `.github/prompts/validate-lua-tests-complete.prompt.md`
+- Updated `tools/audit/lua_test_structure_audit.py`:
+  - added folder-based primary marker detection,
+  - added missing marker and wrong-family marker diagnostics,
+  - restricted strict symbol validation (`--validate-cover-symbols`) to unit `@covers` only,
+  - generalized marker indentation checks/fixes for suite markers,
+  - kept `-- @tests` forbidden.
+- Manual stress-suite fixes:
+  - added missing `@stress` markers in `tests/lua/stress/test_data_stress.lua` and `tests/lua/stress/test_image_stress.lua`,
+  - removed UTF-8 BOM from `tests/lua/stress/test_ecs_stress.lua` and `tests/lua/stress/test_physics_stress.lua`,
+  - added one new Lua stress case in `tests/lua/stress/test_physics_stress.lua` (`deterministic results stay stable across 10 repeated runs`).
+- Validation:
+  - `python tools/validate/cag_validate.py` -> PASS,
+  - `python tools/audit/cag_link_check.py --strict` -> PASS,
+  - `python tools/audit/lua_test_structure_audit.py --path tests/lua/stress` -> PASS,
+  - `python tools/dev/parallel_cargo.py test lua` (`Test: Lua`) -> PASS.
+
 ## [1.0.9-fix.54] - 2026-05-08
 
 ### docs(testing): enforce per-suite Lua test goals, markers, and docstring rules

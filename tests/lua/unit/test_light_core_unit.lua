@@ -4,6 +4,7 @@
 
 -- @describe lurek.light module functions
 describe("lurek.light module functions", function()
+    -- @covers lurek.light
     it("lurek.light is a table", function()
         expect_type("table", lurek.light)
     end)

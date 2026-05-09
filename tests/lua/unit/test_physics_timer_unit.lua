@@ -42,6 +42,7 @@ describe("physics + timer integration", function()
         lurek.physics.destroyWorld(world_id)
     end)
 
+    -- @covers lurek.physics
     it("fixed timestep accumulator pattern", function()
         -- Simulate accumulator pattern
         local fixed_dt = 1.0 / 60.0

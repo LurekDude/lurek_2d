@@ -1,7 +1,4 @@
--- Lurek2D Integration Test: Entity + AI
--- Tests entity system with AI decision-making components
-
--- @describe integration: entity with AI state machine
+-- Integration: ECS entities driven by AI state machines
 describe("integration: entity with AI state machine", function()
     -- @integration LStateMachine:addState
     -- @integration LStateMachine:addTransition
@@ -55,7 +52,4 @@ describe("integration: entity with AI state machine", function()
     end)
 end)
 
--- @describe integration: entity tags with AI agents
-describe("integration: entity tags with AI agents", function()
-end)
 test_summary()
