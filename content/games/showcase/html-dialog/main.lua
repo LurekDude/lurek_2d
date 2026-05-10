@@ -55,7 +55,26 @@ local CSS = [[
 .choice-btn:hover { background:#1d4080; color:#fff; }
 ]]
 
+local function ensure_dialog_doc()
+  if dialog_doc then
+    return true
+  end
+
+  if not lurek.html or type(lurek.html.newDocument) ~= "function" then
+    return false
+  end
+
+  local w = lurek.window.getWidth()
+  local h = lurek.window.getHeight()
+  dialog_doc = lurek.html.newDocument("<body></body>", { css=CSS, width=w, height=h })
+  return dialog_doc ~= nil
+end
+
 local function open_dialog(node_idx)
+  if not ensure_dialog_doc() then
+    return
+  end
+
   local node = CONVO[node_idx]
   if not node then
     dialog_doc:setHtml("")
@@ -99,16 +118,16 @@ local function open_dialog(node_idx)
   end
 end
 
-function lurek.load()
-  local w = lurek.window.getWidth()
-  local h = lurek.window.getHeight()
-  dialog_doc = lurek.html.newDocument("", { css=CSS, width=w, height=h })
+function lurek.init()
+  if ensure_dialog_doc() then
+    open_dialog(1)
+  end
 end
 
-function lurek.update(dt)
-  if dialog_open then dialog_doc:update(dt) end
-  if lurek.keyboard.isDown("escape") then
-    if dialog_open then
+function lurek.process(dt)
+  if dialog_open and dialog_doc then dialog_doc:update(dt) end
+  if lurek.input.keyboard.isDown("escape") then
+    if dialog_open and dialog_doc then
       dialog_doc:setHtml("")
       dialog_open = false
     else
@@ -139,11 +158,11 @@ function lurek.draw()
   end
 
   -- HTML dialog.
-  if dialog_open then dialog_doc:render() end
+  if dialog_open and dialog_doc then dialog_doc:render() end
 end
 
 function lurek.mousepressed(x, y, btn)
-  if dialog_open then
+  if dialog_open and dialog_doc then
     local consumed = dialog_doc:mousepressed(x, y, btn)
     if consumed then return end
   end
@@ -155,6 +174,17 @@ function lurek.mousepressed(x, y, btn)
   end
 end
 
-function lurek.mousereleased(x, y, btn) dialog_doc:mousereleased(x, y, btn) end
-function lurek.mousemoved(x, y) dialog_doc:mousemoved(x, y) end
-function lurek.resize(w, h) dialog_doc:setViewport(w, h) end
+function lurek.mousereleased(x, y, btn)
+  if dialog_doc then dialog_doc:mousereleased(x, y, btn) end
+end
+
+function lurek.mousemoved(x, y)
+  if dialog_doc then dialog_doc:mousemoved(x, y) end
+end
+
+function lurek.resize(w, h)
+  if not ensure_dialog_doc() then
+    return
+  end
+  dialog_doc:setViewport(w, h)
+end

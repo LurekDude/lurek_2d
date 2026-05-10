@@ -1,6 +1,6 @@
 {
   "version": "auto-generated",
-  "generated": "2026-05-07",
+  "generated": "2026-05-10",
   "modules": [
     {
       "name": "ai",
@@ -676,6 +676,24 @@
           "parameters": [],
           "returns": "BlendLayerSet",
           "returnType": "BlendLayerSet",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "buildCharacter",
+          "fullPath": "lurek.animation.buildCharacter",
+          "signature": "(cfg)",
+          "description": "Builds a common character animation bundle: Animation plus optional state machine.",
+          "parameters": [
+            {
+              "name": "cfg",
+              "type": "table",
+              "description": "Setup table with grid, clips, and optional states/transitions.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": false,
           "objectType": null
         }
@@ -6581,6 +6599,72 @@
           "objectType": null
         },
         {
+          "name": "readJson",
+          "fullPath": "lurek.filesystem.readJson",
+          "signature": "(path)",
+          "description": "Reads a JSON file as text and validates that the payload is valid JSON.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Virtual path to the JSON file.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "writeJson",
+          "fullPath": "lurek.filesystem.writeJson",
+          "signature": "(path, json)",
+          "description": "Writes validated JSON text to a file in the save sandbox.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Save path to write.",
+              "optional": false
+            },
+            {
+              "name": "json",
+              "type": "string",
+              "description": "JSON payload.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "readOrWriteJson",
+          "fullPath": "lurek.filesystem.readOrWriteJson",
+          "signature": "(path, default_json)",
+          "description": "Reads JSON from `path`, or writes `default_json` and returns it when missing.",
+          "parameters": [
+            {
+              "name": "path",
+              "type": "string",
+              "description": "Save path to read.",
+              "optional": false
+            },
+            {
+              "name": "default_json",
+              "type": "string",
+              "description": "JSON payload written if file does not exist.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "readBytes",
           "fullPath": "lurek.filesystem.readBytes",
           "signature": "(path)",
@@ -7484,12 +7568,12 @@
           "name": "loadDocument",
           "fullPath": "lurek.html.loadDocument",
           "signature": "(path, [opts])",
-          "description": "Placeholder for future sandboxed document loading.",
+          "description": "Loads an HTML UI document from the game filesystem sandbox.",
           "parameters": [
             {
               "name": "path",
               "type": "string",
-              "description": "Source path to load once this API is implemented.",
+              "description": "Relative game path to the HTML source file.",
               "optional": false
             },
             {
@@ -8089,6 +8173,101 @@
           "signature": "()",
           "description": "Returns an array of all currently loaded locale codes.",
           "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "isRTL",
+          "fullPath": "lurek.i18n.isRTL",
+          "signature": "([locale])",
+          "description": "Returns whether the active locale (or a given locale) uses right-to-left text direction.",
+          "parameters": [
+            {
+              "name": "locale",
+              "type": "string",
+              "description": "Optional locale code to check; defaults to the active locale.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "validateLocale",
+          "fullPath": "lurek.i18n.validateLocale",
+          "signature": "(locale)",
+          "description": "Returns whether a locale code string is a valid BCP 47-like identifier.",
+          "parameters": [
+            {
+              "name": "locale",
+              "type": "string",
+              "description": "Locale code to validate.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "detectLocale",
+          "fullPath": "lurek.i18n.detectLocale",
+          "signature": "()",
+          "description": "Reads system environment variables to guess the active locale.",
+          "parameters": [],
+          "returns": "string?",
+          "returnType": "string?",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "loadString",
+          "fullPath": "lurek.i18n.loadString",
+          "signature": "(locale, content, format)",
+          "description": "Parses a TOML or JSON string and loads it as a locale translation table.",
+          "parameters": [
+            {
+              "name": "locale",
+              "type": "string",
+              "description": "Locale code to store the parsed table under.",
+              "optional": false
+            },
+            {
+              "name": "content",
+              "type": "string",
+              "description": "TOML or JSON text to parse.",
+              "optional": false
+            },
+            {
+              "name": "format",
+              "type": "string",
+              "description": "Either `\"toml\"` or `\"json\"`.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "localeCoverage",
+          "fullPath": "lurek.i18n.localeCoverage",
+          "signature": "(reference)",
+          "description": "Returns missing keys across all loaded locales compared to a reference locale.",
+          "parameters": [
+            {
+              "name": "reference",
+              "type": "string",
+              "description": "Locale code whose key set is treated as complete.",
+              "optional": false
+            }
+          ],
           "returns": "table",
           "returnType": "table",
           "isMethod": false,
@@ -23807,6 +23986,64 @@
           "objectType": null
         },
         {
+          "name": "beginDrag",
+          "fullPath": "lurek.ui.beginDrag",
+          "signature": "(widget)",
+          "description": "Starts a drag operation for the given widget.",
+          "parameters": [
+            {
+              "name": "widget",
+              "type": "table|integer",
+              "description": "Widget handle table or widget pool index.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getActiveDrag",
+          "fullPath": "lurek.ui.getActiveDrag",
+          "signature": "()",
+          "description": "Returns the widget index currently being dragged, or `nil`.",
+          "parameters": [],
+          "returns": "integer?",
+          "returnType": "integer?",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "dropOn",
+          "fullPath": "lurek.ui.dropOn",
+          "signature": "(target)",
+          "description": "Drops the current drag widget on a container target.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "table|integer",
+              "description": "Container widget handle table or widget pool index.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "endDrag",
+          "fullPath": "lurek.ui.endDrag",
+          "signature": "()",
+          "description": "Cancels active dragging and returns the previous drag widget index.",
+          "parameters": [],
+          "returns": "integer?",
+          "returnType": "integer?",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "update_bindings",
           "fullPath": "lurek.ui.update_bindings",
           "signature": "lurek.ui.update_bindings(data)",
@@ -26668,6 +26905,88 @@
           "objectType": "LAccordion"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LAccordion.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LAccordion"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LAccordion.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LAccordion"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LAccordion.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LAccordion"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LAccordion.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LAccordion"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LAccordion.attachToEntity",
           "signature": "(entity_id)",
@@ -27507,9 +27826,27 @@
           "objectType": "LAnimation"
         },
         {
+          "name": "addFramesFromRects",
+          "fullPath": "LAnimation:addFramesFromRects",
+          "signature": "(rects)",
+          "description": "Appends frames from a table of pre-computed source rectangles.",
+          "parameters": [
+            {
+              "name": "rects",
+              "type": "table",
+              "description": "Array of {x, y, w, h} rectangle tables.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LAnimation"
+        },
+        {
           "name": "addClip",
           "fullPath": "LAnimation:addClip",
-          "signature": "(name, indices_tbl, fps, looping)",
+          "signature": "(name, indices_tbl, fps, looping, [mode])",
           "description": "Adds a named clip from explicit frame indices.",
           "parameters": [
             {
@@ -27535,10 +27872,58 @@
               "type": "boolean",
               "description": "Whether the clip should loop.",
               "optional": false
+            },
+            {
+              "name": "mode",
+              "type": "any",
+              "description": "",
+              "optional": true
             }
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LAnimation"
+        },
+        {
+          "name": "setClipMode",
+          "fullPath": "LAnimation:setClipMode",
+          "signature": "(name, mode)",
+          "description": "Sets playback mode for a named clip.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Clip name.",
+              "optional": false
+            },
+            {
+              "name": "mode",
+              "type": "string",
+              "description": "One of forward, reverse, pingpong.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LAnimation"
+        },
+        {
+          "name": "getClipMode",
+          "fullPath": "LAnimation:getClipMode",
+          "signature": "(name)",
+          "description": "Returns playback mode for a named clip.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Clip name.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
           "isMethod": true,
           "objectType": "LAnimation"
         },
@@ -27863,6 +28248,30 @@
               "name": "height",
               "type": "integer",
               "description": "Output image height in pixels.",
+              "optional": false
+            }
+          ],
+          "returns": "ImageData",
+          "returnType": "ImageData",
+          "isMethod": true,
+          "objectType": "LAnimation"
+        },
+        {
+          "name": "drawPreviewGrid",
+          "fullPath": "LAnimation:drawPreviewGrid",
+          "signature": "(columns, cell_size)",
+          "description": "Renders all animation frames into a compact debug grid image.",
+          "parameters": [
+            {
+              "name": "columns",
+              "type": "integer",
+              "description": "Number of columns in the preview grid.",
+              "optional": false
+            },
+            {
+              "name": "cellSize",
+              "type": "integer",
+              "description": "Cell size in pixels.",
               "optional": false
             }
           ],
@@ -30826,6 +31235,88 @@
           "objectType": "LBadge"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LBadge.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBadge"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LBadge.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBadge"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LBadge.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBadge"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LBadge.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBadge"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LBadge.attachToEntity",
           "signature": "(entity_id)",
@@ -33583,6 +34074,88 @@
           "objectType": "LButton"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LButton.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LButton"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LButton.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LButton"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LButton.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LButton"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LButton.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LButton"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LButton.attachToEntity",
           "signature": "(entity_id)",
@@ -36219,6 +36792,88 @@
           "objectType": "LCheckbox"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LCheckbox.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCheckbox"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LCheckbox.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCheckbox"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LCheckbox.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCheckbox"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LCheckbox.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCheckbox"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LCheckbox.attachToEntity",
           "signature": "(entity_id)",
@@ -37646,6 +38301,88 @@
           "objectType": "LColorPicker"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LColorPicker.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LColorPicker"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LColorPicker.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LColorPicker"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LColorPicker.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LColorPicker"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LColorPicker.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LColorPicker"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LColorPicker.attachToEntity",
           "signature": "(entity_id)",
@@ -38773,6 +39510,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LComboBox"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LComboBox.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LComboBox"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LComboBox.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LComboBox"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LComboBox.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LComboBox"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LComboBox.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LComboBox"
         },
@@ -43179,6 +43998,88 @@
           "objectType": "LDialog"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LDialog.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialog"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LDialog.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialog"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LDialog.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialog"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LDialog.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialog"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LDialog.attachToEntity",
           "signature": "(entity_id)",
@@ -44352,6 +45253,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDockPanel"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LDockPanel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDockPanel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LDockPanel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDockPanel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LDockPanel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDockPanel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LDockPanel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LDockPanel"
         },
@@ -50427,6 +51410,88 @@
           "objectType": "LGuiTable"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LGuiTable.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiTable"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LGuiTable.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiTable"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LGuiTable.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiTable"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LGuiTable.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiTable"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LGuiTable.attachToEntity",
           "signature": "(entity_id)",
@@ -51443,6 +52508,88 @@
           "objectType": "LGuiWindow"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LGuiWindow.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiWindow"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LGuiWindow.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiWindow"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LGuiWindow.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiWindow"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LGuiWindow.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGuiWindow"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LGuiWindow.attachToEntity",
           "signature": "(entity_id)",
@@ -52223,7 +53370,31 @@
           "name": "draw",
           "fullPath": "LHtmlDocument:draw",
           "signature": "([x], [y])",
-          "description": "Builds the current draw command list and discards it for now.",
+          "description": "Builds draw commands and enqueues them into the frame render queue.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Optional X offset for the draw origin.",
+              "optional": true
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Optional Y offset for the draw origin.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LHtmlDocument"
+        },
+        {
+          "name": "render",
+          "fullPath": "LHtmlDocument:render",
+          "signature": "([x], [y])",
+          "description": "Backward-compatible alias for `draw`, kept for existing demos.",
           "parameters": [
             {
               "name": "x",
@@ -55343,6 +56514,88 @@
           "objectType": "LImageWidget"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LImageWidget.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LImageWidget"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LImageWidget.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LImageWidget"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LImageWidget.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LImageWidget"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LImageWidget.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LImageWidget"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LImageWidget.attachToEntity",
           "signature": "(entity_id)",
@@ -57242,6 +58495,88 @@
           "objectType": "LLabel"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LLabel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLabel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LLabel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLabel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LLabel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLabel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LLabel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLabel"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LLabel.attachToEntity",
           "signature": "(entity_id)",
@@ -58978,6 +60313,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LLayout"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LLayout.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLayout"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LLayout.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLayout"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LLayout.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLayout"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LLayout.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LLayout"
         },
@@ -61280,6 +62697,88 @@
           "objectType": "LListBox"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LListBox.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LListBox"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LListBox.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LListBox"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LListBox.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LListBox"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LListBox.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LListBox"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LListBox.attachToEntity",
           "signature": "(entity_id)",
@@ -62986,6 +64485,88 @@
           "objectType": "LMenuBar"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LMenuBar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuBar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LMenuBar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuBar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LMenuBar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuBar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LMenuBar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuBar"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LMenuBar.attachToEntity",
           "signature": "(entity_id)",
@@ -63980,6 +65561,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMenuItem"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LMenuItem.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuItem"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LMenuItem.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuItem"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LMenuItem.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMenuItem"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LMenuItem.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LMenuItem"
         },
@@ -69568,6 +71231,88 @@
           "objectType": "LNinePatch"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LNinePatch.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNinePatch"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LNinePatch.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNinePatch"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LNinePatch.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNinePatch"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LNinePatch.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNinePatch"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LNinePatch.attachToEntity",
           "signature": "(entity_id)",
@@ -73209,6 +74954,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LPanel"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LPanel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LPanel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LPanel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LPanel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LPanel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LPanel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LPanel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LPanel"
         },
@@ -78731,6 +80558,88 @@
           "objectType": "LProgressBar"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LProgressBar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProgressBar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LProgressBar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProgressBar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LProgressBar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProgressBar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LProgressBar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LProgressBar"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LProgressBar.attachToEntity",
           "signature": "(entity_id)",
@@ -81302,6 +83211,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRadioButton"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LRadioButton.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LRadioButton"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LRadioButton.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LRadioButton"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LRadioButton.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LRadioButton"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LRadioButton.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LRadioButton"
         },
@@ -85678,6 +87669,88 @@
           "objectType": "LScrollBar"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LScrollBar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollBar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LScrollBar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollBar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LScrollBar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollBar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LScrollBar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollBar"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LScrollBar.attachToEntity",
           "signature": "(entity_id)",
@@ -86670,6 +88743,88 @@
           "objectType": "LScrollPanel"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LScrollPanel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollPanel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LScrollPanel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollPanel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LScrollPanel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollPanel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LScrollPanel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LScrollPanel"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LScrollPanel.attachToEntity",
           "signature": "(entity_id)",
@@ -87606,6 +89761,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LSeparator"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LSeparator.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSeparator"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSeparator.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSeparator"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSeparator.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSeparator"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSeparator.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LSeparator"
         },
@@ -90441,6 +92678,88 @@
           "objectType": "LSlider"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LSlider.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSlider"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSlider.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSlider"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSlider.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSlider"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSlider.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSlider"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LSlider.attachToEntity",
           "signature": "(entity_id)",
@@ -91995,6 +94314,88 @@
           "objectType": "LSpacer"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LSpacer.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpacer"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSpacer.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpacer"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSpacer.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpacer"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSpacer.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpacer"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LSpacer.attachToEntity",
           "signature": "(entity_id)",
@@ -93242,6 +95643,88 @@
           "objectType": "LSpinBox"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LSpinBox.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpinBox"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSpinBox.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpinBox"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSpinBox.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpinBox"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSpinBox.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSpinBox"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LSpinBox.attachToEntity",
           "signature": "(entity_id)",
@@ -94265,6 +96748,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LSplitPanel"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LSplitPanel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSplitPanel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSplitPanel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSplitPanel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSplitPanel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSplitPanel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSplitPanel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LSplitPanel"
         },
@@ -96540,6 +99105,88 @@
           "objectType": "LStatusBar"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LStatusBar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStatusBar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LStatusBar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStatusBar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LStatusBar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStatusBar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LStatusBar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStatusBar"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LStatusBar.attachToEntity",
           "signature": "(entity_id)",
@@ -98385,6 +101032,88 @@
           "objectType": "LSwitch"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LSwitch.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSwitch"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LSwitch.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSwitch"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LSwitch.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSwitch"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LSwitch.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSwitch"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LSwitch.attachToEntity",
           "signature": "(entity_id)",
@@ -99357,6 +102086,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTabBar"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LTabBar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTabBar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LTabBar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTabBar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LTabBar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTabBar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LTabBar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LTabBar"
         },
@@ -101024,6 +103835,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTextInput"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LTextInput.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTextInput"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LTextInput.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTextInput"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LTextInput.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTextInput"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LTextInput.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LTextInput"
         },
@@ -103854,6 +106747,88 @@
           "objectType": "LToast"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LToast.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToast"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LToast.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToast"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LToast.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToast"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LToast.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToast"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LToast.attachToEntity",
           "signature": "(entity_id)",
@@ -104902,6 +107877,88 @@
           "objectType": "LToolbar"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LToolbar.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToolbar"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LToolbar.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToolbar"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LToolbar.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToolbar"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LToolbar.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LToolbar"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LToolbar.attachToEntity",
           "signature": "(entity_id)",
@@ -105867,6 +108924,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTooltipPanel"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LTooltipPanel.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTooltipPanel"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LTooltipPanel.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTooltipPanel"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LTooltipPanel.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTooltipPanel"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LTooltipPanel.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LTooltipPanel"
         },
@@ -107856,6 +110995,88 @@
           "objectType": "LTreeView"
         },
         {
+          "name": "animateAlpha",
+          "fullPath": "LTreeView.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTreeView"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LTreeView.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTreeView"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LTreeView.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTreeView"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LTreeView.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTreeView"
+        },
+        {
           "name": "attachToEntity",
           "fullPath": "LTreeView.attachToEntity",
           "signature": "(entity_id)",
@@ -109622,6 +112843,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LUiWidget"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LUiWidget.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LUiWidget"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LUiWidget.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LUiWidget"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LUiWidget.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LUiWidget"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LUiWidget.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LUiWidget"
         },
@@ -113917,6 +117220,88 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LWidget"
+        },
+        {
+          "name": "animateAlpha",
+          "fullPath": "LWidget.animateAlpha",
+          "signature": "(target, [duration], [hide_on_complete])",
+          "description": "Starts a timed alpha transition to `target`.",
+          "parameters": [
+            {
+              "name": "target",
+              "type": "number",
+              "description": "Target alpha in range `[0, 1]`.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            },
+            {
+              "name": "hideOnComplete",
+              "type": "boolean",
+              "description": "If true and target alpha is `0`, widget is hidden when transition ends.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWidget"
+        },
+        {
+          "name": "animatePosition",
+          "fullPath": "LWidget.animatePosition",
+          "signature": "(x, y, [duration])",
+          "description": "Starts a timed position transition toward `(x, y)`.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target widget X position.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target widget Y position.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds. Pass nil for `0.2`.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWidget"
+        },
+        {
+          "name": "isAnimating",
+          "fullPath": "LWidget.isAnimating",
+          "signature": "()",
+          "description": "Returns true when this widget has active transitions.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWidget"
+        },
+        {
+          "name": "cancelAnimations",
+          "fullPath": "LWidget.cancelAnimations",
+          "signature": "()",
+          "description": "Cancels all active transitions for this widget.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LWidget"
         },

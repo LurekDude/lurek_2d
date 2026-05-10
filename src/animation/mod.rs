@@ -27,13 +27,16 @@ pub mod render;
 pub mod state_machine;
 /// Named animation synchronisation groups.
 pub mod sync_group;
+/// Bridge between [`AnimStateMachine`] and a Spine [`Skeleton`].
+pub mod spine_bridge;
 
 pub use aseprite::{
     load_aseprite_json, AsepriteDirection, AsepriteFrameData, AsepriteParsed, AsepriteTagData,
 };
 pub use blend::{BlendLayer, BlendLayerSet, BlendMask};
-pub use clip::AnimClip;
+pub use clip::{AnimClip, ClipPlaybackMode};
 pub use controller::Animation;
+pub use curve::AnimPropertyTimeline;
 pub use event::AnimEvent;
 pub use frame::{AnimFrame, AnimationFrame};
 pub use render::AnimRenderParams;
@@ -41,3 +44,5 @@ pub use state_machine::{
     AnimParamValue, AnimStateConfig, AnimStateMachine, AnimTransition, ConditionOp, ConditionValue,
     TransitionCondition,
 };
+pub use spine_bridge::SpineAnimBridge;
+pub use sync_group::AnimSyncGroup;

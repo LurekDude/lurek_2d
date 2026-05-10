@@ -245,10 +245,8 @@ impl Overlay {
     }
 
     /// Spawns a single weather particle at a random position along the top edge.
-    fn spawn_particle(&self, width: f32) -> WeatherParticle {
-        // Use a simple hash-based pseudo-random for deterministic-ish placement
-        let seed = self.weather.particles.len() as f32;
-        let frac = ((seed * 1.618033).fract() + 0.5).fract();
+    fn spawn_particle(&mut self, width: f32) -> WeatherParticle {
+        let frac = self.weather.next_unit();
         let x = frac * width;
 
         let (vy, size, alpha) = match self.weather.weather_type {

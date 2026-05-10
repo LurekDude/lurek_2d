@@ -599,32 +599,7 @@ impl PostFxStack {
             .map(|(i, t)| {
                 let effect = super::PostFxEffect::new(*t);
                 let param_count = effect.get_parameter_names().len();
-                let label: &str = match t {
-                    super::PostFxEffectType::Vignette => "VIGNETTE",
-                    super::PostFxEffectType::Grayscale => "GRAYSCALE",
-                    super::PostFxEffectType::Chromatic => "CHROMATIC",
-                    super::PostFxEffectType::Blur => "BLUR",
-                    super::PostFxEffectType::Pixelate => "PIXELATE",
-                    super::PostFxEffectType::Invert => "INVERT",
-                    super::PostFxEffectType::Sepia => "SEPIA",
-                    super::PostFxEffectType::Scanlines => "SCANLINES",
-                    super::PostFxEffectType::Bloom => "BLOOM",
-                    super::PostFxEffectType::Crt => "CRT",
-                    super::PostFxEffectType::Godrays => "GODRAYS",
-                    super::PostFxEffectType::ColourGrade => "COLOUR_GRADE",
-                    super::PostFxEffectType::EdgeDetect => "EDGE_DETECT",
-                    super::PostFxEffectType::HueShift => "HUE_SHIFT",
-                    super::PostFxEffectType::Noise => "NOISE",
-                    super::PostFxEffectType::Custom => "CUSTOM",
-                    super::PostFxEffectType::DepthOfField => "DEPTH_OF_FIELD",
-                    super::PostFxEffectType::MotionBlur => "MOTION_BLUR",
-                    super::PostFxEffectType::PaletteSwap => "PALETTE_SWAP",
-                    super::PostFxEffectType::ColorLut => "COLOR_LUT",
-                    super::PostFxEffectType::WaterDistort => "WATER_DISTORT",
-                    super::PostFxEffectType::Sharpen => "SHARPEN",
-                    super::PostFxEffectType::Dither => "DITHER",
-                    super::PostFxEffectType::Outline => "OUTLINE",
-                };
+                let label = t.debug_label();
                 let color = palette[i % palette.len()];
                 (label, color, param_count)
             })

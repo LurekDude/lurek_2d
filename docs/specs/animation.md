@@ -13,7 +13,7 @@
 
 The `animation` module is Lurek2D's sprite animation system — a Foundations tier subsystem dedicated to describing how a textured sprite changes its source rectangle over time. It imports only from `crate::math`, so it can run in unit tests and non-rendering contexts without any platform services or GPU state.
 
-**Core playback.** `Animation` is the main controller. It owns a flat pool of `AnimFrame` entries (each a source rectangle into a sprite sheet with an optional per-frame duration override) and any number of named `AnimClip` objects (an ordered list of frame indices, a default FPS rate, and a looping flag). Typical usage: `add_frame` or `add_frames_from_grid` for atlas layouts, then `add_clip` to register named states, then `play(clip_name)` when sprite state changes. `update(dt)` advances the frame timer, emits `AnimEvent` notifications via a pending queue (`ClipEnd`, `FrameReached`, `ClipLoop`), and applies crossfade transitions between clips.
+**Core playback.** `Animation` is the main controller. It owns a flat pool of `AnimFrame` entries (each a source rectangle into a sprite sheet with an optional per-frame duration override) and any number of named `AnimClip` objects (an ordered list of frame indices, a default FPS rate, a looping flag, and an explicit playback mode: `forward`, `reverse`, or `pingpong`). Typical usage: `add_frame` or `add_frames_from_grid` for atlas layouts, then `add_clip` to register named states, then `play(clip_name)` when sprite state changes. `update(dt)` advances the frame timer, emits `AnimEvent` notifications via a pending queue (`ClipEnd`, `FrameReached`, `ClipLoop`), and applies crossfade transitions between clips.
 
 **State machine.** `AnimStateMachine` provides parameter-driven transitions between clips. `AnimParamValue` holds boolean, integer, or float values. `AnimTransition` edges carry a `TransitionCondition` (parameter name, `ConditionOp`, threshold) — the machine evaluates all outgoing transitions from the current state each update tick and switches automatically when a condition fires. `AnimStateConfig` stores per-state clip name, transition priority, and optional blend-in duration.
 
@@ -27,7 +27,7 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 
 **Render integration.** `AnimRenderParams` packages all data the render pipeline needs to draw one frame: texture key, source rect, destination transform, and flip flags. The module itself never issues draw calls; it only produces parameters consumed by `render`.
 
-**Lua surface.** `lurek.animation.new()` creates an `Animation`. `lurek.animation.newStateMachine()`, `lurek.animation.newCurve()`, `lurek.animation.newSyncGroup()`, and `lurek.animation.newBlendLayerSet()` expose the additional subsystems. `lurek.animation.loadAseprite(json_string)` parses Aseprite exports. All returned userdatas are fully scriptable with their complete method sets.
+**Lua surface.** `lurek.animation.new()` creates an `Animation`. `lurek.animation.newStateMachine()`, `lurek.animation.newCurve()`, `lurek.animation.newSyncGroup()`, and `lurek.animation.newBlendLayerSet()` expose the additional subsystems. `lurek.animation.fromAseprite(json_string)` parses Aseprite exports. `lurek.animation.buildCharacter(cfg)` builds a common animation+FSM bundle from one configuration table. All returned userdatas are fully scriptable with their complete method sets.
 
 **Scope boundary.** Foundations tier. Depends only on `math`. Lua bridge in `src/lua_api/animation_api.rs`.
 
@@ -156,6 +156,7 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - `lurek.animation.newCurve`: Creates a new empty animation curve with linear interpolation.
 - `lurek.animation.newSyncGroup`: Creates a new empty animation sync group.
 - `lurek.animation.newBlendLayerSet`: Creates a new empty blend layer set for compositing multiple animation clips.
+- `lurek.animation.buildCharacter`: Builds an `Animation` plus optional `AnimStateMachine` from one config table.
 
 ### `LAnimCurve` Methods
 - `LAnimCurve:addKeyframe`: Inserts or replaces a keyframe at the given time.
@@ -189,8 +190,11 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 ### `LAnimation` Methods
 - `LAnimation:addFrame`: Adds a single frame to the frame pool by source rectangle.
 - `LAnimation:addFramesFromGrid`: Slices a sprite-sheet grid into frames and appends them.
-- `LAnimation:addClip`: Adds a named clip from explicit frame indices.
+- `LAnimation:addFramesFromRects`: Appends frames from pre-computed source rectangles.
+- `LAnimation:addClip`: Adds a named clip from explicit frame indices, optionally including playback mode.
 - `LAnimation:addClipFromGrid`: Adds a named clip sliced from a sprite-sheet grid.
+- `LAnimation:setClipMode`: Sets playback mode for a named clip.
+- `LAnimation:getClipMode`: Returns playback mode for a named clip.
 - `LAnimation:play`: Starts playback of the named clip.
 - `LAnimation:stop`: Stops playback and resets to frame 0.
 - `LAnimation:pause`: Pauses playback at the current frame.
@@ -210,6 +214,7 @@ The `animation` module is Lurek2D's sprite animation system — a Foundations ti
 - `LAnimation:crossfade`: Begins a smooth crossfade from the current clip to a new named clip.
 - `LAnimation:getBlendState`: Returns the active crossfade state.
 - `LAnimation:drawToImage`: Renders the current animation frame into a new ImageData (white bg, blue frame rect).
+- `LAnimation:drawPreviewGrid`: Renders all animation frames into a grid preview ImageData.
 - `LAnimation:type`: Returns the type name of this object.
 - `LAnimation:typeOf`: Returns true if this object is of the given type.
 

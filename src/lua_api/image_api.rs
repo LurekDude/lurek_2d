@@ -515,11 +515,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "newCompressedData",
         lua.create_function(move |lua, filename: String| {
-            let path = s.borrow().game_dir.join(&filename);
-            let path_str = path
-                .to_str()
-                .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
-            let cid = CompressedImageData::from_file(path_str).map_err(LuaError::external)?;
+            let bytes = s
+                .borrow()
+                .fs
+                .read_bytes(&filename)
+                .map_err(LuaError::external)?;
+            let cid = CompressedImageData::from_dds(&bytes).map_err(LuaError::external)?;
             lua.create_userdata(LuaCompressedImageData { inner: cid })
         })?,
     )?;
@@ -533,10 +534,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "isCompressed",
         lua.create_function(move |_, filename: String| {
-            let path = s.borrow().game_dir.join(&filename);
-            Ok(CompressedImageData::is_dds_file(
-                path.to_str().unwrap_or(""),
-            ))
+            let bytes = match s.borrow().fs.read_bytes(&filename) {
+                Ok(bytes) => bytes,
+                Err(_) => return Ok(false),
+            };
+            Ok(CompressedImageData::is_dds_magic(&bytes))
         })?,
     )?;
 
@@ -606,11 +608,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "loadImage",
         lua.create_function(move |lua, filename: String| {
-            let path = s.borrow().game_dir.join(&filename);
-            let path_str = path
-                .to_str()
-                .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
-            let img = serial::load_image(path_str).map_err(LuaError::external)?;
+            let bytes = s
+                .borrow()
+                .fs
+                .read_bytes(&filename)
+                .map_err(LuaError::external)?;
+            let img = serial::load_image_from_bytes(&bytes, &filename).map_err(LuaError::external)?;
             lua.create_userdata(img)
         })?,
     )?;
@@ -624,11 +627,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "loadLayered",
         lua.create_function(move |lua, filename: String| {
-            let path = s.borrow().game_dir.join(&filename);
-            let path_str = path
-                .to_str()
-                .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
-            let stack = serial::load_layered(path_str).map_err(LuaError::external)?;
+            let bytes = s
+                .borrow()
+                .fs
+                .read_bytes(&filename)
+                .map_err(LuaError::external)?;
+            let stack =
+                serial::load_layered_from_bytes(&bytes, &filename).map_err(LuaError::external)?;
             lua.create_userdata(LuaLayeredImage { inner: stack })
         })?,
     )?;

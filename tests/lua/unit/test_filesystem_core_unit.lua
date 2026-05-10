@@ -19,7 +19,7 @@ describe("lurek.filesystem module", function()
     -- @covers lurek.filesystem
     it("all expected functions are present", function()
         local fns = {
-            "read", "write", "exists", "append", "remove",
+            "read", "write", "readJson", "writeJson", "readOrWriteJson", "exists", "append", "remove",
             "openFile", "newFileData",
             "getDirectoryItems", "isFile", "isDirectory", "createDirectory",
             "getInfo", "getSource", "getSaveDirectory", "getWorkingDirectory",
@@ -30,6 +30,38 @@ describe("lurek.filesystem module", function()
         for _, name in ipairs(fns) do
             expect_type("function", lurek.filesystem[name], name .. " must be a function")
         end
+    end)
+end)
+
+-- JSON helpers
+
+-- @describe lurek.filesystem.readJson / writeJson / readOrWriteJson
+describe("lurek.filesystem JSON helpers", function()
+    -- @covers lurek.filesystem.readOrWriteJson
+    it("readOrWriteJson writes default JSON when missing", function()
+        local path = TMP .. "json_default.json"
+        if lurek.filesystem.exists(path) then
+            lurek.filesystem.remove(path)
+        end
+        local json = lurek.filesystem.readOrWriteJson(path, '{"hp":10,"name":"mage"}')
+        expect_true(lurek.filesystem.exists(path))
+        expect_equal('{"hp":10,"name":"mage"}', json)
+    end)
+
+    -- @covers lurek.filesystem.readJson
+    -- @covers lurek.filesystem.writeJson
+    it("writeJson then readJson round-trips payload", function()
+        local path = TMP .. "json_roundtrip.json"
+        lurek.filesystem.writeJson(path, '{"score":42}')
+        local json = lurek.filesystem.readJson(path)
+        expect_equal('{"score":42}', json)
+    end)
+
+    -- @covers lurek.filesystem.writeJson
+    it("writeJson rejects invalid JSON", function()
+        expect_error(function()
+            lurek.filesystem.writeJson(TMP .. "json_bad.json", "{bad-json")
+        end)
     end)
 end)
 

@@ -11,7 +11,10 @@ use std::rc::Rc;
 use mlua::prelude::*;
 
 use crate::i18n::format::{format_date, format_number, locale_separators};
-use crate::i18n::{interpolate, Catalog, PluralForm};
+use crate::i18n::{
+    detect_system_locale, flat_table_from_json, flat_table_from_toml, interpolate, is_rtl,
+    is_valid_locale_code, Catalog, PluralForm,
+};
 use crate::runtime::SharedState;
 
 // ---------------------------------------------------------------------------
@@ -669,6 +672,92 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let tbl = lua.create_table()?;
             for (i, locale) in locales.iter().enumerate() {
                 tbl.set(i + 1, *locale)?;
+            }
+            Ok(tbl)
+        })?,
+    )?;
+
+    // -- isRTL --
+    let s = shared.clone();
+    /// Returns whether the active locale (or a given locale) uses right-to-left text direction.
+    /// @param | locale | string? | Optional locale code to check; defaults to the active locale.
+    /// @return | boolean | True when the locale is a known RTL language.
+    loc.set(
+        "isRTL",
+        lua.create_function(move |_, locale: Option<String>| {
+            let code = locale.unwrap_or_else(|| s.borrow().catalog.locale.clone());
+            Ok(is_rtl(&code))
+        })?,
+    )?;
+
+    // -- validateLocale --
+    /// Returns whether a locale code string is a valid BCP 47-like identifier.
+    /// @param | locale | string | Locale code to validate.
+    /// @return | boolean | True when the code is well-formed.
+    loc.set(
+        "validateLocale",
+        lua.create_function(|_, locale: String| Ok(is_valid_locale_code(&locale)))?,
+    )?;
+
+    // -- detectLocale --
+    /// Reads system environment variables to guess the active locale.
+    /// @return | string? | Detected locale code, or nil when none is found.
+    loc.set(
+        "detectLocale",
+        lua.create_function(|lua, ()| {
+            match detect_system_locale() {
+                Some(code) => Ok(LuaValue::String(lua.create_string(&code)?)),
+                None => Ok(LuaValue::Nil),
+            }
+        })?,
+    )?;
+
+    // -- loadString --
+    let s = shared.clone();
+    /// Parses a TOML or JSON string and loads it as a locale translation table.
+    /// @param | locale | string | Locale code to store the parsed table under.
+    /// @param | content | string | TOML or JSON text to parse.
+    /// @param | format | string | Either `"toml"` or `"json"`.
+    /// @return | nil | No value is returned.
+    loc.set(
+        "loadString",
+        lua.create_function(move |_, (locale, content, format): (String, String, String)| {
+            let flat = match format.to_lowercase().as_str() {
+                "toml" => flat_table_from_toml(&content)
+                    .map_err(mlua::Error::RuntimeError)?,
+                "json" => flat_table_from_json(&content)
+                    .map_err(mlua::Error::RuntimeError)?,
+                other => {
+                    return Err(mlua::Error::RuntimeError(format!(
+                        "loadString: unknown format '{}'; expected 'toml' or 'json'",
+                        other
+                    )))
+                }
+            };
+            s.borrow_mut().catalog.load(&locale, flat);
+            Ok(())
+        })?,
+    )?;
+
+    // -- localeCoverage --
+    let s = shared.clone();
+    /// Returns missing keys across all loaded locales compared to a reference locale.
+    /// @param | reference | string | Locale code whose key set is treated as complete.
+    /// @return | table | Array of `{ key, missing_in }` gap tables.
+    loc.set(
+        "localeCoverage",
+        lua.create_function(move |lua, reference: String| {
+            let gaps = s.borrow().catalog.coverage_gaps(&reference);
+            let tbl = lua.create_table()?;
+            for (i, gap) in gaps.iter().enumerate() {
+                let row = lua.create_table()?;
+                row.set("key", gap.key.as_str())?;
+                let missing = lua.create_table()?;
+                for (j, loc) in gap.missing_in.iter().enumerate() {
+                    missing.set(j + 1, loc.as_str())?;
+                }
+                row.set("missing_in", missing)?;
+                tbl.set(i + 1, row)?;
             }
             Ok(tbl)
         })?,

@@ -605,4 +605,224 @@ describe("unit: migrated from integration/test_i18n_ui.lua", function()
 
 end)
 
+-- @describe lurek.i18n new APIs (IDEA.md features)
+describe("lurek.i18n new APIs", function()
+    -- @covers lurek.i18n.isRTL
+    it("all new API functions are present", function()
+        local fns = {
+            "isRTL", "validateLocale", "detectLocale",
+            "loadString", "localeCoverage",
+        }
+        for _, name in ipairs(fns) do
+            expect_type("function", lurek.i18n[name],
+                name .. " must be a function")
+        end
+    end)
+end)
+
+-- @describe lurek.i18n.isRTL
+describe("lurek.i18n.isRTL", function()
+    -- @covers lurek.i18n.isRTL
+    it("returns true for Arabic", function()
+        expect_true(lurek.i18n.isRTL("ar"))
+        expect_true(lurek.i18n.isRTL("ar-SA"))
+    end)
+
+    -- @covers lurek.i18n.isRTL
+    it("returns true for Hebrew", function()
+        expect_true(lurek.i18n.isRTL("he"))
+        expect_true(lurek.i18n.isRTL("he-IL"))
+    end)
+
+    -- @covers lurek.i18n.isRTL
+    it("returns false for LTR locales", function()
+        expect_false(lurek.i18n.isRTL("en"))
+        expect_false(lurek.i18n.isRTL("pl"))
+        expect_false(lurek.i18n.isRTL("ja"))
+        expect_false(lurek.i18n.isRTL("fr-FR"))
+    end)
+
+    -- @covers lurek.i18n.isRTL
+    -- @covers lurek.i18n.setLanguage
+    it("uses active locale when no argument is given", function()
+        lurek.i18n.loadTable("ar", { hello = "مرحبا" })
+        lurek.i18n.setLanguage("ar")
+        expect_true(lurek.i18n.isRTL())
+        -- Reset to English
+        lurek.i18n.loadTable("en", en)
+        lurek.i18n.setLanguage("en")
+        expect_false(lurek.i18n.isRTL())
+    end)
+end)
+
+-- @describe lurek.i18n.validateLocale
+describe("lurek.i18n.validateLocale", function()
+    -- @covers lurek.i18n.validateLocale
+    it("accepts standard locale codes", function()
+        expect_true(lurek.i18n.validateLocale("en"))
+        expect_true(lurek.i18n.validateLocale("en-US"))
+        expect_true(lurek.i18n.validateLocale("zh-CN"))
+        expect_true(lurek.i18n.validateLocale("pt-BR"))
+    end)
+
+    -- @covers lurek.i18n.validateLocale
+    it("accepts underscore-separated codes", function()
+        expect_true(lurek.i18n.validateLocale("en_GB"))
+        expect_true(lurek.i18n.validateLocale("fr_FR"))
+    end)
+
+    -- @covers lurek.i18n.validateLocale
+    it("rejects empty string", function()
+        expect_false(lurek.i18n.validateLocale(""))
+    end)
+
+    -- @covers lurek.i18n.validateLocale
+    it("rejects single character codes", function()
+        expect_false(lurek.i18n.validateLocale("x"))
+    end)
+
+    -- @covers lurek.i18n.validateLocale
+    it("rejects codes with digits in language tag", function()
+        expect_false(lurek.i18n.validateLocale("1en"))
+    end)
+
+    -- @covers lurek.i18n.validateLocale
+    it("rejects excessively long codes", function()
+        expect_false(lurek.i18n.validateLocale("abcdefghijklmnopqrstuvwxyzabcdefghijk"))
+    end)
+end)
+
+-- @describe lurek.i18n.detectLocale
+describe("lurek.i18n.detectLocale", function()
+    -- @covers lurek.i18n.detectLocale
+    it("returns nil or a non-empty string", function()
+        local result = lurek.i18n.detectLocale()
+        if result ~= nil then
+            expect_type("string", result)
+            expect_true(#result > 0, "detected locale must not be empty")
+            -- Should not contain encoding suffix like '.UTF-8'
+            expect_false(result:find("%.") ~= nil, "should not contain encoding suffix")
+        else
+            expect_true(true, "nil is acceptable when no LANG env var is set")
+        end
+    end)
+end)
+
+-- @describe lurek.i18n.loadString
+describe("lurek.i18n.loadString", function()
+    -- @covers lurek.i18n.loadString
+    it("loads a TOML string and makes keys available", function()
+        local toml_str = [[
+[ui]
+ok     = "OK"
+cancel = "Cancel"
+]]
+        expect_no_error(function()
+            lurek.i18n.loadString("toml_test", toml_str, "toml")
+        end)
+        lurek.i18n.setLanguage("toml_test")
+        expect_equal("OK", lurek.i18n.t("ui.ok"))
+        expect_equal("Cancel", lurek.i18n.t("ui.cancel"))
+        lurek.i18n.unloadTable("toml_test")
+    end)
+
+    -- @covers lurek.i18n.loadString
+    it("loads a JSON string and makes keys available", function()
+        local json_str = '{"menu":{"start":"Start","quit":"Quit"}}'
+        expect_no_error(function()
+            lurek.i18n.loadString("json_test", json_str, "json")
+        end)
+        lurek.i18n.setLanguage("json_test")
+        expect_equal("Start", lurek.i18n.t("menu.start"))
+        expect_equal("Quit", lurek.i18n.t("menu.quit"))
+        lurek.i18n.unloadTable("json_test")
+    end)
+
+    -- @covers lurek.i18n.loadString
+    it("returns error for invalid TOML", function()
+        local ok, err = pcall(function()
+            lurek.i18n.loadString("bad", "not valid toml !!!", "toml")
+        end)
+        expect_false(ok, "invalid TOML should raise an error")
+    end)
+
+    -- @covers lurek.i18n.loadString
+    it("returns error for invalid JSON", function()
+        local ok, err = pcall(function()
+            lurek.i18n.loadString("bad", "{bad json", "json")
+        end)
+        expect_false(ok, "invalid JSON should raise an error")
+    end)
+
+    -- @covers lurek.i18n.loadString
+    it("returns error for unknown format", function()
+        local ok, err = pcall(function()
+            lurek.i18n.loadString("bad", "data", "xml")
+        end)
+        expect_false(ok, "unknown format should raise an error")
+    end)
+end)
+
+-- @describe lurek.i18n.localeCoverage
+describe("lurek.i18n.localeCoverage", function()
+    local function clear_loaded_locales()
+        local langs = lurek.i18n.getAvailableLanguages()
+        for _, locale in ipairs(langs) do
+            lurek.i18n.unloadTable(locale)
+        end
+    end
+
+    -- @covers lurek.i18n.localeCoverage
+    it("finds a missing key in a second locale", function()
+        clear_loaded_locales()
+        lurek.i18n.loadTable("cov_en", { hello = "Hello", bye = "Goodbye" })
+        lurek.i18n.loadTable("cov_fr", { hello = "Bonjour" })  -- 'bye' is missing
+
+        local gaps = lurek.i18n.localeCoverage("cov_en")
+        expect_type("table", gaps)
+
+        local found_bye = false
+        for _, gap in ipairs(gaps) do
+            if gap.key == "bye" then
+                found_bye = true
+                expect_type("table", gap.missing_in)
+                local in_fr = false
+                for _, loc in ipairs(gap.missing_in) do
+                    if loc == "cov_fr" then in_fr = true end
+                end
+                expect_true(in_fr, "cov_fr should be listed as missing 'bye'")
+            end
+        end
+        expect_true(found_bye, "'bye' should appear as a coverage gap")
+
+        lurek.i18n.unloadTable("cov_en")
+        lurek.i18n.unloadTable("cov_fr")
+        clear_loaded_locales()
+    end)
+
+    -- @covers lurek.i18n.localeCoverage
+    it("returns empty table when all locales are complete", function()
+        clear_loaded_locales()
+        lurek.i18n.loadTable("full_en", { ok = "OK" })
+        lurek.i18n.loadTable("full_fr", { ok = "OK" })
+
+        local gaps = lurek.i18n.localeCoverage("full_en")
+        expect_type("table", gaps)
+        expect_equal(0, #gaps, "no gaps expected when all keys are present")
+
+        lurek.i18n.unloadTable("full_en")
+        lurek.i18n.unloadTable("full_fr")
+        clear_loaded_locales()
+    end)
+
+    -- @covers lurek.i18n.localeCoverage
+    it("returns empty table for unknown reference locale", function()
+        clear_loaded_locales()
+        local gaps = lurek.i18n.localeCoverage("nonexistent_locale_xyz")
+        expect_type("table", gaps)
+        expect_equal(0, #gaps)
+        clear_loaded_locales()
+    end)
+end)
+
 test_summary()

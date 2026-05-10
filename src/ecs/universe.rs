@@ -9,6 +9,8 @@
 //! and the `lurek.*` Lua API for the scripting interface.
 
 use super::relationships::RelationshipManager;
+use crate::ecs::generational_id::GenerationalId;
+use crate::ecs::lua_table::deep_copy_table;
 use crate::log_msg;
 use crate::runtime::log_messages::{EN01_UNIVERSE_INIT, EN02_ENTITY_SPAWN};
 use mlua::{Function, Lua, RegistryKey, Result as LuaResult, Table, Value as LuaValue};
@@ -16,7 +18,6 @@ use std::collections::{HashMap, HashSet};
 
 #[path = "universe_ext.rs"]
 mod ext;
-pub use ext::deep_copy_table;
 
 /// Maximum number of bitmap tag definitions per Universe.
 const MAX_BITMAP_TAGS: usize = 63;
@@ -175,7 +176,7 @@ impl Universe {
     /// `u32`.
     #[inline]
     pub fn pack_id(slot: u32, gen: u8) -> u32 {
-        ((gen as u32) << 24) | (slot & 0x00FF_FFFF)
+        GenerationalId::pack(slot, gen)
     }
 
     /// Extracts the slot index from a packed entity ID.
@@ -187,7 +188,7 @@ impl Universe {
     /// `u32`.
     #[inline]
     pub fn unpack_slot(id: u32) -> u32 {
-        id & 0x00FF_FFFF
+        GenerationalId::unpack_slot(id)
     }
 
     /// Extracts the generation counter from a packed entity ID.
@@ -199,7 +200,7 @@ impl Universe {
     /// `u8`.
     #[inline]
     pub fn unpack_gen(id: u32) -> u8 {
-        (id >> 24) as u8
+        GenerationalId::unpack_gen(id)
     }
 
     /// Returns the current generation for a slot (0 if never used).

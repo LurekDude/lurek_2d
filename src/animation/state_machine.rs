@@ -250,11 +250,22 @@ impl AnimStateMachine {
     /// - `dt` — `f32`. Delta time in seconds.
     pub fn update(&mut self, dt: f32) {
         self.animation.update(dt);
-        self.check_transitions();
+        self.check_transitions_chain();
     }
 
-    /// Checks all transitions from the current state and fires the first match.
-    fn check_transitions(&mut self) {
+    /// Checks transitions repeatedly so one tick can perform a short transition chain.
+    ///
+    /// A hop cap prevents infinite loops in cyclic transition graphs.
+    fn check_transitions_chain(&mut self) {
+        let hop_limit = self.transitions.len().max(1);
+        for _ in 0..hop_limit {
+            if !self.try_single_transition() {
+                break;
+            }
+        }
+    }
+
+    fn try_single_transition(&mut self) -> bool {
         let current = self.current.clone();
         let transitions: Vec<_> = self
             .transitions
@@ -266,11 +277,11 @@ impl AnimStateMachine {
             if self.evaluate_condition(&transition.condition) {
                 let target = transition.to.clone();
                 if self.force_state(&target) {
-                    // Transition fired — stop checking further transitions
-                    return;
+                    return true;
                 }
             }
         }
+        false
     }
 
     /// Evaluates whether a condition is currently satisfied.

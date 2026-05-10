@@ -12,6 +12,7 @@ use crate::filesystem::file_handle::{FileHandle, FileMode};
 use crate::log_msg;
 use crate::runtime::error::{EngineError, EngineResult};
 use crate::runtime::log_messages::{FS01_GAMEFS_INIT, FS04_PATH_TRAVERSAL, FS05_VFS_MOUNT};
+use serde_json::Value as JsonValue;
 use std::path::{Path, PathBuf};
 
 /// File metadata returned by `get_info()`.
@@ -204,6 +205,55 @@ impl GameFS {
         }
         std::fs::write(&resolved, bytes)
             .map_err(|e| EngineError::FileSystemError(format!("Failed to write '{}': {}", path, e)))
+    }
+
+    /// Reads a JSON file and validates that it contains valid JSON text.
+    ///
+    /// # Parameters
+    /// - `path` — Relative path to the JSON file.
+    ///
+    /// # Returns
+    /// `Ok(String)` — Raw JSON text when valid.
+    /// `Err(EngineError)` — On I/O errors or invalid JSON.
+    pub fn read_json(&self, path: &str) -> EngineResult<String> {
+        let content = self.read_string(path)?;
+        serde_json::from_str::<JsonValue>(&content).map_err(|e| {
+            EngineError::FileSystemError(format!("Invalid JSON in '{}': {}", path, e))
+        })?;
+        Ok(content)
+    }
+
+    /// Writes JSON text to a file in the save sandbox after validating it.
+    ///
+    /// # Parameters
+    /// - `path` — Relative path under `save/`.
+    /// - `json` — JSON text payload.
+    ///
+    /// # Returns
+    /// `Ok(())` on success.
+    pub fn write_json(&self, path: &str, json: &str) -> EngineResult<()> {
+        serde_json::from_str::<JsonValue>(json).map_err(|e| {
+            EngineError::FileSystemError(format!("Invalid JSON for '{}': {}", path, e))
+        })?;
+        self.write_string(path, json)
+    }
+
+    /// Reads JSON from `path`, or writes and returns `default_json` if missing.
+    ///
+    /// Both existing and default content are validated as JSON.
+    ///
+    /// # Parameters
+    /// - `path` — Relative path under `save/`.
+    /// - `default_json` — JSON text written when the file does not exist.
+    ///
+    /// # Returns
+    /// `Ok(String)` — Existing JSON text or the default text after write.
+    pub fn read_or_write_json(&self, path: &str, default_json: &str) -> EngineResult<String> {
+        if self.exists(path) {
+            return self.read_json(path);
+        }
+        self.write_json(path, default_json)?;
+        Ok(default_json.to_string())
     }
 
     /// Returns `true` if the file or directory at `path` exists within the game directory.

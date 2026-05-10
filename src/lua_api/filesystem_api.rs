@@ -328,6 +328,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- readJson --
+    /// Reads a JSON file as text and validates that the payload is valid JSON.
+    /// @param | path | string | Virtual path to the JSON file.
+    /// @return | string | JSON text.
+    let s = state.clone();
+    tbl.set(
+        "readJson",
+        lua.create_function(move |_, path: String| {
+            s.borrow().fs.read_json(&path).map_err(LuaError::external)
+        })?,
+    )?;
+
+    // -- writeJson --
+    /// Writes validated JSON text to a file in the save sandbox.
+    /// @param | path | string | Save path to write.
+    /// @param | json | string | JSON payload.
+    /// @return | nil | No return value.
+    let s = state.clone();
+    tbl.set(
+        "writeJson",
+        lua.create_function(move |_, (path, json): (String, String)| {
+            s.borrow()
+                .fs
+                .write_json(&path, &json)
+                .map_err(LuaError::external)
+        })?,
+    )?;
+
+    // -- readOrWriteJson --
+    /// Reads JSON from `path`, or writes `default_json` and returns it when missing.
+    /// @param | path | string | Save path to read.
+    /// @param | default_json | string | JSON payload written if file does not exist.
+    /// @return | string | Existing or default JSON text.
+    let s = state.clone();
+    tbl.set(
+        "readOrWriteJson",
+        lua.create_function(move |_, (path, default_json): (String, String)| {
+            s.borrow()
+                .fs
+                .read_or_write_json(&path, &default_json)
+                .map_err(LuaError::external)
+        })?,
+    )?;
+
     // -- readBytes --
     /// Reads a file as raw bytes and returns a binary Lua string.
     /// @param | path | string | Virtual path to the file.

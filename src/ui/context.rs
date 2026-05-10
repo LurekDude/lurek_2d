@@ -27,7 +27,19 @@ use crate::ui::extras::{
     Separator, Spacer, StatusBar, Toast, Toolbar, TooltipPanel, TreeView,
 };
 use crate::ui::theme::Theme;
-use crate::ui::widget::{WidgetBase, WidgetState};
+use crate::ui::widget::{WidgetBase, WidgetState, WidgetTransition};
+use std::collections::HashMap;
+
+/// Value variant used by UI model-to-widget binding sync.
+#[derive(Debug, Clone, PartialEq)]
+pub enum UiBindingValue {
+    /// Numeric binding value.
+    Number(f64),
+    /// Text binding value.
+    Text(String),
+    /// Boolean binding value.
+    Bool(bool),
+}
 
 /// A single interaction event emitted by the GUI widget tree.
 ///
@@ -327,6 +339,10 @@ pub struct GuiContext {
     pub viewport_w: f32,
     /// Viewport height in pixels.
     pub viewport_h: f32,
+    /// Widget currently being dragged between containers.
+    pub drag_widget: Option<usize>,
+    /// Last render signature used for lightweight diff invalidation.
+    pub last_render_signature: u64,
 }
 
 impl GuiContext {
@@ -346,6 +362,8 @@ impl GuiContext {
             dirty: true,
             viewport_w: 0.0,
             viewport_h: 0.0,
+            drag_widget: None,
+            last_render_signature: 0,
         }
     }
 
@@ -876,9 +894,257 @@ impl GuiContext {
     /// # Returns
     /// `bool` — `true` if the cache was dirty before this call.
     pub fn flush_cache(&mut self) -> bool {
-        let was_dirty = self.dirty;
+        let signature = self.compute_render_signature();
+        let was_dirty = self.dirty || signature != self.last_render_signature;
         self.dirty = false;
+        self.last_render_signature = signature;
         was_dirty
+    }
+
+    /// Start dragging a widget to be dropped into another container.
+    pub fn begin_drag(&mut self, widget_idx: usize) -> bool {
+        if widget_idx == 0 || widget_idx >= self.widgets.len() {
+            return false;
+        }
+        self.drag_widget = Some(widget_idx);
+        true
+    }
+
+    /// Return the widget currently tracked as active drag payload.
+    pub fn active_drag(&self) -> Option<usize> {
+        self.drag_widget
+    }
+
+    /// Cancel active drag and return the previously dragged widget index.
+    pub fn end_drag(&mut self) -> Option<usize> {
+        self.drag_widget.take()
+    }
+
+    /// Drop the currently dragged widget onto a container target.
+    pub fn drop_on(&mut self, target_idx: usize) -> bool {
+        let Some(drag_idx) = self.drag_widget else {
+            return false;
+        };
+        if target_idx >= self.widgets.len() || drag_idx == target_idx {
+            return false;
+        }
+        if !self.widgets[target_idx].children().is_some() {
+            return false;
+        }
+        if self.contains_descendant(drag_idx, target_idx) {
+            return false;
+        }
+
+        self.detach_from_all_parents(drag_idx);
+        if !self.add_child(target_idx, drag_idx) {
+            return false;
+        }
+        self.drag_widget = None;
+        self.dirty = true;
+        true
+    }
+
+    fn detach_from_all_parents(&mut self, child_idx: usize) {
+        for idx in 0..self.widgets.len() {
+            if let Some(children) = self.widgets[idx].children_mut() {
+                children.retain(|c| *c != child_idx);
+            }
+        }
+    }
+
+    fn contains_descendant(&self, root_idx: usize, needle_idx: usize) -> bool {
+        if root_idx >= self.widgets.len() {
+            return false;
+        }
+        if let Some(children) = self.widgets[root_idx].children() {
+            for child in children {
+                if *child == needle_idx || self.contains_descendant(*child, needle_idx) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    /// Add an alpha transition to a widget.
+    pub fn animate_alpha(
+        &mut self,
+        widget_idx: usize,
+        to_alpha: f32,
+        duration: f32,
+        hide_on_complete: bool,
+    ) -> bool {
+        if widget_idx >= self.widgets.len() {
+            return false;
+        }
+        let base = self.widgets[widget_idx].base_mut();
+        base.visible = true;
+        base.transitions.push(WidgetTransition::alpha(
+            base.alpha,
+            to_alpha.clamp(0.0, 1.0),
+            duration,
+            hide_on_complete,
+        ));
+        self.dirty = true;
+        true
+    }
+
+    /// Add a position transition to a widget.
+    pub fn animate_position(
+        &mut self,
+        widget_idx: usize,
+        to_x: f32,
+        to_y: f32,
+        duration: f32,
+    ) -> bool {
+        if widget_idx >= self.widgets.len() {
+            return false;
+        }
+        let base = self.widgets[widget_idx].base_mut();
+        base.transitions
+            .push(WidgetTransition::position(base.x, base.y, to_x, to_y, duration));
+        self.dirty = true;
+        true
+    }
+
+    /// Cancel all active transitions for a widget.
+    pub fn cancel_animations(&mut self, widget_idx: usize) -> bool {
+        if widget_idx >= self.widgets.len() {
+            return false;
+        }
+        self.widgets[widget_idx].base_mut().transitions.clear();
+        self.dirty = true;
+        true
+    }
+
+    /// Return whether a widget currently has active transitions.
+    pub fn is_animating(&self, widget_idx: usize) -> bool {
+        self.widgets
+            .get(widget_idx)
+            .is_some_and(|w| !w.base().transitions.is_empty())
+    }
+
+    /// Apply model values to bound widgets.
+    pub fn update_bindings(&mut self, values: &HashMap<String, UiBindingValue>) -> usize {
+        let mut changed = 0usize;
+        for w in &mut self.widgets {
+            let Some(key) = w.base().bind_key.clone() else {
+                continue;
+            };
+            let Some(value) = values.get(&key) else {
+                continue;
+            };
+            match value {
+                UiBindingValue::Number(n) => match w {
+                    WidgetKind::Slider(sl) => {
+                        if (sl.value - *n).abs() > f64::EPSILON {
+                            sl.value = *n;
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::ProgressBar(pb) => {
+                        if (pb.value - *n).abs() > f64::EPSILON {
+                            pb.value = *n;
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::SpinBox(sb) => {
+                        if (sb.value - *n).abs() > f64::EPSILON {
+                            sb.value = *n;
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::Badge(b) => {
+                        let next = if *n < 0.0 { 0 } else { *n as u32 };
+                        if b.count != next {
+                            b.count = next;
+                            changed += 1;
+                        }
+                    }
+                    _ => {}
+                },
+                UiBindingValue::Text(t) => match w {
+                    WidgetKind::Label(lbl) => {
+                        if lbl.text != *t {
+                            lbl.text = t.clone();
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::Button(btn) => {
+                        if btn.text != *t {
+                            btn.text = t.clone();
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::TextInput(input) => {
+                        if input.text != *t {
+                            input.text = t.clone();
+                            input.cursor_pos = input.text.len();
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::MenuItem(item) => {
+                        if item.text != *t {
+                            item.text = t.clone();
+                            changed += 1;
+                        }
+                    }
+                    _ => {}
+                },
+                UiBindingValue::Bool(v) => match w {
+                    WidgetKind::CheckBox(cb) => {
+                        if cb.checked != *v {
+                            cb.checked = *v;
+                            changed += 1;
+                        }
+                    }
+                    WidgetKind::Switch(sw) => {
+                        if sw.on != *v {
+                            sw.on = *v;
+                            changed += 1;
+                        }
+                    }
+                    _ => {
+                        if w.base().visible != *v {
+                            w.base_mut().visible = *v;
+                            changed += 1;
+                        }
+                    }
+                },
+            }
+        }
+        if changed > 0 {
+            self.dirty = true;
+        }
+        changed
+    }
+
+    fn compute_render_signature(&self) -> u64 {
+        let mut hash = 1469598103934665603u64;
+        for (idx, w) in self.widgets.iter().enumerate() {
+            let b = w.base();
+            hash ^= idx as u64;
+            hash = hash.wrapping_mul(1099511628211);
+            hash ^= (b.x.to_bits() as u64) ^ ((b.y.to_bits() as u64) << 1);
+            hash = hash.wrapping_mul(1099511628211);
+            hash ^= (b.width.to_bits() as u64)
+                ^ ((b.height.to_bits() as u64) << 1)
+                ^ ((b.alpha.to_bits() as u64) << 2);
+            hash = hash.wrapping_mul(1099511628211);
+            hash ^= (b.visible as u64) | ((b.enabled as u64) << 1) | ((b.state as u64) << 2);
+            hash = hash.wrapping_mul(1099511628211);
+            hash ^= b.id.len() as u64;
+            hash = hash.wrapping_mul(1099511628211);
+            if let Some(children) = w.children() {
+                hash ^= children.len() as u64;
+                hash = hash.wrapping_mul(1099511628211);
+                for child in children {
+                    hash ^= *child as u64;
+                    hash = hash.wrapping_mul(1099511628211);
+                }
+            }
+        }
+        hash
     }
 
     // ── Child management ──────────────────────────────────────────────
@@ -902,6 +1168,7 @@ impl GuiContext {
             if !children.contains(&child_idx) {
                 children.push(child_idx);
             }
+            self.dirty = true;
             true
         } else {
             false
@@ -923,6 +1190,7 @@ impl GuiContext {
         if let Some(children) = self.widgets[parent_idx].children_mut() {
             if let Some(pos) = children.iter().position(|&c| c == child_idx) {
                 children.remove(pos);
+                self.dirty = true;
                 return true;
             }
         }
@@ -1040,6 +1308,50 @@ impl GuiContext {
             toast.update(dt);
         }
         self.toasts.retain(|t| !t.is_expired());
+
+        let mut any_changed = false;
+        for widget in &mut self.widgets {
+            let base = widget.base_mut();
+            if base.transitions.is_empty() {
+                continue;
+            }
+
+            let mut kept = Vec::with_capacity(base.transitions.len());
+            for mut transition in base.transitions.drain(..) {
+                transition.elapsed = (transition.elapsed + dt).max(0.0);
+                let t = if transition.duration <= 0.0 {
+                    1.0
+                } else {
+                    (transition.elapsed / transition.duration).clamp(0.0, 1.0)
+                };
+                match transition.kind {
+                    crate::ui::widget::WidgetTransitionKind::Alpha { from, to } => {
+                        base.alpha = (from + (to - from) * t).clamp(0.0, 1.0);
+                        base.visible = true;
+                        if t >= 1.0 && transition.hide_on_complete && to <= 0.0 {
+                            base.visible = false;
+                        }
+                    }
+                    crate::ui::widget::WidgetTransitionKind::Position {
+                        from_x,
+                        from_y,
+                        to_x,
+                        to_y,
+                    } => {
+                        base.x = from_x + (to_x - from_x) * t;
+                        base.y = from_y + (to_y - from_y) * t;
+                    }
+                }
+                any_changed = true;
+                if t < 1.0 {
+                    kept.push(transition);
+                }
+            }
+            base.transitions = kept;
+        }
+        if any_changed {
+            self.dirty = true;
+        }
     }
 
     // ── Lookup ────────────────────────────────────────────────────────

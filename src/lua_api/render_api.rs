@@ -2955,10 +2955,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     graphics.set(
         "newShader",
         lua.create_function(move |_, code: String| {
-            let shader = Shader::new(code).map_err(|err| {
-                LuaError::RuntimeError(format!("lurek.graphic.newShader: {}", err))
-            })?;
-            let key = s.borrow_mut().shaders.insert(shader);
+            let shader = match Shader::new(code) {
+                Ok(shader) => shader,
+                Err(err) => {
+                    let msg = format!("lurek.graphic.newShader: {}", err);
+                    s.borrow_mut().last_shader_compile_error = Some(msg.clone());
+                    return Err(LuaError::RuntimeError(msg));
+                }
+            };
+            let key = {
+                let mut st = s.borrow_mut();
+                st.last_shader_compile_error = None;
+                st.shaders.insert(shader)
+            };
             Ok(LuaShader {
                 state: s.clone(),
                 key,

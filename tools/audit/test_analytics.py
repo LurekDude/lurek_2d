@@ -9,6 +9,7 @@ and per-method breakdowns, letter grades, and trend comparison.
 Usage:
     python tools/audit/test_analytics.py                      # full summary
     python tools/audit/test_analytics.py --json               # JSON export
+    python tools/audit/test_analytics.py --html               # HTML dashboard
     python tools/audit/test_analytics.py --module physics     # single module
     python tools/audit/test_analytics.py --worst 10           # 10 worst modules
     python tools/audit/test_analytics.py --trend              # compare to last run
@@ -34,6 +35,7 @@ LUA_API_DATA = WORKSPACE_ROOT / "logs" / "data" / "lua_api_data.json"
 LUA_TESTS_DIR = WORKSPACE_ROOT / "tests" / "lua"
 COVERAGE_JSON = WORKSPACE_ROOT / "logs" / "data" / "lua_api_test_coverage.json"
 OUTPUT_JSON = WORKSPACE_ROOT / "logs" / "data" / "test_analytics.json"
+OUTPUT_HTML = WORKSPACE_ROOT / "logs" / "reports" / "test_analytics.html"
 
 # ── Regex patterns ────────────────────────────────────────────────────────────
 
@@ -697,11 +699,166 @@ def print_trend(report: Dict, previous: Optional[Dict]) -> bool:
     return not regression
 
 
+def build_html_report(report: Dict[str, Any]) -> str:
+        """Build a self-contained HTML dashboard report."""
+        summary = report["summary"]
+        modules = sorted(report["modules"].values(), key=lambda r: r["score"])
+        categories = sorted(report["categories"].items(), key=lambda item: item[0])
+
+        category_rows = "\n".join(
+                (
+                        "<tr>"
+                        f"<td>{name}</td>"
+                        f"<td>{len(data['modules'])}</td>"
+                        f"<td>{data['total_functions']}</td>"
+                        f"<td>{data['marker_coverage_pct']:.1f}%</td>"
+                        f"<td>{data['heuristic_coverage_pct']:.1f}%</td>"
+                        f"<td>{data['evidence_count']}</td>"
+                        f"<td>{data['grade']}</td>"
+                        "</tr>"
+                )
+                for name, data in categories
+        )
+
+        module_rows = "\n".join(
+                (
+                        "<tr>"
+                        f"<td>{m['name']}</td>"
+                        f"<td>{m['category']}</td>"
+                        f"<td>{m['function_count']}</td>"
+                        f"<td>{(m['marker_covered'] / m['function_count'] * 100) if m['function_count'] else 0:.1f}%</td>"
+                        f"<td>{(m['heuristic_covered'] / m['function_count'] * 100) if m['function_count'] else 0:.1f}%</td>"
+                        f"<td>{m['evidence_count']}</td>"
+                        f"<td>{m['error_test_count']}</td>"
+                        f"<td>{'Y' if m['has_stress'] else '-'}</td>"
+                        f"<td>{'Y' if m['has_golden'] else '-'}</td>"
+                        f"<td>{m['score']:.1f}</td>"
+                        f"<td>{m['grade']}</td>"
+                        "</tr>"
+                )
+                for m in modules
+        )
+
+        worst_items = "\n".join(
+                f"<li>{name}</li>" for name in report.get("worst_modules", [])
+        )
+
+        return f"""<!doctype html>
+<html lang=\"en\">
+<head>
+    <meta charset=\"utf-8\" />
+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+    <title>Lurek2D Test Analytics</title>
+    <style>
+        :root {{
+            --bg: #0e1116;
+            --panel: #171b22;
+            --text: #d8dde8;
+            --muted: #93a0b5;
+            --ok: #2fa66a;
+            --warn: #cfa24d;
+            --bad: #ce5a5a;
+            --line: #283140;
+        }}
+        body {{
+            margin: 0;
+            font-family: Segoe UI, Tahoma, sans-serif;
+            background: linear-gradient(180deg, #0e1116 0%, #121925 100%);
+            color: var(--text);
+        }}
+        .wrap {{
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }}
+        h1, h2 {{ margin: 0 0 12px; }}
+        .meta {{ color: var(--muted); margin-bottom: 18px; }}
+        .grid {{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }}
+        .card {{
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+        }}
+        .label {{ color: var(--muted); font-size: 12px; }}
+        .value {{ font-size: 22px; font-weight: 700; }}
+        table {{
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }}
+        th, td {{
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--line);
+            text-align: left;
+            font-size: 13px;
+        }}
+        th {{ color: var(--muted); font-weight: 600; }}
+        tr:last-child td {{ border-bottom: none; }}
+        ul {{ margin: 8px 0 0 18px; }}
+    </style>
+</head>
+<body>
+    <main class=\"wrap\">
+        <h1>Lurek2D Test Analytics</h1>
+        <p class=\"meta\">Generated: {report['generated']}</p>
+
+        <section class=\"grid\">
+            <article class=\"card\"><div class=\"label\">Modules</div><div class=\"value\">{summary['total_modules']}</div></article>
+            <article class=\"card\"><div class=\"label\">API Functions</div><div class=\"value\">{summary['total_functions']}</div></article>
+            <article class=\"card\"><div class=\"label\">Marker Coverage</div><div class=\"value\">{summary['marker_coverage_pct']:.1f}%</div></article>
+            <article class=\"card\"><div class=\"label\">Heuristic Coverage</div><div class=\"value\">{summary['heuristic_coverage_pct']:.1f}%</div></article>
+            <article class=\"card\"><div class=\"label\">Evidence Coverage</div><div class=\"value\">{summary['evidence_coverage_pct']:.1f}%</div></article>
+            <article class=\"card\"><div class=\"label\">Error Test Coverage</div><div class=\"value\">{summary['error_test_pct']:.1f}%</div></article>
+            <article class=\"card\"><div class=\"label\">Lua Test Files</div><div class=\"value\">{summary['test_file_count']}</div></article>
+            <article class=\"card\"><div class=\"label\">it() Blocks</div><div class=\"value\">{summary['total_it_count']}</div></article>
+        </section>
+
+        <h2>Category Breakdown</h2>
+        <table>
+            <thead>
+                <tr><th>Category</th><th>Modules</th><th>Functions</th><th>Marker</th><th>Heuristic</th><th>Evidence</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+                {category_rows}
+            </tbody>
+        </table>
+
+        <h2>Module Breakdown</h2>
+        <table>
+            <thead>
+                <tr><th>Module</th><th>Category</th><th>Funcs</th><th>Marker</th><th>Heuristic</th><th>Evidence</th><th>Error</th><th>Stress</th><th>Golden</th><th>Score</th><th>Grade</th></tr>
+            </thead>
+            <tbody>
+                {module_rows}
+            </tbody>
+        </table>
+
+        <h2>Worst Modules</h2>
+        <ul>
+            {worst_items}
+        </ul>
+    </main>
+</body>
+</html>
+"""
+
+
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Lurek2D test analytics")
     parser.add_argument("--json", action="store_true", help="Output JSON report")
+    parser.add_argument("--html", action="store_true", help="Output HTML dashboard")
     parser.add_argument("--module", type=str, help="Filter to single module")
     parser.add_argument("--worst", type=int, metavar="N", help="Show N worst modules")
     parser.add_argument("--category", type=str, help="Filter by category")
@@ -716,6 +873,12 @@ def main() -> int:
 
     # Build report
     report = build_report(api_surface, test_files, module_filter=args.module)
+
+    if args.html:
+        OUTPUT_HTML.parent.mkdir(parents=True, exist_ok=True)
+        OUTPUT_HTML.write_text(build_html_report(report), encoding="utf-8")
+        print(f"Report written to {OUTPUT_HTML.relative_to(WORKSPACE_ROOT)}")
+        return 0
 
     if args.json:
         # Save JSON output

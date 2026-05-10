@@ -2,6 +2,267 @@
 
 All notable changes to Lurek2D are recorded here.
 
+## [1.0.9-fix.66] - 2026-05-10
+
+### feat(ui): add first-class widget transitions, container drag-drop, richer binding sync, and diff-aware cache invalidation
+
+- `src/ui/widget.rs`
+  - Added `WidgetTransitionKind` and `WidgetTransition` as runtime transition primitives.
+  - Added `WidgetBase.transitions` storage for per-widget active transitions.
+- `src/ui/context.rs`
+  - Added first-class transition runtime methods: `animate_alpha`, `animate_position`, `is_animating`, `cancel_animations`.
+  - Added drag-and-drop container flow: `begin_drag`, `active_drag`, `drop_on`, `end_drag`.
+  - Added typed binding model sync with `UiBindingValue` and `update_bindings` coverage across value/text/bool widget types.
+  - Improved `flush_cache` with a lightweight render-signature diff check.
+- `src/ui/render.rs`
+  - Applied widget alpha multiplier in both command generation and CPU `draw_to_image` rendering path.
+- `src/lua_api/ui_api.rs`
+  - Added Lua API: `lurek.ui.beginDrag`, `lurek.ui.getActiveDrag`, `lurek.ui.dropOn`, `lurek.ui.endDrag`.
+  - Added widget methods: `animateAlpha`, `animatePosition`, `isAnimating`, `cancelAnimations`.
+  - Routed `lurek.ui.update_bindings` through typed UI binding model in `ui::context`.
+- `Cargo.toml` and `src/ui/mod.rs`
+  - Added optional UI feature gates: `ui-charts`, `ui-layout-loader` (enabled by default).
+- Tests
+  - Extended `tests/rust/unit/ui_tests.rs` with new coverage for drag-drop, transition stepping, binding updates, scatter/area edge paths, nested layout tree, and `render_to_image` file output.
+  - Extended `tests/lua/unit/test_ui_core_unit.lua` with drag-drop and transition API behavior checks.
+
+Validation:
+- `python tools/dev/parallel_cargo.py test target ui_tests` -> PASS
+- `python tools/dev/parallel_cargo.py test lua` -> PASS
+
+## [1.0.9-fix.65] - 2026-05-10
+
+### test/docs(animation): close remaining IDEA gaps for spine bridge coverage and spec sync
+
+- Added missing Rust unit coverage for `SpineAnimBridge` in `tests/rust/unit/animation_tests.rs`:
+  - `bridge_applies_mapped_clip_on_state_change`
+  - `bridge_handles_unmapped_state_without_panic`
+- Synced animation spec method list in `docs/specs/animation.md`:
+  - added `LAnimation:addFramesFromRects` entry in the Lua API section.
+- Revalidated animation unit suite:
+  - `cargo test --test animation_tests` -> PASS (15/15).
+
+## [1.0.9-fix.64] - 2026-05-10
+
+### feat(i18n): add locale utilities, TOML/JSON loading, coverage audit, and RTL hint
+
+- **`src/i18n/catalog.rs`**
+  - Added `CoverageGap { key, missing_in }` struct returned by `coverage_gaps()`.
+  - Added interior-mutability caches for `categories()` and `build_index()` keyed by locale; invalidated automatically by `load`, `unload`, `set_key`, and `merge`.
+  - Added `Catalog::coverage_gaps(reference_locale)` — audits missing keys across all loaded locales.
+  - Added `is_valid_locale_code(code)` — validates a BCP 47-like locale code (relaxed subset).
+  - Added `is_rtl(locale)` — returns `true` for known RTL language codes (`ar`, `he`, `fa`, `ur`, `yi`, `dv`, `sd`, `ku`, `ckb`).
+  - Added `detect_system_locale()` — reads `LANG` / `LANGUAGE` / `LC_ALL` / `LC_MESSAGES`, normalises separators, strips encoding suffix.
+  - Added `flat_table_from_toml(input)` — parses TOML text to a flat `HashMap<String, String>`.
+  - Added `flat_table_from_json(input)` — parses JSON text to a flat `HashMap<String, String>`.
+- **`src/i18n/mod.rs`** — re-exports: `CoverageGap`, `detect_system_locale`, `flat_table_from_toml`, `flat_table_from_json`, `is_rtl`, `is_valid_locale_code`.
+- **`src/lua_api/i18n_api.rs`** — new Lua bindings under `lurek.i18n`:
+  - `isRTL([locale])` — returns RTL flag for the active or given locale.
+  - `validateLocale(locale)` — BCP 47 validation.
+  - `detectLocale()` — system locale detection; returns `nil` when no LANG variable is set.
+  - `loadString(locale, content, format)` — parse `"toml"` or `"json"` text and load as translation table.
+  - `localeCoverage(reference)` — returns array of `{ key, missing_in }` gap tables sorted by key.
+- **`tests/rust/unit/i18n_tests.rs`** — added `locale_util_tests` module (~18 tests): all new functions, cache invalidation on `load`/`set_key`, TOML/JSON happy path, error paths, RTL detection, and locale code validation.
+- **`tests/lua/unit/test_i18n_core_unit.lua`** — added 6 `describe` blocks covering all new Lua-facing APIs including error-path tests for `loadString`.
+- **`content/examples/i18n.lua`** — added `@api-stub` entries for `isRTL`, `validateLocale`, `detectLocale`, `loadString` (TOML + JSON), and `localeCoverage`.
+- **`docs/specs/i18n.md`** — updated Module Functions list with all new bindings; added caching and delegation notes.
+
+## [1.0.9-fix.63] - 2026-05-10
+
+### feat(animation): spine bridge, rects import, structured fuzz tests, and format boundary docs
+
+- Added `SpineAnimBridge` in `src/animation/spine_bridge.rs`:
+  - Maps FSM state names to Spine skeleton clip names via `map()` and `map_looping()`.
+  - `update(dt, &mut AnimStateMachine)` — drives both FSM and skeleton each tick; fires `play_animation` only on state change.
+  - Accessors: `skeleton()`, `skeleton_mut()`, `last_applied_state()`, `get_mapped_clip()`.
+  - Re-exported as `lurek2d::animation::SpineAnimBridge`.
+- Added `Animation::add_frames_from_rects(&[Rect]) -> usize` in `src/animation/controller.rs`:
+  - Canonical deduplication entry point for callers that hold pre-sliced quads (SpriteSheet, TexturePacker atlas).
+  - `animation` stays Tier 1 (no `sprite` import); bridge is at the Lua/caller layer.
+  - Lua binding: `LAnimation:addFramesFromRects(rects)`.
+- Added `Animation::get_frame_quad(index) -> Option<Rect>` accessor.
+- Added structured fuzz tests in `tests/rust/unit/animation_tests.rs`:
+  - `load_aseprite_json_structured_malformed_inputs_do_not_panic` — 16 edge cases including inverted ranges, OOB tag indices, unknown direction strings, zero-size frames, Unicode names, and truncated JSON.
+  - `add_frames_from_rects_appends_correct_quads` — verifies count and quad accuracy.
+- Documented format boundary between `animation::aseprite` and `sprite::atlas` in module-level docs.
+- Documented ownership boundary between `AnimCurve`/`AnimPropertyTimeline` and `tween::TweenState` in `src/animation/curve.rs` module docs.
+- Updated `src/animation/IDEA.md`: all 14 items marked DONE.
+
+## [1.0.9-fix.62] - 2026-05-10
+
+### feat(animation): add clip playback modes, preview grid helper, setup bundle, and transition-chain behavior
+
+- Added explicit clip playback mode support in animation core:
+  - `ClipPlaybackMode` enum with `Forward`, `Reverse`, `PingPong`.
+  - `Animation::add_clip_with_mode(...)` plus mode-aware update traversal.
+  - removed per-update `AnimClip` cloning in `Animation::update`.
+- Added frame/API consistency helper:
+  - `AnimFrame::new(quad, duration)`.
+- Added preview utility in animation core:
+  - `Animation::draw_preview_grid(columns, cell_size)` for debug frame-sheet inspection.
+- Improved Aseprite integration:
+  - `Animation::load_from_aseprite` now maps tag direction into clip playback mode (`forward`, `reverse`, `pingpong`).
+- Added multi-hop FSM transitions in one tick:
+  - `AnimStateMachine::update` now applies transition chains with a safe hop cap.
+- Extended Lua animation API in `src/lua_api/animation_api.rs`:
+  - `LAnimation:addClip(name, indices, fps, looping, [mode])`
+  - `LAnimation:setClipMode(name, mode)` / `LAnimation:getClipMode(name)`
+  - `LAnimation:drawPreviewGrid(columns, cellSize)`
+  - `lurek.animation.buildCharacter(cfg)` helper to build animation + optional state machine bundle.
+- Added Rust tests in `tests/rust/unit/animation_tests.rs` for:
+  - Aseprite direction mapping and invalid tag handling,
+  - pingpong playback behavior,
+  - multi-hop state transition chain,
+  - fuzz-like random payload robustness for `load_aseprite_json`.
+- Added Lua unit tests in `tests/lua/unit/test_animation_core_unit.lua` for:
+  - mode-aware clip setup and mutation,
+  - preview grid helper,
+  - character bundle helper.
+- Synced animation example and spec:
+  - `content/examples/animation.lua`
+  - `docs/specs/animation.md`.
+
+## [1.0.9-fix.61] - 2026-05-10
+
+### feat(html): expand CSS color parser formats and move parsing logic into html module
+
+- Added dedicated HTML color parser module: `src/html/color.rs`.
+  - New public helper: `parse_css_color_rgba(raw)` re-exported from `src/html/mod.rs`.
+- Extended accepted color formats for HTML draw-command translation:
+  - `rgb(...)` with byte and percent channels,
+  - `rgba(...)` with byte/percent RGB and float/percent alpha,
+  - `hsl(...)` and `hsla(...)` (including `deg`, `turn`, and `rad` hue units),
+  - `transparent`,
+  - extended named color set (e.g. `orange`, `teal`, `crimson`, `indigo`, `gold`).
+- Refactored `src/lua_api/html_api.rs` to consume the shared html color parser
+  instead of keeping color parsing logic in binding code.
+- Added Rust unit test target and coverage:
+  - `tests/rust/unit/html_tests.rs`
+  - `Cargo.toml` test registration: `html_tests`
+- Synced docs and examples:
+  - `docs/specs/html.md` notes updated with supported color formats,
+  - `content/examples/html.lua` updated with accepted color format examples.
+- Added a new showcase game using only file-backed HTML/CSS UI:
+  - `content/games/showcase/html-load-document/`
+  - UI loads via `lurek.html.loadDocument("ui/hud.html", { cssPath = "ui/hud.css" })`
+  - registered smoke test: `demo_smoke_html_load_document`.
+
+Validation:
+- `cargo test --test html_tests -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_unit_html_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_evidence_html_evidence -- --nocapture` -> PASS
+- `python tools/dev/parallel_cargo.py clippy --deny-warnings` -> PASS
+
+## [1.0.9-fix.60] - 2026-05-10
+
+### feat(html): implement file-backed loadDocument, capability probes, and full spec/test/example sync
+
+- Implemented `lurek.html.loadDocument(path, opts)` in `src/lua_api/html_api.rs`.
+  - Loads HTML from the sandboxed game filesystem (`SharedState.fs` / `GameFS`).
+  - Supports `opts.css` (inline CSS), `opts.cssPath` (CSS file path), `opts.width`, and `opts.height`.
+  - Adds companion stylesheet fallback: when neither `opts.css` nor `opts.cssPath` is provided,
+    `<path>.css` is loaded automatically if present.
+- Added shared option parsing helpers in HTML Lua bindings to keep constructor behavior consistent
+  between `newDocument` and `loadDocument`.
+- Extended HTML capability advertisement in `HtmlDocument::supports`:
+  - now includes `css-flex` and `load-document`.
+- Updated HTML module spec text in `docs/specs/html.md`:
+  - `loadDocument` description now reflects implemented sandboxed file loading.
+  - `LHtmlDocument:draw` description now reflects queue-enqueue render behavior.
+- Updated HTML API examples in `content/examples/html.lua`:
+  - added `loadDocument` usage with `cssPath`, viewport options, and capability probe snippets.
+- Added HTML fixtures for file-loading tests:
+  - `tests/fixtures/html/menu.html`
+  - `tests/fixtures/html/menu.css`
+- Added Lua unit coverage in `tests/lua/unit/test_html_core_unit.lua` for:
+  - file-backed `loadDocument`,
+  - `opts.cssPath`,
+  - companion `.css` fallback,
+  - missing-file error path,
+  - `supports("css-flex")` and `supports("load-document")`.
+- Added evidence coverage in `tests/lua/evidence/test_html_evidence.lua`:
+  - emits `tests/output/html/load_document.json` from a `loadDocument` + `cssPath` scenario.
+
+Validation:
+- `cargo test --test lua_tests lua_unit_html_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_evidence_html_evidence -- --nocapture` -> PASS
+- `python tools/dev/parallel_cargo.py clippy --deny-warnings` -> PASS
+
+## [1.0.9-fix.59] - 2026-05-09
+
+### test(roadmap): close phases 4-9 with integration scenarios, advanced test methods, and perf gates
+
+- Added missing 3-module Lua integration tests and harness registrations:
+  - `tests/lua/integration/test_ai_scene_camera.lua`
+  - `tests/lua/integration/test_ui_localization_data.lua`
+  - `tests/lua/integration/test_postfx_camera.lua`
+  - `tests/lua/integration/test_minimap_tilemap_camera.lua`
+  - `tests/lua/integration/test_raycaster_tilemap.lua`
+  - harness wiring in `tests/lua/harness.rs`.
+- Added phase-5 Rust ext smoke test and registered ext binaries in Cargo:
+  - `tests/rust/ext/effects_audio_runtime_smoke_tests.rs`
+  - `tests/rust/ext/graphics_runtime_smoke_tests.rs`
+  - `tests/rust/ext/terminal_demo_smoke_tests.rs`
+  - `Cargo.toml` updated with new `[[test]]` entries.
+- Extended phase-6 advanced methods:
+  - property-based blocks in `test_data_core_unit.lua`, `test_serial_core_unit.lua`, `test_image_core_unit.lua`, `test_physics_core_unit.lua`;
+  - expanded P0 nil/type/extreme fuzz block in `tests/lua/security/test_render.lua`;
+  - added `tools/audit/gen_lua_contract_tests.py` generator;
+  - added `tools/audit/mutation_report.py` for cargo-mutants reporting;
+  - added optional long load test `tests/rust/stress/long_load_tests.rs` and feature gate `long-load-tests` in `Cargo.toml`.
+- Added phase-7 performance regression gate:
+  - `tools/audit/perf_regression_gate.py` + baseline `logs/data/perf_baseline.json`.
+- Restored CI operationalization workflow:
+  - `.github/workflows/test-analytics.yml` with coverage, analytics HTML, contract generation, mutation report, stress report, perf gate, and artifact upload.
+- Synced docs and roadmap:
+  - `ideas/tests/roadmap.md`
+  - `docs/architecture/test-framework.md`
+  - `tests/README.md`
+
+Validation:
+- `cargo test --test lua_tests lua_integration_ai_scene_camera -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_integration_ui_localization_data -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_integration_postfx_camera -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_integration_minimap_tilemap_camera -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_integration_raycaster_tilemap -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_unit_data_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_unit_serial_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_unit_image_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_unit_physics_unit -- --nocapture` -> PASS
+- `cargo test --test lua_tests lua_security_render -- --nocapture` -> PASS
+- `cargo test --test effects_audio_runtime_smoke_tests -- --nocapture` -> PASS
+- `python tools/audit/test_analytics.py --json` -> PASS
+- `python tools/audit/perf_regression_gate.py --min-stress-pct 35 --update-baseline` -> PASS
+- `python tools/audit/mutation_report.py` -> PASS (report generated)
+
+## [1.0.9-fix.58] - 2026-05-09
+
+### test(ci,analytics): add strict describe-aware coverage metrics, html dashboard, and roadmap sync
+
+- Extended `tools/audit/lua_api_test_coverage.py`:
+  - added parsing for `describe("lurek.x.y", ...)` and method-form targets,
+  - added `describe_covered`, `describe_coverage_pct`, and per-module/per-method `describe_score`,
+  - added `--describe-threshold` gate support,
+  - added unresolved `describe(...)` target reporting.
+- Extended `tools/audit/test_analytics.py`:
+  - added `--html` output mode,
+  - generates `logs/reports/test_analytics.html` dashboard.
+- Added CI workflow `.github/workflows/test-analytics.yml`:
+  - runs format, clippy (deny warnings), Rust tests, Lua tests, Lua stub validation,
+  - enforces strict Lua API coverage with describe threshold,
+  - runs evidence/golden audit and stress report,
+  - publishes analytics artifacts (JSON + HTML) for Windows and Linux jobs.
+- Generated refreshed baseline artifacts:
+  - `logs/data/lua_api_test_coverage.json`
+  - `logs/reports/lua_api_test_coverage.md`
+  - `logs/data/test_analytics.json`
+  - `logs/reports/test_analytics.html`
+- Synced roadmap and test docs:
+  - updated `ideas/tests/roadmap.md` with current metrics and phase status,
+  - added `ideas/tests/false_positive_snapshot.md`,
+  - updated `ideas/src-module-review/P4_lua_coverage_matrix.md`,
+  - aligned `docs/architecture/test-framework.md` and `tests/README.md` with marker/evidence/golden and coverage-gate workflow.
+
 ## [1.0.9-fix.57] - 2026-05-09
 
 ### docs(readme): add architecture overview section and ecosystem visualization

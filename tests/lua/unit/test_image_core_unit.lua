@@ -1989,5 +1989,24 @@ describe("unit: migrated from integration/test_image_dataframe.lua", function()
 
 end)
 
+-- @describe property: image resize invariants
+describe("property: image resize invariants", function()
+        -- @covers LImageData:getDimensions
+        -- @covers LImageData:resize
+        -- @covers lurek.image.newImageData
+        it("resize output dimensions match requested size", function()
+            local src = lurek.image.newImageData(8, 6)
+            src:fill(20, 40, 60, 255)
+
+            for w = 2, 10, 2 do
+                local h = w + 1
+                local out = src:resize(w, h, "linear")
+                local ow, oh = out:getDimensions()
+                expect_equal(w, ow)
+                expect_equal(h, oh)
+            end
+        end)
+end)
+
 test_summary()
 

@@ -41,6 +41,11 @@ COVERS_RE = re.compile(
     r"^--\s*@covers\s+((?:lurek\.\w+(?:\.\w+)+)|(?:\w+:\w+)|(?:\w+\.\w+))\s*$"
 )
 
+# Regex for describe("lurek.module.function", ...) and describe("Class:method", ...)
+DESCRIBE_RE = re.compile(
+    r'describe\(\s*["\']((?:lurek\.\w+(?:\.\w+)+)|(?:\w+:\w+)|(?:\w+\.\w+))["\']'
+)
+
 # Regex for @evidence markers
 EVIDENCE_RE = re.compile(
     r"^--\s*@evidence\s+(\w+):(.+)\s*$"
@@ -55,6 +60,15 @@ GOLDEN_RE = re.compile(
 STRESS_RE = re.compile(
     r"^--\s*@stress\s+(.+)\s*$"
 )
+
+# Legacy/test-helper namespaces that are not canonical function/method symbols
+# in lua_api_data.json and should not be reported as orphan markers.
+LEGACY_NON_API_PREFIXES = {
+    "lurek.scene.transitions",
+    "lurek.window.display",
+    "lurek.window.mode",
+    "lurek.window.cursor",
+}
 
 
 def load_api_data(path: Path) -> Dict:
@@ -139,6 +153,34 @@ def scan_markers(tests_dir: Path) -> Dict[str, List[Dict]]:
     return results
 
 
+def scan_describe_targets(tests_dir: Path) -> Dict[str, List[Dict]]:
+    """Scan unit/ Lua test files for describe("...") API targets."""
+    results: Dict[str, List[Dict]] = {}
+
+    unit_dir = tests_dir / "unit"
+    for lua_file in sorted(unit_dir.rglob("*.lua")):
+        rel = str(lua_file.relative_to(WORKSPACE_ROOT)).replace("\\", "/")
+        targets = []
+
+        try:
+            lines = lua_file.read_text(encoding="utf-8").splitlines()
+        except OSError:
+            continue
+
+        for i, line in enumerate(lines):
+            m = DESCRIBE_RE.search(line)
+            if m:
+                targets.append({
+                    "target": m.group(1),
+                    "line": i + 1,
+                })
+
+        if targets:
+            results[rel] = targets
+
+    return results
+
+
 def normalize_api_name(lua_name: str) -> str:
     """Normalize an API name for matching.
 
@@ -146,6 +188,157 @@ def normalize_api_name(lua_name: str) -> str:
     "Vec2:length" -> "Vec2:length"
     """
     return lua_name.strip()
+
+
+def _build_name_maps(
+    api_functions: List[Dict],
+) -> Tuple[Set[str], Dict[str, str], Dict[str, Dict[str, str]], Set[str]]:
+    """Build canonical and alias lookups for API name resolution."""
+    canonical_names: Set[str] = set()
+    alias_map: Dict[str, str] = {}
+    module_method_index: Dict[str, Dict[str, str]] = {}
+    known_modules: Set[str] = set()
+
+    for fn in api_functions:
+        lua_name = fn["lua_name"]
+        canonical_names.add(lua_name)
+        known_modules.add(fn["module"])
+
+        if ":" in lua_name:
+            cls, sep, meth = lua_name.partition(":")
+            if cls.startswith("L") and len(cls) > 1:
+                alias_map[cls[1:] + sep + meth] = lua_name
+                alias_map[cls + "." + meth] = lua_name
+                alias_map[cls[1:] + "." + meth] = lua_name
+        elif "." in lua_name and lua_name.startswith("L"):
+            cls, _, meth = lua_name.rpartition(".")
+            if cls and meth:
+                alias_map[cls + ":" + meth] = lua_name
+                if cls.startswith("L") and len(cls) > 1:
+                    base = cls[1:]
+                    alias_map[base + ":" + meth] = lua_name
+                    alias_map[base + "." + meth] = lua_name
+
+        if fn["kind"] == "method":
+            mod = fn["module"]
+            method = fn["name"]
+            canonical = fn["lua_name"]
+            module_method_index.setdefault(mod, {})
+            module_method_index[mod].setdefault(method, canonical)
+
+    return canonical_names, alias_map, module_method_index, known_modules
+
+
+def _resolve_target(
+    marker: str,
+    canonical_names: Set[str],
+    alias_map: Dict[str, str],
+    module_method_index: Dict[str, Dict[str, str]],
+    known_modules: Set[str],
+) -> str:
+    """Resolve marker/describe target into canonical lua_name or sentinel."""
+    resolved = marker
+
+    if marker in canonical_names:
+        return marker
+
+    if marker in alias_map:
+        return alias_map[marker]
+
+    if any(marker == p or marker.startswith(p + ".") for p in LEGACY_NON_API_PREFIXES):
+        return "__non_api__"
+
+    # Allow a common typo variant used in some tests: LLClass:method -> LClass:method.
+    if marker.startswith("LL") and (":" in marker or "." in marker):
+        normalized = "L" + marker[2:]
+        if normalized in canonical_names:
+            return normalized
+        if normalized in alias_map:
+            return alias_map[normalized]
+
+    # Handle shorthand module targets used in describe names, e.g.:
+    #   audio.newDecoder -> lurek.audio.newDecoder
+    #   data.hash        -> lurek.data.hash
+    if "." in marker and not marker.startswith("lurek.") and ":" not in marker:
+        mod, member = marker.split(".", 1)
+        if mod in known_modules:
+            candidate = f"lurek.{mod}.{member}"
+            if candidate in canonical_names:
+                return candidate
+            canonical_method = module_method_index.get(mod, {}).get(member)
+            if canonical_method:
+                return canonical_method
+        # Shorthand rooted in a local helper/module alias (e.g. C.newRecipe) is
+        # outside canonical lurek.* API coverage and should not be orphaned.
+        return "__non_api__"
+
+    # Non-lurek class-style targets (e.g. Pool:play) that do not resolve through
+    # known aliases are local helper userdata markers and should not be orphaned.
+    if ":" in marker and not marker.startswith("lurek."):
+        if marker in alias_map:
+            return alias_map[marker]
+        return "__non_api__"
+
+    if marker.startswith("lurek."):
+        parts = marker.split(".")
+        if len(parts) >= 2 and parts[1] not in known_modules:
+            # External/non-shipping namespaces (e.g. lurek.turnbattle) are not
+            # part of the canonical API dataset for this gate.
+            return "__non_api__"
+        if len(parts) == 2 and parts[1] in known_modules:
+            return "__namespace__"
+        if len(parts) >= 4:
+            cls_name = parts[-2]
+            meth_name = parts[-1]
+            dotted_alias = cls_name + ":" + meth_name
+            l_alias = "L" + cls_name + ":" + meth_name
+            l_dot_alias = "L" + cls_name + "." + meth_name
+            cls_dot_alias = cls_name + "." + meth_name
+            if dotted_alias in alias_map:
+                resolved = alias_map[dotted_alias]
+            elif l_alias in canonical_names:
+                resolved = l_alias
+            elif l_dot_alias in canonical_names:
+                resolved = l_dot_alias
+            elif l_dot_alias in alias_map:
+                resolved = alias_map[l_dot_alias]
+            elif cls_dot_alias in alias_map:
+                resolved = alias_map[cls_dot_alias]
+            elif parts[1] in known_modules:
+                # Accept extra namespace segments (e.g. lurek.scene.transitions.fade)
+                # by resolving terminal member against module methods.
+                canonical_method = module_method_index.get(parts[1], {}).get(meth_name)
+                if canonical_method:
+                    resolved = canonical_method
+        else:
+            mod = parts[1] if len(parts) >= 2 else ""
+            member = parts[-1] if parts else ""
+            canonical_method = module_method_index.get(mod, {}).get(member)
+            if canonical_method:
+                resolved = canonical_method
+
+            # Class/table describe names (e.g. lurek.patterns.Stack) are
+            # namespace-level anchors, not callable API function symbols.
+            if resolved == marker and len(parts) == 3 and member[:1].isupper():
+                return "__non_api__"
+
+            # Property/constant markers (e.g. lurek.math.pi, lurek.network.MAX_PEERS)
+            # are not represented in this function/method coverage index.
+            if resolved == marker and len(parts) == 3:
+                member = parts[2]
+                if member.isupper() or member in {"pi", "tau", "huge"}:
+                    return "__non_api__"
+
+        if resolved == marker:
+            prefix_dot = marker + "."
+            prefix_colon = marker + ":"
+            if any(
+                name.startswith(prefix_dot) or name.startswith(prefix_colon)
+                for name in canonical_names
+            ):
+                return "__namespace__"
+
+    return resolved
 
 
 def build_marker_coverage(
@@ -164,43 +357,7 @@ def build_marker_coverage(
       - Test-style: Channel:push, Thread:isRunning  (names without L-prefix)
     Both are accepted. lurek.module.Class.method is resolved to LClass:method.
     """
-    # Build canonical lookup and alias mappings
-    canonical_names: Set[str] = set()
-    # Maps aliases -> canonical lua_name  (e.g. "Channel:push" -> "LChannel:push")
-    alias_map: Dict[str, str] = {}
-
-    for fn in api_functions:
-        lua_name = fn["lua_name"]
-        canonical_names.add(lua_name)
-
-        # Build aliases for class methods.
-        # Canonical may be either LFoo:bar or LFoo.bar depending on module.
-        if ":" in lua_name:
-            cls, sep, meth = lua_name.partition(":")
-            if cls.startswith("L") and len(cls) > 1:
-                alias_map[cls[1:] + sep + meth] = lua_name  # Foo:bar
-                alias_map[cls + "." + meth] = lua_name     # LFoo.bar
-                alias_map[cls[1:] + "." + meth] = lua_name # Foo.bar
-        elif "." in lua_name and lua_name.startswith("L"):
-            cls, _, meth = lua_name.rpartition(".")
-            if cls and meth:
-                alias_map[cls + ":" + meth] = lua_name      # LFoo:bar
-                if cls.startswith("L") and len(cls) > 1:
-                    base = cls[1:]
-                    alias_map[base + ":" + meth] = lua_name # Foo:bar
-                    alias_map[base + "." + meth] = lua_name # Foo.bar
-
-    # Module-level helpers for resolving shorthand markers like
-    # `lurek.particle.isActive` to canonical userdata methods.
-    module_method_index: Dict[str, Dict[str, str]] = {}
-    for fn in api_functions:
-        if fn["kind"] != "method":
-            continue
-        mod = fn["module"]
-        method = fn["name"]
-        canonical = fn["lua_name"]
-        module_method_index.setdefault(mod, {})
-        module_method_index[mod].setdefault(method, canonical)
+    canonical_names, alias_map, module_method_index, known_modules = _build_name_maps(api_functions)
 
     covered_names: Set[str] = set()
     coverage_map: Dict[str, List[str]] = {}
@@ -209,55 +366,13 @@ def build_marker_coverage(
     for test_file, markers in marker_data.items():
         for entry in markers:
             marker = entry["marker"]
-            resolved = marker
-
-            # Try direct match first
-            if marker not in canonical_names:
-                # Try alias (e.g. Channel:push -> LChannel:push)
-                if marker in alias_map:
-                    resolved = alias_map[marker]
-                # Try lurek.module.Class.method -> class-method canonical forms
-                elif marker.startswith("lurek."):
-                    parts = marker.split(".")
-                    if len(parts) >= 4:
-                        # lurek.module.ClassName.methodName
-                        cls_name = parts[-2]
-                        meth_name = parts[-1]
-                        dotted_alias = cls_name + ":" + meth_name
-                        l_alias = "L" + cls_name + ":" + meth_name
-                        l_dot_alias = "L" + cls_name + "." + meth_name
-                        cls_dot_alias = cls_name + "." + meth_name
-                        if dotted_alias in alias_map:
-                            resolved = alias_map[dotted_alias]
-                        elif l_alias in canonical_names:
-                            resolved = l_alias
-                        elif l_dot_alias in canonical_names:
-                            resolved = l_dot_alias
-                        elif l_dot_alias in alias_map:
-                            resolved = alias_map[l_dot_alias]
-                        elif cls_dot_alias in alias_map:
-                            resolved = alias_map[cls_dot_alias]
-                    else:
-                        # Try shorthand `lurek.<module>.<method>` for userdata methods
-                        # when tests intentionally omit concrete owner type.
-                        mod = parts[1] if len(parts) >= 2 else ""
-                        member = parts[-1] if parts else ""
-                        canonical_method = module_method_index.get(mod, {}).get(member)
-                        if canonical_method:
-                            resolved = canonical_method
-
-                    # Treat namespace/prefix markers as valid (non-orphan), e.g.:
-                    # - lurek.render
-                    # - lurek.input.mouse
-                    if resolved == marker:
-                        prefix_dot = marker + "."
-                        prefix_colon = marker + ":"
-                        if any(
-                            name.startswith(prefix_dot) or name.startswith(prefix_colon)
-                            for name in canonical_names
-                        ):
-                            # Valid namespace marker used for grouping in tests.
-                            resolved = "__namespace__"
+            resolved = _resolve_target(
+                marker,
+                canonical_names,
+                alias_map,
+                module_method_index,
+                known_modules,
+            )
 
             if resolved in canonical_names:
                 covered_names.add(resolved)
@@ -265,6 +380,9 @@ def build_marker_coverage(
             elif resolved == "__namespace__":
                 # Keep namespace markers out of orphan list, but they do not map to
                 # a specific canonical function.
+                continue
+            elif resolved == "__non_api__":
+                # Non-canonical helpers/properties should not be counted as orphans.
                 continue
             else:
                 orphans.append({
@@ -274,6 +392,45 @@ def build_marker_coverage(
                 })
 
     return covered_names, coverage_map, orphans
+
+
+def build_describe_coverage(
+    api_functions: List[Dict],
+    describe_data: Dict[str, List[Dict]],
+) -> Tuple[Set[str], Dict[str, List[str]], List[Dict]]:
+    """Match describe targets against canonical API list."""
+    canonical_names, alias_map, module_method_index, known_modules = _build_name_maps(api_functions)
+
+    covered_names: Set[str] = set()
+    coverage_map: Dict[str, List[str]] = {}
+    unresolved: List[Dict] = []
+
+    for test_file, targets in describe_data.items():
+        for entry in targets:
+            target = entry["target"]
+            resolved = _resolve_target(
+                target,
+                canonical_names,
+                alias_map,
+                module_method_index,
+                known_modules,
+            )
+
+            if resolved in canonical_names:
+                covered_names.add(resolved)
+                coverage_map.setdefault(resolved, []).append(test_file)
+            elif resolved == "__namespace__":
+                continue
+            elif resolved == "__non_api__":
+                continue
+            else:
+                unresolved.append({
+                    "file": test_file,
+                    "line": entry["line"],
+                    "target": target,
+                })
+
+    return covered_names, coverage_map, unresolved
 
 
 def heuristic_coverage(
@@ -331,9 +488,12 @@ def heuristic_coverage(
 def generate_json_report(
     api_functions: List[Dict],
     marker_covered: Set[str],
+    describe_covered: Set[str],
     heuristic_covered_set: Set[str],
     orphans: List[Dict],
     coverage_map: Dict[str, List[str]],
+    describe_map: Dict[str, List[str]],
+    unresolved_describe: List[Dict],
     strict: bool,
     module_filter: Optional[str],
 ) -> Dict:
@@ -349,25 +509,47 @@ def generate_json_report(
         mod_stats.setdefault(mod, {
             "total": 0,
             "marker_covered": 0,
+            "describe_covered": 0,
             "heuristic_covered": 0,
             "uncovered": [],
             "test_files": set(),
+            "describe_files": set(),
+            "functions": [],
         })
         mod_stats[mod]["total"] += 1
+
+        is_marker = fn["lua_name"] in marker_covered
+        is_describe = fn["lua_name"] in describe_covered
+        is_heuristic = fn["lua_name"] in heuristic_covered_set and not strict
+        is_covered = is_marker or is_heuristic
 
         if fn["lua_name"] in marker_covered:
             mod_stats[mod]["marker_covered"] += 1
             for tf in coverage_map.get(fn["lua_name"], []):
                 mod_stats[mod]["test_files"].add(tf)
-        elif fn["lua_name"] in heuristic_covered_set and not strict:
+        if is_describe:
+            mod_stats[mod]["describe_covered"] += 1
+            for tf in describe_map.get(fn["lua_name"], []):
+                mod_stats[mod]["describe_files"].add(tf)
+        if is_heuristic:
             mod_stats[mod]["heuristic_covered"] += 1
-        else:
+        if not is_covered:
             mod_stats[mod]["uncovered"].append({
                 "lua_name": fn["lua_name"],
                 "kind": fn["kind"],
                 "file": fn["file"],
                 "line": fn["line"],
             })
+
+        mod_stats[mod]["functions"].append({
+            "lua_name": fn["lua_name"],
+            "kind": fn["kind"],
+            "marker_covered": is_marker,
+            "describe_covered": is_describe,
+            "heuristic_covered": is_heuristic,
+            "covered": is_covered,
+            "describe_score": 1.0 if is_describe else 0.0,
+        })
 
     # Convert sets to sorted lists for JSON
     modules_out = {}
@@ -377,11 +559,16 @@ def generate_json_report(
         modules_out[mod_name] = {
             "total": total_mod,
             "marker_covered": stats["marker_covered"],
+            "describe_covered": stats["describe_covered"],
             "heuristic_covered": stats["heuristic_covered"],
             "covered": covered_mod,
             "coverage_pct": round(covered_mod / total_mod * 100, 1) if total_mod else 100.0,
+            "describe_coverage_pct": round(stats["describe_covered"] / total_mod * 100, 1) if total_mod else 100.0,
+            "describe_score": round(stats["describe_covered"] / total_mod, 3) if total_mod else 1.0,
             "uncovered": stats["uncovered"],
             "test_files": sorted(stats["test_files"]),
+            "describe_files": sorted(stats["describe_files"]),
+            "functions": stats["functions"],
         }
 
     return {
@@ -392,12 +579,15 @@ def generate_json_report(
             "module_filter": module_filter,
             "total_api_functions": total,
             "marker_covered": len(marker_covered),
+            "describe_covered": len(describe_covered),
+            "describe_coverage_pct": round(len(describe_covered) / total * 100, 1) if total else 100.0,
             "heuristic_covered": len(heuristic_covered_set) if not strict else 0,
             "total_covered": covered_count,
             "coverage_pct": round(covered_count / total * 100, 1) if total else 100.0,
         },
         "modules": modules_out,
         "orphaned_markers": orphans,
+        "unresolved_describe": unresolved_describe,
     }
 
 
@@ -416,6 +606,8 @@ def generate_markdown_report(report: Dict) -> str:
         "| Metric | Value |",
         "|--------|-------|",
         f"| Marker-covered | {meta['marker_covered']} |",
+        f"| Describe-covered | {meta['describe_covered']} |",
+        f"| Describe coverage | {meta['describe_coverage_pct']}% |",
     ]
 
     if meta["mode"] == "hybrid":
@@ -427,14 +619,15 @@ def generate_markdown_report(report: Dict) -> str:
         "",
         "## Per-Module Coverage",
         "",
-        "| Module | Total | Marker | Heuristic | Covered | Coverage |",
-        "|--------|-------|--------|-----------|---------|----------|",
+        "| Module | Total | Marker | Describe | Describe Score | Heuristic | Covered | Coverage |",
+        "|--------|-------|--------|----------|----------------|-----------|---------|----------|",
     ])
 
     for mod_name, stats in sorted(report["modules"].items(),
                                    key=lambda x: x[1]["coverage_pct"]):
         lines.append(
             f"| {mod_name} | {stats['total']} | {stats['marker_covered']} | "
+            f"{stats['describe_covered']} | {stats['describe_score']:.3f} | "
             f"{stats['heuristic_covered']} | {stats['covered']} | "
             f"{stats['coverage_pct']}% |"
         )
@@ -471,6 +664,17 @@ def generate_markdown_report(report: Dict) -> str:
         for orphan in report["orphaned_markers"]:
             lines.append(
                 f"- `{orphan['marker']}` in `{orphan['file']}:{orphan['line']}`"
+            )
+        lines.append("")
+
+    if report.get("unresolved_describe"):
+        lines.extend([
+            "## Unresolved describe() targets",
+            "",
+        ])
+        for item in report["unresolved_describe"]:
+            lines.append(
+                f"- `{item['target']}` in `{item['file']}:{item['line']}`"
             )
         lines.append("")
 
@@ -548,6 +752,8 @@ def main() -> int:
                         help="Filter to a specific module")
     parser.add_argument("--threshold", type=float, default=50.0,
                         help="Coverage threshold %% (default: 50)")
+    parser.add_argument("--describe-threshold", type=float, default=0.0,
+                        help="Describe coverage threshold %% (0 disables gate)")
     parser.add_argument("--output", metavar="FILE",
                         help="Save output to file")
     args = parser.parse_args()
@@ -571,6 +777,16 @@ def main() -> int:
     )
     print(f"[INFO] Marker coverage: {len(marker_covered)} functions", file=sys.stderr)
 
+    print("[INFO] Scanning Lua test files for describe() targets...", file=sys.stderr)
+    describe_data = scan_describe_targets(LUA_TESTS_DIR)
+    total_describe = sum(len(m) for m in describe_data.values())
+    print(f"[INFO] Found {total_describe} describe() targets", file=sys.stderr)
+    describe_covered, describe_map, unresolved_describe = build_describe_coverage(
+        api_functions,
+        describe_data,
+    )
+    print(f"[INFO] Describe coverage: {len(describe_covered)} functions", file=sys.stderr)
+
     # Heuristic fallback (unless --strict)
     heuristic_covered_set: Set[str] = set()
     if not args.strict:
@@ -582,8 +798,16 @@ def main() -> int:
 
     # Generate report
     report = generate_json_report(
-        api_functions, marker_covered, heuristic_covered_set,
-        orphans, coverage_map, args.strict, args.module
+        api_functions,
+        marker_covered,
+        describe_covered,
+        heuristic_covered_set,
+        orphans,
+        coverage_map,
+        describe_map,
+        unresolved_describe,
+        args.strict,
+        args.module,
     )
 
     # Output
@@ -609,6 +833,8 @@ def main() -> int:
             f"Lua API Test Coverage ({meta['mode']} mode)",
             f"  Total API functions: {meta['total_api_functions']}",
             f"  Marker-covered:      {meta['marker_covered']}",
+            f"  Describe-covered:    {meta['describe_covered']}",
+            f"  Describe coverage:   {meta['describe_coverage_pct']}%",
         ]
         if not args.strict:
             output_lines.append(
@@ -648,6 +874,14 @@ def main() -> int:
     if coverage_pct < args.threshold:
         print(
             f"[WARN] Coverage {coverage_pct}% is below threshold {args.threshold}%",
+            file=sys.stderr,
+        )
+        return 1
+
+    describe_pct = report["meta"]["describe_coverage_pct"]
+    if args.describe_threshold > 0.0 and describe_pct < args.describe_threshold:
+        print(
+            f"[WARN] Describe coverage {describe_pct}% is below threshold {args.describe_threshold}%",
             file=sys.stderr,
         )
         return 1

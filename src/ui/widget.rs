@@ -332,6 +332,60 @@ impl WidgetType {
     }
 }
 
+/// Animation kind for widget transitions.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum WidgetTransitionKind {
+    /// Interpolates widget alpha from `from` to `to`.
+    Alpha { from: f32, to: f32 },
+    /// Interpolates widget position from `(from_x, from_y)` to `(to_x, to_y)`.
+    Position {
+        from_x: f32,
+        from_y: f32,
+        to_x: f32,
+        to_y: f32,
+    },
+}
+
+/// Runtime transition tracked per widget.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct WidgetTransition {
+    /// Transition interpolation kind.
+    pub kind: WidgetTransitionKind,
+    /// Total transition duration in seconds.
+    pub duration: f32,
+    /// Elapsed transition time in seconds.
+    pub elapsed: f32,
+    /// If true and alpha ends at 0.0, widget becomes hidden when complete.
+    pub hide_on_complete: bool,
+}
+
+impl WidgetTransition {
+    /// Create a new alpha transition.
+    pub fn alpha(from: f32, to: f32, duration: f32, hide_on_complete: bool) -> Self {
+        Self {
+            kind: WidgetTransitionKind::Alpha { from, to },
+            duration: duration.max(0.0),
+            elapsed: 0.0,
+            hide_on_complete,
+        }
+    }
+
+    /// Create a new position transition.
+    pub fn position(from_x: f32, from_y: f32, to_x: f32, to_y: f32, duration: f32) -> Self {
+        Self {
+            kind: WidgetTransitionKind::Position {
+                from_x,
+                from_y,
+                to_x,
+                to_y,
+            },
+            duration: duration.max(0.0),
+            elapsed: 0.0,
+            hide_on_complete: false,
+        }
+    }
+}
+
 /// Shared base properties embedded by every concrete widget.
 ///
 /// `WidgetBase` does not carry rendering or input-handling logic — it stores
@@ -436,6 +490,8 @@ pub struct WidgetBase {
     /// When set, `lurek.ui.update_bindings(data)` will look for this key in
     /// the `data` table and update the widget's value/text automatically.
     pub bind_key: Option<String>,
+    /// Active transitions applied in `GuiContext::update(dt)`.
+    pub transitions: Vec<WidgetTransition>,
     /// Computed screen-space rectangle after layout. Written by `run_layout_pass()`.
     pub computed_rect: crate::math::Rect,
     /// Whether this widget is visible after layout (not clipped by parent).
@@ -485,6 +541,7 @@ impl WidgetBase {
             alpha: 1.0,
             entity_attachment: None,
             bind_key: None,
+            transitions: Vec::new(),
             computed_rect: crate::math::Rect::new(0.0, 0.0, 0.0, 0.0),
             is_visible: true,
         }

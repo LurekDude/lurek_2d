@@ -1,123 +1,88 @@
-﻿# Lurek2D â€” Test Suite Overview
+# Lurek2D Test Suite Overview
 
-Lurek2D uses a **two-tier test model**: Rust integration tests and Lua BDD tests.
-Both tiers are executed via `cargo test`.
+Lurek2D uses a two-layer test system executed through cargo:
 
-## Quick Run Commands
+- Rust tests in tests/rust/ for engine internals.
+- Lua BDD tests in tests/lua/ for lurek.* behavior.
+
+This file is a short contributor guide. The architecture source of truth is docs/architecture/test-framework.md.
+
+## Quick Commands
 
 | Goal | Command |
 |---|---|
-| Run all tests | `cargo test` |
-| Run one Rust module | `cargo test --test <name>_tests` |
-| Run one Lua test | `cargo test lua_test_<category>_<name>` |
-| Run golden tests | `cargo test --test golden_tests` |
-| Verbose output | `cargo test -- --nocapture` |
-| Debug log during tests | `$env:RUST_LOG = "debug"; cargo test -- --nocapture` |
+| Full quality gate | python tools/dev/parallel_cargo.py fmt check ; python tools/dev/parallel_cargo.py clippy --deny-warnings ; python tools/dev/parallel_cargo.py test rust ; python tools/dev/parallel_cargo.py test lua |
+| Run Rust tests only | python tools/dev/parallel_cargo.py test rust |
+| Run Lua tests only | python tools/dev/parallel_cargo.py test lua |
+| Strict Lua API coverage | python tools/audit/lua_api_test_coverage.py --strict --threshold 50 |
+| Describe gate | python tools/audit/lua_api_test_coverage.py --strict --describe-threshold <N> |
+| Analytics JSON | python tools/audit/test_analytics.py --json |
+| Analytics HTML | python tools/audit/test_analytics.py --html |
+| Perf Regression Gate | python tools/audit/perf_regression_gate.py --min-stress-pct 35 |
+| Generate Contract Tests | python tools/audit/gen_lua_contract_tests.py |
+| Mutation Report | python tools/audit/mutation_report.py |
 
 ## Directory Layout
 
-```
-tests/
-â”śâ”€â”€ README.md              â† this file
-â”śâ”€â”€ fixtures/              â† shared test assets (images, audio, data files)
-â”‚
-â”śâ”€â”€ rust/                  â† Rust integration tests (all registered in Cargo.toml)
-â”‚   â”śâ”€â”€ unit/              â† per-module Rust unit tests (one file per engine module)
-â”‚   â”śâ”€â”€ stress/            â† throughput + allocation pressure tests
-â”‚   â”śâ”€â”€ golden/            â† deterministic snapshot tests (graphics, audio, text)
-â”‚   â”śâ”€â”€ config/            â† engine configuration loading tests
-â”‚   â”śâ”€â”€ security/          â† sandbox audit, path-traversal tests
-â”‚   â”śâ”€â”€ ext/               â† cross-module Rust smoke tests
-â”‚   â””â”€â”€ fixtures/          â† Rust-specific test assets
-â”‚
-â””â”€â”€ lua/                   â† Lua BDD tests (dispatched by tests/lua/harness.rs)
-    â”śâ”€â”€ harness.rs         â† Rust dispatcher â€” one #[test] per .lua file
-    â”śâ”€â”€ init.lua           â† BDD framework (describe/it/expect_*)
-    â”śâ”€â”€ unit/              â† one file per engine module (lurek.* API surface)
-    â”śâ”€â”€ library/           â† one file per Lunasome library in library/
-    â”śâ”€â”€ integration/       â† tests BETWEEN â‰Ą2 modules (name: test_<a>_<b>.lua)
-    â”śâ”€â”€ stress/            â† Lua throughput tests (high iteration counts)
-    â”śâ”€â”€ security/          â† Lua sandboxing + nil-spam + path-traversal
-    â”śâ”€â”€ golden/            â† deterministic Lua output tests
-    â”śâ”€â”€ config/            â† configuration loading tests
-    â”śâ”€â”€ content/demos/             â† one file per demo in content/demos/
-    â”śâ”€â”€ performance/       â† Lua benchmark helpers
-    â””â”€â”€ fixtures/          â† Lua-specific test assets
-```
+- tests/rust/unit/: per-module Rust unit tests for private/internal logic.
+- tests/rust/stress/: Rust load and throughput checks.
+- tests/rust/golden/: deterministic Rust golden checks.
+- tests/rust/config/: configuration tests.
+- tests/rust/security/: sandbox and path safety tests.
+- tests/rust/ext/: cross-module Rust smoke tests.
+- tests/lua/harness.rs: explicit registration of Lua test files.
+- tests/lua/unit/: one file per module for lurek.* API contracts.
+- tests/lua/library/: one file per pure-Lua library.
+- tests/lua/integration/: tests touching at least 2 modules.
+- tests/lua/stress/: high iteration Lua load tests.
+- tests/lua/security/: hostile input and safety behavior.
+- tests/lua/evidence/: runtime evidence production.
+- tests/lua/golden/: deterministic comparison against baselines.
+- tests/lua/config/: Lua config tests.
+- tests/lua/demos/: one test per content/games demo.
 
-> **Note**: `tests/rust/game/` is retired. Game systems (battle, cardgame, combat, crafting, inventory, quest, stats) are pure-Lua libraries and tested in `tests/lua/library/`.
-> **Note**: `tests/lua/content/examples/` should not be used. Examples are documentation and are not testable in the BDD harness.
+## Marker Rules
 
-## Tier 1: Rust Tests
+Folder marker mapping is strict:
 
-Rust tests live under `tests/rust/` and are registered in `Cargo.toml`.
-They import from the crate root and run entirely headless (no GPU, audio, or window).
+- tests/lua/unit/ -> @covers
+- tests/lua/security/ -> @security
+- tests/lua/integration/ -> @integration
+- tests/lua/stress/ -> @stress
+- tests/lua/evidence/ -> @evidence
 
-**Naming convention**: `<subject>_<scenario>_<expected>` â€” no `test_` prefix.
+Rules:
 
-**Float comparisons**: always `assert!((a - b).abs() < 1e-5)` â€” never `assert_eq!` on `f32`.
+- Markers must be directly above the it() they annotate.
+- Marker indentation must match that it() block.
+- @covers entries must be assertion-backed in the same it().
+- @tests is forbidden.
 
-## Tier 2: Lua BDD Tests
+## Evidence and Golden
 
-Lua tests live under `tests/lua/` and are dispatched by `tests/lua/harness.rs`.
-Each `.lua` file must be registered with a `#[test]` entry in `harness.rs`.
+Use a two-step flow:
 
-**Framework functions** (provided by `tests/lua/init.lua`):
+1. Evidence tests create artifacts from runtime behavior.
+2. Golden tests compare output to committed baselines.
 
-| Function | Purpose |
-|---|---|
-| `describe(name, fn)` | Test group block |
-| `it(name, fn)` | Single test case |
-| `expect_equal(a, b)` | Strict equality assertion |
-| `expect_near(a, b, tol?)` | Float near-equality (default tol: 1e-5) |
-| `expect_type(val, type)` | Type assertion |
-| `expect_error(fn)` | Assert function raises an error |
-| `expect_not_nil(val)` | Non-nil assertion |
-| `test_summary()` | **Mandatory** â€” prints pass/fail totals at end of file |
+Do not mix production and comparison in one it() case.
 
-**Constraint**: Lua tests must not create windows, play audio, or write outside `target/`.
+## Harness and Registration
 
-## Lua Test Categories
+Lua tests are not auto-discovered. Every new Lua file must be registered in tests/lua/harness.rs.
+An unregistered file will not run under cargo test.
 
-| Category | Path | Scope |
-|---|---|---|
-| **unit** | `tests/lua/unit/` | One engine module per file (lurek.* API) |
-| **library** | `tests/lua/library/` | One Lunasome library per file |
-| **integration** | `tests/lua/integration/` | Tests between â‰Ą2 distinct modules |
-| **stress** | `tests/lua/stress/` | High-iteration throughput/load tests |
-| **security** | `tests/lua/security/` | Sandbox, nil spam, path traversal |
-| **golden** | `tests/lua/golden/` | Deterministic output comparison |
-| **config** | `tests/lua/config/` | Configuration loading/validation |
-| **demos** | `tests/lua/content/demos/` | One smoke test per demo folder |
+## CI and Artifacts
 
-## Golden Tests
+Workflow .github/workflows/test-analytics.yml runs on Windows and Linux and publishes:
 
-Golden tests capture deterministic output (images, audio, hashes, struct debug output)
-and compare against expected files in `tests/rust/golden/expected/`.
+- logs/data/lua_api_test_coverage.json
+- logs/reports/lua_api_test_coverage.md
+- logs/data/test_analytics.json
+- logs/reports/test_analytics.html
 
-**Priority domains**: graphics (PNG snapshots), audio (waveform bytes), text (glyph rasters).
+## Notes
 
-Expected files are tracked in git. Subsequent runs compare output and fail on any change.
-To intentionally update: copy `actual/` to `expected/` and commit with a review.
-
-## Adding a New Test
-
-### Rust test
-1. Add `#[test]` functions to the appropriate file under `tests/rust/unit/`, `tests/rust/stress/`, etc.
-2. Ensure the binary is registered in `Cargo.toml` under `[[test]]`
-3. Run: `cargo test --test <file_name>`
-
-### Lua BDD test
-1. Create the `.lua` file in the correct category folder using `describe`/`it`/`expect_*` + `test_summary()`
-2. Add `#[test] fn lua_test_<category>_<name>() { run_lua_test("<category>/test_<name>.lua"); }` to `tests/lua/harness.rs`
-3. Run: `cargo test lua_test_<category>_<name>`
-
-## Quality Gates
-
-Run these before every commit:
-
-```powershell
-cargo test && cargo clippy -- -D warnings
-```
-
-
+- Never edit generated API docs manually.
+- Keep tests deterministic: fixed seeds, fixed dt, no wall-clock assumptions.
+- Use expect_near for float comparisons in Lua tests.

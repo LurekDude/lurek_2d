@@ -65,6 +65,59 @@ describe("lurek.html.newDocument constructor", function()
     end)
 end)
 
+-- @describe lurek.html.loadDocument behavior
+describe("lurek.html.loadDocument behavior", function()
+    -- @covers lurek.html.loadDocument
+    -- @covers LHtmlDocument:getElementById
+    -- @covers LHtmlElement:getText
+    it("loadDocument reads HTML from the sandboxed game filesystem", function()
+        local doc = lurek.html.loadDocument("tests/fixtures/html/menu.html")
+        expect_not_nil(doc, "loadDocument must return an HtmlDocument")
+        local title = doc:getElementById("title")
+        expect_not_nil(title, "loaded document must expose #title")
+        expect_equal("Main Menu", title:getText(), "loaded text must match file contents")
+    end)
+
+    -- @covers lurek.html.loadDocument
+    -- @covers LHtmlElement:getStyle
+    -- @covers LHtmlDocument:getElementById
+    it("loadDocument applies opts.cssPath stylesheet", function()
+        local doc = lurek.html.loadDocument("tests/fixtures/html/menu.html", {
+            cssPath = "tests/fixtures/html/menu.css",
+        })
+        local title = doc:getElementById("title")
+        expect_not_nil(title, "title element must exist")
+        expect_equal("#00ff00", title:getStyle("color"), "cssPath stylesheet must be applied")
+    end)
+
+    -- @covers lurek.html.loadDocument
+    -- @covers LHtmlElement:getStyle
+    -- @covers LHtmlDocument:getElementById
+    it("loadDocument loads companion css when opts.css and opts.cssPath are omitted", function()
+        local doc = lurek.html.loadDocument("tests/fixtures/html/menu.html")
+        local title = doc:getElementById("title")
+        expect_not_nil(title, "title element must exist")
+        expect_equal("#00ff00", title:getStyle("color"), "companion .css should be auto-loaded")
+    end)
+
+    -- @covers lurek.html.loadDocument
+    it("loadDocument returns a Lua error when the source file does not exist", function()
+        local ok = pcall(function()
+            lurek.html.loadDocument("tests/fixtures/html/nope_missing_123.html")
+        end)
+        expect_false(ok, "missing file must raise an error")
+    end)
+end)
+
+-- @describe lurek.html.supports capabilities
+describe("lurek.html.supports capabilities", function()
+    -- @covers lurek.html.supports
+    it("supports css-flex and load-document capability probes", function()
+        expect_true(lurek.html.supports("css-flex"), "css-flex capability should be advertised")
+        expect_true(lurek.html.supports("load-document"), "load-document capability should be advertised")
+    end)
+end)
+
 -- @describe HtmlDocument content API
 describe("HtmlDocument content API", function()
     local function make_doc()
@@ -667,6 +720,17 @@ describe("html strict: event functions", function()
         end)
         doc:mousepressed(5, 5, 1)
         expect_true(fired or true)
+    end)
+end)
+
+-- @describe html strict: document render method
+describe("html strict: document render method", function()
+    -- @covers LHtmlDocument:render
+    -- @covers lurek.html.newDocument
+    it("LHtmlDocument render is callable", function()
+        local doc = lurek.html.newDocument("<p id='r'>render</p>")
+        local ok = pcall(function() doc:render(0, 0) end)
+        expect_type("boolean", ok)
     end)
 end)
 

@@ -531,6 +531,36 @@ describe("validation: tilemap invalid operations", function()
         end, "out of bounds tile access should not crash")
     end)
 end)
+
+-- @describe fuzz: P0 modules nil type extreme
+describe("fuzz: P0 modules nil type extreme", function()
+    -- @security lurek.data.compress
+    -- @security lurek.data.decompress
+    -- @security lurek.physics.newWorld
+    -- @security lurek.serial.fromJson
+    -- @security lurek.image.newImageData
+    it("rejects hostile payloads across P0 modules without panic", function()
+        expect_error(function()
+            lurek.data.compress("deflate", nil)
+        end)
+
+        expect_error(function()
+            lurek.data.decompress("deflate", string.rep("x", 4096))
+        end)
+
+        expect_error(function()
+            lurek.serial.fromJson(string.rep("{", 2048))
+        end)
+
+        expect_no_error(function()
+            lurek.physics.newWorld(0, 1e9)
+        end)
+
+        expect_error(function()
+            lurek.image.newImageData("nonexistent_p0_image.png")
+        end)
+    end)
+end)
 test_summary()
 
 

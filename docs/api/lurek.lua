@@ -2133,8 +2133,9 @@ LAnimation = {}
 ---@param indices table Ordered frame indices for the clip.
 ---@param fps number Clip playback rate in frames per second.
 ---@param looping boolean Whether the clip should loop.
+---@param mode? LuaValue
 ---@return nil Returns nothing.
-function LAnimation:addClip(name, indices, fps, looping) end
+function LAnimation:addClip(name, indices, fps, looping, mode) end
 
 --- Adds a named clip sliced from a sprite-sheet grid.
 ---@param name string Clip name.
@@ -2167,11 +2168,22 @@ function LAnimation:addFrame(x, y, w, h) end
 ---@return integer Returns the total number of frames added.
 function LAnimation:addFramesFromGrid(tex_w, tex_h, frame_w, frame_h, start, count) end
 
+--- Appends frames from a table of pre-computed source rectangles.
+---@param rects table Array of {x, y, w, h} rectangle tables.
+---@return integer Returns number of frames added.
+function LAnimation:addFramesFromRects(rects) end
+
 --- Begins a smooth crossfade from the current clip to a new named clip.
 ---@param clip_name string Target clip name.
 ---@param duration number Crossfade duration in seconds.
 ---@return boolean Returns true if the crossfade started.
 function LAnimation:crossfade(clip_name, duration) end
+
+--- Renders all animation frames into a compact debug grid image.
+---@param columns integer Number of columns in the preview grid.
+---@param cellSize integer Cell size in pixels.
+---@return ImageData Returns preview image data.
+function LAnimation:drawPreviewGrid(columns, cellSize) end
 
 --- Renders the current animation frame into a new ImageData (white bg, blue frame rect).
 ---@param width integer Output image width in pixels.
@@ -2190,6 +2202,11 @@ function LAnimation:getClip() end
 --- Returns the number of registered clips.
 ---@return integer Returns the number of clips.
 function LAnimation:getClipCount() end
+
+--- Returns playback mode for a named clip.
+---@param name string Clip name.
+---@return string forward, reverse, pingpong, or nil when clip does not exist.
+function LAnimation:getClipMode(name) end
 
 --- Returns the current position within the active clip (0-based).
 ---@return integer Returns the current clip-local frame index.
@@ -2231,6 +2248,12 @@ function LAnimation:pollEvents() end
 --- Resumes playback from the current frame.
 ---@return nil Returns nothing.
 function LAnimation:resume() end
+
+--- Sets playback mode for a named clip.
+---@param name string Clip name.
+---@param mode string One of forward, reverse, pingpong.
+---@return boolean Returns true when clip exists and mode was updated.
+function LAnimation:setClipMode(name, mode) end
 
 --- Sets the playback position within the current clip.
 ---@param index integer Clip-local frame index to select.
@@ -2310,6 +2333,11 @@ function LBlendLayerSet:type() end
 ---@param name string Type name to compare.
 ---@return boolean Returns true for LBlendLayerSet or Object.
 function LBlendLayerSet:typeOf(name) end
+
+--- Builds a common character animation bundle: Animation plus optional state machine.
+---@param cfg table Setup table with grid, clips, and optional states/transitions.
+---@return table Returns { animation = LAnimation, stateMachine = LAnimStateMachine? }.
+lurek.animation.buildCharacter = function(cfg) end
 
 --- Parses an Aseprite JSON export string and builds an animation.
 ---@param json_str string Aseprite JSON export text.
@@ -7795,6 +7823,17 @@ lurek.filesystem.readAsync = function(path) end
 ---@return string Raw file bytes as a binary Lua string.
 lurek.filesystem.readBytes = function(path) end
 
+--- Reads a JSON file as text and validates that the payload is valid JSON.
+---@param path string Virtual path to the JSON file.
+---@return string JSON text.
+lurek.filesystem.readJson = function(path) end
+
+--- Reads JSON from `path`, or writes `default_json` and returns it when missing.
+---@param path string Save path to read.
+---@param default_json string JSON payload written if file does not exist.
+---@return string Existing or default JSON text.
+lurek.filesystem.readOrWriteJson = function(path, default_json) end
+
 --- Permanently deletes a file or empty directory from the save directory.
 ---@param path string Save path to remove.
 ---@return nil No return value.
@@ -7852,6 +7891,12 @@ lurek.filesystem.writeAsync = function(path, data) end
 ---@param data string Binary payload.
 ---@return nil No return value.
 lurek.filesystem.writeBytes = function(path, data) end
+
+--- Writes validated JSON text to a file in the save sandbox.
+---@param path string Save path to write.
+---@param json string JSON payload.
+---@return nil No return value.
+lurek.filesystem.writeJson = function(path, json) end
 
 ---@class lurek.globe
 ---@field MAX_PROVINCES integer  Maximum number of provinces the globe supports.
@@ -8821,7 +8866,7 @@ function LHtmlDocument:addCss(css) end
 ---@return nil No value is returned.
 function LHtmlDocument:clearCss() end
 
---- Builds the current draw command list and discards it for now.
+--- Builds draw commands and enqueues them into the frame render queue.
 ---@param x? number Optional X offset for the draw origin.
 ---@param y? number Optional Y offset for the draw origin.
 ---@return nil No value is returned.
@@ -8898,6 +8943,12 @@ function LHtmlDocument:queryAll(selector) end
 --- Forces a layout pass immediately.
 ---@return nil No value is returned.
 function LHtmlDocument:relayout() end
+
+--- Backward-compatible alias for `draw`, kept for existing demos.
+---@param x? number Optional X offset for the draw origin.
+---@param y? number Optional Y offset for the draw origin.
+---@return nil No value is returned.
+function LHtmlDocument:render(x, y) end
 
 --- Replaces this document's stylesheet text.
 ---@param css string Stylesheet text to replace the current CSS rules.
@@ -9085,8 +9136,8 @@ function LHtmlElement:typeOf(name) end
 ---@return boolean True when `preventDefault()` has been called.
 lurek.html.isDefaultPrevented = function() end
 
---- Placeholder for future sandboxed document loading.
----@param path string Source path to load once this API is implemented.
+--- Loads an HTML UI document from the game filesystem sandbox.
+---@param path string Relative game path to the HTML source file.
 ---@param opts? table Optional CSS and viewport configuration table.
 ---@return LHtmlDocument Loaded HTML document.
 lurek.html.loadDocument = function(path, opts) end
@@ -9118,6 +9169,10 @@ lurek.i18n.buildIndex = function() end
 --- Returns unique first-path-segment category prefixes for all active locale keys.
 ---@return table Array of category prefix strings.
 lurek.i18n.categories = function() end
+
+--- Reads system environment variables to guess the active locale.
+---@return string? Detected locale code, or nil when none is found.
+lurek.i18n.detectLocale = function() end
 
 --- Formats a Unix timestamp according to the active locale's date order.
 ---@param timestamp integer Unix timestamp in UTC seconds.
@@ -9175,6 +9230,11 @@ lurek.i18n.hasLanguage = function(locale) end
 ---@return string Interpolated string result.
 lurek.i18n.interpolate = function(template, vars) end
 
+--- Returns whether the active locale (or a given locale) uses right-to-left text direction.
+---@param locale? string Optional locale code to check; defaults to the active locale.
+---@return boolean True when the locale is a known RTL language.
+lurek.i18n.isRTL = function(locale) end
+
 --- Returns the number of keys loaded in the active locale.
 ---@return integer Count of translation keys in the active locale.
 lurek.i18n.keyCount = function() end
@@ -9184,11 +9244,23 @@ lurek.i18n.keyCount = function() end
 ---@return table Array of matching translation key strings.
 lurek.i18n.keysInCategory = function(category) end
 
+--- Parses a TOML or JSON string and loads it as a locale translation table.
+---@param locale string Locale code to store the parsed table under.
+---@param content string TOML or JSON text to parse.
+---@param format string Either `"toml"` or `"json"`.
+---@return nil No value is returned.
+lurek.i18n.loadString = function(locale, content, format) end
+
 --- Loads a language table under the given locale code.
 ---@param locale string Locale code to load.
 ---@param table table Nested translation table to flatten and store.
 ---@return nil No value is returned.
 lurek.i18n.loadTable = function(locale, table) end
+
+--- Returns missing keys across all loaded locales compared to a reference locale.
+---@param reference string Locale code whose key set is treated as complete.
+---@return table Array of `{ key, missing_in }` gap tables.
+lurek.i18n.localeCoverage = function(reference) end
 
 --- Merges a flat key-value table into an existing locale without replacing the whole table.
 ---@param locale string Locale code to modify.
@@ -9268,6 +9340,11 @@ lurek.i18n.tGender = function(key, gender, vars) end
 ---@param locale string Locale code to remove.
 ---@return boolean True when the locale existed and was removed.
 lurek.i18n.unloadTable = function(locale) end
+
+--- Returns whether a locale code string is a valid BCP 47-like identifier.
+---@param locale string Locale code to validate.
+---@return boolean True when the code is well-formed.
+lurek.i18n.validateLocale = function(locale) end
 
 ---@class lurek.image
 lurek.image = {}
@@ -24129,6 +24206,20 @@ LUiWidget = {}
 ---@return nil No value is returned.
 LUiWidget.addChild = function(child) end
 
+--- Starts a timed alpha transition to `target`.
+---@param target number Target alpha in range `[0, 1]`.
+---@param duration? number Transition duration in seconds. Pass nil for `0.2`.
+---@param hideOnComplete? boolean If true and target alpha is `0`, widget is hidden when transition ends.
+---@return boolean True when the transition was queued.
+LUiWidget.animateAlpha = function(target, duration, hideOnComplete) end
+
+--- Starts a timed position transition toward `(x, y)`.
+---@param x number Target widget X position.
+---@param y number Target widget Y position.
+---@param duration? number Transition duration in seconds. Pass nil for `0.2`.
+---@return boolean True when the transition was queued.
+LUiWidget.animatePosition = function(x, y, duration) end
+
 --- Anchors this widget to a world-space entity by its numeric ID.
 ---@param entity_id integer Numeric entity ID to anchor this widget to.
 ---@return nil No value is returned.
@@ -24138,6 +24229,10 @@ LUiWidget.attachToEntity = function(entity_id) end
 ---@param key string Data key to observe when bindings are updated.
 ---@return nil No value is returned.
 LUiWidget.bind = function(key) end
+
+--- Cancels all active transitions for this widget.
+---@return boolean True when cancellation succeeded.
+LUiWidget.cancelAnimations = function() end
 
 --- Removes all anchor constraints.
 ---@return nil No value is returned.
@@ -24242,6 +24337,10 @@ LUiWidget.getTooltip = function() end
 --- Returns the widget z-order.
 ---@return integer Current widget z-order value.
 LUiWidget.getZOrder = function() end
+
+--- Returns true when this widget has active transitions.
+---@return boolean True when one or more transitions are running.
+LUiWidget.isAnimating = function() end
 
 --- Returns whether the widget is enabled.
 ---@return boolean True when the widget is enabled.
@@ -24396,6 +24495,11 @@ LUiWidget.unbind = function() end
 ---@return nil No value is returned.
 lurek.ui.addToast = function(toast) end
 
+--- Starts a drag operation for the given widget.
+---@param widget table|integer Widget handle table or widget pool index.
+---@return boolean True when drag mode started.
+lurek.ui.beginDrag = function(widget) end
+
 --- Removes keyboard focus from this widget so key events go to the next focusable.
 ---@return nil No value is returned.
 lurek.ui.clearFocus = function() end
@@ -24410,6 +24514,15 @@ lurek.ui.draw = function() end
 ---@return ImageData Rendered UI image.
 lurek.ui.drawToImage = function(w, h) end
 
+--- Drops the current drag widget on a container target.
+---@param target table|integer Container widget handle table or widget pool index.
+---@return boolean True when the widget was reparented.
+lurek.ui.dropOn = function(target) end
+
+--- Cancels active dragging and returns the previous drag widget index.
+---@return integer? Previous active drag widget index.
+lurek.ui.endDrag = function() end
+
 --- Returns true if the widget tree changed since the last call, then resets the flag.
 ---@return boolean True if the widget tree changed since the last flush.
 lurek.ui.flushCache = function() end
@@ -24421,6 +24534,10 @@ lurek.ui.focusNext = function() end
 --- Moves focus to the previous focusable widget.
 ---@return nil No value is returned.
 lurek.ui.focusPrev = function() end
+
+--- Returns the widget index currently being dragged, or `nil`.
+---@return integer? Active drag widget index.
+lurek.ui.getActiveDrag = function() end
 
 --- Returns the focused widget index or nil.
 ---@return number Focused widget index. Returns nil if no widget has focus.

@@ -204,11 +204,38 @@ fn draw_series_legend(
     let panel_x = right - panel_w;
     let panel_y = top + 6;
 
-    img.draw_rect(panel_x, panel_y, panel_w as u32, panel_h as u32, 250, 250, 252, 230);
+    img.draw_rect(
+        panel_x,
+        panel_y,
+        panel_w as u32,
+        panel_h as u32,
+        250,
+        250,
+        252,
+        230,
+    );
     img.draw_rect(panel_x, panel_y, panel_w as u32, 1, 170, 176, 188, 255);
-    img.draw_rect(panel_x, panel_y + panel_h - 1, panel_w as u32, 1, 170, 176, 188, 255);
+    img.draw_rect(
+        panel_x,
+        panel_y + panel_h - 1,
+        panel_w as u32,
+        1,
+        170,
+        176,
+        188,
+        255,
+    );
     img.draw_rect(panel_x, panel_y, 1, panel_h as u32, 170, 176, 188, 255);
-    img.draw_rect(panel_x + panel_w - 1, panel_y, 1, panel_h as u32, 170, 176, 188, 255);
+    img.draw_rect(
+        panel_x + panel_w - 1,
+        panel_y,
+        1,
+        panel_h as u32,
+        170,
+        176,
+        188,
+        255,
+    );
 
     let (lr, lg, lb) = cfg.label_color;
     for (idx, (name, color)) in entries.iter().enumerate() {
@@ -332,8 +359,11 @@ impl LineChart {
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
 
-        let legend_entries: Vec<(&str, Color)> =
-            self.series.iter().map(|s| (s.name.as_str(), s.color)).collect();
+        let legend_entries: Vec<(&str, Color)> = self
+            .series
+            .iter()
+            .map(|s| (s.name.as_str(), s.color))
+            .collect();
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         for s in &self.series {
@@ -597,8 +627,11 @@ impl ScatterPlot {
             img.draw_label(title, left + 10, 10, lr, lg, lb);
         }
 
-        let legend_entries: Vec<(&str, Color)> =
-            self.series.iter().map(|s| (s.name.as_str(), s.color)).collect();
+        let legend_entries: Vec<(&str, Color)> = self
+            .series
+            .iter()
+            .map(|s| (s.name.as_str(), s.color))
+            .collect();
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         let x_span = (self.x_range.1 - self.x_range.0).max(f32::EPSILON);
@@ -772,14 +805,7 @@ impl PieChart {
         let legend_x = (w as f32 * 0.72) as i32;
         for seg in &self.segments {
             let pct = seg.value / total * 100.0;
-            img.draw_label(
-                &format!("{pct:.1}%"),
-                legend_x + 76,
-                label_y,
-                lr,
-                lg,
-                lb,
-            );
+            img.draw_label(&format!("{pct:.1}%"), legend_x + 76, label_y, lr, lg, lb);
             label_y += 14;
         }
 
@@ -920,8 +946,11 @@ impl AreaChart {
         }
 
         let (lr, lg, lb) = cfg.label_color;
-        let legend_entries: Vec<(&str, Color)> =
-            self.layers.iter().map(|l| (l.name.as_str(), l.color)).collect();
+        let legend_entries: Vec<(&str, Color)> = self
+            .layers
+            .iter()
+            .map(|l| (l.name.as_str(), l.color))
+            .collect();
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         if let Some(ref title) = cfg.title {

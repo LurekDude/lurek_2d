@@ -114,6 +114,74 @@ mod vfs_tests {
         assert_eq!(fs.get_save_directory(), dir.join("save"));
         let _ = std::fs::remove_dir_all(&dir);
     }
+
+    #[test]
+    fn read_or_write_json_creates_then_reads_existing() {
+        let dir = make_temp_game("read_or_write_json");
+        let fs = GameFS::new(&dir);
+        let path = "save/state.json";
+
+        let first = fs
+            .read_or_write_json(path, "{\"version\":1,\"name\":\"hero\"}")
+            .unwrap();
+        assert!(first.contains("\"version\":1"));
+
+        fs.write_string(path, "{\"version\":2}").unwrap();
+        let second = fs.read_or_write_json(path, "{\"version\":1}").unwrap();
+        assert_eq!(second, "{\"version\":2}");
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn write_json_rejects_invalid_payload() {
+        let dir = make_temp_game("invalid_json");
+        let fs = GameFS::new(&dir);
+        assert!(fs.write_json("save/bad.json", "{not-json").is_err());
+        let _ = std::fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn resolve_read_path_adversarial_inputs_do_not_escape_sandbox() {
+        let dir = make_temp_game("resolve_read_path_adversarial");
+        std::fs::write(dir.join("safe.txt"), "ok").unwrap();
+        let fs = GameFS::new(&dir);
+
+        let mut inputs: Vec<String> = vec![
+            "safe.txt".to_string(),
+            "save/../safe.txt".to_string(),
+            "../../Windows/System32/drivers/etc/hosts".to_string(),
+            "..\\..\\Windows\\System32\\cmd.exe".to_string(),
+            "./safe.txt".to_string(),
+            "".to_string(),
+        ];
+
+        for _ in 0..512 {
+            let len = fastrand::usize(0..48);
+            let mut s = String::with_capacity(len);
+            for _ in 0..len {
+                let c = match fastrand::u8(0..10) {
+                    0 => '.',
+                    1 => '/',
+                    2 => '\\',
+                    3 => ':',
+                    4 => '*',
+                    _ => (b'a' + fastrand::u8(0..26)) as char,
+                };
+                s.push(c);
+            }
+            inputs.push(s);
+        }
+
+        let base = std::fs::canonicalize(&dir).unwrap();
+        for path in &inputs {
+            if let Ok(resolved) = fs.resolve_read_path(path) {
+                assert!(resolved.starts_with(&base), "path escaped sandbox: {path}");
+            }
+        }
+
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
 
 // ── file_handle ───────────────────────────────────────────────────────────────

@@ -2,6 +2,21 @@
 //!
 //! Parses both hash-format (`"frames": {}`) and array-format (`"frames": []`)
 //! TexturePacker JSON exports and provides O(1) region lookup by name.
+//!
+//! # Format boundary
+//!
+//! This module parses **TexturePacker JSON** (hash or array, `"frames"` + `"meta"`).
+//! It must not be confused with `animation::aseprite`, which parses **Aseprite JSON**
+//! (array of frames with per-frame durations and `"frameTags"`).
+//!
+//! | Module | JSON format | Primary output |
+//! |---|---|---|
+//! | `sprite::atlas` (this module) | TexturePacker export | [`SpriteAtlas`] — named region lookup |
+//! | `animation::aseprite` | Aseprite export | [`AsepriteData`] — frame + tag animation data |
+//!
+//! To feed atlas regions into an animation, collect the quads you need and call
+//! `Animation::add_frames_from_rects(&quads)`.  This keeps the dependency
+//! direction correct: `animation` (Tier 1) never imports `sprite`.
 
 use std::collections::HashMap;
 

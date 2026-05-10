@@ -2855,4 +2855,24 @@ describe("unit: migrated from integration/test_physics_tanks.lua", function()
 
 end)
 
+-- @describe property: physics monotonic fall
+describe("property: physics monotonic fall", function()
+        -- @covers lurek.physics.getBody
+        -- @covers lurek.physics.newBody
+        -- @covers lurek.physics.newWorld
+        -- @covers lurek.physics.step
+        it("dynamic body y is non-decreasing under positive gravity", function()
+            local world = lurek.physics.newWorld(0, 100)
+            local body = lurek.physics.newBody(world, 0, 0, "dynamic")
+
+            local _, last_y = lurek.physics.getBody(world, body)
+            for _ = 1, 30 do
+                lurek.physics.step(world, 1/120)
+                local _, y = lurek.physics.getBody(world, body)
+                expect_true(y >= last_y - 1e-5, "y should not move upward")
+                last_y = y
+            end
+        end)
+end)
+
 test_summary()

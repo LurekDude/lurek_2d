@@ -18,6 +18,13 @@ pub struct AnimFrame {
     pub duration: f32,
 }
 
+impl AnimFrame {
+    /// Creates a new frame from source quad and duration.
+    pub fn new(quad: Rect, duration: f32) -> Self {
+        Self { quad, duration }
+    }
+}
+
 // â”€â”€ Backward-compatibility alias â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 /// Backward-compatible alias for [`AnimFrame`].

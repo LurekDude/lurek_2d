@@ -15,6 +15,20 @@ The `ui` module is documented from the current source tree and existing module r
 
 This module primarily collaborates with `image`, `math`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
+### 2026-05 UI Runtime Additions
+
+- Added first-class widget transitions in core UI runtime:
+	- timed alpha transitions and timed position transitions,
+	- runtime helpers for start/cancel/query animation state.
+- Added drag-and-drop reparenting between containers:
+	- explicit drag lifecycle (`beginDrag`, `dropOn`, `endDrag`),
+	- cycle-safe reparenting and parent detachment.
+- Extended model binding sync:
+	- number/text/bool binding values,
+	- binding updates for slider/progress/spinbox/badge, label/button/text input/menu item, checkbox/switch, plus generic visibility.
+- Improved render-cache invalidation:
+	- `flushCache` now uses a lightweight widget-tree signature (position/size/state/topology) in addition to the dirty flag.
+
 ## Files
 
 - `chart.rs`: Generates CPU-rendered chart images for line, bar, scatter, pie, and area graphs without requiring the GPU path.

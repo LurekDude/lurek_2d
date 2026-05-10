@@ -5,7 +5,6 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::filesystem::vfs::GameFS;
 use crate::save::{
     compress_save_content, decompress_save_content, serialize_table, SaveManager, SaveValue,
 };
@@ -161,8 +160,9 @@ impl LuaSaveManager {
             plain
         };
         let path = SaveManager::slot_path(slot);
-        let game_dir = self.state.borrow().game_dir.clone();
-        GameFS::new(game_dir)
+        self.state
+            .borrow()
+            .fs
             .write_string(&path, &content)
             .map_err(|e| LuaError::RuntimeError(format!("lurek.save:save: {}", e)))?;
         self.manager.clear_dirty();
@@ -172,12 +172,9 @@ impl LuaSaveManager {
     // Loads data from a slot file, applies migrations, and restores
     fn load_from_slot(&mut self, lua: &Lua, slot: &str) -> LuaResult<(bool, Option<String>)> {
         let path = SaveManager::slot_path(slot);
-        let raw = {
-            let game_dir = self.state.borrow().game_dir.clone();
-            match GameFS::new(game_dir).read_string(&path) {
-                Ok(c) => c,
-                Err(e) => return Ok((false, Some(format!("lurek.save:load: {}", e)))),
-            }
+        let raw = match self.state.borrow().fs.read_string(&path) {
+            Ok(c) => c,
+            Err(e) => return Ok((false, Some(format!("lurek.save:load: {}", e)))),
         };
         // Handle compressed saves.
         let content: String = match decompress_save_content(&raw) {
@@ -200,8 +197,9 @@ impl LuaSaveManager {
     // Deletes a slot file
     fn delete_slot(&self, slot: &str) -> LuaResult<()> {
         let path = SaveManager::slot_path(slot);
-        let game_dir = self.state.borrow().game_dir.clone();
-        GameFS::new(game_dir)
+        self.state
+            .borrow()
+            .fs
             .remove(&path)
             .map_err(|e| LuaError::RuntimeError(format!("lurek.save:delete: {}", e)))?;
         Ok(())
@@ -210,16 +208,15 @@ impl LuaSaveManager {
     // Checks whether a slot file exists
     fn slot_exists(&self, slot: &str) -> bool {
         let path = SaveManager::slot_path(slot);
-        let game_dir = self.state.borrow().game_dir.clone();
-        GameFS::new(game_dir).exists(&path)
+        self.state.borrow().fs.exists(&path)
     }
 
     // Reads metadata from a slot file without full restore
     fn read_slot_meta<'a>(&self, lua: &'a Lua, slot: &str) -> LuaResult<Option<LuaTable<'a>>> {
         let path = SaveManager::slot_path(slot);
         let content = {
-            let game_dir = self.state.borrow().game_dir.clone();
-            let game_fs = GameFS::new(game_dir);
+            let state_ref = self.state.borrow();
+            let game_fs = &state_ref.fs;
             if !game_fs.exists(&path) {
                 return Ok(None);
             }
@@ -247,12 +244,9 @@ impl LuaSaveManager {
     // Lists all save slots with metadata
     fn list_slots<'a>(&self, lua: &'a Lua) -> LuaResult<LuaTable<'a>> {
         let result = lua.create_table()?;
-        let entries = {
-            let game_dir = self.state.borrow().game_dir.clone();
-            match GameFS::new(game_dir).list("save") {
-                Ok(e) => e,
-                Err(_) => return Ok(result),
-            }
+        let entries = match self.state.borrow().fs.list("save") {
+            Ok(e) => e,
+            Err(_) => return Ok(result),
         };
         let mut idx = 1;
         for entry in &entries {

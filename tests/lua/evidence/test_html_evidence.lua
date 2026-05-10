@@ -123,5 +123,29 @@ describe("evidence: html", function()
         write_artifact(path, json)
         expect_evidence_created(path)
     end)
+
+    -- @evidence file
+    it("saves loadDocument evidence with cssPath", function()
+        local dir  = evidence_output_dir("html")
+        local path = dir .. "load_document.json"
+        local doc = lurek.html.loadDocument("tests/fixtures/html/menu.html", {
+            cssPath = "tests/fixtures/html/menu.css",
+            width = 900,
+            height = 500,
+        })
+        local title = doc:getElementById("title")
+        local color = title and title:getStyle("color") or ""
+        local text  = title and title:getText() or ""
+        local vw, vh = doc:getViewport()
+        local json = string.format(
+            '{"title":"%s","color":"%s","viewport":{"w":%d,"h":%d}}',
+            tostring(text),
+            tostring(color),
+            vw or 0,
+            vh or 0
+        )
+        write_artifact(path, json)
+        expect_evidence_created(path)
+    end)
 end)
 test_summary()

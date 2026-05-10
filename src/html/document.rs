@@ -110,12 +110,14 @@ impl HtmlDocument {
             feature.to_ascii_lowercase().as_str(),
             "html"
                 | "css"
+                | "css-flex"
                 | "selectors"
                 | "events"
                 | "forms"
                 | "pure-rust"
                 | "inline-style"
                 | "draw-commands"
+                | "load-document"
                 | "descendant-selectors"
                 | "child-selectors"
         )
@@ -606,7 +608,9 @@ impl HtmlDocument {
             tag_name: element.tag_name().to_string(),
             text: String::new(),
             rect,
-            background_color: self.style_value(element_id, "background-color"),
+            background_color: self
+                .style_value(element_id, "background-color")
+                .or_else(|| self.style_value(element_id, "background")),
             color: self.style_value(element_id, "color"),
         });
         let text = self.collect_text(element_id);

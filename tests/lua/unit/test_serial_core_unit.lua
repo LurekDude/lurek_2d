@@ -904,4 +904,26 @@ describe("unit: migrated from integration/test_inventory_save_integration.lua", 
 
 end)
 
+-- @describe property: serial json invariants
+describe("property: serial json invariants", function()
+        -- @covers lurek.serial.fromJson
+        -- @covers lurek.serial.toJson
+        it("json roundtrip keeps deterministic records", function()
+            for i = 1, 25 do
+                local record = {
+                    id = i,
+                    name = "n" .. tostring(i),
+                    active = (i % 2 == 0),
+                    score = i * 3,
+                }
+                local encoded = lurek.serial.toJson(record)
+                local decoded = lurek.serial.fromJson(encoded)
+                expect_equal(record.id, decoded.id)
+                expect_equal(record.name, decoded.name)
+                expect_equal(record.active, decoded.active)
+                expect_equal(record.score, decoded.score)
+            end
+        end)
+end)
+
 test_summary()

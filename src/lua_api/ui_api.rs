@@ -1235,6 +1235,78 @@ fn create_widget_table<'a>(
         })?,
     )?;
 
+    // -- animateAlpha --
+
+    /// Starts a timed alpha transition to `target`.
+
+    /// @param | target | number | Target alpha in range `[0, 1]`.
+
+    /// @param | duration | number? | Transition duration in seconds. Pass nil for `0.2`.
+
+    /// @param | hideOnComplete | boolean? | If true and target alpha is `0`, widget is hidden when transition ends.
+
+    /// @return | boolean | True when the transition was queued.
+    let c = ctx.clone();
+
+    t.set(
+        "animateAlpha",
+        lua.create_function(
+            move |_, (target, duration, hide_on_complete): (f32, Option<f32>, Option<bool>)| {
+                Ok(c.borrow_mut().animate_alpha(
+                    idx,
+                    target,
+                    duration.unwrap_or(0.2),
+                    hide_on_complete.unwrap_or(false),
+                ))
+            },
+        )?,
+    )?;
+
+    // -- animatePosition --
+
+    /// Starts a timed position transition toward `(x, y)`.
+
+    /// @param | x | number | Target widget X position.
+
+    /// @param | y | number | Target widget Y position.
+
+    /// @param | duration | number? | Transition duration in seconds. Pass nil for `0.2`.
+
+    /// @return | boolean | True when the transition was queued.
+    let c = ctx.clone();
+
+    t.set(
+        "animatePosition",
+        lua.create_function(move |_, (x, y, duration): (f32, f32, Option<f32>)| {
+            Ok(c.borrow_mut()
+                .animate_position(idx, x, y, duration.unwrap_or(0.2)))
+        })?,
+    )?;
+
+    // -- isAnimating --
+
+    /// Returns true when this widget has active transitions.
+
+    /// @return | boolean | True when one or more transitions are running.
+    let c = ctx.clone();
+
+    t.set(
+        "isAnimating",
+        lua.create_function(move |_, ()| Ok(c.borrow().is_animating(idx)))?,
+    )?;
+
+    // -- cancelAnimations --
+
+    /// Cancels all active transitions for this widget.
+
+    /// @return | boolean | True when cancellation succeeded.
+    let c = ctx.clone();
+
+    t.set(
+        "cancelAnimations",
+        lua.create_function(move |_, ()| Ok(c.borrow_mut().cancel_animations(idx)))?,
+    )?;
+
     // -- attachToEntity --
 
     /// Anchors this widget to a world-space entity by its numeric ID.
@@ -8578,6 +8650,80 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
         lua.create_function(move |_, ()| Ok(c.borrow_mut().flush_cache()))?,
     )?;
 
+    // -- beginDrag --
+
+    /// Starts a drag operation for the given widget.
+
+    /// @param | widget | table|integer | Widget handle table or widget pool index.
+
+    /// @return | boolean | True when drag mode started.
+    let c = ctx.clone();
+
+    tbl.set(
+        "beginDrag",
+        lua.create_function(move |_, widget: LuaValue| {
+            let widget_idx = match widget {
+                LuaValue::Table(t) => t.get::<_, usize>("_idx")?,
+                LuaValue::Integer(i) if i >= 0 => i as usize,
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "beginDrag expects a widget table or widget index".into(),
+                    ));
+                }
+            };
+            Ok(c.borrow_mut().begin_drag(widget_idx))
+        })?,
+    )?;
+
+    // -- getActiveDrag --
+
+    /// Returns the widget index currently being dragged, or `nil`.
+
+    /// @return | integer? | Active drag widget index.
+    let c = ctx.clone();
+
+    tbl.set(
+        "getActiveDrag",
+        lua.create_function(move |_, ()| Ok(c.borrow().active_drag()))?,
+    )?;
+
+    // -- dropOn --
+
+    /// Drops the current drag widget on a container target.
+
+    /// @param | target | table|integer | Container widget handle table or widget pool index.
+
+    /// @return | boolean | True when the widget was reparented.
+    let c = ctx.clone();
+
+    tbl.set(
+        "dropOn",
+        lua.create_function(move |_, target: LuaValue| {
+            let target_idx = match target {
+                LuaValue::Table(t) => t.get::<_, usize>("_idx")?,
+                LuaValue::Integer(i) if i >= 0 => i as usize,
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "dropOn expects a widget table or widget index".into(),
+                    ));
+                }
+            };
+            Ok(c.borrow_mut().drop_on(target_idx))
+        })?,
+    )?;
+
+    // -- endDrag --
+
+    /// Cancels active dragging and returns the previous drag widget index.
+
+    /// @return | integer? | Previous active drag widget index.
+    let c = ctx.clone();
+
+    tbl.set(
+        "endDrag",
+        lua.create_function(move |_, ()| Ok(c.borrow_mut().end_drag()))?,
+    )?;
+
     // -- update_bindings --
 
     /// Updates widgets whose bound keys match values in the provided data table.
@@ -8590,57 +8736,28 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "update_bindings",
         lua.create_function(move |_, data: mlua::Table| {
-            use crate::ui::context::WidgetKind;
-
-            let mut g = c.borrow_mut();
-
-            for w in g.widgets.iter_mut() {
-                let key_opt = w.base().bind_key.clone();
-
-                let Some(key) = key_opt else {
-                    continue;
+            let mut values = std::collections::HashMap::new();
+            for pair in data.clone().pairs::<mlua::Value, mlua::Value>() {
+                let (k, v) = pair?;
+                let key = match k {
+                    mlua::Value::String(s) => s.to_str()?.to_string(),
+                    mlua::Value::Integer(n) => n.to_string(),
+                    mlua::Value::Number(n) => n.to_string(),
+                    _ => continue,
                 };
-
-                let val: mlua::Value = match data.get(key.as_str()) {
-                    Ok(v) => v,
-
-                    Err(_) => continue,
-                };
-
-                match val {
-                    mlua::Value::Number(n) => match w {
-                        WidgetKind::Slider(sl) => sl.value = n,
-
-                        WidgetKind::ProgressBar(pb) => pb.value = n,
-
-                        _ => {}
-                    },
-
+                let val = match v {
+                    mlua::Value::Number(n) => crate::ui::UiBindingValue::Number(n),
+                    mlua::Value::Integer(n) => crate::ui::UiBindingValue::Number(n as f64),
+                    mlua::Value::Boolean(b) => crate::ui::UiBindingValue::Bool(b),
                     mlua::Value::String(s) => {
-                        if let Ok(text) = s.to_str() {
-                            let text = text.to_string();
-
-                            match w {
-                                WidgetKind::Label(lbl) => lbl.text = text,
-
-                                WidgetKind::Button(btn) => btn.text = text,
-
-                                _ => {}
-                            }
-                        }
+                        crate::ui::UiBindingValue::Text(s.to_str()?.to_string())
                     }
-
-                    mlua::Value::Integer(n) => match w {
-                        WidgetKind::Slider(sl) => sl.value = n as f64,
-
-                        WidgetKind::ProgressBar(pb) => pb.value = n as f64,
-
-                        _ => {}
-                    },
-
-                    _ => {}
-                }
+                    _ => continue,
+                };
+                values.insert(key, val);
             }
+
+            c.borrow_mut().update_bindings(&values);
 
             Ok(())
         })?,

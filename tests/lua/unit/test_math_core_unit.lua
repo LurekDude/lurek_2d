@@ -2291,6 +2291,7 @@ describe("math missing explicit coverage", function()
     -- @covers LTween:addValue
     -- @covers LTween:getAllValues
     -- @covers LTween:getClock
+    -- @covers LTween:getValue
     -- @covers LTween:getValueCount
     -- @covers lurek.math.newBezierCurve
     -- @covers lurek.math.newNoiseGenerator
@@ -2314,6 +2315,9 @@ describe("math missing explicit coverage", function()
         tw:addValue(0, 1)
         expect_type("table", tw:getAllValues())
         expect_type("number", tw:getValueCount())
+        local ok_value, value = pcall(function() return tw:getValue(1) end)
+        expect_true(ok_value)
+        expect_type("number", value)
         expect_type("number", tw:getClock())
 
         local nz = lurek.math.newNoiseGenerator(123)

@@ -95,6 +95,9 @@ Under `tools/audit/`:
 | `test_coverage.py` | TST-01 — reports undercovered `lurek.*` surface |
 | `lua_test_structure_audit.py` | BDD documentation standard |
 | `lua_evidence_golden_contract_audit.py` | Evidence/golden separation |
+| `gen_lua_contract_tests.py` | Generates periodic Lua contract smoke from `lua_api_data.json` |
+| `mutation_report.py` | Runs cargo-mutants and saves mutation report |
+| `perf_regression_gate.py` | Enforces stress/perf non-regression threshold for CI |
 
 ### Harness Registration
 
@@ -391,9 +394,13 @@ Both gates must pass before every merge:
 
 | Gate | Command |
 |------|---------|
-| All tests pass | `cargo test` |
-| No clippy warnings | `cargo clippy -- -D warnings` |
-| No undocumented public items | `python tools/docs/collect_docs.py --report-missing` |
+| Format check | `python tools/dev/parallel_cargo.py fmt check` |
+| No clippy warnings | `python tools/dev/parallel_cargo.py clippy --deny-warnings` |
+| Rust tests pass | `python tools/dev/parallel_cargo.py test rust` |
+| Lua tests pass | `python tools/dev/parallel_cargo.py test lua` |
+| Lua stubs stay fresh | `python tools/validate/validate_generated_lua_stubs.py` |
+| Lua API strict marker coverage gate | `python tools/audit/lua_api_test_coverage.py --strict --threshold 50` |
+| Lua API describe coverage gate | `python tools/audit/lua_api_test_coverage.py --strict --describe-threshold <N>` |
 | (CAG changes) | `python tools/validate/cag_validate.py` |
 
 ---
@@ -403,11 +410,23 @@ Both gates must pass before every merge:
 | Tool | Purpose |
 |------|---------|
 | `tools/audit/test_coverage.py` | Reports undercovered `lurek.*` surface (TST-01) |
+| `tools/audit/lua_api_test_coverage.py` | Marker-precise Lua API coverage, orphan markers, strict and describe gates |
+| `tools/audit/test_analytics.py --json` | Aggregated test analytics (category/module scoring) |
+| `tools/audit/test_analytics.py --html` | Generates HTML dashboard in `logs/reports/test_analytics.html` |
 | `tools/audit/inline_test_audit.py` | Lists `#[cfg(test)]` in src/ (TST-02) |
 | `tools/audit/thin_wrapper_audit.py` | Flags business logic in `lua_api/` (TST-03) |
 | `tools/audit/thin_modrs_audit.py` | Flags definitions in `mod.rs` (TST-04) |
 | `tools/audit/lua_test_structure_audit.py` | BDD documentation standard |
 | `tools/audit/lua_evidence_golden_contract_audit.py` | Evidence/golden separation |
+
+Coverage report artefacts:
+- `logs/data/lua_api_test_coverage.json`
+- `logs/reports/lua_api_test_coverage.md`
+- `logs/data/test_analytics.json`
+- `logs/reports/test_analytics.html`
+
+CI workflow:
+- `.github/workflows/test-analytics.yml` runs quality gates, strict coverage, analytics, and uploads artefacts on Windows and Linux.
 
 ---
 

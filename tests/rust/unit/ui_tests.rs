@@ -175,6 +175,7 @@ mod render_tests {
 // ── layout_loader ─────────────────────────────────────────────────────────────
 
 mod layout_loader_tests {
+    use std::fs;
     use lurek2d::ui::context::GuiContext;
     use lurek2d::ui::layout_loader::{load_layout_def, load_layout_toml, LayoutDef, WidgetDef};
 
@@ -220,6 +221,49 @@ h = 600.0
 "#;
         let def: LayoutDef = toml::from_str(toml_src).unwrap();
         assert_eq!(def.resolution, Some([800, 600]));
+    }
+
+    #[test]
+    fn load_layout_def_handles_nested_tree_ids() {
+        let def = WidgetDef {
+            widget_type: "panel".to_string(),
+            id: Some("root".to_string()),
+            children: Some(vec![WidgetDef {
+                widget_type: "panel".to_string(),
+                id: Some("left".to_string()),
+                children: Some(vec![WidgetDef {
+                    widget_type: "label".to_string(),
+                    id: Some("score".to_string()),
+                    text: Some("Score".to_string()),
+                    ..Default::default()
+                }]),
+                ..Default::default()
+            }]),
+            ..Default::default()
+        };
+        let mut ctx = GuiContext::new();
+        let root_idx = load_layout_def(&mut ctx, &def).expect("layout should load");
+        ctx.add_child(0, root_idx);
+
+        let found = ctx.find_by_id(root_idx, "score");
+        assert!(found.is_some(), "nested id should resolve");
+    }
+
+    #[test]
+    fn render_to_image_writes_png_file() {
+        let mut ctx = GuiContext::new();
+        let panel = ctx.add_panel();
+        ctx.add_child(0, panel);
+
+        let out = std::env::temp_dir().join("lurek_ui_layout_loader_test.png");
+        let _ = fs::remove_file(&out);
+        let out_s = out.to_string_lossy().to_string();
+
+        lurek2d::ui::render_to_image(&mut ctx, 96, 64, &out_s).expect("render_to_image should succeed");
+
+        let meta = fs::metadata(&out).expect("png should exist");
+        assert!(meta.len() > 0, "png should not be empty");
+        let _ = fs::remove_file(out);
     }
 }
 
@@ -300,7 +344,9 @@ mod extras_tests {
 // ── context ───────────────────────────────────────────────────────────────────
 
 mod context_tests {
+    use std::collections::HashMap;
     use lurek2d::ui::context::GuiContext;
+    use lurek2d::ui::UiBindingValue;
 
     #[test]
     fn new_context_has_root_panel() {
@@ -379,6 +425,80 @@ mod context_tests {
     fn default_context_equals_new() {
         let ctx = GuiContext::default();
         assert_eq!(ctx.widget_count(), 1);
+    }
+
+    #[test]
+    fn drag_drop_moves_widget_between_containers() {
+        let mut ctx = GuiContext::new();
+        let left = ctx.add_panel();
+        let right = ctx.add_panel();
+        let item = ctx.add_button("Item");
+
+        ctx.add_child(0, left);
+        ctx.add_child(0, right);
+        ctx.add_child(left, item);
+        assert_eq!(ctx.child_count(left), 1);
+        assert_eq!(ctx.child_count(right), 0);
+
+        assert!(ctx.begin_drag(item));
+        assert_eq!(ctx.active_drag(), Some(item));
+        assert!(ctx.drop_on(right));
+
+        assert_eq!(ctx.child_count(left), 0);
+        assert_eq!(ctx.child_count(right), 1);
+        assert_eq!(ctx.active_drag(), None);
+    }
+
+    #[test]
+    fn alpha_animation_progresses_during_update() {
+        let mut ctx = GuiContext::new();
+        let idx = ctx.add_button("Anim");
+        ctx.widgets[idx].base_mut().alpha = 0.0;
+
+        assert!(ctx.animate_alpha(idx, 1.0, 1.0, false));
+        assert!(ctx.is_animating(idx));
+
+        ctx.update(0.5);
+        let mid = ctx.widgets[idx].base().alpha;
+        assert!(mid > 0.0 && mid < 1.0, "expected interpolated alpha, got {mid}");
+
+        ctx.update(0.6);
+        let end = ctx.widgets[idx].base().alpha;
+        assert!((end - 1.0).abs() < 1e-5, "alpha should finish at 1.0, got {end}");
+        assert!(!ctx.is_animating(idx));
+    }
+
+    #[test]
+    fn update_bindings_updates_multiple_widget_types() {
+        let mut ctx = GuiContext::new();
+        let label = ctx.add_label("old");
+        let switch = ctx.add_switch(false);
+        let slider = ctx.add_slider(0.0, 100.0);
+
+        ctx.widgets[label].base_mut().bind_key = Some("hp_text".to_string());
+        ctx.widgets[switch].base_mut().bind_key = Some("enabled".to_string());
+        ctx.widgets[slider].base_mut().bind_key = Some("value".to_string());
+
+        let mut values = HashMap::new();
+        values.insert("hp_text".to_string(), UiBindingValue::Text("HP: 80".to_string()));
+        values.insert("enabled".to_string(), UiBindingValue::Bool(true));
+        values.insert("value".to_string(), UiBindingValue::Number(42.0));
+
+        let changed = ctx.update_bindings(&values);
+        assert!(changed >= 3);
+
+        match &ctx.widgets[label] {
+            lurek2d::ui::context::WidgetKind::Label(lbl) => assert_eq!(lbl.text, "HP: 80"),
+            _ => panic!("expected label"),
+        }
+        match &ctx.widgets[switch] {
+            lurek2d::ui::context::WidgetKind::Switch(sw) => assert!(sw.on),
+            _ => panic!("expected switch"),
+        }
+        match &ctx.widgets[slider] {
+            lurek2d::ui::context::WidgetKind::Slider(sl) => assert!((sl.value - 42.0).abs() < f64::EPSILON),
+            _ => panic!("expected slider"),
+        }
     }
 }
 
@@ -605,5 +725,29 @@ mod chart_tests {
         let mut img = ImageData::new(400, 300);
         bc.draw_to_image(&mut img);
         assert_eq!(img.width(), 400);
+    }
+
+    #[test]
+    fn scatter_plot_zero_range_draw_does_not_panic() {
+        let mut scatter = ScatterPlot::new(ChartConfig::default());
+        scatter.x_range = (1.0, 1.0);
+        scatter.y_range = (5.0, 5.0);
+        scatter.add_series("cluster", &[(1.0, 5.0), (1.0, 5.0)], Color::new(0.2, 0.7, 0.9, 1.0));
+
+        let mut img = ImageData::new(320, 240);
+        scatter.draw_to_image(&mut img);
+        assert_eq!(img.height(), 240);
+    }
+
+    #[test]
+    fn area_chart_sparse_layers_draw_does_not_panic() {
+        let mut area = AreaChart::new(ChartConfig::default());
+        area.y_max = 20.0;
+        area.add_layer("a", &[1.0, 2.0, 3.0], Color::new(0.2, 0.4, 0.8, 1.0));
+        area.add_layer("b", &[0.0], Color::new(0.8, 0.4, 0.2, 1.0));
+
+        let mut img = ImageData::new(320, 200);
+        area.draw_to_image(&mut img);
+        assert_eq!(img.width(), 320);
     }
 }

@@ -879,7 +879,18 @@ def render_luacats(modules: dict) -> str:
     out.append("library = {}")
     out.append("")
 
-    declared_classes: set[str] = set()
+    # Declare built-in Lua types so LSP recognizes them in annotations
+    out.append("---@class number")
+    out.append("---@class string")
+    out.append("---@class boolean")
+    out.append("---@class table")
+    out.append("---@class function")
+    out.append("---@class thread")
+    out.append("---@class userdata")
+    out.append("---@class nil")
+    out.append("")
+
+    declared_classes: set[str] = {"number", "string", "boolean", "table", "function", "thread", "userdata", "nil"}
     referenced_types: set[str] = set()
     for _, info in modules.values():
         for fn in info["functions"]:

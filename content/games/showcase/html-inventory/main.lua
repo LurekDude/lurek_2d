@@ -75,7 +75,7 @@ h2 { color:#e94560; margin-bottom:14px; font-size:18px; letter-spacing:1px; }
 
 local event_handles = {}
 
-function lurek.load()
+function lurek.init()
   local w = lurek.window.getWidth()
   local h = lurek.window.getHeight()
   inv_doc = lurek.html.newDocument(build_html(), { css=CSS, width=w, height=h })
@@ -102,11 +102,11 @@ function lurek.load()
   end
 end
 
-function lurek.update(dt)
+function lurek.process(dt)
   if inv_doc then
     inv_doc:update(dt)
   end
-  if lurek.keyboard.isDown("escape") then lurek.event.quit() end
+  if lurek.input.keyboard.isDown("escape") then lurek.event.quit() end
 end
 
 function lurek.draw()

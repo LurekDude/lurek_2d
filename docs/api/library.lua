@@ -3,6 +3,15 @@
 
 library = {}
 
+---@class number
+---@class string
+---@class boolean
+---@class table
+---@class function
+---@class thread
+---@class userdata
+---@class nil
+
 ---@class StatusEffect
 StatusEffect = {}
 

@@ -149,7 +149,7 @@ end
 -- Fake slider dragging via mouse (simplified: clicking the track sets value).
 local dragging_slider = nil
 
-function lurek.load()
+function lurek.init()
   local w = lurek.window.getWidth()
   local h = lurek.window.getHeight()
   settings_doc = lurek.html.newDocument(build_html(), { css=CSS, width=w, height=h })
@@ -159,11 +159,11 @@ function lurek.load()
   wire_events()
 end
 
-function lurek.update(dt)
+function lurek.process(dt)
   if settings_doc then
     settings_doc:update(dt)
   end
-  if lurek.keyboard.isDown("escape") then lurek.event.quit() end
+  if lurek.input.keyboard.isDown("escape") then lurek.event.quit() end
 end
 
 function lurek.draw()

@@ -121,7 +121,7 @@ This module is mostly self-contained inside the Edge/Integration group. Cross-mo
 - `lurek.html.stopPropagation`: Stops the event from bubbling up to parent elements.
 - `lurek.html.isDefaultPrevented`: Returns true if `preventDefault` has been called on this event.
 - `lurek.html.newDocument`: Creates a detached HTML document from markup and optional CSS/viewport options.
-- `lurek.html.loadDocument`: Placeholder for future sandboxed document loading.
+- `lurek.html.loadDocument`: Loads HTML from the sandboxed game filesystem, with optional `opts.css`, `opts.cssPath`, viewport options, and companion `.css` fallback.
 - `lurek.html.supports`: Returns whether the active HTML facade supports a named feature.
 
 ### `LHtmlDocument` Methods
@@ -133,7 +133,7 @@ This module is mostly self-contained inside the Edge/Integration group. Cross-mo
 - `LHtmlDocument:setViewport`: Sets the document layout viewport in UI pixels.
 - `LHtmlDocument:getViewport`: Returns the document layout viewport in UI pixels.
 - `LHtmlDocument:update`: Advances document state and runs layout if needed.
-- `LHtmlDocument:draw`: Builds the current draw command list and discards it for now.
+- `LHtmlDocument:draw`: Builds draw commands and enqueues them into the frame render queue.
 - `LHtmlDocument:relayout`: Forces a layout pass immediately.
 - `LHtmlDocument:isDirty`: Returns whether DOM, CSS, viewport, or layout state changed.
 - `LHtmlDocument:getRoot`: Returns the root element for this document.
@@ -188,4 +188,5 @@ This module is mostly self-contained inside the Edge/Integration group. Cross-mo
 ## Notes
 
 - Keep this module reference synchronized with `src/html/` and any matching Lua bindings.
+- HTML draw-command color parsing accepts hex, `rgb/rgba`, `hsl/hsla`, `transparent`, and an extended set of CSS named colors (for example `orange`, `teal`, `crimson`, `indigo`).
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.

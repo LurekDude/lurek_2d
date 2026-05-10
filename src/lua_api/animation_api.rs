@@ -7,6 +7,7 @@ use std::rc::Rc;
 
 use crate::animation::aseprite::load_aseprite_json;
 use crate::animation::blend::{BlendLayer, BlendLayerSet, BlendMask};
+use crate::animation::clip::ClipPlaybackMode;
 use crate::animation::state_machine::{AnimParamValue, AnimStateMachine};
 use crate::animation::Animation;
 use crate::math::Rect;
@@ -51,6 +52,27 @@ impl LuaUserData for LuaAnimation {
             },
         );
 
+        // -- addFramesFromRects --
+        /// Appends frames from a table of pre-computed source rectangles.
+        ///
+        /// Each entry in `rects` must be a table with x, y, w, h fields (pixel space).
+        /// Use this when you already have sliced quads from another source
+        /// such as a SpriteSheet or TexturePacker atlas — avoids duplicating grid math.
+        /// @param | rects | table | Array of {x, y, w, h} rectangle tables.
+        /// @return | integer | Returns number of frames added.
+        methods.add_method_mut("addFramesFromRects", |_, this, rects: LuaTable| {
+            let mut quads: Vec<crate::math::Rect> = Vec::new();
+            for entry in rects.sequence_values::<LuaTable>() {
+                let tbl = entry?;
+                let x: f32 = tbl.get("x")?;
+                let y: f32 = tbl.get("y")?;
+                let w: f32 = tbl.get("w")?;
+                let h: f32 = tbl.get("h")?;
+                quads.push(crate::math::Rect::new(x, y, w, h));
+            }
+            Ok(this.inner.add_frames_from_rects(&quads))
+        });
+
         // -- addClip --
         /// Adds a named clip from explicit frame indices.
         /// @param | name | string | Clip name.
@@ -60,15 +82,43 @@ impl LuaUserData for LuaAnimation {
         /// @return | nil | Returns nothing.
         methods.add_method_mut(
             "addClip",
-            |_, this, (name, indices_tbl, fps, looping): (String, LuaTable, f32, bool)| {
+            |_, this, (name, indices_tbl, fps, looping, mode): (String, LuaTable, f32, bool, Option<String>)| {
                 let mut indices: Vec<usize> = Vec::new();
                 for v in indices_tbl.sequence_values::<usize>() {
                     indices.push(v?);
                 }
-                this.inner.add_clip(&name, indices, fps, looping);
+                let mode = parse_clip_mode(mode.as_deref())?;
+                this.inner
+                    .add_clip_with_mode(&name, indices, fps, looping, mode);
                 Ok(())
             },
         );
+
+        // -- setClipMode --
+        /// Sets playback mode for a named clip.
+        /// @param | name | string | Clip name.
+        /// @param | mode | string | One of forward, reverse, pingpong.
+        /// @return | boolean | Returns true when clip exists and mode was updated.
+        methods.add_method_mut("setClipMode", |_, this, (name, mode): (String, String)| {
+            let mode = parse_clip_mode(Some(mode.as_str()))?;
+            if let Some(clip) = this.inner.get_clip_mut(&name) {
+                clip.mode = mode;
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        });
+
+        // -- getClipMode --
+        /// Returns playback mode for a named clip.
+        /// @param | name | string | Clip name.
+        /// @return | string | forward, reverse, pingpong, or nil when clip does not exist.
+        methods.add_method("getClipMode", |_, this, name: String| {
+            Ok(this
+                .inner
+                .get_clip(&name)
+                .map(|clip| clip_mode_name(clip.mode).to_string()))
+        });
 
         // -- addClipFromGrid --
         /// Adds a named clip sliced from a sprite-sheet grid.
@@ -281,6 +331,16 @@ impl LuaUserData for LuaAnimation {
         /// @return | ImageData | Returns the rendered image data.
         methods.add_method("drawToImage", |lua, this, (w, h): (u32, u32)| {
             let img = this.inner.draw_to_image(w, h);
+            lua.create_userdata(img)
+        });
+
+        // -- drawPreviewGrid --
+        /// Renders all animation frames into a compact debug grid image.
+        /// @param | columns | integer | Number of columns in the preview grid.
+        /// @param | cellSize | integer | Cell size in pixels.
+        /// @return | ImageData | Returns preview image data.
+        methods.add_method("drawPreviewGrid", |lua, this, (columns, cell_size): (u32, u32)| {
+            let img = this.inner.draw_preview_grid(columns, cell_size);
             lua.create_userdata(img)
         });
 
@@ -645,8 +705,99 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- buildCharacter --
+    /// Builds a common character animation bundle: Animation plus optional state machine.
+    /// @param | cfg | table | Setup table with grid, clips, and optional states/transitions.
+    /// @return | table | Returns { animation = LAnimation, stateMachine = LAnimStateMachine? }.
+    tbl.set(
+        "buildCharacter",
+        lua.create_function(|lua, cfg: LuaTable| {
+            let tex_w: u32 = cfg.get("texW")?;
+            let tex_h: u32 = cfg.get("texH")?;
+            let frame_w: u32 = cfg.get("frameW")?;
+            let frame_h: u32 = cfg.get("frameH")?;
+
+            let mut anim = Animation::new();
+
+            let clips: LuaTable = cfg.get("clips")?;
+            for clip_tbl in clips.sequence_values::<LuaTable>() {
+                let clip_tbl = clip_tbl?;
+                let name: String = clip_tbl.get("name")?;
+                let start: usize = clip_tbl.get("start")?;
+                let count: usize = clip_tbl.get("count")?;
+                let fps: f32 = clip_tbl.get::<_, Option<f32>>("fps")?.unwrap_or(8.0);
+                let looping: bool = clip_tbl.get::<_, Option<bool>>("looping")?.unwrap_or(true);
+                let mode = parse_clip_mode(clip_tbl.get::<_, Option<String>>("mode")?.as_deref())?;
+
+                let base = anim.get_frame_count();
+                let added = anim.add_frames_from_grid(tex_w, tex_h, frame_w, frame_h, start, count);
+                let indices: Vec<usize> = (base..base + added).collect();
+                anim.add_clip_with_mode(&name, indices, fps, looping, mode);
+            }
+
+            let initial_clip = cfg.get::<_, Option<String>>("initialClip")?;
+            if let Some(name) = initial_clip {
+                let _ = anim.play(&name);
+            }
+
+            let out = lua.create_table()?;
+            let anim_clone_for_sm = anim.clone();
+            let anim_ud = lua.create_userdata(LuaAnimation { inner: anim })?;
+            out.set("animation", anim_ud)?;
+
+            if let Some(states) = cfg.get::<_, Option<LuaTable>>("states")? {
+                let initial_state = cfg
+                    .get::<_, Option<String>>("initialState")?
+                    .unwrap_or_else(|| "idle".to_string());
+                let mut sm = AnimStateMachine::new(anim_clone_for_sm, initial_state);
+
+                for state_tbl in states.sequence_values::<LuaTable>() {
+                    let state_tbl = state_tbl?;
+                    let name: String = state_tbl.get("name")?;
+                    let clip: String = state_tbl.get("clip")?;
+                    let looping: bool = state_tbl.get::<_, Option<bool>>("looping")?.unwrap_or(true);
+                    sm.add_state(&name, &clip, looping);
+                }
+
+                if let Some(transitions) = cfg.get::<_, Option<LuaTable>>("transitions")? {
+                    for t in transitions.sequence_values::<LuaTable>() {
+                        let t = t?;
+                        let from: String = t.get("from")?;
+                        let to: String = t.get("to")?;
+                        let condition: String = t.get("condition")?;
+                        sm.add_transition(&from, &to, &condition);
+                    }
+                }
+
+                let sm_ud = lua.create_userdata(LuaAnimStateMachine { inner: sm })?;
+                out.set("stateMachine", sm_ud)?;
+            }
+
+            Ok(out)
+        })?,
+    )?;
+
     luna.set("animation", tbl)?;
     Ok(())
+}
+
+fn parse_clip_mode(mode: Option<&str>) -> LuaResult<ClipPlaybackMode> {
+    match mode.unwrap_or("forward") {
+        "forward" => Ok(ClipPlaybackMode::Forward),
+        "reverse" => Ok(ClipPlaybackMode::Reverse),
+        "pingpong" => Ok(ClipPlaybackMode::PingPong),
+        other => Err(LuaError::RuntimeError(format!(
+            "clip mode must be forward|reverse|pingpong, got '{other}'"
+        ))),
+    }
+}
+
+fn clip_mode_name(mode: ClipPlaybackMode) -> &'static str {
+    match mode {
+        ClipPlaybackMode::Forward => "forward",
+        ClipPlaybackMode::Reverse => "reverse",
+        ClipPlaybackMode::PingPong => "pingpong",
+    }
 }
 
 // -------------------------------------------------------------------------------

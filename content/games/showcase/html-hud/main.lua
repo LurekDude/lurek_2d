@@ -45,7 +45,7 @@ body { font-family:sans-serif; }
 #hp-val, #score-val, #timer-val { color:#fff; font-size:14px; min-width:40px; }
 ]]
 
-function lurek.load()
+function lurek.init()
   hud = lurek.html.newDocument(HUD_HTML, {
     css    = HUD_CSS,
     width  = lurek.window.getWidth(),
@@ -53,7 +53,7 @@ function lurek.load()
   })
 end
 
-function lurek.update(dt)
+function lurek.process(dt)
   timer  = timer  + dt
   score  = score  + math.floor(dt * 150)
   health = math.max(0, health - dt * 4)
@@ -79,7 +79,7 @@ function lurek.update(dt)
     hud:update(dt)
   end
 
-  if lurek.keyboard.isDown("escape") then lurek.event.quit() end
+  if lurek.input.keyboard.isDown("escape") then lurek.event.quit() end
 end
 
 function lurek.draw()

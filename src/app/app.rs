@@ -1245,6 +1245,27 @@ impl LurekApp {
             state.borrow_mut().render_commands.extend(overlay_cmds);
         }
 
+        // Optional on-screen shader compile diagnostics controlled by lurek.effect.
+        if let Some(font_key) = overlay_font {
+            let shader_err = {
+                let st = state.borrow();
+                if st.shader_error_display_enabled {
+                    st.last_shader_compile_error.clone()
+                } else {
+                    None
+                }
+            };
+            if let Some(err) = shader_err {
+                state.borrow_mut().render_commands.push(RenderCommand::Print {
+                    font_key,
+                    text: format!("Shader error: {}", err),
+                    x: 12.0,
+                    y: 28.0,
+                    scale: 0.9,
+                });
+            }
+        }
+
         frame_profile.callback_total_ms = frame_profile.process_physics_ms
             + frame_profile.fixed_update_ms
             + frame_profile.process_ms

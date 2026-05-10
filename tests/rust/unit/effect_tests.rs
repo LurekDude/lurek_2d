@@ -91,6 +91,8 @@ mod render_tests {
 
 mod weather_tests {
     use super::*;
+    use lurek2d::effect::overlay::Overlay;
+    use lurek2d::effect::weather::WeatherType;
 
     #[test]
     fn weather_particle_fields_accessible() {
@@ -103,5 +105,23 @@ mod weather_tests {
             alpha: 0.8,
         };
         assert!((p.alpha - 0.8).abs() < 1e-6);
+    }
+
+    #[test]
+    fn weather_spawn_positions_have_variation() {
+        let mut overlay = Overlay::new(320, 180);
+        overlay.weather.enabled = true;
+        overlay.weather.weather_type = WeatherType::Rain;
+        overlay.weather.intensity = 1.0;
+
+        overlay.update(0.6);
+        assert!(!overlay.weather.particles.is_empty());
+
+        let mut unique_x = std::collections::HashSet::new();
+        for p in &overlay.weather.particles {
+            unique_x.insert((p.x * 10.0) as i32);
+        }
+
+        assert!(unique_x.len() > 1, "weather spawn x positions should vary");
     }
 }

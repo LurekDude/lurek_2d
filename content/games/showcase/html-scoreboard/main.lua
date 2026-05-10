@@ -101,13 +101,13 @@ local function refresh()
   board_doc:relayout()
 end
 
-function lurek.load()
+function lurek.init()
   local w = lurek.window.getWidth()
   local h = lurek.window.getHeight()
   board_doc = lurek.html.newDocument(build_table_html(), { css=CSS, width=w, height=h })
 end
 
-function lurek.update(dt)
+function lurek.process(dt)
   tick = tick + dt
   if tick >= UPDATE_EVERY then
     tick = tick - UPDATE_EVERY
@@ -129,7 +129,7 @@ function lurek.update(dt)
   if board_doc then
     board_doc:update(dt)
   end
-  if lurek.keyboard.isDown("escape") then lurek.event.quit() end
+  if lurek.input.keyboard.isDown("escape") then lurek.event.quit() end
 end
 
 function lurek.draw()

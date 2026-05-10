@@ -9,8 +9,14 @@
 
 /// Generic relationship system for entity pairs.
 pub mod relationships;
+/// Packed generational entity-id helpers.
+pub mod generational_id;
+/// Shared Lua table helper functions.
+pub mod lua_table;
 /// Universe — entity management with ID recycling, components, tags, and systems.
 pub mod universe;
 
+pub use generational_id::GenerationalId;
+pub use lua_table::deep_copy_table;
 pub use relationships::{RelationType, Relationship, RelationshipManager};
-pub use universe::{deep_copy_table, Universe};
+pub use universe::Universe;

@@ -103,8 +103,7 @@ mod widget_tests {
 
 // ── terminal_state ────────────────────────────────────────────────────────────
 
-mod terminal_state_tests {
-}
+mod terminal_state_tests {}
 
 // ── render ────────────────────────────────────────────────────────────────────
 

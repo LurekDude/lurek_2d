@@ -411,12 +411,21 @@ describe("lurek.network.pack / unpack", function()
     end)
 
     -- @covers LNetworkRuntime:shutdown
+    -- @covers LNetworkRuntime:wsClose
+    -- @covers LNetworkRuntime:wsConnect
+    -- @covers LNetworkRuntime:wsSend
     -- @covers lurek.network.newRuntime
     it("should have WebSocket methods", function()
         local rt = lurek.network.newRuntime()
         expect_equal(type(rt.wsConnect), "function")
         expect_equal(type(rt.wsSend), "function")
         expect_equal(type(rt.wsClose), "function")
+      local ok_connect = pcall(function() rt:wsConnect("ws://127.0.0.1:1") end)
+      local ok_send = pcall(function() rt:wsSend(0, "ping") end)
+      local ok_close = pcall(function() rt:wsClose(0) end)
+      expect_type("boolean", ok_connect)
+      expect_type("boolean", ok_send)
+      expect_type("boolean", ok_close)
         rt:shutdown()
     end)
 end)
@@ -495,6 +504,9 @@ end)
     -- @covers LNetworkHost:broadcast
     -- @covers LNetworkHost:disconnect
     -- @covers LNetworkHost:ping
+    -- @covers LNetworkHost:getRole
+    -- @covers LNetworkHost:isClient
+    -- @covers LNetworkHost:isServer
     -- @covers LNetworkHost:type
     -- @covers LNetworkHost:typeOf
     -- @covers LNetworkHost:destroy
@@ -503,6 +515,9 @@ end)
       local host = lurek.network.newHost({ addr = "0.0.0.0:0" })
       expect_type("string", host:type())
       expect_type("boolean", host:typeOf("LNetworkHost"))
+      expect_type("string", host:getRole())
+      expect_type("boolean", host:isServer())
+      expect_type("boolean", host:isClient())
       local ok_connect = pcall(function() host:connect("127.0.0.1:9") end)
       expect_type("boolean", ok_connect)
       local ok_send = pcall(function() host:send(0, 0, "hello", true) end)

@@ -1,34 +1,25 @@
-[2026-05-06T16:05:55.455Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
-[2026-05-06T16:05:55.456Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
-[2026-05-06T16:05:55.456Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\retro\dungeon_crawler
-[2026-05-06T16:05:57.162Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
-[2026-05-06T16:05:57.163Z] WARN  GENERAL [Loader Message (0x0)]
+[2026-05-10T17:57:33.333Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
+[2026-05-10T17:57:33.335Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-05-10T17:57:33.335Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\showcase\html-load-document
+[2026-05-10T17:57:35.151Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-05-10T17:57:35.153Z] WARN  GENERAL [Loader Message (0x0)]
 	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
-[2026-05-06T16:05:57.163Z] WARN  	objects: (type: INSTANCE, hndl: 0x1e646fa9a20, name: ?)
-[2026-05-06T16:05:57.230Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
-[2026-05-06T16:05:57.230Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
-[2026-05-06T16:05:57.241Z] WARN  Unrecognized present mode 1000361000
-[2026-05-06T16:05:57.572Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
-[2026-05-06T16:05:57.792Z] WARN  Unrecognized present mode 1000361000
-[2026-05-06T16:05:57.792Z] INFO  [L034] GPU texture dimension limit: 32768
-[2026-05-06T16:05:57.793Z] WARN  Unrecognized present mode 1000361000
-[2026-05-06T16:05:58.061Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
-[2026-05-06T16:05:58.062Z] DEBUG Loaded 846 mappings.
-[2026-05-06T16:05:58.087Z] WARN  Unrecognized present mode 1000361000
-[2026-05-06T16:05:58.092Z] WARN  Unrecognized present mode 1000361000
-[2026-05-06T16:05:58.095Z] DEBUG [FS01] GameFS initialised
-[2026-05-06T16:05:58.655Z] DEBUG [AT01] Simulator created
-[2026-05-06T16:05:58.655Z] DEBUG [SC01] SC01
-[2026-05-06T16:05:58.656Z] DEBUG [GU01] GuiContext created
-[2026-05-06T16:05:58.656Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\retro\dungeon_crawler\main.lua
-[2026-05-06T16:05:58.658Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.659Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.659Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.660Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.661Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.661Z] DEBUG [TX01] texture decoded: 64x64
-[2026-05-06T16:05:58.663Z] DEBUG [RC01] RayCastMap created: 80x80
-[2026-05-06T16:08:23.140Z] INFO  [L039] Window close requested
-[2026-05-06T16:08:23.141Z] INFO  [L002] Lurek2D Engine stopped
+[2026-05-10T17:57:35.153Z] WARN  	objects: (type: INSTANCE, hndl: 0x1ceffda6b90, name: ?)
+[2026-05-10T17:57:35.227Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-05-10T17:57:35.228Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-05-10T17:57:35.238Z] WARN  Unrecognized present mode 1000361000
+[2026-05-10T17:57:35.619Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-05-10T17:57:35.828Z] WARN  Unrecognized present mode 1000361000
+[2026-05-10T17:57:35.828Z] INFO  [L034] GPU texture dimension limit: 32768
+[2026-05-10T17:57:35.829Z] WARN  Unrecognized present mode 1000361000
+[2026-05-10T17:57:36.154Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
+[2026-05-10T17:57:36.156Z] DEBUG Loaded 846 mappings.
+[2026-05-10T17:57:36.179Z] WARN  Unrecognized present mode 1000361000
+[2026-05-10T17:57:36.184Z] WARN  Unrecognized present mode 1000361000
+[2026-05-10T17:57:36.188Z] DEBUG [FS01] GameFS initialised
+[2026-05-10T17:57:36.874Z] DEBUG [AT01] Simulator created
+[2026-05-10T17:57:36.874Z] DEBUG [SC01] SC01
+[2026-05-10T17:57:36.875Z] DEBUG [GU01] GuiContext created
+[2026-05-10T17:57:36.876Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\showcase\html-load-document\main.lua
+[2026-05-10T17:57:46.462Z] INFO  [L039] Window close requested
+[2026-05-10T17:57:46.463Z] INFO  [L002] Lurek2D Engine stopped

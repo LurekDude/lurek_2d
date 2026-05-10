@@ -145,6 +145,22 @@ pub struct WeatherState {
     pub particles: Vec<WeatherParticle>,
     /// Internal timer for particle spawning.
     pub spawn_timer: f32,
+    /// Internal PRNG state used for spawn distribution jitter.
+    pub rng_state: u64,
+}
+
+impl WeatherState {
+    /// Returns a pseudo-random float in [0, 1).
+    pub fn next_unit(&mut self) -> f32 {
+        // xorshift64*: tiny state, deterministic and fast for particle spawning.
+        let mut x = self.rng_state;
+        x ^= x >> 12;
+        x ^= x << 25;
+        x ^= x >> 27;
+        self.rng_state = x;
+        let out = x.wrapping_mul(0x2545_F491_4F6C_DD1D);
+        ((out >> 40) as u32) as f32 / (1u32 << 24) as f32
+    }
 }
 
 impl Default for WeatherState {
@@ -157,6 +173,7 @@ impl Default for WeatherState {
             wind_speed: 0.0,
             particles: Vec::new(),
             spawn_timer: 0.0,
+            rng_state: 0x9E37_79B9_7F4A_7C15,
         }
     }
 }

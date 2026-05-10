@@ -133,3 +133,213 @@ mod catalog_tests {
         assert!(catalog.export("missing").is_none());
     }
 }
+
+// ── Locale utilities ──────────────────────────────────────────────────────
+
+mod locale_util_tests {
+    use lurek2d::i18n::{
+        detect_system_locale, flat_table_from_json, flat_table_from_toml, is_rtl,
+        is_valid_locale_code, Catalog,
+    };
+    use std::collections::HashMap;
+
+    // is_valid_locale_code
+    #[test]
+    fn test_valid_locale_code_accepts_bare_language() {
+        assert!(is_valid_locale_code("en"));
+        assert!(is_valid_locale_code("pl"));
+        assert!(is_valid_locale_code("ja"));
+    }
+
+    #[test]
+    fn test_valid_locale_code_accepts_language_region() {
+        assert!(is_valid_locale_code("en-US"));
+        assert!(is_valid_locale_code("zh-CN"));
+        assert!(is_valid_locale_code("pt-BR"));
+        assert!(is_valid_locale_code("en_GB")); // underscore separator
+    }
+
+    #[test]
+    fn test_valid_locale_code_accepts_three_letter_language() {
+        assert!(is_valid_locale_code("ckb")); // Central Kurdish
+    }
+
+    #[test]
+    fn test_valid_locale_code_rejects_empty() {
+        assert!(!is_valid_locale_code(""));
+    }
+
+    #[test]
+    fn test_valid_locale_code_rejects_single_char() {
+        assert!(!is_valid_locale_code("e"));
+    }
+
+    #[test]
+    fn test_valid_locale_code_rejects_digits_in_language() {
+        assert!(!is_valid_locale_code("1en"));
+    }
+
+    #[test]
+    fn test_valid_locale_code_rejects_too_long() {
+        assert!(!is_valid_locale_code("abcdefghijklmnopqrstuvwxyzabcdefghijk"));
+    }
+
+    // is_rtl
+    #[test]
+    fn test_is_rtl_arabic() {
+        assert!(is_rtl("ar"));
+        assert!(is_rtl("ar-SA"));
+    }
+
+    #[test]
+    fn test_is_rtl_hebrew() {
+        assert!(is_rtl("he"));
+        assert!(is_rtl("he-IL"));
+    }
+
+    #[test]
+    fn test_is_rtl_persian() {
+        assert!(is_rtl("fa"));
+    }
+
+    #[test]
+    fn test_is_rtl_false_for_ltr() {
+        assert!(!is_rtl("en"));
+        assert!(!is_rtl("pl"));
+        assert!(!is_rtl("fr-FR"));
+        assert!(!is_rtl("ja"));
+    }
+
+    // detect_system_locale (smoke only — env-dependent)
+    #[test]
+    fn test_detect_system_locale_returns_none_or_valid_string() {
+        // Either returns None or a non-empty String.
+        if let Some(code) = detect_system_locale() {
+            assert!(!code.is_empty());
+            // Should not contain encoding suffix.
+            assert!(!code.contains('.'));
+        }
+    }
+
+    // flat_table_from_toml
+    #[test]
+    fn test_flat_table_from_toml_basic() {
+        let toml = r#"
+[greeting]
+hello = "Hello"
+bye   = "Goodbye"
+"#;
+        let flat = flat_table_from_toml(toml).unwrap();
+        assert_eq!(flat.get("greeting.hello").unwrap(), "Hello");
+        assert_eq!(flat.get("greeting.bye").unwrap(), "Goodbye");
+    }
+
+    #[test]
+    fn test_flat_table_from_toml_nested() {
+        let toml = r#"
+[menu.main]
+start = "Start"
+quit  = "Quit"
+"#;
+        let flat = flat_table_from_toml(toml).unwrap();
+        assert_eq!(flat.get("menu.main.start").unwrap(), "Start");
+        assert_eq!(flat.get("menu.main.quit").unwrap(), "Quit");
+    }
+
+    #[test]
+    fn test_flat_table_from_toml_invalid_returns_err() {
+        assert!(flat_table_from_toml("not valid toml !!! ===").is_err());
+    }
+
+    // flat_table_from_json
+    #[test]
+    fn test_flat_table_from_json_basic() {
+        let json = r#"{"greeting":{"hello":"Hello","bye":"Goodbye"}}"#;
+        let flat = flat_table_from_json(json).unwrap();
+        assert_eq!(flat.get("greeting.hello").unwrap(), "Hello");
+        assert_eq!(flat.get("greeting.bye").unwrap(), "Goodbye");
+    }
+
+    #[test]
+    fn test_flat_table_from_json_invalid_returns_err() {
+        assert!(flat_table_from_json("{bad json").is_err());
+    }
+
+    // coverage_gaps
+    #[test]
+    fn test_coverage_gaps_finds_missing_keys() {
+        let mut catalog = Catalog::new();
+        let mut en = HashMap::new();
+        en.insert("greeting".to_string(), "Hello".to_string());
+        en.insert("farewell".to_string(), "Goodbye".to_string());
+        catalog.load("en", en);
+
+        let mut fr = HashMap::new();
+        fr.insert("greeting".to_string(), "Bonjour".to_string());
+        // "farewell" is missing in French
+        catalog.load("fr", fr);
+
+        let gaps = catalog.coverage_gaps("en");
+        assert_eq!(gaps.len(), 1);
+        assert_eq!(gaps[0].key, "farewell");
+        assert!(gaps[0].missing_in.contains(&"fr".to_string()));
+    }
+
+    #[test]
+    fn test_coverage_gaps_empty_when_complete() {
+        let mut catalog = Catalog::new();
+        let mut en = HashMap::new();
+        en.insert("ok".to_string(), "OK".to_string());
+        catalog.load("en", en.clone());
+        catalog.load("fr", en); // same keys
+
+        let gaps = catalog.coverage_gaps("en");
+        assert!(gaps.is_empty());
+    }
+
+    #[test]
+    fn test_coverage_gaps_unknown_reference_returns_empty() {
+        let catalog = Catalog::new();
+        let gaps = catalog.coverage_gaps("nonexistent");
+        assert!(gaps.is_empty());
+    }
+
+    // categories + index cache invalidation
+    #[test]
+    fn test_categories_cache_invalidated_on_load() {
+        let mut catalog = Catalog::new();
+        let mut table = HashMap::new();
+        table.insert("ui.ok".to_string(), "OK".to_string());
+        catalog.load("en", table);
+        catalog.locale = "en".to_string();
+
+        let cats1 = catalog.categories();
+        assert!(cats1.contains(&"ui".to_string()));
+
+        // Add a new locale entry — cache should invalidate.
+        let mut table2 = HashMap::new();
+        table2.insert("menu.start".to_string(), "Start".to_string());
+        table2.insert("ui.ok".to_string(), "OK".to_string());
+        catalog.load("en", table2);
+
+        let cats2 = catalog.categories();
+        assert!(cats2.contains(&"menu".to_string()));
+    }
+
+    #[test]
+    fn test_build_index_cache_invalidated_on_set_key() {
+        let mut catalog = Catalog::new();
+        let mut table = HashMap::new();
+        table.insert("greeting".to_string(), "Hello".to_string());
+        catalog.load("en", table);
+        catalog.locale = "en".to_string();
+
+        let idx1 = catalog.build_index();
+        assert!(idx1.contains_key("hello"));
+
+        catalog.set_key("en", "farewell", "Goodbye World");
+
+        let idx2 = catalog.build_index();
+        assert!(idx2.contains_key("goodbye"));
+    }
+}

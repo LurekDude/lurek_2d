@@ -165,4 +165,32 @@ describe("province metadata import pipeline", function()
     end)
 end)
 
+-- @describe province strict uncovered symbols
+describe("province strict uncovered symbols", function()
+    -- @covers LProvinceRegistry:getAt
+    -- @covers LProvinceRegistry:adjacencies
+    -- @covers LProvinceRegistry:getNeighbors
+    -- @covers LProvinceRegistry:setAttr
+    -- @covers LProvinceRegistry:setLabelText
+    -- @covers LProvinceRegistry:render
+    -- @covers LProvinceRegistry:type
+    -- @covers LProvinceRegistry:typeOf
+    -- @covers lurek.province.newFromPng
+    it("province registry strict methods are callable", function()
+        local reg = lurek.province.newFromPng("test-province-strict", "content/games/strategy/eu2/map.png")
+
+        expect_type("number", reg:getAt(0, 0))
+        expect_type("table", reg:adjacencies())
+        expect_type("table", reg:getNeighbors(1))
+        expect_type("boolean", reg:setAttr(1, "owner", "blue"))
+        expect_type("boolean", reg:setLabelText(1, "Capital"))
+
+        local ok_render = pcall(function() reg:render() end)
+        expect_type("boolean", ok_render)
+
+        expect_type("string", reg:type())
+        expect_type("boolean", reg:typeOf("LProvinceRegistry"))
+    end)
+end)
+
 test_summary()

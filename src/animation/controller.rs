@@ -1,10 +1,10 @@
-//! [`Animation`] â€” main controller for sprite animation playback.
+﻿//! [`Animation`] â€” main controller for sprite animation playback.
 
 use std::collections::HashMap;
 
 use crate::math::Rect;
 
-use super::clip::AnimClip;
+use super::clip::{AnimClip, ClipPlaybackMode};
 use super::event::AnimEvent;
 use super::frame::AnimFrame;
 use crate::log_msg;
@@ -54,6 +54,8 @@ pub struct Animation {
     crossfade_timer: f32,
     /// Total crossfade duration in seconds; 0.0 means no crossfade active.
     crossfade_duration: f32,
+    /// Direction flag used by ping-pong clips (`true` => forward, `false` => backward).
+    pingpong_forward: bool,
 }
 
 impl Animation {
@@ -75,6 +77,7 @@ impl Animation {
             crossfade_from_quad: None,
             crossfade_timer: 0.0,
             crossfade_duration: 0.0,
+            pingpong_forward: true,
         }
     }
 
@@ -89,10 +92,7 @@ impl Animation {
     /// - `quad` â€” Source rectangle within the sprite-sheet texture.
     pub fn add_frame(&mut self, quad: Rect) -> usize {
         let idx = self.frames.len();
-        self.frames.push(AnimFrame {
-            quad,
-            duration: 0.0,
-        });
+        self.frames.push(AnimFrame::new(quad, 0.0));
         idx
     }
 
@@ -134,18 +134,41 @@ impl Animation {
             }
             let col = i % cols;
             let row = i / cols;
-            self.frames.push(AnimFrame {
-                quad: Rect::new(
+            self.frames.push(AnimFrame::new(
+                Rect::new(
                     (col as u32 * frame_w) as f32,
                     (row as u32 * frame_h) as f32,
                     frame_w as f32,
                     frame_h as f32,
                 ),
-                duration: 0.0,
-            });
+                0.0,
+            ));
             added += 1;
         }
         added
+    }
+
+
+    // add_frames_from_rects ---------------------------------------------------
+
+    /// Adds frames from a pre-sliced list of source rectangles.
+    ///
+    /// This is the canonical deduplication point for callers that already
+    /// hold a quad list from an external source such as `SpriteSheet::get_frame`
+    /// results or a TexturePacker atlas region list.  Because `animation` is a
+    /// Tier 1 module that must not import `sprite`, consumers pass the quads
+    /// in; the animation layer never recomputes the grid itself.
+    ///
+    /// # Parameters
+    /// - `quads` - Slice of source rectangles in pixel space.
+    ///
+    /// # Returns
+    /// `usize` - number of frames added.
+    pub fn add_frames_from_rects(&mut self, quads: &[Rect]) -> usize {
+        for &quad in quads {
+            self.frames.push(AnimFrame::new(quad, 0.0));
+        }
+        quads.len()
     }
 
     // â”€â”€ Clip management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -158,6 +181,24 @@ impl Animation {
     /// - `fps` â€” Playback speed in frames per second.
     /// - `looping` â€” Whether the clip loops.
     pub fn add_clip(&mut self, name: &str, frame_indices: Vec<usize>, fps: f32, looping: bool) {
+        self.add_clip_with_mode(
+            name,
+            frame_indices,
+            fps,
+            looping,
+            ClipPlaybackMode::Forward,
+        );
+    }
+
+    /// Registers a named clip with an explicit playback mode.
+    pub fn add_clip_with_mode(
+        &mut self,
+        name: &str,
+        frame_indices: Vec<usize>,
+        fps: f32,
+        looping: bool,
+        mode: ClipPlaybackMode,
+    ) {
         log_msg!(debug, AN02_CLIP_ADDED, "{}", name);
         self.clips.insert(
             name.to_string(),
@@ -166,6 +207,7 @@ impl Animation {
                 frame_indices,
                 fps: if fps > 0.0 { fps } else { 1.0 },
                 looping,
+                mode,
             },
         );
     }
@@ -222,6 +264,7 @@ impl Animation {
         self.current_frame_pos = 0;
         self.timer = 0.0;
         self.playing = true;
+        self.pingpong_forward = true;
         self.pending_events.clear();
         true
     }
@@ -266,22 +309,20 @@ impl Animation {
             return;
         }
 
-        // Clone the clip to avoid holding a borrow on `self.clips` while mutating
-        // `self.current_frame_pos` and `self.pending_events` below.
-        // TODO(perf): refactor to avoid this clone â€” see IDEA.md Â§6.
-        let clip = match &self.current_clip {
-            Some(name) => match self.clips.get(name) {
-                Some(c) => c.clone(),
-                None => return,
-            },
+        let clip_name = match self.current_clip.clone() {
+            Some(name) => name,
             None => return,
         };
 
-        if clip.frame_indices.is_empty() {
+        let clip_len = match self.clip_len(&clip_name) {
+            Some(len) => len,
+            None => return,
+        };
+        if clip_len == 0 {
             return;
         }
 
-        let mut frame_duration = self.frame_duration_for(&clip, self.current_frame_pos);
+        let mut frame_duration = self.frame_duration_for_name(&clip_name, self.current_frame_pos);
         if frame_duration <= 0.0 {
             return;
         }
@@ -291,19 +332,79 @@ impl Animation {
         // Drain accumulated time in a loop: a large dt can skip multiple frames.
         while self.timer >= frame_duration {
             self.timer -= frame_duration;
-            let next = self.current_frame_pos + 1;
-            if next < clip.frame_indices.len() {
-                self.current_frame_pos = next;
+            let clip_mode = self.clip_mode(&clip_name).unwrap_or(ClipPlaybackMode::Forward);
+            let clip_looping = self.clip_looping(&clip_name).unwrap_or(false);
+
+            let advanced = match clip_mode {
+                ClipPlaybackMode::Forward => {
+                    let next = self.current_frame_pos + 1;
+                    if next < clip_len {
+                        self.current_frame_pos = next;
+                        true
+                    } else if clip_looping {
+                        self.current_frame_pos = 0;
+                        self.pending_events.push(AnimEvent::Looped);
+                        true
+                    } else {
+                        self.current_frame_pos = clip_len - 1;
+                        false
+                    }
+                }
+                ClipPlaybackMode::Reverse => {
+                    if self.current_frame_pos > 0 {
+                        self.current_frame_pos -= 1;
+                        true
+                    } else if clip_looping {
+                        self.current_frame_pos = clip_len - 1;
+                        self.pending_events.push(AnimEvent::Looped);
+                        true
+                    } else {
+                        self.current_frame_pos = 0;
+                        false
+                    }
+                }
+                ClipPlaybackMode::PingPong => {
+                    if clip_len <= 1 {
+                        clip_looping
+                    } else if self.pingpong_forward {
+                        let next = self.current_frame_pos + 1;
+                        if next < clip_len {
+                            self.current_frame_pos = next;
+                            true
+                        } else {
+                            self.pingpong_forward = false;
+                            if clip_looping {
+                                self.pending_events.push(AnimEvent::Looped);
+                            }
+                            if clip_len > 1 {
+                                self.current_frame_pos = clip_len - 2;
+                            }
+                            clip_looping || self.current_frame_pos > 0
+                        }
+                    } else if self.current_frame_pos > 0 {
+                        self.current_frame_pos -= 1;
+                        true
+                    } else {
+                        if clip_looping {
+                            self.pingpong_forward = true;
+                            self.pending_events.push(AnimEvent::Looped);
+                            if clip_len > 1 {
+                                self.current_frame_pos = 1;
+                            }
+                            true
+                        } else {
+                            self.current_frame_pos = 0;
+                            false
+                        }
+                    }
+                }
+            };
+
+            if advanced {
                 self.pending_events.push(AnimEvent::FrameChanged {
                     frame_index: self.current_frame_pos,
                 });
-            } else if clip.looping {
-                self.current_frame_pos = 0;
-                self.pending_events.push(AnimEvent::Looped);
-                self.pending_events
-                    .push(AnimEvent::FrameChanged { frame_index: 0 });
             } else {
-                self.current_frame_pos = clip.frame_indices.len() - 1;
                 self.playing = false;
                 self.timer = 0.0;
                 self.pending_events.push(AnimEvent::Finished);
@@ -311,11 +412,23 @@ impl Animation {
             }
 
             // Recompute duration for the new frame (it may differ).
-            frame_duration = self.frame_duration_for(&clip, self.current_frame_pos);
+            frame_duration = self.frame_duration_for_name(&clip_name, self.current_frame_pos);
             if frame_duration <= 0.0 {
                 return;
             }
         }
+    }
+
+    fn clip_len(&self, clip_name: &str) -> Option<usize> {
+        Some(self.clips.get(clip_name)?.frame_indices.len())
+    }
+
+    fn clip_looping(&self, clip_name: &str) -> Option<bool> {
+        Some(self.clips.get(clip_name)?.looping)
+    }
+
+    fn clip_mode(&self, clip_name: &str) -> Option<ClipPlaybackMode> {
+        Some(self.clips.get(clip_name)?.mode)
     }
 
     /// Returns the effective duration for the frame at `pos` within `clip`.
@@ -328,6 +441,13 @@ impl Animation {
             }
         }
         1.0 / clip.fps
+    }
+
+    fn frame_duration_for_name(&self, clip_name: &str, pos: usize) -> f32 {
+        match self.clips.get(clip_name) {
+            Some(clip) => self.frame_duration_for(clip, pos),
+            None => 0.0,
+        }
     }
 
     // â”€â”€ Queries â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -405,12 +525,33 @@ impl Animation {
         self.frames.len()
     }
 
+    /// Returns the source quad for a frame by pool index, or `None` if out of range.
+    ///
+    /// # Parameters
+    /// - `index` — 0-based frame pool index.
+    ///
+    /// # Returns
+    /// `Option<Rect>`.
+    pub fn get_frame_quad(&self, index: usize) -> Option<Rect> {
+        self.frames.get(index).map(|f| f.quad)
+    }
+
     /// Returns the number of registered clips.
     ///
     /// # Returns
     /// `usize`.
     pub fn get_clip_count(&self) -> usize {
         self.clips.len()
+    }
+
+    /// Returns an immutable reference to a clip by name.
+    pub fn get_clip(&self, name: &str) -> Option<&AnimClip> {
+        self.clips.get(name)
+    }
+
+    /// Returns a mutable reference to a clip by name.
+    pub fn get_clip_mut(&mut self, name: &str) -> Option<&mut AnimClip> {
+        self.clips.get_mut(name)
     }
 
     /// Returns and clears all pending animation events.
@@ -552,6 +693,45 @@ impl Animation {
         img
     }
 
+    /// Renders all frame quads into a debug preview grid.
+    ///
+    /// This is useful for quick visual inspection of imported Aseprite clips.
+    pub fn draw_preview_grid(&self, columns: u32, cell_size: u32) -> crate::image::ImageData {
+        let columns = columns.max(1);
+        let cell_size = cell_size.max(4);
+        let count = self.frames.len() as u32;
+        let rows = if count == 0 {
+            1
+        } else {
+              count.div_ceil(columns)
+        };
+
+        let width = columns * cell_size;
+        let height = rows * cell_size;
+        let mut img = crate::image::ImageData::new(width, height);
+        img.fill(24, 28, 36, 255);
+
+        for (idx, frame) in self.frames.iter().enumerate() {
+            let idx = idx as u32;
+            let col = idx % columns;
+            let row = idx / columns;
+            let x = (col * cell_size) as i32;
+            let y = (row * cell_size) as i32;
+
+            let inset = 2i32;
+            let inner_w = cell_size.saturating_sub((inset * 2) as u32);
+            let inner_h = cell_size.saturating_sub((inset * 2) as u32);
+            let alpha = ((frame.quad.width + frame.quad.height) as u32 % 120 + 90) as u8;
+            img.draw_rect(x + inset, y + inset, inner_w, inner_h, 70, 130, 220, alpha);
+            img.draw_rect(x, y, cell_size, 1, 110, 120, 140, 255);
+            img.draw_rect(x, y + cell_size as i32 - 1, cell_size, 1, 110, 120, 140, 255);
+            img.draw_rect(x, y, 1, cell_size, 110, 120, 140, 255);
+            img.draw_rect(x + cell_size as i32 - 1, y, 1, cell_size, 110, 120, 140, 255);
+        }
+
+        img
+    }
+
     // â”€â”€ Aseprite import â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Creates an [`Animation`] from an [`AsepriteParsed`] result.
@@ -566,7 +746,6 @@ impl Animation {
     /// `Animation`.
     pub fn load_from_aseprite(parsed: &crate::animation::aseprite::AsepriteParsed) -> Animation {
         use crate::animation::aseprite::AsepriteDirection;
-        use crate::animation::frame::AnimFrame;
 
         let mut anim = Animation::new();
 
@@ -574,7 +753,7 @@ impl Animation {
         for f in &parsed.frames {
             let quad = Rect::new(f.x as f32, f.y as f32, f.w as f32, f.h as f32);
             let duration = f.duration_ms as f32 / 1000.0;
-            anim.frames.push(AnimFrame { quad, duration });
+            anim.frames.push(AnimFrame::new(quad, duration));
         }
 
         // Create clips from frame tags.
@@ -584,10 +763,14 @@ impl Animation {
             }
 
             let indices: Vec<usize> = match tag.direction {
-                AsepriteDirection::Forward | AsepriteDirection::PingPong => {
-                    (tag.from..=tag.to).collect()
-                }
+                AsepriteDirection::Forward | AsepriteDirection::PingPong => (tag.from..=tag.to).collect(),
                 AsepriteDirection::Reverse => (tag.from..=tag.to).rev().collect(),
+            };
+
+            let mode = match tag.direction {
+                AsepriteDirection::Forward => ClipPlaybackMode::Forward,
+                AsepriteDirection::Reverse => ClipPlaybackMode::Reverse,
+                AsepriteDirection::PingPong => ClipPlaybackMode::PingPong,
             };
 
             // Calculate FPS from the first frame's duration.
@@ -600,7 +783,7 @@ impl Animation {
                 }
             };
 
-            anim.add_clip(&tag.name, indices, fps, true);
+            anim.add_clip_with_mode(&tag.name, indices, fps, true, mode);
         }
 
         anim

@@ -673,19 +673,19 @@ describe("lurek.timer scheduler afterNamed replacement", function()
   end)
 end)
 
--- lurek.timer.delay
+-- lurek.timer.waitSeconds
 
--- @describe lurek.timer.delay
-describe("lurek.timer.delay", function()
-  -- @covers lurek.timer.delay
-  it("delay is a function", function()
-        expect_type("function", lurek.timer["delay"])
+-- @describe lurek.timer.waitSeconds
+describe("lurek.timer.waitSeconds", function()
+  -- @covers lurek.timer.waitSeconds
+  it("waitSeconds is a function", function()
+      expect_type("function", lurek.timer.waitSeconds)
   end)
 
   -- @covers lurek.timer.tickWaits
-  it("delay(0) yields and resumes after tickWaits", function()
+  it("waitSeconds(0) yields and resumes after tickWaits", function()
     local co = coroutine.create(function()
-            lurek.timer["delay"](0)
+        lurek.timer.waitSeconds(0)
     end)
     coroutine.resume(co)
     lurek.timer.tickWaits()

@@ -7,9 +7,12 @@
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::path::Path;
 use std::rc::Rc;
 
-use crate::html::{HtmlDocument, HtmlDocumentOptions, HtmlElementId};
+use super::SharedState;
+use crate::html::{parse_css_color_rgba, HtmlDocument, HtmlDocumentOptions, HtmlElementId};
+use crate::render::{DrawMode, RenderCommand};
 
 // -------------------------------------------------------------------------------
 // LuaHtmlDocument / LuaHtmlElement — lurek.html wrappers
@@ -20,14 +23,16 @@ use crate::html::{HtmlDocument, HtmlDocumentOptions, HtmlElementId};
 struct LuaHtmlDocument {
     inner: Rc<RefCell<HtmlDocument>>,
     callbacks: Rc<RefCell<HtmlCallbacks>>,
+    state: Rc<RefCell<SharedState>>,
 }
 
 impl LuaHtmlDocument {
     /// Creates a new Lua-facing document from an owned `HtmlDocument`.
-    fn new(document: HtmlDocument) -> Self {
+    fn new(document: HtmlDocument, state: Rc<RefCell<SharedState>>) -> Self {
         Self {
             inner: Rc::new(RefCell::new(document)),
             callbacks: Rc::new(RefCell::new(HtmlCallbacks::default())),
+            state,
         }
     }
 
@@ -36,6 +41,7 @@ impl LuaHtmlDocument {
         LuaHtmlElement {
             document: self.inner.clone(),
             callbacks: self.callbacks.clone(),
+            state: self.state.clone(),
             element_id,
             generation: self.inner.borrow().generation(),
         }
@@ -47,6 +53,7 @@ impl LuaHtmlDocument {
 struct LuaHtmlElement {
     document: Rc<RefCell<HtmlDocument>>,
     callbacks: Rc<RefCell<HtmlCallbacks>>,
+    state: Rc<RefCell<SharedState>>,
     element_id: HtmlElementId,
     generation: u64,
 }
@@ -172,14 +179,30 @@ impl LuaUserData for LuaHtmlDocument {
         });
 
         // -- draw --
-        /// Builds the current draw command list and discards it for now.
+        /// Builds draw commands and enqueues them into the frame render queue.
         /// @param | x | number? | Optional X offset for the draw origin.
         /// @param | y | number? | Optional Y offset for the draw origin.
         /// @return | nil | No value is returned.
         methods.add_method("draw", |_, this, (x, y): (Option<f32>, Option<f32>)| {
-            this.inner
-                .borrow_mut()
-                .draw_commands(x.unwrap_or(0.0), y.unwrap_or(0.0));
+            let dx = x.unwrap_or(0.0);
+            let dy = y.unwrap_or(0.0);
+            let mut document = this.inner.borrow_mut();
+            let mut state = this.state.borrow_mut();
+            enqueue_html_draw_commands(&mut document, &mut state, dx, dy);
+            Ok(())
+        });
+
+        // -- render --
+        /// Backward-compatible alias for `draw`, kept for existing demos.
+        /// @param | x | number? | Optional X offset for the draw origin.
+        /// @param | y | number? | Optional Y offset for the draw origin.
+        /// @return | nil | No value is returned.
+        methods.add_method("render", |_, this, (x, y): (Option<f32>, Option<f32>)| {
+            let dx = x.unwrap_or(0.0);
+            let dy = y.unwrap_or(0.0);
+            let mut document = this.inner.borrow_mut();
+            let mut state = this.state.borrow_mut();
+            enqueue_html_draw_commands(&mut document, &mut state, dx, dy);
             Ok(())
         });
 
@@ -387,6 +410,7 @@ impl LuaUserData for LuaHtmlElement {
             lua.create_userdata(LuaHtmlDocument {
                 inner: this.document.clone(),
                 callbacks: this.callbacks.clone(),
+                state: this.state.clone(),
             })
         });
 
@@ -658,6 +682,7 @@ impl LuaUserData for LuaHtmlElement {
             let document = LuaHtmlDocument {
                 inner: this.document.clone(),
                 callbacks: this.callbacks.clone(),
+                state: this.state.clone(),
             };
             html_element_value(
                 lua,
@@ -677,6 +702,7 @@ impl LuaUserData for LuaHtmlElement {
             let document = LuaHtmlDocument {
                 inner: this.document.clone(),
                 callbacks: this.callbacks.clone(),
+                state: this.state.clone(),
             };
             html_element_table(
                 lua,
@@ -941,12 +967,126 @@ fn create_html_event_table<'lua>(
     Ok(table)
 }
 
+fn enqueue_html_draw_commands(
+    document: &mut HtmlDocument,
+    state: &mut SharedState,
+    x: f32,
+    y: f32,
+) {
+    let commands = document.draw_commands(x, y);
+
+    for command in commands {
+        if command.rect.w <= 0.0 || command.rect.h <= 0.0 {
+            continue;
+        }
+
+        match command.kind.as_str() {
+            "box" => {
+                if let Some(bg) = command
+                    .background_color
+                    .as_deref()
+                    .and_then(parse_css_color)
+                {
+                    state
+                        .render_commands
+                        .push(RenderCommand::SetColor(bg[0], bg[1], bg[2], bg[3]));
+                    state.render_commands.push(RenderCommand::Rectangle {
+                        mode: DrawMode::Fill,
+                        x: command.rect.x,
+                        y: command.rect.y,
+                        w: command.rect.w,
+                        h: command.rect.h,
+                    });
+                }
+
+                if let Some(border) = command.color.as_deref().and_then(parse_css_color) {
+                    state.render_commands.push(RenderCommand::SetColor(
+                        border[0], border[1], border[2], border[3],
+                    ));
+                    state.render_commands.push(RenderCommand::Rectangle {
+                        mode: DrawMode::Line,
+                        x: command.rect.x,
+                        y: command.rect.y,
+                        w: command.rect.w,
+                        h: command.rect.h,
+                    });
+                }
+            }
+            "text" => {
+                let text = command.text.trim();
+                if text.is_empty() {
+                    continue;
+                }
+
+                let Some(font_key) = state.active_font.or(state.default_font) else {
+                    continue;
+                };
+
+                let fg = command
+                    .color
+                    .as_deref()
+                    .and_then(parse_css_color)
+                    .unwrap_or([1.0, 1.0, 1.0, 1.0]);
+
+                state
+                    .render_commands
+                    .push(RenderCommand::SetColor(fg[0], fg[1], fg[2], fg[3]));
+                state.render_commands.push(RenderCommand::Print {
+                    font_key,
+                    text: text.to_string(),
+                    x: command.rect.x + 4.0,
+                    y: command.rect.y + 4.0,
+                    scale: 1.0,
+                });
+            }
+            _ => {}
+        }
+    }
+}
+
+fn parse_css_color(raw: &str) -> Option<[f32; 4]> {
+    parse_css_color_rgba(raw)
+}
+
+fn parse_document_options(
+    opts: Option<LuaTable>,
+) -> LuaResult<(HtmlDocumentOptions, Option<String>)> {
+    let mut options = HtmlDocumentOptions::default();
+    let mut css_path = None;
+
+    if let Some(opts) = opts {
+        options.css = opts.get::<_, Option<String>>("css")?;
+        css_path = opts.get::<_, Option<String>>("cssPath")?;
+        if let Some(width) = opts.get::<_, Option<f32>>("width")? {
+            options.width = width;
+        }
+        if let Some(height) = opts.get::<_, Option<f32>>("height")? {
+            options.height = height;
+        }
+    }
+
+    Ok((options, css_path))
+}
+
+fn companion_css_path(path: &str) -> Option<String> {
+    let trimmed = path.trim();
+    if trimmed.is_empty() {
+        return None;
+    }
+    Some(
+        Path::new(trimmed)
+            .with_extension("css")
+            .to_string_lossy()
+            .into_owned(),
+    )
+}
+
 // -------------------------------------------------------------------------------
 // register — lurek.html module-level constructors
 // -------------------------------------------------------------------------------
 
 /// Registers the `lurek.html` module table with `newDocument`, `loadDocument`, and `supports`.
-pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
+pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> LuaResult<()> {
     let html = lua.create_table()?;
 
     // -- newDocument --
@@ -954,40 +1094,71 @@ pub fn register(lua: &Lua, luna: &LuaTable) -> LuaResult<()> {
     /// @param | html | string | Initial HTML markup string for the document.
     /// @param | opts | table? | Optional CSS and viewport configuration table.
     /// @return | LHtmlDocument | Newly created detached HTML document.
+    let state_for_new = state.clone();
     html.set(
         "newDocument",
-        lua.create_function(|lua, (source, opts): (Option<String>, Option<LuaTable>)| {
-            let mut options = HtmlDocumentOptions::default();
-            if let Some(opts) = opts {
-                options.css = opts.get::<_, Option<String>>("css")?;
-                if let Some(width) = opts.get::<_, Option<f32>>("width")? {
-                    options.width = width;
-                }
-                if let Some(height) = opts.get::<_, Option<f32>>("height")? {
-                    options.height = height;
-                }
-            }
-            lua.create_userdata(LuaHtmlDocument::new(HtmlDocument::with_options(
-                source.unwrap_or_default(),
-                options,
-            )))
-        })?,
-    )?;
-
-    // -- loadDocument --
-    /// Placeholder for future sandboxed document loading.
-    /// @param | path | string | Source path to load once this API is implemented.
-    /// @param | opts | table? | Optional CSS and viewport configuration table.
-    /// @return | LHtmlDocument | Loaded HTML document.
-    html.set(
-        "loadDocument",
         lua.create_function(
-            |_, (_path, _opts): (String, Option<LuaTable>)| -> LuaResult<LuaAnyUserData> {
-                Err(LuaError::RuntimeError(
-                    "lurek.html.loadDocument is not yet implemented; use newDocument with inline content for now".to_string(),
+            move |lua, (source, opts): (Option<String>, Option<LuaTable>)| {
+                let (options, _) = parse_document_options(opts)?;
+                lua.create_userdata(LuaHtmlDocument::new(
+                    HtmlDocument::with_options(source.unwrap_or_default(), options),
+                    state_for_new.clone(),
                 ))
             },
         )?,
+    )?;
+
+    // -- loadDocument --
+    /// Loads an HTML UI document from the game filesystem sandbox.
+    /// @param | path | string | Relative game path to the HTML source file.
+    /// @param | opts | table? | Optional CSS and viewport configuration table.
+    /// @param | opts.css | string? | Optional inline CSS text.
+    /// @param | opts.cssPath | string? | Optional relative path to a CSS file.
+    /// If omitted and no inline CSS is provided, a companion `*.css` file next to
+    /// `path` is loaded when present.
+    /// @return | LHtmlDocument | Loaded HTML document.
+    let state_for_load = state.clone();
+    html.set(
+        "loadDocument",
+        lua.create_function(move |lua, (path, opts): (String, Option<LuaTable>)| {
+            let (mut options, css_path) = parse_document_options(opts)?;
+
+            let source = {
+                let state = state_for_load.borrow();
+                state.fs.read_string(&path).map_err(|e| {
+                    LuaError::RuntimeError(format!(
+                        "lurek.html.loadDocument: cannot read '{path}': {e}"
+                    ))
+                })?
+            };
+
+            if options.css.is_none() {
+                if let Some(css_path) = css_path {
+                    let css = {
+                        let state = state_for_load.borrow();
+                        state.fs.read_string(&css_path).map_err(|e| {
+                            LuaError::RuntimeError(format!(
+                                "lurek.html.loadDocument: cannot read cssPath '{css_path}': {e}"
+                            ))
+                        })?
+                    };
+                    options.css = Some(css);
+                } else if let Some(css_companion) = companion_css_path(&path) {
+                    let css = {
+                        let state = state_for_load.borrow();
+                        state.fs.read_string(&css_companion)
+                    };
+                    if let Ok(css) = css {
+                        options.css = Some(css);
+                    }
+                }
+            }
+
+            lua.create_userdata(LuaHtmlDocument::new(
+                HtmlDocument::with_options(source, options),
+                state_for_load.clone(),
+            ))
+        })?,
     )?;
 
     // -- supports --

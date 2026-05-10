@@ -1543,20 +1543,20 @@ describe("unit: migrated from integration/test_compute_dataframe.lua", function(
         -- @covers lurek.data.encode
         it("compress -> encode -> decode -> decompress roundtrip", function()
             local original = "Lurek2D integration test: compress then encode then decode then decompress."
-    
+
             -- Step 1: Compress
             local compressed = lurek.data.compress("deflate", original, 6)
-    
+
             -- Step 2: Base64 encode (for safe text transport)
             local encoded = lurek.data.encode("base64", compressed)
             expect_type("string", encoded, "encoded is string")
-    
+
             -- Step 3: Base64 decode
             local decoded_compressed = lurek.data.decode("base64", encoded)
-    
+
             -- Step 4: Decompress
             local result = lurek.data.decompress("deflate", decoded_compressed)
-    
+
             expect_equal(original, result, "full pipeline preserves data")
         end)
 
@@ -1565,14 +1565,38 @@ describe("unit: migrated from integration/test_compute_dataframe.lua", function(
         it("hash of compressed data is stable", function()
             local data = "Hash stability test vector"
             local compressed = lurek.data.compress("zlib", data, 6)
-    
+
             local hash1 = lurek.data.hash("sha256", compressed)
             local hash2 = lurek.data.hash("sha256", compressed)
-    
+
             expect_equal(hash1, hash2, "hash is deterministic")
             expect_equal(64, #hash1, "SHA-256 produces 64 hex chars")
         end)
 
+end)
+
+-- @describe property: data pack/unpack invariants
+describe("property: data pack/unpack invariants", function()
+        -- @covers lurek.data.pack
+        -- @covers lurek.data.unpack
+        it("pack/unpack preserves B values for deterministic range", function()
+            for i = 0, 255, 17 do
+                local bytes = lurek.data.pack("B", i)
+                local value = lurek.data.unpack("B", bytes)
+                expect_equal(i, value, "roundtrip for B=" .. tostring(i))
+            end
+        end)
+
+        -- @covers lurek.data.pack
+        -- @covers lurek.data.unpack
+        it("pack/unpack preserves float within tolerance", function()
+            for i = 1, 40 do
+                local x = i * 0.125
+                local bytes = lurek.data.pack("<f", x)
+                local value = lurek.data.unpack("<f", bytes)
+                expect_near(x, value, 1e-5, "float roundtrip")
+            end
+        end)
 end)
 
 test_summary()

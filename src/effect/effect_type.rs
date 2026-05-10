@@ -152,6 +152,36 @@ impl PostFxEffectType {
         }
     }
 
+    /// Returns an uppercase label suitable for debug overlays and visual catalogs.
+    pub fn debug_label(&self) -> &'static str {
+        match self {
+            Self::Vignette => "VIGNETTE",
+            Self::Grayscale => "GRAYSCALE",
+            Self::Chromatic => "CHROMATIC",
+            Self::Blur => "BLUR",
+            Self::Pixelate => "PIXELATE",
+            Self::Invert => "INVERT",
+            Self::Sepia => "SEPIA",
+            Self::Scanlines => "SCANLINES",
+            Self::Bloom => "BLOOM",
+            Self::Crt => "CRT",
+            Self::Godrays => "GODRAYS",
+            Self::ColourGrade => "COLOUR_GRADE",
+            Self::EdgeDetect => "EDGE_DETECT",
+            Self::HueShift => "HUE_SHIFT",
+            Self::Noise => "NOISE",
+            Self::Custom => "CUSTOM",
+            Self::DepthOfField => "DEPTH_OF_FIELD",
+            Self::MotionBlur => "MOTION_BLUR",
+            Self::PaletteSwap => "PALETTE_SWAP",
+            Self::ColorLut => "COLOR_LUT",
+            Self::WaterDistort => "WATER_DISTORT",
+            Self::Sharpen => "SHARPEN",
+            Self::Dither => "DITHER",
+            Self::Outline => "OUTLINE",
+        }
+    }
+
     /// Returns the default parameters for this built-in effect type.
     ///
     /// Each built-in effect ships with carefully chosen defaults that look

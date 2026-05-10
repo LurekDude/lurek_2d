@@ -1351,6 +1351,7 @@ describe("render strict: batch text and OBJ APIs", function()
     end)
 
     -- @covers lurek.render.newImage
+    -- @covers LImage:getId
     it("newImage accepts optional color-space mode", function()
         local ok_srgb, img_srgb = pcall(function()
             return lurek.render.newImage("assets/icon.png", "srgb")
@@ -1363,6 +1364,7 @@ describe("render strict: batch text and OBJ APIs", function()
         expect_true(ok_linear)
         expect_type("userdata", img_srgb)
         expect_type("userdata", img_linear)
+        expect_type("number", img_srgb:getId())
     end)
 
     -- @covers lurek.render.newImage
@@ -1378,6 +1380,8 @@ describe("render strict: batch text and OBJ APIs", function()
     -- @covers LLObjModel:getFaceCount
     -- @covers LLObjModel:getUvCount
     -- @covers LLObjModel:getNormalCount
+    -- @covers LObjModel:getVertexCount
+    -- @covers LObjModel:renderToImage
     -- @covers LLObjModel:projectToMesh
     it("loads OBJ model and exposes mesh projection methods", function()
         local obj = lurek.render.loadObj("content/games/retro/dungeon_crawler/assets/models/tank.obj")
@@ -1388,6 +1392,12 @@ describe("render strict: batch text and OBJ APIs", function()
         expect_true(obj:getFaceCount() >= 0)
         expect_true(obj:getUvCount() >= 0)
         expect_true(obj:getNormalCount() >= 0)
+        expect_type("number", obj:getVertexCount())
+
+        local ok_render_to_image = pcall(function()
+            obj:renderToImage(64, 64, 0.0)
+        end)
+        expect_type("boolean", ok_render_to_image)
 
         local verts = obj:projectToMesh({ x = 0, y = 4, z = 8, tx = 0, ty = 0, tz = 0, fov = 60 }, 320, 180)
         expect_type("table", verts)

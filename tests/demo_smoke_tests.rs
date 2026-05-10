@@ -212,6 +212,10 @@ demo_smoke_test!(
 );
 demo_smoke_test!(demo_smoke_html_dialog, "content/games/showcase/html-dialog");
 demo_smoke_test!(
+    demo_smoke_html_load_document,
+    "content/games/showcase/html-load-document"
+);
+demo_smoke_test!(
     demo_smoke_html_settings,
     "content/games/showcase/html-settings"
 );

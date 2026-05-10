@@ -103,11 +103,23 @@ pub fn save_image(img: &ImageData, path: &str) -> Result<(), String> {
 /// `Result<ImageData, String>`.
 pub fn load_image(path: &str) -> Result<ImageData, String> {
     let data = std::fs::read(path).map_err(|e| format!("LIMG read error '{}': {}", path, e))?;
-    let (type_flag, payload) = parse_header(&data)?;
+    load_image_from_bytes(&data, path)
+}
+
+/// Load a flat [`ImageData`] from an in-memory LIMG byte buffer.
+///
+/// # Parameters
+/// - `data` — Complete LIMG file bytes.
+/// - `label` — Human-readable source label used in error messages.
+///
+/// # Returns
+/// `Result<ImageData, String>`.
+pub fn load_image_from_bytes(data: &[u8], label: &str) -> Result<ImageData, String> {
+    let (type_flag, payload) = parse_header(data)?;
     if type_flag != TYPE_FLAT {
         return Err(format!(
             "LIMG '{}': expected flat image (type 0), got type {}",
-            path, type_flag
+            label, type_flag
         ));
     }
     decode_flat(payload)
@@ -141,11 +153,23 @@ pub fn save_layered(stack: &LayeredImage, path: &str) -> Result<(), String> {
 /// `Result<LayeredImage, String>`.
 pub fn load_layered(path: &str) -> Result<LayeredImage, String> {
     let data = std::fs::read(path).map_err(|e| format!("LIMG read error '{}': {}", path, e))?;
-    let (type_flag, payload) = parse_header(&data)?;
+    load_layered_from_bytes(&data, path)
+}
+
+/// Load a [`LayeredImage`] from an in-memory LIMG byte buffer.
+///
+/// # Parameters
+/// - `data` — Complete LIMG file bytes.
+/// - `label` — Human-readable source label used in error messages.
+///
+/// # Returns
+/// `Result<LayeredImage, String>`.
+pub fn load_layered_from_bytes(data: &[u8], label: &str) -> Result<LayeredImage, String> {
+    let (type_flag, payload) = parse_header(data)?;
     if type_flag != TYPE_LAYERED {
         return Err(format!(
             "LIMG '{}': expected layered image (type 1), got type {}",
-            path, type_flag
+            label, type_flag
         ));
     }
     decode_layered(payload)

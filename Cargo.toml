@@ -9,7 +9,7 @@ readme = "README.md"
 
 [features]
 # LuaJIT — default scripting backend; JIT compilation for x86_64 desktop (Windows/Linux/macOS).
-default = ["lua-jit", "automation-plugin"]
+default = ["lua-jit", "automation-plugin", "ui-charts", "ui-layout-loader"]
 lua-jit = ["mlua/luajit", "mlua/vendored"]
 # Lua 5.4 fallback — use on platforms where LuaJIT is unavailable (WASM, some ARM targets).
 lua54 = ["mlua/lua54", "mlua/vendored"]
@@ -17,6 +17,11 @@ lua54 = ["mlua/lua54", "mlua/vendored"]
 automation-plugin = []
 # ECS sparse-index fast path for multi-component queries (opt-in).
 ecs-archetype = []
+# Enables long-running load tests not intended for default CI runs.
+long-load-tests = []
+# Optional UI plugin-style gates for heavier subsystems.
+ui-charts = []
+ui-layout-loader = []
 
 [dependencies]
 # GPU-accelerated rendering — platform-split; see [target.'cfg(...)'.dependencies] sections near the end.
@@ -310,6 +315,10 @@ name = "graph_tests"
 path = "tests/rust/unit/graph_tests.rs"
 
 [[test]]
+name = "html_tests"
+path = "tests/rust/unit/html_tests.rs"
+
+[[test]]
 name = "i18n_tests"
 path = "tests/rust/unit/i18n_tests.rs"
 
@@ -416,4 +425,20 @@ path = "tests/rust/unit/window_tests.rs"
 [[test]]
 name = "demo_smoke_tests"
 path = "tests/demo_smoke_tests.rs"
+
+[[test]]
+name = "effects_audio_runtime_smoke_tests"
+path = "tests/rust/ext/effects_audio_runtime_smoke_tests.rs"
+
+[[test]]
+name = "graphics_runtime_smoke_tests"
+path = "tests/rust/ext/graphics_runtime_smoke_tests.rs"
+
+[[test]]
+name = "terminal_demo_smoke_tests"
+path = "tests/rust/ext/terminal_demo_smoke_tests.rs"
+
+[[test]]
+name = "long_load_tests"
+path = "tests/rust/stress/long_load_tests.rs"
 

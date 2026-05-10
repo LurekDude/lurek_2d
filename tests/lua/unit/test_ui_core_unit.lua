@@ -3591,4 +3591,78 @@ describe("ui migrated from render unit", function()
     end)
 end)
 
+-- =========================================================================
+-- Drag-and-drop between containers
+-- =========================================================================
+
+-- @describe lurek.ui drag and drop helpers
+describe("lurek.ui drag and drop helpers", function()
+    -- @covers lurek.ui.beginDrag
+    -- @covers lurek.ui.dropOn
+    -- @covers lurek.ui.endDrag
+    -- @covers lurek.ui.getActiveDrag
+    it("moves a widget from one container to another", function()
+        local left = lurek.ui.newPanel()
+        left.setPosition(0, 0)
+        left.setSize(120, 80)
+
+        local right = lurek.ui.newPanel()
+        right.setPosition(140, 0)
+        right.setSize(120, 80)
+        local item = lurek.ui.newButton("Item")
+
+        left.addChild(item)
+        expect_equal(left.getChildCount(), 1)
+        expect_equal(right.getChildCount(), 0)
+
+        expect_true(lurek.ui["beginDrag"](item))
+        expect_true(lurek.ui["getActiveDrag"]() ~= nil)
+        expect_true(lurek.ui["dropOn"](right))
+        expect_true(lurek.ui["getActiveDrag"]() == nil)
+
+        expect_equal(left.getChildCount(), 0)
+        expect_equal(right.getChildCount(), 1)
+
+        -- cancel when nothing is active should be no-op
+        local prev = lurek.ui["endDrag"]()
+        expect_true(prev == nil)
+    end)
+end)
+
+-- =========================================================================
+-- First-class transitions / animations
+-- =========================================================================
+
+-- @describe LUiWidget animation helpers
+describe("LUiWidget animation helpers", function()
+    -- @covers LUiWidget.animateAlpha
+    -- @covers LUiWidget.animatePosition
+    -- @covers LUiWidget.isAnimating
+    -- @covers LUiWidget.cancelAnimations
+    -- @covers lurek.ui.update
+    it("animates alpha and position over update steps", function()
+        local w = lurek.ui.newLabel("Anim")
+        w.setAlpha(0.0)
+
+        local ok_alpha = w["animateAlpha"](1.0, 0.5, false)
+        local ok_pos = w["animatePosition"](90, 40, 0.5)
+        expect_true(ok_alpha)
+        expect_true(ok_pos)
+        expect_true(w["isAnimating"]())
+
+        lurek.ui.update(0.25)
+        local mid_alpha = w.getAlpha()
+        expect_true(mid_alpha > 0.0)
+        expect_true(mid_alpha < 1.0)
+
+        lurek.ui.update(0.35)
+        local end_alpha = w.getAlpha()
+        expect_true(end_alpha >= 0.99)
+        expect_false(w["isAnimating"]())
+
+        local canceled = w["cancelAnimations"]()
+        expect_true(canceled)
+    end)
+end)
+
 test_summary()

@@ -1798,28 +1798,26 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- Shader error display (dev diagnostics) --------------------------------
 
-    let shader_err_display = Rc::new(RefCell::new(false));
-
-    let sed = shader_err_display.clone();
     // -- setShaderErrorDisplay --
     /// Enables or disables on-screen shader error display.
     /// @param | enabled | boolean | Whether shader error display should be enabled.
     /// @return | nil | No return value.
+    let s = state.clone();
     tbl.set(
         "setShaderErrorDisplay",
         lua.create_function(move |_, enabled: bool| {
-            *sed.borrow_mut() = enabled;
+            s.borrow_mut().shader_error_display_enabled = enabled;
             Ok(())
         })?,
     )?;
 
-    let sed = shader_err_display.clone();
     // -- getShaderErrorDisplay --
     /// Returns whether shader error display is currently enabled.
     /// @return | boolean | True when shader error display is enabled.
+    let s = state.clone();
     tbl.set(
         "getShaderErrorDisplay",
-        lua.create_function(move |_, ()| Ok(*sed.borrow()))?,
+        lua.create_function(move |_, ()| Ok(s.borrow().shader_error_display_enabled))?,
     )?;
 
     lurek.set("effect", tbl)?;

@@ -405,6 +405,10 @@ pub struct SharedState {
     pub debug_overlay_enabled: bool,
     /// Last engine error info for structured error reporting.
     pub last_error: Option<ErrorInfo>,
+    /// Whether runtime should render shader compile diagnostics on screen.
+    pub shader_error_display_enabled: bool,
+    /// Most recent shader compile error message from `lurek.graphic.newShader`.
+    pub last_shader_compile_error: Option<String>,
     /// Background file loader for async asset loading.
     pub async_loader: Option<crate::filesystem::AsyncLoader>,
     /// Persistent sandboxed filesystem with mount layer support.
@@ -565,6 +569,8 @@ impl SharedState {
             clock: Clock::new(),
             debug_overlay_enabled: false,
             last_error: None,
+            shader_error_display_enabled: false,
+            last_shader_compile_error: None,
             async_loader: None,
             fs,
             midi_state: MidiState::new(),

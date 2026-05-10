@@ -1166,4 +1166,75 @@ describe("animation migrated from integration/animation_timer", function()
     end)
 end)
 
+-- @describe addClip mode support
+ describe("addClip mode support", function()
+    -- @covers LAnimation:addClip
+    -- @covers LAnimation:getClipMode
+    -- @covers lurek.animation.new
+    it("addClip accepts pingpong mode", function()
+        local anim = lurek.animation.new()
+        anim:addFrame(0, 0, 16, 16)
+        anim:addFrame(16, 0, 16, 16)
+        anim:addClip("walk", {0, 1}, 10, true, "pingpong")
+        expect_equal("pingpong", anim:getClipMode("walk"))
+    end)
+
+    -- @covers LAnimation:setClipMode
+    -- @covers LAnimation:getClipMode
+    -- @covers lurek.animation.new
+    it("setClipMode updates existing clip mode", function()
+        local anim = lurek.animation.new()
+        anim:addFrame(0, 0, 16, 16)
+        anim:addClip("walk", {0}, 10, true)
+        expect_true(anim:setClipMode("walk", "reverse"))
+        expect_equal("reverse", anim:getClipMode("walk"))
+    end)
+end)
+
+-- @describe preview helpers
+ describe("preview helpers", function()
+    -- @covers LAnimation:drawPreviewGrid
+    -- @covers lurek.animation.new
+    it("drawPreviewGrid returns ImageData userdata", function()
+        local anim = lurek.animation.new()
+        anim:addFrame(0, 0, 16, 16)
+        anim:addFrame(16, 0, 16, 16)
+        local img = anim:drawPreviewGrid(2, 24)
+        expect_type("userdata", img)
+    end)
+end)
+
+-- @describe buildCharacter helper
+ describe("buildCharacter helper", function()
+    -- @covers lurek.animation.buildCharacter
+    -- @covers LAnimation:getClipCount
+    -- @covers LAnimStateMachine:getState
+    it("builds animation bundle with optional state machine", function()
+        local bundle = lurek.animation.buildCharacter({
+            texW = 64,
+            texH = 32,
+            frameW = 16,
+            frameH = 16,
+            clips = {
+                { name = "idle", start = 0, count = 2, fps = 4, looping = true, mode = "forward" },
+                { name = "run", start = 2, count = 2, fps = 8, looping = true, mode = "pingpong" },
+            },
+            states = {
+                { name = "idle", clip = "idle", looping = true },
+                { name = "run", clip = "run", looping = true },
+            },
+            transitions = {
+                { from = "idle", to = "run", condition = "speed > 0.5" },
+            },
+            initialState = "idle",
+        })
+
+        expect_type("table", bundle)
+        expect_type("userdata", bundle.animation)
+        expect_type("userdata", bundle.stateMachine)
+        expect_true(bundle.animation:getClipCount() >= 2)
+        expect_equal("idle", bundle.stateMachine:getState())
+    end)
+end)
+
 test_summary()

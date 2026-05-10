@@ -261,7 +261,7 @@ pub fn create_lua_vm(state: Rc<RefCell<SharedState>>, modules: &ModulesConfig) -
     }
 
     // html: lurek.html (always registered - lightweight, no GPU)
-    html_api::register(&lua, &lurek)?;
+    html_api::register(&lua, &lurek, state.clone())?;
 
     // tilemap: lurek.tilemap
     if modules.tilemap {

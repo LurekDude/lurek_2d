@@ -1231,6 +1231,31 @@ fn lua_integration_timer_event() {
     run_lua_test("integration/test_timer_event.lua");
 }
 
+#[test]
+fn lua_integration_ai_scene_camera() {
+    run_lua_test("integration/test_ai_scene_camera.lua");
+}
+
+#[test]
+fn lua_integration_ui_localization_data() {
+    run_lua_test("integration/test_ui_localization_data.lua");
+}
+
+#[test]
+fn lua_integration_postfx_camera() {
+    run_lua_test("integration/test_postfx_camera.lua");
+}
+
+#[test]
+fn lua_integration_minimap_tilemap_camera() {
+    run_lua_test("integration/test_minimap_tilemap_camera.lua");
+}
+
+#[test]
+fn lua_integration_raycaster_tilemap() {
+    run_lua_test("integration/test_raycaster_tilemap.lua");
+}
+
 // ── library layer ──
 
 #[test]

@@ -1406,6 +1406,20 @@ describe("overlay ambient", function()
         expect_equal(ov:isAmbientEnabled(), false)
     end)
 
+    -- @covers LOverlay:pullAmbientFromLight
+    -- @covers LOverlay:pushAmbientToLight
+    -- @covers LOverlay:syncAmbientWithLight
+    -- @covers lurek.effect.newOverlay
+    it("ambient sync bridge methods are callable", function()
+        local ov = lurek.effect.newOverlay()
+        local ok_pull = pcall(function() ov:pullAmbientFromLight() end)
+        local ok_push = pcall(function() ov:pushAmbientToLight() end)
+        local ok_sync = pcall(function() ov:syncAmbientWithLight("avg") end)
+        expect_type("boolean", ok_pull)
+        expect_type("boolean", ok_push)
+        expect_type("boolean", ok_sync)
+    end)
+
     -- @covers LOverlay:getAmbientColor
     -- @covers LOverlay:setAmbientColor
     -- @covers lurek.effect.newOverlay

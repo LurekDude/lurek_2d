@@ -87,22 +87,76 @@ fn draw_tree_nodes_cpu(
             // ▼ down
             img.draw_line(indent, ry + 4, indent + 6, ry + 4, fg[0], fg[1], fg[2], 200);
             img.draw_line(indent, ry + 4, indent + 3, ry + 8, fg[0], fg[1], fg[2], 200);
-            img.draw_line(indent + 6, ry + 4, indent + 3, ry + 8, fg[0], fg[1], fg[2], 200);
+            img.draw_line(
+                indent + 6,
+                ry + 4,
+                indent + 3,
+                ry + 8,
+                fg[0],
+                fg[1],
+                fg[2],
+                200,
+            );
         } else {
             // ▶ right
-            img.draw_line(indent, ry + 3, indent, ry + row_h - 3, fg[0], fg[1], fg[2], 200);
-            img.draw_line(indent, ry + 3, indent + 6, ry + row_h / 2, fg[0], fg[1], fg[2], 200);
-            img.draw_line(indent, ry + row_h - 3, indent + 6, ry + row_h / 2, fg[0], fg[1], fg[2], 200);
+            img.draw_line(
+                indent,
+                ry + 3,
+                indent,
+                ry + row_h - 3,
+                fg[0],
+                fg[1],
+                fg[2],
+                200,
+            );
+            img.draw_line(
+                indent,
+                ry + 3,
+                indent + 6,
+                ry + row_h / 2,
+                fg[0],
+                fg[1],
+                fg[2],
+                200,
+            );
+            img.draw_line(
+                indent,
+                ry + row_h - 3,
+                indent + 6,
+                ry + row_h / 2,
+                fg[0],
+                fg[1],
+                fg[2],
+                200,
+            );
         }
     }
 
-    img.draw_label(&node.text, indent + 10, ry + (row_h - 7) / 2, fg[0], fg[1], fg[2]);
+    img.draw_label(
+        &node.text,
+        indent + 10,
+        ry + (row_h - 7) / 2,
+        fg[0],
+        fg[1],
+        fg[2],
+    );
     let mut next_y = ry + row_h;
 
     if node.expanded {
         let children: Vec<usize> = node.children.clone();
         for child_idx in children {
-            next_y = draw_tree_nodes_cpu(nodes, child_idx, img, x, next_y, max_y, row_h, depth + 1, selected, fg);
+            next_y = draw_tree_nodes_cpu(
+                nodes,
+                child_idx,
+                img,
+                x,
+                next_y,
+                max_y,
+                row_h,
+                depth + 1,
+                selected,
+                fg,
+            );
         }
     }
     next_y
@@ -631,25 +685,30 @@ fn emit_text_at(
     });
 }
 
+struct TreeCtx<'a> {
+    nodes: &'a [crate::ui::extras::TreeNode],
+    selected: Option<usize>,
+    font_key: FontKey,
+    style: &'a WidgetStyle,
+    cmds: &'a mut Vec<RenderCommand>,
+}
+
 fn emit_tree_nodes(
-    nodes: &[crate::ui::extras::TreeNode],
+    ctx: &mut TreeCtx<'_>,
     idx: usize,
     x: f32,
     mut y: f32,
     row_h: f32,
     depth: usize,
-    selected: Option<usize>,
-    font_key: FontKey,
-    style: &WidgetStyle,
-    cmds: &mut Vec<RenderCommand>,
 ) -> f32 {
-    let Some(node) = nodes.get(idx) else {
+    let Some(node) = ctx.nodes.get(idx) else {
         return y;
     };
     let indent = x + depth as f32 * 14.0 + 4.0;
-    if selected == Some(idx) {
-        cmds.push(RenderCommand::SetColor(0.22, 0.36, 0.60, 0.80));
-        cmds.push(RenderCommand::Rectangle {
+    if ctx.selected == Some(idx) {
+        ctx.cmds
+            .push(RenderCommand::SetColor(0.22, 0.36, 0.60, 0.80));
+        ctx.cmds.push(RenderCommand::Rectangle {
             mode: DrawMode::Fill,
             x,
             y,
@@ -658,40 +717,41 @@ fn emit_tree_nodes(
         });
     }
     if !node.children.is_empty() {
-        cmds.push(RenderCommand::SetColor(0.88, 0.90, 0.94, 0.90));
+        ctx.cmds
+            .push(RenderCommand::SetColor(0.88, 0.90, 0.94, 0.90));
         if node.expanded {
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent,
                 y1: y + 4.0,
                 x2: indent + 6.0,
                 y2: y + 4.0,
             });
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent,
                 y1: y + 4.0,
                 x2: indent + 3.0,
                 y2: y + 8.0,
             });
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent + 6.0,
                 y1: y + 4.0,
                 x2: indent + 3.0,
                 y2: y + 8.0,
             });
         } else {
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent,
                 y1: y + 3.0,
                 x2: indent,
                 y2: y + row_h - 3.0,
             });
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent,
                 y1: y + 3.0,
                 x2: indent + 6.0,
                 y2: y + row_h * 0.5,
             });
-            cmds.push(RenderCommand::Line {
+            ctx.cmds.push(RenderCommand::Line {
                 x1: indent,
                 y1: y + row_h - 3.0,
                 x2: indent + 6.0,
@@ -702,26 +762,16 @@ fn emit_tree_nodes(
     emit_text_at(
         &node.text,
         indent + 10.0,
-        y + (row_h - style.font_size) * 0.5,
-        font_key,
-        style,
-        cmds,
+        y + (row_h - ctx.style.font_size) * 0.5,
+        ctx.font_key,
+        ctx.style,
+        ctx.cmds,
     );
     y += row_h;
     if node.expanded {
-        for &child_idx in &node.children {
-            y = emit_tree_nodes(
-                nodes,
-                child_idx,
-                x,
-                y,
-                row_h,
-                depth + 1,
-                selected,
-                font_key,
-                style,
-                cmds,
-            );
+        let children = node.children.clone();
+        for child_idx in children {
+            y = emit_tree_nodes(ctx, child_idx, x, y, row_h, depth + 1);
         }
     }
     y
@@ -789,6 +839,14 @@ fn render_widget(
         .as_ref()
         .and_then(|t| t.get_style(base.widget_type, base.state))
         .unwrap_or(default_style);
+    let mut style_with_alpha = style.clone();
+    let alpha = base.alpha.clamp(0.0, 1.0);
+    style_with_alpha.bg_color[3] *= alpha;
+    style_with_alpha.fg_color[3] *= alpha;
+    style_with_alpha.border_color[3] *= alpha;
+    style_with_alpha.shadow_color[3] *= alpha;
+    style_with_alpha.highlight_alpha *= alpha;
+    let style = &style_with_alpha;
 
     // Drop shadow (drawn before background)
     emit_shadow(base, style, cmds);
@@ -934,7 +992,14 @@ fn render_widget(
                         h: row_h,
                     });
                 }
-                emit_text_at(item, base.x + 6.0, row_y + (row_h - style.font_size) * 0.5, font_key, style, cmds);
+                emit_text_at(
+                    item,
+                    base.x + 6.0,
+                    row_y + (row_h - style.font_size) * 0.5,
+                    font_key,
+                    style,
+                    cmds,
+                );
                 cmds.push(RenderCommand::SetColor(0.22, 0.24, 0.30, 0.60));
                 cmds.push(RenderCommand::Rectangle {
                     mode: DrawMode::Fill,
@@ -965,7 +1030,12 @@ fn render_widget(
                         h: base.height,
                     });
                     if active {
-                        cmds.push(RenderCommand::SetColor(style.fg_color[0], style.fg_color[1], style.fg_color[2], 1.0));
+                        cmds.push(RenderCommand::SetColor(
+                            style.fg_color[0],
+                            style.fg_color[1],
+                            style.fg_color[2],
+                            1.0,
+                        ));
                         cmds.push(RenderCommand::Rectangle {
                             mode: DrawMode::Fill,
                             x: tab_x,
@@ -1004,7 +1074,12 @@ fn render_widget(
             );
         }
         WidgetKind::Separator(w) => {
-            cmds.push(RenderCommand::SetColor(style.fg_color[0], style.fg_color[1], style.fg_color[2], 0.7));
+            cmds.push(RenderCommand::SetColor(
+                style.fg_color[0],
+                style.fg_color[1],
+                style.fg_color[2],
+                0.7,
+            ));
             if w.vertical {
                 cmds.push(RenderCommand::Rectangle {
                     mode: DrawMode::Fill,
@@ -1025,19 +1100,15 @@ fn render_widget(
         }
         WidgetKind::TreeView(w) => {
             let mut row_y = base.y + 4.0;
+            let mut ctx = TreeCtx {
+                nodes: &w.nodes,
+                selected: w.selected_node,
+                font_key,
+                style,
+                cmds,
+            };
             for &root_idx in &w.root_nodes {
-                row_y = emit_tree_nodes(
-                    &w.nodes,
-                    root_idx,
-                    base.x + 4.0,
-                    row_y,
-                    20.0,
-                    0,
-                    w.selected_node,
-                    font_key,
-                    style,
-                    cmds,
-                );
+                row_y = emit_tree_nodes(&mut ctx, root_idx, base.x + 4.0, row_y, 20.0, 0);
             }
         }
         WidgetKind::ScrollBar(w) => {
@@ -1126,7 +1197,13 @@ fn render_widget(
                     rx: 4.0,
                     ry: 4.0,
                 });
-                let label = button.id.chars().next().unwrap_or('?').to_ascii_uppercase().to_string();
+                let label = button
+                    .id
+                    .chars()
+                    .next()
+                    .unwrap_or('?')
+                    .to_ascii_uppercase()
+                    .to_string();
                 emit_text_at(
                     &label,
                     button_x + button_size * 0.5 - 3.0,
@@ -1150,7 +1227,14 @@ fn render_widget(
         }
         WidgetKind::MenuItem(w) => {
             if w.checked {
-                emit_text_at("v", base.x + 4.0, base.y + (base.height - style.font_size) * 0.5, font_key, style, cmds);
+                emit_text_at(
+                    "v",
+                    base.x + 4.0,
+                    base.y + (base.height - style.font_size) * 0.5,
+                    font_key,
+                    style,
+                    cmds,
+                );
             }
             emit_text_at(
                 &w.text,
@@ -1201,7 +1285,14 @@ fn render_widget(
                         rx: 4.0,
                         ry: 4.0,
                     });
-                    emit_text_at(label, button_x + 14.0, footer_y + 4.0, font_key, style, cmds);
+                    emit_text_at(
+                        label,
+                        button_x + 14.0,
+                        footer_y + 4.0,
+                        font_key,
+                        style,
+                        cmds,
+                    );
                     button_x += button_w + 6.0;
                 }
             }
@@ -1209,7 +1300,14 @@ fn render_widget(
         WidgetKind::StatusBar(w) => {
             let mut section_x = base.x;
             for (text, width) in &w.sections {
-                emit_text_at(text, section_x + 6.0, base.y + (base.height - style.font_size) * 0.5, font_key, style, cmds);
+                emit_text_at(
+                    text,
+                    section_x + 6.0,
+                    base.y + (base.height - style.font_size) * 0.5,
+                    font_key,
+                    style,
+                    cmds,
+                );
                 section_x += *width;
                 cmds.push(RenderCommand::SetColor(0.24, 0.26, 0.32, 1.0));
                 cmds.push(RenderCommand::Rectangle {
@@ -1234,8 +1332,20 @@ fn render_widget(
                     rx: 4.0,
                     ry: 4.0,
                 });
-                emit_text_at(&section.title, base.x + 18.0, section_y + 5.0, font_key, style, cmds);
-                cmds.push(RenderCommand::SetColor(style.fg_color[0], style.fg_color[1], style.fg_color[2], 0.9));
+                emit_text_at(
+                    &section.title,
+                    base.x + 18.0,
+                    section_y + 5.0,
+                    font_key,
+                    style,
+                    cmds,
+                );
+                cmds.push(RenderCommand::SetColor(
+                    style.fg_color[0],
+                    style.fg_color[1],
+                    style.fg_color[2],
+                    0.9,
+                ));
                 if section.expanded {
                     cmds.push(RenderCommand::Triangle {
                         mode: DrawMode::Fill,
@@ -1270,7 +1380,14 @@ fn render_widget(
                 w: base.width,
                 h: 2.0,
             });
-            emit_text_at(&w.text, base.x + 6.0, base.y + (base.height - style.font_size) * 0.5, font_key, style, cmds);
+            emit_text_at(
+                &w.text,
+                base.x + 6.0,
+                base.y + (base.height - style.font_size) * 0.5,
+                font_key,
+                style,
+                cmds,
+            );
         }
         WidgetKind::ColorPicker(w) => {
             let swatch_size = (base.height.min(base.width) - 26.0).max(12.0);
@@ -1293,7 +1410,12 @@ fn render_widget(
                 direction: GradientDirection::Horizontal,
             });
             emit_text_at(
-                &format!("#{:02X}{:02X}{:02X}", (w.r * 255.0) as u8, (w.g * 255.0) as u8, (w.b * 255.0) as u8),
+                &format!(
+                    "#{:02X}{:02X}{:02X}",
+                    (w.r * 255.0) as u8,
+                    (w.g * 255.0) as u8,
+                    (w.b * 255.0) as u8
+                ),
                 base.x + 6.0,
                 base.y + swatch_size + 10.0,
                 font_key,
@@ -1313,7 +1435,14 @@ fn render_widget(
             });
             let mut col_x = base.x;
             for col in &w.columns {
-                emit_text_at(&col.header, col_x + 4.0, base.y + 4.0, font_key, style, cmds);
+                emit_text_at(
+                    &col.header,
+                    col_x + 4.0,
+                    base.y + 4.0,
+                    font_key,
+                    style,
+                    cmds,
+                );
                 col_x += col.width;
                 cmds.push(RenderCommand::SetColor(0.22, 0.24, 0.30, 0.8));
                 cmds.push(RenderCommand::Rectangle {
@@ -1361,7 +1490,14 @@ fn render_widget(
                 x2: base.x,
                 y2: base.y + base.height,
             });
-            emit_text_at("[image]", base.x + (base.width - 42.0) * 0.5, base.y + (base.height - style.font_size) * 0.5, font_key, style, cmds);
+            emit_text_at(
+                "[image]",
+                base.x + (base.width - 42.0) * 0.5,
+                base.y + (base.height - style.font_size) * 0.5,
+                font_key,
+                style,
+                cmds,
+            );
         }
         _ => {}
     }
@@ -1476,6 +1612,14 @@ impl GuiContext {
                 .as_ref()
                 .and_then(|t| t.get_style(base.widget_type, base.state))
                 .unwrap_or(&default_style);
+            let mut style_with_alpha = style.clone();
+            let alpha = base.alpha.clamp(0.0, 1.0);
+            style_with_alpha.bg_color[3] *= alpha;
+            style_with_alpha.fg_color[3] *= alpha;
+            style_with_alpha.border_color[3] *= alpha;
+            style_with_alpha.shadow_color[3] *= alpha;
+            style_with_alpha.highlight_alpha *= alpha;
+            let style = &style_with_alpha;
 
             let [sr, sg, sb, sa] = style.shadow_color;
             if sa > 0.0 {
@@ -1496,7 +1640,11 @@ impl GuiContext {
             let [r0, g0, b0, a0] = style.bg_color;
             if let Some([r1, g1, b1, _a1]) = style.gradient_end {
                 for py in 0..h {
-                    let t = if h <= 1 { 0.0 } else { py as f32 / (h - 1) as f32 };
+                    let t = if h <= 1 {
+                        0.0
+                    } else {
+                        py as f32 / (h - 1) as f32
+                    };
                     let rr = r0 + (r1 - r0) * t;
                     let gg = g0 + (g1 - g0) * t;
                     let bb = b0 + (b1 - b0) * t;
@@ -1527,7 +1675,16 @@ impl GuiContext {
             if style.highlight_alpha > 0.0 {
                 let hi = (style.highlight_alpha.clamp(0.0, 1.0) * 140.0) as u8;
                 let strip_h = (style.border_width.max(2.0)) as u32;
-                img.draw_rect(x + 1, y + 1, w.saturating_sub(2), strip_h, 255, 255, 255, hi);
+                img.draw_rect(
+                    x + 1,
+                    y + 1,
+                    w.saturating_sub(2),
+                    strip_h,
+                    255,
+                    255,
+                    255,
+                    hi,
+                );
             }
 
             if style.border_width > 0.0 {
@@ -1555,7 +1712,16 @@ impl GuiContext {
                     let range = (slider.max - slider.min).max(1e-6);
                     let t = ((slider.value - slider.min) / range).clamp(0.0, 1.0) as f32;
                     let fill_w = ((w as f32) * t).max(1.0) as u32;
-                    img.draw_rect(x, y + (h as i32 / 3), fill_w, (h / 3).max(2), fr, fg, fb, 255);
+                    img.draw_rect(
+                        x,
+                        y + (h as i32 / 3),
+                        fill_w,
+                        (h / 3).max(2),
+                        fr,
+                        fg,
+                        fb,
+                        255,
+                    );
                     let knob_x = x + fill_w as i32 - 2;
                     img.draw_circle(knob_x, y + h as i32 / 2, (h / 3).max(3), 220, 230, 240, 255);
                     skip_text = true;
@@ -1565,17 +1731,51 @@ impl GuiContext {
                     let t = ((pb.value - pb.min) / range).clamp(0.0, 1.0) as f32;
                     let fill_w = ((w as f32) * t).max(0.0) as u32;
                     if fill_w > 0 {
-                        img.draw_rect(x + 1, y + 1, fill_w.saturating_sub(2), h.saturating_sub(2), fr, fg, fb, 255);
+                        img.draw_rect(
+                            x + 1,
+                            y + 1,
+                            fill_w.saturating_sub(2),
+                            h.saturating_sub(2),
+                            fr,
+                            fg,
+                            fb,
+                            255,
+                        );
                     }
                     let pct_label = format!("{}%", (t * 100.0).round() as u32);
                     let lw = (pct_label.chars().count() as i32) * 6;
-                    img.draw_label(&pct_label, x + ((w as i32 - lw) / 2).max(1), y + ((h as i32 - 7) / 2).max(1), 230, 235, 240);
+                    img.draw_label(
+                        &pct_label,
+                        x + ((w as i32 - lw) / 2).max(1),
+                        y + ((h as i32 - 7) / 2).max(1),
+                        230,
+                        235,
+                        240,
+                    );
                     skip_text = true;
                 }
                 WidgetKind::SpinBox(sb) => {
                     let btn_w = (h as i32).max(20);
-                    img.draw_rect(x + w as i32 - btn_w, y, btn_w as u32, h / 2, 60, 65, 80, 255);
-                    img.draw_rect(x + w as i32 - btn_w, y + (h / 2) as i32, btn_w as u32, (h + 1) / 2, 50, 55, 70, 255);
+                    img.draw_rect(
+                        x + w as i32 - btn_w,
+                        y,
+                        btn_w as u32,
+                        h / 2,
+                        60,
+                        65,
+                        80,
+                        255,
+                    );
+                    img.draw_rect(
+                        x + w as i32 - btn_w,
+                        y + (h / 2) as i32,
+                        btn_w as u32,
+                        h.div_ceil(2),
+                        50,
+                        55,
+                        70,
+                        255,
+                    );
                     let ax = x + w as i32 - btn_w / 2;
                     let ay = y + h as i32 / 4;
                     img.draw_line(ax - 3, ay + 2, ax, ay - 2, 200, 210, 220, 255);
@@ -1585,21 +1785,46 @@ impl GuiContext {
                     img.draw_line(ax, dy + 2, ax + 3, dy - 2, 200, 210, 220, 255);
                     let label = format!("{}", sb.value);
                     let lw = (label.chars().count() as i32) * 6;
-                    img.draw_label(&label, x + ((w as i32 - btn_w - lw) / 2).max(2), y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                    img.draw_label(
+                        &label,
+                        x + ((w as i32 - btn_w - lw) / 2).max(2),
+                        y + ((h as i32 - 7) / 2).max(1),
+                        fr,
+                        fg,
+                        fb,
+                    );
                     skip_text = true;
                 }
                 WidgetKind::ScrollBar(sb) => {
                     let total = sb.content_size.max(1.0);
-                    let thumb_ratio = (sb.view_size / total).clamp(0.1, 1.0) as f32;
-                    let pos_ratio = (sb.position / total).clamp(0.0, 1.0 - thumb_ratio) as f32;
+                    let thumb_ratio = (sb.view_size / total).clamp(0.1, 1.0);
+                    let pos_ratio = (sb.position / total).clamp(0.0, 1.0 - thumb_ratio);
                     if sb.vertical {
                         let thumb_h = ((h as f32) * thumb_ratio).max(8.0) as u32;
                         let thumb_y = y + (h as f32 * pos_ratio) as i32;
-                        img.draw_rect(x + 2, thumb_y, w.saturating_sub(4), thumb_h, fr, fg, fb, 200);
+                        img.draw_rect(
+                            x + 2,
+                            thumb_y,
+                            w.saturating_sub(4),
+                            thumb_h,
+                            fr,
+                            fg,
+                            fb,
+                            200,
+                        );
                     } else {
                         let thumb_w = ((w as f32) * thumb_ratio).max(8.0) as u32;
                         let thumb_x = x + (w as f32 * pos_ratio) as i32;
-                        img.draw_rect(thumb_x, y + 2, thumb_w, h.saturating_sub(4), fr, fg, fb, 200);
+                        img.draw_rect(
+                            thumb_x,
+                            y + 2,
+                            thumb_w,
+                            h.saturating_sub(4),
+                            fr,
+                            fg,
+                            fb,
+                            200,
+                        );
                     }
                     skip_text = true;
                 }
@@ -1609,22 +1834,64 @@ impl GuiContext {
                     let (on_r, on_g, on_b) = if sw.on { (70, 170, 100) } else { (60, 65, 80) };
                     img.draw_rect(x, y + ty_off as i32, w, track_h, on_r, on_g, on_b, 255);
                     let thumb_x = x + (sw.thumb_t * (w as f32 - track_h as f32)).max(0.0) as i32;
-                    img.draw_circle(thumb_x + track_h as i32 / 2, y + (h / 2) as i32, ((track_h / 2).saturating_sub(1)).max(2), 220, 230, 240, 255);
+                    img.draw_circle(
+                        thumb_x + track_h as i32 / 2,
+                        y + (h / 2) as i32,
+                        ((track_h / 2).saturating_sub(1)).max(2),
+                        220,
+                        230,
+                        240,
+                        255,
+                    );
                     skip_text = true;
                 }
                 // ── Toggle controls ─────────────────────────────────────────
                 WidgetKind::CheckBox(cb) => {
-                    let box_sz = (h as i32).min(14).max(10);
+                    let box_sz = (h as i32).clamp(10, 14);
                     let bx = x + 3;
                     let by = y + (h as i32 - box_sz) / 2;
                     img.draw_rect(bx, by, box_sz as u32, box_sz as u32, 90, 95, 115, 255);
-                    img.draw_rect(bx + 1, by + 1, (box_sz - 2).max(0) as u32, (box_sz - 2).max(0) as u32, 28, 30, 44, 255);
+                    img.draw_rect(
+                        bx + 1,
+                        by + 1,
+                        (box_sz - 2).max(0) as u32,
+                        (box_sz - 2).max(0) as u32,
+                        28,
+                        30,
+                        44,
+                        255,
+                    );
                     if cb.checked {
-                        img.draw_line(bx + 2, by + box_sz / 2, bx + box_sz / 2 - 1, by + box_sz - 3, fr, fg, fb, 255);
-                        img.draw_line(bx + box_sz / 2 - 1, by + box_sz - 3, bx + box_sz - 2, by + 2, fr, fg, fb, 255);
+                        img.draw_line(
+                            bx + 2,
+                            by + box_sz / 2,
+                            bx + box_sz / 2 - 1,
+                            by + box_sz - 3,
+                            fr,
+                            fg,
+                            fb,
+                            255,
+                        );
+                        img.draw_line(
+                            bx + box_sz / 2 - 1,
+                            by + box_sz - 3,
+                            bx + box_sz - 2,
+                            by + 2,
+                            fr,
+                            fg,
+                            fb,
+                            255,
+                        );
                     }
                     if !cb.text.is_empty() {
-                        img.draw_label(&cb.text, bx + box_sz + 6, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                        img.draw_label(
+                            &cb.text,
+                            bx + box_sz + 6,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            fr,
+                            fg,
+                            fb,
+                        );
                     }
                     skip_text = true;
                 }
@@ -1638,19 +1905,43 @@ impl GuiContext {
                         img.draw_circle(cx, cy, (r / 2).max(2), fr, fg, fb, 255);
                     }
                     if !rb.text.is_empty() {
-                        img.draw_label(&rb.text, cx + r as i32 + 6, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                        img.draw_label(
+                            &rb.text,
+                            cx + r as i32 + 6,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            fr,
+                            fg,
+                            fb,
+                        );
                     }
                     skip_text = true;
                 }
                 // ── Text input ──────────────────────────────────────────────
                 WidgetKind::TextInput(ti) => {
                     if ti.text.is_empty() && !ti.placeholder.is_empty() {
-                        img.draw_label(&ti.placeholder, x + base.padding[3] as i32 + 4, y + ((h as i32 - 7) / 2).max(1), 120, 125, 145);
+                        img.draw_label(
+                            &ti.placeholder,
+                            x + base.padding[3] as i32 + 4,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            120,
+                            125,
+                            145,
+                        );
                     } else {
-                        img.draw_label(&ti.text, x + base.padding[3] as i32 + 4, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                        img.draw_label(
+                            &ti.text,
+                            x + base.padding[3] as i32 + 4,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            fr,
+                            fg,
+                            fb,
+                        );
                     }
                     if ti.focused {
-                        let cursor_x = x + base.padding[3] as i32 + 4 + ti.cursor_pos.min(ti.text.len()) as i32 * 6;
+                        let cursor_x = x
+                            + base.padding[3] as i32
+                            + 4
+                            + ti.cursor_pos.min(ti.text.len()) as i32 * 6;
                         img.draw_rect(cursor_x, y + 3, 1, h.saturating_sub(6), fr, fg, fb, 220);
                     }
                     skip_text = true;
@@ -1658,7 +1949,14 @@ impl GuiContext {
                 // ── Selection controls ──────────────────────────────────────
                 WidgetKind::ComboBox(cb) => {
                     if let Some(text) = cb.selected_item() {
-                        img.draw_label(text, x + base.padding[3] as i32 + 4, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                        img.draw_label(
+                            text,
+                            x + base.padding[3] as i32 + 4,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            fr,
+                            fg,
+                            fb,
+                        );
                     }
                     let ax = x + w as i32 - 12;
                     let ay = y + h as i32 / 2;
@@ -1674,7 +1972,16 @@ impl GuiContext {
                             break;
                         }
                         if lb.selected_index == Some(i) {
-                            img.draw_rect(x + 1, iy, w.saturating_sub(2), row_h as u32, 55, 90, 155, 200);
+                            img.draw_rect(
+                                x + 1,
+                                iy,
+                                w.saturating_sub(2),
+                                row_h as u32,
+                                55,
+                                90,
+                                155,
+                                200,
+                            );
                         }
                         img.draw_label(item, x + 6, iy + (row_h - 7) / 2, fr, fg, fb);
                         img.draw_rect(x, iy + row_h - 1, w, 1, 55, 60, 75, 120);
@@ -1687,14 +1994,25 @@ impl GuiContext {
                         let tab_w = (w as i32 / tb.tabs.len() as i32).max(30);
                         for (i, tab) in tb.tabs.iter().enumerate() {
                             let tx = x + i as i32 * tab_w;
-                            let (bg_r, bg_g, bg_b) = if i == tb.active_tab { (48, 52, 72) } else { (32, 35, 50) };
+                            let (bg_r, bg_g, bg_b) = if i == tb.active_tab {
+                                (48, 52, 72)
+                            } else {
+                                (32, 35, 50)
+                            };
                             img.draw_rect(tx, y, tab_w as u32, h, bg_r, bg_g, bg_b, 255);
                             img.draw_rect(tx + tab_w - 1, y, 1, h, 28, 30, 44, 255);
                             if i == tb.active_tab {
                                 img.draw_rect(tx, y, tab_w as u32, 2, fr, fg, fb, 255);
                             }
                             let lw = (tab.chars().count() as i32) * 6;
-                            img.draw_label(tab, tx + ((tab_w - lw) / 2).max(2), y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                            img.draw_label(
+                                tab,
+                                tx + ((tab_w - lw) / 2).max(2),
+                                y + ((h as i32 - 7) / 2).max(1),
+                                fr,
+                                fg,
+                                fb,
+                            );
                         }
                     }
                     skip_text = true;
@@ -1704,19 +2022,40 @@ impl GuiContext {
                     img.draw_rect(x, y, 4, h, 100, 190, 255, 255);
                     let fade_a = ((1.0 - t.progress()) * 200.0) as u8;
                     img.draw_rect(x + w as i32 - 6, y, 6, h, 255, 255, 255, fade_a);
-                    img.draw_label(&t.message, x + 10, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                    img.draw_label(
+                        &t.message,
+                        x + 10,
+                        y + ((h as i32 - 7) / 2).max(1),
+                        fr,
+                        fg,
+                        fb,
+                    );
                     skip_text = true;
                 }
                 WidgetKind::Badge(badge) => {
                     let text = badge.display_text();
                     let lw = (text.chars().count() as i32) * 6;
-                    img.draw_label(&text, x + ((w as i32 - lw) / 2).max(1), y + ((h as i32 - 7) / 2).max(1), 245, 250, 255);
+                    img.draw_label(
+                        &text,
+                        x + ((w as i32 - lw) / 2).max(1),
+                        y + ((h as i32 - 7) / 2).max(1),
+                        245,
+                        250,
+                        255,
+                    );
                     skip_text = true;
                 }
                 WidgetKind::TooltipPanel(ttp) => {
                     img.draw_rect(x, y, w, 2, fr, fg, fb, 100);
                     if !ttp.text.is_empty() {
-                        img.draw_label(&ttp.text, x + 6, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                        img.draw_label(
+                            &ttp.text,
+                            x + 6,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            fr,
+                            fg,
+                            fb,
+                        );
                     }
                     skip_text = true;
                 }
@@ -1763,7 +2102,14 @@ impl GuiContext {
                             img.draw_rect(bx, footer_y + 4, btn_w as u32, 24, 48, 52, 72, 255);
                             img.draw_rect(bx, footer_y + 4, btn_w as u32, 1, 75, 80, 105, 255);
                             let lw = (label.chars().count() as i32) * 6;
-                            img.draw_label(label, bx + ((btn_w - lw) / 2).max(2), footer_y + 10, fr, fg, fb);
+                            img.draw_label(
+                                label,
+                                bx + ((btn_w - lw) / 2).max(2),
+                                footer_y + 10,
+                                fr,
+                                fg,
+                                fb,
+                            );
                             bx += btn_w + 6;
                         }
                     }
@@ -1794,7 +2140,16 @@ impl GuiContext {
                         if section.expanded {
                             img.draw_line(axp, ayp - 2, axp + aw, ayp - 2, fr, fg, fb, 220);
                             img.draw_line(axp, ayp - 2, axp + aw / 2, ayp + 4, fr, fg, fb, 220);
-                            img.draw_line(axp + aw, ayp - 2, axp + aw / 2, ayp + 4, fr, fg, fb, 220);
+                            img.draw_line(
+                                axp + aw,
+                                ayp - 2,
+                                axp + aw / 2,
+                                ayp + 4,
+                                fr,
+                                fg,
+                                fb,
+                                220,
+                            );
                         } else {
                             img.draw_line(axp, ayp - 4, axp, ayp + 4, fr, fg, fb, 220);
                             img.draw_line(axp, ayp - 4, axp + 6, ayp, fr, fg, fb, 220);
@@ -1817,12 +2172,26 @@ impl GuiContext {
                         img.draw_rect(x + px as i32, bar_y, 1, bar_h, hr, hg, hb, 255);
                     }
                     let sw = (h.min(w) as i32 - 28).max(10) as u32;
-                    img.draw_rect(x + 6, y + 6, sw, sw, (cp.r * 255.0) as u8, (cp.g * 255.0) as u8, (cp.b * 255.0) as u8, 255);
+                    img.draw_rect(
+                        x + 6,
+                        y + 6,
+                        sw,
+                        sw,
+                        (cp.r * 255.0) as u8,
+                        (cp.g * 255.0) as u8,
+                        (cp.b * 255.0) as u8,
+                        255,
+                    );
                     img.draw_rect(x + 5, y + 5, sw + 2, 1, 90, 95, 115, 255);
                     img.draw_rect(x + 5, y + 5 + sw as i32 + 1, sw + 2, 1, 90, 95, 115, 255);
                     img.draw_rect(x + 5, y + 5, 1, sw + 2, 90, 95, 115, 255);
                     img.draw_rect(x + 5 + sw as i32 + 1, y + 5, 1, sw + 2, 90, 95, 115, 255);
-                    let hex = format!("#{:02X}{:02X}{:02X}", (cp.r * 255.0) as u8, (cp.g * 255.0) as u8, (cp.b * 255.0) as u8);
+                    let hex = format!(
+                        "#{:02X}{:02X}{:02X}",
+                        (cp.r * 255.0) as u8,
+                        (cp.g * 255.0) as u8,
+                        (cp.b * 255.0) as u8
+                    );
                     img.draw_label(&hex, x + 6, y + sw as i32 + 10, fr, fg, fb);
                     skip_text = true;
                 }
@@ -1864,7 +2233,18 @@ impl GuiContext {
                     let mut ry = y;
                     let roots: Vec<usize> = tv.root_nodes.clone();
                     for ri in roots {
-                        ry = draw_tree_nodes_cpu(&tv.nodes, ri, &mut img, x, ry, max_y, row_h, 0, tv.selected_node, [fr, fg, fb]);
+                        ry = draw_tree_nodes_cpu(
+                            &tv.nodes,
+                            ri,
+                            &mut img,
+                            x,
+                            ry,
+                            max_y,
+                            row_h,
+                            0,
+                            tv.selected_node,
+                            [fr, fg, fb],
+                        );
                     }
                     skip_text = true;
                 }
@@ -1872,13 +2252,51 @@ impl GuiContext {
                     let btn_sz = h.min(28);
                     let mut bx = x + 4;
                     for btn in &tb.buttons {
-                        let (br, bg2, bb2) = if btn.toggled { (55, 90, 140) } else { (40, 44, 62) };
-                        img.draw_rect(bx, y + (h as i32 - btn_sz as i32) / 2, btn_sz, btn_sz, br, bg2, bb2, 255);
-                        img.draw_rect(bx, y + (h as i32 - btn_sz as i32) / 2, btn_sz, 1, 65, 70, 90, 255);
-                        img.draw_rect(bx, y + (h as i32 - btn_sz as i32) / 2, 1, btn_sz, 65, 70, 90, 255);
+                        let (br, bg2, bb2) = if btn.toggled {
+                            (55, 90, 140)
+                        } else {
+                            (40, 44, 62)
+                        };
+                        img.draw_rect(
+                            bx,
+                            y + (h as i32 - btn_sz as i32) / 2,
+                            btn_sz,
+                            btn_sz,
+                            br,
+                            bg2,
+                            bb2,
+                            255,
+                        );
+                        img.draw_rect(
+                            bx,
+                            y + (h as i32 - btn_sz as i32) / 2,
+                            btn_sz,
+                            1,
+                            65,
+                            70,
+                            90,
+                            255,
+                        );
+                        img.draw_rect(
+                            bx,
+                            y + (h as i32 - btn_sz as i32) / 2,
+                            1,
+                            btn_sz,
+                            65,
+                            70,
+                            90,
+                            255,
+                        );
                         if let Some(c) = btn.id.chars().next() {
                             let cs = c.to_uppercase().to_string();
-                            img.draw_label(&cs, bx + btn_sz as i32 / 2 - 3, y + (h as i32 - 7) / 2, fr, fg, fb);
+                            img.draw_label(
+                                &cs,
+                                bx + btn_sz as i32 / 2 - 3,
+                                y + (h as i32 - 7) / 2,
+                                fr,
+                                fg,
+                                fb,
+                            );
                         }
                         bx += btn_sz as i32 + 4;
                     }
@@ -1893,10 +2311,24 @@ impl GuiContext {
                         img.draw_label("v", x + 4, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
                     }
                     let label_x = if mi.checked { x + 18 } else { x + 6 };
-                    img.draw_label(&mi.text, label_x, y + ((h as i32 - 7) / 2).max(1), fr, fg, fb);
+                    img.draw_label(
+                        &mi.text,
+                        label_x,
+                        y + ((h as i32 - 7) / 2).max(1),
+                        fr,
+                        fg,
+                        fb,
+                    );
                     if !mi.shortcut.is_empty() {
                         let lw = (mi.shortcut.chars().count() as i32) * 6;
-                        img.draw_label(&mi.shortcut, x + w as i32 - lw - 6, y + ((h as i32 - 7) / 2).max(1), 140, 145, 165);
+                        img.draw_label(
+                            &mi.shortcut,
+                            x + w as i32 - lw - 6,
+                            y + ((h as i32 - 7) / 2).max(1),
+                            140,
+                            145,
+                            165,
+                        );
                     }
                     skip_text = true;
                 }
@@ -1922,7 +2354,14 @@ impl GuiContext {
                     img.draw_rect(x, y + h as i32 - 1, w, 1, 90, 95, 115, 255);
                     img.draw_rect(x, y, 1, h, 90, 95, 115, 255);
                     img.draw_rect(x + w as i32 - 1, y, 1, h, 90, 95, 115, 255);
-                    img.draw_label("[image]", x + ((w as i32 - 42) / 2).max(1), y + ((h as i32 - 7) / 2).max(1), 130, 135, 155);
+                    img.draw_label(
+                        "[image]",
+                        x + ((w as i32 - 42) / 2).max(1),
+                        y + ((h as i32 - 7) / 2).max(1),
+                        130,
+                        135,
+                        155,
+                    );
                     skip_text = true;
                 }
                 WidgetKind::SplitPanel(sp) => {
