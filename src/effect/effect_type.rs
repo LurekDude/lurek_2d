@@ -83,6 +83,59 @@ pub enum PostFxEffectType {
 }
 
 impl PostFxEffectType {
+    const NAME_MAP: &'static [(Self, &'static str)] = &[
+        (Self::Bloom, "bloom"),
+        (Self::Blur, "blur"),
+        (Self::Crt, "crt"),
+        (Self::Godrays, "godrays"),
+        (Self::Vignette, "vignette"),
+        (Self::ColourGrade, "colourgrade"),
+        (Self::Chromatic, "chromatic"),
+        (Self::Pixelate, "pixelate"),
+        (Self::Sepia, "sepia"),
+        (Self::Grayscale, "grayscale"),
+        (Self::Invert, "invert"),
+        (Self::Scanlines, "scanlines"),
+        (Self::EdgeDetect, "edgedetect"),
+        (Self::HueShift, "hueshift"),
+        (Self::Noise, "noise"),
+        (Self::Custom, "custom"),
+        (Self::DepthOfField, "depthoffield"),
+        (Self::MotionBlur, "motionblur"),
+        (Self::PaletteSwap, "paletteswap"),
+        (Self::ColorLut, "colorlut"),
+        (Self::WaterDistort, "waterdistort"),
+        (Self::Sharpen, "sharpen"),
+        (Self::Dither, "dither"),
+        (Self::Outline, "outline"),
+    ];
+
+    const BUILT_IN_TYPES: &'static [Self] = &[
+        Self::Bloom,
+        Self::Blur,
+        Self::Crt,
+        Self::Godrays,
+        Self::Vignette,
+        Self::ColourGrade,
+        Self::Chromatic,
+        Self::Pixelate,
+        Self::Sepia,
+        Self::Grayscale,
+        Self::Invert,
+        Self::Scanlines,
+        Self::EdgeDetect,
+        Self::HueShift,
+        Self::Noise,
+        Self::DepthOfField,
+        Self::MotionBlur,
+        Self::PaletteSwap,
+        Self::ColorLut,
+        Self::WaterDistort,
+        Self::Sharpen,
+        Self::Dither,
+        Self::Outline,
+    ];
+
     /// Parses a string name into an effect type.
     ///
     /// # Parameters
@@ -91,32 +144,18 @@ impl PostFxEffectType {
     /// # Returns
     /// `Option<Self>` — `None` if the name is unrecognised.
     pub fn from_name(name: &str) -> Option<Self> {
-        match name {
-            "bloom" => Some(Self::Bloom),
-            "blur" => Some(Self::Blur),
-            "crt" => Some(Self::Crt),
-            "godrays" => Some(Self::Godrays),
-            "vignette" => Some(Self::Vignette),
-            "colourgrade" => Some(Self::ColourGrade),
-            "chromatic" => Some(Self::Chromatic),
-            "pixelate" => Some(Self::Pixelate),
-            "sepia" => Some(Self::Sepia),
-            "grayscale" => Some(Self::Grayscale),
-            "invert" => Some(Self::Invert),
-            "scanlines" => Some(Self::Scanlines),
-            "edgedetect" => Some(Self::EdgeDetect),
-            "hueshift" => Some(Self::HueShift),
-            "noise" => Some(Self::Noise),
-            "depthoffield" => Some(Self::DepthOfField),
-            "motionblur" => Some(Self::MotionBlur),
-            "paletteswap" => Some(Self::PaletteSwap),
-            "colorlut" => Some(Self::ColorLut),
-            "waterdistort" => Some(Self::WaterDistort),
-            "sharpen" => Some(Self::Sharpen),
-            "dither" => Some(Self::Dither),
-            "outline" => Some(Self::Outline),
-            _ => None,
-        }
+        Self::BUILT_IN_TYPES
+            .iter()
+            .copied()
+            .find(|effect_type| effect_type.name() == name)
+    }
+
+    /// Returns names of all built-in (non-custom) effect types.
+    pub fn built_in_names() -> Vec<&'static str> {
+        Self::BUILT_IN_TYPES
+            .iter()
+            .map(|effect_type| effect_type.name())
+            .collect()
     }
 
     /// Returns the string name of this effect type.
@@ -124,32 +163,11 @@ impl PostFxEffectType {
     /// # Returns
     /// `&'static str`.
     pub fn name(&self) -> &'static str {
-        match self {
-            Self::Bloom => "bloom",
-            Self::Blur => "blur",
-            Self::Crt => "crt",
-            Self::Godrays => "godrays",
-            Self::Vignette => "vignette",
-            Self::ColourGrade => "colourgrade",
-            Self::Chromatic => "chromatic",
-            Self::Pixelate => "pixelate",
-            Self::Sepia => "sepia",
-            Self::Grayscale => "grayscale",
-            Self::Invert => "invert",
-            Self::Scanlines => "scanlines",
-            Self::EdgeDetect => "edgedetect",
-            Self::HueShift => "hueshift",
-            Self::Noise => "noise",
-            Self::Custom => "custom",
-            Self::DepthOfField => "depthoffield",
-            Self::MotionBlur => "motionblur",
-            Self::PaletteSwap => "paletteswap",
-            Self::ColorLut => "colorlut",
-            Self::WaterDistort => "waterdistort",
-            Self::Sharpen => "sharpen",
-            Self::Dither => "dither",
-            Self::Outline => "outline",
-        }
+        Self::NAME_MAP
+            .iter()
+            .find(|(effect_type, _)| effect_type == self)
+            .map(|(_, name)| *name)
+            .expect("PostFxEffectType::NAME_MAP must include every enum variant")
     }
 
     /// Returns an uppercase label suitable for debug overlays and visual catalogs.

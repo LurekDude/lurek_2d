@@ -1,9 +1,0 @@
-- TODO: Add per-sprite or per-layer effects instead of limiting `PostFxStack` to full-screen passes.
-- TODO: Complete the GPU render-path hookup for shader compile error display so `setShaderErrorDisplay` is not a silent toggle.
-- TODO: Pick one canonical home for screen shake between `effect` and `camera`.
-- TODO: Unify or clearly separate `effect::AmbientState` and `light::LightWorld.ambient`.
-- TODO: Unify or clearly separate weather-particle logic in `effect` from generic particle logic in `particle`.
-- TODO: Replace the duplicated `PostFxEffectType` string-to-enum mapping with a shared table or macro.
-- TODO: Revisit the deterministic weather spawn pattern if it produces visible repetition at higher particle densities.
-- TODO: Add a `sprite-fx` style plugin path if per-sprite post-processing is intentionally kept out of core.
-- TODO: Add an advanced-weather plugin path for turbulence, accumulation, and puddle-style extensions if those features stay out of core.

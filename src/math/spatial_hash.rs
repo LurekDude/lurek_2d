@@ -173,14 +173,15 @@ impl SpatialHash {
     /// `Vec<String>`.
     pub fn query_rect(&self, x: f32, y: f32, w: f32, h: f32) -> Vec<String> {
         let (cx0, cy0, cx1, cy1) = self.cell_range(x, y, w, h);
-        let mut seen = HashSet::new();
+        let mut seen: HashSet<&str> = HashSet::new();
         let mut result = Vec::new();
 
         for cy in cy0..=cy1 {
             for cx in cx0..=cx1 {
                 if let Some(bucket) = self.buckets.get(&(cx, cy)) {
                     for id in bucket {
-                        if seen.contains(id) {
+                        let id_ref = id.as_str();
+                        if seen.contains(id_ref) {
                             continue;
                         }
                         if let Some(item) = self.items.get(id) {
@@ -190,7 +191,7 @@ impl SpatialHash {
                                 && item.y < y + h
                                 && item.y + item.h > y
                             {
-                                seen.insert(id.clone());
+                                seen.insert(id_ref);
                                 result.push(id.clone());
                             }
                         }
@@ -214,29 +215,40 @@ impl SpatialHash {
     /// First queries the bounding rect, then filters by distance from the
     /// circle centre to the nearest point on each item's AABB.
     pub fn query_circle(&self, cx: f32, cy: f32, radius: f32) -> Vec<String> {
-        // Bounding rect of the circle
         let rx = cx - radius;
         let ry = cy - radius;
         let rw = radius * 2.0;
         let rh = radius * 2.0;
+        let (cx0, cy0, cx1, cy1) = self.cell_range(rx, ry, rw, rh);
 
-        let candidates = self.query_rect(rx, ry, rw, rh);
+        let mut seen: HashSet<&str> = HashSet::new();
+        let mut result = Vec::new();
         let r2 = radius * radius;
-        candidates
-            .into_iter()
-            .filter(|id| {
-                if let Some(item) = self.items.get(id) {
-                    // Nearest point on AABB to circle centre
-                    let nearest_x = cx.max(item.x).min(item.x + item.w);
-                    let nearest_y = cy.max(item.y).min(item.y + item.h);
-                    let dx = cx - nearest_x;
-                    let dy = cy - nearest_y;
-                    dx * dx + dy * dy <= r2
-                } else {
-                    false
+
+        for cyi in cy0..=cy1 {
+            for cxi in cx0..=cx1 {
+                if let Some(bucket) = self.buckets.get(&(cxi, cyi)) {
+                    for id in bucket {
+                        let id_ref = id.as_str();
+                        if seen.contains(id_ref) {
+                            continue;
+                        }
+                        if let Some(item) = self.items.get(id) {
+                            let nearest_x = cx.max(item.x).min(item.x + item.w);
+                            let nearest_y = cy.max(item.y).min(item.y + item.h);
+                            let dx = cx - nearest_x;
+                            let dy = cy - nearest_y;
+                            if dx * dx + dy * dy <= r2 {
+                                seen.insert(id_ref);
+                                result.push(id.clone());
+                            }
+                        }
+                    }
                 }
-            })
-            .collect()
+            }
+        }
+
+        result
     }
 
     /// Returns the IDs of all items whose AABBs are intersected by a line

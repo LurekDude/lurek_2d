@@ -172,6 +172,25 @@ do -- lurek.debugbridge.broadcast
   end
   on_enemy_killed({ type = "goblin", x = 240, y = 96 })
 end
+
+--@api-stub: lurek.debugbridge.getProtocolInfo
+-- Returns protocol metadata (version, capabilities, nonce).
+-- Use this when writing a local bridge client in Lua to inspect compatibility and surface diagnostics.
+do -- lurek.debugbridge.getProtocolInfo
+  local info = lurek.debugbridge.getProtocolInfo()
+  lurek.log.info("bridge protocol v" .. info.version .. " caps=" .. #info.capabilities, "debugbridge")
+end
+
+--@api-stub: lurek.debugbridge.consumeHotReloadRequest
+-- Consumes and clears a pending remote hot-reload request.
+-- Poll once per frame and trigger your module reload pipeline exactly once when it returns true.
+do -- lurek.debugbridge.consumeHotReloadRequest
+  function lurek.process(dt)
+    if lurek.debugbridge.consumeHotReloadRequest() then
+      lurek.log.info("remote hot reload requested", "debugbridge")
+    end
+  end
+end
 -- content/examples/debugbridge.lua
 -- EXAMPLEed coverage of the lurek.debugbridge API (14 items).
 --

@@ -18,9 +18,26 @@ use std::collections::{HashMap, HashSet};
 
 #[path = "universe_ext.rs"]
 mod ext;
+#[path = "universe_systems.rs"]
+mod systems;
 
 /// Maximum number of bitmap tag definitions per Universe.
 const MAX_BITMAP_TAGS: usize = 63;
+
+/// Incremental world diff returned by [`Universe::take_snapshot_diff`].
+///
+/// All four buffers are drained on each call; call every frame (or every tick) to accumulate only new changes.
+#[derive(Debug, Default, Clone)]
+pub struct SnapshotDiff {
+    /// `(entity_id, component_name)` pairs added since the last call.
+    pub added_components: Vec<(u32, String)>,
+    /// `(entity_id, component_name)` pairs removed since the last call.
+    pub removed_components: Vec<(u32, String)>,
+    /// Entity IDs killed since the last call.
+    pub deleted_entities: Vec<u32>,
+    /// Entity IDs whose components changed (super-set of adds/removes).
+    pub dirty_entities: Vec<u32>,
+}
 
 /// A self-contained ECS world. Consult the module-level documentation for the broader usage context and preconditions.
 ///
@@ -50,6 +67,7 @@ const MAX_BITMAP_TAGS: usize = 63;
 /// - `blueprint_store` — `Option<RegistryKey>`.
 /// - `system_store` — `Option<RegistryKey>`.
 /// - `dirty_set` — `HashSet<u32>`: packed IDs of entities whose components changed since the last `flushObservers`.
+/// Main ECS world container.
 pub struct Universe {
     next_id: u32,
     free_list: Vec<u32>,
@@ -75,12 +93,18 @@ pub struct Universe {
     system_priorities: Vec<i32>,
     /// Phase name parallel to the system_store table.  Empty string means `"update"`.
     system_phases: Vec<String>,
+    /// Optional system names used for dependency resolution.
+    system_names: Vec<String>,
+    /// Per-system dependency names (must reference system names).
+    system_deps: Vec<Vec<String>>,
     /// Pending component-added events for observer dispatch.
     add_events: Vec<(u32, String)>,
     /// Pending component-removed events for observer dispatch.
     remove_events: Vec<(u32, String)>,
     /// Packed entity IDs whose components changed since the last `take_component_events` call.
     dirty_set: HashSet<u32>,
+    /// Packed entity IDs killed since the last `take_snapshot_diff` call.
+    deleted_entities: Vec<u32>,
     /// Directed named relationship links between entities.
     pub relationships: RelationshipManager,
 }
@@ -111,9 +135,12 @@ impl Universe {
             system_store: None,
             system_priorities: Vec::new(),
             system_phases: Vec::new(),
+            system_names: Vec::new(),
+            system_deps: Vec::new(),
             add_events: Vec::new(),
             remove_events: Vec::new(),
             dirty_set: HashSet::new(),
+            deleted_entities: Vec::new(),
             relationships: RelationshipManager::new(),
         }
     }
@@ -315,7 +342,9 @@ impl Universe {
         if let Some(tags) = self.string_tags.remove(&slot) {
             for tag in &tags {
                 if let Some(entries) = self.tag_index.get_mut(tag) {
-                    entries.retain(|&tid| tid != id);
+                    if let Some(pos) = entries.iter().position(|&tid| tid == id) {
+                        entries.swap_remove(pos);
+                    }
                 }
             }
         }
@@ -336,6 +365,7 @@ impl Universe {
         // Increment generation so old packed IDs are invalidated
         *self.generations.entry(slot).or_insert(0) += 1;
         self.free_list.push(slot);
+        self.deleted_entities.push(id);
         Ok(())
     }
 
@@ -1179,130 +1209,6 @@ impl Universe {
         Ok(LuaValue::Nil)
     }
 
-    // === Systems ===
-
-    /// Adds a system (Lua table) to the system list at the given priority (lower = first).
-    ///
-    /// The optional `phase` string assigns the system to a named execution phase.
-    /// An empty string is treated as `"update"`.
-    ///
-    /// # Parameters
-    /// - `lua` — `&Lua`.
-    /// - `system` — `Table`.
-    /// - `priority` — `i32`.
-    /// - `phase` — `String`: phase name (`""` means `"update"`).
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
-    pub fn add_system(
-        &mut self,
-        lua: &Lua,
-        system: Table,
-        priority: i32,
-        phase: String,
-    ) -> LuaResult<()> {
-        self.ensure_stores(lua)?;
-        let store = self.get_system_store(lua)?;
-        let len = store.raw_len();
-        store.set(len + 1, system)?;
-        self.system_priorities.push(priority);
-        self.system_phases.push(phase);
-        Ok(())
-    }
-
-    /// Returns all 1-based system store indices sorted by ascending priority across all phases.
-    /// Used by `emit` which broadcasts to every registered system regardless of phase.
-    ///
-    /// # Returns
-    /// `Vec<usize>`.
-    pub fn get_sorted_system_indices_all(&self) -> Vec<usize> {
-        let count = self.system_priorities.len();
-        let mut order: Vec<usize> = (1..=count).collect();
-        order.sort_by_key(|&i| self.system_priorities[i - 1]);
-        order
-    }
-
-    /// Returns 1-based system store indices sorted by ascending priority, filtered to the given phase.
-    ///
-    /// Backward-compatibility rule:
-    /// Systems registered with no explicit phase (empty phase string) are treated as
-    /// default systems and run in both `"update"` and `"render"` dispatches.
-    ///
-    /// # Parameters
-    /// - `phase` — `&str`: empty string matches `"update"`.
-    ///
-    /// # Returns
-    /// `Vec<usize>`.
-    pub fn get_sorted_system_indices_for_phase(&self, phase: &str) -> Vec<usize> {
-        let target = if phase.is_empty() { "update" } else { phase };
-        let count = self.system_priorities.len();
-        let mut order: Vec<usize> = (1..=count)
-            .filter(|&i| {
-                let p = &self.system_phases[i - 1];
-                if p.is_empty() {
-                    // Legacy behavior: systems without an explicit phase are active in
-                    // both update() and render().
-                    target == "update" || target == "render"
-                } else {
-                    p == target
-                }
-            })
-            .collect();
-        order.sort_by_key(|&i| self.system_priorities[i - 1]);
-        order
-    }
-
-    /// Removes a system by pointer identity from the system list.
-    ///
-    /// # Parameters
-    /// - `lua` — `&Lua`.
-    /// - `system` — `Table`.
-    ///
-    /// # Returns
-    /// `LuaResult<()>`.
-    pub fn remove_system(&mut self, lua: &Lua, system: Table) -> LuaResult<()> {
-        self.ensure_stores(lua)?;
-        let store = self.get_system_store(lua)?;
-        let len = store.raw_len();
-        let target_ptr = system.to_pointer();
-        for i in 1..=len {
-            let s: Table = store.get(i)?;
-            if s.to_pointer() == target_ptr {
-                // Shift remaining down
-                for j in i..len {
-                    let next: LuaValue = store.get(j + 1)?;
-                    store.set(j, next)?;
-                }
-                store.set(len, LuaValue::Nil)?;
-                // Remove the parallel priority + phase entries (i is 1-based, vec is 0-based)
-                if i <= self.system_priorities.len() {
-                    self.system_priorities.remove(i - 1);
-                }
-                if i <= self.system_phases.len() {
-                    self.system_phases.remove(i - 1);
-                }
-                return Ok(());
-            }
-        }
-        Err(mlua::Error::runtime("System not registered"))
-    }
-
-    /// Returns the number of registered systems.
-    ///
-    /// # Parameters
-    /// - `lua` — `&Lua`.
-    ///
-    /// # Returns
-    /// `LuaResult<usize>`.
-    pub fn get_system_count(&self, lua: &Lua) -> LuaResult<usize> {
-        if let Some(ref key) = self.system_store {
-            let store: Table = lua.registry_value(key)?;
-            Ok(store.raw_len())
-        } else {
-            Ok(0)
-        }
-    }
-
     // === Lifecycle ===
 
     /// Clears all entities, components, tags, layers, and systems. Blueprints are preserved.
@@ -1325,9 +1231,12 @@ impl Universe {
         self.children.clear();
         self.system_priorities.clear();
         self.system_phases.clear();
+        self.system_names.clear();
+        self.system_deps.clear();
         self.add_events.clear();
         self.remove_events.clear();
         self.dirty_set.clear();
+        self.deleted_entities.clear();
         // Clear component store
         if let Some(ref key) = self.component_store {
             let store: Table = lua.registry_value(key)?;
@@ -1379,6 +1288,35 @@ impl Universe {
         let mut ids: Vec<u32> = self.dirty_set.iter().copied().collect();
         ids.sort();
         ids
+    }
+
+    // === Incremental snapshot diff ===
+
+    /// Returns a lightweight diff of world changes since the last call to this method.
+    ///
+    /// The diff contains:
+    /// - `added_components`   — `(entity_id, component_name)` pairs added since last call.
+    /// - `removed_components` — `(entity_id, component_name)` pairs removed since last call.
+    /// - `deleted_entities`   — entity IDs that were killed since last call.
+    /// - `dirty_entities`     — entity IDs whose components changed (super-set of the above).
+    ///
+    /// All four buffers are drained; subsequent calls return only changes since this call.
+    ///
+    /// Use this for network delta sync, replay recording, or lightweight rollback checkpoints
+    /// without serialising the full world each frame.
+    ///
+    /// # Returns
+    /// `SnapshotDiff` — plain data, no Lua allocation required.
+    pub fn take_snapshot_diff(&mut self) -> SnapshotDiff {
+        let dirty_entities = self.get_dirty_entities();
+        let (added_components, removed_components) = self.take_component_events();
+        let deleted_entities = std::mem::take(&mut self.deleted_entities);
+        SnapshotDiff {
+            added_components,
+            removed_components,
+            deleted_entities,
+            dirty_entities,
+        }
     }
 }
 

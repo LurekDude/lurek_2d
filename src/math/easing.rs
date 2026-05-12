@@ -381,32 +381,37 @@ pub fn ease_in_out_back(t: f32) -> f32 {
 /// # Returns
 /// `Some(f32)` with the eased value, or `None` if the name is unrecognised.
 pub fn apply(name: &str, t: f32) -> Option<f32> {
+    resolve_easing_fn(name).map(|f| f(t))
+}
+
+/// Resolves a named easing function to its function pointer.
+pub fn resolve_easing_fn(name: &str) -> Option<fn(f32) -> f32> {
     match name.to_lowercase().as_str() {
-        "linear" => Some(linear(t)),
-        "inquad" => Some(ease_in_quad(t)),
-        "outquad" => Some(ease_out_quad(t)),
-        "inoutquad" => Some(ease_in_out_quad(t)),
-        "incubic" => Some(ease_in_cubic(t)),
-        "outcubic" => Some(ease_out_cubic(t)),
-        "inoutcubic" => Some(ease_in_out_cubic(t)),
-        "inquart" => Some(ease_in_quart(t)),
-        "outquart" => Some(ease_out_quart(t)),
-        "inoutquart" => Some(ease_in_out_quart(t)),
-        "insine" => Some(ease_in_sine(t)),
-        "outsine" => Some(ease_out_sine(t)),
-        "inoutsine" => Some(ease_in_out_sine(t)),
-        "inexpo" => Some(ease_in_expo(t)),
-        "outexpo" => Some(ease_out_expo(t)),
-        "inoutexpo" => Some(ease_in_out_expo(t)),
-        "inelastic" => Some(ease_in_elastic(t)),
-        "outelastic" => Some(ease_out_elastic(t)),
-        "inoutelastic" => Some(ease_in_out_elastic(t)),
-        "outbounce" => Some(ease_out_bounce(t)),
-        "inbounce" => Some(ease_in_bounce(t)),
-        "inoutbounce" => Some(ease_in_out_bounce(t)),
-        "inback" => Some(ease_in_back(t)),
-        "outback" => Some(ease_out_back(t)),
-        "inoutback" => Some(ease_in_out_back(t)),
+        "linear" => Some(linear),
+        "inquad" => Some(ease_in_quad),
+        "outquad" => Some(ease_out_quad),
+        "inoutquad" => Some(ease_in_out_quad),
+        "incubic" => Some(ease_in_cubic),
+        "outcubic" => Some(ease_out_cubic),
+        "inoutcubic" => Some(ease_in_out_cubic),
+        "inquart" => Some(ease_in_quart),
+        "outquart" => Some(ease_out_quart),
+        "inoutquart" => Some(ease_in_out_quart),
+        "insine" => Some(ease_in_sine),
+        "outsine" => Some(ease_out_sine),
+        "inoutsine" => Some(ease_in_out_sine),
+        "inexpo" => Some(ease_in_expo),
+        "outexpo" => Some(ease_out_expo),
+        "inoutexpo" => Some(ease_in_out_expo),
+        "inelastic" => Some(ease_in_elastic),
+        "outelastic" => Some(ease_out_elastic),
+        "inoutelastic" => Some(ease_in_out_elastic),
+        "outbounce" => Some(ease_out_bounce),
+        "inbounce" => Some(ease_in_bounce),
+        "inoutbounce" => Some(ease_in_out_bounce),
+        "inback" => Some(ease_in_back),
+        "outback" => Some(ease_out_back),
+        "inoutback" => Some(ease_in_out_back),
         _ => None,
     }
 }

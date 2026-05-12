@@ -629,4 +629,87 @@ describe("unit: migrated from integration/test_thread_data.lua", function()
 
 end)
 
+-- @describe Bounded channel API
+
+describe("Bounded channel API", function()
+    -- @covers lurek.thread.newBoundedChannel
+    it("newBoundedChannel creates bounded channel", function()
+        local new_bounded = lurek.thread["newBoundedChannel"]
+        local ch = new_bounded(2)
+        expect_not_nil(ch)
+        expect_true(ch:isBounded())
+        expect_equal(2, ch:getCapacity())
+    end)
+
+    -- @covers LChannel:tryPush
+    -- @covers lurek.thread.newBoundedChannel
+    it("tryPush returns false when capacity is reached", function()
+        local new_bounded = lurek.thread["newBoundedChannel"]
+        local ch = new_bounded(1)
+        expect_true(ch:tryPush("a"))
+        expect_false(ch:tryPush("b"))
+        expect_equal(1, ch:getCount())
+    end)
+end)
+
+-- @describe Worker capability introspection
+
+describe("Worker capability introspection", function()
+    -- @covers lurek.thread.getWorkerCapabilities
+    it("returns non-empty capability list", function()
+        local get_caps = lurek.thread["getWorkerCapabilities"]
+        local caps = get_caps()
+        expect_type("table", caps)
+        expect_true(#caps >= 1)
+    end)
+end)
+
+-- @describe Async helpers
+
+describe("Async helpers", function()
+    -- @covers lurek.thread.async
+    it("async accepts Lua function as first argument", function()
+        local async_fn = lurek.thread["async"] --[[@as any]]
+        local p = async_fn(function(v)
+            return (v or 0) + 1
+        end, 41)
+        expect_not_nil(p)
+        -- Promise has polling API (`isDone`/`result`), not blocking `wait`.
+        local done = false
+        local spins = 0
+        while not done and spins < 1000 do
+            done = p:isDone()
+            spins = spins + 1
+        end
+        expect_true(done)
+    end)
+
+    -- @covers LPromise:chain
+    -- @covers lurek.thread.async
+    it("promise chain produces follow-up promise", function()
+        local async_fn = lurek.thread["async"] --[[@as any]]
+        local p1 = async_fn("lurek.thread.getChannel('__promise_result'):push(10)")
+        local spins = 0
+        while not p1:isDone() and spins < 1000 do
+            if lurek.timer and lurek.timer.sleep then
+                lurek.timer.sleep(0.001)
+            end
+            spins = spins + 1
+        end
+        expect_true(p1:isDone())
+        local p2 = p1["chain"](p1, "lurek.thread.getChannel('__promise_result'):push((arg[1] or 0) + 5)")
+        expect_not_nil(p2)
+
+        local spins2 = 0
+        while not p2:isDone() and spins2 < 1000 do
+            if lurek.timer and lurek.timer.sleep then
+                lurek.timer.sleep(0.001)
+            end
+            spins2 = spins2 + 1
+        end
+        expect_true(p2:isDone())
+        expect_equal(15, p2:result())
+    end)
+end)
+
 test_summary()

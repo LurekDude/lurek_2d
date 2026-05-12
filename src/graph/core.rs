@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::log_msg;
 use crate::runtime::log_messages::{GC01, GC02, GC03, GC04};
@@ -67,6 +67,10 @@ pub struct Graph {
     pub edges: HashMap<u64, Edge>,
     /// All items keyed by ID.
     pub items: HashMap<u64, GraphItem>,
+    /// Outgoing edge IDs indexed by source node ID.
+    outgoing_index: HashMap<u64, Vec<u64>>,
+    /// Incoming edge IDs indexed by destination node ID.
+    incoming_index: HashMap<u64, Vec<u64>>,
     /// Next node ID to assign.
     next_node_id: u64,
     /// Next edge ID to assign.
@@ -91,10 +95,46 @@ impl Graph {
             nodes: HashMap::new(),
             edges: HashMap::new(),
             items: HashMap::new(),
+            outgoing_index: HashMap::new(),
+            incoming_index: HashMap::new(),
             next_node_id: 1,
             next_edge_id: 1,
             next_item_id: 1,
         }
+    }
+
+    fn index_edge(&mut self, edge_id: u64, from_node: u64, to_node: u64) {
+        self.outgoing_index
+            .entry(from_node)
+            .or_default()
+            .push(edge_id);
+        self.incoming_index
+            .entry(to_node)
+            .or_default()
+            .push(edge_id);
+    }
+
+    fn unindex_edge(&mut self, edge_id: u64, from_node: u64, to_node: u64) {
+        if let Some(ids) = self.outgoing_index.get_mut(&from_node) {
+            ids.retain(|&id| id != edge_id);
+        }
+        if let Some(ids) = self.incoming_index.get_mut(&to_node) {
+            ids.retain(|&id| id != edge_id);
+        }
+    }
+
+    pub(crate) fn outgoing_edge_ids_slice(&self, node_id: u64) -> &[u64] {
+        self.outgoing_index
+            .get(&node_id)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
+    }
+
+    pub(crate) fn incoming_edge_ids_slice(&self, node_id: u64) -> &[u64] {
+        self.incoming_index
+            .get(&node_id)
+            .map(Vec::as_slice)
+            .unwrap_or(&[])
     }
 
     // ---- Node management ----
@@ -112,6 +152,8 @@ impl Graph {
         self.next_node_id += 1;
         log_msg!(debug, GC01, "id={} type={}", id, node_type);
         self.nodes.insert(id, Node::new(id, node_type, capacity));
+        self.outgoing_index.entry(id).or_default();
+        self.incoming_index.entry(id).or_default();
         id
     }
 
@@ -143,6 +185,8 @@ impl Graph {
                 item.position = ItemPosition::Unplaced;
             }
         }
+        self.outgoing_index.remove(&node_id);
+        self.incoming_index.remove(&node_id);
         log_msg!(debug, GC02, "{}", node_id);
         true
     }
@@ -196,6 +240,7 @@ impl Graph {
         self.next_edge_id += 1;
         let e = Edge::new(id, from, to, edge_type.unwrap_or("default"));
         self.edges.insert(id, e);
+        self.index_edge(id, from, to);
         log_msg!(debug, GC03, "{} -> {} (id={})", from, to, id);
         Ok(id)
     }
@@ -209,6 +254,7 @@ impl Graph {
     /// `bool`.
     pub fn remove_edge(&mut self, edge_id: u64) -> bool {
         if let Some(edge) = self.edges.remove(&edge_id) {
+            self.unindex_edge(edge_id, edge.from_node, edge.to_node);
             for &iid in &edge.items_in_transit {
                 if let Some(item) = self.items.get_mut(&iid) {
                     item.position = ItemPosition::Unplaced;
@@ -257,10 +303,159 @@ impl Graph {
     /// # Returns
     /// `Option<u64>`.
     pub fn get_edge_between(&self, from: u64, to: u64) -> Option<u64> {
-        self.edges
-            .values()
-            .find(|e| e.from_node == from && e.to_node == to)
-            .map(|e| e.id)
+        self.outgoing_edge_ids_slice(from).iter().find_map(|edge_id| {
+            self.edges.get(edge_id).and_then(|edge| {
+                if edge.to_node == to {
+                    Some(edge.id)
+                } else {
+                    None
+                }
+            })
+        })
+    }
+
+    /// Build a standalone graph containing only the requested node IDs and the
+    /// edges/items that remain valid inside that induced subgraph.
+    ///
+    /// # Parameters
+    /// - `node_ids` — `&[u64]`.
+    ///
+    /// # Returns
+    /// `Self`.
+    pub fn subgraph(&self, node_ids: &[u64]) -> Self {
+        let requested: HashSet<u64> = node_ids
+            .iter()
+            .copied()
+            .filter(|id| self.nodes.contains_key(id))
+            .collect();
+
+        let mut sorted_nodes: Vec<u64> = requested.iter().copied().collect();
+        sorted_nodes.sort_unstable();
+
+        let mut sub = Graph::new();
+        let mut node_map: HashMap<u64, u64> = HashMap::new();
+        for old_id in sorted_nodes {
+            let old = &self.nodes[&old_id];
+            let new_id = sub.add_node(&old.node_type, old.capacity);
+            let new_node = sub.nodes.get_mut(&new_id).expect("new node must exist");
+            new_node.active = old.active;
+            new_node.overflow_policy = old.overflow_policy.clone();
+            new_node.flow_mode = old.flow_mode.clone();
+            new_node.push_rate = old.push_rate;
+            new_node.pull_rate = old.pull_rate;
+            new_node.push_filter = old.push_filter.clone();
+            new_node.pull_filter = old.pull_filter.clone();
+            new_node.process_time = old.process_time;
+            new_node.queue_enabled = old.queue_enabled;
+            new_node.queue_capacity = old.queue_capacity;
+            new_node.conversions = old.conversions.clone();
+            new_node.demands = old.demands.clone();
+            new_node.supplies = old.supplies.clone();
+            new_node.tags = old.tags.clone();
+            node_map.insert(old_id, new_id);
+        }
+
+        let mut edge_map: HashMap<u64, u64> = HashMap::new();
+        let mut edge_ids: Vec<u64> = self.edges.keys().copied().collect();
+        edge_ids.sort_unstable();
+        for old_edge_id in edge_ids {
+            let old_edge = &self.edges[&old_edge_id];
+            let Some(&new_from) = node_map.get(&old_edge.from_node) else {
+                continue;
+            };
+            let Some(&new_to) = node_map.get(&old_edge.to_node) else {
+                continue;
+            };
+
+            let new_edge_id = sub
+                .add_edge(new_from, new_to, Some(&old_edge.edge_type))
+                .expect("subgraph edge endpoints should be valid");
+            let new_edge = sub
+                .edges
+                .get_mut(&new_edge_id)
+                .expect("new edge must exist");
+            new_edge.capacity = old_edge.capacity;
+            new_edge.throughput = old_edge.throughput;
+            new_edge.travel_time = old_edge.travel_time;
+            new_edge.weight = old_edge.weight;
+            new_edge.speed_modifier = old_edge.speed_modifier;
+            new_edge.cooldown = old_edge.cooldown;
+            new_edge.cooldown_timer = old_edge.cooldown_timer;
+            new_edge.bidirectional = old_edge.bidirectional;
+            new_edge.active = old_edge.active;
+            new_edge.allowed_types = old_edge.allowed_types.clone();
+            edge_map.insert(old_edge_id, new_edge_id);
+        }
+
+        let mut item_map: HashMap<u64, u64> = HashMap::new();
+        let mut item_ids: Vec<u64> = self.items.keys().copied().collect();
+        item_ids.sort_unstable();
+        for old_item_id in item_ids {
+            let old_item = &self.items[&old_item_id];
+            let new_position = match old_item.position {
+                ItemPosition::AtNode(old_node_id) => {
+                    let Some(&new_node_id) = node_map.get(&old_node_id) else {
+                        continue;
+                    };
+                    ItemPosition::AtNode(new_node_id)
+                }
+                ItemPosition::InTransit {
+                    edge_id: old_edge_id,
+                    progress,
+                } => {
+                    let Some(&new_edge_id) = edge_map.get(&old_edge_id) else {
+                        continue;
+                    };
+                    ItemPosition::InTransit {
+                        edge_id: new_edge_id,
+                        progress,
+                    }
+                }
+                ItemPosition::Unplaced => ItemPosition::Unplaced,
+            };
+
+            let new_item_id = sub.create_item(&old_item.item_type, old_item.decay_time);
+            let new_item = sub
+                .items
+                .get_mut(&new_item_id)
+                .expect("new item must exist");
+            new_item.remaining_life = old_item.remaining_life;
+            new_item.alive = old_item.alive;
+            new_item.priority = old_item.priority;
+            new_item.position = new_position;
+            item_map.insert(old_item_id, new_item_id);
+        }
+
+        for (&old_node_id, &new_node_id) in &node_map {
+            if let Some(old_node) = self.nodes.get(&old_node_id) {
+                if let Some(new_node) = sub.nodes.get_mut(&new_node_id) {
+                    new_node.items = old_node
+                        .items
+                        .iter()
+                        .filter_map(|old_item_id| item_map.get(old_item_id).copied())
+                        .collect();
+                    new_node.queue = old_node
+                        .queue
+                        .iter()
+                        .filter_map(|old_item_id| item_map.get(old_item_id).copied())
+                        .collect();
+                }
+            }
+        }
+
+        for (&old_edge_id, &new_edge_id) in &edge_map {
+            if let Some(old_edge) = self.edges.get(&old_edge_id) {
+                if let Some(new_edge) = sub.edges.get_mut(&new_edge_id) {
+                    new_edge.items_in_transit = old_edge
+                        .items_in_transit
+                        .iter()
+                        .filter_map(|old_item_id| item_map.get(old_item_id).copied())
+                        .collect();
+                }
+            }
+        }
+
+        sub
     }
 
     // ---- Item management ----
@@ -484,11 +679,7 @@ impl Graph {
     /// # Returns
     /// `Vec<u64>`.
     pub fn get_outgoing_edges(&self, node_id: u64) -> Vec<u64> {
-        self.edges
-            .values()
-            .filter(|e| e.from_node == node_id)
-            .map(|e| e.id)
-            .collect()
+        self.outgoing_edge_ids_slice(node_id).to_vec()
     }
 
     /// Get IDs of edges arriving at a node.
@@ -499,11 +690,7 @@ impl Graph {
     /// # Returns
     /// `Vec<u64>`.
     pub fn get_incoming_edges(&self, node_id: u64) -> Vec<u64> {
-        self.edges
-            .values()
-            .filter(|e| e.to_node == node_id)
-            .map(|e| e.id)
-            .collect()
+        self.incoming_edge_ids_slice(node_id).to_vec()
     }
 
     /// Returns edge IDs for a node filtered by direction string.

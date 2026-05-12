@@ -129,8 +129,7 @@ impl TweenState {
 /// # Returns
 /// `Option<fn(f32) -> f32>`.
 pub fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
-    match name.to_lowercase().as_str() {
-        "linear" => Some(easing::linear),
+    easing::resolve_easing_fn(name).or_else(|| match name.to_lowercase().as_str() {
         "quadin" | "easeinquad" => Some(easing::ease_in_quad),
         "quadout" | "easeoutquad" => Some(easing::ease_out_quad),
         "quadinout" | "easeinoutquad" => Some(easing::ease_in_out_quad),
@@ -153,7 +152,7 @@ pub fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
         "backin" | "easeinback" => Some(easing::ease_in_back),
         "backout" | "easeoutback" => Some(easing::ease_out_back),
         _ => None,
-    }
+    })
 }
 
 /// Returns all built-in easing names as a static slice.

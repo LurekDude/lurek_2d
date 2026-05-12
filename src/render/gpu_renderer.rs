@@ -121,8 +121,8 @@ enum TexRef {
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const MAX_COLOR_VERTS: u64 = 1 << 17; // 131 072 vertices
-const MAX_COLOR_IDXS: u64 = 1 << 19; // 524 288 indices
+const MAX_COLOR_VERTS: u64 = 1 << 19; // 524 288 vertices
+const MAX_COLOR_IDXS: u64 = 1 << 21; // 2 097 152 indices
 const MAX_TEX_VERTS: u64 = 1 << 14; // 16 384 vertices
 const MAX_TEX_IDXS: u64 = 1 << 16; // 65 536 indices
 

@@ -420,6 +420,61 @@ describe("ImageData filter effects: grayscale", function()
     end)
 end)
 
+-- =============================================================================
+-- New helpers: palette cycling and nine-slice
+-- =============================================================================
+
+-- @describe PaletteLUT helper: cycle
+describe("PaletteLUT helper: cycle", function()
+    -- @covers LPaletteLUT:cycle
+    -- @covers LPaletteLUT:setColor
+    -- @covers LImageData:applyPaletteLut
+    -- @covers LImageData:getPixel
+    -- @covers LImageData:setPixel
+    -- @covers lurek.image.newImageData
+    -- @covers lurek.image.newPaletteLut
+    it("cycle rotates target palette entries", function()
+        local img = lurek.image.newImageData(1, 1)
+        img:setPixel(0, 0, 255, 0, 0, 255)
+
+        local lut = lurek.image.newPaletteLut()
+        lut:setColor(255, 0, 0, 255, 0, 255, 0, 255)   -- red -> green
+        lut:setColor(0, 255, 0, 255, 0, 0, 255, 255)   -- green -> blue
+        lut:cycle(1)
+
+        img:applyPaletteLut(lut)
+        local r, g, b, a = img:getPixel(0, 0)
+        expect_equal(r, 0)
+        expect_equal(g, 0)
+        expect_equal(b, 255)
+        expect_equal(a, 255)
+    end)
+end)
+
+-- @describe ImageData helper: drawNineSlice
+describe("ImageData helper: drawNineSlice", function()
+    -- @covers LImageData:drawNineSlice
+    -- @covers LImageData:getPixel
+    -- @covers LImageData:setPixel
+    -- @covers lurek.image.newImageData
+    it("draws stretched center area from source patch", function()
+        local src = lurek.image.newImageData(6, 6)
+        src:fill(10, 10, 10, 255)
+        src:drawRect(2, 2, 2, 2, 220, 30, 30, 255)
+
+        local dst = lurek.image.newImageData(20, 20)
+        dst:fill(0, 0, 0, 0)
+
+        dst:drawNineSlice(src, 0, 0, 6, 6, 4, 4, 12, 12, 2, 2, 2, 2)
+
+        local cr, cg, cb, ca = dst:getPixel(10, 10)
+        expect_equal(cr, 220)
+        expect_equal(cg, 30)
+        expect_equal(cb, 30)
+        expect_equal(ca, 255)
+    end)
+end)
+
 -- @describe ImageData filter effects: sepia
 describe("ImageData filter effects: sepia", function()
     -- @covers LImageData:getPixel
@@ -1915,6 +1970,9 @@ describe("image strict: byte constructors and province geometry helpers", functi
 
     -- @covers LProvinceGrid:provinceSpans
     -- @covers LProvinceGrid:borderSegments
+    -- @covers LProvinceGrid:getPolygons
+    -- @covers LProvinceGrid:getPolygonsSimplified
+    -- @covers LProvinceGrid:drawShapes
     -- @covers LProvinceGrid:serializeShapeData
     -- @covers LProvinceGrid:deserializeShapeData
     -- @covers lurek.image.newProvinceGrid
@@ -1922,11 +1980,17 @@ describe("image strict: byte constructors and province geometry helpers", functi
         local pg = lurek.image.newProvinceGrid("content/games/strategy/eu2/map.png")
         local spans = pg:provinceSpans()
         local segs = pg:borderSegments()
+        local polys = pg:getPolygons()
+        local simple_polys = pg:getPolygonsSimplified()
+        local draw_count = pg:drawShapes()
         local blob = pg:serializeShapeData()
         local decoded = pg:deserializeShapeData(blob)
 
         expect_type("table", spans)
         expect_type("table", segs)
+        expect_type("table", polys)
+        expect_type("table", simple_polys)
+        expect_type("number", draw_count)
         expect_type("string", blob)
         expect_type("table", decoded)
         expect_type("table", decoded.spans)

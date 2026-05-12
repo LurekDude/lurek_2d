@@ -6,8 +6,8 @@
 - Source path: `src/effect/`
 - Lua API path(s): `src/lua_api/effect_api.rs`
 - Primary Lua namespace: `lurek.effect`
-- Rust test path(s): tests/rust/unit/fx_tests.rs, tests/rust/unit/postfx_tests.rs, tests/rust/unit/fx_screen_tests.rs
-- Lua test path(s): tests/lua/unit/test_image_effect.lua and related image-effect evidence suites
+- Rust test path(s): tests/rust/unit/effect_tests.rs
+- Lua test path(s): tests/lua/unit/test_effect_core_unit.lua, tests/lua/integration/test_effect_camera.lua, tests/lua/integration/test_effect_light.lua, tests/lua/evidence/test_effect_evidence.lua
 
 ## Summary
 
@@ -37,6 +37,11 @@ The `effect` module owns Lurek2D's post-processing and image-effect pipeline —
 **Lua surface.** `lurek.effect.newStack()` → `PostFxStack` userdata. `stack:add(effectName, params)`, `stack:remove(i)`, `stack:enable(i)`, `stack:disable(i)`. `lurek.effect.newImageEffect(name, params)` → `ImageEffect` userdata (attached to image draws). `lurek.effect.newColorGrade(params)`, `newLensDistort(params)`, `newScanline(params)`. Overlay: `lurek.effect.overlay.*` for ambient, fog, vignette, weather, flash, shake, fade.
 
 **Scope boundary.** Platform Services tier. Depends on `render` (command types), `image`, `runtime`. Lua bridge in `src/lua_api/effect_api.rs`.
+
+**Ownership clarifications.**
+- Screen shake in `effect` is overlay-level screen-space shake (`Overlay::trigger_shake` / `ShakeState`). Camera shake in `camera` remains camera-transform shake. They are intentionally separate control points.
+- `effect::AmbientState` controls post-process ambient tint as an overlay visual layer. `light::LightWorld.ambient` controls gameplay/world light accumulation in the light system. They are separate domains.
+- `effect::WeatherState` is lightweight full-screen weather overlay particles. The `particle` module remains the general-purpose emitter/runtime for gameplay particles.
 
 ## Files
 

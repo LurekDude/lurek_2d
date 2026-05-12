@@ -6,7 +6,7 @@
 - Source path: `src/camera/`
 - Lua API path(s): `src/lua_api/camera_api.rs`
 - Primary Lua namespace: `lurek.camera`
-- Rust test path(s): tests/rust/unit/camera_tests.rs
+- Rust test path(s): tests/rust/unit/camera_tests.rs, tests/rust/stress/camera_fuzz_tests.rs
 - Lua test path(s): tests/lua/unit/test_camera.lua, tests/lua/stress/test_camera_stress.lua, tests/lua/integration/test_tween_camera.lua, tests/lua/integration/test_tilemap_camera.lua, tests/lua/integration/test_scene_camera.lua, tests/lua/integration/test_parallax_camera.lua, tests/lua/integration/test_input_camera.lua, tests/lua/integration/test_render_camera.lua
 
 ## Summary
@@ -19,25 +19,53 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 - *Look-ahead*: optional velocity-based forward prediction so the camera shows more of where the player is heading.
 - *Bounds clamping*: the camera can be constrained to a world-space AABB so it never shows outside the level.
 - *Screen shake*: time-decaying additive offset with configurable magnitude and frequency, applied after follow computation.
+- *Zoom constraints*: optional min/max zoom levels with damping for smooth transitions.
+- *Rotation constraints*: optional min/max rotation angles with damping for smooth transitions.
+- *Follow presets*: configurable camera profiles (tight, cinematic, balanced, aggressive) for common gameplay scenarios.
 
 `Camera` is the minimal flat variant — position, zoom, rotation — and `view_matrix()` produces the `Mat3` applied to all world-space draw commands.
 
-**Viewport.** `Viewport` maps the fixed logical game resolution onto the physical window through four `ScaleMode` variants: `Expand` (canvas grows with window), `FixedWidth` (height grows, width fixed), `PixelPerfect` (integer-only scaling), `Stretch` (fill window ignoring aspect ratio). `ViewportScale` extends `Viewport` with scaled content-dimension tracking for the render transform stack.
+**Viewport.** `Viewport` maps the fixed logical game resolution onto the physical window through three `ScaleMode` variants: `Letterbox` (preserve aspect ratio with bars), `Stretch` (fill window ignoring aspect ratio), and `PixelPerfect` (integer-only scaling). `ViewportScale` extends `Viewport` with scaled content-dimension tracking for the render transform stack. Both now use a shared `ScaleMode::compute_transforms()` helper to eliminate code duplication.
 
 **Cinematic effects.** `effects.rs` adds three time-based overlays applied on top of follow and shake:
 - `ZoomPulse`: brief zoom-in that decays back to base zoom via a sine envelope — useful for hit impacts.
 - `CameraSway`: sinusoidal x/y offset oscillation for underwater or rocking effects.
 - `CameraBreathing`: subtle periodic zoom oscillation for a living-camera feel during cutscenes.
+All effects are now integrated into rendering via `effective_zoom()` and `effect_offset()`.
 
-**Camera path.** `path.rs` provides `CameraPath` for smooth world-space waypoint following over a fixed duration (linear interpolation between consecutive waypoints), and `ZoomTween` for linear zoom-level transitions. Both are non-blocking — `update(dt)` drives them and returns `true` when complete.
+**Camera path.** `path.rs` provides `CameraPath` for smooth world-space waypoint following over a fixed duration (linear interpolation between consecutive waypoints), and `CameraZoomTween` (alias: `ZoomTween`) for zoom-level transitions. Both are non-blocking — `update(dt)` drives them and returns `true` when complete.
+
+**Easing-aware camera motion.** Camera follow and zoom transitions now support easing modes beyond linear interpolation. `Camera2D` exposes follow easing (`linear`, `smoothstep`, `easeout`) and `ZoomTween` supports camera-local easing variants.
+
+**Multi-camera orchestration.** `multi.rs` adds `CameraRig2D`, a named camera rig for split-screen (`left`/`right`), minimap (`main`/`minimap`), and picture-in-picture (`main`/`pip`) layouts.
 
 **Parallax scaling.** Per-camera parallax factors map layer scroll speeds to the camera's view-matrix. `set_parallax_factor(layer_id, factor)` / `get_parallax_factor(layer_id)` / `clear_parallax_factors()` let each camera drive a different parallax coefficient, enabling split-screen scenes with independent depth illusions.
 
-**Render integration.** `render.rs` converts camera state into `RenderCommand` sequences: push transform → translate → rotate → scale → pop transform. The bridge layer invokes this before the game's draw callback so Lua scripts see the camera applied transparently.
+**Render integration.** `render.rs` converts camera state into `RenderCommand` sequences: push transform → translate (with sway and shake offsets) → rotate → scale (using effective zoom) → pop transform. The bridge layer invokes this before the game's draw callback so Lua scripts see the camera applied transparently, including all active effects.
+
+`render.rs` also provides allocation-free append helpers so hot-path camera application can reuse the global render command buffer without per-frame temporary `Vec<RenderCommand>` allocations.
 
 **Coordinate helpers.** `world_to_screen(x, y)` and `screen_to_world(x, y)` convert between coordinate spaces using the current view-matrix and viewport scale, exposed to Lua for picking and UI-anchoring.
 
-**Lua surface.** `lurek.camera.getPosition()`, `setPosition`, `getZoom`, `setZoom`, `getRotation`, `setRotation`, `setFollow(entity)`, `setDeadZone(w, h)`, `setBounds(xmin, ymin, xmax, ymax)`, `shake(magnitude, duration, frequency)`, `worldToScreen`, `screenToWorld`. Extended: `followPath(waypoints, duration)`, `stopPath()`, `pathProgress()`, `zoomTo(target, duration)`, `zoomPulse(magnitude, duration)`, `startSway(amplitude, frequency)`, `stopSway()`, `startBreathing(amplitude, frequency)`, `stopBreathing()`, `setParallaxFactor(layer, factor)`.
+**Lua surface.** Core methods: `getPosition()`, `setPosition`, `getZoom`, `setZoom`, `getRotation`, `setRotation`, `setTarget()`, `setDeadZone(w, h)`, `setBounds(xmin, ymin, xmax, ymax)`, `shake(magnitude, duration)`, `toWorld`, `toScreen`.
+
+Follow behavior: `setFollowSmooth(speed)`, `setLookAhead(multiplier)`, `update(dt)`.
+
+Follow easing and resize helpers: `setFollowEasing(mode)`, `getFollowEasing()`, `onWindowResize(windowW, windowH)`, `onWindowResizeScaled(gameW, gameH, windowW, windowH, mode)`.
+
+Constraints: `setZoomConstraints(min, max)`, `getZoomConstraints()`, `setZoomDamping(factor)`, `getZoomDamping()`, `setRotationConstraints(min, max)`, `getRotationConstraints()`, `setRotationDamping(factor)`, `getRotationDamping()`.
+
+Presets: `presetTightFollow()`, `presetCinematicFollow()`, `presetBalancedFollow()`, `presetAggressiveFollow()`.
+
+Path and zoom: `followPath(waypoints, duration)`, `stopPath()`, `pathProgress()`, `zoomTo(target, duration)`, `stopZoom()`, `updateZoom(dt)`.
+
+Effects: `zoomPulse(amplitude, duration)`, `startSway(amplitude_x, amplitude_y, frequency, decay)`, `stopSway()`, `isSway()`, `startBreathing(amplitude, rate)`, `stopBreathing()`, `isBreathing()`, `getEffectiveZoom()`, `getEffectOffset()`.
+
+Parallax: `setParallaxFactor(layer, factor)`, `getParallaxFactor(layer)`, `clearParallaxFactors()`.
+
+Render: `apply()`, `reset()`, `attach()`, `detach()`.
+
+Rig: `newRig()`, `LCameraRig:splitScreen()`, `LCameraRig:minimap()`, `LCameraRig:pictureInPicture()`, `LCameraRig:setPosition()`, `LCameraRig:setZoom()`, `LCameraRig:setTarget()`, `LCameraRig:updateAll()`, `LCameraRig:apply()`, `LCameraRig:getViewport()`, `LCameraRig:names()`, `LCameraRig:remove()`, `LCameraRig:has()`.
 
 **Scope boundary.** Platform Services tier. Depends only on `math`. Lua bridge in `src/lua_api/camera_api.rs`.
 
@@ -45,6 +73,7 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 
 - `effects.rs`: Cinematic camera effects: zoom pulse, sway, and breathing.
 - `mod.rs`: Declares the camera submodules and re-exports the public camera and viewport surface.
+- `multi.rs`: Named multi-camera rig orchestration for split-screen, minimap, and picture-in-picture.
 - `path.rs`: Camera path follower and smooth-zoom tween for [`super::Camera2D`].
 - `render.rs`: Converts Camera and Camera2D state into push, translate, rotate, scale, and pop render commands.
 - `types.rs`: Defines Camera and Camera2D, including transforms, follow logic, bounds, shake, and coordinate conversion.
@@ -57,7 +86,9 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 - `CameraSway` (`struct`, `effects.rs`): Camera sway — sinusoidal x/y offset oscillation for rocking or underwater effects.
 - `CameraBreathing` (`struct`, `effects.rs`): Camera breathing — subtle periodic zoom oscillation for a "living camera" feel.
 - `CameraPath` (`struct`, `path.rs`): Animates a camera along a series of world-space waypoints over a fixed duration using linear interpolation between consecutive points.
-- `ZoomTween` (`struct`, `path.rs`): Smoothly transitions a camera zoom level from a start value to a target value over a fixed duration (linear interpolation).
+- `CameraTweenEasing` (`enum`, `path.rs`): Easing mode for camera-local tweening.
+- `CameraZoomTween` (`struct`, `path.rs`): Smoothly transitions a camera zoom level from a start value to a target value over a fixed duration.
+- `ZoomTween` (`type`, `path.rs`): Backward-compatible alias for `CameraZoomTween`.
 - `Camera` (`struct`, `types.rs`): Lightweight camera state with position, zoom, rotation, and view-matrix generation.
 - `Camera2D` (`struct`, `types.rs`): Gameplay-facing 2D camera with follow targets, dead zones, look-ahead, bounds clamping, shake, and coordinate helpers.
 - `ScaleMode` (`enum`, `viewport.rs`): Enum selecting letterbox, stretch, or pixel-perfect viewport behavior.
@@ -87,9 +118,10 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 - `CameraPath::update` (`path.rs`): Advances the path by `dt` seconds and returns the current position, or `None` when the path has completed.
 - `CameraPath::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the path.
 - `CameraPath::reset` (`path.rs`): Resets the path back to the beginning.
-- `ZoomTween::new` (`path.rs`): Creates a new `ZoomTween`.
-- `ZoomTween::update` (`path.rs`): Advances the tween by `dt` seconds and returns the current zoom, or `None` when the tween has completed.
-- `ZoomTween::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the tween.
+- `CameraZoomTween::new` (`path.rs`): Creates a new `CameraZoomTween`.
+- `CameraZoomTween::new_with_easing` (`path.rs`): Creates a new `CameraZoomTween` with explicit easing.
+- `CameraZoomTween::update` (`path.rs`): Advances the tween by `dt` seconds and returns the current zoom, or `None` when the tween has completed.
+- `CameraZoomTween::progress` (`path.rs`): Returns the fractional progress `[0, 1]` of the tween.
 - `Camera::begin_render_commands` (`render.rs`): Produces transform-stack render commands for this camera.
 - `Camera::end_render_command` (`render.rs`): Returns the `PopTransform` command that closes the camera scope.
 - `Camera::generate_render_commands` (`render.rs`): Wrap `scene_commands` in the camera's transform scope.
@@ -160,6 +192,7 @@ The `camera` module provides Lurek2D's camera, viewport, and cinematic effects s
 ### Module Functions
 - `lurek.camera.new`: Creates a new Camera2D with the given viewport dimensions.
 - `lurek.camera.newCamera`: Creates a new 2D camera with the given viewport dimensions.
+- `lurek.camera.newRig`: Creates a new multi-camera rig object.
 
 ### `LCamera` Methods
 - `LCamera:setPosition`: Sets the camera's world-space position to the given coordinates.

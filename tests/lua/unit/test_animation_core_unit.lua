@@ -85,6 +85,37 @@ describe("addFramesFromGrid()", function()
     end)
 end)
 
+-- @describe addFramesFromRects()
+describe("addFramesFromRects()", function()
+    -- @covers LAnimation:addFramesFromRects
+    -- @covers LAnimation:getFrameCount
+    -- @covers LAnimation:getQuad
+    -- @covers LAnimation:addClip
+    -- @covers LAnimation:play
+    -- @covers LAnimation:update
+    it("appends rect frames and they can be played", function()
+        local a = lurek.animation.new()
+        local added = a:addFramesFromRects({
+            {x = 0, y = 0, w = 16, h = 16},
+            {x = 16, y = 0, w = 16, h = 16},
+        })
+
+        expect_equal(2, added)
+        expect_equal(2, a:getFrameCount())
+
+        a:addClip("walk", {0, 1}, 12, true)
+        expect_true(a:play("walk"))
+        a:update(0.0)
+
+        local q = a:getQuad()
+        expect_type("table", q)
+        expect_equal(0, q.x)
+        expect_equal(0, q.y)
+        expect_equal(16, q.w)
+        expect_equal(16, q.h)
+    end)
+end)
+
 -- @describe addClip()
 describe("addClip()", function()
     -- @covers LAnimation:addClip

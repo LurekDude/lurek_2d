@@ -1,4 +1,4 @@
-﻿---@diagnostic disable: need-check-nil, undefined-field
+﻿
 local R = lurek.render
 
 local MAP_W = 2000

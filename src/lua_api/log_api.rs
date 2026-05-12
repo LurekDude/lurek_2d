@@ -14,28 +14,77 @@ use super::SharedState;
 use mlua::prelude::*;
 
 use crate::log as log_domain;
-use crate::log::sinks::{Sink, SinkLevel, SinkRegistry};
+use crate::log::sinks::{Sink, SinkKind, SinkLevel, SinkRegistry};
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 // Helper: dispatch a plain message to the given sinks registry.
-fn dispatch(sinks: &Rc<RefCell<SinkRegistry>>, level: SinkLevel, tag: &str, message: &str) {
-    sinks.borrow().dispatch(level, tag, message);
+fn dispatch(
+    lua: &Lua,
+    sinks: &Rc<RefCell<SinkRegistry>>,
+    callback_keys: &Rc<RefCell<BTreeMap<u64, LuaRegistryKey>>>,
+    level: SinkLevel,
+    tag: &str,
+    message: &str,
+) {
+    let reg = sinks.borrow();
+    for sink in &reg.sinks {
+        match &sink.kind {
+            SinkKind::Callback { .. } => {
+                if let Some(key) = callback_keys.borrow().get(&sink.id) {
+                    if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
+                        if let Ok(record_table) = lua.create_table() {
+                            let _ = record_table.set("level", level.as_str().to_lowercase());
+                            let _ = record_table.set("tag", tag);
+                            let _ = record_table.set("message", message);
+                            let _ = func.call::<LuaTable, ()>(record_table);
+                        }
+                    }
+                }
+            }
+            _ => sink.write(level, tag, message),
+        }
+    }
 }
 
 // Helper: dispatch a structured message with key-value fields to sinks.
 fn dispatch_structured(
+    lua: &Lua,
     sinks: &Rc<RefCell<SinkRegistry>>,
+    callback_keys: &Rc<RefCell<BTreeMap<u64, LuaRegistryKey>>>,
     level: SinkLevel,
     tag: &str,
     message: &str,
     fields: &BTreeMap<String, String>,
 ) {
-    sinks
-        .borrow()
-        .dispatch_structured(level, tag, message, fields);
+    let reg = sinks.borrow();
+    for sink in &reg.sinks {
+        match &sink.kind {
+            SinkKind::Callback { .. } => {
+                if let Some(key) = callback_keys.borrow().get(&sink.id) {
+                    if let Ok(func) = lua.registry_value::<LuaFunction>(key) {
+                        if let Ok(record_table) = lua.create_table() {
+                            let _ = record_table.set("level", level.as_str().to_lowercase());
+                            let _ = record_table.set("tag", tag);
+                            let _ = record_table.set("message", message);
+                            if !fields.is_empty() {
+                                if let Ok(fields_table) = lua.create_table() {
+                                    for (key, value) in fields {
+                                        let _ = fields_table.set(key.as_str(), value.clone());
+                                    }
+                                    let _ = record_table.set("fields", fields_table);
+                                }
+                            }
+                            let _ = func.call::<LuaTable, ()>(record_table);
+                        }
+                    }
+                }
+            }
+            _ => sink.write_structured(level, tag, message, fields),
+        }
+    }
 }
 
 // Helper: convert a Lua table of mixed values to a BTreeMap<String, String>.
@@ -56,6 +105,49 @@ fn lua_table_to_fields(tbl: LuaTable) -> LuaResult<BTreeMap<String, String>> {
     Ok(fields)
 }
 
+fn lua_table_to_tags(value: LuaValue) -> LuaResult<Option<Vec<String>>> {
+    match value {
+        LuaValue::Nil => Ok(None),
+        LuaValue::String(s) => Ok(Some(vec![s.to_str()?.to_string()])),
+        LuaValue::Table(tbl) => {
+            let mut tags = Vec::new();
+            for entry in tbl.sequence_values::<LuaValue>() {
+                match entry? {
+                    LuaValue::String(s) => tags.push(s.to_str()?.to_string()),
+                    LuaValue::Nil => {}
+                    other => {
+                        return Err(LuaError::external(format!(
+                            "addSink: tags must contain strings, got {:?}",
+                            other.type_name()
+                        )))
+                    }
+                }
+            }
+            Ok(Some(tags))
+        }
+        other => Err(LuaError::external(format!(
+            "addSink: tags must be a string or an array of strings, got {:?}",
+            other.type_name()
+        ))),
+    }
+}
+
+fn config_bool(config: &LuaTable, key: &str, default: bool) -> bool {
+    config
+        .get::<_, Option<bool>>(key)
+        .ok()
+        .flatten()
+        .unwrap_or(default)
+}
+
+fn config_string(config: &LuaTable, key: &str, default: &str) -> String {
+    config
+        .get::<_, Option<String>>(key)
+        .ok()
+        .flatten()
+        .unwrap_or_else(|| default.to_string())
+}
+
 // ---------------------------------------------------------------------------
 // Register
 // ---------------------------------------------------------------------------
@@ -66,6 +158,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // Shared sinks registry for this VM - lives as long as the Lua closures do.
     let sinks: Rc<RefCell<SinkRegistry>> = Rc::new(RefCell::new(SinkRegistry::new()));
+    let callback_keys: Rc<RefCell<BTreeMap<u64, LuaRegistryKey>>> =
+        Rc::new(RefCell::new(BTreeMap::new()));
+    let callback_keys_all = callback_keys.clone();
 
     // -- debug --
     /// Emits a message at debug severity to the engine log and all registered sinks.
@@ -73,12 +168,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys_print = callback_keys_all.clone();
     tbl.set(
         "debug",
-        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+        lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::debug!("[{}] {}", t, message);
-            dispatch(&s, SinkLevel::Debug, t, &message);
+            dispatch(lua, &s, &callback_keys, SinkLevel::Debug, t, &message);
             Ok(())
         })?,
     )?;
@@ -89,12 +185,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "info",
-        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+        lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::info!("[{}] {}", t, message);
-            dispatch(&s, SinkLevel::Info, t, &message);
+            dispatch(lua, &s, &callback_keys, SinkLevel::Info, t, &message);
             Ok(())
         })?,
     )?;
@@ -105,12 +202,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "warn",
-        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+        lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::warn!("[{}] {}", t, message);
-            dispatch(&s, SinkLevel::Warn, t, &message);
+            dispatch(lua, &s, &callback_keys, SinkLevel::Warn, t, &message);
             Ok(())
         })?,
     )?;
@@ -121,12 +219,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "error",
-        lua.create_function(move |_, (message, tag): (String, Option<String>)| {
+        lua.create_function(move |lua, (message, tag): (String, Option<String>)| {
             let t = tag.as_deref().unwrap_or("Lua");
             log::error!("[{}] {}", t, message);
-            dispatch(&s, SinkLevel::Error, t, &message);
+            dispatch(lua, &s, &callback_keys, SinkLevel::Error, t, &message);
             Ok(())
         })?,
     )?;
@@ -138,10 +237,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | tag | string? | Optional category tag (defaults to "Lua" when omitted)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "print",
         lua.create_function(
-            move |_, (level, message, tag): (String, String, Option<String>)| {
+            move |lua, (level, message, tag): (String, String, Option<String>)| {
                 let t = tag.as_deref().unwrap_or("Lua");
                 let sink_level = match level.to_lowercase().as_str() {
                     "error" => {
@@ -158,14 +258,14 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     }
                     "trace" => {
                         log::trace!("[{}] {}", t, message);
-                        SinkLevel::Debug
+                        SinkLevel::Trace
                     }
                     _ => {
                         log::info!("[{}] {}", t, message);
                         SinkLevel::Info
                     }
                 };
-                dispatch(&s, sink_level, t, &message);
+                dispatch(lua, &s, &callback_keys_print, sink_level, t, &message);
                 Ok(())
             },
         )?,
@@ -200,23 +300,35 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | config | table | Configuration table with keys: type (string), level (string), path (string, for file/rotating), capacity (integer, for memory), max_bytes (integer, for rotating), keep_files (integer, for rotating)
     /// @return | integer | The unique identifier of the newly created sink
     let s = sinks.clone();
+    let callback_keys_for_add = callback_keys_all.clone();
     tbl.set(
         "addSink",
-        lua.create_function(move |_, config: LuaTable| {
+        lua.create_function(move |lua, config: LuaTable| {
             let kind: String = config.get("type").unwrap_or_else(|_| "memory".to_string());
             let level_str: String = config.get("level").unwrap_or_else(|_| "debug".to_string());
-            let min_level = SinkLevel::from_str(&level_str);
+            let min_level = level_str.parse::<SinkLevel>().unwrap_or(SinkLevel::Debug);
+            let format = config_string(&config, "format", "plain");
+            let timestamp = config_bool(&config, "timestamp", false);
+            let use_color = config_bool(&config, "ansi", config_bool(&config, "color", false));
+            let tags = match config.get::<_, LuaValue>("tags") {
+                Ok(value) => lua_table_to_tags(value)?,
+                Err(_) => None,
+            };
             let id = match kind.as_str() {
                 "file" => {
                     let path: String = config.get("path").map_err(|_| {
                         LuaError::external("addSink: path required for type='file'")
                     })?;
                     let sink = Sink::file(0, &path, min_level).map_err(LuaError::external)?;
+                    let mut sink = sink;
+                    sink.configure_output(&format, timestamp, use_color, tags.clone());
                     s.borrow_mut().add(sink)
                 }
                 "memory" => {
                     let cap: usize = config.get("capacity").unwrap_or(1000);
-                    s.borrow_mut().add(Sink::memory(0, cap, min_level))
+                    let mut sink = Sink::memory(0, cap, min_level);
+                    sink.configure_output(&format, timestamp, use_color, tags.clone());
+                    s.borrow_mut().add(sink)
                 }
                 "rotating" => {
                     let path: String = config.get("path").map_err(|_| {
@@ -226,7 +338,21 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                     let keep_files: usize = config.get("keep_files").unwrap_or(0);
                     let sink = Sink::rotating_file(0, &path, min_level, max_bytes, keep_files)
                         .map_err(LuaError::external)?;
+                    let mut sink = sink;
+                    sink.configure_output(&format, timestamp, use_color, tags.clone());
                     s.borrow_mut().add(sink)
+                }
+                "callback" => {
+                    let callback: LuaFunction = config.get("callback").map_err(|_| {
+                        LuaError::external("addSink: callback required for type='callback'")
+                    })?;
+                    let callback_key = lua.create_registry_value(callback)?;
+                    let key_store = callback_keys_for_add.clone();
+                    let mut sink = Sink::callback(0, min_level, 0);
+                    sink.configure_output(&format, timestamp, use_color, tags.clone());
+                    let id = s.borrow_mut().add(sink);
+                    key_store.borrow_mut().insert(id, callback_key);
+                    return Ok(id);
                 }
                 _ => {
                     return Err(LuaError::external(format!(
@@ -243,19 +369,32 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | id | integer | The sink identifier returned by addSink
     /// @return | boolean | True if the sink existed and was removed
     let s = sinks.clone();
+    let callback_keys_for_remove = callback_keys.clone();
     tbl.set(
         "removeSink",
-        lua.create_function(move |_, id: u64| Ok(s.borrow_mut().remove(id)))?,
+        lua.create_function(move |lua, id: u64| {
+            let removed = s.borrow_mut().remove(id);
+            if removed {
+                if let Some(key) = callback_keys_for_remove.borrow_mut().remove(&id) {
+                    let _ = lua.remove_registry_value(key);
+                }
+            }
+            Ok(removed)
+        })?,
     )?;
 
     // -- clearSinks --
     /// Removes every registered log sink, returning the logging system to its default state where messages go only to the engine log backend (stderr).
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys_for_clear = callback_keys.clone();
     tbl.set(
         "clearSinks",
-        lua.create_function(move |_, ()| {
+        lua.create_function(move |lua, ()| {
             s.borrow_mut().clear();
+            for (_, key) in std::mem::take(&mut *callback_keys_for_clear.borrow_mut()) {
+                let _ = lua.remove_registry_value(key);
+            }
             Ok(())
         })?,
     )?;
@@ -332,7 +471,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     let s = sinks.clone();
     tbl.set(
         "flushFile",
-        lua.create_function(move |_, id: u64| {
+        lua.create_function(move |_lua, id: u64| {
             if let Some(sink) = s.borrow().get(id) {
                 sink.flush();
             }
@@ -347,21 +486,23 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "struct",
         lua.create_function(
-            move |_, (level_str, message, fields_tbl): (String, String, LuaTable)| {
+            move |lua, (level_str, message, fields_tbl): (String, String, LuaTable)| {
                 let t = "Lua";
                 let fields = lua_table_to_fields(fields_tbl)?;
-                let sink_level = SinkLevel::from_str(&level_str);
+                let sink_level = level_str.parse::<SinkLevel>().unwrap_or(SinkLevel::Debug);
                 let log_level = match sink_level {
                     SinkLevel::Error => ::log::Level::Error,
                     SinkLevel::Warn => ::log::Level::Warn,
                     SinkLevel::Info => ::log::Level::Info,
                     SinkLevel::Debug => ::log::Level::Debug,
+                    SinkLevel::Trace => ::log::Level::Trace,
                 };
                 log_domain::log_structured(log_level, Some(t), &message, &fields);
-                dispatch_structured(&s, sink_level, t, &message, &fields);
+                dispatch_structured(lua, &s, &callback_keys, sink_level, t, &message, &fields);
                 Ok(())
             },
         )?,
@@ -373,13 +514,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "debug_fields",
-        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Debug, Some(t), &message, &fields);
-            dispatch_structured(&s, SinkLevel::Debug, t, &message, &fields);
+            dispatch_structured(
+                lua,
+                &s,
+                &callback_keys,
+                SinkLevel::Debug,
+                t,
+                &message,
+                &fields,
+            );
             Ok(())
         })?,
     )?;
@@ -390,13 +540,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "info_fields",
-        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Info, Some(t), &message, &fields);
-            dispatch_structured(&s, SinkLevel::Info, t, &message, &fields);
+            dispatch_structured(
+                lua,
+                &s,
+                &callback_keys,
+                SinkLevel::Info,
+                t,
+                &message,
+                &fields,
+            );
             Ok(())
         })?,
     )?;
@@ -407,13 +566,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "warn_fields",
-        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Warn, Some(t), &message, &fields);
-            dispatch_structured(&s, SinkLevel::Warn, t, &message, &fields);
+            dispatch_structured(
+                lua,
+                &s,
+                &callback_keys,
+                SinkLevel::Warn,
+                t,
+                &message,
+                &fields,
+            );
             Ok(())
         })?,
     )?;
@@ -424,13 +592,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @param | fields_table | table | Key-value pairs of metadata (string keys, any values)
     /// @return | nil | No return value.
     let s = sinks.clone();
+    let callback_keys = callback_keys_all.clone();
     tbl.set(
         "error_fields",
-        lua.create_function(move |_, (message, fields_tbl): (String, LuaTable)| {
+        lua.create_function(move |lua, (message, fields_tbl): (String, LuaTable)| {
             let t = "Lua";
             let fields = lua_table_to_fields(fields_tbl)?;
             log_domain::log_structured(::log::Level::Error, Some(t), &message, &fields);
-            dispatch_structured(&s, SinkLevel::Error, t, &message, &fields);
+            dispatch_structured(
+                lua,
+                &s,
+                &callback_keys,
+                SinkLevel::Error,
+                t,
+                &message,
+                &fields,
+            );
             Ok(())
         })?,
     )?;

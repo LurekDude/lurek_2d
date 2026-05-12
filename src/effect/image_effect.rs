@@ -4,6 +4,7 @@
 //! to lightweight [`crate::render::ShaderPassDescriptor`] values via
 //! [`ImageEffect::to_passes`]. This module lives in **Tier 2** and is permitted
 //! to import from `crate::graphics` (Tier 1).
+//! CPU pixel transforms stay in `image/effects.rs`; this module is shader/post-process only.
 
 use std::cell::RefCell;
 use std::rc::Rc;

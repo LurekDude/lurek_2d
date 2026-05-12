@@ -13,6 +13,7 @@
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::{Duration, Instant};
 
 use crate::log_msg;
 use crate::runtime::log_messages::{TH01_WORKER_INIT, TH02_WORKER_START, TH04_WORKER_ERROR};
@@ -141,6 +142,38 @@ impl LuaThread {
         }
     }
 
+    /// Waits up to `timeout_secs` for the worker to finish.
+    ///
+    /// Returns `true` when the worker finished during the timeout window.
+    pub fn wait_timeout(&mut self, timeout_secs: f64) -> bool {
+        if self.handle.is_none() {
+            return true;
+        }
+
+        let timeout = Duration::from_secs_f64(timeout_secs.max(0.0));
+        let deadline = Instant::now() + timeout;
+
+        loop {
+            let finished = self
+                .handle
+                .as_ref()
+                .map(|h| h.is_finished())
+                .unwrap_or(true);
+            if finished {
+                if let Some(handle) = self.handle.take() {
+                    let _ = handle.join();
+                }
+                return true;
+            }
+
+            if Instant::now() >= deadline {
+                return false;
+            }
+
+            thread::sleep(Duration::from_millis(1));
+        }
+    }
+
     /// Check whether the thread is currently running.
     ///
     /// # Returns
@@ -162,6 +195,16 @@ impl LuaThread {
             _ => None,
         }
     }
+}
+
+/// Returns the worker-safe `lurek.*` capability list available inside worker VMs.
+pub fn worker_capabilities() -> &'static [&'static str] {
+    &[
+        "lurek.thread.getChannel",
+        "lurek.fs.read",
+        "arg",
+        "package.path",
+    ]
 }
 
 /// Register only thread-safe modules in a worker Lua VM.

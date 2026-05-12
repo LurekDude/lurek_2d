@@ -10,6 +10,7 @@ use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame, Database};
+use crate::dataframe::lazy::LazyQuery;
 use crate::dataframe::serial;
 use crate::dataframe::sql;
 use crate::dataframe::vectorized::{BinaryOp, CmpOp, ReduceOp, ScalarOp, VecFrame};
@@ -1209,6 +1210,169 @@ impl LuaUserData for LuaDataFrame {
                 Ok(LuaDataFrame::new(result))
             },
         );
+
+        // -- lazy --
+        /// Begin a lazy evaluation pipeline over this DataFrame.
+        ///
+        /// Operations are recorded without allocating intermediate DataFrames.
+        /// Call `collect()` on the returned `LLazyQuery` to execute.
+        ///
+        /// @return | LLazyQuery | Lazy pipeline builder.
+        /// @example
+        /// ```lua
+        /// local result = df:lazy()
+        ///     :filter("age", ">", 25)
+        ///     :sort("score", false)
+        ///     :head(10)
+        ///     :collect()
+        /// ```
+        methods.add_method("lazy", |_, this, ()| {
+            let lq = this.inner.borrow().lazy();
+            Ok(LuaLazyQuery { inner: lq })
+        });
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaLazyQuery UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side lazy query pipeline over a [`DataFrame`].
+///
+/// Build a pipeline by chaining filter, sort, head, tail, slice, dropNil, and
+/// limit calls. Nothing executes until `collect()` is called.
+pub struct LuaLazyQuery {
+    inner: LazyQuery,
+}
+
+impl LuaUserData for LuaLazyQuery {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // Each mutating method consumes `this.inner` (leaving a tombstone in place)
+        // and returns a NEW LuaLazyQuery with the extended pipeline.  This is the
+        // correct pattern for Lua-side chaining: the caller uses the returned value.
+
+        // -- filter --
+        /// Add a row-filter step. Returns a new LLazyQuery for chaining.
+        /// @param | col | string | Column name.
+        /// @param | op  | string | Comparison: `==`, `!=`, `<`, `<=`, `>`, `>=`, `contains`.
+        /// @param | val | any    | Value to compare against.
+        /// @return | LLazyQuery | New pipeline with filter appended.
+        methods.add_method_mut(
+            "filter",
+            |_, this, (col, op, val): (String, String, LuaValue)| {
+                let cell = lua_to_cell(val);
+                let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+                Ok(LuaLazyQuery {
+                    inner: old.filter(&col, &op, cell),
+                })
+            },
+        );
+
+        // -- sort --
+        /// Add a sort step. Returns a new LLazyQuery for chaining.
+        /// @param | col       | string  | Column name.
+        /// @param | ascending | boolean | true = ascending (default), false = descending.
+        /// @return | LLazyQuery | New pipeline with sort appended.
+        methods.add_method_mut(
+            "sort",
+            |_, this, (col, ascending): (String, Option<bool>)| {
+                let asc = ascending.unwrap_or(true);
+                let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+                Ok(LuaLazyQuery {
+                    inner: old.sort(&col, asc),
+                })
+            },
+        );
+
+        // -- head --
+        /// Retain only the first n rows. Returns a new LLazyQuery for chaining.
+        /// @param | n | integer | Number of rows to keep.
+        /// @return | LLazyQuery | New pipeline with head appended.
+        methods.add_method_mut("head", |_, this, n: usize| {
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery { inner: old.head(n) })
+        });
+
+        // -- tail --
+        /// Retain only the last n rows. Returns a new LLazyQuery for chaining.
+        /// @param | n | integer | Number of rows to keep.
+        /// @return | LLazyQuery | New pipeline with tail appended.
+        methods.add_method_mut("tail", |_, this, n: usize| {
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery { inner: old.tail(n) })
+        });
+
+        // -- limit --
+        /// Alias for `head`. Returns a new LLazyQuery for chaining.
+        /// @param | n | integer | Max rows.
+        /// @return | LLazyQuery | New pipeline with limit appended.
+        methods.add_method_mut("limit", |_, this, n: usize| {
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery {
+                inner: old.limit(n),
+            })
+        });
+
+        // -- slice --
+        /// Retain a 1-based inclusive slice [start, end]. Returns a new LLazyQuery.
+        /// @param | start | integer | First row (1-based).
+        /// @param | end   | integer | Last row (1-based, inclusive).
+        /// @return | LLazyQuery | New pipeline with slice appended.
+        methods.add_method_mut("slice", |_, this, (start, end): (usize, usize)| {
+            let s = start.saturating_sub(1);
+            let e = end.saturating_sub(1);
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery {
+                inner: old.slice(s, e),
+            })
+        });
+
+        // -- dropNil --
+        /// Drop rows where the column is nil. Returns a new LLazyQuery.
+        /// @param | col | string | Column name.
+        /// @return | LLazyQuery | New pipeline with dropNil appended.
+        methods.add_method_mut("dropNil", |_, this, col: String| {
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery {
+                inner: old.drop_nil(&col),
+            })
+        });
+
+        // -- select --
+        /// Retain only the specified columns. Returns a new LLazyQuery.
+        /// @param | cols | table | Array of column name strings.
+        /// @return | LLazyQuery | New pipeline with column selection appended.
+        methods.add_method_mut("select", |_, this, cols: LuaTable| {
+            let mut names: Vec<String> = Vec::new();
+            for i in 1..=cols.len()? {
+                names.push(cols.get(i)?);
+            }
+            let old = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            Ok(LuaLazyQuery {
+                inner: old.select(names),
+            })
+        });
+
+        // -- collect --
+        /// Execute the pipeline and return the resulting DataFrame.
+        /// @return | LDataFrame | Evaluated result.
+        methods.add_method_mut("collect", |_, this, ()| {
+            let lq = std::mem::replace(&mut this.inner, LazyQuery::tombstone());
+            let df = lq.collect().map_err(LuaError::RuntimeError)?;
+            Ok(LuaDataFrame::new(df))
+        });
+
+        // -- type --
+        /// @return | string | `"LLazyQuery"`.
+        methods.add_method("type", |_, _, ()| Ok("LLazyQuery"));
+
+        // -- typeOf --
+        /// Check the type tag of this object.
+        /// @param | name | string | Type name to check.
+        /// @return | boolean | true if name matches this type.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LLazyQuery" || name == "LazyQuery" || name == "Object")
+        });
     }
 }
 

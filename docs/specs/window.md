@@ -159,3 +159,10 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - Implemented multi-monitor enhancement from IDEA: `getDisplays`, `setDisplay`, `getCurrentDisplay`, optional display-index support in `getDesktopDimensions` and `getDisplayName`.
 - Implemented API discoverability enhancement: non-breaking grouped aliases under `lurek.window.display`, `lurek.window.mode`, and `lurek.window.cursor`.
 - Implemented event-loop placeholder cleanup: `src/window/event_loop.rs` now owns reusable monitor helpers consumed by `app`.
+
+### Recent sync (1.0.9-fix.73)
+
+- Added helper `lurek.window.windowConfig(opts)` to apply common window boot/config patterns in one call.
+- Clarified viewport-transform boundary:
+  - `window::viewport` owns conversion helpers and scale-mode request surface.
+  - `camera` owns world-camera math and view-space transforms.

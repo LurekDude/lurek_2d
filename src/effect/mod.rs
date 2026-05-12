@@ -19,7 +19,7 @@
 //! | `ambient` | `AmbientState` — time-of-day colour cycling |
 //! | `atmosphere` | `CloudState`, `FogState`, `HeatHazeState`, `VignetteState`, `FilmGrainState`, `LightningState` |
 //! | `screen_effects` | `FlashState`, `ShakeState`, `FadeState` — one-shot screen effects |
-//! | `effect` | `Overlay` — main struct combining all screen subsystems |
+//! | `overlay` | `Overlay` — main struct combining all screen subsystems |
 //! | `weather` | `WeatherState`, `WeatherParticle`, `WeatherType` — weather simulation |
 //! | `presets` | `EffectPreset`, `build_preset`, `preset_names` — named effect stack factories |
 //! | `water_overlay` | `WaterOverlayState` — water surface UV-distortion state |

@@ -23,12 +23,12 @@ pub mod event;
 pub mod frame;
 /// Render-command generation for sprite animations.
 pub mod render;
+/// Bridge between [`AnimStateMachine`] and a Spine [`Skeleton`].
+pub mod spine_bridge;
 /// Finite-state machine for parameter-driven animation control.
 pub mod state_machine;
 /// Named animation synchronisation groups.
 pub mod sync_group;
-/// Bridge between [`AnimStateMachine`] and a Spine [`Skeleton`].
-pub mod spine_bridge;
 
 pub use aseprite::{
     load_aseprite_json, AsepriteDirection, AsepriteFrameData, AsepriteParsed, AsepriteTagData,
@@ -40,9 +40,9 @@ pub use curve::AnimPropertyTimeline;
 pub use event::AnimEvent;
 pub use frame::{AnimFrame, AnimationFrame};
 pub use render::AnimRenderParams;
+pub use spine_bridge::SpineAnimBridge;
 pub use state_machine::{
     AnimParamValue, AnimStateConfig, AnimStateMachine, AnimTransition, ConditionOp, ConditionValue,
     TransitionCondition,
 };
-pub use spine_bridge::SpineAnimBridge;
 pub use sync_group::AnimSyncGroup;

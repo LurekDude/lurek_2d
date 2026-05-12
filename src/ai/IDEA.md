@@ -1,2 +1,0 @@
-- TODO: Integrate steering with NavMesh or nav-grid path queries so steering agents can consume walkable-area paths directly.
-- TODO: Add dialogue AI integration so FSM/BT/Utility AI can drive NPC conversation topic and branch selection.

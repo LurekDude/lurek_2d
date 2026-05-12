@@ -196,7 +196,8 @@ impl AnimPropertyTimeline {
         I: IntoIterator<Item = (S, f32)>,
         S: Into<String>,
     {
-        let mut props_vec: Vec<(String, f32)> = props.into_iter().map(|(k, v)| (k.into(), v)).collect();
+        let mut props_vec: Vec<(String, f32)> =
+            props.into_iter().map(|(k, v)| (k.into(), v)).collect();
         if props_vec.is_empty() {
             return;
         }
@@ -257,7 +258,10 @@ impl AnimPropertyTimeline {
             return Some(values[last_idx]);
         }
 
-        let pos = self.times.partition_point(|kf_t| *kf_t <= t).saturating_sub(1);
+        let pos = self
+            .times
+            .partition_point(|kf_t| *kf_t <= t)
+            .saturating_sub(1);
         let t0 = self.times[pos];
         let t1 = self.times[pos + 1];
         let v0 = values[pos];

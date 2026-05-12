@@ -131,7 +131,16 @@ end
 do -- lurek.engine.getFrameProfile
   function lurek.draw_ui()
     local p = lurek.engine.getFrameProfile()
-    lurek.render.print(string.format("process=%.2fms draw=%.2fms", p.process_ms, p.draw_ms), 8, 28)
+    lurek.render.print(string.format("tick=%.2fms process=%.2fms draw=%.2fms", p.app_tick_ms, p.process_ms, p.draw_ms), 8, 28)
+  end
+end
+
+--@api-stub: lurek.engine.getFrameProfileText
+-- Returns one compact text line with the latest frame timing buckets.
+-- Useful for low-overhead HUD debugging when you do not need table fields.
+do -- lurek.engine.getFrameProfileText
+  function lurek.draw_ui()
+    lurek.render.print(lurek.engine.getFrameProfileText(), 8, 46)
   end
 end
 

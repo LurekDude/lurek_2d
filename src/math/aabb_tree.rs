@@ -582,8 +582,45 @@ impl AabbTree {
             let child_inherited = inherited + (merged - node_area);
             if leaf_area + child_inherited < best_cost {
                 if let NodeKind::Branch { left, right } = &node.kind {
-                    stack.push((*left, child_inherited));
-                    stack.push((*right, child_inherited));
+                    let left_node = self.nodes[*left].as_ref().unwrap();
+                    let right_node = self.nodes[*right].as_ref().unwrap();
+
+                    let left_merged = {
+                        let (x1, y1, x2, y2) = merged_bounds(
+                            left_node.min_x,
+                            left_node.min_y,
+                            left_node.max_x,
+                            left_node.max_y,
+                            lx1,
+                            ly1,
+                            lx2,
+                            ly2,
+                        );
+                        aabb_area(x1, y1, x2, y2)
+                    };
+                    let right_merged = {
+                        let (x1, y1, x2, y2) = merged_bounds(
+                            right_node.min_x,
+                            right_node.min_y,
+                            right_node.max_x,
+                            right_node.max_y,
+                            lx1,
+                            ly1,
+                            lx2,
+                            ly2,
+                        );
+                        aabb_area(x1, y1, x2, y2)
+                    };
+
+                    // Stack is LIFO: push larger estimate first so the smaller (better)
+                    // estimate is explored immediately, tightening `best_cost` faster.
+                    if left_merged <= right_merged {
+                        stack.push((*right, child_inherited));
+                        stack.push((*left, child_inherited));
+                    } else {
+                        stack.push((*left, child_inherited));
+                        stack.push((*right, child_inherited));
+                    }
                 }
             }
         }

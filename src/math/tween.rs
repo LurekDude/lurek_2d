@@ -47,31 +47,30 @@ pub struct Tween {
 
 /// Resolves an easing function pointer from a name string.
 fn resolve_easing(name: &str) -> Option<fn(f32) -> f32> {
-    match name.to_lowercase().as_str() {
-        "linear" => Some(easing::linear),
-        "inquad" | "easeinquad" => Some(easing::ease_in_quad),
-        "outquad" | "easeoutquad" => Some(easing::ease_out_quad),
-        "inoutquad" | "easeinoutquad" => Some(easing::ease_in_out_quad),
-        "incubic" | "easeincubic" => Some(easing::ease_in_cubic),
-        "outcubic" | "easeoutcubic" => Some(easing::ease_out_cubic),
-        "inoutcubic" | "easeinoutcubic" => Some(easing::ease_in_out_cubic),
-        "inquart" | "easeinquart" => Some(easing::ease_in_quart),
-        "outquart" | "easeoutquart" => Some(easing::ease_out_quart),
-        "inoutquart" | "easeinoutquart" => Some(easing::ease_in_out_quart),
-        "insine" | "easeinsine" => Some(easing::ease_in_sine),
-        "outsine" | "easeoutsine" => Some(easing::ease_out_sine),
-        "inoutsine" | "easeinoutsine" => Some(easing::ease_in_out_sine),
-        "inexpo" | "easeinexpo" => Some(easing::ease_in_expo),
-        "outexpo" | "easeoutexpo" => Some(easing::ease_out_expo),
-        "inoutexpo" | "easeinoutexpo" => Some(easing::ease_in_out_expo),
-        "inelastic" | "easeinelastic" => Some(easing::ease_in_elastic),
-        "outelastic" | "easeoutelastic" => Some(easing::ease_out_elastic),
-        "outbounce" | "easeoutbounce" => Some(easing::ease_out_bounce),
-        "inbounce" | "easeinbounce" => Some(easing::ease_in_bounce),
-        "inback" | "easeinback" => Some(easing::ease_in_back),
-        "outback" | "easeoutback" => Some(easing::ease_out_back),
+    easing::resolve_easing_fn(name).or_else(|| match name.to_lowercase().as_str() {
+        "easeinquad" => Some(easing::ease_in_quad),
+        "easeoutquad" => Some(easing::ease_out_quad),
+        "easeinoutquad" => Some(easing::ease_in_out_quad),
+        "easeincubic" => Some(easing::ease_in_cubic),
+        "easeoutcubic" => Some(easing::ease_out_cubic),
+        "easeinoutcubic" => Some(easing::ease_in_out_cubic),
+        "easeinquart" => Some(easing::ease_in_quart),
+        "easeoutquart" => Some(easing::ease_out_quart),
+        "easeinoutquart" => Some(easing::ease_in_out_quart),
+        "easeinsine" => Some(easing::ease_in_sine),
+        "easeoutsine" => Some(easing::ease_out_sine),
+        "easeinoutsine" => Some(easing::ease_in_out_sine),
+        "easeinexpo" => Some(easing::ease_in_expo),
+        "easeoutexpo" => Some(easing::ease_out_expo),
+        "easeinoutexpo" => Some(easing::ease_in_out_expo),
+        "easeinelastic" => Some(easing::ease_in_elastic),
+        "easeoutelastic" => Some(easing::ease_out_elastic),
+        "easeoutbounce" => Some(easing::ease_out_bounce),
+        "easeinbounce" => Some(easing::ease_in_bounce),
+        "easeinback" => Some(easing::ease_in_back),
+        "easeoutback" => Some(easing::ease_out_back),
         _ => None,
-    }
+    })
 }
 
 impl Tween {

@@ -21,7 +21,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 
 **Spatial index.** `SpatialHash` is a uniform-grid broad-phase AABB index: `insert(id, rect)`, `query_rect(rect)` returns a set of IDs, `remove(id)`. `AabbTree` is a dynamic BVH for the same query surface with better worst-case complexity for non-uniformly distributed objects.
 
-**Noise.** `noise_functions.rs` provides standalone Perlin, Simplex, and FBM helpers. `noise_generator.rs` wraps these in `NoiseGenerator` — a seeded, configurable object with named presets (terrain, cloud, wood grain, marble), domain-warping, fractal layering, and Worley cellular noise. `NoiseField` is the simplified Lua-facing wrapper.
+**Noise.** `noise_generator.rs` is the canonical implementation (`NoiseGenerator`) for seeded Perlin/Simplex/Worley + fractal/map generation. `noise_functions.rs` remains as a compatibility free-function surface and delegates to `NoiseGenerator` to keep both APIs behaviorally aligned. `NoiseField` is the simplified Lua-facing wrapper.
 
 **Voronoi tessellation.** `voronoi.rs` implements Fortune's sweep-line algorithm. `VoronoiDiagram::new(points)` computes the tessellation; `cells()` iterates `VoronoiCell` entries with polygon boundary vertices and neighbour indices. Used for procedural territory maps, dungeon partitioning, and noise dithering.
 
@@ -48,7 +48,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `geometry.rs`: Collects free-standing geometry utilities such as circle tests, polygon measurements, segment tests, line rasterization, convex hull, and triangulation helpers.
 - `mat3.rs`: Implements the 3x3 affine matrix used for 2D transforms, point transforms, composition, and inversion.
 - `mod.rs`: Re-exports the public math surface so other modules and the Lua bridge can depend on one stable module root.
-- `noise_functions.rs`: Exposes standalone Perlin, Simplex, and FBM helpers for callers that do not need a reusable generator object.
+- `noise_functions.rs`: Compatibility free-function layer (`perlin2d`, `simplex2d`, `fbm`, ...) delegating to `NoiseGenerator`.
 - `noise_generator.rs`: Owns the seeded `NoiseGenerator` and the richer procedural toolset for Perlin, Simplex, Worley, fractal layering, domain warping, and map generation.
 - `polygon.rs`: Provides polygon-specific helpers centered on convexity testing and ear-clipping triangulation.
 - `random.rs`: Wraps `fastrand` in a deterministic, serializable RNG API that matches engine and Lua expectations.
@@ -77,6 +77,8 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `NoiseGenerator` (`struct`, `noise_generator.rs`): Seeded procedural noise engine with multiple algorithms and fractal modes. It centralizes world-generation style noise work instead of scattering implementations.
 - `RandomGenerator` (`struct`, `random.rs`): Deterministic RNG wrapper with seed and state control. It exists so engine code and Lua scripts can reproduce runs reliably.
 - `Rect` (`struct`, `rect.rs`): Axis-aligned rectangle for cheap containment and overlap checks. It is the basic AABB type used by layout and collision-adjacent code.
+- `PackedRect` (`struct`, `rect_packing.rs`): Placement record produced by runtime rectangle packing.
+- `RectPacker` (`struct`, `rect_packing.rs`): Deterministic shelf-based runtime rectangle packer for atlas/UI layout.
 - `SpatialItem` (`struct`, `spatial_hash.rs`): Stored record for an object indexed by `SpatialHash`. It keeps the query structure decoupled from any particular gameplay object type.
 - `SpatialHash` (`struct`, `spatial_hash.rs`): Broad-phase query structure for coarse spatial lookup by AABB, circle, or segment. It is a utility index, not a full collision or physics system.
 - `Mat3x3` (`struct`, `sphere.rs`): Column-major 3Ã—3 rotation matrix, used for camera orbit and axial tilt.
@@ -119,6 +121,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `BezierCurve::length` (`bezier.rs`): Approximate the total arc length of the curve.
 - `BezierCurve::get_interpolated_position` (`bezier.rs`): Evaluate the curve position at parameter `t` and return it as an `(x, y)` tuple.
 - `BezierCurve::get_interpolated_angle` (`bezier.rs`): Return the angle of the curve tangent at parameter `t` in radians.
+- `BezierCurve::evaluate_at_distance` (`bezier.rs`): Evaluates a curve point by travelled arc-length for near-constant-speed sampling.
 - `Circle::new` (`circle.rs`): Creates a new `Circle` centred at `(x, y)` with the given `radius`.
 - `Circle::center` (`circle.rs`): Returns the centre as a `Vec2`.
 - `Circle::area` (`circle.rs`): Returns the area of the circle (`π r²`).
@@ -207,6 +210,7 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `NoiseGenerator::new` (`noise_generator.rs`): Creates a new generator with the given seed.
 - `NoiseGenerator::set_seed` (`noise_generator.rs`): Replaces the seed and rebuilds the permutation table.
 - `NoiseGenerator::seed` (`noise_generator.rs`): Returns the current seed.
+- `NoiseGenerator::generate_map_compute` (`noise_generator.rs`): Compute-backend entrypoint for map generation (currently CPU fallback compatible).
 - `NoiseGenerator::perlin_1d` (`noise_generator.rs`): 1D Perlin noise.
 - `NoiseGenerator::perlin_2d` (`noise_generator.rs`): 2D Perlin noise.
 - `NoiseGenerator::perlin_3d` (`noise_generator.rs`): 3D Perlin noise.
@@ -218,6 +222,8 @@ The `math` module is Lurek2D's foundational mathematics library — a Foundation
 - `NoiseGenerator::worley_3d` (`noise_generator.rs`): 3D Worley (cellular) noise.
 - `NoiseGenerator::fbm` (`noise_generator.rs`): Fractal Brownian motion — sum of octaves with decreasing amplitude.
 - `NoiseGenerator::ridged` (`noise_generator.rs`): Ridged multi-fractal — sharp ridges from `1 - |noise|`.
+- `RectPacker::new` (`rect_packing.rs`): Creates a new fixed-size runtime rectangle packer.
+- `RectPacker::pack` (`rect_packing.rs`): Attempts to pack a rectangle and returns a placement when successful.
 - `NoiseGenerator::turbulence` (`noise_generator.rs`): Turbulence noise — sum of `|noise|` per octave.
 - `NoiseGenerator::warp_domain` (`noise_generator.rs`): Domain warping — offsets the input coordinates by noise, producing organic distortion.
 - `NoiseGenerator::generate_map` (`noise_generator.rs`): Generates a 2D noise map of `width * height` values using the given options.

@@ -15,6 +15,8 @@ mod terminal_demo_smoke_tests;
 mod animation_tests;
 #[path = "rust/unit/app_tests.rs"]
 mod app_tests;
+#[path = "rust/unit/ai_tests.rs"]
+mod ai_tests;
 #[path = "rust/unit/audio_tests.rs"]
 mod audio_tests;
 #[path = "rust/unit/camera_tests.rs"]

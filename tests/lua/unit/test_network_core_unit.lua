@@ -173,8 +173,8 @@ describe("lurek.network constants", function()
   end)
 
   -- @covers lurek.network.DEFAULT_PEERS
-  it("DEFAULT_PEERS equals 166", function()
-    expect_equal(network_consts.DEFAULT_PEERS, 166)
+  it("DEFAULT_PEERS equals 64", function()
+    expect_equal(network_consts.DEFAULT_PEERS, 64)
   end)
 
   -- @covers lurek.network.MAX_CHANNELS
@@ -233,8 +233,8 @@ describe("lurek.network constants", function()
   end)
 
   -- @covers lurek.network.DEFAULT_PEERS
-  it("DEFAULT_PEERS equals 4", function()
-    expect_equal(network_consts.DEFAULT_PEERS, 166)
+  it("DEFAULT_PEERS equals 64 (legacy merged block)", function()
+    expect_equal(network_consts.DEFAULT_PEERS, 64)
   end)
 
   -- @covers lurek.network.MAX_CHANNELS
@@ -373,6 +373,60 @@ describe("lurek.network.pack / unpack", function()
             local results = rt:poll()
             expect_equal(type(results), "table")
         end
+
+        -- @describe lurek.network matchmaking and relay helpers
+        describe("lurek.network matchmaking and relay helpers", function()
+          -- @covers lurek.network.createRoom
+          -- @covers lurek.network.joinRoom
+          -- @covers lurek.network.leaveRoom
+          -- @covers lurek.network.listRooms
+          it("room lifecycle helper functions work", function()
+            local room = lurek.network.createRoom("ranked", "hostA", 4)
+            expect_type("table", room)
+            expect_type("string", room.id)
+
+            local joined = lurek.network.joinRoom(room.id)
+            expect_true(joined ~= nil, "joinRoom should succeed on non-full room")
+
+            local listed = lurek.network.listRooms()
+            expect_type("table", listed)
+
+            local left = lurek.network.leaveRoom(room.id)
+            expect_true(left ~= nil, "leaveRoom should return updated room")
+          end)
+
+          -- @covers lurek.network.makePunchProbe
+          -- @covers lurek.network.newRelayTicket
+          -- @covers lurek.network.parsePunchProbe
+          -- @covers lurek.network.parseRelayTicket
+          it("relay ticket and punch helpers round-trip", function()
+            local token = lurek.network.newRelayTicket("room-1", "peer-A")
+            expect_type("string", token)
+
+            local parsed = lurek.network.parseRelayTicket(token)
+            expect_type("table", parsed)
+            expect_equal("room-1", parsed.room_id)
+            expect_equal("peer-A", parsed.peer_id)
+
+            local probe = lurek.network.makePunchProbe(parsed.peer_id)
+            local from_peer = lurek.network.parsePunchProbe(probe)
+            expect_equal("peer-A", from_peer)
+          end)
+
+          -- @covers lurek.network.predictLinear
+          -- @covers lurek.network.reconcileSnapshot
+          it("prediction and reconciliation helpers return snapshot tables", function()
+            local snap = { id = 1, tick = 10, x = 0.0, y = 0.0, vx = 3.0, vy = 1.0 }
+            local predicted = lurek.network.predictLinear(snap, 0.1)
+            expect_type("table", predicted)
+            expect_equal(11, predicted.tick)
+
+            local authoritative = { id = 1, tick = 11, x = 0.2, y = 0.1, vx = 3.0, vy = 1.0 }
+            local reconciled = lurek.network.reconcileSnapshot(predicted, authoritative, 0.5)
+            expect_type("table", reconciled)
+            expect_equal(11, reconciled.tick)
+          end)
+        end)
         rt:shutdown()
     end)
 

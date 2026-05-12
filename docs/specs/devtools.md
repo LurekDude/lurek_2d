@@ -17,13 +17,13 @@ The `devtools` module is Lurek2D's in-process developer toolbox — a Feature Sy
 
 **Profiler.** `Profiler` is a hierarchical zone-based frame profiler. `begin_zone(name)` / `end_zone()` bracket sections of game code; the profiler records wall-clock time per zone and builds a tree of `ProfileZone` entries for each completed frame. Each `ProfileZone` has `total_time()` (wall clock including children) and `self_time()` (exclusive cost), and `flatten()` collapses the tree to a pre-order list for tabular display. From Lua: `lurek.devtools.profiler:begin("name")`, `profiler:end()`, `profiler:frame()` returns the last completed frame's zone tree as a table.
 
-**FrameStats.** `FrameStats` is a rolling sample buffer for frame delta-time values. `record(dt)` pushes a new sample, evicting the oldest when at capacity. `snapshot()` returns a `FrameSnapshot` with: current FPS, mean frame time, min, max, and percentile values p50/p95/p99 computed over the current window. Used by the debug overlay and the debug bridge performance endpoint.
+**FrameStats.** `FrameStats` is a rolling sample buffer for frame delta-time values. `record(dt)` pushes a new sample, evicting the oldest when at capacity. The buffer is backed by `VecDeque` so eviction is O(1). `snapshot()` returns a `FrameSnapshot` with: current FPS, mean frame time, min, max, and percentile values p50/p95/p99 computed over the current window. Used by the debug overlay and the debug bridge performance endpoint.
 
 **FileWatcher.** `FileWatcher` polls file modification times at a configurable interval. Watched paths are registered with `watch(path)`; `check()` returns the list of paths whose mtime has changed since the last check. From Lua: `lurek.devtools.watcher:watch(path)`, `watcher:check()` → changed paths table. Intended for hot-reload workflows: a Lua game can watch its own scripts and assets and call `lurek.require` or re-load textures on change without a full restart.
 
 **REPL console.** `ReplConsole` provides an interactive Lua REPL with a bounded input history buffer that can be embedded in a running game session without spawning a separate process. `eval(code)` executes an arbitrary Lua expression in the current VM and returns its string representation. `history()` / `historySize()` / `clearHistory()` manage the input history ring. This enables in-game developer consoles (e.g., a text input field that submits code to `repl:eval()`) without external tooling.
 
-**Lua surface.** `lurek.devtools.newLogger(capacity)` / `newProfiler()` / `newFrameStats(capacity)` / `newWatcher(interval_ms)` / `newRepl()` create instances. `Logger` userdata: `push(level, cat, msg)`, `tail(n)`, `filterCategory(cat)`, `clear()`, `setLevel(level)`. `Profiler` userdata: `begin(name)`, `stop()`, `frame()` (tree). `FrameStats` userdata: `record(dt)`, `snapshot()` (table with fps/mean/min/max/p50/p95/p99). `FileWatcher` userdata: `watch(path)`, `check()`. `ReplConsole` userdata: `eval(code)`, `history()`, `historySize()`, `clearHistory()`.
+**Lua surface.** `lurek.devtools.newLogger(capacity)` / `newProfiler()` / `newFrameStats(capacity)` / `newWatcher(interval_ms)` / `newRepl()` create instances. `Logger` userdata: `push(level, cat, msg)`, `tail(n)`, `filterCategory(cat)`, `clear()`, `setLevel(level)`. `Profiler` userdata: `begin(name)`, `stop()`, `frame()` (tree). `FrameStats` userdata: `record(dt)`, `snapshot()` (table with fps/mean/min/max/p50/p95/p99). `FileWatcher` userdata: `watch(path)`, `check()`. `ReplConsole` userdata: `eval(code)`, `history()`, `historySize()`, `clearHistory()`. Module-level utilities also expose lightweight GPU frame stats (`recordGpuFrameTime`, `getGpuFrameStats`) and an entity inspector toggle (`openEntityInspector`, `isEntityInspectorOpen`).
 
 **Scope boundary.** Feature Systems tier. Depends on `runtime` for VM access in REPL eval. Lua bridge in `src/lua_api/devtools_api.rs`.
 
@@ -116,6 +116,8 @@ The `devtools` module is Lurek2D's in-process developer toolbox — a Feature Sy
 - `lurek.devtools.resetProfile`: Clears all profiling data and resets the zone stack.
 - `lurek.devtools.recordFrameTime`: Records a frame-time sample (call each frame with delta time in seconds).
 - `lurek.devtools.getFrameStats`: Returns a table of computed frame statistics.
+- `lurek.devtools.recordGpuFrameTime`: Records a GPU frame-time sample in seconds.
+- `lurek.devtools.getGpuFrameStats`: Returns a table of computed GPU frame statistics.
 - `lurek.devtools.getFrameHistory`: Returns the raw frame-time sample array.
 - `lurek.devtools.setFrameHistorySize`: Sets the frame-history buffer capacity (clamped 10-10000).
 - `lurek.devtools.getFrameHistorySize`: Returns the current frame-history buffer capacity.
@@ -130,6 +132,8 @@ The `devtools` module is Lurek2D's in-process developer toolbox — a Feature Sy
 - `lurek.devtools.eval`: Evaluates a Lua string and returns (success, results...).
 - `lurek.devtools.openConsole`: Opens the console window (updates the console flag; returns true).
 - `lurek.devtools.isConsoleOpen`: Returns whether the console is considered open.
+- `lurek.devtools.openEntityInspector`: Opens the entity inspector panel flag.
+- `lurek.devtools.isEntityInspectorOpen`: Returns whether the entity inspector is considered open.
 - `lurek.devtools.exposeWatch`: Registers a named live watch. The getter function is called on demand to sample a value.
 - `lurek.devtools.removeWatch`: Removes a watch by the id returned from exposeWatch. Returns true if removed.
 - `lurek.devtools.getWatches`: Calls all registered watch getters and returns a table of {name, category, value} records.

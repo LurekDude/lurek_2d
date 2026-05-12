@@ -7,11 +7,11 @@
 - Lua API path(s): `src/lua_api/data_api.rs`
 - Primary Lua namespace: `lurek.data`
 - Rust test path(s): tests/rust/unit/data_tests.rs; tests/rust/stress/data_stress_tests.rs; inline tests in src/data/byte_data.rs, src/data/encode.rs, src/data/hash.rs
-- Lua test path(s): tests/lua/unit/test_data.lua; tests/lua/stress/test_data_stress.lua; tests/lua/stress/test_data_compression_stress.lua; tests/lua/integration/test_data_app.lua; tests/lua/integration/test_data_fileapp.lua; tests/lua/integration/test_data_compute.lua; tests/lua/integration/test_thread_data.lua; tests/lua/golden/test_data_golden.lua
+- Lua test path(s): tests/lua/unit/test_data_core_unit.lua; tests/lua/stress/test_data_stress.lua; tests/lua/integration/test_data_filesystem.lua; tests/lua/integration/test_data_compute.lua; tests/lua/golden/test_data_golden.lua
 
 ## Summary
 
-The `data` module is Lurek2D's binary data manipulation toolkit — a Foundations tier module with no engine dependencies. It provides the low-level building blocks used by game code and engine internals that must work with binary data at the byte level: raw byte buffers, compression, cryptographic hashing, binary encoding/decoding, structured pack/unpack, MessagePack, and ring buffers.
+The `data` module is Lurek2D's binary data manipulation toolkit — a Foundations tier module with no engine dependencies. It provides the low-level building blocks used by game code and engine internals that must work with binary data at the byte level: raw byte buffers, compression, cryptographic hashing, binary encoding/decoding, structured pack/unpack, and ring buffers.
 
 **`ByteData` — the core buffer.** `ByteData` is an owned, heap-allocated raw byte buffer with bounds-checked element access. It is the primary interchange type: network payloads, save-file blobs, compressed data, and hashed content all flow through `ByteData`. Key operations: `new(n)`, `from_slice`, `as_slice`, `get(i)`, `set(i, v)`, `len`, `append`, `split_at`, `concat`. Lua scripts receive `ByteData` userdata with the full method set including `toHex()`, `toBase64()`, `slice(start, len)`.
 
@@ -27,17 +27,15 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 
 **DataView / DataWriter.** `DataView` is a read-only typed cursor over a byte slice with bounds-checked little-endian typed accessors (no copy). `DataWriter` is the growable write-cursor companion. `LuaDataView` wraps `DataView` as Lua userdata keeping the domain type free of Lua method registration.
 
-**MessagePack.** `msgpack.rs` provides `to_msgpack(json_value) → ByteData` / `from_msgpack(data) → serde_json::Value` via `rmp-serde`. Used by `serial` and `network` for compact cross-language encoding.
+**Serial delegation.** Lua-facing `lurek.data.parseToml`, `lurek.data.encodeToml`, `lurek.data.toMsgPack`, and `lurek.data.fromMsgPack` are thin adapters in `src/lua_api/data_api.rs` that delegate parsing/encoding to the `serial` module (`src/serial/toml.rs` and `src/serial/msgpack.rs`).
 
-**TOML conversion.** `toml_convert.rs` handles TOML string ↔ `toml::Value` trees for the Lua-facing TOML helpers. This keeps TOML parsing concerns isolated from the `serial` module.
-
-**Ring buffer.** `RingBuffer<T>` is a generic fixed-capacity circular buffer, useful for input history windows, debug log tails, and time-stamped event queues. Exposes `push`, `pop`, `peek`, `len`, `is_full`, `as_slice`.
+**Ring buffer.** `RingBuffer<T>` is a generic fixed-capacity circular buffer, useful for input history windows, debug log tails, and time-stamped event queues. Exposes `push`, `pop`, `peek`, `len`, `is_full`, clone-based collection (`to_vec`) and non-cloning access (`iter`, `to_refs`) for large element types.
 
 **Lua surface.** `lurek.data.new(n)` creates a `ByteData`. `lurek.data.compress/decompress(bytes, format)`, `lurek.data.hash(bytes, algo)`, `lurek.data.encode/decode(bytes, format)`, `lurek.data.pack(fmt, ...)`, `lurek.data.unpack(fmt, bytes)`, `lurek.data.newView(bytes)` → `DataView`, `lurek.data.newWriter()` → `DataWriter`. `ByteData` userdata: `get`, `set`, `len`, `append`, `slice`, `toHex`, `toBase64`, `toTable`.
 
 **Note.** Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module under `lurek.serial`. `data` covers only binary representations.
 
-**Scope boundary.** Foundations tier. Depends only on external crates: flate2, lz4_flex, sha2, base64, hex, rmp-serde, toml. Lua bridge in `src/lua_api/data_api.rs`.
+**Scope boundary.** Foundations tier. Depends only on external crates: flate2, lz4_flex, sha2, base64, hex. Lua bridge in `src/lua_api/data_api.rs`.
 
 ## Files
 
@@ -49,10 +47,8 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `encode.rs`: Handles base64 and hex encoding and decoding for binary payload transport.
 - `hash.rs`: Computes MD5, SHA-1, SHA-256, and SHA-512 digests over in-memory data.
 - `mod.rs`: Re-exports the public binary-data surface and keeps callers from importing individual helpers ad hoc.
-- `msgpack.rs`: MessagePack serialization and deserialization for Lurek2D.
 - `pack.rs`: Implements the LÖVE-style single-character binary pack and unpack format used for compact compatibility-oriented serialization.
 - `ring_buffer.rs`: Fixed-capacity circular ring buffer.
-- `toml_convert.rs`: Converts between TOML text and `toml::Value` trees for the Lua-facing TOML helpers.
 
 ## Types
 
@@ -127,8 +123,6 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `HashAlgorithm::parse_str` (`hash.rs`): Parse an algorithm name string (case-insensitive).
 - `hash` (`hash.rs`): Compute the hash of data using the specified algorithm, returned as a hex string.
 - `crc32` (`hash.rs`): Compute the CRC-32 checksum of `data`, returned as a `u64` in the range `[0, 2³²)`.
-- `to_msgpack` (`msgpack.rs`): Serializes a `serde_json::Value` to MessagePack bytes.
-- `from_msgpack` (`msgpack.rs`): Deserializes MessagePack bytes into a `serde_json::Value`.
 - `pack` (`pack.rs`): Packs values according to a format string into a `ByteData` buffer.
 - `unpack` (`pack.rs`): Unpacks values from a byte buffer according to a format string.
 - `get_packed_size` (`pack.rs`): Computes the total byte size that `pack` would produce for the given format and values.
@@ -143,9 +137,10 @@ The `data` module is Lurek2D's binary data manipulation toolkit — a Foundation
 - `RingBuffer::is_empty` (`ring_buffer.rs`): Returns `true` if the buffer contains no elements.
 - `RingBuffer::is_full` (`ring_buffer.rs`): Returns `true` if the buffer has reached its capacity.
 - `RingBuffer::clear` (`ring_buffer.rs`): Removes all elements from the buffer.
+- `RingBuffer::iter` (`ring_buffer.rs`): Returns borrowed references oldest-first without cloning.
 - `RingBuffer::to_vec` (`ring_buffer.rs`): Returns all elements as a `Vec`, ordered oldest-first.
-- `parse_toml` (`toml_convert.rs`): Parse a TOML string into a `toml::Value`.
-- `encode_toml` (`toml_convert.rs`): Encode a `toml::Value` into a TOML string.
+- `RingBuffer::to_refs` (`ring_buffer.rs`): Returns a `Vec<&T>` oldest-first without cloning elements.
+- `RingBuffer::collect_copy` (`ring_buffer.rs`): Collects items efficiently for `Copy` element types.
 
 ## Lua API Reference
 

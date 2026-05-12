@@ -125,3 +125,29 @@ mod weather_tests {
         assert!(unique_x.len() > 1, "weather spawn x positions should vary");
     }
 }
+
+mod effect_type_tests {
+    use lurek2d::effect::PostFxEffectType;
+    use std::collections::HashSet;
+
+    #[test]
+    fn built_in_names_roundtrip_into_effect_types() {
+        let names = PostFxEffectType::built_in_names();
+        assert!(!names.is_empty(), "built-in effect list must not be empty");
+
+        for name in names {
+            let parsed = PostFxEffectType::from_name(name);
+            assert!(parsed.is_some(), "built-in name should parse: {name}");
+            assert_eq!(parsed.expect("validated above").name(), name);
+        }
+    }
+
+    #[test]
+    fn built_in_names_are_unique() {
+        let names = PostFxEffectType::built_in_names();
+        let mut seen = HashSet::new();
+        for name in names {
+            assert!(seen.insert(name), "duplicate built-in effect name: {name}");
+        }
+    }
+}

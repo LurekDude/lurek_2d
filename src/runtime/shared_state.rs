@@ -239,6 +239,14 @@ pub struct ScreenshotRequest {
 /// recently completed frame.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FrameProfile {
+    /// App loop tick overhead (input polling, housekeeping) in milliseconds.
+    pub app_tick_ms: f32,
+    /// App loop update section (`game_update`) in milliseconds.
+    pub app_update_ms: f32,
+    /// App loop render section (`render` or splash/error render) in milliseconds.
+    pub app_render_ms: f32,
+    /// App loop total wall-clock frame time in milliseconds.
+    pub app_frame_total_ms: f32,
     /// `process_physics` callback total time for the frame.
     pub process_physics_ms: f32,
     /// `fixedUpdate` callback total time for the frame.
@@ -282,6 +290,43 @@ pub struct ResourceMemoryStats {
     pub canvas_count: u64,
     /// Number of loaded shaders.
     pub shader_count: u64,
+}
+
+// ─── Physics run configuration sub-domain ──────────────────────────────────
+
+/// Fixed-timestep physics and update configuration, extracted from [`SharedState`]
+/// to group physics runtime settings into a single sub-domain struct.
+///
+/// # Fields
+/// - `fixed_dt` — Fixed step in seconds for `process_physics` (default 1/60).
+/// - `max_steps` — Maximum sub-steps per frame to guard against spiral-of-death (default 8).
+/// - `debug_draw` — Whether the physics debug overlay is enabled.
+/// - `fixed_update_dt` — Fixed step in seconds for `fixedUpdate` callback (`0.0` = disabled).
+#[derive(Debug, Clone)]
+pub struct PhysicsRunConfig {
+    /// Fixed time-step for `process_physics` callback, in seconds (default 1/60).
+    pub fixed_dt: f64,
+    /// Maximum physics sub-steps per frame (spiral-of-death guard). Clamped to 1–64.
+    pub max_steps: u32,
+    /// Whether the physics debug overlay (AABB + velocity vectors) is enabled.
+    ///
+    /// Set via `lurek.physics.debugDraw(true)`.
+    pub debug_draw: bool,
+    /// Fixed time-step for the `fixedUpdate` Lua callback, in seconds.
+    ///
+    /// `0.0` means the fixed-update loop is disabled.
+    pub fixed_update_dt: f64,
+}
+
+impl Default for PhysicsRunConfig {
+    fn default() -> Self {
+        Self {
+            fixed_dt: 1.0 / 60.0,
+            max_steps: 8,
+            debug_draw: false,
+            fixed_update_dt: 0.0,
+        }
+    }
 }
 
 /// Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
@@ -435,22 +480,9 @@ pub struct SharedState {
     pub depth_mode: (DepthMode, bool),
     /// 2D lighting system world containing lights and occluders.
     pub light_world: LightWorld,
-    /// Fixed time-step for `process_physics` callback, in seconds (default 1/60).
-    pub physics_fixed_dt: f64,
-    /// Maximum physics sub-steps per frame (spiral-of-death guard). Default 8.
-    ///
-    /// Clamped to the range 1–64 when set via the Lua API.
-    pub physics_max_steps: u32,
-    /// Fixed time-step for the `fixedUpdate` Lua callback, in seconds.
-    ///
-    /// `0.0` means the fixed-update loop is disabled.  Set from
-    /// `PerformanceConfig::fixed_update_tick_rate` during `init_lua`.
-    pub fixed_update_dt: f64,
-    /// Whether the physics debug overlay (AABB + velocity vectors) is enabled.
-    ///
-    /// Set via `lurek.physics.debugDraw(true)`.  When `true` the engine appends
-    /// physics render commands after the game-world render pass each frame.
-    pub physics_debug_draw: bool,
+    // ─── Physics sub-domain ────────────────────────────────────────────────
+    /// Physics and fixed-update runtime configuration (tick rate, debug draw, etc.).
+    pub physics_run: PhysicsRunConfig,
     /// Parallax layers registered for engine auto-collection.
     ///
     /// Objects are added here when created via `lurek.parallax.newLayer()`.
@@ -491,6 +523,24 @@ pub struct SharedState {
     /// Updated by the render loop whenever a texture command is submitted.
     /// Used by `evict_lru_resources` to find the oldest unused textures.
     pub texture_last_used: HashMap<TextureKey, u64>,
+    /// Maps each live `CanvasKey` to the frame on which it was last rendered to or drawn from.
+    ///
+    /// Updated by `touch_canvas`.  Used by `evict_lru_resources` to track canvas recency
+    /// even though canvas eviction is not yet automatic (GPU cleanup differs from textures).
+    pub canvas_last_used: HashMap<CanvasKey, u64>,
+    /// Optional frame-budget warn threshold from conf.toml `[performance].frame_budget_warn_ms`.
+    ///
+    /// Mirrored from `Config` into `SharedState` on startup and hot-reload so that
+    /// `lurek.runtime.getConfig()` can read it without holding a reference to the config.
+    pub frame_budget_warn_ms: Option<f32>,
+    /// Optional timeout budget in milliseconds for a single Lua callback.
+    ///
+    /// Mirrored from `Config` and applied by the app callback wrapper.
+    pub lua_callback_timeout_ms: Option<f32>,
+    /// When `true`, the app loop should trigger a hot-reload of `conf.toml` on the next tick.
+    ///
+    /// Set by `lurek.runtime.reloadConfig()`.  Consumed and cleared by the app after reload.
+    pub pending_config_reload: bool,
     /// Engine-backed province registries indexed by name.
     ///
     /// Used by `lurek.province.*` and optional adapters (`province_map`, `globe`, `minimap`).
@@ -580,10 +630,7 @@ impl SharedState {
             stencil_mode: StencilMode::default(),
             depth_mode: (DepthMode::Always, false),
             light_world: LightWorld::new(),
-            physics_fixed_dt: 1.0 / 60.0,
-            physics_max_steps: 8,
-            fixed_update_dt: 0.0,
-            physics_debug_draw: false,
+            physics_run: PhysicsRunConfig::default(),
             auto_parallax_layers: Vec::new(),
             auto_tilemaps: Vec::new(),
             auto_ui_ctx: None,
@@ -593,6 +640,10 @@ impl SharedState {
             frame_counter: 0,
             config_reload_revision: 0,
             texture_last_used: HashMap::new(),
+            canvas_last_used: HashMap::new(),
+            frame_budget_warn_ms: None,
+            lua_callback_timeout_ms: None,
+            pending_config_reload: false,
             province_registries: HashMap::new(),
             active_province_registry: None,
         }
@@ -626,38 +677,42 @@ impl SharedState {
         self.texture_last_used.insert(key, self.frame_counter);
     }
 
-    /// Evicts least-recently-used textures until resident size is within budget.
+    /// Records that a canvas was used on the current frame.
     ///
-    /// Computes the total byte footprint of all loaded textures.  If the total
-    /// exceeds `resource_budget_bytes`, textures are sorted by their last-used
-    /// frame (oldest first) and removed one by one until the budget is met or
-    /// no more candidates remain.  Textures with no recorded last-used frame
-    /// are treated as oldest.
+    /// Call this whenever a canvas is rendered to or drawn from so that
+    /// `evict_lru_resources` can rank canvases by recency.
     ///
-    /// The method only removes textures from `SharedState::textures`.
-    /// The corresponding GPU resources are invalidated during the normal
-    /// `released_texture_handles` flush that runs at the start of each frame.
+    /// # Parameters
+    /// - `key` — The `CanvasKey` that was accessed this frame.
+    pub fn touch_canvas(&mut self, key: CanvasKey) {
+        self.canvas_last_used.insert(key, self.frame_counter);
+    }
+
+    /// Evicts least-recently-used textures until total resident resource size is within budget.
+    ///
+    /// Uses [`resource_memory_stats`] to compute the combined byte footprint of textures,
+    /// fonts, canvases, and shaders.  If the total exceeds `resource_budget_bytes`, textures
+    /// are sorted by their last-used frame (oldest first) and removed one by one until the
+    /// budget is met or no more texture candidates remain.
+    ///
+    /// The method only removes entries from `SharedState::textures`; the corresponding GPU
+    /// resources are invalidated during the normal `released_texture_handles` flush at the
+    /// start of each frame.
     pub fn evict_lru_resources(&mut self) {
-        // Compute total resident size: width * height * 4 bytes (RGBA8).
-        let total: u64 = self
-            .textures
-            .values()
-            .map(|t| (t.width as u64) * (t.height as u64) * 4)
-            .sum();
-        if total <= self.resource_budget_bytes {
+        let stats = self.resource_memory_stats();
+        if stats.total_bytes <= self.resource_budget_bytes {
             return;
         }
-        let mut over = total - self.resource_budget_bytes;
-        // Collect candidates sorted by last-used frame (oldest = evict first).
-        let mut candidates: Vec<(TextureKey, u64)> = self
-            .textures
-            .keys()
-            .map(|k| {
-                let last = self.texture_last_used.get(&k).copied().unwrap_or(0);
-                (k, last)
-            })
-            .collect();
-        candidates.sort_by_key(|(_, last)| *last);
+        let mut over = stats.total_bytes - self.resource_budget_bytes;
+        // Pre-allocate with known capacity to avoid repeated reallocation.
+        let tex_count = self.textures.len();
+        let mut candidates: Vec<(TextureKey, u64)> = Vec::with_capacity(tex_count);
+        for k in self.textures.keys() {
+            let last = self.texture_last_used.get(&k).copied().unwrap_or(0);
+            candidates.push((k, last));
+        }
+        // Unstable sort is sufficient and avoids extra comparisons for equal timestamps.
+        candidates.sort_unstable_by_key(|(_, last)| *last);
         for (key, _) in candidates {
             if over == 0 {
                 break;

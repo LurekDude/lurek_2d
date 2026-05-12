@@ -7,6 +7,28 @@
 use crate::camera::effects::{CameraBreathing, CameraSway, ZoomPulse};
 use crate::math::{Mat3, Rect, Vec2};
 
+/// Easing mode used by camera follow interpolation.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CameraFollowEasing {
+    /// Linear interpolation.
+    Linear,
+    /// Smoothstep interpolation (`t*t*(3-2*t)`).
+    SmoothStep,
+    /// Ease-out cubic interpolation.
+    EaseOutCubic,
+}
+
+impl CameraFollowEasing {
+    fn apply(self, t: f32) -> f32 {
+        let clamped = t.clamp(0.0, 1.0);
+        match self {
+            Self::Linear => clamped,
+            Self::SmoothStep => clamped * clamped * (3.0 - 2.0 * clamped),
+            Self::EaseOutCubic => 1.0 - (1.0 - clamped).powi(3),
+        }
+    }
+}
+
 // ═════════════════════════════════════════════════════════════════════════
 // Existing Camera (kept for backward compatibility)
 // ═════════════════════════════════════════════════════════════════════════
@@ -140,6 +162,8 @@ pub struct Camera2D {
     /// Look-ahead multiplier. Estimated target velocity is scaled by this
     /// value and added to the desired position.
     pub look_ahead: f32,
+    /// Follow interpolation easing mode.
+    pub follow_easing: CameraFollowEasing,
 
     // ── Shake ───────────────────────────────────────────────────────────
     /// Current shake intensity (pixels).
@@ -154,6 +178,24 @@ pub struct Camera2D {
     // ── Internal ────────────────────────────────────────────────────────
     /// Previous target for velocity estimation (look-ahead).
     prev_target: Option<Vec2>,
+
+    // ── Constraints ──────────────────────────────────────────────────────
+    /// Minimum zoom level constraint (`0.1` = 10% zoom, optional).
+    zoom_min: Option<f32>,
+    /// Maximum zoom level constraint (`10.0` = 1000% zoom, optional).
+    zoom_max: Option<f32>,
+    /// Zoom damping factor for smooth transitions (`0.0` = instant, `1.0` = no damping).
+    zoom_damping: f32,
+    /// Minimum rotation in radians (optional).
+    rotation_min: Option<f32>,
+    /// Maximum rotation in radians (optional).
+    rotation_max: Option<f32>,
+    /// Rotation damping factor for smooth transitions (`0.0` = instant, `1.0` = no damping).
+    rotation_damping: f32,
+    /// Target zoom used when damping is active.
+    zoom_target: f32,
+    /// Target rotation used when damping is active.
+    rotation_target: f32,
 
     // ── Effects ──────────────────────────────────────────────────────────
     /// Zoom pulse: brief zoom-in with sine envelope decay.
@@ -185,11 +227,20 @@ impl Camera2D {
             follow_smooth: 0.0,
             dead_zone: None,
             look_ahead: 0.0,
+            follow_easing: CameraFollowEasing::Linear,
             shake_intensity: 0.0,
             shake_duration: 0.0,
             shake_timer: 0.0,
             shake_offset: Vec2::ZERO,
             prev_target: None,
+            zoom_min: None,
+            zoom_max: None,
+            zoom_damping: 0.0,
+            rotation_min: None,
+            rotation_max: None,
+            rotation_damping: 0.0,
+            zoom_target: 1.0,
+            rotation_target: 0.0,
             zoom_pulse: ZoomPulse::new(),
             sway: CameraSway::new(),
             breathing: CameraBreathing::new(),
@@ -220,7 +271,10 @@ impl Camera2D {
     /// # Parameters
     /// - `z` — `f32`.
     pub fn set_zoom(&mut self, z: f32) {
-        self.zoom = z;
+        self.zoom_target = z;
+        if self.zoom_damping <= f32::EPSILON {
+            self.zoom = z;
+        }
     }
 
     /// Returns the current zoom factor. This accessor incurs no allocation; call it freely in hot paths.
@@ -236,7 +290,10 @@ impl Camera2D {
     /// # Parameters
     /// - `r` — `f32`.
     pub fn set_rotation(&mut self, r: f32) {
-        self.rotation = r;
+        self.rotation_target = r;
+        if self.rotation_damping <= f32::EPSILON {
+            self.rotation = r;
+        }
     }
 
     /// Returns the current rotation in radians.
@@ -245,6 +302,205 @@ impl Camera2D {
     /// `f32`.
     pub fn get_rotation(&self) -> f32 {
         self.rotation
+    }
+
+    /// Sets the follow interpolation easing mode.
+    pub fn set_follow_easing(&mut self, easing: CameraFollowEasing) {
+        self.follow_easing = easing;
+    }
+
+    /// Returns the current follow interpolation easing mode.
+    pub fn get_follow_easing(&self) -> CameraFollowEasing {
+        self.follow_easing
+    }
+
+    // ── Zoom constraints ────────────────────────────────────────────────
+
+    /// Sets minimum and maximum zoom level constraints.
+    ///
+    /// # Parameters
+    /// - `min_zoom` — `Option<f32>`.
+    /// - `max_zoom` — `Option<f32>`.
+    ///
+    /// Pass `None` to remove a constraint. Zoom is clamped to the valid range
+    /// during `update()`.
+    pub fn set_zoom_constraints(&mut self, min_zoom: Option<f32>, max_zoom: Option<f32>) {
+        self.zoom_min = min_zoom;
+        self.zoom_max = max_zoom;
+        if let Some(min_z) = self.zoom_min {
+            self.zoom_target = self.zoom_target.max(min_z);
+            self.zoom = self.zoom.max(min_z);
+        }
+        if let Some(max_z) = self.zoom_max {
+            self.zoom_target = self.zoom_target.min(max_z);
+            self.zoom = self.zoom.min(max_z);
+        }
+    }
+
+    /// Returns the current zoom constraints as `(min_zoom, max_zoom)`, with `None` for unconstrained directions.
+    ///
+    /// # Returns
+    /// `(Option<f32>, Option<f32>)`.
+    pub fn get_zoom_constraints(&self) -> (Option<f32>, Option<f32>) {
+        (self.zoom_min, self.zoom_max)
+    }
+
+    /// Sets the zoom damping factor for smooth zoom transitions.
+    ///
+    /// # Parameters
+    /// - `damping` — `f32`.
+    ///
+    /// `0.0` = instant zoom changes, `1.0` = no damping (maximum smoothing).
+    /// Typical values: `0.0` to `1.0`.
+    pub fn set_zoom_damping(&mut self, damping: f32) {
+        self.zoom_damping = damping.clamp(0.0, 1.0);
+        if self.zoom_damping <= f32::EPSILON {
+            self.zoom = self.zoom_target;
+        }
+    }
+
+    /// Returns the current zoom damping factor.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_zoom_damping(&self) -> f32 {
+        self.zoom_damping
+    }
+
+    // ── Rotation constraints ────────────────────────────────────────────
+
+    /// Sets minimum and maximum rotation constraints in radians.
+    ///
+    /// # Parameters
+    /// - `min_rot` — `Option<f32>`.
+    /// - `max_rot` — `Option<f32>`.
+    ///
+    /// Pass `None` to remove a constraint. Rotation is clamped to the valid range
+    /// during `update()`.
+    pub fn set_rotation_constraints(&mut self, min_rot: Option<f32>, max_rot: Option<f32>) {
+        self.rotation_min = min_rot;
+        self.rotation_max = max_rot;
+        if let Some(min_r) = self.rotation_min {
+            self.rotation_target = self.rotation_target.max(min_r);
+            self.rotation = self.rotation.max(min_r);
+        }
+        if let Some(max_r) = self.rotation_max {
+            self.rotation_target = self.rotation_target.min(max_r);
+            self.rotation = self.rotation.min(max_r);
+        }
+    }
+
+    /// Returns the current rotation constraints as `(min_rot, max_rot)`, with `None` for unconstrained directions.
+    ///
+    /// # Returns
+    /// `(Option<f32>, Option<f32>)`.
+    pub fn get_rotation_constraints(&self) -> (Option<f32>, Option<f32>) {
+        (self.rotation_min, self.rotation_max)
+    }
+
+    /// Sets the rotation damping factor for smooth rotation transitions.
+    ///
+    /// # Parameters
+    /// - `damping` — `f32`.
+    ///
+    /// `0.0` = instant rotation changes, `1.0` = no damping (maximum smoothing).
+    /// Typical values: `0.0` to `1.0`.
+    pub fn set_rotation_damping(&mut self, damping: f32) {
+        self.rotation_damping = damping.clamp(0.0, 1.0);
+        if self.rotation_damping <= f32::EPSILON {
+            self.rotation = self.rotation_target;
+        }
+    }
+
+    /// Returns the current rotation damping factor.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn get_rotation_damping(&self) -> f32 {
+        self.rotation_damping
+    }
+
+    // ── Follow presets ──────────────────────────────────────────────────
+
+    /// Sets up a tight follow configuration: fast response, small dead zone, look-ahead.
+    ///
+    /// Suitable for action games and precise control. Parameters:
+    /// - `follow_smooth` = 0.9
+    /// - `dead_zone` = (20, 20)
+    /// - `look_ahead` = 0.5
+    pub fn preset_tight_follow(&mut self) {
+        self.set_follow_smooth(0.9);
+        self.set_dead_zone(20.0, 20.0);
+        self.set_look_ahead(0.5);
+    }
+
+    /// Sets up a cinematic follow configuration: slow response, large dead zone, no look-ahead.
+    ///
+    /// Suitable for story-driven games and cutscenes. Parameters:
+    /// - `follow_smooth` = 0.3
+    /// - `dead_zone` = (100, 100)
+    /// - `look_ahead` = 0.0
+    pub fn preset_cinematic_follow(&mut self) {
+        self.set_follow_smooth(0.3);
+        self.set_dead_zone(100.0, 100.0);
+        self.set_look_ahead(0.0);
+    }
+
+    /// Sets up a balanced follow configuration: moderate response, medium dead zone.
+    ///
+    /// Suitable for RPGs and exploration games. Parameters:
+    /// - `follow_smooth` = 0.6
+    /// - `dead_zone` = (40, 40)
+    /// - `look_ahead` = 0.3
+    pub fn preset_balanced_follow(&mut self) {
+        self.set_follow_smooth(0.6);
+        self.set_dead_zone(40.0, 40.0);
+        self.set_look_ahead(0.3);
+    }
+
+    /// Sets up an aggressive follow configuration: maximum response, minimal dead zone, strong look-ahead.
+    ///
+    /// Suitable for fast-paced games and sports simulations. Parameters:
+    /// - `follow_smooth` = 0.99
+    /// - `dead_zone` = (5, 5)
+    /// - `look_ahead` = 1.0
+    pub fn preset_aggressive_follow(&mut self) {
+        self.set_follow_smooth(0.99);
+        self.set_dead_zone(5.0, 5.0);
+        self.set_look_ahead(1.0);
+    }
+
+    /// Auto-wires viewport updates to a raw window resize event.
+    ///
+    /// This helper sets the camera viewport to the full window rectangle.
+    pub fn on_window_resize(&mut self, window_width: f32, window_height: f32) {
+        self.set_viewport(0.0, 0.0, window_width.max(1.0), window_height.max(1.0));
+    }
+
+    /// Auto-wires viewport updates to a window resize with scale-mode mapping.
+    ///
+    /// Uses logical game dimensions and a scale mode to compute letterbox/stretch
+    /// placement before writing the camera viewport rectangle.
+    pub fn on_window_resize_scaled(
+        &mut self,
+        game_width: f32,
+        game_height: f32,
+        window_width: f32,
+        window_height: f32,
+        scale_mode: crate::camera::viewport::ScaleMode,
+    ) {
+        let (scale_x, scale_y, offset_x, offset_y) = scale_mode.compute_transforms(
+            game_width.max(1.0),
+            game_height.max(1.0),
+            window_width.max(1.0),
+            window_height.max(1.0),
+        );
+        self.set_viewport(
+            offset_x,
+            offset_y,
+            game_width.max(1.0) * scale_x,
+            game_height.max(1.0) * scale_y,
+        );
     }
 
     // ── Viewport ────────────────────────────────────────────────────────
@@ -475,9 +731,15 @@ impl Camera2D {
         self.shake_timer = duration;
     }
 
-    // ── Update ──────────────────────────────────────────────────────────
+    /// Returns the current shake offset as `(dx, dy)`.
+    ///
+    /// # Returns
+    /// `(f32, f32)`.
+    pub fn get_shake_offset(&self) -> (f32, f32) {
+        (self.shake_offset.x, self.shake_offset.y)
+    }
 
-    /// Processes smooth follow, camera shake, and bounds clamping.
+    /// Processes smooth follow, camera shake, bounds clamping, and constraint application.
     ///
     /// # Parameters
     /// - `dt` — `f32`.
@@ -510,7 +772,7 @@ impl Camera2D {
 
             // ── 4. Smooth interpolation ─────────────────────────────────
             if self.follow_smooth > 0.0 {
-                let t = (self.follow_smooth * dt).min(1.0);
+                let t = self.follow_easing.apply((self.follow_smooth * dt).min(1.0));
                 self.position.x += (desired.x - self.position.x) * t;
                 self.position.y += (desired.y - self.position.y) * t;
             } else {
@@ -522,8 +784,8 @@ impl Camera2D {
 
         // ── 5. Bounds clamping ──────────────────────────────────────────
         if let Some(bounds) = self.bounds {
-            let z = if self.zoom.abs() > f32::EPSILON {
-                self.zoom
+            let z = if self.zoom_target.abs() > f32::EPSILON {
+                self.zoom_target
             } else {
                 1.0
             };
@@ -564,7 +826,38 @@ impl Camera2D {
             }
         }
 
-        // ── 7. Camera effects ────────────────────────────────────────────
+        // ── 7. Zoom damping & constraints ───────────────────────────────
+        if let Some(min_z) = self.zoom_min {
+            self.zoom_target = self.zoom_target.max(min_z);
+        }
+        if let Some(max_z) = self.zoom_max {
+            self.zoom_target = self.zoom_target.min(max_z);
+        }
+
+        if self.zoom_damping <= f32::EPSILON {
+            self.zoom = self.zoom_target;
+        } else {
+            let alpha = (dt.max(0.0) / (dt.max(0.0) + self.zoom_damping.max(1e-4))).clamp(0.0, 1.0);
+            self.zoom += (self.zoom_target - self.zoom) * alpha;
+        }
+
+        // ── 8. Rotation damping & constraints ───────────────────────────
+        if let Some(min_r) = self.rotation_min {
+            self.rotation_target = self.rotation_target.max(min_r);
+        }
+        if let Some(max_r) = self.rotation_max {
+            self.rotation_target = self.rotation_target.min(max_r);
+        }
+
+        if self.rotation_damping <= f32::EPSILON {
+            self.rotation = self.rotation_target;
+        } else {
+            let alpha =
+                (dt.max(0.0) / (dt.max(0.0) + self.rotation_damping.max(1e-4))).clamp(0.0, 1.0);
+            self.rotation += (self.rotation_target - self.rotation) * alpha;
+        }
+
+        // ── 9. Camera effects ────────────────────────────────────────────
         self.zoom_pulse.update(dt);
         self.sway.update(dt);
         self.breathing.update(dt);
@@ -594,20 +887,24 @@ impl Camera2D {
         self.sway.current_offset()
     }
 
-    /// Computes the view matrix including the shake offset.
+    /// Returns the canonical combined render offset (sway + shake).
+    pub fn render_offset(&self) -> (f32, f32) {
+        let (sx, sy) = self.sway.current_offset();
+        (sx + self.shake_offset.x, sy + self.shake_offset.y)
+    }
+
+    /// Computes the view matrix including sway and shake offsets.
     ///
     /// # Returns
     /// `Mat3`.
     ///
-    /// Order: translate(-(position + shake_offset)), scale(zoom), rotate(rotation).
+    /// Order: translate(-(position + render_offset)), scale(effective_zoom), rotate(rotation).
     pub fn view_matrix(&self) -> Mat3 {
-        let pos = Vec2::new(
-            self.position.x + self.shake_offset.x,
-            self.position.y + self.shake_offset.y,
-        );
+        let (ox, oy) = self.render_offset();
+        let pos = Vec2::new(self.position.x + ox, self.position.y + oy);
         let translation = Mat3::from_translation(Vec2::new(-pos.x, -pos.y));
         let rotation = Mat3::from_rotation(self.rotation);
-        let scale = Mat3::from_scale(Vec2::splat(self.zoom));
+        let scale = Mat3::from_scale(Vec2::splat(self.effective_zoom()));
         scale * rotation * translation
     }
 }

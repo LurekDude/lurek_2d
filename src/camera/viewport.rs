@@ -27,6 +27,52 @@ pub enum ScaleMode {
     PixelPerfect,
 }
 
+impl ScaleMode {
+    /// Computes scale and offset for this scale mode given game and window dimensions.
+    ///
+    /// # Parameters
+    /// - `game_width` — Game-space width.
+    /// - `game_height` — Game-space height.
+    /// - `window_width` — Physical window width.
+    /// - `window_height` — Physical window height.
+    ///
+    /// # Returns
+    /// `(scale_x, scale_y, offset_x, offset_y)` tuple.
+    ///
+    /// This is a shared utility function used by both `Viewport` and `ViewportScale`
+    /// to reduce code duplication and ensure consistent behavior.
+    pub fn compute_transforms(
+        &self,
+        game_width: f32,
+        game_height: f32,
+        window_width: f32,
+        window_height: f32,
+    ) -> (f32, f32, f32, f32) {
+        match self {
+            ScaleMode::Letterbox => {
+                let scale = (window_width / game_width).min(window_height / game_height);
+                let offset_x = (window_width - game_width * scale) / 2.0;
+                let offset_y = (window_height - game_height * scale) / 2.0;
+                (scale, scale, offset_x, offset_y)
+            }
+            ScaleMode::Stretch => {
+                let scale_x = window_width / game_width;
+                let scale_y = window_height / game_height;
+                (scale_x, scale_y, 0.0, 0.0)
+            }
+            ScaleMode::PixelPerfect => {
+                let scale = (window_width / game_width)
+                    .min(window_height / game_height)
+                    .floor()
+                    .max(1.0);
+                let offset_x = (window_width - game_width * scale) / 2.0;
+                let offset_y = (window_height - game_height * scale) / 2.0;
+                (scale, scale, offset_x, offset_y)
+            }
+        }
+    }
+}
+
 /// Virtual resolution with manual transform application.
 ///
 /// # Fields
@@ -88,31 +134,16 @@ impl Viewport {
     /// - `window_width` — `f32`.
     /// - `window_height` — `f32`.
     pub fn resize(&mut self, window_width: f32, window_height: f32) {
-        match self.scale_mode {
-            ScaleMode::Letterbox => {
-                let scale = (window_width / self.game_width).min(window_height / self.game_height);
-                self.scale_x = scale;
-                self.scale_y = scale;
-                self.offset_x = (window_width - self.game_width * scale) / 2.0;
-                self.offset_y = (window_height - self.game_height * scale) / 2.0;
-            }
-            ScaleMode::Stretch => {
-                self.scale_x = window_width / self.game_width;
-                self.scale_y = window_height / self.game_height;
-                self.offset_x = 0.0;
-                self.offset_y = 0.0;
-            }
-            ScaleMode::PixelPerfect => {
-                let scale = (window_width / self.game_width)
-                    .min(window_height / self.game_height)
-                    .floor()
-                    .max(1.0);
-                self.scale_x = scale;
-                self.scale_y = scale;
-                self.offset_x = (window_width - self.game_width * scale) / 2.0;
-                self.offset_y = (window_height - self.game_height * scale) / 2.0;
-            }
-        }
+        let (scale_x, scale_y, offset_x, offset_y) = self.scale_mode.compute_transforms(
+            self.game_width,
+            self.game_height,
+            window_width,
+            window_height,
+        );
+        self.scale_x = scale_x;
+        self.scale_y = scale_y;
+        self.offset_x = offset_x;
+        self.offset_y = offset_y;
     }
 
     /// Current scale factors `(scale_x, scale_y)`.

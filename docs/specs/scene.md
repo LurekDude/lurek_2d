@@ -15,6 +15,14 @@ The `scene` module is documented from the current source tree and existing modul
 
 This module primarily collaborates with `image`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
+## 2026-05 Update
+
+- Added transition sequencer support in Rust (`SceneStack::queue_transition`) and Lua API (`lurek.scene.queueTransition`, `lurek.scene.getQueuedTransitionCount`, `lurek.scene.clearQueuedTransitions`).
+- Added logical scene layer ordering for process callbacks via `SceneStack::set_scene_layer` and Lua API (`lurek.scene.setCurrentLayer`, `lurek.scene.getCurrentLayer`).
+- Active-scene callback order is now layer-first, then stack order for ties.
+- Transition type aliases in helper factories now resolve to canonical tokens: `slideleft`, `slideright`, `slideup`, `slidedown`.
+- Shared easing helper extracted to `src/scene/easing.rs` so bounce curve logic is no longer duplicated in transition internals.
+
 ## Files
 
 - `depth_sorter.rs`: Per-frame depth-ordered callback batcher used by the Lua scene layer.

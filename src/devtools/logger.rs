@@ -6,6 +6,7 @@
 //! output available for overlay display or programmatic inspection.
 
 use std::time::Instant;
+use std::collections::VecDeque;
 
 // ── level ordering ─────────────────────────────────────────────────────────
 
@@ -100,7 +101,7 @@ pub struct LogEntry {
 /// - `min_level` — `LogLevel`.
 /// - `console_enabled` — `bool`.
 /// - `log_file` — `String`.
-/// - `history` — `Vec<LogEntry>`.
+/// - `history` — `VecDeque<LogEntry>`.
 /// - `max_history` — `usize`.
 /// - `epoch` — `Instant`.
 #[derive(Debug)]
@@ -112,7 +113,7 @@ pub struct Logger {
     /// Append messages to this path when non-empty.
     pub log_file: String,
     /// Rolling history of recorded entries.
-    pub history: Vec<LogEntry>,
+    pub history: VecDeque<LogEntry>,
     /// Maximum number of entries retained.
     pub max_history: usize,
     epoch: Instant,
@@ -128,7 +129,7 @@ impl Logger {
             min_level: LogLevel::Info,
             console_enabled: true,
             log_file: String::new(),
-            history: Vec::new(),
+            history: VecDeque::new(),
             max_history: 1_000,
             epoch: Instant::now(),
         }
@@ -195,9 +196,9 @@ impl Logger {
                 );
             }
         }
-        self.history.push(entry);
+        self.history.push_back(entry);
         if self.history.len() > self.max_history {
-            self.history.remove(0);
+            let _ = self.history.pop_front();
         }
     }
 
@@ -207,15 +208,16 @@ impl Logger {
     /// - `count` — `Option<usize>`.
     ///
     /// # Returns
-    /// `&[LogEntry]`.
-    pub fn tail(&self, count: Option<usize>) -> &[LogEntry] {
-        match count {
-            None | Some(0) => &self.history,
-            Some(n) => {
-                let start = self.history.len().saturating_sub(n);
-                &self.history[start..]
-            }
-        }
+    /// `Vec<&LogEntry>`.
+    pub fn tail(&self, count: Option<usize>) -> Vec<&LogEntry> {
+        let n = match count {
+            None | Some(0) => self.history.len(),
+            Some(v) => v.min(self.history.len()),
+        };
+        self.history
+            .iter()
+            .skip(self.history.len().saturating_sub(n))
+            .collect()
     }
 
     /// Filters history by category tag (case-insensitive prefix match).

@@ -1,12 +1,12 @@
-- TODO: Add an entity or ECS inspector surface such as `lurek.devtools.openEntityInspector()`.
-- TODO: Add GPU or render profiling alongside the current CPU-only profiling zones.
+- DONE: Added an entity inspector surface: `lurek.devtools.openEntityInspector()` and `lurek.devtools.isEntityInspectorOpen()`.
+- DONE: Added lightweight GPU profiling surface via `lurek.devtools.recordGpuFrameTime()` and `lurek.devtools.getGpuFrameStats()`.
 - TODO: Replace the polling-only `FileWatcher` with OS-native file-system events where supported.
-- TODO: Replace `Vec::remove(0)` ring eviction in `FrameStats`, `Logger`, and frame history storage with an O(1) buffer strategy.
-- TODO: Reduce avoidable intermediate allocation patterns in `Profiler::end_frame` if profiling overhead becomes measurable.
-- TODO: Add tests for `FrameStats` edge cases such as a single sample and all-equal samples.
-- TODO: Add a test for the logger's log-to-file path.
-- TODO: Add tests covering `Profiler::get_frame()` negative-index behavior.
-- TODO: Add tests for watcher mtime change detection against real files.
+- DONE: Replaced `Vec::remove(0)` ring eviction in `FrameStats`, `Logger`, and profiler frame history with O(1) `VecDeque` strategy.
+- DONE: Reduced avoidable intermediate allocations in `Profiler::end_frame` by pre-allocating frame zone capacity.
+- DONE: Added tests for `FrameStats` edge cases (single sample and all-equal samples) in Rust.
+- DONE: Added a Rust test for logger log-to-file path behavior.
+- DONE: Added Rust test coverage for `Profiler::get_frame()` negative-index behavior.
+- DONE: Added Rust tests for watcher mtime change detection against real files.
 - TODO: Deduplicate the shared epoch or elapsed-time pattern between logger and profiler if it keeps spreading.
 - TODO: Extract `lua_value_to_string` into a shared mlua display helper if other modules need the same conversion.
 - TODO: Move `FileWatcher::mtime` to a more central filesystem utility if watcher helpers keep duplicating there.

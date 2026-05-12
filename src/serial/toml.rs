@@ -6,6 +6,22 @@
 use super::lua_table::SerialValue;
 use indexmap::IndexMap;
 
+/// Parse a TOML string into a raw `toml::Value` (lower-level).
+///
+/// This provides direct access to the toml crate's native type, useful when
+/// you need to inspect TOML structure without converting to `SerialValue`.
+///
+/// # Parameters
+/// - `input` — `&str`. TOML text.
+///
+/// # Returns
+/// `Result<toml::Value, String>`.
+pub fn parse_toml(input: &str) -> Result<toml::Value, String> {
+    input
+        .parse::<toml::Value>()
+        .map_err(|e| format!("TOML parse error: {e}"))
+}
+
 /// Parse a TOML string into a `SerialValue`.
 ///
 /// # Parameters
@@ -14,10 +30,25 @@ use indexmap::IndexMap;
 /// # Returns
 /// `Result<SerialValue, String>`.
 pub fn from_toml(s: &str) -> Result<SerialValue, String> {
-    let v: toml::Value = s
-        .parse::<toml::Value>()
-        .map_err(|e| format!("TOML parse error: {e}"))?;
+    let v = parse_toml(s)?;
     Ok(toml_to_serial(v))
+}
+
+/// Encode a `toml::Value` into a TOML string (lower-level).
+///
+/// Only table values are accepted at the top level because the TOML spec
+/// requires documents to be tables. Non-table values produce an error.
+///
+/// # Parameters
+/// - `value` — `&toml::Value`.
+///
+/// # Returns
+/// `Result<String, String>`.
+pub fn encode_toml(value: &toml::Value) -> Result<String, String> {
+    match value {
+        toml::Value::Table(t) => toml::to_string(t).map_err(|e| format!("TOML encode error: {e}")),
+        _ => Err("encode_toml expects a table value".into()),
+    }
 }
 
 /// Serialize a `SerialValue` to a TOML string.
@@ -29,10 +60,7 @@ pub fn from_toml(s: &str) -> Result<SerialValue, String> {
 /// `Result<String, String>`.
 pub fn to_toml(val: &SerialValue) -> Result<String, String> {
     let tv = serial_to_toml(val)?;
-    match &tv {
-        toml::Value::Table(t) => toml::to_string(t).map_err(|e| format!("TOML encode error: {e}")),
-        _ => Err("to_toml: root value must be a map".to_string()),
-    }
+    encode_toml(&tv)
 }
 
 /// Convert a `toml::Value` to `SerialValue`.

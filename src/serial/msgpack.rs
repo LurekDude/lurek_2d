@@ -111,3 +111,45 @@ pub fn decode(bytes: &[u8]) -> Result<SerialValue, String> {
     log_msg!(debug, SR04_MSGPACK_DEC);
     Ok(msg_to_serial(mv))
 }
+
+// ── serde_json::Value helpers (for backward compatibility and data_api) ──────
+
+/// Encode a `serde_json::Value` to MessagePack bytes (lower-level, no SerialValue).
+///
+/// This is provided for compatibility with code that works directly with
+/// `serde_json::Value`. Prefer `encode()` for new code.
+///
+/// # Parameters
+/// - `value` — `&serde_json::Value`. The value to encode.
+///
+/// # Returns
+/// `Result<Vec<u8>, String>`.
+pub fn encode_json(value: &serde_json::Value) -> Result<Vec<u8>, String> {
+    let bytes = rmps::to_vec(value).map_err(|e| format!("MessagePack encode error: {e}"))?;
+    Ok(bytes)
+}
+
+/// Decode MessagePack bytes into a `serde_json::Value` (lower-level, no SerialValue).
+///
+/// This is provided for compatibility with code that works directly with
+/// `serde_json::Value`. Prefer `decode()` for new code.
+///
+/// # Parameters
+/// - `bytes` — `&[u8]`. The raw MessagePack payload.
+///
+/// # Returns
+/// `Result<serde_json::Value, String>`.
+pub fn decode_json(bytes: &[u8]) -> Result<serde_json::Value, String> {
+    use serde::Deserialize;
+
+    let mut deserializer = rmps::Deserializer::new(std::io::Cursor::new(bytes));
+    let value = serde_json::Value::deserialize(&mut deserializer)
+        .map_err(|e| format!("MessagePack decode error: {e}"))?;
+
+    let consumed = deserializer.get_ref().position() as usize;
+    if consumed != bytes.len() {
+        return Err("MessagePack decode error: trailing bytes after root value".to_string());
+    }
+
+    Ok(value)
+}

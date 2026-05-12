@@ -16,6 +16,8 @@
 use crate::log_msg;
 use crate::runtime::log_messages::{TR01, TR02};
 
+use super::easing::bounce_out;
+
 /// Visual transition types between scenes.
 ///
 /// # Variants
@@ -163,32 +165,6 @@ impl EasingType {
     }
 }
 
-/// Bounce ease-out helper.
-///
-/// Evaluates the standard three-bounce equation for a normalised input `t`.
-///
-/// # Parameters
-/// - `t` â€” `f32`.
-///
-/// # Returns
-/// `f32`.
-fn bounce_out(t: f32) -> f32 {
-    const N1: f32 = 7.5625;
-    const D1: f32 = 2.75;
-    if t < 1.0 / D1 {
-        N1 * t * t
-    } else if t < 2.0 / D1 {
-        let t = t - 1.5 / D1;
-        N1 * t * t + 0.75
-    } else if t < 2.5 / D1 {
-        let t = t - 2.25 / D1;
-        N1 * t * t + 0.9375
-    } else {
-        let t = t - 2.625 / D1;
-        N1 * t * t + 0.984_375
-    }
-}
-
 /// Active transition state tracking progress between two scenes.
 ///
 /// Created by `SceneStack::push`, `pop`, `switch_to`, or `push_overlay` when a
@@ -321,6 +297,9 @@ impl ActiveTransition {
     /// # Parameters
     /// - `dt` â€” `f32`.
     pub fn update(&mut self, dt: f32) {
+        if dt <= 0.0 {
+            return;
+        }
         self.elapsed += dt;
     }
 }

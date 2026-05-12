@@ -1158,6 +1158,20 @@ do -- Graph:getComponents
   lurek.log.info("disconnected components: " .. #g:getComponents(), "factory")
 end
 
+--@api-stub: LGraph:subgraph
+-- Returns a new graph containing only selected nodes and induced links.
+-- Use to run isolated simulation on a connected region without mutating the original graph.
+do -- Graph:subgraph
+  local g = lurek.graph.newGraph()
+  local a = g:addNode("a")
+  local b = g:addNode("b")
+  local c = g:addNode("c")
+  g:addEdge(a, b)
+  g:addEdge(b, c)
+  local slice = g:subgraph({ a, b })
+  lurek.log.info("slice nodes=" .. slice:getNodeCount() .. " edges=" .. slice:getEdgeCount(), "factory")
+end
+
 --@api-stub: LGraph:hasCycle
 -- Returns true if the graph contains a directed cycle.
 -- Refuse to topo-sort or to lay out a DAG layer-by-layer when this returns true.

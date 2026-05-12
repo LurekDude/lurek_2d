@@ -12,14 +12,31 @@ use std::rc::Rc;
 
 use crate::image::serial;
 use crate::image::{CompressedImageData, ImageData, LayeredImage, ProvinceGrid};
+use crate::render::{DrawMode, RenderCommand};
 
 // -------------------------------------------------------------------------------
 // LuaProvinceGrid UserData
 // -------------------------------------------------------------------------------
 
 /// Lua-side wrapper around [`ProvinceGrid`].
+#[derive(Clone)]
+struct ProvinceShapeCacheEntry {
+    r: f32,
+    g: f32,
+    b: f32,
+    min_x: f32,
+    min_y: f32,
+    max_x: f32,
+    max_y: f32,
+    vertices: Vec<f32>,
+}
+
 pub struct LuaProvinceGrid {
     inner: ProvinceGrid,
+    state: Rc<RefCell<SharedState>>,
+    /// Pre-computed per-ring draw data: (r, g, b, flat_unit_vertices).
+    /// Built once on the first `drawShapes()` call, then reused every frame.
+    shape_cache: Option<Vec<ProvinceShapeCacheEntry>>,
 }
 
 impl LuaUserData for LuaProvinceGrid {
@@ -100,6 +117,198 @@ impl LuaUserData for LuaProvinceGrid {
                 t.set(i + 1, seg)?;
             }
             Ok(t)
+        });
+
+        // -- getPolygons --
+        /// Returns the raw border-trace polygon(s) for every province.
+        /// Each entry in the returned table is { province_id, rings }, where
+        /// rings is an array of point arrays {{ x, y }, ...}.
+        /// Points are in pixel-grid space (top-left corner of each pixel).
+        /// @return | table | Per-province polygon data.
+        methods.add_method("getPolygons", |lua, this, ()| {
+            let map = this.inner.province_polygons();
+            let out = lua.create_table()?;
+            let mut idx = 1usize;
+            for (id, rings) in &map {
+                let entry = lua.create_table()?;
+                entry.set("province_id", *id)?;
+                let rings_tbl = lua.create_table()?;
+                for (ri, ring) in rings.iter().enumerate() {
+                    let pts = lua.create_table()?;
+                    for (pi, &(x, y)) in ring.iter().enumerate() {
+                        let pt = lua.create_table()?;
+                        pt.set(1, x)?;
+                        pt.set(2, y)?;
+                        pts.set(pi + 1, pt)?;
+                    }
+                    rings_tbl.set(ri + 1, pts)?;
+                }
+                entry.set("rings", rings_tbl)?;
+                out.set(idx, entry)?;
+                idx += 1;
+            }
+            Ok(out)
+        });
+
+        // -- getPolygonsSimplified --
+        /// Same as getPolygons but collinear points are removed and 45° staircase
+        /// runs are collapsed to a single diagonal segment.
+        /// Use this for rendering outlines or physics shapes — far fewer vertices.
+        /// @return | table | Per-province simplified polygon data (same layout as getPolygons).
+        methods.add_method("getPolygonsSimplified", |lua, this, ()| {
+            let map = this.inner.province_polygons_simplified();
+            let out = lua.create_table()?;
+            let mut idx = 1usize;
+            for (id, rings) in &map {
+                let entry = lua.create_table()?;
+                entry.set("province_id", *id)?;
+                let rings_tbl = lua.create_table()?;
+                for (ri, ring) in rings.iter().enumerate() {
+                    let pts = lua.create_table()?;
+                    for (pi, &(x, y)) in ring.iter().enumerate() {
+                        let pt = lua.create_table()?;
+                        pt.set(1, x)?;
+                        pt.set(2, y)?;
+                        pts.set(pi + 1, pt)?;
+                    }
+                    rings_tbl.set(ri + 1, pts)?;
+                }
+                entry.set("rings", rings_tbl)?;
+                out.set(idx, entry)?;
+                idx += 1;
+            }
+            Ok(out)
+        });
+
+        // -- drawShapes --
+        /// Draws all province shapes using their original PNG colours.
+        /// Polygons are computed once on the first call and cached — subsequent calls
+        /// only push the pre-built draw commands into the render queue.
+        /// Optional viewport args `(x, y, w, h)` cull off-screen shapes in world/map space.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("drawShapes", |_, this, args: LuaMultiValue| {
+            let viewport = if args.is_empty() {
+                None
+            } else {
+                let mut it = args.into_iter();
+                let next_f32 = |v: Option<LuaValue>| -> Result<f32, LuaError> {
+                    match v {
+                        Some(LuaValue::Integer(n)) => Ok(n as f32),
+                        Some(LuaValue::Number(n)) => Ok(n as f32),
+                        Some(other) => Err(LuaError::RuntimeError(format!(
+                            "drawShapes expected numeric viewport argument, got {:?}",
+                            other.type_name()
+                        ))),
+                        None => Err(LuaError::RuntimeError(
+                            "drawShapes expected four viewport numbers".into(),
+                        )),
+                    }
+                };
+
+                let x = next_f32(it.next())?;
+                let y = next_f32(it.next())?;
+                let w = next_f32(it.next())?;
+                let h = next_f32(it.next())?;
+                if it.next().is_some() {
+                    return Err(LuaError::RuntimeError(
+                        "drawShapes accepts either no args or four viewport numbers".into(),
+                    ));
+                }
+                Some((x, y, w, h))
+            };
+            // --- build cache once ---
+            if this.shape_cache.is_none() {
+                // Use simplified polygons so the cached draw data stays compact.
+                // Shared borders are still derived from the same province grid.
+                let polygons = this.inner.province_polygons_simplified();
+                let mut cache: Vec<ProvinceShapeCacheEntry> = Vec::new();
+                for (&id, rings) in &polygons {
+                    if let Some((r, g, b)) = this.inner.province_color(id) {
+                        let rf = r as f32 / 255.0;
+                        let gf = g as f32 / 255.0;
+                        let bf = b as f32 / 255.0;
+                        for ring in rings {
+                            if ring.len() < 3 {
+                                continue;
+                            }
+                            let ring_points: &[(u32, u32)] = if ring.len() >= 2
+                                && ring.first() == ring.last()
+                            {
+                                &ring[..ring.len() - 1]
+                            } else {
+                                ring.as_slice()
+                            };
+                            if ring_points.len() < 3 {
+                                continue;
+                            }
+                            let verts: Vec<f32> = ring_points
+                                .iter()
+                                .flat_map(|&(px, py)| [px as f32, py as f32])
+                                .collect();
+                            let mut min_x = f32::INFINITY;
+                            let mut min_y = f32::INFINITY;
+                            let mut max_x = f32::NEG_INFINITY;
+                            let mut max_y = f32::NEG_INFINITY;
+                            for chunk in verts.chunks_exact(2) {
+                                let x = chunk[0];
+                                let y = chunk[1];
+                                min_x = min_x.min(x);
+                                min_y = min_y.min(y);
+                                max_x = max_x.max(x);
+                                max_y = max_y.max(y);
+                            }
+                            cache.push(ProvinceShapeCacheEntry {
+                                r: rf,
+                                g: gf,
+                                b: bf,
+                                min_x,
+                                min_y,
+                                max_x,
+                                max_y,
+                                vertices: verts,
+                            });
+                        }
+                    }
+                }
+                this.shape_cache = Some(cache);
+            }
+
+            let (view_x, view_y, view_w, view_h) = viewport.unwrap_or((
+                f32::NEG_INFINITY,
+                f32::NEG_INFINITY,
+                f32::INFINITY,
+                f32::INFINITY,
+            ));
+            let view_x2 = view_x + view_w;
+            let view_y2 = view_y + view_h;
+
+            // --- push cached commands ---
+            let saved_color = this.state.borrow().current_color;
+            {
+                let mut st = this.state.borrow_mut();
+                for entry in this.shape_cache.as_ref().unwrap() {
+                    if entry.max_x < view_x
+                        || entry.min_x > view_x2
+                        || entry.max_y < view_y
+                        || entry.min_y > view_y2
+                    {
+                        continue;
+                    }
+                    st.render_commands.push(RenderCommand::SetColor(entry.r, entry.g, entry.b, 1.0));
+                    st.render_commands.push(RenderCommand::Polygon {
+                        mode: DrawMode::Fill,
+                        vertices: entry.vertices.clone(),
+                    });
+                }
+                st.render_commands.push(RenderCommand::SetColor(
+                    saved_color[0],
+                    saved_color[1],
+                    saved_color[2],
+                    saved_color[3],
+                ));
+                st.current_color = saved_color;
+            }
+            Ok(())
         });
 
         // -- type --
@@ -464,12 +673,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 let name = filename
                     .to_str()
                     .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-                let path = s.borrow().game_dir.join(name);
-                ImageData::from_file(
-                    path.to_str()
-                        .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?,
-                )
-                .map_err(LuaError::RuntimeError)?
+                let bytes = s.borrow().fs.read_bytes(name).map_err(LuaError::external)?;
+                ImageData::from_encoded_bytes(&bytes, name).map_err(LuaError::RuntimeError)?
             } else {
                 let width = match first {
                     LuaValue::Integer(n) => n as u32,
@@ -613,7 +818,8 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 .fs
                 .read_bytes(&filename)
                 .map_err(LuaError::external)?;
-            let img = serial::load_image_from_bytes(&bytes, &filename).map_err(LuaError::external)?;
+            let img =
+                serial::load_image_from_bytes(&bytes, &filename).map_err(LuaError::external)?;
             lua.create_userdata(img)
         })?,
     )?;
@@ -666,7 +872,11 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 .to_str()
                 .ok_or_else(|| LuaError::RuntimeError("Invalid path".into()))?;
             let grid = ProvinceGrid::from_file(path_str).map_err(LuaError::RuntimeError)?;
-            lua.create_userdata(LuaProvinceGrid { inner: grid })
+            lua.create_userdata(LuaProvinceGrid {
+                inner: grid,
+                state: s.clone(),
+                shape_cache: None,
+            })
         })?,
     )?;
 
@@ -1125,6 +1335,84 @@ impl mlua::UserData for ImageData {
             },
         );
 
+        // -- drawNineSlice --
+        #[allow(clippy::type_complexity)]
+        /// Draws a nine-slice patch from a source atlas image into this image.
+        ///
+        /// Source rect is defined by `(src_x, src_y, src_w, src_h)`. Insets split
+        /// that rect into corners, edges, and center; corners keep fixed size while
+        /// edges/center stretch to destination size.
+        ///
+        /// @param | source | ImageData | Atlas/source image that contains the patch.
+        /// @param | src_x | integer | Source X in source image.
+        /// @param | src_y | integer | Source Y in source image.
+        /// @param | src_w | integer | Source width.
+        /// @param | src_h | integer | Source height.
+        /// @param | dst_x | integer | Destination X in this image.
+        /// @param | dst_y | integer | Destination Y in this image.
+        /// @param | dst_w | integer | Destination width.
+        /// @param | dst_h | integer | Destination height.
+        /// @param | inset_left | integer | Left inset from atlas metadata.
+        /// @param | inset_right | integer | Right inset from atlas metadata.
+        /// @param | inset_top | integer | Top inset from atlas metadata.
+        /// @param | inset_bottom | integer | Bottom inset from atlas metadata.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "drawNineSlice",
+            |_,
+             this,
+             (
+                src_ud,
+                src_x,
+                src_y,
+                src_w,
+                src_h,
+                dst_x,
+                dst_y,
+                dst_w,
+                dst_h,
+                inset_left,
+                inset_right,
+                inset_top,
+                inset_bottom,
+            ): (
+                LuaAnyUserData,
+                u32,
+                u32,
+                u32,
+                u32,
+                i32,
+                i32,
+                u32,
+                u32,
+                u32,
+                u32,
+                u32,
+                u32,
+            )| {
+                let src_ref = src_ud
+                    .borrow::<ImageData>()
+                    .map_err(|_| LuaError::RuntimeError("source must be an ImageData".into()))?;
+                this.draw_nine_slice(
+                    &src_ref,
+                    src_x,
+                    src_y,
+                    src_w,
+                    src_h,
+                    dst_x,
+                    dst_y,
+                    dst_w,
+                    dst_h,
+                    inset_left,
+                    inset_right,
+                    inset_top,
+                    inset_bottom,
+                )
+                .map_err(LuaError::RuntimeError)?;
+                Ok(())
+            },
+        );
+
         // -- getRegion --
         /// Returns a copy of the rectangular sub-region as a new ImageData.
         ///
@@ -1322,6 +1610,19 @@ impl LuaUserData for LuaPaletteLUT {
         /// @return | nil | No value is returned.
         methods.add_method_mut("clear", |_, this, ()| {
             this.inner.clear();
+            Ok(())
+        });
+
+        // -- cycle --
+        /// Rotates destination palette entries for palette-cycling animation.
+        ///
+        /// Positive values rotate to the right, negative values rotate to the left.
+        /// The source-color side of the LUT stays unchanged.
+        ///
+        /// @param | offset | integer | Rotation offset in entries.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("cycle", |_, this, offset: i32| {
+            this.inner.cycle_to_colors(offset);
             Ok(())
         });
 

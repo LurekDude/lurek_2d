@@ -19,6 +19,8 @@
 
 /// Cinematic camera effects: zoom pulse, sway, and breathing.
 pub mod effects;
+/// Multi-camera orchestration for split-screen, minimap, and picture-in-picture.
+pub mod multi;
 /// Camera path follower and smooth-zoom tween helpers for `LuaCamera2D`.
 pub mod path;
 /// Render-command generation for camera transforms.
@@ -31,7 +33,8 @@ pub mod viewport;
 pub mod viewport_scale;
 
 pub use effects::{CameraBreathing, CameraSway, ZoomPulse};
-pub use path::{CameraPath, ZoomTween};
-pub use types::{Camera, Camera2D};
+pub use multi::CameraRig2D;
+pub use path::{CameraPath, CameraTweenEasing, CameraZoomTween, ZoomTween};
+pub use types::{Camera, Camera2D, CameraFollowEasing};
 pub use viewport::{ScaleMode, Viewport};
 pub use viewport_scale::ViewportScale;

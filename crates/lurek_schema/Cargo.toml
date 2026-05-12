@@ -1,0 +1,9 @@
+[package]
+name = "lurek_schema"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "Lightweight runtime schema validator extracted from Lurek2D docs module"
+
+[dependencies]
+toml = "0.8"

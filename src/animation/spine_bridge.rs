@@ -92,8 +92,7 @@ impl SpineAnimBridge {
     pub fn map_looping(&mut self, fsm_state: &str, skeleton_clip: &str, looping: bool) {
         self.state_map
             .insert(fsm_state.to_string(), skeleton_clip.to_string());
-        self.looping_states
-            .insert(fsm_state.to_string(), looping);
+        self.looping_states.insert(fsm_state.to_string(), looping);
     }
 
     /// Advances the FSM by `dt`, reacts to state changes, and updates the skeleton.

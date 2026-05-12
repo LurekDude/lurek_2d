@@ -8,7 +8,7 @@
 //! All public items are documented. See the parent module for architectural context
 //! and the `lurek.*` Lua API for the scripting interface.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use crate::log_msg;
 use crate::runtime::log_messages::{
@@ -45,6 +45,10 @@ pub struct SceneStack {
     data_keys: HashMap<String, SceneId>,
     /// Active visual transition, if any.
     transition: Option<ActiveTransition>,
+    /// Queued transitions chained by the scene sequencer.
+    transition_queue: VecDeque<(TransitionType, f32, EasingType)>,
+    /// Per-scene logical layer used to order process callbacks.
+    scene_layers: HashMap<SceneId, i32>,
     /// Next available scene ID.
     next_id: u64,
     /// IDs pushed via `push_overlay`; scenes in this set do not pause the scene below.
@@ -63,6 +67,8 @@ impl SceneStack {
             registry: HashMap::new(),
             data_keys: HashMap::new(),
             transition: None,
+            transition_queue: VecDeque::new(),
+            scene_layers: HashMap::new(),
             next_id: 1,
             overlay_ids: HashSet::new(),
         }
@@ -76,6 +82,41 @@ impl SceneStack {
         let id = self.next_id;
         self.next_id += 1;
         id
+    }
+
+    fn enqueue_or_start_transition(
+        &mut self,
+        transition_type: TransitionType,
+        duration: f32,
+        easing: EasingType,
+    ) {
+        if transition_type == TransitionType::None || duration <= 0.0 {
+            return;
+        }
+
+        if self.transition.is_some() {
+            self.transition_queue
+                .push_back((transition_type, duration, easing));
+        } else {
+            self.transition = Some(ActiveTransition::new_with_easing(
+                transition_type,
+                duration,
+                easing,
+            ));
+        }
+    }
+
+    fn start_next_transition_from_queue(&mut self) {
+        if self.transition.is_some() {
+            return;
+        }
+        if let Some((transition_type, duration, easing)) = self.transition_queue.pop_front() {
+            self.transition = Some(ActiveTransition::new_with_easing(
+                transition_type,
+                duration,
+                easing,
+            ));
+        }
     }
 
     /// Push a scene ID onto the stack and start an optional transition.
@@ -101,14 +142,9 @@ impl SceneStack {
     ) -> Option<SceneId> {
         log_msg!(info, SC02_SCENE_PUSH);
         let prev = self.stack.last().copied();
-        if transition_type != TransitionType::None && duration > 0.0 {
-            self.transition = Some(ActiveTransition::new_with_easing(
-                transition_type,
-                duration,
-                easing,
-            ));
-        }
+        self.enqueue_or_start_transition(transition_type, duration, easing);
         self.stack.push(scene_id);
+        self.scene_layers.entry(scene_id).or_insert(0);
         prev
     }
 
@@ -141,14 +177,9 @@ impl SceneStack {
         let popped = self.stack.pop().unwrap();
         // Clear the effect flag if this scene was pushed as an overlay.
         self.overlay_ids.remove(&popped);
+        self.scene_layers.remove(&popped);
         let revealed = self.stack.last().copied();
-        if transition_type != TransitionType::None && duration > 0.0 {
-            self.transition = Some(ActiveTransition::new_with_easing(
-                transition_type,
-                duration,
-                easing,
-            ));
-        }
+        self.enqueue_or_start_transition(transition_type, duration, easing);
         Ok((popped, revealed))
     }
 
@@ -175,18 +206,14 @@ impl SceneStack {
         let old = if !self.stack.is_empty() {
             let old_id = self.stack.pop().unwrap();
             self.overlay_ids.remove(&old_id);
+            self.scene_layers.remove(&old_id);
             Some(old_id)
         } else {
             None
         };
-        if transition_type != TransitionType::None && duration > 0.0 {
-            self.transition = Some(ActiveTransition::new_with_easing(
-                transition_type,
-                duration,
-                easing,
-            ));
-        }
+        self.enqueue_or_start_transition(transition_type, duration, easing);
         self.stack.push(scene_id);
+        self.scene_layers.entry(scene_id).or_insert(0);
         old
     }
 
@@ -199,7 +226,9 @@ impl SceneStack {
     pub fn clear(&mut self) -> Vec<SceneId> {
         log_msg!(info, SC04_STACK_CLEAR);
         self.transition = None;
+        self.transition_queue.clear();
         self.overlay_ids.clear();
+        self.scene_layers.clear();
         std::mem::take(&mut self.stack)
     }
 
@@ -234,6 +263,7 @@ impl SceneStack {
             }
             let id = self.stack.pop().unwrap();
             self.overlay_ids.remove(&id);
+            self.scene_layers.remove(&id);
             popped.push(id);
         }
         popped
@@ -300,6 +330,36 @@ impl SceneStack {
         self.transition.as_ref().map_or(0.0, |t| t.progress_eased())
     }
 
+    /// Queue an additional transition to run after the current transition finishes.
+    ///
+    /// If there is no active transition, the queued transition starts immediately.
+    ///
+    /// # Parameters
+    /// - `transition_type` — `TransitionType`.
+    /// - `duration` — `f32`.
+    /// - `easing` — `EasingType`.
+    pub fn queue_transition(
+        &mut self,
+        transition_type: TransitionType,
+        duration: f32,
+        easing: EasingType,
+    ) {
+        self.enqueue_or_start_transition(transition_type, duration, easing);
+    }
+
+    /// Number of queued transitions waiting behind the current one.
+    ///
+    /// # Returns
+    /// `usize`.
+    pub fn queued_transition_count(&self) -> usize {
+        self.transition_queue.len()
+    }
+
+    /// Clear all transitions queued in the sequencer.
+    pub fn clear_transition_queue(&mut self) {
+        self.transition_queue.clear();
+    }
+
     /// Update the active transition timer. Returns true if the transition just completed.
     ///
     /// # Parameters
@@ -312,8 +372,11 @@ impl SceneStack {
             t.update(dt);
             if t.is_complete() {
                 self.transition = None;
+                self.start_next_transition_from_queue();
                 return true;
             }
+        } else {
+            self.start_next_transition_from_queue();
         }
         false
     }
@@ -346,14 +409,9 @@ impl SceneStack {
         log_msg!(info, SC02_SCENE_PUSH);
         let prev = self.stack.last().copied();
         self.overlay_ids.insert(scene_id);
-        if transition_type != TransitionType::None && duration > 0.0 {
-            self.transition = Some(ActiveTransition::new_with_easing(
-                transition_type,
-                duration,
-                easing,
-            ));
-        }
+        self.enqueue_or_start_transition(transition_type, duration, easing);
         self.stack.push(scene_id);
+        self.scene_layers.entry(scene_id).or_insert(100);
         prev
     }
 
@@ -390,7 +448,41 @@ impl SceneStack {
             }
         }
     }
+    /// Set logical processing layer for a scene.
+    ///
+    /// Lower values run first during `process*` callbacks.
+    ///
+    /// # Parameters
+    /// - `scene_id` — `SceneId`.
+    /// - `layer` — `i32`.
+    pub fn set_scene_layer(&mut self, scene_id: SceneId, layer: i32) {
+        self.scene_layers.insert(scene_id, layer);
+    }
 
+    /// Get logical processing layer for a scene.
+    ///
+    /// # Parameters
+    /// - `scene_id` — `SceneId`.
+    ///
+    /// # Returns
+    /// `i32`.
+    pub fn get_scene_layer(&self, scene_id: SceneId) -> i32 {
+        self.scene_layers.get(&scene_id).copied().unwrap_or(0)
+    }
+
+    /// Return active scene IDs ordered by logical layer and stack order.
+    ///
+    /// Lower layer values are processed first. When two scenes share a layer,
+    /// their relative order follows stack insertion order (bottom-to-top).
+    ///
+    /// # Returns
+    /// `Vec<SceneId>`.
+    pub fn get_active_ids_ordered_by_layer(&self) -> Vec<SceneId> {
+        let mut indexed: Vec<(usize, SceneId)> =
+            self.get_active_ids().iter().copied().enumerate().collect();
+        indexed.sort_by_key(|(idx, id)| (self.get_scene_layer(*id), *idx));
+        indexed.into_iter().map(|(_, id)| id).collect()
+    }
     // -- Registry --
 
     /// Register a scene by name. Panics in debug mode if the same entity is registered twice.

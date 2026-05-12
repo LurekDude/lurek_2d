@@ -160,6 +160,70 @@ mod stack_tests {
 
     // ── Overlay ───────────────────────────────────────────────────────────────
 
+    #[test]
+    fn overlay_stress_all_scenes_active() {
+        let mut s = SceneStack::new();
+        let base = s.next_scene_id();
+        s.push(base, TransitionType::None, 0.0, EasingType::Linear);
+
+        for _ in 0..32 {
+            let overlay = s.next_scene_id();
+            s.push_overlay(overlay, TransitionType::None, 0.0, EasingType::Linear);
+        }
+
+        assert_eq!(s.get_stack_size(), 33);
+        assert_eq!(s.get_active_ids().len(), 33);
+    }
+
+    #[test]
+    fn transition_queue_runs_after_active_transition() {
+        let mut s = SceneStack::new();
+        let id = s.next_scene_id();
+        s.push(id, TransitionType::Fade, 0.5, EasingType::Linear);
+        s.queue_transition(TransitionType::Wipe, 0.5, EasingType::EaseOut);
+
+        assert_eq!(s.queued_transition_count(), 1);
+        assert!(s.is_transitioning());
+
+        let completed = s.update_transition(0.5);
+        assert!(completed);
+        assert!(s.is_transitioning(), "queued transition should start");
+        assert_eq!(s.queued_transition_count(), 0);
+    }
+
+    #[test]
+    fn clear_transition_queue_removes_pending_transitions() {
+        let mut s = SceneStack::new();
+        let id = s.next_scene_id();
+        s.push(id, TransitionType::Fade, 1.0, EasingType::Linear);
+        s.queue_transition(TransitionType::Wipe, 0.3, EasingType::EaseOut);
+        s.queue_transition(TransitionType::Iris, 0.3, EasingType::EaseIn);
+
+        assert_eq!(s.queued_transition_count(), 2);
+        s.clear_transition_queue();
+        assert_eq!(s.queued_transition_count(), 0);
+    }
+
+    #[test]
+    fn active_ids_ordered_by_layer_sorts_ascending() {
+        let mut s = SceneStack::new();
+
+        let a = s.next_scene_id();
+        s.push(a, TransitionType::None, 0.0, EasingType::Linear);
+        s.set_scene_layer(a, 10);
+
+        let b = s.next_scene_id();
+        s.push_overlay(b, TransitionType::None, 0.0, EasingType::Linear);
+        s.set_scene_layer(b, -5);
+
+        let c = s.next_scene_id();
+        s.push_overlay(c, TransitionType::None, 0.0, EasingType::Linear);
+        s.set_scene_layer(c, 3);
+
+        let ordered = s.get_active_ids_ordered_by_layer();
+        assert_eq!(ordered, vec![b, c, a]);
+    }
+
     // ── Registry ───────────────────────────────────────────────────────────────
 
     #[test]
@@ -384,5 +448,19 @@ mod active_transition_tests {
     #[test]
     fn transition_type_from_lua_str_unknown_returns_none_variant() {
         assert_eq!(TransitionType::from_lua_str("xyz"), TransitionType::None);
+    }
+
+    #[test]
+    fn update_ignores_negative_dt() {
+        let mut t = ActiveTransition::new(TransitionType::Fade, 1.0);
+        t.update(-0.25);
+        assert!(t.elapsed.abs() < 1e-6);
+    }
+
+    #[test]
+    fn zero_duration_transition_is_complete_immediately() {
+        let t = ActiveTransition::new_with_easing(TransitionType::Fade, 0.0, EasingType::Linear);
+        assert!(t.is_complete());
+        assert!((t.progress() - 1.0).abs() < 1e-6);
     }
 }

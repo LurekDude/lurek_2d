@@ -477,3 +477,163 @@ mod error_snapshot_tests {
         assert!(json.contains(r#"say \"hello\""#), "json={json}");
     }
 }
+
+// ── PhysicsRunConfig ─────────────────────────────────────────────────────────
+
+mod physics_run_config_tests {
+    use lurek2d::runtime::shared_state::PhysicsRunConfig;
+
+    #[test]
+    fn default_fixed_dt_is_sixty_hz() {
+        let cfg = PhysicsRunConfig::default();
+        let diff = (cfg.fixed_dt - 1.0 / 60.0).abs();
+        assert!(diff < 1e-12, "expected 1/60 s, got {}", cfg.fixed_dt);
+    }
+
+    #[test]
+    fn default_max_steps_is_eight() {
+        assert_eq!(PhysicsRunConfig::default().max_steps, 8);
+    }
+
+    #[test]
+    fn default_debug_draw_is_false() {
+        assert!(!PhysicsRunConfig::default().debug_draw);
+    }
+
+    #[test]
+    fn default_fixed_update_dt_is_zero() {
+        let cfg = PhysicsRunConfig::default();
+        assert_eq!(cfg.fixed_update_dt, 0.0);
+    }
+
+    #[test]
+    fn mutated_cfg_does_not_affect_new_default() {
+        let mut cfg = PhysicsRunConfig::default();
+        cfg.debug_draw = true;
+        cfg.max_steps = 64;
+        drop(cfg); // suppress unused-assignment warning
+        let fresh = PhysicsRunConfig::default();
+        assert!(!fresh.debug_draw);
+        assert_eq!(fresh.max_steps, 8);
+    }
+}
+
+// ── evict_lru_resources (total budget) ───────────────────────────────────────
+
+mod evict_lru_total_budget_tests {
+    use super::*;
+    use slotmap::Key;
+
+    #[test]
+    fn eviction_uses_total_resource_budget_not_just_textures() {
+        let mut st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        // Add a canvas (contributes to total_bytes via resource_memory_stats)
+        let _canvas_key = st.canvases.insert(lurek2d::render::Canvas::new(64, 64));
+
+        // Add two textures (4 * 32 * 32 = 4096 bytes each)
+        let tex_a = st.textures.insert(lurek2d::render::renderer::TextureData {
+            pixels: vec![255u8; 4 * 32 * 32],
+            width: 32,
+            height: 32,
+            color_space: lurek2d::image::TextureColorSpace::Srgb,
+        });
+        let tex_b = st.textures.insert(lurek2d::render::renderer::TextureData {
+            pixels: vec![128u8; 4 * 32 * 32],
+            width: 32,
+            height: 32,
+            color_space: lurek2d::image::TextureColorSpace::Srgb,
+        });
+
+        // Frame 1: touch tex_b (newer), leave tex_a at frame 0.
+        st.frame_counter = 1;
+        st.touch_texture(tex_b);
+
+        // Budget: total_bytes is canvas (64*64*4=16384) + 2 textures (8192) + fonts.
+        // Set budget to 0 to force eviction of both textures.
+        st.resource_budget_bytes = 0;
+        st.evict_lru_resources();
+
+        // tex_a (older) must be evicted first; with budget=0 both should be evicted.
+        assert!(
+            !st.textures.contains_key(tex_a),
+            "older texture should be evicted"
+        );
+        assert!(
+            !st.textures.contains_key(tex_b),
+            "newer texture should also be evicted when budget=0"
+        );
+        // Evicted handles must be queued for GPU release.
+        assert!(
+            st.released_texture_handles
+                .contains(&tex_a.data().as_ffi()),
+            "tex_a handle must be released"
+        );
+    }
+
+    #[test]
+    fn no_eviction_when_within_budget() {
+        let mut st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        st.textures.insert(lurek2d::render::renderer::TextureData {
+            pixels: vec![0u8; 4 * 8 * 8],
+            width: 8,
+            height: 8,
+            color_space: lurek2d::image::TextureColorSpace::Srgb,
+        });
+        // Very generous budget — no eviction expected.
+        st.resource_budget_bytes = 1024 * 1024 * 1024;
+        st.evict_lru_resources();
+        assert_eq!(st.textures.len(), 1, "no texture should be evicted");
+    }
+}
+
+// ── touch_canvas ─────────────────────────────────────────────────────────────
+
+mod touch_canvas_tests {
+    use super::*;
+
+    #[test]
+    fn touch_canvas_records_frame() {
+        let mut st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        let key = st.canvases.insert(lurek2d::render::Canvas::new(16, 16));
+        st.frame_counter = 42;
+        st.touch_canvas(key);
+        assert_eq!(
+            st.canvas_last_used.get(&key).copied(),
+            Some(42),
+            "canvas_last_used should be frame 42"
+        );
+    }
+
+    #[test]
+    fn touch_canvas_overwrites_older_frame() {
+        let mut st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        let key = st.canvases.insert(lurek2d::render::Canvas::new(16, 16));
+        st.frame_counter = 1;
+        st.touch_canvas(key);
+        st.frame_counter = 99;
+        st.touch_canvas(key);
+        assert_eq!(st.canvas_last_used.get(&key).copied(), Some(99));
+    }
+}
+
+// ── pending_config_reload ─────────────────────────────────────────────────────
+
+mod pending_config_reload_tests {
+    use super::*;
+
+    #[test]
+    fn default_pending_config_reload_is_false() {
+        let st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        assert!(!st.pending_config_reload);
+    }
+
+    #[test]
+    fn pending_config_reload_can_be_set_and_cleared() {
+        let mut st = SharedState::new(800, 600, "Test", PathBuf::from("."));
+        st.pending_config_reload = true;
+        assert!(st.pending_config_reload);
+        st.pending_config_reload = false;
+        assert!(!st.pending_config_reload);
+    }
+}
+

@@ -218,7 +218,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     )?;
 
     // -- setCondition --
-    /// Sets a named boolean condition used by `when` and `assert` step fields.
+    /// Sets a named boolean condition used by `when` and `assert` expressions.
     /// @param | name | string | Condition name.
     /// @param | value | boolean | Condition value.
     /// @return | nil | No value is returned.

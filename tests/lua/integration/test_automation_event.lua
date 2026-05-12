@@ -135,6 +135,83 @@ describe("automation + event integration", function()
         automation.stop()
         automation.unload("visual_ok")
     end)
+
+    -- @integration lurek.automation.load
+    -- @integration lurek.automation.start
+    -- @integration lurek.automation.stop
+    -- @integration lurek.automation.unload
+    -- @integration lurek.automation.update
+    -- @integration lurek.automation.setCondition
+    -- @integration lurek.automation.isFailed
+    -- @integration lurek.event.clear
+    -- @integration lurek.event.wait
+    it("supports boolean expressions in when gates", function()
+        lurek.event.clear()
+        automation.setCondition("ready", true)
+        automation.setCondition("paused", true)
+
+        automation.load("expr_when", {
+            steps = {
+                {
+                    action = "keypress",
+                    key = "z",
+                    when = "ready && !paused",
+                    time = 0.0,
+                },
+            }
+        })
+
+        automation.start("expr_when")
+        automation.update(0.02)
+        local ok1 = lurek.event.wait(0)
+        expect_equal(ok1, false)
+
+        automation.stop()
+        automation.setCondition("paused", false)
+        automation.start("expr_when")
+        automation.update(0.02)
+
+        local ok2, name = lurek.event.wait(0)
+        expect_equal(ok2, true)
+        expect_equal(name, "keypressed")
+
+        automation.stop()
+        automation.unload("expr_when")
+        lurek.event.clear()
+    end)
+
+    -- @integration lurek.automation.load
+    -- @integration lurek.automation.start
+    -- @integration lurek.automation.stop
+    -- @integration lurek.automation.unload
+    -- @integration lurek.automation.update
+    -- @integration lurek.automation.setCondition
+    -- @integration lurek.automation.isFailed
+    -- @integration lurek.automation.getLastError
+    it("reports expression failures for assert actions", function()
+        automation.setCondition("ready", true)
+        automation.setCondition("boss_dead", false)
+
+        automation.load("expr_assert", {
+            steps = {
+                {
+                    action = "assert",
+                    assert = "ready && boss_dead",
+                    time = 0.0,
+                },
+            }
+        })
+
+        automation.start("expr_assert")
+        automation.update(0.01)
+
+        expect_equal(automation.isFailed(), true)
+        local err = automation.getLastError() or ""
+        expect_equal(string.find(err, "ready && boss_dead") ~= nil, true)
+
+        automation.stop()
+        automation.unload("expr_assert")
+    end)
 end)
 
 test_summary()

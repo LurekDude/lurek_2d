@@ -1,16 +1,19 @@
 //! `lurek.particle` - Emitter-based 2D particle systems and trail ribbons.
 
 use super::callback_registry::CallbackRegistry;
+use super::physics_api::LuaWorld;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::particle::visualization as particle_vis;
+use crate::particle::{physics_collision, presets as particle_presets};
 use crate::particle::{
     AreaDistribution, EmissionShape, InsertMode, ParticleConfig, ParticleShape, ParticleSystem,
     RelativeMode, Trail,
 };
+use crate::physics::World;
 use crate::runtime::resource_keys::ParticleKey;
 
 // -------------------------------------------------------------------------------
@@ -34,6 +37,9 @@ pub struct LuaParticleSystem {
     pub(crate) custom_callbacks: Rc<RefCell<CallbackRegistry>>,
     pub(crate) custom_shape_id: Option<u32>,
     pub(crate) death_batch_id: Option<u32>,
+    pub(crate) collision_world: Option<Rc<RefCell<World>>>,
+    pub(crate) collision_probe_radius: f32,
+    pub(crate) collision_restitution: f32,
 }
 
 impl LuaUserData for LuaParticleSystem {
@@ -48,6 +54,20 @@ impl LuaUserData for LuaParticleSystem {
                 let mut st = this.state.borrow_mut();
                 if let Some(ps) = st.particle_systems.get_mut(this.key) {
                     ps.update(dt);
+                }
+            }
+            // Phase 1b: optional particle-vs-physics collision response.
+            {
+                if let Some(world) = &this.collision_world {
+                    let mut st = this.state.borrow_mut();
+                    if let Some(ps) = st.particle_systems.get_mut(this.key) {
+                        physics_collision::collide_with_world(
+                            ps,
+                            &world.borrow(),
+                            this.collision_probe_radius,
+                            this.collision_restitution,
+                        );
+                    }
                 }
             }
             // Phase 2: apply custom emission offsets
@@ -1089,6 +1109,9 @@ impl LuaUserData for LuaParticleSystem {
                 custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
                 custom_shape_id: None,
                 death_batch_id: None,
+                collision_world: None,
+                collision_probe_radius: 1.0,
+                collision_restitution: 0.6,
             })
         });
 
@@ -1216,6 +1239,38 @@ impl LuaUserData for LuaParticleSystem {
                 .ok_or_else(|| LuaError::runtime("ParticleSystem handle is invalid (released)"))?;
             ps.clear_bounds();
             Ok(())
+        });
+
+        // -- setCollidesWithPhysics --
+        /// Enables particle collision response against a physics world.
+        /// @param | world | LWorld | Physics world userdata.
+        /// @param | probe_radius | number? | Optional probe radius in world units.
+        /// @param | restitution | number? | Optional bounce restitution in [0..1].
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "setCollidesWithPhysics",
+            |_, this, (world_ud, probe_radius, restitution): (LuaAnyUserData, Option<f32>, Option<f32>)| {
+                let world = world_ud.borrow::<LuaWorld>()?;
+                this.collision_world = Some(world.world_handle());
+                this.collision_probe_radius = probe_radius.unwrap_or(1.0).max(0.1);
+                this.collision_restitution = restitution.unwrap_or(0.6).clamp(0.0, 1.0);
+                Ok(())
+            },
+        );
+
+        // -- clearCollidesWithPhysics --
+        /// Disables particle collision response against the physics world.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("clearCollidesWithPhysics", |_, this, ()| {
+            this.collision_world = None;
+            Ok(())
+        });
+
+        // -- hasCollidesWithPhysics --
+        /// Returns true if particle-vs-physics collisions are enabled.
+        /// @return | boolean | Whether collision response is enabled.
+        methods.add_method("hasCollidesWithPhysics", |_, this, ()| {
+            Ok(this.collision_world.is_some())
         });
 
         // -- addSubEmitter --
@@ -1533,6 +1588,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
                 custom_shape_id: None,
                 death_batch_id: None,
+                collision_world: None,
+                collision_probe_radius: 1.0,
+                collision_restitution: 0.6,
             })
         })?,
     )?;
@@ -1572,6 +1630,46 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
                 custom_shape_id: None,
                 death_batch_id: None,
+                collision_world: None,
+                collision_probe_radius: 1.0,
+                collision_restitution: 0.6,
+            })
+        })?,
+    )?;
+
+    // -- newPreset --
+    /// Creates a new particle system from a built-in preset.
+    /// @param | name | string | Preset name: `fire`, `smoke`, `rain`, `snow`, `sparks`.
+    /// @return | LParticleSystem | New particle system from preset config.
+    let s_preset = state.clone();
+    tbl.set(
+        "newPreset",
+        lua.create_function(move |lua, name: String| {
+            let cfg = match name.as_str() {
+                "fire" => particle_presets::fire(),
+                "smoke" => particle_presets::smoke(),
+                "rain" => particle_presets::rain(),
+                "snow" => particle_presets::snow(),
+                "sparks" => particle_presets::sparks(),
+                _ => {
+                    return Err(LuaError::runtime(format!(
+                        "unknown particle preset '{name}'"
+                    )))
+                }
+            };
+            let key = s_preset
+                .borrow_mut()
+                .particle_systems
+                .insert(ParticleSystem::new(cfg));
+            lua.create_userdata(LuaParticleSystem {
+                state: s_preset.clone(),
+                key,
+                custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
+                custom_shape_id: None,
+                death_batch_id: None,
+                collision_world: None,
+                collision_probe_radius: 1.0,
+                collision_restitution: 0.6,
             })
         })?,
     )?;
@@ -1650,6 +1748,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         "subSystemCount",
         "setCustomEmissionShape",
         "setOnDeathBatch",
+        "setCollidesWithPhysics",
+        "clearCollidesWithPhysics",
+        "hasCollidesWithPhysics",
     ];
     for &method_name in flat_methods {
         let mn = method_name.to_string();

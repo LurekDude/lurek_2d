@@ -87,6 +87,17 @@ impl FileWatcher {
     pub fn is_empty(&self) -> bool {
         self.paths.is_empty()
     }
+
+    /// Marks all watched paths as changed so the next [`poll`][Self::poll] call
+    /// reports them regardless of the actual mtime on disk.
+    ///
+    /// Useful for programmatic reload triggers such as `lurek.runtime.reloadConfig()`.
+    pub fn force_changed(&mut self) {
+        // Corrupt stored mtimes to `UNIX_EPOCH` so the `current != *last` branch fires.
+        for last in self.paths.values_mut() {
+            *last = Some(std::time::UNIX_EPOCH);
+        }
+    }
 }
 
 impl Default for FileWatcher {

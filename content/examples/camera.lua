@@ -9,7 +9,7 @@
 --
 -- Run: cargo run -- content/examples/camera.lua
 
--- â”€â”€ lurek.camera.* functions â”€â”€
+-- == lurek.camera.* functions ==
 
 --@api-stub: lurek.camera.new
 -- Creates a new Camera2D with the given viewport dimensions.
@@ -20,7 +20,7 @@ do -- lurek.camera.new
   lurek.log.info("camera viewport=" .. 1280 .. "x" .. 720, "camera")
 end
 
--- â”€â”€ Camera2D methods â”€â”€
+-- == Camera2D methods ==
 
 --@api-stub: Camera2D:setPosition
 -- Sets the camera's world-space position.
@@ -930,3 +930,296 @@ do -- LCamera:getEffectOffset
   local ox, oy = cam:getEffectOffset()
   lurek.log.info("sway_offset=" .. ox .. "," .. oy, "camera")
 end
+
+--@api-stub: LCamera:setFollowEasing
+-- Sets the easing mode used by smooth-follow interpolation.
+do -- LCamera:setFollowEasing
+  local cam = lurek.camera.new(800, 600)
+  cam:setFollowEasing("smoothstep")
+  lurek.log.info("follow easing set", "camera")
+end
+
+--@api-stub: LCamera:getFollowEasing
+-- Returns the current follow easing mode.
+do -- LCamera:getFollowEasing
+  local cam = lurek.camera.new(800, 600)
+  cam:setFollowEasing("easeout")
+  lurek.log.info("follow easing=" .. cam:getFollowEasing(), "camera")
+end
+
+--@api-stub: LCamera:onWindowResize
+-- Updates camera viewport directly from a raw window resize event.
+do -- LCamera:onWindowResize
+  local cam = lurek.camera.new(800, 600)
+  cam:onWindowResize(1920, 1080)
+  local x, y, w, h = cam:getViewport()
+  lurek.log.info("resized viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCamera:onWindowResizeScaled
+-- Updates viewport from resize event using logical game size and scale mode mapping.
+do -- LCamera:onWindowResizeScaled
+  local cam = lurek.camera.new(800, 600)
+  cam:onWindowResizeScaled(800, 600, 1200, 600, "letterbox")
+  local x, y, w, h = cam:getViewport()
+  lurek.log.info("scaled viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: lurek.camera.newRig
+-- Creates a multi-camera rig for split-screen, minimap, and PiP setups.
+do -- lurek.camera.newRig
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  local names = rig:names()
+  lurek.log.info("rig camera count=" .. tostring(#names), "camera")
+end
+
+--@api-stub: LCameraRig:splitScreen
+-- Builds left/right split-screen cameras and sets their viewports.
+do -- LCameraRig:splitScreen
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  local x, y, w, h = rig:getViewport("left")
+  lurek.log.info("left viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCameraRig:minimap
+-- Builds a main camera and a minimap camera in the top-right corner.
+do -- LCameraRig:minimap
+  local rig = lurek.camera.newRig()
+  rig:minimap(1280, 720, 0.25)
+  local x, y, w, h = rig:getViewport("minimap")
+  lurek.log.info("minimap viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCameraRig:pictureInPicture
+-- Builds a main camera and a PiP camera in the bottom-right corner.
+do -- LCameraRig:pictureInPicture
+  local rig = lurek.camera.newRig()
+  rig:pictureInPicture(1280, 720, 320, 180)
+  local x, y, w, h = rig:getViewport("pip")
+  lurek.log.info("pip viewport=" .. x .. "," .. y .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCamera:getBounds
+do -- LCamera:getBounds
+  local cam = lurek.camera.new(800, 600)
+  cam:setBounds(0, 0, 100, 50)
+  local ok, x, y, w, h = cam:getBounds()
+  lurek.log.info("getBounds ok=" .. tostring(ok) .. " w=" .. w .. " h=" .. h, "camera")
+end
+
+--@api-stub: LCamera:getDeadZone
+do -- LCamera:getDeadZone
+  local cam = lurek.camera.new(800, 600)
+  cam:setDeadZone(40, 20)
+  local ok, w, h = cam:getDeadZone()
+  lurek.log.info("getDeadZone ok=" .. tostring(ok) .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCamera:getFollowSmooth
+do -- LCamera:getFollowSmooth
+  local cam = lurek.camera.new(800, 600)
+  cam:setFollowSmooth(3.0)
+  lurek.log.info("follow smooth=" .. cam:getFollowSmooth(), "camera")
+end
+
+--@api-stub: LCamera:getLookAhead
+do -- LCamera:getLookAhead
+  local cam = lurek.camera.new(800, 600)
+  cam:setLookAhead(0.4)
+  lurek.log.info("lookAhead=" .. cam:getLookAhead(), "camera")
+end
+
+--@api-stub: LCamera:getRenderOffset
+do -- LCamera:getRenderOffset
+  local cam = lurek.camera.new(800, 600)
+  local x, y = cam:getRenderOffset()
+  lurek.log.info("render offset=" .. x .. "," .. y, "camera")
+end
+
+--@api-stub: LCamera:getRotationConstraints
+do -- LCamera:getRotationConstraints
+  local cam = lurek.camera.new(800, 600)
+  cam:setRotationConstraints(-1.0, 1.0)
+  local has_min, min_v, has_max, max_v = cam:getRotationConstraints()
+  lurek.log.info("rot constraints=" .. tostring(has_min) .. "," .. min_v .. "," .. tostring(has_max) .. "," .. max_v, "camera")
+end
+
+--@api-stub: LCamera:getRotationDamping
+do -- LCamera:getRotationDamping
+  local cam = lurek.camera.new(800, 600)
+  cam:setRotationDamping(0.5)
+  lurek.log.info("rotation damping=" .. cam:getRotationDamping(), "camera")
+end
+
+--@api-stub: LCamera:getShakeOffset
+do -- LCamera:getShakeOffset
+  local cam = lurek.camera.new(800, 600)
+  cam:shake(3.0, 0.4)
+  cam:update(0.1)
+  local x, y = cam:getShakeOffset()
+  lurek.log.info("shake offset=" .. x .. "," .. y, "camera")
+end
+
+--@api-stub: LCamera:getTarget
+do -- LCamera:getTarget
+  local cam = lurek.camera.new(800, 600)
+  cam:setTarget(12, 34)
+  local ok, x, y = cam:getTarget()
+  lurek.log.info("target=" .. tostring(ok) .. " " .. x .. "," .. y, "camera")
+end
+
+--@api-stub: LCamera:getZoomConstraints
+do -- LCamera:getZoomConstraints
+  local cam = lurek.camera.new(800, 600)
+  cam:setZoomConstraints(0.5, 2.5)
+  local has_min, min_v, has_max, max_v = cam:getZoomConstraints()
+  lurek.log.info("zoom constraints=" .. tostring(has_min) .. "," .. min_v .. "," .. tostring(has_max) .. "," .. max_v, "camera")
+end
+
+--@api-stub: LCamera:getZoomDamping
+do -- LCamera:getZoomDamping
+  local cam = lurek.camera.new(800, 600)
+  cam:setZoomDamping(0.25)
+  lurek.log.info("zoom damping=" .. cam:getZoomDamping(), "camera")
+end
+
+--@api-stub: LCamera:hasBounds
+do -- LCamera:hasBounds
+  local cam = lurek.camera.new(800, 600)
+  lurek.log.info("hasBounds(before)=" .. tostring(cam:hasBounds()), "camera")
+  cam:setBounds(0, 0, 100, 100)
+  lurek.log.info("hasBounds(after)=" .. tostring(cam:hasBounds()), "camera")
+end
+
+--@api-stub: LCamera:presetAggressiveFollow
+do -- LCamera:presetAggressiveFollow
+  local cam = lurek.camera.new(800, 600)
+  cam:presetAggressiveFollow()
+  lurek.log.info("preset aggressive", "camera")
+end
+
+--@api-stub: LCamera:presetBalancedFollow
+do -- LCamera:presetBalancedFollow
+  local cam = lurek.camera.new(800, 600)
+  cam:presetBalancedFollow()
+  lurek.log.info("preset balanced", "camera")
+end
+
+--@api-stub: LCamera:presetCinematicFollow
+do -- LCamera:presetCinematicFollow
+  local cam = lurek.camera.new(800, 600)
+  cam:presetCinematicFollow()
+  lurek.log.info("preset cinematic", "camera")
+end
+
+--@api-stub: LCamera:presetTightFollow
+do -- LCamera:presetTightFollow
+  local cam = lurek.camera.new(800, 600)
+  cam:presetTightFollow()
+  lurek.log.info("preset tight", "camera")
+end
+
+--@api-stub: LCamera:setRotationConstraints
+do -- LCamera:setRotationConstraints
+  local cam = lurek.camera.new(800, 600)
+  cam:setRotationConstraints(-0.2, 0.2)
+end
+
+--@api-stub: LCamera:setRotationDamping
+do -- LCamera:setRotationDamping
+  local cam = lurek.camera.new(800, 600)
+  cam:setRotationDamping(0.3)
+end
+
+--@api-stub: LCamera:setZoomConstraints
+do -- LCamera:setZoomConstraints
+  local cam = lurek.camera.new(800, 600)
+  cam:setZoomConstraints(0.6, 2.2)
+end
+
+--@api-stub: LCamera:setZoomDamping
+do -- LCamera:setZoomDamping
+  local cam = lurek.camera.new(800, 600)
+  cam:setZoomDamping(0.2)
+end
+
+--@api-stub: LCameraRig:apply
+do -- LCameraRig:apply
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  lurek.log.info("rig apply left=" .. tostring(rig:apply("left")), "camera")
+end
+
+--@api-stub: LCameraRig:getViewport
+do -- LCameraRig:getViewport
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  local ok, x, y, w, h = rig:getViewport("right")
+  lurek.log.info("rig viewport ok=" .. tostring(ok) .. " " .. w .. "x" .. h, "camera")
+end
+
+--@api-stub: LCameraRig:has
+do -- LCameraRig:has
+  local rig = lurek.camera.newRig()
+  rig:minimap(1280, 720, 0.25)
+  lurek.log.info("has minimap=" .. tostring(rig:has("minimap")), "camera")
+end
+
+--@api-stub: LCameraRig:names
+do -- LCameraRig:names
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  local names = rig:names()
+  lurek.log.info("rig names count=" .. tostring(#names), "camera")
+end
+
+--@api-stub: LCameraRig:remove
+do -- LCameraRig:remove
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  lurek.log.info("removed left=" .. tostring(rig:remove("left")), "camera")
+end
+
+--@api-stub: LCameraRig:setPosition
+do -- LCameraRig:setPosition
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  rig:setPosition("left", 50, 75)
+end
+
+--@api-stub: LCameraRig:setTarget
+do -- LCameraRig:setTarget
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  rig:setTarget("left", 100, 150)
+end
+
+--@api-stub: LCameraRig:setZoom
+do -- LCameraRig:setZoom
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  rig:setZoom("left", 1.2)
+end
+
+--@api-stub: LCameraRig:type
+do -- LCameraRig:type
+  local rig = lurek.camera.newRig()
+  lurek.log.info("rig type=" .. rig:type(), "camera")
+end
+
+--@api-stub: LCameraRig:typeOf
+do -- LCameraRig:typeOf
+  local rig = lurek.camera.newRig()
+  lurek.log.info("rig typeOf LCameraRig=" .. tostring(rig:typeOf("LCameraRig")), "camera")
+end
+
+--@api-stub: LCameraRig:updateAll
+do -- LCameraRig:updateAll
+  local rig = lurek.camera.newRig()
+  rig:splitScreen(1280, 720)
+  rig:updateAll(0.016)
+end
+
+

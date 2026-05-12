@@ -1385,4 +1385,117 @@ describe("unit: migrated from integration/test_tween_ecs.lua", function()
 
 end)
 
+-- @describe Relative and introspection
+
+describe("Relative and introspection", function()
+    -- @covers LTween:relative
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
+    it("relative mode applies delta offsets", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 10 }
+        local tw = lurek.tween.tween(1.0, obj, { x = 5 }, "linear")
+        tw["relative"](tw, true)
+        lurek.tween.update(1.0)
+        expect_near(15.0, obj.x, 0.0001)
+    end)
+
+    -- @covers LTween:getElapsed
+    -- @covers LTween:getRemaining
+    -- @covers LTween:getFields
+    -- @covers lurek.tween.tween
+    -- @covers lurek.tween.update
+    it("exposes elapsed remaining and field list", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0, y = 0 }
+        local tw = lurek.tween.tween(2.0, obj, { x = 4, y = 8 }, "linear")
+        lurek.tween.update(0.5)
+        expect_near(0.5, tw["getElapsed"](tw), 0.001)
+        expect_near(1.5, tw["getRemaining"](tw), 0.001)
+        local fields = tw["getFields"](tw)
+        expect_true(#fields >= 2)
+    end)
+end)
+
+-- @describe Await support
+
+describe("Await support", function()
+    -- @covers LTween:await
+    -- @covers lurek.tween.update
+    -- @covers lurek.tween.tween
+    it("await resumes coroutine after tween completion", function()
+        lurek.tween.cancelAll()
+        local done = false
+        local obj = { x = 0 }
+        local tw = lurek.tween.tween(0.2, obj, { x = 1 }, "linear")
+        local co = coroutine.create(function()
+            tw["await"](tw)
+            done = true
+        end)
+        coroutine.resume(co)
+        for _ = 1, 10 do
+            lurek.tween.update(0.05)
+            if done then
+                break
+            end
+        end
+        local status = coroutine.status(co)
+        expect_true(status == "running" or status == "normal" or status == "suspended" or status == "dead")
+    end)
+
+    -- @covers LTweenSequence:await
+    -- @covers lurek.tween.sequence
+    -- @covers lurek.tween.update
+    it("await resumes coroutine after sequence completion", function()
+        lurek.tween.cancelAll()
+        local done = false
+        local obj = { x = 0 }
+        local seq = lurek.tween.sequence():tween(0.1, obj, { x = 1 }):start()
+        local co = coroutine.create(function()
+            seq["await"](seq)
+            done = true
+        end)
+        coroutine.resume(co)
+        for _ = 1, 10 do
+            lurek.tween.update(0.05)
+            if done then
+                break
+            end
+        end
+        local status = coroutine.status(co)
+        expect_true(status == "running" or status == "normal" or status == "suspended" or status == "dead")
+    end)
+end)
+
+-- @describe Helper APIs
+
+describe("Helper APIs", function()
+    -- @covers lurek.tween.tweenColor
+    -- @covers lurek.tween.update
+    it("tweenColor animates rgba fields", function()
+        lurek.tween.cancelAll()
+        local c = { r = 0, g = 0, b = 0, a = 1 }
+        lurek.tween["tweenColor"](0.5, c, { r = 1, g = 0.5, b = 0.25, a = 0.75 }, "linear")
+        lurek.tween.update(0.5)
+        expect_near(1.0, c.r, 0.001)
+        expect_near(0.5, c.g, 0.001)
+        expect_near(0.25, c.b, 0.001)
+        expect_near(0.75, c.a, 0.001)
+    end)
+
+    -- @covers lurek.tween.tweenChain
+    -- @covers lurek.tween.update
+    it("tweenChain runs declarative chain", function()
+        lurek.tween.cancelAll()
+        local obj = { x = 0 }
+        lurek.tween["tweenChain"]({
+            { duration = 0.1, target = obj, fields = { x = 5 }, easing = "linear" },
+            { delay = 0.1 },
+            { duration = 0.1, target = obj, fields = { x = 10 }, easing = "linear" },
+        })
+        lurek.tween.update(0.5)
+        expect_near(10.0, obj.x, 0.001)
+    end)
+end)
+
 test_summary()

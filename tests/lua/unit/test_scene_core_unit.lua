@@ -1438,15 +1438,15 @@ describe("lurek.scene.transitions", function()
     end)
 
     -- @covers lurek.scene.transitions.slide
-    it("slide() returns type=left by default", function()
+    it("slide() returns type=slideleft by default", function()
         local t = scene_transitions.slide()
-        expect_equal(t.type, "left")
+        expect_equal(t.type, "slideleft")
     end)
 
     -- @covers lurek.scene.transitions.slide
-    it("slide(\"right\") returns type=right", function()
+    it("slide(\"right\") returns type=slideright", function()
         local t = scene_transitions.slide("right")
-        expect_equal(t.type, "right")
+        expect_equal(t.type, "slideright")
     end)
 
     -- @covers lurek.scene.transitions.slide
@@ -1490,16 +1490,16 @@ describe("getTransitionTypes", function()
     end)
 
     -- @covers lurek.scene.getTransitionTypes
-    it("contains none, fade, left, right, up, down", function()
+    it("contains none, fade, slideleft, slideright, slideup, slidedown", function()
         local types = lurek.scene.getTransitionTypes()
         local lookup = {}
         for _, v in ipairs(types) do lookup[v] = true end
         expect_equal(true, lookup["none"])
         expect_equal(true, lookup["fade"])
-        expect_equal(true, lookup["left"])
-        expect_equal(true, lookup["right"])
-        expect_equal(true, lookup["up"])
-        expect_equal(true, lookup["down"])
+        expect_equal(true, lookup["slideleft"])
+        expect_equal(true, lookup["slideright"])
+        expect_equal(true, lookup["slideup"])
+        expect_equal(true, lookup["slidedown"])
     end)
 
     -- @covers lurek.scene.getTransitionTypes
@@ -1539,6 +1539,51 @@ describe("lurek.scene.newScene", function()
     end)
 end)
 
+-- @describe scene queue/layer API
+describe("scene queue/layer API", function()
+    -- @covers lurek.scene.clear
+    -- @covers lurek.scene.clearQueuedTransitions
+    -- @covers lurek.scene.getQueuedTransitionCount
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.queueTransition
+    -- @covers lurek.scene.update
+    it("queueTransition chains transition requests", function()
+        lurek.scene.clear()
+        lurek.scene.clearQueuedTransitions()
+        lurek.scene.push({})
+        lurek.scene.queueTransition("fade", 0.5, "linear")
+        lurek.scene.queueTransition("wipe", 0.5, "ease_out")
+        expect_equal(1, lurek.scene.getQueuedTransitionCount())
+        lurek.scene.update(0.5)
+        expect_equal(0, lurek.scene.getQueuedTransitionCount())
+        lurek.scene.clear()
+    end)
+
+    -- @covers lurek.scene.clear
+    -- @covers lurek.scene.getCurrentLayer
+    -- @covers lurek.scene.process
+    -- @covers lurek.scene.push
+    -- @covers lurek.scene.pushOverlay
+    -- @covers lurek.scene.setCurrentLayer
+    it("setCurrentLayer controls process order", function()
+        lurek.scene.clear()
+        local order = {}
+        local base = { process = function(self, dt) table.insert(order, "base") end }
+        local overlay = { process = function(self, dt) table.insert(order, "overlay") end }
+
+        lurek.scene.push(base)
+        lurek.scene.setCurrentLayer(10)
+        lurek.scene.pushOverlay(overlay)
+        lurek.scene.setCurrentLayer(-1)
+
+        expect_equal(-1, lurek.scene.getCurrentLayer())
+        lurek.scene.process(0.016)
+        expect_equal("overlay", order[1])
+        expect_equal("base", order[2])
+        lurek.scene.clear()
+    end)
+end)
+
 -- @describe lurek.scene transition helper aliases
 describe("lurek.scene transition helper aliases", function()
     local function get_helper(name)
@@ -1564,7 +1609,7 @@ describe("lurek.scene transition helper aliases", function()
         local slide = get_helper("slide")
         expect_equal("function", type(slide))
         local t = slide("right", 0.75)
-        expect_equal("right", t.type)
+        expect_equal("slideright", t.type)
         expect_near(0.75, t.duration, 0.001)
     end)
 

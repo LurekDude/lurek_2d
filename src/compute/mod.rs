@@ -30,3 +30,4 @@ pub mod spatial;
 
 pub use array::{DataType, NdArray};
 pub use fft::{fft, fft_magnitude, ifft};
+pub use ops::{get_par_threshold, set_par_threshold};

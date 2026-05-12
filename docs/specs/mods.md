@@ -15,6 +15,7 @@ The `mods` module is documented from the current source tree and existing module
 
 This module primarily collaborates with `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
 
+The manager now performs dependency-aware ordering, parses manifest-level `assets` and `signature` metadata during folder scans, reports malformed manifests through the log, exposes capability-based filtering for Lua consumers, and can process a hot-reload queue by reloading queued manifests from disk.
 ## Files
 
 - `mod.rs`: Declares the mod-management surface and re-exports the manager implementation.
@@ -22,7 +23,7 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 ## Types
 
-- `ModInfo` (`struct`, `mod_manager.rs`): One parsed mod manifest plus runtime status fields such as enabled, loaded, priority, dependencies, and filesystem path.
+- `ModInfo` (`struct`, `mod_manager.rs`): One parsed mod manifest plus runtime status fields such as enabled, loaded, priority, dependencies, filesystem path, asset paths, and optional integrity signature.
 - `ModManager` (`struct`, `mod_manager.rs`): The central registry for discovered mods. It owns the mod list, optional custom load order, dependency checks, and pending reload bookkeeping.
 
 ## Functions
@@ -39,10 +40,11 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `ModManager::all_mods` (`mod_manager.rs`): Returns a slice of all registered mod metadata records.
 - `ModManager::load_order` (`mod_manager.rs`): Get mods in their effective load order.
 - `ModManager::set_load_order` (`mod_manager.rs`): Set an explicit load order by providing a list of mod IDs.
-- `ModManager::clear_load_order` (`mod_manager.rs`): Clear any custom load order, reverting to priority-based sorting.
+- `ModManager::clear_load_order` (`mod_manager.rs`): Clear any custom load order, reverting to dependency-aware ordering.
 - `ModManager::get_custom_load_order` (`mod_manager.rs`): Returns a reference to the current custom load order, if any.
-- `ModManager::scan_folder` (`mod_manager.rs`): Scan a directory for mods and register them.
-- `ModManager::mark_for_reload` (`mod_manager.rs`): Marks a registered mod as requiring hot-reload on the next update tick.
+- `ModManager::get_mods_by_capability` (`mod_manager.rs`): Returns registered mods that declare a given capability flag.
+- `ModManager::scan_folder` (`mod_manager.rs`): Scan a directory for mods, validate manifests, and register them.
+- `ModManager::mark_for_reload` (`mod_manager.rs`): Marks a registered mod as requiring hot-reload on the next update tick and clears its loaded flag.
 - `ModManager::get_reload_queue` (`mod_manager.rs`): Returns the current reload queue (mod IDs pending hot-reload).
 - `ModManager::clear_reload_queue` (`mod_manager.rs`): Clear the reload queue without reloading anything.
 - `ModManager::validate_dependencies` (`mod_manager.rs`): List mod IDs whose dependencies are missing.
@@ -101,6 +103,7 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `LModManager:hasMod`: Returns whether a mod with the given ID is registered.
 - `LModManager:getModCount`: Returns the number of registered mods.
 - `LModManager:getAllMods`: Returns an array of info tables for all registered mods.
+- `LModManager:getModsByCapability`: Returns an array of registered mods that declare a given capability flag.
 - `LModManager:getLoadOrder`: Returns an array of info tables in effective load order.
 - `LModManager:validateDependencies`: Returns an array of mod IDs with missing dependencies.
 - `LModManager:hasCircularDependencies`: Returns whether any circular dependency cycles exist.
@@ -111,6 +114,7 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `LModManager:markForReload`: Marks a registered mod for hot-reload.
 - `LModManager:getReloadQueue`: Returns the array of mod IDs pending hot-reload.
 - `LModManager:clearReloadQueue`: Clears the reload queue without reloading.
+- `LModManager:processReloadQueue`: Reloads queued mods from disk and clears the queue.
 - `LModManager:type`: Returns the type name of this object.
 - `LModManager:typeOf`: Returns true if this object is of the given type.
 

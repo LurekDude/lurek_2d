@@ -7,11 +7,13 @@
 - Lua API path(s): `src/lua_api/patterns_api.rs`
 - Primary Lua namespace: `lurek.patterns`
 - Rust test path(s): tests/rust/unit/patterns_tests.rs
-- Lua test path(s): tests/lua/unit/test_patterns.lua; tests/lua/stress/test_patterns_stress.lua
+- Lua test path(s): tests/lua/unit/test_patterns_core_unit.lua; tests/lua/stress/test_patterns_stress.lua
 
 ## Summary
 
 The `patterns` module is documented from the current source tree and existing module reference data.
+
+Recent scope extension: collection utilities now include richer generic object-management operations inspired by cardgame workflows but exposed as engine-wide neutral APIs (`LStack`, `LQueue`, `LList`, and `LMap`).
 
 This module is mostly self-contained inside the Foundations group. Cross-module behavior should stay in the referenced Rust source files and Lua bindings rather than being duplicated here.
 
@@ -24,6 +26,7 @@ This module is mostly self-contained inside the Foundations group. Cross-module 
 - `event_bus.rs`: Implements named event-subscription metadata with priority ordering and one-shot listeners.
 - `factory.rs`: Implements a constructor-name registry with optional alias resolution.
 - `funnel.rs`: Implements a time-windowed event collector that can batch inputs before flushing.
+- `graph.rs`: Implements a lightweight directed/undirected weighted adjacency-list graph with BFS/DFS helpers.
 - `mediator.rs`: Mediator pattern — pub/sub message channels.
 - `mod.rs`: Declares the patterns submodules and re-exports the public helper types.
 - `object_pool.rs`: Implements slot bookkeeping for reusable pooled objects, including idle and active tracking.
@@ -36,6 +39,9 @@ This module is mostly self-contained inside the Foundations group. Cross-module 
 - `strategy.rs`: Strategy pattern — named, swappable behaviours.
 - `throttle.rs`: Implements leading-edge throttle and trailing-edge debounce timers for callback rate limiting.
 - `trie.rs`: Trie: string-key prefix index with DFS `prefix_search` and recursive `remove`.
+- `behavior_tree.rs`: Implements behavior tree node graph structures and run-state containers for Sequence/Selector/Parallel/Decorator/Leaf AI composition.
+- `weighted_random.rs`: Implements weighted entry pools with deterministic sample-based selection (`pick`, `pick_n`) and revision tracking.
+- `lua_api/patterns_api.rs` (bindings): Adds extended generic operations for stack/queue/list and introduces `LMap` string-key dictionary userdata.
 
 ## Types
 
@@ -51,6 +57,9 @@ This module is mostly self-contained inside the Foundations group. Cross-module 
 - `Factory` (`struct`, `factory.rs`): Named constructor registry. It helps scripts instantiate families of objects without hard-coding constructor tables everywhere.
 - `FunnelEntry` (`struct`, `funnel.rs`): Single buffered record inside a `Funnel`.
 - `Funnel` (`struct`, `funnel.rs`): Batch collector that groups time-adjacent events before a flush.
+- `GraphNode` (`struct`, `graph.rs`): Node record in a graph with stable ID and optional label.
+- `GraphEdge` (`struct`, `graph.rs`): Directed edge record with stable ID, endpoints, weight, and optional label.
+- `Graph` (`struct`, `graph.rs`): Directed/undirected weighted graph with adjacency queries and traversal helpers.
 - `Mediator` (`struct`, `mediator.rs`): Named-channel message broker.
 - `ObjectPool` (`struct`, `object_pool.rs`): Slot manager for reusable objects. It separates active and idle handles so higher-level code can reduce allocation churn.
 - `ObserverEntry` (`struct`, `observer.rs`): Metadata for one observer subscription. It tracks watcher identity, watched key, and once semantics.
@@ -67,6 +76,14 @@ This module is mostly self-contained inside the Foundations group. Cross-module 
 - `Throttle` (`struct`, `throttle.rs`): Leading-edge rate limiter that decides when a callback is allowed to fire.
 - `Debounce` (`struct`, `throttle.rs`): Trailing-edge idle timer that delays firing until input settles.
 - `Trie` (`struct`, `trie.rs`): Prefix-index trie keyed on `String`; supports `insert`, `search` (exact), `starts_with` (prefix Boolean), `prefix_search` (collect all matching keys), `remove` (prunes dead nodes). Foundations tier — no Lua binding.
+- `BtStatus` (`enum`, `behavior_tree.rs`): Tick result status (`Success`, `Failure`, `Running`) for behavior tree nodes.
+- `NodeKind` (`enum`, `behavior_tree.rs`): Structural node kind for behavior trees (Sequence/Selector/Parallel/Inverter/Repeat/Leaf).
+- `BtNode` (`struct`, `behavior_tree.rs`): Node record in a behavior tree (kind, id, children, label).
+- `BehaviorTree` (`struct`, `behavior_tree.rs`): ID-indexed behavior tree definition container.
+- `BtRunState` (`struct`, `behavior_tree.rs`): Runtime state container for running nodes and repeat counters.
+- `WeightedEntry` (`struct`, `weighted_random.rs`): One weighted entry item in a selector pool.
+- `WeightedRandom` (`struct`, `weighted_random.rs`): Deterministic sample-driven weighted selector with revision tracking.
+- `LMap` (`userdata`, `patterns_api.rs`): String-key dictionary/map for generic key-value gameplay state (UI model, runtime caches, quest vars).
 
 ## Functions
 
@@ -120,6 +137,32 @@ This module is mostly self-contained inside the Foundations group. Cross-module 
 - `EventBus::listener_count` (`event_bus.rs`): Returns the subscription count for an event.
 - `EventBus::event_names` (`event_bus.rs`): Returns all unique event names with at least one subscription.
 - `EventBus::total_count` (`event_bus.rs`): Total number of active subscriptions across all events.
+- `Graph::new` (`graph.rs`): Creates an empty directed graph.
+- `Graph::new_undirected` (`graph.rs`): Creates an empty undirected graph.
+- `Graph::add_node` (`graph.rs`): Adds a node and returns its ID.
+- `Graph::remove_node` (`graph.rs`): Removes a node and all incident edges.
+- `Graph::add_edge` (`graph.rs`): Adds an edge between nodes (and reverse edge when undirected).
+- `Graph::remove_edge` (`graph.rs`): Removes all edge records with the given edge ID.
+- `Graph::neighbors` (`graph.rs`): Returns direct outgoing neighbors for a node.
+- `Graph::bfs` (`graph.rs`): Breadth-first traversal order from a start node.
+- `Graph::dfs` (`graph.rs`): Depth-first traversal order from a start node.
+- `Graph::is_connected` (`graph.rs`): Returns whether a path exists between two nodes.
+- `BehaviorTree::new` (`behavior_tree.rs`): Creates an empty behavior tree.
+- `BehaviorTree::add_sequence` (`behavior_tree.rs`): Adds a Sequence composite node.
+- `BehaviorTree::add_selector` (`behavior_tree.rs`): Adds a Selector composite node.
+- `BehaviorTree::add_parallel` (`behavior_tree.rs`): Adds a Parallel composite node.
+- `BehaviorTree::add_inverter` (`behavior_tree.rs`): Adds an Inverter decorator node.
+- `BehaviorTree::add_repeat` (`behavior_tree.rs`): Adds a Repeat decorator node.
+- `BehaviorTree::add_leaf` (`behavior_tree.rs`): Adds a leaf node with callback name key.
+- `BehaviorTree::add_child` (`behavior_tree.rs`): Attaches child node to parent.
+- `BehaviorTree::set_root` (`behavior_tree.rs`): Sets the tree root node.
+- `BtRunState::new` (`behavior_tree.rs`): Creates fresh runtime state for tree ticking.
+- `WeightedRandom::new` (`weighted_random.rs`): Creates an empty weighted selector.
+- `WeightedRandom::add` (`weighted_random.rs`): Adds a weighted entry and returns entry ID.
+- `WeightedRandom::remove` (`weighted_random.rs`): Removes entry by ID.
+- `WeightedRandom::set_weight` (`weighted_random.rs`): Updates entry weight by ID.
+- `WeightedRandom::pick` (`weighted_random.rs`): Selects one entry ID from a sample in `[0, 1)`.
+- `WeightedRandom::pick_n` (`weighted_random.rs`): Selects distinct entries without replacement from sample list.
 - `Factory::new` (`factory.rs`): Creates a new empty factory.
 - `Factory::register` (`factory.rs`): Registers a type name.
 - `Factory::unregister` (`factory.rs`): Removes a type name registration.

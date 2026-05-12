@@ -20,13 +20,14 @@
 //! | `Memory` | Retains entries in a bounded ring buffer for Lua inspection. |
 //! | `RotatingFile` | Appends to a file and rotates by size, keeping N backup copies. |
 
+use crate::data::RingBuffer;
 use std::collections::BTreeMap;
-use std::collections::VecDeque;
-use std::fmt::Write as FmtWrite;
 use std::fs::{self, File, OpenOptions};
 use std::io::Write as IoWrite;
 use std::path::{Path, PathBuf};
+use std::str::FromStr;
 use std::sync::{Mutex, MutexGuard};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 // ── LogLevel ──────────────────────────────────────────────────────────────
 
@@ -39,6 +40,8 @@ use std::sync::{Mutex, MutexGuard};
 pub enum SinkLevel {
     /// Lowest severity — verbose diagnostic output.
     Debug,
+    /// Extremely verbose tracing output.
+    Trace,
     /// Normal operational messages.
     Info,
     /// Potential issues that do not prevent execution.
@@ -48,34 +51,30 @@ pub enum SinkLevel {
 }
 
 impl SinkLevel {
-    /// Parses a level string (case-insensitive).  Recognised inputs:
-    /// `"debug"`, `"info"`, `"warn"` / `"warning"`, `"error"` / `"err"`.
-    /// Any other value — including empty strings — falls back to
-    /// [`SinkLevel::Debug`].
-    ///
-    /// # Parameters
-    /// - `s` — level name (case-insensitive).
-    ///
-    /// # Returns
-    /// The corresponding `SinkLevel`.
-    #[allow(clippy::should_implement_trait)]
-    pub fn from_str(s: &str) -> Self {
-        match s.to_lowercase().as_str() {
-            "info" => Self::Info,
-            "warn" | "warning" => Self::Warn,
-            "error" | "err" => Self::Error,
-            _ => Self::Debug,
-        }
-    }
-
     /// Returns the canonical uppercase display string (`"DEBUG"`, `"INFO"`,
-    /// `"WARN"`, `"ERROR"`).
+    /// `"TRACE"`, `"WARN"`, `"ERROR"`).
     pub fn as_str(self) -> &'static str {
         match self {
             Self::Debug => "DEBUG",
+            Self::Trace => "TRACE",
             Self::Info => "INFO",
             Self::Warn => "WARN",
             Self::Error => "ERROR",
+        }
+    }
+}
+
+impl FromStr for SinkLevel {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "debug" => Ok(Self::Debug),
+            "trace" => Ok(Self::Trace),
+            "info" => Ok(Self::Info),
+            "warn" | "warning" => Ok(Self::Warn),
+            "error" | "err" => Ok(Self::Error),
+            _ => Err(format!("unknown sink level '{s}'")),
         }
     }
 }
@@ -99,6 +98,79 @@ pub struct MemoryEntry {
     pub tag: String,
     /// Structured key-value fields; `None` for plain log entries.
     pub fields: Option<BTreeMap<String, String>>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum SinkFormat {
+    Plain,
+    Json,
+    Ndjson,
+}
+
+fn timestamp_millis() -> Option<u128> {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .ok()
+        .map(|duration| duration.as_millis())
+}
+
+fn format_structured_message(message: &str, fields: &BTreeMap<String, String>) -> String {
+    if fields.is_empty() {
+        message.to_string()
+    } else {
+        let kvs: Vec<String> = fields.iter().map(|(k, v)| format!("{k}={v}")).collect();
+        format!("{} {{ {} }}", message, kvs.join(", "))
+    }
+}
+
+fn format_log_line(
+    level: SinkLevel,
+    tag: &str,
+    message: &str,
+    timestamp: Option<u128>,
+    use_color: bool,
+) -> String {
+    let line = match timestamp {
+        Some(ts) => format!("[{ts}] [{}] {}: {}\n", level.as_str(), tag, message),
+        None => format!("[{}] {}: {}\n", level.as_str(), tag, message),
+    };
+    if !use_color {
+        return line;
+    }
+    let color = match level {
+        SinkLevel::Error => "\u{1b}[31m",
+        SinkLevel::Warn => "\u{1b}[33m",
+        SinkLevel::Info => "\u{1b}[32m",
+        SinkLevel::Debug => "\u{1b}[36m",
+        SinkLevel::Trace => "\u{1b}[90m",
+    };
+    format!("{color}{line}\u{1b}[0m")
+}
+
+fn format_json_line(
+    level: SinkLevel,
+    tag: &str,
+    message: &str,
+    fields: Option<&BTreeMap<String, String>>,
+    timestamp_ms: Option<u128>,
+) -> String {
+    let value = if let Some(fields) = fields {
+        serde_json::json!({
+            "level": level.as_str().to_lowercase(),
+            "tag": tag,
+            "message": message,
+            "timestamp_ms": timestamp_ms,
+            "fields": fields,
+        })
+    } else {
+        serde_json::json!({
+            "level": level.as_str().to_lowercase(),
+            "tag": tag,
+            "message": message,
+            "timestamp_ms": timestamp_ms,
+        })
+    };
+    format!("{}\n", value)
 }
 
 // ── RotatingFileSink ─────────────────────────────────────────────────────
@@ -293,7 +365,7 @@ pub enum SinkKind {
     /// Retains entries in a bounded in-memory ring buffer.
     Memory {
         /// Ring buffer of recent entries, evicting oldest on overflow.
-        entries: Mutex<VecDeque<MemoryEntry>>,
+        entries: Mutex<RingBuffer<MemoryEntry>>,
         /// Maximum retained entries before eviction.
         capacity: usize,
     },
@@ -304,6 +376,11 @@ pub enum SinkKind {
         /// Filesystem path for display and diagnostics.
         path: String,
     },
+    /// Calls back into Lua-side push handlers without polling.
+    Callback {
+        /// Opaque callback id resolved by the Lua binding layer.
+        callback_id: u64,
+    },
 }
 
 impl std::fmt::Debug for SinkKind {
@@ -312,6 +389,7 @@ impl std::fmt::Debug for SinkKind {
             SinkKind::File { path, .. } => write!(f, "File({path})"),
             SinkKind::Memory { capacity, .. } => write!(f, "Memory({capacity})"),
             SinkKind::RotatingFile { path, .. } => write!(f, "RotatingFile({path})"),
+            SinkKind::Callback { callback_id } => write!(f, "Callback({callback_id})"),
         }
     }
 }
@@ -332,6 +410,12 @@ pub struct Sink {
     pub min_level: SinkLevel,
     /// The dispatch strategy.
     pub kind: SinkKind,
+    format: SinkFormat,
+    timestamp: bool,
+    use_color: bool,
+    tag_filters: Option<Vec<String>>,
+    buffer: Mutex<String>,
+    buffer_limit: usize,
 }
 
 impl Sink {
@@ -357,6 +441,12 @@ impl Sink {
                 file: Mutex::new(file),
                 path: path.to_string(),
             },
+            format: SinkFormat::Plain,
+            timestamp: false,
+            use_color: false,
+            tag_filters: None,
+            buffer: Mutex::new(String::new()),
+            buffer_limit: 8 * 1024,
         })
     }
 
@@ -374,9 +464,15 @@ impl Sink {
             id,
             min_level,
             kind: SinkKind::Memory {
-                entries: Mutex::new(VecDeque::with_capacity(capacity.max(1))),
+                entries: Mutex::new(RingBuffer::new(capacity.max(1))),
                 capacity: capacity.max(1),
             },
+            format: SinkFormat::Plain,
+            timestamp: false,
+            use_color: false,
+            tag_filters: None,
+            buffer: Mutex::new(String::new()),
+            buffer_limit: 8 * 1024,
         }
     }
 
@@ -406,7 +502,124 @@ impl Sink {
                 sink: Mutex::new(inner),
                 path: path.to_string(),
             },
+            format: SinkFormat::Plain,
+            timestamp: false,
+            use_color: false,
+            tag_filters: None,
+            buffer: Mutex::new(String::new()),
+            buffer_limit: 8 * 1024,
         })
+    }
+
+    /// Creates a callback sink that is resolved by the Lua binding layer.
+    pub(crate) fn callback(id: u64, min_level: SinkLevel, callback_id: u64) -> Self {
+        Self {
+            id,
+            min_level,
+            kind: SinkKind::Callback { callback_id },
+            format: SinkFormat::Plain,
+            timestamp: false,
+            use_color: false,
+            tag_filters: None,
+            buffer: Mutex::new(String::new()),
+            buffer_limit: 8 * 1024,
+        }
+    }
+
+    /// Configures file output formatting, optional timestamping, ANSI colour, and tag filters.
+    pub(crate) fn configure_output(
+        &mut self,
+        format: &str,
+        timestamp: bool,
+        use_color: bool,
+        tag_filters: Option<Vec<String>>,
+    ) {
+        self.format = match format.to_lowercase().as_str() {
+            "json" => SinkFormat::Json,
+            "ndjson" => SinkFormat::Ndjson,
+            _ => SinkFormat::Plain,
+        };
+        self.timestamp = timestamp;
+        self.use_color = use_color;
+        self.tag_filters = tag_filters;
+    }
+
+    fn allows_tag(&self, tag: &str) -> bool {
+        match &self.tag_filters {
+            Some(filters) => filters
+                .iter()
+                .any(|candidate| candidate.eq_ignore_ascii_case(tag)),
+            None => true,
+        }
+    }
+
+    fn buffered_file_write(&self, text: &str) {
+        if let Ok(mut buffer) = self.buffer.lock() {
+            buffer.push_str(text);
+            if buffer.len() < self.buffer_limit {
+                return;
+            }
+            let chunk = std::mem::take(&mut *buffer);
+            drop(buffer);
+            self.flush_chunk(&chunk);
+        }
+    }
+
+    fn flush_chunk(&self, chunk: &str) {
+        match &self.kind {
+            SinkKind::File { file, .. } => {
+                if let Ok(mut guard) = file.lock() {
+                    let _ = guard.write_all(chunk.as_bytes());
+                }
+            }
+            SinkKind::RotatingFile { sink, .. } => {
+                if let Ok(mut guard) = sink.lock() {
+                    guard.write_with_rotation(chunk);
+                }
+            }
+            SinkKind::Memory { .. } | SinkKind::Callback { .. } => {}
+        }
+    }
+
+    fn flush_buffer(&self) {
+        let chunk = if let Ok(mut buffer) = self.buffer.lock() {
+            if buffer.is_empty() {
+                None
+            } else {
+                Some(std::mem::take(&mut *buffer))
+            }
+        } else {
+            None
+        };
+        if let Some(chunk) = chunk {
+            self.flush_chunk(&chunk);
+        }
+    }
+
+    fn format_plain_entry(&self, level: SinkLevel, tag: &str, message: &str) -> String {
+        format_log_line(
+            level,
+            tag,
+            message,
+            self.timestamp.then(timestamp_millis).flatten(),
+            self.use_color,
+        )
+    }
+
+    fn format_json_entry(
+        &self,
+        level: SinkLevel,
+        tag: &str,
+        message: &str,
+        fields: Option<&BTreeMap<String, String>>,
+    ) -> String {
+        format_json_line(
+            level,
+            tag,
+            message,
+            fields,
+            self.timestamp.then(timestamp_millis).flatten(),
+        )
     }
 
     /// Dispatches a log entry to this sink (no-op when below `min_level`).
@@ -420,24 +633,23 @@ impl Sink {
     /// - `message` — the log text.
     pub fn write(&self, level: SinkLevel, tag: &str, message: &str) {
         // Level gate — fast reject entries below this sink's threshold.
-        if level < self.min_level {
+        if level < self.min_level || !self.allows_tag(tag) {
             return;
         }
         match &self.kind {
             SinkKind::File { file, .. } => {
-                let mut text = String::new();
-                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, message);
-                if let Ok(mut guard) = file.lock() {
-                    let _ = guard.write_all(text.as_bytes());
-                }
-            }
-            SinkKind::Memory { entries, capacity } => {
-                if let Ok(mut q) = entries.lock() {
-                    // Evict oldest entry when the ring buffer is full.
-                    if q.len() >= *capacity {
-                        q.pop_front();
+                let text = match self.format {
+                    SinkFormat::Plain => self.format_plain_entry(level, tag, message),
+                    SinkFormat::Json | SinkFormat::Ndjson => {
+                        self.format_json_entry(level, tag, message, None)
                     }
-                    q.push_back(MemoryEntry {
+                };
+                let _ = file;
+                self.buffered_file_write(&text);
+            }
+            SinkKind::Memory { entries, .. } => {
+                if let Ok(mut q) = entries.lock() {
+                    q.push(MemoryEntry {
                         level,
                         message: message.to_string(),
                         tag: tag.to_string(),
@@ -446,12 +658,16 @@ impl Sink {
                 }
             }
             SinkKind::RotatingFile { sink, .. } => {
-                let mut text = String::new();
-                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, message);
-                if let Ok(mut guard) = sink.lock() {
-                    guard.write_with_rotation(&text);
-                }
+                let text = match self.format {
+                    SinkFormat::Plain => self.format_plain_entry(level, tag, message),
+                    SinkFormat::Json | SinkFormat::Ndjson => {
+                        self.format_json_entry(level, tag, message, None)
+                    }
+                };
+                let _ = sink;
+                self.buffered_file_write(&text);
             }
+            SinkKind::Callback { .. } => {}
         }
     }
 
@@ -473,30 +689,24 @@ impl Sink {
         message: &str,
         fields: &BTreeMap<String, String>,
     ) {
-        if level < self.min_level {
+        if level < self.min_level || !self.allows_tag(tag) {
             return;
         }
-        let plain = if fields.is_empty() {
-            message.to_string()
-        } else {
-            let kvs: Vec<String> = fields.iter().map(|(k, v)| format!("{k}={v}")).collect();
-            format!("{} {{ {} }}", message, kvs.join(", "))
-        };
+        let plain = format_structured_message(message, fields);
         match &self.kind {
             SinkKind::File { file, .. } => {
-                let mut text = String::new();
-                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, plain);
-                if let Ok(mut guard) = file.lock() {
-                    let _ = guard.write_all(text.as_bytes());
-                }
-            }
-            SinkKind::Memory { entries, capacity } => {
-                if let Ok(mut q) = entries.lock() {
-                    // Evict oldest when full; structured entries store the raw fields map.
-                    if q.len() >= *capacity {
-                        q.pop_front();
+                let text = match self.format {
+                    SinkFormat::Plain => self.format_plain_entry(level, tag, &plain),
+                    SinkFormat::Json | SinkFormat::Ndjson => {
+                        self.format_json_entry(level, tag, message, Some(fields))
                     }
-                    q.push_back(MemoryEntry {
+                };
+                let _ = file;
+                self.buffered_file_write(&text);
+            }
+            SinkKind::Memory { entries, .. } => {
+                if let Ok(mut q) = entries.lock() {
+                    q.push(MemoryEntry {
                         level,
                         message: plain,
                         tag: tag.to_string(),
@@ -505,12 +715,16 @@ impl Sink {
                 }
             }
             SinkKind::RotatingFile { sink, .. } => {
-                let mut text = String::new();
-                let _ = writeln!(text, "[{}] {}: {}", level.as_str(), tag, plain);
-                if let Ok(mut guard) = sink.lock() {
-                    guard.write_with_rotation(&text);
-                }
+                let text = match self.format {
+                    SinkFormat::Plain => self.format_plain_entry(level, tag, &plain),
+                    SinkFormat::Json | SinkFormat::Ndjson => {
+                        self.format_json_entry(level, tag, message, Some(fields))
+                    }
+                };
+                let _ = sink;
+                self.buffered_file_write(&text);
             }
+            SinkKind::Callback { .. } => {}
         }
     }
 
@@ -523,6 +737,7 @@ impl Sink {
             SinkKind::File { .. } => "file",
             SinkKind::Memory { .. } => "memory",
             SinkKind::RotatingFile { .. } => "rotating",
+            SinkKind::Callback { .. } => "callback",
         }
     }
 
@@ -535,6 +750,7 @@ impl Sink {
             SinkKind::File { path, .. } => Some(path),
             SinkKind::Memory { .. } => None,
             SinkKind::RotatingFile { path, .. } => Some(path),
+            SinkKind::Callback { .. } => None,
         }
     }
 
@@ -552,9 +768,11 @@ impl Sink {
             SinkKind::Memory { entries, .. } => {
                 if let Ok(mut q) = entries.lock() {
                     if drain {
-                        Some(q.drain(..).collect())
+                        let out = q.to_vec();
+                        q.clear();
+                        Some(out)
                     } else {
-                        Some(q.iter().cloned().collect())
+                        Some(q.to_vec())
                     }
                 } else {
                     Some(Vec::new())
@@ -566,6 +784,7 @@ impl Sink {
 
     /// Flushes a file sink (no-op on memory sinks).
     pub fn flush(&self) {
+        self.flush_buffer();
         match &self.kind {
             SinkKind::File { file, .. } => {
                 if let Ok(guard) = file.lock() {
@@ -579,7 +798,7 @@ impl Sink {
                     guard.flush();
                 }
             }
-            SinkKind::Memory { .. } => {}
+            SinkKind::Memory { .. } | SinkKind::Callback { .. } => {}
         }
     }
 }

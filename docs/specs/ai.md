@@ -18,7 +18,8 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 **Decision-making subsystems.** Ten paradigms are available:
 - **FSM** (`fsm.rs`) — finite state machine with named states, lifecycle callbacks (enter/exit/update), and priority-ordered guarded transitions.
 - **Behavior Tree** (`behavior_tree.rs`) — hierarchical BT supporting Selector, Sequence, Parallel composites; Inverter, Repeater, Succeeder, Guard decorators; Action and Condition leaves. `BtDebugState` snapshots the active path for visual inspection.
-- **Steering** (`steering.rs`) — Reynolds-style movement with Seek, Flee, Arrive, Wander, Pursue, Evade, Flock behaviors. `SteeringManager` blends forces in weighted or priority mode and supports spatial-hash bucketing for large flocks.
+- **Steering** (`steering.rs`) — Reynolds-style movement with Seek, Flee, Arrive, Wander, Pursue, Evade, Flock behaviors. `SteeringManager` blends forces in weighted or priority mode, supports spatial-hash bucketing for large flocks, and can consume nav-grid/navmesh waypoint paths directly through `setPath`.
+- **Dialogue AI** (`dialogue.rs`) — topic/branch selector driven by FSM state, BT status, and utility-action scores for deterministic NPC conversation routing.
 - **Context Steering** (`context_steering.rs`) — radial interest/danger ring evaluator for smooth obstacle-aware direction selection.
 - **GOAP** (`goap.rs`) — Goal-Oriented Action Planning via A* over boolean world-state facts; configurable iteration cap to prevent frame spikes.
 - **Utility AI** (`utility_ai.rs`) — multi-axis action scorer with per-consideration response curves (linear, quadratic, sigmoid, exponential, threshold).
@@ -31,7 +32,7 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 
 **Pathfinding re-exports.** `FlowField`, `Cell`, and `PathGrid` types are re-exported from `crate::pathfind` so that `lurek.ai.*` provides a single scripting surface without requiring separate PathFind module imports.
 
-**Lua surface.** 35 constructor functions under `lurek.ai.*` create every subsystem from Lua. Each type exposes methods through its userdata handle. Key additions: `AIDirector:setTension` for scripted tension sequences; `ContextSteering:addSeekTarget/addAvoidPoint/addAvoidBounds`; `GOAPPlanner:getMaxIterations/setMaxIterations`; `StateMachine:setInitialState`; `TraitProfile:set/get/getBase/addModifier`; `SteeringManager:enableSpatialHash/setSpatialHashCellSize`.
+**Lua surface.** 36 constructor functions under `lurek.ai.*` create every subsystem from Lua. Each type exposes methods through its userdata handle. Key additions: `AIDirector:setTension` for scripted tension sequences; `ContextSteering:addSeekTarget/addAvoidPoint/addAvoidBounds`; `GOAPPlanner:getMaxIterations/setMaxIterations`; `StateMachine:setInitialState`; `TraitProfile:set/get/getBase/addModifier`; `SteeringManager:enableSpatialHash/setSpatialHashCellSize/setPath`; `newDialogueAI` with topic/branch selection methods.
 
 **Scope boundary.** Feature Systems tier. Depends on `math`, `pathfind`, `runtime`. Lua bridge in `src/lua_api/ai_api.rs`. Plugin candidacy under proposed constraint A-05 — see [docs/architecture/plugins.md](../architecture/plugins.md).
 
@@ -44,6 +45,7 @@ The `ai` module is Lurek2D's Feature Systems tier AI toolkit — a collection of
 - `command_queue.rs`: Implements queued AI commands with priorities, interruptibility, and callback integration.
 - `context_steering.rs`: Context Steering — direction-based interest/danger evaluation for smooth movement.
 - `director.rs`: AI Director — dynamic difficulty and pacing controller.
+- `dialogue.rs`: Dialogue AI selector that combines FSM/BT/Utility context into topic and branch choices.
 - `emotion.rs`: AI Emotion Model — simulated affective state for expressive agents.
 - `fsm.rs`: Defines finite state machine structures, state callbacks, and guarded transitions.
 - `genetic.rs`: Genetic Algorithm (GA) for offline AI parameter optimisation.

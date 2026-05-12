@@ -19,7 +19,9 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 
 **Layered compositing.** `LayeredImage` and `ImageLayer` implement a Porter-Duff compositing stack. Each `ImageLayer` carries a name, visibility flag, opacity scalar, and its own `ImageData` backing store. `LayeredImage::flatten()` composites all visible layers in order into a single `ImageData`. Used for multi-layer save files (e.g., the `painting.limg` save format) and for the `effect` module's CPU-side compositing path.
 
-**Province grid.** `ProvinceGrid` in `province_grid.rs` is a flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB is assigned a sequential province ID (1..n). Provides O(1) coordinate-to-province lookup (`get(x, y) → province_id`) and single-pass adjacency detection with border-pixel counts (`adjacencies()` → `Vec<AdjacencyPair>`). Used by the `globe` module and strategy games that use colour-coded province maps.
+**Province grid.** `ProvinceGrid` in `province_grid.rs` is a flat `Vec<u32>` spatial index built from a province-colour PNG in a single O(w×h) scan. Each unique non-black RGB is assigned a sequential province ID (1..n). Provides O(1) coordinate-to-province lookup (`get(x, y) → province_id`), single-pass adjacency detection with border-pixel counts (`adjacencies()` → `Vec<AdjacencyPair>`), and border-corner polygon extraction (`province_polygons()` / `province_polygons_simplified()`) where each vertex is a pixel-grid corner. Used by the `globe` module and strategy games that use colour-coded province maps.
+
+The Lua-side `LProvinceGrid` userdata also exposes `drawShapes(view_x?, view_y?, view_w?, view_h?)`, which uses cached simplified polygons and the original province colours to enqueue filled polygon render commands on the Rust render queue. When a viewport is provided, off-screen shapes are culled before commands are pushed.
 
 **Compressed image data.** `CompressedImageData` holds DDS/DXT1/DXT3/DXT5/BC7/ETC compressed GPU texture data loaded without CPU decompression, ready to upload directly to wgpu. `CompressedFormat` identifies the compression format. This path is used for large atlas textures where the file size and VRAM footprint matter.
 
@@ -36,6 +38,7 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 **Lua surface.** `lurek.image.new(w, h)`, `lurek.image.load(path)`, `lurek.image.newImageDataFromBytes(w, h, bytes)`, and `lurek.image.fromScreen()` (async poll-based GPU readback). `ImageData` userdata: `get(x, y)`, `set(x, y, r, g, b, a)`, `resize(w, h, filter?)`, `blit(src, dx, dy)`, `fill(r, g, b, a)`, `region(x, y, w, h)`, `encodePng()`, `getRawBytes()`, `diff(other)`. Effects: `brightness(v)`, `blur(r)`, `convolve(kernel)`, etc. `lurek.image.newLayers()` → `LayeredImage`. `lurek.image.loadCompressed(path)` → `CompressedImageData`. `lurek.image.newAtlas()` → `TextureAtlas`. Integration path: `lurek.render.newImage(path_or_imageData, color_space?)` accepts optional `"srgb"`/`"linear"` upload hint.
 
 **Scope boundary.** Platform Services tier. Depends on `image` external crate, `ddsfile`, `flate2`, `rayon`. Lua bridge in `src/lua_api/image_api.rs`.
+`src/image/effects.rs` owns CPU pixel transforms and CPU nine-slice drawing helpers. Shader-chain composition for post-processing lives in `src/effect/image_effect.rs`.
 
 ## Files
 
@@ -163,6 +166,8 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 - `ProvinceGrid::adjacencies` (`province_grid.rs`): Returns a slice of `(province_a, province_b, border_pixel_count)` tuples, sorted by `(province_a, province_b)`.
 - `ProvinceGrid::province_spans` (`province_grid.rs`): Returns horizontal fill spans for all non-zero provinces.
 - `ProvinceGrid::border_segments` (`province_grid.rs`): Returns merged border segments between neighboring provinces.
+- `ProvinceGrid::province_polygons` (`province_grid.rs`): Returns province polygon loops built from border pixel corner points (top-left corner grid).
+- `ProvinceGrid::province_polygons_simplified` (`province_grid.rs`): Returns polygon loops simplified by removing collinear points and 45-degree staircase midpoints.
 - `ProvinceGrid::serialize_shape_data` (`province_grid.rs`): Serializes province geometry for shape-based rendering into a binary cache.
 - `ProvinceGrid::deserialize_shape_data` (`province_grid.rs`): Deserializes province geometry from shape cache binary.
 - `ImageData::generate_render_commands` (`render.rs`): Generate a single `DrawImage` render command for this image.
@@ -178,6 +183,7 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 - `Texture::load_with_color_space` (`texture.rs`): Loads an image from `path` with explicit `srgb`/`linear` GPU format hint.
 - `Texture::from_rgba` (`texture.rs`): Creates a texture from raw RGBA pixel data (not premultiplied).
 - `Texture::from_rgba_with_color_space` (`texture.rs`): Creates a texture from raw RGBA pixel data with explicit `srgb`/`linear` hint.
+- `premultiply_alpha_rgba8_in_place` (`texture.rs`): Canonical CPU helper for premultiplying RGBA8 before texture upload.
 - `TextureAtlas::new` (`texture_atlas.rs`): Creates an empty atlas with the given pixel dimensions and inter-region padding.
 - `TextureAtlas::pack` (`texture_atlas.rs`): Packs a named region of size `w` x `h` into the atlas.
 - `TextureAtlas::pack_with_nine_slice` (`texture_atlas.rs`): Packs a named region with optional nine-slice insets.
@@ -305,6 +311,7 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 - `LImageData:mapPixels`: Applies a function to every pixel in-place.
 - `LImageData:convolve`: Applies a custom NxN convolution kernel to the image and returns a new ImageData.
 - `LImageData:applyPaletteLut`: Applies a `PaletteLUT` to the image in place, replacing exact colour matches.
+- `LImageData:drawNineSlice`: Draws a nine-slice patch from atlas/source image data into this image.
 - `LImageData:setRawData`: Replaces all pixel data from a raw RGBA byte string.
 - `LImageData:paste`: Copies pixels from `source` onto this image starting at (dx, dy).
 - `LImageData:type`: Returns the type name of this object.
@@ -335,6 +342,7 @@ The `image` module is Lurek2D's CPU-side pixel buffer and image manipulation lib
 - `LPaletteLUT:setColor`: Appends a colour mapping entry to the palette: when a pixel exactly matching
 - `LPaletteLUT:getColorCount`: Returns the number of colour mapping entries.
 - `LPaletteLUT:clear`: Removes all colour mapping entries.
+- `LPaletteLUT:cycle`: Rotates destination palette entries for palette-cycling animation.
 - `LPaletteLUT:type`: Returns the type name of this object.
 - `LPaletteLUT:typeOf`: Returns true if this object is of the given type.
 

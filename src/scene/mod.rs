@@ -6,6 +6,8 @@
 
 /// Z-order depth sorter for draw-call batching; groups scene objects by depth layer before rendering.
 pub mod depth_sorter;
+/// Internal easing helpers used by transition curves.
+pub(crate) mod easing;
 /// Render-command generation and CPU drawing for the scene module.
 pub mod render;
 /// LIFO scene stack with lifecycle callbacks (`enter`, `leave`, `pause`, `resume`, `update`, `draw`) and a named scene registry.

@@ -2,11 +2,11 @@
 
 ## Niezrobione TODO/WIP
 
-- TODO(FEAT): dodać transition chaining/sequencer (kolejkowanie kilku przejść).
-- TODO(FEAT): rozważyć scene groups/layers z równoległą aktualizacją logiczną.
-- TODO(PERF): profile i benchmark ścieżek sortowania `DepthSorter` dla dużych wolumenów.
-- TODO(TEST): dodać stress-test wielu overlay scen (kolejność i active IDs).
-- TODO(TEST): dodać boundary testy easing/transition dla nietypowych wartości czasu.
-- TODO(dedup): ocenić czy `DepthSorter` powinien zostać w `scene` czy przejść bliżej `render`.
-- TODO(dedup): doprecyzować relację transition rendering (`scene`) vs post-fx (`effect`).
-- TODO(helper): rozważyć przeniesienie/lub współdzielenie `bounce_out` z modułem easing.
+- DONE(FEAT): dodano transition chaining/sequencer (kolejkowanie kilku przejść) przez kolejkę transition w `SceneStack` i API Lua.
+- DONE(FEAT): wdrożono scene layers (deterministyczna kolejność callbacków); równoległa aktualizacja Lua pozostaje wyłączona z powodu pojedynczego VM.
+- DONE(PERF): dodano testy dużych wolumenów `DepthSorter` i uporządkowano ścieżki sortowania dla pomiarów.
+- DONE(TEST): dodano stress-test wielu overlay scen (kolejność i active IDs).
+- DONE(TEST): dodano boundary testy easing/transition dla nietypowych wartości czasu.
+- DONE(dedup): utrzymano `DepthSorter` w `scene` jako właściciela callback lifecycle; granica z `render` doprecyzowana w spec.
+- DONE(dedup): doprecyzowano relację transition rendering (`scene`) vs post-fx (`effect`) w spec.
+- DONE(helper): wydzielono współdzielony helper `bounce_out` do `src/scene/easing.rs`.

@@ -175,9 +175,9 @@ mod render_tests {
 // ── layout_loader ─────────────────────────────────────────────────────────────
 
 mod layout_loader_tests {
-    use std::fs;
     use lurek2d::ui::context::GuiContext;
     use lurek2d::ui::layout_loader::{load_layout_def, load_layout_toml, LayoutDef, WidgetDef};
+    use std::fs;
 
     #[test]
     fn widget_def_default_has_empty_type() {
@@ -259,7 +259,8 @@ h = 600.0
         let _ = fs::remove_file(&out);
         let out_s = out.to_string_lossy().to_string();
 
-        lurek2d::ui::render_to_image(&mut ctx, 96, 64, &out_s).expect("render_to_image should succeed");
+        lurek2d::ui::render_to_image(&mut ctx, 96, 64, &out_s)
+            .expect("render_to_image should succeed");
 
         let meta = fs::metadata(&out).expect("png should exist");
         assert!(meta.len() > 0, "png should not be empty");
@@ -344,9 +345,9 @@ mod extras_tests {
 // ── context ───────────────────────────────────────────────────────────────────
 
 mod context_tests {
-    use std::collections::HashMap;
     use lurek2d::ui::context::GuiContext;
     use lurek2d::ui::UiBindingValue;
+    use std::collections::HashMap;
 
     #[test]
     fn new_context_has_root_panel() {
@@ -460,11 +461,17 @@ mod context_tests {
 
         ctx.update(0.5);
         let mid = ctx.widgets[idx].base().alpha;
-        assert!(mid > 0.0 && mid < 1.0, "expected interpolated alpha, got {mid}");
+        assert!(
+            mid > 0.0 && mid < 1.0,
+            "expected interpolated alpha, got {mid}"
+        );
 
         ctx.update(0.6);
         let end = ctx.widgets[idx].base().alpha;
-        assert!((end - 1.0).abs() < 1e-5, "alpha should finish at 1.0, got {end}");
+        assert!(
+            (end - 1.0).abs() < 1e-5,
+            "alpha should finish at 1.0, got {end}"
+        );
         assert!(!ctx.is_animating(idx));
     }
 
@@ -480,7 +487,10 @@ mod context_tests {
         ctx.widgets[slider].base_mut().bind_key = Some("value".to_string());
 
         let mut values = HashMap::new();
-        values.insert("hp_text".to_string(), UiBindingValue::Text("HP: 80".to_string()));
+        values.insert(
+            "hp_text".to_string(),
+            UiBindingValue::Text("HP: 80".to_string()),
+        );
         values.insert("enabled".to_string(), UiBindingValue::Bool(true));
         values.insert("value".to_string(), UiBindingValue::Number(42.0));
 
@@ -496,9 +506,27 @@ mod context_tests {
             _ => panic!("expected switch"),
         }
         match &ctx.widgets[slider] {
-            lurek2d::ui::context::WidgetKind::Slider(sl) => assert!((sl.value - 42.0).abs() < f64::EPSILON),
+            lurek2d::ui::context::WidgetKind::Slider(sl) => {
+                assert!((sl.value - 42.0).abs() < f64::EPSILON)
+            }
             _ => panic!("expected slider"),
         }
+    }
+
+    #[test]
+    fn widget_kind_base_and_base_mut_cover_multiple_variants() {
+        let mut ctx = GuiContext::new();
+        let button = ctx.add_button("B");
+        let label = ctx.add_label("L");
+        let switch = ctx.add_switch(false);
+
+        ctx.widgets[button].base_mut().x = 11.0;
+        ctx.widgets[label].base_mut().y = 22.0;
+        ctx.widgets[switch].base_mut().width = 33.0;
+
+        assert!((ctx.widgets[button].base().x - 11.0).abs() < f32::EPSILON);
+        assert!((ctx.widgets[label].base().y - 22.0).abs() < f32::EPSILON);
+        assert!((ctx.widgets[switch].base().width - 33.0).abs() < f32::EPSILON);
     }
 }
 
@@ -732,7 +760,11 @@ mod chart_tests {
         let mut scatter = ScatterPlot::new(ChartConfig::default());
         scatter.x_range = (1.0, 1.0);
         scatter.y_range = (5.0, 5.0);
-        scatter.add_series("cluster", &[(1.0, 5.0), (1.0, 5.0)], Color::new(0.2, 0.7, 0.9, 1.0));
+        scatter.add_series(
+            "cluster",
+            &[(1.0, 5.0), (1.0, 5.0)],
+            Color::new(0.2, 0.7, 0.9, 1.0),
+        );
 
         let mut img = ImageData::new(320, 240);
         scatter.draw_to_image(&mut img);
@@ -749,5 +781,18 @@ mod chart_tests {
         let mut img = ImageData::new(320, 200);
         area.draw_to_image(&mut img);
         assert_eq!(img.width(), 320);
+    }
+
+    #[test]
+    fn bar_chart_legend_handles_unpaired_name_entries() {
+        let mut bar = BarChart::new(ChartConfig::default());
+        bar.config.title = Some("Legend".to_string());
+        bar.add_series("s1", Color::new(0.2, 0.6, 0.9, 1.0));
+        bar.series_names.push("s2-without-color".to_string());
+        bar.add_category("Q1", &[42.0]);
+
+        let mut img = ImageData::new(360, 240);
+        bar.draw_to_image(&mut img);
+        assert_eq!(img.height(), 240);
     }
 }

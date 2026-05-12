@@ -246,6 +246,36 @@ fn draw_series_legend(
     }
 }
 
+fn draw_chart_title(img: &mut ImageData, cfg: &ChartConfig, x: i32, y: i32) {
+    if let Some(ref title) = cfg.title {
+        let (lr, lg, lb) = cfg.label_color;
+        img.draw_label(title, x, y, lr, lg, lb);
+    }
+}
+
+fn legend_entries_from_series(series: &[ChartSeries]) -> Vec<(&str, Color)> {
+    series.iter().map(|s| (s.name.as_str(), s.color)).collect()
+}
+
+fn legend_entries_from_names<'a>(names: &'a [String], colors: &[Color]) -> Vec<(&'a str, Color)> {
+    names
+        .iter()
+        .zip(colors.iter().copied())
+        .map(|(name, c)| (name.as_str(), c))
+        .collect()
+}
+
+fn legend_entries_from_layers(layers: &[AreaLayer]) -> Vec<(&str, Color)> {
+    layers.iter().map(|l| (l.name.as_str(), l.color)).collect()
+}
+
+fn legend_entries_from_segments(segments: &[PieSegment]) -> Vec<(&str, Color)> {
+    segments
+        .iter()
+        .map(|seg| (seg.label.as_str(), seg.color))
+        .collect()
+}
+
 /// Helper to draw a filled circle safely (no out-of-bounds panics).
 #[allow(clippy::too_many_arguments)]
 fn safe_circle(img: &mut ImageData, cx: i32, cy: i32, r: i32, red: u8, g: u8, b: u8, a: u8) {
@@ -354,16 +384,8 @@ impl LineChart {
             self.y_max,
         );
 
-        if let Some(ref title) = cfg.title {
-            let (lr, lg, lb) = cfg.label_color;
-            img.draw_label(title, left + 10, 10, lr, lg, lb);
-        }
-
-        let legend_entries: Vec<(&str, Color)> = self
-            .series
-            .iter()
-            .map(|s| (s.name.as_str(), s.color))
-            .collect();
+        draw_chart_title(img, cfg, left + 10, 10);
+        let legend_entries = legend_entries_from_series(&self.series);
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         for s in &self.series {
@@ -498,16 +520,8 @@ impl BarChart {
             self.y_max,
         );
 
-        if let Some(ref title) = cfg.title {
-            img.draw_label(title, left + 10, 10, lr, lg, lb);
-        }
-
-        let legend_entries: Vec<(&str, Color)> = self
-            .series_names
-            .iter()
-            .zip(self.series_colors.iter().copied())
-            .map(|(name, c)| (name.as_str(), c))
-            .collect();
+        draw_chart_title(img, cfg, left + 10, 10);
+        let legend_entries = legend_entries_from_names(&self.series_names, &self.series_colors);
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         let n_series = self.series_colors.len().max(1);
@@ -606,7 +620,6 @@ impl ScatterPlot {
         let (left, right, top, bottom) = draw_grid_and_axes(img, cfg, 5, 5);
         let chart_w = (right - left) as f32;
         let chart_h = (bottom - top) as f32;
-        let (lr, lg, lb) = cfg.label_color;
 
         draw_numeric_axes(
             img,
@@ -623,15 +636,8 @@ impl ScatterPlot {
             self.y_range.1,
         );
 
-        if let Some(ref title) = cfg.title {
-            img.draw_label(title, left + 10, 10, lr, lg, lb);
-        }
-
-        let legend_entries: Vec<(&str, Color)> = self
-            .series
-            .iter()
-            .map(|s| (s.name.as_str(), s.color))
-            .collect();
+        draw_chart_title(img, cfg, left + 10, 10);
+        let legend_entries = legend_entries_from_series(&self.series);
         draw_series_legend(img, cfg, right, top, &legend_entries);
 
         let x_span = (self.x_range.1 - self.x_range.0).max(f32::EPSILON);
@@ -794,11 +800,7 @@ impl PieChart {
         }
 
         let (lr, lg, lb) = cfg.label_color;
-        let legend_entries: Vec<(&str, Color)> = self
-            .segments
-            .iter()
-            .map(|seg| (seg.label.as_str(), seg.color))
-            .collect();
+        let legend_entries = legend_entries_from_segments(&self.segments);
         draw_series_legend(img, cfg, w as i32 - 10, 40, &legend_entries);
 
         let mut label_y = 44i32;
@@ -809,9 +811,7 @@ impl PieChart {
             label_y += 14;
         }
 
-        if let Some(ref title) = cfg.title {
-            img.draw_label(title, 10, 10, lr, lg, lb);
-        }
+        draw_chart_title(img, cfg, 10, 10);
     }
 }
 
@@ -945,16 +945,8 @@ impl AreaChart {
             }
         }
 
-        let (lr, lg, lb) = cfg.label_color;
-        let legend_entries: Vec<(&str, Color)> = self
-            .layers
-            .iter()
-            .map(|l| (l.name.as_str(), l.color))
-            .collect();
+        let legend_entries = legend_entries_from_layers(&self.layers);
         draw_series_legend(img, cfg, right, top, &legend_entries);
-
-        if let Some(ref title) = cfg.title {
-            img.draw_label(title, left + 10, 10, lr, lg, lb);
-        }
+        draw_chart_title(img, cfg, left + 10, 10);
     }
 }

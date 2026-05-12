@@ -1,4 +1,5 @@
 -- content/examples/tween.lua
+---@diagnostic disable: undefined-field
 -- Hand-written coverage of the lurek.tween API (35 items).
 --
 -- The lurek.tween namespace drives table-field interpolation: classic
@@ -121,6 +122,24 @@ do -- lurek.tween.spring
   lurek.tween.spring(cam, { x = 320, y = 180 }, { stiffness = 180, damping = 18 })
 end
 
+--@api-stub: lurek.tween.tweenChain
+-- Builds and starts a declarative sequence from an array of step tables.
+do -- lurek.tween.tweenChain
+  local actor = { x = 0 }
+  lurek.tween["tweenChain"]({
+    { duration = 0.2, target = actor, fields = { x = 32 }, easing = "linear" },
+    { delay = 0.1 },
+    { duration = 0.2, target = actor, fields = { x = 64 }, easing = "linear" },
+  })
+end
+
+--@api-stub: lurek.tween.tweenColor
+-- Convenience helper for animating rgba fields.
+do -- lurek.tween.tweenColor
+  local c = { r = 1, g = 1, b = 1, a = 1 }
+  lurek.tween["tweenColor"](0.4, c, { r = 1, g = 0.2, b = 0.2, a = 0.8 }, "linear")
+end
+
 
 -- â”€â”€ TweenState methods â”€â”€
 
@@ -216,6 +235,69 @@ do -- Tween:getProgress
   lurek.log.debug("loading=" .. p, "ui")
 end
 
+--@api-stub: LTween:getElapsed
+-- Returns elapsed tween time in seconds.
+do -- Tween:getElapsed
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 10 })
+  lurek.tween.update(0.25)
+  lurek.log.debug("elapsed=" .. tw["getElapsed"](tw), "tween")
+end
+
+--@api-stub: LTween:getDuration
+-- Returns configured tween duration in seconds.
+do -- Tween:getDuration
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 10 })
+  lurek.log.debug("duration=" .. tw:getDuration(), "tween")
+end
+
+--@api-stub: LTween:getRemaining
+-- Returns remaining tween time in seconds.
+do -- Tween:getRemaining
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 10 })
+  lurek.tween.update(0.25)
+  lurek.log.debug("remaining=" .. tw["getRemaining"](tw), "tween")
+end
+
+--@api-stub: LTween:getFields
+-- Returns animated field names.
+do -- Tween:getFields
+  local obj = { x = 0, y = 0 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 10, y = 20 })
+  local fields = tw["getFields"](tw)
+  lurek.log.debug("fields=" .. tostring(#fields), "tween")
+end
+
+--@api-stub: LTween:setRelative
+-- Enables or disables relative (delta) mode.
+do -- Tween:setRelative
+  local obj = { x = 10 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 5 }, "linear")
+  tw["setRelative"](tw, true)
+end
+
+--@api-stub: LTween:relative
+-- Chainable alias for relative mode.
+do -- Tween:relative
+  local obj = { x = 10 }
+  local tw = lurek.tween.tween(1.0, obj, { x = 5 }, "linear")
+  tw["relative"](tw, true)
+end
+
+--@api-stub: LTween:await
+-- Yields coroutine until tween completion.
+do -- Tween:await
+  local obj = { x = 0 }
+  local tw = lurek.tween.tween(0.2, obj, { x = 1 }, "linear")
+  local co = coroutine.create(function()
+    tw["await"](tw)
+    lurek.log.debug("await complete", "tween")
+  end)
+  coroutine.resume(co)
+end
+
 --@api-stub: LTween:setRepeat
 -- Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
 -- Pass -1 for infinite; useful for idle loops like a heartbeat glow or a beacon flash.
@@ -256,6 +338,26 @@ do -- TweenSequence:isActive
   if seq:isActive() then
     lurek.log.debug("door opening", "scene")
   end
+end
+
+--@api-stub: LTweenSequence:getProgress
+-- Returns sequence progress ratio.
+do -- TweenSequence:getProgress
+  local door = { y = 0 }
+  local seq = lurek.tween.sequence():tween(0.4, door, { y = 64 }):start()
+  lurek.log.debug("seq progress=" .. seq["getProgress"](seq), "scene")
+end
+
+--@api-stub: LTweenSequence:await
+-- Yields coroutine until sequence completion.
+do -- TweenSequence:await
+  local door = { y = 0 }
+  local seq = lurek.tween.sequence():tween(0.2, door, { y = 64 }):start()
+  local co = coroutine.create(function()
+    seq["await"](seq)
+    lurek.log.debug("sequence done", "scene")
+  end)
+  coroutine.resume(co)
 end
 
 

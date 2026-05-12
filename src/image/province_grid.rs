@@ -7,7 +7,7 @@
 //! This module is part of Lurek2D's `image` subsystem (Platform Services tier).
 //! No rendering, no Lua — pure data.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use crate::image::ImageData;
 
@@ -41,7 +41,12 @@ pub struct ProvinceGrid {
     ids: Vec<u32>,
     /// Sorted list of detected adjacency pairs: (province_a, province_b, shared_border_pixels).
     adjacencies: Vec<(u32, u32, u32)>,
+    /// Maps province_id → packed RGB (`r<<16 | g<<8 | b`). Index 0 is always 0 (background).
+    id_to_color: Vec<u32>,
 }
+
+type GridPoint = (u32, u32);
+type DirectedEdge = (GridPoint, GridPoint);
 
 // -------------------------------------------------------------------------------
 // impl ProvinceGrid
@@ -66,6 +71,8 @@ impl ProvinceGrid {
 
         let mut color_to_id: HashMap<u32, u32> = HashMap::new();
         let mut next_id: u32 = 1;
+        // id_to_color[0] = 0 (background). Grows as new province IDs are assigned.
+        let mut id_to_color: Vec<u32> = vec![0u32];
         let mut ids = Vec::with_capacity(pixel_count);
 
         for y in 0..height {
@@ -78,6 +85,7 @@ impl ProvinceGrid {
                         *color_to_id.entry(key).or_insert_with(|| {
                             let id = next_id;
                             next_id += 1;
+                            id_to_color.push(key);
                             id
                         })
                     }
@@ -103,6 +111,7 @@ impl ProvinceGrid {
             height,
             ids,
             adjacencies,
+            id_to_color,
         }
     }
 
@@ -158,6 +167,25 @@ impl ProvinceGrid {
     pub fn province_count(&self) -> u32 {
         // IDs are assigned 1..next_id, so the count equals the maximum ID value.
         self.ids.iter().copied().max().unwrap_or(0)
+    }
+
+    /// Returns the original RGB colour for a province ID as `(r, g, b)`, each 0-255.
+    /// Returns `None` for ID 0 (background) or out-of-range IDs.
+    ///
+    /// # Returns
+    /// `Option<(u8, u8, u8)>`.
+    pub fn province_color(&self, id: u32) -> Option<(u8, u8, u8)> {
+        if id == 0 {
+            return None;
+        }
+        let packed = *self.id_to_color.get(id as usize)?;
+        if packed == 0 {
+            return None;
+        }
+        let r = ((packed >> 16) & 0xFF) as u8;
+        let g = ((packed >> 8) & 0xFF) as u8;
+        let b = (packed & 0xFF) as u8;
+        Some((r, g, b))
     }
 
     /// Returns a slice of `(province_a, province_b, border_pixel_count)` tuples,
@@ -285,6 +313,91 @@ impl ProvinceGrid {
         out
     }
 
+    /// Builds province polygons from border-pixel corner points.
+    ///
+    /// For each province ID, returns one or more closed loops. Every vertex is a
+    /// pixel-grid corner (top-left corner space), so coordinates are in the
+    /// range `0..=width` and `0..=height`.
+    pub fn province_polygons(&self) -> HashMap<u32, Vec<Vec<(u32, u32)>>> {
+        let mut edges_by_province: HashMap<u32, Vec<DirectedEdge>> = HashMap::new();
+        let w = self.width as usize;
+        let h = self.height as usize;
+
+        if w == 0 || h == 0 {
+            return HashMap::new();
+        }
+
+        for y in 0..h {
+            for x in 0..w {
+                let id = self.ids[y * w + x];
+                if id == 0 {
+                    continue;
+                }
+
+                let xf = x as u32;
+                let yf = y as u32;
+
+                // Top edge
+                if y == 0 || self.ids[(y - 1) * w + x] != id {
+                    edges_by_province
+                        .entry(id)
+                        .or_default()
+                        .push(((xf, yf), (xf + 1, yf)));
+                }
+                // Right edge
+                if x + 1 >= w || self.ids[y * w + (x + 1)] != id {
+                    edges_by_province
+                        .entry(id)
+                        .or_default()
+                        .push(((xf + 1, yf), (xf + 1, yf + 1)));
+                }
+                // Bottom edge
+                if y + 1 >= h || self.ids[(y + 1) * w + x] != id {
+                    edges_by_province
+                        .entry(id)
+                        .or_default()
+                        .push(((xf + 1, yf + 1), (xf, yf + 1)));
+                }
+                // Left edge
+                if x == 0 || self.ids[y * w + (x - 1)] != id {
+                    edges_by_province
+                        .entry(id)
+                        .or_default()
+                        .push(((xf, yf + 1), (xf, yf)));
+                }
+            }
+        }
+
+        let mut polygons = HashMap::new();
+        for (province_id, edges) in edges_by_province {
+            let mut loops = Self::trace_loops_from_edges(&edges);
+            loops.retain(|ring| ring.len() >= 4 && ring.first() == ring.last());
+            if !loops.is_empty() {
+                polygons.insert(province_id, loops);
+            }
+        }
+
+        polygons
+    }
+
+    /// Builds simplified province polygons.
+    ///
+    /// Simplification removes intermediate points on straight runs and folds
+    /// staircase 45-degree runs into diagonal segments.
+    pub fn province_polygons_simplified(&self) -> HashMap<u32, Vec<Vec<(u32, u32)>>> {
+        let mut polygons = self.province_polygons();
+
+        for loops in polygons.values_mut() {
+            for ring in loops.iter_mut() {
+                *ring = Self::simplify_polygon_loop(ring);
+            }
+            loops.retain(|ring| ring.len() >= 4 && ring.first() == ring.last());
+        }
+
+        polygons.retain(|_, loops| !loops.is_empty());
+        polygons
+    }
+
     // ---------------------------------------------------------------------------
     // Private helpers
     // ---------------------------------------------------------------------------
@@ -330,6 +443,300 @@ impl ProvinceGrid {
             .collect();
         result.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
         result
+    }
+
+    fn trace_loops_from_edges(edges: &[DirectedEdge]) -> Vec<Vec<GridPoint>> {
+        if edges.is_empty() {
+            return Vec::new();
+        }
+
+        let mut outgoing: HashMap<GridPoint, Vec<GridPoint>> = HashMap::new();
+        for &(start, end) in edges {
+            outgoing.entry(start).or_default().push(end);
+        }
+
+        let mut used: HashSet<DirectedEdge> = HashSet::new();
+        let mut loops: Vec<Vec<GridPoint>> = Vec::new();
+
+        for &(start, next) in edges {
+            if used.contains(&(start, next)) {
+                continue;
+            }
+
+            let mut ring = vec![start, next];
+            used.insert((start, next));
+
+            let mut prev = start;
+            let mut curr = next;
+            let mut closed = curr == start;
+
+            for _ in 0..=edges.len() {
+                if closed {
+                    break;
+                }
+
+                let Some(candidates) = outgoing.get(&curr) else {
+                    break;
+                };
+
+                let Some(next_point) = Self::pick_next_edge(prev, curr, candidates, &used) else {
+                    break;
+                };
+
+                used.insert((curr, next_point));
+                ring.push(next_point);
+                prev = curr;
+                curr = next_point;
+                if curr == start {
+                    closed = true;
+                }
+            }
+
+            if closed {
+                loops.push(ring);
+            }
+        }
+
+        loops
+    }
+
+    fn pick_next_edge(
+        prev: GridPoint,
+        curr: GridPoint,
+        candidates: &[GridPoint],
+        used: &HashSet<DirectedEdge>,
+    ) -> Option<GridPoint> {
+        let incoming = (
+            curr.0 as i64 - prev.0 as i64,
+            curr.1 as i64 - prev.1 as i64,
+        );
+
+        let mut best: Option<(u8, GridPoint)> = None;
+        for &cand in candidates {
+            if used.contains(&(curr, cand)) {
+                continue;
+            }
+
+            let out = (
+                cand.0 as i64 - curr.0 as i64,
+                cand.1 as i64 - curr.1 as i64,
+            );
+
+            // Avoid immediate backtracking when alternatives exist.
+            if out.0 == -incoming.0 && out.1 == -incoming.1 {
+                continue;
+            }
+
+            let rank = Self::turn_rank(incoming, out);
+            if best.as_ref().is_none_or(|(best_rank, _)| rank < *best_rank) {
+                best = Some((rank, cand));
+            }
+        }
+
+        if let Some((_, point)) = best {
+            return Some(point);
+        }
+
+        candidates
+            .iter()
+            .copied()
+            .find(|cand| !used.contains(&(curr, *cand)))
+    }
+
+    fn turn_rank(incoming: (i64, i64), outgoing: (i64, i64)) -> u8 {
+        let Some(in_dir) = Self::cardinal_dir(incoming) else {
+            return 4;
+        };
+        let Some(out_dir) = Self::cardinal_dir(outgoing) else {
+            return 4;
+        };
+
+        let delta = (out_dir + 4 - in_dir) % 4;
+        match delta {
+            0 => 0, // straight
+            1 => 1, // right turn
+            3 => 2, // left turn
+            2 => 3, // reverse
+            _ => 4,
+        }
+    }
+
+    fn cardinal_dir(v: (i64, i64)) -> Option<u8> {
+        match v {
+            (1, 0) => Some(0),
+            (0, 1) => Some(1),
+            (-1, 0) => Some(2),
+            (0, -1) => Some(3),
+            _ => None,
+        }
+    }
+
+    fn simplify_polygon_loop(points: &[(u32, u32)]) -> Vec<(u32, u32)> {
+        if points.len() < 4 {
+            return points.to_vec();
+        }
+
+        let mut ring = points.to_vec();
+        if ring.first() == ring.last() {
+            ring.pop();
+        }
+        if ring.len() < 3 {
+            return points.to_vec();
+        }
+
+        loop {
+            let n = ring.len();
+            let mut reduced = Vec::with_capacity(n);
+            let mut changed = false;
+
+            for i in 0..n {
+                let prev = ring[(i + n - 1) % n];
+                let curr = ring[i];
+                let next = ring[(i + 1) % n];
+                if Self::is_redundant_vertex(prev, curr, next) {
+                    changed = true;
+                    continue;
+                }
+                reduced.push(curr);
+            }
+
+            if !changed || reduced.len() < 3 {
+                ring = reduced;
+                break;
+            }
+
+            ring = reduced;
+        }
+
+        ring = Self::reduce_45_degree_staircase_vertices(&ring);
+        if ring.len() >= 3 {
+            // Clean up any newly-collinear vertices after staircase reduction.
+            loop {
+                let n = ring.len();
+                let mut reduced = Vec::with_capacity(n);
+                let mut changed = false;
+                for i in 0..n {
+                    let prev = ring[(i + n - 1) % n];
+                    let curr = ring[i];
+                    let next = ring[(i + 1) % n];
+                    if Self::is_redundant_vertex(prev, curr, next) {
+                        changed = true;
+                        continue;
+                    }
+                    reduced.push(curr);
+                }
+                if !changed || reduced.len() < 3 {
+                    ring = reduced;
+                    break;
+                }
+                ring = reduced;
+            }
+        }
+
+        if ring.len() < 3 {
+            return points.to_vec();
+        }
+
+        ring.push(ring[0]);
+        ring
+    }
+
+    fn is_redundant_vertex(prev: GridPoint, curr: GridPoint, next: GridPoint) -> bool {
+        let v1 = (
+            curr.0 as i64 - prev.0 as i64,
+            curr.1 as i64 - prev.1 as i64,
+        );
+        let v2 = (
+            next.0 as i64 - curr.0 as i64,
+            next.1 as i64 - curr.1 as i64,
+        );
+
+        if v1 == (0, 0) || v2 == (0, 0) {
+            return true;
+        }
+
+        let cross = v1.0 * v2.1 - v1.1 * v2.0;
+        let dot = v1.0 * v2.0 + v1.1 * v2.1;
+
+        if cross == 0 && dot > 0 {
+            return true;
+        }
+
+        false
+    }
+
+    fn reduce_45_degree_staircase_vertices(points: &[GridPoint]) -> Vec<GridPoint> {
+        let mut ring = points.to_vec();
+
+        loop {
+            let n = ring.len();
+            if n < 4 {
+                break;
+            }
+
+            let mut diag_dirs: Vec<Option<(i64, i64)>> = vec![None; n];
+            for i in 0..n {
+                let prev = ring[(i + n - 1) % n];
+                let curr = ring[i];
+                let next = ring[(i + 1) % n];
+
+                let in_vec = (
+                    curr.0 as i64 - prev.0 as i64,
+                    curr.1 as i64 - prev.1 as i64,
+                );
+                let out_vec = (
+                    next.0 as i64 - curr.0 as i64,
+                    next.1 as i64 - curr.1 as i64,
+                );
+
+                if in_vec == (0, 0) || out_vec == (0, 0) {
+                    continue;
+                }
+                if in_vec.0 * out_vec.0 + in_vec.1 * out_vec.1 != 0 {
+                    continue;
+                }
+
+                let diag = (
+                    next.0 as i64 - prev.0 as i64,
+                    next.1 as i64 - prev.1 as i64,
+                );
+                if diag.0 == 0 || diag.1 == 0 || diag.0.abs() != diag.1.abs() {
+                    continue;
+                }
+
+                diag_dirs[i] = Some((diag.0.signum(), diag.1.signum()));
+            }
+
+            let mut remove = vec![false; n];
+            for i in 0..n {
+                let Some(dir) = diag_dirs[i] else {
+                    continue;
+                };
+                let left = (i + n - 1) % n;
+                let right = (i + 1) % n;
+                if diag_dirs[left] == Some(dir) || diag_dirs[right] == Some(dir) {
+                    remove[i] = true;
+                }
+            }
+
+            if !remove.iter().any(|v| *v) {
+                break;
+            }
+
+            let next_ring: Vec<GridPoint> = ring
+                .iter()
+                .enumerate()
+                .filter_map(|(i, p)| if remove[i] { None } else { Some(*p) })
+                .collect();
+
+            if next_ring.len() < 3 {
+                break;
+            }
+
+            ring = next_ring;
+        }
+
+        ring
     }
 
     // ---------------------------------------------------------------------------

@@ -15,6 +15,8 @@ The `debugbridge` module provides Lurek2D's TCP debug bridge — a JSON-over-TCP
 
 **Protocol model.** The bridge exposes a command protocol over persistent TCP connections. Each JSON message from a connected client carries a command name and typed parameters. The bridge dispatches to the appropriate handler and sends a JSON reply. Supported commands include: querying current log output (`log`), evaluating arbitrary Lua expressions in the running VM (`eval`), reading/writing engine state fields, listing loaded modules, querying frame performance metrics, taking screenshots, and injecting synthetic input via the automation system. All messages are newline-delimited JSON so they are easy to consume from any language.
 
+Protocol access now includes a lightweight handshake: clients call `ping` to receive a nonce and protocol metadata, then call `hello` with the nonce and matching protocol version. Non-`ping` methods require the valid nonce in `params.nonce`.
+
 **Threading design.** TCP I/O runs on a dedicated background OS thread (`server_thread`) that runs the accept loop and handles all socket reads/writes. This thread cannot call into the Lua VM or touch `SharedState` directly — LuaJIT VMs are single-threaded and not safe to call from any thread other than the one that created them. The bridge resolves this constraint via a two-queue design: operations requiring VM access are serialised as `PendingRequest` entries in `BridgeShared` (guarded by a `Mutex`). The main engine thread calls `bridge.poll()` once per frame to drain the pending-request queue, execute each request on the main thread, and push the resulting `PendingResponse` entries back through the client channel for the background thread to transmit.
 
 **`BridgeShared` — the synchronisation boundary.** `BridgeShared` is the central shared record behind an `Arc<Mutex<BridgeShared>>` alias `SharedBridge`. It holds:
@@ -25,7 +27,7 @@ The `debugbridge` module provides Lurek2D's TCP debug bridge — a JSON-over-TCP
 - A ring buffer of frame delta-time samples for the performance endpoint.
 - Screenshot request/response flags.
 
-`BridgeShared::push_print(entry)` adds a log record and trims history to `max_print_history`. `BridgeShared::record_frame(dt)` appends to the frame-time ring buffer. `BridgeShared::get_performance()` serialises the ring to a JSON summary (fps, min, max, avg frame time).
+`BridgeShared::push_print(entry)` adds a log record and trims history to `max_print_history` in O(1) using `VecDeque`. `BridgeShared::record_frame(dt)` appends to the frame-time ring buffer with O(1) eviction and incrementally maintained performance aggregates. `BridgeShared::get_performance()` serialises cached stats to JSON (fps, min, max, avg frame time) without rescanning the full history every call.
 
 **`PrintEntry`.** Timestamped print-capture record. Lua-side `print()` calls are intercepted and routed through `capture_print_with_broadcast`, which both records the entry and queues a broadcast event so all connected debug clients see live log output without polling.
 
@@ -81,6 +83,8 @@ The `debugbridge` module provides Lurek2D's TCP debug bridge — a JSON-over-TCP
 - `lurek.debugbridge.requestScreenshot`: Flags a screenshot request for the next frame.
 - `lurek.debugbridge.isScreenshotRequested`: Returns whether a screenshot is currently requested.
 - `lurek.debugbridge.broadcast`: Broadcasts a JSON event to all connected clients.
+- `lurek.debugbridge.getProtocolInfo`: Returns bridge protocol metadata (version, capabilities, nonce).
+- `lurek.debugbridge.consumeHotReloadRequest`: Consumes and clears a pending remote hot-reload request.
 
 ## References
 

@@ -45,6 +45,8 @@ use crate::tween::TweenState;
 /// - `yoyo` — `bool`. Alternate direction on each repeat cycle.
 /// - `yoyo_reversed` — `bool`. Current direction flag (false = forward).
 /// - `custom_easing_key` — `Option<LuaRegistryKey>`. Overrides built-in easing.
+/// - `relative` — `bool`. Whether field values are interpreted as deltas from captured starts.
+/// - `waiters` — `Vec<LuaRegistryKey>`. Coroutines waiting for completion via `await`.
 /// - `on_complete` — `Option<LuaRegistryKey>`. Callback fired on successful completion.
 /// - `on_update` — `Option<LuaRegistryKey>`. Callback fired every tick with eased `t`.
 /// - `on_cancel` — `Option<LuaRegistryKey>`. Callback fired on `cancel()`.
@@ -78,6 +80,10 @@ pub struct LuaTween {
     yoyo_reversed: bool,
     /// Optional Lua easing function (overrides built-in easing).
     custom_easing_key: Option<LuaRegistryKey>,
+    /// When true, end values are interpreted as deltas from captured starts.
+    pub relative: bool,
+    /// Coroutines suspended by `LTween:await()`.
+    pub waiters: Vec<LuaRegistryKey>,
     /// Fired when the tween finishes all cycles.
     pub on_complete: Option<LuaRegistryKey>,
     /// Fired every tick with the current eased `t` (0..=1).
@@ -127,6 +133,8 @@ impl LuaTween {
             yoyo: false,
             yoyo_reversed: false,
             custom_easing_key: None,
+            relative: false,
+            waiters: Vec::new(),
             on_complete: None,
             on_update: None,
             on_cancel: None,
@@ -186,8 +194,12 @@ impl LuaTween {
         let table: LuaTable = lua.registry_value(&self.target_key)?;
         for (i, field) in self.fields.iter().enumerate() {
             let start = self.start_values[i];
-            let end = self.end_values[i];
-            let v = start + (end - start) * effective_t;
+            let target = if self.relative {
+                start + self.end_values[i]
+            } else {
+                self.end_values[i]
+            };
+            let v = start + (target - start) * effective_t;
             table.set(field.as_str(), v)?;
         }
 
@@ -204,6 +216,7 @@ impl LuaTween {
                 // No repeat — done
                 self.active = false;
                 self.fire_on_complete(lua);
+                self.resume_waiters(lua)?;
                 return Ok(true);
             } else {
                 // Repeating
@@ -226,6 +239,7 @@ impl LuaTween {
                     // All repeat cycles done
                     self.active = false;
                     self.fire_on_complete(lua);
+                    self.resume_waiters(lua)?;
                     return Ok(true);
                 }
             }
@@ -245,6 +259,44 @@ impl LuaTween {
             }
             let _ = lua.remove_registry_value(k);
         }
+    }
+
+    /// Enables or disables relative interpolation mode.
+    pub fn set_relative(&mut self, enabled: bool) {
+        self.relative = enabled;
+        self.starts_captured = false;
+    }
+
+    /// Registers a coroutine waiter created by `LTween:await()`.
+    pub fn add_waiter(&mut self, waiter: LuaRegistryKey) {
+        self.waiters.push(waiter);
+    }
+
+    /// Resumes and clears all waiters.
+    pub fn resume_waiters(&mut self, lua: &Lua) -> LuaResult<()> {
+        let waiters = std::mem::take(&mut self.waiters);
+        for key in waiters {
+            if let Ok(LuaValue::Thread(thread)) = lua.registry_value::<LuaValue>(&key) {
+                let _ = thread.resume::<_, ()>(());
+            }
+            lua.remove_registry_value(key)?;
+        }
+        Ok(())
+    }
+
+    /// Returns raw progress in range 0..1.
+    pub fn progress(&self) -> f64 {
+        self.state.t_raw() as f64
+    }
+
+    /// Returns elapsed time in seconds.
+    pub fn elapsed(&self) -> f64 {
+        self.state.elapsed
+    }
+
+    /// Returns remaining time in seconds.
+    pub fn remaining(&self) -> f64 {
+        (self.state.duration - self.state.elapsed).max(0.0)
     }
 }
 // ─── SequenceStep ───────────────────────────────────────────────────────────
@@ -298,6 +350,7 @@ pub enum SequenceStep {
 /// - `current` — `usize`. Index of the currently executing step.
 /// - `active` — `bool`. Whether the sequence is running.
 /// - `on_complete` — `Option<LuaRegistryKey>`. Fired when all steps finish.
+/// - `waiters` — `Vec<LuaRegistryKey>`. Coroutines waiting for completion.
 pub struct LuaTweenSequence {
     /// Ordered list of animation steps.
     pub steps: Vec<SequenceStep>,
@@ -307,6 +360,8 @@ pub struct LuaTweenSequence {
     pub active: bool,
     /// Fired when all steps complete.
     pub(crate) on_complete: Option<LuaRegistryKey>,
+    /// Coroutines suspended by `LTweenSequence:await()`.
+    pub waiters: Vec<LuaRegistryKey>,
 }
 
 impl LuaTweenSequence {
@@ -320,6 +375,7 @@ impl LuaTweenSequence {
             current: 0,
             active: false,
             on_complete: None,
+            waiters: Vec::new(),
         }
     }
 
@@ -422,10 +478,41 @@ impl LuaTweenSequence {
                 }
                 lua.remove_registry_value(k)?;
             }
+            self.resume_waiters(lua)?;
             return Ok(true);
         }
 
         Ok(false)
+    }
+
+    /// Returns step-based completion ratio in range 0..1.
+    pub fn progress_ratio(&self) -> f64 {
+        if self.steps.is_empty() {
+            return 1.0;
+        }
+        let done = if self.active {
+            self.current
+        } else {
+            self.steps.len()
+        };
+        (done as f64 / self.steps.len() as f64).clamp(0.0, 1.0)
+    }
+
+    /// Registers a coroutine waiter created by `LTweenSequence:await()`.
+    pub fn add_waiter(&mut self, waiter: LuaRegistryKey) {
+        self.waiters.push(waiter);
+    }
+
+    /// Resumes and clears all waiters.
+    pub fn resume_waiters(&mut self, lua: &Lua) -> LuaResult<()> {
+        let waiters = std::mem::take(&mut self.waiters);
+        for key in waiters {
+            if let Ok(LuaValue::Thread(thread)) = lua.registry_value::<LuaValue>(&key) {
+                let _ = thread.resume::<_, ()>(());
+            }
+            lua.remove_registry_value(key)?;
+        }
+        Ok(())
     }
 }
 

@@ -1,2 +1,0 @@
-- TODO: Add a dedicated headless CLI binary for non-graphical tooling such as validation, packing, and batch screenshots.
-- TODO: Keep shared startup and CLI parsing logic in one place if the binary surface grows beyond `main.rs` and `lurekc.rs`.

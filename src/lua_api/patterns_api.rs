@@ -2018,6 +2018,20 @@ impl LuaUserData for LuaStack {
             Ok(true)
         });
 
+        // -- pushBottom --
+        /// Pushes a value onto the bottom of the stack.
+        /// @param | value | any | Value to push onto the bottom.
+        /// @return | boolean | True when the value was pushed.
+        methods.add_method("pushBottom", |lua, this, value: LuaValue| {
+            let len = this.items.borrow().len();
+            if this.meta.is_full(len) {
+                return Ok(false);
+            }
+            let key = lua.create_registry_value(value)?;
+            this.items.borrow_mut().insert(0, key);
+            Ok(true)
+        });
+
         // -- pop --
         /// Removes and returns the top value.
         /// @return | any | Popped value, or nil if the stack is empty.
@@ -2031,6 +2045,36 @@ impl LuaUserData for LuaStack {
             }
         });
 
+        // -- popBottom --
+        /// Removes and returns the bottom value.
+        /// @return | any | Bottom value, or nil if the stack is empty.
+        methods.add_method("popBottom", |lua, this, ()| {
+            if this.items.borrow().is_empty() {
+                return Ok(LuaValue::Nil);
+            }
+            let key = this.items.borrow_mut().remove(0);
+            let v: LuaValue = lua.registry_value(&key)?;
+            lua.remove_registry_value(key)?;
+            Ok(v)
+        });
+
+        // -- popMany --
+        /// Pops up to `count` values from the top of the stack.
+        /// @param | count | integer | Maximum number of values to pop.
+        /// @return | table | Array of popped values, top-first.
+        methods.add_method("popMany", |lua, this, count: usize| {
+            let out = lua.create_table()?;
+            let n = count.min(this.items.borrow().len());
+            for i in 1..=n {
+                if let Some(key) = this.items.borrow_mut().pop() {
+                    let v: LuaValue = lua.registry_value(&key)?;
+                    lua.remove_registry_value(key)?;
+                    out.set(i, v)?;
+                }
+            }
+            Ok(out)
+        });
+
         // -- peek --
         /// Returns the top value without removing it.
         /// @return | any | Top value, or nil if the stack is empty.
@@ -2041,6 +2085,83 @@ impl LuaUserData for LuaStack {
             } else {
                 Ok(LuaValue::Nil)
             }
+        });
+
+        // -- peekBottom --
+        /// Returns the bottom value without removing it.
+        /// @return | any | Bottom value, or nil if the stack is empty.
+        methods.add_method("peekBottom", |lua, this, ()| {
+            if let Some(key) = this.items.borrow().first() {
+                let v: LuaValue = lua.registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- peekAt --
+        /// Returns the value at a 1-based index (bottom=1).
+        /// @param | index | integer | 1-based index.
+        /// @return | any | Value at index, or nil when out of range.
+        methods.add_method("peekAt", |lua, this, index: usize| {
+            if index == 0 {
+                return Ok(LuaValue::Nil);
+            }
+            if let Some(key) = this.items.borrow().get(index - 1) {
+                let v: LuaValue = lua.registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- insertAt --
+        /// Inserts a value at a 1-based index (clamped to valid range).
+        /// @param | index | integer | 1-based insert index.
+        /// @param | value | any | Value to insert.
+        /// @return | boolean | True when inserted.
+        methods.add_method(
+            "insertAt",
+            |lua, this, (index, value): (usize, LuaValue)| {
+                let len = this.items.borrow().len();
+                if this.meta.is_full(len) {
+                    return Ok(false);
+                }
+                let idx = if index == 0 { 0 } else { (index - 1).min(len) };
+                let key = lua.create_registry_value(value)?;
+                this.items.borrow_mut().insert(idx, key);
+                Ok(true)
+            },
+        );
+
+        // -- removeAt --
+        /// Removes and returns a value at a 1-based index.
+        /// @param | index | integer | 1-based index.
+        /// @return | any | Removed value, or nil when out of range.
+        methods.add_method("removeAt", |lua, this, index: usize| {
+            if index == 0 || index > this.items.borrow().len() {
+                return Ok(LuaValue::Nil);
+            }
+            let key = this.items.borrow_mut().remove(index - 1);
+            let v: LuaValue = lua.registry_value(&key)?;
+            lua.remove_registry_value(key)?;
+            Ok(v)
+        });
+
+        // -- moveWithin --
+        /// Moves an item from one 1-based index to another.
+        /// @param | from | integer | Source 1-based index.
+        /// @param | to | integer | Destination 1-based index.
+        /// @return | boolean | True when move succeeded.
+        methods.add_method("moveWithin", |_, this, (from, to): (usize, usize)| {
+            let len = this.items.borrow().len();
+            if from == 0 || to == 0 || from > len || to > len {
+                return Ok(false);
+            }
+            let mut items = this.items.borrow_mut();
+            let key = items.remove(from - 1);
+            items.insert(to - 1, key);
+            Ok(true)
         });
 
         // -- len --
@@ -2119,11 +2240,38 @@ impl LuaUserData for LuaQueue {
             Ok(true)
         });
 
+        // -- enqueueFront --
+        /// Adds a value to the front of the queue.
+        /// @param | value | any | Value to enqueue at the front.
+        /// @return | boolean | True when the value was enqueued.
+        methods.add_method("enqueueFront", |lua, this, value: LuaValue| {
+            let len = this.items.borrow().len();
+            if this.meta.is_full(len) {
+                return Ok(false);
+            }
+            let key = lua.create_registry_value(value)?;
+            this.items.borrow_mut().push_front(key);
+            Ok(true)
+        });
+
         // -- dequeue --
         /// Removes and returns the front value.
         /// @return | any | Front value, or nil if the queue is empty.
         methods.add_method("dequeue", |lua, this, ()| {
             if let Some(key) = this.items.borrow_mut().pop_front() {
+                let v: LuaValue = lua.registry_value(&key)?;
+                lua.remove_registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- dequeueBack --
+        /// Removes and returns the back value.
+        /// @return | any | Back value, or nil if the queue is empty.
+        methods.add_method("dequeueBack", |lua, this, ()| {
+            if let Some(key) = this.items.borrow_mut().pop_back() {
                 let v: LuaValue = lua.registry_value(&key)?;
                 lua.remove_registry_value(key)?;
                 Ok(v)
@@ -2138,6 +2286,70 @@ impl LuaUserData for LuaQueue {
         methods.add_method("front", |lua, this, ()| {
             if let Some(key) = this.items.borrow().front() {
                 let v: LuaValue = lua.registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- back --
+        /// Returns the back value without removing it.
+        /// @return | any | Back value, or nil if the queue is empty.
+        methods.add_method("back", |lua, this, ()| {
+            if let Some(key) = this.items.borrow().back() {
+                let v: LuaValue = lua.registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- peekAt --
+        /// Returns the value at a 1-based index (front=1).
+        /// @param | index | integer | 1-based index.
+        /// @return | any | Value at index, or nil if out of range.
+        methods.add_method("peekAt", |lua, this, index: usize| {
+            if index == 0 {
+                return Ok(LuaValue::Nil);
+            }
+            if let Some(key) = this.items.borrow().get(index - 1) {
+                let v: LuaValue = lua.registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- insertAt --
+        /// Inserts a value at a 1-based index (front=1).
+        /// @param | index | integer | 1-based insert index.
+        /// @param | value | any | Value to insert.
+        /// @return | boolean | True when inserted.
+        methods.add_method(
+            "insertAt",
+            |lua, this, (index, value): (usize, LuaValue)| {
+                let len = this.items.borrow().len();
+                if this.meta.is_full(len) {
+                    return Ok(false);
+                }
+                let idx = if index == 0 { 0 } else { (index - 1).min(len) };
+                let key = lua.create_registry_value(value)?;
+                this.items.borrow_mut().insert(idx, key);
+                Ok(true)
+            },
+        );
+
+        // -- removeAt --
+        /// Removes and returns a value at a 1-based index.
+        /// @param | index | integer | 1-based index.
+        /// @return | any | Removed value, or nil when out of range.
+        methods.add_method("removeAt", |lua, this, index: usize| {
+            if index == 0 || index > this.items.borrow().len() {
+                return Ok(LuaValue::Nil);
+            }
+            if let Some(key) = this.items.borrow_mut().remove(index - 1) {
+                let v: LuaValue = lua.registry_value(&key)?;
+                lua.remove_registry_value(key)?;
                 Ok(v)
             } else {
                 Ok(LuaValue::Nil)
@@ -2215,6 +2427,26 @@ impl LuaUserData for LuaList {
             Ok(())
         });
 
+        // -- push --
+        /// Alias for `add`.
+        /// @param | value | any | Value to append.
+        /// @return | nil | No return value.
+        methods.add_method("push", |lua, this, value: LuaValue| {
+            let key = lua.create_registry_value(value)?;
+            this.items.borrow_mut().push(key);
+            Ok(())
+        });
+
+        // -- unshift --
+        /// Inserts a value at the beginning of the list.
+        /// @param | value | any | Value to insert at the front.
+        /// @return | nil | No return value.
+        methods.add_method("unshift", |lua, this, value: LuaValue| {
+            let key = lua.create_registry_value(value)?;
+            this.items.borrow_mut().insert(0, key);
+            Ok(())
+        });
+
         // -- get --
         /// Returns the value at a 1-based index.
         /// @param | index | integer | 1-based list index to read.
@@ -2251,6 +2483,19 @@ impl LuaUserData for LuaList {
             Ok(())
         });
 
+        // -- insert --
+        /// Inserts a value at a 1-based index (clamped to valid range).
+        /// @param | index | integer | 1-based insert index.
+        /// @param | value | any | Value to insert.
+        /// @return | nil | No return value.
+        methods.add_method("insert", |lua, this, (index, value): (usize, LuaValue)| {
+            let len = this.items.borrow().len();
+            let idx = if index == 0 { 0 } else { (index - 1).min(len) };
+            let key = lua.create_registry_value(value)?;
+            this.items.borrow_mut().insert(idx, key);
+            Ok(())
+        });
+
         // -- remove --
         /// Removes and returns the value at a 1-based index.
         /// @param | index | integer | 1-based list index to remove.
@@ -2267,6 +2512,54 @@ impl LuaUserData for LuaList {
             let v: LuaValue = lua.registry_value(&key)?;
             lua.remove_registry_value(key)?;
             Ok(v)
+        });
+
+        // -- pop --
+        /// Removes and returns the last value.
+        /// @return | any | Last value, or nil when the list is empty.
+        methods.add_method("pop", |lua, this, ()| {
+            if let Some(key) = this.items.borrow_mut().pop() {
+                let v: LuaValue = lua.registry_value(&key)?;
+                lua.remove_registry_value(key)?;
+                Ok(v)
+            } else {
+                Ok(LuaValue::Nil)
+            }
+        });
+
+        // -- shift --
+        /// Removes and returns the first value.
+        /// @return | any | First value, or nil when the list is empty.
+        methods.add_method("shift", |lua, this, ()| {
+            if this.items.borrow().is_empty() {
+                return Ok(LuaValue::Nil);
+            }
+            let key = this.items.borrow_mut().remove(0);
+            let v: LuaValue = lua.registry_value(&key)?;
+            lua.remove_registry_value(key)?;
+            Ok(v)
+        });
+
+        // -- indexOf --
+        /// Returns 1-based index of the first equal value, or nil when not found.
+        /// @param | value | any | Value to find.
+        /// @return | integer | 1-based index, or nil when not found.
+        methods.add_method("indexOf", |lua, this, value: LuaValue| {
+            for (i, key) in this.items.borrow().iter().enumerate() {
+                let v: LuaValue = lua.registry_value(key)?;
+                if lua.pack(v.clone())? == lua.pack(value.clone())? {
+                    return Ok(Some(i + 1));
+                }
+            }
+            Ok(None::<usize>)
+        });
+
+        // -- reverse --
+        /// Reverses the list in place.
+        /// @return | nil | No return value.
+        methods.add_method("reverse", |_, this, ()| {
+            this.items.borrow_mut().reverse();
+            Ok(())
         });
 
         // -- len --
@@ -2417,6 +2710,749 @@ impl LuaUserData for LuaSet {
             Ok(LuaSet {
                 items: Rc::new(RefCell::new(inter)),
             })
+        });
+    }
+}
+
+// ===========================================================================
+// Map
+// ===========================================================================
+
+/// Lua wrapper for a string-keyed map/dictionary.
+#[derive(Clone)]
+struct LuaMap {
+    items: Rc<RefCell<HashMap<String, LuaRegistryKey>>>,
+}
+
+impl LurekType for LuaMap {
+    const TYPE_NAME: &'static str = "LMap";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LMap", "Object"];
+}
+
+impl LuaUserData for LuaMap {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- set --
+        /// Sets a value for a string key.
+        /// @param | key | string | Key to write.
+        /// @param | value | any | Value to store.
+        /// @return | nil | No return value.
+        methods.add_method("set", |lua, this, (key, value): (String, LuaValue)| {
+            let rk = lua.create_registry_value(value)?;
+            if let Some(old) = this.items.borrow_mut().insert(key, rk) {
+                lua.remove_registry_value(old)?;
+            }
+            Ok(())
+        });
+
+        // -- get --
+        /// Gets value for a key.
+        /// @param | key | string | Key to read.
+        /// @return | any | Stored value, or nil if missing.
+        methods.add_method("get", |lua, this, key: String| {
+            let items = this.items.borrow();
+            match items.get(&key) {
+                Some(rk) => Ok(lua.registry_value::<LuaValue>(rk)?),
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- has --
+        /// Returns true when key exists.
+        /// @param | key | string | Key to check.
+        /// @return | boolean | True when key exists.
+        methods.add_method("has", |_, this, key: String| {
+            Ok(this.items.borrow().contains_key(&key))
+        });
+
+        // -- remove --
+        /// Removes a key and returns whether it existed.
+        /// @param | key | string | Key to remove.
+        /// @return | boolean | True when removed.
+        methods.add_method("remove", |lua, this, key: String| {
+            if let Some(rk) = this.items.borrow_mut().remove(&key) {
+                lua.remove_registry_value(rk)?;
+                Ok(true)
+            } else {
+                Ok(false)
+            }
+        });
+
+        // -- len --
+        /// Returns the number of key-value pairs.
+        /// @return | integer | Pair count.
+        methods.add_method("len", |_, this, ()| Ok(this.items.borrow().len()));
+
+        // -- isEmpty --
+        /// Returns true when map has no entries.
+        /// @return | boolean | True when empty.
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.items.borrow().is_empty()));
+
+        // -- keys --
+        /// Returns all keys.
+        /// @return | table | Array of keys.
+        methods.add_method("keys", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, k) in this.items.borrow().keys().enumerate() {
+                tbl.set(i + 1, k.as_str())?;
+            }
+            Ok(tbl)
+        });
+
+        // -- values --
+        /// Returns all values.
+        /// @return | table | Array of values.
+        methods.add_method("values", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, rk) in this.items.borrow().values().enumerate() {
+                let v: LuaValue = lua.registry_value(rk)?;
+                tbl.set(i + 1, v)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- entries --
+        /// Returns all entries as `{key=..., value=...}` records.
+        /// @return | table | Array of entry tables.
+        methods.add_method("entries", |lua, this, ()| {
+            let tbl = lua.create_table()?;
+            for (i, (k, rk)) in this.items.borrow().iter().enumerate() {
+                let row = lua.create_table()?;
+                row.set("key", k.as_str())?;
+                row.set("value", lua.registry_value::<LuaValue>(rk)?)?;
+                tbl.set(i + 1, row)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- merge --
+        /// Merges another map into this map, overwriting existing keys.
+        /// @param | other | LMap | Source map.
+        /// @return | nil | No return value.
+        methods.add_method("merge", |lua, this, other: LuaAnyUserData| {
+            let other_map = other.borrow::<LuaMap>()?;
+            for (k, rk) in other_map.items.borrow().iter() {
+                let v: LuaValue = lua.registry_value(rk)?;
+                let nk = lua.create_registry_value(v)?;
+                if let Some(old) = this.items.borrow_mut().insert(k.clone(), nk) {
+                    lua.remove_registry_value(old)?;
+                }
+            }
+            Ok(())
+        });
+
+        // -- clear --
+        /// Clears all entries.
+        /// @return | nil | No return value.
+        methods.add_method("clear", |lua, this, ()| {
+            let drained: Vec<(String, LuaRegistryKey)> = this.items.borrow_mut().drain().collect();
+            for (_, rk) in drained {
+                lua.remove_registry_value(rk)?;
+            }
+            Ok(())
+        });
+    }
+}
+
+// ===========================================================================
+// WeightedRandom
+// ===========================================================================
+
+/// Lua wrapper for the WeightedRandom selector pattern.
+#[derive(Clone)]
+struct LuaWeightedRandom {
+    pool: Rc<RefCell<crate::patterns::WeightedRandom>>,
+    payloads: Rc<RefCell<HashMap<u64, LuaRegistryKey>>>,
+}
+
+impl LurekType for LuaWeightedRandom {
+    const TYPE_NAME: &'static str = "LWeightedRandom";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LWeightedRandom", "Object"];
+}
+
+impl LuaUserData for LuaWeightedRandom {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- add -------------------------------------------------
+        /// Adds an entry with the given weight and optional label.
+        /// @param | weight | number | Selection weight; must be >= 0.
+        /// @param | value | any | Payload value to associate with this entry.
+        /// @param | label | string? | Optional entry label.
+        /// @return | integer | Entry ID.
+        methods.add_method(
+            "add",
+            |lua, this, (weight, value, label): (f64, LuaValue, Option<String>)| {
+                let id = this
+                    .pool
+                    .borrow_mut()
+                    .add(weight, label.as_deref().unwrap_or(""));
+                let rk = lua.create_registry_value(value)?;
+                this.payloads.borrow_mut().insert(id, rk);
+                Ok(id)
+            },
+        );
+
+        // -- remove -------------------------------------------------
+        /// Removes the entry with the given ID.
+        /// @param | id | integer | Entry ID to remove.
+        /// @return | boolean | True when the entry was found and removed.
+        methods.add_method("remove", |lua, this, id: u64| {
+            let removed = this.pool.borrow_mut().remove(id);
+            if removed {
+                if let Some(rk) = this.payloads.borrow_mut().remove(&id) {
+                    lua.remove_registry_value(rk)?;
+                }
+            }
+            Ok(removed)
+        });
+
+        // -- setWeight -------------------------------------------------
+        /// Updates the weight of an existing entry.
+        /// @param | id | integer | Entry ID to update.
+        /// @param | weight | number | New weight value.
+        /// @return | boolean | True when the entry was found and updated.
+        methods.add_method("setWeight", |_, this, (id, weight): (u64, f64)| {
+            Ok(this.pool.borrow_mut().set_weight(id, weight))
+        });
+
+        // -- pick -------------------------------------------------
+        /// Selects one entry using a caller-supplied random sample in [0, 1).
+        /// @param | sample | number | Random sample in `[0, 1)`.
+        /// @return | any | Selected payload, or nil when the pool is empty.
+        methods.add_method("pick", |lua, this, sample: f64| {
+            match this.pool.borrow().pick(sample) {
+                Some(id) => {
+                    let payloads = this.payloads.borrow();
+                    match payloads.get(&id) {
+                        Some(rk) => Ok(lua.registry_value::<LuaValue>(rk)?),
+                        None => Ok(LuaValue::Nil),
+                    }
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- pickN -------------------------------------------------
+        /// Selects up to `count` distinct entries without replacement using a samples table.
+        /// @param | count | integer | Maximum number of entries to select.
+        /// @param | samples | table | Array of random samples in `[0, 1)`.
+        /// @return | table | Array of selected payload values.
+        methods.add_method("pickN", |lua, this, (count, samples): (usize, LuaTable)| {
+            let svec: Vec<f64> = samples.sequence_values::<f64>().collect::<LuaResult<_>>()?;
+            let ids = this.pool.borrow().pick_n(count, &svec);
+            let tbl = lua.create_table()?;
+            for (i, id) in ids.iter().enumerate() {
+                let payloads = this.payloads.borrow();
+                let val = match payloads.get(id) {
+                    Some(rk) => lua.registry_value::<LuaValue>(rk)?,
+                    None => LuaValue::Nil,
+                };
+                tbl.set(i + 1, val)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- totalWeight -------------------------------------------------
+        /// Returns the sum of all entry weights.
+        /// @return | number | Total weight of all entries.
+        methods.add_method("totalWeight", |_, this, ()| {
+            Ok(this.pool.borrow().total_weight())
+        });
+
+        // -- len -------------------------------------------------
+        /// Returns the number of entries in the pool.
+        /// @return | integer | Number of entries.
+        methods.add_method("len", |_, this, ()| Ok(this.pool.borrow().len()));
+
+        // -- isEmpty -------------------------------------------------
+        /// Returns true when the pool has no entries.
+        /// @return | boolean | True when the pool is empty.
+        methods.add_method("isEmpty", |_, this, ()| Ok(this.pool.borrow().is_empty()));
+
+        // -- clearAll -------------------------------------------------
+        /// Removes all entries from the pool.
+        /// @return | nil | No return value.
+        methods.add_method("clearAll", |lua, this, ()| {
+            this.pool.borrow_mut().clear();
+            let drained: Vec<(u64, LuaRegistryKey)> = this.payloads.borrow_mut().drain().collect();
+            for (_, rk) in drained {
+                lua.remove_registry_value(rk)?;
+            }
+            Ok(())
+        });
+
+        // -- getRevision -------------------------------------------------
+        /// Returns the pool's revision counter (incremented on structural changes).
+        /// @return | integer | Pool revision counter.
+        methods.add_method("getRevision", |_, this, ()| Ok(this.pool.borrow().revision));
+    }
+}
+
+// ===========================================================================
+// BehaviorTree
+// ===========================================================================
+
+/// Lua wrapper for the BehaviorTree pattern.
+#[derive(Clone)]
+struct LuaBehaviorTree {
+    tree: Rc<RefCell<crate::patterns::BehaviorTree>>,
+    run_state: Rc<RefCell<crate::patterns::BtRunState>>,
+    /// Leaf name -> Lua callback key.
+    leaf_fns: Rc<RefCell<HashMap<String, LuaRegistryKey>>>,
+}
+
+impl LurekType for LuaBehaviorTree {
+    const TYPE_NAME: &'static str = "LBehaviorTree";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LBehaviorTree", "Object"];
+}
+
+impl LuaUserData for LuaBehaviorTree {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- addSequence -------------------------------------------------
+        /// Adds a Sequence composite node.
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method("addSequence", |_, this, label: Option<String>| {
+            Ok(this
+                .tree
+                .borrow_mut()
+                .add_sequence(label.as_deref().unwrap_or("")))
+        });
+
+        // -- addSelector -------------------------------------------------
+        /// Adds a Selector composite node.
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method("addSelector", |_, this, label: Option<String>| {
+            Ok(this
+                .tree
+                .borrow_mut()
+                .add_selector(label.as_deref().unwrap_or("")))
+        });
+
+        // -- addParallel -------------------------------------------------
+        /// Adds a Parallel composite node.
+        /// @param | min_success | integer | Minimum successes required for the node to succeed.
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method(
+            "addParallel",
+            |_, this, (min_success, label): (usize, Option<String>)| {
+                Ok(this
+                    .tree
+                    .borrow_mut()
+                    .add_parallel(min_success, label.as_deref().unwrap_or("")))
+            },
+        );
+
+        // -- addInverter -------------------------------------------------
+        /// Adds an Inverter decorator node.
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method("addInverter", |_, this, label: Option<String>| {
+            Ok(this
+                .tree
+                .borrow_mut()
+                .add_inverter(label.as_deref().unwrap_or("")))
+        });
+
+        // -- addRepeat -------------------------------------------------
+        /// Adds a Repeat decorator node.
+        /// @param | count | integer | Number of repetitions; 0 repeats indefinitely (ticks once per frame until child fails).
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method(
+            "addRepeat",
+            |_, this, (count, label): (usize, Option<String>)| {
+                Ok(this
+                    .tree
+                    .borrow_mut()
+                    .add_repeat(count, label.as_deref().unwrap_or("")))
+            },
+        );
+
+        // -- addLeaf -------------------------------------------------
+        /// Adds a Leaf node backed by a named callback.
+        /// @param | name | string | Leaf name; matches the key used in `setLeaf`.
+        /// @param | label | string? | Optional node label.
+        /// @return | integer | Node ID.
+        methods.add_method(
+            "addLeaf",
+            |_, this, (name, label): (String, Option<String>)| {
+                Ok(this
+                    .tree
+                    .borrow_mut()
+                    .add_leaf(&name, label.as_deref().unwrap_or("")))
+            },
+        );
+
+        // -- addChild -------------------------------------------------
+        /// Attaches a child node to a parent node.
+        /// @param | parent_id | integer | Parent node ID.
+        /// @param | child_id | integer | Child node ID.
+        /// @return | boolean | True when both nodes were found and the child was attached.
+        methods.add_method("addChild", |_, this, (parent_id, child_id): (u32, u32)| {
+            Ok(this.tree.borrow_mut().add_child(parent_id, child_id))
+        });
+
+        // -- setRoot -------------------------------------------------
+        /// Sets the root node of the tree.
+        /// @param | id | integer | Node ID to use as root.
+        /// @return | boolean | True when the node was found.
+        methods.add_method("setRoot", |_, this, id: u32| {
+            Ok(this.tree.borrow_mut().set_root(id))
+        });
+
+        // -- setLeaf -------------------------------------------------
+        /// Registers the callback for a named leaf node.
+        /// @param | name | string | Leaf name matching an `addLeaf` call.
+        /// @param | callback | function | Callback that returns `"success"`, `"failure"`, or `"running"`.
+        /// @return | nil | No return value.
+        methods.add_method(
+            "setLeaf",
+            |lua, this, (name, callback): (String, LuaFunction)| {
+                let rk = lua.create_registry_value(callback)?;
+                if let Some(old) = this.leaf_fns.borrow_mut().insert(name, rk) {
+                    lua.remove_registry_value(old)?;
+                }
+                Ok(())
+            },
+        );
+
+        // -- tick -------------------------------------------------
+        /// Ticks the behaviour tree once from the root node.
+        /// @return | string | `"success"`, `"failure"`, or `"running"`.
+        methods.add_method("tick", |lua, this, ()| {
+            let root = match this.tree.borrow().root {
+                Some(id) => id,
+                None => return Ok("failure"),
+            };
+            let result = Self::tick_node(lua, this, root)?;
+            Ok(match result {
+                crate::patterns::BtStatus::Success => "success",
+                crate::patterns::BtStatus::Failure => "failure",
+                crate::patterns::BtStatus::Running => "running",
+            })
+        });
+
+        // -- resetState -------------------------------------------------
+        /// Resets running state and repeat counters.
+        /// @return | nil | No return value.
+        methods.add_method("resetState", |_, this, ()| {
+            this.run_state.borrow_mut().reset();
+            Ok(())
+        });
+
+        // -- nodeCount -------------------------------------------------
+        /// Returns the number of nodes in the tree.
+        /// @return | integer | Node count.
+        methods.add_method("nodeCount", |_, this, ()| {
+            Ok(this.tree.borrow().node_count())
+        });
+
+        // -- clearAll -------------------------------------------------
+        /// Resets the tree and all registered leaf callbacks.
+        /// @return | nil | No return value.
+        methods.add_method("clearAll", |lua, this, ()| {
+            this.tree.borrow_mut().clear();
+            this.run_state.borrow_mut().reset();
+            let drained: Vec<(String, LuaRegistryKey)> =
+                this.leaf_fns.borrow_mut().drain().collect();
+            for (_, rk) in drained {
+                lua.remove_registry_value(rk)?;
+            }
+            Ok(())
+        });
+    }
+}
+
+impl LuaBehaviorTree {
+    fn tick_node(
+        lua: &Lua,
+        this: &LuaBehaviorTree,
+        id: crate::patterns::NodeId,
+    ) -> LuaResult<crate::patterns::BtStatus> {
+        use crate::patterns::{BtStatus, NodeKind};
+        let (kind, children) = {
+            let t = this.tree.borrow();
+            let node = match t.get_node(id) {
+                Some(n) => n,
+                None => return Ok(BtStatus::Failure),
+            };
+            (node.kind.clone(), node.children.clone())
+        };
+
+        match kind {
+            NodeKind::Sequence => {
+                for child in children {
+                    match Self::tick_node(lua, this, child)? {
+                        BtStatus::Success => continue,
+                        other => return Ok(other),
+                    }
+                }
+                Ok(BtStatus::Success)
+            }
+            NodeKind::Selector => {
+                for child in children {
+                    match Self::tick_node(lua, this, child)? {
+                        BtStatus::Failure => continue,
+                        other => return Ok(other),
+                    }
+                }
+                Ok(BtStatus::Failure)
+            }
+            NodeKind::Parallel { min_success } => {
+                let mut successes = 0usize;
+                let mut any_running = false;
+                for child in &children {
+                    match Self::tick_node(lua, this, *child)? {
+                        BtStatus::Success => successes += 1,
+                        BtStatus::Running => any_running = true,
+                        BtStatus::Failure => {}
+                    }
+                }
+                if successes >= min_success {
+                    Ok(BtStatus::Success)
+                } else if any_running {
+                    Ok(BtStatus::Running)
+                } else {
+                    Ok(BtStatus::Failure)
+                }
+            }
+            NodeKind::Inverter => {
+                let child = match children.first() {
+                    Some(&c) => c,
+                    None => return Ok(BtStatus::Failure),
+                };
+                Ok(match Self::tick_node(lua, this, child)? {
+                    BtStatus::Success => BtStatus::Failure,
+                    BtStatus::Failure => BtStatus::Success,
+                    BtStatus::Running => BtStatus::Running,
+                })
+            }
+            NodeKind::Repeat { count } => {
+                let child = match children.first() {
+                    Some(&c) => c,
+                    None => return Ok(BtStatus::Failure),
+                };
+                let iterations = count.max(1);
+                for _ in 0..iterations {
+                    match Self::tick_node(lua, this, child)? {
+                        BtStatus::Failure => return Ok(BtStatus::Failure),
+                        BtStatus::Running => return Ok(BtStatus::Running),
+                        BtStatus::Success => {}
+                    }
+                }
+                Ok(BtStatus::Success)
+            }
+            NodeKind::Leaf { name } => {
+                let fns = this.leaf_fns.borrow();
+                match fns.get(&name) {
+                    None => Ok(BtStatus::Failure),
+                    Some(rk) => {
+                        let func: LuaFunction = lua.registry_value(rk)?;
+                        drop(fns);
+                        let result: String = func.call(())?;
+                        Ok(match result.as_str() {
+                            "success" => BtStatus::Success,
+                            "running" => BtStatus::Running,
+                            _ => BtStatus::Failure,
+                        })
+                    }
+                }
+            }
+        }
+    }
+}
+
+// ===========================================================================
+// Graph
+// ===========================================================================
+
+/// Lua wrapper for the Graph pattern.
+#[derive(Clone)]
+struct LuaGraph {
+    graph: Rc<RefCell<crate::patterns::Graph>>,
+    node_payloads: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
+    edge_payloads: Rc<RefCell<HashMap<u32, LuaRegistryKey>>>,
+}
+
+impl LurekType for LuaGraph {
+    const TYPE_NAME: &'static str = "LGraph";
+    const TYPE_HIERARCHY: &'static [&'static str] = &["LGraph", "Object"];
+}
+
+impl LuaUserData for LuaGraph {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        add_type_methods(methods);
+
+        // -- addNode -------------------------------------------------
+        /// Adds a node with an optional label and payload.
+        /// @param | label | string? | Optional node label.
+        /// @param | value | any | Optional payload value.
+        /// @return | integer | Node ID.
+        methods.add_method(
+            "addNode",
+            |lua, this, (label, value): (Option<String>, Option<LuaValue>)| {
+                let id = this
+                    .graph
+                    .borrow_mut()
+                    .add_node(label.as_deref().unwrap_or(""));
+                if let Some(v) = value {
+                    let rk = lua.create_registry_value(v)?;
+                    this.node_payloads.borrow_mut().insert(id, rk);
+                }
+                Ok(id)
+            },
+        );
+
+        // -- removeNode -------------------------------------------------
+        /// Removes a node and all its incident edges.
+        /// @param | id | integer | Node ID to remove.
+        /// @return | boolean | True when the node was found and removed.
+        methods.add_method("removeNode", |lua, this, id: u32| {
+            let removed = this.graph.borrow_mut().remove_node(id);
+            if removed {
+                if let Some(rk) = this.node_payloads.borrow_mut().remove(&id) {
+                    lua.remove_registry_value(rk)?;
+                }
+            }
+            Ok(removed)
+        });
+
+        // -- getNodeValue -------------------------------------------------
+        /// Returns the payload stored for a node.
+        /// @param | id | integer | Node ID to look up.
+        /// @return | any | Node payload, or nil if unset.
+        methods.add_method("getNodeValue", |lua, this, id: u32| {
+            let payloads = this.node_payloads.borrow();
+            match payloads.get(&id) {
+                Some(rk) => Ok(lua.registry_value::<LuaValue>(rk)?),
+                None => Ok(LuaValue::Nil),
+            }
+        });
+
+        // -- addEdge -------------------------------------------------
+        /// Adds an edge between two nodes.
+        /// @param | from | integer | Source node ID.
+        /// @param | to | integer | Target node ID.
+        /// @param | weight | number? | Edge weight (default 1.0).
+        /// @param | label | string? | Optional edge label.
+        /// @return | integer | Edge ID, or 0 if either node is unknown.
+        methods.add_method(
+            "addEdge",
+            |_, this, (from, to, weight, label): (u32, u32, Option<f64>, Option<String>)| {
+                Ok(this.graph.borrow_mut().add_edge(
+                    from,
+                    to,
+                    weight.unwrap_or(1.0),
+                    label.as_deref().unwrap_or(""),
+                ))
+            },
+        );
+
+        // -- removeEdge -------------------------------------------------
+        /// Removes all edges with the given ID.
+        /// @param | id | integer | Edge ID to remove.
+        /// @return | boolean | True when at least one edge was removed.
+        methods.add_method("removeEdge", |lua, this, id: u32| {
+            let removed = this.graph.borrow_mut().remove_edge(id);
+            if removed {
+                if let Some(rk) = this.edge_payloads.borrow_mut().remove(&id) {
+                    lua.remove_registry_value(rk)?;
+                }
+            }
+            Ok(removed)
+        });
+
+        // -- neighbors -------------------------------------------------
+        /// Returns the IDs of all direct outgoing neighbours of a node.
+        /// @param | id | integer | Node ID to query.
+        /// @return | table | Neighbour node IDs.
+        methods.add_method("neighbors", |lua, this, id: u32| {
+            let nbs = this.graph.borrow().neighbors(id);
+            let tbl = lua.create_table()?;
+            for (i, nb) in nbs.iter().enumerate() {
+                tbl.set(i + 1, *nb)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- bfs -------------------------------------------------
+        /// Runs a breadth-first search from a node and returns visited IDs in BFS order.
+        /// @param | start | integer | Start node ID.
+        /// @return | table | Visited node IDs in BFS order.
+        methods.add_method("bfs", |lua, this, start: u32| {
+            let order = this.graph.borrow().bfs(start);
+            let tbl = lua.create_table()?;
+            for (i, id) in order.iter().enumerate() {
+                tbl.set(i + 1, *id)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- dfs -------------------------------------------------
+        /// Runs a depth-first search from a node and returns visited IDs in DFS order.
+        /// @param | start | integer | Start node ID.
+        /// @return | table | Visited node IDs in DFS order.
+        methods.add_method("dfs", |lua, this, start: u32| {
+            let order = this.graph.borrow().dfs(start);
+            let tbl = lua.create_table()?;
+            for (i, id) in order.iter().enumerate() {
+                tbl.set(i + 1, *id)?;
+            }
+            Ok(tbl)
+        });
+
+        // -- isConnected -------------------------------------------------
+        /// Returns true if a path exists from `from` to `to`.
+        /// @param | from | integer | Source node ID.
+        /// @param | to | integer | Target node ID.
+        /// @return | boolean | True when a path exists.
+        methods.add_method("isConnected", |_, this, (from, to): (u32, u32)| {
+            Ok(this.graph.borrow().is_connected(from, to))
+        });
+
+        // -- hasNode -------------------------------------------------
+        /// Returns true when a node with the given ID exists.
+        /// @param | id | integer | Node ID to check.
+        /// @return | boolean | True when the node exists.
+        methods.add_method("hasNode", |_, this, id: u32| {
+            Ok(this.graph.borrow().has_node(id))
+        });
+
+        // -- nodeCount -------------------------------------------------
+        /// Returns the number of nodes in the graph.
+        /// @return | integer | Number of nodes.
+        methods.add_method("nodeCount", |_, this, ()| {
+            Ok(this.graph.borrow().node_count())
+        });
+
+        // -- edgeCount -------------------------------------------------
+        /// Returns the number of stored edge records.
+        /// @return | integer | Number of edge records.
+        methods.add_method("edgeCount", |_, this, ()| {
+            Ok(this.graph.borrow().edge_count())
+        });
+
+        // -- clearAll -------------------------------------------------
+        /// Removes all nodes, edges, and stored payloads.
+        /// @return | nil | No return value.
+        methods.add_method("clearAll", |lua, this, ()| {
+            this.graph.borrow_mut().clear();
+            let np: Vec<(u32, LuaRegistryKey)> = this.node_payloads.borrow_mut().drain().collect();
+            for (_, rk) in np {
+                lua.remove_registry_value(rk)?;
+            }
+            let ep: Vec<(u32, LuaRegistryKey)> = this.edge_payloads.borrow_mut().drain().collect();
+            for (_, rk) in ep {
+                lua.remove_registry_value(rk)?;
+            }
+            Ok(())
         });
     }
 }
@@ -2726,6 +3762,62 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(|_, ()| {
             Ok(LuaSet {
                 items: Rc::new(RefCell::new(HashSet::new())),
+            })
+        })?,
+    )?;
+
+    // lurek.patterns.newMap() -> Map
+    /// Creates a string-keyed map/dictionary.
+    /// @return | LMap | New map userdata.
+    patterns.set(
+        "newMap",
+        lua.create_function(|_, ()| {
+            Ok(LuaMap {
+                items: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // lurek.patterns.newWeightedRandom() -> WeightedRandom
+    /// Creates a weighted random selector for loot tables and probability-weighted picks.
+    /// @return | LWeightedRandom | New WeightedRandom userdata.
+    patterns.set(
+        "newWeightedRandom",
+        lua.create_function(|_, ()| {
+            Ok(LuaWeightedRandom {
+                pool: Rc::new(RefCell::new(crate::patterns::WeightedRandom::new())),
+                payloads: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // lurek.patterns.newBehaviorTree() -> BehaviorTree
+    /// Creates a new behaviour tree for composing AI logic with Sequence, Selector, Parallel, Inverter, Repeat, and Leaf nodes.
+    /// @return | LBehaviorTree | New BehaviorTree userdata.
+    patterns.set(
+        "newBehaviorTree",
+        lua.create_function(|_, ()| {
+            Ok(LuaBehaviorTree {
+                tree: Rc::new(RefCell::new(crate::patterns::BehaviorTree::new())),
+                run_state: Rc::new(RefCell::new(crate::patterns::BtRunState::new())),
+                leaf_fns: Rc::new(RefCell::new(HashMap::new())),
+            })
+        })?,
+    )?;
+
+    // lurek.patterns.newGraph(undirected?) -> Graph
+    /// Creates a directed graph (or undirected when `undirected` is true).
+    /// @param | undirected | boolean? | When true, edges are stored in both directions automatically.
+    /// @return | LGraph | New Graph userdata.
+    patterns.set(
+        "newGraph",
+        lua.create_function(|_, undirected: Option<bool>| {
+            let mut g = crate::patterns::Graph::new();
+            g.undirected = undirected.unwrap_or(false);
+            Ok(LuaGraph {
+                graph: Rc::new(RefCell::new(g)),
+                node_payloads: Rc::new(RefCell::new(HashMap::new())),
+                edge_payloads: Rc::new(RefCell::new(HashMap::new())),
             })
         })?,
     )?;

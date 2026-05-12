@@ -437,7 +437,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "process",
         lua.create_function(move |lua, dt: f64| {
             let mut s = st.borrow_mut();
-            let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
+            let active_ids: Vec<SceneId> = s.stack.get_active_ids_ordered_by_layer();
             for id in &active_ids {
                 if s.scene_ready_pending.remove(id) {
                     if let Some(key) = s.scene_refs.get(id) {
@@ -463,7 +463,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "processPhysics",
         lua.create_function(move |lua, dt: f64| {
             let s = st.borrow();
-            let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
+            let active_ids: Vec<SceneId> = s.stack.get_active_ids_ordered_by_layer();
             for id in &active_ids {
                 if let Some(key) = s.scene_refs.get(id) {
                     let _ = call_scene_method(lua, key, "process_physics", dt);
@@ -484,7 +484,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "processLate",
         lua.create_function(move |lua, dt: f64| {
             let s = st.borrow();
-            let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
+            let active_ids: Vec<SceneId> = s.stack.get_active_ids_ordered_by_layer();
             for id in &active_ids {
                 if let Some(key) = s.scene_refs.get(id) {
                     let _ = call_scene_method(lua, key, "process_late", dt);
@@ -611,6 +611,41 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // -- setCurrentLayer --
+    /// Sets processing layer for the current top scene.
+    /// Lower layer values run first in process callbacks.
+    /// @param | layer | integer | Layer value for current scene.
+    /// @return | boolean | True when current scene exists and layer was set.
+    let st = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "setCurrentLayer",
+        lua.create_function(move |_, layer: i32| {
+            let mut s = st.borrow_mut();
+            if let Some(top_id) = s.stack.get_current() {
+                s.stack.set_scene_layer(top_id, layer);
+                return Ok(true);
+            }
+            Ok(false)
+        })?,
+    )?;
+
+    // -- getCurrentLayer --
+    /// Gets processing layer for the current top scene.
+    /// @return | integer | Layer value for current scene or 0 when stack is empty.
+    let st = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "getCurrentLayer",
+        lua.create_function(move |_, ()| {
+            let s = st.borrow();
+            if let Some(top_id) = s.stack.get_current() {
+                return Ok(s.stack.get_scene_layer(top_id));
+            }
+            Ok(0)
+        })?,
+    )?;
+
     // -- Transitions -------------------------------------------------
 
     // -- isTransitioning --
@@ -631,6 +666,53 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     tbl.set(
         "getTransitionProgress",
         lua.create_function(move |_, ()| Ok(st.borrow().stack.get_transition_progress()))?,
+    )?;
+
+    // -- queueTransition --
+    /// Queues a transition to run after the current transition completes.
+    /// If there is no active transition, the queued transition starts immediately.
+    /// @param | transition | string | Transition type name.
+    /// @param | duration | number | Transition duration in seconds.
+    /// @param | easing | string? | Easing curve name.
+    /// @return | nil | No value is returned.
+    let st = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "queueTransition",
+        lua.create_function(
+            move |_, (transition, duration, easing): (String, f32, Option<String>)| {
+                let trans = TransitionType::from_lua_str(transition.as_str());
+                let eas = easing
+                    .as_deref()
+                    .map(EasingType::from_lua_str)
+                    .unwrap_or_default();
+                st.borrow_mut().stack.queue_transition(trans, duration, eas);
+                Ok(())
+            },
+        )?,
+    )?;
+
+    // -- getQueuedTransitionCount --
+    /// Returns the number of queued transitions waiting in the sequencer.
+    /// @return | integer | Count of queued transitions.
+    let st = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "getQueuedTransitionCount",
+        lua.create_function(move |_, ()| Ok(st.borrow().stack.queued_transition_count()))?,
+    )?;
+
+    // -- clearQueuedTransitions --
+    /// Clears queued transitions without affecting the currently running transition.
+    /// @return | nil | No value is returned.
+    let st = state.clone();
+    // Auto-doc: Lua API binding.
+    tbl.set(
+        "clearQueuedTransitions",
+        lua.create_function(move |_, ()| {
+            st.borrow_mut().stack.clear_transition_queue();
+            Ok(())
+        })?,
     )?;
 
     // -- Registry -------------------------------------------------
@@ -952,7 +1034,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         "getActiveScenes",
         lua.create_function(move |lua, ()| {
             let s = st.borrow();
-            let active_ids: Vec<SceneId> = s.stack.get_active_ids().to_vec();
+            let active_ids: Vec<SceneId> = s.stack.get_active_ids_ordered_by_layer();
             let result = lua.create_table()?;
             for (i, id) in active_ids.iter().enumerate() {
                 if let Some(key) = s.scene_refs.get(id) {
@@ -1087,10 +1169,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let types = [
                 "none",
                 "fade",
-                "left",
-                "right",
-                "up",
-                "down",
+                "slideleft",
+                "slideright",
+                "slideup",
+                "slidedown",
                 "wipe",
                 "iris",
                 "zoom",
@@ -1210,7 +1292,13 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(
             |lua, (direction, duration): (Option<String>, Option<f32>)| {
                 let t = lua.create_table()?;
-                let dir = direction.as_deref().unwrap_or("left").to_string();
+                let dir = match direction.as_deref().unwrap_or("left") {
+                    "left" | "slideleft" => "slideleft",
+                    "right" | "slideright" => "slideright",
+                    "up" | "slideup" => "slideup",
+                    "down" | "slidedown" => "slidedown",
+                    _ => "slideleft",
+                };
                 t.set("type", dir)?;
                 t.set("duration", duration.unwrap_or(0.4))?;
                 Ok(t)

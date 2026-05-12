@@ -307,6 +307,42 @@ pub fn gilrs_axis_to_string(axis: gilrs::Axis) -> &'static str {
     }
 }
 
+/// Converts an analog stick vector into a virtual D-pad state.
+///
+/// Useful for touch controls and thumbstick-driven UI navigation where callers
+/// need stable digital directions instead of analog values.
+///
+/// # Parameters
+/// - `x` — Horizontal axis value in `[-1.0, 1.0]`.
+/// - `y` — Vertical axis value in `[-1.0, 1.0]`.
+/// - `deadzone` — Center dead-zone threshold in `[0.0, 1.0]`.
+///
+/// # Returns
+/// `(up, down, left, right, direction)` where `direction` is one of:
+/// `"c"`, `"u"`, `"d"`, `"l"`, `"r"`, `"lu"`, `"ru"`, `"ld"`, `"rd"`.
+pub fn virtual_dpad(x: f32, y: f32, deadzone: f32) -> (bool, bool, bool, bool, &'static str) {
+    let dz = deadzone.clamp(0.0, 1.0);
+    let left = x <= -dz;
+    let right = x >= dz;
+    // Y is treated as screen-space where negative means up.
+    let up = y <= -dz;
+    let down = y >= dz;
+
+    let direction = match (up, down, left, right) {
+        (true, false, false, false) => "u",
+        (true, false, true, false) => "lu",
+        (true, false, false, true) => "ru",
+        (false, true, false, false) => "d",
+        (false, true, true, false) => "ld",
+        (false, true, false, true) => "rd",
+        (false, false, true, false) => "l",
+        (false, false, false, true) => "r",
+        _ => "c",
+    };
+
+    (up, down, left, right, direction)
+}
+
 /// Stores SDL2 GameControllerDB-format mapping strings keyed by GUID.
 ///
 /// Each entry is a single line in the `guid,name,mappings` format used by

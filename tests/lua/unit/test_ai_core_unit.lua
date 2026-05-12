@@ -46,6 +46,11 @@ describe("lurek.ai module exists", function()
         expect_type("function", lurek.ai.newUtilityAI)
     end)
 
+    -- @covers lurek.ai.newDialogueAI
+    it("has newDialogueAI factory", function()
+        expect_type("function", lurek.ai.newDialogueAI)
+    end)
+
     -- @covers lurek.ai.newGOAPPlanner
     it("has newGOAPPlanner factory", function()
         expect_type("function", lurek.ai.newGOAPPlanner)
@@ -1029,6 +1034,42 @@ describe("lurek.ai SteeringManager", function()
         end)
         expect_equal(1, sm:getBehaviorCount())
     end)
+
+    -- @covers LSteeringManager:setPath
+    -- @covers LSteeringManager:hasPath
+    -- @covers lurek.ai.newSteeringManager
+    -- @covers lurek.pathfind.newPathGrid
+    -- @covers LPathGrid:findPath
+    it("setPath consumes pathfind waypoints", function()
+        local grid = lurek.pathfind.newPathGrid(5, 5, 16)
+        local path = grid:findPath(1, 1, 5, 5)
+        local sm = lurek.ai.newSteeringManager()
+        sm:setPath(path, 8.0, 1.0)
+        expect_true(sm:hasPath())
+    end)
+
+    -- @covers LSteeringManager:clearPath
+    -- @covers LSteeringManager:hasPath
+    -- @covers LSteeringManager:setPath
+    -- @covers lurek.ai.newSteeringManager
+    it("clearPath clears active path", function()
+        local sm = lurek.ai.newSteeringManager()
+        sm:setPath({ { x = 16, y = 16 }, { x = 32, y = 16 } })
+        expect_true(sm:hasPath())
+        sm:clearPath()
+        expect_false(sm:hasPath())
+    end)
+
+    -- @covers LSteeringManager:getPathProgress
+    -- @covers LSteeringManager:setPath
+    -- @covers lurek.ai.newSteeringManager
+    it("getPathProgress reports index and total", function()
+        local sm = lurek.ai.newSteeringManager()
+        sm:setPath({ { x = 8, y = 8 }, { x = 12, y = 8 } })
+        local idx, total = sm:getPathProgress()
+        expect_equal(1, idx)
+        expect_equal(2, total)
+    end)
 end)
 
 -- =========================================================================
@@ -1249,6 +1290,78 @@ describe("lurek.ai UtilityAI", function()
             u:addAction("run", function() return 0.5 end, 2.0)
         end)
         expect_equal(1, u:getActionCount())
+    end)
+end)
+
+-- =========================================================================
+-- 12b. DialogueAI
+-- =========================================================================
+-- @describe lurek.ai DialogueAI
+describe("lurek.ai DialogueAI", function()
+    -- @covers LDialogueAI:type
+    -- @covers lurek.ai.newDialogueAI
+    it("type returns DialogueAI", function()
+        local d = lurek.ai.newDialogueAI()
+        expect_equal("LDialogueAI", d:type())
+    end)
+
+    -- @covers LDialogueAI:addTopic
+    -- @covers LDialogueAI:getTopicCount
+    -- @covers lurek.ai.newDialogueAI
+    it("addTopic increases topic count", function()
+        local d = lurek.ai.newDialogueAI()
+        expect_equal(0, d:getTopicCount())
+        d:addTopic("smalltalk", 0.5)
+        expect_equal(1, d:getTopicCount())
+    end)
+
+    -- @covers LDialogueAI:addBranch
+    -- @covers LDialogueAI:addTopic
+    -- @covers lurek.ai.newDialogueAI
+    it("addBranch returns true for existing topic", function()
+        local d = lurek.ai.newDialogueAI()
+        d:addTopic("quest", 1.0)
+        local ok = d:addBranch("quest", "offer", 0.7)
+        expect_true(ok)
+    end)
+
+    -- @covers LDialogueAI:addTopic
+    -- @covers LDialogueAI:selectTopic
+    -- @covers LDialogueAI:setBTStatus
+    -- @covers LDialogueAI:setFSMState
+    -- @covers LDialogueAI:setUtilityScore
+    -- @covers lurek.ai.newDialogueAI
+    it("selectTopic uses FSM/BT/utility context", function()
+        local d = lurek.ai.newDialogueAI()
+        d:addTopic("smalltalk", 0.3, nil, nil, "smalltalk_score")
+        d:addTopic("combat", 0.2, "combat", "success", "combat_score")
+        d:setFSMState("combat")
+        d:setBTStatus("success")
+        d:setUtilityScore("smalltalk_score", 0.1)
+        d:setUtilityScore("combat_score", 0.8)
+
+        expect_equal("combat", d:selectTopic())
+    end)
+
+    -- @covers LDialogueAI:addBranch
+    -- @covers LDialogueAI:addTopic
+    -- @covers LDialogueAI:clearUtilityScores
+    -- @covers LDialogueAI:selectBranch
+    -- @covers LDialogueAI:setFSMState
+    -- @covers LDialogueAI:setUtilityScore
+    -- @covers lurek.ai.newDialogueAI
+    it("selectBranch responds to utility and clearUtilityScores", function()
+        local d = lurek.ai.newDialogueAI()
+        d:addTopic("quest", 1.0)
+        d:addBranch("quest", "offer", 0.2, "idle", nil, "offer_score")
+        d:addBranch("quest", "warn", 0.1, "idle", nil, "warn_score")
+        d:setFSMState("idle")
+        d:setUtilityScore("offer_score", 0.6)
+        d:setUtilityScore("warn_score", 0.2)
+        expect_equal("offer", d:selectBranch("quest"))
+
+        d:clearUtilityScores()
+        expect_equal("offer", d:selectBranch("quest"))
     end)
 end)
 

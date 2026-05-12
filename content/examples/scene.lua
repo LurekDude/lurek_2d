@@ -184,6 +184,29 @@ do -- lurek.scene.getTransitionProgress
   end
 end
 
+--@api-stub: lurek.scene.queueTransition
+-- Queues a transition to run after the currently active transition finishes.
+-- Use when you want deterministic chained scene choreography (intro -> chapter card -> gameplay).
+do -- lurek.scene.queueTransition
+  lurek.scene.push(lurek.scene.new({}), "fade", 0.4, "linear")
+  lurek.scene.queueTransition("wipe", 0.35, "ease_out")
+end
+
+--@api-stub: lurek.scene.getQueuedTransitionCount
+-- Returns how many transitions are waiting in the sequencer queue.
+-- Useful for debug HUDs that show whether transition choreography is still pending.
+do -- lurek.scene.getQueuedTransitionCount
+  local queued = lurek.scene.getQueuedTransitionCount()
+  lurek.log.debug("queued transitions=" .. queued, "scene")
+end
+
+--@api-stub: lurek.scene.clearQueuedTransitions
+-- Clears queued transitions without stopping the currently-running one.
+-- Use as an emergency cancel when player skips cutscenes.
+do -- lurek.scene.clearQueuedTransitions
+  lurek.scene.clearQueuedTransitions()
+end
+
 --@api-stub: lurek.scene.registerScene
 -- Registers a scene table by name for later retrieval.
 -- Register at boot so popTo / pushPreloaded / getRegistered can resolve scenes by name.
@@ -337,6 +360,22 @@ do -- lurek.scene.getActiveScenes
   for _, s in ipairs(lurek.scene.getActiveScenes()) do
     if s.on_resize then s:on_resize(1280, 720) end
   end
+end
+
+--@api-stub: lurek.scene.setCurrentLayer
+-- Sets logical processing layer for the top scene. Lower values process first.
+-- Use with overlays to force deterministic update order.
+do -- lurek.scene.setCurrentLayer
+  lurek.scene.push(lurek.scene.new({}))
+  lurek.scene.setCurrentLayer(5)
+end
+
+--@api-stub: lurek.scene.getCurrentLayer
+-- Gets logical processing layer for the top scene.
+-- Use in diagnostics to verify layer assignments during scene composition.
+do -- lurek.scene.getCurrentLayer
+  local layer = lurek.scene.getCurrentLayer()
+  lurek.log.debug("current layer=" .. tostring(layer), "scene")
 end
 
 --@api-stub: lurek.scene.preload

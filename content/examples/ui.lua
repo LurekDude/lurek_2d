@@ -33,6 +33,15 @@ do
   lurek.ui["dropOn"](right)
 end
 
+-- Nested tree composition (renderer traverses all widget-owned children).
+do
+  local root = lurek.ui.newPanel()
+  local toolbar = lurek.ui.newToolbar()
+  local status = lurek.ui.newStatusBar()
+  root.addChild(toolbar)
+  root.addChild(status)
+end
+
 --@api-stub: lurek.ui.beginDrag
 do -- lurek.ui.beginDrag
   local w = lurek.ui.newButton("Drag")

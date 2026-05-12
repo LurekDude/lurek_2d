@@ -1,6 +1,6 @@
 {
   "version": "auto-generated",
-  "generated": "2026-05-10",
+  "generated": "2026-05-12",
   "modules": [
     {
       "name": "ai",
@@ -239,6 +239,17 @@
           "parameters": [],
           "returns": "LUtilityAI",
           "returnType": "LUtilityAI",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newDialogueAI",
+          "fullPath": "lurek.ai.newDialogueAI",
+          "signature": "()",
+          "description": "Creates a dialogue AI selector that combines FSM/BT/Utility signals.",
+          "parameters": [],
+          "returns": "LDialogueAI",
+          "returnType": "LDialogueAI",
           "isMethod": false,
           "objectType": null
         },
@@ -3036,7 +3047,7 @@
           "name": "setCondition",
           "fullPath": "lurek.automation.setCondition",
           "signature": "(name, value)",
-          "description": "Sets a named boolean condition used by `when` and `assert` step fields.",
+          "description": "Sets a named boolean condition used by `when` and `assert` expressions.",
           "parameters": [
             {
               "name": "name",
@@ -3391,6 +3402,17 @@
           "returnType": "LCamera",
           "isMethod": false,
           "objectType": null
+        },
+        {
+          "name": "newRig",
+          "fullPath": "lurek.camera.newRig",
+          "signature": "()",
+          "description": "Creates a multi-camera rig for split-screen, minimap, and PiP orchestration.",
+          "parameters": [],
+          "returns": "LCameraRig",
+          "returnType": "LCameraRig",
+          "isMethod": false,
+          "objectType": null
         }
       ],
       "methods": []
@@ -3672,6 +3694,35 @@
           ],
           "returns": "table",
           "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getParThreshold",
+          "fullPath": "lurek.compute.getParThreshold",
+          "signature": "()",
+          "description": "Returns the current parallelization threshold.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "setParThreshold",
+          "fullPath": "lurek.compute.setParThreshold",
+          "signature": "(threshold)",
+          "description": "Sets the parallelization threshold for element-wise and reduction operations.",
+          "parameters": [
+            {
+              "name": "threshold",
+              "type": "integer",
+              "description": "New parallelization threshold (minimum 1).",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": false,
           "objectType": null
         }
@@ -4590,6 +4641,28 @@
           "returnType": "nil",
           "isMethod": false,
           "objectType": null
+        },
+        {
+          "name": "getProtocolInfo",
+          "fullPath": "lurek.debugbridge.getProtocolInfo",
+          "signature": "()",
+          "description": "Returns bridge protocol information including version and capabilities.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "consumeHotReloadRequest",
+          "fullPath": "lurek.debugbridge.consumeHotReloadRequest",
+          "signature": "()",
+          "description": "Consumes and clears a pending remote hot-reload request.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
         }
       ],
       "methods": []
@@ -4992,6 +5065,35 @@
           "objectType": null
         },
         {
+          "name": "recordGpuFrameTime",
+          "fullPath": "lurek.devtools.recordGpuFrameTime",
+          "signature": "(dt_val)",
+          "description": "Records a GPU frame-time sample in seconds.",
+          "parameters": [
+            {
+              "name": "dt",
+              "type": "number",
+              "description": "GPU frame delta time in seconds.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getGpuFrameStats",
+          "fullPath": "lurek.devtools.getGpuFrameStats",
+          "signature": "()",
+          "description": "Returns a table of computed GPU frame statistics.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "getFrameHistory",
           "fullPath": "lurek.devtools.getFrameHistory",
           "signature": "()",
@@ -5181,6 +5283,28 @@
           "fullPath": "lurek.devtools.isConsoleOpen",
           "signature": "()",
           "description": "Returns whether the console is considered open.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "openEntityInspector",
+          "fullPath": "lurek.devtools.openEntityInspector",
+          "signature": "()",
+          "description": "Opens the entity inspector panel flag.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "isEntityInspectorOpen",
+          "fullPath": "lurek.devtools.isEntityInspectorOpen",
+          "signature": "()",
+          "description": "Returns whether the entity inspector is considered open.",
           "parameters": [],
           "returns": "boolean",
           "returnType": "boolean",
@@ -6232,6 +6356,17 @@
           "parameters": [],
           "returns": "table",
           "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getFrameProfileText",
+          "fullPath": "lurek.engine.getFrameProfileText",
+          "signature": "()",
+          "description": "Returns a compact one-line summary of the latest frame timings.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
           "isMethod": false,
           "objectType": null
         },
@@ -9112,6 +9247,36 @@
           "objectType": null
         },
         {
+          "name": "virtualDpad",
+          "fullPath": "lurek.input.gamepad.virtualDpad",
+          "signature": "(x, y, [deadzone])",
+          "description": "Converts analog input `(x, y)` into virtual D-pad booleans.",
+          "parameters": [
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Horizontal analog value in range -1.0..1.0.",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Vertical analog value in range -1.0..1.0.",
+              "optional": false
+            },
+            {
+              "name": "deadzone",
+              "type": "number",
+              "description": "Optional dead-zone threshold (default 0.3).",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "isVibrationSupported",
           "fullPath": "lurek.input.gamepad.isVibrationSupported",
           "signature": "(id)",
@@ -10775,6 +10940,36 @@
           ],
           "returns": "LNoiseGenerator",
           "returnType": "LNoiseGenerator",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newRectPacker",
+          "fullPath": "lurek.math.newRectPacker",
+          "signature": "(width, height, [padding])",
+          "description": "Creates a new shelf rectangle packer for atlas/UI runtime layout.",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Packer bin width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Packer bin height.",
+              "optional": false
+            },
+            {
+              "name": "padding",
+              "type": "integer",
+              "description": "Optional padding between packed rectangles.",
+              "optional": true
+            }
+          ],
+          "returns": "LRectPacker",
+          "returnType": "LRectPacker",
           "isMethod": false,
           "objectType": null
         },
@@ -13532,6 +13727,83 @@
           "objectType": null
         },
         {
+          "name": "createRoom",
+          "fullPath": "lurek.network.createRoom",
+          "signature": "(name, host, [max_players])",
+          "description": "Creates a room in the local matchmaking registry.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Room name.",
+              "optional": false
+            },
+            {
+              "name": "host",
+              "type": "string",
+              "description": "Host/player label.",
+              "optional": false
+            },
+            {
+              "name": "max_players",
+              "type": "integer",
+              "description": "Maximum room size.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "listRooms",
+          "fullPath": "lurek.network.listRooms",
+          "signature": "()",
+          "description": "Returns all rooms from the local matchmaking registry.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "joinRoom",
+          "fullPath": "lurek.network.joinRoom",
+          "signature": "(id)",
+          "description": "Joins a room by id.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "description": "Room id.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "leaveRoom",
+          "fullPath": "lurek.network.leaveRoom",
+          "signature": "(id)",
+          "description": "Leaves a room by id.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "description": "Room id.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "syncEntity",
           "fullPath": "lurek.network.syncEntity",
           "signature": "lurek.network.syncEntity(host, entity_id, data, [channel], [reliable])",
@@ -13572,6 +13844,138 @@
           "returnType": "nil",
           "isMethod": false,
           "objectType": null
+        },
+        {
+          "name": "newRelayTicket",
+          "fullPath": "lurek.network.newRelayTicket",
+          "signature": "(room_id, peer_id)",
+          "description": "Encodes a relay ticket token for room + peer identity.",
+          "parameters": [
+            {
+              "name": "room_id",
+              "type": "string",
+              "description": "Room identifier.",
+              "optional": false
+            },
+            {
+              "name": "peer_id",
+              "type": "string",
+              "description": "Peer identifier.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "parseRelayTicket",
+          "fullPath": "lurek.network.parseRelayTicket",
+          "signature": "(token)",
+          "description": "Decodes a relay ticket token.",
+          "parameters": [
+            {
+              "name": "token",
+              "type": "string",
+              "description": "Encoded relay token.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "makePunchProbe",
+          "fullPath": "lurek.network.makePunchProbe",
+          "signature": "(peer_id)",
+          "description": "Creates a UDP punch probe payload for P2P NAT hole punching.",
+          "parameters": [
+            {
+              "name": "peer_id",
+              "type": "string",
+              "description": "Peer identifier.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "parsePunchProbe",
+          "fullPath": "lurek.network.parsePunchProbe",
+          "signature": "(payload)",
+          "description": "Parses a UDP punch probe payload and returns source peer id.",
+          "parameters": [
+            {
+              "name": "payload",
+              "type": "string",
+              "description": "Probe payload bytes.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "predictLinear",
+          "fullPath": "lurek.network.predictLinear",
+          "signature": "(snapshot, dt)",
+          "description": "Predicts one entity snapshot step using linear velocity.",
+          "parameters": [
+            {
+              "name": "snapshot",
+              "type": "table",
+              "description": "Snapshot table: `id,tick,x,y,vx,vy`.",
+              "optional": false
+            },
+            {
+              "name": "dt",
+              "type": "number",
+              "description": "Simulation step.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "reconcileSnapshot",
+          "fullPath": "lurek.network.reconcileSnapshot",
+          "signature": "(pred, auth, alpha)",
+          "description": "Blends predicted and authoritative snapshot.",
+          "parameters": [
+            {
+              "name": "predicted",
+              "type": "table",
+              "description": "Predicted snapshot table.",
+              "optional": false
+            },
+            {
+              "name": "authoritative",
+              "type": "table",
+              "description": "Server-authoritative snapshot table.",
+              "optional": false
+            },
+            {
+              "name": "alpha",
+              "type": "number",
+              "description": "Blend factor in `[0..1]`.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
         }
       ],
       "methods": []
@@ -13589,7 +13993,7 @@
             {
               "name": "opts",
               "type": "table",
-              "description": "Layer options including a required `texture` field.",
+              "description": "Layer options including required `texture`; optional fields include scroll/offset/autoscroll/repeat, `tiling`, `tile_w`, `tile_h`, and `depth`.",
               "optional": false
             }
           ],
@@ -13613,6 +14017,30 @@
           ],
           "returns": "LParallaxSet",
           "returnType": "LParallaxSet",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newPresetLayer",
+          "fullPath": "lurek.parallax.newPresetLayer",
+          "signature": "(preset_name, img_ud)",
+          "description": "Creates a parallax layer from one of the built-in presets.",
+          "parameters": [
+            {
+              "name": "preset",
+              "type": "string",
+              "description": "Preset name: `far`, `mid`, `fog`.",
+              "optional": false
+            },
+            {
+              "name": "texture",
+              "type": "LImage",
+              "description": "Source image.",
+              "optional": false
+            }
+          ],
+          "returns": "LParallaxLayer",
+          "returnType": "LParallaxLayer",
           "isMethod": false,
           "objectType": null
         }
@@ -13675,6 +14103,24 @@
               "name": "path",
               "type": "string",
               "description": "Path to the TOML config file.",
+              "optional": false
+            }
+          ],
+          "returns": "LParticleSystem",
+          "returnType": "LParticleSystem",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newPreset",
+          "fullPath": "lurek.particle.newPreset",
+          "signature": "(name)",
+          "description": "Creates a new particle system from a built-in preset.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Preset name: `fire`, `smoke`, `rain`, `snow`, `sparks`.",
               "optional": false
             }
           ],
@@ -13908,6 +14354,17 @@
           ],
           "returns": "LJpsGrid",
           "returnType": "LJpsGrid",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newNavMesh",
+          "fullPath": "lurek.pathfind.newNavMesh",
+          "signature": "()",
+          "description": "Creates an empty polygon navmesh for non-tile worlds.",
+          "parameters": [],
+          "returns": "LNavMesh",
+          "returnType": "LNavMesh",
           "isMethod": false,
           "objectType": null
         },
@@ -14248,6 +14705,57 @@
           "parameters": [],
           "returns": "LSet",
           "returnType": "LSet",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newMap",
+          "fullPath": "lurek.patterns.newMap",
+          "signature": "()",
+          "description": "Creates a string-keyed map/dictionary.",
+          "parameters": [],
+          "returns": "LMap",
+          "returnType": "LMap",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newWeightedRandom",
+          "fullPath": "lurek.patterns.newWeightedRandom",
+          "signature": "()",
+          "description": "Creates a weighted random selector for loot tables and probability-weighted picks.",
+          "parameters": [],
+          "returns": "LWeightedRandom",
+          "returnType": "LWeightedRandom",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newBehaviorTree",
+          "fullPath": "lurek.patterns.newBehaviorTree",
+          "signature": "()",
+          "description": "Creates a new behaviour tree for composing AI logic with Sequence, Selector, Parallel, Inverter, Repeat, and Leaf nodes.",
+          "parameters": [],
+          "returns": "LBehaviorTree",
+          "returnType": "LBehaviorTree",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "newGraph",
+          "fullPath": "lurek.patterns.newGraph",
+          "signature": "([undirected])",
+          "description": "Creates a directed graph (or undirected when `undirected` is true).",
+          "parameters": [
+            {
+              "name": "undirected",
+              "type": "boolean",
+              "description": "When true, edges are stored in both directions automatically.",
+              "optional": true
+            }
+          ],
+          "returns": "LGraph",
+          "returnType": "LGraph",
           "isMethod": false,
           "objectType": null
         }
@@ -19268,6 +19776,35 @@
           "objectType": null
         },
         {
+          "name": "setCurrentLayer",
+          "fullPath": "lurek.scene.setCurrentLayer",
+          "signature": "(layer)",
+          "description": "Sets processing layer for the current top scene.",
+          "parameters": [
+            {
+              "name": "layer",
+              "type": "integer",
+              "description": "Layer value for current scene.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getCurrentLayer",
+          "fullPath": "lurek.scene.getCurrentLayer",
+          "signature": "()",
+          "description": "Gets processing layer for the current top scene.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "isTransitioning",
           "fullPath": "lurek.scene.isTransitioning",
           "signature": "()",
@@ -19286,6 +19823,58 @@
           "parameters": [],
           "returns": "number",
           "returnType": "number",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "queueTransition",
+          "fullPath": "lurek.scene.queueTransition",
+          "signature": "(transition, duration, [easing])",
+          "description": "Queues a transition to run after the current transition completes.",
+          "parameters": [
+            {
+              "name": "transition",
+              "type": "string",
+              "description": "Transition type name.",
+              "optional": false
+            },
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Transition duration in seconds.",
+              "optional": false
+            },
+            {
+              "name": "easing",
+              "type": "string",
+              "description": "Easing curve name.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getQueuedTransitionCount",
+          "fullPath": "lurek.scene.getQueuedTransitionCount",
+          "signature": "()",
+          "description": "Returns the number of queued transitions waiting in the sequencer.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "clearQueuedTransitions",
+          "fullPath": "lurek.scene.clearQueuedTransitions",
+          "signature": "()",
+          "description": "Clears queued transitions without affecting the currently running transition.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": false,
           "objectType": null
         },
@@ -20502,6 +21091,28 @@
           "objectType": null
         },
         {
+          "name": "reloadConfig",
+          "fullPath": "lurek.runtime.reloadConfig",
+          "signature": "()",
+          "description": "Requests a hot-reload of `conf.toml` on the next engine tick.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getConfig",
+          "fullPath": "lurek.runtime.getConfig",
+          "signature": "()",
+          "description": "Returns a snapshot of the active runtime-mutable configuration values.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "setDebugOverlay",
           "fullPath": "lurek.runtime.setDebugOverlay",
           "signature": "(enabled)",
@@ -21436,6 +22047,24 @@
           "objectType": null
         },
         {
+          "name": "newBoundedChannel",
+          "fullPath": "lurek.thread.newBoundedChannel",
+          "signature": "(capacity)",
+          "description": "Creates a bounded channel with backpressure when full.",
+          "parameters": [
+            {
+              "name": "capacity",
+              "type": "integer",
+              "description": "Maximum queued message count.",
+              "optional": false
+            }
+          ],
+          "returns": "LChannel",
+          "returnType": "LChannel",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
           "name": "getChannel",
           "fullPath": "lurek.thread.getChannel",
           "signature": "(name)",
@@ -21480,24 +22109,35 @@
         {
           "name": "async",
           "fullPath": "lurek.thread.async",
-          "signature": "(code, ...)",
+          "signature": "(...)",
           "description": "Starts a one-shot background computation and returns a promise.",
           "parameters": [
             {
-              "name": "code",
-              "type": "string",
-              "description": "Worker Lua source code.",
+              "name": "work",
+              "type": "string|function",
+              "description": "Worker Lua source code or Lua function.",
               "optional": false
             },
             {
               "name": "...",
-              "type": "table",
+              "type": "any",
               "description": "Argument values passed to the worker.",
               "optional": false
             }
           ],
           "returns": "LPromise",
           "returnType": "LPromise",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "getWorkerCapabilities",
+          "fullPath": "lurek.thread.getWorkerCapabilities",
+          "signature": "()",
+          "description": "Returns the list of APIs that are available in worker VMs.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": false,
           "objectType": null
         }
@@ -22857,6 +23497,60 @@
               "name": "easing",
               "type": "string",
               "description": "Optional easing name; defaults to `linear`.",
+              "optional": true
+            }
+          ],
+          "returns": "LTween",
+          "returnType": "LTween",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "tweenChain",
+          "fullPath": "lurek.tween.tweenChain",
+          "signature": "(steps)",
+          "description": "Builds and starts a tween sequence from a declarative step array.",
+          "parameters": [
+            {
+              "name": "steps",
+              "type": "table",
+              "description": "Array of step tables (`delay`, or `duration` + `target` + `fields`, optional `easing`/`callback`).",
+              "optional": false
+            }
+          ],
+          "returns": "LTweenSequence",
+          "returnType": "LTweenSequence",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "tweenColor",
+          "fullPath": "lurek.tween.tweenColor",
+          "signature": "lurek.tween.tweenColor(duration, target, color, [easing])",
+          "description": "Convenience helper to tween RGBA color fields (`r`,`g`,`b`,`a`) on a target table.",
+          "parameters": [
+            {
+              "name": "duration",
+              "type": "number",
+              "description": "Tween duration in seconds.",
+              "optional": false
+            },
+            {
+              "name": "target",
+              "type": "table",
+              "description": "Target Lua table.",
+              "optional": false
+            },
+            {
+              "name": "color",
+              "type": "table",
+              "description": "Target color fields.",
+              "optional": false
+            },
+            {
+              "name": "easing",
+              "type": "string",
+              "description": "Optional easing name.",
               "optional": true
             }
           ],
@@ -24566,6 +25260,24 @@
           "parameters": [],
           "returns": "integer",
           "returnType": "integer",
+          "isMethod": false,
+          "objectType": null
+        },
+        {
+          "name": "windowConfig",
+          "fullPath": "lurek.window.windowConfig",
+          "signature": "(opts)",
+          "description": "Applies common window configuration fields from one options table.",
+          "parameters": [
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Window configuration options.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": false,
           "objectType": null
         },
@@ -27846,7 +28558,7 @@
         {
           "name": "addClip",
           "fullPath": "LAnimation:addClip",
-          "signature": "(name, indices_tbl, fps, looping, [mode])",
+          "signature": "LAnimation:addClip(name, indices, fps, looping)",
           "description": "Adds a named clip from explicit frame indices.",
           "parameters": [
             {
@@ -27872,12 +28584,6 @@
               "type": "boolean",
               "description": "Whether the clip should loop.",
               "optional": false
-            },
-            {
-              "name": "mode",
-              "type": "any",
-              "description": "",
-              "optional": true
             }
           ],
           "returns": "nil",
@@ -27922,8 +28628,8 @@
               "optional": false
             }
           ],
-          "returns": "string",
-          "returnType": "string",
+          "returns": "string?",
+          "returnType": "string?",
           "isMethod": true,
           "objectType": "LAnimation"
         },
@@ -31646,6 +32352,242 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addSequence",
+          "fullPath": "LBehaviorTree:addSequence",
+          "signature": "([label])",
+          "description": "Adds a Sequence composite node.",
+          "parameters": [
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addSelector",
+          "fullPath": "LBehaviorTree:addSelector",
+          "signature": "([label])",
+          "description": "Adds a Selector composite node.",
+          "parameters": [
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addParallel",
+          "fullPath": "LBehaviorTree:addParallel",
+          "signature": "(min_success, [label])",
+          "description": "Adds a Parallel composite node.",
+          "parameters": [
+            {
+              "name": "min_success",
+              "type": "integer",
+              "description": "Minimum successes required for the node to succeed.",
+              "optional": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addInverter",
+          "fullPath": "LBehaviorTree:addInverter",
+          "signature": "([label])",
+          "description": "Adds an Inverter decorator node.",
+          "parameters": [
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addRepeat",
+          "fullPath": "LBehaviorTree:addRepeat",
+          "signature": "(count, [label])",
+          "description": "Adds a Repeat decorator node.",
+          "parameters": [
+            {
+              "name": "count",
+              "type": "integer",
+              "description": "Number of repetitions; 0 repeats indefinitely (ticks once per frame until child fails).",
+              "optional": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addLeaf",
+          "fullPath": "LBehaviorTree:addLeaf",
+          "signature": "(name, [label])",
+          "description": "Adds a Leaf node backed by a named callback.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Leaf name; matches the key used in `setLeaf`.",
+              "optional": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "addChild",
+          "fullPath": "LBehaviorTree:addChild",
+          "signature": "(parent_id, child_id)",
+          "description": "Attaches a child node to a parent node.",
+          "parameters": [
+            {
+              "name": "parent_id",
+              "type": "integer",
+              "description": "Parent node ID.",
+              "optional": false
+            },
+            {
+              "name": "child_id",
+              "type": "integer",
+              "description": "Child node ID.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "setRoot",
+          "fullPath": "LBehaviorTree:setRoot",
+          "signature": "(id)",
+          "description": "Sets the root node of the tree.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Node ID to use as root.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "setLeaf",
+          "fullPath": "LBehaviorTree:setLeaf",
+          "signature": "(name, callback)",
+          "description": "Registers the callback for a named leaf node.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Leaf name matching an `addLeaf` call.",
+              "optional": false
+            },
+            {
+              "name": "callback",
+              "type": "function",
+              "description": "Callback that returns `\"success\"`, `\"failure\"`, or `\"running\"`.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "tick",
+          "fullPath": "LBehaviorTree:tick",
+          "signature": "()",
+          "description": "Ticks the behaviour tree once from the root node.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "resetState",
+          "fullPath": "LBehaviorTree:resetState",
+          "signature": "()",
+          "description": "Resets running state and repeat counters.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "nodeCount",
+          "fullPath": "LBehaviorTree:nodeCount",
+          "signature": "()",
+          "description": "Returns the number of nodes in the tree.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
+        },
+        {
+          "name": "clearAll",
+          "fullPath": "LBehaviorTree:clearAll",
+          "signature": "()",
+          "description": "Resets the tree and all registered leaf callbacks.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LBehaviorTree"
         }
       ]
     },
@@ -31813,6 +32755,30 @@
           "signature": "()",
           "description": "Returns the approximate arc length of the curve.",
           "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LBezierCurve"
+        },
+        {
+          "name": "evaluateAtDistance",
+          "fullPath": "LBezierCurve:evaluateAtDistance",
+          "signature": "(distance, [samples])",
+          "description": "Evaluates the curve by travelled arc distance for near-constant-speed sampling.",
+          "parameters": [
+            {
+              "name": "distance",
+              "type": "number",
+              "description": "Arc-length from curve start.",
+              "optional": false
+            },
+            {
+              "name": "samples",
+              "type": "integer",
+              "description": "Optional approximation sample count.",
+              "optional": true
+            }
+          ],
           "returns": "number",
           "returnType": "number",
           "isMethod": true,
@@ -34496,6 +35462,28 @@
           "objectType": "LCamera"
         },
         {
+          "name": "getBounds",
+          "fullPath": "LCamera:getBounds",
+          "signature": "()",
+          "description": "Returns current bounds as `(ok, x, y, w, h)`.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "hasBounds",
+          "fullPath": "LCamera:hasBounds",
+          "signature": "()",
+          "description": "Returns true if world bounds are currently set.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
           "name": "setBounds",
           "fullPath": "LCamera:setBounds",
           "signature": "(x, y, w, h)",
@@ -34567,6 +35555,17 @@
           "objectType": "LCamera"
         },
         {
+          "name": "getTarget",
+          "fullPath": "LCamera:getTarget",
+          "signature": "()",
+          "description": "Returns current target as `(ok, x, y)`.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
           "name": "clearTarget",
           "fullPath": "LCamera:clearTarget",
           "signature": "()",
@@ -34596,6 +35595,46 @@
           "objectType": "LCamera"
         },
         {
+          "name": "getFollowSmooth",
+          "fullPath": "LCamera:getFollowSmooth",
+          "signature": "()",
+          "description": "Returns current follow smoothing factor.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "setFollowEasing",
+          "fullPath": "LCamera:setFollowEasing",
+          "signature": "(easing)",
+          "description": "Sets the easing mode used by smooth follow interpolation.",
+          "parameters": [
+            {
+              "name": "easing",
+              "type": "string",
+              "description": "One of: \"linear\", \"smoothstep\", \"easeout\"",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getFollowEasing",
+          "fullPath": "LCamera:getFollowEasing",
+          "signature": "()",
+          "description": "Returns the current follow easing mode.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
           "name": "setDeadZone",
           "fullPath": "LCamera:setDeadZone",
           "signature": "(w, h)",
@@ -34620,6 +35659,17 @@
           "objectType": "LCamera"
         },
         {
+          "name": "getDeadZone",
+          "fullPath": "LCamera:getDeadZone",
+          "signature": "()",
+          "description": "Returns dead-zone size as `(ok, width, height)`.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
           "name": "setLookAhead",
           "fullPath": "LCamera:setLookAhead",
           "signature": "(mul)",
@@ -34629,6 +35679,83 @@
               "name": "mul",
               "type": "number",
               "description": "Look-ahead multiplier (0.0 = disabled, 1.0 = full velocity offset)",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getLookAhead",
+          "fullPath": "LCamera:getLookAhead",
+          "signature": "()",
+          "description": "Returns current look-ahead multiplier.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "onWindowResize",
+          "fullPath": "LCamera:onWindowResize",
+          "signature": "(window_w, window_h)",
+          "description": "Auto-wires viewport updates to a raw window resize event.",
+          "parameters": [
+            {
+              "name": "window_w",
+              "type": "number",
+              "description": "Window width in pixels",
+              "optional": false
+            },
+            {
+              "name": "window_h",
+              "type": "number",
+              "description": "Window height in pixels",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "onWindowResizeScaled",
+          "fullPath": "LCamera:onWindowResizeScaled",
+          "signature": "(game_w, game_h, window_w, window_h, mode)",
+          "description": "Auto-wires viewport updates to a window resize using scale-mode mapping.",
+          "parameters": [
+            {
+              "name": "game_w",
+              "type": "number",
+              "description": "Logical game width",
+              "optional": false
+            },
+            {
+              "name": "game_h",
+              "type": "number",
+              "description": "Logical game height",
+              "optional": false
+            },
+            {
+              "name": "window_w",
+              "type": "number",
+              "description": "Window width in pixels",
+              "optional": false
+            },
+            {
+              "name": "window_h",
+              "type": "number",
+              "description": "Window height in pixels",
+              "optional": false
+            },
+            {
+              "name": "mode",
+              "type": "string",
+              "description": "One of: \"letterbox\", \"stretch\", \"pixelperfect\"",
               "optional": false
             }
           ],
@@ -34853,7 +35980,7 @@
         {
           "name": "zoomTo",
           "fullPath": "LCamera:zoomTo",
-          "signature": "(target_zoom, duration)",
+          "signature": "(target_zoom, duration, [easing])",
           "description": "Smoothly tweens the camera zoom from its current level to `target_zoom` over `duration` seconds.",
           "parameters": [
             {
@@ -34867,6 +35994,12 @@
               "type": "number",
               "description": "Duration in seconds.",
               "optional": false
+            },
+            {
+              "name": "easing",
+              "type": "string",
+              "description": "Optional easing: \"linear\", \"smoothstep\", \"easeout\"",
+              "optional": true
             }
           ],
           "returns": "nil",
@@ -35151,6 +36284,200 @@
           "objectType": "LCamera"
         },
         {
+          "name": "getShakeOffset",
+          "fullPath": "LCamera:getShakeOffset",
+          "signature": "()",
+          "description": "Returns current shake offset as x,y.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getRenderOffset",
+          "fullPath": "LCamera:getRenderOffset",
+          "signature": "()",
+          "description": "Returns canonical render offset (sway + shake) as x,y.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "setZoomConstraints",
+          "fullPath": "LCamera:setZoomConstraints",
+          "signature": "([min_zoom], [max_zoom])",
+          "description": "Sets minimum and maximum zoom level constraints.",
+          "parameters": [
+            {
+              "name": "min_zoom",
+              "type": "number",
+              "description": "Minimum zoom level (nil = unconstrained)",
+              "optional": true
+            },
+            {
+              "name": "max_zoom",
+              "type": "number",
+              "description": "Maximum zoom level (nil = unconstrained)",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getZoomConstraints",
+          "fullPath": "LCamera:getZoomConstraints",
+          "signature": "()",
+          "description": "Returns current zoom constraints as `(has_min, min, has_max, max)`.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "setZoomDamping",
+          "fullPath": "LCamera:setZoomDamping",
+          "signature": "(damping)",
+          "description": "Sets the zoom damping factor for smooth zoom transitions.",
+          "parameters": [
+            {
+              "name": "damping",
+              "type": "number",
+              "description": "Damping factor (0.0 = instant, 1.0 = maximum smoothing)",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getZoomDamping",
+          "fullPath": "LCamera:getZoomDamping",
+          "signature": "()",
+          "description": "Returns the current zoom damping factor.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "setRotationConstraints",
+          "fullPath": "LCamera:setRotationConstraints",
+          "signature": "([min_rot], [max_rot])",
+          "description": "Sets minimum and maximum rotation constraints in radians.",
+          "parameters": [
+            {
+              "name": "min_rot",
+              "type": "number",
+              "description": "Minimum rotation in radians (nil = unconstrained)",
+              "optional": true
+            },
+            {
+              "name": "max_rot",
+              "type": "number",
+              "description": "Maximum rotation in radians (nil = unconstrained)",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getRotationConstraints",
+          "fullPath": "LCamera:getRotationConstraints",
+          "signature": "()",
+          "description": "Returns current rotation constraints as `(has_min, min, has_max, max)`.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "setRotationDamping",
+          "fullPath": "LCamera:setRotationDamping",
+          "signature": "(damping)",
+          "description": "Sets the rotation damping factor for smooth rotation transitions.",
+          "parameters": [
+            {
+              "name": "damping",
+              "type": "number",
+              "description": "Damping factor (0.0 = instant, 1.0 = maximum smoothing)",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "getRotationDamping",
+          "fullPath": "LCamera:getRotationDamping",
+          "signature": "()",
+          "description": "Returns the current rotation damping factor.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "presetTightFollow",
+          "fullPath": "LCamera:presetTightFollow",
+          "signature": "()",
+          "description": "Configures a tight follow setup: fast response, small dead zone, look-ahead enabled.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "presetCinematicFollow",
+          "fullPath": "LCamera:presetCinematicFollow",
+          "signature": "()",
+          "description": "Configures a cinematic follow setup: slow response, large dead zone, no look-ahead.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "presetBalancedFollow",
+          "fullPath": "LCamera:presetBalancedFollow",
+          "signature": "()",
+          "description": "Configures a balanced follow setup: moderate response, medium dead zone.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
+          "name": "presetAggressiveFollow",
+          "fullPath": "LCamera:presetAggressiveFollow",
+          "signature": "()",
+          "description": "Configures an aggressive follow setup: maximum response, minimal dead zone, strong look-ahead.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCamera"
+        },
+        {
           "name": "type",
           "fullPath": "LCamera:type",
           "signature": "()",
@@ -35178,6 +36505,316 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LCamera"
+        }
+      ]
+    },
+    {
+      "name": "LCameraRig",
+      "description": "Lua-side wrapper around a named multi-camera rig.",
+      "methods": [
+        {
+          "name": "splitScreen",
+          "fullPath": "LCameraRig:splitScreen",
+          "signature": "(window_w, window_h)",
+          "description": "Configures split-screen layout and ensures left/right cameras exist.",
+          "parameters": [
+            {
+              "name": "window_w",
+              "type": "number",
+              "description": "Window width in pixels",
+              "optional": false
+            },
+            {
+              "name": "window_h",
+              "type": "number",
+              "description": "Window height in pixels",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "minimap",
+          "fullPath": "LCameraRig:minimap",
+          "signature": "(window_w, window_h, [ratio])",
+          "description": "Configures main+minimap layout and ensures cameras exist.",
+          "parameters": [
+            {
+              "name": "window_w",
+              "type": "number",
+              "description": "Window width in pixels",
+              "optional": false
+            },
+            {
+              "name": "window_h",
+              "type": "number",
+              "description": "Window height in pixels",
+              "optional": false
+            },
+            {
+              "name": "ratio",
+              "type": "number",
+              "description": "Minimap size ratio (default 0.25)",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "pictureInPicture",
+          "fullPath": "LCameraRig:pictureInPicture",
+          "signature": "(window_w, window_h, [pip_w], [pip_h])",
+          "description": "Configures main+picture-in-picture layout and ensures cameras exist.",
+          "parameters": [
+            {
+              "name": "window_w",
+              "type": "number",
+              "description": "Window width in pixels",
+              "optional": false
+            },
+            {
+              "name": "window_h",
+              "type": "number",
+              "description": "Window height in pixels",
+              "optional": false
+            },
+            {
+              "name": "pip_w",
+              "type": "number",
+              "description": "PiP width (default 320)",
+              "optional": true
+            },
+            {
+              "name": "pip_h",
+              "type": "number",
+              "description": "PiP height (default 180)",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "setPosition",
+          "fullPath": "LCameraRig:setPosition",
+          "signature": "(name, x, y)",
+          "description": "Sets a named camera position in the rig.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "description": "World X",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "World Y",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "setZoom",
+          "fullPath": "LCameraRig:setZoom",
+          "signature": "(name, zoom)",
+          "description": "Sets a named camera zoom in the rig.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            },
+            {
+              "name": "zoom",
+              "type": "number",
+              "description": "Zoom value",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "setTarget",
+          "fullPath": "LCameraRig:setTarget",
+          "signature": "(name, x, y)",
+          "description": "Sets a named camera follow target in the rig.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            },
+            {
+              "name": "x",
+              "type": "number",
+              "description": "Target X",
+              "optional": false
+            },
+            {
+              "name": "y",
+              "type": "number",
+              "description": "Target Y",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "updateAll",
+          "fullPath": "LCameraRig:updateAll",
+          "signature": "(dt)",
+          "description": "Updates all cameras in the rig.",
+          "parameters": [
+            {
+              "name": "dt",
+              "type": "number",
+              "description": "Delta time in seconds",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "apply",
+          "fullPath": "LCameraRig:apply",
+          "signature": "(name)",
+          "description": "Appends render commands for a named camera.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "getViewport",
+          "fullPath": "LCameraRig:getViewport",
+          "signature": "(name)",
+          "description": "Returns viewport for a named camera as `(ok, x, y, w, h)`.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "names",
+          "fullPath": "LCameraRig:names",
+          "signature": "()",
+          "description": "Returns a table array of rig camera names.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "remove",
+          "fullPath": "LCameraRig:remove",
+          "signature": "(name)",
+          "description": "Removes a named camera from the rig.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "has",
+          "fullPath": "LCameraRig:has",
+          "signature": "(name)",
+          "description": "Returns true when rig contains a camera name.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Camera name",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "type",
+          "fullPath": "LCameraRig:type",
+          "signature": "()",
+          "description": "Returns the type name of this userdata object.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LCameraRig"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "LCameraRig:typeOf",
+          "signature": "(name)",
+          "description": "Checks whether this object matches the given type name.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type name to check.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LCameraRig"
         }
       ]
     },
@@ -35790,6 +37427,46 @@
           "parameters": [],
           "returns": "integer",
           "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LChannel"
+        },
+        {
+          "name": "getCapacity",
+          "fullPath": "LChannel:getCapacity",
+          "signature": "()",
+          "description": "Returns bounded capacity or nil for unbounded channels.",
+          "parameters": [],
+          "returns": "integer?",
+          "returnType": "integer?",
+          "isMethod": true,
+          "objectType": "LChannel"
+        },
+        {
+          "name": "isBounded",
+          "fullPath": "LChannel:isBounded",
+          "signature": "()",
+          "description": "Returns whether this channel is bounded.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LChannel"
+        },
+        {
+          "name": "tryPush",
+          "fullPath": "LChannel:tryPush",
+          "signature": "(value)",
+          "description": "Attempts to enqueue without blocking when the channel is full.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to enqueue.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LChannel"
         },
@@ -41926,6 +43603,17 @@
           "returnType": "LDataFrame",
           "isMethod": true,
           "objectType": "LDataFrame"
+        },
+        {
+          "name": "lazy",
+          "fullPath": "LDataFrame:lazy",
+          "signature": "()",
+          "description": "Begin a lazy evaluation pipeline over this DataFrame.",
+          "parameters": [],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LDataFrame"
         }
       ]
     },
@@ -44107,6 +45795,242 @@
           "returnType": "nil",
           "isMethod": true,
           "objectType": "LDialog"
+        }
+      ]
+    },
+    {
+      "name": "LDialogueAI",
+      "description": "Lua-side wrapper around a [`DialogueAI`].",
+      "methods": [
+        {
+          "name": "setFSMState",
+          "fullPath": "LDialogueAI:setFSMState",
+          "signature": "([state])",
+          "description": "Sets current FSM state used by dialogue gating.",
+          "parameters": [
+            {
+              "name": "state",
+              "type": "string",
+              "description": "FSM state name or nil.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "setBTStatus",
+          "fullPath": "LDialogueAI:setBTStatus",
+          "signature": "([status])",
+          "description": "Sets current BT status used by dialogue gating.",
+          "parameters": [
+            {
+              "name": "status",
+              "type": "string",
+              "description": "BT status string or nil.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "setUtilityScore",
+          "fullPath": "LDialogueAI:setUtilityScore",
+          "signature": "(key, score)",
+          "description": "Sets a utility score key used by topic and branch ranking.",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Utility score key.",
+              "optional": false
+            },
+            {
+              "name": "score",
+              "type": "number",
+              "description": "Score value.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "clearUtilityScores",
+          "fullPath": "LDialogueAI:clearUtilityScores",
+          "signature": "()",
+          "description": "Clears all utility score keys.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "addTopic",
+          "fullPath": "LDialogueAI:addTopic",
+          "signature": "LDialogueAI:addTopic(id, [weight], [fsmState], [btStatus], [utilityKey])",
+          "description": "Adds a dialogue topic with optional FSM/BT/utility gates.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "string",
+              "description": "Topic identifier.",
+              "optional": false
+            },
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "Optional base topic weight.",
+              "optional": true
+            },
+            {
+              "name": "fsmState",
+              "type": "string",
+              "description": "Optional required FSM state.",
+              "optional": true
+            },
+            {
+              "name": "btStatus",
+              "type": "string",
+              "description": "Optional required BT status.",
+              "optional": true
+            },
+            {
+              "name": "utilityKey",
+              "type": "string",
+              "description": "Optional utility score key.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "addBranch",
+          "fullPath": "LDialogueAI:addBranch",
+          "signature": "LDialogueAI:addBranch(topicId, branchId, [weight], [fsmState], [btStatus], [utilityKey])",
+          "description": "Adds a dialogue branch under a topic.",
+          "parameters": [
+            {
+              "name": "topicId",
+              "type": "string",
+              "description": "Parent topic id.",
+              "optional": false
+            },
+            {
+              "name": "branchId",
+              "type": "string",
+              "description": "Branch identifier.",
+              "optional": false
+            },
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "Optional base branch weight.",
+              "optional": true
+            },
+            {
+              "name": "fsmState",
+              "type": "string",
+              "description": "Optional required FSM state.",
+              "optional": true
+            },
+            {
+              "name": "btStatus",
+              "type": "string",
+              "description": "Optional required BT status.",
+              "optional": true
+            },
+            {
+              "name": "utilityKey",
+              "type": "string",
+              "description": "Optional utility score key.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "selectTopic",
+          "fullPath": "LDialogueAI:selectTopic",
+          "signature": "()",
+          "description": "Selects the best topic for current context.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "selectBranch",
+          "fullPath": "LDialogueAI:selectBranch",
+          "signature": "(topic_id)",
+          "description": "Selects the best branch under a topic for current context.",
+          "parameters": [
+            {
+              "name": "topicId",
+              "type": "string",
+              "description": "Topic identifier.",
+              "optional": false
+            }
+          ],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "getTopicCount",
+          "fullPath": "LDialogueAI:getTopicCount",
+          "signature": "()",
+          "description": "Returns number of registered topics.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "type",
+          "fullPath": "LDialogueAI:type",
+          "signature": "()",
+          "description": "Returns the type name of this object.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "LDialogueAI:typeOf",
+          "signature": "(name)",
+          "description": "Returns true if this object is of the given type.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type name to compare against.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LDialogueAI"
         }
       ]
     },
@@ -48852,6 +50776,24 @@
           "objectType": "LGraph"
         },
         {
+          "name": "subgraph",
+          "fullPath": "LGraph:subgraph",
+          "signature": "(nodes)",
+          "description": "Builds a new graph containing only the given node handles and the",
+          "parameters": [
+            {
+              "name": "nodes",
+              "type": "table",
+              "description": "Array of node userdata to keep in the new graph.",
+              "optional": false
+            }
+          ],
+          "returns": "Graph",
+          "returnType": "Graph",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
           "name": "hasCycle",
           "fullPath": "LGraph:hasCycle",
           "signature": "()",
@@ -49002,6 +50944,249 @@
           ],
           "returns": "boolean",
           "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "addNode",
+          "fullPath": "LGraph:addNode",
+          "signature": "([label], [value])",
+          "description": "Adds a node with an optional label and payload.",
+          "parameters": [
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional node label.",
+              "optional": true
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Optional payload value.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "removeNode",
+          "fullPath": "LGraph:removeNode",
+          "signature": "(id)",
+          "description": "Removes a node and all its incident edges.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Node ID to remove.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "getNodeValue",
+          "fullPath": "LGraph:getNodeValue",
+          "signature": "(id)",
+          "description": "Returns the payload stored for a node.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Node ID to look up.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "addEdge",
+          "fullPath": "LGraph:addEdge",
+          "signature": "(from, to, [weight], [label])",
+          "description": "Adds an edge between two nodes.",
+          "parameters": [
+            {
+              "name": "from",
+              "type": "integer",
+              "description": "Source node ID.",
+              "optional": false
+            },
+            {
+              "name": "to",
+              "type": "integer",
+              "description": "Target node ID.",
+              "optional": false
+            },
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "Edge weight (default 1.0).",
+              "optional": true
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional edge label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "removeEdge",
+          "fullPath": "LGraph:removeEdge",
+          "signature": "(id)",
+          "description": "Removes all edges with the given ID.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Edge ID to remove.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "neighbors",
+          "fullPath": "LGraph:neighbors",
+          "signature": "(id)",
+          "description": "Returns the IDs of all direct outgoing neighbours of a node.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Node ID to query.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "bfs",
+          "fullPath": "LGraph:bfs",
+          "signature": "(start)",
+          "description": "Runs a breadth-first search from a node and returns visited IDs in BFS order.",
+          "parameters": [
+            {
+              "name": "start",
+              "type": "integer",
+              "description": "Start node ID.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "dfs",
+          "fullPath": "LGraph:dfs",
+          "signature": "(start)",
+          "description": "Runs a depth-first search from a node and returns visited IDs in DFS order.",
+          "parameters": [
+            {
+              "name": "start",
+              "type": "integer",
+              "description": "Start node ID.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "isConnected",
+          "fullPath": "LGraph:isConnected",
+          "signature": "(from, to)",
+          "description": "Returns true if a path exists from `from` to `to`.",
+          "parameters": [
+            {
+              "name": "from",
+              "type": "integer",
+              "description": "Source node ID.",
+              "optional": false
+            },
+            {
+              "name": "to",
+              "type": "integer",
+              "description": "Target node ID.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "hasNode",
+          "fullPath": "LGraph:hasNode",
+          "signature": "(id)",
+          "description": "Returns true when a node with the given ID exists.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Node ID to check.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "nodeCount",
+          "fullPath": "LGraph:nodeCount",
+          "signature": "()",
+          "description": "Returns the number of nodes in the graph.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "edgeCount",
+          "fullPath": "LGraph:edgeCount",
+          "signature": "()",
+          "description": "Returns the number of stored edge records.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LGraph"
+        },
+        {
+          "name": "clearAll",
+          "fullPath": "LGraph:clearAll",
+          "signature": "()",
+          "description": "Removes all nodes, edges, and stored payloads.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": true,
           "objectType": "LGraph"
         }
@@ -55015,6 +57200,96 @@
           "objectType": "LImageData"
         },
         {
+          "name": "drawNineSlice",
+          "fullPath": "LImageData:drawNineSlice",
+          "signature": "LImageData:drawNineSlice(source, src_x, src_y, src_w, src_h, dst_x, dst_y, dst_w, dst_h, inset_left, inset_right, inset_top, inset_bottom)",
+          "description": "Draws a nine-slice patch from a source atlas image into this image.",
+          "parameters": [
+            {
+              "name": "source",
+              "type": "ImageData",
+              "description": "Atlas/source image that contains the patch.",
+              "optional": false
+            },
+            {
+              "name": "src_x",
+              "type": "integer",
+              "description": "Source X in source image.",
+              "optional": false
+            },
+            {
+              "name": "src_y",
+              "type": "integer",
+              "description": "Source Y in source image.",
+              "optional": false
+            },
+            {
+              "name": "src_w",
+              "type": "integer",
+              "description": "Source width.",
+              "optional": false
+            },
+            {
+              "name": "src_h",
+              "type": "integer",
+              "description": "Source height.",
+              "optional": false
+            },
+            {
+              "name": "dst_x",
+              "type": "integer",
+              "description": "Destination X in this image.",
+              "optional": false
+            },
+            {
+              "name": "dst_y",
+              "type": "integer",
+              "description": "Destination Y in this image.",
+              "optional": false
+            },
+            {
+              "name": "dst_w",
+              "type": "integer",
+              "description": "Destination width.",
+              "optional": false
+            },
+            {
+              "name": "dst_h",
+              "type": "integer",
+              "description": "Destination height.",
+              "optional": false
+            },
+            {
+              "name": "inset_left",
+              "type": "integer",
+              "description": "Left inset from atlas metadata.",
+              "optional": false
+            },
+            {
+              "name": "inset_right",
+              "type": "integer",
+              "description": "Right inset from atlas metadata.",
+              "optional": false
+            },
+            {
+              "name": "inset_top",
+              "type": "integer",
+              "description": "Top inset from atlas metadata.",
+              "optional": false
+            },
+            {
+              "name": "inset_bottom",
+              "type": "integer",
+              "description": "Bottom inset from atlas metadata.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LImageData"
+        },
+        {
           "name": "getRegion",
           "fullPath": "LImageData:getRegion",
           "signature": "(x, y, w, h)",
@@ -60430,6 +62705,220 @@
       ]
     },
     {
+      "name": "LLazyQuery",
+      "description": "Lua-side lazy query pipeline over a [`DataFrame`].",
+      "methods": [
+        {
+          "name": "filter",
+          "fullPath": "LLazyQuery:filter",
+          "signature": "(col, op, val)",
+          "description": "Add a row-filter step. Returns a new LLazyQuery for chaining.",
+          "parameters": [
+            {
+              "name": "col",
+              "type": "string",
+              "description": "Column name.",
+              "optional": false
+            },
+            {
+              "name": "op",
+              "type": "string",
+              "description": "Comparison: `==`, `!=`, `<`, `<=`, `>`, `>=`, `contains`.",
+              "optional": false
+            },
+            {
+              "name": "val",
+              "type": "any",
+              "description": "Value to compare against.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "sort",
+          "fullPath": "LLazyQuery:sort",
+          "signature": "(col, [ascending])",
+          "description": "Add a sort step. Returns a new LLazyQuery for chaining.",
+          "parameters": [
+            {
+              "name": "col",
+              "type": "string",
+              "description": "Column name.",
+              "optional": false
+            },
+            {
+              "name": "ascending",
+              "type": "boolean",
+              "description": "true = ascending (default), false = descending.",
+              "optional": true
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "head",
+          "fullPath": "LLazyQuery:head",
+          "signature": "(n)",
+          "description": "Retain only the first n rows. Returns a new LLazyQuery for chaining.",
+          "parameters": [
+            {
+              "name": "n",
+              "type": "integer",
+              "description": "Number of rows to keep.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "tail",
+          "fullPath": "LLazyQuery:tail",
+          "signature": "(n)",
+          "description": "Retain only the last n rows. Returns a new LLazyQuery for chaining.",
+          "parameters": [
+            {
+              "name": "n",
+              "type": "integer",
+              "description": "Number of rows to keep.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "limit",
+          "fullPath": "LLazyQuery:limit",
+          "signature": "(n)",
+          "description": "Alias for `head`. Returns a new LLazyQuery for chaining.",
+          "parameters": [
+            {
+              "name": "n",
+              "type": "integer",
+              "description": "Max rows.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "slice",
+          "fullPath": "LLazyQuery:slice",
+          "signature": "(start, end)",
+          "description": "Retain a 1-based inclusive slice [start, end]. Returns a new LLazyQuery.",
+          "parameters": [
+            {
+              "name": "start",
+              "type": "integer",
+              "description": "First row (1-based).",
+              "optional": false
+            },
+            {
+              "name": "end",
+              "type": "integer",
+              "description": "Last row (1-based, inclusive).",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "dropNil",
+          "fullPath": "LLazyQuery:dropNil",
+          "signature": "(col)",
+          "description": "Drop rows where the column is nil. Returns a new LLazyQuery.",
+          "parameters": [
+            {
+              "name": "col",
+              "type": "string",
+              "description": "Column name.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "select",
+          "fullPath": "LLazyQuery:select",
+          "signature": "(cols)",
+          "description": "Retain only the specified columns. Returns a new LLazyQuery.",
+          "parameters": [
+            {
+              "name": "cols",
+              "type": "table",
+              "description": "Array of column name strings.",
+              "optional": false
+            }
+          ],
+          "returns": "LLazyQuery",
+          "returnType": "LLazyQuery",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "collect",
+          "fullPath": "LLazyQuery:collect",
+          "signature": "()",
+          "description": "Execute the pipeline and return the resulting DataFrame.",
+          "parameters": [],
+          "returns": "LDataFrame",
+          "returnType": "LDataFrame",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "type",
+          "fullPath": "LLazyQuery:type",
+          "signature": "()",
+          "description": "",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "LLazyQuery:typeOf",
+          "signature": "(name)",
+          "description": "Check the type tag of this object.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type name to check.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LLazyQuery"
+        }
+      ]
+    },
+    {
       "name": "LLight",
       "description": "Lua-side handle to a light resource stored in [`LightWorld`].",
       "methods": [
@@ -61599,6 +64088,42 @@
           "objectType": "LList"
         },
         {
+          "name": "push",
+          "fullPath": "LList:push",
+          "signature": "(value)",
+          "description": "Alias for `add`.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to append.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
+          "name": "unshift",
+          "fullPath": "LList:unshift",
+          "signature": "(value)",
+          "description": "Inserts a value at the beginning of the list.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to insert at the front.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
           "name": "get",
           "fullPath": "LList:get",
           "signature": "(index)",
@@ -61641,6 +64166,30 @@
           "objectType": "LList"
         },
         {
+          "name": "insert",
+          "fullPath": "LList:insert",
+          "signature": "(index, value)",
+          "description": "Inserts a value at a 1-based index (clamped to valid range).",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based insert index.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to insert.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
           "name": "remove",
           "fullPath": "LList:remove",
           "signature": "(index)",
@@ -61655,6 +64204,57 @@
           ],
           "returns": "any",
           "returnType": "any",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
+          "name": "pop",
+          "fullPath": "LList:pop",
+          "signature": "()",
+          "description": "Removes and returns the last value.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
+          "name": "shift",
+          "fullPath": "LList:shift",
+          "signature": "()",
+          "description": "Removes and returns the first value.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
+          "name": "indexOf",
+          "fullPath": "LList:indexOf",
+          "signature": "(value)",
+          "description": "Returns 1-based index of the first equal value, or nil when not found.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to find.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LList"
+        },
+        {
+          "name": "reverse",
+          "fullPath": "LList:reverse",
+          "signature": "()",
+          "description": "Reverses the list in place.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": true,
           "objectType": "LList"
         },
@@ -62877,6 +65477,174 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LMCTSEngine"
+        }
+      ]
+    },
+    {
+      "name": "LMap",
+      "description": "Lua wrapper for a string-keyed map/dictionary.",
+      "methods": [
+        {
+          "name": "set",
+          "fullPath": "LMap:set",
+          "signature": "(key, value)",
+          "description": "Sets a value for a string key.",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Key to write.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to store.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "get",
+          "fullPath": "LMap:get",
+          "signature": "(key)",
+          "description": "Gets value for a key.",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Key to read.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "has",
+          "fullPath": "LMap:has",
+          "signature": "(key)",
+          "description": "Returns true when key exists.",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Key to check.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "remove",
+          "fullPath": "LMap:remove",
+          "signature": "(key)",
+          "description": "Removes a key and returns whether it existed.",
+          "parameters": [
+            {
+              "name": "key",
+              "type": "string",
+              "description": "Key to remove.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "len",
+          "fullPath": "LMap:len",
+          "signature": "()",
+          "description": "Returns the number of key-value pairs.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "isEmpty",
+          "fullPath": "LMap:isEmpty",
+          "signature": "()",
+          "description": "Returns true when map has no entries.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "keys",
+          "fullPath": "LMap:keys",
+          "signature": "()",
+          "description": "Returns all keys.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "values",
+          "fullPath": "LMap:values",
+          "signature": "()",
+          "description": "Returns all values.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "entries",
+          "fullPath": "LMap:entries",
+          "signature": "()",
+          "description": "Returns all entries as `{key=..., value=...}` records.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "merge",
+          "fullPath": "LMap:merge",
+          "signature": "(other)",
+          "description": "Merges another map into this map, overwriting existing keys.",
+          "parameters": [
+            {
+              "name": "other",
+              "type": "LMap",
+              "description": "Source map.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMap"
+        },
+        {
+          "name": "clear",
+          "fullPath": "LMap:clear",
+          "signature": "()",
+          "description": "Clears all entries.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMap"
         }
       ]
     },
@@ -66569,6 +69337,17 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "getCellCount",
+          "fullPath": "LMinimap:getCellCount",
+          "signature": "()",
+          "description": "Returns the total number of grid cells.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "getGridSize",
           "fullPath": "LMinimap:getGridSize",
           "signature": "()",
@@ -67054,6 +69833,60 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "setObjectTypeTexture",
+          "fullPath": "LMinimap:setObjectTypeTexture",
+          "signature": "LMinimap:setObjectTypeTexture(type_idx, image, [width], [height])",
+          "description": "Attaches a texture-backed icon to an object type.",
+          "parameters": [
+            {
+              "name": "type_idx",
+              "type": "integer",
+              "description": "1-based object type index.",
+              "optional": false
+            },
+            {
+              "name": "image",
+              "type": "LImage",
+              "description": "Texture handle from lurek.render.newImage().",
+              "optional": false
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "description": "Optional on-screen width in pixels.",
+              "optional": true
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "description": "Optional on-screen height in pixels.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
+          "name": "clearObjectTypeTexture",
+          "fullPath": "LMinimap:clearObjectTypeTexture",
+          "signature": "(type_idx)",
+          "description": "Removes the texture-backed icon from an object type.",
+          "parameters": [
+            {
+              "name": "type_idx",
+              "type": "integer",
+              "description": "1-based object type index.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "setObject",
           "fullPath": "LMinimap:setObject",
           "signature": "(id, x, y, type_idx, [owner])",
@@ -67269,6 +70102,54 @@
               "name": "y",
               "type": "number",
               "description": "Y position.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
+          "name": "trackCamera",
+          "fullPath": "LMinimap:trackCamera",
+          "signature": "(camera_ud)",
+          "description": "Centers the minimap on a Camera2D and mirrors its visible area into the viewport overlay.",
+          "parameters": [
+            {
+              "name": "camera",
+              "type": "LCamera",
+              "description": "Camera object from lurek.camera.newCamera().",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
+          "name": "revealRadius",
+          "fullPath": "LMinimap:revealRadius",
+          "signature": "(cx, cy, radius)",
+          "description": "Reveals all fog cells whose centers lie inside the given radius.",
+          "parameters": [
+            {
+              "name": "cx",
+              "type": "number",
+              "description": "Grid-space center X.",
+              "optional": false
+            },
+            {
+              "name": "cy",
+              "type": "number",
+              "description": "Grid-space center Y.",
+              "optional": false
+            },
+            {
+              "name": "radius",
+              "type": "number",
+              "description": "Reveal radius in cells.",
               "optional": false
             }
           ],
@@ -67629,6 +70510,60 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "setMarkerTexture",
+          "fullPath": "LMinimap:setMarkerTexture",
+          "signature": "(id, image_ud, [width], [height])",
+          "description": "Attaches a texture-backed icon to a marker.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Marker id.",
+              "optional": false
+            },
+            {
+              "name": "image",
+              "type": "LImage",
+              "description": "Texture handle from lurek.render.newImage().",
+              "optional": false
+            },
+            {
+              "name": "width",
+              "type": "number",
+              "description": "Optional on-screen width in pixels.",
+              "optional": true
+            },
+            {
+              "name": "height",
+              "type": "number",
+              "description": "Optional on-screen height in pixels.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
+          "name": "clearMarkerTexture",
+          "fullPath": "LMinimap:clearMarkerTexture",
+          "signature": "(id)",
+          "description": "Removes the texture-backed icon from a marker.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Marker id.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "setMarkerAnimation",
           "fullPath": "LMinimap:setMarkerAnimation",
           "signature": "(id, anim_type, speed)",
@@ -67772,6 +70707,17 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "getOverlayShapeCount",
+          "fullPath": "LMinimap:getOverlayShapeCount",
+          "signature": "()",
+          "description": "Returns the number of custom overlay shapes.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "showPath",
           "fullPath": "LMinimap:showPath",
           "signature": "(points_tbl, color_tbl)",
@@ -67814,6 +70760,17 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "getPathCount",
+          "fullPath": "LMinimap:getPathCount",
+          "signature": "()",
+          "description": "Returns the number of displayed paths.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "setLayer",
           "fullPath": "LMinimap:setLayer",
           "signature": "(layer)",
@@ -67843,6 +70800,17 @@
           "objectType": "LMinimap"
         },
         {
+          "name": "getLayerCount",
+          "fullPath": "LMinimap:getLayerCount",
+          "signature": "()",
+          "description": "Returns the number of stored minimap layers.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
           "name": "setLayerData",
           "fullPath": "LMinimap:setLayerData",
           "signature": "(layer, data_tbl)",
@@ -67863,6 +70831,24 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LMinimap"
+        },
+        {
+          "name": "getLayerData",
+          "fullPath": "LMinimap:getLayerData",
+          "signature": "(layer)",
+          "description": "Returns the terrain ids stored in the given layer, or nil if it does not exist.",
+          "parameters": [
+            {
+              "name": "layer",
+              "type": "integer",
+              "description": "Layer index.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": true,
           "objectType": "LMinimap"
         },
@@ -68554,6 +71540,24 @@
           "objectType": "LModManager"
         },
         {
+          "name": "getModsByCapability",
+          "fullPath": "LModManager:getModsByCapability",
+          "signature": "(capability)",
+          "description": "Returns the registered mods that declare a given capability flag.",
+          "parameters": [
+            {
+              "name": "capability",
+              "type": "string",
+              "description": "Capability flag to filter by.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LModManager"
+        },
+        {
           "name": "getLoadOrder",
           "fullPath": "LModManager:getLoadOrder",
           "signature": "()",
@@ -68688,6 +71692,17 @@
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LModManager"
+        },
+        {
+          "name": "processReloadQueue",
+          "fullPath": "LModManager:processReloadQueue",
+          "signature": "()",
+          "description": "Reloads every queued mod from disk and clears the queue.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": true,
           "objectType": "LModManager"
         },
@@ -69130,6 +72145,136 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LNavGrid"
+        }
+      ]
+    },
+    {
+      "name": "LNavMesh",
+      "description": "Lua-side wrapper around a polygon navmesh for non-tile pathfinding.",
+      "methods": [
+        {
+          "name": "addPolygon",
+          "fullPath": "LNavMesh:addPolygon",
+          "signature": "(vertices)",
+          "description": "Adds a polygon from a table of `{x, y}` points.",
+          "parameters": [
+            {
+              "name": "vertices",
+              "type": "table",
+              "description": "Array of vertices as `{x, y}`.",
+              "optional": false
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LNavMesh"
+        },
+        {
+          "name": "connectPolygons",
+          "fullPath": "LNavMesh:connectPolygons",
+          "signature": "(a, b, [bidirectional])",
+          "description": "Connects two polygons by index.",
+          "parameters": [
+            {
+              "name": "a",
+              "type": "integer",
+              "description": "First polygon index (1-based).",
+              "optional": false
+            },
+            {
+              "name": "b",
+              "type": "integer",
+              "description": "Second polygon index (1-based).",
+              "optional": false
+            },
+            {
+              "name": "bidirectional",
+              "type": "boolean",
+              "description": "Whether connection should be bidirectional.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNavMesh"
+        },
+        {
+          "name": "findPath",
+          "fullPath": "LNavMesh:findPath",
+          "signature": "(sx, sy, gx, gy)",
+          "description": "Finds a waypoint path through polygon centroids.",
+          "parameters": [
+            {
+              "name": "sx",
+              "type": "number",
+              "description": "Start world X.",
+              "optional": false
+            },
+            {
+              "name": "sy",
+              "type": "number",
+              "description": "Start world Y.",
+              "optional": false
+            },
+            {
+              "name": "gx",
+              "type": "number",
+              "description": "Goal world X.",
+              "optional": false
+            },
+            {
+              "name": "gy",
+              "type": "number",
+              "description": "Goal world Y.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LNavMesh"
+        },
+        {
+          "name": "getPolygonCount",
+          "fullPath": "LNavMesh:getPolygonCount",
+          "signature": "()",
+          "description": "Returns number of polygons in this navmesh.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LNavMesh"
+        },
+        {
+          "name": "type",
+          "fullPath": "LNavMesh:type",
+          "signature": "()",
+          "description": "Returns the type name of this object.",
+          "parameters": [],
+          "returns": "string",
+          "returnType": "string",
+          "isMethod": true,
+          "objectType": "LNavMesh"
+        },
+        {
+          "name": "typeOf",
+          "fullPath": "LNavMesh:typeOf",
+          "signature": "(name)",
+          "description": "Returns true if this object is of the given type.",
+          "parameters": [
+            {
+              "name": "name",
+              "type": "string",
+              "description": "Type name to compare against.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LNavMesh"
         }
       ]
     },
@@ -71867,6 +75012,36 @@
           "objectType": "LNoiseGenerator"
         },
         {
+          "name": "generateMapCompute",
+          "fullPath": "LNoiseGenerator:generateMapCompute",
+          "signature": "(w, h, [opts])",
+          "description": "Generates a 2D noise map via compute backend entrypoint (falls back to CPU when needed).",
+          "parameters": [
+            {
+              "name": "width",
+              "type": "integer",
+              "description": "Map width.",
+              "optional": false
+            },
+            {
+              "name": "height",
+              "type": "integer",
+              "description": "Map height.",
+              "optional": false
+            },
+            {
+              "name": "opts",
+              "type": "table",
+              "description": "Optional generation settings.",
+              "optional": true
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LNoiseGenerator"
+        },
+        {
           "name": "getSeed",
           "fullPath": "LNoiseGenerator:getSeed",
           "signature": "()",
@@ -74029,6 +77204,24 @@
           "objectType": "LPaletteLUT"
         },
         {
+          "name": "cycle",
+          "fullPath": "LPaletteLUT:cycle",
+          "signature": "(offset)",
+          "description": "Rotates destination palette entries for palette-cycling animation.",
+          "parameters": [
+            {
+              "name": "offset",
+              "type": "integer",
+              "description": "Rotation offset in entries.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LPaletteLUT"
+        },
+        {
           "name": "type",
           "fullPath": "LPaletteLUT:type",
           "signature": "()",
@@ -75593,6 +78786,93 @@
           "returnType": "number",
           "isMethod": true,
           "objectType": "LParallaxLayer"
+        },
+        {
+          "name": "addEffectPass",
+          "fullPath": "LParallaxLayer:addEffectPass",
+          "signature": "(effect_name, [params])",
+          "description": "Appends one shader pass to this layer's per-image effect chain.",
+          "parameters": [
+            {
+              "name": "effect_name",
+              "type": "string",
+              "description": "Built-in effect name.",
+              "optional": false
+            },
+            {
+              "name": "params",
+              "type": "table",
+              "description": "Optional `{ key = number }` parameter table.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParallaxLayer"
+        },
+        {
+          "name": "clearEffects",
+          "fullPath": "LParallaxLayer:clearEffects",
+          "signature": "()",
+          "description": "Clears all per-layer effect passes.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParallaxLayer"
+        },
+        {
+          "name": "effectCount",
+          "fullPath": "LParallaxLayer:effectCount",
+          "signature": "()",
+          "description": "Returns number of configured effect passes for this layer.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LParallaxLayer"
+        },
+        {
+          "name": "setMotionStretch",
+          "fullPath": "LParallaxLayer:setMotionStretch",
+          "signature": "(enabled, strength, max_scale)",
+          "description": "Enables/disables velocity-based stretch and tunes its strength.",
+          "parameters": [
+            {
+              "name": "enabled",
+              "type": "boolean",
+              "description": "Whether motion stretch is active.",
+              "optional": false
+            },
+            {
+              "name": "strength",
+              "type": "number",
+              "description": "Stretch amount per px/s velocity.",
+              "optional": false
+            },
+            {
+              "name": "max_scale",
+              "type": "number",
+              "description": "Maximum stretch multiplier.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParallaxLayer"
+        },
+        {
+          "name": "getMotionStretch",
+          "fullPath": "LParallaxLayer:getMotionStretch",
+          "signature": "()",
+          "description": "Returns current motion-stretch configuration.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LParallaxLayer"
         }
       ]
     },
@@ -75655,6 +78935,24 @@
           "parameters": [],
           "returns": "integer",
           "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LParallaxSet"
+        },
+        {
+          "name": "getLayerZAt",
+          "fullPath": "LParallaxSet:getLayerZAt",
+          "signature": "(index)",
+          "description": "Returns the layer `z` value at a 1-based sorted index.",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "One-based index in current draw order.",
+              "optional": false
+            }
+          ],
+          "returns": "integer?",
+          "returnType": "integer?",
           "isMethod": true,
           "objectType": "LParallaxSet"
         },
@@ -77025,6 +80323,58 @@
           "parameters": [],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParticleSystem"
+        },
+        {
+          "name": "setCollidesWithPhysics",
+          "fullPath": "LParticleSystem:setCollidesWithPhysics",
+          "signature": "(world_ud, [probe_radius], [restitution])",
+          "description": "Enables particle collision response against a physics world.",
+          "parameters": [
+            {
+              "name": "world",
+              "type": "LWorld",
+              "description": "Physics world userdata.",
+              "optional": false
+            },
+            {
+              "name": "probe_radius",
+              "type": "number",
+              "description": "Optional probe radius in world units.",
+              "optional": true
+            },
+            {
+              "name": "restitution",
+              "type": "number",
+              "description": "Optional bounce restitution in [0..1].",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParticleSystem"
+        },
+        {
+          "name": "clearCollidesWithPhysics",
+          "fullPath": "LParticleSystem:clearCollidesWithPhysics",
+          "signature": "()",
+          "description": "Disables particle collision response against the physics world.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LParticleSystem"
+        },
+        {
+          "name": "hasCollidesWithPhysics",
+          "fullPath": "LParticleSystem:hasCollidesWithPhysics",
+          "signature": "()",
+          "description": "Returns true if particle-vs-physics collisions are enabled.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LParticleSystem"
         },
@@ -80735,12 +84085,36 @@
           "returnType": "string",
           "isMethod": true,
           "objectType": "LPromise"
+        },
+        {
+          "name": "chain",
+          "fullPath": "LPromise:chain",
+          "signature": "(code, ...)",
+          "description": "Starts a new promise after this promise resolves and passes the result as arg[1].",
+          "parameters": [
+            {
+              "name": "code",
+              "type": "string",
+              "description": "Worker Lua source code for the chained stage.",
+              "optional": false
+            },
+            {
+              "name": "...",
+              "type": "any",
+              "description": "Optional additional args appended after arg[1].",
+              "optional": false
+            }
+          ],
+          "returns": "LPromise",
+          "returnType": "LPromise",
+          "isMethod": true,
+          "objectType": "LPromise"
         }
       ]
     },
     {
       "name": "LProvinceGrid",
-      "description": "Lua-side wrapper around [`ProvinceGrid`].",
+      "description": "Loads a province map PNG and builds an O(1) spatial index with adjacency data.",
       "methods": [
         {
           "name": "getWidth",
@@ -80829,6 +84203,46 @@
           "parameters": [],
           "returns": "table",
           "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "getPolygons",
+          "fullPath": "LProvinceGrid:getPolygons",
+          "signature": "()",
+          "description": "Returns the raw border-trace polygon(s) for every province.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "getPolygonsSimplified",
+          "fullPath": "LProvinceGrid:getPolygonsSimplified",
+          "signature": "()",
+          "description": "Same as getPolygons but collinear points are removed and 45° staircase",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LProvinceGrid"
+        },
+        {
+          "name": "drawShapes",
+          "fullPath": "LProvinceGrid:drawShapes",
+          "signature": "(...)",
+          "description": "Draws all province shapes using their original PNG colours.",
+          "parameters": [
+            {
+              "name": "...",
+              "type": "any",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": true,
           "objectType": "LProvinceGrid"
         },
@@ -82198,10 +85612,39 @@
           "objectType": "LQueue"
         },
         {
+          "name": "enqueueFront",
+          "fullPath": "LQueue:enqueueFront",
+          "signature": "(value)",
+          "description": "Adds a value to the front of the queue.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to enqueue at the front.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
           "name": "dequeue",
           "fullPath": "LQueue:dequeue",
           "signature": "()",
           "description": "Removes and returns the front value.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
+          "name": "dequeueBack",
+          "fullPath": "LQueue:dequeueBack",
+          "signature": "()",
+          "description": "Removes and returns the back value.",
           "parameters": [],
           "returns": "any",
           "returnType": "any",
@@ -82214,6 +85657,77 @@
           "signature": "()",
           "description": "Returns the front value without removing it.",
           "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
+          "name": "back",
+          "fullPath": "LQueue:back",
+          "signature": "()",
+          "description": "Returns the back value without removing it.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
+          "name": "peekAt",
+          "fullPath": "LQueue:peekAt",
+          "signature": "(index)",
+          "description": "Returns the value at a 1-based index (front=1).",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based index.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
+          "name": "insertAt",
+          "fullPath": "LQueue:insertAt",
+          "signature": "(index, value)",
+          "description": "Inserts a value at a 1-based index (front=1).",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based insert index.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to insert.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LQueue"
+        },
+        {
+          "name": "removeAt",
+          "fullPath": "LQueue:removeAt",
+          "signature": "(index)",
+          "description": "Removes and returns a value at a 1-based index.",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based index.",
+              "optional": false
+            }
+          ],
           "returns": "any",
           "returnType": "any",
           "isMethod": true,
@@ -84733,6 +88247,75 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LRaycaster"
+        }
+      ]
+    },
+    {
+      "name": "LRectPacker",
+      "description": "Lua-side wrapper around a [`RectPacker`].",
+      "methods": [
+        {
+          "name": "pack",
+          "fullPath": "LRectPacker:pack",
+          "signature": "(w, h, [id])",
+          "description": "Packs a rectangle into the bin and returns placement x, y or nil when full.",
+          "parameters": [
+            {
+              "name": "w",
+              "type": "integer",
+              "description": "Rectangle width.",
+              "optional": false
+            },
+            {
+              "name": "h",
+              "type": "integer",
+              "description": "Rectangle height.",
+              "optional": false
+            },
+            {
+              "name": "id",
+              "type": "string",
+              "description": "Optional rectangle identifier.",
+              "optional": true
+            }
+          ],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LRectPacker"
+        },
+        {
+          "name": "clear",
+          "fullPath": "LRectPacker:clear",
+          "signature": "()",
+          "description": "Clears all packed rectangles and resets packer state.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LRectPacker"
+        },
+        {
+          "name": "occupancy",
+          "fullPath": "LRectPacker:occupancy",
+          "signature": "()",
+          "description": "Returns current packed occupancy in range [0, 1].",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LRectPacker"
+        },
+        {
+          "name": "getPacked",
+          "fullPath": "LRectPacker:getPacked",
+          "signature": "()",
+          "description": "Returns packed rectangles as an array of `{x, y, w, h, id?}` tables.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LRectPacker"
         }
       ]
     },
@@ -97903,6 +101486,24 @@
           "objectType": "LStack"
         },
         {
+          "name": "pushBottom",
+          "fullPath": "LStack:pushBottom",
+          "signature": "(value)",
+          "description": "Pushes a value onto the bottom of the stack.",
+          "parameters": [
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to push onto the bottom.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
           "name": "pop",
           "fullPath": "LStack:pop",
           "signature": "()",
@@ -97914,6 +101515,35 @@
           "objectType": "LStack"
         },
         {
+          "name": "popBottom",
+          "fullPath": "LStack:popBottom",
+          "signature": "()",
+          "description": "Removes and returns the bottom value.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "popMany",
+          "fullPath": "LStack:popMany",
+          "signature": "(count)",
+          "description": "Pops up to `count` values from the top of the stack.",
+          "parameters": [
+            {
+              "name": "count",
+              "type": "integer",
+              "description": "Maximum number of values to pop.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
           "name": "peek",
           "fullPath": "LStack:peek",
           "signature": "()",
@@ -97921,6 +101551,101 @@
           "parameters": [],
           "returns": "any",
           "returnType": "any",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "peekBottom",
+          "fullPath": "LStack:peekBottom",
+          "signature": "()",
+          "description": "Returns the bottom value without removing it.",
+          "parameters": [],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "peekAt",
+          "fullPath": "LStack:peekAt",
+          "signature": "(index)",
+          "description": "Returns the value at a 1-based index (bottom=1).",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based index.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "insertAt",
+          "fullPath": "LStack:insertAt",
+          "signature": "(index, value)",
+          "description": "Inserts a value at a 1-based index (clamped to valid range).",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based insert index.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Value to insert.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "removeAt",
+          "fullPath": "LStack:removeAt",
+          "signature": "(index)",
+          "description": "Removes and returns a value at a 1-based index.",
+          "parameters": [
+            {
+              "name": "index",
+              "type": "integer",
+              "description": "1-based index.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LStack"
+        },
+        {
+          "name": "moveWithin",
+          "fullPath": "LStack:moveWithin",
+          "signature": "(from, to)",
+          "description": "Moves an item from one 1-based index to another.",
+          "parameters": [
+            {
+              "name": "from",
+              "type": "integer",
+              "description": "Source 1-based index.",
+              "optional": false
+            },
+            {
+              "name": "to",
+              "type": "integer",
+              "description": "Destination 1-based index.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LStack"
         },
@@ -99551,6 +103276,69 @@
           ],
           "returns": "number",
           "returnType": "number",
+          "isMethod": true,
+          "objectType": "LSteeringManager"
+        },
+        {
+          "name": "setPath",
+          "fullPath": "LSteeringManager:setPath",
+          "signature": "(waypoints, [reach_radius], [weight])",
+          "description": "Sets a world-space waypoint path for path-follow steering.",
+          "parameters": [
+            {
+              "name": "waypoints",
+              "type": "table",
+              "description": "Array of waypoint tables with numeric `x` and `y` fields.",
+              "optional": false
+            },
+            {
+              "name": "reachRadius",
+              "type": "number",
+              "description": "Optional waypoint-reached radius.",
+              "optional": true
+            },
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "Optional path-follow force weight.",
+              "optional": true
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LSteeringManager"
+        },
+        {
+          "name": "clearPath",
+          "fullPath": "LSteeringManager:clearPath",
+          "signature": "()",
+          "description": "Clears the currently active waypoint path.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LSteeringManager"
+        },
+        {
+          "name": "hasPath",
+          "fullPath": "LSteeringManager:hasPath",
+          "signature": "()",
+          "description": "Returns true if there is an unfinished waypoint path.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LSteeringManager"
+        },
+        {
+          "name": "getPathProgress",
+          "fullPath": "LSteeringManager:getPathProgress",
+          "signature": "()",
+          "description": "Returns path-follow progress.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
           "isMethod": true,
           "objectType": "LSteeringManager"
         },
@@ -104178,11 +107966,18 @@
         {
           "name": "join",
           "fullPath": "LThreadPool:join",
-          "signature": "()",
+          "signature": "([timeout])",
           "description": "Blocks until all workers in the pool have finished execution.",
-          "parameters": [],
-          "returns": "nil",
-          "returnType": "nil",
+          "parameters": [
+            {
+              "name": "timeout",
+              "type": "number",
+              "description": "Optional timeout in seconds.",
+              "optional": true
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
           "isMethod": true,
           "objectType": "LThreadPool"
         },
@@ -111387,6 +115182,110 @@
           "objectType": "LTween"
         },
         {
+          "name": "getElapsed",
+          "fullPath": "LTween:getElapsed",
+          "signature": "()",
+          "description": "Returns elapsed tween time in seconds.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "getDuration",
+          "fullPath": "LTween:getDuration",
+          "signature": "()",
+          "description": "Returns configured tween duration in seconds.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "getRemaining",
+          "fullPath": "LTween:getRemaining",
+          "signature": "()",
+          "description": "Returns remaining tween time in seconds.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "getFields",
+          "fullPath": "LTween:getFields",
+          "signature": "()",
+          "description": "Returns animated field names.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "setRelative",
+          "fullPath": "LTween:setRelative",
+          "signature": "(enabled)",
+          "description": "Enables delta mode where field values are interpreted as offsets from start values.",
+          "parameters": [
+            {
+              "name": "enabled",
+              "type": "boolean",
+              "description": "True to enable relative tweening.",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "relative",
+          "fullPath": "LTween.relative",
+          "signature": "(ud, enabled)",
+          "description": "Chainable alias for `setRelative`.",
+          "parameters": [
+            {
+              "name": "self",
+              "type": "LTween",
+              "description": "Tween handle returned for chaining.",
+              "optional": false
+            },
+            {
+              "name": "enabled",
+              "type": "boolean",
+              "description": "True to enable relative tweening.",
+              "optional": false
+            }
+          ],
+          "returns": "LTween",
+          "returnType": "LTween",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
+          "name": "await",
+          "fullPath": "LTween.await",
+          "signature": "(ud)",
+          "description": "Yields the current coroutine until this tween completes or is cancelled.",
+          "parameters": [
+            {
+              "name": "ud",
+              "type": "any",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LTween"
+        },
+        {
           "name": "setRepeat",
           "fullPath": "LTween:setRepeat",
           "signature": "(n)",
@@ -111827,6 +115726,35 @@
           "parameters": [],
           "returns": "boolean",
           "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LTweenSequence"
+        },
+        {
+          "name": "getProgress",
+          "fullPath": "LTweenSequence:getProgress",
+          "signature": "()",
+          "description": "Returns sequence progress ratio from 0..1 based on completed steps.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LTweenSequence"
+        },
+        {
+          "name": "await",
+          "fullPath": "LTweenSequence.await",
+          "signature": "(ud)",
+          "description": "Yields the current coroutine until this sequence completes or is cancelled.",
+          "parameters": [
+            {
+              "name": "ud",
+              "type": "any",
+              "description": "",
+              "optional": false
+            }
+          ],
+          "returns": "nil",
+          "returnType": "nil",
           "isMethod": true,
           "objectType": "LTweenSequence"
         },
@@ -113674,7 +117602,7 @@
           "name": "addSystem",
           "fullPath": "LUniverse:addSystem",
           "signature": "(system, [opts])",
-          "description": "Adds a system table to the universe with an optional priority (lower = earlier) and phase.",
+          "description": "Adds a system table to the universe with an optional priority (lower = earlier), phase,",
           "parameters": [
             {
               "name": "system",
@@ -113685,7 +117613,7 @@
             {
               "name": "opts",
               "type": "table",
-              "description": "Optional table with `priority` integer and `phase` string fields.",
+              "description": "Optional table with `priority` (integer), `phase` (string),",
               "optional": true
             }
           ],
@@ -113855,6 +117783,17 @@
           ],
           "returns": "nil",
           "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LUniverse"
+        },
+        {
+          "name": "takeSnapshotDiff",
+          "fullPath": "LUniverse:takeSnapshotDiff",
+          "signature": "()",
+          "description": "Returns a lightweight incremental diff of world changes since the last call.",
+          "parameters": [],
+          "returns": "table",
+          "returnType": "table",
           "isMethod": true,
           "objectType": "LUniverse"
         },
@@ -116025,6 +119964,181 @@
           "returnType": "boolean",
           "isMethod": true,
           "objectType": "LVecFrame"
+        }
+      ]
+    },
+    {
+      "name": "LWeightedRandom",
+      "description": "Lua wrapper for the WeightedRandom selector pattern.",
+      "methods": [
+        {
+          "name": "add",
+          "fullPath": "LWeightedRandom:add",
+          "signature": "(weight, value, [label])",
+          "description": "Adds an entry with the given weight and optional label.",
+          "parameters": [
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "Selection weight; must be >= 0.",
+              "optional": false
+            },
+            {
+              "name": "value",
+              "type": "any",
+              "description": "Payload value to associate with this entry.",
+              "optional": false
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "description": "Optional entry label.",
+              "optional": true
+            }
+          ],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "remove",
+          "fullPath": "LWeightedRandom:remove",
+          "signature": "(id)",
+          "description": "Removes the entry with the given ID.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Entry ID to remove.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "setWeight",
+          "fullPath": "LWeightedRandom:setWeight",
+          "signature": "(id, weight)",
+          "description": "Updates the weight of an existing entry.",
+          "parameters": [
+            {
+              "name": "id",
+              "type": "integer",
+              "description": "Entry ID to update.",
+              "optional": false
+            },
+            {
+              "name": "weight",
+              "type": "number",
+              "description": "New weight value.",
+              "optional": false
+            }
+          ],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "pick",
+          "fullPath": "LWeightedRandom:pick",
+          "signature": "(sample)",
+          "description": "Selects one entry using a caller-supplied random sample in [0, 1).",
+          "parameters": [
+            {
+              "name": "sample",
+              "type": "number",
+              "description": "Random sample in `[0, 1)`.",
+              "optional": false
+            }
+          ],
+          "returns": "any",
+          "returnType": "any",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "pickN",
+          "fullPath": "LWeightedRandom:pickN",
+          "signature": "(count, samples)",
+          "description": "Selects up to `count` distinct entries without replacement using a samples table.",
+          "parameters": [
+            {
+              "name": "count",
+              "type": "integer",
+              "description": "Maximum number of entries to select.",
+              "optional": false
+            },
+            {
+              "name": "samples",
+              "type": "table",
+              "description": "Array of random samples in `[0, 1)`.",
+              "optional": false
+            }
+          ],
+          "returns": "table",
+          "returnType": "table",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "totalWeight",
+          "fullPath": "LWeightedRandom:totalWeight",
+          "signature": "()",
+          "description": "Returns the sum of all entry weights.",
+          "parameters": [],
+          "returns": "number",
+          "returnType": "number",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "len",
+          "fullPath": "LWeightedRandom:len",
+          "signature": "()",
+          "description": "Returns the number of entries in the pool.",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "isEmpty",
+          "fullPath": "LWeightedRandom:isEmpty",
+          "signature": "()",
+          "description": "Returns true when the pool has no entries.",
+          "parameters": [],
+          "returns": "boolean",
+          "returnType": "boolean",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "clearAll",
+          "fullPath": "LWeightedRandom:clearAll",
+          "signature": "()",
+          "description": "Removes all entries from the pool.",
+          "parameters": [],
+          "returns": "nil",
+          "returnType": "nil",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
+        },
+        {
+          "name": "getRevision",
+          "fullPath": "LWeightedRandom:getRevision",
+          "signature": "()",
+          "description": "Returns the pool's revision counter (incremented on structural changes).",
+          "parameters": [],
+          "returns": "integer",
+          "returnType": "integer",
+          "isMethod": true,
+          "objectType": "LWeightedRandom"
         }
       ]
     },

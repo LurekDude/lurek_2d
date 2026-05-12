@@ -32,10 +32,10 @@ YAML is intentionally not supported (constraint B-05).
 
 Rust (`src/serial/mod.rs` re-exports):
 - `from_json`, `to_json`
-- `from_toml`, `to_toml`
+- `parse_toml`, `encode_toml`, `from_toml`, `to_toml`
 - `from_ini`
 - `from_csv`, `from_csv_reader`, `to_csv`, `CsvOptions`
-- `from_msgpack`, `to_msgpack`
+- `from_msgpack`, `to_msgpack`, `decode_json`, `encode_json`
 - `from_xml`
 - `validate_schema`, `apply_schema_defaults`
 - Unified codec API:
@@ -48,6 +48,9 @@ Rust (`src/serial/mod.rs` re-exports):
 Lua (`lurek.serial`):
 - Existing format functions: `fromJson`, `toJson`, `fromToml`, `toToml`, `fromIni`, `fromCsv`, `toCsv`, `encodeMsgPack`, `decodeMsgPack`, `decodeXml`, `validate`
 - Unified helpers: `detectFormat`, `decode`, `encode`, `applyDefaults`
+
+Note:
+- `parse_toml`, `encode_toml`, `encode_json`, and `decode_json` are lower-level Rust helpers used by bridge code (including `src/lua_api/data_api.rs`) and are not direct Lua API surface.
 
 ## Invariants
 

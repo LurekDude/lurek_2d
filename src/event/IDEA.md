@@ -1,2 +1,0 @@
-- TODO: Expand `glob_match` tests in `signal.rs` with multi-star, adjacent-star, and empty-pattern cases.
-- TODO: Re-evaluate overlap between `event::EventQueue` and `thread::Channel` if queueing or blocking internals keep duplicating.

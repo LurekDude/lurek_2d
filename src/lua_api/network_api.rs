@@ -65,6 +65,19 @@ fn stats_to_table(lua: &Lua, stats: PeerStats) -> LuaResult<LuaTable<'_>> {
     Ok(t)
 }
 
+fn room_to_table<'lua>(
+    lua: &'lua Lua,
+    room: &crate::network::lobby::RoomInfo,
+) -> LuaResult<LuaTable<'lua>> {
+    let t = lua.create_table()?;
+    t.set("id", room.id.clone())?;
+    t.set("name", room.name.clone())?;
+    t.set("host", room.host.clone())?;
+    t.set("player_count", room.player_count)?;
+    t.set("max_players", room.max_players)?;
+    Ok(t)
+}
+
 // Converts a Lua table into a [`NetValue::Array`] or [`NetValue::Map`].
 fn lua_table_to_netvalue(t: &LuaTable) -> LuaResult<NetValue> {
     // Detect array vs map: check if key 1 exists
@@ -952,6 +965,66 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // -- createRoom --
+    /// Creates a room in the local matchmaking registry.
+    /// @param | name | string | Room name.
+    /// @param | host | string | Host/player label.
+    /// @param | max_players | integer? | Maximum room size.
+    /// @return | table | Room table with `id`, `name`, `host`, `player_count`, `max_players`.
+    tbl.set(
+        "createRoom",
+        lua.create_function(
+            |lua, (name, host, max_players): (String, String, Option<u32>)| {
+                let room =
+                    crate::network::lobby::create_room(&name, &host, max_players.unwrap_or(8));
+                room_to_table(lua, &room)
+            },
+        )?,
+    )?;
+
+    // -- listRooms --
+    /// Returns all rooms from the local matchmaking registry.
+    /// @return | table | Array of room tables.
+    tbl.set(
+        "listRooms",
+        lua.create_function(|lua, ()| {
+            let rooms = crate::network::lobby::list_rooms();
+            let out = lua.create_table()?;
+            for (i, room) in rooms.iter().enumerate() {
+                out.set(i + 1, room_to_table(lua, room)?)?;
+            }
+            Ok(out)
+        })?,
+    )?;
+
+    // -- joinRoom --
+    /// Joins a room by id.
+    /// @param | id | string | Room id.
+    /// @return | table | Updated room table, or nil when join failed.
+    tbl.set(
+        "joinRoom",
+        lua.create_function(
+            |lua, id: String| match crate::network::lobby::join_room(&id) {
+                Some(room) => Ok(LuaValue::Table(room_to_table(lua, &room)?)),
+                None => Ok(LuaValue::Nil),
+            },
+        )?,
+    )?;
+
+    // -- leaveRoom --
+    /// Leaves a room by id.
+    /// @param | id | string | Room id.
+    /// @return | table | Updated room table, or nil when room does not exist.
+    tbl.set(
+        "leaveRoom",
+        lua.create_function(
+            |lua, id: String| match crate::network::lobby::leave_room(&id) {
+                Some(room) => Ok(LuaValue::Table(room_to_table(lua, &room)?)),
+                None => Ok(LuaValue::Nil),
+            },
+        )?,
+    )?;
+
     // -- syncEntity --
     /// Convenience helper: packs an entity snapshot and broadcasts it to all peers.
     /// @param | host | LNetworkHost | Host wrapper used to broadcast the snapshot.
@@ -996,6 +1069,125 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 Ok(())
             },
         )?,
+    )?;
+
+    // -- newRelayTicket --
+    /// Encodes a relay ticket token for room + peer identity.
+    /// @param | room_id | string | Room identifier.
+    /// @param | peer_id | string | Peer identifier.
+    /// @return | string | Encoded relay token.
+    tbl.set(
+        "newRelayTicket",
+        lua.create_function(|_, (room_id, peer_id): (String, String)| {
+            let ticket = crate::network::relay::RelayTicket { room_id, peer_id };
+            Ok(crate::network::relay::encode_ticket(&ticket))
+        })?,
+    )?;
+
+    // -- parseRelayTicket --
+    /// Decodes a relay ticket token.
+    /// @param | token | string | Encoded relay token.
+    /// @return | table | `{room_id, peer_id}` or nil on parse failure.
+    tbl.set(
+        "parseRelayTicket",
+        lua.create_function(|lua, token: String| {
+            match crate::network::relay::decode_ticket(&token) {
+                Some(ticket) => {
+                    let t = lua.create_table()?;
+                    t.set("room_id", ticket.room_id)?;
+                    t.set("peer_id", ticket.peer_id)?;
+                    Ok(LuaValue::Table(t))
+                }
+                None => Ok(LuaValue::Nil),
+            }
+        })?,
+    )?;
+
+    // -- makePunchProbe --
+    /// Creates a UDP punch probe payload for P2P NAT hole punching.
+    /// @param | peer_id | string | Peer identifier.
+    /// @return | string | Binary payload bytes.
+    tbl.set(
+        "makePunchProbe",
+        lua.create_function(|lua, peer_id: String| {
+            lua.create_string(crate::network::relay::make_punch_probe(&peer_id))
+        })?,
+    )?;
+
+    // -- parsePunchProbe --
+    /// Parses a UDP punch probe payload and returns source peer id.
+    /// @param | payload | string | Probe payload bytes.
+    /// @return | string | Source peer id or nil.
+    tbl.set(
+        "parsePunchProbe",
+        lua.create_function(|_, payload: LuaString| {
+            Ok(crate::network::relay::parse_punch_probe(payload.as_bytes()))
+        })?,
+    )?;
+
+    // -- predictLinear --
+    /// Predicts one entity snapshot step using linear velocity.
+    /// @param | snapshot | table | Snapshot table: `id,tick,x,y,vx,vy`.
+    /// @param | dt | number | Simulation step.
+    /// @return | table | Predicted snapshot table.
+    tbl.set(
+        "predictLinear",
+        lua.create_function(|lua, (snapshot, dt): (LuaTable, f32)| {
+            let src = crate::network::net_sync::EntitySnapshot {
+                id: snapshot.get("id")?,
+                tick: snapshot.get("tick")?,
+                x: snapshot.get("x")?,
+                y: snapshot.get("y")?,
+                vx: snapshot.get("vx")?,
+                vy: snapshot.get("vy")?,
+            };
+            let out = crate::network::net_sync::predict_linear(&src, dt);
+            let t = lua.create_table()?;
+            t.set("id", out.id)?;
+            t.set("tick", out.tick)?;
+            t.set("x", out.x)?;
+            t.set("y", out.y)?;
+            t.set("vx", out.vx)?;
+            t.set("vy", out.vy)?;
+            Ok(t)
+        })?,
+    )?;
+
+    // -- reconcileSnapshot --
+    /// Blends predicted and authoritative snapshot.
+    /// @param | predicted | table | Predicted snapshot table.
+    /// @param | authoritative | table | Server-authoritative snapshot table.
+    /// @param | alpha | number | Blend factor in `[0..1]`.
+    /// @return | table | Reconciled snapshot table.
+    tbl.set(
+        "reconcileSnapshot",
+        lua.create_function(|lua, (pred, auth, alpha): (LuaTable, LuaTable, f32)| {
+            let predicted = crate::network::net_sync::EntitySnapshot {
+                id: pred.get("id")?,
+                tick: pred.get("tick")?,
+                x: pred.get("x")?,
+                y: pred.get("y")?,
+                vx: pred.get("vx")?,
+                vy: pred.get("vy")?,
+            };
+            let authoritative = crate::network::net_sync::EntitySnapshot {
+                id: auth.get("id")?,
+                tick: auth.get("tick")?,
+                x: auth.get("x")?,
+                y: auth.get("y")?,
+                vx: auth.get("vx")?,
+                vy: auth.get("vy")?,
+            };
+            let out = crate::network::net_sync::reconcile(&predicted, &authoritative, alpha);
+            let t = lua.create_table()?;
+            t.set("id", out.id)?;
+            t.set("tick", out.tick)?;
+            t.set("x", out.x)?;
+            t.set("y", out.y)?;
+            t.set("vx", out.vx)?;
+            t.set("vy", out.vy)?;
+            Ok(t)
+        })?,
     )?;
 
     lurek.set("network", tbl)?;

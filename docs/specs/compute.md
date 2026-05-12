@@ -98,6 +98,8 @@ The `compute` module is Lurek2D's dense N-dimensional numerical array library fo
 - `linsolve` (`linalg.rs`): Solve the linear system A·x = b using Gaussian elimination with partial pivoting.
 - `lu_decompose` (`linalg.rs`): Decomposes a square matrix `a` into P·A = L·U using partial pivoting.
 - `eigenvalue_power` (`linalg.rs`): Computes the dominant eigenvalue and its eigenvector of a square matrix using the power-iteration method.
+- `get_par_threshold` (`ops.rs`): Returns the current parallelization threshold for element-wise and reduction operations (default 10,000).
+- `set_par_threshold` (`ops.rs`): Sets the parallelization threshold for element-wise and reduction operations, returning the previous value.
 - `add` (`ops.rs`): Element-wise addition of two arrays (same shape and dtype).
 - `add_scalar` (`ops.rs`): Add a scalar to every element.
 - `sub` (`ops.rs`): Element-wise subtraction of two arrays (same shape and dtype).
@@ -174,6 +176,8 @@ The `compute` module is Lurek2D's dense N-dimensional numerical array library fo
 - `lurek.compute.fft`: Computes the discrete Fourier transform of a 1D real-valued sample array.
 - `lurek.compute.ifft`: Computes the inverse discrete Fourier transform.
 - `lurek.compute.fftMagnitude`: Returns the magnitude spectrum `|X[k]|` of a real-valued sample array.
+- `lurek.compute.getParThreshold`: Returns the current parallelization threshold for element-wise and reduction operations.
+- `lurek.compute.setParThreshold`: Sets the parallelization threshold and returns the previous value.
 
 ### `LArray` Methods
 - `LArray:getShape`: Returns the shape as a table of dimension sizes.

@@ -4,7 +4,8 @@
 //! cryptographic hashing (MD5/SHA family), encoding (base64/hex),
 //! binary pack/unpack (`pack` module), and a windowed byte-buffer view (`dataview` module).
 //!
-//! Text format parsing (JSON, TOML, CSV) is the responsibility of the `serial` module — see `lurek.serial`.
+//! Note: Text format parsing (JSON, TOML, CSV) and MessagePack serialization
+//! are the responsibility of the `serial` module — see `lurek.serial`.
 
 /// Lurek2D Binary Pack Format — space-separated type-token serialization.
 pub mod bin_pack;
@@ -20,14 +21,10 @@ pub mod dataview;
 pub mod encode;
 /// Cryptographic hash functions (MD5, SHA-1, SHA-256, SHA-512).
 pub mod hash;
-/// MessagePack binary serialization and deserialization.
-pub mod msgpack;
 /// Binary pack/unpack utilities compatible with the LÖVE2D `data.pack` API.
 pub mod pack;
 /// Fixed-capacity circular ring buffer for any `Clone` element type.
 pub mod ring_buffer;
-/// TOML value parsing and encoding utilities.
-pub mod toml_convert;
 pub use bin_pack::{
     measure_size as bin_measure_size, read as bin_read, write as bin_write, BinValue,
 };

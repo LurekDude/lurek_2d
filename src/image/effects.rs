@@ -12,6 +12,7 @@
 //! Effects that work in-place take `&mut self`; effects that produce a new image take `&self`
 //! and return a new `ImageData`.  Apply effects after loading an image and before uploading
 //! to the GPU via `lurek.image.*`.
+//! Shader/post-process chains belong to `effect/image_effect.rs`; this file owns CPU pixel edits.
 //!
 //! ## Parallelism
 //!
@@ -716,6 +717,163 @@ impl ImageData {
                 self.pixels[di + 3] = (out_a * 255.0).round().clamp(0.0, 255.0) as u8;
             }
         }
+    }
+
+    /// Draw a nine-slice patch from `src` into this image using atlas-style insets.
+    ///
+    /// `src_(x,y,w,h)` defines the source region in the atlas image. Insets split that
+    /// region into 9 patches (corners, edges, center). Corners keep fixed size, edges
+    /// stretch in one axis, center stretches in both axes.
+    ///
+    /// Returns `Err` when source bounds are invalid, destination size is zero, or
+    /// insets exceed source region size.
+    #[allow(clippy::too_many_arguments)]
+    pub fn draw_nine_slice(
+        &mut self,
+        src: &ImageData,
+        src_x: u32,
+        src_y: u32,
+        src_w: u32,
+        src_h: u32,
+        dst_x: i32,
+        dst_y: i32,
+        dst_w: u32,
+        dst_h: u32,
+        inset_left: u32,
+        inset_right: u32,
+        inset_top: u32,
+        inset_bottom: u32,
+    ) -> Result<(), String> {
+        if dst_w == 0 || dst_h == 0 {
+            return Err("draw_nine_slice: destination width/height must be > 0".into());
+        }
+        if src_w == 0 || src_h == 0 {
+            return Err("draw_nine_slice: source width/height must be > 0".into());
+        }
+        if src_x + src_w > src.width || src_y + src_h > src.height {
+            return Err("draw_nine_slice: source rect out of bounds".into());
+        }
+        if inset_left + inset_right > src_w || inset_top + inset_bottom > src_h {
+            return Err("draw_nine_slice: insets exceed source region size".into());
+        }
+
+        let src_center_w = src_w.saturating_sub(inset_left + inset_right);
+        let src_center_h = src_h.saturating_sub(inset_top + inset_bottom);
+        let dst_center_w = dst_w.saturating_sub(inset_left + inset_right);
+        let dst_center_h = dst_h.saturating_sub(inset_top + inset_bottom);
+
+        let draw_patch = |dst: &mut ImageData,
+                          sx: u32,
+                          sy: u32,
+                          sw: u32,
+                          sh: u32,
+                          dx: i32,
+                          dy: i32,
+                          dw: u32,
+                          dh: u32|
+         -> Result<(), String> {
+            if sw == 0 || sh == 0 || dw == 0 || dh == 0 {
+                return Ok(());
+            }
+            let patch = src
+                .get_region(sx, sy, sw, sh)
+                .ok_or_else(|| "draw_nine_slice: failed to extract source patch".to_string())?;
+            let patch = if sw == dw && sh == dh {
+                patch
+            } else {
+                patch.resize_nearest(dw, dh)
+            };
+            dst.blit(&patch, dx, dy);
+            Ok(())
+        };
+
+        let s_left = inset_left;
+        let s_right = inset_right;
+        let s_top = inset_top;
+        let s_bottom = inset_bottom;
+
+        let s_mid_x = src_x + s_left;
+        let s_mid_y = src_y + s_top;
+        let s_right_x = src_x + src_w - s_right;
+        let s_bottom_y = src_y + src_h - s_bottom;
+
+        let d_mid_x = dst_x + s_left as i32;
+        let d_mid_y = dst_y + s_top as i32;
+        let d_right_x = dst_x + (s_left + dst_center_w) as i32;
+        let d_bottom_y = dst_y + (s_top + dst_center_h) as i32;
+
+        draw_patch(
+            self, src_x, src_y, s_left, s_top, dst_x, dst_y, s_left, s_top,
+        )?;
+        draw_patch(
+            self,
+            s_mid_x,
+            src_y,
+            src_center_w,
+            s_top,
+            d_mid_x,
+            dst_y,
+            dst_center_w,
+            s_top,
+        )?;
+        draw_patch(
+            self, s_right_x, src_y, s_right, s_top, d_right_x, dst_y, s_right, s_top,
+        )?;
+
+        draw_patch(
+            self,
+            src_x,
+            s_mid_y,
+            s_left,
+            src_center_h,
+            dst_x,
+            d_mid_y,
+            s_left,
+            dst_center_h,
+        )?;
+        draw_patch(
+            self,
+            s_mid_x,
+            s_mid_y,
+            src_center_w,
+            src_center_h,
+            d_mid_x,
+            d_mid_y,
+            dst_center_w,
+            dst_center_h,
+        )?;
+        draw_patch(
+            self,
+            s_right_x,
+            s_mid_y,
+            s_right,
+            src_center_h,
+            d_right_x,
+            d_mid_y,
+            s_right,
+            dst_center_h,
+        )?;
+
+        draw_patch(
+            self, src_x, s_bottom_y, s_left, s_bottom, dst_x, d_bottom_y, s_left, s_bottom,
+        )?;
+        draw_patch(
+            self,
+            s_mid_x,
+            s_bottom_y,
+            src_center_w,
+            s_bottom,
+            d_mid_x,
+            d_bottom_y,
+            dst_center_w,
+            s_bottom,
+        )?;
+        draw_patch(
+            self, s_right_x, s_bottom_y, s_right, s_bottom, d_right_x, d_bottom_y, s_right,
+            s_bottom,
+        )?;
+
+        Ok(())
     }
 
     /// Extract a rectangular sub-region and return it as a new `ImageData`.

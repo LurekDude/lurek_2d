@@ -71,6 +71,27 @@ impl ImageData {
         })
     }
 
+    /// Load an image from encoded bytes (e.g. PNG/JPEG payload) already read via VFS.
+    ///
+    /// # Parameters
+    /// - `bytes` — Encoded image bytes.
+    /// - `label` — Human-readable source label for error messages.
+    ///
+    /// # Returns
+    /// `Result<Self, String>`.
+    pub fn from_encoded_bytes(bytes: &[u8], label: &str) -> Result<Self, String> {
+        let img = ::image::load_from_memory(bytes)
+            .map_err(|e| format!("Failed to decode image '{}': {}", label, e))?;
+        let rgba = img.to_rgba8();
+        let (w, h) = rgba.dimensions();
+        log_msg!(debug, IM01_IMAGE_LOADED, "{}x{}", w, h);
+        Ok(Self {
+            width: w,
+            height: h,
+            pixels: rgba.into_raw(),
+        })
+    }
+
     /// Create from raw RGBA bytes. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Parameters

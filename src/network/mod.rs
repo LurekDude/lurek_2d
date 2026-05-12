@@ -45,6 +45,12 @@ pub mod http;
 /// Binary message serialization via MessagePack.
 pub mod message;
 
+/// Entity sync and prediction helpers.
+pub mod net_sync;
+
+/// Relay/NAT-punch helper payloads.
+pub mod relay;
+
 /// Dedicated network I/O thread with mpsc bridge to the main engine thread.
 pub mod net_thread;
 

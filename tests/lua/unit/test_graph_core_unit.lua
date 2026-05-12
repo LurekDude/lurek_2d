@@ -1255,6 +1255,23 @@ describe("Algorithms", function()
         expect_not_nil(sorted)
         expect_equal(0, #sorted)
     end)
+
+    -- @covers LGraph:addEdge
+    -- @covers LGraph:addNode
+    -- @covers LGraph:subgraph
+    -- @covers lurek.graph.newGraph
+    it("subgraph returns induced graph over selected nodes", function()
+        local g = lurek.graph.newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        local c = g:addNode("c")
+        g:addEdge(a, b)
+        g:addEdge(b, c)
+
+        local s = g:subgraph({ a, b })
+        expect_equal(2, s:getNodeCount())
+        expect_equal(1, s:getEdgeCount())
+    end)
 end)
 
 -- =========================================================================

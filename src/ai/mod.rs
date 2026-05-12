@@ -93,6 +93,9 @@ pub mod context_steering;
 /// AI Director: tension-driven dynamic pacing controller with phase state
 /// machine (BuildUp/Peak/Sustain/Relief) and spawn/loot factor outputs.
 pub mod director;
+/// Dialogue AI: topic/branch selector driven by FSM state, BT status,
+/// and utility-action scores.
+pub mod dialogue;
 /// Emotion model: named affective dimensions (anger, fear, joy) that rise on
 /// triggers and decay toward resting levels over time.
 pub mod emotion;
@@ -145,6 +148,7 @@ pub use world::AIWorld;
 pub use bandit::{Bandit, BanditArm, BanditStrategy};
 pub use context_steering::{ContextBehavior, ContextBehaviorKind, ContextSteering};
 pub use director::{AIDirector, DirectorConfig, DirectorPhase};
+pub use dialogue::{DialogueAI, DialogueBranch, DialogueTopic};
 pub use emotion::{Emotion, EmotionModel};
 pub use genetic::{Chromosome, GeneticAlgorithm};
 pub use htn::{HTNDomain, HTNMethod, HTNPlanner, HTNTask, WorldState};

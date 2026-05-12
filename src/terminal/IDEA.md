@@ -1,4 +1,4 @@
-# IDEA — src/terminal
+﻿# IDEA — src/terminal
 
 ## Niezrobione TODO/WIP
 
@@ -7,6 +7,6 @@
 - TODO(FEAT): hover/highlight interakcje myszy na poziomie komórek.
 - TODO(PERF): ograniczyć klonowanie bufora siatki przy kompozycji widgetów.
 - TODO(TEST): rozszerzyć testy widgetów terminalowych (np. złożone scenariusze focus/children).
-- TODO(dedup): wydzielić wspólne helpery zapisu komórek (`set_render_cell`/`clear_render_rect`/`write_render_text`).
-- TODO(helper): przenieść generyczne helpery tekstowe do współdzielonego `text_utils`.
+- DONE(dedup): wydzielić wspólne helpery zapisu komórek (\set_render_cell\/\clear_render_rect\/\write_render_text\).
+- TODO(helper): przenieść generyczne helpery tekstowe do współdzielonego \	ext_utils\.
 - TODO(plugin): ocenić ekstrakcję modułu jako feature/plugin dla gier bez terminala.

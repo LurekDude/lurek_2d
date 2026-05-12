@@ -59,6 +59,24 @@ do -- lurek.compute.fromTable
   lurek.log.info("wave peak: " .. peak, "compute")
 end
 
+--@api-stub: lurek.compute.getParThreshold
+-- Returns the current minimum element count used to switch to parallel execution.
+-- Use to inspect tuning before benchmarking compute-heavy workloads.
+do -- lurek.compute.getParThreshold
+  local threshold = lurek.compute.getParThreshold()
+  lurek.log.info("compute parallel threshold=" .. threshold, "compute")
+end
+
+--@api-stub: lurek.compute.setParThreshold
+-- Sets the minimum element count used to switch to parallel execution.
+-- Lower values can improve throughput on large batches but may add overhead for tiny arrays.
+do -- lurek.compute.setParThreshold
+  local previous = lurek.compute.getParThreshold()
+  lurek.compute.setParThreshold(1024)
+  local updated = lurek.compute.getParThreshold()
+  lurek.log.info("threshold " .. previous .. " -> " .. updated, "compute")
+end
+
 --@api-stub: lurek.compute.gaussianKernel
 -- Creates a sizeÄ‚â€”size Gaussian kernel array.
 -- Use as the kernel argument to convolve2D for blur passes; size must be odd, sigma controls falloff.

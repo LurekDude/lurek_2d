@@ -336,6 +336,18 @@ do -- ModManager:getLoadOrder
   end
 end
 
+--@api-stub: LModManager:getModsByCapability
+-- Returns an array of registered mods that declare a given capability flag.
+-- Useful for wiring optional services only when a mod advertises support.
+do -- ModManager:getModsByCapability
+  local mgr = lurek.mods.newModManager()
+  mgr:registerMod(lurek.mods.newMod({id = "fan.audio", capabilities = {"audio"}}))
+  mgr:registerMod(lurek.mods.newMod({id = "fan.ui", capabilities = {"ui"}}))
+  for _, info in ipairs(mgr:getModsByCapability("audio")) do
+    lurek.log.info("audio-capable: " .. info.id, "mods")
+  end
+end
+
 --@api-stub: LModManager:validateDependencies
 -- Returns an array of mod IDs with missing dependencies.
 -- An empty result means the graph is satisfied; a non-empty list should be surfaced to the user before launching the game.
@@ -429,7 +441,15 @@ do -- ModManager:clearReloadQueue
   mgr:clearReloadQueue()
   lurek.log.debug("queue size=" .. #mgr:getReloadQueue(), "mods")
 end
-
+--@api-stub: LModManager:processReloadQueue
+-- Reloads every queued mod from disk and clears the queue.
+-- Use this after a file watcher or editor save event has marked one or more mods dirty.
+do -- ModManager:processReloadQueue
+  local mgr = lurek.mods.newModManager()
+  ---@diagnostic disable-next-line: undefined-field
+  local reloaded = mgr:processReloadQueue()
+  lurek.log.debug("reloaded count=" .. #reloaded, "mods")
+end
 -- â”€â”€ Content Registry â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 --@api-stub: lurek.mods.newRegistry

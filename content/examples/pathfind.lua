@@ -113,6 +113,85 @@ do -- lurek.pathfind.newJpsGrid
   lurek.log.info("jps path waypoints: " .. (path and #path or 0), "pathfind")
 end
 
+--@api-stub: lurek.pathfind.newNavMesh
+-- Creates a polygon navmesh for non-tile worlds.
+-- Use navmesh when geometry is free-form and grid quantization causes jitter.
+do -- lurek.pathfind.newNavMesh
+  local mesh = lurek.pathfind.newNavMesh()
+  local a = mesh:addPolygon({
+    {x = 0, y = 0},
+    {x = 100, y = 0},
+    {x = 100, y = 100},
+    {x = 0, y = 100},
+  })
+  local b = mesh:addPolygon({
+    {x = 100, y = 0},
+    {x = 200, y = 0},
+    {x = 200, y = 100},
+    {x = 100, y = 100},
+  })
+  mesh:connectPolygons(a, b, true)
+  local path = mesh:findPath(10, 10, 180, 70)
+  lurek.log.info("navmesh waypoints: " .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: LNavMesh:addPolygon
+-- Adds a polygon to navmesh and returns its 1-based id.
+do -- NavMesh:addPolygon
+  local mesh = lurek.pathfind.newNavMesh()
+  local id = mesh:addPolygon({
+    {x = 0, y = 0},
+    {x = 8, y = 0},
+    {x = 8, y = 8},
+    {x = 0, y = 8},
+  })
+  lurek.log.debug("navmesh polygon id=" .. id, "pathfind")
+end
+
+--@api-stub: LNavMesh:connectPolygons
+-- Connects two navmesh polygons by id.
+do -- NavMesh:connectPolygons
+  local mesh = lurek.pathfind.newNavMesh()
+  local a = mesh:addPolygon({{x=0,y=0},{x=5,y=0},{x=5,y=5},{x=0,y=5}})
+  local b = mesh:addPolygon({{x=5,y=0},{x=10,y=0},{x=10,y=5},{x=5,y=5}})
+  mesh:connectPolygons(a, b, true)
+end
+
+--@api-stub: LNavMesh:findPath
+-- Finds a world-space waypoint path in navmesh.
+do -- NavMesh:findPath
+  local mesh = lurek.pathfind.newNavMesh()
+  local a = mesh:addPolygon({{x=0,y=0},{x=5,y=0},{x=5,y=5},{x=0,y=5}})
+  local b = mesh:addPolygon({{x=5,y=0},{x=10,y=0},{x=10,y=5},{x=5,y=5}})
+  mesh:connectPolygons(a, b, true)
+  local path = mesh:findPath(1, 1, 9, 4)
+  lurek.log.debug("navmesh path points=" .. (path and #path or 0), "pathfind")
+end
+
+--@api-stub: LNavMesh:getPolygonCount
+-- Returns number of polygons in navmesh.
+do -- NavMesh:getPolygonCount
+  local mesh = lurek.pathfind.newNavMesh()
+  mesh:addPolygon({{x=0,y=0},{x=4,y=0},{x=4,y=4},{x=0,y=4}})
+  local n = mesh:getPolygonCount()
+  lurek.log.debug("navmesh polygon count=" .. n, "pathfind")
+end
+
+--@api-stub: LNavMesh:type
+-- Returns userdata type string.
+do -- NavMesh:type
+  local mesh = lurek.pathfind.newNavMesh()
+  lurek.log.debug("navmesh type=" .. mesh:type(), "pathfind")
+end
+
+--@api-stub: LNavMesh:typeOf
+-- Checks userdata type identity.
+do -- NavMesh:typeOf
+  local mesh = lurek.pathfind.newNavMesh()
+  local ok = mesh:typeOf("LNavMesh")
+  lurek.log.debug("is LNavMesh=" .. tostring(ok), "pathfind")
+end
+
 --@api-stub: lurek.pathfind.rangeMap
 -- Computes a Dijkstra range-of-movement map from an origin within a movement budget.
 -- One-shot Dijkstra range query â€” useful for tactics-style 'show movement squares' overlays.

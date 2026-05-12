@@ -4,6 +4,7 @@
 //! frame budget, memory usage, host platform, and total uptime.
 
 use super::SharedState;
+use crate::app::frame_profile::format_frame_profile_line;
 use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -144,6 +145,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, ()| {
             let profile = s.borrow().frame_profile;
             let out = lua.create_table()?;
+            out.set("app_tick_ms", profile.app_tick_ms)?;
+            out.set("app_update_ms", profile.app_update_ms)?;
+            out.set("app_render_ms", profile.app_render_ms)?;
+            out.set("app_frame_total_ms", profile.app_frame_total_ms)?;
             out.set("process_physics_ms", profile.process_physics_ms)?;
             out.set("fixed_update_ms", profile.fixed_update_ms)?;
             out.set("process_ms", profile.process_ms)?;
@@ -152,6 +157,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             out.set("draw_ui_ms", profile.draw_ui_ms)?;
             out.set("callback_total_ms", profile.callback_total_ms)?;
             Ok(out)
+        })?,
+    )?;
+
+    // -- getFrameProfileText --
+    /// Returns a compact one-line summary of the latest frame timings.
+    /// @return | string | Text summary including tick, update, render, and callback timing buckets.
+    let s = state.clone();
+    tbl.set(
+        "getFrameProfileText",
+        lua.create_function(move |_, ()| {
+            let profile = s.borrow().frame_profile;
+            Ok(format_frame_profile_line(&profile))
         })?,
     )?;
 

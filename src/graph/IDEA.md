@@ -1,7 +1,0 @@
-- TODO: Delete dead-code duplicates `graph.rs` and `traversal.rs` if `core.rs` and `pathfinding.rs` remain the canonical implementations.
-- TODO: Add a persistent adjacency index in `Graph` so pathfinding does not scan all edges on each expansion.
-- TODO: Add `Graph::subgraph(node_ids)` extraction for component-isolated simulation slices.
-- TODO: Add direct coverage for `update_parallel()`.
-- TODO: Add targeted tests for edge cooldown expiry edge cases.
-- TODO: Put the graph subsystem behind an optional feature gate if pluginization remains the intended boundary.
-- TODO: Feature-gate `rayon` with the graph subsystem so non-graph builds do not pay for `update_parallel()` support.

@@ -152,3 +152,22 @@ This module primarily collaborates with `math`. Its responsibility should stay i
 
 - Keep this module reference synchronized with `src/tween/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### Recent sync (1.0.9-fix.73)
+
+- Added relative tween mode:
+  - `LTween:setRelative(enabled)` and chain alias `LTween:relative(enabled)`.
+  - Relative mode interprets tween field values as deltas from captured start values.
+- Added runtime introspection for active tweens:
+  - `LTween:getElapsed`, `LTween:getDuration`, `LTween:getRemaining`, `LTween:getFields`.
+- Added coroutine completion waits:
+  - `LTween:await()` and `LTweenSequence:await()` resume suspended coroutine when object completes/cancels.
+  - `LTweenSequence:getProgress()` exposes step-completion ratio.
+- Added helper constructors:
+  - `lurek.tween.tweenChain(steps)` for declarative sequences.
+  - `lurek.tween.tweenColor(duration, target, color, easing?)` for RGBA animation.
+- Reliability update:
+  - explicit waiter cleanup/resume on tween and sequence cancel/complete paths.
+- Boundary clarification (`tween` vs `animation`):
+  - `tween` owns runtime numeric interpolation and per-frame easing.
+  - `animation` owns clip/timeline playback authoring semantics.

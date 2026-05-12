@@ -24,6 +24,44 @@ do -- lurek.particle.newSystem
   fire:start()
 end
 
+--@api-stub: lurek.particle.newPreset
+-- Creates a new particle system from a built-in preset.
+do -- lurek.particle.newPreset
+  local smoke = lurek.particle.newPreset("smoke")
+  smoke:setPosition(300, 260)
+  smoke:start()
+end
+
+--@api-stub: LParticleSystem:setCollidesWithPhysics
+-- Enables particle collision response against a physics world.
+do -- ParticleSystem:setCollidesWithPhysics
+  local world = lurek.physics.newWorld(0, 9.81)
+  local rain = lurek.particle.newPreset("rain")
+  rain:setCollidesWithPhysics(world, 1.0, 0.4)
+  if rain:hasCollidesWithPhysics() then
+    rain:clearCollidesWithPhysics()
+  end
+end
+
+--@api-stub: LParticleSystem:hasCollidesWithPhysics
+-- Returns true if particle-vs-physics collision response is enabled.
+do -- ParticleSystem:hasCollidesWithPhysics
+  local world = lurek.physics.newWorld(0, 9.81)
+  local ps = lurek.particle.newSystem({ maxParticles = 64 })
+  ps:setCollidesWithPhysics(world)
+  local enabled = ps:hasCollidesWithPhysics()
+  lurek.log.debug("physics collision enabled=" .. tostring(enabled), "particle")
+end
+
+--@api-stub: LParticleSystem:clearCollidesWithPhysics
+-- Disables particle-vs-physics collision response.
+do -- ParticleSystem:clearCollidesWithPhysics
+  local world = lurek.physics.newWorld(0, 9.81)
+  local ps = lurek.particle.newSystem({ maxParticles = 64 })
+  ps:setCollidesWithPhysics(world)
+  ps:clearCollidesWithPhysics()
+end
+
 --@api-stub: lurek.particle.newTrail
 -- Creates a new trail ribbon effect.
 -- Create one trail per moving entity at startup; pass (lifetime_seconds, start_width_pixels).

@@ -336,4 +336,18 @@ This module primarily collaborates with `graph`, `image`, `render`, `runtime`. I
 ## Notes
 
 - Keep this module reference synchronized with `src/pathfind/` and any matching Lua bindings.
+
+## 2026-05 Backlog Closure
+
+- Added polygon NavMesh support for non-tile worlds in `src/pathfind/navmesh.rs`.
+- Added module export: `pathfind::NavMesh`.
+- Added Lua API constructor and userdata surface:
+	- `lurek.pathfind.newNavMesh()`
+	- `LNavMesh:addPolygon(vertices)`
+	- `LNavMesh:connectPolygons(a, b, bidirectional?)`
+	- `LNavMesh:findPath(start_x, start_y, goal_x, goal_y)`
+	- `LNavMesh:getPolygonCount()`
+- Added tests:
+	- Rust unit tests for navmesh polygon validation and connected-path retrieval.
+	- Lua unit tests for navmesh construction and path request flow.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.

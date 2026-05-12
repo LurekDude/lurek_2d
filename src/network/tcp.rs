@@ -28,6 +28,8 @@ use super::net_thread::{NetworkResponse, TcpEvent};
 pub struct TcpConnectionManager {
     /// Active TCP connections indexed by their unique ID.
     connections: HashMap<u64, TcpStream>,
+    /// Round-robin cursor for fair polling order.
+    poll_cursor: usize,
 }
 
 impl TcpConnectionManager {
@@ -38,6 +40,7 @@ impl TcpConnectionManager {
     pub fn new() -> Self {
         Self {
             connections: HashMap::new(),
+            poll_cursor: 0,
         }
     }
 
@@ -187,8 +190,19 @@ impl TcpConnectionManager {
     /// - `resp_tx` — Channel for sending events to the main thread.
     pub fn poll_all(&mut self, resp_tx: &mpsc::Sender<NetworkResponse>) {
         let mut to_remove = Vec::new();
+        let mut ids: Vec<u64> = self.connections.keys().copied().collect();
+        if ids.is_empty() {
+            return;
+        }
+        ids.sort_unstable();
+        let start = self.poll_cursor % ids.len();
+        ids.rotate_left(start);
+        self.poll_cursor = (self.poll_cursor + 1) % ids.len().max(1);
 
-        for (&id, stream) in self.connections.iter_mut() {
+        for id in ids {
+            let Some(stream) = self.connections.get_mut(&id) else {
+                continue;
+            };
             let mut buf = [0u8; super::constants::TCP_BUFFER_SIZE];
             match stream.read(&mut buf) {
                 Ok(0) => {

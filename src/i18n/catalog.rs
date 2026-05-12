@@ -441,10 +441,7 @@ pub fn is_valid_locale_code(code: &str) -> bool {
         return false;
     };
     // Language subtag: 2–8 ASCII letters.
-    if lang.len() < 2
-        || lang.len() > 8
-        || !lang.chars().all(|c| c.is_ascii_alphabetic())
-    {
+    if lang.len() < 2 || lang.len() > 8 || !lang.chars().all(|c| c.is_ascii_alphabetic()) {
         return false;
     }
     // Optional subtags: 1–8 ASCII alphanumeric characters each.
@@ -535,8 +532,8 @@ pub fn flat_table_from_toml(input: &str) -> Result<HashMap<String, String>, Stri
 /// # Returns
 /// `Result<HashMap<String, String>, String>`.
 pub fn flat_table_from_json(input: &str) -> Result<HashMap<String, String>, String> {
-    let value: serde_json::Value = serde_json::from_str(input)
-        .map_err(|e| format!("JSON parse error: {e}"))?;
+    let value: serde_json::Value =
+        serde_json::from_str(input).map_err(|e| format!("JSON parse error: {e}"))?;
     let mut out = HashMap::new();
     flatten_json_value(&value, "", &mut out);
     Ok(out)

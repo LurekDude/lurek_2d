@@ -38,7 +38,12 @@ static CATALOG: OnceLock<MessageCatalog> = OnceLock::new();
 /// - `entries` — See field documentation.
 pub struct MessageCatalog {
     /// Flattened ID → text map built from the TOML catalog.
-    messages: HashMap<String, String>,
+    ///
+    /// Values are `&'static str` obtained by leaking `Box<str>` allocations
+    /// during `from_toml`.  The catalog is stored in a `static OnceLock` so
+    /// these allocations live for the entire process lifetime, making the
+    /// intentional leak safe and avoiding any `unsafe` lifetime extension.
+    messages: HashMap<String, &'static str>,
 }
 
 impl MessageCatalog {
@@ -75,7 +80,7 @@ impl MessageCatalog {
     /// # Returns
     /// `Option<&str>`.
     pub fn get(&self, id: &str) -> Option<&str> {
-        self.messages.get(id).map(|s| s.as_str())
+        self.messages.get(id).copied()
     }
 
     /// Number of registered message entries.
@@ -120,13 +125,7 @@ pub fn init() {
 pub fn get_message(id: &'static str) -> &'static str {
     CATALOG
         .get()
-        .and_then(|c| {
-            c.messages
-                .get(id)
-                // SAFETY: `c` is `&'static MessageCatalog`; the `String` values it
-                // contains therefore also live for `'static`.
-                .map(|s: &String| unsafe { &*(s.as_str() as *const str) })
-        })
+        .and_then(|c| c.messages.get(id).copied())
         .unwrap_or(id)
 }
 
@@ -184,12 +183,16 @@ pub fn catalog() -> Option<&'static MessageCatalog> {
 
 /// Recursively walk a [`toml::Value`] tree and insert every leaf `String`
 /// entry into `out`, keyed by its own table key (not the full dotted path).
-fn collect_strings(val: &toml::Value, out: &mut HashMap<String, String>) {
+fn collect_strings(val: &toml::Value, out: &mut HashMap<String, &'static str>) {
     if let toml::Value::Table(table) = val {
         for (key, child) in table {
             match child {
                 toml::Value::String(s) => {
-                    out.insert(key.clone(), s.clone());
+                    // Leak the boxed string so it lives for `'static`.  The catalog is stored in
+                    // a `static OnceLock` and is never dropped, so these allocations are bounded
+                    // by the number of catalog entries (≈100) and intentionally permanent.
+                    let static_str: &'static str = Box::leak(s.clone().into_boxed_str());
+                    out.insert(key.clone(), static_str);
                 }
                 toml::Value::Table(_) => {
                     collect_strings(child, out);

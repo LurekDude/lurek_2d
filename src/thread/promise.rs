@@ -104,6 +104,16 @@ impl Promise {
             *self.state.lock().unwrap() = PromiseState::Error(err);
             return true;
         }
+        // Give the spawned worker a chance to run in busy polling loops.
+        std::thread::yield_now();
+        if self.result_channel.get_count() > 0 {
+            *self.state.lock().unwrap() = PromiseState::Done;
+            return true;
+        }
+        if let Some(err) = self.worker.lock().unwrap().get_error() {
+            *self.state.lock().unwrap() = PromiseState::Error(err);
+            return true;
+        }
         false
     }
 

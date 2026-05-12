@@ -559,28 +559,36 @@ impl Scheduler {
         let scaled_dt = dt * self.time_scale;
         let mut fired = Vec::new();
 
-        for event in &mut self.events {
-            if event.paused {
-                continue;
-            }
-            event.remaining -= scaled_dt;
-            while event.remaining <= 0.0 {
-                fired.push(event.id);
-                if event.one_shot {
-                    event.count = 0;
-                    break;
-                } else if event.count > 0 {
-                    event.count -= 1;
-                    if event.count == 0 {
-                        break;
+        let mut idx = 0;
+        while idx < self.events.len() {
+            let remove;
+            {
+                let event = &mut self.events[idx];
+                if !event.paused {
+                    event.remaining -= scaled_dt;
+                    while event.remaining <= 0.0 {
+                        fired.push(event.id);
+                        if event.one_shot {
+                            event.count = 0;
+                            break;
+                        } else if event.count > 0 {
+                            event.count -= 1;
+                            if event.count == 0 {
+                                break;
+                            }
+                        }
+                        event.remaining += event.interval;
                     }
                 }
-                event.remaining += event.interval;
+                remove = event.count == 0;
+            }
+
+            if remove {
+                self.events.swap_remove(idx);
+            } else {
+                idx += 1;
             }
         }
-
-        // Remove expired events
-        self.events.retain(|e| e.count != 0);
 
         fired
     }
@@ -596,32 +604,38 @@ impl Scheduler {
     pub fn update_frames(&mut self) -> Vec<u32> {
         let mut fired = Vec::new();
 
-        for event in &mut self.frame_events {
-            if event.paused {
-                continue;
-            }
-            if event.remaining_frames > 0 {
-                event.remaining_frames -= 1;
-            }
-            if event.remaining_frames == 0 {
-                fired.push(event.id);
-                if event.one_shot {
-                    event.count = 0;
-                } else if event.count > 0 {
-                    event.count -= 1;
-                    if event.count > 0 {
-                        event.remaining_frames = event.interval_frames;
-                    } else {
-                        // count reached 0, will be cleaned up
+        let mut idx = 0;
+        while idx < self.frame_events.len() {
+            let remove;
+            {
+                let event = &mut self.frame_events[idx];
+                if !event.paused {
+                    if event.remaining_frames > 0 {
+                        event.remaining_frames -= 1;
                     }
-                } else {
-                    // count == -1 (infinite)
-                    event.remaining_frames = event.interval_frames;
+                    if event.remaining_frames == 0 {
+                        fired.push(event.id);
+                        if event.one_shot {
+                            event.count = 0;
+                        } else if event.count > 0 {
+                            event.count -= 1;
+                            if event.count > 0 {
+                                event.remaining_frames = event.interval_frames;
+                            }
+                        } else {
+                            event.remaining_frames = event.interval_frames;
+                        }
+                    }
                 }
+                remove = event.count == 0;
+            }
+
+            if remove {
+                self.frame_events.swap_remove(idx);
+            } else {
+                idx += 1;
             }
         }
-
-        self.frame_events.retain(|e| e.count != 0);
 
         fired
     }

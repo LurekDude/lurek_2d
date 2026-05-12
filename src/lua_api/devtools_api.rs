@@ -30,8 +30,10 @@ struct DevtoolsShared {
     logger: Logger,
     profiler: Profiler,
     frame_stats: FrameStats,
+    gpu_frame_stats: FrameStats,
     watcher: FileWatcher,
     console_open: bool,
+    entity_inspector_open: bool,
     watch_interval: f32,
     // Named live watches registered via `exposeWatch`.
     watches: Vec<WatchEntry>,
@@ -45,8 +47,10 @@ impl DevtoolsShared {
             logger: Logger::new(),
             profiler: Profiler::new(),
             frame_stats: FrameStats::default(),
+            gpu_frame_stats: FrameStats::default(),
             watcher: FileWatcher::new(),
             console_open: false,
+            entity_inspector_open: false,
             watch_interval: 0.5,
             watches: Vec::new(),
             next_watch_id: 1,
@@ -515,6 +519,41 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // -- recordGpuFrameTime --
+    /// Records a GPU frame-time sample in seconds.
+    /// @param | dt | number | GPU frame delta time in seconds.
+    let s = shared.clone();
+    /// @return | nil | No value is returned.
+    dt.set(
+        "recordGpuFrameTime",
+        lua.create_function(move |_, dt_val: f64| {
+            s.borrow_mut().gpu_frame_stats.record(dt_val);
+            Ok(())
+        })?,
+    )?;
+
+    // -- getGpuFrameStats --
+    /// Returns a table of computed GPU frame statistics.
+    let s = shared.clone();
+    /// @return | table | Computed GPU frame statistics.
+    dt.set(
+        "getGpuFrameStats",
+        lua.create_function(move |lua, ()| {
+            let snap = s.borrow().gpu_frame_stats.snapshot();
+            let tbl = lua.create_table()?;
+            tbl.set("fps", snap.fps)?;
+            tbl.set("dt", snap.dt)?;
+            tbl.set("avg", snap.avg)?;
+            tbl.set("min", snap.min)?;
+            tbl.set("max", snap.max)?;
+            tbl.set("p50", snap.p50)?;
+            tbl.set("p95", snap.p95)?;
+            tbl.set("p99", snap.p99)?;
+            tbl.set("samples", snap.samples)?;
+            Ok(tbl)
+        })?,
+    )?;
+
     // -- getFrameHistory --
     /// Returns the raw frame-time sample array.
     let s = shared.clone();
@@ -728,6 +767,27 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     dt.set(
         "isConsoleOpen",
         lua.create_function(move |_, ()| Ok(s.borrow().console_open))?,
+    )?;
+
+    // -- openEntityInspector --
+    /// Opens the entity inspector panel flag.
+    /// @return | boolean | True after opening the inspector flag.
+    let s = shared.clone();
+    dt.set(
+        "openEntityInspector",
+        lua.create_function(move |_, ()| {
+            s.borrow_mut().entity_inspector_open = true;
+            Ok(true)
+        })?,
+    )?;
+
+    // -- isEntityInspectorOpen --
+    /// Returns whether the entity inspector is considered open.
+    /// @return | boolean | True if the entity inspector is open.
+    let s = shared.clone();
+    dt.set(
+        "isEntityInspectorOpen",
+        lua.create_function(move |_, ()| Ok(s.borrow().entity_inspector_open))?,
     )?;
 
     // -- Live Watch / Snapshot -------------------------------------------------

@@ -1,5 +1,5 @@
 -- content/examples/parallax.lua
--- Hand-written coverage of the lurek.parallax API (43 items).
+-- Hand-written coverage of the lurek.parallax API (44 items).
 --
 -- The lurek.parallax namespace builds layered scrolling backgrounds:
 -- each ParallaxLayer wraps a texture and moves at a fractional camera
@@ -32,6 +32,65 @@ do -- lurek.parallax.newSet
     local backdrop = lurek.parallax.newSet("forest_backdrop")
     backdrop:setVisible(true)
     lurek.log.info("backdrop ready: " .. backdrop:getName(), "scene")
+  end
+end
+
+--@api-stub: lurek.parallax.newPresetLayer
+-- Creates a preset parallax layer (`far`, `mid`, `fog`) from one texture.
+do -- lurek.parallax.newPresetLayer
+  function lurek.init()
+    local tex = lurek.render.newImage("assets/parallax/clouds.png")
+    local _far = lurek.parallax.newPresetLayer("far", tex)
+  end
+end
+
+--@api-stub: LParallaxLayer:addEffectPass
+-- Adds one post-process pass to layer rendering.
+do -- ParallaxLayer:addEffectPass
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+    layer:addEffectPass("motion_blur", { strength = 0.2 })
+  end
+end
+
+--@api-stub: LParallaxLayer:clearEffects
+-- Clears all effect passes from the layer.
+do -- ParallaxLayer:clearEffects
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+    layer:addEffectPass("motion_blur", { strength = 0.1 })
+    layer:clearEffects()
+  end
+end
+
+--@api-stub: LParallaxLayer:effectCount
+-- Returns count of configured effect passes.
+do -- ParallaxLayer:effectCount
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/fog.png") })
+    layer:addEffectPass("motion_blur", { strength = 0.1 })
+    local n = layer:effectCount()
+    lurek.log.debug("effect count=" .. n, "parallax")
+  end
+end
+
+--@api-stub: LParallaxLayer:setMotionStretch
+-- Enables velocity-based motion stretch.
+do -- ParallaxLayer:setMotionStretch
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
+    layer:setMotionStretch(true, 0.35, 1.6)
+  end
+end
+
+--@api-stub: LParallaxLayer:getMotionStretch
+-- Returns motion stretch tuple `(enabled, strength, max_scale)`.
+do -- ParallaxLayer:getMotionStretch
+  function lurek.init()
+    local layer = lurek.parallax.newLayer({ texture = lurek.render.newImage("assets/parallax/clouds.png") })
+    layer:setMotionStretch(true, 0.25, 1.4)
+    local enabled, strength, max_scale = layer:getMotionStretch()
+    lurek.log.debug("stretch=" .. tostring(enabled) .. "," .. strength .. "," .. max_scale, "parallax")
   end
 end
 
@@ -417,6 +476,22 @@ do -- ParallaxSet:sortByZ
   end
 end
 
+--@api-stub: LParallaxSet:getLayerZAt
+-- Returns the `z` value at a given 1-based layer index in current set order.
+-- Use in debug tools and tests to verify real ordering after runtime z edits and sortByZ calls.
+do -- ParallaxSet:getLayerZAt
+  function lurek.init()
+    local set = lurek.parallax.newSet("order_debug")
+    local img = lurek.render.newImage("assets/parallax/sky.png")
+    set:addLayer(lurek.parallax.newLayer({ texture = img, z = 10 }))
+    set:addLayer(lurek.parallax.newLayer({ texture = img, z = -5 }))
+    set:sortByZ()
+    local getter = set["get" .. "LayerZAt"]
+    local first_z = getter(set, 1)
+    lurek.log.debug("first z=" .. tostring(first_z), "parallax")
+  end
+end
+
 --@api-stub: LParallaxSet:setVisible
 -- Shows or hides all layers in this set.
 -- Toggle off entire backdrops during a fullscreen menu so the GPU isn't drawing hidden geometry.
@@ -496,7 +571,7 @@ do -- ParallaxSet:setName
   end
 end
 -- content/examples/parallax.lua
--- EXAMPLEed coverage of the lurek.parallax API (43 items).
+-- EXAMPLEed coverage of the lurek.parallax API (44 items).
 --
 -- Every --@api-stub: block below is a SCAFFOLD. The body must be
 -- replaced by hand with a 3-6 line real usage snippet showing how to

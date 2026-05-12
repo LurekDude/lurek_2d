@@ -31,6 +31,18 @@ do -- lurek.thread.newChannel
   lurek.log.info("event=" .. msg.event, "thread") ---@diagnostic disable-line: undefined-field
 end
 
+--@api-stub: lurek.thread.newBoundedChannel
+-- Creates a bounded channel with backpressure.
+-- Use bounded channels to prevent unbounded queue growth between producer and consumer threads.
+do -- lurek.thread.newBoundedChannel
+  local new_bounded = lurek.thread["newBoundedChannel"]
+  local ch = new_bounded(2)
+  ch:tryPush("a")
+  ch:tryPush("b")
+  local pushed = ch:tryPush("c")
+  lurek.log.info("bounded push accepted=" .. tostring(pushed), "thread")
+end
+
 --@api-stub: lurek.thread.getChannel
 -- Gets or creates a named global channel shared across threads.
 -- Same name returns the same channel anywhere; this is how a worker VM finds the main thread's queue.
@@ -62,6 +74,23 @@ do -- lurek.thread.async
     lurek.thread.getChannel("__promise_result"):push(total)
   ]])
   lurek.log.info("checksum job dispatched", "thread")
+
+  -- Function form: async(fn, ...)
+  local async_any = lurek.thread["async"] --[[@as any]]
+  local promise_fn = async_any(function(a, b)
+    return (a or 0) + (b or 0)
+  end, 20, 22)
+  lurek.log.info("function async dispatched: " .. tostring(promise_fn:isDone()), "thread")
+end
+
+--@api-stub: lurek.thread.getWorkerCapabilities
+-- Returns the worker-safe API list available in worker VMs.
+-- Useful for debug UIs that explain why some lurek modules are unavailable in worker scripts.
+do -- lurek.thread.getWorkerCapabilities
+  local caps = lurek.thread["getWorkerCapabilities"]()
+  for i = 1, #caps do
+    lurek.log.debug("worker api: " .. caps[i], "thread")
+  end
 end
 
 -- â”€â”€ ThreadHandle methods â”€â”€
@@ -187,14 +216,16 @@ end
 
 --@api-stub: LThreadPool:join
 -- Blocks until all workers in the pool have finished execution.
--- Call only on shutdown â€” workers in busy loops never finish on their own; push a sentinel value first if needed.
+-- Optional timeout prevents lockups when a worker blocks forever.
 do -- ThreadPool:join
   local pool = lurek.thread.newPool(2, [[
     local n = lurek.thread.getChannel("__pool_input"):pop()
     if n then lurek.thread.getChannel("__pool_output"):push(n) end
   ]])
   pool:submit(1); pool:submit(2)
-  pool:join()
+  local join_any = pool["join"] --[[@as any]]
+  local done = join_any(pool, 0.25)
+  lurek.log.info("pool joined=" .. tostring(done), "thread")
 end
 
 --@api-stub: LThreadPool:getInputChannel
@@ -272,6 +303,19 @@ do -- Promise:getError
   end
 end
 
+--@api-stub: LPromise:chain
+-- Starts another promise after this one resolves; parent result becomes arg[1] in child worker.
+-- Use to compose multi-stage async pipelines without manually polling and re-submitting each stage.
+do -- Promise:chain
+  local p1 = lurek.thread.async([[lurek.thread.getChannel("__promise_result"):push(10)]])
+  function lurek.process(_)
+    if p1:isDone() then
+      local p2 = p1["chain"](p1, [[lurek.thread.getChannel("__promise_result"):push((arg[1] or 0) + 5)]])
+      lurek.log.info("chained promise active=" .. tostring(not p2:isDone()), "thread")
+    end
+  end
+end
+
 -- â”€â”€ Channel methods â”€â”€
 
 --@api-stub: LChannel:type
@@ -344,6 +388,30 @@ do -- Channel:getCount
   if jobs:getCount() < 64 then
     jobs:push({ task = "stream_chunk" })
   end
+end
+
+--@api-stub: LChannel:getCapacity
+-- Returns bounded capacity or nil for unbounded channels.
+do -- Channel:getCapacity
+  local bounded = lurek.thread["newBoundedChannel"](4)
+  lurek.log.debug("capacity=" .. tostring(bounded["getCapacity"](bounded)), "thread")
+end
+
+--@api-stub: LChannel:isBounded
+-- Returns whether this channel has bounded capacity.
+do -- Channel:isBounded
+  local a = lurek.thread.newChannel()
+  local b = lurek.thread["newBoundedChannel"](2)
+  lurek.log.debug("a bounded=" .. tostring(a["isBounded"](a)) .. " b bounded=" .. tostring(b["isBounded"](b)), "thread")
+end
+
+--@api-stub: LChannel:tryPush
+-- Attempts to push without blocking when a bounded channel is full.
+do -- Channel:tryPush
+  local bounded = lurek.thread["newBoundedChannel"](1)
+  bounded["tryPush"](bounded, "first")
+  local ok = bounded["tryPush"](bounded, "second")
+  lurek.log.debug("second push accepted=" .. tostring(ok), "thread")
 end
 
 --@api-stub: LChannel:clear

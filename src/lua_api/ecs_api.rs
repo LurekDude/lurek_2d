@@ -139,9 +139,11 @@ impl LuaUserData for LuaUniverse {
         });
 
         // -- addSystem --
-        /// Adds a system table to the universe with an optional priority (lower = earlier) and phase.
+        /// Adds a system table to the universe with an optional priority (lower = earlier), phase,
+        /// stable name, and dependency list.
         /// @param | system | table | System table to register.
-        /// @param | opts | table? | Optional table with `priority` integer and `phase` string fields.
+        /// @param | opts | table? | Optional table with `priority` (integer), `phase` (string),
+        ///   `name` (string — stable system name) and `after` (table of system names) fields.
         /// @return | nil | No value is returned.
         methods.add_method(
             "addSystem",
@@ -154,9 +156,22 @@ impl LuaUserData for LuaUniverse {
                     .as_ref()
                     .and_then(|o| o.get::<_, String>("phase").ok())
                     .unwrap_or_default();
+                let name = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, String>("name").ok())
+                    .unwrap_or_default();
+                let deps: Vec<String> = opts
+                    .as_ref()
+                    .and_then(|o| o.get::<_, LuaTable>("after").ok())
+                    .map(|t| {
+                        t.sequence_values::<String>()
+                            .filter_map(|r| r.ok())
+                            .collect()
+                    })
+                    .unwrap_or_default();
                 this.inner
                     .borrow_mut()
-                    .add_system(lua, system, priority, phase)
+                    .add_system(lua, system, priority, phase, name, deps)
             },
         );
 
@@ -346,6 +361,56 @@ impl LuaUserData for LuaUniverse {
             this.inner
                 .borrow_mut()
                 .deserialize_from_table(lua, snapshot)
+        });
+
+        // -- takeSnapshotDiff --
+        /// Returns a lightweight incremental diff of world changes since the last call.
+        ///
+        /// The diff table contains four arrays:
+        /// - `added_components`   — `{entity_id, name}` pairs added since last call.
+        /// - `removed_components` — `{entity_id, name}` pairs removed since last call.
+        /// - `deleted_entities`   — entity IDs killed since last call.
+        /// - `dirty_entities`     — entity IDs whose components changed.
+        ///
+        /// All four buffers are drained on each call.  Use this for delta sync or replay recording
+        /// without serialising the full world every frame.
+        ///
+        /// @return | table | Diff table with `added_components`, `removed_components`, `deleted_entities`, `dirty_entities` arrays.
+        methods.add_method("takeSnapshotDiff", |lua, this, ()| {
+            let diff = this.inner.borrow_mut().take_snapshot_diff();
+            let out = lua.create_table()?;
+
+            let added = lua.create_table()?;
+            for (i, (id, name)) in diff.added_components.iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("entity_id", *id)?;
+                entry.set("name", name.clone())?;
+                added.set(i + 1, entry)?;
+            }
+            out.set("added_components", added)?;
+
+            let removed = lua.create_table()?;
+            for (i, (id, name)) in diff.removed_components.iter().enumerate() {
+                let entry = lua.create_table()?;
+                entry.set("entity_id", *id)?;
+                entry.set("name", name.clone())?;
+                removed.set(i + 1, entry)?;
+            }
+            out.set("removed_components", removed)?;
+
+            let deleted = lua.create_table()?;
+            for (i, id) in diff.deleted_entities.iter().enumerate() {
+                deleted.set(i + 1, *id)?;
+            }
+            out.set("deleted_entities", deleted)?;
+
+            let dirty = lua.create_table()?;
+            for (i, id) in diff.dirty_entities.iter().enumerate() {
+                dirty.set(i + 1, *id)?;
+            }
+            out.set("dirty_entities", dirty)?;
+
+            Ok(out)
         });
 
         // -- clear --

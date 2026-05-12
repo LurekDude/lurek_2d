@@ -158,6 +158,16 @@ describe("lurek.devtools frame stats", function()
         expect_equal(10, lurek.devtools.getFrameHistorySize())
         lurek.devtools.setFrameHistorySize(300)
     end)
+
+    -- @covers lurek.devtools.getGpuFrameStats
+    -- @covers lurek.devtools.recordGpuFrameTime
+    it("records and reads gpu frame stats", function()
+        lurek.devtools.recordGpuFrameTime(0.010)
+        lurek.devtools.recordGpuFrameTime(0.011)
+        local stats = lurek.devtools.getGpuFrameStats()
+        expect_not_nil(stats.avg)
+        expect_true(stats.samples >= 2)
+    end)
 end)
 
 -- ===================================================================
@@ -309,6 +319,18 @@ describe("lurek.devtools console", function()
     it("openConsole marks it as open", function()
         lurek.devtools.openConsole()
         expect_equal(true, lurek.devtools.isConsoleOpen())
+    end)
+
+    -- @covers lurek.devtools.isEntityInspectorOpen
+    it("entity inspector defaults to closed", function()
+        expect_equal(false, lurek.devtools.isEntityInspectorOpen())
+    end)
+
+    -- @covers lurek.devtools.isEntityInspectorOpen
+    -- @covers lurek.devtools.openEntityInspector
+    it("openEntityInspector marks inspector as open", function()
+        lurek.devtools.openEntityInspector()
+        expect_equal(true, lurek.devtools.isEntityInspectorOpen())
     end)
 end)
 test_summary()

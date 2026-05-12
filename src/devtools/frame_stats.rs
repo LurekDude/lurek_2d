@@ -3,17 +3,19 @@
 //! [`FrameStats`] maintains a fixed-capacity ring of frame durations and
 //! derives aggregate statistics on demand without allocating per query.
 
+use std::collections::VecDeque;
+
 // ── FrameStats ────────────────────────────────────────────────────────────
 
 /// Rolling-window frame-time accumulator.
 ///
 /// # Fields
-/// - `history` — `Vec<f64>`.
+/// - `history` — `VecDeque<f64>`.
 /// - `capacity` — `usize`.
 #[derive(Debug)]
 pub struct FrameStats {
     /// Ordered ring of frame-time samples (oldest first).
-    pub history: Vec<f64>,
+    pub history: VecDeque<f64>,
     /// Maximum retained sample count.
     pub capacity: usize,
 }
@@ -28,7 +30,7 @@ impl FrameStats {
     /// `Self`.
     pub fn new(capacity: usize) -> Self {
         Self {
-            history: Vec::new(),
+            history: VecDeque::new(),
             capacity: capacity.max(10),
         }
     }
@@ -38,9 +40,9 @@ impl FrameStats {
     /// # Parameters
     /// - `dt` — `f64`.
     pub fn record(&mut self, dt: f64) {
-        self.history.push(dt);
+        self.history.push_back(dt);
         if self.history.len() > self.capacity {
-            self.history.remove(0);
+            let _ = self.history.pop_front();
         }
     }
 
@@ -51,7 +53,7 @@ impl FrameStats {
     pub fn set_capacity(&mut self, cap: usize) {
         self.capacity = cap.clamp(10, 10_000);
         while self.history.len() > self.capacity {
-            self.history.remove(0);
+            let _ = self.history.pop_front();
         }
     }
 
@@ -63,7 +65,7 @@ impl FrameStats {
         if self.history.is_empty() {
             return FrameSnapshot::zero();
         }
-        let mut sorted: Vec<f64> = self.history.clone();
+        let mut sorted: Vec<f64> = self.history.iter().copied().collect();
         sorted.sort_by(|a, b| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal));
         let n = sorted.len();
         let sum: f64 = sorted.iter().sum();

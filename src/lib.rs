@@ -111,6 +111,7 @@ pub mod filesystem;
 /// XCOM-style Geoscape globe â€” province topology, orbit camera, fog-of-war, markers.
 pub mod globe;
 /// Directed graph with item flow simulation, pathfinding, and supply/demand.
+#[cfg(feature = "graph")]
 pub mod graph;
 /// Lightweight pure-Rust HTML/CSS layout engine for `lurek.html`.
 pub mod html;

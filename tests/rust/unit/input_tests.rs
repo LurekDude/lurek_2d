@@ -442,6 +442,47 @@ mod gamepad_tests {
     }
 
     #[test]
+    fn mappings_load_from_string_handles_adversarial_lines() {
+        let mut m = GamepadMappings::new();
+        for _ in 0..512 {
+            let len = fastrand::usize(0..128);
+            let mut line = String::with_capacity(len);
+            for _ in 0..len {
+                let c = match fastrand::u8(0..12) {
+                    0 => '#',
+                    1 => ',',
+                    2 => ':',
+                    3 => ';',
+                    4 => '\\',
+                    5 => '/',
+                    6 => '.',
+                    7 => '_',
+                    8 => '-',
+                    _ => (b'a' + fastrand::u8(0..26)) as char,
+                };
+                line.push(c);
+            }
+            // Should never panic for malformed input lines.
+            let _ = m.load_from_string(&line);
+        }
+    }
+
+    #[test]
+    fn virtual_dpad_direction_and_edges() {
+        let (up, down, left, right, dir) = virtual_dpad(0.0, 0.0, 0.3);
+        assert!(!up && !down && !left && !right);
+        assert_eq!(dir, "c");
+
+        let (up, down, left, right, dir) = virtual_dpad(0.8, -0.8, 0.3);
+        assert!(up && !down && !left && right);
+        assert_eq!(dir, "ru");
+
+        let (up, down, left, right, dir) = virtual_dpad(-0.9, 0.9, 0.25);
+        assert!(!up && down && left && !right);
+        assert_eq!(dir, "ld");
+    }
+
+    #[test]
     fn gilrs_button_to_string_known() {
         assert_eq!(gilrs_button_to_string(gilrs::Button::South), "a");
         assert_eq!(gilrs_button_to_string(gilrs::Button::Start), "start");

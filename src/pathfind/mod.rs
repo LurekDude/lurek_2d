@@ -25,6 +25,8 @@ pub mod hpa;
 pub mod influence_map;
 /// Navigation grid with per-cell costs, diagonal modes, and HPA* support.
 pub mod nav_grid;
+/// Polygon navmesh for non-tile pathfinding.
+pub mod navmesh;
 /// Weighted walkability grid with `Cell` type (moved from ai/pathgrid).
 pub mod pathgrid;
 /// Debug render commands and image export for pathfinding data structures.
@@ -42,10 +44,12 @@ pub use grid::Grid;
 pub use hpa::{build_abstract, hpa_star, is_reachable as hpa_is_reachable, AbstractGraph};
 pub use influence_map::InfluenceMap;
 pub use nav_grid::{DiagonalMode, NavGrid};
+pub use navmesh::NavMesh;
 pub use pathgrid::{Cell, PathGrid};
 pub use unit_pathfinder::{UnitPathfinder, Waypoint};
 
 /// Graph-based A* and Dijkstra range query for node-edge world graphs.
+#[cfg(feature = "graph")]
 pub mod graph_nav;
 /// Hexagonal grid pathfinding with axial coordinate support and optional pathing costs.
 pub mod hex_grid;
@@ -56,6 +60,7 @@ pub mod jps;
 /// Precomputed Dijkstra range map for reachability and movement-budget queries.
 pub mod range_map;
 
+#[cfg(feature = "graph")]
 pub use graph_nav::{graph_astar, graph_range};
 pub use hex_grid::{HexGrid, HexLayout};
 pub use iso_grid::IsoGrid;

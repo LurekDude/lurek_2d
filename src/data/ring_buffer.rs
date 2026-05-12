@@ -143,13 +143,64 @@ impl<T: Clone> RingBuffer<T> {
         self.len = 0;
     }
 
+    /// Returns an iterator over borrowed references to elements, oldest-first.
+    ///
+    /// This is more efficient than [`Self::to_vec`] for large element types
+    /// because it avoids cloning. Use this when you only need to inspect elements.
+    ///
+    /// # Example
+    /// ```no_run
+    /// let rb: RingBuffer<i32> = RingBuffer::new(5);
+    /// for elem in rb.iter() {
+    ///     println!("{}", elem);
+    /// }
+    /// ```
+    pub fn iter(&self) -> impl Iterator<Item = &T> {
+        (0..self.len).map(move |i| {
+            let physical = (self.head + i) % self.capacity;
+            // SAFETY: all slots in [0, len) are guaranteed to be Some(_).
+            self.data[physical].as_ref().unwrap()
+        })
+    }
+
     /// Returns all elements as a `Vec`, ordered oldest-first.
+    ///
+    /// **Warning:** This method clones every element. For large element types,
+    /// prefer [`Self::iter`] to avoid unnecessary cloning.
+    ///
+    /// # Performance Note
+    /// - If `T` implements `Copy`, consider using a slice method instead if possible.
+    /// - For non-Copy types, collect references via `iter()` and clone selectively.
     pub fn to_vec(&self) -> Vec<T> {
         (0..self.len)
             .map(|i| {
                 let physical = (self.head + i) % self.capacity;
                 // SAFETY: all slots in [0, len) are guaranteed to be Some(_).
                 self.data[physical].clone().unwrap()
+            })
+            .collect()
+    }
+
+    /// Collects references to all elements into a `Vec`, ordered oldest-first.
+    ///
+    /// This is useful for efficient inspection without cloning the elements.
+    /// The resulting vec contains borrows that live as long as this buffer.
+    pub fn to_refs(&self) -> Vec<&T> {
+        self.iter().collect()
+    }
+}
+
+impl<T: Clone + Copy> RingBuffer<T> {
+    /// For `Copy` types, efficiently collect all elements into a `Vec` without using `clone()`.
+    ///
+    /// This is equivalent to `to_vec()` but may be semantically clearer for copy types.
+    /// Rust will optimize the copy operations to be as efficient as possible.
+    pub fn collect_copy(&self) -> Vec<T> {
+        (0..self.len)
+            .map(|i| {
+                let physical = (self.head + i) % self.capacity;
+                // For Copy types, dereferencing and assignment is very cheap.
+                *self.data[physical].as_ref().unwrap()
             })
             .collect()
     }

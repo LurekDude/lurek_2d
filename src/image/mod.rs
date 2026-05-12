@@ -42,7 +42,7 @@ pub mod texture;
 /// Atlas of named sub-regions within a single texture.
 pub mod texture_atlas;
 
-pub use texture::{Texture, TextureColorSpace};
+pub use texture::{premultiply_alpha_rgba8_in_place, Texture, TextureColorSpace};
 pub use texture_atlas::{NineSliceInsets, TextureAtlas};
 
 /// Province pixel grid: O(1) coordinate lookup and single-pass adjacency detection.

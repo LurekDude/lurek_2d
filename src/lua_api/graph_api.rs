@@ -1548,6 +1548,26 @@ impl LuaUserData for LuaGraph {
             Ok(outer)
         });
 
+        // -- subgraph --
+        /// Builds a new graph containing only the given node handles and the
+        /// edges/items that remain valid inside that induced subgraph.
+        /// @param | nodes | table | Array of node userdata to keep in the new graph.
+        /// @return | Graph | New graph userdata containing the induced subgraph.
+        methods.add_method("subgraph", |_, this, nodes: LuaTable| {
+            let mut node_ids = Vec::new();
+            for value in nodes.sequence_values::<LuaAnyUserData>() {
+                let node_ud = value?;
+                let node = node_ud.borrow::<LuaNode>()?;
+                node_ids.push(node.id);
+            }
+
+            let sub = this.inner.borrow().subgraph(&node_ids);
+            Ok(LuaGraph {
+                inner: Rc::new(RefCell::new(sub)),
+                callbacks: Rc::new(RefCell::new(HashMap::new())),
+            })
+        });
+
         // -- hasCycle --
         /// Returns true if the graph contains a directed cycle.
         /// @return | boolean | True if the graph contains a directed cycle.

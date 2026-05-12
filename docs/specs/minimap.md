@@ -11,9 +11,11 @@
 
 ## Summary
 
-The `minimap` module is documented from the current source tree and existing module reference data.
+The `minimap` module owns a grid-backed minimap state model plus the CPU/GPU command builders used to visualize that state for gameplay HUDs, screenshots, and evidence tests.
 
-This module primarily collaborates with `image`, `province`, `render`, `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
+This module primarily collaborates with `camera`, `image`, `province`, `render`, and `runtime`. Its responsibility should stay inside the Feature Systems group rather than absorb behavior owned by those neighbors.
+
+Recent additions in this slice include shared fog visibility handling, camera-tracking helpers, radius-based fog reveal, texture-backed marker/object icons, and a single render-command path used by both `render()` and evidence-oriented validation.
 
 ## Files
 

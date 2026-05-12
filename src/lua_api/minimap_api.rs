@@ -1,5 +1,7 @@
 //! `lurek.minimap` - Grid-based minimap with terrain, fog of war, objects, pings, and markers.
 
+use super::camera_api::LuaCamera2D;
+use super::render_api::LuaImage;
 use super::SharedState;
 use mlua::prelude::*;
 use std::cell::RefCell;
@@ -19,6 +21,45 @@ fn parse_color_table(tbl: LuaTable) -> LuaResult<[u8; 4]> {
     let b: u8 = tbl.get(3).unwrap_or(255);
     let a: u8 = tbl.get(4).unwrap_or(255);
     Ok([r, g, b, a])
+}
+
+fn parse_lua_image_icon(
+    image_ud: LuaAnyUserData,
+    default_width: Option<f32>,
+    default_height: Option<f32>,
+    method_name: &str,
+) -> LuaResult<(
+    crate::runtime::resource_keys::TextureKey,
+    f32,
+    f32,
+    f32,
+    f32,
+)> {
+    let image = image_ud.borrow::<LuaImage>().map_err(|_| {
+        LuaError::RuntimeError(format!(
+            "lurek.minimap: {} expects an LImage from lurek.render.newImage()",
+            method_name
+        ))
+    })?;
+
+    let (texture_width, texture_height) = {
+        let state = image.state.borrow();
+        let Some(texture) = state.textures.get(image.key) else {
+            return Err(LuaError::RuntimeError(format!(
+                "lurek.minimap: {} received an image whose texture is no longer resident",
+                method_name
+            )));
+        };
+        (texture.width as f32, texture.height as f32)
+    };
+
+    Ok((
+        image.key,
+        texture_width,
+        texture_height,
+        default_width.unwrap_or(texture_width),
+        default_height.unwrap_or(texture_height),
+    ))
 }
 
 // -------------------------------------------------------------------------------
@@ -46,6 +87,11 @@ impl LuaUserData for LuaMinimap {
         /// Returns the grid height in cells.
         /// @return | integer | Grid height in cells.
         methods.add_method("getGridHeight", |_, this, ()| Ok(this.inner.grid_height()));
+
+        // -- getCellCount --
+        /// Returns the total number of grid cells.
+        /// @return | integer | Total cell count.
+        methods.add_method("getCellCount", |_, this, ()| Ok(this.inner.grid_size()));
 
         // -- getGridSize --
         /// Returns the grid width and height as two values.
@@ -346,6 +392,56 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.object_type_count())
         });
 
+        // -- setObjectTypeTexture --
+        /// Attaches a texture-backed icon to an object type.
+        /// @param | type_idx | integer | 1-based object type index.
+        /// @param | image | LImage | Texture handle from lurek.render.newImage().
+        /// @param | width | number? | Optional on-screen width in pixels.
+        /// @param | height | number? | Optional on-screen height in pixels.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "setObjectTypeTexture",
+            |_,
+             this,
+             (type_idx, image_ud, width, height): (
+                usize,
+                LuaAnyUserData,
+                Option<f32>,
+                Option<f32>,
+            )| {
+                if type_idx == 0 {
+                    return Err(LuaError::RuntimeError(
+                        "lurek.minimap: object type index is 1-based".into(),
+                    ));
+                }
+                let (texture_key, tex_w, tex_h, display_w, display_h) =
+                    parse_lua_image_icon(image_ud, width, height, "setObjectTypeTexture")?;
+                this.inner.set_object_type_texture(
+                    type_idx - 1,
+                    texture_key,
+                    tex_w,
+                    tex_h,
+                    display_w,
+                    display_h,
+                );
+                Ok(())
+            },
+        );
+
+        // -- clearObjectTypeTexture --
+        /// Removes the texture-backed icon from an object type.
+        /// @param | type_idx | integer | 1-based object type index.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("clearObjectTypeTexture", |_, this, type_idx: usize| {
+            if type_idx == 0 {
+                return Err(LuaError::RuntimeError(
+                    "lurek.minimap: object type index is 1-based".into(),
+                ));
+            }
+            this.inner.clear_object_type_texture(type_idx - 1);
+            Ok(())
+        });
+
         // -- Objects --
 
         // -- setObject --
@@ -473,6 +569,38 @@ impl LuaUserData for LuaMinimap {
             this.inner.set_center(x, y);
             Ok(())
         });
+
+        // -- trackCamera --
+        /// Centers the minimap on a Camera2D and mirrors its visible area into the viewport overlay.
+        /// @param | camera | LCamera | Camera object from lurek.camera.newCamera().
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("trackCamera", |_, this, camera_ud: LuaAnyUserData| {
+            let camera = camera_ud.borrow::<LuaCamera2D>().map_err(|_| {
+                LuaError::RuntimeError(
+                    "lurek.minimap: trackCamera expects an LCamera from lurek.camera.newCamera()"
+                        .into(),
+                )
+            })?;
+            let (camera_x, camera_y) = camera.position();
+            let (vx, vy, vw, vh) = camera.visible_area();
+            this.inner.set_center(camera_x, camera_y);
+            this.inner.set_viewport_rect(vx, vy, vw, vh);
+            Ok(())
+        });
+
+        // -- revealRadius --
+        /// Reveals all fog cells whose centers lie inside the given radius.
+        /// @param | cx | number | Grid-space center X.
+        /// @param | cy | number | Grid-space center Y.
+        /// @param | radius | number | Reveal radius in cells.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "revealRadius",
+            |_, this, (cx, cy, radius): (f32, f32, f32)| {
+                this.inner.reveal_radius(cx, cy, radius);
+                Ok(())
+            },
+        );
 
         // -- getCenter --
         /// Returns the center coordinates as x, y.
@@ -680,6 +808,32 @@ impl LuaUserData for LuaMinimap {
             Ok(this.inner.marker_count())
         });
 
+        // -- setMarkerTexture --
+        /// Attaches a texture-backed icon to a marker.
+        /// @param | id | integer | Marker id.
+        /// @param | image | LImage | Texture handle from lurek.render.newImage().
+        /// @param | width | number? | Optional on-screen width in pixels.
+        /// @param | height | number? | Optional on-screen height in pixels.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut(
+            "setMarkerTexture",
+            |_, this, (id, image_ud, width, height): (u32, LuaAnyUserData, Option<f32>, Option<f32>)| {
+                let (texture_key, tex_w, tex_h, display_w, display_h) =
+                    parse_lua_image_icon(image_ud, width, height, "setMarkerTexture")?;
+                this.inner.set_marker_texture(id, texture_key, tex_w, tex_h, display_w, display_h);
+                Ok(())
+            },
+        );
+
+        // -- clearMarkerTexture --
+        /// Removes the texture-backed icon from a marker.
+        /// @param | id | integer | Marker id.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("clearMarkerTexture", |_, this, id: u32| {
+            this.inner.clear_marker_texture(id);
+            Ok(())
+        });
+
         // -- Marker animation --
 
         // -- setMarkerAnimation --
@@ -761,6 +915,13 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
 
+        // -- getOverlayShapeCount --
+        /// Returns the number of custom overlay shapes.
+        /// @return | integer | Number of overlay shapes.
+        methods.add_method("getOverlayShapeCount", |_, this, ()| {
+            Ok(this.inner.overlay_shapes().len())
+        });
+
         // -- Path overlay --
 
         // -- showPath --
@@ -795,6 +956,11 @@ impl LuaUserData for LuaMinimap {
             Ok(())
         });
 
+        // -- getPathCount --
+        /// Returns the number of displayed paths.
+        /// @return | integer | Number of active path overlays.
+        methods.add_method("getPathCount", |_, this, ()| Ok(this.inner.paths().len()));
+
         // -- Multi-layer --
 
         // -- setLayer --
@@ -810,6 +976,11 @@ impl LuaUserData for LuaMinimap {
         /// Returns the index of the currently active render layer.
         /// @return | integer | Index of the currently active render layer.
         methods.add_method("getLayer", |_, this, ()| Ok(this.inner.get_layer()));
+
+        // -- getLayerCount --
+        /// Returns the number of stored minimap layers.
+        /// @return | integer | Number of stored layers.
+        methods.add_method("getLayerCount", |_, this, ()| Ok(this.inner.layer_count()));
 
         // -- setLayerData --
         /// Stores tile data for a specific layer index.
@@ -838,6 +1009,21 @@ impl LuaUserData for LuaMinimap {
                 Ok(())
             },
         );
+
+        // -- getLayerData --
+        /// Returns the terrain ids stored in the given layer, or nil if it does not exist.
+        /// @param | layer | integer | Layer index.
+        /// @return | table | Flat row-major layer cell data table, or nil.
+        methods.add_method("getLayerData", |lua, this, layer: usize| {
+            let Some(layer_data) = this.inner.layer_data(layer) else {
+                return Ok(None::<LuaTable>);
+            };
+            let tbl = lua.create_table()?;
+            for (index, cell) in layer_data.cells.iter().enumerate() {
+                tbl.set(index + 1, *cell)?;
+            }
+            Ok(Some(tbl))
+        });
 
         // -- Rendering options --
 

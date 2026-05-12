@@ -21,9 +21,11 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 3. Auto-collects render commands from parallax, tilemap, raycaster, and UI subsystems.
 4. Calls `GpuRenderer::render_frame()` to flush the accumulated `RenderCommand` queue to the GPU.
 
-**Config hot-reload.** During `about_to_wait`, the app polls `conf.toml` via `filesystem::FileWatcher`. On successful reload it applies mutable settings without process restart: target FPS cap, physics/fixed-update rates, runtime log level, window title, and viewport scale-mode/game-size fields.
+**Hot-reload.** During `about_to_wait`, the app polls `conf.toml` and content watchers (`*.lua` scripts plus common asset extensions) via `filesystem::FileWatcher`. Config changes apply in-place; content changes trigger a game-session restart (Lua VM + game state) without restarting the engine process or recreating the window/GPU device.
 
-**Frame profiling.** `game_update()` records per-callback CPU wall-clock timing buckets (`process_physics`, `fixedUpdate`, `process`, `process_late`, `draw`, `draw_ui`) and stores the last-frame snapshot in `SharedState` for runtime introspection (`lurek.engine.getFrameProfile()`).
+**Frame profiling.** `game_update()` records per-callback CPU wall-clock timing buckets (`process_physics`, `fixedUpdate`, `process`, `process_late`, `draw`, `draw_ui`) and the app loop records frame-stage buckets (`tick`, `update`, `render`, `frame_total`). The snapshot is exposed via `lurek.engine.getFrameProfile()` and `lurek.engine.getFrameProfileText()`.
+
+**Lua callback timeout.** `[performance].lua_callback_timeout_ms` is an optional hard budget for any Lua callback invocation. When exceeded, the callback is aborted via an instruction hook and the run state transitions to `RunState::Error`.
 
 **Run state machine.** `RunState` has three states: Running, Error, and Restarting. Any Lua or engine error transitions to Error, which displays the `ErrorScreen`. R key restarts the game from scratch; the engine re-initialises the Lua VM and reloads all Lua scripts without restarting the process.
 
@@ -42,7 +44,8 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 ## Files
 
 - `app.rs`: Defines the public App entry point and the internal runtime implementation that owns the window, event loop integration, renderer, Lua VM, and frame lifecycle. This is the main file for startup flow, event handling, splash mode, and run-state transitions.
-- `app_winit.rs`: Contains alternate or parked winit-specific app code that is not part of the active module export surface. Treat it as implementation context, not the first place to extend live behavior unless it is reconnected deliberately.
+- `lua_callbacks.rs`: Contains timeout-aware callback wrappers used by the app loop to invoke `lurek.*` callbacks safely.
+- `frame_profile.rs`: Contains helper formatting utilities for exposing frame profile data in-engine.
 - `debug_overlay.rs`: Defines DebugOverlay, the lightweight in-engine overlay for frame and draw statistics. It exists so app-level runtime state can expose quick visual diagnostics without dragging in the full devtools stack.
 - `error_screen.rs`: Defines ErrorScreen, the structured presentation for runtime and Lua failures. This file owns how fatal problems become user-visible render commands instead of raw crashes or console output.
 - `mod.rs`: Module root that exposes the public app-facing types. It keeps the external surface small while hiding most of the runtime wiring details.
@@ -52,7 +55,6 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 - `RunState` (`enum`, `app.rs`): Tracks whether the engine is running normally, showing an error, or shutting down.
 - `LurekApp` (`struct`, `app.rs`): Lurek2D application state managed by the winit event loop.
 - `App` (`struct`, `app.rs`): Public entry point used to launch the engine with loaded configuration and optional startup error context. It is the outward-facing runtime shell around the real application lifecycle.
-- `App` (`struct`, `app_winit.rs`): Public entry point used to launch the engine with loaded configuration and optional startup error context. It is the outward-facing runtime shell around the real application lifecycle.
 - `DebugOverlay` (`struct`, `debug_overlay.rs`): Small runtime overlay for FPS and draw-call visibility. It is useful when changes affect per-frame diagnostics rather than the full devtools subsystem.
 - `ErrorScreen` (`struct`, `error_screen.rs`): Structured error presentation model that converts failures into readable render commands. It is the module's user-facing failure surface.
 
@@ -66,8 +68,6 @@ The `app` module is Lurek2D's application entry point and engine lifecycle orche
 - `LurekApp::init_lua` (`app.rs`): Re-initialises the Lua VM and per-game pipeline state for a new game session.
 - `App::new` (`app.rs`): Creates a new `App` with the given `Config` and an optional conf.toml error.
 - `App::run` (`app.rs`): Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.
-- `App::new` (`app_winit.rs`): Creates a new `App` with the given `Config`.
-- `App::run` (`app_winit.rs`): Initialises the GPU, window, Lua VM, and runs the event loop until the game exits.
 - `DebugOverlay::new` (`debug_overlay.rs`): Creates a new disabled debug overlay.
 - `DebugOverlay::build_render_commands` (`debug_overlay.rs`): Generates draw commands for the effect.
 - `ErrorScreen::from_error` (`error_screen.rs`): Creates an `ErrorScreen` from a plain error message string.

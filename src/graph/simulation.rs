@@ -156,6 +156,7 @@ impl Graph {
     ///
     /// # Returns
     /// `Vec<GraphEvent>`.
+    #[cfg(feature = "graph-parallel")]
     pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
         use rayon::prelude::*;
         log_msg!(debug, GR01);
@@ -203,6 +204,11 @@ impl Graph {
         self.process_queues(dt, &mut events);
         log_msg!(debug, GR02, "{}", events.len());
         events
+    }
+
+    #[cfg(not(feature = "graph-parallel"))]
+    pub fn update_parallel(&mut self, dt: f64) -> Vec<GraphEvent> {
+        self.update(dt)
     }
 
     /// Phase 1: Decay — decrement remaining_life, kill expired items.

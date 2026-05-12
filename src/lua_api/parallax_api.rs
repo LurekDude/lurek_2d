@@ -9,6 +9,8 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 use crate::parallax::layer::ParallaxLayer;
+use crate::parallax::presets;
+use crate::render::ShaderPassDescriptor;
 use crate::render::{BlendMode, RenderCommand};
 
 use crate::lua_api::render_api::LuaImage;
@@ -103,7 +105,7 @@ impl LuaParallaxLayer {
                 sy: batch.sy,
                 ox: 0.0,
                 oy: 0.0,
-                effect: None,
+                effect: batch.effect.clone(),
             });
         }
     }
@@ -394,6 +396,76 @@ impl LuaUserData for LuaParallaxLayer {
         methods.add_method("getDepth", |_, this, ()| {
             Ok(this.layer.borrow().get_depth())
         });
+
+        // -- addEffectPass --
+        /// Appends one shader pass to this layer's per-image effect chain.
+        /// @param | effect_name | string | Built-in effect name.
+        /// @param | params | table? | Optional `{ key = number }` parameter table.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "addEffectPass",
+            |_, this, (effect_name, params): (String, Option<LuaTable>)| {
+                let mut pass = ShaderPassDescriptor::new(effect_name);
+                if let Some(tbl) = params {
+                    let pairs = tbl.pairs::<String, f32>();
+                    for pair in pairs {
+                        let (k, v) = pair?;
+                        pass.params.insert(k, v);
+                    }
+                }
+
+                let mut layer = this.layer.borrow_mut();
+                let mut chain = layer.effect_chain.take().unwrap_or_default();
+                chain.push(pass);
+                layer.set_effect_chain(chain);
+                Ok(())
+            },
+        );
+
+        // -- clearEffects --
+        /// Clears all per-layer effect passes.
+        /// @return | nil | No value is returned.
+        methods.add_method("clearEffects", |_, this, ()| {
+            this.layer.borrow_mut().clear_effect_chain();
+            Ok(())
+        });
+
+        // -- effectCount --
+        /// Returns number of configured effect passes for this layer.
+        /// @return | integer | Effect pass count.
+        methods.add_method("effectCount", |_, this, ()| {
+            Ok(this.layer.borrow().effect_count() as i64)
+        });
+
+        // -- setMotionStretch --
+        /// Enables/disables velocity-based stretch and tunes its strength.
+        /// @param | enabled | boolean | Whether motion stretch is active.
+        /// @param | strength | number | Stretch amount per px/s velocity.
+        /// @param | max_scale | number | Maximum stretch multiplier.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "setMotionStretch",
+            |_, this, (enabled, strength, max_scale): (bool, f32, f32)| {
+                this.layer
+                    .borrow_mut()
+                    .set_motion_stretch(enabled, strength, max_scale);
+                Ok(())
+            },
+        );
+
+        // -- getMotionStretch --
+        /// Returns current motion-stretch configuration.
+        /// @return | boolean | Enabled flag.
+        /// @return | number | Strength value.
+        /// @return | number | Maximum scale multiplier.
+        methods.add_method("getMotionStretch", |_, this, ()| {
+            let layer = this.layer.borrow();
+            Ok((
+                layer.motion_stretch_enabled,
+                layer.motion_stretch_strength,
+                layer.motion_stretch_max_scale,
+            ))
+        });
     }
 }
 
@@ -465,6 +537,18 @@ impl LuaUserData for LuaParallaxSet {
         /// Returns the number of layers in this set.
         /// @return | integer | Returns the number of layers in the set.
         methods.add_method("layerCount", |_, this, ()| Ok(this.layers.len() as i64));
+
+        // -- getLayerZAt --
+        /// Returns the layer `z` value at a 1-based sorted index.
+        /// @param | index | integer | One-based index in current draw order.
+        /// @return | integer? | Layer `z` at index, or `nil` if index is out of range.
+        methods.add_method("getLayerZAt", |_, this, index: usize| {
+            if index == 0 || index > this.layers.len() {
+                return Ok(None);
+            }
+            let z = this.layers[index - 1].layer.borrow().z;
+            Ok(Some(z))
+        });
 
         // -- sortByZ --
         /// Re-sorts all layers by ascending `z` value.
@@ -565,7 +649,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
 
     // -- newLayer --
     /// Creates a new parallax background layer from an options table.
-    /// @param | opts | table | Layer options including a required `texture` field.
+    /// @param | opts | table | Layer options including required `texture`; optional fields include scroll/offset/autoscroll/repeat, `tiling`, `tile_w`, `tile_h`, and `depth`.
     /// @return | LParallaxLayer | Returns the new parallax layer userdata.
     let s = state.clone();
     parallax.set("newLayer", lua.create_function(move |_, opts: LuaTable| {
@@ -647,6 +731,50 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
             if let Ok(v) = opts.get::<_, f32>("scale_y") {
                 layer.scale[1] = v;
             }
+            if let Ok(Some(v)) = opts.get::<_, Option<bool>>("tiling") {
+                layer.set_tiling(v);
+            }
+            if let Ok(v) = opts.get::<_, f32>("depth") {
+                layer.set_depth(v);
+            }
+            if let (Ok(w), Ok(h)) = (opts.get::<_, f32>("tile_w"), opts.get::<_, f32>("tile_h")) {
+                layer.set_tile_size(w, h);
+            }
+            if let Ok(Some(v)) = opts.get::<_, Option<bool>>("motion_stretch") {
+                layer.motion_stretch_enabled = v;
+            }
+            if let Ok(v) = opts.get::<_, f32>("motion_stretch_strength") {
+                layer.motion_stretch_strength = v.max(0.0);
+            }
+            if let Ok(v) = opts.get::<_, f32>("motion_stretch_max") {
+                layer.motion_stretch_max_scale = v.max(1.0);
+            }
+
+            if let Ok(tbl) = opts.get::<_, LuaTable>("effects") {
+                let mut chain = Vec::new();
+                for item in tbl.sequence_values::<LuaValue>() {
+                    match item? {
+                        LuaValue::String(name) => {
+                            chain.push(ShaderPassDescriptor::new(name.to_str()?.to_string()));
+                        }
+                        LuaValue::Table(pass_tbl) => {
+                            let effect_name: String = pass_tbl.get("name")?;
+                            let mut pass = ShaderPassDescriptor::new(effect_name);
+                            if let Ok(params_tbl) = pass_tbl.get::<_, LuaTable>("params") {
+                                for pair in params_tbl.pairs::<String, f32>() {
+                                    let (k, v) = pair?;
+                                    pass.params.insert(k, v);
+                                }
+                            }
+                            chain.push(pass);
+                        }
+                        _ => {}
+                    }
+                }
+                if !chain.is_empty() {
+                    layer.set_effect_chain(chain);
+                }
+            }
 
             Ok(LuaParallaxLayer::new(layer, s.clone()))
         })?,
@@ -660,6 +788,47 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     parallax.set(
         "newSet",
         lua.create_function(move |_, name: String| Ok(LuaParallaxSet::new(name, s.clone())))?,
+    )?;
+
+    // -- newPresetLayer --
+    /// Creates a parallax layer from one of the built-in presets.
+    /// @param | preset | string | Preset name: `far`, `mid`, `fog`.
+    /// @param | texture | LImage | Source image.
+    /// @return | LParallaxLayer | Returns the new preset-based layer.
+    let s = state.clone();
+    parallax.set(
+        "newPresetLayer",
+        lua.create_function(move |_, (preset_name, img_ud): (String, LuaAnyUserData)| {
+            let (tex_key, tex_w, tex_h) = {
+                let img = img_ud.borrow::<LuaImage>().map_err(|_| {
+                    LuaError::RuntimeError(
+                        "lurek.parallax.newPresetLayer: 'texture' must be a valid LuaImage".into(),
+                    )
+                })?;
+                let st = s.borrow();
+                let tex_data = st.textures.get(img.key).ok_or_else(|| {
+                    LuaError::RuntimeError(
+                        "lurek.parallax.newPresetLayer: texture handle is stale or released"
+                            .into(),
+                    )
+                })?;
+                (img.key, tex_data.width as f32, tex_data.height as f32)
+            };
+
+            let layer = match preset_name.as_str() {
+                "far" => presets::far_background(tex_key, tex_w, tex_h),
+                "mid" => presets::mid_background(tex_key, tex_w, tex_h),
+                "fog" => presets::foreground_fog(tex_key, tex_w, tex_h),
+                other => {
+                    return Err(LuaError::RuntimeError(format!(
+                        "lurek.parallax.newPresetLayer: unknown preset '{}'; expected: far, mid, fog",
+                        other
+                    )));
+                }
+            };
+
+            Ok(LuaParallaxLayer::new(layer, s.clone()))
+        })?,
     )?;
 
     lurek.set("parallax", parallax)?;

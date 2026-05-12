@@ -4,7 +4,15 @@
 //! `src/lua_api/parallax_api.rs`.
 
 use crate::render::BlendMode;
+use crate::render::ShaderPassDescriptor;
 use crate::runtime::resource_keys::TextureKey;
+use std::collections::HashMap;
+
+/// Smallest allowed tile size in logical pixels.
+///
+/// This hard floor prevents pathological draw-call explosions when scripts pass
+/// tiny values to `set_tile_size`.
+const MIN_TILE_SIZE: f32 = 16.0;
 
 // ── ParallaxDrawBatch ────────────────────────────────────────────────────────
 
@@ -31,6 +39,8 @@ pub struct ParallaxDrawBatch {
     pub color: [f32; 4],
     /// Blend mode for compositing this layer.
     pub blend_mode: BlendMode,
+    /// Optional per-image shader pass chain for this layer.
+    pub effect: Option<Vec<ShaderPassDescriptor>>,
 }
 
 // ── ParallaxLayer ────────────────────────────────────────────────────────────
@@ -148,6 +158,16 @@ pub struct ParallaxLayer {
     /// Complements `z: i32` for cases where fractional ordering is needed.
     /// Lower values render first (further back).  Default is `0.0`.
     pub depth: f32,
+
+    /// Optional per-image shader pass chain applied to each tile draw call.
+    pub effect_chain: Option<Vec<ShaderPassDescriptor>>,
+
+    /// Enables velocity-based stretch on top of base scale.
+    pub motion_stretch_enabled: bool,
+    /// Stretch factor per px/s of autoscroll speed.
+    pub motion_stretch_strength: f32,
+    /// Upper bound for per-axis stretch multiplier.
+    pub motion_stretch_max_scale: f32,
 }
 
 impl ParallaxLayer {
@@ -187,6 +207,10 @@ impl ParallaxLayer {
             tile_w: None,
             tile_h: None,
             depth: 0.0,
+            effect_chain: None,
+            motion_stretch_enabled: false,
+            motion_stretch_strength: 0.001,
+            motion_stretch_max_scale: 2.0,
         }
     }
 
@@ -204,14 +228,23 @@ impl ParallaxLayer {
 
         // Prevent float overflow — wrap to scaled texture size using rem_euclid
         // so the accumulator stays in [0, tex_w) and [0, tex_h).
-        let tw = self.texture_width * self.scale[0];
-        let th = self.texture_height * self.scale[1];
+        let (tw, th) = self.resolved_tile_dimensions();
         if tw > 0.0 {
             self.autoscroll_accum[0] = self.autoscroll_accum[0].rem_euclid(tw);
         }
         if th > 0.0 {
             self.autoscroll_accum[1] = self.autoscroll_accum[1].rem_euclid(th);
         }
+    }
+
+    fn resolved_tile_dimensions(&self) -> (f32, f32) {
+        let base_w = self.texture_width * self.scale[0];
+        let base_h = self.texture_height * self.scale[1];
+
+        let tw = self.tile_w.unwrap_or(base_w).max(MIN_TILE_SIZE);
+        let th = self.tile_h.unwrap_or(base_h).max(MIN_TILE_SIZE);
+
+        (tw, th)
     }
 
     /// Computes the world-pixel scroll offset for the given camera position.
@@ -259,8 +292,9 @@ impl ParallaxLayer {
             return None;
         }
 
-        let tex_w = self.texture_width * self.scale[0];
-        let tex_h = self.texture_height * self.scale[1];
+        let (tex_w, tex_h) = self.resolved_tile_dimensions();
+        let repeat_x = self.tiling || self.repeat_x;
+        let repeat_y = self.tiling || self.repeat_y;
 
         if tex_w <= 0.0 || tex_h <= 0.0 {
             return None;
@@ -271,63 +305,82 @@ impl ParallaxLayer {
         // Start position: for repeat axes use modulo so we always start at or
         // before the left/top screen edge; for non-repeat, use raw negative offset
         // so the single tile slides with the camera.
-        let start_x = if self.repeat_x {
-            -px.rem_euclid(tex_w)
-        } else {
-            -px
-        };
-        let start_y = if self.repeat_y {
-            -py.rem_euclid(tex_h)
-        } else {
-            -py
-        };
+        let start_x = if repeat_x { -px.rem_euclid(tex_w) } else { -px };
+        let start_y = if repeat_y { -py.rem_euclid(tex_h) } else { -py };
 
-        let mut tiles: Vec<(f32, f32)> = Vec::new();
-
-        // Generate tile positions covering the visible screen area.
-        // The 4-way (repeat_x, repeat_y) matrix determines whether we
-        // tile along one axis, both, or neither.
-        match (self.repeat_x, self.repeat_y) {
-            (true, true) => {
-                let mut tx = start_x;
-                while tx < screen_w {
-                    let mut ty = start_y;
-                    while ty < screen_h {
-                        tiles.push((tx, ty));
-                        ty += tex_h;
-                    }
-                    tx += tex_w;
-                }
-            }
-            (true, false) => {
-                let mut tx = start_x;
-                while tx < screen_w {
-                    tiles.push((tx, start_y));
-                    tx += tex_w;
-                }
-            }
-            (false, true) => {
-                let mut ty = start_y;
-                while ty < screen_h {
-                    tiles.push((start_x, ty));
-                    ty += tex_h;
-                }
-            }
-            (false, false) => {
-                tiles.push((start_x, start_y));
-            }
-        }
+        let tiles = crate::parallax::tile_iter::collect_tiled_positions(
+            start_x,
+            start_y,
+            tex_w,
+            tex_h,
+            repeat_x,
+            repeat_y,
+            [screen_w, screen_h],
+        );
 
         let [tr, tg, tb, ta] = self.tint;
         let color = [tr, tg, tb, ta * self.opacity];
+        let mut sx = if self.texture_width > 0.0 {
+            tex_w / self.texture_width
+        } else {
+            self.scale[0]
+        };
+        let mut sy = if self.texture_height > 0.0 {
+            tex_h / self.texture_height
+        } else {
+            self.scale[1]
+        };
+
+        let mut effect = self.effect_chain.clone();
+
+        if self.motion_stretch_enabled {
+            let speed_x = self.autoscroll[0].abs();
+            let speed_y = self.autoscroll[1].abs();
+            let max_extra = (self.motion_stretch_max_scale - 1.0).max(0.0);
+            let sx_extra = (speed_x * self.motion_stretch_strength).min(max_extra);
+            let sy_extra = (speed_y * self.motion_stretch_strength).min(max_extra);
+            sx *= 1.0 + sx_extra;
+            sy *= 1.0 + sy_extra;
+
+            let speed = (speed_x * speed_x + speed_y * speed_y).sqrt();
+            if speed > 1.0 {
+                let mut params = HashMap::new();
+                params.insert("strength".to_string(), (speed * 0.001).clamp(0.0, 1.0));
+                params.insert(
+                    "direction_x".to_string(),
+                    if speed > 0.0 {
+                        self.autoscroll[0] / speed
+                    } else {
+                        0.0
+                    },
+                );
+                params.insert(
+                    "direction_y".to_string(),
+                    if speed > 0.0 {
+                        self.autoscroll[1] / speed
+                    } else {
+                        0.0
+                    },
+                );
+
+                let mut chain = effect.unwrap_or_default();
+                chain.push(ShaderPassDescriptor {
+                    effect_name: "motion_blur".to_string(),
+                    params,
+                    enabled: true,
+                });
+                effect = Some(chain);
+            }
+        }
 
         Some(ParallaxDrawBatch {
             texture_key: self.texture_key,
             tiles,
-            sx: self.scale[0],
-            sy: self.scale[1],
+            sx,
+            sy,
             color,
             blend_mode: self.blend_mode,
+            effect,
         })
     }
 
@@ -367,8 +420,16 @@ impl ParallaxLayer {
     /// - `w` — `f32` — tile width in pixels.
     /// - `h` — `f32` — tile height in pixels.
     pub fn set_tile_size(&mut self, w: f32, h: f32) {
-        self.tile_w = if w > 0.0 { Some(w) } else { None };
-        self.tile_h = if h > 0.0 { Some(h) } else { None };
+        self.tile_w = if w > 0.0 {
+            Some(w.max(MIN_TILE_SIZE))
+        } else {
+            None
+        };
+        self.tile_h = if h > 0.0 {
+            Some(h.max(MIN_TILE_SIZE))
+        } else {
+            None
+        };
     }
 
     /// Sets the floating-point draw depth for this layer.
@@ -388,6 +449,28 @@ impl ParallaxLayer {
     /// `f32`.
     pub fn get_depth(&self) -> f32 {
         self.depth
+    }
+
+    /// Replaces the per-layer shader pass chain.
+    pub fn set_effect_chain(&mut self, chain: Vec<ShaderPassDescriptor>) {
+        self.effect_chain = if chain.is_empty() { None } else { Some(chain) };
+    }
+
+    /// Clears all per-layer shader passes.
+    pub fn clear_effect_chain(&mut self) {
+        self.effect_chain = None;
+    }
+
+    /// Returns the number of configured per-layer shader passes.
+    pub fn effect_count(&self) -> usize {
+        self.effect_chain.as_ref().map_or(0, Vec::len)
+    }
+
+    /// Enables/disables velocity-based stretch and configures its range.
+    pub fn set_motion_stretch(&mut self, enabled: bool, strength: f32, max_scale: f32) {
+        self.motion_stretch_enabled = enabled;
+        self.motion_stretch_strength = strength.max(0.0);
+        self.motion_stretch_max_scale = max_scale.max(1.0);
     }
 }
 

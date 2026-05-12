@@ -8,12 +8,12 @@ use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::Arc;
 
-use crate::data::toml_convert;
 use crate::data::{
     self, BinValue, ByteData, CompressFormat, DataView, DataWriter, EncodeFormat, HashAlgorithm,
     LuaDataView, PackValue,
 };
 use crate::lua_api::lua_types::LurekType;
+use crate::serial;
 
 // -------------------------------------------------------------------------------
 // Pack conversion helpers
@@ -595,7 +595,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "parseToml",
         lua.create_function(|lua, text: String| {
-            let value = toml_convert::parse_toml(&text).map_err(LuaError::RuntimeError)?;
+            let value = serial::parse_toml(&text).map_err(LuaError::RuntimeError)?;
             toml_value_to_lua(lua, &value)
         })?,
     )?;
@@ -608,7 +608,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "encodeToml",
         lua.create_function(|_, tbl: LuaTable| {
             let value = lua_table_to_toml_value(&LuaValue::Table(tbl))?;
-            toml_convert::encode_toml(&value).map_err(LuaError::RuntimeError)
+            serial::encode_toml(&value).map_err(LuaError::RuntimeError)
         })?,
     )?;
 
@@ -638,10 +638,10 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "toMsgPack",
         lua.create_function(|lua, value: LuaValue| {
-            let serial = crate::serial::lua_table::from_lua(&value).map_err(LuaError::external)?;
-            let json_val = serial_value_to_json(&serial);
-            let bytes =
-                crate::data::msgpack::to_msgpack(&json_val).map_err(LuaError::RuntimeError)?;
+            let serial_val =
+                crate::serial::lua_table::from_lua(&value).map_err(LuaError::external)?;
+            let json_val = serial_value_to_json(&serial_val);
+            let bytes = crate::serial::encode_json(&json_val).map_err(LuaError::RuntimeError)?;
             lua.create_string(&bytes)
         })?,
     )?;
@@ -654,8 +654,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         "fromMsgPack",
         lua.create_function(|lua, bytes: LuaString| {
             let raw: &[u8] = bytes.as_bytes();
-            let json_val =
-                crate::data::msgpack::from_msgpack(raw).map_err(LuaError::RuntimeError)?;
+            let json_val = crate::serial::decode_json(raw).map_err(LuaError::RuntimeError)?;
             let serial = json_value_to_serial(&json_val);
             crate::serial::lua_table::to_lua(lua, &serial)
         })?,

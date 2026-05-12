@@ -462,7 +462,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // Auto-doc: Lua API binding.
     tbl.set(
         "getPhysicsDelta",
-        lua.create_function(move |_, ()| Ok(s.borrow().physics_fixed_dt))?,
+        lua.create_function(move |_, ()| Ok(s.borrow().physics_run.fixed_dt))?,
     )?;
 
     // -- setPhysicsDelta --
@@ -475,7 +475,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         "setPhysicsDelta",
         lua.create_function(move |_, dt: f64| {
             let clamped = dt.clamp(1.0 / 240.0, 1.0 / 10.0);
-            s.borrow_mut().physics_fixed_dt = clamped;
+            s.borrow_mut().physics_run.fixed_dt = clamped;
             Ok(())
         })?,
     )?;
@@ -487,7 +487,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // Auto-doc: Lua API binding.
     tbl.set(
         "getPhysicsMaxSteps",
-        lua.create_function(move |_, ()| Ok(s.borrow().physics_max_steps))?,
+        lua.create_function(move |_, ()| Ok(s.borrow().physics_run.max_steps))?,
     )?;
 
     // -- setPhysicsMaxSteps --
@@ -499,7 +499,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     tbl.set(
         "setPhysicsMaxSteps",
         lua.create_function(move |_, n: u32| {
-            s.borrow_mut().physics_max_steps = n.clamp(1, 64);
+            s.borrow_mut().physics_run.max_steps = n.clamp(1, 64);
             Ok(())
         })?,
     )?;

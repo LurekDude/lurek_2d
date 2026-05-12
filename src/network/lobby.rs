@@ -13,6 +13,7 @@
 //! The discovery port is fixed at [`LOBBY_PORT`].
 
 use std::net::{Ipv4Addr, SocketAddr, UdpSocket};
+use std::sync::{Mutex, OnceLock};
 use std::time::{Duration, Instant};
 
 /// UDP port used for LAN lobby broadcast and discovery.
@@ -179,4 +180,74 @@ pub fn discover_lobbies(timeout_ms: u64) -> Vec<LobbyInfo> {
         }
     }
     results
+}
+
+/// Simple in-memory room record used by matchmaking helpers.
+#[derive(Debug, Clone, PartialEq)]
+pub struct RoomInfo {
+    /// Room identifier.
+    pub id: String,
+    /// Human-readable room name.
+    pub name: String,
+    /// Room host/player label.
+    pub host: String,
+    /// Current number of room players.
+    pub player_count: u32,
+    /// Maximum allowed room players.
+    pub max_players: u32,
+}
+
+#[derive(Debug, Default)]
+struct RoomRegistry {
+    rooms: Vec<RoomInfo>,
+}
+
+fn rooms() -> &'static Mutex<RoomRegistry> {
+    static REGISTRY: OnceLock<Mutex<RoomRegistry>> = OnceLock::new();
+    REGISTRY.get_or_init(|| Mutex::new(RoomRegistry::default()))
+}
+
+/// Creates a room in the local matchmaking registry.
+pub fn create_room(name: &str, host: &str, max_players: u32) -> RoomInfo {
+    let mut reg = rooms().lock().expect("room registry poisoned");
+    let id = format!("room-{}", reg.rooms.len() + 1);
+    let room = RoomInfo {
+        id,
+        name: name.to_string(),
+        host: host.to_string(),
+        player_count: 1,
+        max_players: max_players.max(1),
+    };
+    reg.rooms.push(room.clone());
+    room
+}
+
+/// Lists all rooms from the local matchmaking registry.
+pub fn list_rooms() -> Vec<RoomInfo> {
+    rooms()
+        .lock()
+        .expect("room registry poisoned")
+        .rooms
+        .clone()
+}
+
+/// Joins a room by id.
+pub fn join_room(id: &str) -> Option<RoomInfo> {
+    let mut reg = rooms().lock().expect("room registry poisoned");
+    let room = reg.rooms.iter_mut().find(|r| r.id == id)?;
+    if room.player_count >= room.max_players {
+        return None;
+    }
+    room.player_count += 1;
+    Some(room.clone())
+}
+
+/// Leaves a room by id.
+pub fn leave_room(id: &str) -> Option<RoomInfo> {
+    let mut reg = rooms().lock().expect("room registry poisoned");
+    let room = reg.rooms.iter_mut().find(|r| r.id == id)?;
+    if room.player_count > 0 {
+        room.player_count -= 1;
+    }
+    Some(room.clone())
 }

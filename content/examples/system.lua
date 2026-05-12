@@ -1,5 +1,5 @@
 -- content/examples/system.lua
--- Hand-written coverage of the lurek.runtime API (26 items).
+-- Hand-written coverage of the lurek.runtime API (28 items).
 --
 -- Platform queries (OS, CPU, memory, locale, clipboard) plus runtime-message
 -- catalogue lookup, debug-overlay toggling, structured logging, and CLI
@@ -263,6 +263,37 @@ do -- lurek.runtime.runBatch
   local results = runtime.runBatch(tasks, { stopOnError = true })
   lurek.log.info("batch completed: warmup=" .. results.warmup_cache.status, "boot")
 end
+
+--@api-stub: lurek.system.reloadConfig
+-- are refreshed without restarting the engine.
+do -- lurek.runtime.reloadConfig
+  function lurek.init()
+    -- Example: a key-bind that forces conf.toml to be re-read immediately.
+    lurek.log.info("requesting conf.toml hot-reload", "dev")
+    runtime.reloadConfig()
+  end
+end
+
+--@api-stub: lurek.system.getConfig
+-- Returns a snapshot table of the active runtime-mutable configuration values.
+-- Fields: physics_tick_rate, fixed_update_tick_rate, frame_budget_warn_ms,
+--         vsync, log_level, config_reload_revision.
+do -- lurek.runtime.getConfig
+  local cfg = runtime.getConfig()
+  lurek.log.info(
+    ("config rev=%d physics=%.0f Hz vsync=%s level=%s"):format(
+      cfg.config_reload_revision,
+      cfg.physics_tick_rate,
+      tostring(cfg.vsync),
+      cfg.log_level
+    ),
+    "boot"
+  )
+  if cfg.frame_budget_warn_ms then
+    lurek.log.info("frame budget warn threshold: " .. cfg.frame_budget_warn_ms .. " ms", "perf")
+  end
+end
+
 
 --@api-stub: lurek.runtime.getBatchResults
 -- Returns the output table from the most recently completed runBatch call.

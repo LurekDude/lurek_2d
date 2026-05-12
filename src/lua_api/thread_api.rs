@@ -12,7 +12,7 @@ use crate::thread::channel::{
 };
 use crate::thread::pool::ThreadPool;
 use crate::thread::promise::Promise;
-use crate::thread::worker::LuaThread;
+use crate::thread::worker::{worker_capabilities, LuaThread};
 
 // -------------------------------------------------------------------------------
 // LuaThreadHandle UserData
@@ -132,10 +132,16 @@ impl LuaUserData for LuaThreadPool {
 
         // -- join --
         /// Blocks until all workers in the pool have finished execution.
-        /// @return | nil | No value is returned.
-        methods.add_method("join", |_, this, ()| {
-            this.inner.lock().unwrap().join();
-            Ok(())
+        /// @param | timeout | number? | Optional timeout in seconds.
+        /// @return | boolean | True when all workers finished before timeout.
+        methods.add_method("join", |_, this, timeout: Option<f64>| {
+            let done = if let Some(secs) = timeout {
+                this.inner.lock().unwrap().join_with_timeout(secs)
+            } else {
+                this.inner.lock().unwrap().join();
+                true
+            };
+            Ok(done)
         });
 
         // -- getInputChannel --
@@ -208,6 +214,39 @@ impl LuaUserData for LuaPromise {
         methods.add_method("getError", |_, this, ()| {
             Ok(this.inner.lock().unwrap().get_error())
         });
+
+        // -- chain --
+        /// Starts a new promise after this promise resolves and passes the result as arg[1].
+        /// @param | code | string | Worker Lua source code for the chained stage.
+        /// @param | ... | any | Optional additional args appended after arg[1].
+        /// @return | LPromise | Chained promise handle.
+        methods.add_method("chain", |_, this, (code, rest): (String, LuaMultiValue)| {
+            let parent_result = {
+                let guard = this.inner.lock().unwrap();
+                if let Some(err) = guard.get_error() {
+                    return Err(LuaError::RuntimeError(format!(
+                        "Promise:chain failed; parent promise error: {err}"
+                    )));
+                }
+                guard.result().ok_or_else(|| {
+                    LuaError::RuntimeError(
+                        "Promise:chain requires parent promise result; call after isDone() and before result()".to_string(),
+                    )
+                })?
+            };
+
+            let mut args = Vec::with_capacity(rest.len() + 1);
+            args.push(parent_result);
+            let mut tail = rest
+                .into_iter()
+                .map(lua_to_channel_value)
+                .collect::<LuaResult<Vec<_>>>()?;
+            args.append(&mut tail);
+
+            Ok(LuaPromise {
+                inner: Arc::new(Mutex::new(Promise::new(code, args))),
+            })
+        });
     }
 }
 
@@ -248,6 +287,19 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // -- newBoundedChannel --
+    /// Creates a bounded channel with backpressure when full.
+    /// @param | capacity | integer | Maximum queued message count.
+    /// @return | LChannel | New bounded channel handle.
+    tbl.set(
+        "newBoundedChannel",
+        lua.create_function(|_, capacity: usize| {
+            Ok(LuaChannel {
+                inner: Channel::bounded(capacity),
+            })
+        })?,
+    )?;
+
     // -- getChannel --
     /// Gets or creates a named global channel shared across threads.
     /// @param | name | string | Channel name.
@@ -282,19 +334,81 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
 
     // -- async --
     /// Starts a one-shot background computation and returns a promise.
-    /// @param | code | string | Worker Lua source code.
-    /// @param | args | table | Argument values passed to the worker.
+    ///
+    /// Accepts either `async(code, ...)` or `async(fn, ...)` where `fn` is dumped and executed in worker VM.
+    /// @param | work | string|function | Worker Lua source code or Lua function.
+    /// @param | ... | any | Argument values passed to the worker.
     /// @return | LPromise | New promise handle.
     tbl.set(
         "async",
-        lua.create_function(|_, (code, args): (String, LuaMultiValue)| {
-            let channel_args = args
-                .into_iter()
-                .map(lua_to_channel_value)
-                .collect::<LuaResult<Vec<ChannelValue>>>()?;
+        lua.create_function(|lua, args: LuaMultiValue| {
+            if args.is_empty() {
+                return Err(LuaError::RuntimeError(
+                    "thread.async expects code string or function as first argument".to_string(),
+                ));
+            }
+
+            let mut iter = args.into_iter();
+            let first = iter.next().ok_or_else(|| {
+                LuaError::RuntimeError("thread.async missing first argument".to_string())
+            })?;
+
+            let (code, mut channel_args): (String, Vec<ChannelValue>) = match first {
+                LuaValue::String(s) => {
+                    let code = s.to_str()?.to_string();
+                    let tail = iter
+                        .map(lua_to_channel_value)
+                        .collect::<LuaResult<Vec<ChannelValue>>>()?;
+                    (code, tail)
+                }
+                LuaValue::Function(f) => {
+                    let string_tbl: LuaTable = lua.globals().get("string")?;
+                    let dump_fn: LuaFunction = string_tbl.get("dump")?;
+                    let dumped: LuaString = dump_fn.call(f)?;
+
+                    let wrapper = r#"
+                        local loader = loadstring or load
+                        local unpack_fn = table.unpack or unpack
+                        local fn = assert(loader(arg[1]))
+                        local out = fn(unpack_fn(arg, 2))
+                        lurek.thread.getChannel("__promise_result"):push(out)
+                    "#
+                    .to_string();
+
+                    let mut packed = Vec::new();
+                    packed.push(ChannelValue::Bytes(dumped.as_bytes().to_vec()));
+                    for val in iter {
+                        packed.push(lua_to_channel_value(val)?);
+                    }
+                    (wrapper, packed)
+                }
+                _ => {
+                    return Err(LuaError::RuntimeError(
+                        "thread.async first argument must be string or function".to_string(),
+                    ))
+                }
+            };
+
             Ok(LuaPromise {
-                inner: Arc::new(Mutex::new(Promise::new(code, channel_args))),
+                inner: Arc::new(Mutex::new(Promise::new(
+                    code,
+                    std::mem::take(&mut channel_args),
+                ))),
             })
+        })?,
+    )?;
+
+    // -- getWorkerCapabilities --
+    /// Returns the list of APIs that are available in worker VMs.
+    /// @return | table | Array of worker-safe API names.
+    tbl.set(
+        "getWorkerCapabilities",
+        lua.create_function(|lua, ()| {
+            let out = lua.create_table()?;
+            for (idx, name) in worker_capabilities().iter().enumerate() {
+                out.set((idx + 1) as i64, *name)?;
+            }
+            Ok(out)
         })?,
     )?;
 
@@ -358,6 +472,25 @@ impl LuaUserData for LuaChannel {
         /// Returns the number of items in the channel.
         /// @return | integer | Number of queued items.
         methods.add_method("getCount", |_, this, ()| Ok(this.inner.get_count()));
+
+        // -- getCapacity --
+        /// Returns bounded capacity or nil for unbounded channels.
+        /// @return | integer? | Configured capacity.
+        methods.add_method("getCapacity", |_, this, ()| Ok(this.inner.capacity()));
+
+        // -- isBounded --
+        /// Returns whether this channel is bounded.
+        /// @return | boolean | True when bounded.
+        methods.add_method("isBounded", |_, this, ()| Ok(this.inner.is_bounded()));
+
+        // -- tryPush --
+        /// Attempts to enqueue without blocking when the channel is full.
+        /// @param | value | any | Value to enqueue.
+        /// @return | boolean | True when the value was pushed.
+        methods.add_method("tryPush", |_, this, value: LuaValue| {
+            let cv = lua_to_channel_value(value)?;
+            Ok(this.inner.try_push(cv))
+        });
 
         // -- clear --
         /// Clears all items from the channel.

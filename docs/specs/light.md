@@ -158,6 +158,7 @@ This module primarily collaborates with `image`, `math`, `runtime`. Its responsi
 - `lurek.light.advanceFlickers`: Advances flicker phase for all lights with flicker enabled.
 - `lurek.light.syncAmbient`: Returns the current ambient light color snapshot.
 - `lurek.light.getGodRayHints`: Returns directional light hints for god-ray rendering.
+- `lurek.light.getNormalMapHints`: Returns normal-map lighting hints for plugin renderers.
 
 ### `LLight` Methods
 - `LLight:setPosition`: Sets the light's world-space position.
@@ -182,6 +183,8 @@ This module primarily collaborates with `image`, `math`, `runtime`. Its responsi
 - `LLight:getShadowFilter`: Returns the shadow edge filter as a string.
 - `LLight:setShadowSmooth`: Sets the shadow edge smoothing factor.
 - `LLight:getShadowSmooth`: Returns the shadow edge smoothing factor.
+- `LLight:setShadowSoftness`: Sets the penumbra softness multiplier for shadow edges.
+- `LLight:getShadowSoftness`: Returns the penumbra softness multiplier for shadow edges.
 - `LLight:setLightMask`: Sets the light interaction bitmask.
 - `LLight:getLightMask`: Returns the light interaction bitmask.
 - `LLight:setShadowMask`: Sets the shadow casting bitmask.
@@ -216,6 +219,11 @@ This module primarily collaborates with `image`, `math`, `runtime`. Its responsi
 - `LLight:setCookie`: Sets the texture path used as a light cookie for projection.
 - `LLight:getCookie`: Returns the current cookie texture path, or `nil` if unset.
 - `LLight:clearCookie`: Removes the cookie texture assignment.
+- `LLight:setNormalMap`: Sets the normal-map texture path hint used by plugin renderers.
+- `LLight:getNormalMap`: Returns the normal-map texture path hint, or `nil` when unset.
+- `LLight:clearNormalMap`: Clears the normal-map texture path hint.
+- `LLight:setNormalStrength`: Sets the normal-map response strength multiplier.
+- `LLight:getNormalStrength`: Returns the normal-map response strength multiplier.
 - `LLight:type`: Returns the type name of this object.
 - `LLight:typeOf`: Returns true if this object is of the given type.
 

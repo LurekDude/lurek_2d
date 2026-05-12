@@ -68,14 +68,18 @@ pub struct PrintEntry {
 /// - `pending_requests` — `VecDeque<PendingRequest>`.
 /// - `pending_responses` — `VecDeque<PendingResponse>`.
 /// - `broadcast_queue` — `VecDeque<String>`.
-/// - `print_history` — `Vec<PrintEntry>`.
+/// - `print_history` — `VecDeque<PrintEntry>`.
 /// - `max_print_history` — `usize`.
-/// - `frame_times` — `Vec<f64>`.
+/// - `frame_times` — `VecDeque<f64>`.
 /// - `max_frame_times` — `usize`.
 /// - `screenshot_requested` — `bool`.
 /// - `screenshot_scale` — `u32`.
 /// - `client_count` — `usize`.
 /// - `port` — `u16`.
+/// - `protocol_version` — `u32`.
+/// - `capabilities` — `Vec<String>`.
+/// - `handshake_nonce` — `String`.
+/// - `hot_reload_requested` — `bool`.
 /// - `epoch` — `Instant`.
 pub struct BridgeShared {
     /// Requests waiting for main-thread (Lua) execution.
@@ -85,13 +89,19 @@ pub struct BridgeShared {
     /// JSON event strings broadcast to all connected clients.
     pub broadcast_queue: VecDeque<String>,
     /// Circular print history buffer.
-    pub print_history: Vec<PrintEntry>,
+    pub print_history: VecDeque<PrintEntry>,
     /// Maximum number of print entries to retain.
     pub max_print_history: usize,
     /// Recent frame delta-time values (seconds).
-    pub frame_times: Vec<f64>,
+    pub frame_times: VecDeque<f64>,
     /// Maximum number of frame-time samples to retain.
     pub max_frame_times: usize,
+    /// Running frame-time sum used to avoid rescanning in get_performance().
+    perf_sum: f64,
+    /// Cached frame-time minimum.
+    perf_min: f64,
+    /// Cached frame-time maximum.
+    perf_max: f64,
     /// Set to `true` when a screenshot has been requested via the bridge.
     pub screenshot_requested: bool,
     /// Downscale factor for the next screenshot (1–8).
@@ -100,6 +110,14 @@ pub struct BridgeShared {
     pub client_count: usize,
     /// Port the server is bound to.
     pub port: u16,
+    /// Protocol version expected by this server.
+    pub protocol_version: u32,
+    /// Supported capability names announced during hello.
+    pub capabilities: Vec<String>,
+    /// One-time nonce clients must echo in `hello` before using non-hello methods.
+    pub handshake_nonce: String,
+    /// Set to true when a remote client requests hot reload.
+    pub hot_reload_requested: bool,
     /// Epoch used for `elapsed()` timestamps.
     pub epoch: Instant,
 }
@@ -114,14 +132,30 @@ impl BridgeShared {
             pending_requests: VecDeque::new(),
             pending_responses: VecDeque::new(),
             broadcast_queue: VecDeque::new(),
-            print_history: Vec::new(),
+            print_history: VecDeque::new(),
             max_print_history: 2000,
-            frame_times: Vec::new(),
+            frame_times: VecDeque::new(),
             max_frame_times: 300,
+            perf_sum: 0.0,
+            perf_min: 0.0,
+            perf_max: 0.0,
             screenshot_requested: false,
             screenshot_scale: 1,
             client_count: 0,
             port: 0,
+            protocol_version: 1,
+            capabilities: vec![
+                "hello".to_string(),
+                "eval".to_string(),
+                "stack".to_string(),
+                "globals".to_string(),
+                "locals".to_string(),
+                "screenshot".to_string(),
+                "hot_reload".to_string(),
+                "inspect".to_string(),
+            ],
+            handshake_nonce: format!("{:x}", Instant::now().elapsed().as_nanos() ^ 0xA5A5_5A5A_u128),
+            hot_reload_requested: false,
             epoch: Instant::now(),
         }
     }
@@ -146,11 +180,10 @@ impl BridgeShared {
             });
         }
         let n = self.frame_times.len() as f64;
-        let sum: f64 = self.frame_times.iter().sum();
-        let avg = sum / n;
-        let min = self.frame_times.iter().cloned().fold(f64::MAX, f64::min);
-        let max = self.frame_times.iter().cloned().fold(0.0_f64, f64::max);
-        let last = *self.frame_times.last().unwrap_or(&0.0);
+        let avg = self.perf_sum / n;
+        let min = self.perf_min;
+        let max = self.perf_max;
+        let last = *self.frame_times.back().unwrap_or(&0.0);
         serde_json::json!({
             "fps": if avg > 0.0 { 1.0 / avg } else { 0.0 },
             "dt": last,
@@ -173,9 +206,9 @@ impl BridgeShared {
             source: source.to_string(),
             line,
         };
-        self.print_history.push(entry);
+        self.print_history.push_back(entry);
         if self.print_history.len() > self.max_print_history {
-            self.print_history.remove(0);
+            let _ = self.print_history.pop_front();
         }
     }
 
@@ -186,9 +219,23 @@ impl BridgeShared {
     /// # Parameters
     /// - `dt` — `f64`.
     pub fn record_frame(&mut self, dt: f64) {
-        self.frame_times.push(dt);
+        self.frame_times.push_back(dt);
+        self.perf_sum += dt;
+        if self.frame_times.len() == 1 {
+            self.perf_min = dt;
+            self.perf_max = dt;
+        } else {
+            self.perf_min = self.perf_min.min(dt);
+            self.perf_max = self.perf_max.max(dt);
+        }
+
         if self.frame_times.len() > self.max_frame_times {
-            self.frame_times.remove(0);
+            if let Some(old) = self.frame_times.pop_front() {
+                self.perf_sum -= old;
+                if (old - self.perf_min).abs() < f64::EPSILON || (old - self.perf_max).abs() < f64::EPSILON {
+                    self.recompute_perf_bounds();
+                }
+            }
         }
     }
 
@@ -201,8 +248,29 @@ impl BridgeShared {
     pub fn set_max_print_history(&mut self, max: usize) {
         self.max_print_history = max.clamp(1, 100_000);
         while self.print_history.len() > self.max_print_history {
-            self.print_history.remove(0);
+            let _ = self.print_history.pop_front();
         }
+    }
+
+    /// Drains pending responses into a vector for easy server-side flush.
+    ///
+    /// # Returns
+    /// `Vec<PendingResponse>`.
+    pub(crate) fn drain_responses(&mut self) -> Vec<PendingResponse> {
+        self.pending_responses.drain(..).collect()
+    }
+
+    /// Queues an event object into the broadcast queue.
+    ///
+    /// # Parameters
+    /// - `event` — `&str`.
+    /// - `data` — `serde_json::Value`.
+    pub(crate) fn queue_broadcast_json(&mut self, event: &str, data: serde_json::Value) {
+        let payload = serde_json::json!({
+            "event": event,
+            "data": data
+        });
+        self.broadcast_queue.push_back(payload.to_string());
     }
 
     /// Appends a print entry and queues a broadcast event for all connected clients.
@@ -216,16 +284,35 @@ impl BridgeShared {
     pub fn capture_print_with_broadcast(&mut self, msg: &str, source: &str, line: u32) {
         self.push_print(msg, source, line);
         let ts = self.elapsed();
-        let event = serde_json::json!({
-            "event": "print",
-            "data": {
+        self.queue_broadcast_json(
+            "print",
+            serde_json::json!({
                 "timestamp": ts,
                 "message": msg,
                 "source": source,
                 "line": line
-            }
-        });
-        self.broadcast_queue.push_back(event.to_string());
+            }),
+        );
+    }
+
+    fn recompute_perf_bounds(&mut self) {
+        if self.frame_times.is_empty() {
+            self.perf_min = 0.0;
+            self.perf_max = 0.0;
+            self.perf_sum = 0.0;
+            return;
+        }
+        let mut min = f64::MAX;
+        let mut max = 0.0_f64;
+        let mut sum = 0.0;
+        for &v in &self.frame_times {
+            min = min.min(v);
+            max = max.max(v);
+            sum += v;
+        }
+        self.perf_min = min;
+        self.perf_max = max;
+        self.perf_sum = sum;
     }
 }
 

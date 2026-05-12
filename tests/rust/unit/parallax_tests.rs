@@ -10,6 +10,7 @@ use lurek2d::parallax::render::batch_to_render_commands;
 use lurek2d::parallax::ParallaxLayer;
 use lurek2d::render::renderer::RenderCommand;
 use lurek2d::render::BlendMode;
+use lurek2d::render::ShaderPassDescriptor;
 use lurek2d::runtime::resource_keys::TextureKey;
 use slotmap::KeyData;
 
@@ -59,6 +60,7 @@ mod render_tests {
             sy: 1.0,
             color: [1.0, 1.0, 1.0, 1.0],
             blend_mode: BlendMode::Alpha,
+            effect: None,
         };
         let cmds = batch_to_render_commands(&batch);
         assert_eq!(cmds.len(), 4); // SetColor + SetBlendMode + 2 tiles
@@ -104,5 +106,103 @@ mod draw_tests {
             assert!(r > 200, "expected high red channel from tint");
             assert!(g < 10, "expected zero green channel from tint");
         }
+    }
+}
+
+// ── layer ─────────────────────────────────────────────────────────────────────
+
+mod layer_tests {
+    use super::*;
+
+    #[test]
+    fn build_draw_calls_respects_custom_tile_size() {
+        let mut layer = ParallaxLayer::new(dummy_key(), 100.0, 50.0);
+        layer.repeat_x = true;
+        layer.repeat_y = false;
+        layer.set_tile_size(200.0, 120.0);
+
+        let batch = layer
+            .build_draw_calls(0.0, 0.0, 450.0, 200.0)
+            .expect("batch should exist for visible layer");
+
+        assert!(
+            (batch.sx - 2.0).abs() < 1e-5,
+            "expected sx=2.0, got {}",
+            batch.sx
+        );
+        assert!(
+            (batch.sy - 2.4).abs() < 1e-5,
+            "expected sy=2.4, got {}",
+            batch.sy
+        );
+        assert!(
+            batch.tiles.len() >= 3,
+            "expected at least three horizontal tiles"
+        );
+
+        let has_0 = batch.tiles.iter().any(|(x, _)| (*x - 0.0).abs() < 1e-5);
+        let has_200 = batch.tiles.iter().any(|(x, _)| (*x - 200.0).abs() < 1e-5);
+        let has_400 = batch.tiles.iter().any(|(x, _)| (*x - 400.0).abs() < 1e-5);
+        assert!(has_0, "expected a tile at x=0");
+        assert!(has_200, "expected a tile at x=200");
+        assert!(has_400, "expected a tile at x=400");
+    }
+
+    #[test]
+    fn build_draw_calls_tiling_overrides_repeat_flags_in_both_axes() {
+        let mut layer = ParallaxLayer::new(dummy_key(), 64.0, 64.0);
+        layer.repeat_x = false;
+        layer.repeat_y = false;
+        layer.set_tiling(true);
+
+        let batch = layer
+            .build_draw_calls(0.0, 0.0, 128.0, 128.0)
+            .expect("batch should exist for visible layer");
+
+        assert!(batch.tiles.len() >= 4, "expected 2D tiling coverage");
+
+        let mut has_second_x = false;
+        let mut has_second_y = false;
+        for &(x, y) in &batch.tiles {
+            if (x - 64.0).abs() < 1e-5 {
+                has_second_x = true;
+            }
+            if (y - 64.0).abs() < 1e-5 {
+                has_second_y = true;
+            }
+        }
+
+        assert!(has_second_x, "expected at least one tile at x=64");
+        assert!(has_second_y, "expected at least one tile at y=64");
+    }
+
+    #[test]
+    fn build_draw_calls_applies_motion_stretch_from_autoscroll_speed() {
+        let mut layer = ParallaxLayer::new(dummy_key(), 64.0, 64.0);
+        layer.repeat_x = false;
+        layer.repeat_y = false;
+        layer.autoscroll = [500.0, 0.0];
+        layer.set_motion_stretch(true, 0.001, 1.8);
+
+        let batch = layer
+            .build_draw_calls(0.0, 0.0, 128.0, 128.0)
+            .expect("batch should exist");
+
+        assert!(batch.sx > 1.0, "sx should be stretched by velocity");
+        assert!(batch.sy >= 1.0, "sy should remain valid");
+    }
+
+    #[test]
+    fn build_draw_calls_keeps_effect_chain() {
+        let mut layer = ParallaxLayer::new(dummy_key(), 64.0, 64.0);
+        layer.set_effect_chain(vec![ShaderPassDescriptor::new("blur")]);
+
+        let batch = layer
+            .build_draw_calls(0.0, 0.0, 128.0, 128.0)
+            .expect("batch should exist");
+
+        let effect = batch.effect.expect("effect chain should exist");
+        assert_eq!(effect.len(), 1);
+        assert_eq!(effect[0].effect_name, "blur");
     }
 }

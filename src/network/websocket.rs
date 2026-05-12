@@ -18,6 +18,7 @@
 use std::collections::HashMap;
 use std::net::TcpStream;
 use std::sync::mpsc;
+use std::thread;
 
 use log::{debug, warn};
 use tungstenite::protocol::Message;
@@ -33,6 +34,13 @@ use super::net_thread::{NetworkResponse, WsEvent};
 pub struct WebSocketManager {
     /// Active WebSocket connections indexed by their unique ID.
     connections: HashMap<u64, WebSocket<MaybeTlsStream<TcpStream>>>,
+    /// Background connect tasks still in progress.
+    pending_connects: Vec<PendingConnect>,
+}
+
+struct PendingConnect {
+    id: u64,
+    rx: mpsc::Receiver<Result<WebSocket<MaybeTlsStream<TcpStream>>, String>>,
 }
 
 impl WebSocketManager {
@@ -43,6 +51,7 @@ impl WebSocketManager {
     pub fn new() -> Self {
         Self {
             connections: HashMap::new(),
+            pending_connects: Vec::new(),
         }
     }
 
@@ -65,30 +74,22 @@ impl WebSocketManager {
         id: u64,
         url: &str,
         _protocols: &[String],
-        resp_tx: &mpsc::Sender<NetworkResponse>,
+        _resp_tx: &mpsc::Sender<NetworkResponse>,
     ) {
         debug!("WebSocket connecting to {}", url);
-
-        match tungstenite::connect(url) {
-            Ok((socket, _response)) => {
-                // Set the underlying TCP stream to non-blocking
-                if let MaybeTlsStream::Plain(ref tcp) = socket.get_ref() {
-                    let _ = tcp.set_nonblocking(true);
-                }
-                self.connections.insert(id, socket);
-                let _ = resp_tx.send(NetworkResponse::WebSocketEvent {
-                    id,
-                    event: WsEvent::Open,
-                });
-            }
-            Err(e) => {
-                warn!("WebSocket connect error to {}: {}", url, e);
-                let _ = resp_tx.send(NetworkResponse::WebSocketEvent {
-                    id,
-                    event: WsEvent::Error(format!("connect error: {e}")),
-                });
-            }
-        }
+        let url_s = url.to_string();
+        let (tx, rx) = mpsc::channel();
+        thread::Builder::new()
+            .name(format!("lurek-ws-connect-{id}"))
+            .spawn(move || {
+                let result = match tungstenite::connect(&url_s) {
+                    Ok((socket, _)) => Ok(socket),
+                    Err(e) => Err(format!("connect error: {e}")),
+                };
+                let _ = tx.send(result);
+            })
+            .ok();
+        self.pending_connects.push(PendingConnect { id, rx });
     }
 
     /// Send data on an existing WebSocket connection.
@@ -171,6 +172,7 @@ impl WebSocketManager {
     /// # Parameters
     /// - `resp_tx` — Channel for sending events to the main thread.
     pub fn poll_all(&mut self, resp_tx: &mpsc::Sender<NetworkResponse>) {
+        self.poll_pending_connects(resp_tx);
         let mut to_remove = Vec::new();
 
         for (&id, socket) in self.connections.iter_mut() {
@@ -220,10 +222,44 @@ impl WebSocketManager {
         }
     }
 
+    fn poll_pending_connects(&mut self, resp_tx: &mpsc::Sender<NetworkResponse>) {
+        let mut retained = Vec::with_capacity(self.pending_connects.len());
+        for pending in self.pending_connects.drain(..) {
+            match pending.rx.try_recv() {
+                Ok(Ok(socket)) => {
+                    if let MaybeTlsStream::Plain(ref tcp) = socket.get_ref() {
+                        let _ = tcp.set_nonblocking(true);
+                    }
+                    self.connections.insert(pending.id, socket);
+                    let _ = resp_tx.send(NetworkResponse::WebSocketEvent {
+                        id: pending.id,
+                        event: WsEvent::Open,
+                    });
+                }
+                Ok(Err(err)) => {
+                    warn!("WebSocket connect error on {}: {}", pending.id, err);
+                    let _ = resp_tx.send(NetworkResponse::WebSocketEvent {
+                        id: pending.id,
+                        event: WsEvent::Error(err),
+                    });
+                }
+                Err(mpsc::TryRecvError::Empty) => retained.push(pending),
+                Err(mpsc::TryRecvError::Disconnected) => {
+                    let _ = resp_tx.send(NetworkResponse::WebSocketEvent {
+                        id: pending.id,
+                        event: WsEvent::Error("connect worker disconnected".to_string()),
+                    });
+                }
+            }
+        }
+        self.pending_connects = retained;
+    }
+
     /// Close all active WebSocket connections.
     ///
     /// Called during network thread shutdown.
     pub fn close_all(&mut self) {
+        self.pending_connects.clear();
         for (_, mut socket) in self.connections.drain() {
             let _ = socket.close(None);
         }

@@ -1,6 +1,0 @@
-- TODO: Add lazy or streaming evaluation so large query pipelines do not fully materialize every intermediate result.
-- TODO: Split `query.rs` into smaller submodules, especially around grouping, aggregation, and join logic.
-- TODO: Add coverage for `with_eval`, `pivot_table`, `rolling_mean`, `rolling_sum`, `rank_column`, `random` edge cases, and multi-table `Database` SQL.
-- TODO: Decide whether `dataframe` and `sql` should be extractable behind an optional feature gate.
-- TODO: Add SQLite import support such as `fromSQLite(path, query)`.
-- TODO: Add visualization or chart output support such as `df:plot()`.

@@ -40,6 +40,8 @@ pub mod noise_generator;
 pub mod random;
 /// Axis-aligned rectangle with intersection and containment queries.
 pub mod rect;
+/// Runtime shelf rectangle packing for atlas/UI layout workflows.
+pub mod rect_packing;
 /// Spatial hash for efficient broad-phase AABB collision queries.
 pub mod spatial_hash;
 /// Spherical math helpers (lat/lon, ray-sphere, great-circle, axial tilt).
@@ -62,6 +64,7 @@ pub use mat3::Mat3;
 pub use noise_generator::{DistType, FractalType, MapGenOptions, NoiseGenerator, NoiseKind};
 pub use random::RandomGenerator;
 pub use rect::Rect;
+pub use rect_packing::{PackedRect, RectPacker};
 pub use spatial_hash::SpatialHash;
 pub use spline::{CatmullRomSpline, HermiteSpline};
 pub use transform::Transform;

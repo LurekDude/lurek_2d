@@ -310,6 +310,68 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     // Clone for getLastError below (before state is consumed by getDebugOverlay)
     let state_for_error = state.clone();
 
+    // -- reloadConfig --
+    /// Requests a hot-reload of `conf.toml` on the next engine tick.
+    ///
+    /// The reload is asynchronous: this function sets a flag that the app loop
+    /// checks at the start of the next frame.  The same mutable fields that the
+    /// file-watcher updates are refreshed (physics tick rate, vsync, viewport,
+    /// etc.).  Read-only fields such as window title and renderer backend are
+    /// not changed at runtime.
+    /// @return | nil | No return value.
+    let s = state.clone();
+    system.set(
+        "reloadConfig",
+        lua.create_function(move |_, ()| {
+            s.borrow_mut().pending_config_reload = true;
+            Ok(())
+        })?,
+    )?;
+
+    // -- getConfig --
+    /// Returns a snapshot of the active runtime-mutable configuration values.
+    ///
+    /// The table contains:
+    /// - `physics_tick_rate` (`number`) — current physics fixed-step frequency in Hz.
+    /// - `fixed_update_tick_rate` (`number` or `nil`) — `fixedUpdate` callback frequency in Hz, or `nil` when disabled.
+    /// - `frame_budget_warn_ms` (`number` or `nil`) — frame budget threshold in ms, or `nil` when not set.
+    /// - `lua_callback_timeout_ms` (`number` or `nil`) — per-callback timeout in ms, or `nil` when disabled.
+    /// - `vsync` (`boolean`) — whether vsync is currently enabled.
+    /// - `log_level` (`string`) — current minimum log level name.
+    /// - `config_reload_revision` (`integer`) — monotonic revision counter; increments on each hot-reload.
+    /// @return | table | Returns the active runtime-mutable configuration snapshot.
+    let s = state.clone();
+    system.set(
+        "getConfig",
+        lua.create_function(move |lua, ()| {
+            let st = s.borrow();
+            let tbl = lua.create_table()?;
+            let fixed_dt = st.physics_run.fixed_dt;
+            let physics_tick_rate = if fixed_dt > 0.0 { 1.0 / fixed_dt } else { 0.0 };
+            tbl.set("physics_tick_rate", physics_tick_rate)?;
+            let fixed_update_dt = st.physics_run.fixed_update_dt;
+            if fixed_update_dt > 0.0 {
+                tbl.set("fixed_update_tick_rate", 1.0 / fixed_update_dt)?;
+            } else {
+                tbl.set("fixed_update_tick_rate", mlua::Value::Nil)?;
+            }
+            if let Some(ms) = st.frame_budget_warn_ms {
+                tbl.set("frame_budget_warn_ms", ms)?;
+            } else {
+                tbl.set("frame_budget_warn_ms", mlua::Value::Nil)?;
+            }
+            if let Some(ms) = st.lua_callback_timeout_ms {
+                tbl.set("lua_callback_timeout_ms", ms)?;
+            } else {
+                tbl.set("lua_callback_timeout_ms", mlua::Value::Nil)?;
+            }
+            tbl.set("vsync", st.window_state.vsync_mode != 0)?;
+            tbl.set("log_level", log_messages::get_log_level().to_string())?;
+            tbl.set("config_reload_revision", st.config_reload_revision)?;
+            Ok(tbl)
+        })?,
+    )?;
+
     // -- setDebugOverlay --
     /// Shows or hides the FPS/draw-call debug overlay.
     /// @param | enabled | boolean | Whether the debug overlay should be visible.

@@ -1381,4 +1381,27 @@ describe("unit: migrated from integration/test_particle_timer.lua", function()
 
 end)
 
+-- @describe particle presets and physics collision
+describe("particle presets and physics collision", function()
+    -- @covers lurek.particle.newPreset
+    it("newPreset creates known presets", function()
+        local ps = lurek.particle.newPreset("fire")
+        expect_type("userdata", ps)
+    end)
+
+    -- @covers LParticleSystem:clearCollidesWithPhysics
+    -- @covers LParticleSystem:hasCollidesWithPhysics
+    -- @covers LParticleSystem:setCollidesWithPhysics
+    -- @covers lurek.particle.newSystem
+    -- @covers lurek.physics.newWorld
+    it("setCollidesWithPhysics toggles collision state", function()
+        local ps = lurek.particle.newSystem()
+        local world = lurek.physics.newWorld(0, 9.81)
+        ps:setCollidesWithPhysics(world)
+        expect_true(ps:hasCollidesWithPhysics())
+        ps:clearCollidesWithPhysics()
+        expect_false(ps:hasCollidesWithPhysics())
+    end)
+end)
+
 test_summary()

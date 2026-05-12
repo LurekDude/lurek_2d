@@ -30,6 +30,7 @@ cargo run -- content/examples/<name>.lua
 | `graph.lua` | `lurek.graph` | Directed/undirected graph |
 | `i18n.lua` | `lurek.i18n` | Localisation strings |
 | `image.lua` | `lurek.image` | Pixel data creation and manipulation |
+| `province_sanitize.lua` | `lurek.province` | Marker sanitization + province-count comparison demo |
 | `input.lua` | `lurek.input` | Keyboard, mouse, gamepad, actions |
 | `light.lua` | `lurek.light` | 2D point lights |
 | `log.lua` | `lurek.log` | Structured log output |

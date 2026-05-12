@@ -776,3 +776,21 @@ do -- LUniverse:typeOf
   local u = lurek.ecs.newUniverse()
   local ok = u:typeOf("LUniverse")
 end
+
+--@api-stub: LUniverse:takeSnapshotDiff
+-- Returns incremental world changes since the previous diff pull.
+-- Use this for delta sync / replay streams without serializing the full world every frame.
+do -- LUniverse:takeSnapshotDiff
+  local world = lurek.ecs.newUniverse()
+  local e = world:spawn()
+  world:set(e, "hp", 10)
+  world:remove(e, "hp")
+  world:kill(e)
+  local diff = world:takeSnapshotDiff()
+  lurek.log.info(
+    "diff add=" .. #diff.added_components ..
+    " rem=" .. #diff.removed_components ..
+    " del=" .. #diff.deleted_entities,
+    "ecs"
+  )
+end

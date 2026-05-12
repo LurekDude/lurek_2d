@@ -1,4 +1,5 @@
 -- content/examples/window.lua
+---@diagnostic disable: undefined-field
 -- Hand-written coverage of the lurek.window API (50 items).
 --
 -- The lurek.window namespace owns the OS-level window: title, size,
@@ -280,6 +281,23 @@ do -- lurek.window.getMode
     " vsync=" .. flags.vsync, "video")
 end
 
+--@api-stub: lurek.window.windowConfig
+-- Applies common window setup fields from one options table.
+do -- lurek.window.windowConfig
+  lurek.window["windowConfig"]({
+    title = "My Game - Config Applied",
+    width = 1280,
+    height = 720,
+    fullscreen = false,
+    fullscreentype = "desktop",
+    vsync = 1,
+    x = 100,
+    y = 100,
+    scaleMode = "letterbox",
+    display = 0,
+  })
+end
+
 --@api-stub: lurek.window.close
 -- Requests the window to close.
 -- Bind to an in-game "Quit" menu entry; the engine will run lurek.quit before the process exits.
@@ -533,22 +551,24 @@ end
 --@api-stub: lurek.window.display
 -- Grouped display API aliases.
 do -- lurek.window.display
-  local displays = lurek.window.display.getDisplays()
-  local current = lurek.window.display.getCurrent()
-  lurek.window.display.setCurrent(current)
-  lurek.log.info("display count=" .. lurek.window.display.getCount(), "video")
+  local display_ns = lurek.window["display"]
+  local displays = display_ns.getDisplays()
+  local current = display_ns.getCurrent()
+  display_ns.setCurrent(current)
+  lurek.log.info("display count=" .. display_ns.getCount(), "video")
 end
 
 --@api-stub: lurek.window.mode
 -- Grouped mode API aliases.
 do -- lurek.window.mode
-  local w, h, flags = lurek.window.mode.get()
-  lurek.window.mode.set(w, h, { fullscreen = flags.fullscreen, vsync = flags.vsync })
+  local mode_ns = lurek.window["mode"]
+  local w, h, flags = mode_ns.get()
+  mode_ns.set(w, h, { fullscreen = flags.fullscreen, vsync = flags.vsync })
 end
 
 --@api-stub: lurek.window.cursor
 -- Grouped cursor API aliases.
 do -- lurek.window.cursor
-  local inside = lurek.window.cursor.hasFocus()
+  local inside = lurek.window["cursor"].hasFocus()
   lurek.log.info("cursor in window=" .. tostring(inside), "input")
 end

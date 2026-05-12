@@ -16,6 +16,7 @@
 
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
+use std::time::Instant;
 
 use crate::thread::channel::{Channel, ChannelValue};
 use crate::thread::worker::LuaThread;
@@ -118,6 +119,25 @@ impl ThreadPool {
         for worker in &self.workers {
             worker.lock().unwrap().wait();
         }
+    }
+
+    /// Waits for all workers to finish up to `timeout_secs`.
+    ///
+    /// Returns `true` when all workers finished in time.
+    pub fn join_with_timeout(&mut self, timeout_secs: f64) -> bool {
+        let timeout_secs = timeout_secs.max(0.0);
+        let deadline = Instant::now() + std::time::Duration::from_secs_f64(timeout_secs);
+        for worker in &self.workers {
+            let now = Instant::now();
+            if now >= deadline {
+                return false;
+            }
+            let remaining = deadline.saturating_duration_since(now).as_secs_f64();
+            if !worker.lock().unwrap().wait_timeout(remaining) {
+                return false;
+            }
+        }
+        true
     }
 
     /// Returns the number of workers in this pool.

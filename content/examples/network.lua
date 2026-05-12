@@ -88,6 +88,94 @@ do -- lurek.network.discoverLobbies
   end
 end
 
+--@api-stub: lurek.network.createRoom
+-- Creates a room in local matchmaking registry.
+do -- lurek.network.createRoom
+  local room = lurek.network.createRoom("Ranked-1", "hostA", 6)
+  local same = lurek.network.joinRoom(room.id)
+  lurek.log.info("room " .. room.id .. " players=" .. (same and same.player_count or 0), "match")
+  local _all = lurek.network.listRooms()
+  lurek.network.leaveRoom(room.id)
+end
+
+--@api-stub: lurek.network.joinRoom
+-- Joins room by id and returns updated room.
+do -- lurek.network.joinRoom
+  local room = lurek.network.createRoom("casual", "hostB", 3)
+  local joined = lurek.network.joinRoom(room.id)
+  if joined then lurek.log.debug("joined room=" .. joined.id, "match") end
+end
+
+--@api-stub: lurek.network.leaveRoom
+-- Leaves room by id and returns updated room.
+do -- lurek.network.leaveRoom
+  local room = lurek.network.createRoom("coop", "hostC", 3)
+  local _ = lurek.network.joinRoom(room.id)
+  local left = lurek.network.leaveRoom(room.id)
+  if left then lurek.log.debug("left room=" .. left.id, "match") end
+end
+
+--@api-stub: lurek.network.listRooms
+-- Lists known rooms in local registry.
+do -- lurek.network.listRooms
+  local rooms = lurek.network.listRooms()
+  lurek.log.debug("room count=" .. #rooms, "match")
+end
+
+--@api-stub: lurek.network.newRelayTicket
+-- Encodes relay ticket + NAT punch helper payload.
+do -- lurek.network.newRelayTicket
+  local ticket = lurek.network.newRelayTicket("room-1", "peer-A")
+  local parsed = lurek.network.parseRelayTicket(ticket)
+  if parsed then
+    local probe = lurek.network.makePunchProbe(parsed.peer_id)
+    local from_peer = lurek.network.parsePunchProbe(probe)
+    lurek.log.debug("relay ticket peer=" .. tostring(from_peer), "relay")
+  end
+end
+
+--@api-stub: lurek.network.parseRelayTicket
+-- Decodes a relay ticket token.
+do -- lurek.network.parseRelayTicket
+  local token = lurek.network.newRelayTicket("room-2", "peer-B")
+  local parsed = lurek.network.parseRelayTicket(token)
+  if parsed then lurek.log.debug(parsed.room_id .. ":" .. parsed.peer_id, "relay") end
+end
+
+--@api-stub: lurek.network.makePunchProbe
+-- Builds binary NAT punch probe payload.
+do -- lurek.network.makePunchProbe
+  local probe = lurek.network.makePunchProbe("peer-C")
+  lurek.log.debug("probe bytes=" .. #probe, "relay")
+end
+
+--@api-stub: lurek.network.parsePunchProbe
+-- Parses binary NAT punch probe payload.
+do -- lurek.network.parsePunchProbe
+  local probe = lurek.network.makePunchProbe("peer-D")
+  local who = lurek.network.parsePunchProbe(probe)
+  lurek.log.debug("probe peer=" .. tostring(who), "relay")
+end
+
+--@api-stub: lurek.network.predictLinear
+-- Predicts and reconciles one entity snapshot.
+do -- lurek.network.predictLinear
+  local now = { id = 1, tick = 10, x = 0.0, y = 0.0, vx = 2.0, vy = 0.0 }
+  local predicted = lurek.network.predictLinear(now, 0.1)
+  local server = { id = 1, tick = 11, x = 0.18, y = 0.0, vx = 2.0, vy = 0.0 }
+  local smooth = lurek.network.reconcileSnapshot(predicted, server, 0.5)
+  lurek.log.debug("reconciled x=" .. smooth.x, "net-sync")
+end
+
+--@api-stub: lurek.network.reconcileSnapshot
+-- Reconciles predicted and authoritative snapshots.
+do -- lurek.network.reconcileSnapshot
+  local predicted = { id = 2, tick = 20, x = 1.0, y = 0.0, vx = 1.0, vy = 0.0 }
+  local server = { id = 2, tick = 20, x = 1.2, y = 0.1, vx = 1.0, vy = 0.0 }
+  local out = lurek.network.reconcileSnapshot(predicted, server, 0.5)
+  lurek.log.debug("reconciled snapshot tick=" .. out.tick, "net-sync")
+end
+
 --@api-stub: lurek.network.syncEntity
 -- Convenience helper: packs an entity snapshot and broadcasts it to all peers.
 -- Use for fire-and-forget state replication of fast-moving entities; pass reliable=false to keep latency low.

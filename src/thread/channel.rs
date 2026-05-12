@@ -7,6 +7,7 @@
 
 use std::collections::VecDeque;
 use std::sync::{Arc, Condvar, Mutex};
+use std::time::{Duration, Instant};
 
 use mlua::prelude::*;
 
@@ -41,6 +42,13 @@ pub enum ChannelValue {
     Bytes(Vec<u8>),
 }
 
+/// Overflow behavior for bounded channels.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum OverflowPolicy {
+    /// Block producers until space is available (backpressure).
+    Block,
+}
+
 /// Thread-safe MPMC channel for Lua inter-thread communication.
 ///
 /// Internally uses a `Mutex<VecDeque>` protected queue with a `Condvar`
@@ -52,6 +60,8 @@ pub enum ChannelValue {
 /// - `queue` — `Mutex<VecDeque<ChannelValue>>`.
 /// - `condvar` — `Condvar`.
 /// - `push_count` — `Mutex<u64>`.
+/// - `capacity` — `Option<usize>`.
+/// - `overflow_policy` — `OverflowPolicy`.
 pub struct Channel {
     /// Optional name for globally-registered channels.
     name: Option<String>,
@@ -61,21 +71,49 @@ pub struct Channel {
     condvar: Condvar,
     /// Monotonic push counter for tracking reads.
     push_count: Mutex<u64>,
+    /// Optional bounded capacity; `None` means unbounded.
+    capacity: Option<usize>,
+    /// Overflow behavior once a bounded channel reaches capacity.
+    overflow_policy: OverflowPolicy,
 }
 
 impl Channel {
+    fn create(
+        name: Option<String>,
+        capacity: Option<usize>,
+        overflow_policy: OverflowPolicy,
+    ) -> Arc<Self> {
+        Arc::new(Self {
+            name,
+            queue: Mutex::new(VecDeque::new()),
+            condvar: Condvar::new(),
+            push_count: Mutex::new(0),
+            capacity,
+            overflow_policy,
+        })
+    }
+
     /// Create an unnamed channel. Returns a fully initialised instance with all fields set to their initial values.
     ///
     /// # Returns
     /// `Arc<Self>`.
     pub fn new() -> Arc<Self> {
         log_msg!(debug, CH01);
-        Arc::new(Self {
-            name: None,
-            queue: Mutex::new(VecDeque::new()),
-            condvar: Condvar::new(),
-            push_count: Mutex::new(0),
-        })
+        Self::create(None, None, OverflowPolicy::Block)
+    }
+
+    /// Creates a new bounded channel with backpressure.
+    ///
+    /// When full, `push` blocks until there is free capacity.
+    ///
+    /// # Parameters
+    /// - `capacity` — `usize`.
+    ///
+    /// # Returns
+    /// `Arc<Self>`.
+    pub fn bounded(capacity: usize) -> Arc<Self> {
+        let normalized = capacity.max(1);
+        Self::create(None, Some(normalized), OverflowPolicy::Block)
     }
 
     /// Creates a named bidirectional channel pair, binding the channel name in the global registry.
@@ -87,15 +125,25 @@ impl Channel {
     /// `Arc<Self>`.
     pub fn named(name: String) -> Arc<Self> {
         log_msg!(debug, CH02, "{}", name);
-        Arc::new(Self {
-            name: Some(name),
-            queue: Mutex::new(VecDeque::new()),
-            condvar: Condvar::new(),
-            push_count: Mutex::new(0),
-        })
+        Self::create(Some(name), None, OverflowPolicy::Block)
+    }
+
+    /// Creates a named bounded channel with backpressure.
+    ///
+    /// # Parameters
+    /// - `name` — `String`.
+    /// - `capacity` — `usize`.
+    ///
+    /// # Returns
+    /// `Arc<Self>`.
+    pub fn named_bounded(name: String, capacity: usize) -> Arc<Self> {
+        let normalized = capacity.max(1);
+        Self::create(Some(name), Some(normalized), OverflowPolicy::Block)
     }
 
     /// Push a value to the back of the channel. Returns the push ID.
+    ///
+    /// For bounded channels this method applies backpressure and blocks while full.
     ///
     /// # Parameters
     /// - `value` — `ChannelValue`.
@@ -104,13 +152,48 @@ impl Channel {
     /// `u64`.
     pub fn push(&self, value: ChannelValue) -> u64 {
         let mut queue = self.queue.lock().unwrap();
+        let mut pending = Some(value);
+
+        loop {
+            let has_capacity = self
+                .capacity
+                .map(|limit| queue.len() < limit)
+                .unwrap_or(true);
+            if has_capacity {
+                queue.push_back(pending.take().expect("value must exist before push"));
+                let mut count = self.push_count.lock().unwrap();
+                *count += 1;
+                let id = *count;
+                log_msg!(trace, CH03, "push_id={}", id);
+                self.condvar.notify_one();
+                return id;
+            }
+
+            match self.overflow_policy {
+                OverflowPolicy::Block => {
+                    queue = self.condvar.wait(queue).unwrap();
+                }
+            }
+        }
+    }
+
+    /// Attempts to push a value without blocking.
+    ///
+    /// Returns `false` when the channel is currently at bounded capacity.
+    pub fn try_push(&self, value: ChannelValue) -> bool {
+        let mut queue = self.queue.lock().unwrap();
+        let has_capacity = self
+            .capacity
+            .map(|limit| queue.len() < limit)
+            .unwrap_or(true);
+        if !has_capacity {
+            return false;
+        }
         queue.push_back(value);
         let mut count = self.push_count.lock().unwrap();
         *count += 1;
-        let id = *count;
-        log_msg!(trace, CH03, "push_id={}", id);
         self.condvar.notify_one();
-        id
+        true
     }
 
     /// Pop a value from the front of the channel (non-blocking).
@@ -121,7 +204,11 @@ impl Channel {
     /// Returns `None` if the channel is empty.
     pub fn pop(&self) -> Option<ChannelValue> {
         let mut queue = self.queue.lock().unwrap();
-        queue.pop_front()
+        let out = queue.pop_front();
+        if out.is_some() {
+            self.condvar.notify_one();
+        }
+        out
     }
 
     /// Peek at the front value without removing it.
@@ -147,14 +234,24 @@ impl Channel {
     /// elapses without a value. If `timeout` is `None`, blocks forever.
     pub fn demand(&self, timeout: Option<f64>) -> Option<ChannelValue> {
         let mut queue = self.queue.lock().unwrap();
+        let deadline = timeout
+            .filter(|secs| *secs >= 0.0)
+            .map(|secs| Instant::now() + Duration::from_secs_f64(secs));
+
         loop {
             if let Some(val) = queue.pop_front() {
+                self.condvar.notify_one();
                 return Some(val);
             }
-            match timeout {
-                Some(secs) => {
-                    let duration = std::time::Duration::from_secs_f64(secs);
-                    let (q, result) = self.condvar.wait_timeout(queue, duration).unwrap();
+
+            match deadline {
+                Some(end_at) => {
+                    let now = Instant::now();
+                    if now >= end_at {
+                        return None;
+                    }
+                    let wait_for = end_at.saturating_duration_since(now);
+                    let (q, result) = self.condvar.wait_timeout(queue, wait_for).unwrap();
                     queue = q;
                     if result.timed_out() {
                         return queue.pop_front();
@@ -181,6 +278,7 @@ impl Channel {
         let count = queue.len();
         queue.clear();
         log_msg!(debug, CH04, "{}", count);
+        self.condvar.notify_all();
     }
 
     /// Push a value only if the channel is currently empty.
@@ -195,7 +293,11 @@ impl Channel {
     /// already contained at least one value.
     pub fn supply(&self, value: ChannelValue) -> bool {
         let mut queue = self.queue.lock().unwrap();
-        if queue.is_empty() {
+        let has_capacity = self
+            .capacity
+            .map(|limit| queue.len() < limit)
+            .unwrap_or(true);
+        if queue.is_empty() && has_capacity {
             queue.push_back(value);
             self.condvar.notify_one();
             true
@@ -210,6 +312,16 @@ impl Channel {
     /// `Option<&str>`.
     pub fn name(&self) -> Option<&str> {
         self.name.as_deref()
+    }
+
+    /// Returns configured bounded capacity, or `None` for unbounded channels.
+    pub fn capacity(&self) -> Option<usize> {
+        self.capacity
+    }
+
+    /// Returns `true` when this channel has a bounded capacity.
+    pub fn is_bounded(&self) -> bool {
+        self.capacity.is_some()
     }
 }
 

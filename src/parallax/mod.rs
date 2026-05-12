@@ -31,8 +31,8 @@
 //! lurek.parallax.newLayer(opts)        → LuaParallaxLayer
 //! lurek.parallax.newSet(name)          → LuaParallaxSet
 //! layer:update(dt)
-//! layer:draw(cam_x, cam_y)
-//! layer:drawAuto()                     -- reads lurek.camera position
+//! layer:render(cam_x, cam_y)
+//! layer:renderAuto()                   -- reads lurek.camera position
 //! layer:setScrollFactor(x, y)
 //! layer:setOffset(x, y)
 //! layer:setAutoscroll(vx, vy)
@@ -54,9 +54,10 @@
 //! layer:type()             → "ParallaxLayer"
 //! set:addLayer(layer)
 //! set:removeLayerAt(index)
+//! set:getLayerZAt(index)
 //! set:update(dt)
-//! set:draw(cam_x, cam_y)
-//! set:drawAuto()
+//! set:render(cam_x, cam_y)
+//! set:renderAuto()
 //! set:sortByZ()
 //! set:layerCount()          → n
 //! set:setVisible(v)
@@ -69,7 +70,11 @@
 pub mod draw;
 /// Parallax layer data model and draw-call batch builder.
 pub mod layer;
+/// Ready-to-use layer presets for common parallax backgrounds.
+pub mod presets;
 /// Render-command generation for parallax layers.
 pub mod render;
+/// Shared tiled-position iterator helper.
+pub mod tile_iter;
 
 pub use layer::{ParallaxDrawBatch, ParallaxLayer};

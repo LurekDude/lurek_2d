@@ -89,29 +89,43 @@ impl Graph {
                 }
             }
 
-            for edge in self.edges.values() {
-                let neighbor = if edge.from_node == node_id {
-                    Some(edge.to_node)
-                } else if edge.bidirectional && edge.to_node == node_id {
-                    Some(edge.from_node)
-                } else {
-                    None
+            for &edge_id in self.outgoing_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
                 };
+                if !edge.active {
+                    continue;
+                }
+                let next = edge.to_node;
+                let new_cost = cost + edge.weight;
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    prev.insert(next, (node_id, edge.id));
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
+                }
+            }
 
-                if let Some(next) = neighbor {
-                    if !edge.active {
-                        continue;
-                    }
-                    let new_cost = cost + edge.weight;
-                    let better = dist.get(&next).is_none_or(|&d| new_cost < d);
-                    if better {
-                        dist.insert(next, new_cost);
-                        prev.insert(next, (node_id, edge.id));
-                        heap.push(DijkstraState {
-                            cost: new_cost,
-                            node_id: next,
-                        });
-                    }
+            for &edge_id in self.incoming_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
+                };
+                if !edge.active || !edge.bidirectional {
+                    continue;
+                }
+                let next = edge.from_node;
+                let new_cost = cost + edge.weight;
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    prev.insert(next, (node_id, edge.id));
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
                 }
             }
         }
@@ -163,32 +177,49 @@ impl Graph {
                 }
             }
 
-            for edge in self.edges.values() {
-                let neighbor = if edge.from_node == node_id {
-                    Some(edge.to_node)
-                } else if edge.bidirectional && edge.to_node == node_id {
-                    Some(edge.from_node)
-                } else {
-                    None
+            for &edge_id in self.outgoing_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
                 };
+                if !edge.active || edge.is_on_cooldown() {
+                    continue;
+                }
+                if !edge.is_item_type_allowed(&item_type) {
+                    continue;
+                }
+                let next = edge.to_node;
+                let new_cost = cost + edge.weight;
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    prev.insert(next, (node_id, edge.id));
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
+                }
+            }
 
-                if let Some(next) = neighbor {
-                    if !edge.active || edge.is_on_cooldown() {
-                        continue;
-                    }
-                    if !edge.is_item_type_allowed(&item_type) {
-                        continue;
-                    }
-                    let new_cost = cost + edge.weight;
-                    let better = dist.get(&next).is_none_or(|&d| new_cost < d);
-                    if better {
-                        dist.insert(next, new_cost);
-                        prev.insert(next, (node_id, edge.id));
-                        heap.push(DijkstraState {
-                            cost: new_cost,
-                            node_id: next,
-                        });
-                    }
+            for &edge_id in self.incoming_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
+                };
+                if !edge.active || !edge.bidirectional || edge.is_on_cooldown() {
+                    continue;
+                }
+                if !edge.is_item_type_allowed(&item_type) {
+                    continue;
+                }
+                let next = edge.from_node;
+                let new_cost = cost + edge.weight;
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    prev.insert(next, (node_id, edge.id));
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
                 }
             }
         }
@@ -241,33 +272,51 @@ impl Graph {
                 result.push(node_id);
             }
 
-            for edge in self.edges.values() {
-                let neighbor = if edge.from_node == node_id {
-                    Some(edge.to_node)
-                } else if edge.bidirectional && edge.to_node == node_id {
-                    Some(edge.from_node)
-                } else {
-                    None
+            for &edge_id in self.outgoing_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
                 };
-
-                if let Some(next) = neighbor {
-                    if !edge.active {
+                if !edge.active {
+                    continue;
+                }
+                let next = edge.to_node;
+                let new_cost = cost + edge.weight;
+                if let Some(max) = max_dist {
+                    if new_cost > max {
                         continue;
                     }
-                    let new_cost = cost + edge.weight;
-                    if let Some(max) = max_dist {
-                        if new_cost > max {
-                            continue;
-                        }
+                }
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
+                }
+            }
+
+            for &edge_id in self.incoming_edge_ids_slice(node_id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
+                };
+                if !edge.active || !edge.bidirectional {
+                    continue;
+                }
+                let next = edge.from_node;
+                let new_cost = cost + edge.weight;
+                if let Some(max) = max_dist {
+                    if new_cost > max {
+                        continue;
                     }
-                    let better = dist.get(&next).is_none_or(|&d| new_cost < d);
-                    if better {
-                        dist.insert(next, new_cost);
-                        heap.push(DijkstraState {
-                            cost: new_cost,
-                            node_id: next,
-                        });
-                    }
+                }
+                let better = dist.get(&next).is_none_or(|&d| new_cost < d);
+                if better {
+                    dist.insert(next, new_cost);
+                    heap.push(DijkstraState {
+                        cost: new_cost,
+                        node_id: next,
+                    });
                 }
             }
         }
@@ -284,11 +333,19 @@ impl Graph {
     /// `Vec<u64>`.
     pub fn get_neighbors(&self, node_id: u64) -> Vec<u64> {
         let mut result = HashSet::new();
-        for edge in self.edges.values() {
-            if edge.from_node == node_id && edge.active {
+        for &edge_id in self.outgoing_edge_ids_slice(node_id) {
+            let Some(edge) = self.edges.get(&edge_id) else {
+                continue;
+            };
+            if edge.active {
                 result.insert(edge.to_node);
             }
-            if edge.bidirectional && edge.to_node == node_id && edge.active {
+        }
+        for &edge_id in self.incoming_edge_ids_slice(node_id) {
+            let Some(edge) = self.edges.get(&edge_id) else {
+                continue;
+            };
+            if edge.active && edge.bidirectional {
                 result.insert(edge.from_node);
             }
         }

@@ -66,7 +66,7 @@ pub fn batch_to_render_commands(batch: &ParallaxDrawBatch) -> Vec<RenderCommand>
             sy: batch.sy,
             ox: 0.0,
             oy: 0.0,
-            effect: None,
+            effect: batch.effect.clone(),
         });
     }
 

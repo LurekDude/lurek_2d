@@ -259,11 +259,12 @@ pub struct Step {
     pub repeat_interval: Option<f32>,
     /// Macro name used by [`Action::CallMacro`].
     pub macro_name: Option<String>,
-    /// Optional named condition gate.
+    /// Optional boolean expression gate.
     ///
-    /// When present and false, the step is skipped.
+    /// When present and false, the step is skipped. Expressions support
+    /// identifiers, `true`/`false`, `!`, `&&`, `||`, and parentheses.
     pub when: Option<String>,
-    /// Optional named condition assertion.
+    /// Optional boolean expression assertion.
     ///
     /// When present and false, playback fails.
     pub assert: Option<String>,

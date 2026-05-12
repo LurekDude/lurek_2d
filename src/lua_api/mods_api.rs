@@ -40,6 +40,10 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
                 .collect()
         })
         .unwrap_or_default();
+    let asset_paths = tbl
+        .get::<_, LuaTable>("assets")
+        .map(|assets| assets.sequence_values::<String>().flatten().collect())
+        .unwrap_or_default();
     let mut info = ModInfo::from_parts(
         id,
         tbl.get::<_, String>("name").ok(),
@@ -52,6 +56,8 @@ fn mod_info_from_table(tbl: &LuaTable) -> LuaResult<ModInfo> {
     info.api_version = tbl.get::<_, String>("api_version").ok();
     info.capabilities = capabilities;
     info.config_schema = config_schema;
+    info.asset_paths = asset_paths;
+    info.signature = tbl.get::<_, String>("signature").ok();
     Ok(info)
 }
 
@@ -92,6 +98,17 @@ fn mod_info_to_table<'a>(lua: &'a Lua, info: &ModInfo) -> LuaResult<LuaTable<'a>
         s
     };
     t.set("config_schema", schema)?;
+    let assets = {
+        let a = lua.create_table()?;
+        for (i, asset) in info.asset_paths.iter().enumerate() {
+            a.set(i + 1, asset.as_str())?;
+        }
+        a
+    };
+    t.set("assets", assets)?;
+    if let Some(ref signature) = info.signature {
+        t.set("signature", signature.as_str())?;
+    }
     let deps = lua.create_table()?;
     for (i, dep) in info.dependencies.iter().enumerate() {
         deps.set(i + 1, dep.as_str() as &str)?;
@@ -444,6 +461,17 @@ impl LuaUserData for LuaModManager {
             mod_infos_to_table(lua, this.inner.all_mods().iter())
         });
 
+        // -- getModsByCapability --
+        /// Returns the registered mods that declare a given capability flag.
+        /// @param | capability | string | Capability flag to filter by.
+        /// @return | table | Returns the matching mod info array.
+        methods.add_method("getModsByCapability", |lua, this, capability: String| {
+            mod_infos_to_table(
+                lua,
+                this.inner.get_mods_by_capability(&capability).into_iter(),
+            )
+        });
+
         // -- getLoadOrder --
         /// Returns an array of info tables in effective load order.
         /// @return | table | Returns the load-order info array.
@@ -522,6 +550,13 @@ impl LuaUserData for LuaModManager {
         methods.add_method_mut("clearReloadQueue", |_, this, ()| {
             this.inner.clear_reload_queue();
             Ok(())
+        });
+
+        // -- processReloadQueue --
+        /// Reloads every queued mod from disk and clears the queue.
+        /// @return | table | Returns the array of successfully reloaded mod IDs.
+        methods.add_method_mut("processReloadQueue", |lua, this, ()| {
+            string_slice_to_table(lua, &this.inner.process_reload_queue())
         });
 
         // -- __tostring --

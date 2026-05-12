@@ -451,7 +451,14 @@ impl Parser {
                 list.push(self.parse_agg_expr()?);
             } else {
                 let name = self.expect_ident()?;
-                list.push(SelectExpr::Column(name));
+                // Handle optional table.column qualifier — use only the column part.
+                let col_name = if matches!(self.peek(), Token::Dot) {
+                    self.advance(); // consume '.'
+                    self.expect_ident()?
+                } else {
+                    name
+                };
+                list.push(SelectExpr::Column(col_name));
             }
 
             if matches!(self.peek(), Token::Comma) {

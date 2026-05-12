@@ -17,6 +17,7 @@ use crate::math::Circle;
 use crate::math::NoiseGenerator;
 use crate::math::RandomGenerator;
 use crate::math::Rect;
+use crate::math::RectPacker;
 use crate::math::SpatialHash;
 use crate::math::Transform;
 use crate::math::Tween;
@@ -873,6 +874,22 @@ impl LuaUserData for LuaBezierCurve {
         /// @return | number | Approximate arc length.
         methods.add_method("length", |_, this, ()| Ok(this.inner.length()));
 
+        // -- evaluateAtDistance --
+        /// Evaluates the curve by travelled arc distance for near-constant-speed sampling.
+        /// @param | distance | number | Arc-length from curve start.
+        /// @param | samples | integer? | Optional approximation sample count.
+        /// @return | number | Evaluated X coordinate.
+        /// @return | number | Evaluated Y coordinate.
+        methods.add_method(
+            "evaluateAtDistance",
+            |_, this, (distance, samples): (f32, Option<usize>)| {
+                let p = this
+                    .inner
+                    .evaluate_at_distance(distance, samples.unwrap_or(128));
+                Ok((p.x, p.y))
+            },
+        );
+
         // -- translate --
         /// Translates all control points by (dx, dy).
         /// @param | dx | number | Horizontal offset.
@@ -1457,6 +1474,55 @@ impl LuaUserData for LuaNoiseGenerator {
         methods.add_method(
             "generateMap",
             |lua, this, (w, h, opts): (u32, u32, Option<LuaTable>)| {
+                let map_opts = if let Some(t) = opts.as_ref() {
+                    MapGenOptions {
+                        scale_x: t.get::<_, Option<f64>>("scaleX")?.unwrap_or(1.0),
+                        scale_y: t.get::<_, Option<f64>>("scaleY")?.unwrap_or(1.0),
+                        octaves: t.get::<_, Option<u32>>("octaves")?.unwrap_or(4),
+                        lacunarity: t.get::<_, Option<f64>>("lacunarity")?.unwrap_or(2.0),
+                        persistence: t.get::<_, Option<f64>>("persistence")?.unwrap_or(0.5),
+                        kind: t
+                            .get::<_, Option<String>>("kind")?
+                            .as_deref()
+                            .map(resolve_noise_kind)
+                            .unwrap_or(NoiseKind::Perlin),
+                        fractal: t
+                            .get::<_, Option<String>>("fractal")?
+                            .as_deref()
+                            .map(resolve_fractal_type)
+                            .unwrap_or(FractalType::Fbm),
+                        offset_x: t.get::<_, Option<f64>>("offsetX")?.unwrap_or(0.0),
+                        offset_y: t.get::<_, Option<f64>>("offsetY")?.unwrap_or(0.0),
+                    }
+                } else {
+                    MapGenOptions::default()
+                };
+                let backend = opts
+                    .as_ref()
+                    .and_then(|t| t.get::<_, Option<String>>("backend").ok().flatten())
+                    .unwrap_or_else(|| "cpu".to_string());
+                let data = if backend.eq_ignore_ascii_case("compute") {
+                    this.inner.generate_map_compute(w, h, &map_opts)
+                } else {
+                    this.inner.generate_map(w, h, &map_opts)
+                };
+                let result = lua.create_table()?;
+                for (i, v) in data.iter().enumerate() {
+                    result.set(i + 1, *v)?;
+                }
+                Ok(result)
+            },
+        );
+
+        // -- generateMapCompute --
+        /// Generates a 2D noise map via compute backend entrypoint (falls back to CPU when needed).
+        /// @param | width | integer | Map width.
+        /// @param | height | integer | Map height.
+        /// @param | opts | table? | Optional generation settings.
+        /// @return | table | Flat row-major noise values.
+        methods.add_method(
+            "generateMapCompute",
+            |lua, this, (w, h, opts): (u32, u32, Option<LuaTable>)| {
                 let map_opts = if let Some(t) = opts {
                     MapGenOptions {
                         scale_x: t.get::<_, Option<f64>>("scaleX")?.unwrap_or(1.0),
@@ -1480,7 +1546,7 @@ impl LuaUserData for LuaNoiseGenerator {
                 } else {
                     MapGenOptions::default()
                 };
-                let data = this.inner.generate_map(w, h, &map_opts);
+                let data = this.inner.generate_map_compute(w, h, &map_opts);
                 let result = lua.create_table()?;
                 for (i, v) in data.iter().enumerate() {
                     result.set(i + 1, *v)?;
@@ -1612,6 +1678,62 @@ impl LuaUserData for LuaCircle {
 /// - `inner` — The underlying AABB tree.
 pub struct LuaAabbTree {
     inner: AabbTree,
+}
+
+/// Lua-side wrapper around a [`RectPacker`].
+pub struct LuaRectPacker {
+    inner: RectPacker,
+}
+
+impl LuaUserData for LuaRectPacker {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- pack --
+        /// Packs a rectangle into the bin and returns placement x, y or nil when full.
+        /// @param | w | integer | Rectangle width.
+        /// @param | h | integer | Rectangle height.
+        /// @param | id | string? | Optional rectangle identifier.
+        /// @return | number | Packed x coordinate.
+        /// @return | number | Packed y coordinate.
+        methods.add_method_mut(
+            "pack",
+            |_, this, (w, h, id): (u32, u32, Option<String>)| match this.inner.pack(w, h, id) {
+                Some(r) => Ok((Some(r.x), Some(r.y))),
+                None => Ok((None::<u32>, None::<u32>)),
+            },
+        );
+
+        // -- clear --
+        /// Clears all packed rectangles and resets packer state.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("clear", |_, this, ()| {
+            this.inner.clear();
+            Ok(())
+        });
+
+        // -- occupancy --
+        /// Returns current packed occupancy in range [0, 1].
+        /// @return | number | Occupancy ratio.
+        methods.add_method("occupancy", |_, this, ()| Ok(this.inner.occupancy()));
+
+        // -- getPacked --
+        /// Returns packed rectangles as an array of `{x, y, w, h, id?}` tables.
+        /// @return | table | Packed rectangle list.
+        methods.add_method("getPacked", |lua, this, ()| {
+            let t = lua.create_table()?;
+            for (i, r) in this.inner.packed_rects().iter().enumerate() {
+                let row = lua.create_table()?;
+                row.set("x", r.x)?;
+                row.set("y", r.y)?;
+                row.set("w", r.w)?;
+                row.set("h", r.h)?;
+                if let Some(id) = &r.id {
+                    row.set("id", id.clone())?;
+                }
+                t.set(i + 1, row)?;
+            }
+            Ok(t)
+        });
+    }
 }
 
 impl LuaUserData for LuaAabbTree {
@@ -1859,6 +1981,21 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
         lua.create_function(|lua, seed: Option<u64>| {
             lua.create_userdata(LuaNoiseGenerator {
                 inner: NoiseGenerator::new(seed.unwrap_or(0)),
+            })
+        })?,
+    )?;
+
+    // -- newRectPacker --
+    /// Creates a new shelf rectangle packer for atlas/UI runtime layout.
+    /// @param | width | integer | Packer bin width.
+    /// @param | height | integer | Packer bin height.
+    /// @param | padding | integer? | Optional padding between packed rectangles.
+    /// @return | LRectPacker | New rectangle packer.
+    tbl.set(
+        "newRectPacker",
+        lua.create_function(|lua, (width, height, padding): (u32, u32, Option<u32>)| {
+            lua.create_userdata(LuaRectPacker {
+                inner: RectPacker::new(width, height, padding.unwrap_or(0)),
             })
         })?,
     )?;

@@ -15,7 +15,7 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 
 **Core model.** The central type is `Simulator`, a playback engine that owns a named registry of `Script` objects. Each `Script` contains a time-sorted `Vec<Step>` where every `Step` pairs an `Action` variant with a timestamp (in seconds from script start) and optional parameters. `Action` variants include standard input events plus orchestration actions: `Repeat`, `CallMacro`, `Assert`, and `VisualAssert`. Scripts are capped at `MAX_STEPS` entries (module-wide default, overridable per-script) to prevent unbounded memory use.
 
-**Playback.** `Simulator::update(dt)` advances an internal deterministic microsecond clock and dispatches all steps whose timestamp is reached by pushing synthetic `Event` values into the engine's `EventQueue` through the same `push()` path as real hardware events. The simulator exposes `update_with_sink` via a sink trait for unit tests that do not want to instantiate `EventQueue`. The playback state machine now includes failure handling: `Idle → Running → Paused → Running → Complete | Failed`.
+**Playback.** `Simulator::update(dt)` advances an internal deterministic microsecond clock and dispatches all steps whose timestamp is reached by pushing synthetic `Event` values into the engine's `EventQueue` through the same `push()` path as real hardware events. Time accumulation now uses the shared `timer::accumulate_scaled_micros` helper (fixed-point carry) instead of local float accumulation. The simulator exposes `update_with_sink` via a sink trait for unit tests that do not want to instantiate `EventQueue`. The playback state machine now includes failure handling: `Idle → Running → Paused → Running → Complete | Failed`.
 
 **Script lifecycle.** Scripts can be created programmatically from Lua tables or loaded from TOML files via `Script::from_toml(string)`. Each script carries: name, optional description string, the step list, and an optional per-script step limit via `set_step_limit` / `get_step_limit` (independent of the module-wide `MAX_STEPS` cap).
 
@@ -27,7 +27,7 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 
 **`waitUntil` primitive.** The Lua surface exposes `lurek.automation.waitUntil(predicate)`, a synchronisation step that inserts a blocking sentinel into the timeline. The simulator fires the predicate each tick and only advances to the next step when it returns true. This enables `waitUntil(function() return boss:isDead() end)` style synchronisation without hard-coded timestamps.
 
-**Lua surface.** Script management: `load(name, data)`, `loadFromToml(name, toml)`, `unload(name)`, `hasScript(name)`, `getScripts()`. Playback: `start(name)`, `stop()`, `pause()`, `resume()`, `isComplete()`, `isRunning()`, `isPaused()`, `isFailed()`, `getLastError()`, `update(dt)`. Extended API: `setStepLimit(name, n)`, `getStepLimit(name)`, `setPlaybackSpeed(f)`, `getPlaybackSpeed()`, `saveMacro(name, scriptName)`, `playMacro(name)`, `hasMacro(name)`, `listMacros()`, `setCondition(name, value)`, `getCondition(name)`, `setHighlightMode(bool)`, `isHighlightMode()`, `waitUntil(fn, timeout)`.
+**Lua surface.** Script management: `load(name, data)`, `loadFromToml(name, toml)`, `unload(name)`, `hasScript(name)`, `getScripts()`. Playback: `start(name)`, `stop()`, `pause()`, `resume()`, `isComplete()`, `isRunning()`, `isPaused()`, `isFailed()`, `getLastError()`, `update(dt)`. Extended API: `setStepLimit(name, n)`, `getStepLimit(name)`, `setPlaybackSpeed(f)`, `getPlaybackSpeed()`, `saveMacro(name, scriptName)`, `playMacro(name)`, `hasMacro(name)`, `listMacros()`, `setCondition(name, value)`, `getCondition(name)`, `setHighlightMode(bool)`, `isHighlightMode()`, `waitUntil(fn, timeout)`. `when` and `assert` step fields now accept boolean expressions (`!`, `&&`, `||`, parentheses) over named conditions.
 
 **Scope boundary.** Core Runtime tier (uses runtime event infrastructure). Depends on `event`, `runtime`. Lua bridge in `src/lua_api/automation_api.rs`.
 
@@ -117,7 +117,7 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 - `lurek.automation.playMacro`: Loads and starts playback of a previously saved macro.
 - `lurek.automation.hasMacro`: Returns true if a macro with the given name has been saved.
 - `lurek.automation.listMacros`: Returns an array of all saved macro names.
-- `lurek.automation.setCondition`: Sets a named boolean condition used by scripted `when`/`assert` fields.
+- `lurek.automation.setCondition`: Sets a named boolean condition used by scripted `when`/`assert` expressions.
 - `lurek.automation.getCondition`: Returns a named condition value.
 - `lurek.automation.setPlaybackSpeed`: Sets the playback speed multiplier.
 - `lurek.automation.getPlaybackSpeed`: Returns the current playback speed multiplier (default 1.0).
@@ -148,3 +148,9 @@ The `automation` module is Lurek2D's automated input simulation engine — a Fea
 - Added deterministic microsecond time accumulation in `Simulator::update` to reduce floating-drift behavior in long scripts.
 - Added sink abstraction (`StepEventSink`) and `Simulator::update_with_sink` for isolated event-emission tests.
 - Added runtime condition table and Lua APIs: `setCondition`, `getCondition`, `isFailed`, `getLastError`.
+
+### New in 1.0.9-fix.78
+
+- Added expression-capable condition checks for `when` and `assert` fields (`!`, `&&`, `||`, parentheses).
+- Added shared timer integration via `timer::accumulate_scaled_micros` for replay time progression.
+- Deduplicated automation event-name literals to `input` module constants.

@@ -249,3 +249,18 @@ The `particle` module implements emitter-based 2D particle systems for the Featu
 
 - Keep this module reference synchronized with `src/particle/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+## 2026-05 Backlog Closure
+
+- Added built-in preset package in `src/particle/presets.rs`:
+	- `fire()`, `smoke()`, `rain()`, `snow()`, `sparks()`.
+- Added optional particle-vs-physics collision helper in `src/particle/physics_collision.rs`.
+- Added Lua API methods on `LParticleSystem`:
+	- `setCollidesWithPhysics(world, probe_radius?, restitution?)`
+	- `clearCollidesWithPhysics()`
+	- `hasCollidesWithPhysics()`
+- Added module function:
+	- `lurek.particle.newPreset(name)`
+- Added tests:
+	- Rust: border-rectangle statistical test and fuzz-like update stability.
+	- Lua: preset creation and collision toggle API coverage.

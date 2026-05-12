@@ -1664,33 +1664,7 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
     /// @return | table | Built-in effect type names.
     tbl.set(
         "getEffectTypes",
-        lua.create_function(|_, ()| {
-            Ok(vec![
-                "bloom",
-                "blur",
-                "crt",
-                "godrays",
-                "vignette",
-                "colourgrade",
-                "chromatic",
-                "pixelate",
-                "sepia",
-                "grayscale",
-                "invert",
-                "scanlines",
-                "edgedetect",
-                "hueshift",
-                "noise",
-                "depthoffield",
-                "motionblur",
-                "paletteswap",
-                "colorlut",
-                "waterdistort",
-                "sharpen",
-                "dither",
-                "outline",
-            ])
-        })?,
+        lua.create_function(|_, ()| Ok(PostFxEffectType::built_in_names()))?,
     )?;
 
     // -- newImageEffect --

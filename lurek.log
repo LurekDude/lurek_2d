@@ -1,25 +1,29 @@
-[2026-05-10T17:57:33.333Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
-[2026-05-10T17:57:33.335Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
-[2026-05-10T17:57:33.335Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\games\showcase\html-load-document
-[2026-05-10T17:57:35.151Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
-[2026-05-10T17:57:35.153Z] WARN  GENERAL [Loader Message (0x0)]
+[2026-05-12T16:34:59.629Z] INFO  [L081] L081: C:\Users\tombl\Documents\lurek2D\lurek.log
+[2026-05-12T16:34:59.631Z] INFO  [L001] Lurek2D Engine starting: v1.0.0 (wgpu GPU backend)
+[2026-05-12T16:34:59.631Z] INFO  [L080] Game directory: c:\Users\tombl\Documents\lurek2D\content\examples\province_polygons
+[2026-05-12T16:35:01.425Z] WARN  InstanceFlags::VALIDATION requested, but unable to find layer: VK_LAYER_KHRONOS_validation
+[2026-05-12T16:35:01.427Z] WARN  GENERAL [Loader Message (0x0)]
 	windows_read_data_files_in_registry: Registry lookup failed to get layer manifest files.
-[2026-05-10T17:57:35.153Z] WARN  	objects: (type: INSTANCE, hndl: 0x1ceffda6b90, name: ?)
-[2026-05-10T17:57:35.227Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
-[2026-05-10T17:57:35.228Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
-[2026-05-10T17:57:35.238Z] WARN  Unrecognized present mode 1000361000
-[2026-05-10T17:57:35.619Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
-[2026-05-10T17:57:35.828Z] WARN  Unrecognized present mode 1000361000
-[2026-05-10T17:57:35.828Z] INFO  [L034] GPU texture dimension limit: 32768
-[2026-05-10T17:57:35.829Z] WARN  Unrecognized present mode 1000361000
-[2026-05-10T17:57:36.154Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 800x600)
-[2026-05-10T17:57:36.156Z] DEBUG Loaded 846 mappings.
-[2026-05-10T17:57:36.179Z] WARN  Unrecognized present mode 1000361000
-[2026-05-10T17:57:36.184Z] WARN  Unrecognized present mode 1000361000
-[2026-05-10T17:57:36.188Z] DEBUG [FS01] GameFS initialised
-[2026-05-10T17:57:36.874Z] DEBUG [AT01] Simulator created
-[2026-05-10T17:57:36.874Z] DEBUG [SC01] SC01
-[2026-05-10T17:57:36.875Z] DEBUG [GU01] GuiContext created
-[2026-05-10T17:57:36.876Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\games\showcase\html-load-document\main.lua
-[2026-05-10T17:57:46.462Z] INFO  [L039] Window close requested
-[2026-05-10T17:57:46.463Z] INFO  [L002] Lurek2D Engine stopped
+[2026-05-12T16:35:01.427Z] WARN  	objects: (type: INSTANCE, hndl: 0x2027a18e750, name: ?)
+[2026-05-12T16:35:01.508Z] WARN  Unable to enable D3D12 debug interface: 0x887A002D
+[2026-05-12T16:35:01.508Z] WARN  Unable to enable DXGI debug interface: 0x887A002D
+[2026-05-12T16:35:01.523Z] WARN  Unrecognized present mode 1000361000
+[2026-05-12T16:35:01.981Z] INFO  [L033] GPU adapter selected: NVIDIA GeForce RTX 4060 Laptop GPU (Vulkan, DiscreteGpu) [backend=auto, power=high]
+[2026-05-12T16:35:02.080Z] WARN  Unrecognized present mode 1000361000
+[2026-05-12T16:35:02.080Z] INFO  [L034] GPU texture dimension limit: 32768
+[2026-05-12T16:35:02.081Z] WARN  Unrecognized present mode 1000361000
+[2026-05-12T16:35:02.435Z] INFO  [L035] GPU initialised: 3s (format=Bgra8UnormSrgb, present=Fifo, 1280x720)
+[2026-05-12T16:35:02.436Z] DEBUG Loaded 846 mappings.
+[2026-05-12T16:35:02.478Z] WARN  Unrecognized present mode 1000361000
+[2026-05-12T16:35:02.487Z] WARN  Unrecognized present mode 1000361000
+[2026-05-12T16:35:02.494Z] DEBUG [FS01] GameFS initialised
+[2026-05-12T16:35:03.004Z] DEBUG [AT01] Simulator created
+[2026-05-12T16:35:03.004Z] DEBUG [SC01] SC01
+[2026-05-12T16:35:03.005Z] DEBUG [GU01] GuiContext created
+[2026-05-12T16:35:03.006Z] INFO  [L003] Game loaded: c:\Users\tombl\Documents\lurek2D\content\examples\province_polygons\main.lua
+[2026-05-12T16:35:03.015Z] DEBUG [IM01] ImageData loaded: 2000x900
+[2026-05-12T16:35:03.262Z] DEBUG [IM01] ImageData loaded: 2000x900
+[2026-05-12T16:35:03.604Z] INFO  ProvinceGrid: 2000x900, 1530 provinces, 4037 adjacencies
+[2026-05-12T16:35:03.624Z] INFO  [demo] prowincje: 1530
+[2026-05-12T16:35:43.788Z] INFO  [L039] Window close requested
+[2026-05-12T16:35:43.789Z] INFO  [L002] Lurek2D Engine stopped

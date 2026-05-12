@@ -6,6 +6,7 @@
 //! flame-graph data needed by an overlay panel.
 
 use std::time::Instant;
+use std::collections::VecDeque;
 
 // ── zone ──────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ impl ProfileZone {
 ///
 /// # Fields
 /// - `enabled` — `bool`.
-/// - `frames` — `Vec<Vec<ProfileZone>>`.
+/// - `frames` — `VecDeque<Vec<ProfileZone>>`.
 /// - `max_frames` — `usize`.
 /// - `zone_stack` — internal open zone stack.
 /// - `epoch` — `Instant`.
@@ -74,7 +75,7 @@ pub struct Profiler {
     /// Whether profiling is active.
     pub enabled: bool,
     /// Completed frame records (oldest first).
-    pub frames: Vec<Vec<ProfileZone>>,
+    pub frames: VecDeque<Vec<ProfileZone>>,
     /// Maximum number of frames to retain.
     pub max_frames: usize,
     /// Stack entries: (name, start_time, accumulated_children).
@@ -90,7 +91,7 @@ impl Profiler {
     pub fn new() -> Self {
         Self {
             enabled: false,
-            frames: Vec::new(),
+            frames: VecDeque::new(),
             max_frames: 300,
             zone_stack: Vec::new(),
             epoch: Instant::now(),
@@ -143,7 +144,7 @@ impl Profiler {
         if !self.enabled {
             return;
         }
-        let mut frame_zones: Vec<ProfileZone> = Vec::new();
+        let mut frame_zones: Vec<ProfileZone> = Vec::with_capacity(self.zone_stack.len());
         while let Some((name, start, children)) = self.zone_stack.pop() {
             if name.is_empty() && start == 0.0 {
                 frame_zones.extend(children);
@@ -156,9 +157,9 @@ impl Profiler {
                 });
             }
         }
-        self.frames.push(frame_zones);
+        self.frames.push_back(frame_zones);
         if self.frames.len() > self.max_frames {
-            self.frames.remove(0);
+            let _ = self.frames.pop_front();
         }
     }
 

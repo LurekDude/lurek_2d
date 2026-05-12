@@ -822,6 +822,290 @@ describe("camera strict: newCamera / apply / reset / attach / detach / type / ty
     end)
 end)
 
+-- @describe Camera2D constraint + easing extensions
+describe("Camera2D constraint + easing extensions", function()
+    -- @covers LCamera:setZoomConstraints
+    -- @covers LCamera:getZoomConstraints
+    -- @covers lurek.camera.new
+    it("setZoomConstraints/getZoomConstraints round-trip", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setZoomConstraints(0.5, 2.0)
+        local has_min, minz, has_max, maxz = cam:getZoomConstraints()
+        expect_true(has_min)
+        expect_true(has_max)
+        expect_near(0.5, minz, 0.001)
+        expect_near(2.0, maxz, 0.001)
+    end)
+
+    -- @covers LCamera:setFollowEasing
+    -- @covers LCamera:getFollowEasing
+    -- @covers lurek.camera.new
+    it("setFollowEasing/getFollowEasing round-trip", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setFollowEasing("smoothstep")
+        expect_equal("smoothstep", cam:getFollowEasing())
+    end)
+
+    -- @covers LCamera:onWindowResize
+    -- @covers LCamera:getViewport
+    -- @covers lurek.camera.new
+    it("onWindowResize updates viewport to full window", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:onWindowResize(1920, 1080)
+        local x, y, w, h = cam:getViewport()
+        expect_near(0.0, x, 0.001)
+        expect_near(0.0, y, 0.001)
+        expect_near(1920.0, w, 0.001)
+        expect_near(1080.0, h, 0.001)
+    end)
+
+    -- @covers LCamera:onWindowResizeScaled
+    -- @covers LCamera:getViewport
+    -- @covers lurek.camera.new
+    it("onWindowResizeScaled applies letterbox viewport", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:onWindowResizeScaled(800, 600, 1200, 600, "letterbox")
+        local x, y, w, h = cam:getViewport()
+        expect_near(200.0, x, 0.001)
+        expect_near(0.0, y, 0.001)
+        expect_near(800.0, w, 0.001)
+        expect_near(600.0, h, 0.001)
+    end)
+
+    -- @covers LCamera:presetTightFollow
+    -- @covers LCamera:getFollowSmooth
+    -- @covers LCamera:getDeadZone
+    -- @covers LCamera:getLookAhead
+    -- @covers lurek.camera.new
+    it("presetTightFollow applies expected profile", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:presetTightFollow()
+        local ok, w, h = cam:getDeadZone()
+        expect_true(ok)
+        expect_near(0.9, cam:getFollowSmooth(), 0.001)
+        expect_near(20.0, w, 0.001)
+        expect_near(20.0, h, 0.001)
+        expect_near(0.5, cam:getLookAhead(), 0.001)
+    end)
+
+    -- @covers LCamera:presetCinematicFollow
+    -- @covers LCamera:getFollowSmooth
+    -- @covers LCamera:getDeadZone
+    -- @covers LCamera:getLookAhead
+    -- @covers lurek.camera.new
+    it("presetCinematicFollow applies expected profile", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:presetCinematicFollow()
+        local ok, w, h = cam:getDeadZone()
+        expect_true(ok)
+        expect_near(0.3, cam:getFollowSmooth(), 0.001)
+        expect_near(100.0, w, 0.001)
+        expect_near(100.0, h, 0.001)
+        expect_near(0.0, cam:getLookAhead(), 0.001)
+    end)
+
+    -- @covers LCamera:presetBalancedFollow
+    -- @covers LCamera:getFollowSmooth
+    -- @covers LCamera:getDeadZone
+    -- @covers LCamera:getLookAhead
+    -- @covers lurek.camera.new
+    it("presetBalancedFollow applies expected profile", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:presetBalancedFollow()
+        local ok, w, h = cam:getDeadZone()
+        expect_true(ok)
+        expect_near(0.6, cam:getFollowSmooth(), 0.001)
+        expect_near(40.0, w, 0.001)
+        expect_near(40.0, h, 0.001)
+        expect_near(0.3, cam:getLookAhead(), 0.001)
+    end)
+
+    -- @covers LCamera:presetAggressiveFollow
+    -- @covers LCamera:getFollowSmooth
+    -- @covers LCamera:getDeadZone
+    -- @covers LCamera:getLookAhead
+    -- @covers lurek.camera.new
+    it("presetAggressiveFollow applies expected profile", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:presetAggressiveFollow()
+        local ok, w, h = cam:getDeadZone()
+        expect_true(ok)
+        expect_near(0.99, cam:getFollowSmooth(), 0.001)
+        expect_near(5.0, w, 0.001)
+        expect_near(5.0, h, 0.001)
+        expect_near(1.0, cam:getLookAhead(), 0.001)
+    end)
+end)
+
+-- @describe CameraRig API
+describe("CameraRig API", function()
+    -- @covers lurek.camera.newRig
+    it("creates a rig userdata", function()
+        local rig = lurek.camera.newRig()
+        expect_type("userdata", rig)
+    end)
+
+    -- @covers LCameraRig:splitScreen
+    -- @covers LCameraRig:has
+    -- @covers LCameraRig:getViewport
+    -- @covers lurek.camera.newRig
+    it("splitScreen creates left/right cameras with correct viewport", function()
+        local rig = lurek.camera.newRig()
+        rig:splitScreen(1280, 720)
+        expect_true(rig:has("left"))
+        expect_true(rig:has("right"))
+        local ok, x, y, w, h = rig:getViewport("left")
+        expect_true(ok)
+        expect_near(0.0, x, 0.001)
+        expect_near(640.0, w, 0.001)
+        expect_near(720.0, h, 0.001)
+    end)
+
+    -- @covers LCameraRig:minimap
+    -- @covers LCameraRig:pictureInPicture
+    -- @covers LCameraRig:names
+    -- @covers lurek.camera.newRig
+    it("minimap and pictureInPicture create named cameras", function()
+        local rig = lurek.camera.newRig()
+        rig:minimap(1280, 720, 0.2)
+        rig:pictureInPicture(1280, 720, 320, 180)
+        local names = rig:names()
+        expect_true(#names >= 2)
+    end)
+
+    -- @covers LCameraRig:setPosition
+    -- @covers LCameraRig:setZoom
+    -- @covers LCameraRig:setTarget
+    -- @covers LCameraRig:updateAll
+    -- @covers LCameraRig:apply
+    -- @covers lurek.camera.newRig
+    it("supports per-camera updates and apply", function()
+        local rig = lurek.camera.newRig()
+        rig:splitScreen(1280, 720)
+        rig:setPosition("left", 10, 20)
+        rig:setZoom("left", 1.5)
+        rig:setTarget("left", 100, 50)
+        rig:updateAll(0.016)
+        expect_true(rig:apply("left"))
+        expect_false(rig:apply("missing_name"))
+    end)
+
+    -- @covers LCameraRig:remove
+    -- @covers LCameraRig:has
+    -- @covers lurek.camera.newRig
+    it("remove returns true when camera exists", function()
+        local rig = lurek.camera.newRig()
+        rig:splitScreen(1280, 720)
+        expect_true(rig:has("left"))
+        expect_true(rig:remove("left"))
+        expect_false(rig:has("left"))
+    end)
+end)
+
+-- @describe Camera2D accessor completeness
+describe("Camera2D accessor completeness", function()
+    -- @covers LCamera:getBounds
+    -- @covers LCamera:hasBounds
+    -- @covers LCamera:setBounds
+    -- @covers lurek.camera.new
+    it("bounds getters return explicit success flags", function()
+        local cam = lurek.camera.new(320, 240)
+        local ok0 = cam:hasBounds()
+        expect_false(ok0)
+        cam:setBounds(1, 2, 3, 4)
+        local ok, x, y, w, h = cam:getBounds()
+        expect_true(ok)
+        expect_near(1, x, 0.001)
+        expect_near(2, y, 0.001)
+        expect_near(3, w, 0.001)
+        expect_near(4, h, 0.001)
+    end)
+
+    -- @covers LCamera:getTarget
+    -- @covers LCamera:setTarget
+    -- @covers lurek.camera.new
+    it("target getter returns explicit success flags", function()
+        local cam = lurek.camera.new(320, 240)
+        local ok0 = cam:getTarget()
+        expect_false(ok0)
+        cam:setTarget(11, 22)
+        local ok, x, y = cam:getTarget()
+        expect_true(ok)
+        expect_near(11, x, 0.001)
+        expect_near(22, y, 0.001)
+    end)
+
+    -- @covers LCamera:getDeadZone
+    -- @covers LCamera:setDeadZone
+    -- @covers lurek.camera.new
+    it("dead-zone getter returns explicit success flags", function()
+        local cam = lurek.camera.new(320, 240)
+        local ok0 = cam:getDeadZone()
+        expect_false(ok0)
+        cam:setDeadZone(50, 30)
+        local ok, w, h = cam:getDeadZone()
+        expect_true(ok)
+        expect_near(50, w, 0.001)
+        expect_near(30, h, 0.001)
+    end)
+
+    -- @covers LCamera:getFollowSmooth
+    -- @covers LCamera:getLookAhead
+    -- @covers LCamera:setFollowSmooth
+    -- @covers LCamera:setLookAhead
+    -- @covers lurek.camera.new
+    it("follow smoothing and look-ahead getters reflect current values", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setFollowSmooth(3.5)
+        cam:setLookAhead(0.75)
+        expect_near(3.5, cam:getFollowSmooth(), 0.001)
+        expect_near(0.75, cam:getLookAhead(), 0.001)
+    end)
+
+    -- @covers LCamera:getShakeOffset
+    -- @covers LCamera:getRenderOffset
+    -- @covers LCamera:shake
+    -- @covers LCamera:update
+    -- @covers lurek.camera.new
+    it("shake and render offset getters return numeric pairs", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:shake(5.0, 0.4)
+        cam:update(0.1)
+        local sx, sy = cam:getShakeOffset()
+        local rx, ry = cam:getRenderOffset()
+        expect_type("number", sx)
+        expect_type("number", sy)
+        expect_type("number", rx)
+        expect_type("number", ry)
+    end)
+
+    -- @covers LCamera:setZoomDamping
+    -- @covers LCamera:getZoomDamping
+    -- @covers LCamera:setRotationDamping
+    -- @covers LCamera:getRotationDamping
+    -- @covers lurek.camera.new
+    it("damping getters reflect configured values", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setZoomDamping(0.3)
+        cam:setRotationDamping(0.6)
+        expect_near(0.3, cam:getZoomDamping(), 0.001)
+        expect_near(0.6, cam:getRotationDamping(), 0.001)
+    end)
+
+    -- @covers LCamera:setRotationConstraints
+    -- @covers LCamera:getRotationConstraints
+    -- @covers lurek.camera.new
+    it("rotation constraints getter returns explicit success flags", function()
+        local cam = lurek.camera.new(320, 240)
+        cam:setRotationConstraints(-0.5, 0.5)
+        local has_min, min_r, has_max, max_r = cam:getRotationConstraints()
+        expect_true(has_min)
+        expect_true(has_max)
+        expect_near(-0.5, min_r, 0.001)
+        expect_near(0.5, max_r, 0.001)
+    end)
+end)
+
 -- @describe camera migrated from integration/scene_camera
 describe("camera migrated from integration/scene_camera", function()
     -- @covers LCamera:getPosition

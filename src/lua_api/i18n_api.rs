@@ -704,11 +704,9 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @return | string? | Detected locale code, or nil when none is found.
     loc.set(
         "detectLocale",
-        lua.create_function(|lua, ()| {
-            match detect_system_locale() {
-                Some(code) => Ok(LuaValue::String(lua.create_string(&code)?)),
-                None => Ok(LuaValue::Nil),
-            }
+        lua.create_function(|lua, ()| match detect_system_locale() {
+            Some(code) => Ok(LuaValue::String(lua.create_string(&code)?)),
+            None => Ok(LuaValue::Nil),
         })?,
     )?;
 
@@ -721,22 +719,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
     /// @return | nil | No value is returned.
     loc.set(
         "loadString",
-        lua.create_function(move |_, (locale, content, format): (String, String, String)| {
-            let flat = match format.to_lowercase().as_str() {
-                "toml" => flat_table_from_toml(&content)
-                    .map_err(mlua::Error::RuntimeError)?,
-                "json" => flat_table_from_json(&content)
-                    .map_err(mlua::Error::RuntimeError)?,
-                other => {
-                    return Err(mlua::Error::RuntimeError(format!(
-                        "loadString: unknown format '{}'; expected 'toml' or 'json'",
-                        other
-                    )))
-                }
-            };
-            s.borrow_mut().catalog.load(&locale, flat);
-            Ok(())
-        })?,
+        lua.create_function(
+            move |_, (locale, content, format): (String, String, String)| {
+                let flat = match format.to_lowercase().as_str() {
+                    "toml" => flat_table_from_toml(&content).map_err(mlua::Error::RuntimeError)?,
+                    "json" => flat_table_from_json(&content).map_err(mlua::Error::RuntimeError)?,
+                    other => {
+                        return Err(mlua::Error::RuntimeError(format!(
+                            "loadString: unknown format '{}'; expected 'toml' or 'json'",
+                            other
+                        )))
+                    }
+                };
+                s.borrow_mut().catalog.load(&locale, flat);
+                Ok(())
+            },
+        )?,
     )?;
 
     // -- localeCoverage --

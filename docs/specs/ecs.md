@@ -23,9 +23,9 @@ The `ecs` module provides Lurek2D's Lua-first ECS runtime using a single `Univer
 
 **Hierarchy and directed relations.** `setParent/getParent/getChildren` define parent-child trees. `addRelation/getRelated/removeRelation/clearRelations/hasRelation` provide directed named graph links. `RelationshipManager` in `relationships.rs` provides separate symmetric numeric + level-based relations.
 
-**System scheduling.** Systems are registered with optional `priority` and optional `phase`. Built-in phase usage is `pre_update`, `update`, `post_update`, and `render`. Default-phase systems (no phase specified) run in both `update()` and `render()` for backward compatibility. Dispatch APIs: `update`, `updatePhase`, `render`, `emit`.
+**System scheduling.** Systems are registered with optional `priority`, optional `phase`, optional stable `name`, and optional `after` dependency names. Built-in phase usage is `pre_update`, `update`, `post_update`, and `render`. Default-phase systems (no phase specified) run in both `update()` and `render()` for backward compatibility. Dispatch APIs: `update`, `updatePhase`, `render`, `emit`. Per-phase ordering is dependency-aware (topological by `after`) with priority as stable fallback.
 
-**Change detection and snapshots.** Component writes/removals mark entities dirty (`getDirtyEntities`) until `flushObservers` drains events. World state can be persisted/restored through `serialize/deserialize` and aliases `snapshot/applySnapshot`.
+**Change detection and snapshots.** Component writes/removals mark entities dirty (`getDirtyEntities`) until `flushObservers` drains events. World state can be persisted/restored through `serialize/deserialize` and aliases `snapshot/applySnapshot`. Incremental diffs are available through `takeSnapshotDiff` (Lua) / `take_snapshot_diff` (Rust) and report added/removed components, deleted entities, and dirty entities since the previous diff pull.
 
 **Sparse query fast-path (opt-in).** Cargo feature `ecs-archetype` enables a sparse-set style component index (`component -> entity slots`) used to narrow candidates for `query`, `queryNot`, and `queryMulti` before table checks.
 
@@ -37,12 +37,14 @@ The `ecs` module provides Lurek2D's Lua-first ECS runtime using a single `Univer
 - `relationships.rs`: Defines reusable relationship types and the `RelationshipManager` for symmetric pairwise values and named relation levels.
 - `universe.rs`: Defines `Universe` core state, lifecycle, component/tag/layer/system operations, plus phase ordering and sparse-index helpers.
 - `universe_ext.rs`: Defines extension `impl Universe` blocks for query batching/filtering, bulk spawning, snapshot serialization, and restore logic.
+- `universe_systems.rs`: Defines extracted system registration/removal/count and dependency-aware phase ordering logic.
 
 ## Types
 
 - `RelationType` (`struct`, `relationships.rs`): The definition of one named relationship category and its allowed level strings.
 - `Relationship` (`struct`, `relationships.rs`): The stored record for one normalized entity pair, including a numeric value and per-type named levels.
 - `RelationshipManager` (`struct`, `relationships.rs`): A standalone manager for pairwise entity relationships that is separate from `Universe` but often complements ECS-driven gameplay.
+- `SnapshotDiff` (`struct`, `universe.rs`): Incremental diff payload returned by `take_snapshot_diff`, containing added/removed component events, deleted entities, and dirty entities.
 - `Universe` (`struct`, `universe.rs`): The main ECS world object that owns entity lifecycle, component storage, tags, layers, blueprints, parent-child links, and registered systems.
 
 ## Functions
@@ -114,14 +116,15 @@ The `ecs` module provides Lurek2D's Lua-first ECS runtime using a single `Univer
 - `Universe::remove_blueprint` (`universe.rs`): Removes a blueprint definition.
 - `Universe::list_blueprints` (`universe.rs`): Lists all defined blueprint names.
 - `Universe::get_blueprint_components` (`universe.rs`): Returns a deep copy of a blueprint's component table, or Nil if not found.
-- `Universe::add_system` (`universe.rs`): Adds a system (Lua table) with priority and phase.
-- `Universe::get_sorted_system_indices_all` (`universe.rs`): Returns all 1-based system store indices sorted by ascending priority.
-- `Universe::get_sorted_system_indices_for_phase` (`universe.rs`): Returns 1-based system store indices sorted by ascending priority for one phase.
-- `Universe::remove_system` (`universe.rs`): Removes a system by pointer identity from the system list.
-- `Universe::get_system_count` (`universe.rs`): Returns the number of registered systems.
+- `Universe::add_system` (`universe_systems.rs`): Adds a system (Lua table) with priority, phase, optional stable name, and dependency names.
+- `Universe::get_sorted_system_indices_all` (`universe_systems.rs`): Returns all 1-based system store indices sorted by ascending priority.
+- `Universe::get_sorted_system_indices_for_phase` (`universe_systems.rs`): Returns 1-based system store indices sorted by dependency order (then priority fallback) for one phase.
+- `Universe::remove_system` (`universe_systems.rs`): Removes a system by pointer identity from the system list.
+- `Universe::get_system_count` (`universe_systems.rs`): Returns the number of registered systems.
 - `Universe::clear` (`universe.rs`): Clears all entities, components, tags, layers, and systems.
 - `Universe::take_component_events` (`universe.rs`): Takes and clears all pending component-add and component-remove events.
 - `Universe::get_dirty_entities` (`universe.rs`): Returns entity IDs with component changes pending observer flush.
+- `Universe::take_snapshot_diff` (`universe.rs`): Returns and drains an incremental world diff (added/removed component events, deleted entities, dirty entities).
 - `Universe::query_not` (`universe.rs`): Returns alive entities that have ALL `with` components and NONE of the `without` components.
 - `Universe::query_multi` (`universe.rs`): Calls a callback for entities that match multiple component names, passing all component values in one call.
 - `Universe::spawn_bulk` (`universe.rs`): Spawns `count` entities from a blueprint, applying the same optional overrides to each.

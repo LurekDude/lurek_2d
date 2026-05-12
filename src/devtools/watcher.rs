@@ -95,6 +95,20 @@ impl FileWatcher {
         self.paths.clear();
     }
 
+    /// Marks all watched paths as changed so the next [`poll`][Self::poll] call
+    /// reports them as modified regardless of the actual mtime on disk.
+    ///
+    /// Useful for programmatic reload triggers (e.g. `lurek.runtime.reloadConfig()`).
+    pub fn force_changed(&mut self) {
+        for last in self.paths.values_mut() {
+            // Setting the mtime to `None` (newly added sentinel) means `poll`
+            // will record the current mtime as a baseline on the next call —
+            // which is indistinguishable from a first-seen path.  Instead we
+            // corrupt the timestamp so the `cur != *prev` branch fires.
+            *last = Some(std::time::UNIX_EPOCH);
+        }
+    }
+
     fn mtime(path: &Path) -> Option<SystemTime> {
         std::fs::metadata(path).ok()?.modified().ok()
     }

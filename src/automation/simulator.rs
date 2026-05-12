@@ -22,6 +22,11 @@ use std::collections::HashMap;
 use std::path::Path;
 
 use crate::event::{Event, EventArg, EventQueue};
+use crate::input::{
+    EVENT_KEY_PRESSED, EVENT_KEY_RELEASED, EVENT_MOUSE_MOVED, EVENT_MOUSE_PRESSED,
+    EVENT_MOUSE_RELEASED, EVENT_TEXT_INPUT, EVENT_WHEEL_MOVED,
+};
+use crate::timer::accumulate_scaled_micros;
 
 use super::script::MAX_STEPS;
 use super::{Action, Script, Step};
@@ -565,11 +570,12 @@ impl Simulator {
             return;
         }
 
-        let delta = (dt.max(0.0) as f64) * (self.playback_speed as f64) * 1_000_000.0;
-        let total = self.dt_carry_micros + delta;
-        let whole = total.floor();
-        self.dt_carry_micros = total - whole;
-        self.elapsed_micros = self.elapsed_micros.saturating_add(whole as u64);
+        accumulate_scaled_micros(
+            &mut self.elapsed_micros,
+            &mut self.dt_carry_micros,
+            dt,
+            self.playback_speed,
+        );
 
         let script_name = match &self.active_script {
             Some(name) => name.clone(),
@@ -618,19 +624,17 @@ impl Simulator {
         step: &Step,
         event_sink: &mut S,
     ) -> Result<(), String> {
-        if let Some(cond_name) = step.when.as_deref() {
-            let cond = self.conditions.get(cond_name).copied().unwrap_or(false);
-            if !cond {
+        if let Some(expr) = step.when.as_deref() {
+            if !evaluate_condition_expr(expr, &self.conditions)? {
                 return Ok(());
             }
         }
 
-        if let Some(assert_name) = step.assert.as_deref() {
-            let cond = self.conditions.get(assert_name).copied().unwrap_or(false);
-            if !cond {
+        if let Some(expr) = step.assert.as_deref() {
+            if !evaluate_condition_expr(expr, &self.conditions)? {
                 return Err(format!(
-                    "simulator.assert: condition '{}' is false at step {}",
-                    assert_name, self.next_step_idx
+                    "simulator.assert: expression '{}' is false at step {}",
+                    expr, self.next_step_idx
                 ));
             }
         }
@@ -638,19 +642,17 @@ impl Simulator {
         match step.action {
             Action::CallMacro => self.expand_macro_step(script_name, step),
             Action::Assert => {
-                let name = step
+                let expr = step
                     .assert
                     .as_deref()
                     .or(step.when.as_deref())
-                    .ok_or_else(|| {
-                        "simulator.assert: missing 'assert' condition name".to_string()
-                    })?;
-                if self.conditions.get(name).copied().unwrap_or(false) {
+                    .ok_or_else(|| "simulator.assert: missing 'assert' expression".to_string())?;
+                if evaluate_condition_expr(expr, &self.conditions)? {
                     Ok(())
                 } else {
                     Err(format!(
-                        "simulator.assert action: condition '{}' is false at step {}",
-                        name, self.next_step_idx
+                        "simulator.assert action: expression '{}' is false at step {}",
+                        expr, self.next_step_idx
                     ))
                 }
             }
@@ -734,7 +736,7 @@ impl Simulator {
                 let key = step.key.as_deref().unwrap_or("unknown");
                 let scancode = step.effective_scancode().unwrap_or(key);
                 event_queue.push_event(Event {
-                    name: "keypressed".to_string(),
+                    name: EVENT_KEY_PRESSED.to_string(),
                     args: vec![
                         EventArg::Str(key.to_string()),
                         EventArg::Str(scancode.to_string()),
@@ -746,7 +748,7 @@ impl Simulator {
                 let key = step.key.as_deref().unwrap_or("unknown");
                 let scancode = step.effective_scancode().unwrap_or(key);
                 event_queue.push_event(Event {
-                    name: "keyreleased".to_string(),
+                    name: EVENT_KEY_RELEASED.to_string(),
                     args: vec![
                         EventArg::Str(key.to_string()),
                         EventArg::Str(scancode.to_string()),
@@ -759,7 +761,7 @@ impl Simulator {
                 let dx = step.dx.unwrap_or(0.0);
                 let dy = step.dy.unwrap_or(0.0);
                 event_queue.push_event(Event {
-                    name: "mousemoved".to_string(),
+                    name: EVENT_MOUSE_MOVED.to_string(),
                     args: vec![
                         EventArg::Num(x),
                         EventArg::Num(y),
@@ -774,7 +776,7 @@ impl Simulator {
                 let button = step.button.unwrap_or(1) as f64;
                 let clicks = step.clicks.unwrap_or(1) as f64;
                 event_queue.push_event(Event {
-                    name: "mousepressed".to_string(),
+                    name: EVENT_MOUSE_PRESSED.to_string(),
                     args: vec![
                         EventArg::Num(x),
                         EventArg::Num(y),
@@ -789,7 +791,7 @@ impl Simulator {
                 let y = step.y.unwrap_or(0.0);
                 let button = step.button.unwrap_or(1) as f64;
                 event_queue.push_event(Event {
-                    name: "mousereleased".to_string(),
+                    name: EVENT_MOUSE_RELEASED.to_string(),
                     args: vec![EventArg::Num(x), EventArg::Num(y), EventArg::Num(button)],
                 });
             }
@@ -797,14 +799,14 @@ impl Simulator {
                 let x = step.x.unwrap_or(0.0);
                 let y = step.y.unwrap_or(0.0);
                 event_queue.push_event(Event {
-                    name: "wheelmoved".to_string(),
+                    name: EVENT_WHEEL_MOVED.to_string(),
                     args: vec![EventArg::Num(x), EventArg::Num(y)],
                 });
             }
             Action::TextInput => {
                 let text = step.text.as_deref().unwrap_or("");
                 event_queue.push_event(Event {
-                    name: "textinput".to_string(),
+                    name: EVENT_TEXT_INPUT.to_string(),
                     args: vec![EventArg::Str(text.to_string())],
                 });
             }
@@ -821,6 +823,141 @@ impl Simulator {
 
 fn step_time_micros(step: &Step) -> u64 {
     (step.time.max(0.0) as f64 * 1_000_000.0).round() as u64
+}
+
+fn evaluate_condition_expr(expr: &str, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+    let mut parser = ConditionParser::new(expr);
+    let value = parser.parse_expr(conditions)?;
+    parser.skip_ws();
+    if parser.is_eof() {
+        Ok(value)
+    } else {
+        Err(format!(
+            "simulator.condition: trailing input in expression '{}' at byte {}",
+            expr, parser.idx
+        ))
+    }
+}
+
+struct ConditionParser<'a> {
+    src: &'a str,
+    idx: usize,
+}
+
+impl<'a> ConditionParser<'a> {
+    fn new(src: &'a str) -> Self {
+        Self { src, idx: 0 }
+    }
+
+    fn is_eof(&self) -> bool {
+        self.idx >= self.src.len()
+    }
+
+    fn skip_ws(&mut self) {
+        while let Some(ch) = self.peek_char() {
+            if ch.is_whitespace() {
+                self.idx += ch.len_utf8();
+            } else {
+                break;
+            }
+        }
+    }
+
+    fn peek_char(&self) -> Option<char> {
+        self.src[self.idx..].chars().next()
+    }
+
+    fn eat(&mut self, token: &str) -> bool {
+        self.skip_ws();
+        if self.src[self.idx..].starts_with(token) {
+            self.idx += token.len();
+            true
+        } else {
+            false
+        }
+    }
+
+    fn parse_expr(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+        self.parse_or(conditions)
+    }
+
+    fn parse_or(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+        let mut lhs = self.parse_and(conditions)?;
+        loop {
+            if self.eat("||") {
+                let rhs = self.parse_and(conditions)?;
+                lhs = lhs || rhs;
+            } else {
+                break;
+            }
+        }
+        Ok(lhs)
+    }
+
+    fn parse_and(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+        let mut lhs = self.parse_not(conditions)?;
+        loop {
+            if self.eat("&&") {
+                let rhs = self.parse_not(conditions)?;
+                lhs = lhs && rhs;
+            } else {
+                break;
+            }
+        }
+        Ok(lhs)
+    }
+
+    fn parse_not(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+        if self.eat("!") {
+            Ok(!self.parse_not(conditions)?)
+        } else {
+            self.parse_primary(conditions)
+        }
+    }
+
+    fn parse_primary(&mut self, conditions: &HashMap<String, bool>) -> Result<bool, String> {
+        self.skip_ws();
+        if self.eat("(") {
+            let value = self.parse_expr(conditions)?;
+            if !self.eat(")") {
+                return Err(format!(
+                    "simulator.condition: expected ')' in expression '{}'",
+                    self.src
+                ));
+            }
+            return Ok(value);
+        }
+
+        let ident = self.parse_identifier();
+        match ident.as_deref() {
+            Some("true") => Ok(true),
+            Some("false") => Ok(false),
+            Some(name) => Ok(conditions.get(name).copied().unwrap_or(false)),
+            None => Err(format!(
+                "simulator.condition: expected identifier in expression '{}' at byte {}",
+                self.src, self.idx
+            )),
+        }
+    }
+
+    fn parse_identifier(&mut self) -> Option<String> {
+        self.skip_ws();
+        let mut end = self.idx;
+        for ch in self.src[self.idx..].chars() {
+            if ch.is_ascii_alphanumeric() || matches!(ch, '_' | '.' | '-') {
+                end += ch.len_utf8();
+            } else {
+                break;
+            }
+        }
+        if end == self.idx {
+            None
+        } else {
+            let ident = self.src[self.idx..end].to_string();
+            self.idx = end;
+            Some(ident)
+        }
+    }
 }
 
 fn diff_images(baseline: &Path, actual: &Path) -> Result<u32, String> {

@@ -1,4 +1,4 @@
-﻿//! [`Animation`] â€” main controller for sprite animation playback.
+//! [`Animation`] â€” main controller for sprite animation playback.
 
 use std::collections::HashMap;
 
@@ -148,7 +148,6 @@ impl Animation {
         added
     }
 
-
     // add_frames_from_rects ---------------------------------------------------
 
     /// Adds frames from a pre-sliced list of source rectangles.
@@ -181,13 +180,7 @@ impl Animation {
     /// - `fps` â€” Playback speed in frames per second.
     /// - `looping` â€” Whether the clip loops.
     pub fn add_clip(&mut self, name: &str, frame_indices: Vec<usize>, fps: f32, looping: bool) {
-        self.add_clip_with_mode(
-            name,
-            frame_indices,
-            fps,
-            looping,
-            ClipPlaybackMode::Forward,
-        );
+        self.add_clip_with_mode(name, frame_indices, fps, looping, ClipPlaybackMode::Forward);
     }
 
     /// Registers a named clip with an explicit playback mode.
@@ -332,7 +325,9 @@ impl Animation {
         // Drain accumulated time in a loop: a large dt can skip multiple frames.
         while self.timer >= frame_duration {
             self.timer -= frame_duration;
-            let clip_mode = self.clip_mode(&clip_name).unwrap_or(ClipPlaybackMode::Forward);
+            let clip_mode = self
+                .clip_mode(&clip_name)
+                .unwrap_or(ClipPlaybackMode::Forward);
             let clip_looping = self.clip_looping(&clip_name).unwrap_or(false);
 
             let advanced = match clip_mode {
@@ -703,7 +698,7 @@ impl Animation {
         let rows = if count == 0 {
             1
         } else {
-              count.div_ceil(columns)
+            count.div_ceil(columns)
         };
 
         let width = columns * cell_size;
@@ -724,9 +719,27 @@ impl Animation {
             let alpha = ((frame.quad.width + frame.quad.height) as u32 % 120 + 90) as u8;
             img.draw_rect(x + inset, y + inset, inner_w, inner_h, 70, 130, 220, alpha);
             img.draw_rect(x, y, cell_size, 1, 110, 120, 140, 255);
-            img.draw_rect(x, y + cell_size as i32 - 1, cell_size, 1, 110, 120, 140, 255);
+            img.draw_rect(
+                x,
+                y + cell_size as i32 - 1,
+                cell_size,
+                1,
+                110,
+                120,
+                140,
+                255,
+            );
             img.draw_rect(x, y, 1, cell_size, 110, 120, 140, 255);
-            img.draw_rect(x + cell_size as i32 - 1, y, 1, cell_size, 110, 120, 140, 255);
+            img.draw_rect(
+                x + cell_size as i32 - 1,
+                y,
+                1,
+                cell_size,
+                110,
+                120,
+                140,
+                255,
+            );
         }
 
         img
@@ -763,7 +776,9 @@ impl Animation {
             }
 
             let indices: Vec<usize> = match tag.direction {
-                AsepriteDirection::Forward | AsepriteDirection::PingPong => (tag.from..=tag.to).collect(),
+                AsepriteDirection::Forward | AsepriteDirection::PingPong => {
+                    (tag.from..=tag.to).collect()
+                }
                 AsepriteDirection::Reverse => (tag.from..=tag.to).rev().collect(),
             };
 

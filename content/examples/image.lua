@@ -72,6 +72,18 @@ do -- lurek.image.savePNG
   lurek.image.savePNG(shot, "save/screenshot.png")
 end
 
+--@api-stub: LImageData:drawNineSlice
+-- Draws a nine-slice patch from a source atlas image into this image.
+-- Use it for scalable UI frames where corners must stay crisp.
+do -- LImageData:drawNineSlice
+  local atlas = lurek.image.newImageData(32, 32)
+  atlas:fill(255, 255, 255, 255)
+
+  local out = lurek.image.newImageData(96, 64)
+  out:fill(0, 0, 0, 0)
+  out:drawNineSlice(atlas, 0, 0, 32, 32, 4, 4, 88, 56, 8, 8, 8, 8)
+end
+
 --@api-stub: lurek.image.loadImage
 -- Loads an ImageData from a LIMG binary file.
 -- Pair with saveImage() to reload pixel buffers written by an earlier session.
@@ -167,6 +179,45 @@ do -- ProvinceGrid:adjacencies
   if not ok_grid then return end
   local edges = (grid and grid:adjacencies() or {})
   lurek.log.info("adjacency edges=" .. #edges, "map")
+end
+
+--@api-stub: LProvinceGrid:getPolygons
+-- Returns polygon loops for each province, keyed by province id.
+-- Use this when exporting province borders to vector paths for debug overlays.
+do -- ProvinceGrid:getPolygons
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then return end
+  local polys = (grid and grid:getPolygons() or {})
+  local province_count = 0
+  for _k, _v in pairs(polys) do
+    province_count = province_count + 1
+  end
+  lurek.log.info("province polygon sets=" .. province_count, "map")
+end
+
+--@api-stub: LProvinceGrid:getPolygonsSimplified
+-- Returns simplified polygon loops with collinear/stair-step points removed.
+-- Use this for cheaper rendering and smaller serialized border payloads.
+do -- ProvinceGrid:getPolygonsSimplified
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then return end
+  local polys = (grid and grid:getPolygonsSimplified() or {})
+  local province_count = 0
+  for _k, _v in pairs(polys) do
+    province_count = province_count + 1
+  end
+  lurek.log.info("simplified province polygon sets=" .. province_count, "map")
+end
+
+--@api-stub: LProvinceGrid:drawShapes
+-- Draws province polygon fills through engine render commands.
+-- Call inside render flow after setting desired camera transform and palette state.
+do -- LProvinceGrid:drawShapes
+  local ok_grid, grid = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if not ok_grid then return end
+  pcall(function()
+    grid:drawShapes(0, 0, 1.0)
+  end)
 end
 
 -- â”€â”€ LayeredImage methods â”€â”€
@@ -652,6 +703,20 @@ do -- mlua:applyPaletteLut
   lurek.image.savePNG(img, "save/hero_recoloured.png")
 end
 
+--@api-stub: LImageData:drawNineSlice
+-- Draws a nine-slice patch from an atlas/source image onto this image.
+-- Insets use atlas metadata (left, right, top, bottom) and corners keep fixed size.
+do -- LImageData:drawNineSlice
+  local atlas = lurek.image.newImageData(8, 8)
+  atlas:fill(20, 20, 20, 255)
+  atlas:drawRect(2, 2, 4, 4, 220, 50, 50, 255)
+
+  local canvas = lurek.image.newImageData(32, 20)
+  canvas:fill(0, 0, 0, 0)
+  canvas:drawNineSlice(atlas, 0, 0, 8, 8, 4, 2, 24, 16, 2, 2, 2, 2)
+  lurek.image.savePNG(canvas, "save/panel_nineslice.png")
+end
+
 --@api-stub: mlua:setRawData
 -- Replaces all pixel data from a raw RGBA byte string.
 -- The string length must equal width * height * 4; useful for piping bytes from network or compute.
@@ -682,6 +747,16 @@ do -- PaletteLUT:clear
   local lut = lurek.image.newPaletteLut()
   lut:clear()
   lurek.log.info("lut reset, count=" .. lut:getColorCount(), "image")
+end
+
+--@api-stub: LPaletteLUT:cycle
+-- Rotates destination palette entries for classic palette-cycling animation.
+-- Positive values rotate right, negative values rotate left.
+do -- PaletteLUT:cycle
+  local lut = lurek.image.newPaletteLut()
+  lut:setColor(255, 0, 0, 255, 0, 255, 0, 255)
+  lut:setColor(0, 255, 0, 255, 0, 0, 255, 255)
+  lut:cycle(1)
 end
 
 --@api-stub: mlua (ImageData):blit
@@ -968,17 +1043,21 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do -- LCompressedImageData:type
-  local compressed_image_data_obj = lurek.image.newCompressedData(nil)
-  local t = compressed_image_data_obj:type()
-  lurek.log.info("LCompressedImageData:type = " .. t, "image")
+  local ok, compressed_image_data_obj = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if ok and compressed_image_data_obj then
+    local t = compressed_image_data_obj:type()
+    lurek.log.info("LCompressedImageData:type = " .. t, "image")
+  end
 end
 --@api-stub: LCompressedImageData:typeOf
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do -- LCompressedImageData:typeOf
-  local compressed_image_data_obj = lurek.image.newCompressedData(nil)
-  lurek.log.info("is LCompressedImageData: " .. tostring(compressed_image_data_obj:typeOf("LCompressedImageData")), "image")
-  lurek.log.info("is wrong: " .. tostring(compressed_image_data_obj:typeOf("Unknown")), "image")
+  local ok, compressed_image_data_obj = pcall(lurek.image.newCompressedData, "assets/terrain_bc1.dds")
+  if ok and compressed_image_data_obj then
+    lurek.log.info("is LCompressedImageData: " .. tostring(compressed_image_data_obj:typeOf("LCompressedImageData")), "image")
+    lurek.log.info("is wrong: " .. tostring(compressed_image_data_obj:typeOf("Unknown")), "image")
+  end
 end
 --@api-stub: LImageData:getWidth
 -- Returns the width of the image in pixels.
@@ -1571,17 +1650,21 @@ end
 -- Returns the type name of this object.
 -- Useful for runtime type inspection.
 do -- LProvinceGrid:type
-  local province_grid_obj = lurek.image.newProvinceGrid(nil)
-  local t = province_grid_obj:type()
-  lurek.log.info("LProvinceGrid:type = " .. t, "image")
+  local ok, province_grid_obj = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if ok and province_grid_obj then
+    local t = province_grid_obj:type()
+    lurek.log.info("LProvinceGrid:type = " .. t, "image")
+  end
 end
 --@api-stub: LProvinceGrid:typeOf
 -- Returns true if this object is of the given type.
 -- Use for runtime type checks.
 do -- LProvinceGrid:typeOf
-  local province_grid_obj = lurek.image.newProvinceGrid(nil)
-  lurek.log.info("is LProvinceGrid: " .. tostring(province_grid_obj:typeOf("LProvinceGrid")), "image")
-  lurek.log.info("is wrong: " .. tostring(province_grid_obj:typeOf("Unknown")), "image")
+  local ok, province_grid_obj = pcall(lurek.image.newProvinceGrid, "assets/world_provinces.png")
+  if ok and province_grid_obj then
+    lurek.log.info("is LProvinceGrid: " .. tostring(province_grid_obj:typeOf("LProvinceGrid")), "image")
+    lurek.log.info("is wrong: " .. tostring(province_grid_obj:typeOf("Unknown")), "image")
+  end
 end
 
 -- =============================================================================

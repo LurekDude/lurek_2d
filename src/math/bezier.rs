@@ -48,14 +48,31 @@ impl BezierCurve {
     /// # Returns
     /// The point on the curve at `t`.
     pub fn evaluate(&self, t: f32) -> Vec2 {
-        let mut points = self.control_points.clone();
-        let n = points.len();
-        for level in 1..n {
-            for i in 0..(n - level) {
-                points[i] = points[i].lerp(points[i + 1], t);
+        let n = self.control_points.len();
+        if n == 2 {
+            return self.control_points[0].lerp(self.control_points[1], t);
+        }
+        let tc = t.clamp(0.0, 1.0);
+        let omt = 1.0 - tc;
+
+        // Bernstein polynomial form (no temporary Vec allocations).
+        let mut point = Vec2::ZERO;
+        let mut coeff = 1.0f32; // C(n-1, 0)
+        let degree = (n - 1) as f32;
+
+        for (i, cp) in self.control_points.iter().enumerate() {
+            let i_f = i as f32;
+            let basis = coeff * omt.powf(degree - i_f) * tc.powf(i_f);
+            point.x += cp.x * basis;
+            point.y += cp.y * basis;
+
+            // Next binomial coefficient C(n-1, i+1)
+            if i + 1 < n {
+                coeff = coeff * (degree - i_f) / (i_f + 1.0);
             }
         }
-        points[0]
+
+        point
     }
 
     /// Render the curve as a polyline with the given number of segments.
@@ -263,6 +280,46 @@ impl BezierCurve {
     pub fn get_interpolated_position(&self, t: f32) -> (f32, f32) {
         let p = self.evaluate(t);
         (p.x, p.y)
+    }
+
+    /// Evaluate a point by travelled arc distance along the curve.
+    ///
+    /// This approximates constant-speed parameterization by sampling the curve,
+    /// accumulating arc-length, then interpolating within the segment where the
+    /// requested distance falls.
+    ///
+    /// # Parameters
+    /// - `distance` — travelled arc-length from the start of the curve
+    /// - `samples` — number of samples used for approximation (clamped to ≥ 8)
+    ///
+    /// # Returns
+    /// Point on the curve at the requested distance, clamped to start/end.
+    pub fn evaluate_at_distance(&self, distance: f32, samples: usize) -> Vec2 {
+        let samples = samples.max(8);
+        if distance <= 0.0 {
+            return self.evaluate(0.0);
+        }
+
+        let mut prev = self.evaluate(0.0);
+        let mut walked = 0.0f32;
+
+        for i in 1..=samples {
+            let t = i as f32 / samples as f32;
+            let curr = self.evaluate(t);
+            let seg_len = prev.distance(curr);
+            let next_walked = walked + seg_len;
+            if distance <= next_walked {
+                if seg_len <= f32::EPSILON {
+                    return curr;
+                }
+                let local = (distance - walked) / seg_len;
+                return prev.lerp(curr, local);
+            }
+            walked = next_walked;
+            prev = curr;
+        }
+
+        self.evaluate(1.0)
     }
 
     /// Return the angle of the curve tangent at parameter `t` in radians.

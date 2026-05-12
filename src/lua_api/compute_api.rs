@@ -1223,6 +1223,29 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         })?,
     )?;
 
+    // -- getParThreshold --
+    /// Returns the current parallelization threshold.
+    /// Element-wise and reduction operations use Rayon thread pool when array size exceeds this threshold.
+    /// @return | integer | Current parallelization threshold (default 10,000).
+    tbl.set(
+        "getParThreshold",
+        lua.create_function(|_, ()| Ok(crate::compute::get_par_threshold() as i64))?,
+    )?;
+
+    // -- setParThreshold --
+    /// Sets the parallelization threshold for element-wise and reduction operations.
+    /// Set to a lower value to parallelize smaller arrays; set to a higher value to serialize more operations.
+    /// @param | threshold | integer | New parallelization threshold (minimum 1).
+    /// @return | integer | Previous threshold value.
+    tbl.set(
+        "setParThreshold",
+        lua.create_function(|_, threshold: i64| {
+            let new_threshold = (threshold as usize).max(1);
+            let prev = crate::compute::set_par_threshold(new_threshold);
+            Ok(prev as i64)
+        })?,
+    )?;
+
     lurek.set("compute", tbl)?;
     Ok(())
 }

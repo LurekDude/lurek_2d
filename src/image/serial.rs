@@ -264,7 +264,15 @@ pub fn decode_flat(payload: &[u8]) -> Result<ImageData, String> {
     let width = read_u32(payload, 0)?;
     let height = read_u32(payload, 4)?;
     let pixels = decompress(&payload[8..])?;
-    let expected = (width * height * 4) as usize;
+    let expected = width
+        .checked_mul(height)
+        .and_then(|v| v.checked_mul(4))
+        .ok_or_else(|| {
+            format!(
+                "LIMG flat: dimensions overflow byte size calculation ({}x{})",
+                width, height
+            )
+        })? as usize;
     if pixels.len() != expected {
         return Err(format!(
             "LIMG flat: decompressed {} bytes, expected {} for {}x{}",
@@ -324,7 +332,9 @@ fn decode_layered(payload: &[u8]) -> Result<LayeredImage, String> {
         // name
         let name_len = read_u16(payload, pos)? as usize;
         pos += 2;
-        let name_end = pos + name_len;
+        let name_end = pos
+            .checked_add(name_len)
+            .ok_or_else(|| format!("LIMG layered: layer {} name length overflow", i))?;
         if name_end > payload.len() {
             return Err(format!("LIMG layered: layer {} name out of bounds", i));
         }
@@ -351,7 +361,9 @@ fn decode_layered(payload: &[u8]) -> Result<LayeredImage, String> {
         let comp_len = read_u32(payload, pos)? as usize;
         pos += 4;
 
-        let comp_end = pos + comp_len;
+        let comp_end = pos
+            .checked_add(comp_len)
+            .ok_or_else(|| format!("LIMG layered: layer {} pixel block length overflow", i))?;
         if comp_end > payload.len() {
             return Err(format!(
                 "LIMG layered: layer {} pixel block out of bounds",
@@ -361,7 +373,15 @@ fn decode_layered(payload: &[u8]) -> Result<LayeredImage, String> {
         let pixels = decompress(&payload[pos..comp_end])?;
         pos = comp_end;
 
-        let expected = (canvas_w * canvas_h * 4) as usize;
+        let expected = canvas_w
+            .checked_mul(canvas_h)
+            .and_then(|v| v.checked_mul(4))
+            .ok_or_else(|| {
+                format!(
+                    "LIMG layered: dimensions overflow byte size calculation ({}x{})",
+                    canvas_w, canvas_h
+                )
+            })? as usize;
         if pixels.len() != expected {
             return Err(format!(
                 "LIMG layered: layer {} decompressed {} bytes, expected {}",

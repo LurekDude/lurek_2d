@@ -362,3 +362,93 @@ mod sphere_tests {
         assert!(approx(vector.z, 4.0, 1e-6));
     }
 }
+
+mod noise_edge_case_tests {
+    use lurek2d::math::{MapGenOptions, NoiseGenerator};
+
+    #[test]
+    fn generate_map_zero_octaves_returns_zeros() {
+        let ng = NoiseGenerator::new(123);
+        let opts = MapGenOptions {
+            octaves: 0,
+            ..MapGenOptions::default()
+        };
+        let map = ng.generate_map(8, 8, &opts);
+        assert_eq!(map.len(), 64);
+        assert!(map.iter().all(|v| v.abs() < 1e-9));
+    }
+
+    #[test]
+    fn generate_map_negative_persistence_is_stable() {
+        let ng = NoiseGenerator::new(123);
+        let opts = MapGenOptions {
+            persistence: -0.75,
+            ..MapGenOptions::default()
+        };
+        let map = ng.generate_map(4, 4, &opts);
+        assert_eq!(map.len(), 16);
+        assert!(map.iter().all(|v| v.is_finite()));
+    }
+}
+
+mod geometry_collinear_tests {
+    use lurek2d::math::geometry;
+
+    #[test]
+    fn convex_hull_all_collinear_returns_endpoints() {
+        let points = vec![0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 3.0, 0.0];
+        let hull = geometry::convex_hull(&points);
+        assert_eq!(hull.len(), 4);
+        assert_eq!(hull[0], 0.0);
+        assert_eq!(hull[1], 0.0);
+        assert_eq!(hull[2], 3.0);
+        assert_eq!(hull[3], 0.0);
+    }
+
+    #[test]
+    fn delaunay_collinear_input_returns_empty() {
+        let points = vec![(0.0, 0.0), (1.0, 0.0), (2.0, 0.0), (3.0, 0.0)];
+        let tris = geometry::delaunay_triangulate(&points);
+        assert!(tris.is_empty());
+    }
+}
+
+mod rect_packer_tests {
+    use lurek2d::math::RectPacker;
+
+    #[test]
+    fn shelf_packer_places_rectangles_and_reports_occupancy() {
+        let mut packer = RectPacker::new(32, 32, 1);
+        let a = packer.pack(8, 8, Some("a".to_string()));
+        let b = packer.pack(8, 8, Some("b".to_string()));
+        assert!(a.is_some());
+        assert!(b.is_some());
+        assert!(packer.occupancy() > 0.0);
+    }
+}
+
+mod noise_api_dedup_tests {
+    use lurek2d::math::{noise_functions, NoiseGenerator};
+
+    fn approx_eq(a: f32, b: f32, eps: f32) -> bool {
+        (a - b).abs() <= eps
+    }
+
+    #[test]
+    fn free_perlin2d_matches_noise_generator_path() {
+        let seed = 1337u32;
+        let (x, y) = (1.25f32, -0.75f32);
+        let legacy = noise_functions::perlin2d(x, y, seed);
+        let direct = NoiseGenerator::new(seed as u64).perlin_2d(x as f64, y as f64) as f32;
+        assert!(approx_eq(legacy, direct, 1e-6));
+    }
+
+    #[test]
+    fn free_simplex2d_matches_noise_generator_path() {
+        let seed = 7u32;
+        let (x, y) = (-3.5f32, 2.0f32);
+        let legacy = noise_functions::simplex2d(x, y, seed);
+        let direct = NoiseGenerator::new(seed as u64).simplex_2d(x as f64, y as f64) as f32;
+        assert!(approx_eq(legacy, direct, 1e-6));
+    }
+}

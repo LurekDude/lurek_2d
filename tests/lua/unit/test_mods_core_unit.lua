@@ -287,6 +287,19 @@ describe("ModManager object", function()
         expect_true(#all >= 1, "at least one mod registered")
     end)
 
+    -- @covers LModManager:getModsByCapability
+    -- @covers LModManager:registerMod
+    -- @covers lurek.mods.newMod
+    -- @covers lurek.mods.newModManager
+    it("getModsByCapability filters matching mods", function()
+        local mm = lurek.mods.newModManager()
+        mm:registerMod(lurek.mods.newMod({ id = "save_mod", capabilities = { "save", "ui" } }))
+        mm:registerMod(lurek.mods.newMod({ id = "audio_mod", capabilities = { "audio" } }))
+        local matches = mm:getModsByCapability("save")
+        expect_equal(1, #matches)
+        expect_equal("save_mod", matches[1].id)
+    end)
+
     -- @covers LModManager:hasMod
     -- @covers lurek.mods.newModManager
     it("hasMod returns false for unknown id", function()
@@ -456,6 +469,24 @@ describe("ModManager load order control", function()
         expect_equal("priority_high", order[2].id)
     end)
 
+    -- @covers LModManager:getLoadOrder
+    -- @covers LModManager:registerMod
+    -- @covers lurek.mods.newMod
+    -- @covers lurek.mods.newModManager
+    it("getLoadOrder respects dependencies before priority", function()
+        local mm = lurek.mods.newModManager()
+        mm:registerMod(lurek.mods.newMod({ id = "base_mod", priority = 50 }))
+        mm:registerMod(lurek.mods.newMod({
+            id = "child_mod",
+            priority = -10,
+            dependencies = { "base_mod" },
+        }))
+
+        local order = mm:getLoadOrder()
+        expect_equal("base_mod", order[1].id)
+        expect_equal("child_mod", order[2].id)
+    end)
+
     -- @covers LModManager:clearLoadOrder
     -- @covers LModManager:registerMod
     -- @covers LModManager:setLoadOrder
@@ -477,8 +508,11 @@ describe("ModManager reload queue", function()
     -- @covers lurek.mods.newModManager
     it("markForReload adds a mod id to the reload queue", function()
         local mm = lurek.mods.newModManager()
-        mm:registerMod(lurek.mods.newMod({ id = "reload_me" }))
+        local mod = lurek.mods.newMod({ id = "reload_me" })
+        mod:setEnabled(true)
+        mm:registerMod(mod)
         expect_no_error(function() mm:markForReload("reload_me") end)
+        expect_false(mm:getAllMods()[1].loaded)
     end)
 
     -- @covers LModManager:getReloadQueue
@@ -497,6 +531,7 @@ describe("ModManager reload queue", function()
     it("getReloadQueue contains id after markForReload", function()
         local mm = lurek.mods.newModManager()
         mm:registerMod(lurek.mods.newMod({ id = "rq_mod" }))
+        mm:markForReload("rq_mod")
         mm:markForReload("rq_mod")
         local q = mm:getReloadQueue()
         local found = false
@@ -518,6 +553,16 @@ describe("ModManager reload queue", function()
         mm:markForReload("rq_clear")
         mm:clearReloadQueue()
         expect_equal(0, #mm:getReloadQueue())
+    end)
+
+    -- @covers LModManager:processReloadQueue
+    -- @covers lurek.mods.newModManager
+    it("processReloadQueue returns an array", function()
+        local mm = lurek.mods.newModManager()
+        ---@diagnostic disable-next-line: undefined-field
+        local processed = mm:processReloadQueue()
+        expect_type("table", processed)
+        expect_equal(0, #processed)
     end)
 end)
 
@@ -550,6 +595,21 @@ describe("lurek.mods API coverage", function()
         local mod = lurek.mods.newMod({ id = "api_ver_mod" })
         mod:setApiVersion("3.2.1")
         expect_equal("3.2.1", mod:getApiVersion())
+    end)
+
+    -- @covers LMod:getId
+    -- @covers lurek.mods.newMod
+    it("newMod round-trips assets and signature through manager tables", function()
+        local mm = lurek.mods.newModManager()
+        mm:registerMod(lurek.mods.newMod({
+            id = "asset_sig_mod",
+            assets = { "textures/hero.png" },
+            signature = "deadbeef",
+        }))
+
+        local info = mm:getAllMods()[1]
+        expect_equal("textures/hero.png", info.assets[1])
+        expect_equal("deadbeef", info.signature)
     end)
 
     -- @covers LMod:getCapabilities

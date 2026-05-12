@@ -511,4 +511,61 @@ describe("lurek.runtime.setClipboardText + lurek.runtime.getClipboardText", func
     end)
 end)
 
+-- ============================================================
+-- reloadConfig / getConfig
+-- ============================================================
+-- @describe lurek.runtime.reloadConfig
+describe("lurek.runtime.reloadConfig", function()
+    -- @covers lurek.runtime.reloadConfig
+    it("is a function", function()
+        expect_type("function", lurek.runtime.reloadConfig)
+    end)
+
+    -- @covers lurek.runtime.reloadConfig
+    it("does not error when called", function()
+        lurek.runtime.reloadConfig()
+    end)
+end)
+
+-- @describe lurek.runtime.getConfig
+describe("lurek.runtime.getConfig", function()
+    -- @covers lurek.runtime.getConfig
+    it("is a function", function()
+        expect_type("function", lurek.runtime.getConfig)
+    end)
+
+    -- @covers lurek.runtime.getConfig
+    it("returns a table", function()
+        local cfg = lurek.runtime.getConfig()
+        expect_type("table", cfg)
+    end)
+
+    -- @covers lurek.runtime.getConfig
+    it("has physics_tick_rate >= 1", function()
+        local cfg = lurek.runtime.getConfig()
+        expect_type("number", cfg.physics_tick_rate)
+        expect_true(cfg.physics_tick_rate >= 1, "physics_tick_rate should be at least 1 Hz")
+    end)
+
+    -- @covers lurek.runtime.getConfig
+    it("has vsync as a boolean", function()
+        local cfg = lurek.runtime.getConfig()
+        expect_true(cfg.vsync == true or cfg.vsync == false, "vsync must be boolean")
+    end)
+
+    -- @covers lurek.runtime.getConfig
+    it("has log_level as a string", function()
+        local cfg = lurek.runtime.getConfig()
+        expect_type("string", cfg.log_level)
+        expect_true(#cfg.log_level > 0, "log_level must be non-empty")
+    end)
+
+    -- @covers lurek.runtime.getConfig
+    it("has config_reload_revision as a non-negative integer", function()
+        local cfg = lurek.runtime.getConfig()
+        expect_type("number", cfg.config_reload_revision)
+        expect_true(cfg.config_reload_revision >= 0, "revision must be non-negative")
+    end)
+end)
+
 test_summary()

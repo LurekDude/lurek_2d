@@ -82,31 +82,16 @@ impl ViewportScale {
     /// - `window_width` — `f32`.
     /// - `window_height` — `f32`.
     pub fn resize(&mut self, window_width: f32, window_height: f32) {
-        match self.mode {
-            ScaleMode::Letterbox => {
-                let scale = (window_width / self.game_width).min(window_height / self.game_height);
-                self.scale_x = scale;
-                self.scale_y = scale;
-                self.offset_x = (window_width - self.game_width * scale) / 2.0;
-                self.offset_y = (window_height - self.game_height * scale) / 2.0;
-            }
-            ScaleMode::Stretch => {
-                self.scale_x = window_width / self.game_width;
-                self.scale_y = window_height / self.game_height;
-                self.offset_x = 0.0;
-                self.offset_y = 0.0;
-            }
-            ScaleMode::PixelPerfect => {
-                let scale = (window_width / self.game_width)
-                    .min(window_height / self.game_height)
-                    .floor()
-                    .max(1.0);
-                self.scale_x = scale;
-                self.scale_y = scale;
-                self.offset_x = (window_width - self.game_width * scale) / 2.0;
-                self.offset_y = (window_height - self.game_height * scale) / 2.0;
-            }
-        }
+        let (scale_x, scale_y, offset_x, offset_y) = self.mode.compute_transforms(
+            self.game_width,
+            self.game_height,
+            window_width,
+            window_height,
+        );
+        self.scale_x = scale_x;
+        self.scale_y = scale_y;
+        self.offset_x = offset_x;
+        self.offset_y = offset_y;
         self.scaled_width = self.game_width * self.scale_x;
         self.scaled_height = self.game_height * self.scale_y;
     }

@@ -7,6 +7,9 @@
 // ── channel ───────────────────────────────────────────────────────────────────
 
 mod channel_tests {
+    use std::thread;
+    use std::time::{Duration, Instant};
+
     use lurek2d::thread::channel::{Channel, ChannelValue};
 
     // ── Channel basics ────────────────────────────────────────────────────
@@ -21,6 +24,13 @@ mod channel_tests {
     fn unnamed_channel_has_no_name() {
         let ch = Channel::new();
         assert!(ch.name().is_none());
+    }
+
+    #[test]
+    fn named_bounded_channel_keeps_name_and_capacity() {
+        let ch = Channel::named_bounded("bounded-name".to_string(), 3);
+        assert_eq!(ch.name(), Some("bounded-name"));
+        assert_eq!(ch.capacity(), Some(3));
     }
 
     // ── Push / Pop ────────────────────────────────────────────────────────
@@ -58,6 +68,57 @@ mod channel_tests {
             Some(ChannelValue::Bytes(b)) => assert_eq!(b, vec![0xDE, 0xAD]),
             other => panic!("expected Bytes, got {:?}", other),
         }
+    }
+
+    #[test]
+    fn bounded_channel_reports_capacity() {
+        let ch = Channel::bounded(2);
+        assert_eq!(ch.capacity(), Some(2));
+        assert!(ch.is_bounded());
+    }
+
+    #[test]
+    fn bounded_channel_try_push_respects_capacity() {
+        let ch = Channel::bounded(1);
+        assert!(ch.try_push(ChannelValue::Number(1.0)));
+        assert!(!ch.try_push(ChannelValue::Number(2.0)));
+        assert_eq!(ch.get_count(), 1);
+    }
+
+    #[test]
+    fn supply_requires_empty_channel_and_capacity() {
+        let ch = Channel::bounded(1);
+        assert!(ch.supply(ChannelValue::String("ok".to_string())));
+        assert!(!ch.supply(ChannelValue::String("blocked".to_string())));
+    }
+
+    #[test]
+    fn demand_timeout_respects_deadline_under_spurious_wakeups() {
+        let ch = Channel::new();
+        let start = Instant::now();
+        let out = ch.demand(Some(0.01));
+        let elapsed = start.elapsed();
+        assert!(out.is_none());
+        assert!(elapsed >= Duration::from_millis(5));
+    }
+
+    #[test]
+    fn bounded_push_unblocks_after_consumer_pop() {
+        let ch = Channel::bounded(1);
+        ch.push(ChannelValue::String("first".to_string()));
+        let producer = {
+            let ch = ch.clone();
+            thread::spawn(move || ch.push(ChannelValue::String("second".to_string())))
+        };
+
+        thread::sleep(Duration::from_millis(10));
+        let first = ch.pop();
+        assert!(matches!(first, Some(ChannelValue::String(_))));
+
+        let pushed_id = producer.join().expect("producer thread should finish");
+        assert!(pushed_id > 0);
+        let second = ch.pop();
+        assert!(matches!(second, Some(ChannelValue::String(_))));
     }
 }
 
@@ -156,6 +217,25 @@ mod worker_tests {
     }
 
     #[test]
+    fn wait_timeout_returns_false_for_running_thread() {
+        let channels = empty_channels();
+        let blocker = Channel::named("__wait_timeout_block".to_string());
+        channels
+            .lock()
+            .unwrap()
+            .insert("__wait_timeout_block".to_string(), blocker.clone());
+
+        let mut t = LuaThread::new(
+            r#"lurek.thread.getChannel("__wait_timeout_block"):demand()"#.to_string(),
+            channels,
+        );
+        assert!(t.start(vec![]).is_ok());
+        assert!(!t.wait_timeout(0.01));
+        blocker.push(ChannelValue::Nil);
+        assert!(t.wait_timeout(0.5));
+    }
+
+    #[test]
     fn thread_state_variants_eq() {
         assert_eq!(ThreadState::Pending, ThreadState::Pending);
         assert_eq!(ThreadState::Running, ThreadState::Running);
@@ -215,6 +295,22 @@ mod pool_tests {
         // Channels should exist and be empty initially
         assert_eq!(pool.input.get_count(), 0);
         assert_eq!(pool.output.get_count(), 0);
+    }
+
+    #[test]
+    fn join_with_timeout_returns_false_for_hung_worker() {
+        let mut pool = ThreadPool::new(
+            1,
+            r#"
+                local input = lurek.thread.getChannel("__pool_input")
+                input:demand()
+            "#
+            .to_string(),
+        );
+        let done = pool.join_with_timeout(0.01);
+        assert!(!done);
+        pool.submit(ChannelValue::Nil);
+        assert!(pool.join_with_timeout(0.2));
     }
 }
 

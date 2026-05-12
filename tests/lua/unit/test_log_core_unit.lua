@@ -785,4 +785,127 @@ describe("lurek.log memory sink  plain + structured mixed", function()
         lurek.log.removeSink(sid)
     end)
 end)
+
+-- @describe lurek.log advanced sink options
+describe("lurek.log advanced sink options", function()
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.info
+    -- @covers lurek.log.readMemory
+    -- @covers lurek.log.removeSink
+    it("memory sink filters by tag", function()
+        lurek.log.clearSinks()
+        local id = lurek.log.addSink({
+            type = "memory",
+            level = "debug",
+            tags = { "Allowed" },
+        })
+
+        lurek.log.info("tagged_message_ok", "Allowed")
+        lurek.log.info("tagged_message_skip", "Blocked")
+
+        local entries = lurek.log.readMemory(id)
+        lurek.log.removeSink(id)
+
+        expect_equal(1, #entries)
+        expect_equal("Allowed", entries[1].tag)
+        expect_true(entries[1].message:find("tagged_message_ok") ~= nil)
+    end)
+
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.info
+    -- @covers lurek.log.removeSink
+    it("callback sink receives pushed log records", function()
+        lurek.log.clearSinks()
+        local seen = {}
+        local id = lurek.log.addSink({
+            type = "callback",
+            level = "debug",
+            callback = function(record)
+                table.insert(seen, record)
+            end,
+        })
+
+        lurek.log.info("callback_message", "Ui")
+        lurek.log.removeSink(id)
+
+        expect_equal(1, #seen)
+        expect_equal("info", seen[1].level)
+        expect_equal("Ui", seen[1].tag)
+        expect_true(seen[1].message:find("callback_message") ~= nil)
+    end)
+
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.flushFile
+    -- @covers lurek.log.info
+    -- @covers lurek.log.removeSink
+    it("file sink can emit timestamped plain lines", function()
+        lurek.log.clearSinks()
+        local path = "save/_log_timestamp_test.log"
+        local id = lurek.log.addSink({
+            type = "file",
+            path = path,
+            timestamp = true,
+        })
+
+        lurek.log.info("timestamped_line", "Time")
+        lurek.log.flushFile(id)
+        lurek.log.removeSink(id)
+
+        local content = assert(lurek.filesystem.read(path))
+
+        expect_true(content:find("^%[%d+%]") ~= nil, "timestamp prefix missing")
+        expect_true(content:find("timestamped_line") ~= nil, "message missing")
+    end)
+
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.flushFile
+    -- @covers lurek.log.info
+    -- @covers lurek.log.removeSink
+    it("file sink can emit ANSI-coloured plain lines", function()
+        lurek.log.clearSinks()
+        local path = "save/_log_ansi_test.log"
+        local id = lurek.log.addSink({
+            type = "file",
+            path = path,
+            ansi = true,
+        })
+
+        lurek.log.info("ansi_line", "Ansi")
+        lurek.log.flushFile(id)
+        lurek.log.removeSink(id)
+
+        local content = assert(lurek.filesystem.read(path))
+
+        expect_true(content:find("\27%[") ~= nil, "ANSI escape sequence missing")
+        expect_true(content:find("ansi_line") ~= nil, "message missing")
+    end)
+
+    -- @covers lurek.log.addSink
+    -- @covers lurek.log.clearSinks
+    -- @covers lurek.log.flushFile
+    -- @covers lurek.log.info
+    -- @covers lurek.log.removeSink
+    it("file sink can emit JSON lines", function()
+        lurek.log.clearSinks()
+        local path = "save/_log_json_test.log"
+        local id = lurek.log.addSink({
+            type = "file",
+            path = path,
+            format = "json",
+        })
+
+        lurek.log.info("json_line", "Json")
+        lurek.log.flushFile(id)
+        lurek.log.removeSink(id)
+
+        local content = assert(lurek.filesystem.read(path))
+
+        expect_true(content:find('"level":"info"') ~= nil, "JSON level missing")
+        expect_true(content:find('"message":"json_line"') ~= nil, "JSON message missing")
+    end)
+end)
 test_summary()

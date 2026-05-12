@@ -868,4 +868,32 @@ describe("lurek.window.isResizable", function()
         expect_type("boolean", lurek.window.isResizable())
     end)
 end)
+-- @describe windowConfig helper
+
+describe("windowConfig helper", function()
+    -- @covers lurek.window.windowConfig
+    it("windowConfig is a function", function()
+        expect_type("function", lurek.window["windowConfig"])
+    end)
+
+    -- @covers lurek.window.windowConfig
+    -- @covers lurek.window.getMode
+    it("windowConfig applies title and mode fields", function()
+        local apply = lurek.window["windowConfig"]
+        apply({
+            title = "Window Config Test",
+            width = 800,
+            height = 600,
+            fullscreen = false,
+            fullscreentype = "desktop",
+            vsync = 1,
+            scaleMode = "letterbox",
+        })
+        local w, h, flags = lurek.window.getMode()
+        expect_equal(800, w)
+        expect_equal(600, h)
+        expect_equal(false, flags.fullscreen)
+    end)
+end)
+
 test_summary()

@@ -191,3 +191,59 @@ fn test_import_metadata_from_files_sets_attrs_labels_and_markers() {
     assert_eq!(reg.label_text_for(1), Some("Alpha Province"));
     assert_eq!(reg.capital_for(1), Some((1.5, 0.5)));
 }
+
+#[test]
+fn test_province_polygons_rectangle_simplifies_to_four_corners() {
+    let mut img = ImageData::new(3, 2);
+    for y in 0..2 {
+        for x in 0..3 {
+            img.set_pixel(x, y, 200, 20, 20, 255);
+        }
+    }
+
+    let grid = ProvinceGrid::from_image(&img);
+    let polygons = grid.province_polygons_simplified();
+    let loops = polygons.get(&1).expect("province 1 loops");
+    let main = loops
+        .iter()
+        .max_by_key(|ring| ring.len())
+        .expect("at least one loop");
+
+    assert_eq!(main.first(), main.last());
+    assert_eq!(main.len(), 5);
+    assert!(main.contains(&(0, 0)));
+    assert!(main.contains(&(3, 0)));
+    assert!(main.contains(&(3, 2)));
+    assert!(main.contains(&(0, 2)));
+}
+
+#[test]
+fn test_province_polygons_staircase_produces_fewer_points_and_diagonal() {
+    let mut img = ImageData::new(5, 5);
+    let steps = [(0, 0), (1, 0), (1, 1), (2, 1), (2, 2), (3, 2), (3, 3)];
+    for (x, y) in steps {
+        img.set_pixel(x, y, 20, 200, 20, 255);
+    }
+
+    let grid = ProvinceGrid::from_image(&img);
+    let raw = grid.province_polygons();
+    let simplified = grid.province_polygons_simplified();
+
+    let raw_loop = raw
+        .get(&1)
+        .and_then(|loops| loops.iter().max_by_key(|ring| ring.len()))
+        .expect("raw loop");
+    let simp_loop = simplified
+        .get(&1)
+        .and_then(|loops| loops.iter().max_by_key(|ring| ring.len()))
+        .expect("simplified loop");
+
+    assert!(simp_loop.len() < raw_loop.len());
+
+    let has_diagonal = simp_loop.windows(2).any(|w| {
+        let dx = (w[1].0 as i64 - w[0].0 as i64).abs();
+        let dy = (w[1].1 as i64 - w[0].1 as i64).abs();
+        dx == dy && dx > 0
+    });
+    assert!(has_diagonal);
+}

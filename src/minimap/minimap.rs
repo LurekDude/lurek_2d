@@ -1,13 +1,24 @@
 //! Core `Minimap` data model: terrain grid, fog of war, objects, pings, markers, and navigation.
 
+use crate::camera::Camera2D;
 use crate::log_msg;
 use crate::runtime::log_messages::MM01_MINIMAP_INIT;
+use crate::runtime::resource_keys::TextureKey;
 use std::collections::HashMap;
 
 use super::types::{
     ColorMode, FogLevel, LayerData, MarkerAnimation, MinimapMarker, MinimapObject,
     MinimapObjectType, MinimapPing, OverlayPath, OverlayShape,
 };
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct MinimapIcon {
+    pub texture_key: TextureKey,
+    pub texture_width: f32,
+    pub texture_height: f32,
+    pub display_width: f32,
+    pub display_height: f32,
+}
 
 /// A grid-based minimap with terrain, fog-of-war, objects, pings, markers, and navigation state.
 ///
@@ -62,6 +73,7 @@ pub struct Minimap {
     // ── Objects ──
     objects: HashMap<u32, MinimapObject>,
     object_types: Vec<MinimapObjectType>,
+    object_type_icons: HashMap<usize, MinimapIcon>,
     owner_colors: HashMap<u32, [f32; 4]>,
 
     // ── Display state ──
@@ -78,6 +90,7 @@ pub struct Minimap {
     // ── Pings and markers ──
     pings: Vec<MinimapPing>,
     markers: HashMap<u32, MinimapMarker>,
+    marker_icons: HashMap<u32, MinimapIcon>,
     next_marker_id: u32,
 
     // ── Rendering options ──
@@ -127,6 +140,7 @@ impl Minimap {
             fog_color: [0.0, 0.0, 0.0, 0.8],
             objects: HashMap::new(),
             object_types: Vec::new(),
+            object_type_icons: HashMap::new(),
             owner_colors: HashMap::new(),
             color_mode: ColorMode::Terrain,
             zoom: 1.0,
@@ -137,6 +151,7 @@ impl Minimap {
             viewport_color: [1.0, 1.0, 1.0, 0.8],
             pings: Vec::new(),
             markers: HashMap::new(),
+            marker_icons: HashMap::new(),
             next_marker_id: 1,
             anti_alias: false,
             clickable: true,
@@ -363,6 +378,29 @@ impl Minimap {
         }
     }
 
+    /// Returns the terrain visibility multiplier for a grid cell.
+    ///
+    /// Hidden cells use a stronger dimming factor than explored cells so CPU
+    /// evidence rendering and GPU command generation stay visually aligned.
+    ///
+    /// # Parameters
+    /// - `x` — `u32`.
+    /// - `y` — `u32`.
+    ///
+    /// # Returns
+    /// `f32`.
+    pub fn fog_multiplier(&self, x: u32, y: u32) -> f32 {
+        if !self.fog_enabled {
+            return 1.0;
+        }
+
+        match self.get_fog_level(x, y) {
+            FogLevel::Visible => 1.0,
+            FogLevel::Explored => 0.5,
+            FogLevel::Hidden => 0.15,
+        }
+    }
+
     // ── Object types ──
 
     /// Register a new object type and return its 0-based index.
@@ -381,6 +419,48 @@ impl Minimap {
             visible: true,
         });
         idx
+    }
+
+    /// Attach a texture-backed icon to an object type.
+    ///
+    /// # Parameters
+    /// - `type_index` — `usize`.
+    /// - `texture_key` — `TextureKey`.
+    /// - `texture_width` — `f32`.
+    /// - `texture_height` — `f32`.
+    /// - `display_width` — `f32`.
+    /// - `display_height` — `f32`.
+    pub fn set_object_type_texture(
+        &mut self,
+        type_index: usize,
+        texture_key: TextureKey,
+        texture_width: f32,
+        texture_height: f32,
+        display_width: f32,
+        display_height: f32,
+    ) {
+        if self.object_types.get(type_index).is_none() {
+            return;
+        }
+
+        self.object_type_icons.insert(
+            type_index,
+            MinimapIcon {
+                texture_key,
+                texture_width: texture_width.max(1.0),
+                texture_height: texture_height.max(1.0),
+                display_width: display_width.max(1.0),
+                display_height: display_height.max(1.0),
+            },
+        );
+    }
+
+    /// Remove the texture-backed icon from an object type.
+    ///
+    /// # Parameters
+    /// - `type_index` — `usize`.
+    pub fn clear_object_type_texture(&mut self, type_index: usize) {
+        self.object_type_icons.remove(&type_index);
     }
 
     /// Set whether an object type is visible on the minimap.
@@ -461,6 +541,14 @@ impl Minimap {
         self.objects.len()
     }
 
+    pub(crate) fn objects_iter(&self) -> impl Iterator<Item = &MinimapObject> {
+        self.objects.values()
+    }
+
+    pub(crate) fn object_type(&self, type_index: usize) -> Option<&MinimapObjectType> {
+        self.object_types.get(type_index)
+    }
+
     // ── Owner colors ──
 
     /// Set the display color for an owner/faction.
@@ -530,6 +618,45 @@ impl Minimap {
     pub fn set_center(&mut self, x: f32, y: f32) {
         self.center_x = x;
         self.center_y = y;
+    }
+
+    /// Tracks a camera by centering the minimap and mirroring its visible area.
+    ///
+    /// # Parameters
+    /// - `camera` — `&Camera2D`.
+    pub fn track_camera(&mut self, camera: &Camera2D) {
+        let (camera_x, camera_y) = camera.get_position();
+        let (vx, vy, vw, vh) = camera.get_visible_area();
+        self.set_center(camera_x, camera_y);
+        self.set_viewport_rect(vx, vy, vw, vh);
+    }
+
+    /// Reveals all cells whose center lies within the given radius.
+    ///
+    /// # Parameters
+    /// - `cx` — `f32`.
+    /// - `cy` — `f32`.
+    /// - `radius` — `f32`.
+    pub fn reveal_radius(&mut self, cx: f32, cy: f32, radius: f32) {
+        if radius <= 0.0 {
+            return;
+        }
+
+        let radius_sq = radius * radius;
+        let min_x = ((cx - radius).floor() as i64).max(0) as u32;
+        let min_y = ((cy - radius).floor() as i64).max(0) as u32;
+        let max_x = ((cx + radius).ceil() as i64).min(self.grid_width as i64 - 1) as u32;
+        let max_y = ((cy + radius).ceil() as i64).min(self.grid_height as i64 - 1) as u32;
+
+        for gy in min_y..=max_y {
+            for gx in min_x..=max_x {
+                let dx = gx as f32 + 0.5 - cx;
+                let dy = gy as f32 + 0.5 - cy;
+                if dx * dx + dy * dy <= radius_sq {
+                    self.set_fog_level(gx, gy, FogLevel::Visible);
+                }
+            }
+        }
     }
 
     /// Get the center X coordinate.
@@ -655,6 +782,14 @@ impl Minimap {
         self.markers.values()
     }
 
+    /// Return all marker ids with their marker values.
+    ///
+    /// # Returns
+    /// `impl Iterator<Item = (&u32, &MinimapMarker)>`.
+    pub(crate) fn markers_with_ids(&self) -> impl Iterator<Item = (&u32, &MinimapMarker)> {
+        self.markers.iter()
+    }
+
     // ── Markers ──
 
     /// Add a persistent marker and return its auto-assigned ID.
@@ -691,7 +826,50 @@ impl Minimap {
     /// # Returns
     /// `bool`.
     pub fn remove_marker(&mut self, id: u32) -> bool {
+        self.marker_icons.remove(&id);
         self.markers.remove(&id).is_some()
+    }
+
+    /// Attach a texture-backed icon to a marker.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    /// - `texture_key` — `TextureKey`.
+    /// - `texture_width` — `f32`.
+    /// - `texture_height` — `f32`.
+    /// - `display_width` — `f32`.
+    /// - `display_height` — `f32`.
+    pub fn set_marker_texture(
+        &mut self,
+        id: u32,
+        texture_key: TextureKey,
+        texture_width: f32,
+        texture_height: f32,
+        display_width: f32,
+        display_height: f32,
+    ) {
+        if !self.markers.contains_key(&id) {
+            return;
+        }
+
+        self.marker_icons.insert(
+            id,
+            MinimapIcon {
+                texture_key,
+                texture_width: texture_width.max(1.0),
+                texture_height: texture_height.max(1.0),
+                display_width: display_width.max(1.0),
+                display_height: display_height.max(1.0),
+            },
+        );
+    }
+
+    /// Remove the texture-backed icon from a marker.
+    ///
+    /// # Parameters
+    /// - `id` — `u32`.
+    pub fn clear_marker_texture(&mut self, id: u32) {
+        self.marker_icons.remove(&id);
     }
 
     /// Check if a marker with the given ID exists.
@@ -1062,40 +1240,14 @@ impl Minimap {
         let cell_h = h / self.grid_height.max(1);
 
         let mut img = crate::image::ImageData::new(w, h);
+        let owner_colors = self.owner_colors_by_cell();
 
         // Draw terrain cells
         for gy in 0..self.grid_height {
             for gx in 0..self.grid_width {
                 let terrain_type = self.get_terrain(gx, gy);
-                let tc = match self.color_mode {
-                    ColorMode::Political => {
-                        // Find first object in this cell and use its owner colour
-                        let mut owner_c = self.get_terrain_color(terrain_type);
-                        for obj in self.objects.values() {
-                            let ox = obj.x as u32;
-                            let oy = obj.y as u32;
-                            // If there are objects with this owner, paint the cell area
-                            if ox / self.grid_width.max(1) == gx
-                                || oy / self.grid_height.max(1) == gy
-                            {
-                                owner_c = self.get_owner_color(obj.owner);
-                                break;
-                            }
-                        }
-                        owner_c
-                    }
-                    _ => self.get_terrain_color(terrain_type),
-                };
-
-                let mut mult = 1.0f32;
-                if self.fog_enabled {
-                    let fog = self.get_fog_level(gx, gy);
-                    mult = match fog {
-                        FogLevel::Visible => 1.0,
-                        FogLevel::Explored => 0.5,
-                        FogLevel::Hidden => 0.15,
-                    };
-                }
+                let tc = self.resolve_cell_color(gx, gy, terrain_type, &owner_colors);
+                let mult = self.fog_multiplier(gx, gy);
 
                 let r = (tc[0] * 255.0 * mult) as u8;
                 let g = (tc[1] * 255.0 * mult) as u8;
@@ -1155,91 +1307,44 @@ impl Minimap {
         screen_x: f32,
         screen_y: f32,
     ) -> Vec<crate::render::renderer::RenderCommand> {
-        use crate::render::renderer::{DrawMode, RenderCommand};
+        self.generate_render_commands(screen_x, screen_y)
+    }
 
-        let mut cmds: Vec<RenderCommand> = Vec::new();
-        let cw = (self.display_width / self.grid_width.max(1)) as f32;
-        let ch = (self.display_height / self.grid_height.max(1)) as f32;
+    pub(crate) fn object_type_icon(&self, type_index: usize) -> Option<MinimapIcon> {
+        self.object_type_icons.get(&type_index).copied()
+    }
 
-        // ── Terrain cells ──────────────────────────────────────────────────────
-        for gy in 0..self.grid_height {
-            for gx in 0..self.grid_width {
-                let terrain_type = self.get_terrain(gx, gy);
-                let tc = self.get_terrain_color(terrain_type);
-                let mut mult = 1.0f32;
-                if self.fog_enabled {
-                    let fog = self.get_fog_level(gx, gy);
-                    mult = match fog {
-                        FogLevel::Visible => 1.0,
-                        FogLevel::Explored => 0.5,
-                        FogLevel::Hidden => 0.15,
-                    };
-                }
-                cmds.push(RenderCommand::SetColor(
-                    tc[0] * mult,
-                    tc[1] * mult,
-                    tc[2] * mult,
-                    1.0,
-                ));
-                cmds.push(RenderCommand::Rectangle {
-                    mode: DrawMode::Fill,
-                    x: screen_x + gx as f32 * cw,
-                    y: screen_y + gy as f32 * ch,
-                    w: cw,
-                    h: ch,
-                });
+    pub(crate) fn marker_icon(&self, id: u32) -> Option<MinimapIcon> {
+        self.marker_icons.get(&id).copied()
+    }
+
+    pub(crate) fn owner_colors_by_cell(&self) -> HashMap<(u32, u32), [f32; 4]> {
+        let mut owner_colors = HashMap::with_capacity(self.objects.len());
+        for object in self.objects.values() {
+            let gx = object.x.floor() as i64;
+            let gy = object.y.floor() as i64;
+            if gx < 0 || gy < 0 || gx >= self.grid_width as i64 || gy >= self.grid_height as i64 {
+                continue;
             }
-        }
 
-        // ── Objects ────────────────────────────────────────────────────────────
-        for obj in self.objects.values() {
-            let ox = screen_x + obj.x * cw;
-            let oy = screen_y + obj.y * ch;
-            let ot = self.object_types.get(obj.type_index);
-            let (r, g, b) = if let Some(ot) = ot {
-                (ot.color[0], ot.color[1], ot.color[2])
-            } else {
-                (1.0f32, 1.0, 1.0)
-            };
-            cmds.push(RenderCommand::SetColor(r, g, b, 1.0));
-            cmds.push(RenderCommand::Circle {
-                mode: DrawMode::Fill,
-                x: ox,
-                y: oy,
-                r: 4.0,
-            });
+            owner_colors.insert((gx as u32, gy as u32), self.get_owner_color(object.owner));
         }
+        owner_colors
+    }
 
-        // ── Markers ────────────────────────────────────────────────────────────
-        for marker in self.markers.values() {
-            let mx = screen_x + marker.x * cw;
-            let my = screen_y + marker.y * ch;
-            cmds.push(RenderCommand::SetColor(
-                marker.color[0],
-                marker.color[1],
-                marker.color[2],
-                marker.color[3],
-            ));
-            cmds.push(RenderCommand::Circle {
-                mode: DrawMode::Fill,
-                x: mx,
-                y: my,
-                r: 3.0,
-            });
-            cmds.push(RenderCommand::Line {
-                x1: mx - 4.0,
-                y1: my,
-                x2: mx + 4.0,
-                y2: my,
-            });
-            cmds.push(RenderCommand::Line {
-                x1: mx,
-                y1: my - 4.0,
-                x2: mx,
-                y2: my + 4.0,
-            });
+    pub(crate) fn resolve_cell_color(
+        &self,
+        gx: u32,
+        gy: u32,
+        terrain_type: u32,
+        owner_colors: &HashMap<(u32, u32), [f32; 4]>,
+    ) -> [f32; 4] {
+        match self.color_mode {
+            ColorMode::Terrain => self.get_terrain_color(terrain_type),
+            ColorMode::Political => owner_colors
+                .get(&(gx, gy))
+                .copied()
+                .unwrap_or_else(|| self.get_terrain_color(terrain_type)),
         }
-
-        cmds
     }
 }

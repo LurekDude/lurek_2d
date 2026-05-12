@@ -464,6 +464,18 @@ do -- lurek.input.wasDisconnected
   end
 end
 
+--@api-stub: lurek.input.virtualDpad
+-- Converts analog stick axes into digital d-pad booleans + direction code.
+-- Useful for on-screen touch sticks where gameplay wants digital states.
+do -- lurek.input.virtualDpad
+  local leftx = lurek.input.gamepad.getAxis(0, 0)
+  local lefty = lurek.input.gamepad.getAxis(0, 1)
+  local pad = lurek.input.gamepad.virtualDpad(leftx, lefty, 0.25)
+  if pad.direction ~= "c" then
+    lurek.log.debug("virtual dpad direction: " .. pad.direction, "input")
+  end
+end
+
 --@api-stub: lurek.input.setBackgroundEvents
 -- Enable or disable receiving gamepad events when the window is not focused.
 -- Useful for streamers or split-screen-on-couch setups; default is off so unfocused windows do not eat input.

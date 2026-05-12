@@ -324,10 +324,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
                 .lock()
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
             let entries = match count {
-                Some(0) | None => &s.print_history[..],
+                Some(0) | None => s.print_history.iter().cloned().collect::<Vec<_>>(),
                 Some(n) => {
                     let start = s.print_history.len().saturating_sub(n);
-                    &s.print_history[start..]
+                    s.print_history.iter().skip(start).cloned().collect::<Vec<_>>()
                 }
             };
             let tbl = lua.create_table()?;
@@ -440,9 +440,46 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             let mut s = sh
                 .lock()
                 .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
-            let msg = serde_json::json!({"event": event, "data": json_data});
-            s.broadcast_queue.push_back(msg.to_string());
+            s.queue_broadcast_json(&event, serde_json::json!(json_data));
             Ok(())
+        })?,
+    )?;
+
+    // -- getProtocolInfo --
+    /// Returns bridge protocol information including version and capabilities.
+    /// @return | table | Protocol metadata table.
+    let sh = shared.clone();
+    db.set(
+        "getProtocolInfo",
+        lua.create_function(move |lua, ()| {
+            let s = sh
+                .lock()
+                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+            let t = lua.create_table()?;
+            t.set("version", s.protocol_version)?;
+            let caps = lua.create_table()?;
+            for (i, cap) in s.capabilities.iter().enumerate() {
+                caps.set(i + 1, cap.clone())?;
+            }
+            t.set("capabilities", caps)?;
+            t.set("nonce", s.handshake_nonce.clone())?;
+            Ok(t)
+        })?,
+    )?;
+
+    // -- consumeHotReloadRequest --
+    /// Consumes and clears a pending remote hot-reload request.
+    /// @return | boolean | True when a remote reload request was pending.
+    let sh = shared.clone();
+    db.set(
+        "consumeHotReloadRequest",
+        lua.create_function(move |_, ()| {
+            let mut s = sh
+                .lock()
+                .map_err(|e| LuaError::RuntimeError(e.to_string()))?;
+            let requested = s.hot_reload_requested;
+            s.hot_reload_requested = false;
+            Ok(requested)
         })?,
     )?;
 

@@ -135,3 +135,14 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 - Keep this module reference synchronized with `src/timer/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### Recent sync (1.0.9-fix.73)
+
+- Improved large-scheduler scaling:
+  - `Scheduler::update` and `Scheduler::update_frames` switched from `retain` compaction to in-place `swap_remove` loops.
+  - Reduces per-frame allocation and copy churn under high active timer counts.
+- Added internal scheduler stress coverage:
+  - Rust tests for 1500-2000 event update paths.
+- Responsibility boundary clarification (`timer` vs `tween`):
+  - `timer::Scheduler` owns callback scheduling and coarse event timing.
+  - `tween` owns property interpolation and animation progression.

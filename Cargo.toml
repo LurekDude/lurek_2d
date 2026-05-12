@@ -9,7 +9,7 @@ readme = "README.md"
 
 [features]
 # LuaJIT — default scripting backend; JIT compilation for x86_64 desktop (Windows/Linux/macOS).
-default = ["lua-jit", "automation-plugin", "ui-charts", "ui-layout-loader"]
+default = ["lua-jit", "automation-plugin", "ui-charts", "ui-layout-loader", "graph", "graph-parallel"]
 lua-jit = ["mlua/luajit", "mlua/vendored"]
 # Lua 5.4 fallback — use on platforms where LuaJIT is unavailable (WASM, some ARM targets).
 lua54 = ["mlua/lua54", "mlua/vendored"]
@@ -22,6 +22,10 @@ long-load-tests = []
 # Optional UI plugin-style gates for heavier subsystems.
 ui-charts = []
 ui-layout-loader = []
+# Optional graph subsystem gate.
+graph = []
+# Enables rayon-backed graph simulation update_parallel phase.
+graph-parallel = ["graph"]
 
 [dependencies]
 # GPU-accelerated rendering — platform-split; see [target.'cfg(...)'.dependencies] sections near the end.
@@ -129,6 +133,9 @@ indexmap = "2"
 
 # TOML parsing and encoding
 toml = "0.8"
+
+# Standalone schema validator extracted for reuse outside the engine runtime.
+lurek_schema = { path = "crates/lurek_schema" }
 
 # Platform-specific directories (save data, config paths)
 directories = "6"

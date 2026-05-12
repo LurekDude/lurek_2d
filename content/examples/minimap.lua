@@ -737,3 +737,114 @@ do -- Minimap:showPath
   lurek.log.info("path shown", "minimap")
 end
 
+--@api-stub: LMinimap:getCellCount
+-- Returns the total number of grid cells.
+-- Useful for preallocating flat terrain/fog arrays before calling setTerrainData or setFogData.
+do -- Minimap:getCellCount
+  local mm = lurek.minimap.newMinimap(40, 30)
+  lurek.log.info("cell count: " .. mm:getCellCount(), "minimap")
+end
+
+--@api-stub: LMinimap:trackCamera
+-- Centers the minimap on a Camera2D and mirrors its visible area into the viewport rectangle.
+-- Call after camera movement when your minimap uses the same world-space units as the camera.
+do -- Minimap:trackCamera
+  local mm = lurek.minimap.newMinimap(64, 64, 200, 200)
+  local cam = lurek.camera.new(20, 10)
+  cam:setPosition(12, 18)
+  cam:setZoom(2)
+  mm:trackCamera(cam)
+  local x, y, w, h = mm:getViewportRect()
+  lurek.log.info("camera rect " .. tostring(x) .. "," .. tostring(y) .. "," .. tostring(w) .. "," .. tostring(h), "minimap")
+end
+
+--@api-stub: LMinimap:revealRadius
+-- Reveals all fog cells whose centers lie inside the given radius.
+-- Use after a unit moves to uncover nearby tiles without manually looping over cells.
+do -- Minimap:revealRadius
+  local mm = lurek.minimap.newMinimap(16, 16)
+  mm:setFogEnabled(true)
+  mm:revealRadius(8, 8, 3)
+  lurek.log.info("fog center level: " .. mm:getFogLevel(8, 8), "minimap")
+end
+
+--@api-stub: LMinimap:setObjectTypeTexture
+-- Attaches a texture-backed icon to an object type.
+-- Pass an image from lurek.render.newImage(); width and height override the on-screen icon size.
+do -- Minimap:setObjectTypeTexture
+  local mm = lurek.minimap.newMinimap(32, 32)
+  local tex = lurek.render.newImage("assets/icon.png")
+  local idx = mm:addObjectType("unit", 1, 1, 1, 1)
+  mm:setObjectTypeTexture(idx, tex, 12, 12)
+end
+
+--@api-stub: LMinimap:clearObjectTypeTexture
+-- Removes the texture-backed icon from an object type.
+-- After clearing, objects of that type fall back to the type colour primitive.
+do -- Minimap:clearObjectTypeTexture
+  local mm = lurek.minimap.newMinimap(32, 32)
+  local tex = lurek.render.newImage("assets/icon.png")
+  local idx = mm:addObjectType("unit", 1, 1, 1, 1)
+  mm:setObjectTypeTexture(idx, tex, 12, 12)
+  mm:clearObjectTypeTexture(idx)
+end
+
+--@api-stub: LMinimap:setMarkerTexture
+-- Attaches a texture-backed icon to a marker.
+-- This lets quest or POI markers render as images instead of the default crosshair primitive.
+do -- Minimap:setMarkerTexture
+  local mm = lurek.minimap.newMinimap(32, 32)
+  local tex = lurek.render.newImage("assets/icon.png")
+  local id = mm:addMarker(10, 12, "poi")
+  mm:setMarkerTexture(id, tex, 10, 10)
+end
+
+--@api-stub: LMinimap:clearMarkerTexture
+-- Removes the texture-backed icon from a marker.
+-- After clearing, the marker falls back to the default crosshair primitive.
+do -- Minimap:clearMarkerTexture
+  local mm = lurek.minimap.newMinimap(32, 32)
+  local tex = lurek.render.newImage("assets/icon.png")
+  local id = mm:addMarker(10, 12, "poi")
+  mm:setMarkerTexture(id, tex, 10, 10)
+  mm:clearMarkerTexture(id)
+end
+
+--@api-stub: LMinimap:getOverlayShapeCount
+-- Returns the number of custom overlay shapes.
+-- Useful in debug tooling to confirm shape accumulation before calling clearOverlay().
+do -- Minimap:getOverlayShapeCount
+  local mm = lurek.minimap.newMinimap(32, 32)
+  mm:drawLine(0, 0, 8, 8, {255, 0, 0, 255})
+  mm:drawRect(4, 4, 6, 6, {0, 255, 0, 180})
+  lurek.log.info("overlay shapes: " .. mm:getOverlayShapeCount(), "minimap")
+end
+
+--@api-stub: LMinimap:getPathCount
+-- Returns the number of active path overlays.
+-- Use to verify whether tactical route overlays are still present after clearPath().
+do -- Minimap:getPathCount
+  local mm = lurek.minimap.newMinimap(32, 32)
+  mm:showPath({ {2,2}, {3,4}, {5,6} }, {255, 200, 0, 255})
+  lurek.log.info("path count: " .. mm:getPathCount(), "minimap")
+end
+
+--@api-stub: LMinimap:getLayerCount
+-- Returns the number of stored minimap layers.
+-- Layers include empty filler slots created when you set data at a higher index.
+do -- Minimap:getLayerCount
+  local mm = lurek.minimap.newMinimap(4, 4)
+  mm:setLayerData(1, {0,1,0,1, 1,0,1,0, 0,1,0,1, 1,0,1,0})
+  lurek.log.info("layer count: " .. mm:getLayerCount(), "minimap")
+end
+
+--@api-stub: LMinimap:getLayerData
+-- Returns a flat table of row-major terrain ids for the requested layer, or nil.
+-- Use to inspect cached minimap layers before switching with setLayer().
+do -- Minimap:getLayerData
+  local mm = lurek.minimap.newMinimap(4, 4)
+  mm:setLayerData(0, {1,2,3,4, 4,3,2,1, 1,2,3,4, 4,3,2,1})
+  local data = mm:getLayerData(0)
+  lurek.log.info("layer data len: " .. tostring(data and #data or 0), "minimap")
+end
+

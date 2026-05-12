@@ -123,3 +123,23 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 - Keep this module reference synchronized with `src/thread/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.
+
+### Recent sync (1.0.9-fix.73)
+
+- Added bounded-channel support with backpressure:
+  - `Channel::bounded(capacity)` and `lurek.thread.newBoundedChannel(capacity)`.
+  - `LChannel:isBounded`, `LChannel:getCapacity`, `LChannel:tryPush`.
+- Improved blocking semantics:
+  - `Channel::demand(timeout)` now uses deadline-based waiting to avoid timeout extension under wakeups.
+  - bounded producer paths now unblock when consumers pop.
+- Improved thread-pool resilience:
+  - `ThreadPool::join_with_timeout` and Lua `LThreadPool:join(timeout?)`.
+- Added worker introspection:
+  - `lurek.thread.getWorkerCapabilities()` returns worker-safe API list.
+- Added composable promise chain:
+  - `LPromise:chain(code, ...)` to build multi-stage async pipelines.
+- Added async helper ergonomics:
+  - `lurek.thread.async` now accepts both source string and function form.
+- Queue overlap decision:
+  - `thread::Channel` remains cross-VM/thread communication transport.
+  - `event::EventQueue` remains main-thread gameplay/event routing queue.

@@ -314,6 +314,7 @@ impl ModulesConfig {
 /// - `physics_tick_rate` — Fixed tick rate for `process_physics` callback (Hz, default 60).
 /// - `fixed_update_tick_rate` — Optional fixed tick rate for the `fixedUpdate` Lua callback (Hz).  `None` disables fixed update.
 /// - `frame_budget_warn_ms` — If set, emit a `warn!` log when a frame exceeds this many milliseconds.
+/// - `lua_callback_timeout_ms` — Optional hard timeout (milliseconds) for any single Lua callback. `None` disables timeout protection.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PerformanceConfig {
     pub target_fps: u32,
@@ -325,6 +326,11 @@ pub struct PerformanceConfig {
     /// Frame time threshold in milliseconds before a `warn!` is emitted.  `None` = no warning.
     #[serde(default)]
     pub frame_budget_warn_ms: Option<f32>,
+    /// Optional timeout in milliseconds for one Lua callback invocation.
+    ///
+    /// When set, callbacks that exceed this budget are aborted and surfaced as runtime errors.
+    #[serde(default)]
+    pub lua_callback_timeout_ms: Option<f32>,
 }
 
 impl Default for Config {
@@ -399,6 +405,7 @@ impl Default for Config {
                 physics_tick_rate: 60,
                 fixed_update_tick_rate: None,
                 frame_budget_warn_ms: None,
+                lua_callback_timeout_ms: None,
             },
             identity: None,
             version: None,

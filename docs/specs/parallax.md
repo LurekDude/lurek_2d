@@ -6,8 +6,8 @@
 - Source path: `src/parallax/`
 - Lua API path(s): `src/lua_api/parallax_api.rs`
 - Primary Lua namespace: `lurek.parallax`
-- Rust test path(s): inline tests in src/parallax/layer.rs, src/parallax/render.rs, and src/parallax/draw.rs
-- Lua test path(s): tests/lua/unit/test_parallax.lua, tests/lua/integration/test_parallax_camera.lua
+- Rust test path(s): `tests/rust/unit/parallax_tests.rs`
+- Lua test path(s): `tests/lua/unit/test_parallax_core_unit.lua`, `tests/lua/integration/test_parallax_camera.lua`
 
 ## Summary
 
@@ -20,7 +20,9 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - `draw.rs`: Implements CPU-side image drawing for headless and test-friendly parallax output without depending on the GPU path.
 - `layer.rs`: Defines `ParallaxLayer` state, scroll calculations, autoscroll behavior, and batch-building logic.
 - `mod.rs`: Declares the parallax submodules and re-exports the main layer and batch types.
+- `presets.rs`: Provides reusable constructors for common layer styles (`far`, `mid`, `fog`).
 - `render.rs`: Converts parallax batches into `RenderCommand` sequences with color, blend mode, and repeated image draws.
+- `tile_iter.rs`: Shared tiled-position iterator with stronger off-screen culling margin and safety cap.
 
 ## Types
 
@@ -36,9 +38,13 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - `ParallaxLayer::reset_autoscroll` (`layer.rs`): Resets the autoscroll accumulator to zero.
 - `ParallaxLayer::set_tiling` (`layer.rs`): Enables or disables seamless infinite tiling on both axes.
 - `ParallaxLayer::get_tiling` (`layer.rs`): Returns `true` if seamless infinite tiling is enabled.
-- `ParallaxLayer::set_tile_size` (`layer.rs`): Sets an explicit tile size override, bypassing the scaled texture dimensions.
+- `ParallaxLayer::set_tile_size` (`layer.rs`): Sets an explicit tile size override, bypassing the scaled texture dimensions (with a safety minimum to avoid draw-call explosions).
 - `ParallaxLayer::set_depth` (`layer.rs`): Sets the floating-point draw depth for this layer.
 - `ParallaxLayer::get_depth` (`layer.rs`): Returns the floating-point draw depth.
+- `ParallaxLayer::set_effect_chain` (`layer.rs`): Replaces the per-layer shader pass chain.
+- `ParallaxLayer::clear_effect_chain` (`layer.rs`): Clears all per-layer shader passes.
+- `ParallaxLayer::effect_count` (`layer.rs`): Returns the number of per-layer shader passes.
+- `ParallaxLayer::set_motion_stretch` (`layer.rs`): Enables/disables velocity-based stretch and configures limits.
 - `ParallaxLayer::generate_render_commands` (`render.rs`): Produces render commands for this layer given the current camera and screen.
 - `batch_to_render_commands` (`render.rs`): Converts a pre-computed [`ParallaxDrawBatch`] into render commands.
 
@@ -50,6 +56,7 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 ### Module Functions
 - `lurek.parallax.newLayer`: Creates a new parallax background layer from an options table.
 - `lurek.parallax.newSet`: Creates a new empty parallax set with the given name.
+- `lurek.parallax.newPresetLayer`: Creates a new parallax layer from built-in presets (`far`, `mid`, `fog`).
 
 ### `LParallaxLayer` Methods
 - `LParallaxLayer:type`: Returns the type name of this object.
@@ -82,12 +89,18 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 - `LParallaxLayer:setTileSize`: Sets explicit tile dimensions in logical pixels.
 - `LParallaxLayer:setDepth`: Sets the floating-point draw depth for fine-grained layer ordering.
 - `LParallaxLayer:getDepth`: Returns the current floating-point depth.
+- `LParallaxLayer:addEffectPass`: Appends one shader pass to this layer effect chain.
+- `LParallaxLayer:clearEffects`: Clears all per-layer effect passes.
+- `LParallaxLayer:effectCount`: Returns effect-pass count for this layer.
+- `LParallaxLayer:setMotionStretch`: Enables/disables velocity-based stretch and sets strength/limit.
+- `LParallaxLayer:getMotionStretch`: Returns current motion-stretch config.
 
 ### `LParallaxSet` Methods
 - `LParallaxSet:type`: Returns the type name of this object.
 - `LParallaxSet:addLayer`: Adds a layer to this set.
 - `LParallaxSet:removeLayerAt`: Removes the layer at the given 1-based index.
 - `LParallaxSet:layerCount`: Returns the number of layers in this set.
+- `LParallaxSet:getLayerZAt`: Returns the layer `z` value at a given 1-based sorted index, or `nil` when out of range.
 - `LParallaxSet:sortByZ`: Re-sorts all layers by ascending `z` value.
 - `LParallaxSet:setVisible`: Shows or hides all layers in this set.
 - `LParallaxSet:isVisible`: Returns `true` if the set is currently visible.
@@ -105,5 +118,11 @@ This module primarily collaborates with `image`, `render`, `runtime`. Its respon
 
 ## Notes
 
+- Runtime behavior notes:
+	- `setTiling(true)` forces tiling on both axes even if `repeat_x` and `repeat_y` are false.
+	- `setTileSize(w, h)` enforces a small minimum tile size to protect against pathological tile counts.
+	- `build_draw_calls` now uses a shared tiled iterator helper with expanded culling bounds and an upper safety cap for generated positions.
+	- `DrawImageEx.effect` is now populated from per-layer effect passes configured on `LParallaxLayer`.
+	- Motion-stretch can scale tiles based on autoscroll velocity and can append a `motion_blur` pass dynamically.
 - Keep this module reference synchronized with `src/parallax/` and any matching Lua bindings.
 - Summary paragraphs are manual prose. The collected Files, Types, Functions, Lua API Reference, and References sections can be regenerated when the source changes.

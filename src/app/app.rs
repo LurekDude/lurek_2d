@@ -21,10 +21,14 @@ use winit::window::{CursorGrabMode, CursorIcon, Window, WindowId};
 
 use super::debug_overlay::DebugOverlay;
 use super::error_screen::ErrorScreen;
+use super::lua_callbacks::{
+    call_lua_callback_checked_with_timeout, call_lua_callback_with_timeout,
+};
+use super::splash_screen::{load_splash_branding, make_splash_commands, SplashBranding};
 use crate::input::keyboard::{winit_key_to_string, winit_scancode_to_string};
 use crate::input::{gilrs_axis_to_string, gilrs_button_to_string, SystemCursor};
 use crate::lua_api::create_lua_vm;
-use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
+use crate::render::renderer::{RenderCommand, TextureData};
 use crate::render::GpuRenderer;
 use crate::runtime::resource_keys::{
     CanvasKey, FontKey, MeshKey, ShaderKey, SpriteBatchKey, TextureKey,
@@ -116,19 +120,6 @@ pub enum RunState {
     Restarting,
 }
 
-#[derive(Clone, Copy)]
-struct SplashTexture {
-    texture_key: TextureKey,
-    width: u32,
-    height: u32,
-}
-
-struct SplashBranding {
-    textures: SlotMap<TextureKey, TextureData>,
-    large_icon: SplashTexture,
-    banner: SplashTexture,
-}
-
 /// Returns the splash-mode window title with the engine version appended.
 pub fn splash_window_title(base_title: &str) -> String {
     format!("{} v{}", base_title, env!("CARGO_PKG_VERSION"))
@@ -210,6 +201,10 @@ pub struct LurekApp {
 
     /// Polling watcher used to detect `conf.toml` changes for hot-reload.
     conf_watcher: FileWatcher,
+    /// Polling watcher for Lua script and source-file changes.
+    content_script_watcher: FileWatcher,
+    /// Polling watcher for binary/text assets that should trigger live reload.
+    content_asset_watcher: FileWatcher,
 
     /// True when the game_dir was explicitly passed as a CLI argument.
     explicit_game_dir: bool,
@@ -246,6 +241,14 @@ pub struct LurekApp {
 
     /// Reusable command buffer for viewport-wrapped draw commands; avoids per-frame allocation.
     render_cmd_buf: Vec<RenderCommand>,
+    /// Reused strong references for auto-collected parallax layers.
+    auto_parallax_buf: Vec<Rc<RefCell<crate::parallax::ParallaxLayer>>>,
+    /// Reused strong references for auto-collected tilemaps.
+    auto_tilemap_buf: Vec<Rc<RefCell<crate::tilemap::TileMap>>>,
+    /// Reused command buffer for auto-collected particle draws.
+    auto_particle_cmd_buf: Vec<RenderCommand>,
+    /// Reused command buffer for auto-collected GUI draws.
+    auto_ui_cmd_buf: Vec<RenderCommand>,
 
     /// If `Some`, write an auto-screenshot PNG to this absolute path and quit.
     auto_screenshot_path: Option<PathBuf>,
@@ -293,6 +296,13 @@ impl LurekApp {
         let window_vsync_mode = if config.window.vsync { 1 } else { 0 };
         let mut conf_watcher = FileWatcher::new();
         conf_watcher.watch(game_dir.join("conf.toml"));
+        let mut content_script_watcher = FileWatcher::new();
+        let mut content_asset_watcher = FileWatcher::new();
+        register_content_watchers(
+            &game_dir,
+            &mut content_script_watcher,
+            &mut content_asset_watcher,
+        );
 
         LurekApp {
             config,
@@ -321,6 +331,8 @@ impl LurekApp {
             debug_overlay: DebugOverlay::new(),
             conf_error,
             conf_watcher,
+            content_script_watcher,
+            content_asset_watcher,
             explicit_game_dir,
             window_vsync_mode,
             engine_fonts: None,
@@ -331,6 +343,10 @@ impl LurekApp {
             drag_hover: false,
             max_surface_dim: 4096,
             render_cmd_buf: Vec::new(),
+            auto_parallax_buf: Vec::new(),
+            auto_tilemap_buf: Vec::new(),
+            auto_particle_cmd_buf: Vec::new(),
+            auto_ui_cmd_buf: Vec::new(),
             auto_screenshot_path,
             auto_screenshot_frames,
             auto_screenshot_time,
@@ -346,6 +362,20 @@ impl LurekApp {
             perf_render_ms_acc: 0.0,
             perf_log_enabled: std::env::var("LUREK_PERF_LOG").ok().as_deref() == Some("1"),
         }
+    }
+
+    fn callback_timeout_ms(&self) -> Option<f32> {
+        self.config.performance.lua_callback_timeout_ms
+    }
+
+    fn refresh_content_watchers(&mut self) {
+        self.content_script_watcher = FileWatcher::new();
+        self.content_asset_watcher = FileWatcher::new();
+        register_content_watchers(
+            &self.game_dir,
+            &mut self.content_script_watcher,
+            &mut self.content_asset_watcher,
+        );
     }
 
     fn perf_record_frame(&mut self, tick_ms: f64, update_ms: f64, render_ms: f64) {
@@ -639,12 +669,14 @@ impl LurekApp {
         }
         shared_state.window_state.vsync_mode = self.window_vsync_mode;
         shared_state.window = self.window.as_ref().map(Arc::clone);
-        shared_state.physics_fixed_dt =
+        shared_state.physics_run.fixed_dt =
             1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
-        shared_state.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
+        shared_state.physics_run.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
             Some(rate) if rate > 0 => 1.0 / rate as f64,
             _ => 0.0,
         };
+        shared_state.frame_budget_warn_ms = self.config.performance.frame_budget_warn_ms;
+        shared_state.lua_callback_timeout_ms = self.callback_timeout_ms();
 
         // Initialize viewport state from config.
         {
@@ -692,7 +724,12 @@ impl LurekApp {
                         log_msg!(error, L011_LUA_ERROR, "main.lua: {}", e);
                         self.run_state = RunState::Error(ErrorScreen::from_lua_error(&e));
                     } else {
-                        if let Err(e) = call_lua_callback_checked(&lua, "init", ()) {
+                        if let Err(e) = call_lua_callback_checked_with_timeout(
+                            &lua,
+                            "init",
+                            (),
+                            self.callback_timeout_ms(),
+                        ) {
                             self.run_state = RunState::Error(try_errorhandler_or_screen(&lua, &e));
                         }
                         self.has_game = true;
@@ -935,6 +972,7 @@ impl LurekApp {
         let (Some(lua), Some(state)) = (&self.lua, &self.state) else {
             return;
         };
+        let callback_timeout_ms = self.callback_timeout_ms();
 
         // Count frames for the auto-screenshot delay.
         if self.auto_screenshot_path.is_some() && !self.auto_screenshot_done {
@@ -947,7 +985,7 @@ impl LurekApp {
         // â”€â”€ 1. ready (fires once, before first process) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if !self.ready_fired {
             self.ready_fired = true;
-            if let Err(e) = call_lua_callback_checked(lua, "ready", ()) {
+            if let Err(e) = call_lua_callback_checked_with_timeout(lua, "ready", (), callback_timeout_ms) {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
@@ -959,15 +997,20 @@ impl LurekApp {
         // â”€â”€ 2. process_physics (fixed timestep, may fire 0..N times) â”€â”€â”€â”€
         {
             let phase_start = Instant::now();
-            let fixed_dt = state.borrow().physics_fixed_dt;
+            let fixed_dt = state.borrow().physics_run.fixed_dt;
             self.physics_accumulator += dt;
             // Safety cap: read from shared state, defaults to 8.
-            let max_steps = state.borrow().physics_max_steps as usize;
+            let max_steps = state.borrow().physics_run.max_steps as usize;
             let mut steps = 0;
             while self.physics_accumulator >= fixed_dt && steps < max_steps {
                 self.physics_accumulator -= fixed_dt;
                 steps += 1;
-                if let Err(e) = call_lua_callback_checked(lua, "process_physics", fixed_dt) {
+                if let Err(e) = call_lua_callback_checked_with_timeout(
+                    lua,
+                    "process_physics",
+                    fixed_dt,
+                    callback_timeout_ms,
+                ) {
                     self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                     return;
                 }
@@ -978,7 +1021,7 @@ impl LurekApp {
         // â”€â”€ 2b. fixedUpdate (independent fixed timestep, may fire 0..N times) â”€â”€
         {
             let phase_start = Instant::now();
-            let fixed_dt = state.borrow().fixed_update_dt;
+            let fixed_dt = state.borrow().physics_run.fixed_update_dt;
             if fixed_dt > 0.0 {
                 self.fixed_update_accumulator += dt;
                 // Safety cap: max 8 fixedUpdate steps per frame.
@@ -987,7 +1030,12 @@ impl LurekApp {
                 while self.fixed_update_accumulator >= fixed_dt && steps < max_steps {
                     self.fixed_update_accumulator -= fixed_dt;
                     steps += 1;
-                    if let Err(e) = call_lua_callback_checked(lua, "fixedUpdate", fixed_dt) {
+                    if let Err(e) = call_lua_callback_checked_with_timeout(
+                        lua,
+                        "fixedUpdate",
+                        fixed_dt,
+                        callback_timeout_ms,
+                    ) {
                         self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                         return;
                     }
@@ -999,7 +1047,9 @@ impl LurekApp {
         // â”€â”€ 3. process(dt) (variable timestep, once per frame) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         {
             let phase_start = Instant::now();
-            if let Err(e) = call_lua_callback_checked(lua, "process", dt) {
+            if let Err(e) =
+                call_lua_callback_checked_with_timeout(lua, "process", dt, callback_timeout_ms)
+            {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
@@ -1009,7 +1059,12 @@ impl LurekApp {
         // â”€â”€ 4. process_late(dt) (after process, before render) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         {
             let phase_start = Instant::now();
-            if let Err(e) = call_lua_callback_checked(lua, "process_late", dt) {
+            if let Err(e) = call_lua_callback_checked_with_timeout(
+                lua,
+                "process_late",
+                dt,
+                callback_timeout_ms,
+            ) {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
@@ -1031,13 +1086,11 @@ impl LurekApp {
             let screen_w = s.window_state.game_width;
             let screen_h = s.window_state.game_height;
             // Collect strong refs while holding the borrow; drop before borrow_mut below.
-            let layers: Vec<_> = s
-                .auto_parallax_layers
-                .iter()
-                .filter_map(|w| w.upgrade())
-                .collect();
+            self.auto_parallax_buf.clear();
+            self.auto_parallax_buf
+                .extend(s.auto_parallax_layers.iter().filter_map(|w| w.upgrade()));
             drop(s);
-            for rc in &layers {
+            for rc in &self.auto_parallax_buf {
                 let cmds = rc
                     .borrow()
                     .generate_render_commands(cam_x, cam_y, screen_w, screen_h);
@@ -1057,9 +1110,11 @@ impl LurekApp {
             let cam_y = s.camera.position.y;
             let cam_w = s.window_state.game_width;
             let cam_h = s.window_state.game_height;
-            let maps: Vec<_> = s.auto_tilemaps.iter().filter_map(|w| w.upgrade()).collect();
+            self.auto_tilemap_buf.clear();
+            self.auto_tilemap_buf
+                .extend(s.auto_tilemaps.iter().filter_map(|w| w.upgrade()));
             drop(s);
-            for rc in &maps {
+            for rc in &self.auto_tilemap_buf {
                 let cmds = rc
                     .borrow()
                     .generate_render_commands(0.0, 0.0, cam_x, cam_y, cam_w, cam_h);
@@ -1075,7 +1130,9 @@ impl LurekApp {
         // â”€â”€ 5c. Lua render callback (draw order 4 â€” game world) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         {
             let phase_start = Instant::now();
-            if let Err(e) = call_lua_callback_checked(lua, "draw", ()) {
+            if let Err(e) =
+                call_lua_callback_checked_with_timeout(lua, "draw", (), callback_timeout_ms)
+            {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
@@ -1200,20 +1257,26 @@ impl LurekApp {
         // will have their particles rendered twice (once by Lua, once here).  Use
         // one approach per particle system: either manual Lua render OR auto-collect.
         {
-            let s = state.borrow();
-            let particle_cmds: Vec<_> = s
-                .particle_systems
-                .values()
-                .flat_map(|ps| ps.generate_render_commands())
-                .collect();
-            drop(s);
-            state.borrow_mut().render_commands.extend(particle_cmds);
+            self.auto_particle_cmd_buf.clear();
+            {
+                let s = state.borrow();
+                for ps in s.particle_systems.values() {
+                    self.auto_particle_cmd_buf
+                        .extend(ps.generate_render_commands());
+                }
+            }
+            state
+                .borrow_mut()
+                .render_commands
+                .extend(self.auto_particle_cmd_buf.iter().cloned());
         }
 
         // â”€â”€ 6. render_ui (UI/HUD overlay pass) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         {
             let phase_start = Instant::now();
-            if let Err(e) = call_lua_callback_checked(lua, "draw_ui", ()) {
+            if let Err(e) =
+                call_lua_callback_checked_with_timeout(lua, "draw_ui", (), callback_timeout_ms)
+            {
                 self.run_state = RunState::Error(try_errorhandler_or_screen(lua, &e));
                 return;
             }
@@ -1222,14 +1285,15 @@ impl LurekApp {
 
         // â”€â”€ 6a. Auto-collect: GUI context (draw order 9 â€” after render_ui) â”€â”€
         {
-            let ui_cmds: Vec<_> = state
-                .borrow()
-                .auto_ui_ctx
-                .as_ref()
-                .and_then(|w| w.upgrade())
-                .map(|rc| rc.borrow_mut().generate_render_commands())
-                .unwrap_or_default();
-            state.borrow_mut().render_commands.extend(ui_cmds);
+            self.auto_ui_cmd_buf.clear();
+            if let Some(rc) = state.borrow().auto_ui_ctx.as_ref().and_then(|w| w.upgrade()) {
+                self.auto_ui_cmd_buf
+                    .extend(rc.borrow_mut().generate_render_commands());
+            }
+            state
+                .borrow_mut()
+                .render_commands
+                .extend(self.auto_ui_cmd_buf.iter().cloned());
         }
 
         // Append debug overlay commands after game draw
@@ -1256,13 +1320,16 @@ impl LurekApp {
                 }
             };
             if let Some(err) = shader_err {
-                state.borrow_mut().render_commands.push(RenderCommand::Print {
-                    font_key,
-                    text: format!("Shader error: {}", err),
-                    x: 12.0,
-                    y: 28.0,
-                    scale: 0.9,
-                });
+                state
+                    .borrow_mut()
+                    .render_commands
+                    .push(RenderCommand::Print {
+                        font_key,
+                        text: format!("Shader error: {}", err),
+                        x: 12.0,
+                        y: 28.0,
+                        scale: 0.9,
+                    });
             }
         }
 
@@ -1757,6 +1824,7 @@ impl LurekApp {
     }
 
     fn restart_game(&mut self) {
+        self.refresh_content_watchers();
         // Reset Lua state and reinitialise
         self.lua = None;
         self.state = None;
@@ -1764,6 +1832,25 @@ impl LurekApp {
         self.prev_mouse = [false; 5];
         self.run_state = RunState::Running;
         self.init_lua();
+    }
+
+    fn poll_content_hot_reload(&mut self) {
+        if !self.has_game {
+            return;
+        }
+
+        let script_changed = !self.content_script_watcher.poll().is_empty();
+        let asset_changed = !self.content_asset_watcher.poll().is_empty();
+        if !(script_changed || asset_changed) {
+            return;
+        }
+
+        log::info!(
+            "content hot-reload triggered (scripts_changed={}, assets_changed={})",
+            script_changed,
+            asset_changed
+        );
+        self.restart_game();
     }
 
     fn poll_config_hot_reload(&mut self) {
@@ -1789,11 +1876,13 @@ impl LurekApp {
 
         if let Some(state) = &self.state {
             let mut st = state.borrow_mut();
-            st.physics_fixed_dt = 1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
-            st.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
+            st.physics_run.fixed_dt = 1.0 / self.config.performance.physics_tick_rate.max(1) as f64;
+            st.physics_run.fixed_update_dt = match self.config.performance.fixed_update_tick_rate {
                 Some(rate) if rate > 0 => 1.0 / rate as f64,
                 _ => 0.0,
             };
+            st.frame_budget_warn_ms = self.config.performance.frame_budget_warn_ms;
+            st.lua_callback_timeout_ms = self.callback_timeout_ms();
             st.window_state.vsync_mode = self.window_vsync_mode;
             st.window_state.pending_vsync = Some(self.window_vsync_mode);
             st.window_state.game_width =
@@ -1851,12 +1940,18 @@ impl LurekApp {
         // Fire lurek.resize(w, h) callback
         if self.has_game {
             if let Some(lua) = &self.lua {
-                call_lua_callback(lua, "resize", (width, height));
+                call_lua_callback_with_timeout(
+                    lua,
+                    "resize",
+                    (width, height),
+                    self.callback_timeout_ms(),
+                );
             }
         }
     }
 
     fn poll_gamepads(&mut self) {
+        let callback_timeout_ms = self.callback_timeout_ms();
         let Some(gilrs) = &mut self.gilrs else { return };
         let Some(state) = &self.state else { return };
         let has_game = self.has_game;
@@ -1877,7 +1972,12 @@ impl LurekApp {
                     }
                     if has_game {
                         if let Some(lua) = lua {
-                            call_lua_callback(lua, "gamepadpressed", (id_u32, button_name));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "gamepadpressed",
+                                (id_u32, button_name),
+                                callback_timeout_ms,
+                            );
                         }
                     }
                 }
@@ -1892,7 +1992,12 @@ impl LurekApp {
                     }
                     if has_game {
                         if let Some(lua) = lua {
-                            call_lua_callback(lua, "gamepadreleased", (id_u32, button_name));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "gamepadreleased",
+                                (id_u32, button_name),
+                                callback_timeout_ms,
+                            );
                         }
                     }
                 }
@@ -1907,7 +2012,12 @@ impl LurekApp {
                     }
                     if has_game {
                         if let Some(lua) = lua {
-                            call_lua_callback(lua, "gamepadaxis", (id_u32, axis_name, value));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "gamepadaxis",
+                                (id_u32, axis_name, value),
+                                callback_timeout_ms,
+                            );
                         }
                     }
                 }
@@ -1927,7 +2037,18 @@ impl LurekApp {
                     log_msg!(info, L036_GAMEPAD_CONNECTED, "id={}", id_usize);
                     if has_game {
                         if let Some(lua) = lua {
-                            call_lua_callback(lua, "joystickadded", (id_u32,));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "joystickadded",
+                                (id_u32,),
+                                callback_timeout_ms,
+                            );
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "gamepadconnected",
+                                (id_u32,),
+                                callback_timeout_ms,
+                            );
                         }
                     }
                 }
@@ -1943,7 +2064,18 @@ impl LurekApp {
                     log_msg!(info, L037_GAMEPAD_DISCONNECTED, "id={}", id_usize);
                     if has_game {
                         if let Some(lua) = lua {
-                            call_lua_callback(lua, "joystickremoved", (id_u32,));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "joystickremoved",
+                                (id_u32,),
+                                callback_timeout_ms,
+                            );
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "gamepaddisconnected",
+                                (id_u32,),
+                                callback_timeout_ms,
+                            );
                         }
                     }
                 }
@@ -2171,83 +2303,50 @@ fn load_window_icon(game_dir: &Path, icon_path: &str) -> Option<winit::window::I
     }
 }
 
-fn load_splash_branding() -> Option<SplashBranding> {
-    let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
-    let large_icon = {
-        let image = match ::image::load_from_memory(std::include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/icon-large.png"
-        ))) {
-            Ok(image) => image,
-            Err(error) => {
-                log::warn!(
-                    "Failed to decode embedded splash texture '{}': {}",
-                    "assets/svg/large_icon.png",
-                    error
-                );
-                return None;
-            }
+fn register_content_watchers(
+    game_dir: &Path,
+    script_watcher: &mut FileWatcher,
+    asset_watcher: &mut FileWatcher,
+) {
+    fn walk_dir(
+        root: &Path,
+        script_watcher: &mut FileWatcher,
+        asset_watcher: &mut FileWatcher,
+    ) {
+        let entries = match std::fs::read_dir(root) {
+            Ok(entries) => entries,
+            Err(_) => return,
         };
 
-        let rgba = image.to_rgba8();
-        let (width, height) = rgba.dimensions();
-        match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
-            Ok(texture) => SplashTexture {
-                texture_key: texture.key,
-                width: texture.width,
-                height: texture.height,
-            },
-            Err(error) => {
-                log::warn!(
-                    "Failed to prepare embedded splash texture '{}': {}",
-                    "assets/svg/large_icon.png",
-                    error
-                );
-                return None;
+        for entry in entries.flatten() {
+            let path = entry.path();
+            if path.is_dir() {
+                if let Some(name) = path.file_name().and_then(|n| n.to_str()) {
+                    if matches!(name, "save" | "logs" | "target" | ".git") {
+                        continue;
+                    }
+                }
+                walk_dir(&path, script_watcher, asset_watcher);
+                continue;
+            }
+
+            let ext = path
+                .extension()
+                .and_then(|e| e.to_str())
+                .map(|e| e.to_ascii_lowercase());
+            match ext.as_deref() {
+                Some("lua") => script_watcher.watch(&path),
+                Some("png") | Some("jpg") | Some("jpeg") | Some("webp") | Some("bmp")
+                | Some("gif") | Some("ogg") | Some("wav") | Some("mp3") | Some("flac")
+                | Some("ttf") | Some("otf") | Some("wgsl") | Some("json") | Some("toml") => {
+                    asset_watcher.watch(&path)
+                }
+                _ => {}
             }
         }
-    };
+    }
 
-    let banner = {
-        let image = match ::image::load_from_memory(std::include_bytes!(concat!(
-            env!("CARGO_MANIFEST_DIR"),
-            "/assets/banner.png"
-        ))) {
-            Ok(image) => image,
-            Err(error) => {
-                log::warn!(
-                    "Failed to decode embedded splash texture '{}': {}",
-                    "assets/svg/banner.png",
-                    error
-                );
-                return None;
-            }
-        };
-
-        let rgba = image.to_rgba8();
-        let (width, height) = rgba.dimensions();
-        match crate::image::Texture::from_rgba(width, height, rgba.into_raw(), &mut textures) {
-            Ok(texture) => SplashTexture {
-                texture_key: texture.key,
-                width: texture.width,
-                height: texture.height,
-            },
-            Err(error) => {
-                log::warn!(
-                    "Failed to prepare embedded splash texture '{}': {}",
-                    "assets/svg/banner.png",
-                    error
-                );
-                return None;
-            }
-        }
-    };
-
-    Some(SplashBranding {
-        textures,
-        large_icon,
-        banner,
-    })
+    walk_dir(game_dir, script_watcher, asset_watcher);
 }
 
 impl ApplicationHandler for LurekApp {
@@ -2334,7 +2433,7 @@ impl ApplicationHandler for LurekApp {
             WindowEvent::CloseRequested => {
                 log_msg!(info, L039_WINDOW_CLOSE);
                 if let Some(lua) = &self.lua {
-                    call_lua_callback(lua, "exit", ());
+                    call_lua_callback_with_timeout(lua, "exit", (), self.callback_timeout_ms());
                 }
                 event_loop.exit();
             }
@@ -2359,7 +2458,12 @@ impl ApplicationHandler for LurekApp {
                 }
                 if self.has_game {
                     if let Some(lua) = &self.lua {
-                        call_lua_callback(lua, "focus", (focused,));
+                        call_lua_callback_with_timeout(
+                            lua,
+                            "focus",
+                            (focused,),
+                            self.callback_timeout_ms(),
+                        );
                     }
                 }
             }
@@ -2370,7 +2474,12 @@ impl ApplicationHandler for LurekApp {
                 }
                 if self.has_game {
                     if let Some(lua) = &self.lua {
-                        call_lua_callback(lua, "visible", (!occluded,));
+                        call_lua_callback_with_timeout(
+                            lua,
+                            "visible",
+                            (!occluded,),
+                            self.callback_timeout_ms(),
+                        );
                     }
                 }
             }
@@ -2486,10 +2595,11 @@ impl ApplicationHandler for LurekApp {
                             if self.has_game {
                                 if let Some(lua) = &self.lua {
                                     let sc = scancode_str.clone().unwrap_or_default();
-                                    call_lua_callback(
+                                    call_lua_callback_with_timeout(
                                         lua,
                                         "keypressed",
                                         (key_str.clone(), sc.clone(), event.repeat),
+                                        self.callback_timeout_ms(),
                                     );
                                 }
                             }
@@ -2514,7 +2624,12 @@ impl ApplicationHandler for LurekApp {
                             if self.has_game {
                                 if let Some(lua) = &self.lua {
                                     let sc = scancode_str.clone().unwrap_or_default();
-                                    call_lua_callback(lua, "keyreleased", (key_str.clone(), sc));
+                                    call_lua_callback_with_timeout(
+                                        lua,
+                                        "keyreleased",
+                                        (key_str.clone(), sc),
+                                        self.callback_timeout_ms(),
+                                    );
                                 }
                             }
                             if let Some(state) = &self.state {
@@ -2537,7 +2652,12 @@ impl ApplicationHandler for LurekApp {
                         drop(st);
                         if self.has_game {
                             if let Some(lua) = &self.lua {
-                                call_lua_callback(lua, "textinput", text);
+                                call_lua_callback_with_timeout(
+                                    lua,
+                                    "textinput",
+                                    text,
+                                    self.callback_timeout_ms(),
+                                );
                             }
                         }
                     }
@@ -2582,7 +2702,12 @@ impl ApplicationHandler for LurekApp {
                 }
                 if self.has_game {
                     if let Some(lua) = &self.lua {
-                        call_lua_callback(lua, "wheelmoved", (dx, dy));
+                        call_lua_callback_with_timeout(
+                            lua,
+                            "wheelmoved",
+                            (dx, dy),
+                            self.callback_timeout_ms(),
+                        );
                     }
                 }
             }
@@ -2610,9 +2735,19 @@ impl ApplicationHandler for LurekApp {
                         let my = self.mouse_y;
                         if let Some(lua) = &self.lua {
                             if pressed && !self.prev_mouse[i] {
-                                call_lua_callback(lua, "mousepressed", (mx, my, (i + 1) as u32));
+                                call_lua_callback_with_timeout(
+                                    lua,
+                                    "mousepressed",
+                                    (mx, my, (i + 1) as u32),
+                                    self.callback_timeout_ms(),
+                                );
                             } else if !pressed && self.prev_mouse[i] {
-                                call_lua_callback(lua, "mousereleased", (mx, my, (i + 1) as u32));
+                                call_lua_callback_with_timeout(
+                                    lua,
+                                    "mousereleased",
+                                    (mx, my, (i + 1) as u32),
+                                    self.callback_timeout_ms(),
+                                );
                             }
                         }
                     }
@@ -2733,6 +2868,14 @@ impl ApplicationHandler for LurekApp {
                     }
                 }
 
+                if let Some(state) = &self.state {
+                    let mut st = state.borrow_mut();
+                    st.frame_profile.app_tick_ms = tick_ms as f32;
+                    st.frame_profile.app_update_ms = update_ms as f32;
+                    st.frame_profile.app_render_ms = render_ms as f32;
+                    st.frame_profile.app_frame_total_ms = (tick_ms + update_ms + render_ms) as f32;
+                }
+
                 self.perf_record_frame(tick_ms, update_ms, render_ms);
             }
 
@@ -2763,7 +2906,12 @@ impl ApplicationHandler for LurekApp {
                             state.borrow_mut().touch.touch_start(id, x, y, pressure);
                         }
                         if let Some(lua) = self.lua.as_ref().filter(|_| self.has_game) {
-                            call_lua_callback(lua, "touchpressed", (id, x, y, dx, dy, pressure));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "touchpressed",
+                                (id, x, y, dx, dy, pressure),
+                                self.callback_timeout_ms(),
+                            );
                         }
                     }
                     winit::event::TouchPhase::Moved => {
@@ -2780,7 +2928,12 @@ impl ApplicationHandler for LurekApp {
                             (0.0, 0.0)
                         };
                         if let Some(lua) = self.lua.as_ref().filter(|_| self.has_game) {
-                            call_lua_callback(lua, "touchmoved", (id, x, y, dx, dy, pressure));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "touchmoved",
+                                (id, x, y, dx, dy, pressure),
+                                self.callback_timeout_ms(),
+                            );
                         }
                     }
                     winit::event::TouchPhase::Ended | winit::event::TouchPhase::Cancelled => {
@@ -2797,7 +2950,12 @@ impl ApplicationHandler for LurekApp {
                             (0.0, 0.0)
                         };
                         if let Some(lua) = self.lua.as_ref().filter(|_| self.has_game) {
-                            call_lua_callback(lua, "touchreleased", (id, x, y, dx, dy, pressure));
+                            call_lua_callback_with_timeout(
+                                lua,
+                                "touchreleased",
+                                (id, x, y, dx, dy, pressure),
+                                self.callback_timeout_ms(),
+                            );
                         }
                     }
                 }
@@ -2883,7 +3041,19 @@ impl ApplicationHandler for LurekApp {
     fn about_to_wait(&mut self, event_loop: &ActiveEventLoop) {
         use std::time::Duration;
 
+        // Check for a Lua-triggered reload before the file-watcher poll so both
+        // paths funnel through the same `poll_config_hot_reload` logic.
+        if let Some(state) = &self.state {
+            let requested = state.borrow().pending_config_reload;
+            if requested {
+                state.borrow_mut().pending_config_reload = false;
+                // Force the conf_watcher to be treated as changed so the next
+                // poll_config_hot_reload call performs a full reload.
+                self.conf_watcher.force_changed();
+            }
+        }
         self.poll_config_hot_reload();
+        self.poll_content_hot_reload();
 
         // Safety-net: if screenshot mode has been active too long without a capture,
         // force-quit so batch tools never hang indefinitely.
@@ -3146,30 +3316,6 @@ fn init_logging(
 
 // â”€â”€â”€ Helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
-fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(lua: &'a Lua, name: &str, args: A) {
-    if let Ok(lurek) = lua.globals().get::<_, LuaTable>("lurek") {
-        if let Ok(func) = lurek.get::<_, LuaFunction>(name) {
-            if let Err(e) = func.call::<_, ()>(args) {
-                log_msg!(error, L011_LUA_ERROR, "lurek.{}(): {}", name, e);
-            }
-        }
-    }
-}
-
-/// Calls a Lua callback and returns the error instead of logging it.
-fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
-    lua: &'a Lua,
-    name: &str,
-    args: A,
-) -> Result<(), mlua::Error> {
-    if let Ok(lurek) = lua.globals().get::<_, LuaTable>("lurek") {
-        if let Ok(func) = lurek.get::<_, LuaFunction>(name) {
-            func.call::<_, ()>(args)?;
-        }
-    }
-    Ok(())
-}
-
 /// Tries calling `lurek.errorhandler(msg)`. If it exists and succeeds, returns its
 /// error screen (showing that the handler was called). If it fails or doesn't exist,
 /// returns the default error screen for the original error.
@@ -3196,106 +3342,6 @@ fn try_errorhandler_or_screen(lua: &Lua, err: &mlua::Error) -> ErrorScreen {
         }
     }
     ErrorScreen::from_lua_error(err)
-}
-
-#[allow(clippy::vec_init_then_push)]
-fn make_splash_commands(
-    width: u32,
-    height: u32,
-    small_key: FontKey,
-    fonts: &mut SlotMap<FontKey, crate::render::Font>,
-    branding: Option<&SplashBranding>,
-    drag_hover: bool,
-) -> Vec<RenderCommand> {
-    let width_f = width as f32;
-    let height_f = height as f32;
-    let cx = width_f / 2.0;
-    let hint_text = if drag_hover {
-        "Release to load game"
-    } else {
-        "Drop a game folder here to load it"
-    };
-    let hint_w = fonts
-        .get_mut(small_key)
-        .map(|f| f.text_width(hint_text))
-        .unwrap_or(0.0);
-
-    let top_margin = 24.0_f32;
-    let hint_band_top = height_f - 82.0;
-
-    let mut cmds: Vec<RenderCommand> = Vec::new();
-
-    if let Some(branding) = branding {
-        let (icon_w, icon_h) = fit_contain_size(
-            branding.large_icon.width,
-            branding.large_icon.height,
-            width_f * 0.46,
-            height_f * 0.40,
-        );
-        let (banner_w, banner_h) = fit_contain_size(
-            branding.banner.width,
-            branding.banner.height,
-            width_f * 0.80,
-            height_f * 0.22,
-        );
-
-        let banner_center_min = top_margin + banner_h * 0.5;
-        let banner_center_max = (hint_band_top - 18.0 - banner_h * 0.5).max(banner_center_min);
-        let banner_center_y = (height_f * 0.72).clamp(banner_center_min, banner_center_max);
-
-        let icon_center_min = top_margin + icon_h * 0.5;
-        let icon_center_max =
-            (banner_center_y - banner_h * 0.5 - 32.0 - icon_h * 0.5).max(icon_center_min);
-        let icon_center_y = (height_f * 0.33).clamp(icon_center_min, icon_center_max);
-
-        cmds.push(RenderCommand::SetColor(1.0, 1.0, 1.0, 1.0));
-        cmds.push(RenderCommand::DrawImageEx {
-            texture_key: branding.large_icon.texture_key,
-            x: cx,
-            y: icon_center_y,
-            rotation: 0.0,
-            sx: icon_w / branding.large_icon.width as f32,
-            sy: icon_h / branding.large_icon.height as f32,
-            ox: branding.large_icon.width as f32 * 0.5,
-            oy: branding.large_icon.height as f32 * 0.5,
-            effect: None,
-        });
-        cmds.push(RenderCommand::DrawImageEx {
-            texture_key: branding.banner.texture_key,
-            x: cx,
-            y: banner_center_y,
-            rotation: 0.0,
-            sx: banner_w / branding.banner.width as f32,
-            sy: banner_h / branding.banner.height as f32,
-            ox: branding.banner.width as f32 * 0.5,
-            oy: branding.banner.height as f32 * 0.5,
-            effect: None,
-        });
-    }
-
-    // â”€â”€ Drop hint (bottom of screen) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    if drag_hover {
-        cmds.push(RenderCommand::SetColor(0.40, 0.80, 0.40, 0.15));
-        cmds.push(RenderCommand::Rectangle {
-            mode: DrawMode::Fill,
-            x: cx - 220.0,
-            y: height_f - 70.0,
-            w: 440.0,
-            h: 40.0,
-        });
-        cmds.push(RenderCommand::SetColor(0.50, 0.90, 0.50, 1.0));
-    } else {
-        cmds.push(RenderCommand::SetColor(0.35, 0.30, 0.45, 1.0));
-    }
-    cmds.push(RenderCommand::Print {
-        font_key: small_key,
-        text: hint_text.to_string(),
-        x: cx - hint_w / 2.0,
-        y: height_f - 55.0,
-        scale: 1.0,
-    });
-
-    cmds
 }
 
 // NOTE: Tests private internals (recompute_viewport, fit_contain_size,

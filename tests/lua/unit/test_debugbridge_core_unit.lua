@@ -148,6 +148,29 @@ describe("lurek.debugbridge performance", function()
 
 end)
 
+-- ===== Protocol =====
+
+-- @describe lurek.debugbridge protocol
+describe("lurek.debugbridge protocol", function()
+
+    -- @covers lurek.debugbridge.getProtocolInfo
+    it("getProtocolInfo returns version and capabilities", function()
+        local info = lurek.debugbridge.getProtocolInfo()
+        expect_not_nil(info)
+        expect_true(info.version >= 1)
+        expect_not_nil(info.capabilities)
+        expect_true(#info.capabilities >= 1)
+        expect_not_nil(info.nonce)
+    end)
+
+    -- @covers lurek.debugbridge.consumeHotReloadRequest
+    it("consumeHotReloadRequest returns boolean", function()
+        local pending = lurek.debugbridge.consumeHotReloadRequest()
+        expect_equal(type(pending), "boolean")
+    end)
+
+end)
+
 -- ===== Screenshots =====
 
 -- @describe lurek.debugbridge screenshots

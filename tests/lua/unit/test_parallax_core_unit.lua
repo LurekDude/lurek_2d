@@ -423,6 +423,27 @@ describe("LuaParallaxLayer clamp", function()
             layer:render(1000, 1000)
         end)
     end)
+
+    -- @covers LParallaxLayer:render
+    -- @covers LParallaxLayer:setClamp
+    -- @covers LParallaxLayer:setAutoscroll
+    -- @covers LParallaxLayer:update
+    -- @covers lurek.parallax.newLayer
+    it("autoscroll + clamp interaction remains stable under large camera offsets", function()
+        local layer = lurek.parallax.newLayer({
+            texture = load_image(),
+            autoscroll_x = 800.0,
+            autoscroll_y = -500.0,
+        })
+        layer:setClamp(-32, -24, 32, 24)
+
+        expect_no_error(function()
+            for _ = 1, 8 do
+                layer:update(0.5)
+                layer:render(99999, -99999)
+            end
+        end)
+    end)
 end)
 
 -- newSet
@@ -607,6 +628,27 @@ describe("LuaParallaxSet drawing", function()
         -- After sort, drawing should still work (skipped: draw is nil)
         -- expect_no_error(function() s:render(0, 0) end)
     end)
+
+    -- @covers LParallaxSet:addLayer
+    -- @covers LParallaxSet:getLayerZAt
+    -- @covers LParallaxSet:sortByZ
+    -- @covers lurek.parallax.newLayer
+    -- @covers lurek.parallax.newSet
+    it("sortByZ applies real ascending z order", function()
+        local s = lurek.parallax.newSet("bg")
+        local img = load_image()
+
+        s:addLayer(lurek.parallax.newLayer({ texture = img, z = 10 }))
+        s:addLayer(lurek.parallax.newLayer({ texture = img, z = -3 }))
+        s:addLayer(lurek.parallax.newLayer({ texture = img, z = 5 }))
+
+        s:sortByZ()
+
+        expect_equal(-3, s["getLayerZAt"](s, 1))
+        expect_equal(5, s["getLayerZAt"](s, 2))
+        expect_equal(10, s["getLayerZAt"](s, 3))
+        expect_equal(nil, s["getLayerZAt"](s, 4))
+    end)
 end)
 
 -- Scene-transition pattern
@@ -718,6 +760,54 @@ describe("parallax blend modes", function()
         layer:setBlendMode("multiply")
         layer:setBlendMode("normal")
         expect_equal("normal", layer:getBlendMode())
+    end)
+end)
+
+-- @describe parallax effects and motion stretch
+describe("parallax effects and motion stretch", function()
+    -- @covers LParallaxLayer:addEffectPass
+    -- @covers LParallaxLayer:clearEffects
+    -- @covers LParallaxLayer:effectCount
+    -- @covers lurek.parallax.newLayer
+    it("effect pass chain can be configured", function()
+        local layer = lurek.parallax.newLayer({ texture = load_image() })
+        expect_equal(0, layer:effectCount())
+        layer:addEffectPass("blur", { radius = 2.0 })
+        expect_equal(1, layer:effectCount())
+        layer:clearEffects()
+        expect_equal(0, layer:effectCount())
+    end)
+
+    -- @covers LParallaxLayer:getMotionStretch
+    -- @covers LParallaxLayer:setMotionStretch
+    -- @covers lurek.parallax.newLayer
+    it("motion stretch settings round-trip", function()
+        local layer = lurek.parallax.newLayer({ texture = load_image() })
+        layer:setMotionStretch(true, 0.0025, 1.7)
+        local enabled, strength, max_scale = layer:getMotionStretch()
+        expect_true(enabled)
+        expect_near(0.0025, strength)
+        expect_near(1.7, max_scale)
+    end)
+end)
+
+-- @describe parallax presets helper
+describe("parallax presets helper", function()
+    -- @covers LParallaxLayer:type
+    -- @covers lurek.parallax.newPresetLayer
+    it("newPresetLayer creates valid layer for each preset", function()
+        local img = load_image()
+        expect_equal("LParallaxLayer", lurek.parallax.newPresetLayer("far", img):type())
+        expect_equal("LParallaxLayer", lurek.parallax.newPresetLayer("mid", img):type())
+        expect_equal("LParallaxLayer", lurek.parallax.newPresetLayer("fog", img):type())
+    end)
+
+    -- @covers lurek.parallax.newPresetLayer
+    it("newPresetLayer errors on unknown preset", function()
+        local img = load_image()
+        expect_error(function()
+            lurek.parallax.newPresetLayer("unknown", img)
+        end)
     end)
 end)
 

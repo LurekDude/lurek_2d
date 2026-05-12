@@ -95,6 +95,24 @@ impl PaletteLUT {
         self.to_colors.clear();
     }
 
+    /// Cycles destination palette entries by `offset` steps.
+    ///
+    /// Positive values rotate to the right; negative values rotate to the left.
+    /// Source colors (`from_colors`) are left unchanged so the same key colors map
+    /// to different target colors over time.
+    pub fn cycle_to_colors(&mut self, offset: i32) {
+        if self.to_colors.len() <= 1 {
+            return;
+        }
+
+        let len = self.to_colors.len() as i32;
+        let shift = ((offset % len) + len) % len;
+        if shift == 0 {
+            return;
+        }
+        self.to_colors.rotate_right(shift as usize);
+    }
+
     /// Applies this palette lookup table to an image in place.
     ///
     /// For every pixel in `img` whose RGBA byte values (0–255) match a `from_colors[i]`

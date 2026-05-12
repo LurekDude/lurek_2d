@@ -17,6 +17,12 @@
 /// Entry point for the Lurek2D engine lifecycle and game loop.
 #[allow(clippy::module_inception)]
 pub mod app;
+/// Frame profile formatting helpers used by runtime APIs and overlays.
+pub mod frame_profile;
+/// Lua callback wrappers with optional timeout enforcement.
+pub mod lua_callbacks;
+/// Splash screen asset loading and draw command generation.
+pub mod splash_screen;
 /// Debug overlay for FPS and draw-call statistics.
 pub mod debug_overlay;
 /// Visual error screen for Lua and engine errors.

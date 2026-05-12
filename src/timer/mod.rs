@@ -17,6 +17,8 @@
 //!
 //! All public items are documented. Lua bridge: `src/lua_api/timer_api.rs`.
 
+/// Deterministic scaled-time accumulation helpers.
+pub(crate) mod accumulator;
 /// Frame-based clock providing delta time, total time, and FPS.
 pub mod clock;
 /// Scheduled event manager for delayed and repeating timed callbacks.
@@ -24,6 +26,7 @@ pub mod scheduler;
 /// Thread-blocking sleep helper.
 pub mod sleep;
 
+pub(crate) use accumulator::accumulate_scaled_micros;
 pub use clock::Clock;
 pub use scheduler::Scheduler;
 pub use sleep::sleep;

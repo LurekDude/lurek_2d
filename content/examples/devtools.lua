@@ -196,6 +196,24 @@ do -- lurek.devtools.getFrameStats
   end
 end
 
+--@api-stub: lurek.devtools.recordGpuFrameTime
+-- Records a GPU frame-time sample in seconds.
+-- Feed this from your renderer timing data when available to monitor GPU-side frame pacing.
+do -- lurek.devtools.recordGpuFrameTime
+  function lurek.process(dt)
+    lurek.devtools.recordGpuFrameTime(dt * 0.8)
+  end
+end
+
+--@api-stub: lurek.devtools.getGpuFrameStats
+-- Returns a table of computed GPU frame statistics.
+-- Use this alongside CPU stats to spot GPU-bound frames and surface p95/p99 spikes in overlays.
+do -- lurek.devtools.getGpuFrameStats
+  lurek.devtools.recordGpuFrameTime(1/90)
+  local gpu = lurek.devtools.getGpuFrameStats()
+  lurek.devtools.info("gpu avg dt=" .. gpu.avg .. " samples=" .. gpu.samples)
+end
+
 --@api-stub: lurek.devtools.getFrameHistory
 -- Returns the raw frame-time sample array.
 -- Plot directly as a graph or feed into your own statistics; oldest sample is index 1.
@@ -327,6 +345,22 @@ do -- lurek.devtools.isConsoleOpen
     if lurek.devtools.isConsoleOpen() then
       -- console panel would be drawn here
     end
+  end
+end
+
+--@api-stub: lurek.devtools.openEntityInspector
+-- Opens the entity inspector panel flag.
+-- Bind this to a debug hotkey so gameplay programmers can surface entity internals on demand.
+do -- lurek.devtools.openEntityInspector
+  lurek.devtools.openEntityInspector()
+end
+
+--@api-stub: lurek.devtools.isEntityInspectorOpen
+-- Returns whether the entity inspector is considered open.
+-- Gate your custom inspector UI draw path on this flag.
+do -- lurek.devtools.isEntityInspectorOpen
+  if lurek.devtools.isEntityInspectorOpen() then
+    lurek.devtools.debug("entity inspector active")
   end
 end
 

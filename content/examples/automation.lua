@@ -308,7 +308,7 @@ do -- lurek.automation.waitUntil
 end
 
 --@api-stub: lurek.automation.setCondition
--- Sets a named condition used by script fields `when` and `assert`.
+-- Sets a named condition used by script expressions in `when` and `assert`.
 -- Drive these conditions from game state in update loops so scripted checks remain deterministic.
 do -- lurek.automation.setCondition
   local boss_dead = false

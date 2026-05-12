@@ -41,6 +41,19 @@ pub struct Texture {
     pub height: u32,
 }
 
+/// Premultiplies RGBA8 pixels in-place.
+///
+/// This is the single source of truth for CPU-side premultiply before texture upload.
+/// Input is expected to be tightly packed RGBA8 bytes.
+pub fn premultiply_alpha_rgba8_in_place(pixels: &mut [u8]) {
+    for chunk in pixels.chunks_exact_mut(4) {
+        let a = chunk[3] as f32 / 255.0;
+        chunk[0] = (chunk[0] as f32 * a) as u8;
+        chunk[1] = (chunk[1] as f32 * a) as u8;
+        chunk[2] = (chunk[2] as f32 * a) as u8;
+    }
+}
+
 impl Texture {
     /// Parse a Lua/string-facing texture color-space label.
     ///
@@ -89,15 +102,9 @@ impl Texture {
         let rgba = img.to_rgba8();
         let (width, height) = rgba.dimensions();
 
-        // GPU renderer expects premultiplied alpha RGBA
+        // GPU renderer expects premultiplied alpha RGBA.
         let mut pixels = rgba.into_raw();
-        // Premultiply alpha
-        for chunk in pixels.chunks_exact_mut(4) {
-            let a = chunk[3] as f32 / 255.0;
-            chunk[0] = (chunk[0] as f32 * a) as u8;
-            chunk[1] = (chunk[1] as f32 * a) as u8;
-            chunk[2] = (chunk[2] as f32 * a) as u8;
-        }
+        premultiply_alpha_rgba8_in_place(&mut pixels);
 
         let key = textures.insert(TextureData {
             pixels,
@@ -149,12 +156,7 @@ impl Texture {
                 pixels.len()
             )));
         }
-        for chunk in pixels.chunks_exact_mut(4) {
-            let a = chunk[3] as f32 / 255.0;
-            chunk[0] = (chunk[0] as f32 * a) as u8;
-            chunk[1] = (chunk[1] as f32 * a) as u8;
-            chunk[2] = (chunk[2] as f32 * a) as u8;
-        }
+        premultiply_alpha_rgba8_in_place(&mut pixels);
         let key = textures.insert(TextureData {
             pixels,
             width,

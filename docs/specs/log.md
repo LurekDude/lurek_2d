@@ -7,7 +7,7 @@
 - Lua API path(s): `src/lua_api/log_api.rs`
 - Primary Lua namespace: `lurek.log`
 - Rust test path(s): tests/rust/unit/log_tests.rs
-- Lua test path(s): tests/lua/unit/test_log.lua
+- Lua test path(s): tests/lua/unit/test_log_core_unit.lua
 
 ## Summary
 
@@ -19,15 +19,15 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 
 - `facade.rs`: Structured logging facade exposed to Lua through `lurek.log.*`.
 - `mod.rs`: Defines the small public domain surface for setting and querying the active log level and re-exports sink-related types.
-- `sinks.rs`: Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks, and the registry that tracks active outputs.
+- `sinks.rs`: Implements sink filtering and fan-out, including file-backed sinks, bounded memory sinks backed by `data::RingBuffer<MemoryEntry>`, and the registry that tracks active outputs.
 
 ## Types
 
 - `LogFields` (`type`, `facade.rs`): Sorted map of structured key-value log fields.
-- `SinkLevel` (`enum`, `sinks.rs`): Severity threshold used by sink filtering. It keeps file and memory sinks consistent even when the Lua caller uses string level names.
+- `SinkLevel` (`enum`, `sinks.rs`): Severity threshold used by sink filtering. It keeps file and memory sinks consistent even when the Lua caller uses string level names and now includes `Trace`.
 - `MemoryEntry` (`struct`, `sinks.rs`): Captured log record stored by memory sinks. It is intentionally small so Lua tooling can inspect recent messages without coupling to the Rust `log` crate.
 - `RotatingFileSink` (`struct`, `sinks.rs`): A file sink that rotates the log file when it exceeds a maximum size.
-- `SinkKind` (`enum`, `sinks.rs`): Backend enum for the supported sink storage strategies. It distinguishes append-to-file behavior from bounded in-memory buffering.
+- `SinkKind` (`enum`, `sinks.rs`): Backend enum for the supported sink storage strategies. It distinguishes append-to-file behavior from bounded in-memory buffering and callback sinks.
 - `Sink` (`struct`, `sinks.rs`): Single output destination with an id, minimum level, and concrete backend. It is the unit the Lua API creates, lists, flushes, and removes.
 - `SinkRegistry` (`struct`, `sinks.rs`): Mutable collection of active sinks for one runtime context. The Lua layer keeps one registry per VM and uses it to fan out every emitted message.
 
@@ -37,8 +37,8 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `set_level` (`facade.rs`): Sets the active log level to the named value.
 - `get_level` (`facade.rs`): Returns the current log level name as a static string (e.g.
 - `enabled_for` (`facade.rs`): Returns `true` when messages at `level` would be emitted under the current filter.
-- `SinkLevel::from_str` (`sinks.rs`): Parses a level string (case-insensitive).
-- `SinkLevel::as_str` (`sinks.rs`): Returns the canonical uppercase display string (`"DEBUG"`, `"INFO"`, `"WARN"`, `"ERROR"`).
+- `SinkLevel::from_str` (`sinks.rs`): Parses a level string (case-insensitive) via the standard `FromStr` trait.
+- `SinkLevel::as_str` (`sinks.rs`): Returns the canonical uppercase display string (`"DEBUG"`, `"TRACE"`, `"INFO"`, `"WARN"`, `"ERROR"`).
 - `RotatingFileSink::open` (`sinks.rs`): Opens or creates a rotating file sink at `path`.
 - `RotatingFileSink::write_with_rotation` (`sinks.rs`): Appends `message` to the active log file, rotating if the size threshold is exceeded.
 - `RotatingFileSink::flush` (`sinks.rs`): Flushes the underlying OS write buffer.
@@ -83,6 +83,16 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 - `lurek.log.info_fields`: Emits a structured log message at info severity with key-value metadata.
 - `lurek.log.warn_fields`: Emits a structured log message at warning severity with key-value metadata.
 - `lurek.log.error_fields`: Emits a structured log message at error severity with key-value metadata.
+
+### `addSink` options
+
+- `type = "memory" | "file" | "rotating" | "callback"`
+- `level` accepts `debug`, `trace`, `info`, `warn` / `warning`, `error` / `err`.
+- `tags` can be a string tag or an array of string tags. When present, only matching tags are accepted.
+- `timestamp = true` enables a Unix-millisecond prefix on file-backed plain lines.
+- `ansi = true` or `color = true` enables ANSI colouring on file-backed plain lines.
+- `format = "plain" | "json" | "ndjson"` changes file-backed output formatting.
+- `callback` is required when `type = "callback"` and receives a table with `level`, `tag`, `message`, and optional `fields` / `timestamp_ms`.
 
 ## References
 

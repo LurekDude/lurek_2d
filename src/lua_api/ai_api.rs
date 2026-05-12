@@ -21,6 +21,7 @@ use crate::ai::{
     Consideration,
     ContextSteering,
     DecisionModel,
+    DialogueAI,
     Emotion,
     EmotionModel,
     FormationType,
@@ -1126,6 +1127,64 @@ impl LuaUserData for LuaSteeringManager {
             },
         );
 
+        // -- setPath --
+        /// Sets a world-space waypoint path for path-follow steering.
+        /// Compatible with path tables returned by `lurek.pathfind.*:findPath(...)`.
+        /// @param | waypoints | table | Array of waypoint tables with numeric `x` and `y` fields.
+        /// @param | reachRadius | number? | Optional waypoint-reached radius.
+        /// @param | weight | number? | Optional path-follow force weight.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "setPath",
+            |_, this, (waypoints, reach_radius, weight): (LuaTable, Option<f32>, Option<f32>)| {
+                let mut out = Vec::new();
+                for entry in waypoints.sequence_values::<LuaTable>() {
+                    let pt = entry?;
+                    let x: f32 = pt.get("x").map_err(|_| {
+                        LuaError::RuntimeError(
+                            "lurek.ai.SteeringManager:setPath expected waypoint.x".to_string(),
+                        )
+                    })?;
+                    let y: f32 = pt.get("y").map_err(|_| {
+                        LuaError::RuntimeError(
+                            "lurek.ai.SteeringManager:setPath expected waypoint.y".to_string(),
+                        )
+                    })?;
+                    out.push((x, y));
+                }
+                this.inner.borrow_mut().set_path(
+                    out,
+                    reach_radius.unwrap_or(12.0),
+                    weight.unwrap_or(1.0),
+                );
+                Ok(())
+            },
+        );
+
+        // -- clearPath --
+        /// Clears the currently active waypoint path.
+        /// @return | nil | No value is returned.
+        methods.add_method("clearPath", |_, this, ()| {
+            this.inner.borrow_mut().clear_path();
+            Ok(())
+        });
+
+        // -- hasPath --
+        /// Returns true if there is an unfinished waypoint path.
+        /// @return | boolean | True when a path is active.
+        methods.add_method("hasPath", |_, this, ()| {
+            Ok(this.inner.borrow().has_active_path())
+        });
+
+        // -- getPathProgress --
+        /// Returns path-follow progress.
+        /// @return | integer | Current waypoint index (1-based).
+        /// @return | integer | Total waypoints in the active path.
+        methods.add_method("getPathProgress", |_, this, ()| {
+            let (idx, total) = this.inner.borrow().path_progress();
+            Ok((idx + 1, total))
+        });
+
         // -- type --
         /// Returns the type name of this object.
         /// @return | string | Type name for this userdata.
@@ -1230,6 +1289,153 @@ impl LuaUserData for LuaSteeringManager {
                 Ok(force)
             },
         );
+    }
+}
+
+// -------------------------------------------------------------------------------
+// LuaDialogueAI UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a [`DialogueAI`].
+#[derive(Clone)]
+struct LuaDialogueAI {
+    inner: Rc<RefCell<DialogueAI>>,
+}
+
+impl LuaUserData for LuaDialogueAI {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- setFSMState --
+        /// Sets current FSM state used by dialogue gating.
+        /// @param | state | string? | FSM state name or nil.
+        /// @return | nil | No value is returned.
+        methods.add_method("setFSMState", |_, this, state: Option<String>| {
+            this.inner.borrow_mut().set_fsm_state(state);
+            Ok(())
+        });
+
+        // -- setBTStatus --
+        /// Sets current BT status used by dialogue gating.
+        /// @param | status | string? | BT status string or nil.
+        /// @return | nil | No value is returned.
+        methods.add_method("setBTStatus", |_, this, status: Option<String>| {
+            this.inner.borrow_mut().set_bt_status(status);
+            Ok(())
+        });
+
+        // -- setUtilityScore --
+        /// Sets a utility score key used by topic and branch ranking.
+        /// @param | key | string | Utility score key.
+        /// @param | score | number | Score value.
+        /// @return | nil | No value is returned.
+        methods.add_method("setUtilityScore", |_, this, (key, score): (String, f32)| {
+            this.inner.borrow_mut().set_utility_score(key, score);
+            Ok(())
+        });
+
+        // -- clearUtilityScores --
+        /// Clears all utility score keys.
+        /// @return | nil | No value is returned.
+        methods.add_method("clearUtilityScores", |_, this, ()| {
+            this.inner.borrow_mut().clear_utility_scores();
+            Ok(())
+        });
+
+        // -- addTopic --
+        /// Adds a dialogue topic with optional FSM/BT/utility gates.
+        /// @param | id | string | Topic identifier.
+        /// @param | weight | number? | Optional base topic weight.
+        /// @param | fsmState | string? | Optional required FSM state.
+        /// @param | btStatus | string? | Optional required BT status.
+        /// @param | utilityKey | string? | Optional utility score key.
+        /// @return | nil | No value is returned.
+        methods.add_method(
+            "addTopic",
+            |_,
+             this,
+             (id, weight, fsm_state, bt_status, utility_key): (
+                String,
+                Option<f32>,
+                Option<String>,
+                Option<String>,
+                Option<String>,
+            )| {
+                this.inner.borrow_mut().add_topic(
+                    id,
+                    weight.unwrap_or(1.0),
+                    fsm_state,
+                    bt_status,
+                    utility_key,
+                );
+                Ok(())
+            },
+        );
+
+        // -- addBranch --
+        /// Adds a dialogue branch under a topic.
+        /// @param | topicId | string | Parent topic id.
+        /// @param | branchId | string | Branch identifier.
+        /// @param | weight | number? | Optional base branch weight.
+        /// @param | fsmState | string? | Optional required FSM state.
+        /// @param | btStatus | string? | Optional required BT status.
+        /// @param | utilityKey | string? | Optional utility score key.
+        /// @return | boolean | True if branch was added.
+        methods.add_method(
+            "addBranch",
+            |_,
+             this,
+             (topic_id, branch_id, weight, fsm_state, bt_status, utility_key): (
+                String,
+                String,
+                Option<f32>,
+                Option<String>,
+                Option<String>,
+                Option<String>,
+            )| {
+                Ok(this.inner.borrow_mut().add_branch(
+                    &topic_id,
+                    branch_id,
+                    weight.unwrap_or(1.0),
+                    fsm_state,
+                    bt_status,
+                    utility_key,
+                ))
+            },
+        );
+
+        // -- selectTopic --
+        /// Selects the best topic for current context.
+        /// @return | string | Selected topic id or nil.
+        methods.add_method("selectTopic", |_, this, ()| {
+            Ok(this.inner.borrow().select_topic())
+        });
+
+        // -- selectBranch --
+        /// Selects the best branch under a topic for current context.
+        /// @param | topicId | string | Topic identifier.
+        /// @return | string | Selected branch id or nil.
+        methods.add_method("selectBranch", |_, this, topic_id: String| {
+            Ok(this.inner.borrow().select_branch(&topic_id))
+        });
+
+        // -- getTopicCount --
+        /// Returns number of registered topics.
+        /// @return | integer | Topic count.
+        methods.add_method("getTopicCount", |_, this, ()| {
+            Ok(this.inner.borrow().topic_count())
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Type name for this userdata.
+        methods.add_method("type", |_, _, ()| Ok("LDialogueAI"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True if the type matches DialogueAI or Object.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "DialogueAI" || name == "Object")
+        });
     }
 }
 
@@ -3845,6 +4051,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
             Ok(LuaUtilityAI {
                 inner: Rc::new(RefCell::new(UtilityAI::new())),
                 custom_callbacks: Rc::new(RefCell::new(CallbackRegistry::new())),
+            })
+        })?,
+    )?;
+
+    // -- newDialogueAI --
+    /// Creates a dialogue AI selector that combines FSM/BT/Utility signals.
+    /// @return | LDialogueAI | New dialogue AI userdata.
+    tbl.set(
+        "newDialogueAI",
+        lua.create_function(|_, ()| {
+            Ok(LuaDialogueAI {
+                inner: Rc::new(RefCell::new(DialogueAI::new())),
             })
         })?,
     )?;

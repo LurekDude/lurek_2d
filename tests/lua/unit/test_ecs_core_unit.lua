@@ -1308,21 +1308,21 @@ describe("unit: migrated from integration/test_save_ecs.lua", function()
         -- @covers lurek.ecs.newUniverse
         it("collects entity data for save", function()
             local universe = lurek.ecs.newUniverse()
-    
+
             -- Create game entities
             local player = universe:spawn()
             universe:set(player, "name", "Hero")
             universe:set(player, "health", 85)
             universe:set(player, "position", {x = 100, y = 200})
-    
+
             local enemy1 = universe:spawn()
             universe:set(enemy1, "name", "Goblin")
             universe:set(enemy1, "health", 30)
-    
+
             local enemy2 = universe:spawn()
             universe:set(enemy2, "name", "Dragon")
             universe:set(enemy2, "health", 500)
-    
+
             -- Collect state as save data
             local save_data = {}
             local ids = {player, enemy1, enemy2}
@@ -1334,7 +1334,7 @@ describe("unit: migrated from integration/test_save_ecs.lua", function()
                     }
                 end
             end
-    
+
             expect_equal(3, #save_data, "3 entities collected")
             expect_equal("Hero", save_data[1].name, "player name preserved")
             expect_equal(85, save_data[1].health, "player health preserved")
@@ -1351,13 +1351,13 @@ describe("unit: migrated from integration/test_scene_ecs.lua", function()
         -- @covers lurek.ecs.newUniverse
         it("creates scene and populates with entities", function()
             local universe = lurek.ecs.newUniverse()
-    
+
             -- Spawn parent and children
             local parent = universe:spawn()
             universe:set(parent, "name", "parent")
             universe:set(parent, "x", 0.0)
             universe:set(parent, "y", 0.0)
-    
+
             local children = {}
             for i = 1, 5 do
                 local child = universe:spawn()
@@ -1367,7 +1367,7 @@ describe("unit: migrated from integration/test_scene_ecs.lua", function()
                 universe:set(child, "y", i * 10.0)
                 children[i] = child
             end
-    
+
             -- Verify parent-child relationships
             for i, child in ipairs(children) do
                 local pid = universe:get(child, "parent_id")
@@ -1382,11 +1382,11 @@ describe("unit: migrated from integration/test_scene_ecs.lua", function()
         -- @covers lurek.ecs.newUniverse
         it("killing parent entity is tracked", function()
             local universe = lurek.ecs.newUniverse()
-    
+
             local parent = universe:spawn()
             local child  = universe:spawn()
             universe:set(child, "parent_id", parent)
-    
+
             universe:kill(parent)
             -- After kill, child still exists (orphan is the game engine's responsibility)
             local pid = universe:get(child, "parent_id")
@@ -1401,17 +1401,17 @@ describe("unit: migrated from integration/test_scene_ecs.lua", function()
         it("large entity population in scene does not error", function()
             local universe = lurek.ecs.newUniverse()
             local ids = {}
-    
+
             for i = 1, 200 do
                 local id = universe:spawn()
                 universe:set(id, "index", i)
                 ids[i] = id
             end
-    
+
             -- Verify a sample
             expect_equal(1,   universe:get(ids[1],   "index"), "first entity")
             expect_equal(200, universe:get(ids[200], "index"), "last entity")
-    
+
             -- Kill all
             for _, id in ipairs(ids) do
                 universe:kill(id)
@@ -1421,6 +1421,70 @@ describe("unit: migrated from integration/test_scene_ecs.lua", function()
             expect_equal(0, universe:getEntityCount(), "all entities removed after bulk kill")
         end)
 
+end)
+
+-- @describe LUniverse dependency scheduling + snapshot diff
+describe("LUniverse dependency scheduling + snapshot diff", function()
+    -- @covers LUniverse:addSystem
+    -- @covers LUniverse:update
+    -- @covers lurek.ecs.newUniverse
+    it("addSystem after deps enforce execution order even against priority", function()
+        local w = lurek.ecs.newUniverse()
+        local order = {}
+
+        local sys_a = {
+            update = function() table.insert(order, "A") end
+        }
+        local sys_b = {
+            update = function() table.insert(order, "B") end
+        }
+
+        -- B has lower priority (would normally run first), but declares after A.
+        w:addSystem(sys_b, {name = "B", priority = 0, after = {"A"}})
+        w:addSystem(sys_a, {name = "A", priority = 10})
+
+        w:update(0.016)
+        expect_equal("A", order[1], "A runs before B due to dependency")
+        expect_equal("B", order[2], "B runs after A")
+    end)
+
+    -- @covers LUniverse:set
+    -- @covers LUniverse:remove
+    -- @covers LUniverse:spawn
+    -- @covers LUniverse:takeSnapshotDiff
+    -- @covers lurek.ecs.newUniverse
+    it("takeSnapshotDiff returns added/removed/dirty and then drains", function()
+        local w = lurek.ecs.newUniverse()
+        local e = w:spawn()
+
+        w:set(e, "hp", 10)
+        w:remove(e, "hp")
+
+        local diff = w:takeSnapshotDiff()
+        expect_true(#diff.added_components >= 1, "added components captured")
+        expect_true(#diff.removed_components >= 1, "removed components captured")
+        expect_true(#diff.dirty_entities >= 1, "dirty entities captured")
+
+        local drained = w:takeSnapshotDiff()
+        expect_equal(0, #drained.added_components, "added components drained")
+        expect_equal(0, #drained.removed_components, "removed components drained")
+        expect_equal(0, #drained.deleted_entities, "deleted entities drained")
+        expect_equal(0, #drained.dirty_entities, "dirty entities drained")
+    end)
+
+    -- @covers LUniverse:kill
+    -- @covers LUniverse:spawn
+    -- @covers LUniverse:takeSnapshotDiff
+    -- @covers lurek.ecs.newUniverse
+    it("takeSnapshotDiff reports deleted entity ids", function()
+        local w = lurek.ecs.newUniverse()
+        local e = w:spawn()
+        w:kill(e)
+
+        local diff = w:takeSnapshotDiff()
+        expect_equal(1, #diff.deleted_entities, "one deleted entity reported")
+        expect_equal(e, diff.deleted_entities[1], "deleted entity id matches")
+    end)
 end)
 
 test_summary()

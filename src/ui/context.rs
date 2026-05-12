@@ -181,50 +181,68 @@ pub enum WidgetKind {
     Custom(CustomWidget),
 }
 
+macro_rules! widget_kind_base_match {
+    ($value:expr, $map:ident) => {
+        match $value {
+            WidgetKind::Button(w) => $map!(w),
+            WidgetKind::Label(w) => $map!(w),
+            WidgetKind::TextInput(w) => $map!(w),
+            WidgetKind::CheckBox(w) => $map!(w),
+            WidgetKind::Slider(w) => $map!(w),
+            WidgetKind::ProgressBar(w) => $map!(w),
+            WidgetKind::ComboBox(w) => $map!(w),
+            WidgetKind::ListBox(w) => $map!(w),
+            WidgetKind::Panel(w) => $map!(w),
+            WidgetKind::Layout(w) => $map!(w),
+            WidgetKind::ScrollPanel(w) => $map!(w),
+            WidgetKind::NinePatch(w) => $map!(w),
+            WidgetKind::TabBar(w) => $map!(w),
+            WidgetKind::Toast(w) => $map!(w),
+            WidgetKind::Separator(w) => $map!(w),
+            WidgetKind::Spacer(w) => $map!(w),
+            WidgetKind::TreeView(w) => $map!(w),
+            WidgetKind::RadioButton(w) => $map!(w),
+            WidgetKind::ScrollBar(w) => $map!(w),
+            WidgetKind::GUIWindow(w) => $map!(w),
+            WidgetKind::SplitPanel(w) => $map!(w),
+            WidgetKind::DockPanel(w) => $map!(w),
+            WidgetKind::Toolbar(w) => $map!(w),
+            WidgetKind::MenuBar(w) => $map!(w),
+            WidgetKind::MenuItem(w) => $map!(w),
+            WidgetKind::Dialog(w) => $map!(w),
+            WidgetKind::StatusBar(w) => $map!(w),
+            WidgetKind::Accordion(w) => $map!(w),
+            WidgetKind::TooltipPanel(w) => $map!(w),
+            WidgetKind::ColorPicker(w) => $map!(w),
+            WidgetKind::GUITable(w) => $map!(w),
+            WidgetKind::ImageWidget(w) => $map!(w),
+            WidgetKind::SpinBox(w) => $map!(w),
+            WidgetKind::Switch(w) => $map!(w),
+            WidgetKind::Badge(w) => $map!(w),
+            WidgetKind::Custom(w) => $map!(w),
+        }
+    };
+}
+
+macro_rules! base_ref {
+    ($w:ident) => {
+        &$w.base
+    };
+}
+
+macro_rules! base_mut_ref {
+    ($w:ident) => {
+        &mut $w.base
+    };
+}
+
 impl WidgetKind {
     /// Return a reference to the shared [`WidgetBase`] inside this variant.
     ///
     /// # Returns
     /// `&WidgetBase`.
     pub fn base(&self) -> &WidgetBase {
-        match self {
-            Self::Button(w) => &w.base,
-            Self::Label(w) => &w.base,
-            Self::TextInput(w) => &w.base,
-            Self::CheckBox(w) => &w.base,
-            Self::Slider(w) => &w.base,
-            Self::ProgressBar(w) => &w.base,
-            Self::ComboBox(w) => &w.base,
-            Self::ListBox(w) => &w.base,
-            Self::Panel(w) => &w.base,
-            Self::Layout(w) => &w.base,
-            Self::ScrollPanel(w) => &w.base,
-            Self::NinePatch(w) => &w.base,
-            Self::TabBar(w) => &w.base,
-            Self::Toast(w) => &w.base,
-            Self::Separator(w) => &w.base,
-            Self::Spacer(w) => &w.base,
-            Self::TreeView(w) => &w.base,
-            Self::RadioButton(w) => &w.base,
-            Self::ScrollBar(w) => &w.base,
-            Self::GUIWindow(w) => &w.base,
-            Self::SplitPanel(w) => &w.base,
-            Self::DockPanel(w) => &w.base,
-            Self::Toolbar(w) => &w.base,
-            Self::MenuBar(w) => &w.base,
-            Self::MenuItem(w) => &w.base,
-            Self::Dialog(w) => &w.base,
-            Self::StatusBar(w) => &w.base,
-            Self::Accordion(w) => &w.base,
-            Self::TooltipPanel(w) => &w.base,
-            Self::ColorPicker(w) => &w.base,
-            Self::GUITable(w) => &w.base,
-            Self::ImageWidget(w) => &w.base,
-            Self::SpinBox(w) => &w.base,
-            Self::Switch(w) => &w.base,
-            Self::Badge(w) => &w.base,
-            Self::Custom(w) => &w.base,
-        }
+        widget_kind_base_match!(self, base_ref)
     }
 
     /// Return a mutable reference to the shared [`WidgetBase`].
@@ -232,44 +250,7 @@ impl WidgetKind {
     /// # Returns
     /// `&mut WidgetBase`.
     pub fn base_mut(&mut self) -> &mut WidgetBase {
-        match self {
-            Self::Button(w) => &mut w.base,
-            Self::Label(w) => &mut w.base,
-            Self::TextInput(w) => &mut w.base,
-            Self::CheckBox(w) => &mut w.base,
-            Self::Slider(w) => &mut w.base,
-            Self::ProgressBar(w) => &mut w.base,
-            Self::ComboBox(w) => &mut w.base,
-            Self::ListBox(w) => &mut w.base,
-            Self::Panel(w) => &mut w.base,
-            Self::Layout(w) => &mut w.base,
-            Self::ScrollPanel(w) => &mut w.base,
-            Self::NinePatch(w) => &mut w.base,
-            Self::TabBar(w) => &mut w.base,
-            Self::Toast(w) => &mut w.base,
-            Self::Separator(w) => &mut w.base,
-            Self::Spacer(w) => &mut w.base,
-            Self::TreeView(w) => &mut w.base,
-            Self::RadioButton(w) => &mut w.base,
-            Self::ScrollBar(w) => &mut w.base,
-            Self::GUIWindow(w) => &mut w.base,
-            Self::SplitPanel(w) => &mut w.base,
-            Self::DockPanel(w) => &mut w.base,
-            Self::Toolbar(w) => &mut w.base,
-            Self::MenuBar(w) => &mut w.base,
-            Self::MenuItem(w) => &mut w.base,
-            Self::Dialog(w) => &mut w.base,
-            Self::StatusBar(w) => &mut w.base,
-            Self::Accordion(w) => &mut w.base,
-            Self::TooltipPanel(w) => &mut w.base,
-            Self::ColorPicker(w) => &mut w.base,
-            Self::GUITable(w) => &mut w.base,
-            Self::ImageWidget(w) => &mut w.base,
-            Self::SpinBox(w) => &mut w.base,
-            Self::Switch(w) => &mut w.base,
-            Self::Badge(w) => &mut w.base,
-            Self::Custom(w) => &mut w.base,
-        }
+        widget_kind_base_match!(self, base_mut_ref)
     }
 
     /// Return the child indices if this widget is a container type.
@@ -928,7 +909,7 @@ impl GuiContext {
         if target_idx >= self.widgets.len() || drag_idx == target_idx {
             return false;
         }
-        if !self.widgets[target_idx].children().is_some() {
+        if self.widgets[target_idx].children().is_none() {
             return false;
         }
         if self.contains_descendant(drag_idx, target_idx) {
@@ -1001,8 +982,9 @@ impl GuiContext {
             return false;
         }
         let base = self.widgets[widget_idx].base_mut();
-        base.transitions
-            .push(WidgetTransition::position(base.x, base.y, to_x, to_y, duration));
+        base.transitions.push(WidgetTransition::position(
+            base.x, base.y, to_x, to_y, duration,
+        ));
         self.dirty = true;
         true
     }

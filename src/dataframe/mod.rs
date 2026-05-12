@@ -6,6 +6,8 @@
 
 /// Column-major DataFrame and Database types.
 pub mod frame;
+/// Lazy query pipeline for deferred multi-step evaluation.
+pub mod lazy;
 /// Filter, sort, group-by, and aggregate query engine.
 pub mod query;
 /// Shared deterministic pseudo-random generator.
@@ -18,4 +20,5 @@ pub mod sql;
 pub mod vectorized;
 
 pub use frame::{CellValue, ColRef, DataFrame, DataFrameRowIter, Database};
+pub use lazy::LazyQuery;
 pub use vectorized::{BinaryOp, CmpOp, ColumnStore, ReduceOp, ScalarOp, VecFrame};

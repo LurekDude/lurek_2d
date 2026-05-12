@@ -9,9 +9,41 @@ use mlua::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-use crate::camera::{Camera2D, CameraPath, ZoomTween};
+use crate::camera::{
+    Camera2D, CameraFollowEasing, CameraPath, CameraRig2D, CameraTweenEasing, ZoomTween,
+};
 use crate::render::renderer::RenderCommand;
 use std::collections::HashMap;
+
+fn make_lua_camera(inner: Rc<RefCell<Camera2D>>, state: Rc<RefCell<SharedState>>) -> LuaCamera2D {
+    LuaCamera2D {
+        inner,
+        path: RefCell::new(None),
+        zoom_tween: RefCell::new(None),
+        parallax: RefCell::new(HashMap::new()),
+        state,
+    }
+}
+
+fn parse_follow_easing(name: &str) -> CameraFollowEasing {
+    match name.to_ascii_lowercase().as_str() {
+        "smoothstep" | "smooth" => CameraFollowEasing::SmoothStep,
+        "easeout" | "ease_out" | "ease-out" => CameraFollowEasing::EaseOutCubic,
+        _ => CameraFollowEasing::Linear,
+    }
+}
+
+fn parse_zoom_easing(name: Option<String>) -> CameraTweenEasing {
+    match name
+        .unwrap_or_else(|| "linear".to_string())
+        .to_ascii_lowercase()
+        .as_str()
+    {
+        "smoothstep" | "smooth" => CameraTweenEasing::SmoothStep,
+        "easeout" | "ease_out" | "ease-out" => CameraTweenEasing::EaseOutCubic,
+        _ => CameraTweenEasing::Linear,
+    }
+}
 
 // ---------------------------------------------------------------------------
 // LuaCamera2D UserData
@@ -28,6 +60,16 @@ pub struct LuaCamera2D {
     parallax: RefCell<HashMap<String, f32>>,
     /// Shared engine state for queuing render commands.
     state: Rc<RefCell<SharedState>>,
+}
+
+impl LuaCamera2D {
+    pub(crate) fn visible_area(&self) -> (f32, f32, f32, f32) {
+        self.inner.borrow().get_visible_area()
+    }
+
+    pub(crate) fn position(&self) -> (f32, f32) {
+        self.inner.borrow().get_position()
+    }
 }
 
 impl LuaUserData for LuaCamera2D {
@@ -105,6 +147,29 @@ impl LuaUserData for LuaCamera2D {
             Ok(this.inner.borrow().get_viewport())
         });
 
+        // -- getBounds --
+        /// Returns current bounds as `(ok, x, y, w, h)`.
+        /// @return | boolean | True if bounds are set.
+        /// @return | number | Bounds X (0 when unset).
+        /// @return | number | Bounds Y (0 when unset).
+        /// @return | number | Bounds width (0 when unset).
+        /// @return | number | Bounds height (0 when unset).
+        methods.add_method("getBounds", |_, this, ()| {
+            let out = if let Some((x, y, w, h)) = this.inner.borrow().get_bounds() {
+                (true, x, y, w, h)
+            } else {
+                (false, 0.0, 0.0, 0.0, 0.0)
+            };
+            Ok(out)
+        });
+
+        // -- hasBounds --
+        /// Returns true if world bounds are currently set.
+        /// @return | boolean | True when bounds are enabled
+        methods.add_method("hasBounds", |_, this, ()| {
+            Ok(this.inner.borrow().has_bounds())
+        });
+
         // -- setBounds --
         /// Sets world-space rectangular bounds that clamp the camera position.
         /// @param | x | number | Left edge of the bounding rectangle in world space
@@ -138,6 +203,20 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
+        // -- getTarget --
+        /// Returns current target as `(ok, x, y)`.
+        /// @return | boolean | True if target is set.
+        /// @return | number | Target X (0 when unset).
+        /// @return | number | Target Y (0 when unset).
+        methods.add_method("getTarget", |_, this, ()| {
+            let out = if let Some((x, y)) = this.inner.borrow().get_target() {
+                (true, x, y)
+            } else {
+                (false, 0.0, 0.0)
+            };
+            Ok(out)
+        });
+
         // -- clearTarget --
         /// Clears the follow target so the camera stops tracking any position.
         /// @return | nil | No return value.
@@ -155,6 +234,36 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
+        // -- getFollowSmooth --
+        /// Returns current follow smoothing factor.
+        /// @return | number | Follow smoothing factor
+        methods.add_method("getFollowSmooth", |_, this, ()| {
+            Ok(this.inner.borrow().get_follow_smooth())
+        });
+
+        // -- setFollowEasing --
+        /// Sets the easing mode used by smooth follow interpolation.
+        /// @param | easing | string | One of: "linear", "smoothstep", "easeout"
+        /// @return | nil | No return value.
+        methods.add_method("setFollowEasing", |_, this, easing: String| {
+            this.inner
+                .borrow_mut()
+                .set_follow_easing(parse_follow_easing(&easing));
+            Ok(())
+        });
+
+        // -- getFollowEasing --
+        /// Returns the current follow easing mode.
+        /// @return | string | Current follow easing mode name
+        methods.add_method("getFollowEasing", |_, this, ()| {
+            let mode = match this.inner.borrow().get_follow_easing() {
+                CameraFollowEasing::Linear => "linear",
+                CameraFollowEasing::SmoothStep => "smoothstep",
+                CameraFollowEasing::EaseOutCubic => "easeout",
+            };
+            Ok(mode)
+        });
+
         // -- setDeadZone --
         /// Sets the dead zone half-extents for camera follow.
         /// @param | w | number | Half-width of the dead zone in world units
@@ -165,6 +274,20 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
+        // -- getDeadZone --
+        /// Returns dead-zone size as `(ok, width, height)`.
+        /// @return | boolean | True if dead-zone is set.
+        /// @return | number | Dead-zone width (0 when unset).
+        /// @return | number | Dead-zone height (0 when unset).
+        methods.add_method("getDeadZone", |_, this, ()| {
+            let out = if let Some((w, h)) = this.inner.borrow().get_dead_zone() {
+                (true, w, h)
+            } else {
+                (false, 0.0, 0.0)
+            };
+            Ok(out)
+        });
+
         // -- setLookAhead --
         /// Sets the look-ahead multiplier for predictive camera follow.
         /// @param | mul | number | Look-ahead multiplier (0.0 = disabled, 1.0 = full velocity offset)
@@ -173,6 +296,51 @@ impl LuaUserData for LuaCamera2D {
             this.inner.borrow_mut().set_look_ahead(mul);
             Ok(())
         });
+
+        // -- getLookAhead --
+        /// Returns current look-ahead multiplier.
+        /// @return | number | Look-ahead multiplier
+        methods.add_method("getLookAhead", |_, this, ()| {
+            Ok(this.inner.borrow().get_look_ahead())
+        });
+
+        // -- onWindowResize --
+        /// Auto-wires viewport updates to a raw window resize event.
+        /// @param | window_w | number | Window width in pixels
+        /// @param | window_h | number | Window height in pixels
+        /// @return | nil | No return value.
+        methods.add_method(
+            "onWindowResize",
+            |_, this, (window_w, window_h): (f32, f32)| {
+                this.inner.borrow_mut().on_window_resize(window_w, window_h);
+                Ok(())
+            },
+        );
+
+        // -- onWindowResizeScaled --
+        /// Auto-wires viewport updates to a window resize using scale-mode mapping.
+        /// @param | game_w | number | Logical game width
+        /// @param | game_h | number | Logical game height
+        /// @param | window_w | number | Window width in pixels
+        /// @param | window_h | number | Window height in pixels
+        /// @param | mode | string | One of: "letterbox", "stretch", "pixelperfect"
+        /// @return | nil | No return value.
+        methods.add_method(
+            "onWindowResizeScaled",
+            |_, this, (game_w, game_h, window_w, window_h, mode): (f32, f32, f32, f32, String)| {
+                let scale_mode = match mode.to_ascii_lowercase().as_str() {
+                    "stretch" => crate::camera::ScaleMode::Stretch,
+                    "pixelperfect" | "pixel_perfect" | "pixel-perfect" => {
+                        crate::camera::ScaleMode::PixelPerfect
+                    }
+                    _ => crate::camera::ScaleMode::Letterbox,
+                };
+                this.inner
+                    .borrow_mut()
+                    .on_window_resize_scaled(game_w, game_h, window_w, window_h, scale_mode);
+                Ok(())
+            },
+        );
 
         // -- shake --
         /// Starts a screen-shake effect with the given intensity and duration.
@@ -301,12 +469,21 @@ impl LuaUserData for LuaCamera2D {
         /// Smoothly tweens the camera zoom from its current level to `target_zoom` over `duration` seconds.
         /// @param | target_zoom | number | Target zoom.
         /// @param | duration | number | Duration in seconds.
+        /// @param | easing | string? | Optional easing: "linear", "smoothstep", "easeout"
         /// @return | nil | No return value.
-        methods.add_method("zoomTo", |_, this, (target_zoom, duration): (f32, f32)| {
-            let current = this.inner.borrow().get_zoom();
-            *this.zoom_tween.borrow_mut() = Some(ZoomTween::new(current, target_zoom, duration));
-            Ok(())
-        });
+        methods.add_method(
+            "zoomTo",
+            |_, this, (target_zoom, duration, easing): (f32, f32, Option<String>)| {
+                let current = this.inner.borrow().get_zoom();
+                *this.zoom_tween.borrow_mut() = Some(ZoomTween::new_with_easing(
+                    current,
+                    target_zoom,
+                    duration,
+                    parse_zoom_easing(easing),
+                ));
+                Ok(())
+            },
+        );
 
         // -- stopZoom --
         /// Cancels the active smooth zoom tween immediately, leaving the camera at its current zoom level.
@@ -367,8 +544,10 @@ impl LuaUserData for LuaCamera2D {
         /// Applies this camera's transform to the render stack.
         /// @return | nil | No return value.
         methods.add_method("apply", |_, this, ()| {
-            let cmds = this.inner.borrow().begin_render_commands();
-            this.state.borrow_mut().render_commands.extend(cmds);
+            let mut state = this.state.borrow_mut();
+            this.inner
+                .borrow()
+                .append_begin_render_commands(&mut state.render_commands);
             Ok(())
         });
 
@@ -387,8 +566,10 @@ impl LuaUserData for LuaCamera2D {
         /// Alias for `apply()` that queues this camera's transform onto the render command stack.
         /// @return | nil | No return value.
         methods.add_method("attach", |_, this, ()| {
-            let cmds = this.inner.borrow().begin_render_commands();
-            this.state.borrow_mut().render_commands.extend(cmds);
+            let mut state = this.state.borrow_mut();
+            this.inner
+                .borrow()
+                .append_begin_render_commands(&mut state.render_commands);
             Ok(())
         });
 
@@ -403,7 +584,7 @@ impl LuaUserData for LuaCamera2D {
             Ok(())
         });
 
-        // -- Camera effects ?""""""""""""""""""""""""""""""""""""""""""""""?
+        // -- Camera effects -------------------------------------------------
 
         // -- zoomPulse --
         /// Triggers a momentary zoom-in effect that decays back to the base zoom level via a sine envelope.
@@ -495,6 +676,154 @@ impl LuaUserData for LuaCamera2D {
             Ok(this.inner.borrow().effect_offset())
         });
 
+        // -- getShakeOffset --
+        /// Returns current shake offset as x,y.
+        /// @return | number | Shake X offset
+        /// @return | number | Shake Y offset
+        methods.add_method("getShakeOffset", |_, this, ()| {
+            Ok(this.inner.borrow().get_shake_offset())
+        });
+
+        // -- getRenderOffset --
+        /// Returns canonical render offset (sway + shake) as x,y.
+        /// @return | number | Render X offset
+        /// @return | number | Render Y offset
+        methods.add_method("getRenderOffset", |_, this, ()| {
+            Ok(this.inner.borrow().render_offset())
+        });
+
+        // -- Zoom constraints ──────────────────────────────────────────
+
+        // -- setZoomConstraints --
+        /// Sets minimum and maximum zoom level constraints.
+        /// @param | min_zoom | number? | Minimum zoom level (nil = unconstrained)
+        /// @param | max_zoom | number? | Maximum zoom level (nil = unconstrained)
+        /// @return | nil | No return value.
+        methods.add_method(
+            "setZoomConstraints",
+            |_, this, (min_zoom, max_zoom): (Option<f32>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .set_zoom_constraints(min_zoom, max_zoom);
+                Ok(())
+            },
+        );
+
+        // -- getZoomConstraints --
+        /// Returns current zoom constraints as `(has_min, min, has_max, max)`.
+        /// @return | boolean | True if minimum zoom is constrained.
+        /// @return | number | Minimum zoom value (0 when unconstrained).
+        /// @return | boolean | True if maximum zoom is constrained.
+        /// @return | number | Maximum zoom value (0 when unconstrained).
+        methods.add_method("getZoomConstraints", |_, this, ()| {
+            let (min_z, max_z) = this.inner.borrow().get_zoom_constraints();
+            Ok((
+                min_z.is_some(),
+                min_z.unwrap_or(0.0),
+                max_z.is_some(),
+                max_z.unwrap_or(0.0),
+            ))
+        });
+
+        // -- setZoomDamping --
+        /// Sets the zoom damping factor for smooth zoom transitions.
+        /// @param | damping | number | Damping factor (0.0 = instant, 1.0 = maximum smoothing)
+        /// @return | nil | No return value.
+        methods.add_method("setZoomDamping", |_, this, damping: f32| {
+            this.inner.borrow_mut().set_zoom_damping(damping);
+            Ok(())
+        });
+
+        // -- getZoomDamping --
+        /// Returns the current zoom damping factor.
+        /// @return | number | Zoom damping factor
+        methods.add_method("getZoomDamping", |_, this, ()| {
+            Ok(this.inner.borrow().get_zoom_damping())
+        });
+
+        // -- Rotation constraints ──────────────────────────────────────
+
+        // -- setRotationConstraints --
+        /// Sets minimum and maximum rotation constraints in radians.
+        /// @param | min_rot | number? | Minimum rotation in radians (nil = unconstrained)
+        /// @param | max_rot | number? | Maximum rotation in radians (nil = unconstrained)
+        /// @return | nil | No return value.
+        methods.add_method(
+            "setRotationConstraints",
+            |_, this, (min_rot, max_rot): (Option<f32>, Option<f32>)| {
+                this.inner
+                    .borrow_mut()
+                    .set_rotation_constraints(min_rot, max_rot);
+                Ok(())
+            },
+        );
+
+        // -- getRotationConstraints --
+        /// Returns current rotation constraints as `(has_min, min, has_max, max)`.
+        /// @return | boolean | True if minimum rotation is constrained.
+        /// @return | number | Minimum rotation value (0 when unconstrained).
+        /// @return | boolean | True if maximum rotation is constrained.
+        /// @return | number | Maximum rotation value (0 when unconstrained).
+        methods.add_method("getRotationConstraints", |_, this, ()| {
+            let (min_r, max_r) = this.inner.borrow().get_rotation_constraints();
+            Ok((
+                min_r.is_some(),
+                min_r.unwrap_or(0.0),
+                max_r.is_some(),
+                max_r.unwrap_or(0.0),
+            ))
+        });
+
+        // -- setRotationDamping --
+        /// Sets the rotation damping factor for smooth rotation transitions.
+        /// @param | damping | number | Damping factor (0.0 = instant, 1.0 = maximum smoothing)
+        /// @return | nil | No return value.
+        methods.add_method("setRotationDamping", |_, this, damping: f32| {
+            this.inner.borrow_mut().set_rotation_damping(damping);
+            Ok(())
+        });
+
+        // -- getRotationDamping --
+        /// Returns the current rotation damping factor.
+        /// @return | number | Rotation damping factor
+        methods.add_method("getRotationDamping", |_, this, ()| {
+            Ok(this.inner.borrow().get_rotation_damping())
+        });
+
+        // -- Follow presets ────────────────────────────────────────────
+
+        // -- presetTightFollow --
+        /// Configures a tight follow setup: fast response, small dead zone, look-ahead enabled.
+        /// @return | nil | No return value.
+        methods.add_method("presetTightFollow", |_, this, ()| {
+            this.inner.borrow_mut().preset_tight_follow();
+            Ok(())
+        });
+
+        // -- presetCinematicFollow --
+        /// Configures a cinematic follow setup: slow response, large dead zone, no look-ahead.
+        /// @return | nil | No return value.
+        methods.add_method("presetCinematicFollow", |_, this, ()| {
+            this.inner.borrow_mut().preset_cinematic_follow();
+            Ok(())
+        });
+
+        // -- presetBalancedFollow --
+        /// Configures a balanced follow setup: moderate response, medium dead zone.
+        /// @return | nil | No return value.
+        methods.add_method("presetBalancedFollow", |_, this, ()| {
+            this.inner.borrow_mut().preset_balanced_follow();
+            Ok(())
+        });
+
+        // -- presetAggressiveFollow --
+        /// Configures an aggressive follow setup: maximum response, minimal dead zone, strong look-ahead.
+        /// @return | nil | No return value.
+        methods.add_method("presetAggressiveFollow", |_, this, ()| {
+            this.inner.borrow_mut().preset_aggressive_follow();
+            Ok(())
+        });
+
         // -- type --
         /// Returns the string type name of this userdata object.
         /// @return | string | The type name (e.g. "LScheduler", "LCamera", "LSignal")
@@ -506,6 +835,194 @@ impl LuaUserData for LuaCamera2D {
         /// @return | boolean | True if this object matches the given type name
         methods.add_method("typeOf", |_, _, name: String| {
             Ok(name == "LCamera" || name == "Object")
+        });
+    }
+}
+
+/// Lua-side wrapper around a named multi-camera rig.
+pub struct LuaCameraRig {
+    inner: Rc<RefCell<CameraRig2D>>,
+    state: Rc<RefCell<SharedState>>,
+}
+
+impl LuaUserData for LuaCameraRig {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- splitScreen --
+        /// Configures split-screen layout and ensures left/right cameras exist.
+        /// @param | window_w | number | Window width in pixels
+        /// @param | window_h | number | Window height in pixels
+        /// @return | nil | No return value.
+        methods.add_method(
+            "splitScreen",
+            |_, this, (window_w, window_h): (f32, f32)| {
+                this.inner
+                    .borrow_mut()
+                    .apply_split_screen_layout(window_w, window_h);
+                Ok(())
+            },
+        );
+
+        // -- minimap --
+        /// Configures main+minimap layout and ensures cameras exist.
+        /// @param | window_w | number | Window width in pixels
+        /// @param | window_h | number | Window height in pixels
+        /// @param | ratio | number? | Minimap size ratio (default 0.25)
+        /// @return | nil | No return value.
+        methods.add_method(
+            "minimap",
+            |_, this, (window_w, window_h, ratio): (f32, f32, Option<f32>)| {
+                this.inner.borrow_mut().apply_minimap_layout(
+                    window_w,
+                    window_h,
+                    ratio.unwrap_or(0.25),
+                );
+                Ok(())
+            },
+        );
+
+        // -- pictureInPicture --
+        /// Configures main+picture-in-picture layout and ensures cameras exist.
+        /// @param | window_w | number | Window width in pixels
+        /// @param | window_h | number | Window height in pixels
+        /// @param | pip_w | number? | PiP width (default 320)
+        /// @param | pip_h | number? | PiP height (default 180)
+        /// @return | nil | No return value.
+        methods.add_method(
+            "pictureInPicture",
+            |_, this, (window_w, window_h, pip_w, pip_h): (f32, f32, Option<f32>, Option<f32>)| {
+                this.inner.borrow_mut().apply_picture_in_picture_layout(
+                    window_w,
+                    window_h,
+                    pip_w.unwrap_or(320.0),
+                    pip_h.unwrap_or(180.0),
+                );
+                Ok(())
+            },
+        );
+
+        // -- setPosition --
+        /// Sets a named camera position in the rig.
+        /// @param | name | string | Camera name
+        /// @param | x | number | World X
+        /// @param | y | number | World Y
+        /// @return | nil | No return value.
+        methods.add_method(
+            "setPosition",
+            |_, this, (name, x, y): (String, f32, f32)| {
+                this.inner
+                    .borrow_mut()
+                    .ensure_camera(&name, 800.0, 600.0)
+                    .set_position(x, y);
+                Ok(())
+            },
+        );
+
+        // -- setZoom --
+        /// Sets a named camera zoom in the rig.
+        /// @param | name | string | Camera name
+        /// @param | zoom | number | Zoom value
+        /// @return | nil | No return value.
+        methods.add_method("setZoom", |_, this, (name, zoom): (String, f32)| {
+            this.inner
+                .borrow_mut()
+                .ensure_camera(&name, 800.0, 600.0)
+                .set_zoom(zoom);
+            Ok(())
+        });
+
+        // -- setTarget --
+        /// Sets a named camera follow target in the rig.
+        /// @param | name | string | Camera name
+        /// @param | x | number | Target X
+        /// @param | y | number | Target Y
+        /// @return | nil | No return value.
+        methods.add_method("setTarget", |_, this, (name, x, y): (String, f32, f32)| {
+            this.inner
+                .borrow_mut()
+                .ensure_camera(&name, 800.0, 600.0)
+                .set_target(x, y);
+            Ok(())
+        });
+
+        // -- updateAll --
+        /// Updates all cameras in the rig.
+        /// @param | dt | number | Delta time in seconds
+        /// @return | nil | No return value.
+        methods.add_method("updateAll", |_, this, dt: f32| {
+            this.inner.borrow_mut().update_all(dt);
+            Ok(())
+        });
+
+        // -- apply --
+        /// Appends render commands for a named camera.
+        /// @param | name | string | Camera name
+        /// @return | boolean | True if camera exists and was applied
+        methods.add_method("apply", |_, this, name: String| {
+            let rig = this.inner.borrow();
+            if let Some(cam) = rig.camera(&name) {
+                let mut state = this.state.borrow_mut();
+                cam.append_begin_render_commands(&mut state.render_commands);
+                return Ok(true);
+            }
+            Ok(false)
+        });
+
+        // -- getViewport --
+        /// Returns viewport for a named camera as `(ok, x, y, w, h)`.
+        /// @param | name | string | Camera name
+        /// @return | boolean | True if camera exists.
+        /// @return | number | Viewport X (0 when camera is missing).
+        /// @return | number | Viewport Y (0 when camera is missing).
+        /// @return | number | Viewport width (0 when camera is missing).
+        /// @return | number | Viewport height (0 when camera is missing).
+        methods.add_method("getViewport", |_, this, name: String| {
+            let out = if let Some((x, y, w, h)) = this.inner.borrow().viewport_of(&name) {
+                (true, x, y, w, h)
+            } else {
+                (false, 0.0, 0.0, 0.0, 0.0)
+            };
+            Ok(out)
+        });
+
+        // -- names --
+        /// Returns a table array of rig camera names.
+        /// @return | table | Camera names array
+        methods.add_method("names", |lua, this, ()| {
+            let names = this.inner.borrow().camera_names();
+            let table = lua.create_table()?;
+            for (idx, name) in names.iter().enumerate() {
+                table.set(idx + 1, name.as_str())?;
+            }
+            Ok(table)
+        });
+
+        // -- remove --
+        /// Removes a named camera from the rig.
+        /// @param | name | string | Camera name
+        /// @return | boolean | True if camera existed
+        methods.add_method("remove", |_, this, name: String| {
+            Ok(this.inner.borrow_mut().remove_camera(&name))
+        });
+
+        // -- has --
+        /// Returns true when rig contains a camera name.
+        /// @param | name | string | Camera name
+        /// @return | boolean | True when camera exists
+        methods.add_method("has", |_, this, name: String| {
+            Ok(this.inner.borrow().has_camera(&name))
+        });
+
+        // -- type --
+        /// Returns the type name of this userdata object.
+        /// @return | string | Type name string.
+        methods.add_method("type", |_, _, ()| Ok("LCameraRig"));
+
+        // -- typeOf --
+        /// Checks whether this object matches the given type name.
+        /// @param | name | string | Type name to check.
+        /// @return | boolean | True when object matches `name`.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LCameraRig" || name == "Object")
         });
     }
 }
@@ -529,13 +1046,10 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
             let vh = vh.unwrap_or(600.0);
-            lua.create_userdata(LuaCamera2D {
-                inner: Rc::new(RefCell::new(Camera2D::new(vw, vh))),
-                path: RefCell::new(None),
-                zoom_tween: RefCell::new(None),
-                parallax: RefCell::new(HashMap::new()),
-                state: s.clone(),
-            })
+            lua.create_userdata(make_lua_camera(
+                Rc::new(RefCell::new(Camera2D::new(vw, vh))),
+                s.clone(),
+            ))
         })?,
     )?;
 
@@ -550,11 +1064,22 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         lua.create_function(move |lua, (vw, vh): (Option<f32>, Option<f32>)| {
             let vw = vw.unwrap_or(800.0);
             let vh = vh.unwrap_or(600.0);
-            lua.create_userdata(LuaCamera2D {
-                inner: Rc::new(RefCell::new(Camera2D::new(vw, vh))),
-                path: RefCell::new(None),
-                zoom_tween: RefCell::new(None),
-                parallax: RefCell::new(HashMap::new()),
+            lua.create_userdata(make_lua_camera(
+                Rc::new(RefCell::new(Camera2D::new(vw, vh))),
+                s.clone(),
+            ))
+        })?,
+    )?;
+
+    // -- newRig --
+    /// Creates a multi-camera rig for split-screen, minimap, and PiP orchestration.
+    /// @return | LCameraRig | New camera rig object.
+    let s = state.clone();
+    tbl.set(
+        "newRig",
+        lua.create_function(move |lua, ()| {
+            lua.create_userdata(LuaCameraRig {
+                inner: Rc::new(RefCell::new(CameraRig2D::new())),
                 state: s.clone(),
             })
         })?,

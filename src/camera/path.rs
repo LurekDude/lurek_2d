@@ -86,13 +86,39 @@ impl CameraPath {
 // ZoomTween
 // ---------------------------------------------------------------------------
 
+/// Easing mode for camera-local tweens.
+///
+/// This type is intentionally camera-scoped and should be used when animating
+/// camera-only state (`CameraPath`, `CameraZoomTween`). For generic gameplay
+/// tweening, use the shared tween module.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum CameraTweenEasing {
+    /// Linear interpolation.
+    Linear,
+    /// Smoothstep interpolation (`t*t*(3-2*t)`).
+    SmoothStep,
+    /// Ease-out cubic interpolation.
+    EaseOutCubic,
+}
+
+impl CameraTweenEasing {
+    fn apply(self, t: f32) -> f32 {
+        let clamped = t.clamp(0.0, 1.0);
+        match self {
+            Self::Linear => clamped,
+            Self::SmoothStep => clamped * clamped * (3.0 - 2.0 * clamped),
+            Self::EaseOutCubic => 1.0 - (1.0 - clamped).powi(3),
+        }
+    }
+}
+
 /// Smoothly transitions a camera zoom level from a start value to a target
-/// value over a fixed duration (linear interpolation).
+/// value over a fixed duration.
 ///
 /// Call [`ZoomTween::update`] every frame; it returns the current zoom while
 /// active and `None` once it has finished.
 #[derive(Clone)]
-pub struct ZoomTween {
+pub struct CameraZoomTween {
     /// Zoom level at the start of the tween.
     pub start_zoom: f32,
     /// Desired final zoom level.
@@ -103,17 +129,30 @@ pub struct ZoomTween {
     pub elapsed: f32,
     /// `true` while the tween is running.
     pub active: bool,
+    /// Easing mode used for interpolation.
+    pub easing: CameraTweenEasing,
 }
 
-impl ZoomTween {
-    /// Creates a new `ZoomTween`.
+impl CameraZoomTween {
+    /// Creates a new `CameraZoomTween` with linear easing.
     pub fn new(start_zoom: f32, target_zoom: f32, duration: f32) -> Self {
-        ZoomTween {
+        Self::new_with_easing(start_zoom, target_zoom, duration, CameraTweenEasing::Linear)
+    }
+
+    /// Creates a new `CameraZoomTween` with explicit easing.
+    pub fn new_with_easing(
+        start_zoom: f32,
+        target_zoom: f32,
+        duration: f32,
+        easing: CameraTweenEasing,
+    ) -> Self {
+        CameraZoomTween {
             start_zoom,
             target_zoom,
             duration: duration.max(1e-6),
             elapsed: 0.0,
             active: true,
+            easing,
         }
     }
 
@@ -128,7 +167,7 @@ impl ZoomTween {
             self.active = false;
             return Some(self.target_zoom);
         }
-        let t = (self.elapsed / self.duration).clamp(0.0, 1.0);
+        let t = self.easing.apply(self.elapsed / self.duration);
         Some(self.start_zoom + (self.target_zoom - self.start_zoom) * t)
     }
 
@@ -141,3 +180,6 @@ impl ZoomTween {
         }
     }
 }
+
+/// Backward-compatible alias for camera-local zoom tween.
+pub type ZoomTween = CameraZoomTween;

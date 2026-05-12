@@ -1673,4 +1673,566 @@ describe("RelationshipManager regression: empty default_level", function()
     end)
 end)
 
+-- ===================================================================
+-- WeightedRandom
+-- ===================================================================
+
+-- @describe lurek.patterns.newWeightedRandom
+describe("lurek.patterns.newWeightedRandom", function()
+    ---@type fun():LWeightedRandom
+    local newWeightedRandom = lurek.patterns.newWeightedRandom
+
+    -- @covers lurek.patterns.newWeightedRandom
+    it("creates a WeightedRandom with correct type", function()
+        local wr = newWeightedRandom()
+        expect_equal("LWeightedRandom", wr["type"](wr))
+        expect_true(wr["typeOf"](wr, "LWeightedRandom"))
+        expect_true(wr["typeOf"](wr, "Object"))
+    end)
+
+    -- @covers LWeightedRandom:add
+    -- @covers LWeightedRandom:len
+    -- @covers lurek.patterns.newWeightedRandom
+    it("add increases len", function()
+        local wr = newWeightedRandom()
+        expect_equal(wr:len(), 0)
+        wr:add(1.0, "a")
+        expect_equal(wr:len(), 1)
+        wr:add(2.0, "b")
+        expect_equal(wr:len(), 2)
+    end)
+
+    -- @covers LWeightedRandom:isEmpty
+    -- @covers lurek.patterns.newWeightedRandom
+    it("isEmpty returns true when empty", function()
+        local wr = newWeightedRandom()
+        expect_true(wr:isEmpty())
+        wr:add(1.0, "x")
+        expect_true(not wr:isEmpty())
+    end)
+
+    -- @covers LWeightedRandom:totalWeight
+    -- @covers lurek.patterns.newWeightedRandom
+    it("totalWeight sums all weights", function()
+        local wr = newWeightedRandom()
+        wr:add(3.0, "a")
+        wr:add(7.0, "b")
+        expect_equal(wr:totalWeight(), 10.0)
+    end)
+
+    -- @covers LWeightedRandom:pick
+    -- @covers lurek.patterns.newWeightedRandom
+    it("pick returns nil for empty pool", function()
+        local wr = newWeightedRandom()
+        expect_equal(wr:pick(0.5), nil)
+    end)
+
+    -- @covers LWeightedRandom:add
+    -- @covers LWeightedRandom:pick
+    -- @covers lurek.patterns.newWeightedRandom
+    it("pick selects proportionally by weight", function()
+        local wr = newWeightedRandom()
+        wr:add(1.0, "low")   -- 0..10%
+        wr:add(9.0, "high")  -- 10..100%
+        local val = wr:pick(0.0)  -- minimum -> "low"
+        expect_equal(val, "low")
+        val = wr:pick(0.5)        -- middle -> "high"
+        expect_equal(val, "high")
+    end)
+
+    -- @covers LWeightedRandom:remove
+    -- @covers lurek.patterns.newWeightedRandom
+    it("remove decreases len and returns true", function()
+        local wr = newWeightedRandom()
+        local id = wr:add(1.0, "x")
+        expect_true(wr:remove(id))
+        expect_equal(wr:len(), 0)
+        expect_true(not wr:remove(id))
+    end)
+
+    -- @covers LWeightedRandom:setWeight
+    -- @covers lurek.patterns.newWeightedRandom
+    it("setWeight updates weight and totalWeight", function()
+        local wr = newWeightedRandom()
+        local id = wr:add(2.0, "a")
+        expect_equal(wr:totalWeight(), 2.0)
+        expect_true(wr:setWeight(id, 5.0))
+        expect_equal(wr:totalWeight(), 5.0)
+    end)
+
+    -- @covers LWeightedRandom:pickN
+    -- @covers lurek.patterns.newWeightedRandom
+    it("pickN returns distinct entries without replacement", function()
+        local wr = newWeightedRandom()
+        wr:add(1.0, "a")
+        wr:add(1.0, "b")
+        wr:add(1.0, "c")
+        local results = wr:pickN(2, {0.1, 0.5})
+        expect_equal(#results, 2)
+        expect_true(results[1] ~= results[2])
+    end)
+
+    -- @covers LWeightedRandom:clearAll
+    -- @covers lurek.patterns.newWeightedRandom
+    it("clearAll removes all entries", function()
+        local wr = newWeightedRandom()
+        wr:add(1.0, "a")
+        wr:add(2.0, "b")
+        wr:clearAll()
+        expect_equal(wr:len(), 0)
+        expect_true(wr:isEmpty())
+    end)
+
+    -- @covers LWeightedRandom:getRevision
+    -- @covers lurek.patterns.newWeightedRandom
+    it("getRevision increments on structural changes", function()
+        local wr = newWeightedRandom()
+        local r0 = wr:getRevision()
+        wr:add(1.0, "a")
+        expect_true(wr:getRevision() > r0)
+    end)
+end)
+
+-- ===================================================================
+-- BehaviorTree
+-- ===================================================================
+
+-- @describe lurek.patterns.newBehaviorTree
+describe("lurek.patterns.newBehaviorTree", function()
+    ---@type fun():LBehaviorTree
+    local newBehaviorTree = lurek.patterns.newBehaviorTree
+
+    -- @covers lurek.patterns.newBehaviorTree
+    it("creates a BehaviorTree with correct type", function()
+        local bt = newBehaviorTree()
+        expect_equal("LBehaviorTree", bt["type"](bt))
+        expect_true(bt["typeOf"](bt, "LBehaviorTree"))
+        expect_true(bt["typeOf"](bt, "Object"))
+    end)
+
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("tick returns failure when no root is set", function()
+        local bt = newBehaviorTree()
+        expect_equal(bt:tick(), "failure")
+    end)
+
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("single leaf returning success ticks successfully", function()
+        local bt = newBehaviorTree()
+        local leaf = bt:addLeaf("act")
+        bt:setLeaf("act", function() return "success" end)
+        bt:setRoot(leaf)
+        expect_equal(bt:tick(), "success")
+    end)
+
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addSequence
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("Sequence fails on first failure", function()
+        local bt = newBehaviorTree()
+        local seq = bt:addSequence()
+        local a = bt:addLeaf("a")
+        local b = bt:addLeaf("b")
+        bt:addChild(seq, a)
+        bt:addChild(seq, b)
+        bt:setLeaf("a", function() return "success" end)
+        bt:setLeaf("b", function() return "failure" end)
+        bt:setRoot(seq)
+        expect_equal(bt:tick(), "failure")
+    end)
+
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addSelector
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("Selector succeeds on first success", function()
+        local bt = newBehaviorTree()
+        local sel = bt:addSelector()
+        local a = bt:addLeaf("a")
+        local b = bt:addLeaf("b")
+        bt:addChild(sel, a)
+        bt:addChild(sel, b)
+        bt:setLeaf("a", function() return "failure" end)
+        bt:setLeaf("b", function() return "success" end)
+        bt:setRoot(sel)
+        expect_equal(bt:tick(), "success")
+    end)
+
+    -- @covers LBehaviorTree:addInverter
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("Inverter flips success to failure", function()
+        local bt = newBehaviorTree()
+        local inv = bt:addInverter()
+        local leaf = bt:addLeaf("ok")
+        bt:addChild(inv, leaf)
+        bt:setLeaf("ok", function() return "success" end)
+        bt:setRoot(inv)
+        expect_equal(bt:tick(), "failure")
+    end)
+
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addRepeat
+    -- @covers LBehaviorTree:addParallel
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("Parallel succeeds when min_success met", function()
+        local bt = newBehaviorTree()
+        local par = bt:addParallel(2)
+        local a = bt:addLeaf("a")
+        local b = bt:addLeaf("b")
+        local c = bt:addLeaf("c")
+        bt:addChild(par, a)
+        bt:addChild(par, b)
+        bt:addChild(par, c)
+        bt:setLeaf("a", function() return "success" end)
+        bt:setLeaf("b", function() return "success" end)
+        bt:setLeaf("c", function() return "failure" end)
+        bt:setRoot(par)
+        expect_equal(bt:tick(), "success")
+    end)
+
+    -- @covers LBehaviorTree:addRepeat
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("Repeat reaches success within one or two ticks", function()
+        local bt = newBehaviorTree()
+        local rep = bt:addRepeat(2)
+        local leaf = bt:addLeaf("ok")
+        bt:addChild(rep, leaf)
+        bt:setLeaf("ok", function() return "success" end)
+        bt:setRoot(rep)
+
+        local first = bt:tick()
+        if first == "running" then
+            expect_equal(bt:tick(), "success")
+        else
+            expect_equal(first, "success")
+        end
+    end)
+
+    -- @covers LBehaviorTree:resetState
+    -- @covers LBehaviorTree:addRepeat
+    -- @covers LBehaviorTree:addLeaf
+    -- @covers LBehaviorTree:addChild
+    -- @covers LBehaviorTree:setLeaf
+    -- @covers LBehaviorTree:setRoot
+    -- @covers LBehaviorTree:tick
+    -- @covers lurek.patterns.newBehaviorTree
+    it("resetState clears repeat runtime counters", function()
+        local bt = newBehaviorTree()
+        local rep = bt:addRepeat(2)
+        local leaf = bt:addLeaf("ok")
+        bt:addChild(rep, leaf)
+        bt:setLeaf("ok", function() return "success" end)
+        bt:setRoot(rep)
+
+        local first = bt:tick()
+        expect_true(first == "running" or first == "success")
+        bt:resetState()
+        local after_reset = bt:tick()
+        expect_true(after_reset == "running" or after_reset == "success")
+    end)
+
+    -- @covers LBehaviorTree:nodeCount
+    -- @covers lurek.patterns.newBehaviorTree
+    it("nodeCount returns correct count", function()
+        local bt = newBehaviorTree()
+        expect_equal(bt:nodeCount(), 0)
+        bt:addLeaf("a")
+        bt:addLeaf("b")
+        expect_equal(bt:nodeCount(), 2)
+    end)
+
+    -- @covers LBehaviorTree:clearAll
+    -- @covers lurek.patterns.newBehaviorTree
+    it("clearAll resets the tree", function()
+        local bt = newBehaviorTree()
+        local leaf = bt:addLeaf("x")
+        bt:setRoot(leaf)
+        bt:clearAll()
+        expect_equal(bt:nodeCount(), 0)
+        expect_equal(bt:tick(), "failure")
+    end)
+end)
+
+-- ===================================================================
+-- Graph
+-- ===================================================================
+
+-- @describe lurek.patterns.newGraph
+describe("lurek.patterns.newGraph", function()
+    ---@type fun(undirected?: boolean):any
+    local newGraph = lurek.patterns.newGraph
+
+    -- @covers lurek.patterns.newGraph
+    it("creates a Graph with correct type", function()
+        local g = newGraph()
+        expect_equal("LGraph", g["type"](g))
+        expect_true(g["typeOf"](g, "LGraph"))
+        expect_true(g["typeOf"](g, "Object"))
+    end)
+
+    -- @covers LGraph:addNode
+    -- @covers LGraph:nodeCount
+    -- @covers lurek.patterns.newGraph
+    it("addNode increases nodeCount", function()
+        local g = newGraph()
+        expect_equal(g:nodeCount(), 0)
+        g:addNode("a")
+        g:addNode("b")
+        expect_equal(g:nodeCount(), 2)
+    end)
+
+    -- @covers LGraph:addNode
+    -- @covers LGraph:hasNode
+    -- @covers lurek.patterns.newGraph
+    it("hasNode returns true for added nodes", function()
+        local g = newGraph()
+        local id = g:addNode("x")
+        expect_true(g:hasNode(id))
+        expect_true(not g:hasNode(9999))
+    end)
+
+    -- @covers LGraph:addEdge
+    -- @covers LGraph:edgeCount
+    -- @covers lurek.patterns.newGraph
+    it("addEdge increases edgeCount", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        g:addEdge(a, b)
+        expect_equal(g:edgeCount(), 1)
+    end)
+
+    -- @covers LGraph:addEdge
+    -- @covers LGraph:neighbors
+    -- @covers lurek.patterns.newGraph
+    it("neighbors returns reachable targets", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        local c = g:addNode("c")
+        g:addEdge(a, b)
+        g:addEdge(a, c)
+        local nbs = g:neighbors(a)
+        expect_equal(#nbs, 2)
+    end)
+
+    -- @covers LGraph:bfs
+    -- @covers lurek.patterns.newGraph
+    it("bfs visits all reachable nodes", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        local c = g:addNode("c")
+        g:addEdge(a, b)
+        g:addEdge(b, c)
+        local order = g:bfs(a)
+        expect_equal(#order, 3)
+        expect_equal(order[1], a)
+    end)
+
+    -- @covers LGraph:dfs
+    -- @covers lurek.patterns.newGraph
+    it("dfs visits all reachable nodes in depth-first order", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        local c = g:addNode("c")
+        g:addEdge(a, b)
+        g:addEdge(b, c)
+        local order = g:dfs(a)
+        expect_equal(#order, 3)
+        expect_equal(order[1], a)
+    end)
+
+    -- @covers LGraph:isConnected
+    -- @covers lurek.patterns.newGraph
+    it("isConnected returns true when path exists", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        local c = g:addNode("c")
+        g:addEdge(a, b)
+        g:addEdge(b, c)
+        expect_true(g:isConnected(a, c))
+        expect_true(not g:isConnected(c, a))
+    end)
+
+    -- @covers LGraph:addNode
+    -- @covers LGraph:getNodeValue
+    -- @covers lurek.patterns.newGraph
+    it("addNode stores a payload value", function()
+        local g = newGraph()
+        local id = g:addNode("city", {pop=1000})
+        local v = g:getNodeValue(id)
+        if v then
+            expect_equal(v.pop, 1000)
+        end
+    end)
+
+    -- @covers LGraph:removeNode
+    -- @covers lurek.patterns.newGraph
+    it("removeNode removes node and incident edges", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        g:addEdge(a, b)
+        expect_true(g:removeNode(a))
+        expect_equal(g:nodeCount(), 1)
+        expect_equal(g:edgeCount(), 0)
+    end)
+
+    -- @covers LGraph:clearAll
+    -- @covers lurek.patterns.newGraph
+    it("clearAll removes everything", function()
+        local g = newGraph()
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        g:addEdge(a, b)
+        g:clearAll()
+        expect_equal(g:nodeCount(), 0)
+        expect_equal(g:edgeCount(), 0)
+    end)
+
+    -- @covers LGraph:addEdge
+    -- @covers LGraph:neighbors
+    -- @covers lurek.patterns.newGraph
+    it("undirected graph adds reverse edge automatically", function()
+        local g = newGraph(true)
+        local a = g:addNode("a")
+        local b = g:addNode("b")
+        g:addEdge(a, b)
+        expect_true(g:isConnected(a, b))
+        expect_true(g:isConnected(b, a))
+    end)
+end)
+
+-- @describe patterns generic collections extensions
+describe("patterns generic collections extensions", function()
+    -- @covers LStack:pushBottom
+    -- @covers LStack:popBottom
+    -- @covers LStack:peekBottom
+    -- @covers LStack:peekAt
+    -- @covers LStack:insertAt
+    -- @covers LStack:removeAt
+    -- @covers LStack:moveWithin
+    -- @covers LStack:popMany
+    -- @covers lurek.patterns.newStack
+    it("stack supports bottom/index operations", function()
+        local s = lurek.patterns.newStack()
+        s:push("b")
+        s:pushBottom("a")
+        s:insertAt(3, "c")
+        expect_equal("a", s:peekBottom())
+        expect_equal("b", s:peekAt(2))
+        expect_true(s:moveWithin(3, 2))
+        expect_equal("c", s:peekAt(2))
+        expect_equal("c", s:removeAt(2))
+        local popped = s:popMany(2)
+        expect_equal(2, #popped)
+        expect_equal("a", popped[2])
+        expect_equal(nil, s:popBottom())
+    end)
+
+    -- @covers LQueue:enqueueFront
+    -- @covers LQueue:dequeueBack
+    -- @covers LQueue:back
+    -- @covers LQueue:peekAt
+    -- @covers LQueue:insertAt
+    -- @covers LQueue:removeAt
+    -- @covers lurek.patterns.newQueue
+    it("queue supports front/back/index operations", function()
+        local q = lurek.patterns.newQueue()
+        q:enqueue("b")
+        q:enqueueFront("a")
+        q:enqueue("d")
+        q:insertAt(3, "c")
+        expect_equal("a", q:front())
+        expect_equal("d", q:back())
+        expect_equal("b", q:peekAt(2))
+        expect_equal("c", q:removeAt(3))
+        expect_equal("d", q:dequeueBack())
+    end)
+
+    -- @covers LList:push
+    -- @covers LList:unshift
+    -- @covers LList:insert
+    -- @covers LList:pop
+    -- @covers LList:shift
+    -- @covers LList:indexOf
+    -- @covers LList:reverse
+    -- @covers lurek.patterns.newList
+    it("list supports extended deque and index operations", function()
+        local l = lurek.patterns.newList()
+        l:push("b")
+        l:unshift("a")
+        l:insert(3, "c")
+        expect_equal(2, l:indexOf("b"))
+        l:reverse()
+        expect_equal("c", l:get(1))
+        expect_equal("a", l:pop())
+        expect_equal("c", l:shift())
+    end)
+
+    -- @covers lurek.patterns.newMap
+    -- @covers LMap:set
+    -- @covers LMap:get
+    -- @covers LMap:has
+    -- @covers LMap:remove
+    -- @covers LMap:len
+    -- @covers LMap:isEmpty
+    -- @covers LMap:keys
+    -- @covers LMap:values
+    -- @covers LMap:entries
+    -- @covers LMap:merge
+    -- @covers LMap:clear
+    it("map supports dictionary workflow", function()
+        local m = lurek.patterns.newMap()
+        expect_true(m:isEmpty())
+        m:set("hp", 10)
+        m:set("name", "hero")
+        expect_true(m:has("hp"))
+        expect_equal(10, m:get("hp"))
+        expect_equal(2, m:len())
+        expect_true(#m:keys() >= 2)
+        expect_true(#m:values() >= 2)
+        expect_true(#m:entries() >= 2)
+
+        local other = lurek.patterns.newMap()
+        other:set("hp", 15)
+        other:set("mp", 7)
+        m:merge(other)
+        expect_equal(15, m:get("hp"))
+        expect_equal(7, m:get("mp"))
+        expect_true(m:remove("name"))
+        m:clear()
+        expect_true(m:isEmpty())
+    end)
+end)
+
 test_summary()

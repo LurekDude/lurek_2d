@@ -13,7 +13,10 @@
 
 use crate::log_msg;
 use crate::runtime::log_messages::{MD01_MGR_INIT, MD02_MOD_REG, MD04_ORDER_OK};
-use std::collections::{HashMap, HashSet};
+use sha2::{Digest, Sha256};
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::path::Path;
 
 /// Metadata record describing one registered game mod.
 ///
@@ -31,6 +34,8 @@ use std::collections::{HashMap, HashSet};
 /// - `api_version` â€” `Option<String>`.
 /// - `capabilities` â€” `Vec<String>`.
 /// - `config_schema` â€” `Vec<(String, String, String)>`.
+/// - `asset_paths` â€” `Vec<String>`.
+/// - `signature` â€” `Option<String>`.
 #[derive(Debug, Clone)]
 pub struct ModInfo {
     /// Unique mod identifier.
@@ -62,6 +67,10 @@ pub struct ModInfo {
     /// Config schema: list of `(key, type_hint, default_value)` triples declared
     /// in the `[config]` section of `mod.toml`. Used for validation and tooling.
     pub config_schema: Vec<(String, String, String)>,
+    /// Declared asset paths used for conflict detection during folder scans.
+    pub asset_paths: Vec<String>,
+    /// Optional integrity signature for the manifest metadata.
+    pub signature: Option<String>,
 }
 
 impl ModInfo {
@@ -89,6 +98,8 @@ impl ModInfo {
             api_version: None,
             capabilities: Vec::new(),
             config_schema: Vec::new(),
+            asset_paths: Vec::new(),
+            signature: None,
         }
     }
 
@@ -151,6 +162,8 @@ pub struct ModManager {
     custom_load_order: Option<Vec<String>>,
     /// Queue of mod IDs that have been marked for hot-reload.
     reload_queue: Vec<String>,
+    /// Fast membership set for the reload queue so duplicate marks stay O(1).
+    reload_queue_set: HashSet<String>,
 }
 
 impl ModManager {
@@ -164,6 +177,7 @@ impl ModManager {
             mods: Vec::new(),
             custom_load_order: None,
             reload_queue: Vec::new(),
+            reload_queue_set: HashSet::new(),
         }
     }
 
@@ -176,6 +190,8 @@ impl ModManager {
     ///
     /// If a mod with the same ID already exists it is replaced.
     pub fn register_mod(&mut self, info: ModInfo) {
+        self.reload_queue.retain(|queued| queued != &info.id);
+        self.reload_queue_set.remove(info.id.as_str());
         if let Some(pos) = self.mods.iter().position(|m| m.id == info.id) {
             self.mods[pos] = info;
         } else {
@@ -197,6 +213,7 @@ impl ModManager {
         if let Some(pos) = self.mods.iter().position(|m| m.id == id) {
             self.mods.remove(pos);
             self.reload_queue.retain(|q| q != id);
+            self.reload_queue_set.remove(id);
             true
         } else {
             false
@@ -252,6 +269,20 @@ impl ModManager {
         &self.mods
     }
 
+    /// Returns the registered mods that declare a given capability flag.
+    ///
+    /// # Parameters
+    /// - `capability` — `&str`.
+    ///
+    /// # Returns
+    /// `Vec<&ModInfo>`.
+    pub fn get_mods_by_capability(&self, capability: &str) -> Vec<&ModInfo> {
+        self.mods
+            .iter()
+            .filter(|mod_info| mod_info.capabilities.iter().any(|cap| cap == capability))
+            .collect()
+    }
+
     // â”€â”€ Load Order â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// Get mods in their effective load order. Returns an error if the source data is malformed or missing.
@@ -274,20 +305,261 @@ impl ModManager {
                     seen.insert(m.id.as_str());
                 }
             }
-            // Append remaining mods sorted by priority
+            // Append remaining mods in dependency order when possible.
             let mut remainder: Vec<&ModInfo> = self
                 .mods
                 .iter()
                 .filter(|m| !seen.contains(m.id.as_str()))
                 .collect();
-            remainder.sort_by(|a, b| a.priority.cmp(&b.priority).then(a.id.cmp(&b.id)));
+            remainder = Self::sort_by_priority(remainder);
             result.extend(remainder);
             result
         } else {
-            let mut sorted: Vec<&ModInfo> = self.mods.iter().collect();
-            sorted.sort_by(|a, b| a.priority.cmp(&b.priority).then(a.id.cmp(&b.id)));
-            sorted
+            match self.topological_order() {
+                Ok(sorted) => sorted,
+                Err(cycle_ids) => {
+                    ::log::warn!("mod dependency cycle detected: {:?}", cycle_ids);
+                    Self::sort_by_priority(self.mods.iter().collect())
+                }
+            }
         }
+    }
+
+    fn sort_by_priority(mods: Vec<&ModInfo>) -> Vec<&ModInfo> {
+        let mut sorted = mods;
+        sorted.sort_by(|a, b| a.priority.cmp(&b.priority).then(a.id.cmp(&b.id)));
+        sorted
+    }
+
+    fn topological_order(&self) -> Result<Vec<&ModInfo>, Vec<String>> {
+        let mut index_by_id: HashMap<&str, usize> = HashMap::new();
+        for (index, info) in self.mods.iter().enumerate() {
+            index_by_id.insert(info.id.as_str(), index);
+        }
+
+        let mut indegree = vec![0usize; self.mods.len()];
+        let mut outgoing = vec![Vec::<usize>::new(); self.mods.len()];
+
+        for (index, info) in self.mods.iter().enumerate() {
+            for dependency in &info.dependencies {
+                if let Some(&dependency_index) = index_by_id.get(dependency.as_str()) {
+                    outgoing[dependency_index].push(index);
+                    indegree[index] += 1;
+                }
+            }
+        }
+
+        let mut ready: BinaryHeap<Reverse<(i32, String, usize)>> = BinaryHeap::new();
+        for (index, info) in self.mods.iter().enumerate() {
+            if indegree[index] == 0 {
+                ready.push(Reverse((info.priority, info.id.clone(), index)));
+            }
+        }
+
+        let mut ordered = Vec::with_capacity(self.mods.len());
+        while let Some(Reverse((_priority, _id, index))) = ready.pop() {
+            ordered.push(&self.mods[index]);
+            for &dependent in &outgoing[index] {
+                if indegree[dependent] > 0 {
+                    indegree[dependent] -= 1;
+                    if indegree[dependent] == 0 {
+                        let info = &self.mods[dependent];
+                        ready.push(Reverse((info.priority, info.id.clone(), dependent)));
+                    }
+                }
+            }
+        }
+
+        if ordered.len() != self.mods.len() {
+            let cycle_ids = self
+                .mods
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| indegree[*index] > 0)
+                .map(|(_, info)| info.id.clone())
+                .collect();
+            Err(cycle_ids)
+        } else {
+            Ok(ordered)
+        }
+    }
+
+    fn manifest_signature(info: &ModInfo) -> String {
+        let mut hasher = Sha256::new();
+        hasher.update(info.id.as_bytes());
+        hasher.update([0]);
+        hasher.update(info.name.as_bytes());
+        hasher.update([0]);
+        hasher.update(info.version.as_bytes());
+        hasher.update([0]);
+        hasher.update(info.author.as_bytes());
+        hasher.update([0]);
+        hasher.update(info.description.as_bytes());
+        hasher.update([0]);
+        hasher.update(info.priority.to_le_bytes());
+        hasher.update([0]);
+        for dependency in &info.dependencies {
+            hasher.update(dependency.as_bytes());
+            hasher.update([0]);
+        }
+        for capability in &info.capabilities {
+            hasher.update(capability.as_bytes());
+            hasher.update([0]);
+        }
+        for asset_path in &info.asset_paths {
+            hasher.update(asset_path.as_bytes());
+            hasher.update([0]);
+        }
+        for (key, type_hint, default) in &info.config_schema {
+            hasher.update(key.as_bytes());
+            hasher.update([0]);
+            hasher.update(type_hint.as_bytes());
+            hasher.update([0]);
+            hasher.update(default.as_bytes());
+            hasher.update([0]);
+        }
+        hex::encode(hasher.finalize())
+    }
+
+    fn manifest_conflicts(&self, info: &ModInfo) -> Vec<(String, String)> {
+        let mut conflicts = Vec::new();
+        for asset_path in &info.asset_paths {
+            for existing in &self.mods {
+                if existing.id != info.id
+                    && existing.asset_paths.iter().any(|path| path == asset_path)
+                {
+                    conflicts.push((asset_path.clone(), existing.id.clone()));
+                    break;
+                }
+            }
+        }
+        conflicts
+    }
+
+    fn parse_manifest(entry_path: &Path, content: &str) -> Result<(ModInfo, Vec<String>), String> {
+        let value: toml::Value = content
+            .parse()
+            .map_err(|err| format!("{}: invalid TOML: {}", entry_path.display(), err))?;
+        let table = value.as_table().ok_or_else(|| {
+            format!(
+                "{}: mod.toml must contain a TOML table",
+                entry_path.display()
+            )
+        })?;
+
+        let id = table
+            .get("id")
+            .and_then(|value| value.as_str())
+            .ok_or_else(|| {
+                format!(
+                    "{}: missing required string field 'id'",
+                    entry_path.display()
+                )
+            })?
+            .to_string();
+
+        let dependencies = table
+            .get("dependencies")
+            .and_then(|value| value.as_array())
+            .map(|items| {
+                items
+                    .iter()
+                    .filter_map(|item| item.as_str().map(str::to_string))
+                    .collect()
+            })
+            .unwrap_or_default();
+
+        let mut info = ModInfo::from_parts(
+            id,
+            table
+                .get("name")
+                .and_then(|value| value.as_str())
+                .map(str::to_string),
+            table
+                .get("version")
+                .and_then(|value| value.as_str())
+                .map(str::to_string),
+            table
+                .get("author")
+                .and_then(|value| value.as_str())
+                .map(str::to_string),
+            table
+                .get("description")
+                .and_then(|value| value.as_str())
+                .map(str::to_string),
+            table
+                .get("priority")
+                .and_then(|value| value.as_integer())
+                .map(|value| value as i32),
+            dependencies,
+        );
+        info.path = Some(entry_path.to_string_lossy().into_owned());
+
+        let mut warnings = Vec::new();
+
+        if let Some(items) = table.get("capabilities").and_then(|value| value.as_array()) {
+            info.capabilities = items
+                .iter()
+                .filter_map(|item| item.as_str().map(str::to_string))
+                .collect();
+        }
+
+        if let Some(items) = table.get("assets").and_then(|value| value.as_array()) {
+            info.asset_paths = items
+                .iter()
+                .filter_map(|item| item.as_str().map(str::to_string))
+                .collect();
+        }
+
+        if let Some(signature) = table.get("signature").and_then(|value| value.as_str()) {
+            info.signature = Some(signature.to_string());
+        }
+
+        if let Some(schema) = table
+            .get("config_schema")
+            .and_then(|value| value.as_array())
+        {
+            let mut parsed_schema = Vec::new();
+            for entry in schema {
+                let Some(entry_table) = entry.as_table() else {
+                    warnings.push(format!(
+                        "{}: ignored non-table config_schema entry",
+                        entry_path.display()
+                    ));
+                    continue;
+                };
+                let Some(key) = entry_table.get("key").and_then(|value| value.as_str()) else {
+                    warnings.push(format!(
+                        "{}: config_schema entry missing string key",
+                        entry_path.display()
+                    ));
+                    continue;
+                };
+                let type_hint = entry_table
+                    .get("type")
+                    .and_then(|value| value.as_str())
+                    .unwrap_or("any");
+                let default = entry_table
+                    .get("default")
+                    .map(|value| value.to_string())
+                    .unwrap_or_default();
+                parsed_schema.push((key.to_string(), type_hint.to_string(), default));
+            }
+            info.config_schema = parsed_schema;
+        }
+
+        if let Some(signature) = &info.signature {
+            let expected = Self::manifest_signature(&info);
+            if signature != &expected {
+                return Err(format!(
+                    "{}: signature mismatch for mod '{}'",
+                    entry_path.display(),
+                    info.id
+                ));
+            }
+        }
+
+        Ok((info, warnings))
     }
 
     /// Set an explicit load order by providing a list of mod IDs.
@@ -326,7 +598,8 @@ impl ModManager {
     ///
     /// Each immediate subdirectory of `path` that contains a `mod.toml` file is
     /// parsed into a [`ModInfo`] and registered. Subdirectories without `mod.toml`
-    /// are silently skipped.
+    /// are silently skipped. Malformed manifests and signature/asset conflicts are
+    /// reported through the engine log and skipped.
     ///
     /// Expected `mod.toml` fields (all optional except `id`):
     /// ```toml
@@ -360,42 +633,32 @@ impl ModManager {
             }
             let content = match std::fs::read_to_string(&toml_path) {
                 Ok(c) => c,
-                Err(_) => continue,
+                Err(err) => {
+                    ::log::warn!("{}: {}", toml_path.display(), err);
+                    continue;
+                }
             };
-            let value: toml::Value = match content.parse() {
-                Ok(v) => v,
-                Err(_) => continue,
+            let (info, warnings) = match Self::parse_manifest(&toml_path, &content) {
+                Ok(value) => value,
+                Err(err) => {
+                    ::log::warn!("{}", err);
+                    continue;
+                }
             };
-            let table = match value.as_table() {
-                Some(t) => t,
-                None => continue,
-            };
-            let id = match table.get("id").and_then(|v| v.as_str()) {
-                Some(s) => s.to_string(),
-                None => continue, // id is required
-            };
-            let mut info = ModInfo::new(id);
-            info.path = Some(entry_path.to_string_lossy().into_owned());
-            if let Some(v) = table.get("name").and_then(|v| v.as_str()) {
-                info.name = v.to_string();
+
+            for warning in warnings {
+                ::log::warn!("{}", warning);
             }
-            if let Some(v) = table.get("version").and_then(|v| v.as_str()) {
-                info.version = v.to_string();
-            }
-            if let Some(v) = table.get("author").and_then(|v| v.as_str()) {
-                info.author = v.to_string();
-            }
-            if let Some(v) = table.get("description").and_then(|v| v.as_str()) {
-                info.description = v.to_string();
-            }
-            if let Some(v) = table.get("priority").and_then(|v| v.as_integer()) {
-                info.priority = v as i32;
-            }
-            if let Some(arr) = table.get("dependencies").and_then(|v| v.as_array()) {
-                info.dependencies = arr
-                    .iter()
-                    .filter_map(|v| v.as_str().map(str::to_string))
-                    .collect();
+
+            let conflicts = self.manifest_conflicts(&info);
+            if !conflicts.is_empty() {
+                ::log::warn!(
+                    "{}: asset path conflict(s) detected for mod '{}': {:?}",
+                    toml_path.display(),
+                    info.id,
+                    conflicts
+                );
+                continue;
             }
             self.register_mod(info.clone());
             discovered.push(info);
@@ -420,7 +683,10 @@ impl ModManager {
         if !self.has_mod(id) {
             return false;
         }
-        if !self.reload_queue.contains(&id.to_string()) {
+        if let Some(info) = self.get_mod_mut(id) {
+            info.loaded = false;
+        }
+        if self.reload_queue_set.insert(id.to_string()) {
             self.reload_queue.push(id.to_string());
         }
         true
@@ -437,9 +703,56 @@ impl ModManager {
     /// Clear the reload queue without reloading anything.
     pub fn clear_reload_queue(&mut self) {
         self.reload_queue.clear();
+        self.reload_queue_set.clear();
     }
 
-    // â”€â”€ Dependency Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /// Reloads every queued mod from disk and clears the queue.
+    ///
+    /// # Returns
+    /// `Vec<String>` of mod IDs that were successfully reloaded.
+    pub fn process_reload_queue(&mut self) -> Vec<String> {
+        let queued = std::mem::take(&mut self.reload_queue);
+        self.reload_queue_set.clear();
+
+        let mut reloaded = Vec::new();
+        for id in queued {
+            let Some(path) = self.get_mod(&id).and_then(|info| info.path.clone()) else {
+                ::log::warn!(
+                    "mod '{}' cannot be reloaded because it has no manifest path",
+                    id
+                );
+                continue;
+            };
+
+            let content = match std::fs::read_to_string(&path) {
+                Ok(content) => content,
+                Err(err) => {
+                    ::log::warn!("{}: {}", path, err);
+                    continue;
+                }
+            };
+
+            let (mut info, warnings) = match Self::parse_manifest(Path::new(&path), &content) {
+                Ok(value) => value,
+                Err(err) => {
+                    ::log::warn!("{}", err);
+                    continue;
+                }
+            };
+
+            for warning in warnings {
+                ::log::warn!("{}", warning);
+            }
+
+            info.loaded = true;
+            self.register_mod(info);
+            reloaded.push(id);
+        }
+
+        reloaded
+    }
+
+    // â”€â”€ Dependency Validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     /// List mod IDs whose dependencies are missing.
     ///
@@ -463,51 +776,6 @@ impl ModManager {
     /// # Returns
     /// `bool`.
     pub fn has_circular_dependencies(&self) -> bool {
-        let dep_map: HashMap<&str, Vec<&str>> = self
-            .mods
-            .iter()
-            .map(|m| {
-                (
-                    m.id.as_str(),
-                    m.dependencies.iter().map(|d| d.as_str()).collect(),
-                )
-            })
-            .collect();
-
-        let mut visited = HashSet::new();
-        let mut visiting = HashSet::new();
-
-        for m in &self.mods {
-            if self.visit_cycle(m.id.as_str(), &dep_map, &mut visiting, &mut visited) {
-                return true;
-            }
-        }
-        false
-    }
-
-    fn visit_cycle<'a>(
-        &self,
-        id: &'a str,
-        dep_map: &HashMap<&str, Vec<&'a str>>,
-        visiting: &mut HashSet<&'a str>,
-        visited: &mut HashSet<&'a str>,
-    ) -> bool {
-        if visiting.contains(id) {
-            return true;
-        }
-        if visited.contains(id) {
-            return false;
-        }
-        visiting.insert(id);
-        if let Some(deps) = dep_map.get(id) {
-            for &dep in deps {
-                if self.visit_cycle(dep, dep_map, visiting, visited) {
-                    return true;
-                }
-            }
-        }
-        visiting.remove(id);
-        visited.insert(id);
-        false
+        self.topological_order().is_err()
     }
 }

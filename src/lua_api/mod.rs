@@ -95,6 +95,7 @@ pub mod terminal_api;
 pub mod pipeline_api;
 
 /// Registers the `lurek.graph.*` directed-graph and item-flow simulation API.
+#[cfg(feature = "graph")]
 pub mod graph_api;
 
 /// Registers the `lurek.html.*` lightweight HTML/CSS layout engine API.

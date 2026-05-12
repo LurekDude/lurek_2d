@@ -38,6 +38,8 @@
 //! | `ring.rs` | [`Ring`], [`RingEntry`] |
 //! | `funnel.rs` | [`Funnel`], [`FunnelEntry`] |
 
+/// Behaviour tree nodes for composite AI logic (Sequence, Selector, Parallel, Leaf, Inverter, Repeat).
+pub mod behavior_tree;
 /// Bidirectional key–value map for two-way lookups.
 pub mod bimap;
 /// Shared typed key-value store for AI and game system coordination.
@@ -52,6 +54,8 @@ pub mod event_bus;
 pub mod factory;
 /// Time-windowed event aggregator and batch collector.
 pub mod funnel;
+/// Generic directed/undirected weighted graph for pathfinding and relationship graphs.
+pub mod graph;
 /// Named-channel message broker for decoupled communication.
 pub mod mediator;
 /// Slot-tracking pool to recycle Lua objects without GC pressure.
@@ -74,7 +78,10 @@ pub mod strategy;
 pub mod throttle;
 /// String prefix-index trie for autocomplete and tag filtering.
 pub mod trie;
+/// Weighted random selector for loot tables, spawn probability, and weighted picks.
+pub mod weighted_random;
 
+pub use behavior_tree::{BehaviorTree, BtNode, BtRunState, BtStatus, NodeId, NodeKind};
 pub use bimap::BiMap;
 pub use blackboard::{Blackboard, BlackboardValue};
 pub use collections::{QueueMeta, StackMeta};
@@ -82,6 +89,7 @@ pub use command_stack::{CommandEntry, CommandStack};
 pub use event_bus::{EventBus, Subscription};
 pub use factory::Factory;
 pub use funnel::{Funnel, FunnelEntry};
+pub use graph::{Graph, GraphEdge, GraphNode};
 pub use mediator::Mediator;
 pub use object_pool::ObjectPool;
 pub use observer::{Observer, ObserverEntry};
@@ -93,3 +101,4 @@ pub use state_machine::{StateMachine, TransitionRule};
 pub use strategy::Strategy;
 pub use throttle::{Debounce, Throttle};
 pub use trie::Trie;
+pub use weighted_random::{WeightedEntry, WeightedRandom};

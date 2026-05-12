@@ -62,7 +62,9 @@ do -- lurek.patterns.newFactory
   local enemies = lurek.patterns.newFactory()
   enemies:register("goblin", function(x, y) return { kind = "goblin", x = x, y = y, hp = 20 } end)
   local g = enemies:create("goblin", 64, 32)
-  print("spawned " .. g.kind .. " at " .. g.x .. "," .. g.y)
+  if g then
+    print("spawned " .. g.kind .. " at " .. g.x .. "," .. g.y)
+  end
 end
 
 --@api-stub: lurek.patterns.newSimpleState
@@ -103,7 +105,7 @@ end
 do -- lurek.patterns.newThrottle
   local fire = lurek.patterns.newThrottle(0.25)
   fire:onFire(function() print("BANG") end)
-  function lurek.process(dt) if lurek.input.isDown("space") then fire:update(dt) end end
+  fire:update(0.016)
 end
 
 --@api-stub: lurek.patterns.newDebounce
@@ -526,7 +528,9 @@ do -- Factory:create
   local f = lurek.patterns.newFactory()
   f:register("coin", function(v) return { kind = "coin", value = v } end)
   local c = f:create("coin", 50)
-  print("dropped " .. c.value .. " gold")
+  if c then
+    print("dropped " .. c.value .. " gold")
+  end
 end
 
 --@api-stub: LFactory:has
@@ -546,7 +550,9 @@ do -- Factory:alias
   f:register("goblin", function() return { kind = "goblin" } end)
   f:alias("monster_v1", "goblin")
   local m = f:create("monster_v1")
-  print("created via alias: " .. m.kind)
+  if m then
+    print("created via alias: " .. m.kind)
+  end
 end
 
 --@api-stub: LFactory:getTypes
@@ -1815,4 +1821,252 @@ do -- LList:toArray
   lst:add(30)
   local arr = lst:toArray()
   lurek.log.info("arr[2]=" .. tostring(arr[2]), "patterns")
+end
+
+--@api-stub: lurek.patterns.newWeightedRandom
+--@api-stub: lurek.patterns.newBehaviorTree
+--@api-stub: lurek.patterns.newGraph
+do -- new factories
+  local wr = lurek.patterns.newWeightedRandom()
+  local bt = lurek.patterns.newBehaviorTree()
+  local g = lurek.patterns.newGraph()
+  if wr and bt and g then
+    lurek.log.debug("new patterns factories ready", "patterns")
+  end
+end
+
+--@api-stub: LWeightedRandom:add
+--@api-stub: LWeightedRandom:remove
+--@api-stub: LWeightedRandom:setWeight
+--@api-stub: LWeightedRandom:pick
+--@api-stub: LWeightedRandom:pickN
+--@api-stub: LWeightedRandom:totalWeight
+--@api-stub: LWeightedRandom:len
+--@api-stub: LWeightedRandom:isEmpty
+--@api-stub: LWeightedRandom:clearAll
+--@api-stub: LWeightedRandom:getRevision
+do -- LWeightedRandom methods
+  local wr = lurek.patterns.newWeightedRandom()
+  local id_a = wr:add(1.0, "a", "low")
+  local id_b = wr:add(9.0, "b", "high")
+  wr:setWeight(id_a, 2.0)
+  local one = wr:pick(0.3)
+  local many = wr:pickN(2, { 0.1, 0.9 })
+  local tw = wr:totalWeight()
+  local n = wr:len()
+  local empty = wr:isEmpty()
+  local rev = wr:getRevision()
+  wr:remove(id_b)
+  wr:clearAll()
+  lurek.log.debug(
+    "wr sample=" .. tostring(one) .. " n=" .. tostring(n) .. " empty=" .. tostring(empty) .. " rev=" .. tostring(rev) .. " tw=" .. tostring(tw) .. " picks=" .. tostring(#many),
+    "patterns"
+  )
+end
+
+--@api-stub: LBehaviorTree:addSequence
+--@api-stub: LBehaviorTree:addSelector
+--@api-stub: LBehaviorTree:addParallel
+--@api-stub: LBehaviorTree:addInverter
+--@api-stub: LBehaviorTree:addRepeat
+--@api-stub: LBehaviorTree:addLeaf
+--@api-stub: LBehaviorTree:addChild
+--@api-stub: LBehaviorTree:setRoot
+--@api-stub: LBehaviorTree:setLeaf
+--@api-stub: LBehaviorTree:tick
+--@api-stub: LBehaviorTree:resetState
+--@api-stub: LBehaviorTree:nodeCount
+--@api-stub: LBehaviorTree:clearAll
+do -- LBehaviorTree methods
+  local bt = lurek.patterns.newBehaviorTree()
+  local seq = bt:addSequence("root-seq")
+  local sel = bt:addSelector("fallback")
+  local par = bt:addParallel(1, "parallel")
+  local inv = bt:addInverter("invert")
+  local rep = bt:addRepeat(2, "repeat")
+  local leaf_ok = bt:addLeaf("ok", "ok-leaf")
+  local leaf_fail = bt:addLeaf("fail", "fail-leaf")
+
+  bt:addChild(seq, sel)
+  bt:addChild(sel, par)
+  bt:addChild(par, inv)
+  bt:addChild(inv, rep)
+  bt:addChild(rep, leaf_ok)
+  bt:addChild(sel, leaf_fail)
+
+  bt:setLeaf("ok", function() return "success" end)
+  bt:setLeaf("fail", function() return "failure" end)
+  bt:setRoot(seq)
+
+  local status = bt:tick()
+  local count = bt:nodeCount()
+  bt:resetState()
+  bt:clearAll()
+  lurek.log.debug("bt status=" .. tostring(status) .. " nodes=" .. tostring(count), "patterns")
+end
+
+--@api-stub: LGraph:addNode
+--@api-stub: LGraph:removeNode
+--@api-stub: LGraph:getNodeValue
+--@api-stub: LGraph:addEdge
+--@api-stub: LGraph:removeEdge
+--@api-stub: LGraph:neighbors
+--@api-stub: LGraph:bfs
+--@api-stub: LGraph:dfs
+--@api-stub: LGraph:isConnected
+--@api-stub: LGraph:hasNode
+--@api-stub: LGraph:nodeCount
+--@api-stub: LGraph:edgeCount
+--@api-stub: LGraph:clearAll
+do -- LGraph methods
+  local g = lurek.patterns.newGraph(true)
+  local a = g:addNode("A", { hp = 10 })
+  local b = g:addNode("B", { hp = 20 })
+  local c = g:addNode("C", { hp = 30 })
+  local eid = g:addEdge(a, b, 1.5, "road")
+  g:addEdge(b, c, 2.0, "path")
+
+  local val = g:getNodeValue(a)
+  local nbs = g:neighbors(a)
+  local bfs = g:bfs(a)
+  local dfs = g:dfs(a)
+  local conn = g:isConnected(a, c)
+  local has = g:hasNode(c)
+  local nc = g:nodeCount()
+  local ec = g:edgeCount()
+
+  g:removeEdge(eid)
+  g:removeNode(c)
+  g:clearAll()
+  lurek.log.debug(
+    "graph hp=" .. tostring(val and val.hp) .. " nbs=" .. tostring(#nbs) .. " bfs=" .. tostring(#bfs) .. " dfs=" .. tostring(#dfs) .. " conn=" .. tostring(conn) .. " has=" .. tostring(has) .. " nc=" .. tostring(nc) .. " ec=" .. tostring(ec),
+    "patterns"
+  )
+end
+
+--@api-stub: lurek.patterns.newMap
+-- Creates a string-keyed map/dictionary.
+do -- lurek.patterns.newMap
+  local m = lurek.patterns.newMap()
+  m:set("k", 1)
+  print("map has k=" .. tostring(m:has("k")))
+end
+
+--@api-stub: LStack:pushBottom
+--@api-stub: LStack:popBottom
+--@api-stub: LStack:peekBottom
+--@api-stub: LStack:peekAt
+--@api-stub: LStack:insertAt
+--@api-stub: LStack:removeAt
+--@api-stub: LStack:moveWithin
+--@api-stub: LStack:popMany
+do -- LStack extra methods
+  local s = lurek.patterns.newStack(10)
+  s:push("b")
+  s:pushBottom("a")
+  s:insertAt(3, "c")
+  local bottom = s:peekBottom()
+  local at2 = s:peekAt(2)
+  s:moveWithin(3, 2)
+  local removed = s:removeAt(2)
+  local popped = s:popMany(1)
+  local from_bottom = s:popBottom()
+  lurek.log.debug(
+    "stack extra bottom=" .. tostring(bottom) ..
+    " at2=" .. tostring(at2) ..
+    " removed=" .. tostring(removed) ..
+    " popMany=" .. tostring(#popped) ..
+    " popBottom=" .. tostring(from_bottom),
+    "patterns"
+  )
+end
+
+--@api-stub: LQueue:enqueueFront
+--@api-stub: LQueue:dequeueBack
+--@api-stub: LQueue:back
+--@api-stub: LQueue:peekAt
+--@api-stub: LQueue:insertAt
+--@api-stub: LQueue:removeAt
+do -- LQueue extra methods
+  local q = lurek.patterns.newQueue(10)
+  q:enqueue("b")
+  q:enqueueFront("a")
+  q:enqueue("d")
+  q:insertAt(3, "c")
+  local b = q:back()
+  local p = q:peekAt(2)
+  local r = q:removeAt(3)
+  local db = q:dequeueBack()
+  lurek.log.debug(
+    "queue extra back=" .. tostring(b) ..
+    " peekAt=" .. tostring(p) ..
+    " removeAt=" .. tostring(r) ..
+    " dequeueBack=" .. tostring(db),
+    "patterns"
+  )
+end
+
+--@api-stub: LList:push
+--@api-stub: LList:unshift
+--@api-stub: LList:insert
+--@api-stub: LList:pop
+--@api-stub: LList:shift
+--@api-stub: LList:indexOf
+--@api-stub: LList:reverse
+do -- LList extra methods
+  local l = lurek.patterns.newList()
+  l:push("b")
+  l:unshift("a")
+  l:insert(3, "c")
+  local idx = l:indexOf("b")
+  l:reverse()
+  local p = l:pop()
+  local s = l:shift()
+  lurek.log.debug(
+    "list extra idx=" .. tostring(idx) ..
+    " pop=" .. tostring(p) ..
+    " shift=" .. tostring(s),
+    "patterns"
+  )
+end
+
+--@api-stub: LMap:set
+--@api-stub: LMap:get
+--@api-stub: LMap:has
+--@api-stub: LMap:remove
+--@api-stub: LMap:len
+--@api-stub: LMap:isEmpty
+--@api-stub: LMap:keys
+--@api-stub: LMap:values
+--@api-stub: LMap:entries
+--@api-stub: LMap:merge
+--@api-stub: LMap:clear
+do -- LMap methods
+  local a = lurek.patterns.newMap()
+  a:set("hp", 10)
+  a:set("name", "hero")
+  local hp = a:get("hp")
+  local has_hp = a:has("hp")
+  local ln = a:len()
+  local empty = a:isEmpty()
+  local keys = a:keys()
+  local values = a:values()
+  local entries = a:entries()
+  local b = lurek.patterns.newMap()
+  b:set("hp", 20)
+  b:set("mp", 7)
+  a:merge(b)
+  local removed = a:remove("name")
+  a:clear()
+  lurek.log.debug(
+    "map hp=" .. tostring(hp) ..
+    " has=" .. tostring(has_hp) ..
+    " len=" .. tostring(ln) ..
+    " empty=" .. tostring(empty) ..
+    " keys=" .. tostring(#keys) ..
+    " vals=" .. tostring(#values) ..
+    " entries=" .. tostring(#entries) ..
+    " removed=" .. tostring(removed),
+    "patterns"
+  )
 end

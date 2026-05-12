@@ -10,6 +10,7 @@ use std::rc::Rc;
 use crate::input::combo::{ComboDetector, ComboStep};
 use crate::input::keyboard::{get_key_from_scancode, get_scancode_from_key};
 use crate::input::mouse::{is_cursor_supported, CursorKind, SystemCursor};
+use crate::input::virtual_dpad;
 
 fn parse_gamepad_binding(binding: &str) -> Option<(usize, u32)> {
     let mut parts = binding.split(':');
@@ -768,6 +769,26 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
                 .gamepads
                 .get(id)
                 .map_or(0.0, |gp| gp.get_axis_value(axis)))
+        })?,
+    )?;
+
+    // -- virtualDpad --
+    /// Converts analog input `(x, y)` into virtual D-pad booleans.
+    /// @param | x | number | Horizontal analog value in range -1.0..1.0.
+    /// @param | y | number | Vertical analog value in range -1.0..1.0.
+    /// @param | deadzone | number | Optional dead-zone threshold (default 0.3).
+    /// @return | table | `{up, down, left, right, direction}` digital state.
+    gamepad.set(
+        "virtualDpad",
+        lua.create_function(move |lua, (x, y, deadzone): (f32, f32, Option<f32>)| {
+            let (up, down, left, right, direction) = virtual_dpad(x, y, deadzone.unwrap_or(0.3));
+            let tbl = lua.create_table()?;
+            tbl.set("up", up)?;
+            tbl.set("down", down)?;
+            tbl.set("left", left)?;
+            tbl.set("right", right)?;
+            tbl.set("direction", direction)?;
+            Ok(tbl)
         })?,
     )?;
 

@@ -481,6 +481,54 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         })?,
     )?;
 
+    // -- windowConfig --
+    /// Applies common window configuration fields from one options table.
+    ///
+    /// Supported keys: `title`, `width`, `height`, `fullscreen`, `fullscreentype`, `vsync`, `x`, `y`, `scaleMode`, `display`.
+    /// @param | opts | table | Window configuration options.
+    /// @return | nil | No value is returned.
+    let s = state.clone();
+    tbl.set(
+        "windowConfig",
+        lua.create_function(move |_, opts: LuaTable| {
+            let mut st = s.borrow_mut();
+
+            if let Ok(title) = opts.get::<_, String>("title") {
+                window::set_title(&mut st.window_state, &title);
+            }
+
+            let width = opts.get::<_, u32>("width").ok();
+            let height = opts.get::<_, u32>("height").ok();
+            if let (Some(w), Some(h)) = (width, height) {
+                let fullscreen = opts.get::<_, bool>("fullscreen").ok();
+                let fullscreentype = opts.get::<_, String>("fullscreentype").ok();
+                let vsync = opts.get::<_, i32>("vsync").ok();
+                window::set_mode(
+                    &mut st.window_state,
+                    w,
+                    h,
+                    fullscreen,
+                    fullscreentype.as_deref(),
+                    vsync,
+                );
+            }
+
+            if let (Ok(x), Ok(y)) = (opts.get::<_, i32>("x"), opts.get::<_, i32>("y")) {
+                window::set_position(&mut st.window_state, x, y);
+            }
+
+            if let Ok(scale_mode) = opts.get::<_, String>("scaleMode") {
+                window::set_scale_mode_validated(&mut st.window_state, &scale_mode);
+            }
+
+            if let Ok(display) = opts.get::<_, i32>("display") {
+                let _ = window::set_display(&mut st.window_state, display);
+            }
+
+            Ok(())
+        })?,
+    )?;
+
     // -- close --
     /// Requests the window to close, which will end the game loop after the current frame finishes.
     /// @return | nil | No return value.
@@ -902,6 +950,12 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         tbl.get::<_, LuaFunction>("getCurrentDisplay")?,
     )?;
     display_tbl.set("setCurrent", tbl.get::<_, LuaFunction>("setDisplay")?)?;
+    // -- display --
+    /// Namespace table for display-related functions.
+    ///
+    /// Mirrors existing top-level window display helpers under a grouped subtable:
+    /// `getCount`, `getName`, `getDesktopDimensions`, `getDisplays`, `getCurrent`, `setCurrent`.
+    /// @return | table | Display helper namespace.
     tbl.set("display", display_tbl)?;
 
     let mode_tbl = lua.create_table()?;
@@ -923,10 +977,20 @@ pub fn register(lua: &Lua, lurek: &LuaTable, state: Rc<RefCell<SharedState>>) ->
         tbl.get::<_, LuaFunction>("requestAttention")?,
     )?;
     mode_tbl.set("flash", tbl.get::<_, LuaFunction>("flash")?)?;
+    // -- mode --
+    /// Namespace table for window mode/state functions.
+    ///
+    /// Groups fullscreen, vsync, minimize/maximize, visibility, and attention helpers.
+    /// @return | table | Window mode helper namespace.
     tbl.set("mode", mode_tbl)?;
 
     let cursor_tbl = lua.create_table()?;
     cursor_tbl.set("hasFocus", tbl.get::<_, LuaFunction>("hasMouseFocus")?)?;
+    // -- cursor --
+    /// Namespace table for cursor/focus functions.
+    ///
+    /// Currently exposes `hasFocus` for mouse focus checks.
+    /// @return | table | Cursor helper namespace.
     tbl.set("cursor", cursor_tbl)?;
 
     lurek.set("window", tbl)?;

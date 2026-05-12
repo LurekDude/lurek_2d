@@ -35,7 +35,9 @@ end
 do -- lurek.math.newBezierCurve
   local curve = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
   local mid_x, mid_y = curve:evaluate(0.5)
+  local d_x, d_y = curve:evaluateAtDistance(120)
   lurek.log.info("bezier midpoint " .. mid_x .. "," .. mid_y, "anim")
+  lurek.log.debug("bezier distance sample " .. d_x .. "," .. d_y, "anim")
 end
 
 --@api-stub: lurek.math.newTween
@@ -62,7 +64,59 @@ end
 do -- lurek.math.newNoiseGenerator
   local terrain = lurek.math.newNoiseGenerator(20260422)
   local h = terrain:perlin2d(3.5, 7.25)
+  local map = terrain:generateMapCompute(16, 16, {octaves = 3})
   lurek.log.debug("terrain h=" .. h, "noise")
+  lurek.log.debug("terrain map samples=" .. #map, "noise")
+end
+
+--@api-stub: lurek.math.newRectPacker
+-- Creates a runtime shelf rectangle packer for atlas/UI layout.
+do -- lurek.math.newRectPacker
+  local packer = lurek.math.newRectPacker(256, 256, 2)
+  local x, y = packer:pack(64, 64, "hero")
+  lurek.log.info("packed hero at " .. tostring(x) .. "," .. tostring(y), "atlas")
+end
+
+--@api-stub: LRectPacker:pack
+-- Packs a rectangle and returns placement (x, y), or nil when no space is left.
+-- Returns placement in pixels; provide an optional id to track this rectangle later.
+do -- RectPacker:pack
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  local x, y = packer:pack(32, 24, "btn_ok")
+  if x and y then
+    lurek.log.debug("packed btn_ok at " .. x .. "," .. y, "atlas")
+  end
+end
+
+--@api-stub: LRectPacker:getPacked
+-- Returns packed rectangles as an array of metadata tables.
+-- Use this to export an atlas manifest after packing all sprites.
+do -- RectPacker:getPacked
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  packer:pack(20, 20, "icon_a")
+  packer:pack(30, 18, "icon_b")
+  local packed = packer:getPacked()
+  lurek.log.debug("packed count=" .. #packed, "atlas")
+end
+
+--@api-stub: LRectPacker:occupancy
+-- Returns total packed area occupancy in range [0.0, 1.0].
+-- Good quick signal for deciding whether atlas size should be increased.
+do -- RectPacker:occupancy
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  packer:pack(32, 32, "slot1")
+  local occ = packer:occupancy()
+  lurek.log.debug("occupancy=" .. occ, "atlas")
+end
+
+--@api-stub: LRectPacker:clear
+-- Clears all packed entries and resets internal shelves.
+-- Call before repacking when theme/assets changed at runtime.
+do -- RectPacker:clear
+  local packer = lurek.math.newRectPacker(128, 128, 2)
+  packer:pack(40, 16, "tmp")
+  packer:clear()
+  lurek.log.debug("atlas cleared", "atlas")
 end
 
 --@api-stub: lurek.math.perlin2d
@@ -1402,6 +1456,15 @@ do -- BezierCurve:evaluate
   lurek.log.debug("eval " .. x .. "," .. y, "spline")
 end
 
+--@api-stub: LBezierCurve:evaluateAtDistance
+-- Evaluates the curve point at an arc distance from the start.
+-- Distance is measured along curve length; optional samples improve approximation.
+do -- BezierCurve:evaluateAtDistance
+  local c = lurek.math.newBezierCurve({0, 0, 100, 200, 300, 200, 400, 0})
+  local x, y = c:evaluateAtDistance(120, 128)
+  lurek.log.debug("eval@dist " .. x .. "," .. y, "spline")
+end
+
 --@api-stub: LBezierCurve:render
 -- Renders the curve as a polyline with the given number of segments.
 -- Returns a polyline as an array of 2-element tables; pass enough segments for visual smoothness.
@@ -1857,6 +1920,15 @@ do -- NoiseGenerator:generateMap
   local ng = lurek.math.newNoiseGenerator(99)
   local map = ng:generateMap(32, 32, { scale = 0.05, offsetX = 0.0, offsetY = 0.0 })
   lurek.log.info("map size: " .. #map, "math")
+end
+
+--@api-stub: LNoiseGenerator:generateMapCompute
+-- Generates a 2D noise map using the compute-backed path when available.
+-- Same shape as generateMap: returns width*height floats in a flat table.
+do -- NoiseGenerator:generateMapCompute
+  local ng = lurek.math.newNoiseGenerator(101)
+  local map = ng:generateMapCompute(16, 16, { octaves = 3, lacunarity = 2.0, gain = 0.5 })
+  lurek.log.info("compute map size: " .. #map, "math")
 end
 
 --@api-stub: LSpatialHash:insert

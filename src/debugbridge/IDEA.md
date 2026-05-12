@@ -1,16 +1,16 @@
-- TODO: Add client authentication or at least a handshake/nonce so any local process cannot attach blindly.
-- TODO: Add protocol versioning and capability negotiation, ideally through an initial `hello` message.
-- TODO: Replace `print_history` eviction based on `Vec::remove(0)` with an O(1) structure or shared ring-buffer helper.
-- TODO: Replace `frame_times` eviction based on `Vec::remove(0)` with an O(1) structure or shared ring-buffer helper.
-- TODO: Add rate limiting for broadcast events so chatty games cannot flood bridge clients.
-- TODO: Replace the fixed 5 ms server-loop sleep with an adaptive or blocking strategy.
-- TODO: Add DAP-compatible breakpoint and stepping support for VS Code Lua debugging.
-- TODO: Add a remote hot-reload trigger exposed through the bridge.
-- TODO: Add structured object inspection APIs such as scene or ECS graph queries.
-- TODO: Cache or incrementally maintain performance stats instead of rescanning all frame times on every `get_performance()` call.
-- TODO: Add integration tests for `server_thread` TCP behavior.
-- TODO: Add tests for concurrent multi-client request patterns.
-- TODO: Add tests for screenshot request and scale-clamping edge cases.
-- TODO: Add a `BridgeShared::drain_responses()` helper to simplify server response flushing.
-- TODO: Add a `BridgeShared::queue_broadcast_json()` helper to centralize broadcast JSON construction.
+- DONE: Added nonce-based handshake gating (`ping` + `hello`) so clients cannot call bridge methods blindly.
+- DONE: Added protocol version and capability negotiation through an initial `hello` message flow.
+- DONE: Replaced `print_history` eviction based on `Vec::remove(0)` with O(1) `VecDeque` eviction.
+- DONE: Replaced `frame_times` eviction based on `Vec::remove(0)` with O(1) `VecDeque` eviction.
+- DONE: Added broadcast rate limiting per server tick to prevent client flooding.
+- DONE: Replaced fixed 5 ms sleep with adaptive server-loop sleep based on activity.
+- DONE: Added basic DAP-style control endpoints (`dapSetBreakpoint`, `dapStep`, `dapContinue`) in bridge protocol.
+- DONE: Added remote hot-reload trigger via `triggerHotReload` and Lua-side consume API.
+- DONE: Added structured inspection protocol endpoints (`inspectScene`, `inspectEcs`).
+- DONE: Added incremental performance-stat caching for `get_performance()`.
+- DONE: Added Rust integration test for `server_thread` TCP ping/hello flow.
+- DONE: Added Rust tests for concurrent multi-client request patterns.
+- DONE: Added Rust tests for screenshot request scale clamping edge cases.
+- DONE: Added `BridgeShared::drain_responses()` helper to simplify response flushing.
+- DONE: Added `BridgeShared::queue_broadcast_json()` helper to centralize broadcast JSON construction.
 - TODO: Keep debugbridge behind a feature gate if pluginization remains a goal.

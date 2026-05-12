@@ -133,6 +133,33 @@ do -- lurek.ai.newSteeringManager
   sm:addWander(20, 40, 5, 0.3)
 end
 
+--@api-stub: LSteeringManager:setPath
+--@api-stub: LSteeringManager:hasPath
+-- Feeds waypoints from a nav-grid query directly into steering path-follow.
+do -- LSteeringManager.setPath
+  local grid = lurek.pathfind.newPathGrid(10, 10, 32)
+  local path = grid:findPath(1, 1, 10, 10)
+  local sm = lurek.ai.newSteeringManager()
+  if path then
+    sm:setPath(path, 12.0, 1.0)
+    if sm:hasPath() then
+      local fx, fy = sm:calculate(0, 0, 0, 0, 120, 240, 1 / 60)
+      lurek.log.info("path force: " .. tostring(fx) .. ", " .. tostring(fy), "ai")
+    end
+  end
+end
+
+--@api-stub: LSteeringManager:getPathProgress
+--@api-stub: LSteeringManager:clearPath
+-- Path-follow helpers for inspecting progress and clearing the route.
+do -- LSteeringManager.getPathProgress
+  local sm = lurek.ai.newSteeringManager()
+  sm:setPath({ { x = 16, y = 16 }, { x = 48, y = 16 } })
+  local idx, total = sm:getPathProgress()
+  lurek.log.info("path progress " .. tostring(idx) .. "/" .. tostring(total), "ai")
+  sm:clearPath()
+end
+
 --@api-stub: lurek.ai.newQLearner
 -- Creates a tabular Q-learner.
 -- Allocate state*action Q-table at init; both counts must be known up front.
@@ -149,6 +176,45 @@ do -- lurek.ai.newUtilityAI
   local uai = lurek.ai.newUtilityAI()
   uai:addAction("flee", function() return 0.8 end, 1.0)
   uai:addAction("attack", function() return 0.4 end, 1.0)
+end
+
+--@api-stub: lurek.ai.newDialogueAI
+--@api-stub: LDialogueAI:addTopic
+--@api-stub: LDialogueAI:addBranch
+--@api-stub: LDialogueAI:setFSMState
+--@api-stub: LDialogueAI:setBTStatus
+--@api-stub: LDialogueAI:setUtilityScore
+--@api-stub: LDialogueAI:selectTopic
+--@api-stub: LDialogueAI:selectBranch
+--@api-stub: LDialogueAI:getTopicCount
+--@api-stub: LDialogueAI:clearUtilityScores
+--@api-stub: LDialogueAI:type
+--@api-stub: LDialogueAI:typeOf
+-- Dialogue selection driven by FSM, BT, and utility scores.
+do -- lurek.ai.newDialogueAI
+  local d = lurek.ai.newDialogueAI()
+  local t = d:type()
+  local _is_dialogue = d:typeOf("DialogueAI")
+  lurek.log.info("dialogue type: " .. tostring(t), "ai")
+  d:addTopic("smalltalk", 0.2, nil, nil, "smalltalk_score")
+  d:addTopic("combat", 0.2, "combat", "success", "combat_score")
+  d:addBranch("combat", "taunt", 0.3, "combat", nil, "taunt_score")
+  d:addBranch("combat", "threat", 0.2, "combat", nil, "threat_score")
+  d:setFSMState("combat")
+  d:setBTStatus("success")
+  d:setUtilityScore("smalltalk_score", 0.1)
+  d:setUtilityScore("combat_score", 0.9)
+  d:setUtilityScore("taunt_score", 0.6)
+  d:setUtilityScore("threat_score", 0.4)
+
+  local topic = d:selectTopic()
+  if topic then
+    local branch = d:selectBranch(topic)
+    lurek.log.info("dialogue: " .. tostring(topic) .. "/" .. tostring(branch), "ai")
+  end
+  local topic_count = d:getTopicCount()
+  lurek.log.info("dialogue topics: " .. tostring(topic_count), "ai")
+  d:clearUtilityScores()
 end
 
 --@api-stub: lurek.ai.newGOAPPlanner

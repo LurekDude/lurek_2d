@@ -1,1 +1,0 @@
-- TODO: Extract the schema validator into a lightweight standalone crate if mod-author reuse outside the engine remains a goal.

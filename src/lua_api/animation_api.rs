@@ -82,7 +82,15 @@ impl LuaUserData for LuaAnimation {
         /// @return | nil | Returns nothing.
         methods.add_method_mut(
             "addClip",
-            |_, this, (name, indices_tbl, fps, looping, mode): (String, LuaTable, f32, bool, Option<String>)| {
+            |_,
+             this,
+             (name, indices_tbl, fps, looping, mode): (
+                String,
+                LuaTable,
+                f32,
+                bool,
+                Option<String>,
+            )| {
                 let mut indices: Vec<usize> = Vec::new();
                 for v in indices_tbl.sequence_values::<usize>() {
                     indices.push(v?);
@@ -112,7 +120,7 @@ impl LuaUserData for LuaAnimation {
         // -- getClipMode --
         /// Returns playback mode for a named clip.
         /// @param | name | string | Clip name.
-        /// @return | string | forward, reverse, pingpong, or nil when clip does not exist.
+        /// @return | string? | Playback mode: "forward", "reverse", or "pingpong"; nil when the clip does not exist.
         methods.add_method("getClipMode", |_, this, name: String| {
             Ok(this
                 .inner
@@ -339,10 +347,13 @@ impl LuaUserData for LuaAnimation {
         /// @param | columns | integer | Number of columns in the preview grid.
         /// @param | cellSize | integer | Cell size in pixels.
         /// @return | ImageData | Returns preview image data.
-        methods.add_method("drawPreviewGrid", |lua, this, (columns, cell_size): (u32, u32)| {
-            let img = this.inner.draw_preview_grid(columns, cell_size);
-            lua.create_userdata(img)
-        });
+        methods.add_method(
+            "drawPreviewGrid",
+            |lua, this, (columns, cell_size): (u32, u32)| {
+                let img = this.inner.draw_preview_grid(columns, cell_size);
+                lua.create_userdata(img)
+            },
+        );
 
         // -- type --
         /// Returns the type name of this object.
@@ -755,7 +766,8 @@ pub fn register(lua: &Lua, luna: &LuaTable, _state: Rc<RefCell<SharedState>>) ->
                     let state_tbl = state_tbl?;
                     let name: String = state_tbl.get("name")?;
                     let clip: String = state_tbl.get("clip")?;
-                    let looping: bool = state_tbl.get::<_, Option<bool>>("looping")?.unwrap_or(true);
+                    let looping: bool =
+                        state_tbl.get::<_, Option<bool>>("looping")?.unwrap_or(true);
                     sm.add_state(&name, &clip, looping);
                 }
 

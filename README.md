@@ -8,18 +8,42 @@
 
 ---
 
-One binary. One scripting language. Put `lurek2d` next to `main.lua` and run your game. No installer, no DLLs, no editor lock-in.
+## Is this repo for you?
+
+- **Yes, if** you want to build 2D desktop games in **Lua** and have the heavy systems (render/audio/physics/IO) handled by **Rust**.
+- **Yes, if** you value fast prototyping, moddability, and a clean API under `lurek.*`.
+- **Yes, if** you are interested in an AI-assisted workflow (agents, docs, tests, and examples in one place).
+- **Probably not**, if you need a mobile/web-first engine or an all-in-one closed editor.
+
+## TL;DR
+
+- **What it is:** a desktop 2D runtime for Lua games.
+- **Model:** Rust owns systems, Lua owns game logic.
+- **Scope:** rendering, audio, input, physics, scene/tilemap/sprite/tween, save, networking, tooling.
+- **Repo contents:** engine + full API docs + examples + reference games + Lua libraries.
+- **Audience:** indie devs, rapid prototypers, educators, mod-friendly projects.
+
+## What is in the repo
+
+- **`src/`** — engine source (Rust, modular architecture).
+- **`docs/`** — API and architecture documentation.
+- **`content/examples/`** — short single-file API examples.
+- **`content/games/`** — larger, playable reference games.
+- **`library/`** — reusable pure-Lua gameplay modules (inventory, quest, dialog, combat, etc.).
+- **`extensions/vscode/`** — optional VS Code support and AI workflow tooling.
 
 ---
 
 ## Table of Contents
 
-1. [Quick Start](#quick-start)
-2. [Architecture Overview](#architecture-overview)
-3. [What Ships](#what-ships)
-4. [Tech Stack](#tech-stack)
-5. [Project Identity](#project-identity)
-6. [License](#license)
+1. [Is this repo for you?](#is-this-repo-for-you)
+2. [TL;DR](#tldr)
+3. [What is in the repo](#what-is-in-the-repo)
+4. [Architecture Overview](#architecture-overview)
+5. [What Ships](#what-ships)
+6. [Tech Stack](#tech-stack)
+7. [Project Identity](#project-identity)
+8. [License](#license)
 
 ### Architecture Contents
 
@@ -29,33 +53,6 @@ One binary. One scripting language. Put `lurek2d` next to `main.lua` and run you
 4. [Use Cases (where to use Lurek2D)](#use-cases-where-to-use-lurek2d)
 5. [AI-First Engineering (how AI is used)](#ai-first-engineering-how-ai-is-used)
 6. [Key Architecture Notes](#key-architecture-notes)
-
----
-
-## Quick Start
-
-```bash
-cargo run                               # Splash screen (no game)
-cargo run -- content/examples/render.lua # Run an API example
-```
-
-Create `main.lua` anywhere:
-
-```lua
-function lurek.init()
-    lurek.render.setBackgroundColor(0.1, 0.1, 0.2)
-end
-
-function lurek.draw()
-    lurek.render.print("Hello, Lurek2D!", 100, 100)
-end
-```
-
-```bash
-cargo run -- path/to/your/game   # No project files. No config required.
-```
-
-An empty `main.lua` is valid. With no game argument, the engine shows a built-in splash screen - drag and drop a folder onto the window to load it.
 
 ---
 ## Architecture Overview
@@ -357,5 +354,6 @@ All direct Cargo dependencies are permissive (MIT, Apache-2.0, Zlib, or Unlicens
 ---
 
 [Contributing](CONTRIBUTING.md) - [Security](SECURITY.md) - [License](LICENSE)
+
 
 

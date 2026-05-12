@@ -1,8 +1,0 @@
-- TODO: Guarantee deterministic timing over long runs instead of accumulating `playback_speed * dt` drift in `f32`.
-- TODO: Add support for arbitrary expression-based conditions or assertions, beyond the current named-condition flow.
-- TODO: Benchmark playback of 10,000-step scripts and verify sub-millisecond `update()` overhead.
-- TODO: Profile `from_toml` parsing on large scripts with 1,000+ steps.
-- TODO: Add tests for every `from_toml` step-field combination.
-- TODO: Deduplicate elapsed-time accumulation with the `timer` module's accumulator utilities.
-- TODO: Deduplicate action/event kind strings with the `input` module.
-- TODO: Keep automation behind a feature gate if pluginization remains a goal.

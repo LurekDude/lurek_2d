@@ -812,6 +812,65 @@ fn widget_render_children(widget: &WidgetKind) -> Vec<usize> {
     children
 }
 
+/// Resolve widget style from theme/default and apply widget alpha to visual channels.
+fn resolve_style_with_alpha(
+    ctx: &GuiContext,
+    base: &WidgetBase,
+    default_style: &WidgetStyle,
+) -> WidgetStyle {
+    let style = ctx
+        .theme
+        .as_ref()
+        .and_then(|t| t.get_style(base.widget_type, base.state))
+        .unwrap_or(default_style);
+    let mut style_with_alpha = style.clone();
+    let alpha = base.alpha.clamp(0.0, 1.0);
+    style_with_alpha.bg_color[3] *= alpha;
+    style_with_alpha.fg_color[3] *= alpha;
+    style_with_alpha.border_color[3] *= alpha;
+    style_with_alpha.shadow_color[3] *= alpha;
+    style_with_alpha.highlight_alpha *= alpha;
+    style_with_alpha
+}
+
+/// Thin render-pipeline coordinator for root traversal and recursive widget emission.
+struct WidgetRenderer<'a> {
+    ctx: &'a GuiContext,
+    font_key: FontKey,
+    default_style: &'a WidgetStyle,
+    cmds: &'a mut Vec<RenderCommand>,
+}
+
+impl<'a> WidgetRenderer<'a> {
+    fn new(
+        ctx: &'a GuiContext,
+        font_key: FontKey,
+        default_style: &'a WidgetStyle,
+        cmds: &'a mut Vec<RenderCommand>,
+    ) -> Self {
+        Self {
+            ctx,
+            font_key,
+            default_style,
+            cmds,
+        }
+    }
+
+    fn render_widget(&mut self, idx: usize) {
+        render_widget(self.ctx, idx, self.font_key, self.default_style, self.cmds);
+    }
+
+    fn render_root_children(&mut self) {
+        if let Some(children) = self.ctx.widgets.first().and_then(|w| w.children()) {
+            for &child_idx in children {
+                if child_idx < self.ctx.widgets.len() {
+                    self.render_widget(child_idx);
+                }
+            }
+        }
+    }
+}
+
 /// Recursively walk a widget and its children, emitting render commands.
 ///
 /// # Parameters
@@ -834,18 +893,7 @@ fn render_widget(
         return;
     }
 
-    let style = ctx
-        .theme
-        .as_ref()
-        .and_then(|t| t.get_style(base.widget_type, base.state))
-        .unwrap_or(default_style);
-    let mut style_with_alpha = style.clone();
-    let alpha = base.alpha.clamp(0.0, 1.0);
-    style_with_alpha.bg_color[3] *= alpha;
-    style_with_alpha.fg_color[3] *= alpha;
-    style_with_alpha.border_color[3] *= alpha;
-    style_with_alpha.shadow_color[3] *= alpha;
-    style_with_alpha.highlight_alpha *= alpha;
+    let style_with_alpha = resolve_style_with_alpha(ctx, base, default_style);
     let style = &style_with_alpha;
 
     // Drop shadow (drawn before background)
@@ -1543,14 +1591,7 @@ impl GuiContext {
         let default_style = WidgetStyle::default();
         let mut cmds = Vec::new();
 
-        // Root is always index 0 (invisible panel)
-        if let Some(children) = self.widgets.first().and_then(|w| w.children()) {
-            for &child_idx in children {
-                if child_idx < self.widgets.len() {
-                    render_widget(self, child_idx, font_key, &default_style, &mut cmds);
-                }
-            }
-        }
+        WidgetRenderer::new(self, font_key, &default_style, &mut cmds).render_root_children();
 
         cmds
     }
@@ -1607,18 +1648,7 @@ impl GuiContext {
             let w = rect.width.max(1.0) as u32;
             let h = rect.height.max(1.0) as u32;
 
-            let style = layout_ctx
-                .theme
-                .as_ref()
-                .and_then(|t| t.get_style(base.widget_type, base.state))
-                .unwrap_or(&default_style);
-            let mut style_with_alpha = style.clone();
-            let alpha = base.alpha.clamp(0.0, 1.0);
-            style_with_alpha.bg_color[3] *= alpha;
-            style_with_alpha.fg_color[3] *= alpha;
-            style_with_alpha.border_color[3] *= alpha;
-            style_with_alpha.shadow_color[3] *= alpha;
-            style_with_alpha.highlight_alpha *= alpha;
+            let style_with_alpha = resolve_style_with_alpha(&layout_ctx, base, &default_style);
             let style = &style_with_alpha;
 
             let [sr, sg, sb, sa] = style.shadow_color;

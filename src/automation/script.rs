@@ -174,6 +174,9 @@ impl Script {
     /// `clicks`, `repeat`, `repeatInterval`, `macro`, `when`, `assert`,
     /// `baseline`, `actual`, and `maxDiff`.
     ///
+    /// `when` and `assert` accept boolean expressions using condition names,
+    /// `true`/`false`, `!`, `&&`, `||`, and parentheses.
+    ///
     /// Returns `Err(String)` if the TOML is malformed, if any `action` value
     /// is unrecognised, or if a step is missing the required `action` field.
     ///

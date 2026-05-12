@@ -1253,3 +1253,61 @@ end
 --   lurek.log.info("is LGroupedFrame: " .. tostring(grouped and grouped:typeOf("LGroupedFrame") or false), "dataframe")
 --   lurek.log.info("is unknown: " .. tostring(grouped and grouped:typeOf("Unknown") or false), "dataframe")
 -- end
+
+-- -----------------------------------------------------------------------------
+-- Lazy query pipeline
+-- -----------------------------------------------------------------------------
+
+--@api-stub: LDataFrame:lazy
+-- Starts a lazy query pipeline from this DataFrame.
+do -- LDataFrame:lazy
+  local df = lurek.dataframe.fromTable({
+    {name = "alice", hp = 12, team = "red"},
+    {name = "bob", hp = 7, team = "blue"},
+    {name = "cara", hp = 20, team = "red"},
+  })
+  local q = df:lazy()
+  local t = q:type()
+  lurek.log.info("lazy type: " .. tostring(t), "dataframe")
+end
+
+--@api-stub: LLazyQuery:filter
+--@api-stub: LLazyQuery:sort
+--@api-stub: LLazyQuery:head
+--@api-stub: LLazyQuery:tail
+--@api-stub: LLazyQuery:limit
+--@api-stub: LLazyQuery:slice
+--@api-stub: LLazyQuery:dropNil
+--@api-stub: LLazyQuery:select
+--@api-stub: LLazyQuery:collect
+--@api-stub: LLazyQuery:type
+--@api-stub: LLazyQuery:typeOf
+-- Demonstrates the full LLazyQuery chain and terminal collect().
+do -- LLazyQuery chain
+  local df = lurek.dataframe.fromTable({
+    {name = "alice", hp = 12, mana = 5, team = "red"},
+    {name = "bob", hp = 7, mana = nil, team = "blue"},
+    {name = "cara", hp = 20, mana = 9, team = "red"},
+    {name = "dave", hp = 15, mana = 3, team = "blue"},
+  })
+
+  local q = df:lazy()
+  local is_lazy = q:typeOf("LLazyQuery")
+  lurek.log.info("is lazy query: " .. tostring(is_lazy), "dataframe")
+
+  local filtered = df:lazy():filter("hp", ">", 10):collect()
+  local sorted = df:lazy():sort("hp", false):head(2):collect()
+  local tailed = df:lazy():tail(2):collect()
+  local limited = df:lazy():limit(3):collect()
+  local sliced = df:lazy():slice(2, 4):collect()
+  local non_nil = df:lazy():dropNil("mana"):collect()
+  local selected = df:lazy():select({"name", "hp"}):collect()
+
+  lurek.log.info("filtered rows: " .. filtered:nrows(), "dataframe")
+  lurek.log.info("sorted rows: " .. sorted:nrows(), "dataframe")
+  lurek.log.info("tailed rows: " .. tailed:nrows(), "dataframe")
+  lurek.log.info("limited rows: " .. limited:nrows(), "dataframe")
+  lurek.log.info("sliced rows: " .. sliced:nrows(), "dataframe")
+  lurek.log.info("non-nil rows: " .. non_nil:nrows(), "dataframe")
+  lurek.log.info("selected cols: " .. selected:ncols(), "dataframe")
+end

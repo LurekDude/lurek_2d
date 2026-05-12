@@ -11,7 +11,7 @@ use crate::pathfind::ai_flow_field::FlowField as AiFlowField;
 use crate::pathfind::hpa::{build_abstract, AbstractGraph};
 use crate::pathfind::pathgrid::PathGrid;
 use crate::pathfind::{
-    bidirectional_astar, DiagonalMode, FlowField, NavGrid, UnitPathfinder, Waypoint,
+    bidirectional_astar, DiagonalMode, FlowField, NavGrid, NavMesh, UnitPathfinder, Waypoint,
 };
 use crate::pathfind::{HexGrid, HexLayout, JpsGrid, RangeMap};
 use crate::runtime::log_messages::LA08_PATHFINDING_THREAD_UNIMPL;
@@ -1186,6 +1186,103 @@ impl LuaUserData for LuaJpsGrid {
 }
 
 // -------------------------------------------------------------------------------
+// LuaNavMesh UserData
+// -------------------------------------------------------------------------------
+
+/// Lua-side wrapper around a polygon navmesh for non-tile pathfinding.
+pub struct LuaNavMesh {
+    inner: Rc<RefCell<NavMesh>>,
+}
+
+impl LuaUserData for LuaNavMesh {
+    fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
+        // -- addPolygon --
+        /// Adds a polygon from a table of `{x, y}` points.
+        /// @param | vertices | table | Array of vertices as `{x, y}`.
+        /// @return | integer | Polygon index (1-based).
+        methods.add_method_mut("addPolygon", |_, this, vertices: LuaTable| {
+            let mut points = Vec::new();
+            for entry in vertices.sequence_values::<LuaTable>() {
+                let v = entry?;
+                let x: f32 = v.get("x")?;
+                let y: f32 = v.get("y")?;
+                points.push((x, y));
+            }
+            let id = this
+                .inner
+                .borrow_mut()
+                .add_polygon(points)
+                .ok_or_else(|| LuaError::runtime("addPolygon requires at least 3 vertices"))?;
+            Ok((id + 1) as u32)
+        });
+
+        // -- connectPolygons --
+        /// Connects two polygons by index.
+        /// @param | a | integer | First polygon index (1-based).
+        /// @param | b | integer | Second polygon index (1-based).
+        /// @param | bidirectional | boolean? | Whether connection should be bidirectional.
+        /// @return | boolean | True when connection succeeded.
+        methods.add_method_mut(
+            "connectPolygons",
+            |_, this, (a, b, bidirectional): (u32, u32, Option<bool>)| {
+                Ok(this.inner.borrow_mut().connect(
+                    a.saturating_sub(1) as usize,
+                    b.saturating_sub(1) as usize,
+                    bidirectional.unwrap_or(true),
+                ))
+            },
+        );
+
+        // -- findPath --
+        /// Finds a waypoint path through polygon centroids.
+        /// @param | sx | number | Start world X.
+        /// @param | sy | number | Start world Y.
+        /// @param | gx | number | Goal world X.
+        /// @param | gy | number | Goal world Y.
+        /// @return | table | Waypoints as `{x, y}` or nil if unreachable.
+        methods.add_method(
+            "findPath",
+            |lua, this, (sx, sy, gx, gy): (f32, f32, f32, f32)| {
+                let path = this.inner.borrow().find_path((sx, sy), (gx, gy));
+                match path {
+                    Some(points) => {
+                        let out = lua.create_table()?;
+                        for (i, (x, y)) in points.iter().enumerate() {
+                            let node = lua.create_table()?;
+                            node.set("x", *x)?;
+                            node.set("y", *y)?;
+                            out.set(i + 1, node)?;
+                        }
+                        Ok(LuaValue::Table(out))
+                    }
+                    None => Ok(LuaValue::Nil),
+                }
+            },
+        );
+
+        // -- getPolygonCount --
+        /// Returns number of polygons in this navmesh.
+        /// @return | integer | Number of polygons.
+        methods.add_method("getPolygonCount", |_, this, ()| {
+            Ok(this.inner.borrow().polygon_count() as u32)
+        });
+
+        // -- type --
+        /// Returns the type name of this object.
+        /// @return | string | Lua-visible type name.
+        methods.add_method("type", |_, _, ()| Ok("LNavMesh"));
+
+        // -- typeOf --
+        /// Returns true if this object is of the given type.
+        /// @param | name | string | Type name to compare against.
+        /// @return | boolean | True when the type matches.
+        methods.add_method("typeOf", |_, _, name: String| {
+            Ok(name == "LNavMesh" || name == "Object")
+        });
+    }
+}
+
+// -------------------------------------------------------------------------------
 // Register
 // -------------------------------------------------------------------------------
 
@@ -1362,6 +1459,18 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         lua.create_function(|_, (width, height): (u32, u32)| {
             Ok(LuaJpsGrid {
                 inner: Rc::new(RefCell::new(JpsGrid::new(width, height))),
+            })
+        })?,
+    )?;
+
+    // -- newNavMesh --
+    /// Creates an empty polygon navmesh for non-tile worlds.
+    /// @return | LNavMesh | New navmesh userdata.
+    tbl.set(
+        "newNavMesh",
+        lua.create_function(|_, ()| {
+            Ok(LuaNavMesh {
+                inner: Rc::new(RefCell::new(NavMesh::new())),
             })
         })?,
     )?;

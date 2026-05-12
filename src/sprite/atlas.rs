@@ -98,6 +98,31 @@ impl SpriteAtlas {
         }
     }
 
+    /// Builds a `SpriteAtlas` from regions packed by `image::TextureAtlas`.
+    ///
+    /// This is an interoperability helper so CPU-packed atlas regions can be
+    /// consumed by sprite systems that already expect `SpriteAtlas` entries.
+    pub fn from_texture_atlas(atlas: &crate::image::TextureAtlas) -> Self {
+        let mut out = Self::new();
+        let mut regions = atlas.get_regions();
+        regions.sort_by(|a, b| a.name.cmp(&b.name));
+
+        for region in regions {
+            out.add_entry(AtlasEntry {
+                name: region.name.clone(),
+                x: region.x,
+                y: region.y,
+                w: region.w,
+                h: region.h,
+                rotated: false,
+                flip_x: false,
+                flip_y: false,
+            });
+        }
+
+        out
+    }
+
     /// Adds a region to the atlas.
     ///
     /// If a region with the same name already exists it is overwritten in-place.

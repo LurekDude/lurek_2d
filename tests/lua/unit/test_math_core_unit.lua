@@ -513,6 +513,19 @@ describe("math.newBezierCurve", function()
         expect_near(x, 5, 0.0001)
         expect_near(y, 5, 0.0001)
     end)
+
+    -- @covers LBezierCurve:evaluateAtDistance
+    -- @covers lurek.math.newBezierCurve
+    it("evaluateAtDistance clamps start/end", function()
+        local curve = lurek.math.newBezierCurve({0, 0, 5, 10, 10, 0})
+        local sx, sy = curve:evaluateAtDistance(0)
+        expect_near(sx, 0, 0.0001)
+        expect_near(sy, 0, 0.0001)
+
+        local ex, ey = curve:evaluateAtDistance(9999)
+        expect_near(ex, 10, 0.01)
+        expect_near(ey, 0, 0.01)
+    end)
 end)
 
 -- NoiseGenerator
@@ -573,6 +586,28 @@ describe("math.newNoiseGenerator", function()
         local v1 = ng1:perlin2d(1.5, 2.3)
         local v2 = ng2:perlin2d(1.5, 2.3)
         expect_not_equal(v1, v2)
+    end)
+
+    -- @covers LNoiseGenerator:generateMapCompute
+    -- @covers lurek.math.newNoiseGenerator
+    it("generateMapCompute returns row-major array", function()
+        local ng = lurek.math.newNoiseGenerator(123)
+        local map = ng:generateMapCompute(4, 4, {octaves = 0})
+        expect_equal(#map, 16)
+    end)
+end)
+
+-- @describe math.newRectPacker
+describe("math.newRectPacker", function()
+    -- @covers LRectPacker:pack
+    -- @covers LRectPacker:occupancy
+    -- @covers lurek.math.newRectPacker
+    it("packs and reports occupancy", function()
+        local packer = lurek.math.newRectPacker(32, 32, 1)
+        local x, y = packer:pack(8, 8, "hero")
+        expect_type("number", x)
+        expect_type("number", y)
+        expect_true(packer:occupancy() > 0)
     end)
 end)
 

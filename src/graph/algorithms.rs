@@ -26,9 +26,13 @@ impl Graph {
         for &nid in self.nodes.keys() {
             adj.entry(nid).or_default();
         }
-        for edge in self.edges.values() {
-            adj.entry(edge.from_node).or_default().insert(edge.to_node);
-            adj.entry(edge.to_node).or_default().insert(edge.from_node);
+        for &from in self.nodes.keys() {
+            for &edge_id in self.outgoing_edge_ids_slice(from) {
+                if let Some(edge) = self.edges.get(&edge_id) {
+                    adj.entry(edge.from_node).or_default().insert(edge.to_node);
+                    adj.entry(edge.to_node).or_default().insert(edge.from_node);
+                }
+            }
         }
 
         for &nid in self.nodes.keys() {
@@ -72,8 +76,12 @@ impl Graph {
         for &nid in self.nodes.keys() {
             adj.entry(nid).or_default();
         }
-        for edge in self.edges.values() {
-            adj.entry(edge.from_node).or_default().push(edge.to_node);
+        for &from in self.nodes.keys() {
+            for &edge_id in self.outgoing_edge_ids_slice(from) {
+                if let Some(edge) = self.edges.get(&edge_id) {
+                    adj.entry(edge.from_node).or_default().push(edge.to_node);
+                }
+            }
         }
 
         while let Some(&start) = white.iter().next() {
@@ -128,9 +136,13 @@ impl Graph {
             in_degree.entry(nid).or_insert(0);
             adj.entry(nid).or_default();
         }
-        for edge in self.edges.values() {
-            adj.entry(edge.from_node).or_default().push(edge.to_node);
-            *in_degree.entry(edge.to_node).or_insert(0) += 1;
+        for &from in self.nodes.keys() {
+            for &edge_id in self.outgoing_edge_ids_slice(from) {
+                if let Some(edge) = self.edges.get(&edge_id) {
+                    adj.entry(edge.from_node).or_default().push(edge.to_node);
+                    *in_degree.entry(edge.to_node).or_insert(0) += 1;
+                }
+            }
         }
 
         // Start with nodes that have no incoming edges
@@ -228,9 +240,13 @@ impl Graph {
         for id in self.nodes.keys() {
             adj.entry(*id).or_default();
         }
-        for edge in self.edges.values() {
-            adj.entry(edge.from_node).or_default().push(edge.to_node);
-            adj.entry(edge.to_node).or_default().push(edge.from_node);
+        for &from in self.nodes.keys() {
+            for &edge_id in self.outgoing_edge_ids_slice(from) {
+                if let Some(edge) = self.edges.get(&edge_id) {
+                    adj.entry(edge.from_node).or_default().push(edge.to_node);
+                    adj.entry(edge.to_node).or_default().push(edge.from_node);
+                }
+            }
         }
 
         let mut colors: HashMap<u64, usize> = HashMap::new();
@@ -261,9 +277,13 @@ impl Graph {
         for id in self.nodes.keys() {
             adj.entry(*id).or_default();
         }
-        for edge in self.edges.values() {
-            adj.entry(edge.from_node).or_default().push(edge.to_node);
-            adj.entry(edge.to_node).or_default().push(edge.from_node);
+        for &from in self.nodes.keys() {
+            for &edge_id in self.outgoing_edge_ids_slice(from) {
+                if let Some(edge) = self.edges.get(&edge_id) {
+                    adj.entry(edge.from_node).or_default().push(edge.to_node);
+                    adj.entry(edge.to_node).or_default().push(edge.from_node);
+                }
+            }
         }
 
         for &start in self.nodes.keys() {
@@ -376,17 +396,37 @@ impl Graph {
             }
             let cur_g = *g_cost.get(&id).unwrap_or(&f32::MAX);
 
-            for edge in self.edges.values() {
+            for &edge_id in self.outgoing_edge_ids_slice(id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
+                    continue;
+                };
                 if !edge.active {
                     continue;
                 }
-                let nb = if edge.from_node == id {
-                    edge.to_node
-                } else if edge.bidirectional && edge.to_node == id {
-                    edge.from_node
-                } else {
+                let nb = edge.to_node;
+                if !self.nodes.contains_key(&nb) {
+                    continue;
+                }
+
+                let new_g = cur_g + edge.weight.max(0.0) as f32;
+                if new_g < *g_cost.get(&nb).unwrap_or(&f32::MAX) {
+                    g_cost.insert(nb, new_g);
+                    came_from.insert(nb, id);
+                    open.push(ANode {
+                        id: nb,
+                        f: new_g + heuristic(nb),
+                    });
+                }
+            }
+
+            for &edge_id in self.incoming_edge_ids_slice(id) {
+                let Some(edge) = self.edges.get(&edge_id) else {
                     continue;
                 };
+                if !edge.active || !edge.bidirectional {
+                    continue;
+                }
+                let nb = edge.from_node;
                 if !self.nodes.contains_key(&nb) {
                     continue;
                 }

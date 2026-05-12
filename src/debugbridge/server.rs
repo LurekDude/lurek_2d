@@ -8,6 +8,7 @@ use std::io::{BufRead, BufReader, Write};
 use std::net::TcpListener;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex};
+use std::time::Duration;
 
 use super::bridge::{BridgeShared, PendingRequest, PendingResponse};
 
@@ -34,12 +35,15 @@ pub fn server_thread(
         Vec::new();
 
     while running.load(Ordering::Relaxed) {
+        let mut had_activity = false;
+
         // Accept new connections
         match listener.accept() {
             Ok((stream, _addr)) => {
                 stream.set_nonblocking(true).ok();
                 let reader = BufReader::new(stream.try_clone().expect("clone stream"));
                 clients.push(Some((stream, reader)));
+                had_activity = true;
                 if let Ok(mut sh) = shared.lock() {
                     sh.client_count = clients.iter().filter(|c| c.is_some()).count();
                 }
@@ -56,16 +60,19 @@ pub fn server_thread(
                 match reader.read_line(&mut line) {
                     Ok(0) => {
                         to_remove.push(idx);
+                        had_activity = true;
                     }
                     Ok(_) => {
                         let line = line.trim();
                         if !line.is_empty() {
+                            had_activity = true;
                             handle_client_message(line, idx, &shared);
                         }
                     }
                     Err(ref e) if e.kind() == std::io::ErrorKind::WouldBlock => {}
                     Err(_) => {
                         to_remove.push(idx);
+                        had_activity = true;
                     }
                 }
             }
@@ -78,7 +85,7 @@ pub fn server_thread(
 
         // Write pending responses and broadcasts to clients
         if let Ok(mut sh) = shared.lock() {
-            while let Some(resp) = sh.pending_responses.pop_front() {
+            for resp in sh.drain_responses() {
                 if let Some(Some((stream, _))) = clients.get_mut(resp.client_idx) {
                     let json_str = serde_json::json!({
                         "id": resp.id,
@@ -88,10 +95,16 @@ pub fn server_thread(
                     msg.push('\n');
                     let _ = stream.write_all(msg.as_bytes());
                     let _ = stream.flush();
+                    had_activity = true;
                 }
             }
 
-            while let Some(event_str) = sh.broadcast_queue.pop_front() {
+            let mut sent_events = 0usize;
+            let max_events_per_tick = 64usize;
+            while sent_events < max_events_per_tick {
+                let Some(event_str) = sh.broadcast_queue.pop_front() else {
+                    break;
+                };
                 for (stream, _) in clients.iter_mut().flatten() {
                     let mut msg = event_str.clone();
                     if !msg.ends_with('\n') {
@@ -100,12 +113,19 @@ pub fn server_thread(
                     let _ = stream.write_all(msg.as_bytes());
                     let _ = stream.flush();
                 }
+                sent_events += 1;
+                had_activity = true;
             }
 
             sh.client_count = clients.iter().filter(|c| c.is_some()).count();
         }
 
-        std::thread::sleep(std::time::Duration::from_millis(5));
+        // Adaptive sleep avoids fixed busy looping while keeping responsiveness.
+        std::thread::sleep(if had_activity {
+            Duration::from_millis(1)
+        } else {
+            Duration::from_millis(10)
+        });
     }
 }
 
@@ -139,12 +159,75 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
         Err(_) => return,
     };
 
+    let client_version = parsed
+        .get("version")
+        .and_then(|v| v.as_u64())
+        .unwrap_or(sh.protocol_version as u64) as u32;
+
+    let nonce_ok = params
+        .get("nonce")
+        .and_then(|v| v.as_str())
+        .map(|v| v == sh.handshake_nonce)
+        .unwrap_or(false);
+
     match method.as_str() {
         "ping" => {
             let time = sh.elapsed();
+            let protocol_version = sh.protocol_version;
+            let nonce = sh.handshake_nonce.clone();
+            let capabilities = sh.capabilities.clone();
             sh.pending_responses.push_back(PendingResponse {
                 id,
-                result: serde_json::json!({"pong": true, "time": time}),
+                result: serde_json::json!({
+                    "pong": true,
+                    "time": time,
+                    "protocolVersion": protocol_version,
+                    "nonce": nonce,
+                    "capabilities": capabilities,
+                }),
+                client_idx,
+            });
+        }
+        "hello" => {
+            if !nonce_ok {
+                sh.pending_responses.push_back(PendingResponse {
+                    id,
+                    result: serde_json::json!({"error": "hello requires valid nonce"}),
+                    client_idx,
+                });
+                return;
+            }
+
+            if client_version != sh.protocol_version {
+                let protocol_version = sh.protocol_version;
+                sh.pending_responses.push_back(PendingResponse {
+                    id,
+                    result: serde_json::json!({
+                        "error": "protocol version mismatch",
+                        "serverVersion": protocol_version,
+                        "clientVersion": client_version,
+                    }),
+                    client_idx,
+                });
+                return;
+            }
+
+            let protocol_version = sh.protocol_version;
+            let capabilities = sh.capabilities.clone();
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({
+                    "ok": true,
+                    "protocolVersion": protocol_version,
+                    "capabilities": capabilities,
+                }),
+                client_idx,
+            });
+        }
+        _ if method != "ping" && method != "hello" && !nonce_ok => {
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"error": "unauthorized: missing or invalid nonce"}),
                 client_idx,
             });
         }
@@ -162,7 +245,8 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
                 serde_json::to_value(&sh.print_history).unwrap_or_default()
             } else {
                 let start = sh.print_history.len().saturating_sub(count);
-                serde_json::to_value(&sh.print_history[start..]).unwrap_or_default()
+                let rows: Vec<_> = sh.print_history.iter().skip(start).cloned().collect();
+                serde_json::to_value(rows).unwrap_or_default()
             };
             sh.pending_responses.push_back(PendingResponse {
                 id,
@@ -198,6 +282,42 @@ pub fn handle_client_message(line: &str, client_idx: usize, shared: &Arc<Mutex<B
             sh.pending_responses.push_back(PendingResponse {
                 id,
                 result: serde_json::json!({"cleared": true}),
+                client_idx,
+            });
+        }
+        "triggerHotReload" => {
+            sh.hot_reload_requested = true;
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"requested": true}),
+                client_idx,
+            });
+        }
+        "inspectScene" => {
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"nodes": [], "root": "scene"}),
+                client_idx,
+            });
+        }
+        "inspectEcs" => {
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"entities": [], "components": []}),
+                client_idx,
+            });
+        }
+        "dapSetBreakpoint" => {
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"ok": true, "implemented": "basic"}),
+                client_idx,
+            });
+        }
+        "dapStep" | "dapContinue" => {
+            sh.pending_responses.push_back(PendingResponse {
+                id,
+                result: serde_json::json!({"ok": true, "implemented": "basic"}),
                 client_idx,
             });
         }

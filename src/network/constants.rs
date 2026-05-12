@@ -10,7 +10,7 @@
 pub const MAX_PEERS: usize = 4096;
 
 /// Default number of peers when no explicit value is provided.
-pub const DEFAULT_PEERS: usize = 166;
+pub const DEFAULT_PEERS: usize = 64;
 
 /// Maximum number of independent ENet channels per connection.
 ///

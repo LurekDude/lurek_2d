@@ -58,6 +58,7 @@ This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`
 - `FrameProfile` (`struct`, `shared_state.rs`): Per-frame callback timing snapshot recorded by the app loop.
 - `ResourceMemoryStats` (`struct`, `shared_state.rs`): Resource-memory accounting snapshot with per-kind bytes and counts.
 - `SharedState` (`struct`, `shared_state.rs`): Shared mutable state passed via `Rc<RefCell<SharedState>>` to all Lua API closures and the engine loop.
+- `PhysicsRunConfig` (`struct`, `shared_state.rs`): Physics and fixed-update runtime configuration sub-domain (`fixed_dt`, `max_steps`, `debug_draw`, `fixed_update_dt`), held as `SharedState::physics_run`.
 - `RendererStats` (`struct`, `shared_state.rs`): Snapshot of renderer statistics for a single frame.
 
 ## Functions
@@ -86,7 +87,8 @@ This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`
 - `SharedState::new` (`shared_state.rs`): Creates a new `SharedState` with the given window dimensions, title, and game directory.
 - `SharedState::step_timer` (`shared_state.rs`): Advances the clock by one tick and syncs `delta_time`, `total_time`, and `fps`.
 - `SharedState::touch_texture` (`shared_state.rs`): Records that a texture was used on the current frame.
-- `SharedState::evict_lru_resources` (`shared_state.rs`): Evicts least-recently-used textures until resident size is within budget.
+- `SharedState::touch_canvas` (`shared_state.rs`): Records that a canvas was used on the current frame (updates `canvas_last_used`).
+- `SharedState::evict_lru_resources` (`shared_state.rs`): Evicts least-recently-used textures until total resident resource size (textures + fonts + canvases + shaders) is within budget.
 - `SharedState::resource_memory_stats` (`shared_state.rs`): Returns a summary of resident resource memory usage.
 - `SharedState::request_async_load` (`shared_state.rs`): Submits a background file-read request, lazily creating the async loader.
 - `SharedState::load_default_fonts` (`shared_state.rs`): Loads all 6 embedded bitmap fonts into `fonts` and stores their keys in `default_fonts`.
@@ -122,4 +124,10 @@ This module primarily collaborates with `audio`, `camera`, `event`, `filesystem`
 - This module has no dedicated direct `lurek.*` namespace and is usually consumed through higher integration layers.
 - **conf.toml only (updated 2026-04-21)**: `conf.lua` support has been removed. `Config::load` tries `conf.toml` and returns `Config::default()` if absent. `load_from_conf_lua`, `build_config_table`, and `read_config_table` have been deleted. Configuration is TOML-only.
 - **Hot-reload (updated 2026-05-07)**: `app` now watches `conf.toml` and applies mutable settings live (target fps, physics tick, fixed update tick, log level, window title, viewport scale mode) while incrementing a runtime config revision counter.
-- **Engine diagnostics (updated 2026-05-07)**: `lurek.engine.getResourceStats()` now includes per-kind bytes/counts (`texture`, `font`, `canvas`, `shader`, `total`), and `lurek.engine.getFrameProfile()` exposes per-callback CPU timing buckets.
+- **Hot-reload programmatic trigger (updated 2026-05-12)**: `lurek.runtime.reloadConfig()` sets `SharedState::pending_config_reload`; the app loop consumes this flag and calls `FileWatcher::force_changed()` before the normal `poll_config_hot_reload` path, enabling Lua-triggered reloads without requiring a file change on disk.
+- **Config inspector (updated 2026-05-12)**: `lurek.runtime.getConfig()` returns a snapshot table of active runtime-mutable config values: `physics_tick_rate`, `fixed_update_tick_rate`, `frame_budget_warn_ms`, `lua_callback_timeout_ms`, `vsync`, `log_level`, `config_reload_revision`.
+- **PhysicsRunConfig (updated 2026-05-12)**: Four physics-related fields (`physics_fixed_dt`, `physics_max_steps`, `fixed_update_dt`, `physics_debug_draw`) removed from flat `SharedState` and grouped into `PhysicsRunConfig` sub-struct accessible as `SharedState::physics_run`.
+- **evict_lru_resources total budget (updated 2026-05-12)**: Eviction check now uses `resource_memory_stats().total_bytes` (textures + fonts + canvases + shaders) instead of texture-only byte sum. `canvas_last_used` map and `touch_canvas()` method added for canvas recency tracking. Internal allocation pattern improved: `Vec::with_capacity` + `sort_unstable_by_key`.
+- **messages.rs unsafe removed (updated 2026-05-12)**: `MessageCatalog` stores `&'static str` values via `Box::leak` in `collect_strings`; no `unsafe` blocks remain in `messages.rs`. `get_message` return type and `MessageCatalog::get` return type unchanged.
+- **Engine diagnostics (updated 2026-05-12)**: `lurek.engine.getResourceStats()` includes per-kind bytes/counts (`texture`, `font`, `canvas`, `shader`, `total`), `lurek.engine.getFrameProfile()` now includes both callback buckets and app-loop buckets (`app_tick_ms`, `app_update_ms`, `app_render_ms`, `app_frame_total_ms`), and `lurek.engine.getFrameProfileText()` returns a compact one-line timing summary.
+- **Lua callback timeout (updated 2026-05-12)**: `[performance].lua_callback_timeout_ms` is mirrored into runtime state and enforced for app-driven Lua callbacks via an instruction hook. Timeouts are surfaced as runtime errors and route the app to `RunState::Error`.

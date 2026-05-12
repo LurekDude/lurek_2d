@@ -541,3 +541,69 @@ mod websocket_tests {
         }
     }
 }
+
+mod relay_and_sync_tests {
+    use lurek2d::network::lobby;
+    use lurek2d::network::net_sync::{predict_linear, reconcile, EntitySnapshot};
+    use lurek2d::network::relay::{
+        decode_ticket, encode_ticket, make_punch_probe, parse_punch_probe, RelayTicket,
+    };
+
+    #[test]
+    fn relay_ticket_round_trip() {
+        let ticket = RelayTicket {
+            room_id: "room-1".to_string(),
+            peer_id: "peer-a".to_string(),
+        };
+        let encoded = encode_ticket(&ticket);
+        let decoded = decode_ticket(&encoded).expect("decode");
+        assert_eq!(decoded, ticket);
+    }
+
+    #[test]
+    fn punch_probe_round_trip() {
+        let payload = make_punch_probe("peer-z");
+        let parsed = parse_punch_probe(&payload).expect("parse");
+        assert_eq!(parsed, "peer-z");
+    }
+
+    #[test]
+    fn net_sync_predict_and_reconcile() {
+        let base = EntitySnapshot {
+            id: 1,
+            tick: 10,
+            x: 0.0,
+            y: 0.0,
+            vx: 2.0,
+            vy: 0.0,
+        };
+        let predicted = predict_linear(&base, 0.5);
+        assert_eq!(predicted.tick, 11);
+        assert!(predicted.x > base.x);
+
+        let auth = EntitySnapshot {
+            id: 1,
+            tick: 11,
+            x: 0.8,
+            y: 0.0,
+            vx: 2.0,
+            vy: 0.0,
+        };
+        let merged = reconcile(&predicted, &auth, 0.5);
+        assert!(merged.x >= predicted.x.min(auth.x));
+        assert!(merged.x <= predicted.x.max(auth.x));
+    }
+
+    #[test]
+    fn room_registry_lifecycle() {
+        let room = lobby::create_room("ranked", "hostA", 4);
+        let listed = lobby::list_rooms();
+        assert!(listed.iter().any(|r| r.id == room.id));
+
+        let joined = lobby::join_room(&room.id).expect("join room");
+        assert!(joined.player_count >= 2);
+
+        let left = lobby::leave_room(&room.id).expect("leave room");
+        assert!(left.player_count >= 1);
+    }
+}

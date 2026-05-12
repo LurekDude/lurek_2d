@@ -1304,7 +1304,7 @@ describe("unit: migrated from integration/test_pathfind_ai.lua", function()
             local map = lurek.pathfind.newHexGrid(10, 10)
             local los_clear = map:lineOfSight(1, 1, 5, 5)
             expect_equal(true, los_clear, "open map should have LOS")
-    
+
             -- Add a wall column
             for row = 1, 10 do
                 map:setBlocked(3, row, true)
@@ -1471,15 +1471,15 @@ describe("unit: migrated from integration/test_pathfind_ecs.lua", function()
         it("blocked cells force path around obstacle", function()
             local grid = lurek.pathfind.newNavGrid(10, 10)
             local pf   = lurek.pathfind.newPathfinder(grid)
-    
+
             -- Block a wall at column 6 (1-based), rows 1-9
             for y = 1, 9 do
                 grid:setBlocked(6, y, true)
             end
-    
+
             local path = pf:findPath(1, 6, 10, 6)
             expect_true(path ~= nil, "path found around wall")
-    
+
             if path then
                 local len = #path
                 -- Path around wall should be longer than direct
@@ -1494,12 +1494,12 @@ describe("unit: migrated from integration/test_pathfind_ecs.lua", function()
         it("no path returns nil for unreachable goal", function()
             local grid = lurek.pathfind.newNavGrid(10, 10)
             local pf   = lurek.pathfind.newPathfinder(grid)
-    
+
             -- Block all of row 2 so (1,1) is trapped in row 1 and cannot reach (1,10)
             for x = 1, 10 do
                 grid:setBlocked(x, 2, true)
             end
-    
+
             local path = pf:findPath(1, 1, 1, 10)
             expect_true(path == nil, "no path to unreachable goal (got " .. tostring(path) .. ")")
         end)
@@ -1808,6 +1808,54 @@ describe("unit: migrated from integration/test_pathfind_hexmap.lua", function()
             expect_true(#r6.cells >= #r3.cells, "larger budget should reach at least as many cells")
         end)
 
+end)
+
+-- @describe NavMesh
+describe("NavMesh", function()
+    -- @covers lurek.pathfind.newNavMesh
+    it("newNavMesh returns userdata", function()
+        local mesh = lurek.pathfind.newNavMesh()
+        expect_type("userdata", mesh)
+    end)
+
+    -- @covers LNavMesh:addPolygon
+    -- @covers LNavMesh:getPolygonCount
+    -- @covers lurek.pathfind.newNavMesh
+    it("addPolygon increments polygon count", function()
+        local mesh = lurek.pathfind.newNavMesh()
+        local a = mesh:addPolygon({
+            {x = 0, y = 0},
+            {x = 10, y = 0},
+            {x = 10, y = 10},
+            {x = 0, y = 10},
+        })
+        expect_equal(1, a)
+        expect_equal(1, mesh:getPolygonCount())
+    end)
+
+    -- @covers LNavMesh:addPolygon
+    -- @covers LNavMesh:connectPolygons
+    -- @covers LNavMesh:findPath
+    -- @covers lurek.pathfind.newNavMesh
+    it("findPath returns waypoints across connected polygons", function()
+        local mesh = lurek.pathfind.newNavMesh()
+        local p1 = mesh:addPolygon({
+            {x = 0, y = 0},
+            {x = 10, y = 0},
+            {x = 10, y = 10},
+            {x = 0, y = 10},
+        })
+        local p2 = mesh:addPolygon({
+            {x = 10, y = 0},
+            {x = 20, y = 0},
+            {x = 20, y = 10},
+            {x = 10, y = 10},
+        })
+        expect_true(mesh:connectPolygons(p1, p2, true))
+        local path = mesh:findPath(2, 2, 18, 8)
+        expect_type("table", path)
+        expect_true(#path >= 2)
+    end)
 end)
 
 test_summary()

@@ -104,6 +104,13 @@ pub struct LuaWorld {
     body_data: Rc<RefCell<HashMap<usize, LuaRegistryKey>>>,
 }
 
+impl LuaWorld {
+    /// Returns a clone of the shared world handle.
+    pub(crate) fn world_handle(&self) -> Rc<RefCell<World>> {
+        self.world.clone()
+    }
+}
+
 impl LuaUserData for LuaWorld {
     fn add_methods<'lua, M: LuaUserDataMethods<'lua, Self>>(methods: &mut M) {
         // -- drawDebug --
@@ -2680,7 +2687,7 @@ pub fn register(lua: &Lua, luna: &LuaTable, state: Rc<RefCell<SharedState>>) -> 
     tbl.set(
         "debugDraw",
         lua.create_function(move |_, enable: bool| {
-            s.borrow_mut().physics_debug_draw = enable;
+            s.borrow_mut().physics_run.debug_draw = enable;
             Ok(())
         })?,
     )?;

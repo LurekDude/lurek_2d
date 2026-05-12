@@ -181,7 +181,9 @@ mod locale_util_tests {
 
     #[test]
     fn test_valid_locale_code_rejects_too_long() {
-        assert!(!is_valid_locale_code("abcdefghijklmnopqrstuvwxyzabcdefghijk"));
+        assert!(!is_valid_locale_code(
+            "abcdefghijklmnopqrstuvwxyzabcdefghijk"
+        ));
     }
 
     // is_rtl

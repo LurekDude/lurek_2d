@@ -9,9 +9,36 @@
 
 use crate::compute::array::{DataType, NdArray};
 use rayon::prelude::*;
+use std::sync::OnceLock;
+use std::sync::{Arc, Mutex};
 
-/// Element count above which element-wise and reduction ops use Rayon thread pool.
-const PAR_THRESHOLD: usize = 10_000;
+/// Configurable parallelization threshold for element-wise and reduction ops.
+/// Element count above this threshold uses Rayon thread pool; below uses serial computation.
+static PAR_THRESHOLD_CONFIG: OnceLock<Arc<Mutex<usize>>> = OnceLock::new();
+
+fn get_par_threshold_config() -> &'static Arc<Mutex<usize>> {
+    PAR_THRESHOLD_CONFIG.get_or_init(|| Arc::new(Mutex::new(10_000)))
+}
+
+/// Get the current parallelization threshold.
+/// # Returns
+/// Current threshold as a `usize`. Defaults to 10,000.
+pub fn get_par_threshold() -> usize {
+    *get_par_threshold_config().lock().unwrap()
+}
+
+/// Set the parallelization threshold for element-wise and reduction ops.
+/// # Parameters
+/// - `threshold` — `usize`. Element count above which to use Rayon parallel operations.
+///
+/// # Returns
+/// The previous threshold value.
+pub fn set_par_threshold(threshold: usize) -> usize {
+    let mut config = get_par_threshold_config().lock().unwrap();
+    let prev = *config;
+    *config = threshold.max(1); // Ensure minimum value of 1
+    prev
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -19,7 +46,7 @@ const PAR_THRESHOLD: usize = 10_000;
 
 /// Run an index-based operation either serially or with Rayon.
 fn dispatch_parallel(size: usize, op: impl Fn(usize) -> f64 + Sync + Send) -> Vec<f64> {
-    if size > PAR_THRESHOLD {
+    if size > get_par_threshold() {
         (0..size).into_par_iter().map(op).collect()
     } else {
         (0..size).map(op).collect()
@@ -764,7 +791,7 @@ pub fn all(a: &NdArray) -> bool {
 /// # Returns
 /// `f64`.
 pub fn sum(a: &NdArray) -> f64 {
-    if a.size() > PAR_THRESHOLD {
+    if a.size() > get_par_threshold() {
         (0..a.size()).into_par_iter().map(|i| a.get_f64(i)).sum()
     } else {
         let mut s = 0.0;
@@ -794,7 +821,7 @@ pub fn mean(a: &NdArray) -> f64 {
 /// # Returns
 /// `f64`.
 pub fn min_val(a: &NdArray) -> f64 {
-    if a.size() > PAR_THRESHOLD {
+    if a.size() > get_par_threshold() {
         (0..a.size())
             .into_par_iter()
             .map(|i| a.get_f64(i))
@@ -820,7 +847,7 @@ pub fn min_val(a: &NdArray) -> f64 {
 /// # Returns
 /// `f64`.
 pub fn max_val(a: &NdArray) -> f64 {
-    if a.size() > PAR_THRESHOLD {
+    if a.size() > get_par_threshold() {
         (0..a.size())
             .into_par_iter()
             .map(|i| a.get_f64(i))

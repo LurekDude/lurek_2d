@@ -554,6 +554,17 @@ describe("comparison", function()
         expect_near(0.0, c:get(3), 1e-5)
     end)
 
+    -- @covers LArray:neq
+    -- @covers lurek.compute.fromTable
+    it("neq with scalar", function()
+        local a = lurek.compute.fromTable({1, 2, 2, 3})
+        local c = a:neq(2)
+        expect_near(1.0, c:get(1), 1e-5)
+        expect_near(0.0, c:get(2), 1e-5)
+        expect_near(0.0, c:get(3), 1e-5)
+        expect_near(1.0, c:get(4), 1e-5)
+    end)
+
     -- @covers LArray:gt
     -- @covers lurek.compute.fromTable
     it("gt returns 1.0 where a > b", function()
@@ -1085,6 +1096,60 @@ describe("2D spatial operations", function()
         -- Untouched regions remain zero
         expect_near(0.0, a:get(1, 1), 1e-5)
     end)
+
+    -- @covers LArray:convolve2D
+    -- @covers lurek.compute.fromTable
+    it("convolve2D with 1x3 horizontal kernel (non-square)", function()
+        -- 3x3 input
+        local a = lurek.compute.fromTable({1,2,3, 4,5,6, 7,8,9}, {3,3})
+        -- 1x3 horizontal edge kernel
+        local k = lurek.compute.fromTable({-1, 0, 1}, {1, 3})
+        local c = a:convolve2D(k)
+        expect_equal(3, c:getShape()[1])
+        expect_equal(3, c:getShape()[2])
+    end)
+
+    -- @covers LArray:convolve2D
+    -- @covers lurek.compute.fromTable
+    it("convolve2D with 3x1 vertical kernel (non-square)", function()
+        -- 4x4 input
+        local a = lurek.compute.fromTable({1,2,3,4, 5,6,7,8, 9,10,11,12, 13,14,15,16}, {4,4})
+        -- 3x1 vertical kernel
+        local k = lurek.compute.fromTable({-1, 0, 1}, {3, 1})
+        local c = a:convolve2D(k)
+        expect_equal(4, c:getShape()[1])
+        expect_equal(4, c:getShape()[2])
+    end)
+
+    -- @covers LArray:convolve2D
+    -- @covers lurek.compute.fromTable
+    -- @covers lurek.compute.zeros
+    it("convolve2D with 2x2 kernel (non-square input)", function()
+        -- 5x3 rectangular input
+        local a = lurek.compute.zeros({5, 3})
+        for i = 1, 15 do
+            local row = math.floor((i - 1) / 3) + 1
+            local col = ((i - 1) % 3) + 1
+            a:set(row, col, 1.0)
+        end
+        -- 2x2 kernel
+        local k = lurek.compute.fromTable({1, 1, 1, 1}, {2, 2})
+        local c = a:convolve2D(k)
+        expect_equal(5, c:getShape()[1])
+        expect_equal(3, c:getShape()[2])
+    end)
+
+    -- @covers LArray:convolve2D
+    -- @covers lurek.compute.fromTable
+    it("convolve2D with 1x5 kernel preserves output shape", function()
+        -- 3x5 input
+        local a = lurek.compute.fromTable({1,2,3,4,5, 6,7,8,9,10, 11,12,13,14,15}, {3,5})
+        -- 1x5 kernel
+        local k = lurek.compute.fromTable({1, 1, 1, 1, 1}, {1, 5})
+        local c = a:convolve2D(k)
+        expect_equal(3, c:getShape()[1])
+        expect_equal(5, c:getShape()[2])
+    end)
 end)
 
 -- =========================================================================
@@ -1246,6 +1311,46 @@ describe("bitwise shift", function()
         expect_equal(4, r:get(1))
         expect_equal(2, r:get(2))
         expect_equal(1, r:get(3))
+    end)
+
+    -- @covers LArray:bitwiseLShift
+    -- @covers lurek.compute.fromTable
+    it("bitwiseLShift with shift amount 0 preserves values", function()
+        local a = lurek.compute.fromTable({5, 10, 15}, {3}, "int32")
+        local r = a:bitwiseLShift(0)
+        expect_equal(5, r:get(1))
+        expect_equal(10, r:get(2))
+        expect_equal(15, r:get(3))
+    end)
+
+    -- @covers LArray:bitwiseRShift
+    -- @covers lurek.compute.fromTable
+    it("bitwiseRShift with shift amount 0 preserves values", function()
+        local a = lurek.compute.fromTable({5, 10, 15}, {3}, "int32")
+        local r = a:bitwiseRShift(0)
+        expect_equal(5, r:get(1))
+        expect_equal(10, r:get(2))
+        expect_equal(15, r:get(3))
+    end)
+
+    -- @covers LArray:bitwiseLShift
+    -- @covers lurek.compute.fromTable
+    it("bitwiseLShift with large shift amounts", function()
+        local a = lurek.compute.fromTable({1, 1, 1}, {3}, "int32")
+        local r = a:bitwiseLShift(8)
+        expect_equal(256, r:get(1))
+        expect_equal(256, r:get(2))
+        expect_equal(256, r:get(3))
+    end)
+
+    -- @covers LArray:bitwiseRShift
+    -- @covers lurek.compute.fromTable
+    it("bitwiseRShift with large values", function()
+        local a = lurek.compute.fromTable({256, 512, 1024}, {3}, "int32")
+        local r = a:bitwiseRShift(4)
+        expect_equal(16, r:get(1))
+        expect_equal(32, r:get(2))
+        expect_equal(64, r:get(3))
     end)
 end)
 
@@ -2194,6 +2299,48 @@ describe("compute strict: LArray where", function()
         local mask = lurek.compute.newArray({4}, "float32")
         local ok = pcall(function() return a:where(mask, b) end)
         expect_type("boolean", ok)
+    end)
+end)
+
+-- @describe lurek.compute parallelization configuration
+describe("lurek.compute parallelization configuration", function()
+    -- @covers lurek.compute.getParThreshold
+    it("has getParThreshold function", function()
+        expect_type("function", lurek.compute.getParThreshold)
+    end)
+
+    -- @covers lurek.compute.setParThreshold
+    it("has setParThreshold function", function()
+        expect_type("function", lurek.compute.setParThreshold)
+    end)
+
+    -- @covers lurek.compute.getParThreshold
+    it("getParThreshold returns an integer", function()
+        local threshold = lurek.compute.getParThreshold()
+        expect_type("number", threshold)
+        assert(threshold > 0, "threshold should be positive")
+    end)
+
+    -- @covers lurek.compute.setParThreshold
+    -- @covers lurek.compute.getParThreshold
+    it("setParThreshold changes the threshold and returns previous value", function()
+        local old_threshold = lurek.compute.getParThreshold()
+        local new_threshold = 5000
+        local returned_old = lurek.compute.setParThreshold(new_threshold)
+        expect_equal(old_threshold, returned_old)
+        expect_equal(new_threshold, lurek.compute.getParThreshold())
+        -- Restore original threshold
+        lurek.compute.setParThreshold(old_threshold)
+    end)
+
+    -- @covers lurek.compute.setParThreshold
+    -- @covers lurek.compute.getParThreshold
+    it("setParThreshold enforces minimum value of 1", function()
+        local original = lurek.compute.getParThreshold()
+        lurek.compute.setParThreshold(0)
+        local result = lurek.compute.getParThreshold()
+        expect_true(result >= 1, "threshold should be at least 1")
+        lurek.compute.setParThreshold(original)
     end)
 end)
 

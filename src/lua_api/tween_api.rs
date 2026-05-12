@@ -396,6 +396,107 @@ pub fn register(lua: &Lua, lurek: &LuaTable, _state: Rc<RefCell<SharedState>>) -
         )?,
     )?;
 
+    // -- tweenChain -------------------------------------------------
+    /// Builds and starts a tween sequence from a declarative step array.
+    /// @param | steps | table | Array of step tables (`delay`, or `duration` + `target` + `fields`, optional `easing`/`callback`).
+    /// @return | LTweenSequence | Started sequence handle.
+    let s = engine.clone();
+    tbl.set(
+        "tweenChain",
+        lua.create_function(move |lua, steps: LuaTable| {
+            let mut seq = LuaTweenSequence::new();
+            let len = steps.raw_len();
+            for i in 1..=len {
+                let step: LuaTable = steps.raw_get(i)?;
+                if let Ok(delay) = step.get::<_, f64>("delay") {
+                    let callback = step
+                        .get::<_, LuaFunction>("callback")
+                        .ok()
+                        .map(|f| lua.create_registry_value(f))
+                        .transpose()?;
+                    seq.steps.push(SequenceStep::Delay {
+                        duration: delay.max(0.0),
+                        elapsed: 0.0,
+                        callback,
+                    });
+                    continue;
+                }
+
+                let duration: f64 = step.get("duration")?;
+                let target: LuaTable = step.get("target")?;
+                let fields_tbl: LuaTable = step.get("fields")?;
+                let easing_name = step
+                    .get::<_, String>("easing")
+                    .unwrap_or_else(|_| "linear".to_string());
+
+                let target_key = lua.create_registry_value(target)?;
+                let mut fields = Vec::new();
+                let mut end_values = Vec::new();
+                for pair in fields_tbl.pairs::<String, f64>() {
+                    let (k, v) = pair?;
+                    fields.push(k);
+                    end_values.push(v);
+                }
+                let n = fields.len();
+                seq.steps.push(SequenceStep::Tween {
+                    state: TweenState::new(duration, &easing_name),
+                    target_key,
+                    fields,
+                    end_values,
+                    start_values: Vec::with_capacity(n),
+                    starts_captured: false,
+                });
+
+                if let Ok(cb) = step.get::<_, LuaFunction>("callback") {
+                    seq.steps
+                        .push(SequenceStep::Callback(lua.create_registry_value(cb)?));
+                }
+            }
+
+            seq.active = true;
+            let ud = lua.create_userdata(seq)?;
+            let key = lua.create_registry_value(ud.clone())?;
+            s.borrow_mut().active_seqs.push(key);
+            Ok(ud)
+        })?,
+    )?;
+
+    // -- tweenColor -------------------------------------------------
+    /// Convenience helper to tween RGBA color fields (`r`,`g`,`b`,`a`) on a target table.
+    /// @param | duration | number | Tween duration in seconds.
+    /// @param | target | table | Target Lua table.
+    /// @param | color | table | Target color fields.
+    /// @param | easing | string? | Optional easing name.
+    /// @return | LTween | New tween handle.
+    let s = engine.clone();
+    tbl.set(
+        "tweenColor",
+        lua.create_function(
+            move |lua,
+                  (duration, target, color_tbl, easing): (
+                f64,
+                LuaTable,
+                LuaTable,
+                Option<String>,
+            )| {
+                let easing_name = easing.as_deref().unwrap_or("linear");
+                let mut fields = Vec::new();
+                let mut end_values = Vec::new();
+                for key in ["r", "g", "b", "a"] {
+                    if let Ok(value) = color_tbl.get::<_, f64>(key) {
+                        fields.push(key.to_string());
+                        end_values.push(value);
+                    }
+                }
+                let tw = LuaTween::new(lua, duration, target, fields, end_values, easing_name)?;
+                let ud = lua.create_userdata(tw)?;
+                let key = lua.create_registry_value(ud.clone())?;
+                s.borrow_mut().active_tweens.push(key);
+                Ok(ud)
+            },
+        )?,
+    )?;
+
     // -- spring -------------------------------------------------
     /// Creates a spring animation that drives named table fields toward target values.
     /// @param | target_table | table | Lua table whose numeric fields will be animated.
@@ -467,6 +568,7 @@ impl LuaUserData for LuaTween {
                 }
                 lua.remove_registry_value(k)?;
             }
+            tw.resume_waiters(lua)?;
             Ok(())
         });
 
@@ -494,7 +596,78 @@ impl LuaUserData for LuaTween {
         // -- getProgress -------------------------------------------------
         /// Returns raw 0..1 playback progress (not eased, not accounting for yoyo).
         /// @return | number | Raw playback progress in the range 0 to 1.
-        methods.add_method("getProgress", |_, this, ()| Ok(this.state.t_raw() as f64));
+        methods.add_method("getProgress", |_, this, ()| Ok(this.progress()));
+
+        // -- getElapsed -------------------------------------------------
+        /// Returns elapsed tween time in seconds.
+        /// @return | number | Elapsed seconds.
+        methods.add_method("getElapsed", |_, this, ()| Ok(this.elapsed()));
+
+        // -- getDuration -------------------------------------------------
+        /// Returns configured tween duration in seconds.
+        /// @return | number | Duration in seconds.
+        methods.add_method("getDuration", |_, this, ()| Ok(this.state.duration));
+
+        // -- getRemaining -------------------------------------------------
+        /// Returns remaining tween time in seconds.
+        /// @return | number | Remaining seconds until completion.
+        methods.add_method("getRemaining", |_, this, ()| Ok(this.remaining()));
+
+        // -- getFields -------------------------------------------------
+        /// Returns animated field names.
+        /// @return | table | Array of field names.
+        methods.add_method("getFields", |lua, this, ()| {
+            let out = lua.create_table()?;
+            for (idx, field) in this.fields.iter().enumerate() {
+                out.set((idx + 1) as i64, field.as_str())?;
+            }
+            Ok(out)
+        });
+
+        // -- setRelative -------------------------------------------------
+        /// Enables delta mode where field values are interpreted as offsets from start values.
+        /// @param | enabled | boolean | True to enable relative tweening.
+        /// @return | nil | No value is returned.
+        methods.add_method_mut("setRelative", |_, this, enabled: bool| {
+            this.set_relative(enabled);
+            Ok(())
+        });
+
+        // -- relative -------------------------------------------------
+        /// Chainable alias for `setRelative`.
+        /// @param | self | LTween | Tween handle returned for chaining.
+        /// @param | enabled | boolean | True to enable relative tweening.
+        /// @return | LTween | The same tween handle.
+        methods.add_function("relative", |_, (ud, enabled): (LuaAnyUserData, bool)| {
+            ud.borrow_mut::<LuaTween>()?.set_relative(enabled);
+            Ok(ud)
+        });
+
+        // -- await -------------------------------------------------
+        /// Yields the current coroutine until this tween completes or is cancelled.
+        /// @return | nil | No value is returned.
+        methods.add_function("await", |lua, ud: LuaAnyUserData| {
+            let co_tbl: LuaTable = lua.globals().get("coroutine")?;
+            let running_fn: LuaFunction = co_tbl.get("running")?;
+            let thread_val: LuaValue = running_fn.call(())?;
+            if matches!(thread_val, LuaValue::Nil) {
+                return Err(LuaError::RuntimeError(
+                    "LTween:await must be called from within a coroutine".to_string(),
+                ));
+            }
+
+            {
+                let mut tw = ud.borrow_mut::<LuaTween>()?;
+                if !tw.active {
+                    return Ok(());
+                }
+                tw.add_waiter(lua.create_registry_value(thread_val)?);
+            }
+
+            let yield_fn: LuaFunction = co_tbl.get("yield")?;
+            yield_fn.call::<_, ()>(())?;
+            Ok(())
+        });
 
         // -- setRepeat -------------------------------------------------
         /// Sets the number of extra play cycles after the first (0 = play once, -1 = infinite).
@@ -676,8 +849,9 @@ impl LuaUserData for LuaTweenSequence {
         // -- cancel -------------------------------------------------
         /// Cancels the sequence and stops all pending steps.
         /// @return | nil | No value is returned.
-        methods.add_method_mut("cancel", |_, this, ()| {
+        methods.add_method_mut("cancel", |lua, this, ()| {
             this.active = false;
+            this.resume_waiters(lua)?;
             Ok(())
         });
 
@@ -685,6 +859,37 @@ impl LuaUserData for LuaTweenSequence {
         /// Returns true if the sequence has been started and has not yet completed.
         /// @return | boolean | True when the sequence is active.
         methods.add_method("isActive", |_, this, ()| Ok(this.active));
+
+        // -- getProgress -------------------------------------------------
+        /// Returns sequence progress ratio from 0..1 based on completed steps.
+        /// @return | number | Step-based progress ratio.
+        methods.add_method("getProgress", |_, this, ()| Ok(this.progress_ratio()));
+
+        // -- await -------------------------------------------------
+        /// Yields the current coroutine until this sequence completes or is cancelled.
+        /// @return | nil | No value is returned.
+        methods.add_function("await", |lua, ud: LuaAnyUserData| {
+            let co_tbl: LuaTable = lua.globals().get("coroutine")?;
+            let running_fn: LuaFunction = co_tbl.get("running")?;
+            let thread_val: LuaValue = running_fn.call(())?;
+            if matches!(thread_val, LuaValue::Nil) {
+                return Err(LuaError::RuntimeError(
+                    "LTweenSequence:await must be called from within a coroutine".to_string(),
+                ));
+            }
+
+            {
+                let mut seq = ud.borrow_mut::<LuaTweenSequence>()?;
+                if !seq.active {
+                    return Ok(());
+                }
+                seq.add_waiter(lua.create_registry_value(thread_val)?);
+            }
+
+            let yield_fn: LuaFunction = co_tbl.get("yield")?;
+            yield_fn.call::<_, ()>(())?;
+            Ok(())
+        });
 
         // -- onComplete -------------------------------------------------
         /// Sets a callback fired when all steps complete.

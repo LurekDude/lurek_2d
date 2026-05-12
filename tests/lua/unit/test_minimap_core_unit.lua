@@ -38,6 +38,18 @@ end)
 
 -- @describe grid dimensions
 describe("grid dimensions", function()
+    -- @covers LMinimap:getCellCount
+    -- @covers lurek.minimap.newMinimap
+    it("returns total cell count", function()
+        local m = lurek.minimap.newMinimap(40, 30)
+        expect_equal(1200, m:getCellCount())
+    end)
+
+    -- @covers LMinimap:clearPath
+    -- @covers LMinimap:getPathCount
+    -- @covers LMinimap:showPath
+    -- @covers lurek.minimap.newMinimap
+
     -- @covers LMinimap:getGridSize
     -- @covers lurek.minimap.newMinimap
     it("returns grid size as two values", function()
@@ -338,6 +350,48 @@ describe("zoom and pan", function()
         local cx, cy = m:getCenter()
         expect_near(5, cx)
         expect_near(3, cy)
+    end)
+
+    -- @covers LMinimap:getCenter
+    -- @covers LMinimap:getViewportRect
+    -- @covers LMinimap:trackCamera
+    -- @covers lurek.camera.new
+    -- @covers lurek.minimap.newMinimap
+    it("can track a camera", function()
+        local m = lurek.minimap.newMinimap(64, 64)
+        local cam = lurek.camera.new(20, 10)
+        cam:setPosition(12, 18)
+        cam:setZoom(2.0)
+
+        m:trackCamera(cam)
+
+        local cx, cy = m:getCenter()
+        local x, y, w, h = m:getViewportRect()
+        expect_near(12, cx)
+        expect_near(18, cy)
+        expect_near(7, x)
+        expect_near(15.5, y)
+        expect_near(10, w)
+        expect_near(5, h)
+    end)
+
+    -- @covers LMinimap:getFogLevel
+    -- @covers LMinimap:revealRadius
+    -- @covers LMinimap:setFogData
+    -- @covers LMinimap:setFogEnabled
+    -- @covers lurek.minimap.newMinimap
+    it("can reveal a circular fog area", function()
+        local m = lurek.minimap.newMinimap(8, 8)
+        local hidden = {}
+        for i = 1, 64 do hidden[i] = 0 end
+        m:setFogEnabled(true)
+        m:setFogData(hidden)
+
+        m:revealRadius(3.5, 3.5, 1.6)
+
+        expect_equal(2, m:getFogLevel(4, 4))
+        expect_equal(2, m:getFogLevel(3, 4))
+        expect_equal(0, m:getFogLevel(1, 1))
     end)
 end)
 
@@ -848,6 +902,25 @@ describe("minimap layers", function()
         mm:setLayerData(2, data)
         expect_equal(true, true)
     end)
+
+    -- @covers LMinimap:getLayerCount
+    -- @covers LMinimap:getLayerData
+    -- @covers LMinimap:setLayerData
+    -- @covers lurek.minimap.newMinimap
+    it("returns stored layer data and layer count", function()
+        local mm = lurek.minimap.newMinimap(4, 4)
+        local data = {}
+        for i = 1, 16 do data[i] = i % 3 end
+        mm:setLayerData(1, data)
+
+        local out = mm:getLayerData(1)
+        expect_equal(2, mm:getLayerCount())
+        expect_type("table", out)
+        expect_equal(16, #out)
+        expect_equal(data[1], out[1])
+        expect_equal(data[16], out[16])
+        expect_nil(mm:getLayerData(5))
+    end)
 end)
 
 -- @describe minimap marker animation
@@ -970,6 +1043,18 @@ describe("minimap geometry overlay", function()
         mm:clearOverlay()
         expect_equal(true, true)
     end)
+
+    -- @covers LMinimap:drawLine
+    -- @covers LMinimap:drawRect
+    -- @covers LMinimap:getOverlayShapeCount
+    -- @covers lurek.minimap.newMinimap
+    it("reports overlay shape count", function()
+        local mm = lurek.minimap.newMinimap(64, 64)
+        expect_equal(0, mm:getOverlayShapeCount())
+        mm:drawLine(0, 0, 10, 10, {255, 0, 0, 255})
+        mm:drawRect(0, 0, 8, 8, {255, 255, 0, 255})
+        expect_equal(2, mm:getOverlayShapeCount())
+    end)
 end)
 
 -- Minimap Path (merged from test_minimap_path.lua)
@@ -1029,6 +1114,29 @@ describe("minimap path visualization", function()
         local mm = lurek.minimap.newMinimap(64, 64)
         mm:clearPath()
         expect_equal(true, true)
+    end)
+end)
+
+-- @describe minimap icon helpers
+describe("minimap icon helpers", function()
+    -- @covers LMinimap:addMarker
+    -- @covers LMinimap:addObjectType
+    -- @covers LMinimap:clearMarkerTexture
+    -- @covers LMinimap:clearObjectTypeTexture
+    -- @covers LMinimap:setMarkerTexture
+    -- @covers LMinimap:setObjectTypeTexture
+    -- @covers lurek.minimap.newMinimap
+    -- @covers lurek.render.newImage
+    it("accepts texture-backed icons for object types and markers", function()
+        local mm = lurek.minimap.newMinimap(32, 32)
+        local tex = lurek.render.newImage("assets/icon.png")
+        local type_idx = mm:addObjectType("unit", 1, 0, 0, 1)
+        local marker_id = mm:addMarker(5, 6, "poi")
+
+        expect_no_error(function() mm:setObjectTypeTexture(type_idx, tex, 12, 12) end)
+        expect_no_error(function() mm:clearObjectTypeTexture(type_idx) end)
+        expect_no_error(function() mm:setMarkerTexture(marker_id, tex, 10, 10) end)
+        expect_no_error(function() mm:clearMarkerTexture(marker_id) end)
     end)
 end)
 

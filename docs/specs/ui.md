@@ -29,6 +29,13 @@ This module primarily collaborates with `image`, `math`, `render`, `runtime`. It
 - Improved render-cache invalidation:
 	- `flushCache` now uses a lightweight widget-tree signature (position/size/state/topology) in addition to the dirty flag.
 
+### 2026-05 UI Refactor Closure (IDEA.md)
+
+- Reduced `WidgetKind::base` / `WidgetKind::base_mut` dispatch boilerplate in `src/ui/context.rs` via shared macro mapping.
+- Introduced `WidgetRenderer` orchestration in `src/ui/render.rs` to keep root traversal/render pipeline setup separate from per-widget emission logic.
+- Unified repeated chart legend/title fragments in `src/ui/chart.rs` through shared helper functions used by line/bar/scatter/pie/area renderers.
+- No Lua API surface change in this pass; behavior is preserved while reducing maintenance duplication.
+
 ## Files
 
 - `chart.rs`: Generates CPU-rendered chart images for line, bar, scatter, pie, and area graphs without requiring the GPU path.

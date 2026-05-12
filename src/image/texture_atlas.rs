@@ -2,6 +2,7 @@
 //!
 //! Packs named rectangular regions into a fixed-size atlas without any
 //! GPU interaction. Useful for building sprite-sheet layouts at load time.
+//! `sprite::atlas` parses external JSON metadata; `TextureAtlas` owns CPU packing.
 
 use std::collections::HashMap;
 

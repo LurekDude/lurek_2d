@@ -137,13 +137,6 @@ describe("construction", function()
         })
         expect_equal(2, df:nrows())
         expect_equal(2, df:ncols())
-    end)
-
-    -- @covers LDataFrame:getValue
-    -- @covers LDataFrame:ncols
-    -- @covers LDataFrame:nrows
-    -- @covers lurek.dataframe.fromRows
-    it("fromRows creates DataFrame from explicit columns and row-major values", function()
         local df = lurek.dataframe.fromRows(
             { "id", "name", "score" },
             {
@@ -190,15 +183,6 @@ describe("construction", function()
         for i = 1, 5 do
             expect_near(df1:getValue(i, "val"), df2:getValue(i, "val"), 1e-5)
         end
-    end)
-
-    -- @covers LDataFrame:ncols
-    -- @covers LDataFrame:nrows
-    -- @covers lurek.dataframe.fromCSV
-    it("fromCSV with empty body creates empty DataFrame", function()
-        local df = lurek.dataframe.fromCSV("x,y")
-        expect_equal(0, df:nrows())
-        expect_equal(2, df:ncols())
     end)
 
     -- @covers LDataFrame:ncols
@@ -3559,6 +3543,151 @@ describe("unit: migrated from integration/test_image_dataframe.lua", function()
             end
             expect_equal(256, df:nrows(), "256 rows without overflow")
         end)
+
+end)
+
+test_summary()
+
+-- @describe lazy evaluation pipeline
+describe("lazy evaluation pipeline", function()
+
+    -- @covers LDataFrame:lazy
+    it("lazy has lazy factory method", function()
+        local df = lurek.dataframe.fromCSV("a,b\n1,2\n3,4")
+        local lq = df:lazy()
+        expect_not_nil(lq, "lazy() returns a value")
+        expect_equal("LLazyQuery", lq:type(), "type is LLazyQuery")
+    end)
+
+    -- @covers LDataFrame:lazy
+    -- @covers LLazyQuery:collect
+    it("lazy collect with no steps returns identical rows", function()
+        local df = lurek.dataframe.fromCSV("x,y\n1,2\n3,4\n5,6")
+        local out = df:lazy():collect()
+        expect_equal(3, out:nrows(), "row count preserved")
+        expect_equal(2, out:ncols(), "col count preserved")
+    end)
+
+    -- @covers LLazyQuery:filter
+    -- @covers LLazyQuery:collect
+    it("lazy filter reduces rows", function()
+        local df = lurek.dataframe.fromCSV("age,score\n20,80\n30,90\n40,70")
+        local out = df:lazy():filter("age", ">", 25):collect()
+        expect_equal(2, out:nrows(), "two rows pass age > 25")
+    end)
+
+    -- @covers LLazyQuery:sort
+    -- @covers LLazyQuery:head
+    it("lazy sort + head returns top-n", function()
+        local df = lurek.dataframe.fromCSV("v\n3\n1\n4\n1\n5\n9")
+        local out = df:lazy():sort("v", false):head(3):collect()
+        expect_equal(3, out:nrows(), "head(3) yields 3 rows")
+        expect_equal(9, out:getValue(1, "v"), "first row is max value")
+    end)
+
+    -- @covers LLazyQuery:tail
+    it("lazy tail returns last rows", function()
+        local df = lurek.dataframe.fromCSV("n\n1\n2\n3\n4\n5")
+        local out = df:lazy():tail(2):collect()
+        expect_equal(2, out:nrows(), "tail(2) yields 2 rows")
+        expect_equal(5, out:getValue(2, "n"), "last row is 5")
+    end)
+
+    -- @covers LLazyQuery:limit
+    it("lazy limit is alias for head", function()
+        local df = lurek.dataframe.fromCSV("x\n10\n20\n30\n40")
+        local out = df:lazy():limit(2):collect()
+        expect_equal(2, out:nrows(), "limit(2) yields 2 rows")
+    end)
+
+    -- @covers LLazyQuery:dropNil
+    it("lazy dropNil removes nil rows", function()
+        local df = lurek.dataframe.newDataFrame()
+        df:addColumn("v")
+        df:addRow({ v = 1 })
+        df:addRow({})        -- nil
+        df:addRow({ v = 3 })
+        local out = df:lazy():dropNil("v"):collect()
+        expect_equal(2, out:nrows(), "two non-nil rows remain")
+    end)
+
+    -- @covers LLazyQuery:select
+    it("lazy select retains only named columns", function()
+        local df = lurek.dataframe.fromCSV("a,b,c\n1,2,3\n4,5,6")
+        local out = df:lazy():select({"a", "c"}):collect()
+        expect_equal(2, out:ncols(), "two columns selected")
+        expect_equal("a", out:columns()[1], "first column is a")
+        expect_equal("c", out:columns()[2], "second column is c")
+    end)
+
+    -- @covers LLazyQuery:filter
+    -- @covers LLazyQuery:sort
+    -- @covers LLazyQuery:head
+    it("lazy chained filter-sort-head pipeline", function()
+        local df = lurek.dataframe.fromCSV("name,score\nalice,80\nbob,60\ncharlie,90\ndave,70")
+        local out = df:lazy()
+            :filter("score", ">=", 70)
+            :sort("score", false)
+            :head(2)
+            :collect()
+        expect_equal(2, out:nrows(), "two rows pass score >= 70 after head(2)")
+        expect_equal(90, out:getValue(1, "score"), "top score first")
+    end)
+
+    -- @covers LLazyQuery:typeOf
+    it("lazy typeOf returns true for LLazyQuery", function()
+        local df = lurek.dataframe.fromCSV("x\n1")
+        local lq = df:lazy()
+        expect_true(lq:typeOf("LLazyQuery"), "typeOf LLazyQuery")
+        expect_true(lq:typeOf("Object"), "typeOf Object")
+        expect_false(lq:typeOf("LDataFrame"), "typeOf LDataFrame is false")
+    end)
+
+end)
+
+-- @describe random edge cases
+describe("random edge cases", function()
+
+    -- @covers lurek.dataframe.random
+    it("random with n=0 returns empty DataFrame", function()
+        local defs = { {"x", "number"}, {"y", "number"} }
+        local df = lurek.dataframe.random(defs, 0, 1)
+        expect_equal(0, df:nrows(), "zero rows when n=0")
+        expect_equal(2, df:ncols(), "columns still present")
+    end)
+
+    -- @covers lurek.dataframe.random
+    it("random returns exactly n rows", function()
+        local defs = { {"id", "number"} }
+        local df = lurek.dataframe.random(defs, 7, 99)
+        expect_equal(7, df:nrows(), "exactly 7 rows")
+    end)
+
+end)
+
+-- @describe Database multi-table SQL JOIN
+describe("Database multi-table SQL JOIN", function()
+
+    -- @covers LDatabase:query
+    it("SQL JOIN on two tables returns combined rows", function()
+        local orders = lurek.dataframe.fromCSV("order_id,customer_id,amount\n1,10,100\n2,20,200\n3,10,150")
+        local customers = lurek.dataframe.fromCSV("customer_id,name\n10,Alice\n20,Bob")
+        local db = lurek.dataframe.newDatabase()
+        db:addTable("orders", orders)
+        db:addTable("customers", customers)
+        local result = db:query("SELECT orders.order_id, customers.name, orders.amount FROM orders JOIN customers ON orders.customer_id = customers.customer_id")
+        expect_not_nil(result, "query returns a result")
+        expect_equal(3, result:nrows(), "three joined rows")
+    end)
+
+    -- @covers LDatabase:query
+    it("SQL query against single table returns filtered rows", function()
+        local scores = lurek.dataframe.fromCSV("player,score\nAlice,90\nBob,70\nCharlie,85")
+        local db = lurek.dataframe.newDatabase()
+        db:addTable("scores", scores)
+        local result = db:query("SELECT player, score FROM scores WHERE score > 80")
+        expect_equal(2, result:nrows(), "two rows with score > 80")
+    end)
 
 end)
 

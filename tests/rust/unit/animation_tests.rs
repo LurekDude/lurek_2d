@@ -158,7 +158,13 @@ mod aseprite_and_playback_tests {
         anim.add_frame(Rect::new(0.0, 0.0, 16.0, 16.0));
         anim.add_frame(Rect::new(16.0, 0.0, 16.0, 16.0));
         anim.add_frame(Rect::new(32.0, 0.0, 16.0, 16.0));
-        anim.add_clip_with_mode("walk", vec![0, 1, 2], 10.0, true, ClipPlaybackMode::PingPong);
+        anim.add_clip_with_mode(
+            "walk",
+            vec![0, 1, 2],
+            10.0,
+            true,
+            ClipPlaybackMode::PingPong,
+        );
         assert!(anim.play("walk"));
 
         anim.update(0.11);
@@ -218,7 +224,10 @@ mod aseprite_and_playback_tests {
             // unknown direction string
             r#"{"frames": [{"frame": {"x":0,"y":0,"w":16,"h":16},"duration":100}],"meta":{"size":{"w":16,"h":16},"frameTags":[{"name":"t","from":0,"to":0,"direction":"diagonal"}]}}"#,
             // very long name
-            &format!(r#"{{"frames":[{{"frame":{{"x":0,"y":0,"w":16,"h":16}},"duration":100}}],"meta":{{"size":{{"w":16,"h":16}},"frameTags":[{{"name":"{name}","from":0,"to":0,"direction":"forward"}}]}}}}"#, name = "x".repeat(4096)),
+            &format!(
+                r#"{{"frames":[{{"frame":{{"x":0,"y":0,"w":16,"h":16}},"duration":100}}],"meta":{{"size":{{"w":16,"h":16}},"frameTags":[{{"name":"{name}","from":0,"to":0,"direction":"forward"}}]}}}}"#,
+                name = "x".repeat(4096)
+            ),
             // zero size texture
             r#"{"frames": [{"frame": {"x":0,"y":0,"w":0,"h":0},"duration":100}],"meta":{"size":{"w":0,"h":0},"frameTags":[]}}"#,
             // unicode in names
@@ -337,7 +346,10 @@ mod spine_bridge_tests {
         assert_eq!(sm.get_state(), "run");
         assert_eq!(bridge.last_applied_state(), "run");
         assert_eq!(bridge.get_mapped_clip("run"), Some("skel_run"));
-        assert_eq!(bridge.skeleton().current_animation.as_deref(), Some("skel_run"));
+        assert_eq!(
+            bridge.skeleton().current_animation.as_deref(),
+            Some("skel_run")
+        );
     }
 
     #[test]

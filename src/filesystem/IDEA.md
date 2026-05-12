@@ -1,4 +1,0 @@
-- TODO: Add a fuzz target for `vfs::resolve_read_path` with adversarial path strings.
-- TODO: Remove duplicated save-dir write logic from `save::SaveManager` and route it through VFS ownership.
-- TODO: Make image loading go through `GameFS` instead of calling `std::fs::read` directly in image serializers or loaders.
-- TODO: Add a reusable filesystem JSON helper for the repeated read-or-write JSON pattern used by scripts and libraries.

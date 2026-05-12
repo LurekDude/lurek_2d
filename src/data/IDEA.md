@@ -1,4 +1,0 @@
-- TODO: Avoid full-element cloning in `RingBuffer::to_vec` for large element types.
-- TODO: Decide whether `toml_convert.rs` and `msgpack.rs` belong in `data` or should move into `serial`.
-- TODO: Merge `data::msgpack` and `serial::msgpack` into one canonical implementation.
-- TODO: Remove bounded-ring duplication between `log::sinks` and `data::RingBuffer`.

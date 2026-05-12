@@ -762,6 +762,7 @@ impl NoiseGenerator {
     /// # Returns
     /// `f64`.
     pub fn fbm(&self, x: f64, y: f64, octaves: u32, lac: f64, pers: f64, kind: NoiseKind) -> f64 {
+        let pers = pers.max(0.0);
         let mut total = 0.0;
         let mut amplitude = 1.0;
         let mut frequency = 1.0;
@@ -800,6 +801,7 @@ impl NoiseGenerator {
         pers: f64,
         kind: NoiseKind,
     ) -> f64 {
+        let pers = pers.max(0.0);
         let mut total = 0.0;
         let mut amplitude = 1.0;
         let mut frequency = 1.0;
@@ -839,6 +841,7 @@ impl NoiseGenerator {
         pers: f64,
         kind: NoiseKind,
     ) -> f64 {
+        let pers = pers.max(0.0);
         let mut total = 0.0;
         let mut amplitude = 1.0;
         let mut frequency = 1.0;
@@ -890,6 +893,7 @@ impl NoiseGenerator {
     pub fn generate_map(&self, width: u32, height: u32, opts: &MapGenOptions) -> Vec<f64> {
         let len = (width as usize) * (height as usize);
         let mut map = Vec::with_capacity(len);
+        let persistence = opts.persistence.max(0.0);
 
         for iy in 0..height {
             for ix in 0..width {
@@ -901,7 +905,7 @@ impl NoiseGenerator {
                         ny,
                         opts.octaves,
                         opts.lacunarity,
-                        opts.persistence,
+                        persistence,
                         opts.kind,
                     ),
                     FractalType::Ridged => self.ridged(
@@ -909,7 +913,7 @@ impl NoiseGenerator {
                         ny,
                         opts.octaves,
                         opts.lacunarity,
-                        opts.persistence,
+                        persistence,
                         opts.kind,
                     ),
                     FractalType::Turbulence => self.turbulence(
@@ -917,7 +921,7 @@ impl NoiseGenerator {
                         ny,
                         opts.octaves,
                         opts.lacunarity,
-                        opts.persistence,
+                        persistence,
                         opts.kind,
                     ),
                 };
@@ -925,5 +929,13 @@ impl NoiseGenerator {
             }
         }
         map
+    }
+
+    /// Generates a 2D noise map using a compute-oriented backend entrypoint.
+    ///
+    /// This currently falls back to the CPU implementation while preserving a
+    /// stable API shape for future GPU-compute acceleration.
+    pub fn generate_map_compute(&self, width: u32, height: u32, opts: &MapGenOptions) -> Vec<f64> {
+        self.generate_map(width, height, opts)
     }
 }

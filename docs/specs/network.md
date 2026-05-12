@@ -192,3 +192,21 @@ This module primarily collaborates with `runtime`. Its responsibility should sta
 ### New in 0.14.1
 
 - `lurek.network.newHost` and `newServer` accept `maxPeers` as the preferred peer-limit key; `peers` is retained as a legacy alias.
+
+## 2026-05 Backlog Closure
+
+- Added local matchmaking room helpers in `src/network/lobby.rs`:
+	- `create_room`, `list_rooms`, `join_room`, `leave_room`.
+- Added relay/NAT punch helper module `src/network/relay.rs`:
+	- relay ticket encode/decode, punch probe make/parse.
+- Added entity sync helper module `src/network/net_sync.rs`:
+	- `EntitySnapshot`, `predict_linear`, `reconcile`.
+- Exposed new Lua API helpers:
+	- `createRoom`, `listRooms`, `joinRoom`, `leaveRoom`
+	- `newRelayTicket`, `parseRelayTicket`, `makePunchProbe`, `parsePunchProbe`
+	- `predictLinear`, `reconcileSnapshot`
+- Improved runtime performance characteristics:
+	- WebSocket connect path made asynchronous to avoid network-thread stalls.
+	- TCP poll order switched to round-robin fairness.
+- Quality adjustment:
+	- `DEFAULT_PEERS` changed to `64` from `166` and tests updated.
