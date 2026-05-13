@@ -5,7 +5,6 @@ description: >-
   skill guidelines and architecture, run structure + coverage audits, execute tests,
   fix problems without asking, and move to next file until entire folder is validated.
   100% real test coverage required — no placeholders or stubs.
-agent: tester
 ---
 
 # Lua Test Validation Pipeline (Complete)

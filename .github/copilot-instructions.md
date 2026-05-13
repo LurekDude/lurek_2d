@@ -84,8 +84,8 @@ Run before every commit:
 - Agent-specific audits (coverage, doc, persona matrix) are listed in each agent's Workflow section.
 
 ## Git Hygiene
-- Before any state-changing git action, ask whether the user wants git work in this session.
 - Confirm the branch with `git rev-parse --abbrev-ref HEAD`. Read-only inspection (status, diff, log, blame) is always allowed.
+- Do not stop work because of unrelated or pre-existing worktree changes. Continue the requested task and ignore files outside your scope unless the user explicitly asks for investigation.
 - Stage only touched files. Never use `git add .`.
 - Commit format: `type(scope): description`. Allowed types: `feat`, `fix`, `refactor`, `test`, `docs`, `chore`. One logical change per commit.
 - Every commit must add or extend the current version entry in `docs/CHANGELOG.md`. MAJOR/MINOR changes also update `Cargo.toml`.

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- docs/cag: removed optional `agent` field from prompt frontmatters and made `agent` field non-required in `cag_validate.py`; agents no longer need explicit routing—they work autonomously until Manager calls or task completes.
+
+- docs/cag: added explicit Git Hygiene rule in `.github/copilot-instructions.md` that agents must not stop work because of unrelated or pre-existing worktree changes; they should continue scoped task execution unless user asks otherwise.
+
+- chore/cag: removed CAG wording that required pre-approval before state-changing git actions and simplified Manager input text from "worktree state" to "branch state".
+
+- chore/cag: fixed CAG validation and strict link-check blockers by adding required `agent` frontmatter to `workflow-document-rust-module.prompt.md` and correcting stale skill links in `analytics` and `gpu-programming`.
+
 - docs/cag: clarified that file-level Rustdoc should be wrapped into short readable lines near the ~600-character target instead of a single long line.
 
 - docs/cag: clarified Rust module file-level doc rules in `rust-coding` and `workflow-document-rust-module` so `//!` comments stay compact, describe file ownership only, and do not repeat in-file declarations.

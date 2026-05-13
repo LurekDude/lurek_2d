@@ -543,7 +543,7 @@ def check_prompt(
             out.append(Violation(rel, "E303", "error",
                                  f"tools references missing path: '{t}'"))
 
-    # agent stays in frontmatter
+    # agent is optional in frontmatter; if present, validate it exists
     expected = fm.get_str("agent").strip()
     if expected:
         norm = expected.lower().replace(" ", "-")
@@ -551,9 +551,6 @@ def check_prompt(
         if norm not in known_lower and expected != "Manager":
             out.append(Violation(rel, "E304", "error",
                                  f"agent does not exist: '{expected}'"))
-    else:
-        out.append(Violation(rel, "E307", "error",
-                             "Prompt is missing required 'agent' frontmatter field"))
 
     out.extend(_check_required_sections(rel, body, PROMPT_REQUIRED_SECTIONS, "E305"))
 
