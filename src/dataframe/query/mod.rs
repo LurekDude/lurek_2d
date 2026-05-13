@@ -1,6 +1,4 @@
-﻿//! Scope: Query engine sub-modules for filtering, grouping, analytics, and windowing.
-//! This file re-exports the public sub-modules and the percentile helper.
-//! It owns query implementation organization across filter, grouping, analytics, and window.
+//! Query submodules: filter, grouping, analytics, window.
 
 pub mod analytics;
 pub mod filter;

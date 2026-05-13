@@ -1,5 +1,4 @@
-﻿//! Scope: agent entity model and decision-mode wiring used by AIWorld.
-//! This file defines persistent per-agent state: identity, kinematics, tags, and optional subsystem handles.
+//! agent entity model and decision-mode wiring used by AIWorld.
 //! It also defines decision-mode selection used by the update loop to choose FSM, BT, steering, or custom flow.
 use std::collections::HashSet;
 
@@ -30,7 +29,7 @@ pub enum DecisionModel {
 }
 
 impl DecisionModel {
-    /// Parses a Lua-side string identifier into the corresponding `DecisionModel`.
+    /// Parse a Lua-side string identifier into the corresponding `DecisionModel`.
     pub fn parse_str(s: &str) -> Option<Self> {
         match s {
             "fsm" => Some(Self::Fsm),
@@ -42,7 +41,7 @@ impl DecisionModel {
         }
     }
 
-    /// Returns the canonical Lua string identifier for this decision model.
+    /// Return the canonical Lua string identifier for this decision model.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Fsm => "fsm",
@@ -94,7 +93,7 @@ pub struct Agent {
 }
 
 impl Agent {
-    /// Creates a new agent with sensible default kinematic state.
+    /// Create a new agent with sensible default kinematic state.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),

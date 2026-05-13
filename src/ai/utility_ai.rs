@@ -1,6 +1,4 @@
-﻿//! Scope: utility-AI scoring with response curves and action ranking.
-//! This file defines curves, considerations, action records, and evaluation flow that selects the highest score.
-//! It owns deterministic per-frame score caching and last-action memory for decision continuity.
+//! utility-AI scoring with response curves and action ranking.
 use mlua::prelude::*;
 use mlua::RegistryKey;
 
@@ -25,7 +23,7 @@ pub enum ResponseCurve {
 }
 
 impl ResponseCurve {
-    /// Parses from Lua string. Returns an error if the source data is malformed or missing.
+    /// Parse from Lua string. Returns an error if the source data is malformed or missing.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "quadratic" => Self::Quadratic,
@@ -100,7 +98,7 @@ pub struct UtilityAI {
 }
 
 impl UtilityAI {
-    /// Creates a new empty UtilityAI scorer.
+    /// Create a new empty UtilityAI scorer.
     pub fn new() -> Self {
         Self {
             actions: Vec::new(),
@@ -109,7 +107,7 @@ impl UtilityAI {
         }
     }
 
-    /// Adds an action with the given scorer callback and momentum bonus. Used by the Lua API.
+    /// Add an action with the given scorer callback and momentum bonus. Used by the Lua API.
     pub fn add_action(&mut self, name: String, scorer: RegistryKey, momentum_bonus: f64) {
         self.actions.push(UAAction {
             name,
@@ -119,7 +117,7 @@ impl UtilityAI {
         });
     }
 
-    /// Adds a consideration to the named action. No-op if action not found. Used by the Lua API.
+    /// Add a consideration to the named action. No-op if action not found. Used by the Lua API.
     #[allow(clippy::too_many_arguments)]
     pub fn add_consideration(
         &mut self,
@@ -145,7 +143,7 @@ impl UtilityAI {
         }
     }
 
-    /// Returns the name of the last chosen action, or `None` if no evaluation has occurred.
+    /// Return the name of the last chosen action, or `None` if no evaluation has occurred.
     pub fn last_action_name(&self) -> Option<&str> {
         self.last_action
             .and_then(|i| self.actions.get(i))

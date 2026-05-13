@@ -1,6 +1,4 @@
-﻿//! Scope: AI world container and subsystem orchestration update path.
-//! This file defines storage and coordination logic for agents plus attached FSM, BT, steering, and support systems.
-//! It owns deterministic update ordering, cross-subsystem calls, and world-level helper queries.
+//! AI world container and subsystem orchestration update path.
 use std::collections::HashMap;
 
 use crate::ai::agent::Agent;
@@ -17,7 +15,7 @@ pub struct AIWorld {
 }
 
 impl AIWorld {
-    /// Creates a new empty AIWorld.
+    /// Create a new empty AIWorld.
     pub fn new() -> Self {
         Self {
             agents: Vec::new(),
@@ -26,7 +24,7 @@ impl AIWorld {
         }
     }
 
-    /// Adds a new agent with the given name. Returns the agent's index.
+    /// Add a new agent with the given name. Returns the agent's index.
     pub fn add_agent(&mut self, name: &str) -> Result<usize, String> {
         if self.name_index.contains_key(name) {
             return Err(format!("Agent '{}' already exists", name));
@@ -40,7 +38,7 @@ impl AIWorld {
         Ok(idx)
     }
 
-    /// Removes an agent by name. Rebuilds the name-index map.
+    /// Remove an agent by name. Rebuilds the name-index map.
     pub fn remove_agent(&mut self, name: &str) -> bool {
         if let Some(&idx) = self.name_index.get(name) {
             self.agents.remove(idx);
@@ -55,22 +53,22 @@ impl AIWorld {
         }
     }
 
-    /// Returns the index of an agent by name.
+    /// Return the index of an agent by name.
     pub fn get_agent_index(&self, name: &str) -> Option<usize> {
         self.name_index.get(name).copied()
     }
 
-    /// Returns the number of agents.
+    /// Return the number of agents.
     pub fn agent_count(&self) -> usize {
         self.agents.len()
     }
 
-    /// Returns a reference to the global blackboard.
+    /// Return a reference to the global blackboard.
     pub fn global_blackboard(&self) -> &Blackboard {
         &self.global_blackboard
     }
 
-    /// Returns a mutable reference to the global blackboard.
+    /// Return a mutable reference to the global blackboard.
     pub fn global_blackboard_mut(&mut self) -> &mut Blackboard {
         &mut self.global_blackboard
     }

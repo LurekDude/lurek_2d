@@ -1,11 +1,11 @@
-//! Named audio buses for grouping and controlling playback.
-//! Bus: shared volume/pitch/pause/effects state applied to all assigned sources.
+//! Named audio buses for volume/pitch/pause/effects grouping.
+//! Bus: shared DSP state applied to assigned sources; supports effects chain.
 
 use crate::audio::dsp::{AtomicParam, EffectParams, EffectType};
 use crate::log_msg;
 use crate::runtime::log_messages::{BU01, BU02, BU03};
 
-/// Named audio bus applying shared volume, pitch, pause, and effects to assigned sources.
+/// Named audio bus applying shared volume, pitch, pause, and effects to sources.
 #[derive(Debug, Clone)]
 pub struct Bus {
     name: String,
@@ -20,7 +20,7 @@ pub struct Bus {
 }
 
 impl Bus {
-    /// Creates a new bus with the given name, default volume/pitch 1.0.
+    /// Create new bus with name; default volume/pitch 1.0.
     pub fn new(name: impl Into<String>) -> Self {
         let name = name.into();
         log_msg!(debug, BU01, "{}", name);
@@ -34,52 +34,49 @@ impl Bus {
         }
     }
 
-    /// Returns the bus name.
+    /// Return the bus name.
     pub fn name(&self) -> &str {
         &self.name
     }
 
-    /// Returns the bus volume (clamped >= 0.0).
+    /// Return bus volume (clamped >= 0.0).
     pub fn volume(&self) -> f32 {
         self.volume
     }
 
-    /// Sets the bus volume (clamped >= 0.0).
+    /// Set bus volume (clamped >= 0.0).
     pub fn set_volume(&mut self, volume: f32) {
         self.volume = volume.max(0.0);
     }
 
-    /// Returns the bus pitch multiplier (clamped >= 0.0).
+    /// Return bus pitch multiplier (clamped >= 0.0).
     pub fn pitch(&self) -> f32 {
         self.pitch
     }
 
-    /// Sets the bus pitch multiplier (clamped >= 0.0).
+    /// Set bus pitch multiplier (clamped >= 0.0).
     pub fn set_pitch(&mut self, pitch: f32) {
         self.pitch = pitch.max(0.0);
     }
 
-    /// Pauses all sources assigned to this bus.
+    /// Pause all sources assigned to this bus.
     pub fn pause(&mut self) {
         log_msg!(debug, BU02, "{}", self.name);
         self.paused = true;
     }
 
-    /// Resumes playback of this bus.
+    /// Resume playback of this bus.
     pub fn resume(&mut self) {
         log_msg!(debug, BU03, "{}", self.name);
         self.paused = false;
     }
 
-    /// Returns whether the bus is paused.
+    /// Return true if the bus is paused.
     pub fn is_paused(&self) -> bool {
         self.paused
     }
 
-    /// Adds a DSP effect to this bus and returns its ID.
-    /// Valid effect types: `"lowpass"`, `"highpass"`, `"bandpass"`, `"notch"`,
-    /// `"lowshelf"`, `"highshelf"`, `"bell_eq"`, `"reverb"`, `"reverb2"`,
-    /// `"chorus"`, `"flanger"`, `"phaser"`, `"distortion"`, `"limiter"`, `"compressor"`.
+    /// Add DSP effect to this bus and return its ID; supported types: lowpass, highpass, bandpass, reverb, chorus, etc.
     pub fn add_effect(&self, effect_type_str: &str, p1_val: f32) -> Result<u32, String> {
         let effect_type = match effect_type_str {
             "lowpass" => EffectType::Lowpass,

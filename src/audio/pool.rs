@@ -1,4 +1,5 @@
-//! Round-robin voice pooling for polyphonic playback of a single audio file.
+//! Round-robin polyphony pool for repeated playback of a single audio file.
+//! SoundPool: cycles through pre-loaded voice keys for cost-effective concurrent playback.
 
 use crate::runtime::resource_keys::SoundKey;
 
@@ -12,7 +13,7 @@ pub struct SoundPool {
 }
 
 impl SoundPool {
-    /// Creates a new pool from pre-loaded voice keys.
+    /// Create new pool from pre-loaded voice keys.
     pub fn new(keys: Vec<SoundKey>, file_path: String) -> Self {
         Self {
             keys,
@@ -23,54 +24,54 @@ impl SoundPool {
         }
     }
 
-    /// Returns voice count.
+    /// Return voice count.
     pub fn voice_count(&self) -> usize {
         self.keys.len()
     }
 
-    /// Returns the source file path.
+    /// Return the source file path.
     pub fn file_path(&self) -> &str {
         &self.file_path
     }
 
-    /// Returns shared volume (default 1.0).
+    /// Return shared volume (default 1.0).
     pub fn volume(&self) -> f32 {
         self.volume
     }
 
-    /// Sets shared volume (clamped >= 0.0).
+    /// Set shared volume (clamped >= 0.0).
     pub fn set_volume(&mut self, vol: f32) {
         self.volume = vol.max(0.0);
     }
 
-    /// Returns the assigned bus name, if any.
+    /// Return the assigned bus name, if any.
     pub fn bus_name(&self) -> Option<&str> {
         self.bus_name.as_deref()
     }
 
-    /// Assigns all voices to a named bus.
+    /// Assign all voices to a named bus.
     pub fn set_bus(&mut self, name: &str) {
         self.bus_name = Some(name.to_owned());
     }
 
-    /// Clears the bus assignment.
+    /// Clear the bus assignment.
     pub fn clear_bus(&mut self) {
         self.bus_name = None;
     }
 
-    /// Returns next voice key, cycling through all voices.
+    /// Return next voice key, cycling through all voices.
     pub fn next_voice(&mut self) -> SoundKey {
         let key = self.keys[self.next % self.keys.len()];
         self.next = (self.next + 1) % self.keys.len();
         key
     }
 
-    /// Returns all voice keys as a slice.
+    /// Return all voice keys as a slice.
     pub fn all_keys(&self) -> &[SoundKey] {
         &self.keys
     }
 
-    /// Returns `true` if pool has at least one voice.
+    /// Return true if pool has at least one voice.
     pub fn is_valid(&self) -> bool {
         !self.keys.is_empty()
     }

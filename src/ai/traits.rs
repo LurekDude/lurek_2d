@@ -1,6 +1,4 @@
-﻿//! Scope: personality trait profiles and timed trait modifiers.
-//! This file defines trait storage, aggregation, and temporary modifier application for per-agent disposition.
-//! It owns trait value resolution used by utility, strategy, dialogue, and behavior parameterization.
+//! personality trait profiles and timed trait modifiers.
 use std::collections::HashMap;
 
 // ---- Type: TraitModifier ----
@@ -18,7 +16,7 @@ pub struct TraitModifier {
 }
 
 impl TraitModifier {
-    /// Creates a new modifier.
+    /// Create a new modifier.
     pub fn new(trait_name: &str, delta: f32, duration: Option<f32>, source: &str) -> Self {
         Self {
             trait_name: trait_name.to_string(),
@@ -28,7 +26,7 @@ impl TraitModifier {
         }
     }
 
-    /// Returns `true` if a timed modifier has expired (remaining 0).
+    /// Return `true` if a timed modifier has expired (remaining 0).
     pub fn is_expired(&self) -> bool {
         self.remaining.map(|r| r <= 0.0).unwrap_or(false)
     }
@@ -55,12 +53,12 @@ pub struct TraitProfile {
 }
 
 impl TraitProfile {
-    /// Creates a new empty trait profile with no base traits and no modifiers.
+    /// Create a new empty trait profile with no base traits and no modifiers.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Creates a trait profile from a named archetype with optional variance jitter.
+    /// Create a trait profile from a named archetype with optional variance jitter.
     pub fn from_archetype(archetypes: &TraitArchetypes, name: &str, variance: f32) -> Option<Self> {
         let base = archetypes.get(name)?;
         let mut profile = Self::new();
@@ -81,13 +79,13 @@ impl TraitProfile {
         Some(profile)
     }
 
-    /// Sets the base value for a trait, clamped to `[0.0, 1.0]`.
+    /// Set the base value for a trait, clamped to `[0.0, 1.0]`.
     pub fn set(&mut self, name: &str, value: f32) {
         self.base_values
             .insert(name.to_string(), value.clamp(0.0, 1.0));
     }
 
-    /// Returns the effective trait value (base + all active modifier deltas), clamped to `[0.0, 1.0]`.
+    /// Return the effective trait value (base + all active modifier deltas), clamped to `[0.0, 1.0]`.
     pub fn get(&self, name: &str) -> f32 {
         let base = self.base_values.get(name).copied().unwrap_or(0.0);
         let delta: f32 = self
@@ -99,12 +97,12 @@ impl TraitProfile {
         (base + delta).clamp(0.0, 1.0)
     }
 
-    /// Returns the raw base value for a trait without applying modifiers.
+    /// Return the raw base value for a trait without applying modifiers.
     pub fn get_base(&self, name: &str) -> f32 {
         self.base_values.get(name).copied().unwrap_or(0.0)
     }
 
-    /// Adds an additive modifier to a trait with optional duration.
+    /// Add an additive modifier to a trait with optional duration.
     pub fn add_modifier(
         &mut self,
         trait_name: &str,
@@ -116,7 +114,7 @@ impl TraitProfile {
             .push(TraitModifier::new(trait_name, delta, duration, source));
     }
 
-    /// Removes all modifiers whose `source` field matches the given string.
+    /// Remove all modifiers whose `source` field matches the given string.
     pub fn remove_modifiers_by_source(&mut self, source: &str) {
         self.modifiers.retain(|m| m.source != source);
     }
@@ -129,17 +127,17 @@ impl TraitProfile {
         self.modifiers.retain(|m| !m.is_expired());
     }
 
-    /// Returns a `Vec` of all base trait names defined in this profile.
+    /// Return a `Vec` of all base trait names defined in this profile.
     pub fn trait_names(&self) -> Vec<&str> {
         self.base_values.keys().map(|s| s.as_str()).collect()
     }
 
-    /// Returns the number of base traits defined in this profile.
+    /// Return the number of base traits defined in this profile.
     pub fn trait_count(&self) -> usize {
         self.base_values.len()
     }
 
-    /// Returns `true` if a base value for `name` has been set.
+    /// Return `true` if a base value for `name` has been set.
     pub fn has(&self, name: &str) -> bool {
         self.base_values.contains_key(name)
     }
@@ -154,7 +152,7 @@ impl TraitProfile {
         }
     }
 
-    /// Returns the archetype name this profile was created from, if any.
+    /// Return the archetype name this profile was created from, if any.
     pub fn archetype(&self) -> Option<&str> {
         self.archetype.as_deref()
     }
@@ -169,7 +167,7 @@ pub struct TraitArchetypes {
 }
 
 impl TraitArchetypes {
-    /// Creates an empty archetype registry.
+    /// Create an empty archetype registry.
     pub fn new() -> Self {
         Self::default()
     }
@@ -183,17 +181,17 @@ impl TraitArchetypes {
         self.archetypes.insert(name.to_string(), clamped);
     }
 
-    /// Returns the trait map for a named archetype, or `None` if not found.
+    /// Return the trait map for a named archetype, or `None` if not found.
     pub fn get(&self, name: &str) -> Option<&HashMap<String, f32>> {
         self.archetypes.get(name)
     }
 
-    /// Returns a list of all registered archetype names.
+    /// Return a list of all registered archetype names.
     pub fn names(&self) -> Vec<&str> {
         self.archetypes.keys().map(|s| s.as_str()).collect()
     }
 
-    /// Returns the number of registered archetypes.
+    /// Return the number of registered archetypes.
     pub fn count(&self) -> usize {
         self.archetypes.len()
     }

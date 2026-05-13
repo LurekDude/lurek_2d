@@ -54,7 +54,7 @@ pub fn histogram(
     range_hi: Option<f64>,
 ) -> Result<Vec<(f64, f64, u64)>, String> {
     if bins == 0 {
-        return Err("histogram: bins must be â‰Ą 1".to_string());
+        return Err("histogram: bins must be >= 1".to_string());
     }
     let n = a.size();
     if n == 0 {

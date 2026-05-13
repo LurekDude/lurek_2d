@@ -1,6 +1,4 @@
-﻿//! Scope: ordered command queue for AI action sequencing and interruption.
-//! This file defines command records and queue operations for enqueue, front-insert interrupt, pop, and cancellation.
-//! It owns deterministic command ordering semantics used by high-level planners and low-level action execution.
+//! ordered command queue for AI action sequencing and interruption.
 use std::collections::VecDeque;
 
 use crate::log_msg;
@@ -31,7 +29,7 @@ pub struct CommandQueue {
 }
 
 impl CommandQueue {
-    /// Creates a new empty command queue.
+    /// Create a new empty command queue.
     pub fn new() -> Self {
         log_msg!(debug, CQ01);
         Self {
@@ -39,7 +37,7 @@ impl CommandQueue {
         }
     }
 
-    /// Appends a command to the back of the queue.
+    /// Append a command to the back of the queue.
     pub fn enqueue(&mut self, cmd: Command) {
         log_msg!(debug, CQ02);
         self.commands.push_back(cmd);
@@ -74,22 +72,22 @@ impl CommandQueue {
         log_msg!(debug, CQ03, "{}", count);
     }
 
-    /// Returns the number of queued commands.
+    /// Return the number of queued commands.
     pub fn count(&self) -> usize {
         self.commands.len()
     }
 
-    /// Returns whether the queue is empty.
+    /// Return whether the queue is empty.
     pub fn is_empty(&self) -> bool {
         self.commands.is_empty()
     }
 
-    /// Returns the type of the front command, if any.
+    /// Return the type of the front command, if any.
     pub fn current_type(&self) -> Option<&str> {
         self.commands.front().map(|c| c.kind.as_str())
     }
 
-    /// Returns the target coordinates of the front command.
+    /// Return the target coordinates of the front command.
     pub fn current_target(&self) -> (f32, f32) {
         self.commands
             .front()
@@ -102,7 +100,7 @@ impl CommandQueue {
         self.commands.pop_front();
     }
 
-    /// Appends a new command built from raw parameters. Used by the Lua API.
+    /// Append a new command built from raw parameters. Used by the Lua API.
     pub fn enqueue_raw(
         &mut self,
         kind: String,

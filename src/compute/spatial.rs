@@ -269,7 +269,7 @@ pub fn matmul(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {
     let n = b.shape()[1];
     if k_a != k_b {
         return Err(format!(
-            "matmul: inner dimensions mismatch: ({m},{k_a}) Ă— ({k_b},{n})"
+            "matmul: inner dimensions mismatch: ({m},{k_a}) x ({k_b},{n})"
         ));
     }
 

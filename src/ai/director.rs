@@ -1,6 +1,4 @@
-﻿//! Scope: pacing director that maps gameplay pressure to AI phase decisions.
-//! This file defines tension metrics, phase thresholds, and runtime update rules for adaptive encounter control.
-//! It owns director state transitions and emitted pacing signals consumed by spawn, behavior, and event systems.
+//! pacing director that maps gameplay pressure to AI phase decisions.
 // ---- Type: DirectorPhase ----
 
 /// Current pacing phase of the AI Director state machine.
@@ -17,7 +15,7 @@ pub enum DirectorPhase {
 }
 
 impl DirectorPhase {
-    /// Returns the canonical string label for this phase.
+    /// Return the canonical string label for this phase.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::BuildUp => "build_up",
@@ -78,7 +76,7 @@ pub struct AIDirector {
 }
 
 impl AIDirector {
-    /// Creates a new director with default configuration starting in `Relief` phase.
+    /// Create a new director with default configuration starting in `Relief` phase.
     pub fn new() -> Self {
         Self {
             config: DirectorConfig::default(),
@@ -90,7 +88,7 @@ impl AIDirector {
         }
     }
 
-    /// Creates a director with a custom configuration.
+    /// Create a director with a custom configuration.
     pub fn with_config(config: DirectorConfig) -> Self {
         Self {
             config,
@@ -102,27 +100,27 @@ impl AIDirector {
         }
     }
 
-    /// Returns the current tension level in `[0.0, 1.0]`.
+    /// Return the current tension level in `[0.0, 1.0]`.
     pub fn tension(&self) -> f32 {
         self.tension
     }
 
-    /// Returns the current pacing phase.
+    /// Return the current pacing phase.
     pub fn phase(&self) -> DirectorPhase {
         self.phase
     }
 
-    /// Returns the current phase as a string label.
+    /// Return the current phase as a string label.
     pub fn phase_str(&self) -> &'static str {
         self.phase.as_str()
     }
 
-    /// Returns the total elapsed time in seconds.
+    /// Return the total elapsed time in seconds.
     pub fn elapsed(&self) -> f32 {
         self.elapsed
     }
 
-    /// Returns the total number of events pushed to this director.
+    /// Return the total number of events pushed to this director.
     pub fn total_events(&self) -> u32 {
         self.total_events
     }
@@ -173,7 +171,7 @@ impl AIDirector {
         }
     }
 
-    /// Returns a spawn rate multiplier for game systems.
+    /// Return a spawn rate multiplier for game systems.
     pub fn spawn_rate_factor(&self) -> f32 {
         match self.phase {
             DirectorPhase::BuildUp => {
@@ -184,7 +182,7 @@ impl AIDirector {
         }
     }
 
-    /// Returns a loot drop multiplier for game systems (highest during relief).
+    /// Return a loot drop multiplier for game systems (highest during relief).
     pub fn loot_factor(&self) -> f32 {
         match self.phase {
             DirectorPhase::Relief => self.config.relief_loot_factor,
@@ -193,7 +191,7 @@ impl AIDirector {
         }
     }
 
-    /// Returns an ambient intensity value `[0.0, 1.0]` for music and atmosphere.
+    /// Return an ambient intensity value `[0.0, 1.0]` for music and atmosphere.
     pub fn ambient_intensity(&self) -> f32 {
         match self.phase {
             DirectorPhase::Peak => (self.tension * 0.5 + 0.5).clamp(0.0, 1.0),

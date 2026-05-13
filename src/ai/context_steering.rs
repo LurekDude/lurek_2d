@@ -1,6 +1,4 @@
-﻿//! Scope: radial context-steering evaluator using interest and danger rings.
-//! This file defines behavior kinds, weighted ring fills, and direction solve logic for smooth local navigation.
-//! It owns slot sampling, cone filling, and final heading selection under dynamic world and boundary constraints.
+//! radial context-steering evaluator using interest and danger rings.
 use std::f32::consts::{PI, TAU};
 
 // ---- Type: ContextBehaviorKind ----
@@ -88,7 +86,7 @@ pub struct ContextSteering {
 }
 
 impl ContextSteering {
-    /// Creates a new context steering evaluator with `slot_count` direction slots.
+    /// Create a new context steering evaluator with `slot_count` direction slots.
     pub fn new(slot_count: usize) -> Self {
         let n = slot_count.max(4);
         Self {
@@ -103,12 +101,12 @@ impl ContextSteering {
         }
     }
 
-    /// Returns the number of direction slots.
+    /// Return the number of direction slots.
     pub fn slot_count(&self) -> usize {
         self.slot_count
     }
 
-    /// Adds a behavior that fills the interest ring (where to go).
+    /// Add a behavior that fills the interest ring (where to go).
     pub fn add_interest(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -118,7 +116,7 @@ impl ContextSteering {
         });
     }
 
-    /// Adds a behavior that fills the danger ring (where NOT to go).
+    /// Add a behavior that fills the danger ring (where NOT to go).
     pub fn add_danger(&mut self, kind: ContextBehaviorKind, weight: f32) {
         self.behaviors.push(ContextBehavior {
             kind,
@@ -128,12 +126,12 @@ impl ContextSteering {
         });
     }
 
-    /// Adds a `SeekTarget` interest behavior pointing toward `(tx, ty)`.
+    /// Add a `SeekTarget` interest behavior pointing toward `(tx, ty)`.
     pub fn add_seek_target(&mut self, tx: f32, ty: f32, weight: f32) {
         self.add_interest(ContextBehaviorKind::SeekTarget { x: tx, y: ty }, weight);
     }
 
-    /// Adds a `Wander` interest behavior.
+    /// Add a `Wander` interest behavior.
     pub fn add_wander(&mut self, jitter: f32, weight: f32) {
         self.add_interest(
             ContextBehaviorKind::Wander {
@@ -144,12 +142,12 @@ impl ContextSteering {
         );
     }
 
-    /// Adds an `AvoidPoint` danger behavior.
+    /// Add an `AvoidPoint` danger behavior.
     pub fn add_avoid_point(&mut self, x: f32, y: f32, radius: f32, weight: f32) {
         self.add_danger(ContextBehaviorKind::AvoidPoint { x, y, radius }, weight);
     }
 
-    /// Adds an `AvoidBounds` danger behavior.
+    /// Add an `AvoidBounds` danger behavior.
     pub fn add_avoid_bounds(
         &mut self,
         min_x: f32,
@@ -301,22 +299,22 @@ impl ContextSteering {
         (chosen_angle.cos(), chosen_angle.sin())
     }
 
-    /// Returns the chosen direction angle from the last `evaluate` call (radians).
+    /// Return the chosen direction angle from the last `evaluate` call (radians).
     pub fn chosen_direction(&self) -> f32 {
         self.chosen_dir
     }
 
-    /// Returns the chosen magnitude (net interest score) from the last `evaluate` call.
+    /// Return the chosen magnitude (net interest score) from the last `evaluate` call.
     pub fn chosen_magnitude(&self) -> f32 {
         self.chosen_magnitude
     }
 
-    /// Returns a copy of the current interest ring values.
+    /// Return a copy of the current interest ring values.
     pub fn interest_map(&self) -> Vec<f32> {
         self.interest.clone()
     }
 
-    /// Returns a copy of the current danger ring values.
+    /// Return a copy of the current danger ring values.
     pub fn danger_map(&self) -> Vec<f32> {
         self.danger.clone()
     }

@@ -1,6 +1,4 @@
-﻿//! Scope: steering behavior models and force-combination runtime.
-//! This file defines behavior variants, shared behavior settings, and manager logic that combines movement forces.
-//! It owns local force math used by agents for seek/flee/arrive/wander and optional path-follow contribution.
+//! steering behavior models and force-combination runtime.
 /// 2D force vector (fx, fy).
 pub type Force = (f32, f32);
 
@@ -14,7 +12,7 @@ pub enum CombineMode {
 }
 
 impl CombineMode {
-    /// Parses from Lua string. Returns an error if the source data is malformed or missing.
+    /// Parse from Lua string. Returns an error if the source data is malformed or missing.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "priority" => Self::Priority,
@@ -22,7 +20,7 @@ impl CombineMode {
         }
     }
 
-    /// Returns the Lua string representation.
+    /// Return the Lua string representation.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Weighted => "weighted",
@@ -129,7 +127,7 @@ pub enum SteeringBehaviorType {
 }
 
 impl SteeringBehaviorType {
-    /// Returns a reference to the common steering data.
+    /// Return a reference to the common steering data.
     pub fn base(&self) -> &SteeringBase {
         match self {
             Self::Seek { base, .. }
@@ -143,7 +141,7 @@ impl SteeringBehaviorType {
         }
     }
 
-    /// Returns a mutable reference to the common steering data.
+    /// Return a mutable reference to the common steering data.
     pub fn base_mut(&mut self) -> &mut SteeringBase {
         match self {
             Self::Seek { base, .. }
@@ -157,7 +155,7 @@ impl SteeringBehaviorType {
         }
     }
 
-    /// Returns the behavior kind as a Lua-friendly string.
+    /// Return the behavior kind as a Lua-friendly string.
     pub fn kind(&self) -> &'static str {
         match self {
             Self::Seek { .. } => "seek",
@@ -292,7 +290,7 @@ pub struct SteeringManager {
 }
 
 impl SteeringManager {
-    /// Creates a new empty SteeringManager with weighted combination.
+    /// Create a new empty SteeringManager with weighted combination.
     pub fn new() -> Self {
         Self {
             behaviors: Vec::new(),
@@ -356,7 +354,7 @@ impl SteeringManager {
         combined
     }
 
-    /// Adds a Seek behavior targeting `(tx, ty)` with the given weight.
+    /// Add a Seek behavior targeting `(tx, ty)` with the given weight.
     pub fn add_seek(&mut self, tx: f32, ty: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Seek {
             target: (tx, ty),
@@ -367,7 +365,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds a Flee behavior away from `(tx, ty)` within `panic_dist`.
+    /// Add a Flee behavior away from `(tx, ty)` within `panic_dist`.
     pub fn add_flee(&mut self, tx: f32, ty: f32, panic_dist: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flee {
             target: (tx, ty),
@@ -379,7 +377,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds an Arrive behavior targeting `(tx, ty)` with deceleration inside `slowing_radius`.
+    /// Add an Arrive behavior targeting `(tx, ty)` with deceleration inside `slowing_radius`.
     pub fn add_arrive(&mut self, tx: f32, ty: f32, slowing_radius: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Arrive {
             target: (tx, ty),
@@ -391,7 +389,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds a Wander behavior with the given circle parameters.
+    /// Add a Wander behavior with the given circle parameters.
     pub fn add_wander(&mut self, radius: f32, distance: f32, jitter: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Wander {
             wander_radius: radius,
@@ -405,7 +403,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds a Pursue behavior targeting a named agent.
+    /// Add a Pursue behavior targeting a named agent.
     pub fn add_pursue(&mut self, target_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Pursue {
             target_name,
@@ -416,7 +414,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds an Evade behavior fleeing from a named threat agent.
+    /// Add an Evade behavior fleeing from a named threat agent.
     pub fn add_evade(&mut self, threat_name: Option<String>, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Evade {
             threat_name,
@@ -427,7 +425,7 @@ impl SteeringManager {
         });
     }
 
-    /// Adds a Flock behavior for group movement among named neighbors.
+    /// Add a Flock behavior for group movement among named neighbors.
     pub fn add_flock(&mut self, neighbor_radius: f32, sep: f32, align: f32, coh: f32, weight: f32) {
         self.behaviors.push(SteeringBehaviorType::Flock {
             neighbor_radius,
@@ -442,17 +440,17 @@ impl SteeringManager {
         });
     }
 
-    /// Sets the combination mode from a Lua string (`"weighted"` or `"priority"`).
+    /// Set the combination mode from a Lua string (`"weighted"` or `"priority"`).
     pub fn set_combine_mode_str(&mut self, mode: &str) {
         self.combine_mode = CombineMode::parse_str(mode);
     }
 
-    /// Returns the force vector computed during the last `calculate()` call.
+    /// Return the force vector computed during the last `calculate()` call.
     pub fn last_force(&self) -> Force {
         self.last_force
     }
 
-    /// Sets the cell size used by the spatial-hash neighbourhood search.
+    /// Set the cell size used by the spatial-hash neighbourhood search.
     pub fn set_cell_size(&mut self, size: f32) {
         self.cell_size = size.max(0.1);
     }
@@ -462,7 +460,7 @@ impl SteeringManager {
         self.use_spatial_hash = enabled;
     }
 
-    /// Replaces the current path-follow waypoints with a new world-space path.
+    /// Replace the current path-follow waypoints with a new world-space path.
     pub fn set_path(&mut self, waypoints: Vec<(f32, f32)>, reach_radius: f32, weight: f32) {
         self.path_waypoints = waypoints;
         self.path_index = 0;
@@ -476,12 +474,12 @@ impl SteeringManager {
         self.path_index = 0;
     }
 
-    /// Returns true when there is an unfinished waypoint path.
+    /// Return true when there is an unfinished waypoint path.
     pub fn has_active_path(&self) -> bool {
         self.path_index < self.path_waypoints.len()
     }
 
-    /// Returns path-follow progress as `(current_index, total_waypoints)`.
+    /// Return path-follow progress as `(current_index, total_waypoints)`.
     pub fn path_progress(&self) -> (usize, usize) {
         (self.path_index, self.path_waypoints.len())
     }

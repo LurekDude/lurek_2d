@@ -1,6 +1,5 @@
-//! Scope: App lifecycle orchestration for window, Lua callbacks, and rendering.
-//! This file defines run-state types, app handlers, and helper functions for startup and timing.
-//! It owns event-loop control flow, game-session initialization, and frame-step ordering.
+//! LurekApp: winit event loop, Lua runtime, and rendering coordination.
+//! Owns frame pacing, input handling, window lifecycle, and async asset loading.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -62,15 +61,7 @@ pub use crate::runtime::shared_state::WindowState;
 
 // ---- Helper Functions: Viewport and Layout ----
 
-/// Recomputes viewport scale and offset based on game and window dimensions.
-///
-/// Updates `viewport_scale_x`, `viewport_scale_y`, `viewport_offset_x`, and `viewport_offset_y`
-/// on the provided `WindowState` given the current physical window size.
-///
-/// # Parameters
-/// - `ws` - Mutable reference to the window state to update.
-/// - `win_w` - Physical window width in pixels.
-/// - `win_h` - Physical window height in pixels.
+/// Update viewport scale and offset for the given scale mode and window dimensions.
 pub fn recompute_viewport(ws: &mut WindowState, win_w: u32, win_h: u32) {
     // Clamp game dimensions to at least 1 to prevent division by zero.
     let gw = ws.game_width.max(1.0);
@@ -123,21 +114,12 @@ pub enum RunState {
     Restarting,
 }
 
-/// Returns the splash-mode window title with the engine version appended.
+/// Return splash-window title with engine version appended.
 pub fn splash_window_title(base_title: &str) -> String {
     format!("{} v{}", base_title, env!("CARGO_PKG_VERSION"))
 }
 
-/// Computes the largest size that fits `src` inside `max` while preserving aspect ratio.
-///
-/// # Parameters
-/// - `src_w` - Source width in pixels.
-/// - `src_h` - Source height in pixels.
-/// - `max_w` - Maximum width of the bounding box.
-/// - `max_h` - Maximum height of the bounding box.
-///
-/// # Returns
-/// `(f32, f32)` - Scaled width and height that fit within the bounding box.
+/// Return largest aspect-fitted size that fits within a bounding box.
 pub fn fit_contain_size(src_w: u32, src_h: u32, max_w: f32, max_h: f32) -> (f32, f32) {
     // Clamp to at least 1 to avoid division by zero.
     let src_w = src_w.max(1) as f32;
@@ -429,7 +411,7 @@ impl LurekApp {
         }
     }
 
-    /// Selects the best available [`wgpu::PresentMode`] for the given `requested_mode` integer.
+    /// Pick best [`wgpu::PresentMode`] for requested mode; return mode and mapped id.
     pub fn resolve_present_mode(
         available_modes: &[wgpu::PresentMode],
         requested_mode: i32,

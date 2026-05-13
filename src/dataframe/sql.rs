@@ -1,6 +1,4 @@
-//! Scope: SQL-like query parsing and execution for DataFrame and Database.
-//! This file defines Token, Lexer, Parser, and query-execution types.
-//! It owns SQL subset parsing, predicate evaluation, and multi-table joins.
+//! SQL parsing and execution over in-memory tables.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame, Database};
 

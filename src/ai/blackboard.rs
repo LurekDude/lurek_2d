@@ -1,6 +1,4 @@
-﻿//! Scope: hierarchical blackboard store for typed shared AI data.
-//! This file defines value variants, local entry ownership, and parent-chain lookup for cross-subsystem reads.
-//! It owns key lifecycle operations (set/get/remove/clear/keys/size) used by planners, sensors, and decision systems.
+//! hierarchical blackboard store for typed shared AI data.
 use std::collections::HashMap;
 
 use crate::log_msg;
@@ -27,7 +25,7 @@ pub struct Blackboard {
 }
 
 impl Blackboard {
-    /// Creates an empty Blackboard with no parent.
+    /// Create an empty Blackboard with no parent.
     pub fn new() -> Self {
         log_msg!(debug, BB01);
         Self {
@@ -36,7 +34,7 @@ impl Blackboard {
         }
     }
 
-    /// Sets a number value in the local store.
+    /// Set a number value in the local store.
     pub fn set_number(&mut self, key: &str, value: f64) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Number(value));
@@ -53,7 +51,7 @@ impl Blackboard {
         default
     }
 
-    /// Sets a boolean value in the local store.
+    /// Set a boolean value in the local store.
     pub fn set_bool(&mut self, key: &str, value: bool) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Bool(value));
@@ -70,7 +68,7 @@ impl Blackboard {
         default
     }
 
-    /// Sets a string value in the local store.
+    /// Set a string value in the local store.
     pub fn set_string(&mut self, key: &str, value: &str) {
         self.entries
             .insert(key.to_string(), BlackboardValue::Text(value.to_string()));
@@ -87,7 +85,7 @@ impl Blackboard {
         default.to_string()
     }
 
-    /// Checks if a key exists locally or in any ancestor.
+    /// Check if a key exists locally or in any ancestor.
     pub fn has(&self, key: &str) -> bool {
         if self.entries.contains_key(key) {
             return true;
@@ -98,7 +96,7 @@ impl Blackboard {
         false
     }
 
-    /// Removes a key from the local store only.
+    /// Remove a key from the local store only.
     pub fn remove(&mut self, key: &str) {
         log_msg!(trace, BB02, "{}", key);
         self.entries.remove(key);
@@ -111,22 +109,22 @@ impl Blackboard {
         log_msg!(debug, BB03, "{}", count);
     }
 
-    /// Returns all local key names.
+    /// Return all local key names.
     pub fn keys(&self) -> Vec<String> {
         self.entries.keys().cloned().collect()
     }
 
-    /// Returns the number of local entries. Runs in O(1) time.
+    /// Return the number of local entries. Runs in O(1) time.
     pub fn size(&self) -> usize {
         self.entries.len()
     }
 
-    /// Sets the parent Blackboard for hierarchical lookup.
+    /// Set the parent Blackboard for hierarchical lookup.
     pub fn set_parent(&mut self, parent: Blackboard) {
         self.parent = Some(Box::new(parent));
     }
 
-    /// Returns a reference to the parent Blackboard, if any.
+    /// Return a reference to the parent Blackboard, if any.
     pub fn parent(&self) -> Option<&Blackboard> {
         self.parent.as_deref()
     }

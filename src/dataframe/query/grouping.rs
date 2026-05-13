@@ -1,11 +1,9 @@
-//! Scope: Group aggregation, pivot tables, and multi-column correlation analysis.
-//! This file defines group_by, pivot, and correlation methods on DataFrame.
-//! It owns distinct-value grouping, pivot-table materialization, and pairwise stats.
+//! Group-by aggregation and pivot table operations.
 
 use crate::dataframe::frame::{AggFn, CellValue, ColRef, DataFrame};
 
 impl DataFrame {
-    /// Group `group_col` and aggregate `agg_col` with the given function; return a two-column DataFrame `(group_key, aggregated_value)`.
+    /// Group by column and aggregate; return (group_key, agg_value) frame.
     #[allow(clippy::needless_range_loop)]
     pub fn group_agg(
         &self,
@@ -106,9 +104,6 @@ impl DataFrame {
     // -----------------------------------------------------------------------
 
     /// Build a pivot table.
-    /// - Rows: unique values of `row_col`.
-    /// - Columns: unique values of `col_col`.
-    /// - Cells: first matching value from `val_col`; missing pairs → `Nil`.
     #[allow(clippy::needless_range_loop)]
     pub fn pivot(
         &self,

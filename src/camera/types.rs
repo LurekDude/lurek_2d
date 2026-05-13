@@ -1,17 +1,12 @@
-//! Camera types for 2D viewport control.
-//!
-//! Provides the original [`Camera`] (used by `SharedState` for the flat
-//! `lurek.render.setCamera()` API) and the new Phase 24 [`Camera2D`] with
-//! smooth follow, dead zone, bounds clamping, and screen-shake.
+//! Define core camera state objects used by renderer and runtime state.
+//! Keep both flat `Camera` and feature-rich `Camera2D` in one domain file.
+//! Own follow, bounds, shake, damping, and effect composition math.
 
 use crate::camera::effects::{CameraBreathing, CameraSway, ZoomPulse};
 use crate::math::{Mat3, Rect, Vec2};
 
-// ---- Type: CameraFollowEasing ----
-
 /// Easing mode used by camera follow interpolation.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-/// Easing mode used by camera follow interpolation.
 pub enum CameraFollowEasing {
     /// Linear interpolation.
     Linear,
@@ -20,8 +15,6 @@ pub enum CameraFollowEasing {
     /// Ease-out cubic interpolation.
     EaseOutCubic,
 }
-
-// ---- Implementation: CameraFollowEasing ----
 
 impl CameraFollowEasing {
     fn apply(self, t: f32) -> f32 {
@@ -34,16 +27,7 @@ impl CameraFollowEasing {
     }
 }
 
-// ---- Type: Camera ----
-
-/// Basic camera with position, zoom, and rotation.
-///
-/// Used by `SharedState` for the flat `lurek.render.setCamera()` API.
-///
-/// # Fields
-/// - `position` — World-space centre point the camera is looking at.
-/// - `zoom` — Uniform scale factor; `1.0` = natural size, `2.0` = 2x zoom in.
-/// - `rotation` — Rotation in radians, applied after zoom.
+/// Store flat camera transform used by shared render state.
 pub struct Camera {
     /// World-space centre point.
     pub position: Vec2,
@@ -53,18 +37,8 @@ pub struct Camera {
     pub rotation: f32,
 }
 
-// ---- Implementation: Camera ----
-
 impl Camera {
-    /// Creates a new `Camera` with the given position, zoom, and rotation.
-    ///
-    /// # Parameters
-    /// - `position` — `Vec2`.
-    /// - `zoom` — `f32`.
-    /// - `rotation` — `f32`.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create a new `Camera` with the given position, zoom, and rotation.
     pub fn new(position: Vec2, zoom: f32, rotation: f32) -> Self {
         Camera {
             position,
@@ -73,13 +47,7 @@ impl Camera {
         }
     }
 
-    /// Computes the view transformation matrix for this camera.
-    ///
-    /// # Returns
-    /// `Mat3`.
-    ///
-    /// Combines translation (negate position), rotation, and scale (zoom)
-    /// into a single `Mat3`.
+    /// Compute camera view matrix and return combined translation, rotation, and zoom scale.
     pub fn view_matrix(&self) -> Mat3 {
         let translation = Mat3::from_translation(Vec2::new(-self.position.x, -self.position.y));
         let rotation = Mat3::from_rotation(self.rotation);
@@ -87,32 +55,21 @@ impl Camera {
         scale * rotation * translation
     }
 
-    /// Moves the camera to `position` in world space.
-    ///
-    /// # Parameters
-    /// - `position` — `Vec2`.
+    /// Move the camera to `position` in world space.
     pub fn set_position(&mut self, position: Vec2) {
         self.position = position;
     }
 
-    /// Sets the camera's zoom level. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `zoom` — `f32`.
+    /// Set camera zoom.
     pub fn set_zoom(&mut self, zoom: f32) {
         self.zoom = zoom;
     }
 
-    /// Sets the camera's rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `rotation` — `f32`.
+    /// Set camera rotation in radians.
     pub fn set_rotation(&mut self, rotation: f32) {
         self.rotation = rotation;
     }
 }
-
-// ---- Default Implementation ----
 
 impl Default for Camera {
     fn default() -> Self {
@@ -124,25 +81,7 @@ impl Default for Camera {
     }
 }
 
-// ---- Type: Camera2D ----
-
-/// Full-featured 2D camera with smooth follow, dead zone, bounds clamping,
-///
-/// # Fields
-/// - `position` — `Vec2`.
-/// - `zoom` — `f32`.
-/// - `rotation` — `f32`.
-/// - `viewport` — `Rect`.
-/// - `bounds` — `Option<Rect>`.
-/// - `target` — `Option<Vec2>`.
-/// - `follow_smooth` — `f32`.
-/// - `dead_zone` — `Option<(f32, f32)>`.
-/// - `look_ahead` — `f32`.
-/// and screen-shake.
-///
-/// Create with [`Camera2D::new`], configure follow / bounds / shake, then
-/// call [`Camera2D::update`] each frame. Use [`Camera2D::view_matrix`] to
-/// obtain the transform for rendering.
+/// Store advanced 2D camera state with follow, bounds, shake, and effects.
 pub struct Camera2D {
     /// Camera world-space position (centre of the viewport).
     pub position: Vec2,
@@ -152,25 +91,18 @@ pub struct Camera2D {
     pub rotation: f32,
     /// Viewport rectangle in screen pixels: `(x, y, width, height)`.
     pub viewport: Rect,
-    /// Optional world-space bounds for clamping. When set the visible area
-    /// will never extend beyond these bounds.
+    /// Store optional world bounds used to clamp visible camera area.
     pub bounds: Option<Rect>,
-
-    // ---- Helper Functions: Follow System ----
     /// Target world position the camera tries to follow.
     pub target: Option<Vec2>,
     /// Interpolation speed for smooth following. `0.0` = instant snap.
     pub follow_smooth: f32,
-    /// Dead zone half-extents `(half_w, half_h)`. The camera does not move
-    /// while the target stays inside this rectangle centred on the camera.
+    /// Store follow dead-zone half extents `(half_w, half_h)` around camera center.
     pub dead_zone: Option<(f32, f32)>,
-    /// Look-ahead multiplier. Estimated target velocity is scaled by this
-    /// value and added to the desired position.
+    /// Store look-ahead multiplier applied to estimated target velocity.
     pub look_ahead: f32,
     /// Follow interpolation easing mode.
     pub follow_easing: CameraFollowEasing,
-
-    // ---- Helper Functions: Shake ----
     /// Current shake intensity (pixels).
     shake_intensity: f32,
     /// Total shake duration in seconds.
@@ -179,12 +111,8 @@ pub struct Camera2D {
     shake_timer: f32,
     /// Current frame's shake offset (applied in [`view_matrix`](Self::view_matrix)).
     shake_offset: Vec2,
-
-    // ---- Helper Functions: Internal State ----
     /// Previous target for velocity estimation (look-ahead).
     prev_target: Option<Vec2>,
-
-    // ---- Helper Functions: Constraints ----
     /// Minimum zoom level constraint (`0.1` = 10% zoom, optional).
     zoom_min: Option<f32>,
     /// Maximum zoom level constraint (`10.0` = 1000% zoom, optional).
@@ -201,8 +129,6 @@ pub struct Camera2D {
     zoom_target: f32,
     /// Target rotation used when damping is active.
     rotation_target: f32,
-
-    // ---- Helper Functions: Effects ----
     /// Zoom pulse: brief zoom-in with sine envelope decay.
     pub zoom_pulse: ZoomPulse,
     /// Camera sway: sinusoidal x/y offset oscillation.
@@ -211,18 +137,8 @@ pub struct Camera2D {
     pub breathing: CameraBreathing,
 }
 
-// ---- Implementation: Camera2D ----
-
 impl Camera2D {
-    /// Creates a new `Camera2D` centred at the origin with the given viewport
-    ///
-    /// # Parameters
-    /// - `viewport_w` — `f32`.
-    /// - `viewport_h` — `f32`.
-    ///
-    /// # Returns
-    /// `Self`.
-    /// dimensions.
+    /// Create a `Camera2D` at origin for provided viewport dimensions and return it.
     pub fn new(viewport_w: f32, viewport_h: f32) -> Self {
         Self {
             position: Vec2::ZERO,
@@ -254,48 +170,29 @@ impl Camera2D {
         }
     }
 
-    // ---- Helper Functions: Position Zoom Rotation ----
-
-    /// Sets the camera position in world space.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
+    /// Set the camera position in world space.
     pub fn set_position(&mut self, x: f32, y: f32) {
         self.position = Vec2::new(x, y);
     }
 
-    /// Returns the camera position as `(x, y)`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Return the camera position as `(x, y)`.
     pub fn get_position(&self) -> (f32, f32) {
         (self.position.x, self.position.y)
     }
 
-    /// Sets the uniform zoom factor. Replaces the current zoom value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `z` — `f32`.
+    /// Set zoom target and update live zoom immediately when damping is disabled.
     pub fn set_zoom(&mut self, z: f32) {
         self.zoom_target = z;
         if self.zoom_damping <= f32::EPSILON {
             self.zoom = z;
         }
     }
-
-    /// Returns the current zoom factor. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return current zoom factor and preserve damping state.
     pub fn get_zoom(&self) -> f32 {
         self.zoom
     }
 
-    /// Sets the rotation in radians. Replaces the current rotation value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `r` — `f32`.
+    /// Set rotation target and update live rotation immediately when damping is disabled.
     pub fn set_rotation(&mut self, r: f32) {
         self.rotation_target = r;
         if self.rotation_damping <= f32::EPSILON {
@@ -303,34 +200,22 @@ impl Camera2D {
         }
     }
 
-    /// Returns the current rotation in radians.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return the current rotation in radians.
     pub fn get_rotation(&self) -> f32 {
         self.rotation
     }
 
-    /// Sets the follow interpolation easing mode.
+    /// Set the follow interpolation easing mode.
     pub fn set_follow_easing(&mut self, easing: CameraFollowEasing) {
         self.follow_easing = easing;
     }
 
-    /// Returns the current follow interpolation easing mode.
+    /// Return the current follow interpolation easing mode.
     pub fn get_follow_easing(&self) -> CameraFollowEasing {
         self.follow_easing
     }
 
-    // ---- Helper Functions: Zoom Constraints ----
-
-    /// Sets minimum and maximum zoom level constraints.
-    ///
-    /// # Parameters
-    /// - `min_zoom` — `Option<f32>`.
-    /// - `max_zoom` — `Option<f32>`.
-    ///
-    /// Pass `None` to remove a constraint. Zoom is clamped to the valid range
-    /// during `update()`.
+    /// Set optional min and max zoom constraints and clamp current targets.
     pub fn set_zoom_constraints(&mut self, min_zoom: Option<f32>, max_zoom: Option<f32>) {
         self.zoom_min = min_zoom;
         self.zoom_max = max_zoom;
@@ -344,21 +229,12 @@ impl Camera2D {
         }
     }
 
-    /// Returns the current zoom constraints as `(min_zoom, max_zoom)`, with `None` for unconstrained directions.
-    ///
-    /// # Returns
-    /// `(Option<f32>, Option<f32>)`.
+    /// Return zoom constraints as `(min_zoom, max_zoom)` with `None` for unconstrained sides.
     pub fn get_zoom_constraints(&self) -> (Option<f32>, Option<f32>) {
         (self.zoom_min, self.zoom_max)
     }
 
-    /// Sets the zoom damping factor for smooth zoom transitions.
-    ///
-    /// # Parameters
-    /// - `damping` — `f32`.
-    ///
-    /// `0.0` = instant zoom changes, `1.0` = no damping (maximum smoothing).
-    /// Typical values: `0.0` to `1.0`.
+    /// Set zoom damping in `[0.0, 1.0]` and snap to target when damping is zero.
     pub fn set_zoom_damping(&mut self, damping: f32) {
         self.zoom_damping = damping.clamp(0.0, 1.0);
         if self.zoom_damping <= f32::EPSILON {
@@ -366,24 +242,12 @@ impl Camera2D {
         }
     }
 
-    /// Returns the current zoom damping factor.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return the current zoom damping factor.
     pub fn get_zoom_damping(&self) -> f32 {
         self.zoom_damping
     }
 
-    // ---- Helper Functions: Rotation Constraints ----
-
-    /// Sets minimum and maximum rotation constraints in radians.
-    ///
-    /// # Parameters
-    /// - `min_rot` — `Option<f32>`.
-    /// - `max_rot` — `Option<f32>`.
-    ///
-    /// Pass `None` to remove a constraint. Rotation is clamped to the valid range
-    /// during `update()`.
+    /// Set optional min and max rotation constraints and clamp current targets.
     pub fn set_rotation_constraints(&mut self, min_rot: Option<f32>, max_rot: Option<f32>) {
         self.rotation_min = min_rot;
         self.rotation_max = max_rot;
@@ -397,21 +261,12 @@ impl Camera2D {
         }
     }
 
-    /// Returns the current rotation constraints as `(min_rot, max_rot)`, with `None` for unconstrained directions.
-    ///
-    /// # Returns
-    /// `(Option<f32>, Option<f32>)`.
+    /// Return rotation constraints as `(min_rot, max_rot)` with `None` for unconstrained sides.
     pub fn get_rotation_constraints(&self) -> (Option<f32>, Option<f32>) {
         (self.rotation_min, self.rotation_max)
     }
 
-    /// Sets the rotation damping factor for smooth rotation transitions.
-    ///
-    /// # Parameters
-    /// - `damping` — `f32`.
-    ///
-    /// `0.0` = instant rotation changes, `1.0` = no damping (maximum smoothing).
-    /// Typical values: `0.0` to `1.0`.
+    /// Set rotation damping in `[0.0, 1.0]` and snap to target when damping is zero.
     pub fn set_rotation_damping(&mut self, damping: f32) {
         self.rotation_damping = damping.clamp(0.0, 1.0);
         if self.rotation_damping <= f32::EPSILON {
@@ -419,75 +274,45 @@ impl Camera2D {
         }
     }
 
-    /// Returns the current rotation damping factor.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return the current rotation damping factor.
     pub fn get_rotation_damping(&self) -> f32 {
         self.rotation_damping
     }
 
-    // ---- Helper Functions: Follow Presets ----
-
-    /// Sets up a tight follow configuration: fast response, small dead zone, look-ahead.
-    ///
-    /// Suitable for action games and precise control. Parameters:
-    /// - `follow_smooth` = 0.9
-    /// - `dead_zone` = (20, 20)
-    /// - `look_ahead` = 0.5
+    /// Set preset values for a tight follow profile.
     pub fn preset_tight_follow(&mut self) {
         self.set_follow_smooth(0.9);
         self.set_dead_zone(20.0, 20.0);
         self.set_look_ahead(0.5);
     }
 
-    /// Sets up a cinematic follow configuration: slow response, large dead zone, no look-ahead.
-    ///
-    /// Suitable for story-driven games and cutscenes. Parameters:
-    /// - `follow_smooth` = 0.3
-    /// - `dead_zone` = (100, 100)
-    /// - `look_ahead` = 0.0
+    /// Set preset values for a cinematic follow profile.
     pub fn preset_cinematic_follow(&mut self) {
         self.set_follow_smooth(0.3);
         self.set_dead_zone(100.0, 100.0);
         self.set_look_ahead(0.0);
     }
 
-    /// Sets up a balanced follow configuration: moderate response, medium dead zone.
-    ///
-    /// Suitable for RPGs and exploration games. Parameters:
-    /// - `follow_smooth` = 0.6
-    /// - `dead_zone` = (40, 40)
-    /// - `look_ahead` = 0.3
+    /// Set preset values for a balanced follow profile.
     pub fn preset_balanced_follow(&mut self) {
         self.set_follow_smooth(0.6);
         self.set_dead_zone(40.0, 40.0);
         self.set_look_ahead(0.3);
     }
 
-    /// Sets up an aggressive follow configuration: maximum response, minimal dead zone, strong look-ahead.
-    ///
-    /// Suitable for fast-paced games and sports simulations. Parameters:
-    /// - `follow_smooth` = 0.99
-    /// - `dead_zone` = (5, 5)
-    /// - `look_ahead` = 1.0
+    /// Set preset values for an aggressive follow profile.
     pub fn preset_aggressive_follow(&mut self) {
         self.set_follow_smooth(0.99);
         self.set_dead_zone(5.0, 5.0);
         self.set_look_ahead(1.0);
     }
 
-    /// Auto-wires viewport updates to a raw window resize event.
-    ///
-    /// This helper sets the camera viewport to the full window rectangle.
+    /// Set viewport to full window rectangle for raw window resize values.
     pub fn on_window_resize(&mut self, window_width: f32, window_height: f32) {
         self.set_viewport(0.0, 0.0, window_width.max(1.0), window_height.max(1.0));
     }
 
-    /// Auto-wires viewport updates to a window resize with scale-mode mapping.
-    ///
-    /// Uses logical game dimensions and a scale mode to compute letterbox/stretch
-    /// placement before writing the camera viewport rectangle.
+    /// Recompute viewport from logical game size, window size, and selected scale mode.
     pub fn on_window_resize_scaled(
         &mut self,
         game_width: f32,
@@ -510,23 +335,12 @@ impl Camera2D {
         );
     }
 
-    // ---- Helper Functions: Viewport ----
-
-    /// Sets the viewport rectangle in screen pixels.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
-    /// - `w` — `f32`.
-    /// - `h` — `f32`.
+    /// Set the viewport rectangle in screen pixels.
     pub fn set_viewport(&mut self, x: f32, y: f32, w: f32, h: f32) {
         self.viewport = Rect::new(x, y, w, h);
     }
 
-    /// Returns the viewport as `(x, y, w, h)`.
-    ///
-    /// # Returns
-    /// `(f32, f32, f32, f32)`.
+    /// Return the viewport as `(x, y, w, h)`.
     pub fn get_viewport(&self) -> (f32, f32, f32, f32) {
         (
             self.viewport.x,
@@ -536,74 +350,37 @@ impl Camera2D {
         )
     }
 
-    // ---- Helper Functions: Bounds ----
-
-    /// Sets world-space bounds for camera clamping.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
-    /// - `w` — `f32`.
-    /// - `h` — `f32`.
+    /// Set world-space bounds for camera clamping.
     pub fn set_bounds(&mut self, x: f32, y: f32, w: f32, h: f32) {
         self.bounds = Some(Rect::new(x, y, w, h));
     }
-
-    /// Returns the world-space bounds, if set. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `Option<(f32, f32, f32, f32)>`.
+    /// Return world bounds tuple when bounds are set.
     pub fn get_bounds(&self) -> Option<(f32, f32, f32, f32)> {
         self.bounds.map(|b| (b.x, b.y, b.width, b.height))
     }
 
-    /// Removes previously set bounds. Returns the removed value if present, or `None` when the key did not exist.
+    /// Clear world bounds and return without changing other camera state.
     pub fn remove_bounds(&mut self) {
         self.bounds = None;
     }
 
-    /// Returns `true` if world-space bounds are set.
-    ///
-    /// # Returns
-    /// `bool`.
+    /// Return `true` if world-space bounds are set.
     pub fn has_bounds(&self) -> bool {
         self.bounds.is_some()
     }
 
-    // ---- Helper Functions: Movement ----
-
-    /// Translates the camera by `(dx, dy)` in world space.
-    ///
-    /// # Parameters
-    /// - `dx` — `f32`.
-    /// - `dy` — `f32`.
+    /// Move camera by world-space delta `(dx, dy)`.
     pub fn move_by(&mut self, dx: f32, dy: f32) {
         self.position.x += dx;
         self.position.y += dy;
     }
 
-    /// Sets the camera position directly (shorthand for [`set_position`](Self::set_position)).
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
+    /// Set camera position directly from world coordinates.
     pub fn look_at(&mut self, x: f32, y: f32) {
         self.position = Vec2::new(x, y);
     }
 
-    // ---- Helper Functions: Coordinate Conversion ----
-
-    /// Converts screen coordinates to world coordinates.
-    ///
-    /// # Parameters
-    /// - `screen_x` — `f32`.
-    /// - `screen_y` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
-    ///
-    /// This is the inverse of the view transform (ignoring rotation for
-    /// the simple 2D case).
+    /// Convert screen coordinates to world coordinates using zoom, viewport center, and shake offset.
     pub fn to_world_coords(&self, screen_x: f32, screen_y: f32) -> (f32, f32) {
         let z = if self.zoom.abs() > f32::EPSILON {
             self.zoom
@@ -616,14 +393,7 @@ impl Camera2D {
         (wx, wy)
     }
 
-    /// Converts world coordinates to screen coordinates.
-    ///
-    /// # Parameters
-    /// - `world_x` — `f32`.
-    /// - `world_y` — `f32`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Convert world coordinates to screen coordinates.
     pub fn to_screen_coords(&self, world_x: f32, world_y: f32) -> (f32, f32) {
         let sx = (world_x - self.position.x - self.shake_offset.x) * self.zoom
             + self.viewport.width * 0.5;
@@ -632,11 +402,7 @@ impl Camera2D {
         (sx, sy)
     }
 
-    /// Returns the world-space axis-aligned bounding box of the visible area
-    ///
-    /// # Returns
-    /// `(f32, f32, f32, f32)`.
-    /// as `(x, y, w, h)`.
+    /// Return visible world-space AABB as `(x, y, w, h)`.
     pub fn get_visible_area(&self) -> (f32, f32, f32, f32) {
         let z = if self.zoom.abs() > f32::EPSILON {
             self.zoom
@@ -650,124 +416,73 @@ impl Camera2D {
         (cx - half_w, cy - half_h, half_w * 2.0, half_h * 2.0)
     }
 
-    // ---- Helper Functions: Follow Dead Zone Look Ahead ----
-
-    /// Sets the dead zone half-extents. Pass `(0, 0)` for no dead zone.
-    ///
-    /// # Parameters
-    /// - `w` — `f32`.
-    /// - `h` — `f32`.
+    /// Set dead-zone extents from full width and height values.
     pub fn set_dead_zone(&mut self, w: f32, h: f32) {
         self.dead_zone = Some((w * 0.5, h * 0.5));
     }
 
-    /// Returns the dead zone as `(width, height)` (full extents), if set.
-    ///
-    /// # Returns
-    /// `Option<(f32, f32)>`.
+    /// Return dead-zone full extents `(width, height)` when configured.
     pub fn get_dead_zone(&self) -> Option<(f32, f32)> {
         self.dead_zone.map(|(hw, hh)| (hw * 2.0, hh * 2.0))
     }
 
-    /// Sets the follow target position. Replaces the current target value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `x` — `f32`.
-    /// - `y` — `f32`.
+    /// Set follow target position.
     pub fn set_target(&mut self, x: f32, y: f32) {
         self.target = Some(Vec2::new(x, y));
     }
 
-    /// Returns the current follow target, if any.
-    ///
-    /// # Returns
-    /// `Option<(f32, f32)>`.
+    /// Return the current follow target, if any.
     pub fn get_target(&self) -> Option<(f32, f32)> {
         self.target.map(|t| (t.x, t.y))
     }
 
-    /// Clears the follow target so the camera stops tracking.
+    /// Clear the follow target so the camera stops tracking.
     pub fn clear_target(&mut self) {
         self.target = None;
     }
 
-    /// Sets the smooth follow interpolation speed.
-    ///
-    /// # Parameters
-    /// - `speed` — `f32`.
-    ///
-    /// `0.0` means instant snap, higher values give smoother following.
+    /// Set smooth-follow speed where `0.0` snaps instantly and higher values smooth motion.
     pub fn set_follow_smooth(&mut self, speed: f32) {
         self.follow_smooth = speed.max(0.0);
     }
-
-    /// Returns the smooth follow speed. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return smooth-follow speed.
     pub fn get_follow_smooth(&self) -> f32 {
         self.follow_smooth
     }
 
-    /// Sets the look-ahead multiplier. Replaces the current look ahead value; callers hold responsibility for maintaining consistency with related fields.
-    ///
-    /// # Parameters
-    /// - `mul` — `f32`.
+    /// Set look-ahead multiplier.
     pub fn set_look_ahead(&mut self, mul: f32) {
         self.look_ahead = mul;
     }
-
-    /// Returns the look-ahead multiplier. This accessor incurs no allocation; call it freely in hot paths.
-    ///
-    /// # Returns
-    /// `f32`.
+    /// Return look-ahead multiplier.
     pub fn get_look_ahead(&self) -> f32 {
         self.look_ahead
     }
 
-    // ---- Helper Functions: Shake Control ----
-
-    /// Starts a camera shake effect.
-    ///
-    /// # Parameters
-    /// - `intensity` — Maximum pixel offset.
-    /// - `duration` — How long the shake lasts in seconds.
+    /// Start a camera shake effect.
     pub fn shake(&mut self, intensity: f32, duration: f32) {
         self.shake_intensity = intensity;
         self.shake_duration = duration;
         self.shake_timer = duration;
     }
 
-    /// Returns the current shake offset as `(dx, dy)`.
-    ///
-    /// # Returns
-    /// `(f32, f32)`.
+    /// Return the current shake offset as `(dx, dy)`.
     pub fn get_shake_offset(&self) -> (f32, f32) {
         (self.shake_offset.x, self.shake_offset.y)
     }
 
-    /// Processes smooth follow, camera shake, bounds clamping, and constraint application.
-    ///
-    /// # Parameters
-    /// - `dt` — `f32`.
-    ///
-    /// Call once per frame with the delta time in seconds.
+    /// Update follow, shake, bounds, damping, and effect state for frame delta `dt`.
     pub fn update(&mut self, dt: f32) {
-        // ---- Helper Functions: Update Stage 1 Follow Target ----
         if let Some(target) = self.target {
             let mut desired = target;
-
-            // ---- Helper Functions: Update Stage 2 Dead Zone ----
             if let Some((hw, hh)) = self.dead_zone {
                 let dx = target.x - self.position.x;
                 let dy = target.y - self.position.y;
                 if dx.abs() <= hw && dy.abs() <= hh {
-                    // Target inside dead zone — keep current position as desired.
+                    // Keep camera static while target remains inside dead-zone extents.
                     desired = self.position;
                 }
             }
-
-            // ---- Helper Functions: Update Stage 3 Look Ahead ----
             if self.look_ahead > 0.0 {
                 if let Some(prev) = self.prev_target {
                     let vx = target.x - prev.x;
@@ -776,8 +491,6 @@ impl Camera2D {
                     desired.y += vy * self.look_ahead;
                 }
             }
-
-            // ---- Helper Functions: Update Stage 4 Smooth Interpolation ----
             if self.follow_smooth > 0.0 {
                 let t = self.follow_easing.apply((self.follow_smooth * dt).min(1.0));
                 self.position.x += (desired.x - self.position.x) * t;
@@ -788,8 +501,6 @@ impl Camera2D {
 
             self.prev_target = Some(target);
         }
-
-        // ---- Helper Functions: Update Stage 5 Bounds Clamping ----
         if let Some(bounds) = self.bounds {
             let z = if self.zoom_target.abs() > f32::EPSILON {
                 self.zoom_target
@@ -815,8 +526,6 @@ impl Camera2D {
                 self.position.y = bounds.y + bounds.height * 0.5;
             }
         }
-
-        // ---- Helper Functions: Update Stage 6 Shake ----
         if self.shake_timer > 0.0 {
             self.shake_timer -= dt;
             if self.shake_timer <= 0.0 {
@@ -825,15 +534,12 @@ impl Camera2D {
             } else {
                 let ratio = self.shake_timer / self.shake_duration;
                 let t = self.shake_timer;
-                // Deterministic pseudo-random shake using sin() of scaled timer values.
-                // Different frequency multipliers (53, 97) ensure x and y offsets are uncorrelated.
+                // Use fixed sinusoid frequencies for deterministic shake offsets.
                 let ox = (t * 53.0).sin() * self.shake_intensity * ratio;
                 let oy = (t * 97.0).sin() * self.shake_intensity * ratio;
                 self.shake_offset = Vec2::new(ox, oy);
             }
         }
-
-        // ---- Helper Functions: Update Stage 7 Zoom Damping And Constraints ----
         if let Some(min_z) = self.zoom_min {
             self.zoom_target = self.zoom_target.max(min_z);
         }
@@ -847,8 +553,6 @@ impl Camera2D {
             let alpha = (dt.max(0.0) / (dt.max(0.0) + self.zoom_damping.max(1e-4))).clamp(0.0, 1.0);
             self.zoom += (self.zoom_target - self.zoom) * alpha;
         }
-
-        // ---- Helper Functions: Update Stage 8 Rotation Damping And Constraints ----
         if let Some(min_r) = self.rotation_min {
             self.rotation_target = self.rotation_target.max(min_r);
         }
@@ -863,49 +567,28 @@ impl Camera2D {
                 (dt.max(0.0) / (dt.max(0.0) + self.rotation_damping.max(1e-4))).clamp(0.0, 1.0);
             self.rotation += (self.rotation_target - self.rotation) * alpha;
         }
-
-        // ---- Helper Functions: Update Stage 9 Camera Effects ----
         self.zoom_pulse.update(dt);
         self.sway.update(dt);
         self.breathing.update(dt);
     }
 
-    /// Returns the effective zoom level, combining the base zoom with active
-    /// zoom pulse and breathing effect deltas.
-    ///
-    /// Use this instead of [`Self::zoom`] when generating the view transform
-    /// so that effects are reflected in the rendered output.
-    ///
-    /// # Returns
-    /// `f32`
+    /// Return effective zoom computed from base zoom plus pulse and breathing deltas.
     pub fn effective_zoom(&self) -> f32 {
         self.zoom + self.zoom_pulse.current_delta() + self.breathing.current_delta()
     }
 
-    /// Returns the current world-space position offset contributed by the
-    /// active sway effect as `(dx, dy)`.
-    ///
-    /// Add this to the camera position when building the view transform to
-    /// include sway in the rendered output.
-    ///
-    /// # Returns
-    /// `(f32, f32)`
+    /// Return current sway offset contribution as world-space `(dx, dy)`.
     pub fn effect_offset(&self) -> (f32, f32) {
         self.sway.current_offset()
     }
 
-    /// Returns the canonical combined render offset (sway + shake).
+    /// Return the canonical combined render offset (sway + shake).
     pub fn render_offset(&self) -> (f32, f32) {
         let (sx, sy) = self.sway.current_offset();
         (sx + self.shake_offset.x, sy + self.shake_offset.y)
     }
 
-    /// Computes the view matrix including sway and shake offsets.
-    ///
-    /// # Returns
-    /// `Mat3`.
-    ///
-    /// Order: translate(-(position + render_offset)), scale(effective_zoom), rotate(rotation).
+    /// Compute view matrix from translated render offset, effective zoom, and rotation.
     pub fn view_matrix(&self) -> Mat3 {
         let (ox, oy) = self.render_offset();
         let pos = Vec2::new(self.position.x + ox, self.position.y + oy);
@@ -921,3 +604,6 @@ impl Default for Camera2D {
         Self::new(800.0, 600.0)
     }
 }
+
+
+

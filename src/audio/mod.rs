@@ -1,5 +1,5 @@
-//! Audio subsystem: mixer, buses, playback state, DSP effects (via rodio).
-//! lurek.audio Lua bindings delegate to Mixer + Bus in SharedState.
+//! Audio subsystem: loading, mixing, playback, buses, and effects.
+//! Mixer manages sounds and buses; DSP provides lock-free effect parameters.
 
 /// Named audio bus: shared volume/pitch/pause/effects.
 pub mod bus;

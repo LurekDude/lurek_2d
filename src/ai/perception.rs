@@ -1,6 +1,4 @@
-﻿//! Scope: perception model for stimuli storage, sensing, and awareness updates.
-//! This file defines stimulus channels, world registry, sensor limits, detection tests, and awareness accumulation.
-//! It owns stimulus lifecycle and sensory filtering used by reaction logic in behavior and state machines.
+//! perception model for stimuli storage, sensing, and awareness updates.
 use std::collections::HashMap;
 
 // ---- Type: StimulusType ----
@@ -17,7 +15,7 @@ pub enum StimulusType {
 }
 
 impl StimulusType {
-    /// Parses a string into a `StimulusType`.
+    /// Parse a string into a `StimulusType`.
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s {
@@ -27,7 +25,7 @@ impl StimulusType {
         }
     }
 
-    /// Returns the canonical string name of this stimulus type.
+    /// Return the canonical string name of this stimulus type.
     pub fn as_str(&self) -> String {
         match self {
             Self::Visual => "visual".to_string(),
@@ -88,7 +86,7 @@ pub struct StimulusWorld {
 }
 
 impl StimulusWorld {
-    /// Creates a new empty stimulus world.
+    /// Create a new empty stimulus world.
     pub fn new() -> Self {
         Self {
             stimuli: Vec::new(),
@@ -173,7 +171,7 @@ impl StimulusWorld {
         })
     }
 
-    /// Removes a stimulus by ID. Returns `true` if it was found and removed.
+    /// Remove a stimulus by ID. Returns `true` if it was found and removed.
     pub fn remove(&mut self, id: u64) -> bool {
         let before = self.stimuli.len();
         self.stimuli.retain(|s| s.id != id);
@@ -190,17 +188,17 @@ impl StimulusWorld {
         self.stimuli.retain(|s| s.intensity > 0.0);
     }
 
-    /// Returns a reference to all currently active stimuli.
+    /// Return a reference to all currently active stimuli.
     pub fn stimuli(&self) -> &[Stimulus] {
         &self.stimuli
     }
 
-    /// Returns the number of active stimuli.
+    /// Return the number of active stimuli.
     pub fn count(&self) -> usize {
         self.stimuli.len()
     }
 
-    /// Removes all stimuli immediately.
+    /// Remove all stimuli immediately.
     pub fn clear(&mut self) {
         self.stimuli.clear();
     }
@@ -237,7 +235,7 @@ pub struct Sensor {
 }
 
 impl Sensor {
-    /// Creates a sensor with default parameters suitable for a typical guard agent.
+    /// Create a sensor with default parameters suitable for a typical guard agent.
     pub fn new() -> Self {
         Self {
             sight_range: 200.0,
@@ -252,7 +250,7 @@ impl Sensor {
         }
     }
 
-    /// Returns `true` if a given world-space target position is inside this
+    /// Return `true` if a given world-space target position is inside this
     pub fn can_see(&self, sensor_pos: (f32, f32), target_pos: (f32, f32)) -> bool {
         let dx = target_pos.0 - sensor_pos.0;
         let dy = target_pos.1 - sensor_pos.1;
@@ -269,7 +267,7 @@ impl Sensor {
         diff.abs() <= half_cone
     }
 
-    /// Returns `true` if an auditory stimulus can be heard from `sensor_pos`.
+    /// Return `true` if an auditory stimulus can be heard from `sensor_pos`.
     pub fn can_hear(&self, sensor_pos: (f32, f32), stimulus: &Stimulus) -> bool {
         if stimulus.stimulus_type != StimulusType::Auditory {
             return false;
@@ -322,7 +320,7 @@ impl Sensor {
         }
     }
 
-    /// Returns `true` when awareness has reached or exceeded `alert_threshold`.
+    /// Return `true` when awareness has reached or exceeded `alert_threshold`.
     pub fn is_alert(&self) -> bool {
         self.awareness >= self.alert_threshold
     }
@@ -341,7 +339,7 @@ impl Default for Sensor {
 
 // ---- Type: Helper ----
 
-/// Returns the signed angular difference between `a` and `b` in radians,
+/// Return the signed angular difference between `a` and `b` in radians,
 fn angle_diff(a: f32, b: f32) -> f32 {
     let mut diff = a - b;
     while diff > std::f32::consts::PI {

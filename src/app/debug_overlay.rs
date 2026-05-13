@@ -1,46 +1,26 @@
-//! Scope: Debug overlay rendering for runtime performance indicators.
-//! This file defines the DebugOverlay type and command generation for overlay text.
-//! It owns visibility toggling and draw-command composition for FPS and draw-call stats.
+//! Overlay displaying frame-rate and render-statistics diagnostics.
+//! DebugOverlay: builds draw commands for FPS and draw-call counters.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::resource_keys::FontKey;
 
 // ---- Type: DebugOverlay ----
 
-/// Debug overlay showing FPS and render statistics.
-///
-/// # Fields
-/// - `enabled` — `bool`.
-///
-/// Generates `RenderCommand` sequences for rendering performance info in the
-/// top-right corner of the screen.
+/// Toggleable performance overlay; toggleable via F12.
 pub struct DebugOverlay {
-    /// Whether the effect is currently visible.
+    /// Whether the overlay is currently visible.
     pub enabled: bool,
 }
 
 impl DebugOverlay {
     // ---- Implementation: DebugOverlay ----
 
-    /// Creates a new disabled debug overlay.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create new disabled overlay.
     pub fn new() -> Self {
         Self { enabled: false }
     }
 
-    /// Generates draw commands for the effect.
-    ///
-    /// Shows FPS and draw call count as green text on a dark semi-transparent background.
-    ///
-    /// # Parameters
-    /// - `screen_w` — Screen width in pixels.
-    /// - `fps` — Current frames per second.
-    /// - `draw_calls` — Number of draw calls in the last frame.
-    ///
-    /// # Returns
-    /// A `Vec<RenderCommand>` to append after the main game rendering.
+    /// Build draw commands for FPS and draw-call count overlay.
     pub fn build_render_commands(
         &self,
         screen_w: u32,

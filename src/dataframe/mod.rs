@@ -1,10 +1,5 @@
-//! In-memory column-major tabular data with query, analytics, and SQL.
-//!
-//! Provides `DataFrame` for named-column data tables and `Database` for
-//! multi-table catalogs. Used by the `lurek.dataframe` Lua module.
-//! `VecFrame` adds a typed-column vectorized layer for bulk numeric transforms.
+//! In-memory column-major tables.
 
-/// Column-major DataFrame and Database types.
 pub mod frame;
 /// Lazy query pipeline for deferred multi-step evaluation.
 pub mod lazy;

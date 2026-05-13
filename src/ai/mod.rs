@@ -1,6 +1,4 @@
-﻿//! Scope: AI module composition root and re-export surface for engine runtime.
-//! This file defines submodule boundaries and central public exports consumed by AIWorld, systems, and Lua bridge.
-//! It owns stable internal wiring for planners, steering, sensing, learning, and coordination subsystems.
+//! AI module composition root and re-export surface for engine runtime.
 /// Autonomous agent with kinematic state (position, velocity) and pluggable
 pub mod agent;
 /// Hierarchical behavior tree with composite nodes (sequence, selector, parallel),

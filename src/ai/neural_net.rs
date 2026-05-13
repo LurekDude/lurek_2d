@@ -1,6 +1,4 @@
-﻿//! Scope: feedforward neural network inference and weight serialization helpers.
-//! This file defines activation functions, dense layers, network stacks, and deterministic forward-pass routines.
-//! It owns lightweight runtime inference utilities used by AI features without training-time dependencies.
+//! feedforward neural network inference and weight serialization helpers.
 
 // ---- Type: Activation ----
 
@@ -20,7 +18,7 @@ pub enum Activation {
 }
 
 impl Activation {
-    /// Parses a string into an `Activation`. Case-insensitive.
+    /// Parse a string into an `Activation`. Case-insensitive.
     #[allow(clippy::should_implement_trait)]
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
@@ -32,7 +30,7 @@ impl Activation {
         }
     }
 
-    /// Returns the canonical lowercase string name.
+    /// Return the canonical lowercase string name.
     pub fn as_str(self) -> &'static str {
         match self {
             Self::ReLU => "relu",
@@ -94,7 +92,7 @@ pub struct NeuralLayer {
 // ---- Implementation: NeuralLayer ----
 
 impl NeuralLayer {
-    /// Creates a new zeroed layer.
+    /// Create a new zeroed layer.
     pub fn new(inputs: usize, outputs: usize, activation: Activation) -> Self {
         Self {
             inputs,
@@ -105,7 +103,7 @@ impl NeuralLayer {
         }
     }
 
-    /// Returns the total number of weight parameters (weights + biases).
+    /// Return the total number of weight parameters (weights + biases).
     pub fn param_count(&self) -> usize {
         self.inputs * self.outputs + self.outputs
     }
@@ -135,18 +133,18 @@ pub struct NeuralNet {
 }
 
 impl NeuralNet {
-    /// Creates a new empty neural network.
+    /// Create a new empty neural network.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Appends a fully-connected layer to the network.
+    /// Append a fully-connected layer to the network.
     pub fn add_layer(&mut self, inputs: usize, outputs: usize, activation: Activation) {
         self.layers
             .push(NeuralLayer::new(inputs, outputs, activation));
     }
 
-    /// Returns the total number of trainable parameters across all layers.
+    /// Return the total number of trainable parameters across all layers.
     pub fn param_count(&self) -> usize {
         self.layers.iter().map(|l| l.param_count()).sum()
     }
@@ -190,7 +188,7 @@ impl NeuralNet {
         out
     }
 
-    /// Returns the number of layers.
+    /// Return the number of layers.
     pub fn layer_count(&self) -> usize {
         self.layers.len()
     }

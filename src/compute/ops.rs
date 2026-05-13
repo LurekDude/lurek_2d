@@ -534,7 +534,7 @@ pub fn all(a: &NdArray) -> bool {
     true
 }
 
-// Reductions â€” global
+// Global reductions.
 
 /// Sum all elements.
 pub fn sum(a: &NdArray) -> f64 {
@@ -798,7 +798,7 @@ pub fn clone_array(a: &NdArray) -> NdArray {
     a.clone()
 }
 
-// Bitwise â€” Int32 only
+// Bitwise operations for Int32 only.
 
 /// Compute bitwise AND for two Int32 arrays and return the result array.
 pub fn bitwise_and(a: &NdArray, b: &NdArray) -> Result<NdArray, String> {

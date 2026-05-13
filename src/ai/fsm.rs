@@ -1,6 +1,4 @@
-﻿//! Scope: finite-state machine runtime for named state transitions.
-//! This file defines state records, transition conditions, callback hooks, and update progression semantics.
-//! It owns deterministic enter/update/exit ordering used by agents configured with FSM-based decision flow.
+//! finite-state machine runtime for named state transitions.
 use std::collections::HashMap;
 
 use crate::log_msg;
@@ -45,7 +43,7 @@ pub struct StateMachine {
 }
 
 impl StateMachine {
-    /// Creates a new empty state machine.
+    /// Create a new empty state machine.
     pub fn new() -> Self {
         log_msg!(debug, FN01);
         Self {
@@ -57,24 +55,24 @@ impl StateMachine {
         }
     }
 
-    /// Adds a transition and re-sorts by descending priority.
+    /// Add a transition and re-sorts by descending priority.
     pub fn add_transition(&mut self, transition: Transition) {
         log_msg!(debug, FN02);
         self.transitions.push(transition);
         self.transitions.sort_by(|a, b| b.priority.cmp(&a.priority));
     }
 
-    /// Returns the current state name, if any.
+    /// Return the current state name, if any.
     pub fn current_state(&self) -> Option<&str> {
         self.current_state.as_deref()
     }
 
-    /// Returns the time spent in the current state in seconds.
+    /// Return the time spent in the current state in seconds.
     pub fn time_in_state(&self) -> f32 {
         self.time_in_state
     }
 
-    /// Adds a named state with optional lifecycle callbacks. Used by the Lua API.
+    /// Add a named state with optional lifecycle callbacks. Used by the Lua API.
     pub fn add_state_raw(
         &mut self,
         name: String,
@@ -92,7 +90,7 @@ impl StateMachine {
         );
     }
 
-    /// Adds a transition with optional guard callback. Used by the Lua API.
+    /// Add a transition with optional guard callback. Used by the Lua API.
     pub fn add_transition_raw(
         &mut self,
         from: String,
@@ -108,7 +106,7 @@ impl StateMachine {
         });
     }
 
-    /// Sets the initial state name. The machine transitions here on its first update.
+    /// Set the initial state name. The machine transitions here on its first update.
     pub fn set_initial_state(&mut self, name: String) {
         self.initial_state = Some(name);
     }

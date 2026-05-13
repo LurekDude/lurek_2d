@@ -1,10 +1,8 @@
-//! Headless tooling binary for non-graphical Lurek2D workflows.
-//!
-//! Commands:
-//! - `validate [game_dir]`: runs `python tools/validate/validate_game.py`.
-//! - `pack <game_dir> <output.lurek>`: packages a game directory into a `.lurek` archive.
-//! - `screenshot-batch <games_root> <output_dir> [frames]`: captures one screenshot
-//!   per child game directory that contains `main.lua`.
+//! Non-graphical CLI binary for Lurek2D tooling workflows.
+//! Three commands: `validate` (runs tools/validate/validate_game.py),
+//! `pack` (zips a game directory to a `.lurek` archive),
+//! `screenshot-batch` (drives lurek2d headless screenshot capture per game dir).
+//! No wgpu, no winit; depends only on std, zip, and std::process::Command.
 
 use std::env;
 use std::fs::{self, File};
@@ -14,6 +12,7 @@ use std::process::{Command, ExitCode};
 
 use zip::write::FileOptions;
 
+/// Print CLI usage summary to stderr.
 fn print_usage() {
     eprintln!("lurek_headless <command> [args]\n");
     eprintln!("Commands:");
@@ -22,6 +21,7 @@ fn print_usage() {
     eprintln!("  screenshot-batch <games_root> <output_dir> [frames]");
 }
 
+/// Run tools/validate/validate_game.py on an optional game directory; return Err on non-zero exit.
 fn run_validate(game_dir: Option<String>) -> Result<(), String> {
     let mut cmd = Command::new("python");
     cmd.arg("tools/validate/validate_game.py");
@@ -38,6 +38,7 @@ fn run_validate(game_dir: Option<String>) -> Result<(), String> {
     }
 }
 
+/// Recursively add all files under `dir` into `zip` with paths relative to `root`.
 fn add_dir_to_zip<W: Write + Seek>(
     zip: &mut zip::ZipWriter<W>,
     root: &Path,
@@ -69,6 +70,7 @@ fn add_dir_to_zip<W: Write + Seek>(
     Ok(())
 }
 
+/// Pack the game directory at `game_dir` into a ZIP archive at `output`; return Err if main.lua is absent.
 fn run_pack(game_dir: String, output: String) -> Result<(), String> {
     let root = PathBuf::from(&game_dir);
     if !root.join("main.lua").exists() {
@@ -92,6 +94,7 @@ fn run_pack(game_dir: String, output: String) -> Result<(), String> {
     Ok(())
 }
 
+/// Capture one screenshot PNG per game subdirectory under `games_root` via lurek2d headless; save to `out_dir`.
 fn run_screenshot_batch(games_root: String, out_dir: String, frames: u32) -> Result<(), String> {
     let root = PathBuf::from(games_root);
     let out = PathBuf::from(out_dir);

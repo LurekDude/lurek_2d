@@ -1,6 +1,4 @@
-﻿//! Scope: affective state model with decay and event-driven modulation.
-//! This file defines emotion channels, clamped updates, and helpers to convert stimuli into affect adjustments.
-//! It owns internal emotional state mutation used by decision, dialogue, and utility scoring subsystems.
+//! affective state model with decay and event-driven modulation.
 
 // ---- Type: Emotion ----
 
@@ -21,7 +19,7 @@ pub struct Emotion {
 // ---- Implementation: Emotion ----
 
 impl Emotion {
-    /// Creates a new emotion starting at its resting level.
+    /// Create a new emotion starting at its resting level.
     pub fn new(name: &str, resting_level: f32, decay_rate: f32, min_visible: f32) -> Self {
         Self {
             name: name.to_string(),
@@ -32,7 +30,7 @@ impl Emotion {
         }
     }
 
-    /// Returns `true` when this emotion's value is at or above `min_visible`.
+    /// Return `true` when this emotion's value is at or above `min_visible`.
     pub fn is_active(&self) -> bool {
         self.value >= self.min_visible
     }
@@ -42,7 +40,7 @@ impl Emotion {
         self.value = (self.value + amount).clamp(0.0, 1.0);
     }
 
-    /// Sets the emotion to an exact value, clamped to `[0.0, 1.0]`.
+    /// Set the emotion to an exact value, clamped to `[0.0, 1.0]`.
     pub fn set(&mut self, value: f32) {
         self.value = value.clamp(0.0, 1.0);
     }
@@ -68,12 +66,12 @@ pub struct EmotionModel {
 // ---- Implementation: EmotionModel ----
 
 impl EmotionModel {
-    /// Creates an empty emotion model.
+    /// Create an empty emotion model.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Adds or replaces an emotion by name.
+    /// Add or replaces an emotion by name.
     pub fn add(&mut self, emotion: Emotion) {
         if let Some(e) = self.emotions.iter_mut().find(|e| e.name == emotion.name) {
             *e = emotion;
@@ -82,7 +80,7 @@ impl EmotionModel {
         }
     }
 
-    /// Returns the current value of a named emotion, or `0.0` if not found.
+    /// Return the current value of a named emotion, or `0.0` if not found.
     pub fn get(&self, name: &str) -> f32 {
         self.emotions
             .iter()
@@ -98,7 +96,7 @@ impl EmotionModel {
         }
     }
 
-    /// Sets a named emotion to an exact value. Silently ignores unknown emotions.
+    /// Set a named emotion to an exact value. Silently ignores unknown emotions.
     pub fn set(&mut self, name: &str, value: f32) {
         if let Some(e) = self.emotions.iter_mut().find(|e| e.name == name) {
             e.set(value);
@@ -112,7 +110,7 @@ impl EmotionModel {
         }
     }
 
-    /// Returns the name of the dominant (highest active) emotion, or `None` if no emotion is currently active.
+    /// Return the name of the dominant (highest active) emotion, or `None` if no emotion is currently active.
     pub fn dominant(&self) -> Option<&str> {
         self.emotions
             .iter()
@@ -121,7 +119,7 @@ impl EmotionModel {
             .map(|e| e.name.as_str())
     }
 
-    /// Returns `true` when a named emotion is at or above its `min_visible` threshold.
+    /// Return `true` when a named emotion is at or above its `min_visible` threshold.
     pub fn is_active(&self, name: &str) -> bool {
         self.emotions
             .iter()
@@ -130,7 +128,7 @@ impl EmotionModel {
             .unwrap_or(false)
     }
 
-    /// Returns the names of all emotions currently active (above `min_visible`).
+    /// Return the names of all emotions currently active (above `min_visible`).
     pub fn active_names(&self) -> Vec<&str> {
         self.emotions
             .iter()
@@ -139,7 +137,7 @@ impl EmotionModel {
             .collect()
     }
 
-    /// Returns the number of emotions registered in this model.
+    /// Return the number of emotions registered in this model.
     pub fn count(&self) -> usize {
         self.emotions.len()
     }

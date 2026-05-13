@@ -1,6 +1,4 @@
-//! Scope: Define animation clip metadata and playback modes.
-//! This file defines clip playback direction and clip frame-index metadata.
-//! It owns the static data used by animation playback state.
+//! Define animation clip metadata and playback modes.
 
 // ---- Type: ClipPlaybackMode ----
 
@@ -18,15 +16,6 @@ pub enum ClipPlaybackMode {
 // ---- Type: AnimClip ----
 
 /// A named animation clip that references frame indices in the parent animation.
-///
-/// # Fields
-/// - `name` â€” `String`.
-/// - `frame_indices` â€” `Vec<usize>`.
-/// - `fps` â€” `f32`.
-/// - `looping` â€” `bool`.
-/// - `mode` â€” [`ClipPlaybackMode`].
-///
-/// The indices refer to the frame pool in [`Animation`](crate::animation::Animation).
 #[derive(Debug, Clone)]
 pub struct AnimClip {
     /// Human-readable clip name.

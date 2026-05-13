@@ -1,4 +1,5 @@
 //! DSP effects: lock-free parameters, biquads, reverb, modulation, dynamics.
+//! AtomicParam: bit-cast f32 via AtomicU32; EffectParams: effect type + 3 parameters.
 
 use rodio::Source;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -14,19 +15,19 @@ pub struct AtomicParam {
 }
 
 impl AtomicParam {
-    /// Creates a new parameter initialized to `val`.
+    /// Create new parameter initialized to val.
     pub fn new(val: f32) -> Self {
         Self {
             val: AtomicU32::new(val.to_bits()),
         }
     }
 
-    /// Returns current value (relaxed atomicity).
+    /// Return current value (relaxed atomicity).
     pub fn get(&self) -> f32 {
         f32::from_bits(self.val.load(Ordering::Relaxed))
     }
 
-    /// Stores new value (relaxed atomicity).
+    /// Store new value (relaxed atomicity).
     pub fn set(&self, val: f32) {
         self.val.store(val.to_bits(), Ordering::Relaxed);
     }
@@ -63,7 +64,7 @@ pub struct EffectParams {
 }
 
 impl EffectParams {
-    /// Creates a new effect slot.
+    /// Create new effect slot.
     pub fn new(id: u32, typ: EffectType) -> Self {
         log_msg!(debug, DP01, "id={}", id);
         Self {
@@ -75,7 +76,7 @@ impl EffectParams {
         }
     }
 
-    /// Sets a named parameter.
+    /// Set a named parameter; return error if unsupported for this effect type.
     pub fn set_param(&self, param: &str, value: f32) -> Result<(), String> {
         match self.typ {
             EffectType::Lowpass | EffectType::Highpass | EffectType::Bandpass => match param {

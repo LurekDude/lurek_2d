@@ -1,6 +1,5 @@
-//! Scope: Lua callback invocation helpers for the app loop.
-//! This file defines checked and unchecked callback wrappers with optional timeout control.
-//! It owns consistent missing-callback handling and timeout enforcement at callback boundaries.
+//! Lua callback invocation with optional timeout enforcement.
+//! Helpers for calling lurek.* callbacks with missing-callback safety and timeout control.
 
 use std::time::{Duration, Instant};
 
@@ -9,7 +8,7 @@ use mlua::HookTriggers;
 
 // ---- Helper Functions: Lua Callback Invocation ----
 
-/// Calls a named `lurek.*` callback and logs any runtime error.
+/// Call named lurek.* callback and log any Lua error.
 pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -20,7 +19,7 @@ pub fn call_lua_callback<'a, A: IntoLuaMulti<'a>>(
     }
 }
 
-/// Calls a named `lurek.*` callback and returns any Lua error to the caller.
+/// Call named lurek.* callback; return any error or Ok if missing.
 pub fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -29,7 +28,7 @@ pub fn call_lua_callback_checked<'a, A: IntoLuaMulti<'a>>(
     call_lua_callback_checked_with_timeout(lua, name, args, None)
 }
 
-/// Calls a Lua callback with an optional hard timeout and logs any error.
+/// Call lurek.* callback with optional timeout; log any error.
 pub fn call_lua_callback_with_timeout<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,
@@ -41,9 +40,7 @@ pub fn call_lua_callback_with_timeout<'a, A: IntoLuaMulti<'a>>(
     }
 }
 
-/// Calls a Lua callback and returns any Lua error.
-///
-/// Missing callbacks are treated as `Ok(())`.
+/// Call lurek.* callback with optional timeout; return any error.
 pub fn call_lua_callback_checked_with_timeout<'a, A: IntoLuaMulti<'a>>(
     lua: &'a Lua,
     name: &str,

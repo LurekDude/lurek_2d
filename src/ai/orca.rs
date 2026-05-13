@@ -1,6 +1,4 @@
-﻿//! Scope: ORCA crowd avoidance solver and per-agent avoidance state.
-//! This file defines velocity-obstacle constraints and solves collision-avoidant preferred velocity outputs.
-//! It owns local reciprocal avoidance math used for dense-agent navigation without global path replanning.
+//! ORCA crowd avoidance solver and per-agent avoidance state.
 // ---- Type: ORCAAgent ----
 
 /// A single agent participating in ORCA collision avoidance.
@@ -21,7 +19,7 @@ pub struct ORCAAgent {
 }
 
 impl ORCAAgent {
-    /// Creates an agent at the given position with zero velocity.
+    /// Create an agent at the given position with zero velocity.
     pub fn new(x: f32, y: f32, radius: f32, max_speed: f32) -> Self {
         Self {
             position: (x, y),
@@ -54,7 +52,7 @@ pub struct ORCASolver {
 }
 
 impl ORCASolver {
-    /// Creates a new solver with a given time horizon in seconds.
+    /// Create a new solver with a given time horizon in seconds.
     pub fn new(time_horizon: f32) -> Self {
         Self {
             time_horizon: time_horizon.max(0.1),
@@ -62,14 +60,14 @@ impl ORCASolver {
         }
     }
 
-    /// Adds an agent to the solver and returns its index.
+    /// Add an agent to the solver and returns its index.
     pub fn add_agent(&mut self, agent: ORCAAgent) -> usize {
         let idx = self.agents.len();
         self.agents.push(agent);
         idx
     }
 
-    /// Removes the agent at `index` by swapping with the last agent.
+    /// Remove the agent at `index` by swapping with the last agent.
     pub fn remove_agent(&mut self, index: usize) -> Option<ORCAAgent> {
         if index < self.agents.len() {
             Some(self.agents.swap_remove(index))
@@ -78,7 +76,7 @@ impl ORCASolver {
         }
     }
 
-    /// Returns the number of agents in the solver.
+    /// Return the number of agents in the solver.
     pub fn agent_count(&self) -> usize {
         self.agents.len()
     }

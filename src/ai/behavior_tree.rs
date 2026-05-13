@@ -1,6 +1,4 @@
-﻿//! Scope: behavior tree execution model with composites, decorators, leaves, and debug state.
-//! This file defines node types, status semantics, control policies, and tree reset/count helpers for runtime ticks.
-//! It owns deterministic traversal state needed to resume running branches across frames in AIWorld update order.
+//! behavior tree execution model with composites, decorators, leaves, and debug state.
 use mlua::RegistryKey;
 
 /// Execution status returned by every behavior tree node after a tick.
@@ -24,7 +22,7 @@ impl BTStatus {
         }
     }
 
-    /// Returns the canonical Lua string for this status.
+    /// Return the canonical Lua string for this status.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Success => "success",
@@ -44,7 +42,7 @@ pub enum ParallelPolicy {
 }
 
 impl ParallelPolicy {
-    /// Parses a Lua string (`"requireOne"` or `"requireAll"`) into a policy.
+    /// Parse a Lua string (`"requireOne"` or `"requireAll"`) into a policy.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "requireAll" => Self::RequireAll,
@@ -52,7 +50,7 @@ impl ParallelPolicy {
         }
     }
 
-    /// Returns the Lua string identifier for this policy.
+    /// Return the Lua string identifier for this policy.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::RequireOne => "requireOne",
@@ -164,7 +162,7 @@ impl BTNode {
         }
     }
 
-    /// Returns the number of direct children this node has.
+    /// Return the number of direct children this node has.
     pub fn child_count(&self) -> usize {
         match self {
             BTNode::Selector { children, .. }
@@ -188,7 +186,7 @@ pub struct BehaviorTree {
 }
 
 impl BehaviorTree {
-    /// Creates a new behavior tree with no root node.
+    /// Create a new behavior tree with no root node.
     pub fn new() -> Self {
         Self {
             root: None,
@@ -227,7 +225,7 @@ pub struct BtDebugState {
 }
 
 impl BehaviorTree {
-    /// Returns a diagnostic snapshot of this tree's current state.
+    /// Return a diagnostic snapshot of this tree's current state.
     pub fn debug_state(&self) -> BtDebugState {
         let node_count = match &self.root {
             Some(root) => count_bt_nodes(root),

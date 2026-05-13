@@ -1,13 +1,9 @@
-//! Scope: Rolling-window and derived-column operations for time-series data.
-//! This file defines rolling_mean, rank, pct_change, cumsum methods on DataFrame.
-//! It owns window semantics, null-row handling, and per-column transformations.
+//! Rolling window operations: mean, sum, min, max, rank, pct-change, cumsum.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 
 impl DataFrame {
-    /// Add a rolling-mean column.
-    /// Rows with fewer than `window` predecessors get `Nil`.
-    /// `window` must be ≥ 1.
+    /// Add rolling mean column; rows before window get Nil.
     #[allow(clippy::needless_range_loop)]
     pub fn with_rolling_mean(
         &mut self,
@@ -49,7 +45,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Add a rolling-sum column. `window` must be ≥ 1.
+    /// Add rolling sum column; rows before window get Nil.
     pub fn with_rolling_sum(
         &mut self,
         col: ColRef,
@@ -81,7 +77,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Add a rolling-minimum column. `window` must be ≥ 1.
+    /// Add rolling minimum column; rows before window get Nil.
     pub fn with_rolling_min(
         &mut self,
         col: ColRef,
@@ -117,7 +113,7 @@ impl DataFrame {
         Ok(())
     }
 
-    /// Add a rolling-maximum column. `window` must be ≥ 1.
+    /// Add rolling maximum column; rows before window get Nil.
     pub fn with_rolling_max(
         &mut self,
         col: ColRef,

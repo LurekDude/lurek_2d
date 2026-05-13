@@ -1,4 +1,5 @@
 //! PCM sample buffers: decoding, procedural generation, DSP operations.
+//! SoundData: interleaved f32 samples clamped to [-1, 1]; supports in-memory and file-based loading.
 
 use rodio::Source;
 
@@ -12,7 +13,7 @@ pub struct SoundData {
 }
 
 impl SoundData {
-    /// Creates a silent zero-filled buffer.
+    /// Create silent zero-filled buffer.
     pub fn new(sample_count: usize, sample_rate: u32, channels: u16) -> Self {
         Self {
             samples: vec![0.0; sample_count * channels as usize],
@@ -22,7 +23,7 @@ impl SoundData {
         }
     }
 
-    /// Creates from an existing f32 sample buffer.
+    /// Create from existing f32 sample buffer.
     pub fn from_samples(samples: Vec<f32>, sample_rate: u32, channels: u16) -> Self {
         Self {
             samples,
@@ -32,7 +33,7 @@ impl SoundData {
         }
     }
 
-    /// Creates from path (if Some) or silent buffer.
+    /// Create from path (if Some) or silent buffer.
     pub fn from_lua_args(
         path: Option<&str>,
         count: usize,
@@ -45,7 +46,7 @@ impl SoundData {
         }
     }
 
-    /// Decodes an audio file to SoundData.
+    /// Decode audio file to SoundData; return error on open/decode failure.
     pub fn from_file(path: &str) -> Result<Self, String> {
         use std::io::BufReader;
         let file = std::fs::File::open(path)

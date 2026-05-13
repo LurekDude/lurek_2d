@@ -1,6 +1,4 @@
-﻿//! Scope: neuroevolution helpers that evolve neural-network parameter vectors.
-//! This file defines genotype handling and evolution integration points between GA logic and neural network weights.
-//! It owns mutation/crossover orchestration for AI policies represented as compact numeric chromosomes.
+//! neuroevolution helpers that evolve neural-network parameter vectors.
 use crate::ai::{genetic::GeneticAlgorithm, neural_net::NeuralNet};
 
 // ---- Type: Neuroevolution ----
@@ -18,7 +16,7 @@ pub struct Neuroevolution {
 // ---- Implementation: Neuroevolution ----
 
 impl Neuroevolution {
-    /// Creates a new neuroevolution trainer for the given network topology.
+    /// Create a new neuroevolution trainer for the given network topology.
     pub fn new(layer_spec: Vec<(usize, usize, &str)>, pop_size: usize, seed: u64) -> Self {
         let gene_count = Self::total_params(&layer_spec);
         let ga = GeneticAlgorithm::new(pop_size, gene_count, seed);
@@ -32,12 +30,12 @@ impl Neuroevolution {
         }
     }
 
-    /// Returns the total parameter count implied by the given layer spec.
+    /// Return the total parameter count implied by the given layer spec.
     fn total_params(spec: &[(usize, usize, &str)]) -> usize {
         spec.iter().map(|(i, o, _)| i * o + o).sum()
     }
 
-    /// Returns the population size.
+    /// Return the population size.
     pub fn pop_size(&self) -> usize {
         self.ga.pop_size()
     }
@@ -50,7 +48,7 @@ impl Neuroevolution {
         Some(net)
     }
 
-    /// Sets the fitness for chromosome at index `i`.
+    /// Set the fitness for chromosome at index `i`.
     pub fn set_fitness(&mut self, i: usize, fitness: f32) {
         if let Some(c) = self.ga.population.get_mut(i) {
             c.fitness = fitness;
@@ -63,7 +61,7 @@ impl Neuroevolution {
         self.generation += 1;
     }
 
-    /// Returns a `NeuralNet` loaded with the weights of the best chromosome.
+    /// Return a `NeuralNet` loaded with the weights of the best chromosome.
     pub fn best_network(&self) -> Option<NeuralNet> {
         let best = self.ga.best()?;
         let mut net = self.build_empty_net();
@@ -71,12 +69,12 @@ impl Neuroevolution {
         Some(net)
     }
 
-    /// Returns the fitness of the best chromosome.
+    /// Return the fitness of the best chromosome.
     pub fn best_fitness(&self) -> f32 {
         self.ga.best().map(|c| c.fitness).unwrap_or(0.0)
     }
 
-    /// Returns a reference to the raw population chromosomes.
+    /// Return a reference to the raw population chromosomes.
     pub fn population(&self) -> &[crate::ai::genetic::Chromosome] {
         &self.ga.population
     }

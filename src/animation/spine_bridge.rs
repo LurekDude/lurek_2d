@@ -1,6 +1,4 @@
-//! Scope: Bridge animation state-machine transitions into Spine skeleton playback.
-//! This file defines a state-to-clip mapping bridge around a Spine skeleton.
-//! It owns applying mapped skeleton clip changes when FSM states change.
+//! Bridge animation state-machine transitions into Spine skeleton playback.
 
 use std::collections::HashMap;
 
@@ -10,16 +8,6 @@ use crate::spine::skeleton::Skeleton;
 // ---- Type: SpineAnimBridge ----
 
 /// Bridge that couples an [`AnimStateMachine`] to a [`Skeleton`].
-///
-/// When the FSM transitions to a new state the bridge fires `play_animation` on
-/// the skeleton for the mapped clip name, then calls `update_animation` and
-/// `update_world_transforms` each tick.
-///
-/// # Fields
-/// - `skeleton` — [`Skeleton`]. Owned skeletal rig.
-/// - `state_map` — `HashMap<String, String>`. FSM state name → skeleton clip name.
-/// - `last_state` — `String`. FSM state observed at the end of the previous tick.
-/// - `looping_states` — `HashMap<String, bool>`. Per-state looping override; defaults to `true`.
 #[derive(Debug, Clone)]
 pub struct SpineAnimBridge {
     skeleton: Skeleton,
@@ -30,16 +18,7 @@ pub struct SpineAnimBridge {
 
 impl SpineAnimBridge {
     // ---- Implementation: SpineAnimBridge ----
-    /// Creates a new bridge wrapping the given skeleton.
-    ///
-    /// No state mappings are registered yet; call [`map`](Self::map) for each
-    /// FSM state that should drive a skeleton clip.
-    ///
-    /// # Parameters
-    /// - `skeleton` — [`Skeleton`].
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create a new bridge wrapping the given skeleton.
     pub fn new(skeleton: Skeleton) -> Self {
         Self {
             skeleton,
@@ -50,21 +29,12 @@ impl SpineAnimBridge {
     }
 
     /// Registers a mapping from an FSM state name to a skeleton animation clip name.
-    ///
-    /// # Parameters
-    /// - `fsm_state` — `&str`. FSM state name (must match a state registered with [`AnimStateMachine::add_state`]).
-    /// - `skeleton_clip` — `&str`. Clip name registered in the skeleton (must match a [`SkeletonAnimation::name`]).
     pub fn map(&mut self, fsm_state: &str, skeleton_clip: &str) {
         self.state_map
             .insert(fsm_state.to_string(), skeleton_clip.to_string());
     }
 
     /// Registers a mapping with an explicit looping flag.
-    ///
-    /// # Parameters
-    /// - `fsm_state` — `&str`. FSM state name.
-    /// - `skeleton_clip` — `&str`. Clip name in the skeleton.
-    /// - `looping` — `bool`. Whether the clip loops.
     pub fn map_looping(&mut self, fsm_state: &str, skeleton_clip: &str, looping: bool) {
         self.state_map
             .insert(fsm_state.to_string(), skeleton_clip.to_string());
@@ -72,12 +42,6 @@ impl SpineAnimBridge {
     }
 
     /// Advances the FSM by `dt`, reacts to state changes, and updates the skeleton.
-    ///
-    /// Call this once per frame in place of calling `AnimStateMachine::update` directly.
-    ///
-    /// # Parameters
-    /// - `dt` — `f32`. Delta time in seconds.
-    /// - `fsm` — `&mut AnimStateMachine`. The state machine to drive.
     pub fn update(&mut self, dt: f32, fsm: &mut AnimStateMachine) {
         let state_before = fsm.get_state().to_string();
         fsm.update(dt);
@@ -104,39 +68,22 @@ impl SpineAnimBridge {
         self.skeleton.update_world_transforms();
     }
 
-    /// Returns an immutable reference to the owned skeleton.
-    ///
-    /// # Returns
-    /// `&Skeleton`.
+    /// Return an immutable reference to the owned skeleton.
     pub fn skeleton(&self) -> &Skeleton {
         &self.skeleton
     }
 
-    /// Returns a mutable reference to the owned skeleton.
-    ///
-    /// # Returns
-    /// `&mut Skeleton`.
+    /// Return a mutable reference to the owned skeleton.
     pub fn skeleton_mut(&mut self) -> &mut Skeleton {
         &mut self.skeleton
     }
 
-    /// Returns the FSM state name that was most recently applied to the skeleton.
-    ///
-    /// Returns an empty string before the first [`update`](Self::update) call.
-    ///
-    /// # Returns
-    /// `&str`.
+    /// Return the FSM state name that was most recently applied to the skeleton.
     pub fn last_applied_state(&self) -> &str {
         &self.last_state
     }
 
-    /// Returns the skeleton clip name mapped for `fsm_state`, or `None` if no mapping exists.
-    ///
-    /// # Parameters
-    /// - `fsm_state` — `&str`.
-    ///
-    /// # Returns
-    /// `Option<&str>`.
+    /// Return the skeleton clip name mapped for `fsm_state`, or `None` if no mapping exists.
     pub fn get_mapped_clip(&self, fsm_state: &str) -> Option<&str> {
         self.state_map.get(fsm_state).map(String::as_str)
     }

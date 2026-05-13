@@ -1,6 +1,4 @@
-﻿//! Scope: debug-render command builders for AI inspection overlays.
-//! This file defines render-side helper data used to visualise AI internals such as paths, targets, and sensors.
-//! It owns non-authoritative debug output only; no gameplay decision state is mutated by this module.
+//! debug-render command builders for AI inspection overlays.
 use crate::ai::behavior_tree::{BTNode, BTStatus, BehaviorTree};
 use crate::ai::fsm::StateMachine;
 use crate::image::ImageData;

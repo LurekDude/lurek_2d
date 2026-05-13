@@ -1,6 +1,4 @@
-﻿//! Scope: AI level-of-detail tier assignment and update throttling.
-//! This file defines distance tiers, skip cadence, and helper checks to reduce far-agent computation cost.
-//! It owns per-agent LOD decisions that gate expensive subsystems while preserving close-range responsiveness.
+//! AI level-of-detail tier assignment and update throttling.
 
 // ---- Type: LodTier ----
 
@@ -20,7 +18,7 @@ pub struct LodTier {
 // ---- Implementation: LodTier ----
 
 impl LodTier {
-    /// Creates a new LOD tier.
+    /// Create a new LOD tier.
     pub fn new(name: &str, max_distance: f32, update_every: u32, think_distance: f32) -> Self {
         Self {
             name: name.to_string(),
@@ -42,18 +40,18 @@ pub struct AILod {
 // ---- Implementation: AILod ----
 
 impl AILod {
-    /// Creates a LOD system from a custom tier list.
+    /// Create a LOD system from a custom tier list.
     pub fn new(mut tiers: Vec<LodTier>) -> Self {
         tiers.sort_by(|a, b| a.max_distance.partial_cmp(&b.max_distance).unwrap());
         Self { tiers }
     }
 
-    /// Returns a reference to the tier at index `i`.
+    /// Return a reference to the tier at index `i`.
     pub fn tier(&self, i: usize) -> Option<&LodTier> {
         self.tiers.get(i)
     }
 
-    /// Returns the number of tiers.
+    /// Return the number of tiers.
     pub fn tier_count(&self) -> usize {
         self.tiers.len()
     }
@@ -79,7 +77,7 @@ impl AILod {
             .collect()
     }
 
-    /// Returns `true` if an agent in `tier` should be updated on `frame_number`.
+    /// Return `true` if an agent in `tier` should be updated on `frame_number`.
     pub fn should_update(&self, tier: usize, frame_number: u64) -> bool {
         match self.tiers.get(tier) {
             Some(t) => {
@@ -97,7 +95,7 @@ impl AILod {
 // ---- Default Implementation ----
 
 impl Default for AILod {
-    /// Creates a three-tier default configuration:
+    /// Create a three-tier default configuration:
     fn default() -> Self {
         Self::new(vec![
             LodTier::new("near", 400.0, 1, 400.0),

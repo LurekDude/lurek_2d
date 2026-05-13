@@ -1,7 +1,5 @@
-//! Scope: Offline audio processing and file export.
-//! This file defines OfflineEffect and the synchronous processing helpers.
-//! It owns decoding, DSP chaining, and writing processed audio files.
-//! Offline audio processing: decode, apply effects, write WAV.
+//! Offline audio processing: decode, apply effects, write 16-bit PCM WAV.
+//! OfflineEffect: DSP chain for batch audio file processing without real-time playback.
 
 use std::{
     fs::File,
@@ -39,11 +37,7 @@ pub struct OfflineEffect {
 }
 
 
-/// Decodes `input_path`, applies `effects` in series, and writes the result to `output_path`.
-/// The output is a 16-bit PCM mono/stereo WAV file with the same sample rate and
-/// channel count as the input.  An empty `effects` slice performs a passthrough.
-/// Returns an error string when decode or write fails.
-/// Decodes input, applies effects chain, writes 16-bit PCM WAV.
+/// Decode input, apply effects chain, write 16-bit PCM WAV; return error on failure.
 pub fn process_offline(
     input_path: &str,
     output_path: &str,

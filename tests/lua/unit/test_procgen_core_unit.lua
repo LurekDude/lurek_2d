@@ -575,7 +575,7 @@ describe("unit: migrated from integration/test_procgen_tilemap.lua", function()
         it("different seeds produce different tilemaps", function()
             local map1_tiles = {}
             local map2_tiles = {}
-    
+
             for y = 0, 3 do
                 for x = 0, 3 do
                     local n1 = lurek.procgen.perlinNoise(x * 0.1, y * 0.1, 1, 1)
@@ -584,7 +584,7 @@ describe("unit: migrated from integration/test_procgen_tilemap.lua", function()
                     table.insert(map2_tiles, n2)
                 end
             end
-    
+
             -- At least one tile should differ
             local any_different = false
             for i = 1, #map1_tiles do

@@ -1,14 +1,9 @@
-//! Scope: Binary-to-text encoding and decoding.
-//! This file defines EncodeFormat plus encode and decode helpers.
-//! It owns base64 and lowercase-hex transport conversions.
+//! Binary-to-text codecs: base64 and hex.
 
 use base64::Engine;
 
-/// Supported binary-to-text encoding formats for `lurek.data.encode()` and `lurek.data.decode()`.
+/// Encoding format selector.
 ///
-/// # Variants
-/// - `Base64` — Base64 variant.
-/// - `Hex` — Hex variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EncodeFormat {
     /// Base64 (RFC 4648 standard alphabet).
@@ -21,10 +16,7 @@ impl EncodeFormat {
     /// Parse a format name string (case-insensitive).
     /// Accepts `"base64"` or `"hex"`.
     ///
-    /// # Parameters
-    /// - `s` — `&str`.
     ///
-    /// # Returns
     /// `Result<Self, String>`.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
@@ -40,11 +32,7 @@ impl EncodeFormat {
 
 /// Encode bytes into a string using the specified format.
 ///
-/// # Parameters
-/// - `format` — `EncodeFormat`.
-/// - `data` — `&[u8]`.
 ///
-/// # Returns
 /// `String`.
 pub fn encode(format: EncodeFormat, data: &[u8]) -> String {
     match format {
@@ -55,11 +43,7 @@ pub fn encode(format: EncodeFormat, data: &[u8]) -> String {
 
 /// Decode a string back into bytes using the specified format.
 ///
-/// # Parameters
-/// - `format` — `EncodeFormat`.
-/// - `text` — `&str`.
 ///
-/// # Returns
 /// `Result<Vec<u8>, String>`.
 pub fn decode(format: EncodeFormat, text: &str) -> Result<Vec<u8>, String> {
     match format {

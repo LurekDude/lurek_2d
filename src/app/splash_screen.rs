@@ -1,6 +1,5 @@
-//! Scope: Splash-screen branding asset loading and rendering commands.
-//! This file defines branding data types and command builders for the no-game splash screen.
-//! It owns embedded texture decode and splash draw-command composition.
+//! Splash-screen branding asset loading and render-command generation.
+//! Loads embedded PNG assets and builds draw commands for splash-screen display.
 
 use super::app::fit_contain_size;
 use crate::render::renderer::{DrawMode, RenderCommand, TextureData};
@@ -10,7 +9,7 @@ use slotmap::SlotMap;
 // ---- Type: SplashTexture ----
 
 #[derive(Clone, Copy)]
-/// Texture metadata used when drawing splash branding images.
+/// Splash texture with key and dimensions.
 pub struct SplashTexture {
     /// Texture handle stored in the splash texture map.
     pub texture_key: TextureKey,
@@ -22,7 +21,7 @@ pub struct SplashTexture {
 
 // ---- Type: SplashBranding ----
 
-/// Loaded splash branding resources kept for repeated frame rendering.
+/// Loaded splash-screen branding resources (textures, icon, banner).
 pub struct SplashBranding {
     /// Texture storage containing decoded embedded splash assets.
     pub textures: SlotMap<TextureKey, TextureData>,
@@ -34,7 +33,7 @@ pub struct SplashBranding {
 
 // ---- Helper Functions: Splash Asset Loading ----
 
-/// Loads embedded splash branding textures and returns them as a ready-to-draw bundle.
+/// Load embedded splash branding textures and return ready-to-draw bundle; return None on decode failure.
 pub fn load_splash_branding() -> Option<SplashBranding> {
     let mut textures: SlotMap<TextureKey, TextureData> = SlotMap::with_key();
     let large_icon = {

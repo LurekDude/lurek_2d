@@ -1,16 +1,8 @@
-//! Scope: Byte-buffer compression and decompression.
-//! This file defines compression formats and buffer/stream helpers.
-//! It owns codec selection, chunked I/O handling, and compression levels.
+//! Compression wrappers: deflate, gzip, lz4, zlib codecs.
 
 use std::io::{Cursor, Read, Write};
 
-/// Supported compression algorithms available through `lurek.data.compress()` and `lurek.data.decompress()`.
-///
-/// # Variants
-/// - `Deflate` — Deflate variant.
-/// - `Gzip` — Gzip variant.
-/// - `Lz4` — Lz4 variant.
-/// - `Zlib` — Zlib variant.
+/// Compression codec selector.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum CompressFormat {
     /// Raw deflate.
@@ -27,10 +19,7 @@ impl CompressFormat {
     /// Parse a format name string (case-insensitive).
     /// Accepts `"deflate"`, `"gzip"` / `"gz"`, `"lz4"`, `"zlib"`.
     ///
-    /// # Parameters
-    /// - `s` — `&str`.
     ///
-    /// # Returns
     /// `Result<Self, String>`.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
@@ -48,12 +37,7 @@ impl CompressFormat {
 
 /// Compress data using the specified format and compression level (0-9).
 ///
-/// # Parameters
-/// - `data` — `&[u8]`.
-/// - `format` — `CompressFormat`.
-/// - `level` — `u32`.
 ///
-/// # Returns
 /// `Result<Vec<u8>, String>`.
 pub fn compress(data: &[u8], format: CompressFormat, level: u32) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
@@ -63,11 +47,7 @@ pub fn compress(data: &[u8], format: CompressFormat, level: u32) -> Result<Vec<u
 
 /// Decompress data using the specified format.
 ///
-/// # Parameters
-/// - `data` — `&[u8]`.
-/// - `format` — `CompressFormat`.
 ///
-/// # Returns
 /// `Result<Vec<u8>, String>`.
 pub fn decompress(data: &[u8], format: CompressFormat) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
@@ -77,12 +57,7 @@ pub fn decompress(data: &[u8], format: CompressFormat) -> Result<Vec<u8>, String
 
 /// Compresss a sequence of byte chunks without requiring callers to pre-concatenate input.
 ///
-/// # Parameters
-/// - `chunks` — Ordered byte chunks.
-/// - `format` — `CompressFormat`.
-/// - `level` — Compression level for flate-based formats; clamped to 0-9.
 ///
-/// # Returns
 /// `Result<Vec<u8>, String>`.
 pub fn compress_chunks(
     chunks: &[&[u8]],
@@ -139,11 +114,7 @@ pub fn compress_chunks(
 
 /// Decompress a sequence of compressed byte chunks.
 ///
-/// # Parameters
-/// - `chunks` — Ordered compressed chunks.
-/// - `format` — `CompressFormat`.
 ///
-/// # Returns
 /// `Result<Vec<u8>, String>`.
 pub fn decompress_chunks(chunks: &[&[u8]], format: CompressFormat) -> Result<Vec<u8>, String> {
     let mut out = Vec::new();
@@ -207,13 +178,7 @@ impl Read for ChunkReader<'_> {
 /// This path avoids requiring a full pre-concatenated input buffer and enables
 /// chunked pipelines for large payloads.
 ///
-/// # Parameters
-/// - `reader` — Input byte source.
-/// - `writer` — Output sink for compressed bytes.
-/// - `format` — `CompressFormat`.
-/// - `level` — Compression level for flate-based formats; clamped to 0-9.
 ///
-/// # Returns
 /// `Result<(), String>`.
 pub fn compress_stream<R: Read, W: Write>(
     mut reader: R,
@@ -268,12 +233,7 @@ pub fn compress_stream<R: Read, W: Write>(
 
 /// Decompress data from `reader` to `writer` using the specified format.
 ///
-/// # Parameters
-/// - `reader` — Input byte source.
-/// - `writer` — Output sink for decompressed bytes.
-/// - `format` — `CompressFormat`.
 ///
-/// # Returns
 /// `Result<(), String>`.
 pub fn decompress_stream<R: Read, W: Write>(
     mut reader: R,

@@ -1,17 +1,10 @@
-//! Scope: Cryptographic hashing and checksums.
-//! This file defines HashAlgorithm plus hash and crc32 helpers.
-//! It owns digest selection and hex-encoded integrity outputs.
+//! Hashing: MD5, SHA-1, SHA-256, SHA-512, CRC-32.
 
 use md5::Digest;
 use sha1;
 
-/// Supported cryptographic hash algorithms for `lurek.data.hash()`.
+/// Hash algorithm selector.
 ///
-/// # Variants
-/// - `Md5` — Md5 variant.
-/// - `Sha1` — Sha1 variant.
-/// - `Sha256` — Sha256 variant.
-/// - `Sha512` — Sha512 variant.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum HashAlgorithm {
     /// MD5 (128-bit, not recommended for security).
@@ -29,10 +22,7 @@ impl HashAlgorithm {
     /// Accepts `"md5"`, `"sha1"` / `"sha-1"`, `"sha256"` / `"sha-256"`,
     /// `"sha512"` / `"sha-512"`.
     ///
-    /// # Parameters
-    /// - `s` — `&str`.
     ///
-    /// # Returns
     /// `Result<Self, String>`.
     pub fn parse_str(s: &str) -> Result<Self, String> {
         match s.to_lowercase().as_str() {
@@ -50,11 +40,7 @@ impl HashAlgorithm {
 
 /// Compute the hash of data using the specified algorithm, returned as a hex string.
 ///
-/// # Parameters
-/// - `algorithm` — `HashAlgorithm`.
-/// - `data` — `&[u8]`.
 ///
-/// # Returns
 /// `String`.
 pub fn hash(algorithm: HashAlgorithm, data: &[u8]) -> String {
     match algorithm {
@@ -77,16 +63,13 @@ pub fn hash(algorithm: HashAlgorithm, data: &[u8]) -> String {
     }
 }
 
-/// Computes the CRC-32 checksum of `data` using the IEEE polynomial.
+/// Compute the CRC-32 checksum of `data` using the IEEE polynomial.
 ///
 /// Suitable for non-security integrity checks and binary format validation.
 /// The result is a `u32` returned as `u64` for ergonomic use in Lua (integers
 /// are 64-bit in LuaJIT and Lua 5.4).
 ///
-/// # Parameters
-/// - `data` — `&[u8]` — Input bytes.
 ///
-/// # Returns
 /// `u64` — CRC-32 value in `[0, 2³²)`.
 pub fn crc32(data: &[u8]) -> u64 {
     crc32fast::hash(data) as u64

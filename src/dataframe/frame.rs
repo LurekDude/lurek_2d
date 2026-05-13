@@ -1,6 +1,4 @@
-//! Scope: Core DataFrame and Database types with cell-level access.
-//! This file defines CellValue, ColRef, DataFrame, Database, and basic row/column operations.
-//! It owns cell storage, row iteration, and column indexing semantics.
+//! Core DataFrame types and cell storage.
 
 use std::cmp::Ordering;
 use std::collections::HashMap;

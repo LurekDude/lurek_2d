@@ -1,6 +1,4 @@
-﻿//! Scope: dialogue decision helpers connected to AI runtime state.
-//! This file defines dialogue topics, branch scoring, and selection utilities used by conversation-driven agents.
-//! It owns deterministic topic/branch ranking inputs from blackboard, needs, emotion, and strategic context.
+//! dialogue decision helpers connected to AI runtime state.
 use std::collections::HashMap;
 
 /// One branch candidate under a dialogue topic.
@@ -48,7 +46,7 @@ pub struct DialogueAI {
 }
 
 impl DialogueAI {
-    /// Creates a new empty dialogue planner.
+    /// Create a new empty dialogue planner.
     pub fn new() -> Self {
         Self {
             topics: Vec::new(),
@@ -58,17 +56,17 @@ impl DialogueAI {
         }
     }
 
-    /// Sets the current FSM state used by topic/branch gate checks.
+    /// Set the current FSM state used by topic/branch gate checks.
     pub fn set_fsm_state(&mut self, state: Option<String>) {
         self.fsm_state = state;
     }
 
-    /// Sets the current BT status used by topic/branch gate checks.
+    /// Set the current BT status used by topic/branch gate checks.
     pub fn set_bt_status(&mut self, status: Option<String>) {
         self.bt_status = status;
     }
 
-    /// Sets one utility score used when ranking topics/branches.
+    /// Set one utility score used when ranking topics/branches.
     pub fn set_utility_score(&mut self, key: String, score: f32) {
         self.utility_scores.insert(key, score);
     }
@@ -78,7 +76,7 @@ impl DialogueAI {
         self.utility_scores.clear();
     }
 
-    /// Adds a dialogue topic.
+    /// Add a dialogue topic.
     pub fn add_topic(
         &mut self,
         id: String,
@@ -97,7 +95,7 @@ impl DialogueAI {
         });
     }
 
-    /// Adds a branch under an existing topic.
+    /// Add a branch under an existing topic.
     pub fn add_branch(
         &mut self,
         topic_id: &str,
@@ -149,7 +147,7 @@ impl DialogueAI {
         best.map(|(branch, _)| branch.id.clone())
     }
 
-    /// Returns the number of registered topics.
+    /// Return the number of registered topics.
     pub fn topic_count(&self) -> usize {
         self.topics.len()
     }

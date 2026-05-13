@@ -1,6 +1,4 @@
-﻿//! Scope: high-level strategic goal scoring and selection state.
-//! This file defines strategic goal records, scoring utilities, and refresh cadence controls for long-horizon intent.
-//! It owns deterministic top-level objective choice consumed by lower-level planners and action systems.
+//! high-level strategic goal scoring and selection state.
 // ---- Type: StrategicGoal ----
 
 /// Named strategic goal with cost/benefit estimates.
@@ -19,7 +17,7 @@ pub struct StrategicGoal {
 }
 
 impl StrategicGoal {
-    /// Creates a new goal with full priority and no preconditions.
+    /// Create a new goal with full priority and no preconditions.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
@@ -30,12 +28,12 @@ impl StrategicGoal {
         }
     }
 
-    /// Adds a precondition tag requirement.
+    /// Add a precondition tag requirement.
     pub fn require_tag(&mut self, tag: &str) {
         self.precondition_tags.push(tag.to_string());
     }
 
-    /// Returns `true` if all precondition tags are present in `active_tags`.
+    /// Return `true` if all precondition tags are present in `active_tags`.
     pub fn is_eligible(&self, active_tags: &[String]) -> bool {
         self.enabled
             && self
@@ -62,7 +60,7 @@ pub struct StrategyAI {
 }
 
 impl StrategyAI {
-    /// Creates a new strategy AI with the given evaluation interval in seconds.
+    /// Create a new strategy AI with the given evaluation interval in seconds.
     pub fn new(update_interval: f32) -> Self {
         Self {
             goals: Vec::new(),
@@ -74,7 +72,7 @@ impl StrategyAI {
         }
     }
 
-    /// Adds a goal to the evaluator.
+    /// Add a goal to the evaluator.
     pub fn add_goal(&mut self, goal: StrategicGoal) {
         self.goals.push(goal);
     }
@@ -84,24 +82,24 @@ impl StrategyAI {
         self.add_goal(StrategicGoal::new(name));
     }
 
-    /// Sets the active world-state tags used to filter goal eligibility.
+    /// Set the active world-state tags used to filter goal eligibility.
     pub fn set_tags(&mut self, tags: Vec<String>) {
         self.active_tags = tags;
     }
 
-    /// Adds a single active tag.
+    /// Add a single active tag.
     pub fn add_tag(&mut self, tag: &str) {
         if !self.active_tags.iter().any(|t| t == tag) {
             self.active_tags.push(tag.to_string());
         }
     }
 
-    /// Removes a tag.
+    /// Remove a tag.
     pub fn remove_tag(&mut self, tag: &str) {
         self.active_tags.retain(|t| t != tag);
     }
 
-    /// Returns the name of the currently active goal, or `None` if no evaluation
+    /// Return the name of the currently active goal, or `None` if no evaluation
     pub fn active_goal(&self) -> Option<&str> {
         self.active_goal.as_deref()
     }
@@ -152,12 +150,12 @@ impl StrategyAI {
         self.total_evaluations += 1;
     }
 
-    /// Returns the number of registered goals.
+    /// Return the number of registered goals.
     pub fn goal_count(&self) -> usize {
         self.goals.len()
     }
 
-    /// Returns seconds remaining until the next scheduled evaluation.
+    /// Return seconds remaining until the next scheduled evaluation.
     pub fn time_until_next(&self) -> f32 {
         (self.update_interval - self.timer).max(0.0)
     }

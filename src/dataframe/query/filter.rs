@@ -1,6 +1,4 @@
-//! Scope: DataFrame filtering, sorting, joining, and aggregation operations.
-//! This file defines filter/sort/join/sample methods on DataFrame via extensions.
-//! It owns query predicate evaluation, batch helpers, and join semantics.
+//! Filtering, sorting, joining, sampling operators.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 use crate::dataframe::rng::Xorshift64;

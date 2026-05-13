@@ -1,6 +1,4 @@
-﻿//! Scope: hierarchical task network planner with recursive decomposition.
-//! This file defines tasks, methods, domains, and decomposition flow from compound goals to executable primitives.
-//! It owns method matching and expansion order used by HTN-driven strategic behavior in AIWorld updates.
+//! hierarchical task network planner with recursive decomposition.
 use std::collections::HashMap;
 
 // World State
@@ -33,7 +31,7 @@ pub enum HTNTask {
 }
 
 impl HTNTask {
-    /// Returns the name of this task.
+    /// Return the name of this task.
     pub fn name(&self) -> &str {
         match self {
             Self::Compound { name, .. } => name.as_str(),
@@ -41,12 +39,12 @@ impl HTNTask {
         }
     }
 
-    /// Returns `true` if this is a primitive task.
+    /// Return `true` if this is a primitive task.
     pub fn is_primitive(&self) -> bool {
         matches!(self, Self::Primitive { .. })
     }
 
-    /// Checks whether a primitiv's preconditions are satisfied in the given state.
+    /// Check whether a primitiv's preconditions are satisfied in the given state.
     pub fn preconditions_met(&self, state: &WorldState) -> bool {
         match self {
             Self::Primitive { preconditions, .. } => preconditions
@@ -87,7 +85,7 @@ pub struct HTNMethod {
 }
 
 impl HTNMethod {
-    /// Creates a method with no preconditions (always applicable).
+    /// Create a method with no preconditions (always applicable).
     pub fn always(name: &str, sub_tasks: Vec<&str>) -> Self {
         Self {
             name: name.to_string(),
@@ -96,7 +94,7 @@ impl HTNMethod {
         }
     }
 
-    /// Creates a method with preconditions.
+    /// Create a method with preconditions.
     pub fn with_preconditions(name: &str, preconditions: Vec<&str>, sub_tasks: Vec<&str>) -> Self {
         Self {
             name: name.to_string(),
@@ -105,7 +103,7 @@ impl HTNMethod {
         }
     }
 
-    /// Returns `true` if this metho's preconditions are satisfied in `state`.
+    /// Return `true` if this metho's preconditions are satisfied in `state`.
     pub fn is_applicable(&self, state: &WorldState) -> bool {
         self.preconditions
             .iter()
@@ -122,7 +120,7 @@ pub struct HTNDomain {
 }
 
 impl HTNDomain {
-    /// Creates an empty domain.
+    /// Create an empty domain.
     pub fn new() -> Self {
         Self::default()
     }
@@ -161,7 +159,7 @@ impl HTNDomain {
         self.tasks.get(name)
     }
 
-    /// Returns the number of registered tasks.
+    /// Return the number of registered tasks.
     pub fn task_count(&self) -> usize {
         self.tasks.len()
     }

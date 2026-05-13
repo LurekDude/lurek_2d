@@ -1,6 +1,4 @@
-﻿//! Scope: GOAP planning over symbolic world-state facts and action effects.
-//! This file defines goals, actions, preconditions, and search utilities for discrete task sequence planning.
-//! It owns state transition expansion and plan extraction used by high-level agent objective selection.
+//! GOAP planning over symbolic world-state facts and action effects.
 use std::cmp::Ordering;
 use std::collections::{BinaryHeap, HashMap};
 
@@ -78,7 +76,7 @@ pub struct GOAPPlanner {
 }
 
 impl GOAPPlanner {
-    /// Creates a new empty GOAP planner.
+    /// Create a new empty GOAP planner.
     pub fn new() -> Self {
         log_msg!(debug, GP01);
         Self {
@@ -196,7 +194,7 @@ impl GOAPPlanner {
             .count() as f64
     }
 
-    /// Adds an action with the given cost and optional Lua callback. Used by the Lua API.
+    /// Add an action with the given cost and optional Lua callback. Used by the Lua API.
     pub fn add_action(&mut self, name: String, cost: f64, callback: Option<RegistryKey>) {
         self.actions.push(GOAPAction {
             name,
@@ -207,21 +205,21 @@ impl GOAPPlanner {
         });
     }
 
-    /// Adds a boolean precondition to the named action. No-op if action not found.
+    /// Add a boolean precondition to the named action. No-op if action not found.
     pub fn add_precondition(&mut self, action_name: &str, key: String, value: bool) {
         if let Some(a) = self.actions.iter_mut().find(|a| a.name == action_name) {
             a.preconditions.insert(key, value);
         }
     }
 
-    /// Adds a boolean effect to the named action. No-op if action not found.
+    /// Add a boolean effect to the named action. No-op if action not found.
     pub fn add_effect(&mut self, action_name: &str, key: String, value: bool) {
         if let Some(a) = self.actions.iter_mut().find(|a| a.name == action_name) {
             a.effects.insert(key, value);
         }
     }
 
-    /// Adds a goal with the given name and priority. Used by the Lua API.
+    /// Add a goal with the given name and priority. Used by the Lua API.
     pub fn add_goal(&mut self, name: String, priority: f64) {
         self.goals.push(GOAPGoal {
             name,
@@ -230,19 +228,19 @@ impl GOAPPlanner {
         });
     }
 
-    /// Sets a boolean condition on the named goal. No-op if goal not found.
+    /// Set a boolean condition on the named goal. No-op if goal not found.
     pub fn set_goal_state(&mut self, goal_name: &str, key: String, value: bool) {
         if let Some(g) = self.goals.iter_mut().find(|g| g.name == goal_name) {
             g.state.insert(key, value);
         }
     }
 
-    /// Returns the maximum A* planning iterations.
+    /// Return the maximum A* planning iterations.
     pub fn get_max_iterations(&self) -> usize {
         self.max_iterations
     }
 
-    /// Sets the maximum A* planning iterations. A value of `0` means unlimited.
+    /// Set the maximum A* planning iterations. A value of `0` means unlimited.
     pub fn set_max_iterations(&mut self, n: usize) {
         self.max_iterations = n;
     }

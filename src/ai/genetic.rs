@@ -1,6 +1,4 @@
-﻿//! Scope: genetic algorithm utilities for parameter and policy optimization.
-//! This file defines chromosome representation, fitness flow, selection, crossover, mutation, and generation steps.
-//! It owns deterministic population evolution helpers used by AI tuning and meta-optimization pipelines.
+//! genetic algorithm utilities for parameter and policy optimization.
 
 // ---- Type: Chromosome ----
 
@@ -18,7 +16,7 @@ pub struct Chromosome {
 // ---- Implementation: Chromosome ----
 
 impl Chromosome {
-    /// Creates a zeroed chromosome.
+    /// Create a zeroed chromosome.
     pub fn new(gene_count: usize, id: u64) -> Self {
         Self {
             genes: vec![0.0; gene_count],
@@ -53,7 +51,7 @@ pub struct GeneticAlgorithm {
 // ---- Implementation: GeneticAlgorithm ----
 
 impl GeneticAlgorithm {
-    /// Creates a new GA with a random initial population.
+    /// Create a new GA with a random initial population.
     pub fn new(pop_size: usize, gene_count: usize, seed: u64) -> Self {
         let mut ga = Self {
             population: Vec::with_capacity(pop_size),
@@ -78,12 +76,12 @@ impl GeneticAlgorithm {
         ga
     }
 
-    /// Returns the population size.
+    /// Return the population size.
     pub fn pop_size(&self) -> usize {
         self.population.len()
     }
 
-    /// Returns a reference to the chromosome with highest fitness.
+    /// Return a reference to the chromosome with highest fitness.
     pub fn best(&self) -> Option<&Chromosome> {
         self.population
             .iter()
@@ -126,7 +124,7 @@ impl GeneticAlgorithm {
 
     // ---- Helper Functions: Tournament, Crossover, Mutation ----
 
-    /// Returns index of winning chromosome in a tournament of `tournament_size`.
+    /// Return index of winning chromosome in a tournament of `tournament_size`.
     fn tournament_select(&mut self, pop_size: usize) -> usize {
         let mut best_idx = self.rand_usize(pop_size);
         for _ in 1..self.tournament_size {
@@ -179,7 +177,7 @@ impl GeneticAlgorithm {
         (-2.0 * u1.ln()).sqrt() * (2.0 * std::f32::consts::PI * u2).cos()
     }
 
-    /// Returns `true` ~50% of the time.
+    /// Return `true` ~50% of the time.
     fn rand_bool(&mut self) -> bool {
         self.rng = xorshift64(self.rng);
         self.rng & 1 == 0

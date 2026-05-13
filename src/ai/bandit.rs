@@ -1,6 +1,4 @@
-﻿//! Scope: online multi-armed bandit exploration and exploitation runtime.
-//! This file defines arm statistics, strategy selection (epsilon-greedy, UCB1, Thompson), and reward updates.
-//! It owns deterministic local PRNG helpers used by selection and posterior sampling for bounded decision loops.
+//! online multi-armed bandit exploration and exploitation runtime.
 
 // ---- Type: BanditArm ----
 
@@ -20,7 +18,7 @@ pub struct BanditArm {
 }
 
 impl BanditArm {
-    /// Returns the mean estimated reward (0.5 when unpulled).
+    /// Return the mean estimated reward (0.5 when unpulled).
     pub fn mean_reward(&self) -> f64 {
         if self.pulls == 0 {
             0.5
@@ -60,7 +58,7 @@ pub struct Bandit {
 }
 // ---- Implementation: BanditArm ----
 impl Bandit {
-    /// Creates a new bandit with `arm_count` arms and the given strategy.
+    /// Create a new bandit with `arm_count` arms and the given strategy.
     pub fn new(arm_count: usize, strategy: BanditStrategy, seed: u64) -> Self {
         let arms = (0..arm_count)
             .map(|_| BanditArm {
@@ -79,7 +77,7 @@ impl Bandit {
         }
     }
 
-    /// Returns the number of arms.
+    /// Return the number of arms.
     pub fn arm_count(&self) -> usize {
         self.arms.len()
     }
@@ -141,7 +139,7 @@ impl Bandit {
         self.total_pulls += 1;
     }
 
-    /// Returns the index of the arm with the highest mean reward.
+    /// Return the index of the arm with the highest mean reward.
     pub fn best_arm(&self) -> usize {
         (0..self.arms.len())
             .max_by(|&a, &b| {

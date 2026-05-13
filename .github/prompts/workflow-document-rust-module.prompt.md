@@ -1,10 +1,11 @@
 ---
 description: "Audit and complete Rust docs in src/<module>/ by following rust-coding skill rules as the single source of truth, then verify with quality checks."
+agent: "Developer"
 ---
 # Workflow: Document Rust Module
 
 ## Goal
-- Every `.rs` file in `src/<module>/` (excluding `mod.rs`) follows the active doc rules from `../skills/rust-coding/SKILL.md`.
+- Every `.rs` file in `src/<module>/` (including `mod.rs`) follows the active doc rules from `../skills/rust-coding/SKILL.md`.
 - Every file-level `//!` doc is a compact technical summary of the file's role, up to about 600 characters, wrapped across short readable lines when needed, and must not duplicate the `pub` items or re-list what the file already declares.
 - Specifically: remove all AI-generated prose, synonym inflation, and synthetic phrases ("incurs no allocation", "alias for", "placeholder", "O(1) amortised", "call it freely in hot paths", "returns a fully initialised instance", etc.).
 - Replace with concrete technical one-liners in imperative form ("Return", "Parse", "Read", not "Returns", "Parses", "Reads").
@@ -35,7 +36,7 @@ For every `mod.rs` in scope:
 
 1. Load [skill: rust-coding](../skills/rust-coding/SKILL.md) and [skill: documentation](../skills/documentation/SKILL.md) before acting.
 
-2. **Inventory pass** — For every `.rs` file in `src/<module>/` (skip `mod.rs`):
+2. **Inventory pass** — For every `.rs` file in `src/<module>/` (include `mod.rs`):
    - Check docs against current `rust-coding` skill rules only.
    - Check: does it have `#[cfg(test)]`?
    - Check: list items missing required docs per skill.
@@ -43,7 +44,7 @@ For every `mod.rs` in scope:
 
 3. **Fix tests first** — Extract all `#[cfg(test)]` blocks from source files, create the corresponding `tests/rust/unit/` files, and update `mod.rs` registration. Verify `cargo check` still passes before continuing.
 
-4. **File-by-file doc pass** — For each file with findings from step 2:
+4. **File-by-file doc pass** — For each file with findings from step 2 (including `mod.rs`):
    a. Apply exactly the active style from `rust-coding` skill.
    b. Do not add local style inventions or legacy formats.
    c. Keep edits minimal and deterministic.
@@ -55,7 +56,7 @@ For every `mod.rs` in scope:
    Any remaining issue must be listed with the exact file, line, and reason it could not be fixed.
 
 ## Success Criteria
-- [ ] Every `.rs` file in `src/<module>/` follows current `rust-coding` skill doc rules.
+- [ ] Every `.rs` file in `src/<module>/` including `mod.rs` follows current `rust-coding` skill doc rules.
 - [ ] Zero `#[cfg(test)]` blocks remain in `src/<module>/`.
 - [ ] `cargo check` passes with zero errors.
 - [ ] `cargo clippy -- -D warnings` passes with zero warnings.

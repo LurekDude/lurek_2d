@@ -1,10 +1,11 @@
-//! Streaming PCM chunk decoding from audio files.
+//! Streaming audio decoder: load file to memory, serve fixed-size chunks.
+//! Decoder: reads from disk and buffers interleaved PCM chunks.
 
 use crate::log_msg;
 use crate::runtime::log_messages::AD01_AUDIO_DECODED;
 use crate::runtime::EngineError;
 
-/// Streaming audio decoder that loads a file to memory and serves fixed-size chunks.
+/// Streaming audio decoder: buffer loaded file, serve chunks on demand.
 pub struct Decoder {
     /// Source file path.
     pub path: String,
@@ -23,15 +24,7 @@ pub struct Decoder {
 }
 
 impl Decoder {
-    /// Loads an audio file into memory and creates a chunk decoder.
-    ///
-    /// # Arguments
-    /// * `path` - Input audio file path.
-    /// * `buffer_size` - Max samples returned by one `decode()` call.
-    ///
-    /// # Errors
-    /// Returns `EngineError::FileSystemError` when opening the file fails.
-    /// Returns `EngineError::AudioError` when decoding fails.
+    /// Load audio file to memory and create chunk decoder; return error on open/decode failure.
     pub fn from_file(path: &str, buffer_size: usize) -> Result<Self, EngineError> {
         use rodio::Source;
         use std::fs::File;
@@ -57,7 +50,7 @@ impl Decoder {
         })
     }
 
-    /// Returns the next fixed-size chunk, or `None` at end of stream.
+    /// Return next fixed-size chunk, or None at end of stream.
     pub fn decode(&mut self) -> Option<Vec<i16>> {
         if self.cursor >= self.pcm.len() {
             return None;
@@ -68,7 +61,7 @@ impl Decoder {
         Some(chunk)
     }
 
-    /// Returns total decoded duration in seconds.
+    /// Return total decoded duration in seconds.
     pub fn get_duration(&self) -> f64 {
         if self.sample_rate == 0 || self.channels == 0 {
             return 0.0;

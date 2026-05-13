@@ -1,18 +1,9 @@
-//! Scope: Binary pack and unpack helpers.
-//! This file defines PackValue plus format-string pack and unpack routines.
-//! It owns endian selection and byte-buffer serialization compatibility.
+//! Pack/unpack using LOVE2D format strings.
 
 use crate::data::byte_data::ByteData;
 
-/// A Rust-side value that can be packed into or unpacked from a binary buffer.
+/// Packable value type.
 ///
-/// # Variants
-/// - `Int` — Signed integer (i64).
-/// - `UInt` — Unsigned integer (u64).
-/// - `Float` — 32-bit float (f32).
-/// - `Double` — 64-bit float (f64).
-/// - `Str` — UTF-8 string.
-/// - `Bytes` — Raw byte vector.
 #[derive(Debug, Clone)]
 pub enum PackValue {
     /// Signed integer (i64).
@@ -39,23 +30,8 @@ enum Endian {
 /// Packs values according to a format string into a `ByteData` buffer.
 ///
 /// Format characters:
-/// - `<` — switch to little-endian (default)
-/// - `>` — switch to big-endian
-/// - `b`/`B` — i8 / u8
-/// - `h`/`H` — i16 / u16
-/// - `i`/`I` — i32 / u32
-/// - `l`/`L` — i64 / u64
-/// - `f` — f32
-/// - `d`/`n` — f64
-/// - `s` — length-prefixed string (u32 len + bytes)
-/// - `z` — null-terminated string
-/// - `x` — padding byte (zero)
 ///
-/// # Parameters
-/// - `format` — `&str`. Format string (e.g., `"<fI"`).
-/// - `values` — `&[PackValue]`. Values to pack in order.
 ///
-/// # Returns
 /// `Result<ByteData, String>`.
 pub fn pack(format: &str, values: &[PackValue]) -> Result<ByteData, String> {
     let mut buf = Vec::new();
@@ -192,14 +168,9 @@ pub fn pack(format: &str, values: &[PackValue]) -> Result<ByteData, String> {
 
 /// Unpacks values from a byte buffer according to a format string.
 ///
-/// Returns all decoded values followed by the next unread byte offset.
+/// Return all decoded values followed by the next unread byte offset.
 ///
-/// # Parameters
-/// - `format` — `&str`. Format string.
-/// - `data` — `&[u8]`. Source bytes.
-/// - `offset` — `usize`. Starting byte offset (0-based).
 ///
-/// # Returns
 /// `Result<(Vec<PackValue>, usize), String>` — decoded values and next byte position.
 pub fn unpack(format: &str, data: &[u8], offset: usize) -> Result<(Vec<PackValue>, usize), String> {
     let mut values = Vec::new();
@@ -345,17 +316,13 @@ pub fn unpack(format: &str, data: &[u8], offset: usize) -> Result<(Vec<PackValue
     Ok((values, pos))
 }
 
-/// Computes the total byte size that `pack` would produce for the given format and values.
+/// Compute the total byte size that `pack` would produce for the given format and values.
 ///
 /// For fixed-width types (`b`/`B`/`h`/`H`/`i`/`I`/`l`/`L`/`f`/`d`/`n`) the values are not
 /// accessed, so an empty slice may be passed. String types (`s`/`z`) require the corresponding
 /// `PackValue::Str` entry to compute the size.
 ///
-/// # Parameters
-/// - `format` — `&str`. Format string.
-/// - `values` — `&[PackValue]`. Values (only needed for `s` and `z` entries).
 ///
-/// # Returns
 /// `Result<usize, String>`.
 pub fn get_packed_size(format: &str, values: &[PackValue]) -> Result<usize, String> {
     let mut size = 0usize;

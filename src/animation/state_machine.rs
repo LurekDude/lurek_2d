@@ -1,6 +1,4 @@
-//! Scope: Drive animation clip changes from parameterized finite-state transitions.
-//! This file defines state-machine types, transition conditions, and helper parsers.
-//! It owns transition evaluation and state-to-clip control behavior.
+//! Drive animation clip changes from parameterized finite-state transitions.
 
 use std::collections::HashMap;
 
@@ -9,11 +7,6 @@ use super::controller::Animation;
 // ---- Type: AnimParamValue ----
 
 /// Value held by an animation parameter.
-///
-/// # Variants
-/// - `Bool` — `bool` flag.
-/// - `Float` — `f32` continuous value.
-/// - `Int` — `i32` integer value.
 #[derive(Debug, Clone)]
 pub enum AnimParamValue {
     /// Boolean flag parameter.
@@ -27,9 +20,6 @@ pub enum AnimParamValue {
 // ---- Type: ConditionOp ----
 
 /// Comparison operator for a transition condition.
-///
-/// # Variants
-/// - `Gt`, `Lt`, `Gte`, `Lte`, `Eq`, `Neq` — comparison operators.
 #[derive(Debug, Clone, PartialEq)]
 pub enum ConditionOp {
     /// Greater than (`>`).
@@ -49,10 +39,6 @@ pub enum ConditionOp {
 // ---- Type: ConditionValue ----
 
 /// Right-hand side value for a transition condition.
-///
-/// # Variants
-/// - `Number` — `f32` numeric threshold.
-/// - `Bool` — `bool` flag.
 #[derive(Debug, Clone)]
 pub enum ConditionValue {
     /// Numeric threshold value.
@@ -64,11 +50,6 @@ pub enum ConditionValue {
 // ---- Type: TransitionCondition ----
 
 /// A single condition on one named parameter.
-///
-/// # Fields
-/// - `param` — `String`. Parameter name.
-/// - `op` — [`ConditionOp`]. Comparison operator.
-/// - `value` — [`ConditionValue`]. Threshold to compare against.
 #[derive(Debug, Clone)]
 pub struct TransitionCondition {
     /// Name of the parameter to test.
@@ -82,11 +63,6 @@ pub struct TransitionCondition {
 // ---- Type: AnimTransition ----
 
 /// A directed state transition with a single condition.
-///
-/// # Fields
-/// - `from` — `String`. Source state name.
-/// - `to` — `String`. Target state name.
-/// - `condition` — [`TransitionCondition`].
 #[derive(Debug, Clone)]
 pub struct AnimTransition {
     /// Name of the source state.
@@ -100,10 +76,6 @@ pub struct AnimTransition {
 // ---- Type: AnimStateConfig ----
 
 /// Configuration for a single state in the state machine.
-///
-/// # Fields
-/// - `clip` — `String`. Animation clip name to play in this state.
-/// - `looping` — `bool`. Whether the clip loops.
 #[derive(Debug, Clone)]
 pub struct AnimStateConfig {
     /// Name of the animation clip to play for this state.
@@ -115,17 +87,6 @@ pub struct AnimStateConfig {
 // ---- Type: AnimStateMachine ----
 
 /// Parameter-driven finite-state machine for animation control.
-///
-/// Owns an [`Animation`] controller. On each [`update`](Self::update) call the
-/// machine advances the animation by `dt` seconds, then checks registered transitions
-/// to see if the current state should change.
-///
-/// # Fields
-/// - `states` — `HashMap<String, AnimStateConfig>`.
-/// - `transitions` — `Vec<AnimTransition>`.
-/// - `current` — `String`. Active state name.
-/// - `params` — `HashMap<String, AnimParamValue>`.
-/// - `animation` — [`Animation`].
 pub struct AnimStateMachine {
     /// All registered states.
     states: HashMap<String, AnimStateConfig>,
@@ -141,14 +102,7 @@ pub struct AnimStateMachine {
 
 impl AnimStateMachine {
     // ---- Implementation: AnimStateMachine ----
-    /// Creates a new state machine with an owned animation and a named initial state.
-    ///
-    /// # Parameters
-    /// - `animation` — [`Animation`]. Animation controller to drive.
-    /// - `initial` — `String`. Name of the starting state.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create a new state machine with an owned animation and a named initial state.
     pub fn new(animation: Animation, initial: String) -> Self {
         Self {
             states: HashMap::new(),
@@ -160,11 +114,6 @@ impl AnimStateMachine {
     }
 
     /// Registers a named state mapping to a clip.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. State name.
-    /// - `clip` — `&str`. Clip name in the owned animation.
-    /// - `looping` — `bool`. Whether the clip loops.
     pub fn add_state(&mut self, name: &str, clip: &str, looping: bool) {
         self.states.insert(
             name.to_string(),
@@ -175,16 +124,7 @@ impl AnimStateMachine {
         );
     }
 
-    /// Adds a transition rule by parsing a condition string.
-    ///
-    /// Condition format: `"param op value"` where:
-    /// - `op` is one of `>`, `<`, `>=`, `<=`, `==`, `!=`
-    /// - `value` is a number, `"true"`, or `"false"`
-    ///
-    /// # Parameters
-    /// - `from` — `&str`. Source state name.
-    /// - `to` — `&str`. Target state name.
-    /// - `condition_str` — `&str`. Condition string (e.g. `"speed > 0.1"`).
+    /// Add a transition rule by parsing a condition string.
     pub fn add_transition(&mut self, from: &str, to: &str, condition_str: &str) {
         match parse_condition(condition_str) {
             Ok(cond) => {
@@ -204,62 +144,36 @@ impl AnimStateMachine {
         }
     }
 
-    /// Sets a float parameter.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `f32`.
+    /// Set a float parameter.
     pub fn set_param_float(&mut self, name: &str, value: f32) {
         self.params
             .insert(name.to_string(), AnimParamValue::Float(value));
     }
 
-    /// Sets a boolean parameter.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `bool`.
+    /// Set a boolean parameter.
     pub fn set_param_bool(&mut self, name: &str, value: bool) {
         self.params
             .insert(name.to_string(), AnimParamValue::Bool(value));
     }
 
-    /// Sets an integer parameter.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    /// - `value` — `i32`.
+    /// Set an integer parameter.
     pub fn set_param_int(&mut self, name: &str, value: i32) {
         self.params
             .insert(name.to_string(), AnimParamValue::Int(value));
     }
 
-    /// Returns a reference to the current value of a named parameter.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Parameter name.
-    ///
-    /// # Returns
-    /// `Option<&AnimParamValue>`.
+    /// Return a reference to the current value of a named parameter.
     pub fn get_param(&self, name: &str) -> Option<&AnimParamValue> {
         self.params.get(name)
     }
 
     /// Advances the animation by `dt` seconds and evaluates transitions.
-    ///
-    /// If a transition condition is satisfied the machine switches to the target
-    /// state and starts the corresponding clip.
-    ///
-    /// # Parameters
-    /// - `dt` — `f32`. Delta time in seconds.
     pub fn update(&mut self, dt: f32) {
         self.animation.update(dt);
         self.check_transitions_chain();
     }
 
-    /// Checks transitions repeatedly so one tick can perform a short transition chain.
-    ///
-    /// A hop cap prevents infinite loops in cyclic transition graphs.
+    /// Check transitions repeatedly so one tick can perform a short transition chain.
     fn check_transitions_chain(&mut self) {
         let hop_limit = self.transitions.len().max(1);
         for _ in 0..hop_limit {
@@ -323,26 +237,17 @@ impl AnimStateMachine {
         }
     }
 
-    /// Returns the name of the currently active state.
-    ///
-    /// # Returns
-    /// `&str`.
+    /// Return the name of the currently active state.
     pub fn get_state(&self) -> &str {
         &self.current
     }
 
     /// Forces a transition to the named state, playing the associated clip.
-    ///
-    /// # Parameters
-    /// - `name` — `&str`. Target state name.
-    ///
-    /// # Returns
-    /// `bool` — `true` if the state exists and the transition succeeded.
     pub fn force_state(&mut self, name: &str) -> bool {
         if let Some(cfg) = self.states.get(name) {
             let clip = cfg.clip.clone();
             let looping = cfg.looping;
-            // Play the clip (ignore return — clip may not exist yet if lazy-loaded)
+            // Play the clip (ignore return â€” clip may not exist yet if lazy-loaded)
             let played = self.animation.play(&clip);
             if played {
                 // Re-apply looping flag
@@ -355,18 +260,12 @@ impl AnimStateMachine {
         }
     }
 
-    /// Returns an immutable reference to the owned animation.
-    ///
-    /// # Returns
-    /// `&Animation`.
+    /// Return an immutable reference to the owned animation.
     pub fn get_animation(&self) -> &Animation {
         &self.animation
     }
 
-    /// Returns a mutable reference to the owned animation.
-    ///
-    /// # Returns
-    /// `&mut Animation`.
+    /// Return a mutable reference to the owned animation.
     pub fn get_animation_mut(&mut self) -> &mut Animation {
         &mut self.animation
     }
@@ -386,15 +285,7 @@ pub fn compare_nums(lhs: f32, rhs: f32, op: &ConditionOp) -> bool {
     }
 }
 
-/// Parses a condition string such as `"speed > 0.1"` or `"jumping == true"`.
-///
-/// Multi-character operators (`>=`, `<=`, `!=`) are tried before single-character ones.
-///
-/// # Parameters
-/// - `s` — `&str`. Condition expression.
-///
-/// # Returns
-/// `Result<TransitionCondition, String>`.
+/// Parse a condition string such as `"speed > 0.1"` or `"jumping == true"`.
 pub fn parse_condition(s: &str) -> Result<TransitionCondition, String> {
     let s = s.trim();
 

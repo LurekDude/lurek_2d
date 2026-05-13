@@ -1,17 +1,8 @@
-//! Scope: Describe events emitted by animation playback updates.
-//! This file defines event variants and query helpers for event payloads.
-//! It owns the event contract produced by the animation controller.
+//! Describe events emitted by animation playback updates.
 
 // ---- Type: AnimEvent ----
 
 /// Events emitted by [`Animation::update`](crate::animation::Animation::update).
-///
-/// # Variants
-/// - `Finished` â€” Finished variant.
-/// - `FrameChanged` â€” FrameChanged variant.
-/// - `Looped` â€” Looped variant.
-///
-/// Retrieve pending events with [`Animation::drain_events`](crate::animation::Animation::drain_events).
 #[derive(Debug, Clone, PartialEq)]
 pub enum AnimEvent {
     /// A non-looping clip reached its final frame and stopped.
@@ -28,10 +19,7 @@ pub enum AnimEvent {
 
 impl AnimEvent {
     // ---- Implementation: AnimEvent ----
-    /// Returns the event type as a Lua-friendly string.
-    ///
-    /// # Returns
-    /// `&'static str`.
+    /// Return the event type as a Lua-friendly string.
     pub fn type_name(&self) -> &'static str {
         match self {
             Self::Finished => "finished",
@@ -40,10 +28,7 @@ impl AnimEvent {
         }
     }
 
-    /// Returns the frame index for `FrameChanged` events, or `None`.
-    ///
-    /// # Returns
-    /// `Option<usize>`.
+    /// Return the frame index for `FrameChanged` events, or `None`.
     pub fn frame_index(&self) -> Option<usize> {
         match self {
             Self::FrameChanged { frame_index } => Some(*frame_index),

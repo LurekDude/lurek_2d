@@ -1,6 +1,5 @@
-//! Scope: Error-screen presentation for runtime and Lua failures.
-//! This file defines ErrorScreen and helper functions for wrapping and formatting error text.
-//! It owns deterministic error text layout and render-command generation for fallback display.
+//! Fallback error screen display for unhandled failures.
+//! ErrorScreen: formats error and traceback into render commands for blue error display.
 
 use crate::render::renderer::{DrawMode, RenderCommand};
 use crate::runtime::error::EngineError;
@@ -24,13 +23,12 @@ const GLYPH_W: f32 = 8.0;
 /// Line height at scale 1.0 for the built-in bitmap font.
 const LINE_H: f32 = 14.0;
 
-/// Visual error screen that generates `RenderCommand` sequences for the GPU renderer.
-///
-/// Stores a pre-processed error title, message lines, and traceback so that
-/// `build_render_commands()` can emit a frame without any game assets loaded.
+/// Error screen with wrapped message and traceback display.
+/// Generates render commands for a blue error fallback screen.
 /// # Fields
-/// - `title` — See field documentation.
-/// - `message` — See field documentation.
+/// - `title` — Error heading.
+/// - `message_lines` — Wrapped message body.
+/// - `traceback_lines` — Stack trace lines (empty if none).
 pub struct ErrorScreen {
     /// Bold heading (first line of the error).
     title: String,
@@ -43,16 +41,7 @@ pub struct ErrorScreen {
 impl ErrorScreen {
     // ---- Implementation: ErrorScreen ----
 
-    /// Creates an `ErrorScreen` from a plain error message string.
-    ///
-    /// # Parameters
-    /// - `msg` — `&str`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// The first line becomes the title; remaining lines form the body.
-    /// Lines longer than `WRAP_WIDTH` are soft-wrapped.
+    /// Create error screen from plain error message; first line is title, rest is body.
     pub fn from_error(msg: &str) -> Self {
         let lines: Vec<&str> = msg.lines().collect();
         let title = lines.first().unwrap_or(&"Error").to_string();
@@ -69,16 +58,7 @@ impl ErrorScreen {
         }
     }
 
-    /// Creates an `ErrorScreen` from an `mlua::Error`.
-    ///
-    /// # Parameters
-    /// - `err` — `&mlua::Error`.
-    ///
-    /// # Returns
-    /// `Self`.
-    ///
-    /// Extracts the error message and any embedded traceback.
-    /// Provides a clear "what / where / why" structure.
+    /// Create error screen from mlua error; extract message and traceback.
     pub fn from_lua_error(err: &mlua::Error) -> Self {
         let full = format_lua_error(err);
         let (msg_part, tb_part) = split_traceback(&full);

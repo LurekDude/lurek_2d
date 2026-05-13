@@ -1,35 +1,20 @@
-//! Camera and viewport types for 2D rendering.
-//!
-//! This is a Tier 1 engine module. Imports only from `crate::math`.
-//!
-//! ## Subsystem inventory
-//! - [`camera`] — [`Camera`] and [`Camera2D`] transform types
-//! - [`viewport`] — [`Viewport`] virtual-resolution mapping with [`ScaleMode`]
-//! - [`viewport_scale`] — [`ViewportScale`] with automatic scaled-dimension tracking
-//!
-//! ## Architecture note (Tier 1)
-//! `camera` is a Tier 1 engine module. It was extracted from `src/graphics/` during the
-//! graphics-module-split session. `SharedState` holds a `Camera` field; see
-//! `work/graphics-module-split/reports/camera-decision.md` for the CPD-1 Option C rationale.
-//!
-//! ## Typical usage sequence
-//! 1. Construct a [`Camera`] or [`Camera2D`] via `new()`.
-//! 2. Call `view_matrix()` to obtain the transform applied to draw calls.
-//! 3. Use [`Viewport`] or [`ViewportScale`] to map the fixed game resolution onto the window.
+//! Group camera state, effect helpers, and viewport scaling primitives.
+//! Re-export the module surface used by runtime state and render command builders.
+//! Keep camera-domain logic independent from Lua binding code.
 
-/// Cinematic camera effects: zoom pulse, sway, and breathing.
+/// Define runtime camera effect states.
 pub mod effects;
-/// Multi-camera orchestration for split-screen, minimap, and picture-in-picture.
+/// Define multi-camera layout orchestration.
 pub mod multi;
-/// Camera path follower and smooth-zoom tween helpers for `LuaCamera2D`.
+/// Define camera-local path and zoom tweens.
 pub mod path;
-/// Render-command generation for camera transforms.
+/// Build render commands from camera transforms.
 pub mod render;
-/// Camera types: [`Camera`] (flat API) and [`Camera2D`] (smooth follow, shake, bounds).
+/// Define `Camera`, `Camera2D`, and follow easing types.
 pub mod types;
-/// Virtual-resolution viewport with letterbox / stretch / pixel-perfect scaling.
+/// Define fixed-resolution viewport mapping.
 pub mod viewport;
-/// Virtual-resolution viewport that also exposes scaled content dimensions for transform-stack integration.
+/// Define viewport mapping with cached scaled dimensions.
 pub mod viewport_scale;
 
 pub use effects::{CameraBreathing, CameraSway, ZoomPulse};
@@ -38,3 +23,4 @@ pub use path::{CameraPath, CameraTweenEasing, CameraZoomTween, ZoomTween};
 pub use types::{Camera, Camera2D, CameraFollowEasing};
 pub use viewport::{ScaleMode, Viewport};
 pub use viewport_scale::ViewportScale;
+

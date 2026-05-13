@@ -1,16 +1,17 @@
 //! Audio playback device enumeration (stub layer).
+//! Currently returns default device only; cross-platform device switching not yet implemented.
 
-/// Returns available playback device names.
+/// Return available playback device names.
 pub fn get_playback_devices() -> Vec<String> {
     vec!["Default".to_string()]
 }
 
-/// Returns the active playback device name.
+/// Return the active playback device name.
 pub fn get_playback_device() -> String {
     "Default".to_string()
 }
 
-/// Selects playback device by name.
+/// Select playback device by name; return error if not found.
 pub fn set_playback_device(name: &str) -> Result<(), crate::runtime::error::EngineError> {
     if get_playback_devices().iter().any(|d| d == name) {
         Ok(())

@@ -1,5 +1,5 @@
-//! Legacy audio source metadata and spatial state.
-//! SpatialState: 3D positioning; AudioSource: legacy handle (superseded by Mixer SlotMap).
+//! Audio source metadata and 3D spatial state.
+//! SpatialState: position, velocity, orientation for spatial audio; AudioSource: legacy handle.
 
 use crate::log_msg;
 use crate::runtime::log_messages::AS01;
@@ -25,7 +25,7 @@ impl Default for SpatialState {
     }
 }
 
-/// Legacy audio source handle (superseded by SlotMap-based mixer).
+/// Legacy audio source handle (superseded by Mixer SlotMap).
 pub struct AudioSource {
     /// Numeric ID (legacy, unused).
     pub id: usize,
@@ -38,7 +38,7 @@ pub struct AudioSource {
 }
 
 impl AudioSource {
-    /// Creates a new audio source with default volume (1.0), looping disabled.
+    /// Create new source with default volume (1.0) and no looping.
     pub fn new(id: usize, file_path: &str) -> Self {
         log_msg!(debug, AS01, "{}", file_path);
         AudioSource {

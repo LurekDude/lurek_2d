@@ -1,18 +1,12 @@
-//! Scope: Read-only byte-buffer windowing.
-//! This file defines the DataView type and typed read accessors.
-//! It owns bounds-checked, little-endian reads over shared buffers.
+//! Read-only views over shared byte buffers.
 
 use std::sync::Arc;
 
-/// A windowed, read-only view into a shared byte buffer.
+/// Bounds-checked read-only view over shared buffer.
 ///
 /// Uses `Arc<Vec<u8>>` for shared ownership so that multiple views can reference the
 /// same buffer without copying.
 ///
-/// # Fields
-/// - `data` — `Arc<Vec<u8>>`. The shared backing buffer.
-/// - `offset` — `usize`. The byte offset in `data` where this view starts.
-/// - `size` — `usize`. The number of bytes in this view.
 pub struct DataView {
     /// The underlying byte buffer (shared ownership).
     pub data: Arc<Vec<u8>>,
@@ -23,12 +17,9 @@ pub struct DataView {
 }
 
 impl DataView {
-    /// Creates a new view spanning the entire buffer.
+/// Create a new view spanning the entire buffer.
     ///
-    /// # Parameters
-    /// - `data` — `Arc<Vec<u8>>`. The backing buffer.
     ///
-    /// # Returns
     /// `Self`.
     pub fn new(data: Arc<Vec<u8>>) -> Self {
         let size = data.len();
@@ -38,17 +29,11 @@ impl DataView {
             size,
         }
     }
-
-    /// Creates a view starting at `offset` covering `size` bytes.
+/// Create a view starting at `offset` covering `size` bytes.
     ///
-    /// Returns an error if `offset + size` exceeds the buffer length.
+/// Return an error if `offset + size` exceeds the buffer length.
     ///
-    /// # Parameters
-    /// - `data` — `Arc<Vec<u8>>`. The backing buffer.
-    /// - `offset` — `usize`. Byte offset where the view starts.
-    /// - `size` — `usize`. Number of bytes in the view.
     ///
-    /// # Returns
     /// `Result<Self, String>`.
     pub fn new_slice(data: Arc<Vec<u8>>, offset: usize, size: usize) -> Result<Self, String> {
         if offset + size > data.len() {
@@ -61,71 +46,49 @@ impl DataView {
         }
         Ok(Self { data, offset, size })
     }
-
-    /// Returns the number of bytes in this view.
+/// Return the number of bytes in this view.
     ///
-    /// # Returns
     /// `usize`.
     pub fn get_size(&self) -> usize {
         self.size
     }
-
-    /// Reads a `u8` at `idx` relative to this view's start offset.
+/// Read a `u8` at `idx` relative to this view's start offset.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<u8, String>`.
     pub fn get_u8(&self, idx: usize) -> Result<u8, String> {
         self.check(idx, 1)?;
         Ok(self.data[self.offset + idx])
     }
-
-    /// Reads an `i8` at `idx`.
+/// Read an `i8` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<i8, String>`.
     pub fn get_i8(&self, idx: usize) -> Result<i8, String> {
         self.check(idx, 1)?;
         Ok(self.data[self.offset + idx] as i8)
     }
-
-    /// Reads a little-endian `u16` at `idx`.
+/// Read a little-endian `u16` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<u16, String>`.
     pub fn get_u16(&self, idx: usize) -> Result<u16, String> {
         self.check(idx, 2)?;
         let abs = self.offset + idx;
         Ok(u16::from_le_bytes([self.data[abs], self.data[abs + 1]]))
     }
-
-    /// Reads a little-endian `i16` at `idx`.
+/// Read a little-endian `i16` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<i16, String>`.
     pub fn get_i16(&self, idx: usize) -> Result<i16, String> {
         self.check(idx, 2)?;
         let abs = self.offset + idx;
         Ok(i16::from_le_bytes([self.data[abs], self.data[abs + 1]]))
     }
-
-    /// Reads a little-endian `u32` at `idx`.
+/// Read a little-endian `u32` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<u32, String>`.
     pub fn get_u32(&self, idx: usize) -> Result<u32, String> {
         self.check(idx, 4)?;
@@ -137,13 +100,9 @@ impl DataView {
             self.data[abs + 3],
         ]))
     }
-
-    /// Reads a little-endian `i32` at `idx`.
+/// Read a little-endian `i32` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<i32, String>`.
     pub fn get_i32(&self, idx: usize) -> Result<i32, String> {
         self.check(idx, 4)?;
@@ -155,13 +114,9 @@ impl DataView {
             self.data[abs + 3],
         ]))
     }
-
-    /// Reads a little-endian `f32` at `idx`.
+/// Read a little-endian `f32` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<f32, String>`.
     pub fn get_f32(&self, idx: usize) -> Result<f32, String> {
         self.check(idx, 4)?;
@@ -173,13 +128,9 @@ impl DataView {
             self.data[abs + 3],
         ]))
     }
-
-    /// Reads a little-endian `f64` at `idx`.
+/// Read a little-endian `f64` at `idx`.
     ///
-    /// # Parameters
-    /// - `idx` — `usize`. View-relative byte index.
     ///
-    /// # Returns
     /// `Result<f64, String>`.
     pub fn get_f64(&self, idx: usize) -> Result<f64, String> {
         self.check(idx, 8)?;
@@ -217,19 +168,14 @@ impl DataView {
 /// Keeps the domain type free of mlua method registration while exposing
 /// the same read-only accessor surface through the Lua bridge.
 ///
-/// # Fields
-/// - `inner` — `DataView`.
 pub struct LuaDataView {
     pub(crate) inner: DataView,
 }
 
 impl LuaDataView {
-    /// Creates a new `LuaDataView` wrapping the given `DataView`.
+/// Create a new `LuaDataView` wrapping the given `DataView`.
     ///
-    /// # Parameters
-    /// - `inner` — `DataView`.
     ///
-    /// # Returns
     /// `Self`.
     pub fn new(inner: DataView) -> Self {
         Self { inner }

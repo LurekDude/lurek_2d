@@ -1,13 +1,10 @@
-//! Scope: Contiguous byte buffer utilities.
-//! This file defines the ByteData type and byte/string conversion helpers.
-//! It owns mutable byte storage used by pack/unpack and compression APIs.
+//! Byte buffer wrapper `ByteData` for mutable data operations.
+//! Provides indexed reads/writes, UTF-8 conversion, and byte manipulation.
 
-/// Contiguous byte buffer for binary data manipulation.
+/// Byte buffer holding a contiguous `Vec<u8>` with indexing and string conversion.
 ///
 /// Wraps a `Vec<u8>` with indexed get/set operations and string conversion.
 ///
-/// # Fields
-/// - `data` — `Vec<u8>`.
 #[derive(Debug, Clone)]
 pub struct ByteData {
     data: Vec<u8>,
@@ -16,10 +13,7 @@ pub struct ByteData {
 impl ByteData {
     /// Create a zero-filled buffer of the given size.
     ///
-    /// # Parameters
-    /// - `size` — `usize`.
     ///
-    /// # Returns
     /// `Self`.
     pub fn new(size: usize) -> Self {
         Self {
@@ -29,10 +23,7 @@ impl ByteData {
 
     /// Create from an existing byte vector, taking ownership.
     ///
-    /// # Parameters
-    /// - `bytes` — `Vec<u8>`.
     ///
-    /// # Returns
     /// `Self`.
     pub fn from_bytes(bytes: Vec<u8>) -> Self {
         Self { data: bytes }
@@ -40,10 +31,7 @@ impl ByteData {
 
     /// Create from a UTF-8 string, copying the string’s bytes into the buffer.
     ///
-    /// # Parameters
-    /// - `s` — `&str`.
     ///
-    /// # Returns
     /// `Self`.
     pub fn from_string(s: &str) -> Self {
         Self {
@@ -53,7 +41,6 @@ impl ByteData {
 
     /// Get the size of the buffer in bytes.
     ///
-    /// # Returns
     /// `usize`.
     pub fn len(&self) -> usize {
         self.data.len()
@@ -61,7 +48,6 @@ impl ByteData {
 
     /// Check if the buffer contains zero bytes.
     ///
-    /// # Returns
     /// `bool`.
     pub fn is_empty(&self) -> bool {
         self.data.is_empty()
@@ -69,10 +55,7 @@ impl ByteData {
 
     /// Get a byte at the given offset (0-based).
     ///
-    /// # Parameters
-    /// - `offset` — `usize`.
     ///
-    /// # Returns
     /// `Option<u8>`.
     pub fn get_byte(&self, offset: usize) -> Option<u8> {
         self.data.get(offset).copied()
@@ -80,11 +63,7 @@ impl ByteData {
 
     /// Set a byte at the given offset (0-based). Returns false if out of bounds.
     ///
-    /// # Parameters
-    /// - `offset` — `usize`.
-    /// - `value` — `u8`.
     ///
-    /// # Returns
     /// `bool`.
     pub fn set_byte(&mut self, offset: usize, value: u8) -> bool {
         if offset < self.data.len() {
@@ -97,15 +76,12 @@ impl ByteData {
 
     /// Get the data as a lossy UTF-8 string.
     ///
-    /// # Returns
     /// `String`.
     pub fn get_string(&self) -> String {
         String::from_utf8_lossy(&self.data).to_string()
     }
-
-    /// Returns a reference to the raw byte slice.
+/// Return a reference to the raw byte slice.
     ///
-    /// # Returns
     /// `&[u8]`.
     pub fn as_bytes(&self) -> &[u8] {
         &self.data
@@ -113,7 +89,6 @@ impl ByteData {
 
     /// Get a mutable reference to the raw bytes.
     ///
-    /// # Returns
     /// `&mut [u8]`.
     pub fn as_bytes_mut(&mut self) -> &mut [u8] {
         &mut self.data
@@ -121,7 +96,6 @@ impl ByteData {
 
     /// Clones the internal byte buffer into a new standalone `ByteData` instance.
     ///
-    /// # Returns
     /// `Self`.
     pub fn clone_data(&self) -> Self {
         Self {

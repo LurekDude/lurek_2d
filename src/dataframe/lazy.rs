@@ -1,6 +1,4 @@
-//! Scope: Lazy query pipeline for deferred DataFrame operations.
-//! This file defines LazyQuery and the Step operation types.
-//! It owns query composition without materializing intermediate frames.
+//! Deferred query composition.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 

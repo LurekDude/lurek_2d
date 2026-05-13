@@ -1,6 +1,4 @@
-﻿//! Scope: tabular Q-learning runtime for discrete-state action policies.
-//! This file defines Q-table storage, epsilon-greedy action choice, Bellman updates, and episode decay controls.
-//! It owns lightweight serialisation/deserialisation helpers for saving and restoring learned state snapshots.
+//! tabular Q-learning runtime for discrete-state action policies.
 /// Tabular epsilon-greedy Q-learner for discrete-state reinforcement learning.
 pub struct QLearner {
     /// Number of discrete states.
@@ -22,7 +20,7 @@ pub struct QLearner {
 }
 
 impl QLearner {
-    /// Creates a new Q-learner with zero-initialized Q-values.
+    /// Create a new Q-learner with zero-initialized Q-values.
     pub fn new(state_count: usize, action_count: usize) -> Self {
         Self {
             state_count,
@@ -48,7 +46,7 @@ impl QLearner {
         }
     }
 
-    /// Returns the greedy-best action (highest Q-value) for the given state.
+    /// Return the greedy-best action (highest Q-value) for the given state.
     pub fn best_action(&self, state: usize) -> usize {
         if state >= self.state_count {
             return 0;
@@ -86,7 +84,7 @@ impl QLearner {
         self.episode_count += 1;
     }
 
-    /// Returns the Q-value for a (state, action) pair, or 0.0 if out of range.
+    /// Return the Q-value for a (state, action) pair, or 0.0 if out of range.
     pub fn get_q(&self, state: usize, action: usize) -> f64 {
         if state >= self.state_count || action >= self.action_count {
             return 0.0;

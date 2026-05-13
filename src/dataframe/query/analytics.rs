@@ -1,6 +1,4 @@
-//! Scope: Statistical analysis and normalization for numeric data.
-//! This file defines normalise, outlier detection, mode, entropy, and percentile helpers.
-//! It owns percentile interpolation, z-score normalization, and distribution stats.
+//! Statistical helpers: percentile, normalization, outliers.
 
 use crate::dataframe::frame::{CellValue, ColRef, DataFrame};
 

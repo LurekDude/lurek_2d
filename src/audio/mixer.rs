@@ -1,5 +1,5 @@
-//! Core audio mixer: source management, playback control, effects, spatial audio.
-//! Mixer: central registry of loaded sounds, active sinks, buses, queueable sources.
+//! Sound mixer: registry, playback control, bus routing, effect chains.
+//! Mixer: holds SlotMap of sources, manages playback state and spatial audio.
 
 use std::collections::VecDeque;
 use std::io::BufReader;
@@ -21,7 +21,7 @@ use crate::runtime::resource_keys::BusKey;
 use crate::runtime::resource_keys::QueueableKey;
 use crate::runtime::resource_keys::SoundKey;
 
-/// Audio source type: memory-decoded or streamed from disk.
+/// Audio source type: memory-decoded or streamed.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SourceType {
     /// Decoded to memory buffer - low latency, higher memory.
@@ -30,7 +30,7 @@ pub enum SourceType {
     Stream,
 }
 
-/// Audio playback state.
+/// Audio playback state: stopped, playing, or paused.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum PlayState {
     /// Not playing, at beginning.
@@ -64,7 +64,7 @@ struct AudioEntry {
     pub peak: f32,
 }
 
-/// Queueable PCM source: game code pushes buffers via `queue_buffer`.
+/// PCM buffer source for push-driven playback via game code buffers.
 pub struct QueueableSource {
     /// Sample rate in Hz.
     pub sample_rate: u32,
@@ -81,7 +81,7 @@ pub struct QueueableSource {
 }
 
 impl QueueableSource {
-    /// Creates a new queueable source with all buffer slots free.
+    /// Create new queueable source with all buffer slots free.
     pub fn new(sample_rate: u32, bit_depth: u8, channels: u8, buffer_count: usize) -> Self {
         QueueableSource {
             sample_rate,
@@ -93,7 +93,7 @@ impl QueueableSource {
         }
     }
 
-    /// Pushes an f32 PCM buffer. Returns `Err` if no free slots.
+    /// Queue an f32 PCM buffer; return error if no free slots.
     pub fn queue_buffer(&mut self, data: &[f32]) -> Result<(), EngineError> {
         if self.free_buffers == 0 {
             return Err(EngineError::AudioError(

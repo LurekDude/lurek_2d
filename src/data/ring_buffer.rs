@@ -1,16 +1,10 @@
-//! Scope: Fixed-capacity circular ring storage.
-//! This file defines the RingBuffer type and FIFO buffer operations.
-//! It owns overwrite-on-full behavior and oldest-first iteration order.
+//! Fixed-capacity FIFO ring: oldest-first iteration, overwrites on full.
 
-// ---- Type: RingBuffer ----
-
-/// A fixed-capacity circular ring buffer.
+/// Fixed-capacity circular buffer with clone elements.
 ///
 /// When the buffer is full and a new value is pushed, the oldest element is
-/// silently overwritten.  All operations are O(1).
+/// silently overwritten.
 ///
-/// # Type Parameters
-/// - `T` — Element type; must implement `Clone`.
 pub struct RingBuffer<T: Clone> {
     /// Backing storage for ring slots.
     data: Vec<Option<T>>,
@@ -25,12 +19,10 @@ pub struct RingBuffer<T: Clone> {
 // ---- Implementation: RingBuffer ----
 
 impl<T: Clone> RingBuffer<T> {
-    /// Creates a new ring buffer with the given capacity.
+/// Create a new ring buffer with the given capacity.
     ///
     /// If `capacity` is 0 it is silently clamped to 1.
     ///
-    /// # Parameters
-    /// - `capacity` — Maximum number of elements the buffer can hold.
     pub fn new(capacity: usize) -> Self {
         let cap = capacity.max(1);
         let data = vec![None; cap];
@@ -44,12 +36,10 @@ impl<T: Clone> RingBuffer<T> {
 
     /// Pushes `value` onto the buffer.
     ///
-    /// Returns `true` if there was space available (no overwrite occurred).
-    /// Returns `false` when the buffer was full and the oldest element was
+/// Return `true` if there was space available (no overwrite occurred).
+/// Return `false` when the buffer was full and the oldest element was
     /// replaced.
     ///
-    /// # Parameters
-    /// - `value` — The element to push.
     pub fn push(&mut self, value: T) -> bool {
         let had_space = self.len < self.capacity;
         if had_space {
@@ -68,7 +58,7 @@ impl<T: Clone> RingBuffer<T> {
 
     /// Removes and returns the oldest element (FIFO order).
     ///
-    /// Returns `None` if the buffer is empty.
+/// Return `None` if the buffer is empty.
     pub fn pop(&mut self) -> Option<T> {
         if self.len == 0 {
             return None;
@@ -78,10 +68,9 @@ impl<T: Clone> RingBuffer<T> {
         self.len -= 1;
         val
     }
-
-    /// Returns a reference to the oldest element without removing it.
+/// Return a reference to the oldest element without removing it.
     ///
-    /// Returns `None` if the buffer is empty.
+/// Return `None` if the buffer is empty.
     pub fn peek(&self) -> Option<&T> {
         if self.len == 0 {
             None
@@ -89,10 +78,9 @@ impl<T: Clone> RingBuffer<T> {
             self.data[self.head].as_ref()
         }
     }
-
-    /// Returns a reference to the newest element without removing it.
+/// Return a reference to the newest element without removing it.
     ///
-    /// Returns `None` if the buffer is empty.
+/// Return `None` if the buffer is empty.
     pub fn peek_newest(&self) -> Option<&T> {
         if self.len == 0 {
             None
@@ -101,14 +89,11 @@ impl<T: Clone> RingBuffer<T> {
             self.data[newest].as_ref()
         }
     }
-
-    /// Returns a reference to the element at the given logical index.
+/// Return a reference to the element at the given logical index.
     ///
     /// Index 0 refers to the oldest element; `len - 1` refers to the newest.
-    /// Returns `None` if `index` is out of bounds.
+/// Return `None` if `index` is out of bounds.
     ///
-    /// # Parameters
-    /// - `index` — 0-based logical index (0 = oldest).
     pub fn get(&self, index: usize) -> Option<&T> {
         if index >= self.len {
             None
@@ -117,23 +102,19 @@ impl<T: Clone> RingBuffer<T> {
             self.data[physical].as_ref()
         }
     }
-
-    /// Returns the maximum number of elements the buffer can hold.
+/// Return the maximum number of elements the buffer can hold.
     pub fn capacity(&self) -> usize {
         self.capacity
     }
-
-    /// Returns the number of elements currently stored.
+/// Return the number of elements currently stored.
     pub fn len(&self) -> usize {
         self.len
     }
-
-    /// Returns `true` if the buffer contains no elements.
+/// Return `true` if the buffer contains no elements.
     pub fn is_empty(&self) -> bool {
         self.len == 0
     }
-
-    /// Returns `true` if the buffer has reached its capacity.
+/// Return `true` if the buffer has reached its capacity.
     pub fn is_full(&self) -> bool {
         self.len == self.capacity
     }
@@ -146,13 +127,11 @@ impl<T: Clone> RingBuffer<T> {
         self.head = 0;
         self.len = 0;
     }
-
-    /// Returns an iterator over borrowed references to elements, oldest-first.
+/// Return an iterator over borrowed references to elements, oldest-first.
     ///
     /// This is more efficient than [`Self::to_vec`] for large element types
     /// because it avoids cloning. Use this when you only need to inspect elements.
     ///
-    /// # Example
     /// ```no_run
     /// let rb: RingBuffer<i32> = RingBuffer::new(5);
     /// for elem in rb.iter() {
@@ -166,15 +145,11 @@ impl<T: Clone> RingBuffer<T> {
             self.data[physical].as_ref().unwrap()
         })
     }
-
-    /// Returns all elements as a `Vec`, ordered oldest-first.
+/// Return all elements as a `Vec`, ordered oldest-first.
     ///
     /// **Warning:** This method clones every element. For large element types,
     /// prefer [`Self::iter`] to avoid unnecessary cloning.
     ///
-    /// # Performance Note
-    /// - If `T` implements `Copy`, consider using a slice method instead if possible.
-    /// - For non-Copy types, collect references via `iter()` and clone selectively.
     pub fn to_vec(&self) -> Vec<T> {
         (0..self.len)
             .map(|i| {

@@ -1,6 +1,4 @@
-﻿//! Scope: Monte Carlo Tree Search runtime and configuration primitives.
-//! This file defines tree nodes, UCT selection, rollout accounting, and budget controls for search iterations.
-//! It owns action value estimation loops used by turn-based or lookahead decision problems in AI modules.
+//! Monte Carlo Tree Search runtime and configuration primitives.
 // ---- Type: MCTSConfig ----
 
 /// Configuration for the MCTS engine.
@@ -61,7 +59,7 @@ impl MCTSNode {
         q + u
     }
 
-    /// Returns `true` if all child actions have been tried.
+    /// Return `true` if all child actions have been tried.
     fn is_fully_expanded(&self) -> bool {
         self.untried_actions.is_empty()
     }
@@ -78,7 +76,7 @@ pub struct MCTSEngine {
 }
 
 impl MCTSEngine {
-    /// Creates a new MCTS engine with the given configuration.
+    /// Create a new MCTS engine with the given configuration.
     pub fn new(config: MCTSConfig) -> Self {
         let rng = config.seed;
         Self {
@@ -88,7 +86,7 @@ impl MCTSEngine {
         }
     }
 
-    /// Returns a reference to the current configuration.
+    /// Return a reference to the current configuration.
     pub fn config(&self) -> &MCTSConfig {
         &self.config
     }

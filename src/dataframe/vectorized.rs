@@ -1,6 +1,4 @@
-//! Scope: Vectorized columnar storage and SIMD-friendly bulk operations.
-//! This file defines ColumnStore, VecFrame, BinaryOp, and scalar/reduce operations.
-//! It owns dense typed buffers, validity masks, and parallel numeric transforms.
+//! Typed columnar storage with SIMD-friendly buffers.
 
 use std::collections::HashMap;
 
@@ -319,8 +317,6 @@ impl CmpOp {
 /// Typed-column vectorized DataFrame.
 /// Each column is a [`ColumnStore`] — a dense typed `Vec` with an optional
 /// null bitmap.  This layout enables:
-/// - Auto-vectorization (SIMD) by the compiler for `f64` / `i64` arithmetic.
-/// - Parallel multi-column operations via `rayon`.
 /// Conversion helpers `VecFrame::from_dataframe` and `VecFrame::to_dataframe`
 /// bridge between the flexible `CellValue`-based API and this fast numeric layer.
 #[derive(Debug, Clone)]

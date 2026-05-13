@@ -1,6 +1,4 @@
-//! Scope: Evaluate keyframe curves and multi-property timelines for animation.
-//! This file defines easing kinds, single-property curves, and shared timelines.
-//! It owns interpolation behavior and keyframe ordering rules.
+//! Evaluate keyframe curves and multi-property timelines for animation.
 
 use std::collections::HashMap;
 
@@ -11,7 +9,7 @@ use crate::math::easing;
 /// Interpolation mode applied between each pair of consecutive keyframes.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum EasingKind {
-    /// Constant hold â€” output equals the value of the preceding keyframe.
+    /// Constant hold Ă˘â‚¬â€ť output equals the value of the preceding keyframe.
     Step,
     /// Linear interpolation.
     Linear,
@@ -29,12 +27,6 @@ pub enum EasingKind {
 // ---- Type: AnimCurve ----
 
 /// A keyframe-based animation curve.
-///
-/// Each `keyframe` entry is a `(time: f32, value: f32)` pair.  Keyframes must
-/// be kept in ascending time order â€” [`AnimCurve::add_keyframe`] inserts them
-/// in sorted position automatically.  [`AnimCurve::eval`] evaluates the curve
-/// at any time by locating the surrounding pair and applying the chosen
-/// [`EasingKind`].
 #[derive(Debug, Clone)]
 pub struct AnimCurve {
     /// Sorted (time, value) keyframe pairs.
@@ -45,10 +37,7 @@ pub struct AnimCurve {
 
 impl AnimCurve {
     // ---- Implementation: AnimCurve ----
-    /// Creates an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create an empty `AnimCurve` with [`EasingKind::Linear`] interpolation.
     pub fn new() -> Self {
         Self {
             keyframes: Vec::new(),
@@ -56,13 +45,7 @@ impl AnimCurve {
         }
     }
 
-    /// Creates an empty `AnimCurve` with the given easing kind.
-    ///
-    /// # Parameters
-    /// - `easing` â€” [`EasingKind`].
-    ///
-    /// # Returns
-    /// `Self`.
+    /// Create an empty `AnimCurve` with the given easing kind.
     pub fn with_easing(easing: EasingKind) -> Self {
         Self {
             keyframes: Vec::new(),
@@ -70,13 +53,7 @@ impl AnimCurve {
         }
     }
 
-    /// Adds a keyframe, keeping the internal list sorted by time.
-    ///
-    /// If a keyframe at the exact same time already exists it is replaced.
-    ///
-    /// # Parameters
-    /// - `time` â€” `f32`.
-    /// - `value` â€” `f32`.
+    /// Add a keyframe, keeping the internal list sorted by time.
     pub fn add_keyframe(&mut self, time: f32, value: f32) {
         match self
             .keyframes
@@ -87,28 +64,17 @@ impl AnimCurve {
         }
     }
 
-    /// Returns the number of keyframes.
+    /// Return the number of keyframes.
     pub fn keyframe_count(&self) -> usize {
         self.keyframes.len()
     }
 
-    /// Removes all keyframes.
+    /// Remove all keyframes.
     pub fn clear(&mut self) {
         self.keyframes.clear();
     }
 
     /// Evaluates the curve at the given time.
-    ///
-    /// - Returns `0.0` if there are no keyframes.
-    /// - Returns the first keyframe value if `t` precedes all keyframes.
-    /// - Returns the last keyframe value if `t` follows all keyframes.
-    /// - Interpolates between the surrounding pair otherwise.
-    ///
-    /// # Parameters
-    /// - `t` â€” evaluation time in the same units as the keyframes.
-    ///
-    /// # Returns
-    /// `f32` â€” interpolated value.
     pub fn eval(&self, t: f32) -> f32 {
         match self.keyframes.len() {
             0 => 0.0,
@@ -164,7 +130,7 @@ pub struct AnimPropertyTimeline {
 
 impl AnimPropertyTimeline {
     // ---- Implementation: AnimPropertyTimeline ----
-    /// Creates an empty property timeline with linear easing.
+    /// Create an empty property timeline with linear easing.
     pub fn new() -> Self {
         Self {
             times: Vec::new(),
@@ -173,9 +139,7 @@ impl AnimPropertyTimeline {
         }
     }
 
-    /// Adds a keyframe for one or more named properties at the same time.
-    ///
-    /// Properties not provided in this keyframe keep their previous value.
+    /// Add a keyframe for one or more named properties at the same time.
     pub fn add_keyframe<I, S>(&mut self, time: f32, props: I)
     where
         I: IntoIterator<Item = (S, f32)>,
@@ -215,7 +179,7 @@ impl AnimPropertyTimeline {
         }
     }
 
-    /// Returns all property names tracked by this timeline.
+    /// Return all property names tracked by this timeline.
     pub fn property_names(&self) -> Vec<String> {
         self.values.keys().cloned().collect()
     }

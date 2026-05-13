@@ -1,6 +1,4 @@
-//! Scope: Serialization and deserialization of DataFrames in multiple formats.
-//! This file defines CSV, JSON, and LVDF binary I/O helpers.
-//! It owns format parsing, type inference, field quoting, and round-trip preservation.
+//! CSV and JSON serialization for DataFrames.
 
 use crate::dataframe::frame::{CellValue, DataFrame};
 

@@ -1,6 +1,4 @@
-﻿//! Scope: needs and drive simulation for motivation-based decisions.
-//! This file defines need values, decay/recovery, and utility-facing summaries used by behavior prioritization.
-//! It owns deterministic need updates that feed dialogue, strategy, utility AI, and planner preconditions.
+//! needs and drive simulation for motivation-based decisions.
 
 // ---- Type: Need ----
 
@@ -23,7 +21,7 @@ pub struct Need {
 // ---- Implementation: Need ----
 
 impl Need {
-    /// Creates a new need with full satisfaction and the given parameters.
+    /// Create a new need with full satisfaction and the given parameters.
     pub fn new(name: &str, decay_rate: f32, urgency_threshold: f32, urgency_factor: f32) -> Self {
         Self {
             name: name.to_string(),
@@ -35,12 +33,12 @@ impl Need {
         }
     }
 
-    /// Returns `true` when this need's value is below `urgency_threshold`.
+    /// Return `true` when this need's value is below `urgency_threshold`.
     pub fn is_urgent(&self) -> bool {
         self.enabled && self.value < self.urgency_threshold
     }
 
-    /// Returns the urgency score: `urgency_factor * (1.0 - value)`, or `0.0` if this need is disabled.
+    /// Return the urgency score: `urgency_factor * (1.0 - value)`, or `0.0` if this need is disabled.
     pub fn urgency_score(&self) -> f32 {
         if !self.enabled {
             return 0.0;
@@ -48,7 +46,7 @@ impl Need {
         self.urgency_factor * (1.0 - self.value)
     }
 
-    /// Adds `amount` to the current need value, clamped to `[0.0, 1.0]`.
+    /// Add `amount` to the current need value, clamped to `[0.0, 1.0]`.
     pub fn satisfy(&mut self, amount: f32) {
         self.value = (self.value + amount).clamp(0.0, 1.0);
     }
@@ -87,7 +85,7 @@ pub struct NeedAdvertisement {
 // ---- Implementation: NeedAdvertisement ----
 
 impl NeedAdvertisement {
-    /// Creates a new need advertisement with no cooldown.
+    /// Create a new need advertisement with no cooldown.
     pub fn new(need_name: &str, satisfaction: f32, x: f32, y: f32, advertiser_name: &str) -> Self {
         Self {
             need_name: need_name.to_string(),
@@ -99,7 +97,7 @@ impl NeedAdvertisement {
         }
     }
 
-    /// Returns `true` if the advertisement is currently available (no cooldown remaining).
+    /// Return `true` if the advertisement is currently available (no cooldown remaining).
     pub fn is_available(&self) -> bool {
         self.remaining_cooldown <= 0.0
     }
@@ -139,12 +137,12 @@ pub struct NeedSystem {
 }
 
 impl NeedSystem {
-    /// Creates an empty need system.
+    /// Create an empty need system.
     pub fn new() -> Self {
         Self::default()
     }
 
-    /// Adds a need to this system. Overwrites any existing need with the same name.
+    /// Add a need to this system. Overwrites any existing need with the same name.
     pub fn add_need(&mut self, need: Need) {
         if let Some(existing) = self.needs.iter_mut().find(|n| n.name == need.name) {
             *existing = need;
@@ -153,12 +151,12 @@ impl NeedSystem {
         }
     }
 
-    /// Returns a reference to the need with the given name, or `None`.
+    /// Return a reference to the need with the given name, or `None`.
     pub fn get(&self, name: &str) -> Option<&Need> {
         self.needs.iter().find(|n| n.name == name)
     }
 
-    /// Returns a mutable reference to the need with the given name, or `None`.
+    /// Return a mutable reference to the need with the given name, or `None`.
     pub fn get_mut(&mut self, name: &str) -> Option<&mut Need> {
         self.needs.iter_mut().find(|n| n.name == name)
     }
@@ -170,7 +168,7 @@ impl NeedSystem {
         }
     }
 
-    /// Returns the name of the most urgent need (highest `urgency_score`).
+    /// Return the name of the most urgent need (highest `urgency_score`).
     pub fn most_urgent(&self) -> Option<&str> {
         self.needs
             .iter()
@@ -186,12 +184,12 @@ impl NeedSystem {
         }
     }
 
-    /// Returns a list of all need names in this system.
+    /// Return a list of all need names in this system.
     pub fn need_names(&self) -> Vec<&str> {
         self.needs.iter().map(|n| n.name.as_str()).collect()
     }
 
-    /// Returns the satisfaction value for a named need, or `1.0` if not found.
+    /// Return the satisfaction value for a named need, or `1.0` if not found.
     pub fn value_of(&self, name: &str) -> f32 {
         self.get(name).map(|n| n.value).unwrap_or(1.0)
     }

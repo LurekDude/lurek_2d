@@ -1,4 +1,5 @@
 //! Audio visualization: waveform and spectrogram PNG rendering.
+//! Renders mono amplitude envelope or frequency spectrum to PNG images.
 
 use std::{fs::File, io::BufReader};
 
@@ -22,7 +23,7 @@ fn ensure_parent_dir(path: &str) -> Result<(), String> {
 }
 
 
-/// Renders amplitude waveform to PNG: dark navy background, cyan waveform bars.
+/// Render amplitude waveform to PNG: dark navy background, cyan waveform bars.
 pub fn waveform_to_png(
     input_wav: &str,
     output_png: &str,

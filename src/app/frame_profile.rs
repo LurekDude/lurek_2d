@@ -1,6 +1,5 @@
-//! Scope: Frame-profile text formatting for app diagnostics.
-//! This file defines helpers that convert runtime profile values into compact strings.
-//! It owns stable formatting of app tick/update/render timing summaries.
+//! Frame timing statistics compact formatting.
+//! Formats app tick, update, render, and callback durations as single-line text.
 
 use crate::runtime::FrameProfile;
 

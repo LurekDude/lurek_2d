@@ -1,25 +1,8 @@
-//! Scope: Binary pack format serialization and parsing.
-//! This file defines BinValue, Token, and the pack/read/write helpers.
-//! It owns named-token format parsing and byte-order handling for packed data.
+//! Binary pack format using tokens: u8, i16, f32, str, cstr, pad.
 
 use crate::data::byte_data::ByteData;
 
-/// A Lurek2D serializable binary value.
-///
-/// # Variants
-/// - `U8` — Unsigned 8-bit integer.
-/// - `U16` — Unsigned 16-bit integer.
-/// - `U32` — Unsigned 32-bit integer.
-/// - `U64` — Unsigned 64-bit integer.
-/// - `I8` — Signed 8-bit integer.
-/// - `I16` — Signed 16-bit integer.
-/// - `I32` — Signed 32-bit integer.
-/// - `I64` — Signed 64-bit integer.
-/// - `F32` — 32-bit float.
-/// - `F64` — 64-bit float.
-/// - `Bool` — Boolean.
-/// - `Str` — UTF-8 string.
-/// - `Bytes` — Raw byte vector.
+/// Packable value: enum of all types.
 #[derive(Debug, Clone)]
 pub enum BinValue {
     /// Unsigned 8-bit integer.
@@ -78,10 +61,7 @@ enum Endian {
 
 /// Parse a Lurek2D binary format string into an endianness and a token list.
 ///
-/// # Parameters
-/// - `fmt` — `&str`. Space-separated format token string.
 ///
-/// # Returns
 /// `Result<(Endian, Vec<Token>), String>`.
 fn parse_format(fmt: &str) -> Result<(Endian, Vec<Token>), String> {
     let mut endian = Endian::Little;
@@ -112,11 +92,7 @@ fn parse_format(fmt: &str) -> Result<(Endian, Vec<Token>), String> {
 
 /// Write values into a binary buffer according to a Lurek2D format string.
 ///
-/// # Parameters
-/// - `format` — `&str`. Space-separated format token string (e.g. `"u32 f32 str"`).
-/// - `values` — `&[BinValue]`. Values to write, one per non-`pad` token in order.
 ///
-/// # Returns
 /// `Result<ByteData, String>`.
 pub fn write(format: &str, values: &[BinValue]) -> Result<ByteData, String> {
     let (endian, tokens) = parse_format(format)?;
@@ -247,12 +223,7 @@ pub fn write(format: &str, values: &[BinValue]) -> Result<ByteData, String> {
 
 /// Read values from a binary buffer according to a Lurek2D format string.
 ///
-/// # Parameters
-/// - `format` — `&str`. Space-separated format token string.
-/// - `data` — `&[u8]`. Source byte buffer.
-/// - `offset` — `usize`. Starting byte offset (0-based).
 ///
-/// # Returns
 /// `Result<(Vec<BinValue>, usize), String>` — decoded values and next byte position.
 pub fn read(format: &str, data: &[u8], offset: usize) -> Result<(Vec<BinValue>, usize), String> {
     let (endian, tokens) = parse_format(format)?;
@@ -404,13 +375,10 @@ pub fn read(format: &str, data: &[u8], offset: usize) -> Result<(Vec<BinValue>, 
 
 /// Compute the total byte size that `write` would produce for the given format string.
 ///
-/// Returns an error if the format contains `str` or `cstr` tokens since their
+/// Return an error if the format contains `str` or `cstr` tokens since their
 /// encoded size depends on the string content.
 ///
-/// # Parameters
-/// - `format` — `&str`. Space-separated format token string.
 ///
-/// # Returns
 /// `Result<usize, String>`.
 pub fn measure_size(format: &str) -> Result<usize, String> {
     let (_endian, tokens) = parse_format(format)?;

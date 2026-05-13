@@ -1,31 +1,18 @@
-//! Application lifecycle: game loop, window management, and diagnostics.
-//!
-//! This module owns the [`App`] struct that drives the winit event loop, fires Lua
-//! callbacks, and coordinates rendering. It also provides the debug overlay and error screen.
-//!
-//! # Module group
-//!
-//! `Edge/Integration` — sits at the top of the dependency graph. Nothing in the
-//! engine imports from `app`; it orchestrates every other subsystem.
-//!
-//! # Key types
-//!
-//! - [`App`] — public entry point: call [`App::run()`] to start the engine.
-//! - [`DebugOverlay`] — lightweight FPS / draw-call counter (toggled via F12).
-//! - [`ErrorScreen`] — structured blue error screen for Lua and engine failures.
+//! Engine entry point: window, event loop, Lua callbacks, and frame rendering.
+//! Coordinates subsystems via [`App::run()`]; only module at top of dependency graph.
 
-/// Entry point for the Lurek2D engine lifecycle and game loop.
+/// Application state and main loop orchestration.
 #[allow(clippy::module_inception)]
 pub mod app;
-/// Frame profile formatting helpers used by runtime APIs and overlays.
+/// Frame timing statistics formatting.
 pub mod frame_profile;
-/// Lua callback wrappers with optional timeout enforcement.
+/// Lua callback invocation with timeout control.
 pub mod lua_callbacks;
-/// Splash screen asset loading and draw command generation.
+/// Splash-screen branding asset loading and rendering.
 pub mod splash_screen;
-/// Debug overlay for FPS and draw-call statistics.
+/// Frame rate and draw-call diagnostic overlay.
 pub mod debug_overlay;
-/// Visual error screen for Lua and engine errors.
+/// Fallback error display for runtime and Lua failures.
 pub mod error_screen;
 
 pub use app::App;

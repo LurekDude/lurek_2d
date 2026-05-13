@@ -1,6 +1,4 @@
-﻿//! Scope: squad grouping, membership, and formation offset helpers.
-//! This file defines squad-level metadata and geometric utilities for multi-agent coordinated movement.
-//! It owns local formation layout calculations consumed by steering and tactical behavior layers.
+//! squad grouping, membership, and formation offset helpers.
 use crate::ai::blackboard::Blackboard;
 
 /// Formation shapes for squad positioning.
@@ -19,7 +17,7 @@ pub enum FormationType {
 }
 
 impl FormationType {
-    /// Parses a Lua string into a `FormationType`. Unrecognised strings default to `None`.
+    /// Parse a Lua string into a `FormationType`. Unrecognised strings default to `None`.
     pub fn parse_str(s: &str) -> Self {
         match s {
             "line" => Self::Line,
@@ -30,7 +28,7 @@ impl FormationType {
         }
     }
 
-    /// Returns the canonical lowercase Lua string for this formation type.
+    /// Return the canonical lowercase Lua string for this formation type.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::None => "none",
@@ -59,7 +57,7 @@ pub struct Squad {
 }
 
 impl Squad {
-    /// Creates a new squad with no members, no leader, and default formation spacing of 30 world units.
+    /// Create a new squad with no members, no leader, and default formation spacing of 30 world units.
     pub fn new(name: &str) -> Self {
         Self {
             name: name.to_string(),
